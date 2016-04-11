@@ -1,0 +1,778 @@
+                    <!-- BEGIN PAGE BAR -->
+                    <div class="page-bar">
+                        <div class="page-toolbar">
+                            
+                            <div id="dashboard-report-range" class="pull-right  btn btn-sm" data-container="body" data-placement="bottom" data-original-title="Change dashboard date range">
+                                DATE RANGE&nbsp;&nbsp;&nbsp;&nbsp;<i class="icon-calendar"></i>&nbsp;
+                                <span class="thin uppercase hidden-xs"></span>&nbsp;
+                                <i class="fa fa-angle-down"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- END PAGE BAR -->
+                    <!-- BEGIN PAGE TITLE-->
+                    <h3 class="page-title">Dashboard</h3>
+                    <!-- END PAGE TITLE-->
+                    <!-- END PAGE HEADER-->
+                    <div class="row">
+                        <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                            <div class="dashboard-stat2 ">
+                                <div class="display">
+                                    <div class="number">
+                                        <h3 class="font-purple-soft">
+                                            <span data-counter="counterup" data-value="76"></span>
+                                        </h3>
+                                        <small class="font-purple-soft">SAMPLES WAITING</small><br>
+                                        <small class="font-purple-soft">27 Mar 2016</small>
+                                    </div>
+                                    <div class="icon">
+                                        <i class="icon-pie-chart"></i>
+                                    </div>
+                                </div>
+                                <canvas id="samplesWaitingChart" width="210" height="150"></canvas>
+                            </div>
+                        </div>                        
+                        <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                            <div class="dashboard-stat2 ">
+                                <div class="display">
+                                    <div class="number">
+                                        <h3 class="font-green-sharp">
+                                            <span data-counter="counterup" data-value="20">0</span>
+                                        </h3>
+                                        <small class="font-green-sharp">SAMPLES RECEIVED</small><br>
+                                        <small class="font-green-sharp">27 Mar 2016</small>
+                                    </div>
+                                    <div class="icon">
+                                        <i class="icon-pie-chart"></i>
+                                    </div>
+                                </div>
+                                <canvas id="samplesReceivedChart" width="210" height="150"></canvas>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                            <div class="dashboard-stat2 ">
+                                <div class="display">
+                                    <div class="number">
+                                        <h3 class="font-red-haze">
+                                            <span data-counter="counterup" data-value="49">0</span>
+                                        </h3>
+                                        <small class="font-red-haze">SAMPLES TESTED</small><br>
+                                        <small class="font-red-haze">27 Mar 2016</small>
+                                    </div>
+                                    <div class="icon">
+                                        <i class="icon-pie-chart"></i>
+                                    </div>
+                                </div>
+                                <canvas id="samplesTestedChart" width="210" height="150"></canvas>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                            <div class="dashboard-stat2 ">
+                                <div class="display">
+                                    <div class="number">
+                                        <h3 class="font-blue-sharp">
+                                            <span data-counter="counterup" data-value="57"></span>
+                                        </h3>
+                                        <small class="font-blue-sharp">SAMPLES REJECTED</small><br>
+                                        <small class="font-blue-sharp">27 Mar 2016</small>
+                                    </div>
+                                    <div class="icon">
+                                        <i class="icon-pie-chart"></i>
+                                    </div>
+                                </div>
+                                <canvas id="samplesRejectedChart" width="210" height="150"></canvas>
+                            </div>
+                        </div>
+                        
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 col-sm-6">
+                            <div class="portlet light ">
+                                <div class="portlet-title">
+                                    <div class="caption">
+                                        <span class="caption-subject bold uppercase font-dark">Requisition Forms for Testing</span>
+                                    </div>
+                                </div>
+                                <div class="portlet-body">
+                                    <div id="reqformspie" style="min-width: 310px; height: 400px; max-width: 600px; margin: 0 auto"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6">
+                            <div class="portlet light ">
+                                <div class="portlet-title">
+                                    <div class="caption ">
+                                        <span class="caption-subject font-dark bold uppercase">Tested VS VL Suppressed</span>
+                                    </div>
+                                </div>
+                                <div class="portlet-body">
+                                    <div id="samplesTestedVsSupressed"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 col-sm-6">
+                            <div class="portlet light ">
+                                <div class="portlet-title">
+                                    <div class="caption ">
+                                        <span class="caption-subject font-dark bold uppercase">Average Turnaround Time</span>
+                                    </div>
+                                </div>
+                                <div class="portlet-body">
+                                    <div id="patientsTestedVsSupressed"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 col-sm-6">
+                            <div class="portlet light ">
+                                <div class="portlet-title">
+                                    <div class="caption">
+                                        <i class="icon-share font-dark hide"></i>
+                                        <span class="caption-subject font-dark bold uppercase">Regional Stats</span>
+                                    </div>
+                                </div>
+                                <div class="portlet-body">
+
+                                    <div id="controls-polyline"></div>
+                                    <div id="gmap-polyline"  class="mapChart"></div>
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.min.js"></script>               
+        <script src="https://code.highcharts.com/highcharts.js"></script>               
+        <script src="https://maps.google.com/maps/api/js?libraries=geometry&v=3.22&key=AIzaSyAFpbfAKFJZ8Ps7yAGIDZtD4EeBlsb_ANA"></script>
+        <script src="<?php echo $this->basePath('assets/pages/scripts/dashboard.js'); ?>" type="text/javascript"></script>
+        <script src="<?php echo $this->basePath('assets/global/scripts/maplace.min.js'); ?>"></script>
+        
+        <script>
+            
+            
+            var ctx = document.getElementById("samplesReceivedChart").getContext("2d");
+            var data = {
+                labels: ["21 Mar", "22 Mar", "23 Mar", "24 Mar", "25 Mar", "26 Mar", "27 Mar"],
+                datasets: [{
+                    label: "My First dataset",
+                    fillColor: "rgba(42, 180, 195, 0.5)",
+                    strokeColor: "rgba(42, 180, 195, 0.8)",
+                    highlightFill: "rgba(42, 180, 195, 0.75)",
+                    highlightStroke: "rgba(42, 180, 195, 1)",
+                    data: [49, 90, 60, 49, 90, 49, 90]
+                }]
+            };
+            var myBarChart = new Chart(ctx).Bar(data);
+            
+            
+            var ctx = document.getElementById("samplesTestedChart").getContext("2d");
+            var data = {
+                labels: ["21 Mar", "22 Mar", "23 Mar", "24 Mar", "25 Mar", "26 Mar", "27 Mar"],
+                datasets: [{
+                    label: "My First dataset",
+                    fillColor: "rgba(243, 106, 90,0.5)",
+                    strokeColor: "rgba(243, 106, 90,0.8)",
+                    highlightFill: "rgba(243, 106, 90,0.75)",
+                    highlightStroke: "rgba(243, 106, 90,1)",
+                    data: [25, 29,25, 29,25, 29, 49]
+                }]
+            };
+            var myBarChart = new Chart(ctx).Bar(data);
+            
+            
+            
+            var ctx = document.getElementById("samplesRejectedChart").getContext("2d");
+            var data = {
+                labels: ["21 Mar", "22 Mar", "23 Mar", "24 Mar", "25 Mar", "26 Mar", "27 Mar"],
+                datasets: [{
+                    label: "My First dataset",
+                    fillColor: "rgba(122, 164, 211,0.5)",
+                    strokeColor: "rgba(122, 164, 211,0.8)",
+                    highlightFill: "rgba(122, 164, 211,0.75)",
+                    highlightStroke: "rgba(122, 164, 211,1)",
+                    data: [65, 59, 65, 59, 65, 59, 57]
+                }]
+            };
+            var myBarChart = new Chart(ctx).Bar(data);
+            
+            
+            var ctx = document.getElementById("samplesWaitingChart").getContext("2d");
+            var data = {
+                labels: ["21 Mar", "22 Mar", "23 Mar", "24 Mar", "25 Mar", "26 Mar", "27 Mar"],
+                datasets: [{
+                    label: "My First dataset",
+                    fillColor: "rgba(136, 119, 169,0.5)",
+                    strokeColor: "rgba(136, 119, 169,0.8)",
+                    highlightFill: "rgba(136, 119, 169,0.75)",
+                    highlightStroke: "rgba(136, 119, 169,1)",
+                    data: [45, 19,45, 19,45, 19, 76]
+                }]
+            };
+            var myBarChart = new Chart(ctx).Bar(data);
+            
+            
+            $(function () {
+                
+$('#reqformspie').highcharts({
+        chart: {
+            type: 'column'
+        },
+        title: {
+            text: ''
+        },
+        xAxis: {
+            categories: ["21 Mar", "22 Mar", "23 Mar", "24 Mar", "25 Mar", "26 Mar", "27 Mar"]
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                text: 'Forms'
+            },
+            stackLabels: {
+                enabled: true,
+                style: {
+                    fontWeight: 'bold',
+                    color: (Highcharts.theme && Highcharts.theme.textColor) || 'gray'
+                }
+            }
+        },
+        legend: {
+            align: 'right',
+            x: -30,
+            verticalAlign: 'top',
+            y: 25,
+            floating: true,
+            backgroundColor: (Highcharts.theme && Highcharts.theme.background2) || 'white',
+            borderColor: '#CCC',
+            borderWidth: 1,
+            shadow: false
+        },
+        tooltip: {
+            headerFormat: '<b>{point.x}</b><br/>',
+            pointFormat: '{series.name}: {point.y}<br/>Total: {point.stackTotal}'
+        },
+        plotOptions: {
+            column: {
+                stacking: 'normal',
+                dataLabels: {
+                    enabled: true,
+                    color: (Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'white',
+                    style: {
+                        textShadow: '0 0 3px black'
+                    }
+                }
+            }
+        },
+        series: [{
+            name: 'Incomplete',
+            data: [5, 3, 4, 7, 2, 7, 2]
+        }, {
+            name: 'Complete',
+            data: [2, 2, 3, 2, 1, 2, 1]
+        }],
+    colors: [
+        '#F36A5A',
+        '#60d18f'
+    ]
+    });                
+                
+                
+                
+                
+                
+                
+                    
+                    
+                    
+                    
+                    
+                        $('#samplesTestedVsSupressed').highcharts({
+
+        chart: {
+            type: 'column'
+        },
+
+        title: {
+            text: ''
+        },
+
+        xAxis: {
+            categories: ["21 Mar", "22 Mar", "23 Mar", "24 Mar", "25 Mar", "26 Mar", "27 Mar"]
+        },
+
+        yAxis: {
+            allowDecimals: false,
+            min: 0,
+            title: {
+                text: ''
+            }
+        },
+
+        tooltip: {
+            formatter: function () {
+                return '<b>' + this.x + '</b><br/>' +
+                    this.series.name + ': ' + this.y + '<br/>' +
+                    'Total: ' + this.point.stackTotal;
+            }
+        },
+
+        plotOptions: {
+            column: {
+                stacking: 'normal'
+            }
+        },
+
+        series: [{
+            name: 'Patients',
+            data: [5, 3, 4, 7, 2, 7, 2],
+            stack: 'male'
+        }, {
+            name: 'VL Suppressed',
+            data: [3, 4, 4, 2, 5, 2, 5],
+            stack: 'male'
+        }, {
+            name: 'Samples',
+            data: [2, 5, 6, 2, 1, 2, 1],
+            stack: 'female'
+        }, {
+            name: 'VL Suppressed',
+            data: [3, 0, 4, 4, 3, 4, 3],
+            stack: 'female'
+        }],
+    colors: [
+        '#5f9cce',
+        '#f7d67b',
+        '#CCCCCC',
+        '#666666',
+    ]
+    });                          
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    $('#patientsTestedVsSupressed').highcharts({
+        chart: {
+            type: 'bar'
+        },
+        title: {
+            text: ''
+        },
+        subtitle: {
+            text: ''
+        },
+        xAxis: {
+            categories: ["21 Mar", "22 Mar", "23 Mar", "24 Mar", "25 Mar", "26 Mar", "27 Mar"],
+            title: {
+                text: null
+            }
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                text: 'TAT',
+                align: 'high'
+            },
+            labels: {
+                overflow: 'justify'
+            }
+        },
+        tooltip: {
+            valueSuffix: ' hours'
+        },
+        plotOptions: {
+            bar: {
+                dataLabels: {
+                    enabled: true
+                }
+            }
+        },
+        legend: {
+            layout: 'vertical',
+            align: 'right',
+            verticalAlign: 'top',
+            x: -40,
+            y: 80,
+            floating: true,
+            borderWidth: 1,
+            backgroundColor: ((Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#FFFFFF'),
+            shadow: true
+        },
+        credits: {
+            enabled: false
+        },
+        series: [{
+            name: 'TAT',
+            data: [10, 21, 13, 20, 10, 35, 20]
+        }]
+    });
+                    
+                    
+                    
+                    
+                    
+                    
+var LocsAv2 = [
+    {
+       
+        lat: -26.305201,
+        lon: 31.1349953,
+        title: 'Mbabne',
+        html: '<h3>Mbabne</h3>',
+        icon: '<?php echo $this->basePath('assets/img/hub.png') ?>',
+        draggable: false
+    },
+    {
+        lat: -26.781057,
+        lon: 31.9284363,
+        title: 'Big Bend',
+        html: [
+            '<h3>Big Bend</h3>',
+            '<p>Lorem Ipsum..</p>'
+        ].join(''),
+        zoom: 8,
+        icon: '<?php echo $this->basePath('assets/img/lab.png') ?>',
+        visible: true
+    },
+    {
+        lat: -26.210721,
+        lon: 31.9243163,
+        title: 'Simunye',
+        html: '<h3>Simunye</h3>',
+        show_infowindow: false,
+        visible: true,
+        icon: '<?php echo $this->basePath('assets/img/clinic.png') ?>',
+        draggable: false
+    },
+    {
+        lat: -26.781057,
+        lon: 31.9284363,
+        title: 'Big Bend',
+        html: [
+            '<h3>Big Bend</h3>',
+            '<p>Lorem Ipsum..</p>'
+        ].join(''),
+        zoom: 8,
+        icon: '<?php echo $this->basePath('assets/img/lab.png') ?>',
+        visible: true
+    }
+];
+                    
+new Maplace({
+    locations: LocsAv2,
+    map_div: '#gmap-polyline',
+    view_all_text: 'Start',
+    type: 'polyline'
+}).Load();
+                    
+                   
+//                   
+//                   // svg path for target icon
+//var targetSVG = "M9,0C4.029,0,0,4.029,0,9s4.029,9,9,9s9-4.029,9-9S13.971,0,9,0z M9,15.93 c-3.83,0-6.93-3.1-6.93-6.93S5.17,2.07,9,2.07s6.93,3.1,6.93,6.93S12.83,15.93,9,15.93 M12.5,9c0,1.933-1.567,3.5-3.5,3.5S5.5,10.933,5.5,9S7.067,5.5,9,5.5 S12.5,7.067,12.5,9z";
+//// svg path for plane icon
+//var planeSVG = "M19.671,8.11l-2.777,2.777l-3.837-0.861c0.362-0.505,0.916-1.683,0.464-2.135c-0.518-0.517-1.979,0.278-2.305,0.604l-0.913,0.913L7.614,8.804l-2.021,2.021l2.232,1.061l-0.082,0.082l1.701,1.701l0.688-0.687l3.164,1.504L9.571,18.21H6.413l-1.137,1.138l3.6,0.948l1.83,1.83l0.947,3.598l1.137-1.137V21.43l3.725-3.725l1.504,3.164l-0.687,0.687l1.702,1.701l0.081-0.081l1.062,2.231l2.02-2.02l-0.604-2.689l0.912-0.912c0.326-0.326,1.121-1.789,0.604-2.306c-0.452-0.452-1.63,0.101-2.135,0.464l-0.861-3.838l2.777-2.777c0.947-0.947,3.599-4.862,2.62-5.839C24.533,4.512,20.618,7.163,19.671,8.11z";
+//
+//window.map = AmCharts.makeChart( "flightmap", {
+//  type: "map",
+//  "theme": "light",
+//  dataProvider: {
+//    map: "worldLow",
+//    linkToObject: "mbabne",
+//    images: [ {
+//        id: "mbabne",
+//        color: "#000000",
+//        svgPath: targetSVG,
+//        title: "Mbabne",
+//        latitude: -26.305201,
+//        longitude: 31.1349953,
+//        scale: 1.5,
+//        zoomLevel: 60,
+//        zoomLatitude: -26.305201,
+//        zoomLongitude: 31.1349953,
+//
+//        lines: [ {
+//          latitudes: [ -26.305201, -26.319785 ],
+//          longitudes: [ 31.1349953, 31.4769023 ]
+//        }, {
+//          latitudes: [ -26.305201, -26.856842 ],
+//          longitudes: [ 31.1349953, 31.4488133 ]
+//        },{
+//          latitudes: [ -26.305201, -27.126056 ],
+//          longitudes: [ 31.1349953, 31.4103603 ]
+//        }, {
+//          latitudes: [ -26.305201, -26.434603 ],
+//          longitudes: [ 31.1349953, 31.9239713 ]
+//        }, {
+//          latitudes: [ -26.305201, -26.781057 ],
+//          longitudes: [ 31.1349953, 31.9284363 ]
+//        }, {
+//          latitudes: [ -26.305201, -26.305201 ],
+//          longitudes: [ 31.1349953, 31.1349953 ]
+//        }, {
+//          latitudes: [ -26.305201, -27.011107 ],
+//          longitudes: [ 31.1349953, 31.9074923 ]
+//        }, {
+//          latitudes: [ -26.305201, -26.319785 ],
+//          longitudes: [ 31.1349953, 31.4769023 ]
+//        } ],
+//
+//        images: [ {
+//          label: "Samples from Mbabne",
+//          left: 100,
+//          top: 45,
+//          labelShiftY: 5,
+//          color: "#CC0000",
+//          labelColor: "#CC0000",
+//          labelRollOverColor: "#CC0000",
+//          labelFontSize: 20
+//        }, {
+//          label: "show samples from Big Bend",
+//          left: 106,
+//          top: 70,
+//          labelColor: "#000000",
+//          labelRollOverColor: "#CC0000",
+//          labelFontSize: 11,
+//          linkToObject: "bigbend"
+//        }, {
+//          label: "show samples from Simunye",
+//          left: 106,
+//          top: 90,
+//          labelColor: "#000000",
+//          labelRollOverColor: "#CC0000",
+//          labelFontSize: 11,
+//          linkToObject: "simunye"
+//        } ]
+//      },
+//
+//      {
+//        id: "bigbend",
+//        color: "#000000",
+//        svgPath: targetSVG,
+//        title: "Big Bend",
+//        latitude: -26.781057,
+//        longitude: 31.9284363,
+//        scale: 1.5,
+//        zoomLevel: 60,
+//        zoomLatitude: -26.781057,
+//        zoomLongitude: 31.9284363,
+//        lines: [{
+//          latitudes: [ -26.781057, -27.126056 ],
+//          longitudes: [ 31.9284363, 31.4103603 ]
+//        }, {
+//          latitudes: [ -26.781057, -26.431822 ],
+//          longitudes: [ 31.9284363, 31.7686813 ]
+//        }, {
+//          latitudes: [ -26.781057, -26.781057 ],
+//          longitudes: [ 31.9284363, 31.9284363 ]
+//        }, {
+//          latitudes: [ -26.781057, -26.230291 ],
+//          longitudes: [ 31.9284363, 31.0587983 ]
+//        }],
+//
+//        images: [ {
+//          label: "Samples from Big Bend",
+//          left: 100,
+//          top: 45,
+//          labelShiftY: 5,
+//          color: "#CC0000",
+//          labelColor: "#CC0000",
+//          labelRollOverColor: "#CC0000",
+//          labelFontSize: 20
+//        }, {
+//          label: "show samples from Mbabne",
+//          left: 106,
+//          top: 70,
+//          labelColor: "#000000",
+//          labelRollOverColor: "#CC0000",
+//          labelFontSize: 11,
+//          linkToObject: "mbabne"
+//        }, {
+//          label: "show samples from Simunye",
+//          left: 106,
+//          top: 90,
+//          labelColor: "#000000",
+//          labelRollOverColor: "#CC0000",
+//          labelFontSize: 11,
+//          linkToObject: "simunye"
+//        }
+//        ]
+//      },
+//      {
+//        id: "simunye",
+//        color: "#000000",
+//        svgPath: targetSVG,
+//        title: "Simunye",
+//        latitude: -26.210721,
+//        longitude: 31.9243163,
+//        scale: 1.5,
+//        zoomLevel: 60,
+//        zoomLatitude: -26.210721,
+//        zoomLongitude: 31.9243163,
+//
+//        lines: [ {
+//          latitudes: [ -26.210721, -26.319785 ],
+//          longitudes: [ 31.9243163, 31.4769023 ]
+//        },  {
+//          latitudes: [ -26.210721, -26.856842 ],
+//          longitudes: [ 31.9243163, 31.4488133 ]
+//        }, {
+//          latitudes: [ -26.210721, -27.126056 ],
+//          longitudes: [ 31.9243163, 31.4103603 ]
+//        }, {
+//          latitudes: [ -26.210721, -26.434603 ],
+//          longitudes: [ 31.9243163, 31.9239713 ]
+//        }, {
+//          latitudes: [ -26.210721, -26.210721 ],
+//          longitudes: [ 31.9243163, 31.9243163 ]
+//        }, {
+//          latitudes: [ -26.210721, -26.305201 ],
+//          longitudes: [ 31.9243163, 31.1349953 ]
+//        }, {
+//          latitudes: [ -26.210721, -27.011107 ],
+//          longitudes: [ 31.9243163, 31.9074923 ]
+//        } ],
+//
+//        images: [ {
+//          label: "Samples from Simunye",
+//          left: 100,
+//          top: 45,
+//          labelShiftY: 5,
+//          color: "#CC0000",
+//          labelColor: "#CC0000",
+//          labelRollOverColor: "#CC0000",
+//          labelFontSize: 20
+//        }, {
+//          label: "show samples from Mbabne",
+//          left: 106,
+//          top: 70,
+//          labelColor: "#000000",
+//          labelRollOverColor: "#CC0000",
+//          labelFontSize: 11,
+//          linkToObject: "mbabne"
+//        }, {
+//          label: "show samples from Simunye",
+//          left: 106,
+//          top: 90,
+//          labelColor: "#000000",
+//          labelRollOverColor: "#CC0000",
+//          labelFontSize: 11,
+//          linkToObject: "simunye"
+//        } ]
+//      },
+//      
+//      {
+//        svgPath: targetSVG,
+//        title: "Luve",
+//        latitude: -26.319785,
+//        longitude: 31.4769023
+//      }, {
+//        svgPath: targetSVG,
+//        title: "Kubuta",
+//        latitude: -26.856842,
+//        longitude: 31.4488133
+//      }, {
+//        svgPath: targetSVG,
+//        title: "Siteki",
+//        latitude: -26.434603,
+//        longitude: 31.9239713
+//      }, {
+//        svgPath: targetSVG,
+//        title: "Ngwenya",
+//        latitude: -26.230291,
+//        longitude: 31.0587983
+//      }, {
+//        svgPath: targetSVG,
+//        title: "Nsoko",
+//        latitude: -27.011107,
+//        longitude: 31.9074923
+//      }, {
+//        svgPath: targetSVG,
+//        title: "Mliba",
+//        latitude: -26.237682,
+//        longitude: 31.5888883
+//      }, {
+//        svgPath: targetSVG,
+//        title: "Mpaka",
+//        latitude: -26.431822,
+//        longitude: 31.7686813
+//      }, {
+//        svgPath: targetSVG,
+//        title: "Nhlangano",
+//        latitude: -27.126056,
+//        longitude: 31.4103603
+//      }, {
+//        svgPath: targetSVG,
+//        title: "Maloma",
+//        latitude: -26.998871,
+//        longitude: 31.6534333
+//      }, {
+//        svgPath: targetSVG,
+//        title: "Mankayane",
+//        latitude: -26.6791802,
+//        longitude: 31.0481427
+//      }, {
+//        svgPath: targetSVG,
+//        title: "Bhunya",
+//        latitude: -26.540309,
+//        longitude: 30.9983733
+//      }, {
+//        svgPath: targetSVG,
+//        title: "Manzini",
+//        latitude: -26.508361,
+//        longitude: 31.3739683
+//      }, {
+//        svgPath: targetSVG,
+//        title: "Lamoti",
+//        latitude: -25.814411,
+//        longitude: 31.3547423
+//      }, {
+//        svgPath: targetSVG,
+//        title: "Mayiwane",
+//        latitude: -25.871424,
+//        longitude: 31.5067293
+//      }
+//    ]
+//  },
+//
+//  areasSettings: {
+//    unlistedAreasColor: "#60D18F"
+//  },
+//
+//  imagesSettings: {
+//    color: "#CC0000",
+//    rollOverColor: "#CC0000",
+//    selectedColor: "#000000"
+//  },
+//
+//  linesSettings: {
+//    color: "#CC0000",
+//    alpha: 0.4
+//  },
+//   
+//  balloon:{
+//   drop:true
+//  },
+//
+//
+//  backgroundZoomsToTop: true,
+//  linesAboveImages: true,
+//
+//  "export": {
+//    "enabled": true
+//  }
+//} );
+                    
+                    
+                    
+                    
+                    
+                });
+        </script>

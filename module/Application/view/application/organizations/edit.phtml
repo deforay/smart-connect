@@ -1,0 +1,161 @@
+<?php
+
+//\Zend\Debug\Debug::dump($org);
+
+?>
+                    <!-- BEGIN PAGE HEADER-->
+                    <!-- BEGIN THEME PANEL -->
+                    <!-- END THEME PANEL -->
+                    <!-- BEGIN PAGE BAR -->
+                    <div class="page-bar">
+                        <ul class="page-breadcrumb">
+                            <li>
+                                <a href="/">Dashboard</a>
+                                <i class="fa fa-circle"></i>
+                            </li>
+                            <li>
+                                <a href="/organizations">Facilities</a>
+                                <i class="fa fa-circle"></i>
+                            </li>
+                            <li>
+                                <a href="javascript:;">Edit</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <!-- END PAGE BAR -->
+                    <!-- BEGIN PAGE TITLE-->
+                    <h3 class="page-title"> Edit Facility
+                    </h3>
+                    <!-- END PAGE TITLE-->
+                    <!-- END PAGE HEADER-->
+                    <div class="row">
+                        <div class="col-md-12">
+                            <!-- BEGIN EXAMPLE TABLE PORTLET-->
+                            <div class="portlet light bordered">
+                                <div class="portlet-body">
+
+
+                                <div class="portlet-body form">
+                                    <form class="form-horizontal" method="post" action="/organizations/edit" role="form">
+                                        <div class="form-body">
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">Facility Name <span class="font-red-mint">*</span></label>
+                                                <div class="col-md-6">
+                                                    <input type="text" id="name" name="name" class="form-control" placeholder="" value="<?php echo $org['name']; ?>">
+                                                    <input type="hidden" id="orgId" name="orgId" class="form-control" placeholder="" value="<?php echo $org['org_id']; ?>">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">Type <span class="font-red-mint">*</span></label>
+                                                <div class="col-md-6">
+                                                    <select class="form-control" name="type" id="type">
+                                                        <option value="">--Select--</option>
+
+                                                        
+                                                        <?php foreach($orgTypes as $ot) { ?>
+                                                        <option value="<?php echo $ot['id'] ?>"  <?php echo ($org['org_type'] == $ot['id'] ? " selected='selected' " : ""); ?>><?php echo $ot['type'] ?></option>
+                                                        <?php } ?>                                                        
+                                                        
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">Facility ID <span class="font-red-mint">*</span></label>
+                                                <div class="col-md-6">
+                                                    <input type="text" id="facilityId" name="facilityId" class="form-control" placeholder=""  value="<?php echo $org['facility_id']; ?>">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">Email <span class="font-red-mint">*</span></label>
+                                                <div class="col-md-6">
+                                                    <input type="email" id="email" name="email" class="form-control" placeholder=""  value="<?php echo $org['email']; ?>">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">Secondary Email </label>
+                                                <div class="col-md-6">
+                                                    <input type="email" id="secondaryEmail" name="secondaryEmail" class="form-control" placeholder=""  value="<?php echo $org['secondary_email']; ?>">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">Phone <span class="font-red-mint">*</span></label>
+                                                <div class="col-md-6">
+                                                    <input type="tel" id="phone" name="phone" class="form-control" placeholder="" value="<?php echo $org['phone']; ?>">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">Secondary Phone </label>
+                                                <div class="col-md-6">
+                                                    <input type="tel" id="secondaryPhone" name="secondaryPhone" class="form-control" placeholder=""  value="<?php echo $org['secondary_phone']; ?>">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">Contact Person <span class="font-red-mint">*</span></label>
+                                                <div class="col-md-6">
+                                                    <input type="text" id="contactPerson" name="contactPerson" class="form-control" placeholder=""  value="<?php echo $org['contact_person']; ?>">
+                                                </div>
+                                            </div>                                            
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">Address <span class="font-red-mint">*</span></label>
+                                                <div class="col-md-6">
+                                                    <textarea id="address" name="address" class="form-control" placeholder=""><?php echo $org['address']; ?></textarea>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">Country <span class="font-red-mint">*</span></label>
+                                                <div class="col-md-6">
+                                                    <select class="form-control" name="country" id="country">
+                                                        <option value="">--Select--</option>
+                                                        <?php foreach($countries as $country) { ?>
+                                                        <option value="<?php echo $country['id'] ?>" <?php echo ($org['country'] == $country['id'] ? " selected='selected' " : ""); ?>><?php echo $country['name'] ?></option>
+                                                        <?php } ?>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">Sub-Level <span class="font-red-mint">*</span></label>
+                                                <div class="col-md-6">
+                                                    <input type="text" id="subLevel" name="subLevel" class="form-control" placeholder="" value="<?php echo $org['sub_level']; ?>">
+                                                </div>
+                                            </div>                                             
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">Latitude</label>
+                                                <div class="col-md-6">
+                                                    <input type="text" id="latitude" name="latitude" class="form-control" placeholder="" value="<?php echo $org['latitude']; ?>">
+                                                </div>
+                                            </div>                                            
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">Longitude</label>
+                                                <div class="col-md-6">
+                                                    <input type="text" id="longitude" name="longitude" class="form-control" placeholder="" value="<?php echo $org['longitude']; ?>">
+                                                </div>
+                                            </div>                                            
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">Status <span class="font-red-mint">*</span></label>
+                                                <div class="col-md-6">
+                                                    <select class="form-control" name="status" id="status">
+                                                        <option value="">--Select--</option>
+                                                        <option value="active" "<?php echo ($org['status'] == 'active' ? " selected='selected' " : ""); ?>">Active</option>
+                                                        <option value="inactive" "<?php echo ($org['status'] == 'inactive' ? " selected='selected' " : ""); ?>">Inactive</option>
+                                                    </select>
+                                                </div>
+                                            </div>                                            
+                                        </div>
+                                        <div class="form-actions">
+                                            <div class="row">
+                                                <div class="col-md-offset-3 col-md-9">
+                                                    <button type="submit" class="btn green">Submit</button>
+                                                    <button type="button" class="btn default" onclick="document.location.href='/organizations'">Cancel</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+
+
+                                    
+                                </div>
+                            </div>
+                            <!-- END EXAMPLE TABLE PORTLET-->
+                        </div>
+                    </div>

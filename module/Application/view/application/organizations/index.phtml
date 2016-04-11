@@ -1,0 +1,133 @@
+
+           <!-- BEGIN PAGE HEADER-->
+                    <!-- BEGIN THEME PANEL -->
+                    <!-- END THEME PANEL -->
+                    <!-- BEGIN PAGE BAR -->
+                    <div class="page-bar">
+                        <ul class="page-breadcrumb">
+                            <li>
+                                <a href="/">Dashboard</a>
+                                <i class="fa fa-circle"></i>
+                            </li>
+                            <li>
+                                <a href="/organizations">Organizations</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <!-- END PAGE BAR -->
+                    <!-- BEGIN PAGE TITLE-->
+                    <h3 class="page-title"> Manage Facilities  
+                        <small>add/edit facilities</small>
+                    </h3>
+                    <!-- END PAGE TITLE-->
+                    <!-- END PAGE HEADER-->
+                    <div class="row">
+                        <div class="col-md-12">
+                            <!-- BEGIN EXAMPLE TABLE PORTLET-->
+                            <div class="portlet light bordered">
+                                <div class="portlet-body">
+                                    <div class="table-toolbar">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="btn-group pull-right">
+                                                    <a href="/organizations/add" class="btn sbold green"> Add New
+                                                        <i class="fa fa-plus"></i>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <br>
+                                        <table class="table table-striped table-bordered table-hover table-checkable order-column" id="sample_1">
+                                                    <thead>
+                                                        <tr>
+                                                            <th> Facility Name </th>
+                                                            <th> Facility Type </th>
+                                                            <th> Email </th>
+                                                            <th> Phone </th>
+                                                            <th> Address </th>
+                                                            <th> Action </th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        
+                                                        <?php foreach($organizations as $org){ ?>
+                                                        <tr>
+                                                               <td><?php echo $org['name']; ?></td>                                                  
+                                                               <td><?php echo $org['type']; ?></td>                                                  
+                                                               <td><?php echo $org['email']; ?></td>                                                  
+                                                               <td><?php echo $org['phone']; ?></td>                                                  
+                                                               <td><?php echo $org['address']; ?></td>
+                                                               <td><a href="/organizations/edit/<?php echo $org['org_id']; ?>" class="btn green">Edit</a></td>
+                                                        </tr>
+                                                        <?php } ?>
+                                                        
+                                                        
+                                                    </tbody>
+                                                </table>
+
+                                    </div>
+                                    
+                                </div>
+                            </div>
+                            <!-- END EXAMPLE TABLE PORTLET-->
+                        </div>
+                    </div>
+<script>
+    $(document).ready(function(){
+    
+    
+    
+    
+                var e = $("#sample_1").dataTable({
+                language: {
+                    aria: {
+                        sortAscending: ": activate to sort column ascending",
+                        sortDescending: ": activate to sort column descending"
+                    },
+                    emptyTable: "No data available in table",
+                    info: "Showing _START_ to _END_ of _TOTAL_ records",
+                    infoEmpty: "No records found",
+                    infoFiltered: "(filtered1 from _MAX_ total records)",
+                    lengthMenu: "Show _MENU_",
+                    search: "Search:",
+                    zeroRecords: "No matching records found",
+                    paginate: {
+                        previous: "Prev",
+                        next: "Next",
+                        last: "Last",
+                        first: "First"
+                    }
+                },
+                bStateSave: !0,
+
+                lengthMenu: [
+                    [5, 15, 20, -1],
+                    [5, 15, 20, "All"]
+                ],
+                pageLength: 5,
+                pagingType: "bootstrap_full_number",
+
+                order: [
+                    [1, "asc"]
+                ]
+            });
+            
+            jQuery("#sample_1_wrapper");
+            e.find(".group-checkable").change(function() {
+                var e = jQuery(this).attr("data-set"),
+                    a = jQuery(this).is(":checked");
+                jQuery(e).each(function() {
+                    a ? ($(this).prop("checked", !0), $(this).parents("tr").addClass("active")) : ($(this).prop("checked", !1), $(this).parents("tr").removeClass("active"))
+                }), jQuery.uniform.update(e)
+            }), e.on("change", "tbody tr .checkboxes", function() {
+                $(this).parents("tr").toggleClass("active")
+            })
+        
+    
+    
+    });
+
+    
+
+
+</script>
