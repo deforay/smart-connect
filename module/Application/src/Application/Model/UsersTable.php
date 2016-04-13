@@ -36,6 +36,7 @@ class UsersTable extends AbstractTableGateway {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->from(array('u' => 'users'))
+                ->join(array('r' => 'user_roles'), 'u.role=r.id')
                 ->where(array('email' => $username, 'password' => $password));
         $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
         
@@ -49,6 +50,7 @@ class UsersTable extends AbstractTableGateway {
             $logincontainer->mobile = $rResult[0]["mobile"];
             $logincontainer->role = $rResult[0]["role"];
             $logincontainer->email = $rResult[0]["email"];
+            $logincontainer->accessType = $rResult[0]["access_type"];
             //die('home');
             return '/';
         } else {
@@ -62,7 +64,7 @@ class UsersTable extends AbstractTableGateway {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->from(array('u' => 'users'))
-                ->join(array('r' => 'user_roles'), 'u.role=r.id', array('role_name'));
+                ->join(array('r' => 'user_roles'), 'u.role=r.id');
         
         $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();

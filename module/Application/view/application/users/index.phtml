@@ -51,11 +51,18 @@
                                                         
                                                         <?php foreach($users as $org){ ?>
                                                         <tr>
-                                                               <td><?php echo $org['username']; ?></td>                                                  
-                                                               <td><?php echo $org['role_name']; ?></td>                                                  
-                                                               <td><?php echo $org['email']; ?></td>                                                  
+                                                               <td style="width:25%;"><?php echo $org['username']; ?></td>                                                  
+                                                               <td style="width:15%;">
+                                                                <?php echo $org['role_name']; ?>
+                                                                <br>
+                                                                <span class="text-info"><small><?php echo strtoupper($org['access_type']); ?></small></span>
+                                                               </td>                                                  
+                                                               <td style="width:20%;"><?php echo $org['email']; ?></td>                                                  
                                                                <td><?php echo $org['mobile']; ?></td>                                                  
-                                                               <td><a href="/users/edit/<?php echo $org['user_id']; ?>" class="btn green">Edit</a></td>
+                                                               <td>
+                                                                    <a href="/users/edit/<?php echo $org['user_id']; ?>" class="btn green">Edit</a>
+                                                                    <a href="/users/map/<?php echo $org['user_id']; ?>" class="btn green">Map Facilities</a>
+                                                               </td>
                                                         </tr>
                                                         <?php } ?>
                                                         

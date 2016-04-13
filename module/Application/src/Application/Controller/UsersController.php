@@ -58,6 +58,30 @@ class UsersController extends AbstractActionController
             }   
         }
     }
+    public function mapAction()
+    {
+        $this->layout()->setVariable('activeTab', 'admin');    
+        $this->layout()->setVariable('activeMenu', 'users');
+        $userService = $this->getServiceLocator()->get('UserService');
+        $orgService = $this->getServiceLocator()->get('OrganizationService');
+
+        
+        if($this->getRequest()->isPost()){
+            $params=$this->getRequest()->getPost();
+            $result=$userService->mapUserOrganizations($params);
+            return $this->_redirect()->toRoute('users');
+        }else{
+            $userId = ($this->params()->fromRoute('id'));
+            $user = $userService->getUser($userId);
+            if($user == false){
+                return $this->_redirect()->toRoute('users'); 
+            }else{
+                $orgs = $orgService->fetchOrganizations();
+                $map = $userService->fetchUserOrganizations($userId);
+                return new ViewModel(array('user'=>$user,'facilities' => $orgs,'map'=>$map));
+            }   
+        }
+    }
 
 
 }

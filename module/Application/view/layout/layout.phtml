@@ -124,7 +124,7 @@ $logincontainer = new Container('credo');
                             <!-- END SIDEBAR TOGGLER BUTTON -->
                         </li>
                         <!-- DOC: To remove the search box from the sidebar you just need to completely remove the below "sidebar-search-wrapper" LI element -->
-                        <li class="nav-item start <?php echo ($activeTab == 'dashboard' ? " active open " : ""); ?>">
+                       <li class="nav-item start <?php echo ($activeTab == 'dashboard' ? " active open " : ""); ?>">
                             <a href="/" class="nav-link nav-toggle">
                                 <i class="icon-home"></i>
                                 <span class="title">Dashboard</span>
@@ -132,6 +132,9 @@ $logincontainer = new Container('credo');
                             </a>
                             
                         </li>
+                       
+                       <?php if(isset($logincontainer->accessType) && $logincontainer->accessType == 'admin') { ?>
+                       
                         <li class="nav-item <?php echo ($activeTab == 'admin' ? " active open " : ""); ?> ">
                             <a href="javascript:;" class="nav-link nav-toggle">
                                 <i class="icon-settings"></i>
@@ -139,18 +142,37 @@ $logincontainer = new Container('credo');
                                 <span class="arrow"></span>
                             </a>
                             <ul class="sub-menu">
+
                                 <li class="nav-item  <?php echo ($activeMenu == 'organizations' ? " active open " : ""); ?>  ">
                                     <a href="/organizations" class="nav-link ">
-                                        <span class="title">Manage Facilities</span>
+                                      <i class="fa fa-angle-right"></i>   <span class="title">Manage Facilities</span>
                                     </a>
                                 </li>
                                 <li class="nav-item  <?php echo ($activeMenu == 'users' ? " active open " : ""); ?>  ">
                                     <a href="/users" class="nav-link ">
-                                        <span class="title">Manage Users</span>
+                                       <i class="fa fa-angle-right"></i>  <span class="title">Manage Users</span>
+                                    </a>
+                                </li>
+                                <li class="nav-item  <?php echo ($activeMenu == 'config-email' ? " active open " : ""); ?>  ">
+                                    <a href="javascript:;" class="nav-link ">
+                                      <i class="fa fa-angle-right"></i>   <span class="title">Configure Email</span>
+                                    </a>
+                                </li>
+                                <li class="nav-item  <?php echo ($activeMenu == 'config-sms' ? " active open " : ""); ?>  ">
+                                    <a href="javascript:;" class="nav-link ">
+                                       <i class="fa fa-angle-right"></i>  <span class="title">Configure SMS</span>
+                                    </a>
+                                </li>
+                                <li class="nav-item  <?php echo ($activeMenu == 'config-general' ? " active open " : ""); ?>  ">
+                                    <a href="javascript:;" class="nav-link ">
+                                       <i class="fa fa-angle-right"></i>  <span class="title">General Config</span>
                                     </a>
                                 </li>
                             </ul>
                         </li>
+                        
+                        <?php } ?>
+                        <?php if(isset($logincontainer->accessType) && $logincontainer->accessType == 'clinic') { ?>
                         <li class="nav-item <?php echo ($activeTab == 'clinic' ? " active open " : ""); ?> ">
                             <a href="javascript:;" class="nav-link nav-toggle">
                                 <i class="icon-settings"></i>
@@ -158,79 +180,129 @@ $logincontainer = new Container('credo');
                                 <span class="arrow"></span>
                             </a>
                             <ul class="sub-menu">
+
                                 <li class="nav-item">
                                     <a href="javascript:;" class="nav-link ">
-                                        <span class="title">Dashboard</span>
+                                       <i class="fa fa-angle-right"></i>  <span class="title">VL Test Request</span>
+                                    </a>
+                                </li>                           
+                               <!-- <li class="nav-item">
+                                    <a href="javascript:;" class="nav-link ">
+                                        <span class="title">Create Batch</span>
+                                    </a>
+                                </li> -->
+                                <li class="nav-item">
+                                    <a href="javascript:;" class="nav-link ">
+                                      <i class="fa fa-angle-right"></i>   <span class="title">Sample Shipment</span>
                                     </a>
                                 </li>
                                 <li class="nav-item">
                                     <a href="javascript:;" class="nav-link ">
-                                        <span class="title">Test Request</span>
+                                       <i class="fa fa-print"></i>  <span class="title">Print VL Test Results</span>
                                     </a>
                                 </li>
                                 <li class="nav-item">
                                     <a href="javascript:;" class="nav-link ">
-                                        <span class="title">Batch Creation</span>
+                                       <i class="fa fa-marker"></i>  <span class="title">VL Sample Tracking</span>
                                     </a>
                                 </li>
                                 <li class="nav-item">
                                     <a href="javascript:;" class="nav-link ">
-                                        <span class="title">Sample Shipment</span>
+                                       <i class="fa fa-mobile" style="font-size:23px;color:red;"></i>  <span class="title">Send Results</span>
                                     </a>
                                 </li>
-                                <li class="nav-item">
+                               <li class="nav-item">
                                     <a href="javascript:;" class="nav-link ">
-                                        <span class="title">Print Results</span>
+                                        <i class="fa fa-angle-right"></i>  <span class="title">User Information</span>
                                     </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="javascript:;" class="nav-link ">
-                                        <span class="title">Pending Test Reminders</span>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="javascript:;" class="nav-link ">
-                                        <span class="title">Send Results</span>
-                                    </a>
-                                </li>
+                                </li>                                  
                             </ul>
                         </li>
+                        <?php } ?>
+                        <?php if(isset($logincontainer->accessType) && $logincontainer->accessType == 'hub') { ?>
+                        <li class="nav-item <?php echo ($activeTab == 'clinic' ? " active open " : ""); ?> ">
+                            <a href="javascript:;" class="nav-link nav-toggle">
+                                <i class="icon-settings"></i>
+                                <span class="title">Hub</span>
+                                <span class="arrow"></span>
+                            </a>
+                            <ul class="sub-menu">
+
+                                <li class="nav-item">
+                                    <a href="javascript:;" class="nav-link ">
+                                       <i class="fa fa-angle-right"></i>  <span class="title">VL Test Request</span>
+                                    </a>
+                                </li>                              
+                               <!-- <li class="nav-item">
+                                    <a href="javascript:;" class="nav-link ">
+                                        <span class="title">Create Batch</span>
+                                    </a>
+                                </li> -->
+                                <li class="nav-item">
+                                    <a href="javascript:;" class="nav-link ">
+                                      <i class="fa fa-angle-right"></i>   <span class="title">Sample Shipment</span>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="javascript:;" class="nav-link ">
+                                       <i class="fa fa-print"></i>  <span class="title">Print VL Test Results</span>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="javascript:;" class="nav-link ">
+                                       <i class="fa fa-marker"></i>  <span class="title">VL Sample Tracking</span>
+                                    </a>
+                                </li>
+                               <li class="nav-item">
+                                    <a href="javascript:;" class="nav-link ">
+                                        <i class="fa fa-angle-right"></i>  <span class="title">User Information</span>
+                                    </a>
+                                </li>                                  
+                            </ul>
+                        </li>
+                        <?php } ?>
+                        <?php if(isset($logincontainer->accessType) && $logincontainer->accessType == 'laboratory') { ?>                        
                         <li class="nav-item <?php echo ($activeTab == 'laboratory' ? " active open " : ""); ?> ">
                             <a href="javascript:;" class="nav-link nav-toggle">
                                 <i class="icon-settings"></i>
                                 <span class="title">Laboratory</span>
                                 <span class="arrow"></span>
                             </a>
-                            <ul class="sub-menu">
+                            <ul class="sub-menu">                          
                                 <li class="nav-item">
                                     <a href="javascript:;" class="nav-link ">
-                                        <span class="title">Test Request</span>
+                                       <i class="fa fa-angle-right"></i>  <span class="title"> VL Test Request</span>
                                     </a>
                                 </li>
-                                <li class="nav-item">
+                                
+                               <!-- <li class="nav-item">
                                     <a href="javascript:;" class="nav-link ">
                                         <span class="title">Batch Creation</span>
                                     </a>
-                                </li>
+                                </li> -->
                                 <li class="nav-item">
                                     <a href="javascript:;" class="nav-link ">
-                                        <span class="title">Print Results</span>
+                                       <i class="fa fa-print"></i>  <span class="title">Print VL Test Results</span>
                                     </a>
                                 </li>
                                 <li class="nav-item">
                                     <a href="javascript:;" class="nav-link ">
-                                        <span class="title">Send Reminders</span>
+                                       <i class="fa fa-marker"></i>  <span class="title">VL Sample Tracking</span>
                                     </a>
                                 </li>
                                 <li class="nav-item">
                                     <a href="javascript:;" class="nav-link ">
-                                        <span class="title">Send Results</span>
+                                       <i class="fa fa-mobile" style="font-size:23px;color:red;"></i>  <span class="title">Send Results</span>
                                     </a>
                                 </li>
+                               <li class="nav-item">
+                                    <a href="javascript:;" class="nav-link ">
+                                        <i class="fa fa-angle-right"></i>  <span class="title">User Information</span>
+                                    </a>
+                                </li>                                  
                             </ul>
                         </li>
-                        
-                        
+                    <?php } ?>
                         
                     </ul>
                     <!-- END SIDEBAR MENU -->

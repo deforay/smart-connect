@@ -45,4 +45,14 @@ class UserService {
         return $db->updateUser($params);
     }
    
+    public function fetchUserOrganizations($userId) {
+        $db = $this->sm->get('UserOrganizationsMapTable');
+        return $db->fetchOrganizations($userId);
+    }
+   
+    public function mapUserOrganizations($params) {
+        $db = $this->sm->get('UserOrganizationsMapTable');
+        return $db->mapUserOrganizations($params);
+    }
+   
 }

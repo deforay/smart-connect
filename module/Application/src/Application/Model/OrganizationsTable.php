@@ -40,7 +40,6 @@ class OrganizationsTable extends AbstractTableGateway {
     }
     
     
-    
     public function addOrganization($params){
         $credoContainer = new Container('credo');
         $newData=array('name'=>$params['name'],

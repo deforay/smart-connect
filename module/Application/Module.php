@@ -16,6 +16,7 @@ use Application\Model\OrganizationsTable;
 use Application\Model\OrganizationTypesTable;
 use Application\Model\CountriesTable;
 use Application\Model\RolesTable;
+use Application\Model\UserOrganizationsMapTable;
 
 use Application\Service\CommonService;
 use Application\Service\UserService;
@@ -100,6 +101,11 @@ class Module
 				'RolesTable' => function($sm) {
                     $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
                     $table = new RolesTable($dbAdapter);
+                    return $table;
+                },
+				'UserOrganizationsMapTable' => function($sm) {
+                    $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+                    $table = new UserOrganizationsMapTable($dbAdapter);
                     return $table;
                 },
                 'CommonService' => function($sm) {

@@ -1,4 +1,5 @@
                     <!-- BEGIN PAGE BAR -->
+                    <!-- BEGIN PAGE BAR -->
                     <div class="page-bar">
                         <div class="page-toolbar">
                             
@@ -30,7 +31,7 @@
                                         <i class="icon-pie-chart"></i>
                                     </div>
                                 </div>
-                                <canvas id="samplesWaitingChart" width="210" height="150"></canvas>
+                                <div id="samplesWaitingChart" width="210" height="150"></div>
                             </div>
                         </div>                        
                         <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
@@ -47,7 +48,7 @@
                                         <i class="icon-pie-chart"></i>
                                     </div>
                                 </div>
-                                <canvas id="samplesReceivedChart" width="210" height="150"></canvas>
+                                <div id="samplesReceivedChart" width="210" height="150"></div>
                             </div>
                         </div>
                         <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
@@ -64,7 +65,7 @@
                                         <i class="icon-pie-chart"></i>
                                     </div>
                                 </div>
-                                <canvas id="samplesTestedChart" width="210" height="150"></canvas>
+                                <div id="samplesTestedChart" width="210" height="150"></div>
                             </div>
                         </div>
                         <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
@@ -81,7 +82,7 @@
                                         <i class="icon-pie-chart"></i>
                                     </div>
                                 </div>
-                                <canvas id="samplesRejectedChart" width="210" height="150"></canvas>
+                                <div id="samplesRejectedChart" width="210" height="150"></div>
                             </div>
                         </div>
                         
@@ -95,7 +96,7 @@
                                     </div>
                                 </div>
                                 <div class="portlet-body">
-                                    <div id="reqformspie" style="min-width: 310px; height: 400px; max-width: 600px; margin: 0 auto"></div>
+                                    <div id="reqformspie"></div>
                                 </div>
                             </div>
                         </div>
@@ -131,7 +132,23 @@
                                 <div class="portlet-title">
                                     <div class="caption">
                                         <i class="icon-share font-dark hide"></i>
-                                        <span class="caption-subject font-dark bold uppercase">Regional Stats</span>
+                                        <span class="caption-subject font-dark bold uppercase"></span>
+                                    </div>
+                                </div>
+                                <div class="portlet-body">
+
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12 col-sm-12">
+                            <div class="portlet light ">
+                                <div class="portlet-title">
+                                    <div class="caption">
+                                        <i class="icon-share font-dark hide"></i>
+                                        <span class="caption-subject font-dark bold uppercase"></span>
                                     </div>
                                 </div>
                                 <div class="portlet-body">
@@ -141,7 +158,7 @@
                                     
                                 </div>
                             </div>
-                        </div>
+                        </div>                        
                     </div>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.min.js"></script>               
         <script src="https://code.highcharts.com/highcharts.js"></script>               
@@ -152,68 +169,202 @@
         <script>
             
             
-            var ctx = document.getElementById("samplesReceivedChart").getContext("2d");
-            var data = {
-                labels: ["21 Mar", "22 Mar", "23 Mar", "24 Mar", "25 Mar", "26 Mar", "27 Mar"],
-                datasets: [{
-                    label: "My First dataset",
-                    fillColor: "rgba(42, 180, 195, 0.5)",
-                    strokeColor: "rgba(42, 180, 195, 0.8)",
-                    highlightFill: "rgba(42, 180, 195, 0.75)",
-                    highlightStroke: "rgba(42, 180, 195, 1)",
-                    data: [49, 90, 60, 49, 90, 49, 90]
-                }]
-            };
-            var myBarChart = new Chart(ctx).Bar(data);
             
-            
-            var ctx = document.getElementById("samplesTestedChart").getContext("2d");
-            var data = {
-                labels: ["21 Mar", "22 Mar", "23 Mar", "24 Mar", "25 Mar", "26 Mar", "27 Mar"],
-                datasets: [{
-                    label: "My First dataset",
-                    fillColor: "rgba(243, 106, 90,0.5)",
-                    strokeColor: "rgba(243, 106, 90,0.8)",
-                    highlightFill: "rgba(243, 106, 90,0.75)",
-                    highlightStroke: "rgba(243, 106, 90,1)",
-                    data: [25, 29,25, 29,25, 29, 49]
-                }]
-            };
-            var myBarChart = new Chart(ctx).Bar(data);
-            
-            
-            
-            var ctx = document.getElementById("samplesRejectedChart").getContext("2d");
-            var data = {
-                labels: ["21 Mar", "22 Mar", "23 Mar", "24 Mar", "25 Mar", "26 Mar", "27 Mar"],
-                datasets: [{
-                    label: "My First dataset",
-                    fillColor: "rgba(122, 164, 211,0.5)",
-                    strokeColor: "rgba(122, 164, 211,0.8)",
-                    highlightFill: "rgba(122, 164, 211,0.75)",
-                    highlightStroke: "rgba(122, 164, 211,1)",
-                    data: [65, 59, 65, 59, 65, 59, 57]
-                }]
-            };
-            var myBarChart = new Chart(ctx).Bar(data);
-            
-            
-            var ctx = document.getElementById("samplesWaitingChart").getContext("2d");
-            var data = {
-                labels: ["21 Mar", "22 Mar", "23 Mar", "24 Mar", "25 Mar", "26 Mar", "27 Mar"],
-                datasets: [{
-                    label: "My First dataset",
-                    fillColor: "rgba(136, 119, 169,0.5)",
-                    strokeColor: "rgba(136, 119, 169,0.8)",
-                    highlightFill: "rgba(136, 119, 169,0.75)",
-                    highlightStroke: "rgba(136, 119, 169,1)",
-                    data: [45, 19,45, 19,45, 19, 76]
-                }]
-            };
-            var myBarChart = new Chart(ctx).Bar(data);
+        
             
             
             $(function () {
+                
+                
+                
+                
+                
+                
+                
+       
+            
+$('#samplesWaitingChart').highcharts({
+        chart: {
+            type: 'column',
+            height: 150
+        },
+        title: {
+            text: ''
+        },
+        subtitle: {
+            text: ''
+        },
+        xAxis: {
+            categories: ["21 Mar", "22 Mar", "23 Mar", "24 Mar", "25 Mar", "26 Mar", "27 Mar"],
+            crosshair: true
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                text: null
+            }
+        },
+        tooltip: {
+            headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+            pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                '<td style="padding:0"><b>{point.y}</b></td></tr>',
+            footerFormat: '</table>',
+            shared: true,
+            useHTML: true
+        },
+        plotOptions: {
+            column: {
+                pointPadding: 0.2,
+                borderWidth: 0
+            }
+        },
+        series: [{
+            showInLegend: false,  
+            name: 'Samples Waiting',
+            data: [45, 19,45, 19,45, 19, 76]
+
+        }],
+        colors : ['#8877a9']
+    });                        
+                
+      
+$('#samplesReceivedChart').highcharts({
+        chart: {
+            type: 'column',
+            height: 150
+        },
+        title: {
+            text: ''
+        },
+        subtitle: {
+            text: ''
+        },
+        xAxis: {
+            categories: ["21 Mar", "22 Mar", "23 Mar", "24 Mar", "25 Mar", "26 Mar", "27 Mar"],
+            crosshair: true
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                text: null
+            }
+        },
+        tooltip: {
+            headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+            pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                '<td style="padding:0"><b>{point.y}</b></td></tr>',
+            footerFormat: '</table>',
+            shared: true,
+            useHTML: true
+        },
+        plotOptions: {
+            column: {
+                pointPadding: 0.2,
+                borderWidth: 0
+            }
+        },
+        series: [{
+            showInLegend: false,  
+            name: 'Samples Received',
+            data: [25, 49,60, 69,55, 39, 20]
+
+        }],
+        colors : ['#2ab4c0']
+    });        
+
+
+      
+$('#samplesTestedChart').highcharts({
+        chart: {
+            type: 'column',
+            height: 150
+        },
+        title: {
+            text: ''
+        },
+        subtitle: {
+            text: ''
+        },
+        xAxis: {
+            categories: ["21 Mar", "22 Mar", "23 Mar", "24 Mar", "25 Mar", "26 Mar", "27 Mar"],
+            crosshair: true
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                text: null
+            }
+        },
+        tooltip: {
+            headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+            pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                '<td style="padding:0"><b>{point.y}</b></td></tr>',
+            footerFormat: '</table>',
+            shared: true,
+            useHTML: true
+        },
+        plotOptions: {
+            column: {
+                pointPadding: 0.2,
+                borderWidth: 0
+            }
+        },
+        series: [{
+            showInLegend: false,  
+            name: 'Samples Tested',
+            data: [25, 29,60, 29,25, 29, 49]
+
+        }],
+        colors : ['#f36a5a']
+    });        
+
+    
+    
+
+$('#samplesRejectedChart').highcharts({
+        chart: {
+            type: 'column',
+            height: 150
+        },
+        title: {
+            text: ''
+        },
+        subtitle: {
+            text: ''
+        },
+        xAxis: {
+            categories: ["21 Mar", "22 Mar", "23 Mar", "24 Mar", "25 Mar", "26 Mar", "27 Mar"],
+            crosshair: true
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                text: null
+            }
+        },
+        tooltip: {
+            headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+            pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                '<td style="padding:0"><b>{point.y}</b></td></tr>',
+            footerFormat: '</table>',
+            shared: true,
+            useHTML: true
+        },
+        plotOptions: {
+            column: {
+                pointPadding: 0.2,
+                borderWidth: 0
+            }
+        },
+        series: [{
+            showInLegend: false,  
+            name: 'Samples Rejected',
+            data: [65, 59, 65, 59, 65, 59, 57]
+
+        }],
+        colors : ['#5C9BD1']
+    });        
+
                 
 $('#reqformspie').highcharts({
         chart: {
@@ -427,19 +578,17 @@ var LocsAv2 = [
         lon: 31.1349953,
         title: 'Mbabne',
         html: '<h3>Mbabne</h3>',
-        icon: '<?php echo $this->basePath('assets/img/hub.png') ?>',
         draggable: false
     },
     {
-        lat: -26.781057,
-        lon: 31.9284363,
+        lat: -26.305201,
+        lon: 31.6049953,
         title: 'Big Bend',
         html: [
-            '<h3>Big Bend</h3>',
+            '<h3>ANOTHER Bend</h3>',
             '<p>Lorem Ipsum..</p>'
         ].join(''),
         zoom: 8,
-        icon: '<?php echo $this->basePath('assets/img/lab.png') ?>',
         visible: true
     },
     {
@@ -447,31 +596,71 @@ var LocsAv2 = [
         lon: 31.9243163,
         title: 'Simunye',
         html: '<h3>Simunye</h3>',
-        show_infowindow: false,
         visible: true,
-        icon: '<?php echo $this->basePath('assets/img/clinic.png') ?>',
         draggable: false
     },
     {
-        lat: -26.781057,
-        lon: 31.9284363,
+        lat: -26.782000,
+        lon: 31.9285000,
         title: 'Big Bend',
         html: [
             '<h3>Big Bend</h3>',
             '<p>Lorem Ipsum..</p>'
         ].join(''),
         zoom: 8,
-        icon: '<?php echo $this->basePath('assets/img/lab.png') ?>',
         visible: true
     }
 ];
                     
-new Maplace({
-    locations: LocsAv2,
-    map_div: '#gmap-polyline',
-    view_all_text: 'Start',
-    type: 'polyline'
-}).Load();
+
+var locations = [
+  //Starting Point is "Home", and links to other locations"//
+  ['Mbabne', -26.305201, 31.1349953, '<?php echo $this->basePath('assets/img/lab0.png') ?>'],
+  ['Big Bend', -26.781057, 31.9284363, '<?php echo $this->basePath('assets/img/clinic.png') ?>'],
+  ['Simunye', -26.210721, 31.9243163, '<?php echo $this->basePath('assets/img/clinic.png') ?>'],
+  ['Siteki', -26.434603, 31.9239713, '<?php echo $this->basePath('assets/img/clinic.png') ?>'],
+  ['Maloma', -26.998871, 31.6534333, '<?php echo $this->basePath('assets/img/clinic.png') ?>']
+]
+
+function initMap() {
+
+  var map = new google.maps.Map(document.getElementById('gmap-polyline'), {
+    zoom: 13,
+    mapTypeId: google.maps.MapTypeId.ROADMAP,
+    center: {
+      lat: 0,
+      lng: 0
+    }
+  });
+  var markers = [];
+  var bounds = new google.maps.LatLngBounds();
+  // Add the markers and infowindows to the map
+  for (var i = 0; i < locations.length; i++) {
+
+    var marker = new google.maps.Marker({
+      position: new google.maps.LatLng(locations[i][1], locations[i][2]),
+      title: locations[i][0],     
+      map: map,
+      icon: locations[i][3]      
+    })
+    markers.push(marker);
+    bounds.extend(marker.getPosition());
+    if (i > 0) {
+      var sitepath = new google.maps.Polyline({
+        path: [markers[0].getPosition(), marker.getPosition()],
+        geodesic: true,
+        strokeColor: '#F00',
+        strokeOpacity: 0.5,
+        strokeWeight: 2,
+        map: map
+      });
+    }
+  }
+  map.fitBounds(bounds);
+}
+google.maps.event.addDomListener(window, "load", initMap);
+
+
                     
                    
 //                   

@@ -46,9 +46,30 @@
                                                 <div class="col-md-6">
                                                     <select class="form-control" name="role" id="role">
                                                         <option value="">--Select--</option>
-                                                        <?php foreach($roles as $r) { ?>
-                                                        <option value="<?php echo $r['id'] ?>"  <?php echo ($user['role'] == $r['id'] ? " selected='selected' " : ""); ?>><?php echo $r['role_name'] ?></option>
-                                                        <?php } ?>
+
+                                                        <?php
+                                                            $options = [];
+                                                            foreach($roles as $r) {
+                                                                
+                                                               $options[$r['access_type']][$r['id']] = $r['role_name'];
+                                                               
+                                                            }
+                                                            
+                                                           foreach($options as $grp => $opt){
+                                                        ?>
+                                                            <optgroup label ="<?php echo strtoupper($grp); ?>">
+                                                        <?php
+                                                          foreach($opt as $id=>$role){
+                                                        ?>
+                                                            <option value="<?php echo $id ?>"  <?php echo ($user['role'] == $id ? " selected='selected' " : ""); ?>><?php echo $role ?></option>
+                                                        <?php
+                                                            }
+                                                        ?>      
+                                                            </optgroup>
+                                                        <?php
+                                                       }
+                                                       ?>                                                        
+                                                        
                                                     </select>
                                                 </div>
                                             </div>
