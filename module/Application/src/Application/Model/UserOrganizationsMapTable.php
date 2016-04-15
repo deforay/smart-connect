@@ -40,6 +40,19 @@ class UserOrganizationsMapTable extends AbstractTableGateway {
     }
     
     
+    
+    public function fetchUsers($orgId){
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $sQuery = $sql->select()->from(array('uom' => 'user_organization_map'))
+                      ->where(array('organization_id' => $orgId));
+        
+        $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
+        $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+        return $rResult;
+    }
+    
+    
     public function mapUserOrganizations($params){
         
         $this->delete(array('user_id' => $params['userId']));
@@ -48,6 +61,20 @@ class UserOrganizationsMapTable extends AbstractTableGateway {
         
         foreach($params['facilities'] as $facilityId){
             $this->insert(array('user_id'=>$params['userId'],'organization_id' => $facilityId));
+        }
+    }    
+    
+    
+    
+    
+    public function mapOrganizationToUsers($params){
+        
+        $this->delete(array('organization_id' => $params['orgId']));
+        
+        $credoContainer = new Container('credo');
+        
+        foreach($params['users'] as $userId){
+            $this->insert(array('organization_id'=>$params['orgId'],'user_id' => $userId));
         }
     }    
     

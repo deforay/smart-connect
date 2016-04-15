@@ -57,7 +57,10 @@
                                                                <td><?php echo $org['email']; ?></td>                                                  
                                                                <td><?php echo $org['phone']; ?></td>                                                  
                                                                <td><?php echo $org['address']; ?></td>
-                                                               <td><a href="/organizations/edit/<?php echo $org['org_id']; ?>" class="btn green">Edit</a></td>
+                                                               <td>
+                                                                <a href="/organizations/edit/<?php echo $org['org_id']; ?>" class="btn green">Edit</a>
+                                                                <a href="/organizations/map/<?php echo $org['org_id']; ?>" class="btn green">Map Users</a>
+                                                               </td>
                                                         </tr>
                                                         <?php } ?>
                                                         

@@ -133,7 +133,7 @@ $logincontainer = new Container('credo');
                             
                         </li>
                        
-                       <?php if(isset($logincontainer->accessType) && $logincontainer->accessType == 'admin') { ?>
+                       <?php if(isset($logincontainer->accessType) && $logincontainer->accessType == '4') { ?>
                        
                         <li class="nav-item <?php echo ($activeTab == 'admin' ? " active open " : ""); ?> ">
                             <a href="javascript:;" class="nav-link nav-toggle">
@@ -172,7 +172,7 @@ $logincontainer = new Container('credo');
                         </li>
                         
                         <?php } ?>
-                        <?php if(isset($logincontainer->accessType) && $logincontainer->accessType == 'clinic') { ?>
+                        <?php if(isset($logincontainer->accessType) && $logincontainer->accessType == '1') { ?>
                         <li class="nav-item <?php echo ($activeTab == 'clinic' ? " active open " : ""); ?> ">
                             <a href="javascript:;" class="nav-link nav-toggle">
                                 <i class="icon-settings"></i>
@@ -219,7 +219,7 @@ $logincontainer = new Container('credo');
                             </ul>
                         </li>
                         <?php } ?>
-                        <?php if(isset($logincontainer->accessType) && $logincontainer->accessType == 'hub') { ?>
+                        <?php if(isset($logincontainer->accessType) && $logincontainer->accessType == '2') { ?>
                         <li class="nav-item <?php echo ($activeTab == 'clinic' ? " active open " : ""); ?> ">
                             <a href="javascript:;" class="nav-link nav-toggle">
                                 <i class="icon-settings"></i>
@@ -261,7 +261,7 @@ $logincontainer = new Container('credo');
                             </ul>
                         </li>
                         <?php } ?>
-                        <?php if(isset($logincontainer->accessType) && $logincontainer->accessType == 'laboratory') { ?>                        
+                        <?php if(isset($logincontainer->accessType) && $logincontainer->accessType == '3') { ?>                        
                         <li class="nav-item <?php echo ($activeTab == 'laboratory' ? " active open " : ""); ?> ">
                             <a href="javascript:;" class="nav-link nav-toggle">
                                 <i class="icon-settings"></i>

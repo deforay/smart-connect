@@ -44,5 +44,18 @@ class OrganizationService {
     }
     
     
+    public function fetchOrganizationMap($orgId) {
+        $db = $this->sm->get('UserOrganizationsMapTable');
+        return $db->fetchUsers($orgId);
+    }
+    
+    
+    
+    public function mapOrganizationToUsers($params) {
+        $db = $this->sm->get('UserOrganizationsMapTable');
+        return $db->mapOrganizationToUsers($params);
+    }
+    
+    
    
 }

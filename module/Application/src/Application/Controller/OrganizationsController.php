@@ -64,6 +64,32 @@ class OrganizationsController extends AbstractActionController
         }       
         
     }
+    
+    
+    public function mapAction()
+    {
+        $this->layout()->setVariable('activeTab', 'admin');    
+        $this->layout()->setVariable('activeMenu', 'users');
+        $userService = $this->getServiceLocator()->get('UserService');
+        $orgService = $this->getServiceLocator()->get('OrganizationService');
+
+        
+        if($this->getRequest()->isPost()){
+            $params=$this->getRequest()->getPost();
+            $result=$orgService->mapOrganizationToUsers($params);
+            return $this->_redirect()->toRoute('organizations');
+        }else{
+            $orgId = ($this->params()->fromRoute('id'));
+            $org = $orgService->getOrganization($orgId);
+            if($org == false){
+                return $this->_redirect()->toRoute('organizations'); 
+            }else{
+                $users = $userService->fetchUsers();
+                $map  = $orgService->fetchOrganizationMap($orgId);
+                return new ViewModel(array('users'=>$users,'org'=>$org,'map'=>$map));
+            }   
+        }
+    } 
 
 
 }
