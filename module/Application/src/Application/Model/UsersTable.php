@@ -99,6 +99,7 @@ class UsersTable extends AbstractTableGateway {
 
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->from(array('u' => 'users'))
+        ->join(array('r' => 'user_roles'), 'u.role=r.id')
                       ->where("user_id= $userId");
         
         $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
