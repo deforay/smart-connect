@@ -29,7 +29,7 @@ return array(
             'application' => array(
                 'type'    => 'Literal',
                 'options' => array(
-                    'route'    => '/application',
+                    'route'    => '/dashboard',
                     'defaults' => array(
                         '__NAMESPACE__' => 'Application\Controller',
                         'controller'    => 'Index',
@@ -58,6 +58,16 @@ return array(
                     'route' => '/organizations[/][:action][/:id]',
                     'defaults' => array(
                         'controller' => 'Application\Controller\Organizations',
+                        'action' => 'index',
+                    ),
+                ),
+            ),
+            'laboratory' => array(
+                'type' => 'segment',
+                'options' => array(
+                    'route' => '/labs[/][:action][/:id]',
+                    'defaults' => array(
+                        'controller' => 'Application\Controller\Laboratory',
                         'action' => 'index',
                     ),
                 ),
@@ -101,6 +111,7 @@ return array(
             'Application\Controller\Organizations' => 'Application\Controller\OrganizationsController',
             'Application\Controller\Users' => 'Application\Controller\UsersController',
             'Application\Controller\Login' => 'Application\Controller\LoginController',
+            'Application\Controller\Laboratory' => 'Application\Controller\LaboratoryController',
         ),
     ),
     'view_manager' => array(

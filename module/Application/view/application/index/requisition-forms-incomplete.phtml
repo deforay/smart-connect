@@ -10,12 +10,10 @@
                                 <i class="fa fa-circle"></i>
                             </li>
                             <li>
-                                <a href="/organizations">Facilities</a>
+                                <a href="javascript:;">Incomplete Requisition Forms</a>
                             </li>
                         </ul>
                     </div>
-                    <!-- END PAGE BAR -->
-                    <!-- BEGIN PAGE TITLE-->
                     <!-- END PAGE BAR -->
                     <!-- BEGIN PAGE TITLE-->
                     <h3 class="page-title"></h3>
@@ -27,48 +25,29 @@
                             <div class="portlet box blue">
                                 <div class="portlet-title">
                                     <div class="caption">
-                                        <i class="fa fa-cogs"></i>Manage Facilities </div>
-                                </div>                                
+                                        <i class="fa fa-cogs"></i>Incomplete Requisition Forms </div>
+                                </div>
                                 <div class="portlet-body">
                                     <div class="table-toolbar">
-                                        <div class="row">
-                                            <div class="col-md-12">
-                                                <div class="btn-group pull-right">
-                                                    <a href="/organizations/add" class="btn sbold green"> Add New
-                                                        <i class="fa fa-plus"></i>
-                                                    </a>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <br>
-                                        <table class="table table-striped table-bordered table-hover table-checkable order-column" id="sample_1">
+                                        <table class="table table-striped table-bordered table-hover order-column" id="sample_1">
                                                     <thead>
                                                         <tr>
                                                             <th> Facility Name </th>
-                                                            <th> Facility Type </th>
-                                                            <th> Email </th>
-                                                            <th> Phone </th>
-                                                            <th> Address </th>
-                                                            <th> Action </th>
+                                                            <th> Form Date </th>
+                                                            <th> Reason </th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
-                                                        
-                                                        <?php foreach($organizations as $org){ ?>
                                                         <tr>
-                                                               <td><?php echo $org['name']; ?></td>                                                  
-                                                               <td><?php echo $org['type']; ?></td>                                                  
-                                                               <td><?php echo $org['email']; ?></td>                                                  
-                                                               <td><?php echo $org['phone']; ?></td>                                                  
-                                                               <td><?php echo $org['address']; ?></td>
-                                                               <td>
-                                                                <a href="/organizations/edit/<?php echo $org['org_id']; ?>" class="btn green">Edit</a>
-                                                                <a href="/organizations/map/<?php echo $org['org_id']; ?>" class="btn green">Map Users</a>
-                                                               </td>
+                                                        <td>Clinic 01010</td>                                                        
+                                                        <td>30 Mar 2016</td>                                                        
+                                                        <td>Some things are not filled as per requirements</td>                                                        
                                                         </tr>
-                                                        <?php } ?>
-                                                        
-                                                        
+                                                        <tr>
+                                                        <td>Clinic 34343</td>                                                        
+                                                        <td>04 Apr 2016</td>                                                        
+                                                        <td>Illegible entries</td>                                                        
+                                                        </tr>
                                                     </tbody>
                                                 </table>
 

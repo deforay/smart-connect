@@ -3,7 +3,7 @@
                     <div class="page-bar">
                         <ul class="page-breadcrumb">
                             <li>
-                                <a href="/">Dashboard</a>
+                                <a href="/labs/dashboard">Dashboard</a>
                             </li>
                         </ul>
                     </div>
@@ -110,7 +110,7 @@
                             <div class="portlet light ">
                                 <div class="portlet-title">
                                     <div class="caption ">
-                                        <span class="caption-subject font-dark bold uppercase">Samples Tested</span>
+                                        <span class="caption-subject font-dark bold uppercase">Samples Tested VS VL Suppressed</span>
                                     </div>
                                 </div>
                                 <div class="portlet-body">
@@ -123,7 +123,7 @@
                             <div class="portlet light ">
                                 <div class="portlet-title">
                                     <div class="caption ">
-                                        <span class="caption-subject font-dark bold uppercase">Samples Tested (last 7 facilities)</span>
+                                        <span class="caption-subject font-dark bold uppercase">Samples Tested VS VL Suppressed</span>
                                     </div>
                                 </div>
                                 <div class="portlet-body">
@@ -138,7 +138,7 @@
                             <div class="portlet light ">
                                 <div class="portlet-title">
                                     <div class="caption ">
-                                        <span class="caption-subject font-dark bold uppercase">Laboratory Turnaround Time</span>
+                                        <span class="caption-subject font-dark bold uppercase">Average Turnaround Time</span>
                                     </div>
                                 </div>
                                 <div class="portlet-body">
@@ -241,7 +241,7 @@ $('#samplesWaitingChart').highcharts({
                 point: {
                     events: {
                         click: function () {
-                            window.location.href='/dashboard/index/samples-waiting';
+                            window.location.href='/labs/samples';
                         }
                     }
                 }
@@ -294,7 +294,7 @@ $('#samplesReceivedChart').highcharts({
                 point: {
                     events: {
                         click: function () {
-                            window.location.href='/dashboard/index/samples-accession';
+                            window.location.href='/labs/samples';
                         }
                     }
                 }                
@@ -348,7 +348,7 @@ $('#samplesTestedChart').highcharts({
                 point: {
                     events: {
                         click: function () {
-                            window.location.href='/dashboard/index/samples-tested';
+                            window.location.href='/labs/samples';
                         }
                     }
                 }
@@ -403,7 +403,7 @@ $('#samplesRejectedChart').highcharts({
                 point: {
                     events: {
                         click: function () {
-                            window.location.href='/dashboard/index/samples-rejected';
+                            window.location.href='/labs/samples';
                         }
                     }
                 }
@@ -485,8 +485,8 @@ $('#reqformspie').highcharts({
             data: [2, 2, 3, 2, 1, 2, 1]
         }],
     colors: [
-        '#64ade5',
-        '#8877a9'
+        '#F36A5A',
+        '#60d18f'
     ]
     });                
                 
@@ -534,31 +534,18 @@ $('#reqformspie').highcharts({
             }
         },
 
-        series: [
-        {
-            name: 'Plasma',
+        series: [{
+            name: 'Samples',
             data: [2, 5, 6, 2, 1, 2, 1],
             stack: 'female'
         }, {
             name: 'VL Suppressed',
-            data: [3, 2, 4, 4, 3, 4, 3],
+            data: [3, 0, 4, 4, 3, 4, 3],
             stack: 'female'
-        },
-        {
-            name: 'DBS',
-            data: [12, 9, 8, 12, 4, 6, 9],
-            stack: 'male'
-        }, {
-            name: 'VL Suppressed',
-            data: [9, 5, 4, 4, 3, 4, 3],
-            stack: 'male'
-        }
-        ],
+        }],
     colors: [
         '#F36A5A',
-        '#60d18f',
-        '#ff1900',
-        '#09843a',
+        '#60d18f'
     ]
     });                          
                 
@@ -602,28 +589,17 @@ $('#reqformspie').highcharts({
         },
 
         series: [{
-            name: 'Plasma',
-            data: [35, 30, 25, 20, 15, 10, 5],
+            name: 'Samples',
+            data: [20, 15, 16, 21, 15, 12, 9],
             stack: 'female'
         }, {
             name: 'VL Suppressed',
             data: [19, 10, 14, 14,13, 9, 3],
             stack: 'female'
-        },
-        {
-            name: 'DBS',
-            data: [12, 9, 8, 12, 4, 6, 9],
-            stack: 'male'
-        }, {
-            name: 'VL Suppressed',
-            data: [9, 5, 4, 4, 3, 4, 3],
-            stack: 'male'
         }],
     colors: [
         '#F36A5A',
-        '#60d18f',
-        '#ff1900',
-        '#09843a'
+        '#60d18f'
     ]
     });                          
                     
@@ -637,9 +613,9 @@ $('#reqformspie').highcharts({
                     
                     
                     
-    $('#patientsTestedVsSupressed').highcharts({
+                    $('#patientsTestedVsSupressed').highcharts({
         chart: {
-            type: 'line'
+            type: 'bar'
         },
         title: {
             text: ''
@@ -648,23 +624,48 @@ $('#reqformspie').highcharts({
             text: ''
         },
         xAxis: {
-            categories: ["21 Mar", "22 Mar", "23 Mar", "24 Mar", "25 Mar", "26 Mar", "27 Mar"]
-        },
-        yAxis: {
+            categories: ["21 Mar", "22 Mar", "23 Mar", "24 Mar", "25 Mar", "26 Mar", "27 Mar"],
             title: {
-                text: 'TAT in Hours'
+                text: null
             }
         },
+        yAxis: {
+            min: 0,
+            title: {
+                text: 'Average TAT in Hrs',
+                align: 'high'
+            },
+            labels: {
+                overflow: 'justify'
+            }
+        },
+        tooltip: {
+            valueSuffix: ' hours'
+        },
         plotOptions: {
-            line: {
+            bar: {
                 dataLabels: {
                     enabled: true
                 }
             }
         },
+        legend: {
+            layout: 'vertical',
+            align: 'right',
+            verticalAlign: 'top',
+            x: -40,
+            y: 80,
+            floating: true,
+            borderWidth: 1,
+            backgroundColor: ((Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#FFFFFF'),
+            shadow: true
+        },
+        credits: {
+            enabled: false
+        },
         series: [{
-            name: 'Average Turnaround Time',
-            data: [14,16,15,13,16,17,15]
+            name: 'TAT',
+            data: [10, 21, 13, 20, 10, 35, 20]
         }]
     });
                     
