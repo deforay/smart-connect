@@ -3,7 +3,7 @@
                     <div class="page-bar">
                         <ul class="page-breadcrumb">
                             <li>
-                                <a href="/">Dashboard</a>
+                                <a href="/labs/dashboard">Labs Dashboard</a>
                             </li>
                         </ul>
                     </div>
@@ -166,16 +166,10 @@
                     <div class="row">
                         <div class="col-md-12 col-sm-12">
                             <div class="portlet light ">
-                                <div class="portlet-title">
-                                    <div class="caption">
-                                        <i class="icon-share font-dark hide"></i>
-                                        <span class="caption-subject font-dark bold uppercase"></span>
-                                    </div>
-                                </div>
                                 <div class="portlet-body">
 
                                     <div id="controls-polyline"></div>
-                                    <div id="gmap-polyline"  class="mapChart"></div>
+                                    <div id="gmap-polyline"  class="mapChart" style="height:600px !important;"></div>
                                     
                                 </div>
                             </div>
@@ -241,7 +235,7 @@ $('#samplesWaitingChart').highcharts({
                 point: {
                     events: {
                         click: function () {
-                            window.location.href='/dashboard/index/samples-waiting';
+                            window.location.href='/labs/samples-waiting';
                         }
                     }
                 }
@@ -294,7 +288,7 @@ $('#samplesReceivedChart').highcharts({
                 point: {
                     events: {
                         click: function () {
-                            window.location.href='/dashboard/index/samples-accession';
+                            window.location.href='/labs/samples-accession';
                         }
                     }
                 }                
@@ -348,7 +342,7 @@ $('#samplesTestedChart').highcharts({
                 point: {
                     events: {
                         click: function () {
-                            window.location.href='/dashboard/index/samples-tested';
+                            window.location.href='/labs/samples-tested';
                         }
                     }
                 }
@@ -403,7 +397,7 @@ $('#samplesRejectedChart').highcharts({
                 point: {
                     events: {
                         click: function () {
-                            window.location.href='/dashboard/index/samples-rejected';
+                            window.location.href='/labs/samples-rejected';
                         }
                     }
                 }
@@ -464,7 +458,7 @@ $('#reqformspie').highcharts({
                 point: {
                     events: {
                         click: function () {
-                            window.location.href='/dashboard/index/requisition-forms-incomplete';
+                            window.location.href='/labs/requisition-forms-incomplete';
                         }
                     }
                 },
@@ -537,7 +531,7 @@ $('#reqformspie').highcharts({
                 point: {
                     events: {
                         click: function () {
-                            window.location.href='/dashboard/index/samples-tested';
+                            window.location.href='/labs/samples-tested';
                         }
                     }
                 }
@@ -546,20 +540,20 @@ $('#reqformspie').highcharts({
 
         series: [
         {
-            name: 'Plasma',
+            name: 'Plasma Not Suppressed',
             data: [2, 5, 6, 2, 1, 2, 1],
             stack: 'female'
         }, {
-            name: 'VL Suppressed',
+            name: 'Plasma Suppressed',
             data: [3, 2, 4, 4, 3, 4, 3],
             stack: 'female'
         },
         {
-            name: 'DBS',
+            name: 'DBS Not Suppressed',
             data: [12, 9, 8, 12, 4, 6, 9],
             stack: 'male'
         }, {
-            name: 'VL Suppressed',
+            name: 'DBS Suppressed',
             data: [9, 5, 4, 4, 3, 4, 3],
             stack: 'male'
         }
@@ -586,7 +580,7 @@ $('#reqformspie').highcharts({
         },
 
         xAxis: {
-            categories: ["Clinic 001", "Clinic 002", "Clinic 003", "Clinic 004", "Clinic 005", "Clinic 006", "Clinic 007"]
+            categories: ["Lab 001", "Lab 002", "Lab 003", "Lab 004", "Lab 005", "Lab 006", "Lab 007"]
         },
 
         yAxis: {
@@ -614,7 +608,7 @@ $('#reqformspie').highcharts({
                 point: {
                     events: {
                         click: function () {
-                            window.location.href='/dashboard/index/samples-tested';
+                            window.location.href='/labs/samples-tested';
                         }
                     }
                 }
@@ -622,22 +616,64 @@ $('#reqformspie').highcharts({
         },
 
         series: [{
-            name: 'Plasma',
+            name: 'Plasma Not Suppressed',
             data: [35, 30, 25, 20, 15, 10, 5],
             stack: 'female'
         }, {
-            name: 'VL Suppressed',
+            name: 'Plasma Suppressed',
             data: [19, 10, 14, 14,13, 9, 3],
             stack: 'female'
         },
         {
-            name: 'DBS',
+            name: 'DBS Not Suppressed',
             data: [12, 9, 8, 12, 4, 6, 9],
             stack: 'male'
         }, {
-            name: 'VL Suppressed',
+            name: 'DBS Suppressed',
             data: [9, 5, 4, 4, 3, 4, 3],
             stack: 'male'
+        },{
+            type: 'pie',
+            name: 'Samples',
+            data: [{
+                name: 'Lab 001',
+                y: 13,
+                color : 'yellow'
+            }, {
+                name: 'Lab 002',
+                y: 23
+            },
+            {
+                name: 'Lab 003',
+                y: 22
+            },
+            {
+                name: 'Lab 004',
+                y: 29
+            },
+            {
+                name: 'Lab 005',
+                y: 1
+            },
+            {
+                name: 'Lab 006',
+                y: 5
+            },
+            {
+                name: 'Lab 007',
+                y: 15
+            },
+            {
+                name: 'Lab 008',
+                y: 9
+            }
+            ],
+            center: [290, 30],
+            size: 100,
+            showInLegend: false,
+            dataLabels: {
+                enabled: false
+            }
         }],
     colors: [
         '#F36A5A',
@@ -687,30 +723,13 @@ $('#reqformspie').highcharts({
             }
         },
         series: [{
-            name: 'Average Turnaround Time',
-            data: [14,16,15,13,16,17,15]
-        }, {
-            type: 'pie',
-            name: 'Samples',
-            data: [{
-                name: 'Lab 001',
-                y: 13,
-                color: 'red' // Jane's color
-            }, {
-                name: 'Lab 002',
-                y: 23,
-                color: '#7DC6FE' // John's color
-            }, {
-                name: 'Lab 003',
-                y: 19,
-                color: 'yellow' // Joe's color
-            }],
-            center: [50, 30],
-            size: 100,
-            showInLegend: false,
-            dataLabels: {
-                enabled: false
-            }
+            name: 'Plasma',
+            data: [14,16,15,13,16,17,15],
+            color : '#64ade5'
+        },{
+            name: 'DBS',
+            data: [15,17,19,10,16,11,12],
+            color : '#8877a9'
         }]
     });
                     

@@ -124,10 +124,18 @@ $logincontainer = new Container('credo');
                             <!-- END SIDEBAR TOGGLER BUTTON -->
                         </li>
                         <!-- DOC: To remove the search box from the sidebar you just need to completely remove the below "sidebar-search-wrapper" LI element -->
-                       <li class="nav-item start <?php echo ($activeTab == 'dashboard' ? " active open " : ""); ?>">
-                            <a href="/" class="nav-link nav-toggle">
+                       <li class="nav-item start <?php echo ($activeTab == 'labs-dashboard' ? " active open " : ""); ?>">
+                            <a href="/labs/dashboard" class="nav-link nav-toggle">
                                 <i class="icon-home"></i>
-                                <span class="title">Dashboard</span>
+                                <span class="title">Labs Dashboard</span>
+                                <span class="selected"></span>
+                            </a>
+                            
+                        </li>
+                       <li class="nav-item start <?php echo ($activeTab == 'clinics-dashboard' ? " active open " : ""); ?>">
+                            <a href="/clinics/dashboard" class="nav-link nav-toggle">
+                                <i class="icon-home"></i>
+                                <span class="title">Clinics Dashboard</span>
                                 <span class="selected"></span>
                             </a>
                             

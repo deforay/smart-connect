@@ -72,6 +72,16 @@ return array(
                     ),
                 ),
             ),
+            'clinics' => array(
+                'type' => 'segment',
+                'options' => array(
+                    'route' => '/clinics[/][:action][/:id]',
+                    'defaults' => array(
+                        'controller' => 'Application\Controller\Clinic',
+                        'action' => 'index',
+                    ),
+                ),
+            ),
             'login' => array(
                 'type'    => 'segment',
                 'options' => array(
@@ -112,6 +122,7 @@ return array(
             'Application\Controller\Users' => 'Application\Controller\UsersController',
             'Application\Controller\Login' => 'Application\Controller\LoginController',
             'Application\Controller\Laboratory' => 'Application\Controller\LaboratoryController',
+            'Application\Controller\Clinic' => 'Application\Controller\ClinicController',
         ),
     ),
     'view_manager' => array(

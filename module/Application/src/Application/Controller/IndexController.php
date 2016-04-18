@@ -41,7 +41,7 @@ class IndexController extends AbstractActionController
     
     public function samplesTestedAction()
     {
-        $this->layout()->setVariable('activeTab', 'dashboard');          
+        $this->layout()->setVariable('activeTab', 'dashboard');
         return new ViewModel();
     }
     

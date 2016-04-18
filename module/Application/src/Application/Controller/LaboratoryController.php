@@ -15,11 +15,38 @@ class LaboratoryController extends AbstractActionController
 
     public function dashboardAction()
     {
+        $this->layout()->setVariable('activeTab', 'labs-dashboard');          
         return new ViewModel();
     }
 
-    public function samplesAction()
+    public function samplesAccessionAction()
     {
+        $this->layout()->setVariable('activeTab', 'labs-dashboard');          
+        return new ViewModel();
+    }
+    
+    public function samplesWaitingAction()
+    {
+        $this->layout()->setVariable('activeTab', 'labs-dashboard');                
+        return new ViewModel();
+    }
+    
+    
+    public function samplesRejectedAction()
+    {
+        $this->layout()->setVariable('activeTab', 'labs-dashboard');                 
+        return new ViewModel();
+    }
+    
+    public function samplesTestedAction()
+    {
+        $this->layout()->setVariable('activeTab', 'labs-dashboard');               
+        return new ViewModel();
+    }
+    
+    public function requisitionFormsIncompleteAction()
+    {
+        $this->layout()->setVariable('activeTab', 'labs-dashboard');          
         return new ViewModel();
     }
 

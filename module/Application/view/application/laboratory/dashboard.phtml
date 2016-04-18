@@ -3,7 +3,7 @@
                     <div class="page-bar">
                         <ul class="page-breadcrumb">
                             <li>
-                                <a href="/labs/dashboard">Dashboard</a>
+                                <a href="/">Dashboard</a>
                             </li>
                         </ul>
                     </div>
@@ -16,8 +16,11 @@
                         <div class="col-lg-6">
                                 <select class="form-control">
                                     <option>All my facilities</option>
-                                    <option>Clinic 1</option>
-                                    <option>Clinic 2</option>
+                                    <option>Lab 001</option>
+                                    <option>Lab 002</option>
+                                    <option>Lab 003</option>
+                                    <option>Lab 004</option>
+                                    <option>Lab 005</option>
                                 </select>
                             </div>
                         <div class="col-lg-6">
@@ -110,7 +113,7 @@
                             <div class="portlet light ">
                                 <div class="portlet-title">
                                     <div class="caption ">
-                                        <span class="caption-subject font-dark bold uppercase">Samples Tested VS VL Suppressed</span>
+                                        <span class="caption-subject font-red-haze bold uppercase">Samples Tested</span>
                                     </div>
                                 </div>
                                 <div class="portlet-body">
@@ -123,7 +126,7 @@
                             <div class="portlet light ">
                                 <div class="portlet-title">
                                     <div class="caption ">
-                                        <span class="caption-subject font-dark bold uppercase">Samples Tested VS VL Suppressed</span>
+                                        <span class="caption-subject font-red-haze bold uppercase">Samples Tested based on Volume</span>
                                     </div>
                                 </div>
                                 <div class="portlet-body">
@@ -138,11 +141,11 @@
                             <div class="portlet light ">
                                 <div class="portlet-title">
                                     <div class="caption ">
-                                        <span class="caption-subject font-dark bold uppercase">Average Turnaround Time</span>
+                                        <span class="caption-subject font-dark bold uppercase">Laboratory Turnaround Time</span>
                                     </div>
                                 </div>
                                 <div class="portlet-body">
-                                    <div id="patientsTestedVsSupressed"></div>
+                                    <div id="labAverageTat"></div>
                                 </div>
                             </div>
                         </div>
@@ -166,16 +169,10 @@
                     <div class="row">
                         <div class="col-md-12 col-sm-12">
                             <div class="portlet light ">
-                                <div class="portlet-title">
-                                    <div class="caption">
-                                        <i class="icon-share font-dark hide"></i>
-                                        <span class="caption-subject font-dark bold uppercase"></span>
-                                    </div>
-                                </div>
                                 <div class="portlet-body">
 
                                     <div id="controls-polyline"></div>
-                                    <div id="gmap-polyline"  class="mapChart"></div>
+                                    <div id="gmap-polyline"  class="mapChart" style="height:600px !important;"></div>
                                     
                                 </div>
                             </div>
@@ -241,7 +238,7 @@ $('#samplesWaitingChart').highcharts({
                 point: {
                     events: {
                         click: function () {
-                            window.location.href='/labs/samples';
+                            window.location.href='/labs/samples-waiting';
                         }
                     }
                 }
@@ -294,7 +291,7 @@ $('#samplesReceivedChart').highcharts({
                 point: {
                     events: {
                         click: function () {
-                            window.location.href='/labs/samples';
+                            window.location.href='/labs/samples-accession';
                         }
                     }
                 }                
@@ -348,7 +345,7 @@ $('#samplesTestedChart').highcharts({
                 point: {
                     events: {
                         click: function () {
-                            window.location.href='/labs/samples';
+                            window.location.href='/labs/samples-tested';
                         }
                     }
                 }
@@ -403,7 +400,7 @@ $('#samplesRejectedChart').highcharts({
                 point: {
                     events: {
                         click: function () {
-                            window.location.href='/labs/samples';
+                            window.location.href='/labs/samples-rejected';
                         }
                     }
                 }
@@ -464,7 +461,7 @@ $('#reqformspie').highcharts({
                 point: {
                     events: {
                         click: function () {
-                            window.location.href='/dashboard/index/requisition-forms-incomplete';
+                            window.location.href='/labs/requisition-forms-incomplete';
                         }
                     }
                 },
@@ -485,8 +482,8 @@ $('#reqformspie').highcharts({
             data: [2, 2, 3, 2, 1, 2, 1]
         }],
     colors: [
-        '#F36A5A',
-        '#60d18f'
+        '#64ade5',
+        '#8877a9'
     ]
     });                
                 
@@ -530,22 +527,45 @@ $('#reqformspie').highcharts({
 
         plotOptions: {
             column: {
-                stacking: 'normal'
+                stacking: 'normal',
+                pointPadding: 0.2,
+                borderWidth: 0,
+                cursor: 'pointer',
+                point: {
+                    events: {
+                        click: function () {
+                            window.location.href='/labs/samples-tested';
+                        }
+                    }
+                }
             }
         },
 
-        series: [{
-            name: 'Samples',
+        series: [
+        {
+            name: 'Plasma Not Suppressed',
             data: [2, 5, 6, 2, 1, 2, 1],
             stack: 'female'
         }, {
-            name: 'VL Suppressed',
-            data: [3, 0, 4, 4, 3, 4, 3],
+            name: 'Plasma Suppressed',
+            data: [3, 2, 4, 4, 3, 4, 3],
             stack: 'female'
-        }],
+        },
+        {
+            name: 'DBS Not Suppressed',
+            data: [12, 9, 8, 12, 4, 6, 9],
+            stack: 'male'
+        }, {
+            name: 'DBS Suppressed',
+            data: [9, 5, 4, 4, 3, 4, 3],
+            stack: 'male'
+        }
+        ],
     colors: [
         '#F36A5A',
-        '#60d18f'
+        '#60d18f',
+        '#ff1900',
+        '#09843a',
     ]
     });                          
                 
@@ -563,7 +583,7 @@ $('#reqformspie').highcharts({
         },
 
         xAxis: {
-            categories: ["Clinic 001", "Clinic 002", "Clinic 003", "Clinic 004", "Clinic 005", "Clinic 006", "Clinic 007"]
+            categories: ["Lab 001", "Lab 002", "Lab 003", "Lab 004", "Lab 005", "Lab 006", "Lab 007"]
         },
 
         yAxis: {
@@ -584,22 +604,85 @@ $('#reqformspie').highcharts({
 
         plotOptions: {
             column: {
-                stacking: 'normal'
+                stacking: 'normal',
+                pointPadding: 0.2,
+                borderWidth: 0,
+                cursor: 'pointer',
+                point: {
+                    events: {
+                        click: function () {
+                            window.location.href='/labs/samples-tested';
+                        }
+                    }
+                }
             }
         },
 
         series: [{
-            name: 'Samples',
-            data: [20, 15, 16, 21, 15, 12, 9],
+            name: 'Plasma Not Suppressed',
+            data: [35, 30, 25, 20, 15, 10, 5],
             stack: 'female'
         }, {
-            name: 'VL Suppressed',
+            name: 'Plasma Suppressed',
             data: [19, 10, 14, 14,13, 9, 3],
             stack: 'female'
+        },
+        {
+            name: 'DBS Not Suppressed',
+            data: [12, 9, 8, 12, 4, 6, 9],
+            stack: 'male'
+        }, {
+            name: 'DBS Suppressed',
+            data: [9, 5, 4, 4, 3, 4, 3],
+            stack: 'male'
+        },{
+            type: 'pie',
+            name: 'Samples',
+            data: [{
+                name: 'Lab 001',
+                y: 13,
+                color : 'yellow'
+            }, {
+                name: 'Lab 002',
+                y: 23
+            },
+            {
+                name: 'Lab 003',
+                y: 22
+            },
+            {
+                name: 'Lab 004',
+                y: 29
+            },
+            {
+                name: 'Lab 005',
+                y: 1
+            },
+            {
+                name: 'Lab 006',
+                y: 5
+            },
+            {
+                name: 'Lab 007',
+                y: 15
+            },
+            {
+                name: 'Lab 008',
+                y: 9
+            }
+            ],
+            center: [290, 30],
+            size: 100,
+            showInLegend: false,
+            dataLabels: {
+                enabled: false
+            }
         }],
     colors: [
         '#F36A5A',
-        '#60d18f'
+        '#60d18f',
+        '#ff1900',
+        '#09843a'
     ]
     });                          
                     
@@ -613,9 +696,9 @@ $('#reqformspie').highcharts({
                     
                     
                     
-                    $('#patientsTestedVsSupressed').highcharts({
+    $('#labAverageTat').highcharts({
         chart: {
-            type: 'bar'
+            type: 'line'
         },
         title: {
             text: ''
@@ -624,48 +707,32 @@ $('#reqformspie').highcharts({
             text: ''
         },
         xAxis: {
-            categories: ["21 Mar", "22 Mar", "23 Mar", "24 Mar", "25 Mar", "26 Mar", "27 Mar"],
-            title: {
-                text: null
-            }
+            categories: ["21 Mar", "22 Mar", "23 Mar", "24 Mar", "25 Mar", "26 Mar", "27 Mar"]
         },
         yAxis: {
-            min: 0,
             title: {
-                text: 'Average TAT in Hrs',
-                align: 'high'
-            },
-            labels: {
-                overflow: 'justify'
-            }
-        },
-        tooltip: {
-            valueSuffix: ' hours'
+                text: 'TAT in Hours'
+            },plotLines: [{
+                    value: 16,
+                    color: 'red',
+                    width: 2
+                }]
         },
         plotOptions: {
-            bar: {
+            line: {
                 dataLabels: {
                     enabled: true
                 }
             }
         },
-        legend: {
-            layout: 'vertical',
-            align: 'right',
-            verticalAlign: 'top',
-            x: -40,
-            y: 80,
-            floating: true,
-            borderWidth: 1,
-            backgroundColor: ((Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#FFFFFF'),
-            shadow: true
-        },
-        credits: {
-            enabled: false
-        },
         series: [{
-            name: 'TAT',
-            data: [10, 21, 13, 20, 10, 35, 20]
+            name: 'Plasma',
+            data: [14,16,15,13,16,17,15],
+            color : '#64ade5'
+        },{
+            name: 'DBS',
+            data: [15,17,19,10,16,11,12],
+            color : '#8877a9'
         }]
     });
                     
@@ -718,11 +785,11 @@ var LocsAv2 = [
 
 var locations = [
   //Starting Point is "Home", and links to other locations"//
-  ['Mbabne', -26.305201, 31.1349953, '<?php echo $this->basePath('assets/img/lab0.png') ?>'],
-  ['Big Bend', -26.781057, 31.9284363, '<?php echo $this->basePath('assets/img/clinic.png') ?>'],
-  ['Simunye', -26.210721, 31.9243163, '<?php echo $this->basePath('assets/img/clinic.png') ?>'],
-  ['Siteki', -26.434603, 31.9239713, '<?php echo $this->basePath('assets/img/clinic.png') ?>'],
-  ['Maloma', -26.998871, 31.6534333, '<?php echo $this->basePath('assets/img/clinic.png') ?>']
+  ['Mbabne', -26.305201, 31.1349953, '<?php echo $this->basePath('assets/img/lab0.png') ?>', '<strong>No. of Samples : 30</strong>'],
+  ['Big Bend', -26.781057, 31.9284363, '<?php echo $this->basePath('assets/img/clinic.png') ?>', '<strong>No. of Samples : 10</strong>'],
+  ['Simunye', -26.210721, 31.9243163, '<?php echo $this->basePath('assets/img/clinic.png') ?>', '<strong>No. of Samples : 33</strong>'],
+  ['Siteki', -26.434603, 31.9239713, '<?php echo $this->basePath('assets/img/clinic.png') ?>', '<strong>No. of Samples : 40</strong>'],
+  ['Maloma', -26.998871, 31.6534333, '<?php echo $this->basePath('assets/img/clinic.png') ?>', '<strong>No. of Samples : 90</strong>']
 ]
 
 function initMap() {
@@ -746,7 +813,17 @@ function initMap() {
       title: locations[i][0],     
       map: map,
       icon: locations[i][3]      
-    })
+    });
+    
+    marker['infowindow'] = new google.maps.InfoWindow({
+        content: locations[i][4]      
+    });    
+    
+    google.maps.event.addListener(marker, 'mouseover', function() {
+        this['infowindow'].open(map, this);
+    });    
+    
+    
     markers.push(marker);
     bounds.extend(marker.getPosition());
     if (i > 0) {

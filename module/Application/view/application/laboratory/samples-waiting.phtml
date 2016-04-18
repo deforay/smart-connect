@@ -1,0 +1,440 @@
+           <!-- BEGIN PAGE HEADER-->
+                    <!-- BEGIN THEME PANEL -->
+                    <!-- END THEME PANEL -->
+                    <!-- BEGIN PAGE BAR -->
+                    <div class="page-bar">
+                        <ul class="page-breadcrumb">
+                            <li>
+                                <a href="/">Dashboard</a>
+                                <i class="fa fa-circle"></i>
+                            </li>
+                            <li>
+                                <a href="javascript:;">Samples Waiting</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <!-- END PAGE BAR -->
+                    <!-- BEGIN PAGE TITLE-->
+                    <h3 class="page-title">Samples Waiting</h3>
+                    <!-- END PAGE TITLE-->
+                    <!-- END PAGE HEADER-->
+                    
+                    
+                    
+                    
+                    <div class="row">
+
+                        <div class="col-md-12" style="padding-left:30px;">
+                            <form class="form-Horizontal">
+                                
+                        <div class="col-md-12">
+                            <div class="form-group col-lg-4">
+                                <label class="control-label">Date Range&nbsp;</label>
+                              <div id="daterange" class="btn btn-sm form-control col-lg-6" style="text-align:left;"
+                                 data-container="body"
+                                 data-placement="bottom"
+                                 data-original-title="Change dashboard date range">
+                                        <i class="icon-calendar"></i>&nbsp;
+                                        <span class="thin uppercase hidden-xs"></span>&nbsp;
+                                        <i class="fa fa-angle-down"></i>
+                            </div>
+                            </div>                            
+                        </div>                                
+                        <div class="col-md-12">        
+                            <div class="form-group col-lg-4">
+                                <label class="control-label">Lab&nbsp;</label>
+                              <select class="form-control">
+                                <option>All Labs</option>
+                                <option>Lab 001</option>
+                                <option>Lab 002</option>
+                                <option>Lab 003</option>
+                              </select>
+                            </div>
+                            <div class="form-group col-lg-4">
+                                <label class="control-label">Hub</label>
+                              <select class="form-control">
+                                <option>All Hubs</option>
+                                <option>Hub 001</option>
+                                <option>Hub 002</option>
+                                <option>Hub 003</option>
+                              </select>
+                            </div>                            
+                            <div class="form-group col-lg-4">
+                                <label class="control-label">Clinic&nbsp;</label>
+                              <select class="form-control">
+                                <option>All Clinic</option>
+                                <option>Clinic 001</option>
+                                <option>Clinic 002</option>
+                                <option>Clinic 003</option>
+                              </select>
+                            </div>
+
+                        </div>                                
+                        <div class="col-md-12">
+                            <div class="form-group col-lg-4">
+                                <label class="control-label">Test Result&nbsp;</label>
+                              <select class="form-control">
+                                <option>All</option>
+                                <option>VL Suppressed</option>
+                                <option>VL Not Suppressed</option>
+                              </select>
+                            </div>
+                            <div class="form-group col-lg-4">
+                                <label class="control-label">Sample Type</label>
+                              <select class="form-control">
+                                <option>All</option>
+                                <option>Plasma</option>
+                                <option>DBS</option>
+                              </select>
+                            </div>
+                            <div class="form-group col-lg-4">
+                                <br>
+                                <button class="btn btn-primary" onclick="return false;">Filter</button>
+                            </div>
+                        </div>
+                            
+                          </form>
+                        </div>
+                    </div>
+                    
+                    
+
+                    <div class="row" style="margin-bottom:30px;">
+                        <div class="col-lg-6">
+                            <div id="piecontainer" style="min-width: 310px; height: 400px; max-width: 100%; margin: 0 auto;padding:1.5%;"></div>
+                            
+                                                <!--<button id="piebutton" class="btn btn-default pull-right" style="margin-right:12px;margin-bottom:10px;margin-top:5px;display:none;"><span>View Pie Chart</span></button>
+                    <button id="barbutton" class="btn btn-default pull-right" style="margin-right:12px;margin-bottom:10px;margin-top:5px;"><span>View Bar Chart</span></button>                    -->
+                        </div>
+                        <div class="col-lg-6">
+                            <div id="barcontainer" style="min-width: 310px; height: 400px; max-width: 100%; margin: 0 auto;padding:1.5%;"></div>
+                        </div>
+                    </div>
+
+                        <br>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <!-- BEGIN EXAMPLE TABLE PORTLET-->
+                            <div class="portlet box blue">
+                                <div class="portlet-title">
+                                    <div class="caption">
+                                        <i class="fa fa-cogs"></i>Samples
+                                    </div>
+                                    <div class="tools">
+                                        <button class="btn btn-default"><span><i class="fa fa-file-excel-o" aria-hidden="true"></i> Excel</span></button>
+                                    </div>
+
+                                </div>
+                                <div class="portlet-body">
+                                    <div class="table-toolbar">
+                                        <table class="table table-striped table-bordered table-hover order-column" id="sample_1">
+                                            <thead>
+                                                <tr>
+                                                    <th> Date </th>
+                                                    <th> No. of Samples </th>
+                                                    <th> Sample Type </th>
+                                                    <th> Clinics </th>
+                                                    <th> Hubs </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>20-Apr-2016</td>
+                                                    <td>20</td>
+                                                    <td>Plasma</td>
+                                                    <td>Clinic 001</td>
+                                                    <td>Hub 002</td>
+                                                    
+                                                </tr>
+                                                <tr>
+                                                    <td>21-Apr-2016</td>
+                                                    <td>24</td>
+                                                    <td>DBS</td>
+                                                    <td>Clinic 002</td>
+                                                    <td>Hub 002</td>
+                                                    
+                                                </tr>
+                                                <tr>
+                                                    <td>22-Apr-2016</td>
+                                                    <td>30</td>
+                                                    <td>DBS</td>
+                                                    <td>Clinic 003</td>
+                                                    <td>Hub 002</td>
+                                                    
+                                                </tr>
+                                                <tr>
+                                                    <td>23-Apr-2016</td>
+                                                    <td>22</td>
+                                                    <td>Plasma</td>
+                                                    <td>Clinic 001</td>
+                                                    <td>Hub 002</td>
+                                                    
+                                                </tr>
+                                                <tr>
+                                                    <td>24-Apr-2016</td>
+                                                    <td>18</td>
+                                                    <td>Plasma</td>
+                                                    <td>Clinic 002</td>
+                                                    <td>Hub 003</td>
+                                                    
+                                                </tr>
+                                                <tr>
+                                                    <td>25-Apr-2016</td>
+                                                    <td>14</td>
+                                                    <td>Plasma</td>
+                                                    <td>Clinic 003</td>
+                                                    <td>Hub 001</td>
+                                                    
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    
+                                </div>
+                            </div>
+                            <!-- END EXAMPLE TABLE PORTLET-->
+                        </div>
+                    </div>
+
+<script>
+    
+    function generateBarContainer(args) {
+        
+        
+    //$("#piecontainer").hide();
+    //$("#barbutton").hide();
+    //$("#piebutton").show();
+        
+    $('#barcontainer').highcharts({
+        chart: {
+            type: 'column'
+        },
+        title: {
+            text: ''
+        },
+        xAxis: {
+            categories: [
+                'Clinic 001',
+                'Clinic 002',
+                'Clinic 003',
+                'Clinic 004',
+                'Clinic 005',
+                'Clinic 006'
+            ],
+            crosshair: true
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                text: 'Samples'
+            }
+        },
+        tooltip: {
+            headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+            pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                '<td style="padding:0"><b>{point.y:.0f}</b></td></tr>',
+            footerFormat: '</table>',
+            shared: true,
+            useHTML: true
+        },
+        plotOptions: {
+            column: {
+                pointPadding: 0.2,
+                borderWidth: 0
+            }
+        },
+        series: [{
+            name: 'Samples',
+            data: [56,24,10,47,91,20]
+
+        }]
+    });
+    
+    }
+    
+    
+    function generatePieContainer(){
+            //$("#barcontainer").hide();
+            //$("#barbutton").show();
+            //$("#piebutton").hide();
+    $('#piecontainer').highcharts({
+        chart: {
+            plotBackgroundColor: null,
+            plotBorderWidth: null,
+            plotShadow: false,
+            type: 'pie'
+        },
+        title: {
+            text: ''
+        },
+        tooltip: {
+            pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+        },
+        plotOptions: {
+            pie: {
+                allowPointSelect: true,
+                cursor: 'pointer',
+                dataLabels: {
+                    enabled: true,
+                    format: '<b>{point.name}</b> : {point.percentage:.1f}%',
+                    style: {
+                        color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                    }
+                }
+            }
+        },
+        series: [{
+            name: 'Samples',
+            colorByPoint: true,
+            data: [{
+                name: 'Clinic 001',
+                y: 56
+            }, {
+                name: 'Clinic 002',
+                y: 24
+            }, {
+                name: 'Clinic 003',
+                y: 10
+            }, {
+                name: 'Clinic 004',
+                y: 47
+            }, {
+                name: 'Clinic 005',
+                y: 91
+            }, {
+                name: 'Clinic 006',
+                y: 20
+            }]
+        }]
+    });
+            
+    }
+    
+    
+    $(document).ready(function(){
+    
+    
+    
+$('#piebutton').on('click', function () {
+        $('#piecontainer').fadeIn(function () {
+            generatePieContainer();
+        });
+});
+    
+$('#barbutton').on('click', function () {
+        $('#barcontainer').fadeIn(function () {
+      
+            generateBarContainer();
+        });
+});
+    
+    generatePieContainer();
+    generateBarContainer();
+    
+    
+    
+                var e = $("#sample_1").dataTable({
+                language: {
+                    aria: {
+                        sortAscending: ": activate to sort column ascending",
+                        sortDescending: ": activate to sort column descending"
+                    },
+                    emptyTable: "No data available in table",
+                    info: "Showing _START_ to _END_ of _TOTAL_ records",
+                    infoEmpty: "No records found",
+                    infoFiltered: "(filtered1 from _MAX_ total records)",
+                    lengthMenu: "Show _MENU_",
+                    search: "Search:",
+                    zeroRecords: "No matching records found",
+                    paginate: {
+                        previous: "Prev",
+                        next: "Next",
+                        last: "Last",
+                        first: "First"
+                    }
+                },
+                bStateSave: !0,
+
+                lengthMenu: [
+                    [5, 15, 20, -1],
+                    [5, 15, 20, "All"]
+                ],
+                pageLength: 5,
+                pagingType: "bootstrap_full_number",
+
+                order: [
+                    [1, "asc"]
+                ]
+            });
+            
+            jQuery("#sample_1_wrapper");
+            e.find(".group-checkable").change(function() {
+                var e = jQuery(this).attr("data-set"),
+                    a = jQuery(this).is(":checked");
+                jQuery(e).each(function() {
+                    a ? ($(this).prop("checked", !0), $(this).parents("tr").addClass("active")) : ($(this).prop("checked", !1), $(this).parents("tr").removeClass("active"))
+                }), jQuery.uniform.update(e)
+            }), e.on("change", "tbody tr .checkboxes", function() {
+                $(this).parents("tr").toggleClass("active")
+            })
+            
+
+    $('#daterange').daterangepicker({
+                "ranges": {
+                    'Today': [moment(), moment()],
+                    'Yesterday': [moment().subtract('days', 1), moment().subtract('days', 1)],
+                    'Last 7 Days': [moment().subtract('days', 6), moment()],
+                    'Last 30 Days': [moment().subtract('days', 29), moment()],
+                    'This Month': [moment().startOf('month'), moment().endOf('month')],
+                    'Last Month': [moment().subtract('month', 1).startOf('month'), moment().subtract('month', 1).endOf('month')]
+                },
+                "locale": {
+                    "format": "MM/DD/YYYY",
+                    "separator": " - ",
+                    "applyLabel": "Apply",
+                    "cancelLabel": "Cancel",
+                    "fromLabel": "From",
+                    "toLabel": "To",
+                    "customRangeLabel": "Custom",
+                    "daysOfWeek": [
+                        "Su",
+                        "Mo",
+                        "Tu",
+                        "We",
+                        "Th",
+                        "Fr",
+                        "Sa"
+                    ],
+                    "monthNames": [
+                        "January",
+                        "February",
+                        "March",
+                        "April",
+                        "May",
+                        "June",
+                        "July",
+                        "August",
+                        "September",
+                        "October",
+                        "November",
+                        "December"
+                    ],
+                    "firstDay": 1
+                },
+                //"startDate": "11/08/2015",
+                //"endDate": "11/14/2015",
+                opens: "left",
+            }, function(start, end, label) {
+                $('#daterange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+            });
+
+            $('#daterange span').html(moment().subtract('days', 29).format('MMMM D, YYYY') + ' - ' + moment().format('MMMM D, YYYY'));
+            $('#daterange').show();
+            
+            
+        });
+
+    
+
+
+</script>
