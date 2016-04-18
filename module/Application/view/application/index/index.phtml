@@ -110,7 +110,7 @@
                             <div class="portlet light ">
                                 <div class="portlet-title">
                                     <div class="caption ">
-                                        <span class="caption-subject font-dark bold uppercase">Samples Tested</span>
+                                        <span class="caption-subject font-red-haze bold uppercase">Samples Tested</span>
                                     </div>
                                 </div>
                                 <div class="portlet-body">
@@ -123,7 +123,7 @@
                             <div class="portlet light ">
                                 <div class="portlet-title">
                                     <div class="caption ">
-                                        <span class="caption-subject font-dark bold uppercase">Samples Tested (last 7 facilities)</span>
+                                        <span class="caption-subject font-red-haze bold uppercase">Samples Tested based on Volume</span>
                                     </div>
                                 </div>
                                 <div class="portlet-body">
@@ -142,7 +142,7 @@
                                     </div>
                                 </div>
                                 <div class="portlet-body">
-                                    <div id="patientsTestedVsSupressed"></div>
+                                    <div id="labAverageTat"></div>
                                 </div>
                             </div>
                         </div>
@@ -530,7 +530,17 @@ $('#reqformspie').highcharts({
 
         plotOptions: {
             column: {
-                stacking: 'normal'
+                stacking: 'normal',
+                pointPadding: 0.2,
+                borderWidth: 0,
+                cursor: 'pointer',
+                point: {
+                    events: {
+                        click: function () {
+                            window.location.href='/dashboard/index/samples-tested';
+                        }
+                    }
+                }
             }
         },
 
@@ -597,7 +607,17 @@ $('#reqformspie').highcharts({
 
         plotOptions: {
             column: {
-                stacking: 'normal'
+                stacking: 'normal',
+                pointPadding: 0.2,
+                borderWidth: 0,
+                cursor: 'pointer',
+                point: {
+                    events: {
+                        click: function () {
+                            window.location.href='/dashboard/index/samples-tested';
+                        }
+                    }
+                }
             }
         },
 
@@ -637,7 +657,7 @@ $('#reqformspie').highcharts({
                     
                     
                     
-    $('#patientsTestedVsSupressed').highcharts({
+    $('#labAverageTat').highcharts({
         chart: {
             type: 'line'
         },
@@ -653,7 +673,11 @@ $('#reqformspie').highcharts({
         yAxis: {
             title: {
                 text: 'TAT in Hours'
-            }
+            },plotLines: [{
+                    value: 16,
+                    color: 'red',
+                    width: 2
+                }]
         },
         plotOptions: {
             line: {
@@ -665,6 +689,28 @@ $('#reqformspie').highcharts({
         series: [{
             name: 'Average Turnaround Time',
             data: [14,16,15,13,16,17,15]
+        }, {
+            type: 'pie',
+            name: 'Samples',
+            data: [{
+                name: 'Lab 001',
+                y: 13,
+                color: 'red' // Jane's color
+            }, {
+                name: 'Lab 002',
+                y: 23,
+                color: '#7DC6FE' // John's color
+            }, {
+                name: 'Lab 003',
+                y: 19,
+                color: 'yellow' // Joe's color
+            }],
+            center: [50, 30],
+            size: 100,
+            showInLegend: false,
+            dataLabels: {
+                enabled: false
+            }
         }]
     });
                     
@@ -717,11 +763,11 @@ var LocsAv2 = [
 
 var locations = [
   //Starting Point is "Home", and links to other locations"//
-  ['Mbabne', -26.305201, 31.1349953, '<?php echo $this->basePath('assets/img/lab0.png') ?>'],
-  ['Big Bend', -26.781057, 31.9284363, '<?php echo $this->basePath('assets/img/clinic.png') ?>'],
-  ['Simunye', -26.210721, 31.9243163, '<?php echo $this->basePath('assets/img/clinic.png') ?>'],
-  ['Siteki', -26.434603, 31.9239713, '<?php echo $this->basePath('assets/img/clinic.png') ?>'],
-  ['Maloma', -26.998871, 31.6534333, '<?php echo $this->basePath('assets/img/clinic.png') ?>']
+  ['Mbabne', -26.305201, 31.1349953, '<?php echo $this->basePath('assets/img/lab0.png') ?>', '<strong>No. of Samples : 30</strong>'],
+  ['Big Bend', -26.781057, 31.9284363, '<?php echo $this->basePath('assets/img/clinic.png') ?>', '<strong>No. of Samples : 10</strong>'],
+  ['Simunye', -26.210721, 31.9243163, '<?php echo $this->basePath('assets/img/clinic.png') ?>', '<strong>No. of Samples : 33</strong>'],
+  ['Siteki', -26.434603, 31.9239713, '<?php echo $this->basePath('assets/img/clinic.png') ?>', '<strong>No. of Samples : 40</strong>'],
+  ['Maloma', -26.998871, 31.6534333, '<?php echo $this->basePath('assets/img/clinic.png') ?>', '<strong>No. of Samples : 90</strong>']
 ]
 
 function initMap() {
@@ -745,7 +791,17 @@ function initMap() {
       title: locations[i][0],     
       map: map,
       icon: locations[i][3]      
-    })
+    });
+    
+    marker['infowindow'] = new google.maps.InfoWindow({
+        content: locations[i][4]      
+    });    
+    
+    google.maps.event.addListener(marker, 'mouseover', function() {
+        this['infowindow'].open(map, this);
+    });    
+    
+    
     markers.push(marker);
     bounds.extend(marker.getPosition());
     if (i > 0) {
