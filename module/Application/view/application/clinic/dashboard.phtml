@@ -34,6 +34,22 @@
                     <!-- END PAGE TITLE-->
                     <!-- END PAGE HEADER-->
                     <div class="row">
+                        <div class="col-md-12 col-sm-12">
+                            <div class="portlet light ">
+                                <div class="portlet-title">
+                                    <div class="caption ">
+                                        <span class="caption-subject bold uppercase font-dark">Overall Viral Load Status</span>
+                                    </div>
+                                </div>
+                                <div class="portlet-body">
+                                    <div id="combochart" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    
+                    <div class="row">
                         
                         <div class="col-md-6 col-sm-6">
                             <div class="portlet light ">
@@ -293,12 +309,6 @@
                                             </div>
                                         </div>
                                     
-                                    
-                                    
-                                    
-                                    
-                                    
-                                    
                                 </div>
                             </div>
                         </div>                        
@@ -453,7 +463,88 @@
         '#ff1900',
         '#09843a',
     ]
-    });   
+    });
+    
+    
+    
+    
+$('#combochart').highcharts({
+
+        chart: {
+            type: 'column'
+        },
+
+        title: {
+            text: ''
+        },
+
+        xAxis: {
+            categories: ['No. of VL Tested',
+                         'No. of Suppressed',
+                         'No. of VL Not Suppressed',
+                         'Lines of Treatment',
+                         'Total 1st Line',
+                         '1st Line Not Suppressed',
+                         'Total 2nd Line',
+                         '2nd Line Not Suppressed',
+                         'Total 3rd Line',
+                         '3rd Line Not Suppressed'
+                         ]
+        },
+
+        yAxis: {
+            allowDecimals: false,
+            min: 0,
+            title: {
+                text: 'Number of Samples'
+            }
+        },
+
+        tooltip: {
+            formatter: function () {
+                return '<b>' + this.x + '</b><br/>' +
+                    this.series.name + ': ' + this.y + '<br/>' +
+                    'Total: ' + this.point.stackTotal;
+            }
+        },
+
+        plotOptions: {
+            column: {
+                stacking: 'normal',
+                dataLabels: {
+                    enabled: true
+                },
+                enableMouseTracking: false
+            }
+        },
+
+        series: [{
+            name: 'Sample',
+            showInLegend: false, 
+            data: [ { y : 60 , color : '#ECD078' },
+                    { y : 45 , color : '#ddef55' },
+                    { y : 25 , color : '#D95B43' },
+                    { y : 03 , color : '#3598DC' },
+                    { y : 26 , color : '#A7DBD8' },
+                    { y : 15 , color : '#D95B43' },
+                    { y : 20 , color : '#53777A' },
+                    { y : 10 , color : '#D95B43' },
+                    { y : 15 , color : '#3598DC' },
+                    { y : 03 , color : '#D95B43' }
+                   ],
+            stack: 'male'
+        }, {
+            name: 'Sample',
+            showInLegend: false, 
+            data: [null, null, null, { y : 10 , color : '#53777A' }, null, null, null, null, null, null],
+            stack: 'male'
+        }, {
+            name: 'Sample',
+            showInLegend: false, 
+            data: [null, null, null, { y : 20 , color : '#A7DBD8' }, null, null, null, null, null, null],
+            stack: 'male'
+        }]
+    });    
     
     
     
