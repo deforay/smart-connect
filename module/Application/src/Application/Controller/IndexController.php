@@ -16,7 +16,8 @@ class IndexController extends AbstractActionController
 {
     public function indexAction()
     {
-        $this->layout()->setVariable('activeTab', 'dashboard');          
+        $this->layout()->setVariable('activeTab', 'dashboard');
+        return $this->_redirect()->toUrl('/labs/dashboard');
         return new ViewModel();
     }
     

@@ -3,7 +3,7 @@
                     <div class="page-bar">
                         <ul class="page-breadcrumb">
                             <li>
-                                <a href="/labs/dashboard">Labs Dashboard</a>
+                                <a href="/">Dashboard</a>
                             </li>
                         </ul>
                     </div>
@@ -11,30 +11,13 @@
                     <!-- END PAGE BAR -->
                     <!-- BEGIN PAGE TITLE-->
                     
+                    <br>
+                    <br>
                     
-                    <div class="row" style="padding-top:10px;padding-bottom:20px;">
-                        <div class="col-lg-6">
-                                <select class="form-control">
-                                    <option>All my facilities</option>
-                                    <option>Clinic 1</option>
-                                    <option>Clinic 2</option>
-                                </select>
-                            </div>
-                        <div class="col-lg-6">
-                            <div id="dashboard-report-range" class="btn btn-sm form-control"
-                                 data-container="body"
-                                 data-placement="bottom"
-                                 data-original-title="Change dashboard date range">
-                                        DATE RANGE&nbsp;&nbsp;&nbsp;&nbsp;<i class="icon-calendar"></i>&nbsp;
-                                        <span class="thin uppercase hidden-xs"></span>&nbsp;
-                                        <i class="fa fa-angle-down"></i>
-                            </div>
-                        </div>
-                    </div>
                     <!-- END PAGE TITLE-->
                     <!-- END PAGE HEADER-->
                     <div class="row">
-                        <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                        <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12" style="cursor:pointer;" onclick="document.location.href='/labs/samples-accession'">
                             <div class="dashboard-stat2 ">
                                 <div class="display">
                                     <div class="number">
@@ -51,7 +34,7 @@
                                 <div id="samplesReceivedChart" width="210" height="150"></div>
                             </div>
                         </div>                        
-                        <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                        <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12" style="cursor:pointer;" onclick="document.location.href='/labs/samples-waiting'">
                             <div class="dashboard-stat2 ">
                                 <div class="display">
                                     <div class="number">
@@ -68,15 +51,15 @@
                                 <div id="samplesWaitingChart" width="210" height="150"></div>
                             </div>
                         </div>                        
-                        <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                        <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12" style="cursor:pointer;" onclick="document.location.href='/labs/samples-tested'">
                             <div class="dashboard-stat2 ">
                                 <div class="display">
                                     <div class="number">
-                                        <h3 class="font-red-haze">
+                                        <h3 class="font-blue-sharp">
                                             <span data-counter="counterup" data-value="49">0</span>
                                         </h3>
-                                        <small class="font-red-haze">SAMPLES TESTED</small><br>
-                                        <small class="font-red-haze">27 Mar 2016</small>
+                                        <small class="font-blue-sharp">SAMPLES TESTED</small><br>
+                                        <small class="font-blue-sharp">27 Mar 2016</small>
                                     </div>
                                     <div class="icon">
                                         <i class="icon-pie-chart"></i>
@@ -85,15 +68,15 @@
                                 <div id="samplesTestedChart" width="210" height="150"></div>
                             </div>
                         </div>
-                        <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                        <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12" style="cursor:pointer;" onclick="document.location.href='/labs/samples-rejected'">
                             <div class="dashboard-stat2 ">
                                 <div class="display">
                                     <div class="number">
-                                        <h3 class="font-blue-sharp">
+                                        <h3 class="font-red-haze">
                                             <span data-counter="counterup" data-value="57"></span>
                                         </h3>
-                                        <small class="font-blue-sharp">SAMPLES REJECTED</small><br>
-                                        <small class="font-blue-sharp">27 Mar 2016</small>
+                                        <small class="font-red-haze">SAMPLES REJECTED</small><br>
+                                        <small class="font-red-haze">27 Mar 2016</small>
                                     </div>
                                     <div class="icon">
                                         <i class="icon-pie-chart"></i>
@@ -104,13 +87,36 @@
                         </div>
                         
                     </div>
+                    <div class="row" style="padding-top:10px;padding-bottom:20px;">
+                        <div class="col-lg-6">
+                                <select class="form-control">
+                                    <option>All my Labs</option>
+                                    <option>Lab 001</option>
+                                    <option>Lab 002</option>
+                                    <option>Lab 003</option>
+                                    <option>Lab 004</option>
+                                    <option>Lab 005</option>
+                                </select>
+                            </div>
+                        <div class="col-lg-6">
+                            <div id="dashboard-report-range" class="btn btn-sm form-control"
+                                 data-container="body"
+                                 data-placement="bottom"
+                                 data-original-title="Change dashboard date range">
+                                        DATE RANGE&nbsp;&nbsp;&nbsp;&nbsp;<i class="icon-calendar"></i>&nbsp;
+                                        <span class="thin uppercase hidden-xs"></span>&nbsp;
+                                        <i class="fa fa-angle-down"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <div class="row">
                         
                         <div class="col-md-6 col-sm-6">
-                            <div class="portlet light ">
+                            <div class="portlet box blue">
                                 <div class="portlet-title">
                                     <div class="caption ">
-                                        <span class="caption-subject font-red-haze bold uppercase">Samples Tested</span>
+                                        <span class="caption-subject">Samples Tested</span>
                                     </div>
                                 </div>
                                 <div class="portlet-body">
@@ -120,10 +126,10 @@
                         </div>
                         
                         <div class="col-md-6 col-sm-6">
-                            <div class="portlet light ">
+                            <div class="portlet box blue">
                                 <div class="portlet-title">
                                     <div class="caption ">
-                                        <span class="caption-subject font-red-haze bold uppercase">Samples Tested based on Volume</span>
+                                        <span class="caption-subject">Samples Tested based on Volume</span>
                                     </div>
                                 </div>
                                 <div class="portlet-body">
@@ -134,11 +140,11 @@
                         
                     </div>
                     <div class="row">
-                        <div class="col-md-6 col-sm-6">
-                            <div class="portlet light ">
+                        <div class="col-md-4 col-sm-4">
+                            <div class="portlet box blue">
                                 <div class="portlet-title">
                                     <div class="caption ">
-                                        <span class="caption-subject font-dark bold uppercase">Laboratory Turnaround Time</span>
+                                        <span class="caption-subject">Laboratory Turnaround Time</span>
                                     </div>
                                 </div>
                                 <div class="portlet-body">
@@ -146,15 +152,29 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-6 col-sm-6">
-                            <div class="portlet light ">
+                        <div class="col-md-4 col-sm-4">
+                            <div class="portlet box blue">
                                 <div class="portlet-title">
                                     <div class="caption">
-                                        <span class="caption-subject bold uppercase font-dark">Requisition Forms for Testing</span>
+                                        <span class="caption-subject">Requisition Forms for Testing</span>
                                     </div>
                                 </div>
                                 <div class="portlet-body">
                                     <div id="reqformspie"></div>
+                                </div>
+                            </div>                            
+                            
+                            
+                        </div>
+                        <div class="col-md-4 col-sm-4">
+                            <div class="portlet box blue">
+                                <div class="portlet-title">
+                                    <div class="caption">
+                                        <span class="caption-subject">Sample Volume</span>
+                                    </div>
+                                </div>
+                                <div class="portlet-body">
+                                    <div id="gotoPie"></div>
                                 </div>
                             </div>                            
                             
@@ -165,7 +185,12 @@
                     </div>
                     <div class="row">
                         <div class="col-md-12 col-sm-12">
-                            <div class="portlet light ">
+                            <div class="portlet box blue">
+                                <div class="portlet-title">
+                                    <div class="caption ">
+                                        <span class="caption-subject">Facilities</span>
+                                    </div>
+                                </div>                                
                                 <div class="portlet-body">
 
                                     <div id="controls-polyline"></div>
@@ -632,48 +657,6 @@ $('#reqformspie').highcharts({
             name: 'DBS Suppressed',
             data: [9, 5, 4, 4, 3, 4, 3],
             stack: 'male'
-        },{
-            type: 'pie',
-            name: 'Samples',
-            data: [{
-                name: 'Lab 001',
-                y: 13,
-                color : 'yellow'
-            }, {
-                name: 'Lab 002',
-                y: 23
-            },
-            {
-                name: 'Lab 003',
-                y: 22
-            },
-            {
-                name: 'Lab 004',
-                y: 29
-            },
-            {
-                name: 'Lab 005',
-                y: 1
-            },
-            {
-                name: 'Lab 006',
-                y: 5
-            },
-            {
-                name: 'Lab 007',
-                y: 15
-            },
-            {
-                name: 'Lab 008',
-                y: 9
-            }
-            ],
-            center: [290, 30],
-            size: 100,
-            showInLegend: false,
-            dataLabels: {
-                enabled: false
-            }
         }],
     colors: [
         '#F36A5A',
@@ -693,6 +676,59 @@ $('#reqformspie').highcharts({
                     
                     
                     
+    $('#gotoPie').highcharts({
+        chart: {
+            plotBackgroundColor: null,
+            plotBorderWidth: null,
+            plotShadow: false,
+            type: 'pie'
+        },
+        title: {
+            text: ''
+        },
+        tooltip: {
+            pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+        },
+        plotOptions: {
+            pie: {
+                allowPointSelect: true,
+                cursor: 'pointer',
+                dataLabels: {
+                    enabled: false,
+                    format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                    style: {
+                        color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                    }
+                },
+                showInLegend: true
+            }
+        },
+        series: [{
+            name: 'Brands',
+            colorByPoint: true,
+            data: [{
+                name: 'Lab 001',
+                y: 33
+            }, {
+                name: 'Lab 002',
+                y: 24
+            }, {
+                name: 'Lab 003',
+                y: 10
+            }, {
+                name: 'Lab 004',
+                y: 47
+            }, {
+                name: 'Lab 005',
+                y: 19
+            }, {
+                name: 'Lab 006',
+                y: 20
+            }]
+        }]
+    });
+    
+    
     $('#labAverageTat').highcharts({
         chart: {
             type: 'line'

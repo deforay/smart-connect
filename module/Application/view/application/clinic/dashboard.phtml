@@ -35,10 +35,10 @@
                     <!-- END PAGE HEADER-->
                     <div class="row">
                         <div class="col-md-12 col-sm-12">
-                            <div class="portlet light ">
+                            <div class="portlet box blue">
                                 <div class="portlet-title">
                                     <div class="caption ">
-                                        <span class="caption-subject bold uppercase font-dark">Overall Viral Load Status</span>
+                                        <span class="caption-subject">Overall Viral Load Status</span>
                                     </div>
                                 </div>
                                 <div class="portlet-body">
@@ -52,14 +52,14 @@
                     <div class="row">
                         
                         <div class="col-md-6 col-sm-6">
-                            <div class="portlet light ">
+                            <div class="portlet box blue">
                                 <div class="portlet-title">
                                     <div class="caption ">
-                                        <span class="caption-subject bold uppercase font-dark">VL Ordered</span>
+                                        <span class="caption-subject">VL Ordered</span>
                                     </div>
                                     <div class="actions">
                                         <div class="btn-group">
-                                            <a href="" class="btn dark btn-outline btn-circle btn-sm dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-close-others="true"> Filter Range
+                                            <a href="" class="btn white btn-outline btn-circle btn-sm dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-close-others="true"> Filter Range
                                                 <span class="fa fa-angle-down"> </span>
                                             </a>
                                             <ul class="dropdown-menu pull-right">
@@ -88,9 +88,49 @@
                                 </div>
                             </div>
                         </div>
-                        
                         <div class="col-md-6 col-sm-6">
-                            <div class="portlet light ">
+                            <div class="portlet box blue">
+                                <div class="portlet-title">
+                                    <div class="caption ">
+                                        <span class="caption-subject">VL Suppressed</span>
+                                    </div>
+                                    <div class="actions">
+                                        <div class="btn-group">
+                                            <a href="" class="btn white btn-outline btn-circle btn-sm dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-close-others="true"> Filter Range
+                                                <span class="fa fa-angle-down"> </span>
+                                            </a>
+                                            <ul class="dropdown-menu pull-right">
+                                                <li class="active">
+                                                    <a href="javascript:;"> Weekly
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a href="javascript:;"> Monthly
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a href="javascript:;"> Quarterly
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a href="javascript:;"> Yearly
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>                                    
+                                </div>
+                                <div class="portlet-body">
+                                    <div id="vlSuppressed" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        
+                    </div>
+                    <div class="row">
+                                                <div class="col-md-6 col-sm-6">
+                            <div class="portlet box">
                                 <div class="portlet-body">
                                     
                                     
@@ -114,7 +154,7 @@
                                                             <tr>
                                                                 <th> Batch Date </th>
                                                                 <th> No. of Samples </th>
-                                                                <th> Result <br>Received Date </th>
+                                                                <th> Received Date </th>
                                                                 <th> View/Print </th>
                                                             </tr>
                                                         </thead>
@@ -180,50 +220,10 @@
                                 </div>
                             </div>
                         </div>                        
-                        
-                    </div>
-                    <div class="row">
+
                         
                         <div class="col-md-6 col-sm-6">
-                            <div class="portlet light ">
-                                <div class="portlet-title">
-                                    <div class="caption ">
-                                        <span class="caption-subject bold uppercase font-dark">VL Suppressed</span>
-                                    </div>
-                                    <div class="actions">
-                                        <div class="btn-group">
-                                            <a href="" class="btn dark btn-outline btn-circle btn-sm dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-close-others="true"> Filter Range
-                                                <span class="fa fa-angle-down"> </span>
-                                            </a>
-                                            <ul class="dropdown-menu pull-right">
-                                                <li class="active">
-                                                    <a href="javascript:;"> Weekly
-                                                    </a>
-                                                </li>
-                                                <li>
-                                                    <a href="javascript:;"> Monthly
-                                                    </a>
-                                                </li>
-                                                <li>
-                                                    <a href="javascript:;"> Quarterly
-                                                    </a>
-                                                </li>
-                                                <li>
-                                                    <a href="javascript:;"> Yearly
-                                                    </a>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </div>                                    
-                                </div>
-                                <div class="portlet-body">
-                                    <div id="vlSuppressed" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="col-md-6 col-sm-6">
-                            <div class="portlet light ">
+                            <div class="portlet box">
                                 <div class="portlet-body">
                                     
                                     
@@ -524,13 +524,13 @@ $('#combochart').highcharts({
             data: [ { y : 60 , color : '#ECD078' },
                     { y : 45 , color : '#ddef55' },
                     { y : 25 , color : '#D95B43' },
-                    { y : 03 , color : '#3598DC' },
+                    { y : 3 , color : '#3598DC' },
                     { y : 26 , color : '#A7DBD8' },
                     { y : 15 , color : '#D95B43' },
                     { y : 20 , color : '#53777A' },
                     { y : 10 , color : '#D95B43' },
                     { y : 15 , color : '#3598DC' },
-                    { y : 03 , color : '#D95B43' }
+                    { y : 3 , color : '#D95B43' }
                    ],
             stack: 'male'
         }, {
