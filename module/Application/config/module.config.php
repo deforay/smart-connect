@@ -82,6 +82,16 @@ return array(
                     ),
                 ),
             ),
+            'hubs' => array(
+                'type' => 'segment',
+                'options' => array(
+                    'route' => '/hubs[/][:action][/:id]',
+                    'defaults' => array(
+                        'controller' => 'Application\Controller\Hubs',
+                        'action' => 'index',
+                    ),
+                ),
+            ),
             'login' => array(
                 'type'    => 'segment',
                 'options' => array(
@@ -123,6 +133,7 @@ return array(
             'Application\Controller\Login' => 'Application\Controller\LoginController',
             'Application\Controller\Laboratory' => 'Application\Controller\LaboratoryController',
             'Application\Controller\Clinic' => 'Application\Controller\ClinicController',
+            'Application\Controller\Hubs' => 'Application\Controller\HubsController',
         ),
     ),
     'view_manager' => array(
