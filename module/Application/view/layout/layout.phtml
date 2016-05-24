@@ -75,7 +75,7 @@ $logincontainer = new Container('credo');
                 <!-- BEGIN LOGO -->
                 <div class="page-logo">
                     <a href="/">
-                        <img src="<?php echo $this->basePath('assets/layouts/layout/img/logo.png'); ?>" alt="logo" class="logo-default" /> </a>
+                        <img src="<?php echo $this->basePath('assets/layouts/layout/img/logo.png'); ?>" alt="logo" class="logo-default" style="margin-top:-5px;margin-right:5px;"/> <span style="color:#fff;line-height:50px;">Smart Connect</span></a>
                     <div class="menu-toggler sidebar-toggler"> </div>
                 </div>
                 <!-- END LOGO -->
@@ -83,8 +83,11 @@ $logincontainer = new Container('credo');
                 <a href="javascript:;" class="menu-toggler responsive-toggler" data-toggle="collapse" data-target=".navbar-collapse"> </a>
                 <!-- END RESPONSIVE MENU TOGGLER -->
                 <!-- BEGIN TOP NAVIGATION MENU -->
+                <span style="color:#ccc;padding:10px;line-height:50px;font-weight:lighter">Development/Test Environment with dummy data</span>
                 <div class="top-menu">
+                    
                     <ul class="nav navbar-nav pull-right">
+                        
                         <!-- BEGIN USER LOGIN DROPDOWN -->
                         <!-- DOC: Apply "dropdown-dark" class after below "dropdown-extended" to change the dropdown styte -->
                         <li class="dropdown dropdown-user">
@@ -356,7 +359,12 @@ $logincontainer = new Container('credo');
         <!-- END CONTAINER -->
         <!-- BEGIN FOOTER -->
         <div class="page-footer">
-            <div class="page-footer-inner"> 2016 &copy; Viral Load
+            <div class="page-footer-inner" style="font-size:1em;">
+                
+                Smart Connect - The Viral Load Dashboard (Testing Environment with dummy data) | 
+                
+                Funded by <a href="http://www.taskforce.org/" style="color:#ccc;text-decoration:underline;">The Task Force for Global Health</a>  &
+                <a href="http://www.emory.edu/home/index.html"  style="color:#ccc;text-decoration:underline;">Emory University / PEPFAR</a>
                 
             </div>
             <div class="scroll-to-top">

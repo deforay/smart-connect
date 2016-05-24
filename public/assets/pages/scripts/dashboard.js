@@ -2,13 +2,6 @@ var Dashboard = function() {
 
     return {
 
-
-
-
-
-
-
-
         initDashboardDaterange: function() {
             if (!jQuery().daterangepicker) {
                 return;
@@ -77,6 +70,6 @@ var Dashboard = function() {
 }();
 
 
-    jQuery(document).ready(function() {
-        Dashboard.init();
-    });
+jQuery(document).ready(function() {
+   Dashboard.init();
+});

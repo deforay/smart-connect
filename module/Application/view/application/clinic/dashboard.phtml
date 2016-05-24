@@ -16,22 +16,7 @@
                     <!-- END PAGE HEADER-->
                     <br>
                     <br>
-                    <div class="row">
-                        <div class="col-md-12 col-sm-12">
-                            <div class="portlet box blue">
-                                <div class="portlet-title">
-                                    <div class="caption ">
-                                        <span class="caption-subject">Overall Viral Load Status</span>
-                                    </div>
-                                </div>
-                                <div class="portlet-body">
-                                    <div id="combochart" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-                    <div class="row" style="padding-top:10px;padding-bottom:20px;">
+                                        <div class="row" style="padding-top:10px;padding-bottom:20px;">
                         <div class="col-lg-6">
                                 <select class="form-control">
                                     <option>All my Clinics</option>
@@ -53,8 +38,175 @@
                             </div>
                         </div>
                     </div>
+
+                    <div class="row" style="display:none;">
+                        <div class="col-md-12 col-sm-12">
+                            <div class="portlet box blue">
+                                <div class="portlet-title">
+                                    <div class="caption ">
+                                        <span class="caption-subject">Overall Viral Load Status</span>
+                                    </div>
+                                </div>
+                                <div class="portlet-body">
+                                    <div id="combochart" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
                     
                     
+                    
+                    <div class="row">
+
+                        <div class="">
+                            <form>
+                                                              
+                        <div class="col-md-12">
+                            <div class="form-group col-lg-4">
+                                <label class="control-label">Test Result&nbsp;</label>
+                              <select class="form-control">
+                                <option>All</option>
+                                <option>> 1000 cp/mL</option>
+                                <option>< 1000 cp/mL</option>
+                              </select>
+                            </div>
+                            <div class="form-group col-lg-4">
+                                <label class="control-label">Sample Type</label>
+                              <select class="form-control">
+                                <option>All</option>
+                                <option>Plasma</option>
+                                <option>DBS</option>
+                              </select>
+                            </div>
+                            <div class="form-group col-lg-4">
+                                <label class="control-label">Age Group&nbsp;</label>
+                              <select class="form-control">
+                                <option>0-10</option>
+                                <option>10-20</option>
+                                <option>20-30</option>
+                                <option>30-40</option>
+                                <option>50-60</option>
+                                <option>60-70</option>
+                                <option>70-80</option>
+                                <option>Above 80</option>
+                              </select>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group col-lg-4">
+                                <label class="control-label">ARV Adherence</label>
+                              <select class="form-control">
+                                <option>--Select--</option>
+                                <option>Good >= 95%</option>
+                                <option>Fair 85-94%</option>
+                                <option>Poor < 85%</option>
+                              </select>
+                            </div>
+                            <div class="form-group col-lg-4">
+                                <label class="control-label">Gender</label>
+                              <select class="form-control">
+                                <option>--Select--</option>
+                                <option>Male</option>
+                                <option>Female</option>
+                                <option>Other</option>
+                              </select>
+                            </div>
+                            <div class="form-group col-lg-4">
+                                <br>
+                                <button class="btn btn-primary" onclick="return false;">Filter</button>
+                            </div>
+                        </div>
+                            
+                          </form>
+                        </div>
+                    </div>
+                    
+                    
+                    
+                    <div class="row">
+                        <div class="col-md-12 col-sm-12">
+                            <div class="portlet box blue">
+                                <div class="portlet-title">
+                                    <div class="caption ">
+                                        <span class="caption-subject">Overall Viral Load Status</span>
+                                    </div>
+                                </div>
+                                <div class="portlet-body col-md-12 col-sm-12">
+                                    <div class="col-md-6 col-sm-6">
+                                    <div id="combochart1" style="min-width: 310px; height: 520px; margin: 0 auto"></div>
+                                    </div>
+                                    <div class="col-md-6 col-sm-6">
+                                    <table class="table table-striped table-bordered table-hover order-column datatables" id="testResults">
+                                                        <thead>
+                                                            <tr>
+                                                                <th> Sample ID </th>
+                                                                <th> Date Tested</th>
+                                                                <th> Viral Load <br> (cp/mL) </th>                                                                
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>S0101</td>
+                                                                <td>25-Apr-2016</td>
+                                                                <td>1020</td>                                                                
+                                                            </tr>
+                                                            <tr>
+                                                                <td>S0701</td>
+                                                                <td>25-Apr-2016</td>
+                                                                <td>1100</td> 
+                                                            </tr>
+                                                            <tr>
+                                                                <td>S2131</td>
+                                                                <td>24-Apr-2016</td>
+                                                                <td>1300</td>                                                                
+                                                            </tr>
+                                                            <tr>
+                                                                <td>S0178</td>
+                                                                <td>25-Apr-2016</td>
+                                                                <td>1220</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>S9101</td>
+                                                                <td>26-Apr-2016</td>
+                                                                <td>1520</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>S9171</td>
+                                                                <td>30-Apr-2016</td>
+                                                                <td>890</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>S6181</td>
+                                                                <td>29-Apr-2016</td>
+                                                                <td>1000</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>S5121</td>
+                                                                <td>22-Apr-2016</td>
+                                                                <td>1520</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>S5121</td>
+                                                                <td>22-Apr-2016</td>
+                                                                <td>1520</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>S5121</td>
+                                                                <td>22-Apr-2016</td>
+                                                                <td>1520</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                        
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    
+                    <br><br>
                     <div class="row">
                         
                         <div class="col-md-6 col-sm-6">
@@ -98,7 +250,7 @@
                             <div class="portlet box blue">
                                 <div class="portlet-title">
                                     <div class="caption ">
-                                        <span class="caption-subject">VL ( < 1000 cp/ml)</span>
+                                        <span class="caption-subject">VL ( < 1000 cp/mL)</span>
                                     </div>
                                     <div class="actions">
                                         <div class="btn-group">
@@ -151,13 +303,13 @@
                                             </div>
                                             <div class="portlet-body">
                                                 <div class="table-toolbar">
-                                                    <table class="table table-striped table-bordered table-hover order-column" id="testResults">
+                                                    <table class="table table-striped table-bordered table-hover order-column datatables" id="testResults">
                                                         <thead>
                                                             <tr>
                                                                 <th> Sample ID </th>
                                                                 <th> Date Collected</th>
                                                                 <th> Date Tested</th>
-                                                                <th> Viral Load <br> (cp per ml) </th>                                                                
+                                                                <th> Viral Load <br> (cp/mL) </th>                                                                
                                                                 <th> Action </th>
                                                             </tr>
                                                         </thead>
@@ -166,7 +318,7 @@
                                                                 <td>S0101</td>
                                                                 <td>20-Apr-2016</td>
                                                                 <td>25-Apr-2016</td>
-                                                                <td>1020</td>                                                                
+                                                                <td>5020</td>                                                                
                                                                 <td>
                                                                     <a href="#" class="btn btn-primary btn-xs">View</a>
                                                                     
@@ -176,7 +328,7 @@
                                                                 <td>S0701</td>
                                                                 <td>21-Apr-2016</td>
                                                                 <td>25-Apr-2016</td>
-                                                                <td>1100</td>                                                                
+                                                                <td>8100</td>                                                                
                                                                 <td>
                                                                     <a href="#" class="btn btn-primary btn-xs">View</a>
                                                                     
@@ -186,7 +338,7 @@
                                                                 <td>S2131</td>
                                                                 <td>23-Apr-2016</td>
                                                                 <td>24-Apr-2016</td>
-                                                                <td>1300</td>                                                                
+                                                                <td>7300</td>                                                                
                                                                 <td>
                                                                     <a href="#" class="btn btn-primary btn-xs">View</a>
                                                                     
@@ -196,7 +348,7 @@
                                                                 <td>S0178</td>
                                                                 <td>24-Apr-2016</td>
                                                                 <td>25-Apr-2016</td>
-                                                                <td>1220</td>                                                                
+                                                                <td>3220</td>                                                                
                                                                 <td>
                                                                     <a href="#" class="btn btn-primary btn-xs">View</a>
                                                                     
@@ -206,7 +358,7 @@
                                                                 <td>S9101</td>
                                                                 <td>25-Apr-2016</td>
                                                                 <td>26-Apr-2016</td>
-                                                                <td>1520</td>                                                                
+                                                                <td>6520</td>                                                                
                                                                 <td>
                                                                     <a href="#" class="btn btn-primary btn-xs">View</a>
                                                                     
@@ -234,6 +386,7 @@
                     </div>
         
         <script src="https://code.highcharts.com/highcharts.js"></script>
+        <script src="https://highcharts.github.io/pattern-fill/pattern-fill.js"></script>
         
 <script>
     $(function () {
@@ -355,22 +508,40 @@
 
         series: [
         {
-            name: 'Plasma ( > 1000 cp/ml)',
+            name: 'Plasma - VL ( > 1000 cp/mL)',
             data: [2, 5, 6, 2, 1, 2, 1],
             stack: 'female'
         }, {
-            name: 'Plasma ( < 1000 cp/ml)',
+            name: 'Plasma - VL ( < 1000 cp/mL)',
             data: [3, 2, 4, 4, 3, 4, 3],
             stack: 'female'
+        },{
+            name: 'Plasma - VL Not Detected',
+            data: [2, 3, 3, 2,1, 2, 1],
+            stack: 'female',
+            color: {
+                pattern : "<?php echo $this->basePath("assets/img/patterns/light-green-pattern.jpg") ?>",
+                width: 6,
+                height: 6
+            }
         },
         {
-            name: 'DBS ( > 1000 cp/ml)',
+            name: 'DBS - VL ( > 1000 cp/mL)',
             data: [12, 9, 8, 12, 4, 6, 9],
             stack: 'male'
         }, {
-            name: 'DBS ( < 1000 cp/ml)',
+            name: 'DBS - VL ( < 1000 cp/mL)',
             data: [9, 5, 4, 4, 3, 4, 3],
             stack: 'male'
+        },{
+            name: 'DBS - VL Not Detected',
+            data: [2, 3, 3, 2,1, 2, 1],
+            stack: 'male',
+            color: {
+                pattern : "<?php echo $this->basePath("assets/img/patterns/dark-green-pattern.jpg") ?>",
+                width: 6,
+                height: 6
+            }
         }
         ],
     colors: [
@@ -380,8 +551,6 @@
         '#09843a',
     ]
     });
-    
-    
     
     
 $('#combochart').highcharts({
@@ -396,15 +565,15 @@ $('#combochart').highcharts({
 
         xAxis: {
             categories: ['No. of VL Tested',
-                         'No. of ( < 1000 cp/ml)',
-                         'No. of VL ( > 1000 cp/ml)',
+                         'No. of ( < 1000 cp/mL)',
+                         'No. of VL ( > 1000 cp/mL)',
                          'Lines of Treatment',
                          'Total 1st Line',
-                         '1st Line ( > 1000 cp/ml)',
+                         '1st Line ( > 1000 cp/mL)',
                          'Total 2nd Line',
-                         '2nd Line ( > 1000 cp/ml)',
+                         '2nd Line ( > 1000 cp/mL)',
                          'Total 3rd Line',
-                         '3rd Line ( > 1000 cp/ml)'
+                         '3rd Line ( > 1000 cp/mL)'
                          ]
         },
 
@@ -458,6 +627,65 @@ $('#combochart').highcharts({
             name: 'Sample',
             showInLegend: false, 
             data: [null, null, null, { y : 26 , color : '#A7DBD8' }, null, null, null, null, null, null],
+            stack: 'male'
+        }]
+    });    
+    
+    
+$(".datatables").dataTable();    
+    
+$('#combochart1').highcharts({
+
+        chart: {
+            type: 'column'
+        },
+
+        title: {
+            text: ''
+        },
+
+        xAxis: {
+            categories: ['VL Tested',
+                         '< 1000 cp/mL',
+                         '> 1000 cp/mL',
+                         'Total Samples'
+                         ]
+        },
+
+        yAxis: {
+            allowDecimals: false,
+            min: 0,
+            title: {
+                text: 'Number of Samples'
+            }
+        },
+
+        tooltip: {
+            formatter: function () {
+                return '<b>' + this.x + '</b><br/>' +
+                    this.series.name + ': ' + this.y + '<br/>' +
+                    'Total: ' + this.point.stackTotal;
+            }
+        },
+
+        plotOptions: {
+            column: {
+                stacking: 'normal',
+                dataLabels: {
+                    enabled: true
+                },
+                enableMouseTracking: false
+            }
+        },
+
+        series: [{
+            name: 'Sample',
+            showInLegend: false, 
+            data: [ { y : 70 , color : '#ECD078' },
+                    { y : 45 , color : '#ddef55' },
+                    { y : 28 , color : '#D95B43' },
+                    { y : 70 , color : '#3598DC' }
+                   ],
             stack: 'male'
         }]
     });    
