@@ -161,9 +161,24 @@ $logincontainer = new Container('credo');
                                 <span class="title">Clinics Dashboard</span>
                                 <span class="selected"></span>
                             </a>
-                            
                         </li>
                        
+                        
+                        <li class="nav-item <?php echo ($activeTab == 'vl-request' ? " active open " : ""); ?> ">
+                            <a href="javascript:;" class="nav-link nav-toggle">
+                                <i class="icon-settings"></i>
+                                <span class="title">VL Request</span>
+                                <span class="arrow"></span>
+                            </a>
+                            <ul class="sub-menu">
+                                <li class="nav-item  <?php echo ($activeMenu == 'vl-request' ? " active open " : ""); ?>  ">
+                                    <a href="/vl-request/index" class="nav-link ">
+                                      <i class="fa fa-angle-right"></i>   <span class="title">Import Excel</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        
                        <?php if(isset($logincontainer->accessType) && $logincontainer->accessType == '4') { ?>
                        
                         <li class="nav-item <?php echo ($activeTab == 'admin' ? " active open " : ""); ?> ">

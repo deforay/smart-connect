@@ -112,7 +112,16 @@ return array(
                     ),
                 ),
             ),
-            
+            'vl-request' => array(
+                'type'    => 'segment',
+                'options' => array(
+                    'route'    => '/vl-request[/][:action][/:id]',
+                    'defaults' => array(
+                        'controller' => 'Application\Controller\VlRequest',
+                        'action' => 'index',
+                    ),
+                ),
+            ),
             
         ),
     ),
@@ -134,6 +143,7 @@ return array(
             'Application\Controller\Laboratory' => 'Application\Controller\LaboratoryController',
             'Application\Controller\Clinic' => 'Application\Controller\ClinicController',
             'Application\Controller\Hubs' => 'Application\Controller\HubsController',
+            'Application\Controller\VlRequest' => 'Application\Controller\VlRequestController',
         ),
     ),
     'view_manager' => array(

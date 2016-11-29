@@ -36,7 +36,7 @@ class UsersTable extends AbstractTableGateway {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->from(array('u' => 'users'))
-                ->join(array('r' => 'user_roles'), 'u.role=r.id')
+                ->join(array('r' => 'user_roles'), 'u.role=r.role_id')
                 ->where(array('email' => $username, 'password' => $password));
         $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
         
@@ -64,7 +64,7 @@ class UsersTable extends AbstractTableGateway {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->from(array('u' => 'users'))
-                ->join(array('r' => 'user_roles'), 'u.role=r.id');
+                ->join(array('r' => 'user_roles'), 'u.role=r.role_id');
         
         $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -99,7 +99,7 @@ class UsersTable extends AbstractTableGateway {
 
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->from(array('u' => 'users'))
-        ->join(array('r' => 'user_roles'), 'u.role=r.id')
+        ->join(array('r' => 'user_roles'), 'u.role=r.role_id')
                       ->where("user_id= $userId");
         
         $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
