@@ -17,10 +17,14 @@ use Application\Model\OrganizationTypesTable;
 use Application\Model\CountriesTable;
 use Application\Model\RolesTable;
 use Application\Model\UserOrganizationsMapTable;
+use Application\Model\SourceTable;
+use Application\Model\SampleTable;
 
 use Application\Service\CommonService;
 use Application\Service\UserService;
 use Application\Service\OrganizationService;
+use Application\Service\SourceService;
+use Application\Service\SampleService;
 
 use Zend\Mvc\ModuleRouteListener;
 use Zend\Mvc\MvcEvent;
@@ -110,6 +114,16 @@ class Module
                     $table = new UserOrganizationsMapTable($dbAdapter);
                     return $table;
                 },
+				'SourceTable' => function($sm) {
+                    $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+                    $table = new SourceTable($dbAdapter);
+                    return $table;
+                },
+				'SampleTable' => function($sm) {
+                    $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+                    $table = new SampleTable($dbAdapter);
+                    return $table;
+                },
                 'CommonService' => function($sm) {
                     return new CommonService($sm);
                 },
@@ -118,7 +132,13 @@ class Module
                 },
                 'OrganizationService' => function($sm) {
                     return new OrganizationService($sm);
-                }
+                },
+                'SourceService' => function($sm) {
+                    return new SourceService($sm);
+                },
+                'SampleService' => function($sm) {
+                    return new SampleService($sm);
+                },
             ),
           
         );
