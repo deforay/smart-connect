@@ -19,6 +19,11 @@ use Application\Model\RolesTable;
 use Application\Model\UserOrganizationsMapTable;
 use Application\Model\SourceTable;
 use Application\Model\SampleTable;
+use Application\Model\FacilityTable;
+use Application\Model\FacilityTypeTable;
+use Application\Model\SampleStatusTable;
+use Application\Model\TestReasonTable;
+use Application\Model\SampleTypeTable;
 
 use Application\Service\CommonService;
 use Application\Service\UserService;
@@ -122,6 +127,31 @@ class Module
 				'SampleTable' => function($sm) {
                     $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
                     $table = new SampleTable($dbAdapter);
+                    return $table;
+                },
+				'FacilityTable' => function($sm) {
+                    $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+                    $table = new FacilityTable($dbAdapter);
+                    return $table;
+                },
+				'FacilityTypeTable' => function($sm) {
+                    $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+                    $table = new FacilitytypeTable($dbAdapter);
+                    return $table;
+                },
+				'TestReasonTable' => function($sm) {
+                    $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+                    $table = new TestReasonTable($dbAdapter);
+                    return $table;
+                },
+				'SampleStatusTable' => function($sm) {
+                    $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+                    $table = new SampleStatusTable($dbAdapter);
+                    return $table;
+                },
+				'SampleTypeTable' => function($sm) {
+                    $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+                    $table = new SampleTypeTable($dbAdapter);
                     return $table;
                 },
                 'CommonService' => function($sm) {

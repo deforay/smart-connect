@@ -27,7 +27,6 @@ class UsersTable extends AbstractTableGateway {
         $this->adapter = $adapter;
     }
     
-    
     public function login($params) {
         
         $username = $params['email'];
@@ -72,9 +71,6 @@ class UsersTable extends AbstractTableGateway {
     
     }
     
-    
-    
-    
     public function addUser($params){
         $credoContainer = new Container('credo');
         $newData=array('username'=>$params['username'],
@@ -92,7 +88,6 @@ class UsersTable extends AbstractTableGateway {
         $this->insert($newData);
         return $this->lastInsertValue;
     }    
-    
     
     public function getUser($userId){
         $dbAdapter = $this->adapter;
@@ -127,10 +122,5 @@ class UsersTable extends AbstractTableGateway {
                        );
         return $this->update($data,array('user_id' => $params['userId']));
     }    
-    
-        
-    
-    
-    
     
 }
