@@ -122,7 +122,26 @@ return array(
                     ),
                 ),
             ),
-            
+            'source' => array(
+                'type'    => 'segment',
+                'options' => array(
+                    'route'    => '/source[/][:action][/:id]',
+                    'defaults' => array(
+                        'controller' => 'Application\Controller\Source',
+                        'action' => 'index',
+                    ),
+                ),
+            ),
+            'common' => array(
+                'type'    => 'segment',
+                'options' => array(
+                    'route'    => '/common[/][:action][/:id]',
+                    'defaults' => array(
+                        'controller' => 'Application\Controller\Common',
+                        'action' => 'index',
+                    ),
+                ),
+            ),
         ),
     ),
     'service_manager' => array(
@@ -144,6 +163,8 @@ return array(
             'Application\Controller\Clinic' => 'Application\Controller\ClinicController',
             'Application\Controller\Hubs' => 'Application\Controller\HubsController',
             'Application\Controller\VlRequest' => 'Application\Controller\VlRequestController',
+            'Application\Controller\Source' => 'Application\Controller\SourceController',
+            'Application\Controller\Common' => 'Application\Controller\CommonController',
         ),
     ),
     'view_manager' => array(

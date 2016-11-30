@@ -1,0 +1,102 @@
+
+                    <!-- BEGIN PAGE HEADER-->
+                    <!-- BEGIN THEME PANEL -->
+                    <!-- END THEME PANEL -->
+                    <!-- BEGIN PAGE BAR -->
+                    <div class="page-bar">
+                        <ul class="page-breadcrumb">
+                            <li>
+                                <a href="/">Dashboard</a>
+                                <i class="fa fa-circle"></i>
+                            </li>
+                            <li>
+                                <a href="/users">Source</a>
+                                <i class="fa fa-circle"></i>
+                            </li>
+                            <li>
+                                <a href="javascript:;">Edit</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <!-- END PAGE BAR -->
+                    <!-- BEGIN PAGE TITLE-->
+                    <h3 class="page-title"> Edit Source
+                    </h3>
+                    <!-- END PAGE TITLE-->
+                    <!-- END PAGE HEADER-->
+                    <div class="row">
+                        <div class="col-md-12">
+                            <!-- BEGIN EXAMPLE TABLE PORTLET-->
+                            <div class="portlet light bordered">
+                                <div class="portlet-body">
+
+
+                                <div class="portlet-body form">
+                                    <form class="form-horizontal" name="addSourceInformation" id="addSourceInformation"  method="post" action="<?php echo $this->url('source', array('action' => 'edit')); ?>" autocomplete="off">
+                                        <div class="form-body">
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">Source Name <span class="font-red-mint">*</span></label>
+                                                <div class="col-md-6">
+                                                    <input type="text" class="form-control isRequired" id="sourceName" name="sourceName" placeholder="Enter source name" title="Please enter source name" onblur="checkNameValidation('sources', 'source_name', this,'<?php echo "source_id##" .$result->source_id; ?>', 'Already exist this source name . Please enter another name.');" value="<?php echo $result->source_name; ?>"/>
+                                                    <input type="hidden" class="form-control" id="sourceId" name="sourceId"  value="<?php echo $result->source_id; ?>" />
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">Status <span class="font-red-mint">*</span></label>
+                                                <div class="col-md-6">
+                                                    <select class="form-control" name="status" id="status">
+                                                        <option value="">--Select--</option>
+                                                        <option value="active" "<?php echo ($result['status'] == 'active' ? " selected='selected' " : ""); ?>">Active</option>
+                                                        <option value="inactive" "<?php echo ($result['status'] == 'inactive' ? " selected='selected' " : ""); ?>">Inactive</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-actions">
+                                            <div class="row">
+                                                <div class="col-md-offset-3 col-md-9">
+                                                    <input type="button" class="btn green" value="Submit" onclick="validateNow();return false;">
+                                                    <a href="<?php echo $this->url('source', array('action' => 'index'));?>" class="btn default"> Cancel </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                                </div>
+                            </div>
+                            <!-- END EXAMPLE TABLE PORTLET-->
+                        </div>
+                    </div>
+<script type="text/javascript">
+    duplicateName = true;
+    function validateNow() {
+
+        flag = deforayValidator.init({
+            formId: 'addSourceInformation'
+        });
+        if (flag) {
+            if (duplicateName) {
+                $.blockUI();
+                document.getElementById('addSourceInformation').submit();
+            }
+        }
+    }
+    
+    function checkNameValidation(tableName, fieldName, obj, fnct, msg){
+        checkValue = document.getElementById(obj.id).value;
+        $.post("<?php echo $this->url('common', array('action' => 'index')); ?>", {tableName: tableName, fieldName: fieldName, value: checkValue, fnct: fnct},
+        function(data) {
+            if (data > 0)
+            {
+                alert(msg);
+                duplicateName = false;
+                document.getElementById(obj.id).value = "";
+            }
+            else {
+                duplicateName = true;
+            }
+        });
+    }
+    
+</script>

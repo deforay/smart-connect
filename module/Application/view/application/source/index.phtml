@@ -1,0 +1,153 @@
+<?php
+use Zend\Session\Container;
+$sessionLogin = new Container('credo');
+//$role = $sessionLogin->roleCode;
+$editAction = '{"sClass":"center"},{"sClass":"center"},{"sClass":"center","bSortable":false}';
+?>
+           <!-- BEGIN PAGE HEADER-->
+                    <!-- BEGIN THEME PANEL -->
+                    <!-- END THEME PANEL -->
+                    <!-- BEGIN PAGE BAR -->
+                    <div class="page-bar">
+                        <ul class="page-breadcrumb">
+                            <li>
+                                <a href="/">Dashboard</a>
+                                <i class="fa fa-circle"></i>
+                            </li>
+                            <li>
+                                <a href="/users">Sources</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <!-- END PAGE BAR -->
+                    <!-- BEGIN PAGE TITLE-->
+                    <h3 class="page-title"></h3>
+                    <!-- END PAGE TITLE-->
+                    <!-- END PAGE HEADER-->
+                    <div class="row">
+                        <div class="col-md-12">
+                            <!-- BEGIN EXAMPLE TABLE PORTLET-->
+                            <div class="portlet box blue">
+                                <div class="portlet-title">
+                                    <div class="caption">
+                                        <i class="fa fa-cogs"></i>Manage Source </div>
+                                </div>    
+                                <div class="portlet-body">
+                                    <div class="table-toolbar">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="btn-group pull-right">
+                                                    <a href="<?php echo $this->url('source', array('action' => 'add'));?>" class="btn sbold green"> Add New
+                                                        <i class="fa fa-plus"></i>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <br>
+                                        <table class="table table-striped table-bordered table-hover table-checkable order-column" id="sourceDataTable">
+                                            <thead>
+                                                <tr>
+                                                    <th> Source Name </th>
+                                                    <th> Status </th>
+                                                    <th> Action </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td colspan="3" class="dataTables_empty">Loading data from server</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+
+                                    </div>
+                                    
+                                </div>
+                            </div>
+                            <!-- END EXAMPLE TABLE PORTLET-->
+                        </div>
+                    </div>
+<script type="text/javascript">
+    /* Table initialisation */
+     oTable = null;
+        $(document).ready(function() {
+    $('#sourceDataTable').dataTable( {
+		"bAutoWidth": false,
+        "bProcessing": true,
+        "bServerSide": true,
+         "aoColumns": [
+		<?php echo $editAction;?>
+            ],
+        "sAjaxSource": "<?php echo $this->url('source',array('action' => 'index')); ?>",
+         "fnServerData": function ( sSource, aoData, fnCallback ) {
+                $.ajax({
+                    "dataType": 'json',
+                    "type": "POST",
+                    "url": sSource,
+                    "data": aoData,
+                    "success": fnCallback
+                });
+            }
+    } );
+
+} );
+       
+</script>
+<script>
+    $(document).ready(function(){
+    
+    
+    
+    
+                var e = $("#sample_1").dataTable({
+                language: {
+                    aria: {
+                        sortAscending: ": activate to sort column ascending",
+                        sortDescending: ": activate to sort column descending"
+                    },
+                    emptyTable: "No data available in table",
+                    info: "Showing _START_ to _END_ of _TOTAL_ records",
+                    infoEmpty: "No records found",
+                    infoFiltered: "(filtered1 from _MAX_ total records)",
+                    lengthMenu: "Show _MENU_",
+                    search: "Search:",
+                    zeroRecords: "No matching records found",
+                    paginate: {
+                        previous: "Prev",
+                        next: "Next",
+                        last: "Last",
+                        first: "First"
+                    }
+                },
+                bStateSave: !0,
+
+                lengthMenu: [
+                    [5, 15, 20, -1],
+                    [5, 15, 20, "All"]
+                ],
+                pageLength: 5,
+                pagingType: "bootstrap_full_number",
+
+                order: [
+                    [1, "asc"]
+                ]
+            });
+            
+            jQuery("#sample_1_wrapper");
+            e.find(".group-checkable").change(function() {
+                var e = jQuery(this).attr("data-set"),
+                    a = jQuery(this).is(":checked");
+                jQuery(e).each(function() {
+                    a ? ($(this).prop("checked", !0), $(this).parents("tr").addClass("active")) : ($(this).prop("checked", !1), $(this).parents("tr").removeClass("active"))
+                }), jQuery.uniform.update(e)
+            }), e.on("change", "tbody tr .checkboxes", function() {
+                $(this).parents("tr").toggleClass("active")
+            })
+        
+    
+    
+    });
+
+    
+
+
+</script>
