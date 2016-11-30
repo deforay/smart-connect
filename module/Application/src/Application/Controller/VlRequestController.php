@@ -22,7 +22,7 @@ class VlRequestController extends AbstractActionController
             return $this->redirect()->toRoute("vl-request");
         }else{
             $sourceService = $this->getServiceLocator()->get('SourceService');
-            $sourceResult=$sourceService->getAllSources();
+            $sourceResult=$sourceService->getAllActiveSource();
             if ($sourceResult) {
                 return new ViewModel(array(
                     'sourceResult' => $sourceResult

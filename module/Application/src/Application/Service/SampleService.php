@@ -23,7 +23,7 @@ class SampleService {
     }
     public function UploadSampleResultFile($params) {
         $container = new Container('alert');
-        
+        $common = new CommonService();
         $sampleDb = $this->sm->get('SampleTable');
         $facilityDb = $this->sm->get('FacilityTable');
         $facilityTypeDb = $this->sm->get('FacilityTypeTable');
@@ -196,6 +196,8 @@ class SampleService {
                             }
                         }
                     }
+                    //remove directory
+                    $common->removeDirectory(UPLOAD_PATH . DIRECTORY_SEPARATOR ."vl-sample-result" . DIRECTORY_SEPARATOR . $fileName);
                     //for loop end
                     $container->alertMsg = 'File Uploaded Successfully';
                 }
