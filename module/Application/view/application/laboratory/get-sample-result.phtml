@@ -1,0 +1,326 @@
+<?php
+//\Zend\Debug\Debug::dump($result['stResult']);die;
+$receivedTotal = 0;$dFormat = '';
+$acceptedTotal = 0;$acceptedDate = '';
+$waitingTotal = 0;$waitingDate= '';
+$rejectedTotal = 0;$rejectedDate = '';
+if(count($result['stResult'])>0){
+    $access = end($result['stResult']);
+    $receivedTotal = $access['accessTotal'];
+    $accessDate = $access['accessDate'];
+}if(count($result['saResult'])>0){
+    $accept = end($result['saResult']);
+    $acceptedTotal = $accept['acceptTotal'];
+    $acceptedDate = $accept['acceptDate'];
+}if(count($result['swResult'])>0){
+    $wait = end($result['swResult']);
+    $waitingTotal = $wait['waitingTotal'];
+    $waitingDate = $wait['waitingDate'];
+}if(count($result['srResult'])>0){
+    $reject = end($result['srResult']);
+    $rejectedTotal = $reject['rejectTotal'];
+    $rejectedDate = $reject['rejectDate'];
+}
+?>
+<div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 ">
+    <div class="dashboard-stat2 bluebox" style="cursor:pointer;" >
+        <div class="display">
+            <div class="number">
+                <h3 class="font-green-sharp">
+                    <span data-counter="counterup" data-value="<?php echo $receivedTotal; ?>"><?php echo $receivedTotal; ?></span>
+                </h3>
+                <small class="font-green-sharp">SAMPLES ACCESSION</small><br>
+                <small class="font-green-sharp"><?php echo $accessDate;?></small>
+            </div>
+            <div class="icon">
+                <i class="icon-pie-chart"></i>
+            </div>
+        </div>
+        <div id="samplesReceivedChart" width="210" height="150" style="min-height:150px;"></div>
+    </div>
+</div>
+<div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+    <div class="dashboard-stat2 " style="cursor:pointer;">
+        <div class="display">
+            <div class="number">
+                <h3 class="font-purple-soft">
+                    <span data-counter="counterup" data-value="<?php echo $waitingTotal; ?>"><?php echo $waitingTotal; ?></span>
+                </h3>
+                <small class="font-purple-soft">SAMPLES WAITING</small><br>
+                <small class="font-purple-soft"><?php echo $waitingDate;?></small>
+            </div>
+            <div class="icon">
+                <i class="icon-pie-chart"></i>
+            </div>
+        </div>
+        <div id="samplesWaitingChart" width="210" height="150" style="min-height:150px;"></div>
+    </div>
+</div>
+<div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+    <div class="dashboard-stat2 " style="cursor:pointer;" >
+        <div class="display">
+            <div class="number">
+                <h3 class="font-blue-sharp">
+                    <span data-counter="counterup" data-value="<?php echo $acceptedTotal; ?>"><?php echo $acceptedTotal; ?></span>
+                </h3>
+                <small class="font-blue-sharp">SAMPLES TESTED</small><br>
+                <small class="font-blue-sharp"><?php echo $acceptedDate;?></small>
+            </div>
+            <div class="icon">
+                <i class="icon-pie-chart"></i>
+            </div>
+        </div>
+        <div id="samplesTestedChart" width="210" height="150" style="min-height:150px;"></div>
+    </div>
+</div>
+<div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+    <div class="dashboard-stat2 " style="cursor:pointer;" >
+        <div class="display">
+            <div class="number">
+                <h3 class="font-red-haze">
+                    <span data-counter="counterup" data-value="<?php echo $rejectedTotal; ?>"><?php echo $rejectedTotal; ?></span>
+                </h3>
+                <small class="font-red-haze">SAMPLES REJECTED</small><br>
+                <small class="font-red-haze"><?php echo $rejectedDate;?></small>
+            </div>
+            <div class="icon">
+                <i class="icon-pie-chart"></i>
+            </div>
+        </div>
+        <div id="samplesRejectedChart" width="210" height="150" style="min-height:150px;"></div>
+    </div>
+</div>
+<script>
+    <?php
+    if(isset($result['stResult']) && count($result['stResult'])>0){
+        if($receivedTotal>0){
+        ?>
+      
+    $('#samplesReceivedChart').highcharts({
+        chart: {
+            type: 'column',
+            height: 150
+        },
+        title: {
+            text: ''
+        },
+        subtitle: {
+            text: ''
+        },
+        xAxis: {
+            categories: [
+            <?php
+            foreach($result['stResult'] as $total){
+                echo "'".ucwords($total['date'])."',";
+            }
+            ?>],
+            crosshair: true
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                text: null
+            }
+        },
+        tooltip: {
+            headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+            pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                '<td style="padding:0"><b>{point.y}</b></td></tr>',
+            footerFormat: '</table>',
+            shared: true,
+            useHTML: true
+        },
+        plotOptions: {
+            column: {
+                pointPadding: 0.2,
+                borderWidth: 0,
+                cursor: 'pointer',
+                //point: {
+                //    events: {
+                //        click: function () {
+                //            window.location.href='/labs/samples-accession';
+                //        }
+                //    }
+                //}                
+            }
+        },
+        series: [{
+            showInLegend: false,  
+            name: 'Samples Received',
+            data: [<?php
+            foreach($result['stResult'] as $total){
+                echo ucwords($total[0]['total']).",";
+            }
+            ?>]
+
+        }],
+        colors : ['#2ab4c0']
+    });
+    <?php } 
+    //waiting result
+    if($waitingTotal>0){ ?>
+    $('#samplesWaitingChart').highcharts({
+        chart: {
+            type: 'column',
+            height: 150
+        },
+        title: {
+            text: ''
+        },
+        subtitle: {
+            text: ''
+        },
+        xAxis: {
+            categories: [<?php
+            foreach($result['swResult'] as $total){
+                echo "'".ucwords($total['date'])."',";
+            }
+            ?>],
+            crosshair: true
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                text: null
+            }
+        },
+        tooltip: {
+            headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+            pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                '<td style="padding:0"><b>{point.y}</b></td></tr>',
+            footerFormat: '</table>',
+            shared: true,
+            useHTML: true
+        },
+        plotOptions: {
+            column: {
+                pointPadding: 0.2,
+                borderWidth: 0,
+                cursor: 'pointer',
+            }
+        },
+        series: [{
+            showInLegend: false,  
+            name: 'Samples Waiting',
+            data: [<?php
+            foreach($result['swResult'] as $total){
+                echo ucwords($total[0]['total']).",";
+            }
+            ?>]
+
+        }],
+        colors : ['#8877a9']
+    });
+    <?php }
+    if($acceptedTotal>0){
+    ?>
+      
+$('#samplesTestedChart').highcharts({
+        chart: {
+            type: 'column',
+            height: 150
+        },
+        title: {
+            text: ''
+        },
+        subtitle: {
+            text: ''
+        },
+        xAxis: {
+            categories: [<?php
+            foreach($result['saResult'] as $total){
+                echo "'".ucwords($total['date'])."',";
+            }
+            ?>],
+            crosshair: true
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                text: null
+            }
+        },
+        tooltip: {
+            headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+            pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                '<td style="padding:0"><b>{point.y}</b></td></tr>',
+            footerFormat: '</table>',
+            shared: true,
+            useHTML: true
+        },
+        plotOptions: {
+            column: {
+                pointPadding: 0.2,
+                borderWidth: 0,
+                cursor: 'pointer',
+            }
+        },
+        series: [{
+            showInLegend: false,  
+            name: 'Samples Tested',
+            data: [<?php
+            foreach($result['saResult'] as $total){
+                echo ucwords($total[0]['total']).",";
+            }
+            ?>]
+
+        }],
+        colors : ['#f36a5a']
+    });        
+<?php }
+if($rejectedTotal>0){
+?>
+$('#samplesRejectedChart').highcharts({
+        chart: {
+            type: 'column',
+            height: 150
+        },
+        title: {
+            text: ''
+        },
+        subtitle: {
+            text: ''
+        },
+        xAxis: {
+            categories: [<?php
+            foreach($result['srResult'] as $total){
+                echo "'".ucwords($total['date'])."',";
+            }
+            ?>],
+            crosshair: true
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                text: null
+            }
+        },
+        tooltip: {
+            headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+            pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                '<td style="padding:0"><b>{point.y}</b></td></tr>',
+            footerFormat: '</table>',
+            shared: true,
+            useHTML: true
+        },
+        plotOptions: {
+            column: {
+                pointPadding: 0.2,
+                borderWidth: 0,
+                cursor: 'pointer',
+            }
+        },
+        series: [{
+            showInLegend: false,  
+            name: 'Samples Rejected',
+            data: [<?php
+            foreach($result['srResult'] as $total){
+                echo ucwords($total[0]['total']).",";
+            }
+            ?>]
+
+        }],
+        colors : ['#5C9BD1']
+    });   
+    <?php } }?>
+</script>

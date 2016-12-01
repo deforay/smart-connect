@@ -257,4 +257,11 @@ class SampleService {
         $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
         return $sResult;
     }
+    
+    //get sample result details
+    public function getSampleResultDetails($params)
+    {
+        $sampleDb = $this->sm->get('SampleTable');
+        return $sampleDb->fetchSampleResultDetails($params);
+    }
 }

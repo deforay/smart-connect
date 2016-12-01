@@ -49,6 +49,19 @@ class LaboratoryController extends AbstractActionController
         $this->layout()->setVariable('activeTab', 'labs-dashboard');          
         return new ViewModel();
     }
+    public function getSampleResultAction()
+    {
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $sampleService = $this->getServiceLocator()->get('SampleService');
+            $result = $sampleService->getSampleResultDetails($params);
+            $viewModel = new ViewModel();
+            $viewModel->setVariables(array('result' => $result))
+                        ->setTerminal(true);
+            return $viewModel;
+        }
+    }
 
 
 }

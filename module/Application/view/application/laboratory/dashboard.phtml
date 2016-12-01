@@ -22,75 +22,23 @@
                     <!-- END PAGE TITLE-->
                     <!-- END PAGE HEADER-->
                     <div class="row">
-                        <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 ">
-                            <div class="dashboard-stat2 bluebox" style="cursor:pointer;" onclick="document.location.href='/labs/samples-accession'">
-                                <div class="display">
-                                    <div class="number">
-                                        <h3 class="font-green-sharp">
-                                            <span data-counter="counterup" data-value="20">0</span>
-                                        </h3>
-                                        <small class="font-green-sharp">SAMPLES ACCESSION</small><br>
-                                        <small class="font-green-sharp">27 Mar 2016</small>
-                                    </div>
-                                    <div class="icon">
-                                        <i class="icon-pie-chart"></i>
-                                    </div>
-                                </div>
-                                <div id="samplesReceivedChart" width="210" height="150"></div>
-                            </div>
-                        </div>                        
-                        <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
-                            <div class="dashboard-stat2 " style="cursor:pointer;" onclick="document.location.href='/labs/samples-waiting'">
-                                <div class="display">
-                                    <div class="number">
-                                        <h3 class="font-purple-soft">
-                                            <span data-counter="counterup" data-value="76"></span>
-                                        </h3>
-                                        <small class="font-purple-soft">SAMPLES WAITING</small><br>
-                                        <small class="font-purple-soft">27 Mar 2016</small>
-                                    </div>
-                                    <div class="icon">
-                                        <i class="icon-pie-chart"></i>
-                                    </div>
-                                </div>
-                                <div id="samplesWaitingChart" width="210" height="150"></div>
-                            </div>
-                        </div>                        
-                        <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
-                            <div class="dashboard-stat2 " style="cursor:pointer;" onclick="document.location.href='/labs/samples-tested'">
-                                <div class="display">
-                                    <div class="number">
-                                        <h3 class="font-blue-sharp">
-                                            <span data-counter="counterup" data-value="49">0</span>
-                                        </h3>
-                                        <small class="font-blue-sharp">SAMPLES TESTED</small><br>
-                                        <small class="font-blue-sharp">27 Mar 2016</small>
-                                    </div>
-                                    <div class="icon">
-                                        <i class="icon-pie-chart"></i>
-                                    </div>
-                                </div>
-                                <div id="samplesTestedChart" width="210" height="150"></div>
+                        <div class="col-lg-6">
+                            <div id="dashboard-report-range" class="btn btn-sm form-control"
+                                 data-container="body"
+                                 data-placement="bottom"
+                                 data-original-title="Change dashboard date range">
+                                        DATE RANGE&nbsp;&nbsp;&nbsp;&nbsp;<i class="icon-calendar"></i>&nbsp;
+                                        <span class="thin uppercase hidden-xs"></span>&nbsp;
+                                        <i class="fa fa-angle-down"></i>
+                                        <input type="hidden" name="sampleCollectionDate" id="sampleCollectionDate" />
                             </div>
                         </div>
-                        <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
-                            <div class="dashboard-stat2 " style="cursor:pointer;" onclick="document.location.href='/labs/samples-rejected'">
-                                <div class="display">
-                                    <div class="number">
-                                        <h3 class="font-red-haze">
-                                            <span data-counter="counterup" data-value="57"></span>
-                                        </h3>
-                                        <small class="font-red-haze">SAMPLES REJECTED</small><br>
-                                        <small class="font-red-haze">27 Mar 2016</small>
-                                    </div>
-                                    <div class="icon">
-                                        <i class="icon-pie-chart"></i>
-                                    </div>
-                                </div>
-                                <div id="samplesRejectedChart" width="210" height="150"></div>
+                        <div class="col-lg-4">
+                                <a href="javascript:void(0);" class="btn btn-info btn-sm" onclick="getSampleResult()">Submit</a>
                             </div>
-                        </div>
-                        
+                    </div><br/>
+                    <div class="row">
+                        <div id="sampleResultDetails"></div>
                     </div>
                     <div class="row" style="padding-top:10px;padding-bottom:20px;">
                         <div class="col-lg-6">
@@ -104,7 +52,7 @@
                                 </select>
                             </div>
                         <div class="col-lg-6">
-                            <div id="dashboard-report-range" class="btn btn-sm form-control"
+                            <div id="dashboard-report" class="btn btn-sm form-control"
                                  data-container="body"
                                  data-placement="bottom"
                                  data-original-title="Change dashboard date range">
@@ -281,233 +229,71 @@
             var gfxPath = 'https://raw.githubusercontent.com/highslide-software/pattern-fill/master/graphics/';
 
             
-        
+        function getSampleResult()
+        {
+            dateRange = $("#sampleCollectionDate").val();
+        $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-result')); ?>",{sampleCollectionDate:dateRange},
+        function(data) {
+            $("#sampleResultDetails").html(data);
+        });
+        }
             
             
             $(function () {
                 
+                $('#dashboard-report-range').daterangepicker({
+                "ranges": {
+                    'Today': [moment(), moment()],
+                    'Yesterday': [moment().subtract('days', 1), moment().subtract('days', 1)],
+                    'Last 7 Days': [moment().subtract('days', 6), moment()],
+                    'Last 30 Days': [moment().subtract('days', 29), moment()],
+                    'This Month': [moment().startOf('month'), moment().endOf('month')],
+                    'Last Month': [moment().subtract('month', 1).startOf('month'), moment().subtract('month', 1).endOf('month')]
+                },
+                "locale": {
+                    "format": "YYYY-MM-DD",
+                    "separator": " to ",
+                    "applyLabel": "Apply",
+                    "cancelLabel": "Cancel",
+                    "fromLabel": "From",
+                    "toLabel": "To",
+                    "customRangeLabel": "Custom",
+                    "daysOfWeek": [
+                        "Su",
+                        "Mo",
+                        "Tu",
+                        "We",
+                        "Th",
+                        "Fr",
+                        "Sa"
+                    ],
+                    "monthNames": [
+                        "January",
+                        "February",
+                        "March",
+                        "April",
+                        "May",
+                        "June",
+                        "July",
+                        "August",
+                        "September",
+                        "October",
+                        "November",
+                        "December"
+                    ],
+                    //"firstDay": 1
+                },
+                //"startDate": "11/08/2015",
+                //"endDate": "11/14/2015",
+                opens: "left",
+            }, function(start, end, label) {
+                $('#dashboard-report-range span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+                $('#sampleCollectionDate').val(start.format('YYYY-MM-DD') + ' - ' + end.format('YYYY-MM-DD'));
+            });
+                $('#dashboard-report-range span').html(moment().subtract('days', 29).format('MMMM D, YYYY') + ' - ' + moment().format('MMMM D, YYYY'));
+            $('#dashboard-report-range').show();
                 
-                
-                
-                
-                
-                
-       
-            
-$('#samplesWaitingChart').highcharts({
-        chart: {
-            type: 'column',
-            height: 150
-        },
-        title: {
-            text: ''
-        },
-        subtitle: {
-            text: ''
-        },
-        xAxis: {
-            categories: ["21 Mar", "22 Mar", "23 Mar", "24 Mar", "25 Mar", "26 Mar", "27 Mar"],
-            crosshair: true
-        },
-        yAxis: {
-            min: 0,
-            title: {
-                text: null
-            }
-        },
-        tooltip: {
-            headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
-            pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
-                '<td style="padding:0"><b>{point.y}</b></td></tr>',
-            footerFormat: '</table>',
-            shared: true,
-            useHTML: true
-        },
-        plotOptions: {
-            column: {
-                pointPadding: 0.2,
-                borderWidth: 0,
-                cursor: 'pointer',
-                point: {
-                    events: {
-                        click: function () {
-                            window.location.href='/labs/samples-waiting';
-                        }
-                    }
-                }
-            }
-        },
-        series: [{
-            showInLegend: false,  
-            name: 'Samples Waiting',
-            data: [45, 19,45, 19,45, 19, 76]
-
-        }],
-        colors : ['#8877a9']
-    });                        
-                
-      
-$('#samplesReceivedChart').highcharts({
-        chart: {
-            type: 'column',
-            height: 150
-        },
-        title: {
-            text: ''
-        },
-        subtitle: {
-            text: ''
-        },
-        xAxis: {
-            categories: ["21 Mar", "22 Mar", "23 Mar", "24 Mar", "25 Mar", "26 Mar", "27 Mar"],
-            crosshair: true
-        },
-        yAxis: {
-            min: 0,
-            title: {
-                text: null
-            }
-        },
-        tooltip: {
-            headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
-            pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
-                '<td style="padding:0"><b>{point.y}</b></td></tr>',
-            footerFormat: '</table>',
-            shared: true,
-            useHTML: true
-        },
-        plotOptions: {
-            column: {
-                pointPadding: 0.2,
-                borderWidth: 0,
-                cursor: 'pointer',
-                point: {
-                    events: {
-                        click: function () {
-                            window.location.href='/labs/samples-accession';
-                        }
-                    }
-                }                
-            }
-        },
-        series: [{
-            showInLegend: false,  
-            name: 'Samples Received',
-            data: [25, 49,60, 69,55, 39, 20]
-
-        }],
-        colors : ['#2ab4c0']
-    });        
-
-
-      
-$('#samplesTestedChart').highcharts({
-        chart: {
-            type: 'column',
-            height: 150
-        },
-        title: {
-            text: ''
-        },
-        subtitle: {
-            text: ''
-        },
-        xAxis: {
-            categories: ["21 Mar", "22 Mar", "23 Mar", "24 Mar", "25 Mar", "26 Mar", "27 Mar"],
-            crosshair: true
-        },
-        yAxis: {
-            min: 0,
-            title: {
-                text: null
-            }
-        },
-        tooltip: {
-            headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
-            pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
-                '<td style="padding:0"><b>{point.y}</b></td></tr>',
-            footerFormat: '</table>',
-            shared: true,
-            useHTML: true
-        },
-        plotOptions: {
-            column: {
-                pointPadding: 0.2,
-                borderWidth: 0,
-                cursor: 'pointer',
-                point: {
-                    events: {
-                        click: function () {
-                            window.location.href='/labs/samples-tested';
-                        }
-                    }
-                }
-            }
-        },
-        series: [{
-            showInLegend: false,  
-            name: 'Samples Tested',
-            data: [25, 29,60, 29,25, 29, 49]
-
-        }],
-        colors : ['#f36a5a']
-    });        
-
-    
-    
-
-$('#samplesRejectedChart').highcharts({
-        chart: {
-            type: 'column',
-            height: 150
-        },
-        title: {
-            text: ''
-        },
-        subtitle: {
-            text: ''
-        },
-        xAxis: {
-            categories: ["21 Mar", "22 Mar", "23 Mar", "24 Mar", "25 Mar", "26 Mar", "27 Mar"],
-            crosshair: true
-        },
-        yAxis: {
-            min: 0,
-            title: {
-                text: null
-            }
-        },
-        tooltip: {
-            headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
-            pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
-                '<td style="padding:0"><b>{point.y}</b></td></tr>',
-            footerFormat: '</table>',
-            shared: true,
-            useHTML: true
-        },
-        plotOptions: {
-            column: {
-                pointPadding: 0.2,
-                borderWidth: 0,
-                cursor: 'pointer',
-                point: {
-                    events: {
-                        click: function () {
-                            window.location.href='/labs/samples-rejected';
-                        }
-                    }
-                }
-            }
-        },
-        series: [{
-            showInLegend: false,  
-            name: 'Samples Rejected',
-            data: [65, 59, 65, 59, 65, 59, 57]
-
-        }],
-        colors : ['#5C9BD1']
-    });        
-
+                getSampleResult();
                 
 $('#reqformspie').highcharts({
         chart: {
