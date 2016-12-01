@@ -60,6 +60,11 @@ class SampleTable extends AbstractTableGateway {
             $acceptedTotal = 0;
             $rejectedTotal = 0;
             $receivedTotal = 0;
+            $tResult = array();
+            $acceptedResult = array();
+            $waitingResult = array();
+            $rejectedResult = array();
+            if($sResult){
             foreach($sResult as $sampleData){
                 if($sampleData['year']!=NULL){
                 $date = $sampleData['year']."-".$sampleData['month']."-".$sampleData['day'];
@@ -126,6 +131,7 @@ class SampleTable extends AbstractTableGateway {
                 }
                 $i++;
                 }
+            }
             }
             //\Zend\Debug\Debug::dump($tResult);die;
         return array('stResult'=>$tResult,'saResult'=>$acceptedResult,'swResult'=>$waitingResult,'srResult'=>$rejectedResult);
