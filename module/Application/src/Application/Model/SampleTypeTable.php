@@ -26,4 +26,10 @@ class SampleTypeTable extends AbstractTableGateway {
     public function __construct(Adapter $adapter) {
         $this->adapter = $adapter;
     }
+    
+    public function fetchAllSampleType()
+    {
+        $query = $this->select();
+        return $query;
+    }
 }

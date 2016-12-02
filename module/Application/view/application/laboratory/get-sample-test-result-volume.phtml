@@ -1,0 +1,91 @@
+<?php
+//\Zend\Debug\Debug::dump($result);die;
+?>
+<div id="facilitiesTestedVsSuppressed"></div>
+
+<script>
+       $(function () {
+        $('#facilitiesTestedVsSuppressed').highcharts({
+        chart: {
+            type: 'column'
+        },
+        title: {
+            text: ''
+        },
+        xAxis: {
+            categories: [<?php
+            foreach($result as $key=>$lab){
+                echo "'".$key."',";
+            }
+            ?>]
+        },
+        yAxis: {
+            allowDecimals: false,
+            min: 0,
+            title: {
+                text: ''
+            }
+        },
+        tooltip: {
+            formatter: function () {
+                return '<b>' + this.x + '</b><br/>' +
+                    this.series.name + ': ' + this.y + '<br/>' +
+                    'Total: ' + this.point.stackTotal;
+            }
+        },
+        plotOptions: {
+            column: {
+                stacking: 'normal',
+                pointPadding: 0.2,
+                borderWidth: 0,
+                cursor: 'pointer',
+                point: {
+                    events: {
+                        click: function () {
+                            window.location.href='/labs/samples-tested';
+                        }
+                    }
+                }
+            }
+        },
+        series: [
+            <?php
+            foreach($sampleType as $sample){
+                    foreach($result as $key=>$condition){
+                    ?>
+                    {
+                    name:'<?php echo $sample['sample_name']." - ".$key;?>',
+                    data:[<?php
+                        foreach($condition as $count){
+                            echo $count.",";
+                        }
+                    ?>],
+                    },
+                    <?php
+                    }
+            }
+            ?>
+        ],
+    colors: [
+        <?php
+        $chars = "ABCDEF0123456789";   
+            $size = strlen( $chars );
+            //$str = array();
+            for( $i = 0; $i < 18; $i++ ) {
+                $str = '';
+                $str.="#";
+                for( $j = 0; $j < 6; $j++ ) {
+                    $str .= $chars[ rand( 0, $size - 1 ) ];
+                }
+                echo "'".$str."',";
+            }
+        ?>
+        
+        //'#F36A5A',
+        //'#60d18f',
+        //'#ff1900',
+        //'#09843a',
+    ]
+    });
+    });
+</script>

@@ -15,8 +15,12 @@ class LaboratoryController extends AbstractActionController
 
     public function dashboardAction()
     {
+        $sampleService = $this->getServiceLocator()->get('SampleService');
+        $sampleType = $sampleService->getSampleType();
         $this->layout()->setVariable('activeTab', 'labs-dashboard');          
-        return new ViewModel();
+        return new ViewModel(array(
+                    'sampleType' => $sampleType
+                ));
     }
 
     public function samplesAccessionAction()
@@ -58,6 +62,34 @@ class LaboratoryController extends AbstractActionController
             $result = $sampleService->getSampleResultDetails($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('result' => $result))
+                        ->setTerminal(true);
+            return $viewModel;
+        }
+    }
+    public function getSampleTestResultAction()
+    {
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $sampleService = $this->getServiceLocator()->get('SampleService');
+            $result = $sampleService->getSampleTestedResultDetails($params);
+            $sampleType = $sampleService->getSampleType();
+            $viewModel = new ViewModel();
+            $viewModel->setVariables(array('result' => $result,'sampleType'=>$sampleType))
+                        ->setTerminal(true);
+            return $viewModel;
+        }
+    }
+    public function getSampleTestResultVolumeAction()
+    {
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $sampleService = $this->getServiceLocator()->get('SampleService');
+            $result = $sampleService->getSampleTestedResultBasedVolumeDetails($params);
+            $sampleType = $sampleService->getSampleType();
+            $viewModel = new ViewModel();
+            $viewModel->setVariables(array('result' => $result,'sampleType'=>$sampleType))
                         ->setTerminal(true);
             return $viewModel;
         }

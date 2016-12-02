@@ -3,6 +3,11 @@
         border:1px solid #3598DC;
     }
 </style>
+<?php
+foreach($sampleType as $samples){
+    $sType.='<option value="'.base64_encode($samples['type_id']).'">'.ucwords($samples['sample_name']).'</option>';
+}
+?>
                     <!-- BEGIN PAGE BAR -->
                     <!-- BEGIN PAGE BAR -->
                     <div class="page-bar">
@@ -34,7 +39,7 @@
                             </div>
                         </div>
                         <div class="col-lg-4">
-                                <a href="javascript:void(0);" class="btn btn-info btn-sm" onclick="getSampleResult()">Submit</a>
+                                <a href="javascript:void(0);" class="btn btn-info btn-sm" onclick="getSampleResult(),getTestedSampleResult()">Submit</a>
                             </div>
                     </div><br/>
                     <div class="row">
@@ -73,29 +78,16 @@
                                     </div>
                                     <div class="actions">
                                         <div class="btn-group">
-                                            <a href="" class="btn white btn-outline btn-circle btn-sm dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-close-others="true"> Sample Type
-                                                <span class="fa fa-angle-down"> </span>
-                                            </a>
-                                            <ul class="dropdown-menu pull-right">
-                                                <li class="active">
-                                                    <a href="javascript:;"> All
-                                                    </a>
-                                                </li>
-                                                <li>
-                                                    <a href="javascript:;"> DBS
-                                                    </a>
-                                                </li>
-                                                <li>
-                                                    <a href="javascript:;"> Plasma
-                                                    </a>
-                                                </li>
-                                            </ul>
+                                            <select id="sampleType" class="btn white btn-outline btn-circle btn-sm dropdown-toggle">
+                                                <option value="">Sample Type</option>
+                                                <?php echo $sType;?>
+                                            </select>
                                         </div>
                                     </div>                                    
                                     
                                 </div>
                                 <div class="portlet-body" style="cursor:pointer;" onclick="document.location.href='/labs/samples-tested'">
-                                    <div id="samplesTestedVsSupressed"></div>
+                                    <div id="samplesTestedResult"></div>
                                 </div>
                             </div>
                         </div>
@@ -108,29 +100,15 @@
                                     </div>
                                     <div class="actions">
                                         <div class="btn-group">
-                                            <a href="" class="btn white btn-outline btn-circle btn-sm dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-close-others="true"> Sample Type
-                                                <span class="fa fa-angle-down"> </span>
-                                            </a>
-                                            <ul class="dropdown-menu pull-right">
-                                                <li class="active">
-                                                    <a href="javascript:;"> All
-                                                    </a>
-                                                </li>
-                                                <li>
-                                                    <a href="javascript:;"> DBS
-                                                    </a>
-                                                </li>
-                                                <li>
-                                                    <a href="javascript:;"> Plasma
-                                                    </a>
-                                                </li>
-                                            </ul>
+                                            <select id="sampleTypeVolume" class="btn white btn-outline btn-circle btn-sm dropdown-toggle">
+                                                <option value="">Sample Type</option>
+                                                <?php echo $sType;?>
+                                            </select>
                                         </div>
                                     </div>                                    
-                                    
                                 </div>
                                 <div class="portlet-body" style="cursor:pointer;" onclick="document.location.href='/labs/samples-tested'">
-                                    <div id="facilitiesTestedVsSuppressed"></div>
+                                    <div id="facilitiesTestedValue"></div>
                                 </div>
                             </div>
                         </div>                        
@@ -236,8 +214,25 @@
         function(data) {
             $("#sampleResultDetails").html(data);
         });
+        } 
+        function getTestedSampleResult()
+        {
+            sampleType = $("#sampleType").val();
+            dateRange = $("#sampleCollectionDate").val();
+            $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-test-result')); ?>",{sampleCollectionDate:dateRange,sampleType:sampleType},
+            function(data) {
+            $("#samplesTestedResult").html(data);
+            });
         }
-            
+        function getTestedSampleResultBasedVolume()
+        {
+            sampleType = $("#sampleTypeVolume").val();
+            dateRange = $("#sampleCollectionDate").val();
+            $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-test-result-volume')); ?>",{sampleCollectionDate:dateRange,sampleType:sampleType},
+            function(data) {
+            $("#facilitiesTestedValue").html(data);
+            });
+        }
             
             $(function () {
                 
@@ -291,9 +286,11 @@
                 $('#sampleCollectionDate').val(start.format('YYYY-MM-DD') + ' - ' + end.format('YYYY-MM-DD'));
             });
                 $('#dashboard-report-range span').html(moment().subtract('days', 29).format('MMMM D, YYYY') + ' - ' + moment().format('MMMM D, YYYY'));
-            $('#dashboard-report-range').show();
+                $('#dashboard-report-range').show();
                 
                 getSampleResult();
+                getTestedSampleResult();
+                getTestedSampleResultBasedVolume();
                 
 $('#reqformspie').highcharts({
         chart: {
@@ -364,209 +361,8 @@ $('#reqformspie').highcharts({
         '#64ade5',
         '#8877a9'
     ]
-    });                
-                
-                
-                
-                
-                
-                
-                    
-                    
-                    
-        $('#samplesTestedVsSupressed').highcharts({
+    });
 
-        chart: {
-            type: 'column'
-        },
-
-        title: {
-            text: ''
-        },
-
-        xAxis: {
-            categories: ["21 Mar", "22 Mar", "23 Mar", "24 Mar", "25 Mar", "26 Mar", "27 Mar"]
-        },
-
-        yAxis: {
-            allowDecimals: false,
-            min: 0,
-            title: {
-                text: ''
-            }
-        },
-
-        tooltip: {
-            formatter: function () {
-                return '<b>' + this.x + '</b><br/>' +
-                    this.series.name + ': ' + this.y + '<br/>' +
-                    'Total: ' + this.point.stackTotal;
-            }
-        },
-
-        plotOptions: {
-            column: {
-                stacking: 'normal',
-                pointPadding: 0.2,
-                borderWidth: 0,
-                cursor: 'pointer',
-                point: {
-                    events: {
-                        click: function () {
-                            window.location.href='/labs/samples-tested';
-                        }
-                    }
-                }
-            }
-        },
-
-        series: [
-        {
-            name: 'Plasma - VL ( > 1000 cp/ml)',
-            data: [2, 5, 6, 2, 1, 2, 1],
-            stack: 'female'
-        }, {
-            name: 'Plasma - VL ( < 1000 cp/ml)',
-            data: [3, 2, 4, 4, 3, 4, 3],
-            stack: 'female'
-        },{
-            name: 'Plasma - VL Not Detected',
-            data: [2, 3, 3, 2,1, 2, 1],
-            stack: 'female',
-            color: {
-                pattern : "<?php echo $this->basePath("assets/img/patterns/light-green-pattern.jpg") ?>",
-                width: 6,
-                height: 6
-            }
-        },
-        {
-            name: 'DBS - VL ( > 1000 cp/ml)',
-            data: [12, 9, 8, 12, 4, 6, 9],
-            stack: 'male'
-        }, {
-            name: 'DBS - VL ( < 1000 cp/ml)',
-            data: [9, 5, 4, 4, 3, 4, 3],
-            stack: 'male'
-        },{
-            name: 'DBS - VL Not Detected',
-            data: [2, 3, 3, 2,1, 2, 1],
-            stack: 'male',
-            color: {
-                pattern : "<?php echo $this->basePath("assets/img/patterns/dark-green-pattern.jpg") ?>",
-                width: 6,
-                height: 6
-            }
-        }
-        ],
-    colors: [
-        '#F36A5A',
-        '#60d18f',
-        '#ff1900',
-        '#09843a',
-    ]
-    });                          
-                
-                    
-                    
-                    
-        $('#facilitiesTestedVsSuppressed').highcharts({
-
-        chart: {
-            type: 'column'
-        },
-
-        title: {
-            text: ''
-        },
-
-        xAxis: {
-            categories: ["Lab 001", "Lab 002", "Lab 003", "Lab 004", "Lab 005", "Lab 006", "Lab 007"]
-        },
-
-        yAxis: {
-            allowDecimals: false,
-            min: 0,
-            title: {
-                text: ''
-            }
-        },
-
-        tooltip: {
-            formatter: function () {
-                return '<b>' + this.x + '</b><br/>' +
-                    this.series.name + ': ' + this.y + '<br/>' +
-                    'Total: ' + this.point.stackTotal;
-            }
-        },
-
-        plotOptions: {
-            column: {
-                stacking: 'normal',
-                pointPadding: 0.2,
-                borderWidth: 0,
-                cursor: 'pointer',
-                point: {
-                    events: {
-                        click: function () {
-                            window.location.href='/labs/samples-tested';
-                        }
-                    }
-                }
-            }
-        },
-
-        series: [{
-            name: 'Plasma - VL ( > 1000 cp/ml)',
-            data: [35, 30, 25, 20, 15, 10, 5],
-            stack: 'female',
-            color : '#F36A5A'
-        }, {
-            name: 'Plasma - VL ( < 1000 cp/ml)',
-            data: [19, 10, 14, 14,13, 9, 3],
-            stack: 'female',
-            color: '#60d18f'
-        },{
-            name: 'Plasma - VL Not Detected',
-            data: [2, 3, 3, 2,1, 2, 1],
-            stack: 'female',
-            color: {
-                pattern : "<?php echo $this->basePath("assets/img/patterns/light-green-pattern.jpg") ?>",
-                width: 6,
-                height: 6
-            }
-        },
-        {
-            name: 'DBS - VL ( > 1000 cp/ml)',
-            data: [12, 9, 8, 12, 4, 6, 9],
-            stack: 'male',
-            color: '#ff1900'
-        }, {
-            name: 'DBS - VL ( < 1000 cp/ml)',
-            data: [9, 5, 4, 4, 3, 4, 3],
-            stack: 'male',
-            color: '#09843a'
-        },{
-            name: 'DBS - VL Not Detected',
-            data: [2, 3, 3, 2,1, 2, 1],
-            stack: 'male',
-            color: {
-                pattern : "<?php echo $this->basePath("assets/img/patterns/dark-green-pattern.jpg") ?>",
-                width: 6,
-                height: 6
-            }
-        }]
-    });                          
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
     $('#gotoPie').highcharts({
         chart: {
             plotBackgroundColor: null,

@@ -264,4 +264,22 @@ class SampleService {
         $sampleDb = $this->sm->get('SampleTable');
         return $sampleDb->fetchSampleResultDetails($params);
     }
+    //get sample tested result details
+    public function getSampleTestedResultDetails($params)
+    {
+        $sampleDb = $this->sm->get('SampleTable');
+        return $sampleDb->fetchSampleTestedResultDetails($params);
+    }
+    //get sample tested result details
+    public function getSampleTestedResultBasedVolumeDetails($params)
+    {
+        $sampleDb = $this->sm->get('SampleTable');
+        return $sampleDb->fetchSampleTestedResultBasedVolumeDetails($params);
+    }
+    //get all smaple type
+    public function getSampleType()
+    {
+        $sampleDb = $this->sm->get('SampleTypeTable');
+        return $sampleDb->fetchAllSampleType();
+    }
 }
