@@ -61,6 +61,7 @@
                             echo $count.",";
                         }
                     ?>],
+                    stack: 'female',
                     },
                     <?php
                     }
@@ -68,26 +69,6 @@
             }
             ?>
         ],
-    colors: [
-        <?php
-        $chars = "ABCDEF0123456789";   
-            $size = strlen( $chars );
-            //$str = array();
-            for( $i = 0; $i < 18; $i++ ) {
-                $str = '';
-                $str.="#";
-                for( $j = 0; $j < 6; $j++ ) {
-                    $str .= $chars[ rand( 0, $size - 1 ) ];
-                }
-                echo "'".$str."',";
-            }
-        ?>
-        
-        //'#F36A5A',
-        //'#60d18f',
-        //'#ff1900',
-        //'#09843a',
-    ]
     });
     });
 </script>

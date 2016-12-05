@@ -4,6 +4,7 @@
     }
 </style>
 <?php
+$sType = '';
 foreach($sampleType as $samples){
     $sType.='<option value="'.base64_encode($samples['type_id']).'">'.ucwords($samples['sample_name']).'</option>';
 }

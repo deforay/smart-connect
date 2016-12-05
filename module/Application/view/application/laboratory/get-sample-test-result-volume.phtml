@@ -14,8 +14,8 @@
         },
         xAxis: {
             categories: [<?php
-            foreach($result as $key=>$lab){
-                echo "'".$key."',";
+            foreach($result['lab'] as $lab){
+                echo "'".$lab['facility_name']."',";
             }
             ?>]
         },
@@ -50,42 +50,32 @@
         },
         series: [
             <?php
-            foreach($sampleType as $sample){
-                    foreach($result as $key=>$condition){
+            $name = 'female';
+            foreach($result['lab'] as $lab){
+              if(isset($result['result'][$lab['sample_name']])){
+                     if($name == 'female' ){
+                         $name = 'male'   ;
+                     }else{
+                         $name = 'female';   
+                     }
+                    foreach($result['result'][$lab['sample_name']] as $key=>$condition){
                     ?>
                     {
-                    name:'<?php echo $sample['sample_name']." - ".$key;?>',
+                    name:'<?php echo $lab['sample_name']." - ".$key;?>',
                     data:[<?php
                         foreach($condition as $count){
                             echo $count.",";
                         }
                     ?>],
+                    stack:'<?php echo $name;?>'
                     },
                     <?php
+                    $i++;
                     }
+              }
             }
             ?>
         ],
-    colors: [
-        <?php
-        $chars = "ABCDEF0123456789";   
-            $size = strlen( $chars );
-            //$str = array();
-            for( $i = 0; $i < 18; $i++ ) {
-                $str = '';
-                $str.="#";
-                for( $j = 0; $j < 6; $j++ ) {
-                    $str .= $chars[ rand( 0, $size - 1 ) ];
-                }
-                echo "'".$str."',";
-            }
-        ?>
-        
-        //'#F36A5A',
-        //'#60d18f',
-        //'#ff1900',
-        //'#09843a',
-    ]
     });
     });
 </script>
