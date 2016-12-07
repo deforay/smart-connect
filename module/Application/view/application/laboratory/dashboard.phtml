@@ -27,7 +27,7 @@ foreach($sampleType as $samples){
                     
                     <!-- END PAGE TITLE-->
                     <!-- END PAGE HEADER-->
-                    <div class="row">
+                    <div class="row" style="padding-top:10px;padding-bottom:20px;">
                         <div class="col-lg-6">
                             <div id="dashboard-report-range" class="btn btn-sm form-control"
                                  data-container="body"
@@ -39,38 +39,27 @@ foreach($sampleType as $samples){
                                         <input type="hidden" name="sampleCollectionDate" id="sampleCollectionDate" />
                             </div>
                         </div>
-                        <div class="col-lg-4">
-                                <a href="javascript:void(0);" class="btn btn-info btn-sm" onclick="getSampleResult(),getTestedSampleResult()">Submit</a>
+                        <div class="col-lg-3">
+                            <select name="labName" id="labName" class="form-control" title="Please choose lab name">
+                                <option value="">-- Lab Name --</option>
+                                <?php
+                                foreach($labName as $lab)
+                                {
+                                    ?>
+                                    <option value="<?php echo base64_encode($lab['facility_id']);?>"><?php echo $lab['facility_name'];?></option>
+                                    <?php
+                                }
+                                ?>
+                            </select>
+                        </div>
+                        <div class="col-lg-3">
+                                <a href="javascript:void(0);" class="btn btn-info btn-sm" onclick="getSampleResult(),getTestedSampleResult(),getTestedSampleResultBasedVolume()">Submit</a>
                             </div>
-                    </div><br/>
+                    </div>
                     <div class="row">
                         <div id="sampleResultDetails"></div>
                     </div>
-                    <div class="row" style="padding-top:10px;padding-bottom:20px;">
-                        <div class="col-lg-6">
-                                <select class="form-control">
-                                    <option>All my Labs</option>
-                                    <option>Lab 001</option>
-                                    <option>Lab 002</option>
-                                    <option>Lab 003</option>
-                                    <option>Lab 004</option>
-                                    <option>Lab 005</option>
-                                </select>
-                            </div>
-                        <div class="col-lg-6">
-                            <div id="dashboard-report" class="btn btn-sm form-control"
-                                 data-container="body"
-                                 data-placement="bottom"
-                                 data-original-title="Change dashboard date range">
-                                        DATE RANGE&nbsp;&nbsp;&nbsp;&nbsp;<i class="icon-calendar"></i>&nbsp;
-                                        <span class="thin uppercase hidden-xs"></span>&nbsp;
-                                        <i class="fa fa-angle-down"></i>
-                            </div>
-                        </div>
-                    </div>
-                    
                     <div class="row">
-                        
                         <div class="col-md-6 col-sm-6">
                             <div class="portlet box blue">
                                 <div class="portlet-title">
@@ -229,7 +218,8 @@ foreach($sampleType as $samples){
         {
             sampleType = $("#sampleTypeVolume").val();
             dateRange = $("#sampleCollectionDate").val();
-            $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-test-result-volume')); ?>",{sampleCollectionDate:dateRange,sampleType:sampleType},
+            facilityId = $("#labName").val();
+            $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-test-result-volume')); ?>",{sampleCollectionDate:dateRange,sampleType:sampleType,facilityId:facilityId},
             function(data) {
             $("#facilitiesTestedValue").html(data);
             });

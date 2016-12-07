@@ -282,4 +282,10 @@ class SampleService {
         $sampleDb = $this->sm->get('SampleTypeTable');
         return $sampleDb->fetchAllSampleType();
     }
+    //get all Lab
+    public function getAllLabName()
+    {
+        $facilityDb = $this->sm->get('FacilityTable');
+        return $facilityDb->fetchAllLabName();
+    }
 }
