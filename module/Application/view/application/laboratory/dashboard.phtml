@@ -53,7 +53,7 @@ foreach($sampleType as $samples){
                             </select>
                         </div>
                         <div class="col-lg-3">
-                                <a href="javascript:void(0);" class="btn btn-info btn-sm" onclick="getSampleResult(),getTestedSampleResult(),getTestedSampleResultBasedVolume()">Submit</a>
+                                <a href="javascript:void(0);" class="btn btn-info btn-sm" onclick="getSampleResult(),getTestedSampleResult(),getTestedSampleResultBasedVolume(),getRequisitionFormsTested()">Submit</a>
                             </div>
                     </div>
                     <div class="row">
@@ -124,8 +124,8 @@ foreach($sampleType as $samples){
                                         <span class="caption-subject">Requisition Forms for Testing</span>
                                     </div>
                                 </div>
-                                <div class="portlet-body">
-                                    <div id="reqformspie"></div>
+                                <div class="portlet-body" id="requisitionForms">
+                                    
                                 </div>
                             </div>                            
                             
@@ -224,6 +224,14 @@ foreach($sampleType as $samples){
             $("#facilitiesTestedValue").html(data);
             });
         }
+        function getRequisitionFormsTested()
+        {
+            dateRange = $("#sampleCollectionDate").val();
+            $.post("<?php echo $this->url('laboratory', array('action' => 'get-requisition-forms')); ?>",{sampleCollectionDate:dateRange},
+            function(data) {
+            $("#requisitionForms").html(data);
+            });
+        }
             
             $(function () {
                 
@@ -273,86 +281,17 @@ foreach($sampleType as $samples){
                 //"endDate": "11/14/2015",
                 opens: "left",
             }, function(start, end, label) {
-                $('#dashboard-report-range span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
-                $('#sampleCollectionDate').val(start.format('YYYY-MM-DD') + ' - ' + end.format('YYYY-MM-DD'));
+                $('#dashboard-report-range span').html(start.format('MMMM D, YYYY') + ' to ' + end.format('MMMM D, YYYY'));
+                $('#sampleCollectionDate').val(start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
             });
-                $('#dashboard-report-range span').html(moment().subtract('days', 29).format('MMMM D, YYYY') + ' - ' + moment().format('MMMM D, YYYY'));
+                $('#dashboard-report-range span').html(moment().subtract('days', 29).format('MMMM D, YYYY') + ' to ' + moment().format('MMMM D, YYYY'));
                 $('#dashboard-report-range').show();
                 
                 getSampleResult();
                 getTestedSampleResult();
                 getTestedSampleResultBasedVolume();
+                getRequisitionFormsTested();
                 
-$('#reqformspie').highcharts({
-        chart: {
-            type: 'column'
-        },
-        title: {
-            text: ''
-        },
-        xAxis: {
-            categories: ["21 Mar", "22 Mar", "23 Mar", "24 Mar", "25 Mar", "26 Mar", "27 Mar"]
-        },
-        yAxis: {
-            min: 0,
-            title: {
-                text: 'Forms'
-            },
-            stackLabels: {
-                enabled: true,
-                style: {
-                    fontWeight: 'bold',
-                    color: (Highcharts.theme && Highcharts.theme.textColor) || 'gray'
-                }
-            }
-        },
-        legend: {
-            align: 'right',
-            x: -30,
-            verticalAlign: 'top',
-            y: 25,
-            floating: true,
-            backgroundColor: (Highcharts.theme && Highcharts.theme.background2) || 'white',
-            borderColor: '#CCC',
-            borderWidth: 1,
-            shadow: false
-        },
-        tooltip: {
-            headerFormat: '<b>{point.x}</b><br/>',
-            pointFormat: '{series.name}: {point.y}<br/>Total: {point.stackTotal}'
-        },
-        plotOptions: {
-            column: {
-                stacking: 'normal',
-                cursor: 'pointer',
-                point: {
-                    events: {
-                        click: function () {
-                            window.location.href='/labs/requisition-forms-incomplete';
-                        }
-                    }
-                },
-                dataLabels: {
-                    enabled: true,
-                    color: (Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'white',
-                    style: {
-                        textShadow: '0 0 3px black'
-                    }
-                }
-            }
-        },
-        series: [{
-            name: 'Incomplete',
-            data: [5, 3, 4, 7, 2, 7, 2]
-        }, {
-            name: 'Complete',
-            data: [2, 2, 3, 2, 1, 2, 1]
-        }],
-    colors: [
-        '#64ade5',
-        '#8877a9'
-    ]
-    });
 
     $('#gotoPie').highcharts({
         chart: {

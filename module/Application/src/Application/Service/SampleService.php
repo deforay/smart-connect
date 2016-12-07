@@ -276,16 +276,23 @@ class SampleService {
         $sampleDb = $this->sm->get('SampleTable');
         return $sampleDb->fetchSampleTestedResultBasedVolumeDetails($params);
     }
+    //get Requisition Forms tested
+    public function getRequisitionFormsTested($params)
+    {
+        $sampleDb = $this->sm->get('SampleTable');
+        return $sampleDb->getRequisitionFormsTested($params);
+    }
     //get all smaple type
     public function getSampleType()
     {
         $sampleDb = $this->sm->get('SampleTypeTable');
         return $sampleDb->fetchAllSampleType();
     }
-    //get all Lab
+    //get all Lab Name
     public function getAllLabName()
     {
         $facilityDb = $this->sm->get('FacilityTable');
         return $facilityDb->fetchAllLabName();
     }
+    
 }
