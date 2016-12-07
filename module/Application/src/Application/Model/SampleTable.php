@@ -261,7 +261,7 @@ class SampleTable extends AbstractTableGateway {
         }
     }
     
-    public function getRequisitionFormsTested()
+    public function getRequisitionFormsTested($params)
     {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
@@ -288,20 +288,23 @@ class SampleTable extends AbstractTableGateway {
                     $dFormat = date("d M", strtotime($date));
                     
                     $completeQuery = $sql->select()->from(array('s'=>'samples'))->columns(array('total' => new Expression('COUNT(*)')))
-                                    ->where(array("s.sample_collection_date <='" . $cDate ." 00:00:00". "'", "s.sample_collection_date >='" . $lastSevenDay." 23:59:00". "'"))
+                                    ->where(array("s.sample_collection_date >='" . $date ." 00:00:00". "'", "s.sample_collection_date <='" . $date." 23:59:00". "'"))
                                     ->where(array('s.result!=""'));
                     $cQueryStr = $sql->getSqlStringForSqlObject($completeQuery);
                     $completeResult = $dbAdapter->query($cQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
                     $result['Complete'][$i] = $completeResultCount+$completeResult['total'];
                     
                     $inCompleteQuery = $sql->select()->from(array('s'=>'samples'))->columns(array('total' => new Expression('COUNT(*)')))
-                                    ->where(array("s.sample_collection_date <='" . $cDate ." 00:00:00". "'", "s.sample_collection_date >='" . $lastSevenDay." 23:59:00". "'"))
+                                    ->where(array("s.sample_collection_date >='" . $date ." 00:00:00". "'", "s.sample_collection_date <='" . $date." 23:59:00". "'"))
                                     ->where(array('s.result=""'));
                     $incQueryStr = $sql->getSqlStringForSqlObject($inCompleteQuery);
                     $inCompleteResult = $dbAdapter->query($incQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
                     $result['Incomplete'][$i] = $inCompleteResultCount+$inCompleteResult['total'];
                     if($completeResult['total']!=0 || $inCompleteResult['total']!=0){
-                    $result['date'][$i] = $dFormat;    
+                    $result['date'][$i] = $dFormat;
+                    }else if($completeResult['total']==0 && $inCompleteResult['total']==0){
+                        unset($result['Complete'][$i]);
+                        unset($result['Incomplete'][$i]);
                     }
                     $i++;
                 }
