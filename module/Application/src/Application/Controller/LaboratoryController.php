@@ -109,6 +109,19 @@ class LaboratoryController extends AbstractActionController
             return $viewModel;
         }
     }
+    public function getSampleVolumeAction()
+    {
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $sampleService = $this->getServiceLocator()->get('SampleService');
+            $result = $sampleService->getSampleVolume($params);
+            $viewModel = new ViewModel();
+            $viewModel->setVariables(array('result' => $result))
+                        ->setTerminal(true);
+            return $viewModel;
+        }
+    }
 
 }
 

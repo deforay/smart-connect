@@ -53,7 +53,7 @@ foreach($sampleType as $samples){
                             </select>
                         </div>
                         <div class="col-lg-3">
-                                <a href="javascript:void(0);" class="btn btn-info btn-sm" onclick="getSampleResult(),getTestedSampleResult(),getTestedSampleResultBasedVolume(),getRequisitionFormsTested()">Submit</a>
+                                <a href="javascript:void(0);" class="btn btn-info btn-sm" onclick="getSampleResult(),getTestedSampleResult(),getTestedSampleResultBasedVolume(),getRequisitionFormsTested(),getSampleVolume()">Submit</a>
                             </div>
                     </div>
                     <div class="row">
@@ -139,28 +139,15 @@ foreach($sampleType as $samples){
                                     </div>
                                     <div class="actions">
                                         <div class="btn-group">
-                                            <a href="" class="btn white btn-outline btn-circle btn-sm dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-close-others="true"> Sample Type
-                                                <span class="fa fa-angle-down"> </span>
-                                            </a>
-                                            <ul class="dropdown-menu pull-right">
-                                                <li class="active">
-                                                    <a href="javascript:;"> All
-                                                    </a>
-                                                </li>
-                                                <li>
-                                                    <a href="javascript:;"> DBS
-                                                    </a>
-                                                </li>
-                                                <li>
-                                                    <a href="javascript:;"> Plasma
-                                                    </a>
-                                                </li>
-                                            </ul>
+                                            <select id="sampleVolume" class="btn white btn-outline btn-circle btn-sm dropdown-toggle">
+                                                <option value="">Sample Type</option>
+                                                <?php echo $sType;?>
+                                            </select>
                                         </div>
                                     </div>                                    
                                 </div>
-                                <div class="portlet-body">
-                                    <div id="gotoPie"></div>
+                                <div class="portlet-body" id="pieChartLabResult">
+                                    
                                 </div>
                             </div>                            
                             
@@ -204,7 +191,7 @@ foreach($sampleType as $samples){
         function(data) {
             $("#sampleResultDetails").html(data);
         });
-        } 
+        }
         function getTestedSampleResult()
         {
             sampleType = $("#sampleType").val();
@@ -230,6 +217,15 @@ foreach($sampleType as $samples){
             $.post("<?php echo $this->url('laboratory', array('action' => 'get-requisition-forms')); ?>",{sampleCollectionDate:dateRange},
             function(data) {
             $("#requisitionForms").html(data);
+            });
+        }
+        function getSampleVolume()
+        {
+            dateRange = $("#sampleCollectionDate").val();
+            sampleType = $("#sampleVolume").val();
+            $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-volume')); ?>",{sampleCollectionDate:dateRange,sampleType:sampleType},
+            function(data) {
+            $("#pieChartLabResult").html(data);
             });
         }
             
@@ -291,61 +287,9 @@ foreach($sampleType as $samples){
                 getTestedSampleResult();
                 getTestedSampleResultBasedVolume();
                 getRequisitionFormsTested();
+                getSampleVolume();
                 
 
-    $('#gotoPie').highcharts({
-        chart: {
-            plotBackgroundColor: null,
-            plotBorderWidth: null,
-            plotShadow: false,
-            type: 'pie'
-        },
-        title: {
-            text: ''
-        },
-        tooltip: {
-            pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
-        },
-        plotOptions: {
-            pie: {
-                allowPointSelect: true,
-                cursor: 'pointer',
-                dataLabels: {
-                    enabled: false,
-                    format: '<b>{point.name}</b>: {point.percentage:.1f} %',
-                    style: {
-                        color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
-                    }
-                },
-                showInLegend: true
-            }
-        },
-        series: [{
-            name: 'Labs',
-            colorByPoint: true,
-            data: [{
-                name: 'Lab 001',
-                y: 33
-            }, {
-                name: 'Lab 002',
-                y: 24
-            }, {
-                name: 'Lab 003',
-                y: 10
-            }, {
-                name: 'Lab 004',
-                y: 47
-            }, {
-                name: 'Lab 005',
-                y: 19
-            }, {
-                name: 'Lab 006',
-                y: 20
-            }]
-        }]
-    });
-    
-    
     $('#labAverageTat').highcharts({
         chart: {
             type: 'line'
@@ -393,12 +337,7 @@ foreach($sampleType as $samples){
         
         ]
     });
-                    
-                    
-                    
-                    
-                    
-                    
+                  
 var LocsAv2 = [
     {
        

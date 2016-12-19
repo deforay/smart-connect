@@ -282,6 +282,12 @@ class SampleService {
         $sampleDb = $this->sm->get('SampleTable');
         return $sampleDb->getRequisitionFormsTested($params);
     }
+    //get Requisition Forms tested
+    public function getSampleVolume($params)
+    {
+        $sampleDb = $this->sm->get('SampleTable');
+        return $sampleDb->getSampleVolume($params);
+    }
     //get all smaple type
     public function getSampleType()
     {

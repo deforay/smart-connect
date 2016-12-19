@@ -213,7 +213,8 @@ class SampleTable extends AbstractTableGateway {
         $fQuery = $sql->select()->from(array('f'=>'facility_details'))
                         ->join(array('s'=>'samples'),'s.lab_id=f.facility_id',array('lab_id','sample_id'))
                         ->join(array('rs'=>'r_sample_types'),'rs.type_id=s.sample_type',array('sample_name'))
-                        ->where(array("s.sample_collection_date <='" . $cDate ." 00:00:00". "'", "s.sample_collection_date >='" . $lastSevenDay." 23:59:00". "'"))
+                        ->where(array("s.sample_collection_date <='" . $cDate ." 23:59:00". "'", "s.sample_collection_date >='" . $lastSevenDay." 00:00:00". "'"))
+                        ->where('s.lab_id !=0')
                         ->group('f.facility_id');
         if(isset($params['facilityId']) && trim($params['facilityId'])!=''){
             $fQuery = $fQuery->where('f.facility_id="'.base64_decode(trim($params['facilityId'])).'"');
@@ -228,36 +229,40 @@ class SampleTable extends AbstractTableGateway {
             $lessTotal = 0;$greaterTotal= 0;$notTargetTotal=0;
             foreach($facilityResult as $facility){
                 $lessThanQuery = $sql->select()->from(array('s'=>'samples'))->columns(array('total' => new Expression('COUNT(*)')))
-                                    ->where(array("s.sample_collection_date <='" . $cDate ." 00:00:00". "'", "s.sample_collection_date >='" . $lastSevenDay." 23:59:00". "'"))
+                                    ->where(array("s.sample_collection_date <='" . $cDate ." 23:59:00". "'", "s.sample_collection_date >='" . $lastSevenDay." 00:00:00". "'"))
                                     ->where('s.lab_id="'.$facility['facility_id'].'"')
                                     ->where(array('s.result<1000'));
                 $lQueryStr = $sql->getSqlStringForSqlObject($lessThanQuery);
                 $lessResult[$i] = $dbAdapter->query($lQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-                $result[$facility['sample_name']]['VL (< 1000 cp/ml)'][$i] = $lessTotal+$lessResult[$i]['total'];
-                
+                $result[$facility['facility_name']][$facility['sample_name']]['VL (< 1000 cp/ml)'][$i] = $lessTotal+$lessResult[$i]['total'];
+                $firstArray[1]['VL (< 1000 cp/ml)'][] = $lessTotal+$lessResult[$i]['total'];
+            
                 $greaterThanQuery = $sql->select()->from(array('s'=>'samples'))->columns(array('total' => new Expression('COUNT(*)')))
-                                        ->where(array("s.sample_collection_date <='" . $cDate ." 00:00:00". "'", "s.sample_collection_date >='" . $lastSevenDay." 23:59:00". "'"))
+                                        ->where(array("s.sample_collection_date <='" . $cDate ." 23:59:00". "'", "s.sample_collection_date >='" . $lastSevenDay." 00:00:00". "'"))
                                         ->where('s.sample_type="'.$facility['facility_id'].'"')
                                         ->where(array('s.result>1000'));
                 $gQueryStr = $sql->getSqlStringForSqlObject($greaterThanQuery);
                 $greaterResult[$i] = $dbAdapter->query($gQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-                $result[$facility['sample_name']]['VL (> 1000 cp/ml)'][$i] = $greaterTotal+$greaterResult[$i]['total'];
+                $result[$facility['facility_name']][$facility['sample_name']]['VL (> 1000 cp/ml)'][$i] = $greaterTotal+$greaterResult[$i]['total'];
+                $firstArray[2]['VL (> 1000 cp/ml)'][] = $greaterTotal+$greaterResult[$i]['total'];
                 
                 $notDetectQuery = $sql->select()->from(array('s'=>'samples'))->columns(array('total' => new Expression('COUNT(*)')))
-                                    ->where(array("s.sample_collection_date <='" . $cDate ." 00:00:00". "'", "s.sample_collection_date >='" . $lastSevenDay." 23:59:00". "'"))
+                                    ->where(array("s.sample_collection_date <='" . $cDate ." 23:59:00". "'", "s.sample_collection_date >='" . $lastSevenDay." 00:00:00". "'"))
                                     ->where('s.sample_type="'.$facility['facility_id'].'"')
                                     ->where(array('s.result'=>'Target Not Detected'));
                 $nQueryStr = $sql->getSqlStringForSqlObject($notDetectQuery);
                 $notTargetResult[$i] = $dbAdapter->query($nQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-                $result[$facility['sample_name']]['VL Not Detected'][$i] = $notTargetTotal+$notTargetResult[$i]['total'];
+                $result[$facility['facility_name']][$facility['sample_name']]['VL Not Detected'][$i] = $notTargetTotal+$notTargetResult[$i]['total'];
+                $firstArray[3]['VL Not Detected'][] = $notTargetTotal+$notTargetResult[$i]['total'];
+                //\Zend\Debug\Debug::dump($result);die;
                 if($lessResult[$i]['total']==0 && $greaterResult[$i]['total']==0 && $notTargetResult[$i]['total']==0){
-                    unset($result[$facility['sample_name']]['VL (< 1000 cp/ml)'][$i]);
-                    unset($result[$facility['sample_name']]['VL (> 1000 cp/ml)'][$i]);
-                    unset($result[$facility['sample_name']]['VL Not Detected'][$i]);
+                    unset($result[$facility['facility_name']][$facility['sample_name']]['VL (< 1000 cp/ml)'][$i]);
+                    unset($result[$facility['facility_name']][$facility['sample_name']]['VL (> 1000 cp/ml)'][$i]);
+                    unset($result[$facility['facility_name']][$facility['sample_name']]['VL Not Detected'][$i]);
                 }
-                $i++;
             }
-            return array('result'=>$result,'lab'=>$facilityResult);
+            //\Zend\Debug\Debug::dump($firstArray);die;
+            return array('result'=>$result,'lab'=>$facilityResult,'totalResult'=>$firstArray);
         }
     }
     
@@ -312,6 +317,54 @@ class SampleTable extends AbstractTableGateway {
             return $result;
         }
     }
+    public function getSampleVolume($params)
+    {
+        $result = '';
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $common = new CommonService();
+        $cDate = date('Y-m-d');
+        $lastSevenDay = date('Y-m-d', strtotime('-30 days'));
+        if(isset($params['sampleCollectionDate']) && trim($params['sampleCollectionDate'])!= ''){
+            $s_c_date = explode("to", $params['sampleCollectionDate']);
+            if (isset($s_c_date[0]) && trim($s_c_date[0]) != "") {
+              $lastSevenDay = trim($s_c_date[0]);
+            }
+            if (isset($s_c_date[1]) && trim($s_c_date[1]) != "") {
+              $cDate = trim($s_c_date[1]);
+            }
+        }
+        
+        $fQuery = $sql->select()->from(array('f'=>'facility_details'))
+                        ->join(array('s'=>'samples'),'s.lab_id=f.facility_id',array('lab_id','sample_id'))
+                        ->join(array('rs'=>'r_sample_types'),'rs.type_id=s.sample_type',array('sample_name'))
+                        ->where(array("s.sample_collection_date <='" . $cDate ." 23:59:00". "'", "s.sample_collection_date >='" . $lastSevenDay." 00:00:00". "'"))
+                        ->where('s.lab_id !=0')
+                        ->group('f.facility_id');
+        if(isset($params['facilityId']) && trim($params['facilityId'])!=''){
+            $fQuery = $fQuery->where('f.facility_id="'.base64_decode(trim($params['facilityId'])).'"');
+        }
+        if(isset($params['sampleType']) && trim($params['sampleType'])!=''){
+            $fQuery = $fQuery->where('rs.type_id="'.base64_decode(trim($params['sampleType'])).'"');
+        }
+        $fQueryStr = $sql->getSqlStringForSqlObject($fQuery);
+        $facilityResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+        //\Zend\Debug\Debug::dump($facilityResult);die;
+        if($facilityResult){
+            $i = 0;
+            foreach($facilityResult as $facility){
+                $countQuery = $sql->select()->from(array('s'=>'samples'))->columns(array('total' => new Expression('COUNT(*)')))
+                                    ->where(array("s.sample_collection_date >='" . $lastSevenDay ." 00:00:00". "'", "s.sample_collection_date <='" .$cDate." 23:59:00". "'"))
+                                    ->where('s.lab_id="'.$facility['facility_id'].'"');
+                $cQueryStr = $sql->getSqlStringForSqlObject($countQuery);
+                $countResult[$i] = $dbAdapter->query($cQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
+                $result[$i][0] = $countResult[$i]['total'];
+                $result[$i][1] = $facility['facility_name'];
+                $i++;
+            }
+        }
+        return $result;
+    }
     
     //get distinict date
     public function getDistinicDate($cDate,$lastSevenDay)
@@ -320,9 +373,10 @@ class SampleTable extends AbstractTableGateway {
         $sql = new Sql($dbAdapter);
         $squery = $sql->select()->from(array('s'=>'samples'))
                             ->columns(array(new Expression('DISTINCT YEAR(sample_collection_date) as year,MONTH(sample_collection_date) as month,DAY(sample_collection_date) as day')))
+                            ->where('s.lab_id !=0')
                             ->order('month ASC')->order('day ASC');
         if(isset($cDate) && trim($cDate)!= ''){
-            $squery = $squery->where(array("s.sample_collection_date <='" . $cDate ." 00:00:00". "'", "s.sample_collection_date >='" . $lastSevenDay." 23:59:00". "'"));
+            $squery = $squery->where(array("s.sample_collection_date <='" . $cDate ." 23:59:00". "'", "s.sample_collection_date >='" . $lastSevenDay." 00:00:00". "'"));
         }
         $sQueryStr = $sql->getSqlStringForSqlObject($squery);
         $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();

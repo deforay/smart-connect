@@ -1,0 +1,51 @@
+<?php
+//\Zend\Debug\Debug::dump($result);die;
+?>
+<div id="gotoPie"></div>
+
+<script>
+       $(function () {
+        $('#gotoPie').highcharts({
+        chart: {
+            plotBackgroundColor: null,
+            plotBorderWidth: null,
+            plotShadow: false,
+            type: 'pie'
+        },
+        title: {
+            text: ''
+        },
+        tooltip: {
+            pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+        },
+        plotOptions: {
+            pie: {
+                allowPointSelect: true,
+                cursor: 'pointer',
+                dataLabels: {
+                    enabled: false,
+                    format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                    style: {
+                        color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                    }
+                },
+                showInLegend: true
+            }
+        },
+        series: [{
+            name: 'Labs',
+            colorByPoint: true,
+            data: [<?php
+            foreach($result as $lab){
+                ?>
+                {
+                  name:<?php echo "'".$lab[1]."'";?>,
+                  y:<?php echo $lab[0];?>
+                },
+                <?php
+            }
+            ?>]
+        }]
+    });
+    });
+</script>
