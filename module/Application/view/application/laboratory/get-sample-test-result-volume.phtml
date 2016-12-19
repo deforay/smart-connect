@@ -52,7 +52,7 @@
             $name = 'female';
               $j= 0;
                      for($i=1;$i<=3;$i++){
-                    foreach($result['totalResult'][$i] as $key=>$condition){
+                    foreach($result['totalResult'][$i] as $key=>$count){
                      if($name == 'female' ){
                          $name = 'male';
                      }else{
@@ -61,8 +61,8 @@
                     ?>
                     {
                     name:'<?php echo $key;?>',
-                    data:[<?php echo implode(",",$condition);?>],
-                    stack:'<?php echo $result['lab'][$j]['sample_name'];?>'
+                    data:[<?php echo implode(",",$count);?>],
+                    stack:'<?php echo $name;?>'
                     },
                     <?php
                     $j++;

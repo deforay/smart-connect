@@ -234,7 +234,7 @@ class SampleTable extends AbstractTableGateway {
                                     ->where(array('s.result<1000'));
                 $lQueryStr = $sql->getSqlStringForSqlObject($lessThanQuery);
                 $lessResult[$i] = $dbAdapter->query($lQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-                $result[$facility['facility_name']][$facility['sample_name']]['VL (< 1000 cp/ml)'][$i] = $lessTotal+$lessResult[$i]['total'];
+                //$result[$facility['facility_name']][$facility['sample_name']]['VL (< 1000 cp/ml)'][$i] = $lessTotal+$lessResult[$i]['total'];
                 $firstArray[1]['VL (< 1000 cp/ml)'][] = $lessTotal+$lessResult[$i]['total'];
             
                 $greaterThanQuery = $sql->select()->from(array('s'=>'samples'))->columns(array('total' => new Expression('COUNT(*)')))
@@ -243,7 +243,7 @@ class SampleTable extends AbstractTableGateway {
                                         ->where(array('s.result>1000'));
                 $gQueryStr = $sql->getSqlStringForSqlObject($greaterThanQuery);
                 $greaterResult[$i] = $dbAdapter->query($gQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-                $result[$facility['facility_name']][$facility['sample_name']]['VL (> 1000 cp/ml)'][$i] = $greaterTotal+$greaterResult[$i]['total'];
+                //$result[$facility['facility_name']][$facility['sample_name']]['VL (> 1000 cp/ml)'][$i] = $greaterTotal+$greaterResult[$i]['total'];
                 $firstArray[2]['VL (> 1000 cp/ml)'][] = $greaterTotal+$greaterResult[$i]['total'];
                 
                 $notDetectQuery = $sql->select()->from(array('s'=>'samples'))->columns(array('total' => new Expression('COUNT(*)')))
@@ -252,7 +252,7 @@ class SampleTable extends AbstractTableGateway {
                                     ->where(array('s.result'=>'Target Not Detected'));
                 $nQueryStr = $sql->getSqlStringForSqlObject($notDetectQuery);
                 $notTargetResult[$i] = $dbAdapter->query($nQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-                $result[$facility['facility_name']][$facility['sample_name']]['VL Not Detected'][$i] = $notTargetTotal+$notTargetResult[$i]['total'];
+                //$result[$facility['facility_name']][$facility['sample_name']]['VL Not Detected'][$i] = $notTargetTotal+$notTargetResult[$i]['total'];
                 $firstArray[3]['VL Not Detected'][] = $notTargetTotal+$notTargetResult[$i]['total'];
                 //\Zend\Debug\Debug::dump($result);die;
                 if($lessResult[$i]['total']==0 && $greaterResult[$i]['total']==0 && $notTargetResult[$i]['total']==0){
@@ -261,8 +261,7 @@ class SampleTable extends AbstractTableGateway {
                     unset($result[$facility['facility_name']][$facility['sample_name']]['VL Not Detected'][$i]);
                 }
             }
-            //\Zend\Debug\Debug::dump($firstArray);die;
-            return array('result'=>$result,'lab'=>$facilityResult,'totalResult'=>$firstArray);
+            return array('lab'=>$facilityResult,'totalResult'=>$firstArray);
         }
     }
     
