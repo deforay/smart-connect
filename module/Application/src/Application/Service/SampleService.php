@@ -257,7 +257,7 @@ class SampleService {
         $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
         return $sResult;
     }
-    
+    //lab details start
     //get sample result details
     public function getSampleResultDetails($params)
     {
@@ -288,6 +288,21 @@ class SampleService {
         $sampleDb = $this->sm->get('SampleTable');
         return $sampleDb->getSampleVolume($params);
     }
+    //lab details end
+    
+    //clinic details start
+    public function getOverAllLoadStatus($params)
+    {
+        $sampleDb = $this->sm->get('SampleTable');
+        return $sampleDb->fetchOverAllLoadStatus($params);
+    }
+    public function getChartOverAllLoadStatus($params)
+    {
+        $sampleDb = $this->sm->get('SampleTable');
+        return $sampleDb->fetchChartOverAllLoadStatus($params);
+    }
+    //clinic details end
+    
     //get all smaple type
     public function getSampleType()
     {
@@ -299,6 +314,12 @@ class SampleService {
     {
         $facilityDb = $this->sm->get('FacilityTable');
         return $facilityDb->fetchAllLabName();
+    }
+    //get all Lab Name
+    public function getAllClinicName()
+    {
+        $facilityDb = $this->sm->get('FacilityTable');
+        return $facilityDb->fetchAllClinicName();
     }
     
 }

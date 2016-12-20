@@ -28,16 +28,17 @@ class SampleTable extends AbstractTableGateway {
         $this->adapter = $adapter;
     }
     
+    //start lab dashboard details 
     public function fetchSampleResultDetails($params)
     {
         $common = new CommonService();
         $cDate = date('Y-m-d');
-        $lastSevenDay = date('Y-m-d', strtotime('-30 days'));
+        $lastThirtyDay = date('Y-m-d', strtotime('-30 days'));
         if(isset($params['sampleCollectionDate']) && trim($params['sampleCollectionDate'])!= ''){
             $s_c_date = explode("to", $params['sampleCollectionDate']);
             //print_r($s_c_date);die;
             if (isset($s_c_date[0]) && trim($s_c_date[0]) != "") {
-              $lastSevenDay = trim($s_c_date[0]);
+              $lastThirtyDay = trim($s_c_date[0]);
             }
             if (isset($s_c_date[1]) && trim($s_c_date[1]) != "") {
               $cDate = trim($s_c_date[1]);
@@ -45,7 +46,7 @@ class SampleTable extends AbstractTableGateway {
         }
         
         $dbAdapter = $this->adapter;$sql = new Sql($dbAdapter);
-        $sResult = $this->getDistinicDate($cDate,$lastSevenDay);
+        $sResult = $this->getDistinicDate($cDate,$lastThirtyDay);
         //set count
             $i = 0;
             $waitingTotal = 0;$acceptedTotal = 0;$rejectedTotal = 0;$receivedTotal = 0;
@@ -130,11 +131,11 @@ class SampleTable extends AbstractTableGateway {
         $sql = new Sql($dbAdapter);
         $common = new CommonService();
         $cDate = date('Y-m-d');
-        $lastSevenDay = date('Y-m-d', strtotime('-30 days'));
+        $lastThirtyDay = date('Y-m-d', strtotime('-30 days'));
         if(isset($params['sampleCollectionDate']) && trim($params['sampleCollectionDate'])!= ''){
             $s_c_date = explode("to", $params['sampleCollectionDate']);
             if (isset($s_c_date[0]) && trim($s_c_date[0]) != "") {
-              $lastSevenDay = trim($s_c_date[0]);
+              $lastThirtyDay = trim($s_c_date[0]);
             }
             if (isset($s_c_date[1]) && trim($s_c_date[1]) != "") {
               $cDate = trim($s_c_date[1]);
@@ -149,7 +150,7 @@ class SampleTable extends AbstractTableGateway {
         $sampleTypeResult = $dbAdapter->query($rsQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         if($sampleTypeResult){
             //set datewise query
-            $sResult = $this->getDistinicDate($cDate,$lastSevenDay);
+            $sResult = $this->getDistinicDate($cDate,$lastThirtyDay);
             $j = 0;
             if($sResult){
                 foreach($sResult as $sampleData){
@@ -199,11 +200,11 @@ class SampleTable extends AbstractTableGateway {
         $sql = new Sql($dbAdapter);
         $common = new CommonService();
         $cDate = date('Y-m-d');
-        $lastSevenDay = date('Y-m-d', strtotime('-30 days'));
+        $lastThirtyDay = date('Y-m-d', strtotime('-30 days'));
         if(isset($params['sampleCollectionDate']) && trim($params['sampleCollectionDate'])!= ''){
             $s_c_date = explode("to", $params['sampleCollectionDate']);
             if (isset($s_c_date[0]) && trim($s_c_date[0]) != "") {
-              $lastSevenDay = trim($s_c_date[0]);
+              $lastThirtyDay = trim($s_c_date[0]);
             }
             if (isset($s_c_date[1]) && trim($s_c_date[1]) != "") {
               $cDate = trim($s_c_date[1]);
@@ -213,7 +214,7 @@ class SampleTable extends AbstractTableGateway {
         $fQuery = $sql->select()->from(array('f'=>'facility_details'))
                     ->join(array('s'=>'samples'),'s.lab_id=f.facility_id',array('lab_id','sample_id'))
                     ->join(array('rs'=>'r_sample_types'),'rs.type_id=s.sample_type',array('sample_name'))
-                    ->where(array("s.sample_collection_date <='" . $cDate ." 23:59:00". "'", "s.sample_collection_date >='" . $lastSevenDay." 00:00:00". "'"))
+                    ->where(array("s.sample_collection_date <='" . $cDate ." 23:59:00". "'", "s.sample_collection_date >='" . $lastThirtyDay." 00:00:00". "'"))
                     ->where('s.lab_id !=0')
                     ->group('f.facility_id');
         if(isset($params['facilityId']) && trim($params['facilityId'])!=''){
@@ -240,7 +241,7 @@ class SampleTable extends AbstractTableGateway {
                 $lessTotal = 0;$greaterTotal = 0;$notTargetTotal = 0;
                 foreach($sampleTypeResult as $sample){
                     $lessThanQuery = $sql->select()->from(array('s'=>'samples'))->columns(array('total' => new Expression('COUNT(*)')))
-                                            ->where(array("s.sample_collection_date <='" . $cDate ." 23:59:00". "'", "s.sample_collection_date >='" . $lastSevenDay." 00:00:00". "'"))
+                                            ->where(array("s.sample_collection_date <='" . $cDate ." 23:59:00". "'", "s.sample_collection_date >='" . $lastThirtyDay." 00:00:00". "'"))
                                             ->where('s.sample_type="'.$sample['type_id'].'"')
                                             ->where(array('s.lab_id'=>$facility['facility_id']))
                                         ->where(array('s.result<1000'));
@@ -249,7 +250,7 @@ class SampleTable extends AbstractTableGateway {
                     $result[$sample['sample_name']]['VL (< 1000 cp/ml)'][$j] = $lessTotal+$lessResult[$i]['total'];
                     
                     $greaterThanQuery = $sql->select()->from(array('s'=>'samples'))->columns(array('total' => new Expression('COUNT(*)')))
-                                            ->where(array("s.sample_collection_date <='" . $cDate ." 23:59:00". "'", "s.sample_collection_date >='" . $lastSevenDay." 00:00:00". "'"))
+                                            ->where(array("s.sample_collection_date <='" . $cDate ." 23:59:00". "'", "s.sample_collection_date >='" . $lastThirtyDay." 00:00:00". "'"))
                                             ->where('s.sample_type="'.$sample['type_id'].'"')
                                             ->where(array('s.lab_id'=>$facility['facility_id']))
                                             ->where(array('s.result>1000'));
@@ -258,7 +259,7 @@ class SampleTable extends AbstractTableGateway {
                     $result[$sample['sample_name']]['VL (> 1000 cp/ml)'][$j] = $greaterTotal+$greaterResult[$i]['total'];
                     
                     $notDetectQuery = $sql->select()->from(array('s'=>'samples'))->columns(array('total' => new Expression('COUNT(*)')))
-                                        ->where(array("s.sample_collection_date <='" . $cDate ." 23:59:00". "'", "s.sample_collection_date >='" . $lastSevenDay." 00:00:00". "'"))
+                                        ->where(array("s.sample_collection_date <='" . $cDate ." 23:59:00". "'", "s.sample_collection_date >='" . $lastThirtyDay." 00:00:00". "'"))
                                         ->where('s.sample_type="'.$sample['type_id'].'"')
                                         ->where(array('s.lab_id'=>$facility['facility_id']))
                                         ->where(array('s.result'=>'Target Not Detected'));
@@ -280,18 +281,18 @@ class SampleTable extends AbstractTableGateway {
         $sql = new Sql($dbAdapter);
         $common = new CommonService();
         $cDate = date('Y-m-d');
-        $lastSevenDay = date('Y-m-d', strtotime('-30 days'));
+        $lastThirtyDay = date('Y-m-d', strtotime('-30 days'));
         if(isset($params['sampleCollectionDate']) && trim($params['sampleCollectionDate'])!= ''){
             $s_c_date = explode("to", $params['sampleCollectionDate']);
             if (isset($s_c_date[0]) && trim($s_c_date[0]) != "") {
-              $lastSevenDay = trim($s_c_date[0]);
+              $lastThirtyDay = trim($s_c_date[0]);
             }
             if (isset($s_c_date[1]) && trim($s_c_date[1]) != "") {
               $cDate = trim($s_c_date[1]);
             }
         }
         //set datewise query
-        $sResult = $this->getDistinicDate($cDate,$lastSevenDay);
+        $sResult = $this->getDistinicDate($cDate,$lastThirtyDay);
         if($sResult){
             $i = 0;
             $completeResultCount = 0;$inCompleteResultCount = 0;
@@ -332,11 +333,11 @@ class SampleTable extends AbstractTableGateway {
         $sql = new Sql($dbAdapter);
         $common = new CommonService();
         $cDate = date('Y-m-d');
-        $lastSevenDay = date('Y-m-d', strtotime('-30 days'));
+        $lastThirtyDay = date('Y-m-d', strtotime('-30 days'));
         if(isset($params['sampleCollectionDate']) && trim($params['sampleCollectionDate'])!= ''){
             $s_c_date = explode("to", $params['sampleCollectionDate']);
             if (isset($s_c_date[0]) && trim($s_c_date[0]) != "") {
-              $lastSevenDay = trim($s_c_date[0]);
+              $lastThirtyDay = trim($s_c_date[0]);
             }
             if (isset($s_c_date[1]) && trim($s_c_date[1]) != "") {
               $cDate = trim($s_c_date[1]);
@@ -346,7 +347,7 @@ class SampleTable extends AbstractTableGateway {
         $fQuery = $sql->select()->from(array('f'=>'facility_details'))
                         ->join(array('s'=>'samples'),'s.lab_id=f.facility_id',array('lab_id','sample_id'))
                         ->join(array('rs'=>'r_sample_types'),'rs.type_id=s.sample_type',array('sample_name'))
-                        ->where(array("s.sample_collection_date <='" . $cDate ." 23:59:00". "'", "s.sample_collection_date >='" . $lastSevenDay." 00:00:00". "'"))
+                        ->where(array("s.sample_collection_date <='" . $cDate ." 23:59:00". "'", "s.sample_collection_date >='" . $lastThirtyDay." 00:00:00". "'"))
                         ->where('s.lab_id !=0')
                         ->group('f.facility_id');
         if(isset($params['facilityId']) && trim($params['facilityId'])!=''){
@@ -362,7 +363,7 @@ class SampleTable extends AbstractTableGateway {
             $i = 0;
             foreach($facilityResult as $facility){
                 $countQuery = $sql->select()->from(array('s'=>'samples'))->columns(array('total' => new Expression('COUNT(*)')))
-                                    ->where(array("s.sample_collection_date >='" . $lastSevenDay ." 00:00:00". "'", "s.sample_collection_date <='" .$cDate." 23:59:00". "'"))
+                                    ->where(array("s.sample_collection_date >='" . $lastThirtyDay ." 00:00:00". "'", "s.sample_collection_date <='" .$cDate." 23:59:00". "'"))
                                     ->where('s.lab_id="'.$facility['facility_id'].'"');
                 $cQueryStr = $sql->getSqlStringForSqlObject($countQuery);
                 $countResult[$i] = $dbAdapter->query($cQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
@@ -373,9 +374,119 @@ class SampleTable extends AbstractTableGateway {
         }
         return $result;
     }
+    //end lab dashboard details 
+    
+    //start clinic details
+    public function fetchOverAllLoadStatus($params)
+    {
+        $common = new CommonService();
+        $cDate = date('Y-m-d');
+        $lastThirtyDay = date('Y-m-d', strtotime('-30 days'));
+        if(isset($params['sampleCollectionDate']) && trim($params['sampleCollectionDate'])!= ''){
+            $s_c_date = explode("to", $params['sampleCollectionDate']);
+            if (isset($s_c_date[0]) && trim($s_c_date[0]) != "") {
+              $lastThirtyDay = trim($s_c_date[0]);
+            }
+            if (isset($s_c_date[1]) && trim($s_c_date[1]) != "") {
+              $cDate = trim($s_c_date[1]);
+            }
+        }
+        
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $squery = $sql->select()->from(array('s'=>'samples'))->columns(array('sample_code','lab_tested_date','result','sample_type'))
+                        ->join(array('rst'=>'r_sample_types'),'rst.type_id=s.sample_type')
+                        ->where(array("s.sample_collection_date <='" . $cDate ." 23:59:00". "'", "s.sample_collection_date >='" . $lastThirtyDay." 00:00:00". "'"))
+                        ->where('s.clinic_id !=0');
+        if(isset($params['clinicId']) && $params['clinicId']!=''){
+            $squery = $squery->where('s.clinic_id="'.base64_decode(trim($params['clinicId'])).'"');
+        }
+        if(isset($params['sampleId']) && $params['sampleId']!=''){
+            $squery = $squery->where('s.sample_type="'.base64_decode(trim($params['sampleId'])).'"');
+        }
+        if(isset($params['testResult']) && $params['testResult']!=''){
+            $squery = $squery->where('s.result'.$params['testResult']);
+        }
+        if(isset($params['age']) && $params['age']!=''){
+            $age = explode("-",$params['age']);
+            if(isset($age[1])){
+            $squery = $squery->where(array("s.age_in_yrs >='".$age[0]."'","s.age_in_yrs <='".$age[1]."'"));
+            }else{
+            $squery = $squery->where('s.age_in_yrs'.$params['age']);
+            }
+        }
+        $sQueryStr = $sql->getSqlStringForSqlObject($squery);
+        $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+        return $sResult;
+    }
+    public function fetchChartOverAllLoadStatus($params)
+    {
+        $testedTotal = 0;$lessTotal = 0;$gTotal = 0;$overAllTotal = 0;
+        //total tested
+        $where = '';
+        $overAllTotal = $this->fetchChartOverAllLoadResult($params,$where);
+        
+        $where = 's.result!=""';
+        $testedTotal = $this->fetchChartOverAllLoadResult($params,$where);
+        
+        //total <1000
+    
+        $where = 's.result<1000';
+        $lessTotal = $this->fetchChartOverAllLoadResult($params,$where);
+        //total >1000
+        $where = 's.result>1000';
+        $gTotal = $this->fetchChartOverAllLoadResult($params,$where);
+        
+        return array($testedTotal,$lessTotal,$gTotal,$overAllTotal);
+    }
+    public function fetchChartOverAllLoadResult($params,$where)
+    {
+        $common = new CommonService();
+        $cDate = date('Y-m-d');
+        $lastThirtyDay = date('Y-m-d', strtotime('-30 days'));
+        if(isset($params['sampleCollectionDate']) && trim($params['sampleCollectionDate'])!= ''){
+            $s_c_date = explode("to", $params['sampleCollectionDate']);
+            if (isset($s_c_date[0]) && trim($s_c_date[0]) != "") {
+              $lastThirtyDay = trim($s_c_date[0]);
+            }
+            if (isset($s_c_date[1]) && trim($s_c_date[1]) != "") {
+              $cDate = trim($s_c_date[1]);
+            }
+        }
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $squery = $sql->select()->from(array('s'=>'samples'))->columns(array('total' => new Expression('COUNT(*)')))
+                        ->join(array('rst'=>'r_sample_types'),'rst.type_id=s.sample_type')
+                        ->where(array("s.sample_collection_date <='" . $cDate ." 23:59:00". "'", "s.sample_collection_date >='" . $lastThirtyDay." 00:00:00". "'"))
+                        ->where('s.clinic_id !=0');
+        if(isset($params['clinicId']) && $params['clinicId']!=''){
+            $squery = $squery->where('s.clinic_id="'.base64_decode(trim($params['clinicId'])).'"');
+        }
+        if(isset($params['sampleId']) && $params['sampleId']!=''){
+            $squery = $squery->where('s.sample_type="'.base64_decode(trim($params['sampleId'])).'"');
+        }
+        if(isset($params['testResult']) && $params['testResult']!=''){
+            $squery = $squery->where('s.result'.$params['testResult']);
+        }
+        if(isset($params['age']) && $params['age']!=''){
+            $age = explode("-",$params['age']);
+            if(isset($age[1])){
+            $squery = $squery->where(array("s.age_in_yrs >='".$age[0]."'","s.age_in_yrs <='".$age[1]."'"));
+            }else{
+            $squery = $squery->where('s.age_in_yrs'.$params['age']);
+            }
+        }
+        if($where!=''){
+        $squery = $squery->where($where);    
+        }
+        $sQueryStr = $sql->getSqlStringForSqlObject($squery);
+        $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
+        return $sResult;
+    }
+    //end clinic details
     
     //get distinict date
-    public function getDistinicDate($cDate,$lastSevenDay)
+    public function getDistinicDate($cDate,$lastThirtyDay)
     {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
@@ -384,7 +495,7 @@ class SampleTable extends AbstractTableGateway {
                             ->where('s.lab_id !=0')
                             ->order('month ASC')->order('day ASC');
         if(isset($cDate) && trim($cDate)!= ''){
-            $squery = $squery->where(array("s.sample_collection_date <='" . $cDate ." 23:59:00". "'", "s.sample_collection_date >='" . $lastSevenDay." 00:00:00". "'"));
+            $squery = $squery->where(array("s.sample_collection_date <='" . $cDate ." 23:59:00". "'", "s.sample_collection_date >='" . $lastThirtyDay." 00:00:00". "'"));
         }
         $sQueryStr = $sql->getSqlStringForSqlObject($squery);
         $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();

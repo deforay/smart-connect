@@ -1,0 +1,90 @@
+<?php
+$common = new \Application\Service\CommonService();
+?>
+<table class="table table-striped table-bordered table-hover order-column " id="testResults">
+    <thead>
+        <tr>
+            <th> Sample ID </th>
+            <th> Date Tested</th>
+            <th> Viral Load <br> (cp/mL) </th>                                                                
+        </tr>
+    </thead>
+    <tbody>
+        <?php
+        foreach($result as $sampleData){
+            $testedDate[0] = '';
+            $testedDate[1] = '';
+            if($sampleData['lab_tested_date']!='0000-00-00 00:00:00' && $sampleData['lab_tested_date']!=''){
+                $testedDate = explode(" ",$sampleData['lab_tested_date']);
+            }
+            ?>
+            <tr>
+                <td><?php echo $sampleData['sample_code'];?></td>
+                <td><?php echo $common->humanDateFormat($testedDate[0])." ".$testedDate[1];?></td>
+                <td><?php echo $sampleData['result'];?></td>
+            </tr>
+            <?php
+        }
+        ?>
+    </tbody>
+</table>
+<script>
+    $(function () {
+    $("#testResults").dataTable();
+    
+$('#combochart1').highcharts({
+        chart: {
+            type: 'column'
+        },
+
+        title: {
+            text: ''
+        },
+
+        xAxis: {
+            categories: ['VL Tested',
+                         '< 1000 cp/mL',
+                         '> 1000 cp/mL',
+                         'Total Samples'
+                         ]
+        },
+
+        yAxis: {
+            allowDecimals: false,
+            min: 0,
+            title: {
+                text: 'Number of Samples'
+            }
+        },
+
+        tooltip: {
+            formatter: function () {
+                return '<b>' + this.x + '</b><br/>' +
+                    this.series.name + ': ' + this.y + '<br/>' +
+                    'Total: ' + this.point.stackTotal;
+            }
+        },
+
+        plotOptions: {
+            column: {
+                stacking: 'normal',
+                dataLabels: {
+                    enabled: true
+                },
+                enableMouseTracking: false
+            }
+        },
+
+        series: [{
+            name: 'Sample',
+            showInLegend: false, 
+            data: [ { y : <?php echo $chartResult[0]['total'];?> , color : '#ECD078' },
+                    { y : <?php echo $chartResult[1]['total'];?> , color : '#ddef55' },
+                    { y : <?php echo $chartResult[2]['total'];?> , color : '#D95B43' },
+                    { y : <?php echo $chartResult[3]['total'];?> , color : '#3598DC' }
+                   ],
+            stack: 'male'
+        }]
+    });    
+    });
+</script>
