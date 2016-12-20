@@ -36,6 +36,7 @@
             name: 'Labs',
             colorByPoint: true,
             data: [<?php
+            if(count($result)>0 && $result!=''){
             foreach($result as $lab){
                 ?>
                 {
@@ -43,6 +44,7 @@
                   y:<?php echo $lab[0];?>
                 },
                 <?php
+            }
             }
             ?>]
         }]

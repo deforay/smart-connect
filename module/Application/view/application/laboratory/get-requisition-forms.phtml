@@ -4,6 +4,7 @@
 <div id="reqformspie"></div>
 
 <script>
+       
        $(function () {
 $('#reqformspie').highcharts({
         chart: {
@@ -14,9 +15,11 @@ $('#reqformspie').highcharts({
         },
         xAxis: {
             categories: [<?php
+       if(count($result['date'])>0){
             foreach($result['date'] as $date){
                 echo "'".$date."',";
             }
+       }
             ?>]
         },
         yAxis: {
@@ -68,6 +71,9 @@ $('#reqformspie').highcharts({
             }
         },
         series: [
+              <?php
+              if(count($result['Complete'])>0){
+              ?>
                 {
                     name: 'Complete',
                     data: [<?php echo implode(",",$result['Complete']);?>]
@@ -76,6 +82,7 @@ $('#reqformspie').highcharts({
                     name: 'Incomplete',
                     data: [<?php echo implode(",",$result['Incomplete']);?>]
                 },
+                <?php } ?>
                 ],
     colors: [
         '#64ade5',

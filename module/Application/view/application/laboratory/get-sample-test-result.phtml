@@ -14,8 +14,10 @@
         },
         xAxis: {
             categories: [<?php
+            if(isset($result['date']) && count($result['date'])>0){
             foreach($result['date'] as $date){
                 echo "'".$date."',";
+            }
             }
             ?>]
         },

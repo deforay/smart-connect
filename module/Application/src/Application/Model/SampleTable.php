@@ -119,13 +119,13 @@ class SampleTable extends AbstractTableGateway {
                 }
             }
             }
-            //\Zend\Debug\Debug::dump($tResult);die;
         return array('stResult'=>$tResult,'saResult'=>$acceptedResult,'swResult'=>$waitingResult,'srResult'=>$rejectedResult);
     }
     
     //get sample tested result details
     public function fetchSampleTestedResultDetails($params)
     {
+        $result = array();
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $common = new CommonService();
@@ -189,12 +189,12 @@ class SampleTable extends AbstractTableGateway {
                     }
                 }
             }
-            //\Zend\Debug\Debug::dump($result);die;
             return $result;
         }
     }
     public function fetchSampleTestedResultBasedVolumeDetails($params)
     {
+        $result = array();
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $common = new CommonService();
