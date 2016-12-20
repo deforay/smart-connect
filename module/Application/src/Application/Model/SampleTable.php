@@ -211,11 +211,11 @@ class SampleTable extends AbstractTableGateway {
         }
         
         $fQuery = $sql->select()->from(array('f'=>'facility_details'))
-                        ->join(array('s'=>'samples'),'s.lab_id=f.facility_id',array('lab_id','sample_id'))
-                        ->join(array('rs'=>'r_sample_types'),'rs.type_id=s.sample_type',array('sample_name'))
-                        ->where(array("s.sample_collection_date <='" . $cDate ." 23:59:00". "'", "s.sample_collection_date >='" . $lastSevenDay." 00:00:00". "'"))
-                        ->where('s.lab_id !=0')
-                        ->group('f.facility_id');
+                    ->join(array('s'=>'samples'),'s.lab_id=f.facility_id',array('lab_id','sample_id'))
+                    ->join(array('rs'=>'r_sample_types'),'rs.type_id=s.sample_type',array('sample_name'))
+                    ->where(array("s.sample_collection_date <='" . $cDate ." 23:59:00". "'", "s.sample_collection_date >='" . $lastSevenDay." 00:00:00". "'"))
+                    ->where('s.lab_id !=0')
+                    ->group('f.facility_id');
         if(isset($params['facilityId']) && trim($params['facilityId'])!=''){
             $fQuery = $fQuery->where('f.facility_id="'.base64_decode(trim($params['facilityId'])).'"');
         }
@@ -224,45 +224,54 @@ class SampleTable extends AbstractTableGateway {
         }
         $fQueryStr = $sql->getSqlStringForSqlObject($fQuery);
         $facilityResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-        if($facilityResult){
-            $i = 0;
-            $lessTotal = 0;$greaterTotal= 0;$notTargetTotal=0;
-            foreach($facilityResult as $facility){
-                $lessThanQuery = $sql->select()->from(array('s'=>'samples'))->columns(array('total' => new Expression('COUNT(*)')))
-                                    ->where(array("s.sample_collection_date <='" . $cDate ." 23:59:00". "'", "s.sample_collection_date >='" . $lastSevenDay." 00:00:00". "'"))
-                                    ->where('s.lab_id="'.$facility['facility_id'].'"')
-                                    ->where(array('s.result<1000'));
-                $lQueryStr = $sql->getSqlStringForSqlObject($lessThanQuery);
-                $lessResult[$i] = $dbAdapter->query($lQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-                //$result[$facility['facility_name']][$facility['sample_name']]['VL (< 1000 cp/ml)'][$i] = $lessTotal+$lessResult[$i]['total'];
-                $firstArray[1]['VL (< 1000 cp/ml)'][] = $lessTotal+$lessResult[$i]['total'];
-            
-                $greaterThanQuery = $sql->select()->from(array('s'=>'samples'))->columns(array('total' => new Expression('COUNT(*)')))
-                                        ->where(array("s.sample_collection_date <='" . $cDate ." 23:59:00". "'", "s.sample_collection_date >='" . $lastSevenDay." 00:00:00". "'"))
-                                        ->where('s.sample_type="'.$facility['facility_id'].'"')
-                                        ->where(array('s.result>1000'));
-                $gQueryStr = $sql->getSqlStringForSqlObject($greaterThanQuery);
-                $greaterResult[$i] = $dbAdapter->query($gQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-                //$result[$facility['facility_name']][$facility['sample_name']]['VL (> 1000 cp/ml)'][$i] = $greaterTotal+$greaterResult[$i]['total'];
-                $firstArray[2]['VL (> 1000 cp/ml)'][] = $greaterTotal+$greaterResult[$i]['total'];
-                
-                $notDetectQuery = $sql->select()->from(array('s'=>'samples'))->columns(array('total' => new Expression('COUNT(*)')))
-                                    ->where(array("s.sample_collection_date <='" . $cDate ." 23:59:00". "'", "s.sample_collection_date >='" . $lastSevenDay." 00:00:00". "'"))
-                                    ->where('s.sample_type="'.$facility['facility_id'].'"')
-                                    ->where(array('s.result'=>'Target Not Detected'));
-                $nQueryStr = $sql->getSqlStringForSqlObject($notDetectQuery);
-                $notTargetResult[$i] = $dbAdapter->query($nQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-                //$result[$facility['facility_name']][$facility['sample_name']]['VL Not Detected'][$i] = $notTargetTotal+$notTargetResult[$i]['total'];
-                $firstArray[3]['VL Not Detected'][] = $notTargetTotal+$notTargetResult[$i]['total'];
-                //\Zend\Debug\Debug::dump($result);die;
-                if($lessResult[$i]['total']==0 && $greaterResult[$i]['total']==0 && $notTargetResult[$i]['total']==0){
-                    unset($result[$facility['facility_name']][$facility['sample_name']]['VL (< 1000 cp/ml)'][$i]);
-                    unset($result[$facility['facility_name']][$facility['sample_name']]['VL (> 1000 cp/ml)'][$i]);
-                    unset($result[$facility['facility_name']][$facility['sample_name']]['VL Not Detected'][$i]);
-                }
-            }
-            return array('lab'=>$facilityResult,'totalResult'=>$firstArray);
+        
+        $rsQuery = $sql->select()->from(array('rs'=>'r_sample_types'));
+        if(isset($params['sampleType']) && trim($params['sampleType'])!=''){
+            $rsQuery = $rsQuery->where('rs.type_id="'.base64_decode(trim($params['sampleType'])).'"');
         }
+        $rsQueryStr = $sql->getSqlStringForSqlObject($rsQuery);
+        $sampleTypeResult = $dbAdapter->query($rsQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+        
+        if($facilityResult && $sampleTypeResult){
+            $j = 0;
+            foreach($facilityResult as $facility)
+            {
+                $i = 0;
+                $lessTotal = 0;$greaterTotal = 0;$notTargetTotal = 0;
+                foreach($sampleTypeResult as $sample){
+                    $lessThanQuery = $sql->select()->from(array('s'=>'samples'))->columns(array('total' => new Expression('COUNT(*)')))
+                                            ->where(array("s.sample_collection_date <='" . $cDate ." 23:59:00". "'", "s.sample_collection_date >='" . $lastSevenDay." 00:00:00". "'"))
+                                            ->where('s.sample_type="'.$sample['type_id'].'"')
+                                            ->where(array('s.lab_id'=>$facility['facility_id']))
+                                        ->where(array('s.result<1000'));
+                    $lQueryStr = $sql->getSqlStringForSqlObject($lessThanQuery);
+                    $lessResult[$i] = $dbAdapter->query($lQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
+                    $result[$sample['sample_name']]['VL (< 1000 cp/ml)'][$j] = $lessTotal+$lessResult[$i]['total'];
+                    
+                    $greaterThanQuery = $sql->select()->from(array('s'=>'samples'))->columns(array('total' => new Expression('COUNT(*)')))
+                                            ->where(array("s.sample_collection_date <='" . $cDate ." 23:59:00". "'", "s.sample_collection_date >='" . $lastSevenDay." 00:00:00". "'"))
+                                            ->where('s.sample_type="'.$sample['type_id'].'"')
+                                            ->where(array('s.lab_id'=>$facility['facility_id']))
+                                            ->where(array('s.result>1000'));
+                    $gQueryStr = $sql->getSqlStringForSqlObject($greaterThanQuery);
+                    $greaterResult[$i] = $dbAdapter->query($gQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
+                    $result[$sample['sample_name']]['VL (> 1000 cp/ml)'][$j] = $greaterTotal+$greaterResult[$i]['total'];
+                    
+                    $notDetectQuery = $sql->select()->from(array('s'=>'samples'))->columns(array('total' => new Expression('COUNT(*)')))
+                                        ->where(array("s.sample_collection_date <='" . $cDate ." 23:59:00". "'", "s.sample_collection_date >='" . $lastSevenDay." 00:00:00". "'"))
+                                        ->where('s.sample_type="'.$sample['type_id'].'"')
+                                        ->where(array('s.lab_id'=>$facility['facility_id']))
+                                        ->where(array('s.result'=>'Target Not Detected'));
+                    $nQueryStr = $sql->getSqlStringForSqlObject($notDetectQuery);
+                    $notTargetResult[$i] = $dbAdapter->query($nQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
+                    $result[$sample['sample_name']]['VL Not Detected'][$j] = $notTargetTotal+$notTargetResult[$i]['total'];
+                    $i++;
+                }
+                $result['lab'][$j] = $facility['facility_name'];
+                $j++;
+            }
+        }
+        return $result;
     }
     
     public function getRequisitionFormsTested($params)
