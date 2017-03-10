@@ -21,7 +21,7 @@ use Zend\Db\TableGateway\AbstractTableGateway;
  */
 class SampleTypeTable extends AbstractTableGateway {
 
-    protected $table = 'r_sample_types';
+    protected $table = 'r_sample_type';
 
     public function __construct(Adapter $adapter) {
         $this->adapter = $adapter;

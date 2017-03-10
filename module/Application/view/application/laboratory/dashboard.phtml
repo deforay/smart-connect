@@ -6,7 +6,7 @@
 <?php
 $sType = '';
 foreach($sampleType as $samples){
-    $sType.='<option value="'.base64_encode($samples['type_id']).'">'.ucwords($samples['sample_name']).'</option>';
+    $sType.='<option value="'.base64_encode($samples['sample_id']).'">'.ucwords($samples['sample_name']).'</option>';
 }
 ?>
                     <!-- BEGIN PAGE BAR -->
@@ -187,7 +187,8 @@ foreach($sampleType as $samples){
         function getSampleResult()
         {
             dateRange = $("#sampleCollectionDate").val();
-        $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-result')); ?>",{sampleCollectionDate:dateRange},
+            facilityId = $("#labName").val();
+        $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-result')); ?>",{sampleCollectionDate:dateRange,facilityId:facilityId},
         function(data) {
             $("#sampleResultDetails").html(data);
         });
@@ -196,7 +197,7 @@ foreach($sampleType as $samples){
         {
             sampleType = $("#sampleType").val();
             dateRange = $("#sampleCollectionDate").val();
-            $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-test-result')); ?>",{sampleCollectionDate:dateRange,sampleType:sampleType},
+            $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-test-result')); ?>",{sampleCollectionDate:dateRange,sampleType:sampleType,facilityId:facilityId},
             function(data) {
             $("#samplesTestedResult").html(data);
             });
@@ -206,7 +207,7 @@ foreach($sampleType as $samples){
             sampleType = $("#sampleTypeVolume").val();
             dateRange = $("#sampleCollectionDate").val();
             facilityId = $("#labName").val();
-            $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-test-result-volume')); ?>",{sampleCollectionDate:dateRange,sampleType:sampleType,facilityId:facilityId},
+            $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-test-result-volume')); ?>",{sampleCollectionDate:dateRange,sampleType:sampleType,facilityId:facilityId,facilityId:facilityId},
             function(data) {
             $("#facilitiesTestedValue").html(data);
             });
@@ -214,7 +215,7 @@ foreach($sampleType as $samples){
         function getRequisitionFormsTested()
         {
             dateRange = $("#sampleCollectionDate").val();
-            $.post("<?php echo $this->url('laboratory', array('action' => 'get-requisition-forms')); ?>",{sampleCollectionDate:dateRange},
+            $.post("<?php echo $this->url('laboratory', array('action' => 'get-requisition-forms')); ?>",{sampleCollectionDate:dateRange,facilityId:facilityId},
             function(data) {
             $("#requisitionForms").html(data);
             });
@@ -223,7 +224,7 @@ foreach($sampleType as $samples){
         {
             dateRange = $("#sampleCollectionDate").val();
             sampleType = $("#sampleVolume").val();
-            $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-volume')); ?>",{sampleCollectionDate:dateRange,sampleType:sampleType},
+            $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-volume')); ?>",{sampleCollectionDate:dateRange,sampleType:sampleType,facilityId:facilityId},
             function(data) {
             $("#pieChartLabResult").html(data);
             });
@@ -379,7 +380,6 @@ var LocsAv2 = [
     }
 ];
                     
-
 var locations = [
   //Starting Point is "Home", and links to other locations"//
   ['Mbabne', -26.305201, 31.1349953, '<?php echo $this->basePath('assets/img/lab0.png') ?>', '<strong>No. of Samples : 30</strong>'],
@@ -437,9 +437,5 @@ function initMap() {
   map.fitBounds(bounds);
 }
 google.maps.event.addDomListener(window, "load", initMap);
-     
-                    
-                    
-                    
-                });
+});
         </script>

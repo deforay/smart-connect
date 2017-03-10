@@ -21,7 +21,7 @@ use Zend\Db\TableGateway\AbstractTableGateway;
  */
 class FacilityTypeTable extends AbstractTableGateway {
 
-    protected $table = 'facility_types';
+    protected $table = 'facility_type';
 
     public function __construct(Adapter $adapter) {
         $this->adapter = $adapter;

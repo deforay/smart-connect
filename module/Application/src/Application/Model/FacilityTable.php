@@ -32,8 +32,8 @@ class FacilityTable extends AbstractTableGateway {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $fQuery = $sql->select()->from(array('f'=>'facility_details'))
-                        ->join(array('ft'=>'facility_types'),'ft.facility_type_id=f.facility_type')
-                        ->where('ft.facility_type_name="Lab"');
+                        ->join(array('ft'=>'facility_type'),'ft.facility_type_id=f.facility_type')
+                        ->where('ft.facility_type_name="Viral Load Lab"');
         $fQueryStr = $sql->getSqlStringForSqlObject($fQuery);
         $facilityResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         return $facilityResult;
@@ -43,8 +43,8 @@ class FacilityTable extends AbstractTableGateway {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $fQuery = $sql->select()->from(array('f'=>'facility_details'))
-                        ->join(array('ft'=>'facility_types'),'ft.facility_type_id=f.facility_type')
-                        ->where('ft.facility_type_name="Clinic"');
+                        ->join(array('ft'=>'facility_type'),'ft.facility_type_id=f.facility_type')
+                        ->where('ft.facility_type_name="clinic"');
         $fQueryStr = $sql->getSqlStringForSqlObject($fQuery);
         $facilityResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         return $facilityResult;
