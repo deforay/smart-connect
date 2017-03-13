@@ -53,7 +53,7 @@ foreach($sampleType as $samples){
                             </select>
                         </div>
                         <div class="col-lg-3">
-                                <a href="javascript:void(0);" class="btn btn-info btn-sm" onclick="getSampleResult(),getTestedSampleResult(),getTestedSampleResultBasedVolume(),getRequisitionFormsTested(),getSampleVolume()">Submit</a>
+                                <a href="javascript:void(0);" class="btn btn-info btn-sm" onclick="getSampleResult(),getTestedSampleResult(),getTestedSampleResultBasedVolume(),getRequisitionFormsTested(),getSampleVolume(),getLabTime()">Submit</a>
                             </div>
                     </div>
                     <div class="row">
@@ -215,6 +215,7 @@ foreach($sampleType as $samples){
         function getRequisitionFormsTested()
         {
             dateRange = $("#sampleCollectionDate").val();
+            facilityId = $("#labName").val();
             $.post("<?php echo $this->url('laboratory', array('action' => 'get-requisition-forms')); ?>",{sampleCollectionDate:dateRange,facilityId:facilityId},
             function(data) {
             $("#requisitionForms").html(data);
@@ -224,9 +225,20 @@ foreach($sampleType as $samples){
         {
             dateRange = $("#sampleCollectionDate").val();
             sampleType = $("#sampleVolume").val();
+            facilityId = $("#labName").val();
             $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-volume')); ?>",{sampleCollectionDate:dateRange,sampleType:sampleType,facilityId:facilityId},
             function(data) {
             $("#pieChartLabResult").html(data);
+            });
+        }
+        function getLabTime()
+        {
+            dateRange = $("#sampleCollectionDate").val();
+            sampleType = $("#sampleVolume").val();
+            facilityId = $("#labName").val();
+            $.post("<?php echo $this->url('laboratory', array('action' => 'get-lab-turn-around-time')); ?>",{sampleCollectionDate:dateRange,sampleType:sampleType,facilityId:facilityId},
+            function(data) {
+            $("#labAverageTat").html(data);
             });
         }
             
@@ -289,56 +301,9 @@ foreach($sampleType as $samples){
                 getTestedSampleResultBasedVolume();
                 getRequisitionFormsTested();
                 getSampleVolume();
+                getLabTime();
                 
 
-    $('#labAverageTat').highcharts({
-        chart: {
-            type: 'line'
-        },
-        title: {
-            text: ''
-        },
-        subtitle: {
-            text: ''
-        },
-        xAxis: {
-            categories: ["21 Mar", "22 Mar", "23 Mar", "24 Mar", "25 Mar", "26 Mar", "27 Mar"]
-        },
-        yAxis: {
-            title: {
-                text: 'TAT in Hours'
-            },plotLines: [{
-                    value: 16,
-                    color: 'red',
-                    width: 2
-                }]
-        },
-        plotOptions: {
-            line: {
-                dataLabels: {
-                    enabled: true
-                }
-            }
-        },
-        series: [{
-            name: 'Plasma',
-            data: [14,16,15,13,16,17,15],
-            color : '#64ade5',
-            visible : false
-        },{
-            name: 'DBS',
-            data: [15,17,19,10,16,11,12],
-            color : '#8877a9',
-            visible : false
-        },{
-            name: 'All',
-            data: [14.5,16.5,17,11.5,16,14,13.5],
-            color : '#1B325F'
-        }
-        
-        ]
-    });
-                  
 var LocsAv2 = [
     {
        

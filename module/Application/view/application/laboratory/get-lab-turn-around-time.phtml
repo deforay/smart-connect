@@ -1,0 +1,96 @@
+<div id="labAverageTat"></div>
+<script>
+    
+    $('#labAverageTat').highcharts({
+        chart: {
+            type: 'line'
+        },
+        title: {
+            text: ''
+        },
+        subtitle: {
+            text: ''
+        },
+        xAxis: {
+            //categories: ["21 Mar", "22 Mar", "23 Mar", "24 Mar", "25 Mar", "26 Mar", "27 Mar"]
+            categories: [<?php
+       if(count($result['date'])>0){
+            foreach($result['date'] as $date){
+                echo "'".$date."',";
+            }
+       }
+            ?>]
+        },
+        yAxis: {
+            title: {
+                text: 'TAT in Hours'
+            },plotLines: [{
+                    value: 16,
+                    color: 'red',
+                    width: 2
+                }]
+        },
+        plotOptions: {
+            line: {
+                dataLabels: {
+                    enabled: true
+                }
+            }
+        },
+        
+        series: [
+            <?php
+            foreach($sampleType as $sample){
+                if(isset($result[$sample['sample_name']])){
+                    foreach($result[$sample['sample_name']] as $key=>$condition){
+                    ?>
+                    {
+                    name:'<?php echo $sample['sample_name'];?>',
+                    data:[<?php
+                        foreach($condition as $count){
+                            echo $count.",";
+                        }
+                    ?>],
+                    color : getRandomColor(),
+                    visible:false
+                    },
+                    <?php
+                    }
+                }
+            }
+            ?>
+            {
+            name: 'All',
+            data: [<?php echo implode(",",$result['all']);?>],
+            color : '#1B325F',
+        },
+        ],
+        
+        
+        //series: [{
+        //    name: 'Plasma',
+        //    data: [14,16,15,13,16,17,15],
+        //    color : '#64ade5',
+        //    visible : false
+        //},{
+        //    name: 'DBS',
+        //    data: [15,17,19,10,16,11,12],
+        //    color : '#8877a9',
+        //    visible : false
+        //},{
+        //    name: 'All',
+        //    data: [14.5,16.5,17,11.5,16,14,13.5],
+        //    color : '#1B325F'
+        //}
+        //
+        //]
+    });
+    function getRandomColor() {
+    var letters = '0123456789ABCDEF';
+    var color = '#';
+    for (var i = 0; i < 6; i++ ) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+    }
+</script>

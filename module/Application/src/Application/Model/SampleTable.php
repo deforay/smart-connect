@@ -402,6 +402,89 @@ class SampleTable extends AbstractTableGateway {
         }
         return $result;
     }
+    public function fetchLabTurnAroundTime($params)
+    {
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $common = new CommonService();
+        $cDate = date('Y-m-d');
+        $lastThirtyDay = date('Y-m-d', strtotime('-30 days'));
+        if(isset($params['sampleCollectionDate']) && trim($params['sampleCollectionDate'])!= ''){
+            $s_c_date = explode("to", $params['sampleCollectionDate']);
+            if (isset($s_c_date[0]) && trim($s_c_date[0]) != "") {
+              $lastThirtyDay = trim($s_c_date[0]);
+            }
+            if (isset($s_c_date[1]) && trim($s_c_date[1]) != "") {
+              $cDate = trim($s_c_date[1]);
+            }
+        }
+        //set datewise query
+        $sResult = $this->getDistinicDate($cDate,$lastThirtyDay);
+
+        $rsQuery = $sql->select()->from(array('rs'=>'r_sample_type'));
+        $rsQueryStr = $sql->getSqlStringForSqlObject($rsQuery);
+        $sampleTypeResult = $dbAdapter->query($rsQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+        
+        if($sResult && $sampleTypeResult){
+            $j = 0;
+            $avgResult = array();
+            foreach($sResult as $sampleData){
+                if($sampleData['year']!=NULL){
+                    $date = $sampleData['year']."-".$sampleData['month']."-".$sampleData['day'];
+                    $dFormat = date("d M", strtotime($date));
+                    $i = 0;
+                    foreach($sampleTypeResult as $sample){
+                        $lQuery = $sql->select()->from(array('vl'=>'vl_request_form'))->columns(array('lab_tested_date','sample_collection_date'))
+                                            ->where(array("vl.sample_collection_date >='" . $date ." 00:00:00". "'", "vl.sample_collection_date <='" . $date." 23:59:00". "'"))
+                                            ->where('vl.sample_id="'.$sample['sample_id'].'"');
+                        $lQueryStr = $sql->getSqlStringForSqlObject($lQuery);
+                        $lResult = $dbAdapter->query($lQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+                        
+                        if(count($lResult)>0){
+                        $total = 0;
+                        foreach($lResult as $data){
+                            if($data['lab_tested_date']!='0000-00-00 00:00:00' && $data['sample_collection_date']!='0000-00-00 00:00:00'){
+                            $date1 = $data['sample_collection_date'];$date2 = $data['lab_tested_date'];
+                            $hourdiff = round((strtotime($date2) - strtotime($date1))/3600, 1);
+                            $total = $total + ($hourdiff);
+                            }
+                        }
+                            $avgResult[$sample['sample_name']][$i][$j] = round($total/count($lResult),1);
+                        }else{
+                            $avgResult[$sample['sample_name']][$i][$j] = 0;
+                            
+                        }
+                        $i++;
+                    }
+                    //all result
+                    $alQuery = $sql->select()->from(array('vl'=>'vl_request_form'))->columns(array('lab_tested_date','sample_collection_date'))
+                                            ->where(array("vl.sample_collection_date >='" . $date ." 00:00:00". "'", "vl.sample_collection_date <='" . $date." 23:59:00". "'"));
+                    $alQueryStr = $sql->getSqlStringForSqlObject($alQuery);
+                    $alResult = $dbAdapter->query($alQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+                    
+                    if(count($alResult)>0){
+                    $total = 0;
+                    foreach($alResult as $data){
+                        if($data['lab_tested_date']!='0000-00-00 00:00:00' && $data['sample_collection_date']!='0000-00-00 00:00:00'){
+                        $date1 = $data['sample_collection_date'];$date2 = $data['lab_tested_date'];
+                        $hourdiff = round((strtotime($date2) - strtotime($date1))/3600, 1);
+                        $total = $total + ($hourdiff);
+                        }
+                    }
+                        $avgResult['all'][$j] = round($total/count($alResult),1);
+                    }else{
+                        $avgResult['all'][$j] = 0;
+                    }
+                }
+                $avgResult['date'][$j] = $dFormat;
+                $j++;
+            }
+            
+        }
+        //\Zend\Debug\Debug::dump($avgResult);die;
+        return $avgResult;
+    }
+    
     //end lab dashboard details 
     
     //start clinic details

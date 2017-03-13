@@ -122,6 +122,20 @@ class LaboratoryController extends AbstractActionController
             return $viewModel;
         }
     }
+    public function getLabTurnAroundTimeAction()
+    {
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $sampleService = $this->getServiceLocator()->get('SampleService');
+            $sampleType = $sampleService->getSampleType();
+            $result = $sampleService->getLabTurnAroundTime($params);
+            $viewModel = new ViewModel();
+            $viewModel->setVariables(array('result' => $result,'sampleType'=>$sampleType))
+                        ->setTerminal(true);
+            return $viewModel;
+        }
+    }
 
 }
 
