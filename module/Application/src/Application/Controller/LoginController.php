@@ -20,7 +20,7 @@ class LoginController extends AbstractActionController
             return $this->redirect()->toUrl($url);
         }
         if (isset($logincontainer->userId) && $logincontainer->userId != "") {
-            return $this->redirect()->toUrl("/devices/status");
+            return $this->redirect()->toUrl("labs/dashboard");
         } else {
             $vm = new ViewModel();
             $vm->setTerminal(true);

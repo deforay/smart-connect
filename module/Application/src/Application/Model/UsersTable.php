@@ -21,7 +21,7 @@ use Zend\Db\TableGateway\AbstractTableGateway;
  */
 class UsersTable extends AbstractTableGateway {
 
-    protected $table = 'users';
+    protected $table = 'dash_users';
 
     public function __construct(Adapter $adapter) {
         $this->adapter = $adapter;
@@ -34,8 +34,8 @@ class UsersTable extends AbstractTableGateway {
 
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $sQuery = $sql->select()->from(array('u' => 'users'))
-                ->join(array('r' => 'user_roles'), 'u.role=r.role_id')
+        $sQuery = $sql->select()->from(array('u' => 'dash_users'))
+                ->join(array('r' => 'dash_user_roles'), 'u.role=r.role_id')
                 ->where(array('email' => $username, 'password' => $password));
         $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
         
@@ -45,11 +45,12 @@ class UsersTable extends AbstractTableGateway {
         $logincontainer = new Container('credo');
         if (count($rResult) > 0) {
             $logincontainer->userId = $rResult[0]["user_id"];
-            $logincontainer->name = $rResult[0]["name"];
+            $logincontainer->name = $rResult[0]["user_name"];
             $logincontainer->mobile = $rResult[0]["mobile"];
             $logincontainer->role = $rResult[0]["role"];
             $logincontainer->email = $rResult[0]["email"];
-            $logincontainer->accessType = $rResult[0]["access_type"];
+            //$logincontainer->accessType = $rResult[0]["access_type"];
+            $container->alertMsg = '';
             //die('home');
             return '/labs/dashboard';
         } else {
@@ -62,8 +63,8 @@ class UsersTable extends AbstractTableGateway {
     public function fetchUsers(){
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $sQuery = $sql->select()->from(array('u' => 'users'))
-                ->join(array('r' => 'user_roles'), 'u.role=r.role_id');
+        $sQuery = $sql->select()->from(array('u' => 'dash_users'))
+                ->join(array('r' => 'dash_user_roles'), 'u.role=r.role_id');
         
         $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -93,8 +94,8 @@ class UsersTable extends AbstractTableGateway {
         $dbAdapter = $this->adapter;
 
         $sql = new Sql($dbAdapter);
-        $sQuery = $sql->select()->from(array('u' => 'users'))
-        ->join(array('r' => 'user_roles'), 'u.role=r.role_id')
+        $sQuery = $sql->select()->from(array('u' => 'dash_users'))
+        ->join(array('r' => 'dash_user_roles'), 'u.role=r.role_id')
                       ->where("user_id= $userId");
         
         $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);

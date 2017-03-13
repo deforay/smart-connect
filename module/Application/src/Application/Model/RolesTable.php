@@ -21,7 +21,7 @@ use Zend\Db\TableGateway\AbstractTableGateway;
  */
 class RolesTable extends AbstractTableGateway {
 
-    protected $table = 'user_roles';
+    protected $table = 'dash_user_roles';
 
     public function __construct(Adapter $adapter) {
         $this->adapter = $adapter;
@@ -31,7 +31,7 @@ class RolesTable extends AbstractTableGateway {
     public function fetchRoles(){
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $sQuery = $sql->select()->from(array('r' => 'user_roles'));
+        $sQuery = $sql->select()->from(array('r' => 'dash_user_roles'));
         
         $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();

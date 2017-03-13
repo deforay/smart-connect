@@ -57,9 +57,9 @@ class Module
         
 	if ($e->getRouteMatch()->getParam('controller') != 'Application\Controller\Login') {
             $session = new Container('credo');
-			$session->userId = 'guest';
-			$session->accessType = 4;
-            /*if (!isset($session->userId) || $session->userId == "") {
+			//$session->userId = 'guest';
+			//$session->accessType = 4;
+            if (!isset($session->userId) || $session->userId == "") {
                 $url = $e->getRouter()->assemble(array(), array('name' => 'login'));
                 $response = $e->getResponse();
                 $response->getHeaders()->addHeaderLine('Location', $url);
@@ -75,7 +75,7 @@ class Module
                 //Attach the "break" as a listener with a high priority
                 $e->getApplication()->getEventManager()->attach(MvcEvent::EVENT_ROUTE, $stopCallBack, -10000);
                 return $response;
-            }*/
+            }
         }
     }
     
