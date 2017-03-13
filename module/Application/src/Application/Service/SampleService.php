@@ -293,6 +293,11 @@ class SampleService {
         $sampleDb = $this->sm->get('SampleTable');
         return $sampleDb->fetchLabTurnAroundTime($params);
     }
+    public function getFacilites($params)
+    {
+        $sampleDb = $this->sm->get('SampleTable');
+        return $sampleDb->fetchFacilites($params);
+    }
     //lab details end
     
     //clinic details start

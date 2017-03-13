@@ -136,6 +136,20 @@ class LaboratoryController extends AbstractActionController
             return $viewModel;
         }
     }
+    public function getLabFacilitiesAction()
+    {
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $sampleService = $this->getServiceLocator()->get('SampleService');
+            $sampleType = $sampleService->getSampleType();
+            $result = $sampleService->getFacilites($params);
+            $viewModel = new ViewModel();
+            $viewModel->setVariables(array('result' => $result,'sampleType'=>$sampleType))
+                        ->setTerminal(true);
+            return $viewModel;
+        }
+    }
 
 }
 

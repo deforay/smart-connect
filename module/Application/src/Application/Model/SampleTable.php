@@ -424,10 +424,10 @@ class SampleTable extends AbstractTableGateway {
         $rsQuery = $sql->select()->from(array('rs'=>'r_sample_type'));
         $rsQueryStr = $sql->getSqlStringForSqlObject($rsQuery);
         $sampleTypeResult = $dbAdapter->query($rsQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-        
+        $avgResult = array();
         if($sResult && $sampleTypeResult){
             $j = 0;
-            $avgResult = array();
+            
             foreach($sResult as $sampleData){
                 if($sampleData['year']!=NULL){
                     $date = $sampleData['year']."-".$sampleData['month']."-".$sampleData['day'];
@@ -481,8 +481,51 @@ class SampleTable extends AbstractTableGateway {
             }
             
         }
-        //\Zend\Debug\Debug::dump($avgResult);die;
         return $avgResult;
+    }
+    public function fetchFacilites($params)
+    {
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $common = new CommonService();
+        $cDate = date('Y-m-d');
+        $lastThirtyDay = date('Y-m-d', strtotime('-30 days'));
+        if(isset($params['sampleCollectionDate']) && trim($params['sampleCollectionDate'])!= ''){
+            $s_c_date = explode("to", $params['sampleCollectionDate']);
+            if (isset($s_c_date[0]) && trim($s_c_date[0]) != "") {
+              $lastThirtyDay = trim($s_c_date[0]);
+            }
+            if (isset($s_c_date[1]) && trim($s_c_date[1]) != "") {
+              $cDate = trim($s_c_date[1]);
+            }
+        }
+        //set datewise query
+        $sResult = $this->getDistinicDate($cDate,$lastThirtyDay);
+
+        $lQuery = $sql->select()->from(array('vl'=>'vl_request_form'))->columns(array('lab_tested_date','sample_collection_date','lab_id','labCount' => new \Zend\Db\Sql\Expression("COUNT(vl.lab_id)")))
+                                            ->join(array('fd'=>'facility_details'),'fd.facility_id=vl.lab_id',array('facility_name','latitude','longitude'))
+                                            ->where(array("vl.sample_collection_date >='" . $lastThirtyDay ." 00:00:00". "'", "vl.sample_collection_date <='" .$cDate." 23:59:00". "'"))
+                                            ->group('vl.lab_id');
+        $lQueryStr = $sql->getSqlStringForSqlObject($lQuery);
+        $lResult = $dbAdapter->query($lQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+        
+        if(count($lResult)>0){
+            $i = 0;
+            foreach($lResult as $lab){
+                if($lab['lab_id']!='' && $lab['lab_id']!=NULL && $lab['lab_id']!=0){
+                    $lcQuery = $sql->select()->from(array('vl'=>'vl_request_form'))
+                                            ->columns(array('lab_tested_date','sample_collection_date','lab_id','facility_id','vl_sample_id','clinicCount' => new \Zend\Db\Sql\Expression("COUNT(vl.facility_id)")))
+                                            ->join(array('fd'=>'facility_details'),'fd.facility_id=vl.facility_id',array('facility_name','latitude','longitude'))
+                                            ->where(array("vl.lab_id"=>$lab['lab_id'],'fd.facility_type'=>'1'))
+                                            ->group('vl.facility_id');
+                    $lcQueryStr = $sql->getSqlStringForSqlObject($lcQuery);
+                    $lResult[$i]['clinic'] = $dbAdapter->query($lcQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+                    $i++;
+                }
+            }
+        }
+        //\Zend\Debug\Debug::dump($lResult);die;
+        return $lResult;
     }
     
     //end lab dashboard details 
