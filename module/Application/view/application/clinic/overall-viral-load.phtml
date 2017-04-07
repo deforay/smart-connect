@@ -14,8 +14,8 @@ $common = new \Application\Service\CommonService();
         foreach($result as $sampleData){
             $testedDate[0] = '';
             $testedDate[1] = '';
-            if($sampleData['lab_tested_date']!='0000-00-00 00:00:00' && $sampleData['lab_tested_date']!=''){
-                $testedDate = explode(" ",$sampleData['lab_tested_date']);
+            if($sampleData['sample_tested_datetime']!='0000-00-00 00:00:00' && $sampleData['sample_tested_datetime']!=''){
+                $testedDate = explode(" ",$sampleData['sample_tested_datetime']);
             }
             ?>
             <tr>

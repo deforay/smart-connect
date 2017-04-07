@@ -55,29 +55,29 @@ class SampleService {
                         if(trim($sheetData[$i]['A']) != '' && trim($sheetData[$i]['B']) != '') {
                             $sampleCode = trim($sheetData[$i]['A']);
                             $data = array('sample_code'=>$sampleCode,
-                                          'vl_instance_id'=>trim($sheetData[$i]['B']),
+                                          'vlsm_instance_id'=>trim($sheetData[$i]['B']),
                                           'source'=>$params['sourceName'],
-                                          'gender'=>(trim($sheetData[$i]['C'])!='' ? trim($sheetData[$i]['C']) :  NULL),
-                                          'age_in_yrs'=>(trim($sheetData[$i]['D'])!='' ? trim($sheetData[$i]['D']) :  NULL),
+                                          'patient_gender'=>(trim($sheetData[$i]['C'])!='' ? trim($sheetData[$i]['C']) :  NULL),
+                                          'patient_age_in_years'=>(trim($sheetData[$i]['D'])!='' ? trim($sheetData[$i]['D']) :  NULL),
                                           'sample_collection_date'=>(trim($sheetData[$i]['U'])!='' ? trim($sheetData[$i]['U']) :  NULL),
-                                          'lab_tested_date'=>(trim($sheetData[$i]['AJ'])!='' ? trim($sheetData[$i]['AJ']) :  NULL),
-                                          'log_value'=>(trim($sheetData[$i]['AK'])!='' ? trim($sheetData[$i]['AK']) :  NULL),
-                                          'absolute_value'=>(trim($sheetData[$i]['AL'])!='' ? trim($sheetData[$i]['AL']) :  NULL),
-                                          'text_value'=>(trim($sheetData[$i]['AM'])!='' ? trim($sheetData[$i]['AM']) :  NULL),
-                                          'absolute_decimal_value'=>(trim($sheetData[$i]['AN'])!='' ? trim($sheetData[$i]['AN']) :  NULL),
+                                          'sample_tested_datetime'=>(trim($sheetData[$i]['AJ'])!='' ? trim($sheetData[$i]['AJ']) :  NULL),
+                                          'result_value_log'=>(trim($sheetData[$i]['AK'])!='' ? trim($sheetData[$i]['AK']) :  NULL),
+                                          'result_value_absolute'=>(trim($sheetData[$i]['AL'])!='' ? trim($sheetData[$i]['AL']) :  NULL),
+                                          'result_value_text'=>(trim($sheetData[$i]['AM'])!='' ? trim($sheetData[$i]['AM']) :  NULL),
+                                          'result_value_absolute_decimal'=>(trim($sheetData[$i]['AN'])!='' ? trim($sheetData[$i]['AN']) :  NULL),
                                           'result'=>(trim($sheetData[$i]['AO'])!='' ? trim($sheetData[$i]['AO']) :  NULL),
                                           );
-                            $facilityData = array('vl_instance_id'=>trim($sheetData[$i]['B']),
+                            $facilityData = array('vlsm_instance_id'=>trim($sheetData[$i]['B']),
                                                   'facility_name'=>trim($sheetData[$i]['E']),
                                                   'facility_code'=>trim($sheetData[$i]['F']),
-                                                  'phone_number'=>trim($sheetData[$i]['I']),
+                                                  'facility_mobile_numbers'=>trim($sheetData[$i]['I']),
                                                   'address'=>trim($sheetData[$i]['J']),
-                                                  'hub_name'=>trim($sheetData[$i]['K']),
+                                                  'facility_hub_name'=>trim($sheetData[$i]['K']),
                                                   'contact_person'=>trim($sheetData[$i]['L']),
                                                   'report_email'=>trim($sheetData[$i]['M']),
                                                   'country'=>trim($sheetData[$i]['N']),
-                                                  'state'=>trim($sheetData[$i]['G']),
-                                                  'district'=>trim($sheetData[$i]['H']),
+                                                  'facility_state'=>trim($sheetData[$i]['G']),
+                                                  'facility_district'=>trim($sheetData[$i]['H']),
                                                   'longitude'=>trim($sheetData[$i]['O']),
                                                   'latitude'=>trim($sheetData[$i]['P']),
                                                   'status'=>trim($sheetData[$i]['Q']),
@@ -98,23 +98,23 @@ class SampleService {
                                 $facilityDataResult = $this->checkFacilityDetails(trim($sheetData[$i]['E']));
                                 if($facilityDataResult){
                                     $facilityDb->update($facilityData,array('facility_id'=>$facilityDataResult['facility_id']));
-                                    $data['clinic_id'] = $facilityDataResult['facility_id'];
+                                    $data['facility_id'] = $facilityDataResult['facility_id'];
                                 }else{
                                     $facilityDb->insert($facilityData);
-                                    $data['clinic_id'] = $facilityDb->lastInsertValue;
+                                    $data['facility_id'] = $facilityDb->lastInsertValue;
                                 }
                             }else{
-                                    $data['clinic_id'] = NULL;
+                                    $data['facility_id'] = NULL;
                             }
                             
-                            $labData = array('vl_instance_id'=>trim($sheetData[$i]['B']),
+                            $labData = array('vlsm_instance_id'=>trim($sheetData[$i]['B']),
                                                   'facility_name'=>trim($sheetData[$i]['V']),
                                                   'facility_code'=>trim($sheetData[$i]['W']),
-                                                  'state'=>trim($sheetData[$i]['X']),
-                                                  'district'=>trim($sheetData[$i]['Y']),
-                                                  'phone_number'=>trim($sheetData[$i]['Z']),
+                                                  'facility_state'=>trim($sheetData[$i]['X']),
+                                                  'facility_district'=>trim($sheetData[$i]['Y']),
+                                                  'facility_mobile_numbers'=>trim($sheetData[$i]['Z']),
                                                   'address'=>trim($sheetData[$i]['AA']),
-                                                  'hub_name'=>trim($sheetData[$i]['AB']),
+                                                  'facility_hub_name'=>trim($sheetData[$i]['AB']),
                                                   'contact_person'=>trim($sheetData[$i]['AC']),
                                                   'report_email'=>trim($sheetData[$i]['AD']),
                                                   'country'=>trim($sheetData[$i]['AE']),
@@ -150,33 +150,33 @@ class SampleService {
                             if(trim($sheetData[$i]['AP'])!=''){
                                 $testReasonResult = $this->checkTestingReson(trim($sheetData[$i]['AP']));
                                 if($testReasonResult){
-                                    $testReasonDb->update(array('reason_name'=>trim($sheetData[$i]['AP']),'reason_status'=>trim($sheetData[$i]['AQ'])),array('reason_id'=>$testReasonResult['reason_id']));
-                                    $data['test_reason'] = $testReasonResult['reason_id'];
+                                    $testReasonDb->update(array('test_reason_name'=>trim($sheetData[$i]['AP']),'test_reason_status'=>trim($sheetData[$i]['AQ'])),array('test_reason_id'=>$testReasonResult['test_reason_id']));
+                                    $data['reason_for_vl_testing'] = $testReasonResult['test_reason_id'];
                                 }else{
-                                    $testReasonDb->insert(array('reason_name'=>trim($sheetData[$i]['AP']),'reason_status'=>trim($sheetData[$i]['AQ'])));
-                                    $data['test_reason'] = $testReasonDb->lastInsertValue;
+                                    $testReasonDb->insert(array('test_reason_name'=>trim($sheetData[$i]['AP']),'test_reason_status'=>trim($sheetData[$i]['AQ'])));
+                                    $data['reason_for_vl_testing'] = $testReasonDb->lastInsertValue;
                                 }
                             }else{
-                                    $data['test_reason'] = 0;
+                                    $data['reason_for_vl_testing'] = 0;
                             }
                             //check testing reason
                             if(trim($sheetData[$i]['AR'])!=''){
                                 $sampleStatusResult = $this->checkSampleStatus(trim($sheetData[$i]['AR']));
                                 if($sampleStatusResult){
-                                    $data['sample_status'] = $sampleStatusResult['status_id'];
+                                    $data['result_status'] = $sampleStatusResult['status_id'];
                                 }else{
                                     $testStatusDb->insert(array('status_name'=>trim($sheetData[$i]['AR'])));
-                                    $data['sample_status'] = $testStatusDb->lastInsertValue;
+                                    $data['result_status'] = $testStatusDb->lastInsertValue;
                                 }
                             }else{
-                                $data['sample_status'] = 0;
+                                $data['result_status'] = 6;
                             }
                             //check sample type
                             if(trim($sheetData[$i]['S'])!=''){
                                 $sampleType = $this->checkSampleType(trim($sheetData[$i]['S']));
                                 if($sampleType){
-                                    $sampleTypeDb->update(array('sample_name'=>trim($sheetData[$i]['S']),'status'=>trim($sheetData[$i]['T'])),array('type_id'=>$sampleType['type_id']));
-                                    $data['sample_type'] = $sampleType['type_id'];
+                                    $sampleTypeDb->update(array('sample_name'=>trim($sheetData[$i]['S']),'status'=>trim($sheetData[$i]['T'])),array('sample_id'=>$sampleType['sample_id']));
+                                    $data['sample_type'] = $sampleType['sample_id'];
                                 }else{
                                     $sampleTypeDb->insert(array('sample_name'=>trim($sheetData[$i]['S']),'status'=>trim($sheetData[$i]['T'])));
                                     $data['sample_type'] = $sampleTypeDb->lastInsertValue;
@@ -189,7 +189,7 @@ class SampleService {
                             $sampleCode = $this->checkSampleCode($sampleCode);
                             if($sampleCode){
                                 //sample data update
-                                $sampleDb->update($data,array('sample_id'=>$sampleCode['sample_id']));
+                                $sampleDb->update($data,array('vl_sample_id'=>$sampleCode['vl_sample_id']));
                             }else{
                                 //sample data insert
                                 $sampleDb->insert($data);
@@ -207,7 +207,7 @@ class SampleService {
     {
         $dbAdapter = $this->sm->get('Zend\Db\Adapter\Adapter');
         $sql = new Sql($dbAdapter);
-        $sQuery = $sql->select()->from('samples')->where(array('sample_code' => $sampleCode));
+        $sQuery = $sql->select()->from('dash_vl_request_form')->where(array('sample_code' => $sampleCode));
         $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
         $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
         return $sResult;
@@ -225,7 +225,7 @@ class SampleService {
     {
         $dbAdapter = $this->sm->get('Zend\Db\Adapter\Adapter');
         $sql = new Sql($dbAdapter);
-        $fQuery = $sql->select()->from('facility_types')->where(array('facility_type_name' => $facilityTypeName));
+        $fQuery = $sql->select()->from('facility_type')->where(array('facility_type_name' => $facilityTypeName));
         $fQueryStr = $sql->getSqlStringForSqlObject($fQuery);
         $fResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
         return $fResult;
@@ -234,7 +234,7 @@ class SampleService {
     {
         $dbAdapter = $this->sm->get('Zend\Db\Adapter\Adapter');
         $sql = new Sql($dbAdapter);
-        $tQuery = $sql->select()->from('r_test_reasons')->where(array('reason_name' => $testingReson));
+        $tQuery = $sql->select()->from('r_vl_test_reasons')->where(array('test_reason_name' => $testingReson));
         $tQueryStr = $sql->getSqlStringForSqlObject($tQuery);
         $tResult = $dbAdapter->query($tQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
         return $tResult;
@@ -252,7 +252,7 @@ class SampleService {
     {
         $dbAdapter = $this->sm->get('Zend\Db\Adapter\Adapter');
         $sql = new Sql($dbAdapter);
-        $sQuery = $sql->select()->from('r_sample_types')->where(array('sample_name' => $sampleType));
+        $sQuery = $sql->select()->from('r_sample_type')->where(array('sample_name' => $sampleType));
         $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
         $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
         return $sResult;

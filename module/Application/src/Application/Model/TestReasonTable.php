@@ -21,7 +21,7 @@ use Zend\Db\TableGateway\AbstractTableGateway;
  */
 class TestReasonTable extends AbstractTableGateway {
 
-    protected $table = 'r_test_reasons';
+    protected $table = 'r_vl_test_reasons';
 
     public function __construct(Adapter $adapter) {
         $this->adapter = $adapter;

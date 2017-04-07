@@ -22,7 +22,7 @@ use Zend\Db\Sql\Expression;
  */
 class SourceTable extends AbstractTableGateway  {
 
-    protected $table = 'sources';
+    protected $table = 'dash_sources';
 
     public function __construct(Adapter $adapter) {
         $this->adapter = $adapter;
