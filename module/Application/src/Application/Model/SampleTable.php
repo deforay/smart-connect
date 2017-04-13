@@ -655,4 +655,302 @@ class SampleTable extends AbstractTableGateway {
         $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         return $sResult;
     }
+    
+    public function fetchAllTestResults($parameters) {
+        /* Array of database columns which should be read and sent back to DataTables. Use a space where
+         * you want to insert a non-database field (for example a counter or static image)
+        */
+        $aColumns = array('sample_code','DATE_FORMAT(sample_collection_date,"%d-%b-%Y")','DATE_FORMAT(sample_testing_date,"%d-%b-%Y")','result');
+        $orderColumns = array('sample_code','sample_collection_date','sample_testing_date','result');
+
+        /*
+         * Paging
+         */
+        $sLimit = "";
+        if (isset($parameters['iDisplayStart']) && $parameters['iDisplayLength'] != '-1') {
+            $sOffset = $parameters['iDisplayStart'];
+            $sLimit = $parameters['iDisplayLength'];
+        }
+
+        /*
+         * Ordering
+         */
+
+        $sOrder = "";
+        if (isset($parameters['iSortCol_0'])) {
+            for ($i = 0; $i < intval($parameters['iSortingCols']); $i++) {
+                if ($parameters['bSortable_' . intval($parameters['iSortCol_' . $i])] == "true") {
+                    $sOrder .= $orderColumns[intval($parameters['iSortCol_' . $i])] . " " . ( $parameters['sSortDir_' . $i] ) . ",";
+                }
+            }
+            $sOrder = substr_replace($sOrder, "", -1);
+        }
+
+        /*
+         * Filtering
+         * NOTE this does not match the built-in DataTables filtering which does it
+         * word by word on any field. It's possible to do here, but concerned about efficiency
+         * on very large tables, and MySQL's regex functionality is very limited
+         */
+
+        $sWhere = "";
+        if (isset($parameters['sSearch']) && $parameters['sSearch'] != "") {
+            $searchArray = explode(" ", $parameters['sSearch']);
+            $sWhereSub = "";
+            foreach ($searchArray as $search) {
+                if ($sWhereSub == "") {
+                    $sWhereSub .= "(";
+                } else {
+                    $sWhereSub .= " AND (";
+                }
+                $colSize = count($aColumns);
+
+                for ($i = 0; $i < $colSize; $i++) {
+                    if ($i < $colSize - 1) {
+                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search ) . "%' OR ";
+                    } else {
+                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search ) . "%' ";
+                    }
+                }
+                $sWhereSub .= ")";
+            }
+            $sWhere .= $sWhereSub;
+        }
+
+        /* Individual column filtering */
+        for ($i = 0; $i < count($aColumns); $i++) {
+            if (isset($parameters['bSearchable_' . $i]) && $parameters['bSearchable_' . $i] == "true" && $parameters['sSearch_' . $i] != '') {
+                if ($sWhere == "") {
+                    $sWhere .= $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
+                } else {
+                    $sWhere .= " AND " . $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
+                }
+            }
+        }
+
+        /*
+         * SQL queries
+         * Get data to display
+        */
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $sQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
+                ->columns(array('vl_sample_id','sample_code','sample_collection_date','sample_type','sample_testing_date','result_value_log','result_value_absolute','result_value_text','result'))
+				->join(array('fd'=>'facility_details'),'fd.facility_id=vl.facility_id',array('facility_name'))
+				->where(array('fd.facility_type'=>'1'));
+		
+        		
+        if (isset($sWhere) && $sWhere != "") {
+            $sQuery->where($sWhere);
+        }
+
+        if (isset($sOrder) && $sOrder != "") {
+            $sQuery->order($sOrder);
+        }
+
+        if (isset($sLimit) && isset($sOffset)) {
+            $sQuery->limit($sLimit);
+            $sQuery->offset($sOffset);
+        }
+
+        $sQueryStr = $sql->getSqlStringForSqlObject($sQuery); // Get the string of the Sql, instead of the Select-instance 
+        //echo $sQueryStr;die;
+        $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
+
+        /* Data set length after filtering */
+        $sQuery->reset('limit');
+        $sQuery->reset('offset');
+        $fQuery = $sql->getSqlStringForSqlObject($sQuery);
+        $aResultFilterTotal = $dbAdapter->query($fQuery, $dbAdapter::QUERY_MODE_EXECUTE);
+        $iFilteredTotal = count($aResultFilterTotal);
+
+        /* Total data set length */
+        $iQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))->columns(array('vl_sample_id'))
+				->join(array('fd'=>'facility_details'),'fd.facility_id=vl.facility_id',array('facility_name'))
+				->where(array('fd.facility_type'=>'1'));
+        $iQueryStr = $sql->getSqlStringForSqlObject($iQuery);
+        $iResult = $dbAdapter->query($iQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+        $iTotal = count($iResult);
+        
+        $output = array(
+            "sEcho" => intval($parameters['sEcho']),
+            "iTotalRecords" => $iTotal,
+            "iTotalDisplayRecords" => $iFilteredTotal,
+            "aaData" => array()
+        );
+        
+		$common = new CommonService();
+        foreach ($rResult as $aRow) {
+            $row = array();
+			if(isset($aRow['sample_collection_date']) && trim($aRow['sample_collection_date'])!=""){
+                $xepCollectDate=explode(" ",$aRow['sample_collection_date']);
+                $aRow['sample_collection_date']=$common->humanDateFormat($xepCollectDate[0])." ".$xepCollectDate[1];
+            }
+            if(isset($aRow['sample_testing_date']) && trim($aRow['sample_testing_date'])!=""){
+                $xepTestingDate=explode(" ",$aRow['sample_testing_date']);
+                $aRow['sample_testing_date']=$common->humanDateFormat($xepTestingDate[0])." ".$xepTestingDate[1];
+            }
+            $row[] = $aRow['sample_code'];
+            $row[] = $aRow['sample_collection_date'];
+            $row[] = $aRow['sample_testing_date'];
+			$row[] = $aRow['result'];
+			$row[]='<a href="#" class="btn btn-primary btn-xs">View</a>';
+            
+            $output['aaData'][] = $row;
+        }
+        return $output;
+    }
+    
+    //get sample tested result details
+    public function fetchClinicSampleTestedResults($params)
+    {
+        $result = array();
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $common = new CommonService();
+        $cDate = date('Y-m-d');
+        $lastThirtyDay = date('Y-m-d', strtotime('-30 days'));
+        if(isset($params['sampleCollectionDate']) && trim($params['sampleCollectionDate'])!= ''){
+            $s_c_date = explode("to", $params['sampleCollectionDate']);
+            if (isset($s_c_date[0]) && trim($s_c_date[0]) != "") {
+              $lastThirtyDay = trim($s_c_date[0]);
+            }
+            if (isset($s_c_date[1]) && trim($s_c_date[1]) != "") {
+              $cDate = trim($s_c_date[1]);
+            }
+        }
+        
+        $rsQuery = $sql->select()->from(array('rs'=>'r_sample_type'));
+        if(isset($params['sampleType']) && trim($params['sampleType'])!=''){
+            $rsQuery = $rsQuery->where('rs.sample_id="'.base64_decode(trim($params['sampleType'])).'"');
+        }
+        $rsQueryStr = $sql->getSqlStringForSqlObject($rsQuery);
+        $sampleTypeResult = $dbAdapter->query($rsQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+        if($sampleTypeResult){
+            //set datewise query
+            $sResult = $this->getClinicDistinicDate($cDate,$lastThirtyDay);
+            $j = 0;
+            if($sResult){
+                foreach($sResult as $sampleData){
+                    if($sampleData['year']!=NULL){
+                        $date = $sampleData['year']."-".$sampleData['month']."-".$sampleData['day'];
+                        $dFormat = date("d M", strtotime($date));
+                        $i = 0;
+                        $lessTotal = 0;$greaterTotal = 0;$notTargetTotal = 0;
+                        foreach($sampleTypeResult as $sample){
+                            if(isset($params['testResult']) && ($params['testResult']=="" || $params['testResult']=='<1000')){
+                                $lessThanQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))->columns(array('total' => new Expression('COUNT(*)')))
+                                                ->join(array('fd'=>'facility_details'),'fd.facility_id=vl.facility_id',array('facility_name'))
+                                                ->where(array('fd.facility_type'=>'1'))
+                                                ->where(array("vl.sample_collection_date >='" . $date ." 00:00:00". "'", "vl.sample_collection_date <='" . $date." 23:59:00". "'"))
+                                                ->where('vl.sample_type="'.$sample['sample_id'].'"')
+                                                ->where(array('vl.result<1000'));
+                                if($params['facilityId'] !=''){
+                                    $lessThanQuery = $lessThanQuery->where(array("vl.facility_id ='".base64_decode($params['facilityId'])."'")); 
+                                }
+                                if(isset($params['gender'] ) && trim($params['gender'])!=''){
+                                    $lessThanQuery = $lessThanQuery->where(array("vl.patient_gender ='".$params['gender']."'")); 
+                                }
+                                if(isset($params['age']) && trim($params['age'])!=''){
+                                    $expAge=explode("-",$params['age']);
+                                    if(trim($expAge[0])!="" && trim($expAge[1])!=""){
+                                        $lessThanQuery=$lessThanQuery->where("(vl.patient_age_in_years>='".$expAge[0]."' AND vl.patient_age_in_years<='".$expAge[1]."')");
+                                    }else{
+                                        $lessThanQuery = $lessThanQuery->where(array("vl.patient_age_in_years >'".$expAge[0]."'"));
+                                    }
+                                }
+                                if(isset($params['adherence']) && trim($params['adherence'])!=''){
+                                    $lessThanQuery = $lessThanQuery->where(array("vl.arv_adherance_percentage ='".$params['adherence']."'")); 
+                                }
+                                $lQueryStr = $sql->getSqlStringForSqlObject($lessThanQuery);
+                                $lessResult[$i] = $dbAdapter->query($lQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
+                                $result[$sample['sample_name']]['VL (< 1000 cp/ml)'][$j] = $lessTotal+$lessResult[$i]['total'];
+                            }
+                            
+                            if(isset($params['testResult']) && ($params['testResult']=="" || $params['testResult']=='>1000')){
+                                $greaterThanQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))->columns(array('total' => new Expression('COUNT(*)')))
+                                                    ->join(array('fd'=>'facility_details'),'fd.facility_id=vl.facility_id',array('facility_name'))
+                                                    ->where(array('fd.facility_type'=>'1'))
+                                                    ->where(array("vl.sample_collection_date >='" . $date ." 00:00:00". "'", "vl.sample_collection_date <='" . $date." 23:59:00". "'"))
+                                                    ->where('vl.sample_type="'.$sample['sample_id'].'"')
+                                                    ->where(array('vl.result>1000'));
+                                if($params['facilityId'] !=''){
+                                    $greaterThanQuery = $greaterThanQuery->where(array("vl.facility_id ='".base64_decode($params['facilityId'])."'")); 
+                                }
+                                if(isset($params['gender'] ) && trim($params['gender'])!=''){
+                                    $greaterThanQuery = $greaterThanQuery->where(array("vl.patient_gender ='".$params['gender']."'")); 
+                                }
+                                if(isset($params['age']) && trim($params['age'])!=''){
+                                    $expAge=explode("-",$params['age']);
+                                    if(trim($expAge[0])!="" && trim($expAge[1])!=""){
+                                        $greaterThanQuery=$greaterThanQuery->where("(vl.patient_age_in_years>='".$expAge[0]."' AND vl.patient_age_in_years<='".$expAge[1]."')");
+                                    }else{
+                                        $greaterThanQuery = $greaterThanQuery->where(array("vl.patient_age_in_years >'".$expAge[0]."'"));
+                                    }
+                                }
+                                if(isset($params['adherence']) && trim($params['adherence'])!=''){
+                                    $greaterThanQuery = $greaterThanQuery->where(array("vl.arv_adherance_percentage ='".$params['adherence']."'")); 
+                                }
+                                $gQueryStr = $sql->getSqlStringForSqlObject($greaterThanQuery);
+                                $greaterResult[$i] = $dbAdapter->query($gQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
+                                $result[$sample['sample_name']]['VL (> 1000 cp/ml)'][$j] = $greaterTotal+$greaterResult[$i]['total'];
+                            }
+                            
+                            if(isset($params['testResult']) && $params['testResult']==""){
+                                $notDetectQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))->columns(array('total' => new Expression('COUNT(*)')))
+                                                ->join(array('fd'=>'facility_details'),'fd.facility_id=vl.facility_id',array('facility_name'))
+                                                ->where(array('fd.facility_type'=>'1'))
+                                                ->where(array("vl.sample_collection_date >='" . $date ." 00:00:00". "'", "vl.sample_collection_date <='" . $date." 23:59:00". "'"))
+                                                ->where('vl.sample_type="'.$sample['sample_id'].'"')
+                                                ->where(array('vl.result'=>'Target Not Detected'));
+                                if($params['facilityId'] !=''){
+                                    $notDetectQuery = $notDetectQuery->where(array("vl.facility_id ='".base64_decode($params['facilityId'])."'")); 
+                                }
+                                if($params['gender'] !=''){
+                                    $notDetectQuery = $notDetectQuery->where(array("vl.patient_gender ='".$params['gender']."'")); 
+                                }
+                                if(isset($params['age']) && trim($params['age'])!=''){
+                                    $expAge=explode("-",$params['age']);
+                                    if(trim($expAge[0])!="" && trim($expAge[1])!=""){
+                                        $notDetectQuery=$notDetectQuery->where("(vl.patient_age_in_years>='".$expAge[0]."' AND vl.patient_age_in_years<='".$expAge[1]."')");
+                                    }else{
+                                        $notDetectQuery = $notDetectQuery->where(array("vl.patient_age_in_years >'".$expAge[0]."'"));
+                                    }
+                                }
+                                if(isset($params['adherence']) && trim($params['adherence'])!=''){
+                                    $notDetectQuery = $notDetectQuery->where(array("vl.arv_adherance_percentage ='".$params['adherence']."'")); 
+                                }
+                                $nQueryStr = $sql->getSqlStringForSqlObject($notDetectQuery);
+                                $notTargetResult[$i] = $dbAdapter->query($nQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
+                                $result[$sample['sample_name']]['VL Not Detected'][$j] = $notTargetTotal+$notTargetResult[$i]['total'];
+                            }
+                            $i++;
+                        }
+                        $result['date'][$j] = $dFormat;
+                        $j++;
+                    }
+                }
+            }
+            //\Zend\Debug\Debug::dump($result);die;
+            return $result;
+        }
+    }
+    
+    public function getClinicDistinicDate($cDate,$lastThirtyDay)
+    {
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $squery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
+                            ->columns(array(new Expression('DISTINCT YEAR(sample_collection_date) as year,MONTH(sample_collection_date) as month,DAY(sample_collection_date) as day')))
+                            ->join(array('fd'=>'facility_details'),'fd.facility_id=vl.facility_id',array('facility_name'))
+                            ->where(array('fd.facility_type'=>'1'))
+                            ->where('vl.lab_id !=0')
+                            ->order('month ASC')->order('day ASC');
+        if(isset($cDate) && trim($cDate)!= ''){
+            $squery = $squery->where(array("vl.sample_collection_date <='" . $cDate ." 23:59:00". "'", "vl.sample_collection_date >='" . $lastThirtyDay." 00:00:00". "'"));
+        }
+        $sQueryStr = $sql->getSqlStringForSqlObject($squery);
+        $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+        return $sResult;
+    }
 }

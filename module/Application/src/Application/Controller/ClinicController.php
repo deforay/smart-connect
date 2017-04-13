@@ -4,6 +4,7 @@ namespace Application\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
+use Zend\Json\Json;
 
 class ClinicController extends AbstractActionController
 {
@@ -25,6 +26,7 @@ class ClinicController extends AbstractActionController
                 'clinicName' => $clinicName,
             ));
     }
+    
     public function overallViralLoadAction()
     {
         $request = $this->getRequest();
@@ -39,7 +41,30 @@ class ClinicController extends AbstractActionController
             return $viewModel;
         }
     }
-
-
+    
+    public function testResultAction() {
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $sampleService = $this->getServiceLocator()->get('SampleService');
+            $result = $sampleService->getAllTestResults($params);
+            return $this->getResponse()->setContent(Json::encode($result));
+        }
+    }
+    
+    public function getSampleTestResultAction()
+    {
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $sampleService = $this->getServiceLocator()->get('SampleService');
+            $result = $sampleService->getClinicSampleTestedResults($params);
+            $sampleType = $sampleService->getSampleType();
+            $viewModel = new ViewModel();
+            $viewModel->setVariables(array('result' => $result,'sampleType'=>$sampleType))
+                        ->setTerminal(true);
+            return $viewModel;
+        }
+    }
 }
 

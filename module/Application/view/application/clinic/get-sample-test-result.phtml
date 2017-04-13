@@ -1,0 +1,77 @@
+<?php
+//\Zend\Debug\Debug::dump($result);die;
+?>
+<div id="samplesTestedVsSupressed"></div>
+
+<script>
+       $(function () {
+        $('#samplesTestedVsSupressed').highcharts({
+        chart: {
+            type: 'column'
+        },
+        title: {
+            text: ''
+        },
+        xAxis: {
+            categories: [<?php
+            if(isset($result['date']) && count($result['date'])>0){
+            foreach($result['date'] as $date){
+                echo "'".$date."',";
+            }
+            }
+            ?>]
+        },
+        yAxis: {
+            allowDecimals: false,
+            min: 0,
+            title: {
+                text: ''
+            }
+        },
+        tooltip: {
+            formatter: function () {
+                return '<b>' + this.x + '</b><br/>' +
+                    this.series.name + ': ' + this.y + '<br/>' +
+                    'Total: ' + this.point.stackTotal;
+            }
+        },
+        plotOptions: {
+            column: {
+                stacking: 'normal',
+                pointPadding: 0.2,
+                borderWidth: 0,
+                cursor: 'pointer',
+                point: {
+                    events: {
+                        click: function () {
+                            window.location.href='/labs/samples-tested';
+                        }
+                    }
+                }
+            }
+        },
+        series: [
+            <?php
+            //$name = 'female';
+            foreach($sampleType as $sample){
+                if(isset($result[$sample['sample_name']])){
+                    foreach($result[$sample['sample_name']] as $key=>$condition){
+                    ?>
+                    {
+                    name:'<?php echo $sample['sample_name']." - ".$key;?>',
+                    data:[<?php
+                        foreach($condition as $count){
+                            echo $count.",";
+                        }
+                    ?>],
+                    stack:'<?php echo $sample['sample_name'];?>'
+                    },
+                    <?php
+                    }
+                }
+            }
+            ?>
+        ],
+    });
+    });
+</script>

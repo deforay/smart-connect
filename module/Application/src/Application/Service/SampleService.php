@@ -332,4 +332,15 @@ class SampleService {
         return $facilityDb->fetchAllClinicName();
     }
     
+    public function getAllTestResults($params)
+    {
+        $sampleDb = $this->sm->get('SampleTable');
+        return $sampleDb->fetchAllTestResults($params);
+    }
+    
+    public function getClinicSampleTestedResults($params)
+    {
+        $sampleDb = $this->sm->get('SampleTable');
+        return $sampleDb->fetchClinicSampleTestedResults($params);
+    }
 }
