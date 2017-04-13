@@ -569,6 +569,9 @@ class SampleTable extends AbstractTableGateway {
             $squery = $squery->where('vl.patient_age_in_years'.$params['age']);
             }
         }
+        if(isset($params['adherence']) && trim($params['adherence'])!=''){
+            $squery = $squery->where(array("vl.arv_adherance_percentage ='".$params['adherence']."'")); 
+        }
         $sQueryStr = $sql->getSqlStringForSqlObject($squery);
         $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         return $sResult;
@@ -592,6 +595,71 @@ class SampleTable extends AbstractTableGateway {
         $gTotal = $this->fetchChartOverAllLoadResult($params,$where);
         
         return array($testedTotal,$lessTotal,$gTotal,$overAllTotal);
+    }
+    public function fetchSampleTestedReason($params)
+    {
+        $rResult = '';
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $common = new CommonService();
+        $cDate = date('Y-m-d');
+        $lastThirtyDay = date('Y-m-d', strtotime('-30 days'));
+        if(isset($params['sampleCollectionDate']) && trim($params['sampleCollectionDate'])!= ''){
+            $s_c_date = explode("to", $params['sampleCollectionDate']);
+            if (isset($s_c_date[0]) && trim($s_c_date[0]) != "") {
+              $lastThirtyDay = trim($s_c_date[0]);
+            }
+            if (isset($s_c_date[1]) && trim($s_c_date[1]) != "") {
+              $cDate = trim($s_c_date[1]);
+            }
+        }
+        $sResult = $this->getDistinicDate($cDate,$lastThirtyDay);
+        $rsQuery = $sql->select()->from(array('r'=>'r_vl_test_reasons'));
+        if(isset($params['testReason']) && $params['testReason']!=''){
+            $rsQuery = $rsQuery->where('r.test_reason_id="'.base64_decode(trim($params['testReason'])).'"');
+        }
+        $rsQueryStr = $sql->getSqlStringForSqlObject($rsQuery);
+        $testReason = $dbAdapter->query($rsQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+        if($sResult && $testReason){
+             $i = 0;
+            foreach($testReason as $reason){
+                $j = 0;
+                foreach($sResult as $sampleData){
+                    if($sampleData['year']!=NULL){
+                        $date = $sampleData['year']."-".$sampleData['month']."-".$sampleData['day'];
+                        $dFormat = date("d M", strtotime($date));
+                        $rQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))->columns(array('total' => new Expression('COUNT(*)')))
+                                        ->join(array('rst'=>'r_sample_type'),'rst.sample_id=vl.sample_type')
+                                        ->where(array("vl.sample_collection_date >='" . $date ." 00:00:00". "'", "vl.sample_collection_date <='" . $date." 23:59:00". "'"))
+                                        ->where('vl.facility_id !=0')
+                                        ->where('vl.reason_for_vl_testing="'.$reason['test_reason_id'].'"');
+                        if(isset($params['clinicId']) && $params['clinicId']!=''){
+                            $rQuery = $rQuery->where('vl.facility_id="'.base64_decode(trim($params['clinicId'])).'"');
+                        }
+                        if(isset($params['sampleId']) && $params['sampleId']!=''){
+                            $rQuery = $rQuery->where('vl.sample_type="'.base64_decode(trim($params['sampleId'])).'"');
+                        }
+                        if(isset($params['testResult']) && $params['testResult']!=''){
+                            $rQuery = $rQuery->where('vl.result'.$params['testResult']);
+                        }
+                        if(isset($params['age']) && $params['age']!=''){
+                            $age = explode("-",$params['age']);
+                            if(isset($age[1])){
+                            $rQuery = $rQuery->where(array("vl.patient_age_in_years >='".$age[0]."'","vl.patient_age_in_years <='".$age[1]."'"));
+                            }else{
+                            $rQuery = $rQuery->where('vl.patient_age_in_years'.$params['age']);
+                            }
+                        }
+                        $rQueryStr = $sql->getSqlStringForSqlObject($rQuery);
+                        $rResult[$reason['test_reason_name']][$j] = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
+                        $rResult['date'][$j] = $dFormat;
+                    }
+                    $j++;
+                    }
+                    $i++;
+                }
+            }
+        return $rResult;
     }
     public function fetchChartOverAllLoadResult($params,$where)
     {

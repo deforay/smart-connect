@@ -20,10 +20,12 @@ class ClinicController extends AbstractActionController
         $sampleService = $this->getServiceLocator()->get('SampleService');
         $sampleType = $sampleService->getSampleType();
         $clinicName = $sampleService->getAllClinicName();
+        $testReasonName = $sampleService->getAllTestReasonName();
         $this->layout()->setVariable('activeTab', 'clinics-dashboard');          
         return new ViewModel(array(
                 'sampleType' => $sampleType,
                 'clinicName' => $clinicName,
+                'testReason' => $testReasonName,
             ));
     }
     
@@ -65,6 +67,20 @@ class ClinicController extends AbstractActionController
                         ->setTerminal(true);
             return $viewModel;
         }
+    }
+    public function getSampleTestReasonAction()
+    {
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $sampleService = $this->getServiceLocator()->get('SampleService');
+            $result = $sampleService->fetchSampleTestedReason($params);
+            $testReasonName = $sampleService->getAllTestReasonName();
+            $viewModel = new ViewModel();
+            $viewModel->setVariables(array('result' => $result,'testReason' => $testReasonName))
+                        ->setTerminal(true);
+            return $viewModel;
+        }   
     }
 }
 

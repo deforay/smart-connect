@@ -1,0 +1,96 @@
+<div id="vlOrderedContainer" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+<?php
+//\Zend\Debug\Debug::dump($result);die;
+?>
+<script>
+    $(function () {
+    $('#vlOrderedContainer').highcharts({
+        chart: {
+            type: 'column'
+        },
+        title: {
+            text: ''
+        },
+        xAxis: {
+            categories: [<?php
+            if(isset($result['date']) && count($result['date'])>0){
+            foreach($result['date'] as $date){
+                echo "'".$date."',";
+            }
+            }
+            ?>]
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                text: 'Samples'
+            },
+            stackLabels: {
+                enabled: true,
+                style: {
+                    fontWeight: 'bold',
+                    color: (Highcharts.theme && Highcharts.theme.textColor) || 'gray'
+                }
+            }
+        },
+        legend: {
+            align: 'right',
+            x: 0,
+            verticalAlign: 'top',
+            y: -3,
+            floating: true,
+            backgroundColor: (Highcharts.theme && Highcharts.theme.background2) || 'white',
+            borderColor: '#CCC',
+            borderWidth: 1,
+            shadow: false
+        },
+        tooltip: {
+            headerFormat: '<b>{point.x}</b><br/>',
+            pointFormat: '{series.name}: {point.y}<br/>Total: {point.stackTotal}'
+        },
+        plotOptions: {
+            column: {
+                stacking: 'normal',
+                dataLabels: {
+                    enabled: true,
+                    color: (Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'white',
+                    style: {
+                        textShadow: '0 0 3px black'
+                    }
+                }
+            }
+        },
+        series: [
+        <?php foreach($testReason as $reason)
+        {
+            $k = 0;
+            ?>
+            {
+                name:'<?php echo $reason['test_reason_name'];?>',
+                data:[
+                <?php
+                if(isset($result[$reason['test_reason_name']])){
+                foreach($result[$reason['test_reason_name']] as $total){
+                    if($k<4)
+                    {
+                        echo $total['total'].",";
+                    }else{
+                        echo $total['total'];
+                    }
+                    $k++;
+                    }
+                }
+                ?>
+                ]
+            },
+            <?php
+        }
+        ?>],
+        
+    colors: [
+        '#9CC4E4', '#3A89C9' ,'#1B325F'
+    ]
+    });
+    
+    });
+    </script>

@@ -98,7 +98,7 @@ foreach($sampleType as $samples){
                             <div class="form-group col-lg-4">
                                 <label class="control-label">ARV Adherence</label>
                                 <select class="form-control" name="adherence" id="adherence">
-                                  <option>--Select--</option>
+                                  <option value=''>--Select--</option>
                                   <option value="good">Good >= 95%</option>
                                   <option value="fair">Fair 85-94%</option>
                                   <option value="poor">Poor < 85%</option>
@@ -107,7 +107,7 @@ foreach($sampleType as $samples){
                             <div class="form-group col-lg-4">
                                 <label class="control-label">Gender</label>
                               <select class="form-control" name="gender" id="gender">
-                                <option>--Select--</option>
+                                <option value=''>--Select--</option>
                                 <option value="male">Male</option>
                                 <option value="female">Female</option>
                                 <option value="other">Other</option>
@@ -153,32 +153,22 @@ foreach($sampleType as $samples){
                                     </div>
                                     <div class="actions">
                                         <div class="btn-group">
-                                            <a href="" class="btn white btn-outline btn-circle btn-sm dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-close-others="true"> Filter Range
-                                                <span class="fa fa-angle-down"> </span>
-                                            </a>
-                                            <ul class="dropdown-menu pull-right">
-                                                <li class="active">
-                                                    <a href="javascript:;"> Weekly
-                                                    </a>
-                                                </li>
-                                                <li>
-                                                    <a href="javascript:;"> Monthly
-                                                    </a>
-                                                </li>
-                                                <li>
-                                                    <a href="javascript:;"> Quarterly
-                                                    </a>
-                                                </li>
-                                                <li>
-                                                    <a href="javascript:;"> Yearly
-                                                    </a>
-                                                </li>
-                                            </ul>
+                                            <select id="testReason" class="btn white btn-outline btn-circle btn-sm dropdown-toggle">
+                                                <option value="">Test Reasons</option>
+                                                <?php
+                                                foreach($testReason as $test)
+                                                {
+                                                    ?>
+                                                    <option value="<?php echo base64_encode($test['test_reason_id']);?>"><?php echo $test['test_reason_name'];?></option>
+                                                    <?php
+                                                }
+                                                ?>
+                                            </select>
                                         </div>
-                                    </div>                                    
+                                    </div>                                   
                                 </div>
-                                <div class="portlet-body">
-                                    <div id="vlOrderedContainer" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+                                <div class="portlet-body" id="samplesTestedReason">
+                                    
                                 </div>
                             </div>
                         </div>
@@ -299,75 +289,8 @@ foreach($sampleType as $samples){
                 $('#dashboard-report-range').show();
         
         getOverAllViralLoad();
-        
-        
-    $('#vlOrderedContainer').highcharts({
-        chart: {
-            type: 'column'
-        },
-        title: {
-            text: ''
-        },
-        xAxis: {
-            categories: ["21 Apr", "22 Apr", "23 Apr", "24 Apr", "25 Apr", "26 Apr", "27 Apr"]
-        },
-        yAxis: {
-            min: 0,
-            title: {
-                text: 'Samples'
-            },
-            stackLabels: {
-                enabled: true,
-                style: {
-                    fontWeight: 'bold',
-                    color: (Highcharts.theme && Highcharts.theme.textColor) || 'gray'
-                }
-            }
-        },
-        legend: {
-            align: 'right',
-            x: 0,
-            verticalAlign: 'top',
-            y: -3,
-            floating: true,
-            backgroundColor: (Highcharts.theme && Highcharts.theme.background2) || 'white',
-            borderColor: '#CCC',
-            borderWidth: 1,
-            shadow: false
-        },
-        tooltip: {
-            headerFormat: '<b>{point.x}</b><br/>',
-            pointFormat: '{series.name}: {point.y}<br/>Total: {point.stackTotal}'
-        },
-        plotOptions: {
-            column: {
-                stacking: 'normal',
-                dataLabels: {
-                    enabled: true,
-                    color: (Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'white',
-                    style: {
-                        textShadow: '0 0 3px black'
-                    }
-                }
-            }
-        },
-        series: [{
-            name: 'Routine Monitoring',
-            data: [5, 8, 9, 12, 10,5, 8]
-        }, {
-            name: 'Repeat VL Test',
-            data: [3, 6, 3, 6, 7,3, 6]
-        }, {
-            name: 'Suspected Treatment Failure',
-            data: [1, 4, 1, 4, 2,2, 5]
-        }],
-    colors: [
-        '#9CC4E4', '#3A89C9' ,'#1B325F'
-    ]
-    });
-    
-    
-    
+        getAllTestReason();
+         
 $('#combochart').highcharts({
 
         chart: {
@@ -450,7 +373,6 @@ $('#combochart').highcharts({
     //$(".datatables").dataTable();    
     oTable=$('#testResults').dataTable( {
         
-        "bAutoWidth": false,
 			"bProcessing": true,
 			"bServerSide": true,
         "aoColumns": [
@@ -460,6 +382,7 @@ $('#combochart').highcharts({
             {"sClass":"center"},
             {"sClass":"center","bSortable":false}
             ],
+        "iDisplayLength": 10,
         "aaSorting": [[ 1, "desc" ]],
 
         "sAjaxSource": "<?php echo $this->url('clinics',array('action' => 'test-result')); ?>",
@@ -490,7 +413,9 @@ function getOverAllViralLoad()
     sampleId = $("#sampleId").val();
     testResult = $("#testResult").val();
     age = $("#age").val();
-    $.post("<?php echo $this->url('clinics', array('action' => 'overall-viral-load')); ?>",{sampleCollectionDate:dateRange,clinicId:clinicId,sampleId:sampleId,testResult:testResult,age:age},
+    gender = $("#gender").val();
+    adherence = $("#adherence").val();
+    $.post("<?php echo $this->url('clinics', array('action' => 'overall-viral-load')); ?>",{sampleCollectionDate:dateRange,clinicId:clinicId,sampleId:sampleId,testResult:testResult,age:age,gender:gender,adherence:adherence},
     function(data) {
     $("#viralLoadTable").html(data);
     });
@@ -500,6 +425,7 @@ function searchData(){
     //alert($('#sampleCollectionDate').val());
     //console.log(oTable.fnDraw());
     getOverAllViralLoad();
+    getAllTestReason();
 }
 
     function getTestedSampleResult()
@@ -516,6 +442,22 @@ function searchData(){
         $("#samplesTestedResult").html(data);
         });
     }
+    function getAllTestReason()
+    {
+        sampleType = $("#sampleId").val();
+        testResult = $("#testResult").val();
+        age = $("#age").val();
+        dateRange = $("#sampleCollectionDate").val();
+        clinicId = $("#clinicId").val();
+        gender = $("#gender").val();
+        adherence = $("#adherence").val();
+        testReason = $("#testReason").val();
+        $.post("<?php echo $this->url('clinics', array('action' => 'get-sample-test-reason')); ?>",{sampleCollectionDate:dateRange,sampleType:sampleType,facilityId:clinicId,gender:gender,age:age,testResult:testResult,adherence:adherence,testReason:testReason},
+        function(data) {
+        $("#samplesTestedReason").html(data);
+        });
+    }
+    
 </script>        
         
         

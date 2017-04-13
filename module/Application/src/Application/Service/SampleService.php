@@ -311,6 +311,16 @@ class SampleService {
         $sampleDb = $this->sm->get('SampleTable');
         return $sampleDb->fetchChartOverAllLoadStatus($params);
     }
+    public function fetchSampleTestedReason($params)
+    {
+        $sampleDb = $this->sm->get('SampleTable');
+        return $sampleDb->fetchSampleTestedReason($params);
+    }
+    public function getAllTestReasonName()
+    {
+        $reasonDb = $this->sm->get('TestReasonTable');
+        return $reasonDb->fetchAllTestReasonName();
+    }
     //clinic details end
     
     //get all smaple type
