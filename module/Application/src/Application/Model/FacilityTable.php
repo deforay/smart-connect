@@ -27,6 +27,46 @@ class FacilityTable extends AbstractTableGateway {
         $this->adapter = $adapter;
     }
     
+    public function saveFacility($params){
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        
+        if(!isset($params['vlsm_instance_id']) || $params['vlsm_instance_id'] == ''){
+            $params['vlsm_instance_id'] = 'mozambiquedisaopenldr';
+        }
+        
+        if(!isset($params['facility_name']) || $params['facility_name'] == ''){
+            $params['facility_name'] = $params['facility_code'];
+        }
+        
+        
+        $fQuery = $sql->select()->from(array('f'=>'facility_details'))
+                      ->where('f.facility_code=?',$params['facility_code'])
+                      ->where('f.vlsm_instance_id=?',$params['vlsm_instance_id']);
+        
+        $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
+
+        $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+        if(count($rResult) > 0){
+            return true;
+        }else{
+            $newData=array(
+                           'vlsm_instance_id'=>$params['vlsm_instance_id'],
+                           'facility_name'=>$params['facility_name'],
+                           'facility_code'=>$params['facility_code'],
+                           'facility_state'=>$params['facility_province'],
+                           'facility_country'=>$params['facility_country'],
+                           'latitude'=>$params['facility_latitude'],
+                           'longitude'=>$params['facility_longitude'],
+                           'status'=>'active'
+                           );
+
+            $this->insert($newData);
+            return $this->lastInsertValue;            
+
+        }
+    }
+
     public function fetchAllLabName()
     {
         $dbAdapter = $this->adapter;
