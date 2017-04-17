@@ -806,8 +806,38 @@ class SampleTable extends AbstractTableGateway {
                 ->columns(array('vl_sample_id','sample_code','sample_collection_date','sample_type','sample_testing_date','result_value_log','result_value_absolute','result_value_text','result'))
 				->join(array('fd'=>'facility_details'),'fd.facility_id=vl.facility_id',array('facility_name'))
 				->where(array('fd.facility_type'=>'1'));
-		
-        		
+        $cDate = ''; $lastThirtyDay = '';
+	if(isset($parameters['sampleCollectionDate']) && trim($parameters['sampleCollectionDate'])!= ''){
+            $s_c_date = explode("to", $parameters['sampleCollectionDate']);
+            if (isset($s_c_date[0]) && trim($s_c_date[0]) != "") {
+              $lastThirtyDay = trim($s_c_date[0]);
+            }
+            if (isset($s_c_date[1]) && trim($s_c_date[1]) != "") {
+              $cDate = trim($s_c_date[1]);
+            }
+        }
+        if($cDate!='' && $lastThirtyDay!='')
+        {
+            $sQuery = $sQuery->where(array("vl.sample_collection_date <='" . $cDate ." 23:59:00". "'", "vl.sample_collection_date >='" . $lastThirtyDay." 00:00:00". "'"));
+        }
+        if($parameters['facilityId'] !=''){
+            $sQuery = $sQuery->where(array("vl.facility_id ='".base64_decode($parameters['facilityId'])."'")); 
+        }
+        if(isset($parameters['gender'] ) && trim($parameters['gender'])!=''){
+            $sQuery = $sQuery->where(array("vl.patient_gender ='".$parameters['gender']."'")); 
+        }
+        if(isset($parameters['age']) && trim($parameters['age'])!=''){
+            $expAge=explode("-",$parameters['age']);
+            if(trim($expAge[0])!="" && trim($expAge[1])!=""){
+                $sQuery=$sQuery->where("(vl.patient_age_in_years>='".$expAge[0]."' AND vl.patient_age_in_years<='".$expAge[1]."')");
+            }else{
+                $sQuery = $sQuery->where(array("vl.patient_age_in_years >'".$expAge[0]."'"));
+            }
+        }
+        if(isset($parameters['adherence']) && trim($parameters['adherence'])!=''){
+            $sQuery = $sQuery->where(array("vl.arv_adherance_percentage ='".$parameters['adherence']."'")); 
+        }
+        
         if (isset($sWhere) && $sWhere != "") {
             $sQuery->where($sWhere);
         }
