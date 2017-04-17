@@ -236,37 +236,7 @@ foreach($sampleType as $samples){
 <script>
     var oTable = null;
     $(function () {
-         oTable = $('#testResults').DataTable( {
-        
-			"bProcessing": true,
-			"bServerSide": true,
-        "aoColumns": [
-            {"sClass":"center"},
-            {"sClass":"center"},
-            {"sClass":"center"},
-            {"sClass":"center"},
-            {"sClass":"center","bSortable":false}
-            ],
-        "iDisplayLength": 10,
-        "aaSorting": [[ 1, "desc" ]],
-
-        "sAjaxSource": "<?php echo $this->url('clinics',array('action' => 'test-result')); ?>",
-        "fnServerData": function ( sSource, aoData, fnCallback ) {
-            aoData.push({ "name":"sampleCollectionDate","value": $("#sampleCollectionDate").val()});
-			aoData.push({ "name":"clinicId","value": $("#clinicId").val()});
-			aoData.push({ "name":"sampleId","value": $("#sampleId").val()});
-			aoData.push({ "name":"testResult","value": $("#testResult").val()});
-			aoData.push({ "name":"age","value": $("#age").val()});
-			aoData.push({ "name":"gender","value": $("#gender").val()});
-            $.ajax({
-                "dataType": 'json',
-                "type": "POST",
-                "url": sSource,
-                "data": aoData,
-                "success": fnCallback
-            });
-        }
-    } );
+         
          
         $('#dashboard-report-range').daterangepicker({
                 "ranges": {
@@ -320,8 +290,7 @@ foreach($sampleType as $samples){
                 $('#dashboard-report-range span').html(moment().subtract('days', 29).format('MMMM D, YYYY') + ' to ' + moment().format('MMMM D, YYYY'));
                 $('#dashboard-report-range').show();
         
-        getOverAllViralLoad();
-        getAllTestReason();
+        
          
 $('#combochart').highcharts({
 
@@ -400,13 +369,53 @@ $('#combochart').highcharts({
             stack: 'male'
         }]
     });    
-    
-    
-    //$(".datatables").dataTable();    
-   
-     getTestedSampleResult();
+     
+     getAllFunction()
+     
 });
+    function getAllFunction()
+    {
+        if( !$('#sampleCollectionDate').val() ) {
+            $('#sampleCollectionDate').val(moment().subtract('days', 29).format('YYYY-MM-DD') + ' to ' + moment().format('YYYY-MM-DD'));
+        }
+        getOverAllViralLoad();
+        getAllTestReason();
+        getTestedSampleResult();
+        testResul();
+    }
+function testResul()
+{
+    oTable = $('#testResults').DataTable( {
+        "bProcessing": true,
+	"bServerSide": true,
+        "aoColumns": [
+            {"sClass":"center"},
+            {"sClass":"center"},
+            {"sClass":"center"},
+            {"sClass":"center"},
+            {"sClass":"center","bSortable":false}
+            ],
+        "iDisplayLength": 10,
+        "aaSorting": [[ 1, "desc" ]],
 
+        "sAjaxSource": "<?php echo $this->url('clinics',array('action' => 'test-result')); ?>",
+        "fnServerData": function ( sSource, aoData, fnCallback ) {
+            aoData.push({ "name":"sampleCollectionDate","value": $("#sampleCollectionDate").val()});
+			aoData.push({ "name":"clinicId","value": $("#clinicId").val()});
+			aoData.push({ "name":"sampleId","value": $("#sampleId").val()});
+			aoData.push({ "name":"testResult","value": $("#testResult").val()});
+			aoData.push({ "name":"age","value": $("#age").val()});
+			aoData.push({ "name":"gender","value": $("#gender").val()});
+            $.ajax({
+                "dataType": 'json',
+                "type": "POST",
+                "url": sSource,
+                "data": aoData,
+                "success": fnCallback
+            });
+        }
+    } );
+}
 function getOverAllViralLoad()
 {
     

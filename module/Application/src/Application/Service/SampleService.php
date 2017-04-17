@@ -309,7 +309,8 @@ class SampleService {
     public function getChartOverAllLoadStatus($params)
     {
         $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->fetchChartOverAllLoadStatus($params);
+        $result =  $sampleDb->fetchChartOverAllLoadStatus($params);
+        return $result;
     }
     public function fetchSampleTestedReason($params)
     {

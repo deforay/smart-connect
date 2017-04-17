@@ -440,7 +440,6 @@ class SampleTable extends AbstractTableGateway {
         $avgResult = array();
         if($sResult && $sampleTypeResult){
             $j = 0;
-            
             foreach($sResult as $sampleData){
                 if($sampleData['year']!=NULL){
                     $date = $sampleData['year']."-".$sampleData['month']."-".$sampleData['day'];
@@ -449,16 +448,16 @@ class SampleTable extends AbstractTableGateway {
                     foreach($sampleTypeResult as $sample){
                         $lQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))->columns(array('sample_tested_datetime','sample_collection_date'))
                                             ->where(array("vl.sample_collection_date >='" . $date ." 00:00:00". "'", "vl.sample_collection_date <='" . $date." 23:59:00". "'"))
+                                            ->where(array('vl.sample_collection_date IS NOT NULL','vl.sample_tested_datetime IS NOT NULL'))
                                             ->where('vl.sample_type="'.$sample['sample_id'].'"');
                         $lQueryStr = $sql->getSqlStringForSqlObject($lQuery);
                         $lResult = $dbAdapter->query($lQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-                        
                         if(count($lResult)>0){
                         $total = 0;
                         foreach($lResult as $data){
-                            if($data['sample_tested_datetime']!='0000-00-00 00:00:00' && $data['sample_collection_date']!='0000-00-00 00:00:00'){
+                            if(($data['sample_tested_datetime']!='0000-00-00 00:00:00' && $data['sample_collection_date']!='0000-00-00 00:00:00') && ($data['sample_tested_datetime']!=NULL && $data['sample_collection_date']!=NULL)){
                             $date1 = $data['sample_collection_date'];$date2 = $data['sample_tested_datetime'];
-                            $hourdiff = round((strtotime($date2) - strtotime($date1))/3600, 1);
+                            $hourdiff = round((strtotime($date2) - strtotime($date1))/3600, 1)."<br/>";
                             $total = $total + ($hourdiff);
                             }
                         }
@@ -471,14 +470,14 @@ class SampleTable extends AbstractTableGateway {
                     }
                     //all result
                     $alQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))->columns(array('sample_tested_datetime','sample_collection_date'))
+                                            ->where(array('vl.sample_collection_date IS NOT NULL','vl.sample_tested_datetime IS NOT NULL'))
                                             ->where(array("vl.sample_collection_date >='" . $date ." 00:00:00". "'", "vl.sample_collection_date <='" . $date." 23:59:00". "'"));
                     $alQueryStr = $sql->getSqlStringForSqlObject($alQuery);
                     $alResult = $dbAdapter->query($alQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-                    
                     if(count($alResult)>0){
                     $total = 0;
                     foreach($alResult as $data){
-                        if($data['sample_tested_datetime']!='0000-00-00 00:00:00' && $data['sample_collection_date']!='0000-00-00 00:00:00'){
+                        if(($data['sample_tested_datetime']!='0000-00-00 00:00:00' && $data['sample_collection_date']!='0000-00-00 00:00:00') && ($data['sample_tested_datetime']!=NULL && $data['sample_collection_date']!=NULL)){
                         $date1 = $data['sample_collection_date'];$date2 = $data['sample_tested_datetime'];
                         $hourdiff = round((strtotime($date2) - strtotime($date1))/3600, 1);
                         $total = $total + ($hourdiff);
@@ -574,6 +573,10 @@ class SampleTable extends AbstractTableGateway {
         if(isset($params['testResult']) && $params['testResult']!=''){
             $squery = $squery->where('vl.result'.$params['testResult']);
         }
+        
+        if(isset($params['gender'] ) && trim($params['gender'])!=''){
+            $squery = $squery->where(array("vl.patient_gender ='".$params['gender']."'")); 
+        }
         if(isset($params['age']) && $params['age']!=''){
             $age = explode("-",$params['age']);
             if(isset($age[1])){
@@ -646,14 +649,17 @@ class SampleTable extends AbstractTableGateway {
                                         ->where(array("vl.sample_collection_date >='" . $date ." 00:00:00". "'", "vl.sample_collection_date <='" . $date." 23:59:00". "'"))
                                         ->where('vl.facility_id !=0')
                                         ->where('vl.reason_for_vl_testing="'.$reason['test_reason_id'].'"');
-                        if(isset($params['clinicId']) && $params['clinicId']!=''){
-                            $rQuery = $rQuery->where('vl.facility_id="'.base64_decode(trim($params['clinicId'])).'"');
+                        if(isset($params['facilityId']) && $params['facilityId']!=''){
+                            $rQuery = $rQuery->where('vl.facility_id="'.base64_decode(trim($params['facilityId'])).'"');
                         }
                         if(isset($params['sampleId']) && $params['sampleId']!=''){
                             $rQuery = $rQuery->where('vl.sample_type="'.base64_decode(trim($params['sampleId'])).'"');
                         }
                         if(isset($params['testResult']) && $params['testResult']!=''){
                             $rQuery = $rQuery->where('vl.result'.$params['testResult']);
+                        }
+                        if(isset($params['gender'] ) && trim($params['gender'])!=''){
+                            $rQuery = $rQuery->where(array("vl.patient_gender ='".$params['gender']."'")); 
                         }
                         if(isset($params['age']) && $params['age']!=''){
                             $age = explode("-",$params['age']);
@@ -702,6 +708,10 @@ class SampleTable extends AbstractTableGateway {
         }
         if(isset($params['testResult']) && $params['testResult']!=''){
             $squery = $squery->where('vl.result'.$params['testResult']);
+        }
+        
+        if(isset($params['gender'] ) && trim($params['gender'])!=''){
+            $squery = $squery->where(array("vl.patient_gender ='".$params['gender']."'")); 
         }
         if(isset($params['age']) && $params['age']!=''){
             $age = explode("-",$params['age']);
@@ -833,11 +843,14 @@ class SampleTable extends AbstractTableGateway {
         {
             $sQuery = $sQuery->where(array("vl.sample_collection_date <='" . $cDate ." 23:59:00". "'", "vl.sample_collection_date >='" . $lastThirtyDay." 00:00:00". "'"));
         }
-        if($parameters['facilityId'] !=''){
-            $sQuery = $sQuery->where(array("vl.facility_id ='".base64_decode($parameters['facilityId'])."'")); 
+        if($parameters['clinicId'] !=''){
+            $sQuery = $sQuery->where(array("vl.facility_id ='".base64_decode(trim($parameters['clinicId']))."'")); 
         }
         if(isset($parameters['gender'] ) && trim($parameters['gender'])!=''){
             $sQuery = $sQuery->where(array("vl.patient_gender ='".$parameters['gender']."'")); 
+        }
+        if(isset($parameters['sampleId'] ) && trim($parameters['sampleId'])!=''){
+            $sQuery = $sQuery->where('vl.sample_type="'.base64_decode(trim($parameters['sampleId'])).'"');
         }
         if(isset($parameters['age']) && trim($parameters['age'])!=''){
             $expAge=explode("-",$parameters['age']);
