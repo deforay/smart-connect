@@ -24,6 +24,7 @@ use Application\Model\FacilityTypeTable;
 use Application\Model\SampleStatusTable;
 use Application\Model\TestReasonTable;
 use Application\Model\SampleTypeTable;
+use Application\Model\GlobalTable;
 
 use Application\Service\CommonService;
 use Application\Service\UserService;
@@ -152,6 +153,10 @@ class Module
 				'SampleTypeTable' => function($sm) {
                     $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
                     $table = new SampleTypeTable($dbAdapter);
+                    return $table;
+                },'GlobalTable' => function($sm) {
+                    $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+                    $table = new GlobalTable($dbAdapter);
                     return $table;
                 },
                 'CommonService' => function($sm) {

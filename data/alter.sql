@@ -14,3 +14,5 @@ ALTER TABLE `samples` CHANGE `clinic_id` `clinic_id` INT(11) NULL DEFAULT NULL;
 ALTER TABLE `samples` CHANGE `sample_collection_date` `sample_collection_date` DATETIME NULL DEFAULT NULL;
 
 ALTER TABLE `samples` CHANGE `lab_tested_date` `lab_tested_date` DATETIME NULL DEFAULT NULL;
+--saravanan 18-apr-2017
+INSERT INTO `dash_global_config` (`name`, `display_name`, `value`) VALUES ('sample_waiting_month_range', 'Sample Waiting Month Range', '3');

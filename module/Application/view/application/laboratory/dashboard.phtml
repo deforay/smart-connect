@@ -359,59 +359,58 @@ foreach($sampleType as $samples){
         }
         function getSampleVolume()
         {
-            dateRange = $("#sampleCollectionDate").val();
+            
             sampleType = $("#sampleVolume").val();
             facilityId = $("#labName").val();
-            $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-volume')); ?>",{sampleCollectionDate:dateRange,sampleType:sampleType,facilityId:facilityId},
+            fromDate=$('#mrp-lowerDate').val();
+            toDate=$('#mrp-upperDate').val();
+            $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-volume')); ?>",{fromDate:fromDate,toDate:toDate,sampleType:sampleType,facilityId:facilityId},
             function(data) {
             $("#pieChartLabResult").html(data);
             });
         }
         function getLabTime()
         {
-            dateRange = $("#sampleCollectionDate").val();
+            fromDate=$('#mrp-lowerDate').val();
+            toDate=$('#mrp-upperDate').val();
             facilityId = $("#labName").val();
-            $.post("<?php echo $this->url('laboratory', array('action' => 'get-lab-turn-around-time')); ?>",{sampleCollectionDate:dateRange,facilityId:facilityId},
+            $.post("<?php echo $this->url('laboratory', array('action' => 'get-lab-turn-around-time')); ?>",{fromDate:fromDate,toDate:toDate,facilityId:facilityId},
             function(data) {
             $("#labAverageTat").html(data);
             });
         }
         function getLabFacilities()
         {
-            dateRange = $("#sampleCollectionDate").val();
+            fromDate=$('#mrp-lowerDate').val();
+            toDate=$('#mrp-upperDate').val();
             facilityId = $("#labName").val();
-            $.post("<?php echo $this->url('laboratory', array('action' => 'get-lab-facilities')); ?>",{sampleCollectionDate:dateRange,facilityId:facilityId},
+            $.post("<?php echo $this->url('laboratory', array('action' => 'get-lab-facilities')); ?>",{fromDate:fromDate,toDate:toDate,facilityId:facilityId},
             function(data) {
             $("#gmap-polyline-data").html(data);
             });
         }
             
             $(function () {
-                
-                $.blockUI.defaults.css.border = '1px solid grey'; 
-                $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
-                
-
                 $(".fetchAll").on("change", function(){
                     getEverything();
                 });
-                
                 getEverything();    
-});
+            });
             
         function getEverything(){
-
+            $.blockUI.defaults.css.border = '1px solid grey'; 
+                $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
             if( !$('#sampleCollectionDate').val() ) {
               $('#sampleCollectionDate').val(moment().subtract('days', 179).format('YYYY-MM-DD') + ' to ' + moment().format('YYYY-MM-DD'));
             }
             
             getSampleResult();
-            getTestedSampleResult();
-            getTestedSampleResultBasedVolume();
             getRequisitionFormsTested();
             getSampleVolume();
             getLabTime();
             getLabFacilities();
+            getTestedSampleResult();
+            getTestedSampleResultBasedVolume();
         }            
             
         var MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
@@ -709,8 +708,8 @@ function paintMonths(){
     else{
     endmonth = endmonth;    
     }
-     $('#mrp-lowerDate').val(startyear+' - '+startmonth);
-    $('#mrp-upperDate').val(endyear+' - '+endmonth);
+     $('#mrp-lowerDate').val(startyear+'-'+startmonth);
+    $('#mrp-upperDate').val(endyear+'-'+endmonth);
    
     
   	if(startyear == parseInt($('.mpr-calendar:first h5 span').html()))
