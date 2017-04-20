@@ -50,26 +50,19 @@
                 }
             }
         },
-        series: [
-            <?php
-            $name = 'female';
-            foreach($sampleType as $sample){
-                if(isset($result[$sample['sample_name']])){
-                    foreach($result[$sample['sample_name']] as $key=>$condition){
-                    ?>
-                    {
-                    name:'<?php echo $sample['sample_name']." - ".$key;?>',
-                    data:[<?php
-                        foreach($condition as $count){
-                            echo $count.",";
-                        }
-                    ?>],
-                    stack:'<?php echo $sample['sample_name'];?>'
-                    },
-                    <?php
-                    }
-                }
-            }
+        series: [<?php
+              foreach($result['sampleName'] as $key=>$condition){
+              ?>
+              {
+              name:'<?php echo $key;?>',
+              data:[<?php
+                  foreach($condition as $count){
+                      echo $count.",";
+                  }
+              ?>],
+              },
+              <?php
+              }
             ?>
         ],
     });
