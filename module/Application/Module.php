@@ -31,6 +31,7 @@ use Application\Service\UserService;
 use Application\Service\OrganizationService;
 use Application\Service\SourceService;
 use Application\Service\SampleService;
+use Application\Service\ConfigService;
 
 use Zend\Mvc\ModuleRouteListener;
 use Zend\Mvc\MvcEvent;
@@ -173,6 +174,9 @@ class Module
                 },
                 'SampleService' => function($sm) {
                     return new SampleService($sm);
+                },
+				'ConfigService' => function($sm) {
+                    return new ConfigService($sm);
                 },
             ),
           

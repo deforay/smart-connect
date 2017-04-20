@@ -142,6 +142,16 @@ return array(
                     ),
                 ),
             ),
+            'config' => array(
+                'type'    => 'segment',
+                'options' => array(
+                    'route'    => '/config[/][:action][/:id]',
+                    'defaults' => array(
+                        'controller' => 'Application\Controller\Config',
+                        'action' => 'index',
+                    ),
+                ),
+            ),
         ),
     ),
     'service_manager' => array(
@@ -165,6 +175,7 @@ return array(
             'Application\Controller\VlRequest' => 'Application\Controller\VlRequestController',
             'Application\Controller\Source' => 'Application\Controller\SourceController',
             'Application\Controller\Common' => 'Application\Controller\CommonController',
+            'Application\Controller\Config' => 'Application\Controller\ConfigController',
         ),
     ),
     'view_manager' => array(

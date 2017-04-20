@@ -158,7 +158,13 @@ $logincontainer = new Container('credo');
                                 <span class="selected"></span>
                             </a>
                         </li>
-                       
+                       <li class="nav-item start <?php echo ($activeTab == 'config' ? " active open " : ""); ?>">
+                            <a href="<?php echo $this->url('config', array('action' => 'index')) ?>" class="nav-link nav-toggle">
+                                <i class="icon-settings"></i>
+                                <span class="title">Global Config</span>
+                                <span class="selected"></span>
+                            </a>
+                        </li>
                         
                         <li class="nav-item <?php echo ($activeTab == 'vl-request' ? " active open " : ""); ?> ">
                             <a href="javascript:;" class="nav-link nav-toggle">
@@ -167,7 +173,7 @@ $logincontainer = new Container('credo');
                                 <span class="arrow"></span>
                             </a>
                             <ul class="sub-menu">
-                                <li class="nav-item  <?php echo ($activeMenu == 'vl-request' ? " active open " : ""); ?>  ">
+                                <li class="nav-item  <?php echo (isset($activeMenu) && $activeMenu == 'vl-request' ? " active open " : ""); ?>  ">
                                     <a href="/vl-request/import-file" class="nav-link ">
                                       <i class="fa fa-angle-right"></i>   <span class="title">Import Excel</span>
                                     </a>
