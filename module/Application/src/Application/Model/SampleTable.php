@@ -270,6 +270,7 @@ class SampleTable extends AbstractTableGateway {
                                          ->where(array("vl.sample_collection_date !=''"))
                                          ->where(array('vl.patient_art_no !=""'))
                                          ->where(array('vl.current_regimen !=""'))
+                                         ->where(array('vl.patient_age_in_years !=""'))
                                          ->where(array('vl.patient_gender !=""'));
                 if($params['facilityId'] !=''){
                     $completeQuery = $completeQuery->where(array("vl.lab_id ='".base64_decode($params['facilityId'])."'")); 
@@ -281,7 +282,7 @@ class SampleTable extends AbstractTableGateway {
                 $inCompleteQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
                                            ->columns(array('total' => new Expression('COUNT(*)')))
                                            ->where("Month(sample_collection_date)='".$mnth."' AND Year(sample_collection_date)='".$year."'")
-                                           ->where(array('(vl.sample_collection_date ="" OR  vl.patient_art_no="" OR vl.current_regimen="" OR vl.patient_gender="")'));
+                                           ->where(array('(vl.sample_collection_date =""  OR  vl.patient_art_no="" OR vl.current_regimen="" OR vl.patient_age_in_years =""  OR vl.patient_gender="")'));
                 if($params['facilityId'] !=''){
                     $inCompleteQuery = $inCompleteQuery->where(array("vl.lab_id ='".base64_decode($params['facilityId'])."'")); 
                 }
@@ -354,8 +355,7 @@ class SampleTable extends AbstractTableGateway {
             if($sampleTypeResult){
                 $avgResult = array();$j = 0;
                 $start = $month = strtotime($startMonth); $end = strtotime($endMonth);
-                while($month <= $end)
-                {
+                while($month <= $end){
                     $mnth = date('m', $month);$year = date('Y', $month);$dFormat = date("M-Y", $month);
                     $i = 0;
                     foreach($sampleTypeResult as $sample){
@@ -369,35 +369,38 @@ class SampleTable extends AbstractTableGateway {
                         $lQueryStr = $sql->getSqlStringForSqlObject($lQuery);
                         $lResult = $dbAdapter->query($lQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
                         if(count($lResult)>0){
-                        $total = 0;
-                        foreach($lResult as $data){
-                            $hourdiff = $data['diff']*24;
-                            $total = $total + ($hourdiff);
-                        }
-                            $avgResult[$sample['sample_name']][$i][$j] = round($total/count($lResult),1);
+                            $total = 0;
+                            foreach($lResult as $data){
+                                $hourdiff = $data['diff']*24;
+                                $total = $total + ($hourdiff);
+                            }
+                            $avgResult[$sample['sample_name']][$i][$j] = round($total/count($lResult),2);
                         }else{
-                            $avgResult[$sample['sample_name']][$i][$j] = 0;
+                            $avgResult[$sample['sample_name']][$i][$j] = "null";
                         }
                         $i++;
                     }
                     //all result
-                    $alQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))->columns(array('sample_tested_datetime','sample_collection_date','diff'=>new Expression('DATEDIFF(sample_tested_datetime,sample_collection_date)')))
+                    $alQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
+                                   ->columns(array('sample_tested_datetime',
+                                                   'sample_collection_date',
+                                                   'diff'=>new Expression('DATEDIFF(sample_tested_datetime,sample_collection_date)')))
                                             ->where(array('vl.sample_tested_datetime IS NOT NULL'))
-                                            ->where("Month(sample_collection_date)='".$mnth."' AND Year(sample_collection_date)='".$year."'");
+                                            ->where("MONTH(sample_collection_date)='".$mnth."' AND YEAR(sample_collection_date)='".$year."'");
                     if($params['facilityId'] !=''){
                         $alQuery = $alQuery->where(array("vl.lab_id ='".base64_decode($params['facilityId'])."'")); 
                     }
                     $alQueryStr = $sql->getSqlStringForSqlObject($alQuery);
                     $alResult = $dbAdapter->query($alQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
                     if(count($alResult)>0){
-                    $total = 0;
-                    foreach($alResult as $data){
-                        $hourdiff = $data['diff']*24;
-                        $total = $total + ($hourdiff);
-                    }
-                        $avgResult['all'][$j] = round($total/count($alResult),1);
+                        $total = 0;
+                        foreach($alResult as $data){
+                            $hourdiff = $data['diff']*24;
+                            $total = $total + ($hourdiff);
+                        }
+                        $avgResult['all'][$j] = round($total/count($alResult),2);
                     }else{
-                        $avgResult['all'][$j] = 0;
+                        $avgResult['all'][$j] = "null";
                     }
                     $avgResult['date'][$j] = $dFormat;
                     $month = strtotime("+1 month", $month);
@@ -405,6 +408,9 @@ class SampleTable extends AbstractTableGateway {
                 }
             }
         }
+        
+       //\Zend\Debug\Debug::dump($avgResult);die;
+        
         return $avgResult;
     }
     public function fetchFacilites($params)

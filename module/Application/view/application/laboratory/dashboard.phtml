@@ -354,7 +354,7 @@ foreach($sampleType as $samples){
             facilityId = $("#labName").val();
             $.post("<?php echo $this->url('laboratory', array('action' => 'get-requisition-forms')); ?>",{fromDate:fromDate,toDate:toDate,facilityId:facilityId},
             function(data) {
-            $("#requisitionForms").html(data);
+                $("#requisitionForms").html(data);
             });
         }
         function getSampleVolume()
@@ -369,14 +369,14 @@ foreach($sampleType as $samples){
             $("#pieChartLabResult").html(data);
             });
         }
-        function getLabTime()
+        function getAverageLabTAT()
         {
             fromDate=$('#mrp-lowerDate').val();
             toDate=$('#mrp-upperDate').val();
             facilityId = $("#labName").val();
             $.post("<?php echo $this->url('laboratory', array('action' => 'get-lab-turn-around-time')); ?>",{fromDate:fromDate,toDate:toDate,facilityId:facilityId},
             function(data) {
-            $("#labAverageTat").html(data);
+                $("#labAverageTat").html(data);
             });
         }
         function getLabFacilities()
@@ -407,7 +407,7 @@ foreach($sampleType as $samples){
             getSampleResult();
             getRequisitionFormsTested();
             getSampleVolume();
-            getLabTime();
+            getAverageLabTAT();
             getLabFacilities();
             getTestedSampleResult();
             getTestedSampleResultBasedVolume();
