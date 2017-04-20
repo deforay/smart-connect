@@ -247,19 +247,7 @@ class SampleTable extends AbstractTableGateway {
             $endMonth = date("Y-m", strtotime(trim($params['toDate'])));
             $start = $month = strtotime($startMonth);
             $end = strtotime($endMonth);
-            
-            $rsQuery = $sql->select()->from(array('rs'=>'r_sample_type'));
-            if(isset($params['sampleType']) && trim($params['sampleType'])!=''){
-                $rsQuery = $rsQuery->where('rs.sample_id="'.base64_decode(trim($params['sampleType'])).'"');
-            }
-            $rsQueryStr = $sql->getSqlStringForSqlObject($rsQuery);
-            $sampleTypeResult = $dbAdapter->query($rsQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-            if($sampleTypeResult){
-                $sampleId = array();
-                foreach($sampleTypeResult as $samples)
-                {
-                    $sampleId[] = $samples['sample_id'];
-                }
+           
                 $j = 0;
                 $lessTotal = 0;$greaterTotal = 0;$notTargetTotal = 0;
                 $gender = array('M','F','');
@@ -267,8 +255,8 @@ class SampleTable extends AbstractTableGateway {
                 {
                     $mnth = date('m', $month);$year = date('Y', $month);$dFormat = date("M-Y", $month);
                         $lessThanQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))->columns(array('total' => new Expression('COUNT(*)')))
-                                            ->where("Month(sample_collection_date)='".$mnth."' AND Year(sample_collection_date)='".$year."'")
-                                            ->where('vl.sample_type IN ("' . implode('", "', $sampleId) . '")');
+                                            ->where("Month(sample_collection_date)='".$mnth."' AND Year(sample_collection_date)='".$year."'");
+                                            //->where('vl.sample_type IN ("' . implode('", "', $sampleId) . '")');
                         if($params['facilityId'] !=''){
                             $lessThanQuery = $lessThanQuery->where(array("vl.lab_id ='".base64_decode($params['facilityId'])."'")); 
                         }
@@ -288,7 +276,7 @@ class SampleTable extends AbstractTableGateway {
                     $month = strtotime("+1 month", $month);
                     $j++;
                 }
-            }
+            
             return $result;
         }
     }
@@ -304,27 +292,15 @@ class SampleTable extends AbstractTableGateway {
             $start = $month = strtotime($startMonth);
             $end = strtotime($endMonth);
             
-            $rsQuery = $sql->select()->from(array('rs'=>'r_sample_type'));
-            if(isset($params['sampleType']) && trim($params['sampleType'])!=''){
-                $rsQuery = $rsQuery->where('rs.sample_id="'.base64_decode(trim($params['sampleType'])).'"');
-            }
-            $rsQueryStr = $sql->getSqlStringForSqlObject($rsQuery);
-            $sampleTypeResult = $dbAdapter->query($rsQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-            if($sampleTypeResult){
-                $sampleId = array();
-                foreach($sampleTypeResult as $samples)
-                {
-                    $sampleId[] = $samples['sample_id'];
-                }
                 $j = 0;
                 $lessTotal = 0;$greaterTotal = 0;$notTargetTotal = 0;
-                $age = array('>60','<60');
+                $age = array('>16','<16');
                 while($month <= $end)
                 {
                     $mnth = date('m', $month);$year = date('Y', $month);$dFormat = date("M-Y", $month);
                         $lessThanQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))->columns(array('total' => new Expression('COUNT(*)')))
-                                            ->where("Month(sample_collection_date)='".$mnth."' AND Year(sample_collection_date)='".$year."'")
-                                            ->where('vl.sample_type IN ("' . implode('", "', $sampleId) . '")');
+                                            ->where("Month(sample_collection_date)='".$mnth."' AND Year(sample_collection_date)='".$year."'");
+                                            //->where('vl.sample_type IN ("' . implode('", "', $sampleId) . '")');
                         if($params['facilityId'] !=''){
                             $lessThanQuery = $lessThanQuery->where(array("vl.lab_id ='".base64_decode($params['facilityId'])."'")); 
                         }
@@ -344,7 +320,7 @@ class SampleTable extends AbstractTableGateway {
                     $month = strtotime("+1 month", $month);
                     $j++;
                 }
-            }
+            
             //\Zend\Debug\Debug::dump($result);die;
             return $result;
         }
