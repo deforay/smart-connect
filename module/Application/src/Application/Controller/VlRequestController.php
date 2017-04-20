@@ -14,6 +14,8 @@ class VlRequestController extends AbstractActionController
         //$this->layout()->setVariable('activeTab', 'vl-request');
     }
     public function importFileAction(){
+        $this->layout()->setVariable('activeTab', 'vl-request');
+        $this->layout()->setVariable('activeMenu', 'vl-request');
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();            

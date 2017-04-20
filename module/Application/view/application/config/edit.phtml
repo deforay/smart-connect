@@ -1,0 +1,71 @@
+                    
+                    <!-- BEGIN PAGE HEADER-->
+                    <!-- BEGIN THEME PANEL -->
+                    <!-- END THEME PANEL -->
+                    <!-- BEGIN PAGE BAR -->
+                    <div class="page-bar">
+                        <ul class="page-breadcrumb">
+                            <li>
+                                <a href="/">Dashboard</a>
+                                <i class="fa fa-circle"></i>
+                            </li>
+                            <li>
+                                <a href="<?php echo $this->url('config', array('action' => 'index')) ?>">Config</a>
+                                <i class="fa fa-circle"></i>
+                            </li>
+                            <li>
+                                <a href="javascript:;">Edit Config</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <!-- END PAGE BAR -->
+                    <!-- BEGIN PAGE TITLE-->
+                    <h3 class="page-title"> Edit Config </h3>
+                    <!-- END PAGE TITLE-->
+                    <!-- END PAGE HEADER-->
+                    <div class="row">
+                        <div class="col-md-12">
+                            <!-- BEGIN EXAMPLE TABLE PORTLET-->
+                            <div class="portlet light bordered">
+                                <div class="portlet-body">
+                                <div class="portlet-body form">
+                                    <form class="form-horizontal" name="editGlobalInformation" id="editGlobalInformation" method="post" role="form" action="<?php echo $this->url('config', array('action' => 'edit')); ?>" autocomplete="off" onsubmit="validateNow();return false;">
+                                        <div class="form-group">
+                                            <label class="col-md-3 control-label">Sample Waiting Month Range <span class="font-red-mint">*</span></label>
+                                            <div class="col-md-4">
+                                                <input type="text" class="form-control isRequired " id="sample_waiting_month_range" name="sample_waiting_month_range" value="<?php echo $config["sample_waiting_month_range"]; ?>"/>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="form-actions">
+                                            <div class="row">
+                                                <div class="col-md-offset-3 col-md-9">
+                                                    <button type="submit" class="btn green">Submit</button>
+                                                    <a href="<?php echo $this->url('config', array('action' => 'index')); ?>" class="btn default">Cancel</a>                                                    
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                                </div>
+                            </div>
+                            <!-- END EXAMPLE TABLE PORTLET-->
+                        </div>
+                    </div>
+                    
+
+<script type="text/javascript">
+    duplicateName = true;
+    selectedDate="";
+    function validateNow() {
+
+        flag = deforayValidator.init({
+            formId: 'editGlobalInformation'
+        });
+        if (flag) {
+            if (duplicateName) {
+              document.getElementById('editGlobalInformation').submit();
+            }
+        }
+    }
+</script>             
