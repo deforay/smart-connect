@@ -1,12 +1,11 @@
 <?php
-//\Zend\Debug\Debug::dump($result);die;
+//Zend\Debug\Debug::dump($result['lab']);die;
 ?>
-<div id="samplesTestedVsSupressed"></div>
-
+<div id="facilitiesTestedGender"></div>
 <script>
        $(function () {
-        $('#samplesTestedVsSupressed').highcharts({
-        chart: {
+        $('#facilitiesTestedGender').highcharts({
+       chart: {
             type: 'column'
         },
         title: {
@@ -51,18 +50,30 @@
             }
         },
         series: [<?php
-              foreach($result['sampleName'] as $key=>$condition){
+        $gender = array('M','F','');
+        for($i=0;$i<3;$i++){
+              $specific = $gender[$i];
+              if($gender[$i]=='')
+              {
+                     $specific = 'Not Specified';
+              }
+              foreach($result[$gender[$i]]['sampleName'] as $key=>$condition){
               ?>
               {
-              name:'<?php echo $key;?>',
+              name:'<?php echo $key."(".$specific.")";?>',
               data:[<?php
                   foreach($condition as $count){
                       echo $count.",";
                   }
               ?>],
+              stack:'<?php echo $gender[$i];?>',
               },
               <?php
               }
+              ?>
+              
+              <?php
+        }
             ?>
         ],
         colors: ['#ff1900','#333333','#60d18f',],

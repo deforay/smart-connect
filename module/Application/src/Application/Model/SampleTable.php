@@ -182,6 +182,120 @@ class SampleTable extends AbstractTableGateway {
             return $result;
         }
     }
+    //get sample tested result details
+    public function fetchSampleTestedResultGenderDetails($params)
+    {
+        $result = array();
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $common = new CommonService();
+        if(trim($params['fromDate'])!= '' && trim($params['toDate'])!= ''){
+            $startMonth = date("Y-m", strtotime(trim($params['fromDate'])));
+            $endMonth = date("Y-m", strtotime(trim($params['toDate'])));
+            $start = $month = strtotime($startMonth);
+            $end = strtotime($endMonth);
+            
+            $rsQuery = $sql->select()->from(array('rs'=>'r_sample_type'));
+            if(isset($params['sampleType']) && trim($params['sampleType'])!=''){
+                $rsQuery = $rsQuery->where('rs.sample_id="'.base64_decode(trim($params['sampleType'])).'"');
+            }
+            $rsQueryStr = $sql->getSqlStringForSqlObject($rsQuery);
+            $sampleTypeResult = $dbAdapter->query($rsQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+            if($sampleTypeResult){
+                $sampleId = array();
+                foreach($sampleTypeResult as $samples)
+                {
+                    $sampleId[] = $samples['sample_id'];
+                }
+                $j = 0;
+                $lessTotal = 0;$greaterTotal = 0;$notTargetTotal = 0;
+                $gender = array('M','F','');
+                while($month <= $end)
+                {
+                    $mnth = date('m', $month);$year = date('Y', $month);$dFormat = date("M-Y", $month);
+                        $lessThanQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))->columns(array('total' => new Expression('COUNT(*)')))
+                                            ->where("Month(sample_collection_date)='".$mnth."' AND Year(sample_collection_date)='".$year."'")
+                                            ->where('vl.sample_type IN ("' . implode('", "', $sampleId) . '")');
+                        if($params['facilityId'] !=''){
+                            $lessThanQuery = $lessThanQuery->where(array("vl.lab_id ='".base64_decode($params['facilityId'])."'")); 
+                        }
+                        $lQueryStr = $sql->getSqlStringForSqlObject($lessThanQuery);
+                        
+                        for($g=0;$g<3;$g++){
+                        $greaterResult = $dbAdapter->query($lQueryStr." AND vl.result>1000 AND vl.patient_gender='".$gender[$g]."'", $dbAdapter::QUERY_MODE_EXECUTE)->current();
+                        $result[$gender[$g]]['sampleName']['VL (> 1000 cp/ml)'][$j] = $greaterTotal+$greaterResult['total'];
+                        
+                        $notTargetResult = $dbAdapter->query($lQueryStr." AND 'vl.result'='Target Not Detected' AND vl.patient_gender='".$gender[$g]."'", $dbAdapter::QUERY_MODE_EXECUTE)->current();
+                        $result[$gender[$g]]['sampleName']['VL Not Detected'][$j] = $notTargetTotal+$notTargetResult['total'];
+                        
+                        $lessResult = $dbAdapter->query($lQueryStr." AND vl.result<1000 AND vl.patient_gender='".$gender[$g]."'", $dbAdapter::QUERY_MODE_EXECUTE)->current();
+                        $result[$gender[$g]]['sampleName']['VL (< 1000 cp/ml)'][$j] = $lessTotal+$lessResult['total'];
+                        }
+                    $result['date'][$j] = $dFormat;
+                    $month = strtotime("+1 month", $month);
+                    $j++;
+                }
+            }
+            return $result;
+        }
+    }
+    public function fetchSampleTestedResultAgeDetails($params)
+    {
+        $result = array();
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $common = new CommonService();
+        if(trim($params['fromDate'])!= '' && trim($params['toDate'])!= ''){
+            $startMonth = date("Y-m", strtotime(trim($params['fromDate'])));
+            $endMonth = date("Y-m", strtotime(trim($params['toDate'])));
+            $start = $month = strtotime($startMonth);
+            $end = strtotime($endMonth);
+            
+            $rsQuery = $sql->select()->from(array('rs'=>'r_sample_type'));
+            if(isset($params['sampleType']) && trim($params['sampleType'])!=''){
+                $rsQuery = $rsQuery->where('rs.sample_id="'.base64_decode(trim($params['sampleType'])).'"');
+            }
+            $rsQueryStr = $sql->getSqlStringForSqlObject($rsQuery);
+            $sampleTypeResult = $dbAdapter->query($rsQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+            if($sampleTypeResult){
+                $sampleId = array();
+                foreach($sampleTypeResult as $samples)
+                {
+                    $sampleId[] = $samples['sample_id'];
+                }
+                $j = 0;
+                $lessTotal = 0;$greaterTotal = 0;$notTargetTotal = 0;
+                $age = array('>60','<60');
+                while($month <= $end)
+                {
+                    $mnth = date('m', $month);$year = date('Y', $month);$dFormat = date("M-Y", $month);
+                        $lessThanQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))->columns(array('total' => new Expression('COUNT(*)')))
+                                            ->where("Month(sample_collection_date)='".$mnth."' AND Year(sample_collection_date)='".$year."'")
+                                            ->where('vl.sample_type IN ("' . implode('", "', $sampleId) . '")');
+                        if($params['facilityId'] !=''){
+                            $lessThanQuery = $lessThanQuery->where(array("vl.lab_id ='".base64_decode($params['facilityId'])."'")); 
+                        }
+                        $lQueryStr = $sql->getSqlStringForSqlObject($lessThanQuery);
+                        
+                        for($g=0;$g<2;$g++){
+                        $greaterResult = $dbAdapter->query($lQueryStr." AND vl.result>1000 AND vl.patient_age_in_years ".$age[$g], $dbAdapter::QUERY_MODE_EXECUTE)->current();
+                        $result[$age[$g]]['sampleName']['VL (> 1000 cp/ml)'][$j] = $greaterTotal+$greaterResult['total'];
+                        
+                        $notTargetResult = $dbAdapter->query($lQueryStr." AND 'vl.result'='Target Not Detected' AND vl.patient_age_in_years ".$age[$g], $dbAdapter::QUERY_MODE_EXECUTE)->current();
+                        $result[$age[$g]]['sampleName']['VL Not Detected'][$j] = $notTargetTotal+$notTargetResult['total'];
+                        
+                        $lessResult = $dbAdapter->query($lQueryStr." AND vl.result<1000 AND vl.patient_age_in_years ".$age[$g], $dbAdapter::QUERY_MODE_EXECUTE)->current();
+                        $result[$age[$g]]['sampleName']['VL (< 1000 cp/ml)'][$j] = $lessTotal+$lessResult['total'];
+                        }
+                    $result['date'][$j] = $dFormat;
+                    $month = strtotime("+1 month", $month);
+                    $j++;
+                }
+            }
+            //\Zend\Debug\Debug::dump($result);die;
+            return $result;
+        }
+    }
     public function fetchSampleTestedResultBasedVolumeDetails($params)
     {
         $result = array();

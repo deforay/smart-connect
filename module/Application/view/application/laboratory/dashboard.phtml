@@ -234,7 +234,49 @@ foreach($sampleType as $samples){
                                 </div>
                             </div>
                         </div>                        
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 col-sm-6">
+                            <div class="portlet box blue">
+                                <div class="portlet-title">
+                                    <div class="caption ">
+                                        <span class="caption-subject">Samples Tested based on Gender </span>
+                                    </div>
+                                    <div class="actions">
+                                        <div class="btn-group">
+                                            <select id="sampleTypeGender" class="fetchAll btn white btn-outline btn-circle btn-sm dropdown-toggle">
+                                                <option value="">All Sample Types</option>
+                                                <?php echo $sType;?>
+                                            </select>
+                                        </div>
+                                    </div>  
+                                </div>
+                                <div class="portlet-body" style="cursor:pointer;" onclick="document.location.href='/labs/samples-tested'">
+                                    <div id="samplesTestedResultGender"></div>
+                                </div>
+                            </div>
+                        </div>
                         
+                        <div class="col-md-6 col-sm-6">
+                            <div class="portlet box blue">
+                                <div class="portlet-title">
+                                    <div class="caption ">
+                                        <span class="caption-subject">Samples Tested based on Age</span>
+                                    </div>
+                                    <div class="actions">
+                                        <div class="btn-group">
+                                            <select id="sampleTypeVolumeAge" class="fetchAll btn white btn-outline btn-circle btn-sm dropdown-toggle">
+                                                <option value="">All Sample Types</option>
+                                                <?php echo $sType;?>
+                                            </select>
+                                        </div>
+                                    </div>                           
+                                </div>
+                                <div class="portlet-body" style="cursor:pointer;" onclick="document.location.href='/labs/samples-tested'">
+                                    <div id="samplesTestedResultAge"></div>
+                                </div>
+                            </div>
+                        </div>                        
                     </div>
                     <div class="row">
                         <div class="col-md-4 col-sm-4">
@@ -342,9 +384,31 @@ foreach($sampleType as $samples){
             fromDate=$('#mrp-lowerDate').val();
             toDate=$('#mrp-upperDate').val();
             facilityId = $("#labName").val();
-            $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-test-result-volume')); ?>",{fromDate:fromDate,toDate:toDate,sampleType:sampleType,facilityId:facilityId,facilityId:facilityId},
+            $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-test-result-volume')); ?>",{fromDate:fromDate,toDate:toDate,sampleType:sampleType,facilityId:facilityId},
             function(data) {
                 $("#facilitiesTestedValue").html(data);
+            });
+        }
+        function getTestedSampleResultBasedGender()
+        {
+            sampleType = $("#sampleTypeVolumeGender").val();
+            fromDate=$('#mrp-lowerDate').val();
+            toDate=$('#mrp-upperDate').val();
+            facilityId = $("#labName").val();
+            $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-test-result-gender')); ?>",{fromDate:fromDate,toDate:toDate,sampleType:sampleType,facilityId:facilityId},
+            function(data) {
+                $("#samplesTestedResultGender").html(data);
+            });
+        }
+        function getTestedSampleResultBasedAge()
+        {
+            sampleType = $("#sampleTypeVolumeAge").val();
+            fromDate=$('#mrp-lowerDate').val();
+            toDate=$('#mrp-upperDate').val();
+            facilityId = $("#labName").val();
+            $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-test-result-age')); ?>",{fromDate:fromDate,toDate:toDate,sampleType:sampleType,facilityId:facilityId},
+            function(data) {
+                $("#samplesTestedResultAge").html(data);
             });
         }
         function getRequisitionFormsTested()
@@ -411,6 +475,8 @@ foreach($sampleType as $samples){
             getLabFacilities();
             getTestedSampleResult();
             getTestedSampleResultBasedVolume();
+            getTestedSampleResultBasedGender();
+            getTestedSampleResultBasedAge();
         }            
             
         var MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];

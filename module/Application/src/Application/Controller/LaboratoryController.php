@@ -96,6 +96,36 @@ class LaboratoryController extends AbstractActionController
             return $viewModel;
         }
     }
+    public function getSampleTestResultGenderAction()
+    {
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $sampleService = $this->getServiceLocator()->get('SampleService');
+            $params['gender'] = 'yes';
+            $result = $sampleService->getSampleTestedResultGenderDetails($params);
+            $sampleType = $sampleService->getSampleType();
+            $viewModel = new ViewModel();
+            $viewModel->setVariables(array('result' => $result,'sampleType'=>$sampleType))
+                        ->setTerminal(true);
+            return $viewModel;
+        }
+    }
+    public function getSampleTestResultAgeAction()
+    {
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $sampleService = $this->getServiceLocator()->get('SampleService');
+            $params['age'] = 'yes';
+            $result = $sampleService->getSampleTestedResultAgeDetails($params);
+            $sampleType = $sampleService->getSampleType();
+            $viewModel = new ViewModel();
+            $viewModel->setVariables(array('result' => $result,'sampleType'=>$sampleType))
+                        ->setTerminal(true);
+            return $viewModel;
+        }
+    }
     public function getRequisitionFormsAction()
     {
         $request = $this->getRequest();

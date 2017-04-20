@@ -1,12 +1,11 @@
 <?php
-//\Zend\Debug\Debug::dump($result);die;
+//Zend\Debug\Debug::dump($result['lab']);die;
 ?>
-<div id="samplesTestedVsSupressed"></div>
-
+<div id="facilitiesTestedAge"></div>
 <script>
        $(function () {
-        $('#samplesTestedVsSupressed').highcharts({
-        chart: {
+        $('#facilitiesTestedAge').highcharts({
+       chart: {
             type: 'column'
         },
         title: {
@@ -51,18 +50,25 @@
             }
         },
         series: [<?php
-              foreach($result['sampleName'] as $key=>$condition){
+        $age = array('>60','<60');
+        for($i=0;$i<count($age);$i++){
+              foreach($result[$age[$i]]['sampleName'] as $key=>$condition){
               ?>
               {
-              name:'<?php echo $key;?>',
+              name:'<?php echo $key."(".htmlspecialchars($age[$i]).")";?>',
               data:[<?php
                   foreach($condition as $count){
                       echo $count.",";
                   }
               ?>],
+              stack:'<?php echo $age[$i];?>',
               },
               <?php
               }
+              ?>
+              
+              <?php
+        }
             ?>
         ],
         colors: ['#ff1900','#333333','#60d18f',],
