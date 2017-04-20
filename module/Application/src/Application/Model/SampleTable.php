@@ -28,8 +28,59 @@ class SampleTable extends AbstractTableGateway {
         $this->adapter = $adapter;
     }
     
+    
+    public function fetchQuickStats($params){
+        $dbAdapter = $this->adapter;$sql = new Sql($dbAdapter);
+        $common = new CommonService();
+        $query = "SELECT count(*) as 'Total', 
+		SUM(CASE 
+            WHEN patient_gender IS NULL OR patient_gender ='' THEN 0
+            ELSE 1
+            END) as GenderMissing, 
+		SUM(CASE 
+            WHEN patient_age_in_years IS NULL OR patient_age_in_years ='' THEN 0
+            ELSE 1
+            END) as AgeMissing,
+        SUM(CASE
+            WHEN (result is NULL OR result ='') AND (sample_collection_date > DATE_SUB(NOW(), INTERVAL 6 MONTH) AND (reason_for_sample_rejection is NULL or reason_for_sample_rejection ='')) THEN 1
+            ELSE 0
+            END) as ResultWaiting
+           FROM `dash_vl_request_form` as vl";
+           
+        $globalDb = new \Application\Model\GlobalTable($this->adapter);
+        $samplesWaitingFromLastXMonths = $globalDb->getGlobalValue('sample_waiting_month_range');
+        
+        $query = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
+                                ->columns(
+                                          array("Total Samples" => new Expression('COUNT(*)'),
+                                          "Gender Missing" => new Expression("SUM(CASE 
+                                                                                    WHEN patient_gender IS NULL OR patient_gender ='' THEN 0
+                                                                                    ELSE 1
+                                                                                    END)"),
+                                          "Age Missing" => new Expression("SUM(CASE 
+                                                                                WHEN patient_age_in_years IS NULL OR patient_age_in_years ='' THEN 0
+                                                                                ELSE 1
+                                                                                END)"),
+                                          "Results Awaited (> $samplesWaitingFromLastXMonths months)" => new Expression("SUM(CASE
+                                                                                    WHEN (result is NULL OR result ='') AND (sample_collection_date > DATE_SUB(NOW(), INTERVAL $samplesWaitingFromLastXMonths MONTH) AND (reason_for_sample_rejection is NULL or reason_for_sample_rejection ='')) THEN 1
+                                                                                    ELSE 0
+                                                                                    END)")
+                                          )
+                                        );
+        if($params['facilityId'] !=''){
+            $query = $query->where(array("vl.lab_id ='".base64_decode($params['facilityId'])."'")); 
+        }
+        
+        $queryStr = $sql->getSqlStringForSqlObject($query);
+        
+        $result = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+        return $result[0];
+        
+    }
+    
     //start lab dashboard details 
     public function fetchSampleResultDetails($params){
+        $quickStats = $this->fetchQuickStats($params);
         $dbAdapter = $this->adapter;$sql = new Sql($dbAdapter);
         $common = new CommonService();
         if(trim($params['fromDate'])!= '' && trim($params['toDate'])!= ''){
@@ -54,12 +105,12 @@ class SampleTable extends AbstractTableGateway {
                 $aQueryStr = $sql->getSqlStringForSqlObject($acceptedQuery);
                 $acceptedResult[$i] = $dbAdapter->query($aQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
                 if($acceptedResult[$i][0]['total']!=0){
-                $acceptedTotal = $acceptedTotal + $acceptedResult[$i][0]['total'];
-                $acceptedResult[$i]['date'] = $dFormat;
-                $acceptedResult[$i]['acceptDate'] = $dFormat;
-                $acceptedResult[$i]['acceptTotal'] = $acceptedTotal;
+                    $acceptedTotal = $acceptedTotal + $acceptedResult[$i][0]['total'];
+                    $acceptedResult[$i]['date'] = $dFormat;
+                    $acceptedResult[$i]['acceptDate'] = $dFormat;
+                    $acceptedResult[$i]['acceptTotal'] = $acceptedTotal;
                 }else{
-                unset($acceptedResult[$i]);
+                    unset($acceptedResult[$i]);
                 }
                 //get rejected data
                 $rejectedQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
@@ -72,10 +123,10 @@ class SampleTable extends AbstractTableGateway {
                 $rQueryStr = $sql->getSqlStringForSqlObject($rejectedQuery);
                 $rejectedResult[$i] = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
                 if($rejectedResult[$i][0]['total']!=0){
-                $rejectedTotal = $rejectedTotal + $rejectedResult[$i][0]['total'];
-                $rejectedResult[$i]['date'] = $dFormat;
-                $rejectedResult[$i]['rejectDate'] = $dFormat;
-                $rejectedResult[$i]['rejectTotal'] = $rejectedTotal;
+                    $rejectedTotal = $rejectedTotal + $rejectedResult[$i][0]['total'];
+                    $rejectedResult[$i]['date'] = $dFormat;
+                    $rejectedResult[$i]['rejectDate'] = $dFormat;
+                    $rejectedResult[$i]['rejectTotal'] = $rejectedTotal;
                 }else{
                 unset($rejectedResult[$i]);
                 }
@@ -98,32 +149,34 @@ class SampleTable extends AbstractTableGateway {
                 $month = strtotime("+1 month", $month);
                 $i++;
             }
-            //waiting query based on global config
-            $i = 0;
-            $globalDb = new \Application\Model\GlobalTable($this->adapter);
-            $mnthRange = $globalDb->getGlobalValue('sample_waiting_month_range');
-            for ($m = 0; $m < $mnthRange; $m++){
-                $mnth = date('m',strtotime('-'.$m.' month'));$year = date('Y',strtotime('-'.$m.' month'));$dFormat = date('M-Y', strtotime('-'.$m.' month'));
-                $waitingQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
-                                        ->columns(array('total' => new Expression('COUNT(*)')))
-                                        ->where(array("(vl.result='' OR vl.result is NULL)"))
-                                        ->where("Month(sample_collection_date)='".$mnth."' AND Year(sample_collection_date)='".$year."'");
-                if($params['facilityId'] !=''){
-                   $waitingQuery = $waitingQuery->where(array("vl.lab_id ='".base64_decode($params['facilityId'])."'")); 
-                }
-                $wQueryStr = $sql->getSqlStringForSqlObject($waitingQuery);
-                $waitingResult[$i] = $dbAdapter->query($wQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-                if($waitingResult[$i][0]['total']!=0){
-                    $waitingTotal = $waitingTotal + $waitingResult[$i][0]['total'];
-                    $waitingResult[$i]['date'] = $dFormat;
-                    $waitingResult[$i]['waitingDate'] = $dFormat;
-                    $waitingResult[$i]['waitingTotal'] = $waitingTotal;
-                }else{
-                    unset($waitingResult[$i]);
-                }
-                $i++;
-            }
-            return array('stResult'=>$tResult,'saResult'=>$acceptedResult,'swResult'=>$waitingResult,'srResult'=>$rejectedResult);
+            ////waiting query based on global config
+            //$i = 0;
+            //$globalDb = new \Application\Model\GlobalTable($this->adapter);
+            //$mnthRange = $globalDb->getGlobalValue('sample_waiting_month_range');
+            //for ($m = 0; $m < $mnthRange; $m++){
+            //    $mnth = date('m',strtotime('-'.$m.' month'));
+            //    $year = date('Y',strtotime('-'.$m.' month'));
+            //    $dFormat = date('M-Y', strtotime('-'.$m.' month'));
+            //    $waitingQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
+            //                            ->columns(array('total' => new Expression('COUNT(*)')))
+            //                            ->where(array("(vl.result='' OR vl.result is NULL)"))
+            //                            ->where("Month(sample_collection_date)='".$mnth."' AND Year(sample_collection_date)='".$year."'");
+            //    if($params['facilityId'] !=''){
+            //       $waitingQuery = $waitingQuery->where(array("vl.lab_id ='".base64_decode($params['facilityId'])."'")); 
+            //    }
+            //    $wQueryStr = $sql->getSqlStringForSqlObject($waitingQuery);
+            //    $waitingResult[$i] = $dbAdapter->query($wQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+            //    if($waitingResult[$i][0]['total']!=0){
+            //        $waitingTotal = $waitingTotal + $waitingResult[$i][0]['total'];
+            //        $waitingResult[$i]['date'] = $dFormat;
+            //        $waitingResult[$i]['waitingDate'] = $dFormat;
+            //        $waitingResult[$i]['waitingTotal'] = $waitingTotal;
+            //    }else{
+            //        unset($waitingResult[$i]);
+            //    }
+            //    $i++;
+            //}
+            return array('quickStats'=>$quickStats,'stResult'=>$tResult,'saResult'=>$acceptedResult,'srResult'=>$rejectedResult);
         }
     }
     

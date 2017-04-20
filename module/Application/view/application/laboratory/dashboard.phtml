@@ -200,7 +200,7 @@ foreach($sampleType as $samples){
                                     </div>
                                     <div class="actions">
                                         <div class="btn-group">
-                                            <select id="sampleType" class="fetchAll btn white btn-outline btn-circle btn-sm dropdown-toggle">
+                                            <select id="sampleType" class="btn white btn-outline btn-circle btn-sm dropdown-toggle" onchange="getTestedSampleResult()">
                                                 <option value="">All Sample Types</option>
                                                 <?php echo $sType;?>
                                             </select>
@@ -222,7 +222,7 @@ foreach($sampleType as $samples){
                                     </div>
                                     <div class="actions">
                                         <div class="btn-group">
-                                            <select id="sampleTypeVolume" class="fetchAll btn white btn-outline btn-circle btn-sm dropdown-toggle">
+                                            <select id="sampleTypeVolume" class="btn white btn-outline btn-circle btn-sm dropdown-toggle" onchange="getTestedSampleResultBasedVolume();">
                                                 <option value="">All Sample Types</option>
                                                 <?php echo $sType;?>
                                             </select>
@@ -271,7 +271,7 @@ foreach($sampleType as $samples){
                                     </div>
                                     <div class="actions">
                                         <div class="btn-group">
-                                            <select id="sampleVolume" class="fetchAll btn white btn-outline btn-circle btn-sm dropdown-toggle">
+                                            <select id="sampleVolume" class="btn white btn-outline btn-circle btn-sm dropdown-toggle" onchange="getSampleVolume();">
                                                 <option value="">All Sample Types</option>
                                                 <?php echo $sType;?>
                                             </select>
@@ -357,8 +357,7 @@ foreach($sampleType as $samples){
                 $("#requisitionForms").html(data);
             });
         }
-        function getSampleVolume()
-        {
+        function getSampleVolume(){
             
             sampleType = $("#sampleVolume").val();
             facilityId = $("#labName").val();
