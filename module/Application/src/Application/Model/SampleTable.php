@@ -32,20 +32,20 @@ class SampleTable extends AbstractTableGateway {
     public function fetchQuickStats($params){
         $dbAdapter = $this->adapter;$sql = new Sql($dbAdapter);
         $common = new CommonService();
-        $query = "SELECT count(*) as 'Total', 
-		SUM(CASE 
-            WHEN patient_gender IS NULL OR patient_gender ='' THEN 0
-            ELSE 1
-            END) as GenderMissing, 
-		SUM(CASE 
-            WHEN patient_age_in_years IS NULL OR patient_age_in_years ='' THEN 0
-            ELSE 1
-            END) as AgeMissing,
-        SUM(CASE
-            WHEN (result is NULL OR result ='') AND (sample_collection_date > DATE_SUB(NOW(), INTERVAL 6 MONTH) AND (reason_for_sample_rejection is NULL or reason_for_sample_rejection ='')) THEN 1
-            ELSE 0
-            END) as ResultWaiting
-           FROM `dash_vl_request_form` as vl";
+//        $query = "SELECT count(*) as 'Total', 
+//		SUM(CASE 
+//            WHEN patient_gender IS NULL OR patient_gender ='' THEN 0
+//            ELSE 1
+//            END) as GenderMissing, 
+//		SUM(CASE 
+//            WHEN patient_age_in_years IS NULL OR patient_age_in_years ='' THEN 0
+//            ELSE 1
+//            END) as AgeMissing,
+//        SUM(CASE
+//            WHEN (result is NULL OR result ='') AND (sample_collection_date > DATE_SUB(NOW(), INTERVAL 6 MONTH) AND (reason_for_sample_rejection is NULL or reason_for_sample_rejection ='')) THEN 1
+//            ELSE 0
+//            END) as ResultWaiting
+//           FROM `dash_vl_request_form` as vl";
            
         $globalDb = new \Application\Model\GlobalTable($this->adapter);
         $samplesWaitingFromLastXMonths = $globalDb->getGlobalValue('sample_waiting_month_range');
