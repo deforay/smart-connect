@@ -244,16 +244,16 @@ foreach($sampleType as $samples){
                                     </div>
                                     <div class="actions">
                                         <div class="btn-group">
-                                            <select id="sampleTypeGender" class="fetchAll btn white btn-outline btn-circle btn-sm dropdown-toggle">
+                                            <select id="sampleTypeGender" class="btn white btn-outline btn-circle btn-sm dropdown-toggle" onchange="getTestedSampleResultBasedGender()">
                                                 <option value="">All Sample Types</option>
                                                 <?php echo $sType;?>
                                             </select>
                                         </div>
                                     </div>  
                                 </div>
-                                <div class="portlet-body" style="cursor:pointer;" onclick="document.location.href='/labs/samples-tested'">
+                                <!--<div class="portlet-body" style="cursor:pointer;" onclick="document.location.href='/labs/samples-tested'">-->
                                     <div id="samplesTestedResultGender"></div>
-                                </div>
+                                <!--</div>-->
                             </div>
                         </div>
                         
@@ -265,16 +265,16 @@ foreach($sampleType as $samples){
                                     </div>
                                     <div class="actions">
                                         <div class="btn-group">
-                                            <select id="sampleTypeVolumeAge" class="fetchAll btn white btn-outline btn-circle btn-sm dropdown-toggle">
+                                            <select id="sampleTypeVolumeAge" class="btn white btn-outline btn-circle btn-sm dropdown-toggle" onchange="getTestedSampleResultBasedAge()">
                                                 <option value="">All Sample Types</option>
                                                 <?php echo $sType;?>
                                             </select>
                                         </div>
                                     </div>                           
                                 </div>
-                                <div class="portlet-body" style="cursor:pointer;" onclick="document.location.href='/labs/samples-tested'">
+                                <!--<div class="portlet-body" style="cursor:pointer;" onclick="document.location.href='/labs/samples-tested'">-->
                                     <div id="samplesTestedResultAge"></div>
-                                </div>
+                                <!--</div>-->
                             </div>
                         </div>                        
                     </div>
