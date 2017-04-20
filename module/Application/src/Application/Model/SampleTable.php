@@ -103,7 +103,7 @@ class SampleTable extends AbstractTableGateway {
             $globalDb = new \Application\Model\GlobalTable($this->adapter);
             $mnthRange = $globalDb->getGlobalValue('sample_waiting_month_range');
             for ($m = 0; $m < $mnthRange; $m++){
-                $mnth = date('m',strtotime('-'.$m.' month'));$year = date('Y',strtotime('-'.$m.' month'));$dFormat = date('Y-m', strtotime('-'.$m.' month'));
+                $mnth = date('m',strtotime('-'.$m.' month'));$year = date('Y',strtotime('-'.$m.' month'));$dFormat = date('M-Y', strtotime('-'.$m.' month'));
                 $waitingQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
                                         ->columns(array('total' => new Expression('COUNT(*)')))
                                         ->where(array("(vl.result='' OR vl.result is NULL)"))
