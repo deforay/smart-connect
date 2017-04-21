@@ -1,6 +1,3 @@
-<?php
-//Zend\Debug\Debug::dump($result['lab']);die;
-?>
 <div id="facilitiesTestedAge"></div>
 <script>
        $(function () {
@@ -52,7 +49,7 @@
         series: [<?php
         $age = array('>16','<16');
         for($i=0;$i<count($age);$i++){
-              foreach($result[$age[$i]]['sampleName'] as $key=>$condition){
+              foreach($result[$age[$i]] as $key=>$condition){
               ?>
               {
               name:'<?php echo $key."(".htmlspecialchars($age[$i]).")";?>',
