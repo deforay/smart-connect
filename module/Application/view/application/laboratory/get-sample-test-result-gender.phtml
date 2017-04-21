@@ -50,17 +50,12 @@
             }
         },
         series: [<?php
-        $gender = array('M','F','');
+        $gender = array('M','F','Not Specified');
         for($i=0;$i<3;$i++){
-              $specific = $gender[$i];
-              if($gender[$i]=='')
-              {
-                     $specific = 'Not Specified';
-              }
               foreach($result[$gender[$i]]['sampleName'] as $key=>$condition){
               ?>
               {
-              name:'<?php echo $key."(".$specific.")";?>',
+              name:'<?php echo $key."(".$gender[$i].")";?>',
               data:[<?php
                   foreach($condition as $count){
                       echo $count.",";
