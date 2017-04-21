@@ -52,7 +52,7 @@
         series: [<?php
         $gender = array('M','F','Not Specified');
         for($i=0;$i<3;$i++){
-              foreach($result[$gender[$i]]['sampleName'] as $key=>$condition){
+              foreach($result[$gender[$i]] as $key=>$condition){
               ?>
               {
               name:'<?php echo $key."(".$gender[$i].")";?>',

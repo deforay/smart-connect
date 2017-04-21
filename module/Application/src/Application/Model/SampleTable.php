@@ -264,25 +264,24 @@ class SampleTable extends AbstractTableGateway {
                         
                         //for($g=0;$g<3;$g++){
                         $greaterResult = $dbAdapter->query($lQueryStr." AND vl.result>1000", $dbAdapter::QUERY_MODE_EXECUTE)->current();
-                        $result['M']['sampleName']['VL (> 1000 cp/ml)'][$j] = $greaterTotal+$greaterResult['Male'];
-                        $result['F']['sampleName']['VL (> 1000 cp/ml)'][$j] = $greaterTotal+$greaterResult['Female'];
-                        $result['Not Specified']['sampleName']['VL (> 1000 cp/ml)'][$j] = $greaterTotal+$greaterResult['Other'];
+                        $result['M']['VL (> 1000 cp/ml)'][$j] = $greaterTotal+$greaterResult['Male'];
+                        $result['F']['VL (> 1000 cp/ml)'][$j] = $greaterTotal+$greaterResult['Female'];
+                        $result['Not Specified']['VL (> 1000 cp/ml)'][$j] = $greaterTotal+$greaterResult['Other'];
                         
                         $notTargetResult = $dbAdapter->query($lQueryStr." AND 'vl.result'='Target Not Detected'", $dbAdapter::QUERY_MODE_EXECUTE)->current();
-                        $result['M']['sampleName']['VL Not Detected'][$j] = $notTargetTotal+$notTargetResult['Male'];
-                        $result['F']['sampleName']['VL Not Detected'][$j] = $notTargetTotal+$notTargetResult['Female'];
-                        $result['Not Specified']['sampleName']['VL Not Detected'][$j] = $notTargetTotal+$notTargetResult['Other'];
+                        $result['M']['VL Not Detected'][$j] = $notTargetTotal+$notTargetResult['Male'];
+                        $result['F']['VL Not Detected'][$j] = $notTargetTotal+$notTargetResult['Female'];
+                        $result['Not Specified']['VL Not Detected'][$j] = $notTargetTotal+$notTargetResult['Other'];
                         
                         $lessResult = $dbAdapter->query($lQueryStr." AND vl.result<1000 ", $dbAdapter::QUERY_MODE_EXECUTE)->current();
-                        $result['M']['sampleName']['VL (< 1000 cp/ml)'][$j] = $lessTotal+$lessResult['Male'];
-                        $result['F']['sampleName']['VL (< 1000 cp/ml)'][$j] = $lessTotal+$lessResult['Female'];
-                        $result['Not Specified']['sampleName']['VL (< 1000 cp/ml)'][$j] = $lessTotal+$lessResult['Other'];
+                        $result['M']['VL (< 1000 cp/ml)'][$j] = $lessTotal+$lessResult['Male'];
+                        $result['F']['VL (< 1000 cp/ml)'][$j] = $lessTotal+$lessResult['Female'];
+                        $result['Not Specified']['VL (< 1000 cp/ml)'][$j] = $lessTotal+$lessResult['Other'];
                         //}
                     $result['date'][$j] = $dFormat;
                     $month = strtotime("+1 month", $month);
                     $j++;
                 }
-            //\Zend\Debug\Debug::dump($result);die;
             return $result;
         }
     }
@@ -304,7 +303,7 @@ class SampleTable extends AbstractTableGateway {
                 while($month <= $end)
                 {
                     $mnth = date('m', $month);$year = date('Y', $month);$dFormat = date("M-Y", $month);
-                        $lessThanQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))->columns(array('total' => new Expression('COUNT(*)')))
+                        $lessThanQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))->columns(array('total' => new Expression('COUNT(*)'),'>16' => new Expression('SUM(CASE WHEN patient_age_in_years > 16 THEN 1 ELSE 0 END)'),'<16' => new Expression('SUM(CASE WHEN patient_age_in_years < 16 THEN 1 ELSE 0 END)')))
                                             ->where("Month(sample_collection_date)='".$mnth."' AND Year(sample_collection_date)='".$year."'");
                                             //->where('vl.sample_type IN ("' . implode('", "', $sampleId) . '")');
                         if($params['facilityId'] !=''){
@@ -312,16 +311,19 @@ class SampleTable extends AbstractTableGateway {
                         }
                         $lQueryStr = $sql->getSqlStringForSqlObject($lessThanQuery);
                         
-                        for($g=0;$g<2;$g++){
-                        $greaterResult = $dbAdapter->query($lQueryStr." AND vl.result>1000 AND vl.patient_age_in_years ".$age[$g], $dbAdapter::QUERY_MODE_EXECUTE)->current();
-                        $result[$age[$g]]['sampleName']['VL (> 1000 cp/ml)'][$j] = $greaterTotal+$greaterResult['total'];
+                        //for($g=0;$g<2;$g++){
+                        $greaterResult = $dbAdapter->query($lQueryStr." AND vl.result>1000", $dbAdapter::QUERY_MODE_EXECUTE)->current();
+                        $result['>16']['VL (> 1000 cp/ml)'][$j] = $greaterTotal+$greaterResult['>16'];
+                        $result['<16']['VL (> 1000 cp/ml)'][$j] = $greaterTotal+$greaterResult['<16'];
                         
-                        $notTargetResult = $dbAdapter->query($lQueryStr." AND 'vl.result'='Target Not Detected' AND vl.patient_age_in_years ".$age[$g], $dbAdapter::QUERY_MODE_EXECUTE)->current();
-                        $result[$age[$g]]['sampleName']['VL Not Detected'][$j] = $notTargetTotal+$notTargetResult['total'];
+                        $notTargetResult = $dbAdapter->query($lQueryStr." AND 'vl.result'='Target Not Detected'", $dbAdapter::QUERY_MODE_EXECUTE)->current();
+                        $result['>16']['VL Not Detected'][$j] = $notTargetTotal+$notTargetResult['>16'];
+                        $result['<16']['VL Not Detected'][$j] = $notTargetTotal+$notTargetResult['<16'];
                         
-                        $lessResult = $dbAdapter->query($lQueryStr." AND vl.result<1000 AND vl.patient_age_in_years ".$age[$g], $dbAdapter::QUERY_MODE_EXECUTE)->current();
-                        $result[$age[$g]]['sampleName']['VL (< 1000 cp/ml)'][$j] = $lessTotal+$lessResult['total'];
-                        }
+                        $lessResult = $dbAdapter->query($lQueryStr." AND vl.result<1000", $dbAdapter::QUERY_MODE_EXECUTE)->current();
+                        $result['>16']['VL (< 1000 cp/ml)'][$j] = $lessTotal+$lessResult['>16'];
+                        $result['<16']['VL (< 1000 cp/ml)'][$j] = $lessTotal+$lessResult['<16'];
+                        //}
                     $result['date'][$j] = $dFormat;
                     $month = strtotime("+1 month", $month);
                     $j++;
