@@ -46,8 +46,21 @@ class LaboratoryController extends AbstractActionController
     
     public function samplesTestedAction()
     {
-        $this->layout()->setVariable('activeTab', 'labs-dashboard');               
-        return new ViewModel();
+        $this->layout()->setVariable('activeTab', 'labs-dashboard');
+        $sampleService = $this->getServiceLocator()->get('SampleService');
+        $labName = $sampleService->getAllLabName();
+        $clinicName = $sampleService->getAllClinicName();
+        $hubName = $sampleService->getAllHubName();
+        $sampleType = $sampleService->getSampleType();
+        $currentRegimen = $sampleService->getAllCurrentRegimen();
+        return new ViewModel(array(
+                'sampleType' => $sampleType,
+                'labName' => $labName,
+                'clinicName' => $clinicName,
+                'hubName' => $hubName,
+                'currentRegimen' => $currentRegimen,
+        ));
+        //return new ViewModel();
     }
     
     public function requisitionFormsIncompleteAction()
