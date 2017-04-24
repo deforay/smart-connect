@@ -468,7 +468,7 @@ class SampleTable extends AbstractTableGateway {
             $fQuery = $fQuery->where('f.facility_id="'.base64_decode(trim($params['facilityId'])).'"');
         }
         if(isset($params['sampleType']) && trim($params['sampleType'])!=''){
-            $fQuery = $fQuery->where('rs.sample_id="'.base64_decode(trim($params['sampleType'])).'"');
+            //$fQuery = $fQuery->where('rs.sample_id="'.base64_decode(trim($params['sampleType'])).'"');
         }
         $fQueryStr = $sql->getSqlStringForSqlObject($fQuery);
         $facilityResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -478,6 +478,10 @@ class SampleTable extends AbstractTableGateway {
                 $countQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))->columns(array('total' => new Expression('COUNT(*)')))
                                     ->where(array("vl.sample_collection_date >='" . $startMonth ." 00:00:00". "'", "vl.sample_collection_date <='" .$endMonth." 23:59:00". "'"))
                                     ->where('vl.lab_id="'.$facility['facility_id'].'"');
+                
+                if(isset($params['sampleType']) && trim($params['sampleType'])!=''){
+                    $countQuery = $countQuery->where('vl.sample_type="'.base64_decode(trim($params['sampleType'])).'"');
+                }
                 $cQueryStr = $sql->getSqlStringForSqlObject($countQuery);
                 $countResult[$i] = $dbAdapter->query($cQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
                 $result[$i][0] = $countResult[$i]['total'];
