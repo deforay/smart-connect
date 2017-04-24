@@ -43,42 +43,60 @@
                         <div class="col-md-12">        
                             <div class="form-group col-lg-4">
                                 <label class="control-label">Lab&nbsp;</label>
-                              <select class="form-control">
-                                <option>All Labs</option>
-                                <option>Lab 001</option>
-                                <option>Lab 002</option>
-                                <option>Lab 003</option>
-                              </select>
+                                <select name="labName" id="labName" class="form-control" title="Please choose lab name">
+                                    <option value="">All Labs</option>
+                                    <?php
+                                    foreach($labName as $lab)
+                                    {
+                                    ?>
+                                        <option value="<?php echo base64_encode($lab['facility_id']);?>"><?php echo $lab['facility_name'];?></option>
+                                    <?php
+                                    }
+                                    ?>
+                                </select>
                             </div>
+                            
                             <div class="form-group col-lg-4">
-                                <label class="control-label">Hub</label>
-                              <select class="form-control">
-                                <option>All Hubs</option>
-                                <option>Hub 001</option>
-                                <option>Hub 002</option>
-                                <option>Hub 003</option>
-                              </select>
+                                <label class="control-label">Hub </label>
+                                <select class="form-control" id="hub" name="hub">
+                                    <option value="">All Hubs</option>
+                                    <?php
+                                    foreach($hubName as $hub){
+                                    ?>
+                                    <option value="<?php echo base64_encode($hub['facility_id']);?>"><?php echo $hub['facility_name'];?></option>
+                                    <?php
+                                    }
+                                    ?>
+                                </select>
                             </div>                            
                             <div class="form-group col-lg-4">
                                 <label class="control-label">Clinic&nbsp;</label>
-                              <select class="form-control">
-                                <option>All Clinic</option>
-                                <option>Clinic 001</option>
-                                <option>Clinic 002</option>
-                                <option>Clinic 003</option>
-                              </select>
+                                <select class="form-control" id="clinicId" name="clinicId">
+                                    <option value="">All Clinics</option>
+                                    <?php
+                                    foreach($clinicName as $clinic){
+                                    ?>
+                                    <option value="<?php echo base64_encode($clinic['facility_id']);?>"><?php echo $clinic['facility_name'];?></option>
+                                    <?php
+                                    }
+                                    ?>
+                                </select>
                             </div>
 
                         </div>                                
                         <div class="col-md-12">
                             <div class="form-group col-lg-4">
                                 <label class="control-label">Current Regimen</label>
-                              <select class="form-control">
-                                <option>--Select--</option>
-                                <option>1</option>
-                                <option>2</option>
-                                <option>3</option>
-                              </select>
+                                <select class="form-control" id="currentRegimen" name="currentRegimen">
+                                    <option value="">All</option>
+                                    <?php
+                                    foreach($currentRegimen as $regimen){
+                                    ?>
+                                    <option value="<?php echo base64_encode($regimen['art_id']);?>"><?php echo $regimen['art_code'];?></option>
+                                    <?php
+                                    }
+                                    ?>
+                                </select>
                             </div>
                             <div class="form-group col-lg-4">
                                 <label class="control-label">ARV Adherence</label>
@@ -91,27 +109,42 @@
                             </div>
                             <div class="form-group col-lg-4">
                                 <label class="control-label">Age Group</label>
-                              <select class="form-control">
-                                <option>--Select--</option>
-                              </select>
+                                <select class="form-control" name="age" id="age" title="Please choose age group">
+                                  <option value="">-- Age --</option>
+                                  <option value="0-10">0-10</option>
+                                  <option value="10-20">10-20</option>
+                                  <option value="20-30">20-30</option>
+                                  <option value="30-40">30-40</option>
+                                  <option value="40-50">40-50</option>
+                                  <option value="50-60">50-60</option>
+                                  <option value="60-70">60-70</option>
+                                  <option value="70-80">70-80</option>
+                                  <option value="80">Above 80</option>
+                                </select>
                             </div>
                         </div>
                         <div class="col-md-12">
                             <div class="form-group col-lg-4">
                                 <label class="control-label">Test Result&nbsp;</label>
-                              <select class="form-control">
-                                <option>All</option>
-                                <option>VL Suppressed</option>
-                                <option>VL Not Suppressed</option>
+                                <select class="form-control" name="testResult" id="testResult" title="Please choose result">
+                                <option value="">All</option>
+                                <option value=">1000">> 1000 cp/mL</option>
+                                <option value="<1000">< 1000 cp/mL</option>
                               </select>
                             </div>
                             <div class="form-group col-lg-4">
                                 <label class="control-label">Sample Type</label>
-                              <select class="form-control">
-                                <option>All</option>
-                                <option>Plasma</option>
-                                <option>DBS</option>
-                              </select>
+                                <select class="form-control" id="sampleType" name="sampleType">
+                                    <option value="">All</option>
+                                    <?php
+                                    foreach($sampleType as $samples){
+                                    ?>
+                                    <option value="<?php echo base64_encode($samples['sample_id']);?>"><?php echo $samples['sample_name'];?></option>
+                                    <?php
+                                    }
+                                    ?>
+                                </select>
+                              
                             </div>
                             <div class="form-group col-lg-4">
                                 <br>

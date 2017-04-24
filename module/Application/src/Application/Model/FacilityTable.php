@@ -78,6 +78,7 @@ class FacilityTable extends AbstractTableGateway {
         $facilityResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         return $facilityResult;
     }
+    
     public function fetchAllClinicName()
     {
         $dbAdapter = $this->adapter;
@@ -85,6 +86,18 @@ class FacilityTable extends AbstractTableGateway {
         $fQuery = $sql->select()->from(array('f'=>'facility_details'))
                         ->join(array('ft'=>'facility_type'),'ft.facility_type_id=f.facility_type')
                         ->where('ft.facility_type_name="clinic"');
+        $fQueryStr = $sql->getSqlStringForSqlObject($fQuery);
+        $facilityResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+        return $facilityResult;
+    }
+    
+    public function fetchAllHubName()
+    {
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $fQuery = $sql->select()->from(array('f'=>'facility_details'))
+                        ->join(array('ft'=>'facility_type'),'ft.facility_type_id=f.facility_type')
+                        ->where('ft.facility_type_name="hub"');
         $fQueryStr = $sql->getSqlStringForSqlObject($fQuery);
         $facilityResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         return $facilityResult;
