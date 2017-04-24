@@ -43,7 +43,6 @@
                 point: {
                     events: {
                         click: function (e) {
-                            //console.log(e.point.url)
                             window.open(e.point.url+'&month='+e.point.category, '_blank');
                         }
                     }
@@ -59,7 +58,7 @@
               name:'<?php echo $key."(".$gender[$i].")";?>',
               data:[<?php
                   foreach($condition as $count){
-                      echo '{y:'.$count.',url:"/labs/samples-tested?gender='.$gender[$i].'"},';
+                      echo '{y:'.$count.',url:"/labs/samples-tested?gender='.$gender[$i].'&range='.$key.'"},';
                   }
               ?>],
               stack:'<?php echo $gender[$i];?>',

@@ -55,7 +55,7 @@
               name:'<?php echo $key."(".htmlspecialchars($age[$i]).")";?>',
               data:[<?php
                   foreach($condition as $count){
-                     echo '{y:'.$count.',url:"/labs/samples-tested?age='.$age[$i].'"},';
+                     echo '{y:'.$count.',url:"/labs/samples-tested?age='.$age[$i].'&range='.$key.'"},';
                   }
               ?>],
               stack:'<?php echo $age[$i];?>',

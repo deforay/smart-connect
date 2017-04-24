@@ -43,8 +43,8 @@
                 cursor: 'pointer',
                 point: {
                     events: {
-                        click: function () {
-                            window.location.href='/labs/samples-tested';
+                        click: function (e) {
+                        window.open(e.point.url+'&month='+e.point.category, '_blank');
                         }
                     }
                 }
@@ -57,7 +57,7 @@
               name:'<?php echo $key;?>',
               data:[<?php
                   foreach($condition as $count){
-                      echo $count.",";
+                     echo '{y:'.$count.',url:"/labs/samples-tested?range='.$key.'"},';
                   }
               ?>],
               },
