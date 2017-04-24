@@ -1137,4 +1137,81 @@ class SampleTable extends AbstractTableGateway {
         $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         return $sResult;
     }
+	
+	public function fetchSampleDetails($params)
+    {
+		//\Zend\Debug\Debug::dump($params);
+		//die;
+        $result = '';
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $common = new CommonService();
+        //if(trim($params['fromDate'])!= '' && trim($params['toDate'])!= ''){
+            $startMonth = date("Y-m", strtotime(trim($params['fromDate'])))."-01";
+            $endMonth = date("Y-m", strtotime(trim($params['toDate'])))."-31";
+        
+			$fQuery = $sql->select()->from(array('f'=>'facility_details'))
+                        ->join(array('vl'=>'dash_vl_request_form'),'vl.lab_id=f.facility_id',array('lab_id','sample_type','result'))
+                        ->where('vl.lab_id !=0')
+                        ->group('f.facility_id');
+						
+			if(isset($params['facilityId']) && trim($params['facilityId'])!=''){
+				$fQuery = $fQuery->where('f.facility_id="'.base64_decode(trim($params['facilityId'])).'"');
+			}
+			
+			
+			
+			$fQueryStr = $sql->getSqlStringForSqlObject($fQuery);
+			$facilityResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+			if($facilityResult){
+				$i = 0;
+				foreach($facilityResult as $facility){
+					$countQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))->columns(array('total' => new Expression('COUNT(*)')))
+										->where('vl.lab_id="'.$facility['facility_id'].'"');
+					
+					if(isset($params['sampleType']) && trim($params['sampleType'])!=''){
+						$countQuery = $countQuery->where('rs.sample_id="'.base64_decode(trim($params['sampleType'])).'"');
+					}
+					if(isset($params['testResult']) && trim($params['testResult'])!=''){
+						$countQuery = $countQuery->where('vl.result'.$params['testResult']);
+					}
+					if(isset($params['gender']) && trim($params['gender'])!=''){
+						$countQuery = $countQuery->where('vl.patient_gender="'.$params['gender'].'"');
+					}
+					if(isset($params['currentRegimen']) && trim($params['currentRegimen'])!=''){
+						$countQuery = $countQuery->where('vl.current_regimen="'.base64_decode(trim($params['currentRegimen'])).'"');
+					}
+					
+					if(isset($params['adherence']) && trim($params['adherence'])!=''){
+						$countQuery = $countQuery->where(array("vl.arv_adherance_percentage ='".$params['adherence']."'")); 
+			        }
+					
+					if(isset($params['searchMonth']) && trim($params['searchMonth'])!=''){
+						$expMonth=explode("-",$params['searchMonth']);
+						$mnth = date("m", strtotime($expMonth[0]));
+						$year = $expMonth[1];
+						$countQuery = $countQuery->where("Month(sample_collection_date)='".$mnth."' AND Year(sample_collection_date)='".$year."'");
+					}
+					
+					if(isset($params['age']) && $params['age']!=''){
+						$age = explode("-",$params['age']);
+						if(isset($age[1])){
+						$countQuery = $countQuery->where(array("vl.patient_age_in_years >='".$age[0]."'","vl.patient_age_in_years <='".$age[1]."'"));
+						}else{
+						$countQuery = $countQuery->where('vl.patient_age_in_years'.$params['age']);
+						}
+					}
+		
+					$cQueryStr = $sql->getSqlStringForSqlObject($countQuery);
+					$countResult[$i] = $dbAdapter->query($cQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
+					$result[$i][0] = $countResult[$i]['total'];
+					$result[$i][1] = $facility['facility_name'];
+					$i++;
+				}
+			}
+		//}
+		//\Zend\Debug\Debug::dump($result);
+		//die;
+        return $result;
+    }
 }

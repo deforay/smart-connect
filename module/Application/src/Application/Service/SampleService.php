@@ -378,4 +378,10 @@ class SampleService {
         $artCodeDb = $this->sm->get('ArtCodeTable');
         return $artCodeDb->fetchAllCurrentRegimen();
     }
+    
+    public function getSampleDetails($params)
+    {
+        $sampleDb = $this->sm->get('SampleTable');
+        return $sampleDb->fetchSampleDetails($params);
+    }
 }

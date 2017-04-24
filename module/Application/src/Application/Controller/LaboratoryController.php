@@ -45,8 +45,26 @@ class LaboratoryController extends AbstractActionController
     }
     
     public function samplesTestedAction()
-    {
+    {   
         $this->layout()->setVariable('activeTab', 'labs-dashboard');
+        $gender="";
+        $month="";
+        $range="";
+        $age="";
+        if($this->params()->fromQuery('gender')){
+            $gender=$this->params()->fromQuery('gender');
+        }
+        if($this->params()->fromQuery('month')){
+            $month=$this->params()->fromQuery('month');
+        }
+        if($this->params()->fromQuery('range')){
+            $range=$this->params()->fromQuery('range');
+        }
+        if($this->params()->fromQuery('age')){
+            $age=$this->params()->fromQuery('age');
+        }
+        
+        
         $sampleService = $this->getServiceLocator()->get('SampleService');
         $labName = $sampleService->getAllLabName();
         $clinicName = $sampleService->getAllClinicName();
@@ -59,6 +77,9 @@ class LaboratoryController extends AbstractActionController
                 'clinicName' => $clinicName,
                 'hubName' => $hubName,
                 'currentRegimen' => $currentRegimen,
+                'searchMonth' => $month,
+                'searchGender' => $gender,
+                'searchRange' => $range,
         ));
         //return new ViewModel();
     }
@@ -193,6 +214,34 @@ class LaboratoryController extends AbstractActionController
             return $viewModel;
         }
     }
-
+    
+    public function getSampleDetailsAction()
+    {
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $sampleService = $this->getServiceLocator()->get('SampleService');
+            $result = $sampleService->getSampleDetails($params);
+            $viewModel = new ViewModel();
+            $viewModel->setVariables(array('result' => $result))
+                        ->setTerminal(true);
+            return $viewModel;
+        }
+    }
+    
+    public function getBarSampleDetailsAction()
+    {
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $sampleService = $this->getServiceLocator()->get('SampleService');
+            $result = $sampleService->getSampleDetails($params);
+            $viewModel = new ViewModel();
+            $viewModel->setVariables(array('result' => $result))
+                        ->setTerminal(true);
+            return $viewModel;
+        }
+    }
+    
 }
 
