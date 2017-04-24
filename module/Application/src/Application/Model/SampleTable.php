@@ -418,11 +418,7 @@ class SampleTable extends AbstractTableGateway {
                 $completeQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
                                          ->columns(array('total' => new Expression('COUNT(*)')))
                                          ->where("Month(sample_collection_date)='".$mnth."' AND Year(sample_collection_date)='".$year."'")
-                                         ->where(array("vl.sample_collection_date !=''"))
-                                         ->where(array('vl.patient_art_no !=""'))
-                                         ->where(array('vl.current_regimen !=""'))
-                                         ->where(array('vl.patient_age_in_years !=""'))
-                                         ->where(array('vl.patient_gender !=""'));
+                                         ->where('vl.patient_art_no !="" AND vl.current_regimen !="" AND vl.patient_age_in_years !="" AND vl.patient_gender !=""');
                 if($params['facilityId'] !=''){
                     $completeQuery = $completeQuery->where(array("vl.lab_id ='".base64_decode($params['facilityId'])."'")); 
                 }
@@ -433,7 +429,7 @@ class SampleTable extends AbstractTableGateway {
                 $inCompleteQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
                                            ->columns(array('total' => new Expression('COUNT(*)')))
                                            ->where("Month(sample_collection_date)='".$mnth."' AND Year(sample_collection_date)='".$year."'")
-                                           ->where(array('(vl.sample_collection_date =""  OR  vl.patient_art_no="" OR vl.current_regimen="" OR vl.patient_age_in_years =""  OR vl.patient_gender="")'));
+                                           ->where(array('(vl.patient_art_no="" OR vl.current_regimen="" OR vl.patient_age_in_years =""  OR vl.patient_gender="")'));
                 if($params['facilityId'] !=''){
                     $inCompleteQuery = $inCompleteQuery->where(array("vl.lab_id ='".base64_decode($params['facilityId'])."'")); 
                 }
