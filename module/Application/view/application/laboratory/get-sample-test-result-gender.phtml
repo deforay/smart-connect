@@ -53,12 +53,18 @@
         $gender = array('M','F','Not Specified');
         for($i=0;$i<3;$i++){
               foreach($result[$gender[$i]] as $key=>$condition){
+              if($key!='VL Not Detected'){
+              $range = substr($key,4,6);
+              $range = preg_replace('/\s+/', '', $range);
+              }else{
+              $range = 'nd';
+              }
               ?>
               {
               name:'<?php echo $key."(".$gender[$i].")";?>',
               data:[<?php
                   foreach($condition as $count){
-                      echo '{y:'.$count.',url:"/labs/samples-tested?gender='.$gender[$i].'&range='.$key.'"},';
+                      echo '{y:'.$count.',url:"/labs/samples-tested?gender='.$gender[$i].'&range='.$range.'"},';
                   }
               ?>],
               stack:'<?php echo $gender[$i];?>',

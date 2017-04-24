@@ -50,12 +50,18 @@
         $age = array('>16','<16');
         for($i=0;$i<count($age);$i++){
               foreach($result[$age[$i]] as $key=>$condition){
+              if($key!='VL Not Detected'){
+              $range = substr($key,4,6);
+              $range = preg_replace('/\s+/', '', $range);
+              }else{
+              $range = 'nd';
+              }
               ?>
               {
               name:'<?php echo $key."(".htmlspecialchars($age[$i]).")";?>',
               data:[<?php
                   foreach($condition as $count){
-                     echo '{y:'.$count.',url:"/labs/samples-tested?age='.$age[$i].'&range='.$key.'"},';
+                     echo '{y:'.$count.',url:"/labs/samples-tested?age='.$age[$i].'&range='.$range.'"},';
                   }
               ?>],
               stack:'<?php echo $age[$i];?>',
