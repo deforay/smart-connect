@@ -117,6 +117,9 @@ if(count($result['stResult'])>0){
         subtitle: {
             text: ''
         },
+        credits: {
+            enabled: false
+        },
         xAxis: {
             categories: [
             <?php
@@ -182,6 +185,9 @@ $('#samplesTestedChart').highcharts({
         subtitle: {
             text: ''
         },
+        credits: {
+            enabled: false
+        },
         xAxis: {
             categories: [<?php
             foreach($result['saResult'] as $total){
@@ -236,6 +242,9 @@ $('#samplesRejectedChart').highcharts({
         },
         subtitle: {
             text: ''
+        },
+        credits: {
+            enabled: false
         },
         xAxis: {
             categories: [<?php

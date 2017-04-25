@@ -51,6 +51,8 @@ class LaboratoryController extends AbstractActionController
         $month="";
         $range="";
         $age="";
+        $fromMonth="";
+        $toMonth="";
         if($this->params()->fromQuery('gender')){
             $gender=$this->params()->fromQuery('gender');
         }
@@ -63,7 +65,12 @@ class LaboratoryController extends AbstractActionController
         if($this->params()->fromQuery('age')){
             $age=$this->params()->fromQuery('age');
         }
-        
+        if($this->params()->fromQuery('fromMonth')){
+            $fromMonth=$this->params()->fromQuery('fromMonth');
+        }
+        if($this->params()->fromQuery('toMonth')){
+            $toMonth=$this->params()->fromQuery('toMonth');
+        }
         
         $sampleService = $this->getServiceLocator()->get('SampleService');
         $labName = $sampleService->getAllLabName();
@@ -80,6 +87,8 @@ class LaboratoryController extends AbstractActionController
                 'searchMonth' => $month,
                 'searchGender' => $gender,
                 'searchRange' => $range,
+                'fromMonth' => $fromMonth,
+                'toMonth' => $toMonth,
         ));
         //return new ViewModel();
     }
