@@ -364,4 +364,24 @@ class SampleService {
         $sampleDb = $this->sm->get('SampleTable');
         return $sampleDb->fetchClinicSampleTestedResults($params);
     }
+    
+    //get all Hub Name
+    public function getAllHubName()
+    {
+        $facilityDb = $this->sm->get('FacilityTable');
+        return $facilityDb->fetchAllHubName();
+    }
+    
+    //get all Current Regimen
+    public function getAllCurrentRegimen()
+    {
+        $artCodeDb = $this->sm->get('ArtCodeTable');
+        return $artCodeDb->fetchAllCurrentRegimen();
+    }
+    
+    public function getSampleDetails($params)
+    {
+        $sampleDb = $this->sm->get('SampleTable');
+        return $sampleDb->fetchSampleDetails($params);
+    }
 }

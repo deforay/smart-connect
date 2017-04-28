@@ -25,6 +25,7 @@ use Application\Model\SampleStatusTable;
 use Application\Model\TestReasonTable;
 use Application\Model\SampleTypeTable;
 use Application\Model\GlobalTable;
+use Application\Model\ArtCodeTable;
 
 use Application\Service\CommonService;
 use Application\Service\UserService;
@@ -159,7 +160,12 @@ class Module
                     $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
                     $table = new GlobalTable($dbAdapter);
                     return $table;
+                },'ArtCodeTable' => function($sm) {
+                    $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+                    $table = new ArtCodeTable($dbAdapter);
+                    return $table;
                 },
+				
                 'CommonService' => function($sm) {
                     return new CommonService($sm);
                 },

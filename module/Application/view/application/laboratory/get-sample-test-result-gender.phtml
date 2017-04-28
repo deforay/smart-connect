@@ -11,6 +11,9 @@
         title: {
             text: ''
         },
+       credits: {
+              enabled: false
+       },
         xAxis: {
             categories: [<?php
             if(isset($result['date']) && count($result['date'])>0){
@@ -42,37 +45,36 @@
                 cursor: 'pointer',
                 point: {
                     events: {
-                        click: function () {
-                            window.location.href='/labs/samples-tested';
+                        click: function (e) {
+                            window.open(e.point.url+'&month='+e.point.category, '_blank');
                         }
                     }
                 }
             }
         },
         series: [<?php
-        $gender = array('M','F','');
+        $gender = array('M','F','Not Specified');
         for($i=0;$i<3;$i++){
-              $specific = $gender[$i];
-              if($gender[$i]=='')
-              {
-                     $specific = 'Not Specified';
+              foreach($result[$gender[$i]] as $key=>$condition){
+              if($key!='VL Not Detected'){
+              $range = substr($key,4,6);
+              $range = preg_replace('/\s+/', '', $range);
+              }else{
+              $range = 'nd';
               }
-              foreach($result[$gender[$i]]['sampleName'] as $key=>$condition){
               ?>
               {
-              name:'<?php echo $key."(".$specific.")";?>',
+              name:'<?php echo $key."(".$gender[$i].")";?>',
               data:[<?php
                   foreach($condition as $count){
-                      echo $count.",";
+                      echo '{y:'.$count.',url:"/labs/samples-tested?gender='.$gender[$i].'&range='.$range.'"},';
                   }
               ?>],
               stack:'<?php echo $gender[$i];?>',
+              
               },
               <?php
               }
-              ?>
-              
-              <?php
         }
             ?>
         ],

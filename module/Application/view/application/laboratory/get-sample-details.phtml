@@ -1,11 +1,11 @@
 <?php
 //\Zend\Debug\Debug::dump($result);die;
 ?>
-<div id="gotoPie"></div>
+
 
 <script>
        $(function () {
-        $('#gotoPie').highcharts({
+        $('#piecontainer').highcharts({
         chart: {
             plotBackgroundColor: null,
             plotBorderWidth: null,
@@ -15,7 +15,7 @@
         title: {
             text: ''
         },
-       credits: {
+        credits: {
               enabled: false
        },
         tooltip: {
@@ -26,13 +26,12 @@
                 allowPointSelect: true,
                 cursor: 'pointer',
                 dataLabels: {
-                    enabled: false,
-                    format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                    enabled: true,
+                    format: '<b>{point.name}</b> : {point.percentage:.1f}%',
                     style: {
                         color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
                     }
-                },
-                showInLegend: true
+                }
             }
         },
         series: [{

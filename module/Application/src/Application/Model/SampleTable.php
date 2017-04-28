@@ -254,7 +254,7 @@ class SampleTable extends AbstractTableGateway {
                 while($month <= $end)
                 {
                     $mnth = date('m', $month);$year = date('Y', $month);$dFormat = date("M-Y", $month);
-                        $lessThanQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))->columns(array('total' => new Expression('COUNT(*)')))
+                        $lessThanQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))->columns(array('total' => new Expression('COUNT(*)'),'Male' => new Expression('SUM(CASE WHEN patient_gender = "M" OR patient_gender ="m" THEN 1 ELSE 0 END)'),'Female' => new Expression('SUM(CASE WHEN patient_gender = "F" OR patient_gender ="f" THEN 1 ELSE 0 END)'),'Other' => new Expression('SUM(CASE WHEN (patient_gender != "F" AND patient_gender !="f" AND patient_gender != "M" AND patient_gender !="m") THEN 1 ELSE 0 END)')))
                                             ->where("Month(sample_collection_date)='".$mnth."' AND Year(sample_collection_date)='".$year."'");
                                             //->where('vl.sample_type IN ("' . implode('", "', $sampleId) . '")');
                         if($params['facilityId'] !=''){
@@ -262,21 +262,26 @@ class SampleTable extends AbstractTableGateway {
                         }
                         $lQueryStr = $sql->getSqlStringForSqlObject($lessThanQuery);
                         
-                        for($g=0;$g<3;$g++){
-                        $greaterResult = $dbAdapter->query($lQueryStr." AND vl.result>1000 AND vl.patient_gender='".$gender[$g]."'", $dbAdapter::QUERY_MODE_EXECUTE)->current();
-                        $result[$gender[$g]]['sampleName']['VL (> 1000 cp/ml)'][$j] = $greaterTotal+$greaterResult['total'];
+                        //for($g=0;$g<3;$g++){
+                        $greaterResult = $dbAdapter->query($lQueryStr." AND vl.result>1000", $dbAdapter::QUERY_MODE_EXECUTE)->current();
+                        $result['M']['VL (> 1000 cp/ml)'][$j] = $greaterTotal+$greaterResult['Male'];
+                        $result['F']['VL (> 1000 cp/ml)'][$j] = $greaterTotal+$greaterResult['Female'];
+                        $result['Not Specified']['VL (> 1000 cp/ml)'][$j] = $greaterTotal+$greaterResult['Other'];
                         
-                        $notTargetResult = $dbAdapter->query($lQueryStr." AND 'vl.result'='Target Not Detected' AND vl.patient_gender='".$gender[$g]."'", $dbAdapter::QUERY_MODE_EXECUTE)->current();
-                        $result[$gender[$g]]['sampleName']['VL Not Detected'][$j] = $notTargetTotal+$notTargetResult['total'];
+                        $notTargetResult = $dbAdapter->query($lQueryStr." AND 'vl.result'='Target Not Detected'", $dbAdapter::QUERY_MODE_EXECUTE)->current();
+                        $result['M']['VL Not Detected'][$j] = $notTargetTotal+$notTargetResult['Male'];
+                        $result['F']['VL Not Detected'][$j] = $notTargetTotal+$notTargetResult['Female'];
+                        $result['Not Specified']['VL Not Detected'][$j] = $notTargetTotal+$notTargetResult['Other'];
                         
-                        $lessResult = $dbAdapter->query($lQueryStr." AND vl.result<1000 AND vl.patient_gender='".$gender[$g]."'", $dbAdapter::QUERY_MODE_EXECUTE)->current();
-                        $result[$gender[$g]]['sampleName']['VL (< 1000 cp/ml)'][$j] = $lessTotal+$lessResult['total'];
-                        }
+                        $lessResult = $dbAdapter->query($lQueryStr." AND vl.result<1000 ", $dbAdapter::QUERY_MODE_EXECUTE)->current();
+                        $result['M']['VL (< 1000 cp/ml)'][$j] = $lessTotal+$lessResult['Male'];
+                        $result['F']['VL (< 1000 cp/ml)'][$j] = $lessTotal+$lessResult['Female'];
+                        $result['Not Specified']['VL (< 1000 cp/ml)'][$j] = $lessTotal+$lessResult['Other'];
+                        //}
                     $result['date'][$j] = $dFormat;
                     $month = strtotime("+1 month", $month);
                     $j++;
                 }
-            
             return $result;
         }
     }
@@ -298,7 +303,7 @@ class SampleTable extends AbstractTableGateway {
                 while($month <= $end)
                 {
                     $mnth = date('m', $month);$year = date('Y', $month);$dFormat = date("M-Y", $month);
-                        $lessThanQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))->columns(array('total' => new Expression('COUNT(*)')))
+                        $lessThanQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))->columns(array('total' => new Expression('COUNT(*)'),'>16' => new Expression('SUM(CASE WHEN patient_age_in_years > 16 THEN 1 ELSE 0 END)'),'<16' => new Expression('SUM(CASE WHEN patient_age_in_years < 16 THEN 1 ELSE 0 END)')))
                                             ->where("Month(sample_collection_date)='".$mnth."' AND Year(sample_collection_date)='".$year."'");
                                             //->where('vl.sample_type IN ("' . implode('", "', $sampleId) . '")');
                         if($params['facilityId'] !=''){
@@ -306,16 +311,19 @@ class SampleTable extends AbstractTableGateway {
                         }
                         $lQueryStr = $sql->getSqlStringForSqlObject($lessThanQuery);
                         
-                        for($g=0;$g<2;$g++){
-                        $greaterResult = $dbAdapter->query($lQueryStr." AND vl.result>1000 AND vl.patient_age_in_years ".$age[$g], $dbAdapter::QUERY_MODE_EXECUTE)->current();
-                        $result[$age[$g]]['sampleName']['VL (> 1000 cp/ml)'][$j] = $greaterTotal+$greaterResult['total'];
+                        //for($g=0;$g<2;$g++){
+                        $greaterResult = $dbAdapter->query($lQueryStr." AND vl.result>1000", $dbAdapter::QUERY_MODE_EXECUTE)->current();
+                        $result['>16']['VL (> 1000 cp/ml)'][$j] = $greaterTotal+$greaterResult['>16'];
+                        $result['<16']['VL (> 1000 cp/ml)'][$j] = $greaterTotal+$greaterResult['<16'];
                         
-                        $notTargetResult = $dbAdapter->query($lQueryStr." AND 'vl.result'='Target Not Detected' AND vl.patient_age_in_years ".$age[$g], $dbAdapter::QUERY_MODE_EXECUTE)->current();
-                        $result[$age[$g]]['sampleName']['VL Not Detected'][$j] = $notTargetTotal+$notTargetResult['total'];
+                        $notTargetResult = $dbAdapter->query($lQueryStr." AND 'vl.result'='Target Not Detected'", $dbAdapter::QUERY_MODE_EXECUTE)->current();
+                        $result['>16']['VL Not Detected'][$j] = $notTargetTotal+$notTargetResult['>16'];
+                        $result['<16']['VL Not Detected'][$j] = $notTargetTotal+$notTargetResult['<16'];
                         
-                        $lessResult = $dbAdapter->query($lQueryStr." AND vl.result<1000 AND vl.patient_age_in_years ".$age[$g], $dbAdapter::QUERY_MODE_EXECUTE)->current();
-                        $result[$age[$g]]['sampleName']['VL (< 1000 cp/ml)'][$j] = $lessTotal+$lessResult['total'];
-                        }
+                        $lessResult = $dbAdapter->query($lQueryStr." AND vl.result<1000", $dbAdapter::QUERY_MODE_EXECUTE)->current();
+                        $result['>16']['VL (< 1000 cp/ml)'][$j] = $lessTotal+$lessResult['>16'];
+                        $result['<16']['VL (< 1000 cp/ml)'][$j] = $lessTotal+$lessResult['<16'];
+                        //}
                     $result['date'][$j] = $dFormat;
                     $month = strtotime("+1 month", $month);
                     $j++;
@@ -410,11 +418,7 @@ class SampleTable extends AbstractTableGateway {
                 $completeQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
                                          ->columns(array('total' => new Expression('COUNT(*)')))
                                          ->where("Month(sample_collection_date)='".$mnth."' AND Year(sample_collection_date)='".$year."'")
-                                         ->where(array("vl.sample_collection_date !=''"))
-                                         ->where(array('vl.patient_art_no !=""'))
-                                         ->where(array('vl.current_regimen !=""'))
-                                         ->where(array('vl.patient_age_in_years !=""'))
-                                         ->where(array('vl.patient_gender !=""'));
+                                         ->where('vl.patient_art_no !="" AND vl.current_regimen !="" AND vl.patient_age_in_years !="" AND vl.patient_gender !=""');
                 if($params['facilityId'] !=''){
                     $completeQuery = $completeQuery->where(array("vl.lab_id ='".base64_decode($params['facilityId'])."'")); 
                 }
@@ -425,7 +429,7 @@ class SampleTable extends AbstractTableGateway {
                 $inCompleteQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
                                            ->columns(array('total' => new Expression('COUNT(*)')))
                                            ->where("Month(sample_collection_date)='".$mnth."' AND Year(sample_collection_date)='".$year."'")
-                                           ->where(array('(vl.sample_collection_date =""  OR  vl.patient_art_no="" OR vl.current_regimen="" OR vl.patient_age_in_years =""  OR vl.patient_gender="")'));
+                                           ->where(array('(vl.patient_art_no="" OR vl.current_regimen="" OR vl.patient_age_in_years =""  OR vl.patient_gender="")'));
                 if($params['facilityId'] !=''){
                     $inCompleteQuery = $inCompleteQuery->where(array("vl.lab_id ='".base64_decode($params['facilityId'])."'")); 
                 }
@@ -464,7 +468,7 @@ class SampleTable extends AbstractTableGateway {
             $fQuery = $fQuery->where('f.facility_id="'.base64_decode(trim($params['facilityId'])).'"');
         }
         if(isset($params['sampleType']) && trim($params['sampleType'])!=''){
-            $fQuery = $fQuery->where('rs.sample_id="'.base64_decode(trim($params['sampleType'])).'"');
+            //$fQuery = $fQuery->where('rs.sample_id="'.base64_decode(trim($params['sampleType'])).'"');
         }
         $fQueryStr = $sql->getSqlStringForSqlObject($fQuery);
         $facilityResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -474,6 +478,10 @@ class SampleTable extends AbstractTableGateway {
                 $countQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))->columns(array('total' => new Expression('COUNT(*)')))
                                     ->where(array("vl.sample_collection_date >='" . $startMonth ." 00:00:00". "'", "vl.sample_collection_date <='" .$endMonth." 23:59:00". "'"))
                                     ->where('vl.lab_id="'.$facility['facility_id'].'"');
+                
+                if(isset($params['sampleType']) && trim($params['sampleType'])!=''){
+                    $countQuery = $countQuery->where('vl.sample_type="'.base64_decode(trim($params['sampleType'])).'"');
+                }
                 $cQueryStr = $sql->getSqlStringForSqlObject($countQuery);
                 $countResult[$i] = $dbAdapter->query($cQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
                 $result[$i][0] = $countResult[$i]['total'];
@@ -1128,5 +1136,82 @@ class SampleTable extends AbstractTableGateway {
         $sQueryStr = $sql->getSqlStringForSqlObject($squery);
         $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         return $sResult;
+    }
+	
+	public function fetchSampleDetails($params)
+    {
+		//\Zend\Debug\Debug::dump($params);
+		//die;
+        $result = '';
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $common = new CommonService();
+        //if(trim($params['fromDate'])!= '' && trim($params['toDate'])!= ''){
+            $startMonth = date("Y-m", strtotime(trim($params['fromDate'])))."-01";
+            $endMonth = date("Y-m", strtotime(trim($params['toDate'])))."-31";
+        
+			$fQuery = $sql->select()->from(array('f'=>'facility_details'))
+                        ->join(array('vl'=>'dash_vl_request_form'),'vl.lab_id=f.facility_id',array('lab_id','sample_type','result'))
+                        ->where('vl.lab_id !=0')
+                        ->group('f.facility_id');
+						
+			if(isset($params['facilityId']) && trim($params['facilityId'])!=''){
+				$fQuery = $fQuery->where('f.facility_id="'.base64_decode(trim($params['facilityId'])).'"');
+			}
+			
+			
+			
+			$fQueryStr = $sql->getSqlStringForSqlObject($fQuery);
+			$facilityResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+			if($facilityResult){
+				$i = 0;
+				foreach($facilityResult as $facility){
+					$countQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))->columns(array('total' => new Expression('COUNT(*)')))
+										->where('vl.lab_id="'.$facility['facility_id'].'"');
+					
+					if(isset($params['sampleType']) && trim($params['sampleType'])!=''){
+						$countQuery = $countQuery->where('rs.sample_id="'.base64_decode(trim($params['sampleType'])).'"');
+					}
+					if(isset($params['testResult']) && trim($params['testResult'])!=''){
+						$countQuery = $countQuery->where('vl.result'.$params['testResult']);
+					}
+					if(isset($params['gender']) && trim($params['gender'])!=''){
+						$countQuery = $countQuery->where('vl.patient_gender="'.$params['gender'].'"');
+					}
+					if(isset($params['currentRegimen']) && trim($params['currentRegimen'])!=''){
+						$countQuery = $countQuery->where('vl.current_regimen="'.base64_decode(trim($params['currentRegimen'])).'"');
+					}
+					
+					if(isset($params['adherence']) && trim($params['adherence'])!=''){
+						$countQuery = $countQuery->where(array("vl.arv_adherance_percentage ='".$params['adherence']."'")); 
+			        }
+					
+					if(isset($params['searchMonth']) && trim($params['searchMonth'])!=''){
+						$expMonth=explode("-",$params['searchMonth']);
+						$mnth = date("m", strtotime($expMonth[0]));
+						$year = $expMonth[1];
+						$countQuery = $countQuery->where("Month(sample_collection_date)='".$mnth."' AND Year(sample_collection_date)='".$year."'");
+					}
+					
+					if(isset($params['age']) && $params['age']!=''){
+						$age = explode("-",$params['age']);
+						if(isset($age[1])){
+						$countQuery = $countQuery->where(array("vl.patient_age_in_years >='".$age[0]."'","vl.patient_age_in_years <='".$age[1]."'"));
+						}else{
+						$countQuery = $countQuery->where('vl.patient_age_in_years'.$params['age']);
+						}
+					}
+		
+					$cQueryStr = $sql->getSqlStringForSqlObject($countQuery);
+					$countResult[$i] = $dbAdapter->query($cQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
+					$result[$i][0] = $countResult[$i]['total'];
+					$result[$i][1] = $facility['facility_name'];
+					$i++;
+				}
+			}
+		//}
+		//\Zend\Debug\Debug::dump($result);
+		//die;
+        return $result;
     }
 }

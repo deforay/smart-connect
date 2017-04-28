@@ -4,13 +4,16 @@
 <div id="facilitiesTestedVsSuppressed"></div>
 <script>
        $(function () {
-        $('#facilitiesTestedVsSuppressed').highcharts({
-        chart: {
+       $('#facilitiesTestedVsSuppressed').highcharts({
+       chart: {
             type: 'column'
-        },
-        title: {
+       },
+       title: {
             text: ''
-        },
+       },
+       credits: {
+              enabled: false
+       },
         xAxis: {
             categories: [<?php
             if(isset($result['lab']) && count($result['lab'])>0){
@@ -42,8 +45,12 @@
                 cursor: 'pointer',
                 point: {
                     events: {
-                        click: function () {
-                            window.location.href='/labs/samples-tested';
+                        click: function (e) {
+                        fromMonth = $(".mrp-lowerMonth").html();
+                        fromMonth = fromMonth.replace(" ","-");
+                        toMonth = $(".mrp-upperMonth").html();
+                        toMonth = toMonth.replace(" ","-");
+                            window.open(e.point.url+'&fromMonth='+fromMonth+'&toMonth='+toMonth+'&lab='+e.point.category, '_blank');
                         }
                     }
                 }
@@ -51,12 +58,18 @@
         },
         series: [<?php
               foreach($result['sampleName'] as $key=>$condition){
+              if($key!='VL Not Detected'){
+              $range = substr($key,4,6);
+              $range = preg_replace('/\s+/', '', $range);
+              }else{
+              $range = 'nd';
+              }
               ?>
               {
               name:'<?php echo $key;?>',
               data:[<?php
                   foreach($condition as $count){
-                      echo $count.",";
+                      echo '{y:'.$count.',url:"/labs/samples-tested?range='.$range.'"},';
                   }
               ?>],
               },
