@@ -522,10 +522,9 @@ class SampleTable extends AbstractTableGateway {
                         if(count($lResult)>0){
                             $total = 0;
                             foreach($lResult as $data){
-                                $hourdiff = $data['diff']*24;
-                                $total = $total + ($hourdiff);
+                                $total = $total + $data['diff'];
                             }
-                            $avgResult[$sample['sample_name']][$i][$j] = round($total/count($lResult),2);
+                            $avgResult[$sample['sample_name']][$i][$j] = round($total/count($lResult));
                         }else{
                             $avgResult[$sample['sample_name']][$i][$j] = "null";
                         }
@@ -546,10 +545,9 @@ class SampleTable extends AbstractTableGateway {
                     if(count($alResult)>0){
                         $total = 0;
                         foreach($alResult as $data){
-                            $hourdiff = $data['diff']*24;
-                            $total = $total + ($hourdiff);
+                            $total = $total + $data['diff'];
                         }
-                        $avgResult['all'][$j] = round($total/count($alResult),2);
+                        $avgResult['all'][$j] = round($total/count($alResult));
                     }else{
                         $avgResult['all'][$j] = "null";
                     }
