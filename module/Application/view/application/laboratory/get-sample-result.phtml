@@ -133,7 +133,8 @@ if(count($result['stResult'])>0){
             min: 0,
             title: {
                 text: null
-            }
+            },
+            labels: { formatter: function() { return this.value; } },
         },
         tooltip: {
             headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
@@ -200,7 +201,8 @@ $('#samplesTestedChart').highcharts({
             min: 0,
             title: {
                 text: null
-            }
+            },
+            labels: { formatter: function() { return this.value; } },
         },
         tooltip: {
             headerFormat: '<span style="font-size:10px">{point.key}</span><table>',

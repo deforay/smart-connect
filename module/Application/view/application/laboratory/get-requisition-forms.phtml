@@ -30,6 +30,7 @@ $('#reqformspie').highcharts({
             title: {
                 text: 'Forms'
             },
+            labels: { formatter: function() { return this.value; } },
             stackLabels: {
                 enabled: true,
                 style: {
