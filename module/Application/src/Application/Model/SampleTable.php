@@ -1152,7 +1152,7 @@ class SampleTable extends AbstractTableGateway {
                 ->group('f.facility_id');
                                         
                 if(isset($params['facilityId']) && trim($params['facilityId'])!=''){
-                        $fQuery = $fQuery->where('f.facility_id="'.base64_decode(trim($params['facilityId'])).'"');
+                    $fQuery = $fQuery->where('f.facility_id="'.base64_decode(trim($params['facilityId'])).'"');
                 }
                 
                 $fQueryStr = $sql->getSqlStringForSqlObject($fQuery);
