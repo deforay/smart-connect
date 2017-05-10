@@ -1327,12 +1327,10 @@ class SampleTable extends AbstractTableGateway {
             }else if($parameters['testResult'] == '>1000') {
               $sQuery = $sQuery->where("vl.result > 1000");
             }
-        }if(isset($parameters['lab'] ) && trim($parameters['lab'])!=''){
-            $sQuery = $sQuery->where(array("vl.lab_id ='".base64_decode($parameters['lab'])."'")); 
-        }if(isset($parameters['hub'] ) && trim($parameters['hub'])!=''){
-            $sQuery = $sQuery->where(array("vl.facility_id ='".base64_decode($parameters['hub'])."'"));
         }if(isset($parameters['clinic'] ) && trim($parameters['clinic'])!=''){
             $sQuery = $sQuery->where(array("vl.facility_id ='".base64_decode($parameters['clinic'])."'")); 
+        }if(isset($parameters['lab'] ) && trim($parameters['lab'])!=''){
+            $sQuery = $sQuery->where(array("vl.lab_id ='".base64_decode($parameters['lab'])."'")); 
         }if(isset($parameters['sampleType']) && trim($parameters['sampleType'])!=''){
             $sQuery = $sQuery->where('vl.sample_type="'.base64_decode(trim($parameters['sampleType'])).'"');
         }if(isset($parameters['currentRegimen']) && trim($parameters['currentRegimen'])!=''){
@@ -1400,12 +1398,10 @@ class SampleTable extends AbstractTableGateway {
             }else if($parameters['testResult'] == '>1000') {
               $iQuery = $iQuery->where("vl.result > 1000");
             }
-        }if(isset($parameters['lab'] ) && trim($parameters['lab'])!=''){
-            $iQuery = $iQuery->where(array("vl.lab_id ='".base64_decode($parameters['lab'])."'")); 
-        }if(isset($parameters['hub'] ) && trim($parameters['hub'])!=''){
-            $iQuery = $iQuery->where(array("vl.facility_id ='".base64_decode($parameters['hub'])."'"));
         }if(isset($parameters['clinic'] ) && trim($parameters['clinic'])!=''){
             $iQuery = $iQuery->where(array("vl.facility_id ='".base64_decode($parameters['clinic'])."'")); 
+        }if(isset($parameters['lab'] ) && trim($parameters['lab'])!=''){
+            $iQuery = $iQuery->where(array("vl.lab_id ='".base64_decode($parameters['lab'])."'")); 
         }if(isset($parameters['sampleType']) && trim($parameters['sampleType'])!=''){
             $iQuery = $iQuery->where('vl.sample_type="'.base64_decode(trim($parameters['sampleType'])).'"');
         }if(isset($parameters['currentRegimen']) && trim($parameters['currentRegimen'])!=''){
