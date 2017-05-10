@@ -27,7 +27,8 @@
             min: 0,
             title: {
                 text: 'Samples'
-            }
+            },
+            labels: { formatter: function() { return this.value; } },
         },
         tooltip: {
             headerFormat: '<span style="font-size:10px">{point.key}</span><table>',

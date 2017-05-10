@@ -4,6 +4,7 @@ namespace Application\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
+use Zend\Json\Json;
 
 class LaboratoryController extends AbstractActionController
 {
@@ -53,6 +54,7 @@ class LaboratoryController extends AbstractActionController
         $age="";
         $fromMonth="";
         $toMonth="";
+        $labFilter="";
         if($this->params()->fromQuery('gender')){
             $gender=$this->params()->fromQuery('gender');
         }
@@ -70,6 +72,9 @@ class LaboratoryController extends AbstractActionController
         }
         if($this->params()->fromQuery('toMonth')){
             $toMonth=$this->params()->fromQuery('toMonth');
+        }
+        if($this->params()->fromQuery('lab')){
+            $labFilter=$this->params()->fromQuery('lab');
         }
         
         $sampleService = $this->getServiceLocator()->get('SampleService');
@@ -89,8 +94,9 @@ class LaboratoryController extends AbstractActionController
                 'searchRange' => $range,
                 'fromMonth' => $fromMonth,
                 'toMonth' => $toMonth,
+                'labFilter' => $labFilter,
+                'age' => $age
         ));
-        //return new ViewModel();
     }
     
     public function requisitionFormsIncompleteAction()
@@ -249,6 +255,16 @@ class LaboratoryController extends AbstractActionController
             $viewModel->setVariables(array('result' => $result))
                         ->setTerminal(true);
             return $viewModel;
+        }
+    }
+    
+    public function getFilterSampleDetailsAction(){
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $sampleService = $this->getServiceLocator()->get('SampleService');
+            $result = $sampleService->getFilterSampleDetails($params);
+            return $this->getResponse()->setContent(Json::encode($result));
         }
     }
     

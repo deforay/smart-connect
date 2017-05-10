@@ -384,4 +384,9 @@ class SampleService {
         $sampleDb = $this->sm->get('SampleTable');
         return $sampleDb->fetchSampleDetails($params);
     }
+    
+    public function getFilterSampleDetails($params){
+        $sampleDb = $this->sm->get('SampleTable');
+        return $sampleDb->fetchFilterSampleDetails($params);
+    }
 }
