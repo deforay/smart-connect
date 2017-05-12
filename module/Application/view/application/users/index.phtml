@@ -39,7 +39,7 @@
                                             </div>
                                         </div>
                                         <br>
-                                        <table class="table table-striped table-bordered table-hover table-checkable order-column" id="sample_1">
+                                        <table id="userTable" class="table table-striped table-bordered table-hover table-checkable order-column">
                                                     <thead>
                                                         <tr>
                                                             <th> User Name </th>
@@ -50,26 +50,11 @@
                                                         </tr>
                                                     </thead>
                                                     <tbody>
-                                                        
-                                                        <?php foreach($users as $org){ ?>
                                                         <tr>
-                                                               <td style="width:25%;"><?php echo $org['username']; ?></td>                                                  
-                                                               <td style="width:15%;">
-                                                                <?php echo $org['role_name']; ?>
-                                                                <h6 class="text-info"><?php echo strtoupper($org['access_type_name']); ?></h6>
-                                                               </td>                                                  
-                                                               <td style="width:20%;"><?php echo $org['email']; ?></td>                                                  
-                                                               <td><?php echo $org['mobile']; ?></td>                                                  
-                                                               <td>
-                                                                    <a href="/users/edit/<?php echo $org['user_id']; ?>" class="btn green">Edit</a>
-                                                                    <a href="/users/map/<?php echo $org['user_id']; ?>" class="btn green">Map Facilities</a>
-                                                               </td>
+                                                            <td colspan="5" class="dataTables_empty">Loading data from server</td>
                                                         </tr>
-                                                        <?php } ?>
-                                                        
-                                                        
                                                     </tbody>
-                                                </table>
+                                        </table>
 
                                     </div>
                                     
@@ -78,62 +63,33 @@
                             <!-- END EXAMPLE TABLE PORTLET-->
                         </div>
                     </div>
-<script>
-    $(document).ready(function(){
-    
-    
-    
-    
-                var e = $("#sample_1").dataTable({
-                language: {
-                    aria: {
-                        sortAscending: ": activate to sort column ascending",
-                        sortDescending: ": activate to sort column descending"
-                    },
-                    emptyTable: "No data available in table",
-                    info: "Showing _START_ to _END_ of _TOTAL_ records",
-                    infoEmpty: "No records found",
-                    infoFiltered: "(filtered1 from _MAX_ total records)",
-                    lengthMenu: "Show _MENU_",
-                    search: "Search:",
-                    zeroRecords: "No matching records found",
-                    paginate: {
-                        previous: "Prev",
-                        next: "Next",
-                        last: "Last",
-                        first: "First"
-                    }
-                },
-                bStateSave: !0,
+<script type="text/javascript">
+    /* Table initialisation */
+     oTable = null;
+    $(document).ready(function() {
+    $('#userTable').dataTable( {
+		"bAutoWidth": false,
+        "bProcessing": true,
+        "bServerSide": true,
+         "aoColumns": [
+		{"sClass":"center"},
+        {"sClass":"center"},
+        {"sClass":"center"},
+        {"sClass":"center"},
+        {"sClass":"center","bSortable":false}
+            ],
+        "sAjaxSource": "<?php echo $this->url('users',array('action' => 'index')); ?>",
+         "fnServerData": function ( sSource, aoData, fnCallback ) {
+                $.ajax({
+                    "dataType": 'json',
+                    "type": "POST",
+                    "url": sSource,
+                    "data": aoData,
+                    "success": fnCallback
+                });
+            }
+    } );
 
-                lengthMenu: [
-                    [5, 15, 20, -1],
-                    [5, 15, 20, "All"]
-                ],
-                pageLength: 5,
-                pagingType: "bootstrap_full_number",
-
-                order: [
-                    [1, "asc"]
-                ]
-            });
-            
-            jQuery("#sample_1_wrapper");
-            e.find(".group-checkable").change(function() {
-                var e = jQuery(this).attr("data-set"),
-                    a = jQuery(this).is(":checked");
-                jQuery(e).each(function() {
-                    a ? ($(this).prop("checked", !0), $(this).parents("tr").addClass("active")) : ($(this).prop("checked", !1), $(this).parents("tr").removeClass("active"))
-                }), jQuery.uniform.update(e)
-            }), e.on("change", "tbody tr .checkboxes", function() {
-                $(this).parents("tr").toggleClass("active")
-            })
-        
-    
-    
-    });
-
-    
-
-
+} );
+       
 </script>

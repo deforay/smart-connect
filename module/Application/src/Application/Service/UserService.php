@@ -36,13 +36,41 @@ class UserService {
     }
     
     public function addUser($params) {
-        $db = $this->sm->get('UsersTable');
-        return $db->addUser($params);
+        $adapter = $this->sm->get('Zend\Db\Adapter\Adapter')->getDriver()->getConnection();
+        $adapter->beginTransaction();
+        try {
+            $db = $this->sm->get('UsersTable');
+            $result = $db->addUser($params);
+            if($result>0){
+             $adapter->commit();
+             $alertContainer = new Container('alert');
+             $alertContainer->alertMsg = 'User details added successfully';
+            }
+        }
+        catch (Exception $exc) {
+            $adapter->rollBack();
+            error_log($exc->getMessage());
+            error_log($exc->getTraceAsString());
+        }
     }
     
     public function updateUser($params) {
-        $db = $this->sm->get('UsersTable');
-        return $db->updateUser($params);
+        $adapter = $this->sm->get('Zend\Db\Adapter\Adapter')->getDriver()->getConnection();
+        $adapter->beginTransaction();
+        try {
+            $db = $this->sm->get('UsersTable');
+            $result = $db->updateUser($params);
+            if($result>0){
+             $adapter->commit();
+             $alertContainer = new Container('alert');
+             $alertContainer->alertMsg = 'User details updated successfully';
+            }
+        }
+        catch (Exception $exc) {
+            $adapter->rollBack();
+            error_log($exc->getMessage());
+            error_log($exc->getTraceAsString());
+        }
     }
    
     public function fetchUserOrganizations($userId) {
@@ -54,5 +82,9 @@ class UserService {
         $db = $this->sm->get('UserOrganizationsMapTable');
         return $db->mapUserOrganizations($params);
     }
-   
+    
+    public function getAllUsers($parameters){
+        $db = $this->sm->get('UsersTable');
+        return $db->fetchAllUsers($parameters);
+    }
 }

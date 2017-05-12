@@ -32,38 +32,27 @@
 
 
                                 <div class="portlet-body form">
-                                    <form class="form-horizontal" method="post" action="/users/add" role="form">
+                                    <form class="form-horizontal" name="addUserInformation" id="addUserInformation" method="post" action="/users/add" role="form"  autocomplete="off">
                                         <div class="form-body">
                                             <div class="form-group">
                                                 <label class="col-md-3 control-label">Name <span class="font-red-mint">*</span></label>
                                                 <div class="col-md-6">
-                                                    <input type="text" id="username" name="username" class="form-control" placeholder="">
+                                                    <input type="text" id="username" name="username" class="form-control isRequired" placeholder="" title="Please enter the name">
                                                 </div>
                                             </div>
                                             <div class="form-group">
                                                 <label class="col-md-3 control-label">User Type <span class="font-red-mint">*</span></label>
                                                 <div class="col-md-6">
-                                                    <select class="form-control" name="role" id="role">
+                                                    <select class="form-control isRequired" name="role" id="role" title="Please select the role">
                                                         <option value="">--Select--</option>
                                                         <?php
                                                             $options = [];
                                                             foreach($roles as $r) {
                                                                 
-                                                               $options[$r['access_type_name']][$r['id']] = $r['role_name'];
-                                                               
-                                                            }
-                                                            
-                                                           foreach($options as $grp => $opt){
+                                                            //$options[$r['access_type_name']][$r['role_id']] = $r['role_name'];
+                                                              
                                                         ?>
-                                                            <optgroup label ="<?php echo strtoupper($grp); ?>">
-                                                        <?php
-                                                          foreach($opt as $id=>$role){
-                                                        ?>
-                                                            <option value="<?php echo $id ?>"><?php echo $role ?></option>
-                                                        <?php
-                                                            }
-                                                        ?>      
-                                                            </optgroup>
+                                                          <option value="<?php echo $r['role_id']; ?>"><?php echo $r['role_name'] ?></option>
                                                         <?php
                                                        }
                                                        ?>
@@ -74,19 +63,19 @@
                                             <div class="form-group">
                                                 <label class="col-md-3 control-label">Email <span class="font-red-mint">*</span></label>
                                                 <div class="col-md-6">
-                                                    <input type="email" id="email" name="email" class="form-control" placeholder="">
+                                                    <input type="email" id="email" name="email" class="form-control isEmail isRequired" placeholder="" title="Please enter valid email">
                                                 </div>
                                             </div>
                                             <div class="form-group">
-                                                <label class="col-md-3 control-label">Mobile <span class="font-red-mint">*</span></label>
+                                                <label class="col-md-3 control-label">Mobile </label>
                                                 <div class="col-md-6">
-                                                    <input type="tel" id="mobile" name="mobile" class="form-control" placeholder="">
+                                                    <input type="tel" id="mobile" name="mobile" class="form-control" placeholder="" title="Please enter mobile number">
                                                 </div>
                                             </div>
                                             <div class="form-group">
                                                 <label class="col-md-3 control-label">Password <span class="font-red-mint">*</span></label>
                                                 <div class="col-md-6">
-                                                    <input type="password" id="password" name="password" class="form-control" placeholder="">
+                                                    <input type="password" id="password" name="password" class="form-control isRequired" placeholder="" title="Please enter the password">
                                                 </div>
                                             </div>
 
@@ -96,18 +85,30 @@
                                         <div class="form-actions">
                                             <div class="row">
                                                 <div class="col-md-offset-3 col-md-9">
-                                                    <button type="submit" class="btn green">Submit</button>
-                                                    <button type="button" class="btn default" onclick="document.location.href='/users'">Cancel</button>
+                                                    <input type="button" class="btn green" value="Submit" onclick="validateNow();return false;">
+                                                    <a href="<?php echo $this->url('users', array('action' => 'index')); ?>" class="btn default">Cancel</a>
+                                                    
                                                 </div>
                                             </div>
                                         </div>
                                     </form>
                                 </div>
-
-
-                                    
                                 </div>
                             </div>
                             <!-- END EXAMPLE TABLE PORTLET-->
                         </div>
                     </div>
+<script type="text/javascript">
+    duplicateName = true;
+    function validateNow() {
+        flag = deforayValidator.init({
+            formId: 'addUserInformation'
+        });
+        if (flag) {
+            if (duplicateName) {
+                $.blockUI();
+                document.getElementById('addUserInformation').submit();
+            }
+        }
+    }
+</script>
