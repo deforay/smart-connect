@@ -1217,6 +1217,90 @@ class SampleTable extends AbstractTableGateway {
         return $result;
     }
     
+    public function fetchBarSampleDetails($params){
+        //\Zend\Debug\Debug::dump($params);
+		//die;
+                $result = '';
+                $dbAdapter = $this->adapter;
+                $sql = new Sql($dbAdapter);
+                $common = new CommonService();
+                if(trim($params['fromDate'])!= '' && trim($params['toDate'])!= ''){
+                    $startMonth = date("Y-m", strtotime(trim($params['fromDate'])))."-01";
+                    $endMonth = date("Y-m", strtotime(trim($params['toDate'])))."-31";
+                }
+                $fQuery = $sql->select()->from(array('f'=>'facility_details'))
+                ->join(array('vl'=>'dash_vl_request_form'),'vl.lab_id=f.facility_id',array('lab_id','sample_type','result'))
+                ->where('vl.lab_id !=0')
+                ->group('f.facility_id');
+                                        
+                if(isset($params['facilityId']) && trim($params['facilityId'])!=''){
+                    $fQuery = $fQuery->where('f.facility_id="'.base64_decode(trim($params['facilityId'])).'"');
+                }
+                
+                $fQueryStr = $sql->getSqlStringForSqlObject($fQuery);
+                $facilityResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+                if($facilityResult){
+                        $j = 0;
+                        foreach($facilityResult as $facility){
+                            $countQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))->columns(array('total' => new Expression('COUNT(*)')))
+                                                                        ->where('vl.lab_id="'.$facility['facility_id'].'"');
+                            if(isset($params['sampleType']) && trim($params['sampleType'])!=''){
+                                    $countQuery = $countQuery->where('rs.sample_id="'.base64_decode(trim($params['sampleType'])).'"');
+                            }
+                            if(isset($params['testResult']) && $params['testResult']!=''){
+                                if($params['testResult'] == '<1000'){
+                                  $countQuery = $countQuery->where("vl.result < 1000");
+                                }else if($params['testResult'] == '>1000') {
+                                  $countQuery = $countQuery->where("vl.result > 1000");
+                                }
+                            }
+                            if(isset($params['gender']) && trim($params['gender'])!=''){
+                                    $countQuery = $countQuery->where('vl.patient_gender="'.$params['gender'].'"');
+                            }
+                            if(isset($params['currentRegimen']) && trim($params['currentRegimen'])!=''){
+                                    $countQuery = $countQuery->where('vl.current_regimen="'.base64_decode(trim($params['currentRegimen'])).'"');
+                            }
+                            
+                            if(isset($params['adherence']) && trim($params['adherence'])!=''){
+                                    $countQuery = $countQuery->where(array("vl.arv_adherance_percentage ='".$params['adherence']."'")); 
+                            }
+                            
+                            if(trim($params['fromDate'])!= '' && trim($params['toDate'])!= ''){
+                                    if(trim($params['fromDate'])!= trim($params['toDate'])){
+                                       $countQuery = $countQuery->where(array("vl.sample_collection_date >='" . $startMonth ." 00:00:00". "'", "vl.sample_collection_date <='" .$endMonth." 23:59:00". "'"));
+                                    }else{
+                                        $fromMonth = date("Y-m", strtotime(trim($params['fromDate'])));
+                                        $month = strtotime($fromMonth);
+                                        $mnth = date('m', $month);$year = date('Y', $month);
+                                        $countQuery = $countQuery->where("Month(sample_collection_date)='".$mnth."' AND Year(sample_collection_date)='".$year."'");
+                                    }
+                            }
+                            
+                            if(isset($params['age']) && $params['age']!=''){
+                                    if($params['age'] == '<18'){
+                                      $countQuery = $countQuery->where("vl.patient_age_in_years < 18");
+                                    }else if($params['age'] == '>18') {
+                                      $countQuery = $countQuery->where("vl.patient_age_in_years > 18");
+                                    }else if($params['age'] == 'unknown'){
+                                      $countQuery = $countQuery->where("vl.patient_age_in_years = 'unknown' OR vl.patient_age_in_years = '' OR vl.patient_age_in_years IS NULL");
+                                    }
+                            }
+                            $cQueryStr = $sql->getSqlStringForSqlObject($countQuery);
+                            $lessResult = $dbAdapter->query($cQueryStr." AND vl.result < 1000", $dbAdapter::QUERY_MODE_EXECUTE)->current();
+                            $result['sample']['Suppressed'][$j] = $lessResult->total;
+                            $greaterResult = $dbAdapter->query($cQueryStr." AND vl.result > 1000", $dbAdapter::QUERY_MODE_EXECUTE)->current();
+                            $result['sample']['Not Suppressed'][$j] = $greaterResult->total;
+                            $rejectionResult = $dbAdapter->query($cQueryStr." AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != 0", $dbAdapter::QUERY_MODE_EXECUTE)->current();
+                            $result['sample']['Rejected'][$j] = $rejectionResult->total;
+                            $result['lab'][$j] = $facility['facility_name'];
+                            $j++;
+                        }
+                }
+		//\Zend\Debug\Debug::dump($result);
+		//die;
+        return $result;
+    }
+    
     public function fetchLabSampleDetails($params){
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
