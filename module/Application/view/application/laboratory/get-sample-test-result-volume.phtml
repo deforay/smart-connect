@@ -59,17 +59,17 @@
         series: [<?php
               foreach($result['sampleName'] as $key=>$condition){
               if($key!='VL Not Detected'){
-              $range = substr($key,4,6);
-              $range = preg_replace('/\s+/', '', $range);
+                $range = substr($key,4,6);
+                $range = preg_replace('/\s+/', '', $range);
               }else{
-              $range = 'nd';
+               $range = 'nd';
               }
               ?>
               {
               name:'<?php echo $key;?>',
               data:[<?php
                   foreach($condition as $count){
-                      echo '{y:'.$count.',url:"/labs/samples-tested?range='.$range.'"},';
+                      echo '{y:'.$count.',url:"/labs/samples-tested-lab?range='.$range.'"},';
                   }
               ?>],
               },

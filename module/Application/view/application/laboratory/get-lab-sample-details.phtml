@@ -1,0 +1,50 @@
+<script>
+       $(function () {
+        $('#piecontainer').highcharts({
+        chart: {
+            plotBackgroundColor: null,
+            plotBorderWidth: null,
+            plotShadow: false,
+            type: 'pie'
+        },
+        title: {
+            text: ''
+        },
+        credits: {
+              enabled: false
+       },
+        tooltip: {
+            pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+        },
+        plotOptions: {
+            pie: {
+                allowPointSelect: true,
+                cursor: 'pointer',
+                dataLabels: {
+                    enabled: true,
+                    format: '<b>{point.name}</b> : {point.percentage:.1f}%',
+                    style: {
+                        color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                    }
+                }
+            }
+        },
+        series: [{
+            name: 'Sample',
+            colorByPoint: true,
+            data: [<?php
+            if(count($result)>0 && $result!=''){
+            foreach($result as $lab){
+                ?>
+                {
+                  name:<?php echo "'".$lab['sample_name']."'";?>,
+                  y:<?php echo $lab['samples'];?>
+                },
+                <?php
+            }
+            }
+            ?>]
+        }]
+    });
+    });
+</script>

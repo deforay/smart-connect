@@ -4,6 +4,7 @@ namespace Application\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
+use Zend\Json\Json;
 
 class LaboratoryController extends AbstractActionController
 {
@@ -53,6 +54,7 @@ class LaboratoryController extends AbstractActionController
         $age="";
         $fromMonth="";
         $toMonth="";
+        $labFilter="";
         if($this->params()->fromQuery('gender')){
             $gender=$this->params()->fromQuery('gender');
         }
@@ -70,6 +72,9 @@ class LaboratoryController extends AbstractActionController
         }
         if($this->params()->fromQuery('toMonth')){
             $toMonth=$this->params()->fromQuery('toMonth');
+        }
+        if($this->params()->fromQuery('lab')){
+            $labFilter=$this->params()->fromQuery('lab');
         }
         
         $sampleService = $this->getServiceLocator()->get('SampleService');
@@ -89,8 +94,9 @@ class LaboratoryController extends AbstractActionController
                 'searchRange' => $range,
                 'fromMonth' => $fromMonth,
                 'toMonth' => $toMonth,
+                'labFilter' => $labFilter,
+                'age' => $age
         ));
-        //return new ViewModel();
     }
     
     public function requisitionFormsIncompleteAction()
@@ -244,7 +250,7 @@ class LaboratoryController extends AbstractActionController
         if ($request->isPost()) {
             $params = $request->getPost();
             $sampleService = $this->getServiceLocator()->get('SampleService');
-            $result = $sampleService->getSampleDetails($params);
+            $result = $sampleService->getBarSampleDetails($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('result' => $result))
                         ->setTerminal(true);
@@ -252,5 +258,94 @@ class LaboratoryController extends AbstractActionController
         }
     }
     
+    public function getFilterSampleDetailsAction(){
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $sampleService = $this->getServiceLocator()->get('SampleService');
+            $result = $sampleService->getFilterSampleDetails($params);
+            return $this->getResponse()->setContent(Json::encode($result));
+        }
+    }
+    
+    public function samplesTestedLabAction()
+    {   
+        $this->layout()->setVariable('activeTab', 'labs-dashboard');
+        $gender="";
+        $month="";
+        $range="";
+        $age="";
+        $fromMonth="";
+        $toMonth="";
+        $labFilter="";
+        if($this->params()->fromQuery('gender')){
+            $gender=$this->params()->fromQuery('gender');
+        }
+        if($this->params()->fromQuery('month')){
+            $month=$this->params()->fromQuery('month');
+        }
+        if($this->params()->fromQuery('range')){
+            $range=$this->params()->fromQuery('range');
+        }
+        if($this->params()->fromQuery('age')){
+            $age=$this->params()->fromQuery('age');
+        }
+        if($this->params()->fromQuery('fromMonth')){
+            $fromMonth=$this->params()->fromQuery('fromMonth');
+        }
+        if($this->params()->fromQuery('toMonth')){
+            $toMonth=$this->params()->fromQuery('toMonth');
+        }
+        if($this->params()->fromQuery('lab')){
+            $labFilter=$this->params()->fromQuery('lab');
+        }
+        
+        $sampleService = $this->getServiceLocator()->get('SampleService');
+        $labName = $sampleService->getAllLabName();
+        $clinicName = $sampleService->getAllClinicName();
+        $hubName = $sampleService->getAllHubName();
+        $sampleType = $sampleService->getSampleType();
+        $currentRegimen = $sampleService->getAllCurrentRegimen();
+        return new ViewModel(array(
+                'sampleType' => $sampleType,
+                'labName' => $labName,
+                'clinicName' => $clinicName,
+                'hubName' => $hubName,
+                'currentRegimen' => $currentRegimen,
+                'searchMonth' => $month,
+                'searchGender' => $gender,
+                'searchRange' => $range,
+                'fromMonth' => $fromMonth,
+                'toMonth' => $toMonth,
+                'labFilter' => $labFilter,
+                'age' => $age
+        ));
+    }
+    
+    public function getLabSampleDetailsAction(){
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $sampleService = $this->getServiceLocator()->get('SampleService');
+            $result = $sampleService->getLabSampleDetails($params);
+            $viewModel = new ViewModel();
+            $viewModel->setVariables(array('result' => $result))
+                        ->setTerminal(true);
+            return $viewModel;
+        }
+    }
+    
+    public function getLabBarSampleDetailsAction(){
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $sampleService = $this->getServiceLocator()->get('SampleService');
+            $result = $sampleService->getLabBarSampleDetails($params);
+            $viewModel = new ViewModel();
+            $viewModel->setVariables(array('result' => $result))
+                        ->setTerminal(true);
+            return $viewModel;
+        }
+    }
 }
 

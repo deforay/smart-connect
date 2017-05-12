@@ -1,12 +1,31 @@
 <?php
-$startYear=date("Y", strtotime("-1 year"));
-$startMonth = date('m', strtotime('+1 month', strtotime('-1 year')));
-$endYear = date('Y');
-$endMonth = date('m');
-
-$startDate = date('Y-m', strtotime('+1 month', strtotime('-1 year')));
-$endDate=date('Y-m');
-
+if(isset($searchMonth) && trim($searchMonth)!= ''){
+    $splitSearchMonth = explode("-",$searchMonth);
+    $startDate = $endDate = $splitSearchMonth[1].'-'.date('m', strtotime($splitSearchMonth[0]));
+    $startMonth = $endMonth = date('m', strtotime($splitSearchMonth[0]));
+    $startYear = $endYear = $splitSearchMonth[1];
+    $startDisplayDate = $endDisplayDate = $searchMonth;
+}else if((isset($fromMonth) && trim($fromMonth)!= '') && (isset($toMonth) && trim($toMonth)!= '')){
+    $splitFromMonth = explode("-",$fromMonth);
+    $startDate = $splitFromMonth[1].'-'.date('m', strtotime($splitFromMonth[0]));
+    $startMonth = date('m', strtotime($splitFromMonth[0]));
+    $startYear = $splitFromMonth[1];
+    $startDisplayDate = $fromMonth;
+    $splitToMonth = explode("-",$toMonth);
+    $endDate = $splitToMonth[1].'-'.date('m', strtotime($splitToMonth[0]));
+    $endMonth = date('m', strtotime($splitToMonth[0]));
+    $endYear = $splitToMonth[1];
+    $endDisplayDate = $toMonth;
+}else{
+    $startDate = date("Y", strtotime("-1 year")).'-'.date('m', strtotime('+1 month', strtotime('-1 year')));
+    $endDate = date('Y').'-'.date('m');
+    $startMonth = date('m', strtotime('+1 month', strtotime('-1 year')));
+    $endMonth = date('m');
+    $startYear = date("Y", strtotime("-1 year"));
+    $endYear = date('Y');
+    $startDisplayDate  = strtoupper(date('M', strtotime('+1 month', strtotime('-1 year')))).' '.date("Y", strtotime("-1 year"));
+    $endDisplayDate  = strtoupper(date('M')).' '.date('Y');
+}
 ?>
 <link href="<?php echo $this->basePath('assets/global/css/month-year-rang-picker.css'); ?>" rel="stylesheet" type="text/css" />
            <!-- BEGIN PAGE HEADER-->
@@ -30,9 +49,6 @@ $endDate=date('Y-m');
                     <!-- END PAGE TITLE-->
                     <!-- END PAGE HEADER-->
                     
-                    
-                    
-                    
                     <div class="row">
                         <div class="col-md-12" style="padding-left:30px;">
                             <form class="form-Horizontal">
@@ -43,12 +59,12 @@ $endDate=date('Y-m');
                                 
                                 <span class="mrp-icon"><i class="fa fa-calendar"></i> &nbsp;</span>
                                 <div class="mrp-monthdisplay ">
-                                  <span class="mrp-lowerMonth"><?php echo date('M', strtotime('+1 month', strtotime('-1 year')));; ?> <?php echo $startYear; ?></span>
+                                  <span class="mrp-lowerMonth"><?php echo $startDisplayDate; ?></span>
                                   <span class="mrp-to"> to </span>
-                                  <span class="mrp-upperMonth"><?php echo date('M'); ?> <?php echo date('Y'); ?></span>
+                                  <span class="mrp-upperMonth"><?php echo $endDisplayDate; ?></span>
                                 </div>
-                              <input type="hidden" value="" id="mrp-lowerDate" />
-                              <input type="hidden" value="" id="mrp-upperDate" />
+                              <input type="hidden" value="<?php echo $startDate; ?>" id="mrp-lowerDate" />
+                              <input type="hidden" value="<?php echo $endDate; ?>" id="mrp-upperDate" />
                             
                             </div>
                             </div>                            
@@ -59,29 +75,28 @@ $endDate=date('Y-m');
                                 <select name="labName" id="labName" class="form-control" title="Please choose lab name">
                                     <option value="">All Labs</option>
                                     <?php
-                                    foreach($labName as $lab)
-                                    {
+                                    foreach($labName as $lab){
                                     ?>
-                                        <option value="<?php echo base64_encode($lab['facility_id']);?>"><?php echo $lab['facility_name'];?></option>
+                                        <option value="<?php echo base64_encode($lab['facility_id']);?>" <?php echo(isset($labFilter) && trim($labFilter)!= '' && $labFilter == $lab['facility_name'])?'selected="selected"':''; ?>><?php echo $lab['facility_name'];?></option>
                                     <?php
                                     }
                                     ?>
                                 </select>
                             </div>
                             
-                            <div class="form-group col-lg-4">
+                            <!--<div class="form-group col-lg-4">
                                 <label class="control-label">Hub </label>
                                 <select class="form-control" id="hub" name="hub">
                                     <option value="">All Hubs</option>
-                                    <?php
+                                    < ?php
                                     foreach($hubName as $hub){
                                     ?>
-                                    <option value="<?php echo base64_encode($hub['facility_id']);?>"><?php echo $hub['facility_name'];?></option>
-                                    <?php
+                                    <option value="< ?php echo base64_encode($hub['facility_id']);?>">< ?php echo $hub['facility_name'];?></option>
+                                    < ?php
                                     }
                                     ?>
                                 </select>
-                            </div>                            
+                            </div>  -->                          
                             <div class="form-group col-lg-4">
                                 <label class="control-label">Clinic&nbsp;</label>
                                 <select class="form-control" id="clinicId" name="clinicId">
@@ -95,9 +110,6 @@ $endDate=date('Y-m');
                                     ?>
                                 </select>
                             </div>
-
-                        </div>                                
-                        <div class="col-md-12">
                             <div class="form-group col-lg-4">
                                 <label class="control-label">Current Regimen</label>
                                 <select class="form-control" id="currentRegimen" name="currentRegimen">
@@ -111,6 +123,8 @@ $endDate=date('Y-m');
                                     ?>
                                 </select>
                             </div>
+                        </div>                                
+                        <div class="col-md-12">
                             <div class="form-group col-lg-4">
                                 <label class="control-label">ARV Adherence</label>
                               <select class="form-control" name="adherence" id="adherence">
@@ -124,27 +138,21 @@ $endDate=date('Y-m');
                                 <label class="control-label">Age Group</label>
                                 <select class="form-control" name="age" id="age" title="Please choose age group">
                                   <option value="">-- Age --</option>
-                                  <option value="0-10">0-10</option>
-                                  <option value="10-20">10-20</option>
-                                  <option value="20-30">20-30</option>
-                                  <option value="30-40">30-40</option>
-                                  <option value="40-50">40-50</option>
-                                  <option value="50-60">50-60</option>
-                                  <option value="60-70">60-70</option>
-                                  <option value="70-80">70-80</option>
-                                  <option value="80">Above 80</option>
+                                  <option value="<18" <?php echo (isset($age) && $age == '<18')?'selected="selected"':''; ?>> <18</option>
+                                  <option value=">18" <?php echo (isset($age) && $age == '>18')?'selected="selected"':''; ?>> >18</option>
+                                  <option value="unknown"> Unknown</option>
                                 </select>
                             </div>
-                        </div>
-                        <div class="col-md-12">
                             <div class="form-group col-lg-4">
                                 <label class="control-label">Test Result&nbsp;</label>
                                 <select class="form-control" name="testResult" id="testResult" title="Please choose result">
                                 <option value="">All</option>
-                                <option value=">1000" <?php echo(($searchRange=='>1000') ? "selected='selected'" : "") ?>>> 1000 cp/mL</option>
-                                <option value="<1000" <?php echo(($searchRange=='<1000') ? "selected='selected'" : "") ?>>< 1000 cp/mL</option>
+                                <option value=">1000" <?php echo((isset($searchRange) && $searchRange=='>1000') ? "selected='selected'" : "") ?>>> 1000 cp/mL</option>
+                                <option value="<1000" <?php echo((isset($searchRange) && $searchRange=='<1000') ? "selected='selected'" : "") ?>>< 1000 cp/mL</option>
                               </select>
                             </div>
+                        </div>
+                        <div class="col-md-12">
                             <div class="form-group col-lg-4">
                                 <label class="control-label">Sample Type</label>
                                 <select class="form-control" id="sampleType" name="sampleType">
@@ -170,7 +178,6 @@ $endDate=date('Y-m');
                     </div>
                     
                     
-
                     <div class="row" style="margin-bottom:30px;">
                         <div class="col-lg-6">
                             <div id="piecontainer" style="min-width: 310px; height: 400px; max-width: 100%; margin: 0 auto;padding:1.5%;"></div>
@@ -196,58 +203,18 @@ $endDate=date('Y-m');
                                 </div>
                                 <div class="portlet-body">
                                     <div class="table-toolbar">
-                                        <table class="table table-striped table-bordered table-hover order-column" id="sample_1">
+                                        <table class="table table-striped table-bordered table-hover order-column" id="sampleDataTable">
                                             <thead>
                                                 <tr>
-                                                    <th> Date </th>
-                                                    <th> No. of Samples </th>
-                                                    <th> Sample Type </th>
-                                                    <th> Clinics </th>
-                                                    <th> Status </th>
+                                                    <th>Date </th>
+                                                    <th>No. of Samples </th>
+                                                    <th>Sample Type </th>
+                                                    <th>Clinics </th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 <tr>
-                                                    <td>20-Apr-2016</td>
-                                                    <td>20</td>
-                                                    <td>Plasma</td>
-                                                    <td>Clinic 001</td>
-                                                    <td>Tested</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>21-Apr-2016</td>
-                                                    <td>24</td>
-                                                    <td>DBS</td>
-                                                    <td>Clinic 002</td>
-                                                    <td>Tested</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>22-Apr-2016</td>
-                                                    <td>30</td>
-                                                    <td>DBS</td>
-                                                    <td>Clinic 003</td>
-                                                    <td>Tested</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>23-Apr-2016</td>
-                                                    <td>22</td>
-                                                    <td>Plasma</td>
-                                                    <td>Clinic 001</td>
-                                                    <td>Pending</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>24-Apr-2016</td>
-                                                    <td>18</td>
-                                                    <td>Plasma</td>
-                                                    <td>Clinic 002</td>
-                                                    <td>Tested</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>25-Apr-2016</td>
-                                                    <td>14</td>
-                                                    <td>Plasma</td>
-                                                    <td>Clinic 003</td>
-                                                    <td>Tested</td>
+                                                    <td colspan="4" class="dataTables_empty">Loading data from server</td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -263,7 +230,8 @@ $endDate=date('Y-m');
     
     function generateBarContainer() {
         searchGender = '<?php echo $searchGender ?>';
-        searchMonth = '<?php echo $searchMonth ?>';
+        fromDate = $('#mrp-lowerDate').val();
+        toDate = $('#mrp-upperDate').val();
         testResult = $("#testResult").val();
         facilityId = $("#labName").val();
         sampleType = $("#sampleType").val();
@@ -271,7 +239,7 @@ $endDate=date('Y-m');
         adherence = $("#adherence").val();
         age = $("#age").val();
         
-        $.post("<?php echo $this->url('laboratory', array('action' => 'get-bar-sample-details')); ?>",{testResult:testResult,searchMonth:searchMonth,gender:searchGender,facilityId:facilityId,sampleType:sampleType,currentRegimen:currentRegimen,adherence:adherence,age:age},
+        $.post("<?php echo $this->url('laboratory', array('action' => 'get-bar-sample-details')); ?>",{testResult:testResult,fromDate:fromDate,toDate:toDate,gender:searchGender,facilityId:facilityId,sampleType:sampleType,currentRegimen:currentRegimen,adherence:adherence,age:age},
         function(data) {
             $("#barcontainer").html(data);
         });
@@ -280,7 +248,8 @@ $endDate=date('Y-m');
     
     function generatePieContainer(){
         searchGender = '<?php echo $searchGender ?>';
-        searchMonth = '<?php echo $searchMonth ?>';
+        fromDate = $('#mrp-lowerDate').val();
+        toDate = $('#mrp-upperDate').val();
         testResult = $("#testResult").val();
         facilityId = $("#labName").val();
         sampleType = $("#sampleType").val();
@@ -288,60 +257,87 @@ $endDate=date('Y-m');
         adherence = $("#adherence").val();
         age = $("#age").val();
         
-        $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-details')); ?>",{testResult:testResult,searchMonth:searchMonth,gender:searchGender,facilityId:facilityId,sampleType:sampleType,currentRegimen:currentRegimen,adherence:adherence,age:age},
+        $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-details')); ?>",{testResult:testResult,fromDate:fromDate,toDate:toDate,gender:searchGender,facilityId:facilityId,sampleType:sampleType,currentRegimen:currentRegimen,adherence:adherence,age:age},
         function(data) {
             $("#piecontainer").html(data);
         });
     }
-    
-    
-    
+    var oTable = null;
     $(document).ready(function(){
-    
-    
-    
-$('#piebutton').on('click', function () {
-    $('#piecontainer').fadeIn(function () {
-        generatePieContainer();
-    });
-});
-    
-$('#barbutton').on('click', function () {
-    $('#barcontainer').fadeIn(function () {
-        generateBarContainer();
-    });
-});
-    
-    generatePieContainer();
-    generateBarContainer();
-    
-    
-    
-            
+        $('#piebutton').on('click', function () {
+            $('#piecontainer').fadeIn(function () {
+                generatePieContainer();
+            });
         });
+            
+        $('#barbutton').on('click', function () {
+            $('#barcontainer').fadeIn(function () {
+                generateBarContainer();
+            });
+        });
+      generatePieContainer();
+      generateBarContainer();
+      loadSampleDataTable();
+    });
 
     
 
 function searchSampleTestedResult(){
     generatePieContainer();
     generateBarContainer();
+    oTable.fnDraw();
+}
+
+function loadSampleDataTable(){
+    oTable = $('#sampleDataTable').dataTable({
+            "bAutoWidth": false,
+            "bProcessing": true,
+            "bServerSide": true,
+            "aoColumns": [
+                {"sClass":"center"},
+                {"sClass":"center","bSortable":false},
+                {"sClass":"center"},
+                {"sClass":"center"}
+            ],
+            "aaSorting": [[ 0, "desc" ]],
+            "sAjaxSource": "<?php echo $this->url('laboratory',array('action' => 'get-filter-sample-details')); ?>",
+            "fnServerData": function ( sSource, aoData, fnCallback ) {
+                aoData.push({"name": "searchGender", "value": '<?php echo $searchGender ?>'});
+                aoData.push({"name": "fromDate", "value": $('#mrp-lowerDate').val()});
+                aoData.push({"name": "toDate", "value": $('#mrp-upperDate').val()});
+                aoData.push({"name": "testResult", "value": $('#testResult').val()});
+                aoData.push({"name": "clinic", "value": $('#clinicId').val()});
+                aoData.push({"name": "lab", "value": $('#labName').val()});
+                aoData.push({"name": "sampleType", "value": $('#sampleType').val()});
+                aoData.push({"name": "currentRegimen", "value": $('#currentRegimen').val()});
+                aoData.push({"name": "adherence", "value": $('#adherence').val()});
+                aoData.push({"name": "age", "value": $('#age').val()});
+                $.ajax({
+                    "dataType": 'json',
+                    "type": "POST",
+                    "url": sSource,
+                    "data": aoData,
+                    "success": fnCallback
+                });
+            }
+        } );
 }
 
 var MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
 $(function () {
-   startMonth = 7;
-  startYear = 2014
-  endMonth = 8;
-  endYear = 2015;
+  startMonth = '<?php echo $startMonth; ?>';
+  startYear = '<?php echo $startYear; ?>';
+  endMonth = '<?php echo $endMonth; ?>';
+  endYear = '<?php echo $endYear; ?>';
   fiscalMonth = 7;
-  if(startMonth < 10)
-  	startDate = parseInt("" + startYear + '0' + startMonth + "");
-  else
+  //if(startMonth < 10)
+    //startDate = parseInt("" + startYear + '0' + startMonth + "");
+  //else
     startDate = parseInt("" + startYear  + startMonth + "");
-  if(endMonth < 10)
-  	endDate = parseInt("" + endYear + '0' + endMonth + "");
-  else
+  //if(endMonth < 10)
+    //endDate = parseInt("" + endYear + '0' + endMonth + "");
+  //else
     endDate = parseInt("" + endYear + endMonth + "");
   
   content = '<div class="row mpr-calendarholder">';

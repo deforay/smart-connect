@@ -26,8 +26,10 @@
         },
         yAxis: {
             title: {
-                text: 'TAT in Hours'
-            },plotLines: [{
+                text: 'TAT in Days'
+            },
+            labels: { formatter: function() { return this.value; } },
+            plotLines: [{
                     value: 16,
                     color: 'red',
                     width: 2

@@ -384,4 +384,24 @@ class SampleService {
         $sampleDb = $this->sm->get('SampleTable');
         return $sampleDb->fetchSampleDetails($params);
     }
+    
+     public function getBarSampleDetails($params){
+        $sampleDb = $this->sm->get('SampleTable');
+        return $sampleDb->fetchBarSampleDetails($params);
+    }
+    
+    public function getFilterSampleDetails($params){
+        $sampleDb = $this->sm->get('SampleTable');
+        return $sampleDb->fetchFilterSampleDetails($params);
+    }
+    
+    public function getLabSampleDetails($params){
+        $sampleDb = $this->sm->get('SampleTable');
+        return $sampleDb->fetchLabSampleDetails($params);
+    }
+    
+    public function getLabBarSampleDetails($params){
+        $sampleDb = $this->sm->get('SampleTable');
+        return $sampleDb->fetchLabBarSampleDetails($params);
+    }
 }

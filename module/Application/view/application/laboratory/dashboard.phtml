@@ -158,23 +158,12 @@ foreach($sampleType as $samples){
                     <!-- END PAGE TITLE-->
                     <!-- END PAGE HEADER-->
                     <div class="row" style="padding-top:10px;padding-bottom:20px;">
-                        <div class="col-lg-3">
-                            <div id="sla-data-range" class="mrp-container form-control">
-                                <span class="mrp-icon"><i class="fa fa-calendar"></i> &nbsp;</span>
-                                <div class="mrp-monthdisplay ">
-                                  <span class="mrp-lowerMonth"><?php echo date('M', strtotime('+1 month', strtotime('-1 year')));; ?> <?php echo $startYear; ?></span>
-                                  <span class="mrp-to"> to </span>
-                                  <span class="mrp-upperMonth"><?php echo date('M'); ?> <?php echo date('Y'); ?></span>
-                                </div>
-                              <input type="hidden" value="<?php echo $startDate; ?>" id="mrp-lowerDate" />
-                              <input type="hidden" value="<?php echo $endDate; ?>" id="mrp-upperDate" />
-                            </div>
-                        </div>
                         
                         
-                        <div class="col-lg-3">
+                        
+                        <div class="col-lg-6">
                             <select name="labName" id="labName" class="form-control" title="Please choose lab name">
-                                <option value="">-- Lab Name --</option>
+                                <option value="">-- All Labs --</option>
                                 <?php
                                 foreach($labName as $lab)
                                 {
@@ -187,8 +176,20 @@ foreach($sampleType as $samples){
                             </select>
                         </div>
                         <div class="col-lg-3">
-                                <a href="javascript:void(0);" class="btn btn-info btn-sm" onclick="getEverything()">Submit</a>
+                            <div id="sla-data-range" class="mrp-container form-control">
+                                <span class="mrp-icon"><i class="fa fa-calendar"></i> &nbsp;</span>
+                                <div class="mrp-monthdisplay ">
+                                  <span class="mrp-lowerMonth"><?php echo date('M', strtotime('+1 month', strtotime('-1 year')));; ?> <?php echo $startYear; ?></span>
+                                  <span class="mrp-to"> to </span>
+                                  <span class="mrp-upperMonth"><?php echo date('M'); ?> <?php echo date('Y'); ?></span>
+                                </div>
+                              <input type="hidden" value="<?php echo $startDate; ?>" id="mrp-lowerDate" onchange=""/>
+                              <input type="hidden" value="<?php echo $endDate; ?>" id="mrp-upperDate" />
                             </div>
+                        </div>                        
+                        <div class="col-lg-1">
+                            <a href="javascript:void(0);" class="btn btn-info btn-sm" onclick="getEverything();">Submit</a>
+                        </div>
                     </div>
                     <div class="row">
                         <div id="sampleResultDetails"></div>
@@ -464,7 +465,7 @@ foreach($sampleType as $samples){
             
         function getEverything(){
             $.blockUI.defaults.css.border = '1px solid grey'; 
-                $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
+            $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
             if( !$('#sampleCollectionDate').val() ) {
               $('#sampleCollectionDate').val(moment().subtract('days', 179).format('YYYY-MM-DD') + ' to ' + moment().format('YYYY-MM-DD'));
             }
