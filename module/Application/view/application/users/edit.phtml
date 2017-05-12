@@ -32,40 +32,27 @@
 
 
                                 <div class="portlet-body form">
-                                    <form class="form-horizontal" method="post" action="/users/edit" role="form">
+                                    <form class="form-horizontal" name="addUserInformation" id="addUserInformation" method="post" action="/users/edit" role="form" autocomplete="off">
                                         <div class="form-body">
                                             <div class="form-group">
                                                 <label class="col-md-3 control-label">Name <span class="font-red-mint">*</span></label>
                                                 <div class="col-md-6">
-                                                    <input type="text" id="username" name="username" class="form-control" placeholder="" value="<?php echo $user['username']; ?>">
-                                                    <input type="hidden" id="userId" name="userId" class="form-control" placeholder="" value="<?php echo $user['user_id']; ?>">
+                                                    <input type="text" id="username" name="username" class="form-control isRequired" placeholder="" value="<?php echo $user['user_name']; ?>" title="Please enter the name">
+                                                    <input type="hidden" id="userId" name="userId" class="form-control isRequired" placeholder="" value="<?php echo base64_encode($user['user_id']); ?>">
                                                 </div>
                                             </div>
                                             <div class="form-group">
                                                 <label class="col-md-3 control-label">User Type <span class="font-red-mint">*</span></label>
                                                 <div class="col-md-6">
-                                                    <select class="form-control" name="role" id="role">
+                                                    <select class="form-control isRequired" name="role" id="role" title="Please select the role">
                                                         <option value="">--Select--</option>
 
                                                         <?php
                                                             $options = [];
                                                             foreach($roles as $r) {
-                                                                
-                                                               $options[$r['access_type_name']][$r['id']] = $r['role_name'];
-                                                               
-                                                            }
-                                                            
-                                                           foreach($options as $grp => $opt){
+                                                            // $options[$r['access_type_name']][$r['id']] = $r['role_name'];
                                                         ?>
-                                                            <optgroup label ="<?php echo strtoupper($grp); ?>">
-                                                        <?php
-                                                          foreach($opt as $id=>$role){
-                                                        ?>
-                                                            <option value="<?php echo $id ?>"  <?php echo ($user['role'] == $id ? " selected='selected' " : ""); ?>><?php echo $role ?></option>
-                                                        <?php
-                                                            }
-                                                        ?>      
-                                                            </optgroup>
+                                                          <option value="<?php echo $r['role_id']; ?>" <?php echo ($user['role'] == $r['role_id'] ? " selected='selected' " : ""); ?> ><?php echo $r['role_name'] ?></option>
                                                         <?php
                                                        }
                                                        ?>                                                        
@@ -77,25 +64,25 @@
                                             <div class="form-group">
                                                 <label class="col-md-3 control-label">Email <span class="font-red-mint">*</span></label>
                                                 <div class="col-md-6">
-                                                    <input type="email" id="email" name="email" class="form-control" placeholder="" value="<?php echo $user['email']; ?>">
+                                                    <input type="email" id="email" name="email" class="form-control isEmail isRequired" placeholder="" value="<?php echo $user['email']; ?>" title="Please enter valid email">
                                                 </div>
                                             </div>
                                             <div class="form-group">
                                                 <label class="col-md-3 control-label">Mobile <span class="font-red-mint">*</span></label>
                                                 <div class="col-md-6">
-                                                    <input type="tel" id="mobile" name="mobile" class="form-control" placeholder="" value="<?php echo $user['mobile']; ?>" >
+                                                    <input type="tel" id="mobile" name="mobile" class="form-control " placeholder="" value="<?php echo $user['mobile']; ?>" >
                                                 </div>
                                             </div>
                                             <div class="form-group">
                                                 <label class="col-md-3 control-label">Password </label>
                                                 <div class="col-md-6">
-                                                    <input type="password" id="password" name="password" class="form-control" placeholder="Leave blank to retain old password">
+                                                    <input type="password" id="password" name="password" class="form-control" placeholder="">
                                                 </div>
                                             </div>
                                             <div class="form-group">
                                                 <label class="col-md-3 control-label">Status <span class="font-red-mint">*</span></label>
                                                 <div class="col-md-6">
-                                                    <select class="form-control" name="status" id="status">
+                                                    <select class="form-control isRequired" name="status" id="status" title="Please select the status">
                                                         <option value="">--Select--</option>
                                                         <option value="active" "<?php echo ($user['status'] == 'active' ? " selected='selected' " : ""); ?>">Active</option>
                                                         <option value="inactive" "<?php echo ($user['status'] == 'inactive' ? " selected='selected' " : ""); ?>">Inactive</option>
@@ -108,8 +95,8 @@
                                         <div class="form-actions">
                                             <div class="row">
                                                 <div class="col-md-offset-3 col-md-9">
-                                                    <button type="submit" class="btn green">Submit</button>
-                                                    <button type="button" class="btn default" onclick="document.location.href='/users'">Cancel</button>
+                                                    <input type="button" class="btn green" value="Submit" onclick="validateNow();return false;">
+                                                    <a href="<?php echo $this->url('users', array('action' => 'index')); ?>" class="btn default">Cancel</a>
                                                 </div>
                                             </div>
                                         </div>
@@ -123,3 +110,17 @@
                             <!-- END EXAMPLE TABLE PORTLET-->
                         </div>
                     </div>
+<script type="text/javascript">
+    duplicateName = true;
+    function validateNow() {
+        flag = deforayValidator.init({
+            formId: 'addUserInformation'
+        });
+        if (flag) {
+            if (duplicateName) {
+                $.blockUI();
+                document.getElementById('addUserInformation').submit();
+            }
+        }
+    }
+</script>

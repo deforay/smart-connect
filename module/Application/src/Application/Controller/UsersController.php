@@ -4,25 +4,28 @@ namespace Application\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
+use Zend\Json\Json;
 
 class UsersController extends AbstractActionController
 {
 
     public function indexAction()
     {
-        $service = $this->getServiceLocator()->get('UserService');
-        $users = $service->fetchUsers();
-        $roles = $service->fetchRoles();
-        $this->layout()->setVariable('activeTab', 'admin');
-        $this->layout()->setVariable('activeMenu', 'users');
-
-        return new ViewModel(array('users' => $users));
+        $this->layout()->setVariable('activeTab', 'users');
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $userService = $this->getServiceLocator()->get('UserService');
+            $result = $userService->getAllUsers($params);
+            return $this->getResponse()->setContent(Json::encode($result));
+        }
+        
+      
     }
 
     public function addAction()
     {
-        $this->layout()->setVariable('activeTab', 'admin');    
-        $this->layout()->setVariable('activeMenu', 'users');
+        $this->layout()->setVariable('activeTab', 'users');
         $userService = $this->getServiceLocator()->get('UserService');
         $commonService = $this->getServiceLocator()->get('CommonService');
         
@@ -38,17 +41,14 @@ class UsersController extends AbstractActionController
 
     public function editAction()
     {
-        $this->layout()->setVariable('activeTab', 'admin');    
-        $this->layout()->setVariable('activeMenu', 'users');
+        $this->layout()->setVariable('activeTab', 'users');
         $userService = $this->getServiceLocator()->get('UserService');
-
-        
         if($this->getRequest()->isPost()){
             $params=$this->getRequest()->getPost();
             $result=$userService->updateUser($params);
             return $this->_redirect()->toRoute('users');
         }else{
-            $userId = ($this->params()->fromRoute('id'));
+            $userId = base64_decode($this->params()->fromRoute('id'));
             $user = $userService->getUser($userId);
             if($user == false){
                 return $this->_redirect()->toRoute('users'); 
