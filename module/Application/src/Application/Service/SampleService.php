@@ -404,4 +404,14 @@ class SampleService {
         $sampleDb = $this->sm->get('SampleTable');
         return $sampleDb->fetchLabBarSampleDetails($params);
     }
+    
+    public function getIncompleteSampleDetails($params){
+        $sampleDb = $this->sm->get('SampleTable');
+        return $sampleDb->fetchIncompleteSampleDetails($params);
+    }
+    
+    public function getIncompleteBarSampleDetails($params){
+        $sampleDb = $this->sm->get('SampleTable');
+        return $sampleDb->fetchIncompleteBarSampleDetails($params);
+    }
 }

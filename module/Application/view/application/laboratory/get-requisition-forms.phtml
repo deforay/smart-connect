@@ -2,10 +2,8 @@
 //\Zend\Debug\Debug::dump($result);die;
 ?>
 <div id="reqformspie"></div>
-
 <script>
-       
-       $(function () {
+$(function () {
 $('#reqformspie').highcharts({
         chart: {
             type: 'column'
@@ -60,8 +58,9 @@ $('#reqformspie').highcharts({
                 cursor: 'pointer',
                 point: {
                     events: {
-                        click: function () {
-                            window.location.href='/labs/requisition-forms-incomplete';
+                        click: function (e) {
+                            redirectUrl='/labs/requisition-forms-incomplete';
+                            window.open(redirectUrl+'?month='+e.point.category, '_blank');
                         }
                     }
                 },

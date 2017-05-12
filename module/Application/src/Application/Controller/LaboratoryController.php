@@ -99,11 +99,46 @@ class LaboratoryController extends AbstractActionController
         ));
     }
     
-    public function requisitionFormsIncompleteAction()
-    {
-        $this->layout()->setVariable('activeTab', 'labs-dashboard');          
-        return new ViewModel();
+    public function requisitionFormsIncompleteAction(){
+        $this->layout()->setVariable('activeTab', 'labs-dashboard');
+        $month="";
+        if($this->params()->fromQuery('month')){
+            $month=$this->params()->fromQuery('month');
+        }
+        $sampleService = $this->getServiceLocator()->get('SampleService');
+        $labList = $sampleService->getAllLabName();
+        return new ViewModel(array(
+            'labList' => $labList,
+            'searchMonth' => $month
+        ));
     }
+    
+    public function getIncompleteSampleDetailsAction(){
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $sampleService = $this->getServiceLocator()->get('SampleService');
+            $result = $sampleService->getIncompleteSampleDetails($params);
+            $viewModel = new ViewModel();
+            $viewModel->setVariables(array('result' => $result))
+                        ->setTerminal(true);
+            return $viewModel;
+        }
+    }
+    
+    public function getIncompleteBarSampleDetailsAction(){
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $sampleService = $this->getServiceLocator()->get('SampleService');
+            $result = $sampleService->getIncompleteBarSampleDetails($params);
+            $viewModel = new ViewModel();
+            $viewModel->setVariables(array('result' => $result))
+                        ->setTerminal(true);
+            return $viewModel;
+        }
+    }
+    
     public function getSampleResultAction()
     {
         $request = $this->getRequest();
