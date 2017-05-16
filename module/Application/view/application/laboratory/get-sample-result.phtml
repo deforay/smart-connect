@@ -1,18 +1,16 @@
 <?php
-//\Zend\Debug\Debug::dump($result);die;
-$receivedTotal = 0;$accessDate = '';
-$acceptedTotal = 0;$acceptedDate = '';
-$quickStats = $result['quickStats'];
-
+$receivedTotal = 0;$receivedDate = '';
+$testedTotal = 0;$testedDate = '';
 $rejectedTotal = 0;$rejectedDate = '';
-if(count($result['stResult'])>0){
-    $access = end($result['stResult']);
-    $receivedTotal = $access['accessTotal'];
-    $accessDate = $access['accessDate'];
-}if(count($result['saResult'])>0){
-    $accept = end($result['saResult']);
-    $acceptedTotal = $accept['acceptTotal'];
-    $acceptedDate = $accept['acceptDate'];
+$quickStats = $result['quickStats'];
+if(count($result['scResult'])>0){
+    $received = end($result['scResult']);
+    $receivedTotal = $received['receivedTotal'];
+    $receivedDate = $received['receivedDate'];
+}if(count($result['stResult'])>0){
+    $tested = end($result['stResult']);
+    $testedTotal = $tested['testedTotal'];
+    $testedDate = $tested['testedDate'];
 }if(count($result['srResult'])>0){
     $reject = end($result['srResult']);
     $rejectedTotal = $reject['rejectTotal'];
@@ -56,7 +54,7 @@ if(count($result['stResult'])>0){
                     <span data-counter="counterup" data-value="<?php echo $receivedTotal; ?>"><?php echo $receivedTotal; ?></span>
                 </h3>
                 <small class="font-green-sharp">SAMPLES ACCESSION</small><br>
-                <!--<small class="font-green-sharp"><?php echo $accessDate;?></small>-->
+                <!--<small class="font-green-sharp"><?php echo $receivedDate;?></small>-->
             </div>
             <div class="icon">
                 <i class="icon-pie-chart"></i>
@@ -71,10 +69,10 @@ if(count($result['stResult'])>0){
         <div class="display">
             <div class="number">
                 <h3 class="font-blue-sharp">
-                    <span data-counter="counterup" data-value="<?php echo $acceptedTotal; ?>"><?php echo $acceptedTotal; ?></span>
+                    <span data-counter="counterup" data-value="<?php echo $testedTotal; ?>"><?php echo $testedTotal; ?></span>
                 </h3>
                 <small class="font-blue-sharp">SAMPLES TESTED</small><br>
-                <!--<small class="font-blue-sharp"><?php echo $acceptedDate;?></small>-->
+                <!--<small class="font-blue-sharp"><?php echo $testedDate;?></small>-->
             </div>
             <div class="icon">
                 <i class="icon-pie-chart"></i>
@@ -102,7 +100,7 @@ if(count($result['stResult'])>0){
 </div>
 <script>
     <?php
-    if(isset($result['stResult']) && count($result['stResult'])>0){
+    if(isset($result['scResult']) && count($result['scResult'])>0){
         if($receivedTotal>0){
         ?>
       
@@ -172,7 +170,7 @@ if(count($result['stResult'])>0){
     });
     <?php } 
 
-    if($acceptedTotal>0){
+    if($testedTotal>0){
     ?>
       
 $('#samplesTestedChart').highcharts({

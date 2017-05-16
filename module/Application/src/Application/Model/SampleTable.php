@@ -83,72 +83,67 @@ class SampleTable extends AbstractTableGateway {
         $quickStats = $this->fetchQuickStats($params);
         $dbAdapter = $this->adapter;$sql = new Sql($dbAdapter);
         $common = new CommonService();
-        if(trim($params['fromDate'])!= '' && trim($params['toDate'])!= ''){
-            $startMonth = date("Y-m", strtotime(trim($params['fromDate'])));
-            $endMonth = date("Y-m", strtotime(trim($params['toDate'])));
-            $start = $month = strtotime($startMonth);
-            $end = strtotime($endMonth);
-            $i = 0;
-            $waitingTotal = 0;$acceptedTotal = 0;$rejectedTotal = 0;$receivedTotal = 0;
-            $tResult = array();$acceptedResult = array();$waitingResult = array();$rejectedResult = array();
-            while($month <= $end){
-                $mnth = date('m', $month);$year = date('Y', $month);$dFormat = date("M-Y", $month);
-                //get accepted data
-                $acceptedQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
-                                                   ->columns(array('total' => new Expression('COUNT(*)')))
-                                                   ->where(array("(vl.result!='' AND vl.result is NOT NULL)"))
-                                                   ->where("Month(sample_collection_date)='".$mnth."' AND Year(sample_collection_date)='".$year."'");
-                if($params['facilityId'] !=''){
-                    $acceptedQuery = $acceptedQuery->where(array("vl.lab_id ='".base64_decode($params['facilityId'])."'")); 
-                }
-                $aQueryStr = $sql->getSqlStringForSqlObject($acceptedQuery);
-                $acceptedResult[$i] = $dbAdapter->query($aQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-                if($acceptedResult[$i][0]['total']!=0){
-                    $acceptedTotal = $acceptedTotal + $acceptedResult[$i][0]['total'];
-                    $acceptedResult[$i]['date'] = $dFormat;
-                    $acceptedResult[$i]['acceptDate'] = $dFormat;
-                    $acceptedResult[$i]['acceptTotal'] = $acceptedTotal;
-                }else{
-                    unset($acceptedResult[$i]);
-                }
-                //get rejected data
-                $rejectedQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
+        $timestamp = time();
+        $waitingTotal = 0;$receivedTotal = 0;$testedTotal = 0;$rejectedTotal = 0;
+        $waitingResult = array();$receivedResult = array();$tResult = array();$rejectedResult = array();
+        for ($i = 0 ; $i < 7 ; $i++) {
+            $currentDate = date('Y-m-d', $timestamp);
+            $displayDate = $common->humanDateFormat(date('y-m-d', $timestamp));
+            //get received data
+            $receivedQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
                                                ->columns(array('total' => new Expression('COUNT(*)')))
-                                               ->where(array("(vl.reason_for_sample_rejection !='' AND vl.reason_for_sample_rejection IS NOT NULL)"))
-                                               ->where("Month(sample_collection_date)='".$mnth."' AND Year(sample_collection_date)='".$year."'");
-                if($params['facilityId'] !=''){
-                   $rejectedQuery = $rejectedQuery->where(array("vl.lab_id ='".base64_decode($params['facilityId'])."'")); 
-                }
-                $rQueryStr = $sql->getSqlStringForSqlObject($rejectedQuery);
-                $rejectedResult[$i] = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-                if($rejectedResult[$i][0]['total']!=0){
-                    $rejectedTotal = $rejectedTotal + $rejectedResult[$i][0]['total'];
-                    $rejectedResult[$i]['date'] = $dFormat;
-                    $rejectedResult[$i]['rejectDate'] = $dFormat;
-                    $rejectedResult[$i]['rejectTotal'] = $rejectedTotal;
-                }else{
-                   unset($rejectedResult[$i]);
-                }
-                //all data
-                $sQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))->columns(array('total' => new Expression('COUNT(*)')))
-                                        ->where("Month(sample_collection_date)='".$mnth."' AND Year(sample_collection_date)='".$year."'");
-                if($params['facilityId'] !=''){
-                   $sQuery = $sQuery->where(array("vl.lab_id ='".base64_decode($params['facilityId'])."'")); 
-                }
-                $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
-                $tResult[$i] = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-                if($tResult[$i][0]['total']!=0){
-                $receivedTotal = $receivedTotal + $tResult[$i][0]['total'];
-                $tResult[$i]['date'] = $dFormat;
-                $tResult[$i]['accessDate'] = $dFormat;
-                $tResult[$i]['accessTotal'] = $receivedTotal;
-                }else{
-                   unset($tResult[$i]);
-                }
-                $month = strtotime("+1 month", $month);
-                $i++;
+                                               ->where("vl.result!='' AND vl.result is NOT NULL AND DATE(sample_collection_date) = '".$currentDate."'");
+                                               //->where(new \Zend\Db\Sql\Predicate\Expression('DATE(sample_collection_date) = ?', '2017-05-16'));
+            if($params['facilityId'] !=''){
+                $receivedQuery = $receivedQuery->where(array("vl.lab_id ='".base64_decode($params['facilityId'])."'")); 
             }
-            ////waiting query based on global config
+            $cQueryStr = $sql->getSqlStringForSqlObject($receivedQuery);
+            //echo $cQueryStr;die;
+            $receivedResult[$i] = $dbAdapter->query($cQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+            if($receivedResult[$i][0]['total']!=0){
+                $receivedTotal = $receivedTotal + $receivedResult[$i][0]['total'];
+                $receivedResult[$i]['date'] = $displayDate;
+                $receivedResult[$i]['receivedDate'] = $displayDate;
+                $receivedResult[$i]['receivedTotal'] = $receivedTotal;
+            }else{
+                unset($receivedResult[$i]);
+            }
+            //get rejected data
+            $rejectedQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
+                                           ->columns(array('total' => new Expression('COUNT(*)')))
+                                           ->where("vl.reason_for_sample_rejection !='' AND vl.reason_for_sample_rejection IS NOT NULL AND DATE(sample_collection_date) = '".$currentDate."'");
+            if($params['facilityId'] !=''){
+               $rejectedQuery = $rejectedQuery->where(array("vl.lab_id ='".base64_decode($params['facilityId'])."'")); 
+            }
+            $rQueryStr = $sql->getSqlStringForSqlObject($rejectedQuery);
+            $rejectedResult[$i] = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+            if($rejectedResult[$i][0]['total']!=0){
+                $rejectedTotal = $rejectedTotal + $rejectedResult[$i][0]['total'];
+                $rejectedResult[$i]['date'] = $displayDate;
+                $rejectedResult[$i]['rejectDate'] = $displayDate;
+                $rejectedResult[$i]['rejectTotal'] = $rejectedTotal;
+            }else{
+               unset($rejectedResult[$i]);
+            }
+            //tested data
+            $sQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))->columns(array('total' => new Expression('COUNT(*)')))
+                                    ->where("DATE(sample_tested_datetime)='".$currentDate."'");
+            if($params['facilityId'] !=''){
+               $sQuery = $sQuery->where(array("vl.lab_id ='".base64_decode($params['facilityId'])."'")); 
+            }
+            $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
+            $tResult[$i] = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+            if($tResult[$i][0]['total']!=0){
+                $testedTotal = $testedTotal + $tResult[$i][0]['total'];
+                $tResult[$i]['date'] = $displayDate;
+                $tResult[$i]['testedDate'] = $displayDate;
+                $tResult[$i]['testedTotal'] = $testedTotal;
+            }else{
+               unset($tResult[$i]);
+            }
+           $timestamp -= 24 * 3600;
+        }
+        //waiting query based on global config
             //$i = 0;
             //$globalDb = new \Application\Model\GlobalTable($this->adapter);
             //$mnthRange = $globalDb->getGlobalValue('sample_waiting_month_range');
@@ -175,8 +170,7 @@ class SampleTable extends AbstractTableGateway {
             //    }
             //    $i++;
             //}
-            return array('quickStats'=>$quickStats,'stResult'=>$tResult,'saResult'=>$acceptedResult,'srResult'=>$rejectedResult);
-        }
+        return array('quickStats'=>$quickStats,'scResult'=>$receivedResult,'stResult'=>$tResult,'srResult'=>$rejectedResult);
     }
     
     //get sample tested result details
