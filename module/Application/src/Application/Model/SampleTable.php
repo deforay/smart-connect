@@ -100,14 +100,14 @@ class SampleTable extends AbstractTableGateway {
             $cQueryStr = $sql->getSqlStringForSqlObject($receivedQuery);
             //echo $cQueryStr;die;
             $receivedResult[$i] = $dbAdapter->query($cQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-            if($receivedResult[$i][0]['total']!=0){
+            //if($receivedResult[$i][0]['total']!=0){
                 $receivedTotal = $receivedTotal + $receivedResult[$i][0]['total'];
                 $receivedResult[$i]['date'] = $displayDate;
                 $receivedResult[$i]['receivedDate'] = $displayDate;
                 $receivedResult[$i]['receivedTotal'] = $receivedTotal;
-            }else{
-                unset($receivedResult[$i]);
-            }
+            //}else{
+               // unset($receivedResult[$i]);
+            //}
             //get rejected data
             $rejectedQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
                                            ->columns(array('total' => new Expression('COUNT(*)')))
@@ -117,14 +117,14 @@ class SampleTable extends AbstractTableGateway {
             }
             $rQueryStr = $sql->getSqlStringForSqlObject($rejectedQuery);
             $rejectedResult[$i] = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-            if($rejectedResult[$i][0]['total']!=0){
+            //if($rejectedResult[$i][0]['total']!=0){
                 $rejectedTotal = $rejectedTotal + $rejectedResult[$i][0]['total'];
                 $rejectedResult[$i]['date'] = $displayDate;
                 $rejectedResult[$i]['rejectDate'] = $displayDate;
                 $rejectedResult[$i]['rejectTotal'] = $rejectedTotal;
-            }else{
-               unset($rejectedResult[$i]);
-            }
+            //}else{
+               //unset($rejectedResult[$i]);
+            //}
             //tested data
             $sQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))->columns(array('total' => new Expression('COUNT(*)')))
                                     ->where("DATE(sample_tested_datetime)='".$currentDate."'");
@@ -133,14 +133,14 @@ class SampleTable extends AbstractTableGateway {
             }
             $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
             $tResult[$i] = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-            if($tResult[$i][0]['total']!=0){
+            //if($tResult[$i][0]['total']!=0){
                 $testedTotal = $testedTotal + $tResult[$i][0]['total'];
                 $tResult[$i]['date'] = $displayDate;
                 $tResult[$i]['testedDate'] = $displayDate;
                 $tResult[$i]['testedTotal'] = $testedTotal;
-            }else{
-               unset($tResult[$i]);
-            }
+            //}else{
+               //unset($tResult[$i]);
+            //}
            $timestamp -= 24 * 3600;
         }
         //waiting query based on global config
