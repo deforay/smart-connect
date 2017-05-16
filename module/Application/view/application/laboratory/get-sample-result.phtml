@@ -121,7 +121,7 @@ if(count($result['scResult'])>0){
         xAxis: {
             categories: [
             <?php
-            foreach($result['stResult'] as $total){
+            foreach($result['scResult'] as $total){
                 echo "'".ucwords($total['date'])."',";
             }
             ?>],
@@ -160,7 +160,7 @@ if(count($result['scResult'])>0){
             showInLegend: false,  
             name: 'Samples Received',
             data: [<?php
-            foreach($result['stResult'] as $total){
+            foreach($result['scResult'] as $total){
                 echo ucwords($total[0]['total']).",";
             }
             ?>]
@@ -189,7 +189,7 @@ $('#samplesTestedChart').highcharts({
         },
         xAxis: {
             categories: [<?php
-            foreach($result['saResult'] as $total){
+            foreach($result['stResult'] as $total){
                 echo "'".ucwords($total['date'])."',";
             }
             ?>],
@@ -221,7 +221,7 @@ $('#samplesTestedChart').highcharts({
             showInLegend: false,  
             name: 'Samples Tested',
             data: [<?php
-            foreach($result['saResult'] as $total){
+            foreach($result['stResult'] as $total){
                 echo ucwords($total[0]['total']).",";
             }
             ?>]
