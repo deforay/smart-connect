@@ -129,7 +129,7 @@ class Module
                 },
 				'SampleTable' => function($sm) {
                     $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
-                    $table = new SampleTable($dbAdapter);
+                    $table = new SampleTable($dbAdapter,$sm);
                     return $table;
                 },
 				'FacilityTable' => function($sm) {
@@ -185,6 +185,9 @@ class Module
                     return new ConfigService($sm);
                 },
             ),
+			'abstract_factories' => array(
+		      'Zend\Cache\Service\StorageCacheAbstractServiceFactory',
+			)
           
         );
     }

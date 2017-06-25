@@ -1,5 +1,5 @@
 <?php
-//Zend\Debug\Debug::dump($result['lab']);die;
+//Zend\Debug\Debug::dump($result);die;
 ?>
 <div id="facilitiesTestedVsSuppressed"></div>
 <script>
@@ -57,7 +57,8 @@
             }
         },
         series: [<?php
-              foreach($result['sampleName'] as $key=>$condition){
+        if(isset($result['sampleName']) && $result['sampleName'] != "" && count($result['sampleName']) > 0 ){
+             foreach($result['sampleName'] as $key=>$condition){
               if($key!='VL Not Detected'){
                 $range = substr($key,4,6);
                 $range = preg_replace('/\s+/', '', $range);
@@ -74,7 +75,11 @@
               ?>],
               },
               <?php
-              }
+              } 
+        }else {
+              echo "";
+        }
+              
             ?>],
             colors: ['#ff1900','#333333','#60d18f',],
     });

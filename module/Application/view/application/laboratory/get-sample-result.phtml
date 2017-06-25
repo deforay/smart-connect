@@ -25,14 +25,15 @@ if(count($result['scResult'])>0){
                 <h3 class="font-purple-soft">
                     <span style="font-size:25px;">Quick Stats</span>
                 </h3>
-                <small class="font-purple-soft" style="font-size:12px;">as on <?php echo date("dS M Y"); ?></small><br>
+                <small class="font-purple-soft" style="">as on <?php echo date("dS M Y"); ?></small><br>
             </div>
+            
             <div class="icon">
                 <i class="icon-pie-chart"></i>
             </div>
         </div>
-        <div id="samplesWaitingChart" width="210" height="150" style="min-height:150px;">
-            
+        <div id="samplesWaitingChart" width="210" height="170" style="min-height:180px;">
+          
             <table class="table table-striped table-hover table-compressed">
                 <?php foreach($quickStats as $statName => $statValue) { ?>
                 <tr>
@@ -53,8 +54,8 @@ if(count($result['scResult'])>0){
                 <h3 class="font-green-sharp">
                     <span data-counter="counterup" data-value="<?php echo $receivedTotal; ?>"><?php echo $receivedTotal; ?></span>
                 </h3>
-                <small class="font-green-sharp">SAMPLES ACCESSION</small><br>
-                <!--<small class="font-green-sharp"><?php echo $receivedDate;?></small>-->
+                <small class="font-green-sharp">SAMPLES COLLECTED</small><br>
+                <small class="font-green-sharp">Last 7 days</small>
             </div>
             <div class="icon">
                 <i class="icon-pie-chart"></i>
@@ -73,6 +74,7 @@ if(count($result['scResult'])>0){
                 </h3>
                 <small class="font-blue-sharp">SAMPLES TESTED</small><br>
                 <!--<small class="font-blue-sharp"><?php echo $testedDate;?></small>-->
+                <small class="font-blue-sharp">Last 7 days</small>
             </div>
             <div class="icon">
                 <i class="icon-pie-chart"></i>
@@ -90,6 +92,7 @@ if(count($result['scResult'])>0){
                 </h3>
                 <small class="font-red-haze">SAMPLES REJECTED</small><br>
                 <!--<small class="font-red-haze"><?php echo $rejectedDate;?></small>-->
+                <small class="font-red-haze">Last 7 days</small>
             </div>
             <div class="icon">
                 <i class="icon-pie-chart"></i>

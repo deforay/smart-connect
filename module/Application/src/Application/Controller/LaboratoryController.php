@@ -45,8 +45,7 @@ class LaboratoryController extends AbstractActionController
         return new ViewModel();
     }
     
-    public function samplesTestedAction()
-    {   
+    public function samplesTestedAction(){
         $this->layout()->setVariable('activeTab', 'labs-dashboard');
         $gender="";
         $month="";

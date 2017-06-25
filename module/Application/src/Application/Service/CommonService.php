@@ -10,11 +10,12 @@ use Zend\Mail;
 use Zend\Mime\Message as MimeMessage;
 use Zend\Mime\Part as MimePart;
 
+
 class CommonService {
 
     public $sm = null;
 
-    public function __construct($sm = null) {
+    public function __construct($sm) {
         $this->sm = $sm;
     }
 
@@ -319,7 +320,38 @@ class CommonService {
     
    
     
-
+    public function cacheQuery($queryString,$dbAdapter, $fetchCurrent = false){
+        
+       // $res = $dbAdapter->query($queryString, $dbAdapter::QUERY_MODE_EXECUTE);
+       // return $res;
+        
+        $cacheObj = $this->sm->get('Cache\Persistent');
+        //\Zend\Debug\Debug::dump($cacheObj);die;
+        $cacheId = hash("sha512",$queryString);
+        $res = null;
+        try{
+            if (!$cacheObj->hasItem($cacheId)) {
+                if(!$fetchCurrent){
+                    $res = $dbAdapter->query($queryString, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+                }else{
+                    $res = $dbAdapter->query($queryString, $dbAdapter::QUERY_MODE_EXECUTE)->current();
+                }
+                $cacheObj->addItem($cacheId, ($res));
+            } else {
+                $res = ($cacheObj->getItem($cacheId));
+            }
+            return $res;
+        }catch(Exception $e){
+            error_log($e->getMessage());
+            //if(!$fetchCurrent){
+            //    $res = $dbAdapter->query($queryString, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+            //}else{
+            //    $res = $dbAdapter->query($queryString, $dbAdapter::QUERY_MODE_EXECUTE)->current();
+            //}
+            //return $res;
+        }
+        
+    }
     
 }
 
