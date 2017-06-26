@@ -77,7 +77,8 @@ class SampleTable extends AbstractTableGateway {
         
         $queryStr = $sql->getSqlStringForSqlObject($query);
         
-        $result = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+        //$result = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+        $result = $common->cacheQuery($queryStr,$dbAdapter);
         return $result[0];
         
         
@@ -113,7 +114,8 @@ class SampleTable extends AbstractTableGateway {
         }
         $cQueryStr = $sql->getSqlStringForSqlObject($receivedQuery);
         //echo $cQueryStr;die;
-        $rResult = $dbAdapter->query($cQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+        //$rResult = $dbAdapter->query($cQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+        $rResult = $common->cacheQuery($cQueryStr,$dbAdapter);
         
         //var_dump($receivedResult);die;
         $recTotal = 0;
@@ -135,8 +137,8 @@ class SampleTable extends AbstractTableGateway {
         }
         $cQueryStr = $sql->getSqlStringForSqlObject($rejectedQuery);
         //echo $cQueryStr;die;
-        $rResult = $dbAdapter->query($cQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-        
+        //$rResult = $dbAdapter->query($cQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+        $rResult = $common->cacheQuery($cQueryStr,$dbAdapter);
         //var_dump($receivedResult);die;
         $rejTotal = 0;
         foreach($rResult as $rRow){
@@ -155,7 +157,8 @@ class SampleTable extends AbstractTableGateway {
         }
         $cQueryStr = $sql->getSqlStringForSqlObject($testedQuery);
         //echo $cQueryStr;//die;
-        $rResult = $dbAdapter->query($cQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+        //$rResult = $dbAdapter->query($cQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+        $rResult = $common->cacheQuery($cQueryStr,$dbAdapter);
         
         //var_dump($receivedResult);die;
         $testedTotal = 0;
@@ -184,7 +187,8 @@ class SampleTable extends AbstractTableGateway {
                 $rsQuery = $rsQuery->where('rs.sample_id="'.base64_decode(trim($params['sampleType'])).'"');
             }
             $rsQueryStr = $sql->getSqlStringForSqlObject($rsQuery);
-            $sampleTypeResult = $dbAdapter->query($rsQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+            //$sampleTypeResult = $dbAdapter->query($rsQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+            $sampleTypeResult = $common->cacheQuery($rsQueryStr,$dbAdapter);
             
           if($sampleTypeResult){  
             $sampleId = array();
@@ -216,8 +220,10 @@ class SampleTable extends AbstractTableGateway {
                     order by DATE(sample_collection_date)";
             }
             
-            //$queryStr = $sql->getSqlStringForSqlObject($sqlString);
-            $sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+            
+            //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+            $sampleResult = $common->cacheQuery($queryStr,$dbAdapter);
+           
            // \Zend\Debug\Debug::dump($sampleResult);
            //  die();
             
@@ -284,7 +290,9 @@ class SampleTable extends AbstractTableGateway {
                         order by DATE(sample_collection_date)";
             
             
-            $sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+            //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+            $sampleResult = $common->cacheQuery($queryStr,$dbAdapter);
+            
             
             $result = array();
             $j=0;
@@ -359,7 +367,8 @@ class SampleTable extends AbstractTableGateway {
                         
                         order by DATE(sample_collection_date)";            
             
-            $sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+            //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+            $sampleResult = $common->cacheQuery($queryStr,$dbAdapter);
             
             $result = array();            
             $j=0;
@@ -414,7 +423,10 @@ class SampleTable extends AbstractTableGateway {
             $rsQuery = $rsQuery->where('rs.sample_id="'.base64_decode(trim($params['sampleType'])).'"');
         }
         $rsQueryStr = $sql->getSqlStringForSqlObject($rsQuery);
-        $sampleTypeResult = $dbAdapter->query($rsQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+        //$sampleTypeResult = $dbAdapter->query($rsQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+        
+        $sampleTypeResult = $common->cacheQuery($rsQueryStr,$dbAdapter);
+        
         if($facilityResult && $sampleTypeResult){
             $sampleId = array();
             foreach($sampleTypeResult as $samples)
