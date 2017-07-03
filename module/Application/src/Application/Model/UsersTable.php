@@ -52,7 +52,13 @@ class UsersTable extends AbstractTableGateway {
             //$logincontainer->accessType = $rResult[0]["access_type"];
             $container->alertMsg = '';
             //die('home');
-            return '/labs/dashboard';
+            if($logincontainer->role == 1 || $logincontainer->role == 2){
+               return '/labs/dashboard';
+            }else if($logincontainer->role == 3){
+                return '/clinics/dashboard';
+            }else if($logincontainer->role == 4){
+                return '/hubs/dashboard';
+            }
         } else {
             $container->alertMsg = 'Please check your login credentials';
             //die('login');

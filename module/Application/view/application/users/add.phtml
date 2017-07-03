@@ -52,7 +52,7 @@
                                                             //$options[$r['access_type_name']][$r['role_id']] = $r['role_name'];
                                                               
                                                         ?>
-                                                          <option value="<?php echo $r['role_id']; ?>"><?php echo $r['role_name'] ?></option>
+                                                          <option value="<?php echo $r['role_id']; ?>"><?php echo ucwords($r['role_name']); ?></option>
                                                         <?php
                                                        }
                                                        ?>

@@ -52,7 +52,7 @@
                                                             foreach($roles as $r) {
                                                             // $options[$r['access_type_name']][$r['id']] = $r['role_name'];
                                                         ?>
-                                                          <option value="<?php echo $r['role_id']; ?>" <?php echo ($user['role'] == $r['role_id'] ? " selected='selected' " : ""); ?> ><?php echo $r['role_name'] ?></option>
+                                                          <option value="<?php echo $r['role_id']; ?>" <?php echo ($user['role'] == $r['role_id'] ? " selected='selected' " : ""); ?> ><?php echo ucwords($r['role_name']); ?></option>
                                                         <?php
                                                        }
                                                        ?>                                                        

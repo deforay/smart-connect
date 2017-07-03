@@ -3,7 +3,6 @@ use Zend\Session\Container;
 $container = new Container('alert');
 $logincontainer = new Container('credo');
 ?>
-
 <!DOCTYPE html>
 <!--[if IE 8]> <html lang="en" class="ie8 no-js"> <![endif]-->
 <!--[if IE 9]> <html lang="en" class="ie9 no-js"> <![endif]-->
@@ -135,43 +134,55 @@ $logincontainer = new Container('credo');
                             <!-- END SIDEBAR TOGGLER BUTTON -->
                         </li>
                         <!-- DOC: To remove the search box from the sidebar you just need to completely remove the below "sidebar-search-wrapper" LI element -->
-                       <li class="nav-item start <?php echo ($activeTab == 'labs-dashboard' ? " active open " : ""); ?>">
-                            <a href="/labs/dashboard" class="nav-link nav-toggle">
-                                <i class="icon-home"></i>
-                                <span class="title">Labs Dashboard</span>
-                                <span class="selected"></span>
-                            </a>
-                            
-                        </li>
-                       <li class="nav-item start <?php echo ($activeTab == 'hubs-dashboard' ? " active open " : ""); ?>">
-                            <a href="/hubs/dashboard" class="nav-link nav-toggle">
-                                <i class="icon-home"></i>
-                                <span class="title">Hubs Dashboard</span>
-                                <span class="selected"></span>
-                            </a>
-                            
-                        </li>
-                       <li class="nav-item start <?php echo ($activeTab == 'clinics-dashboard' ? " active open " : ""); ?>">
-                            <a href="/clinics/dashboard" class="nav-link nav-toggle">
-                                <i class="icon-home"></i>
-                                <span class="title">Clinics Dashboard</span>
-                                <span class="selected"></span>
-                            </a>
-                        </li>
-                       <li class="nav-item start <?php echo ($activeTab == 'config' ? " active open " : ""); ?>">
-                            <a href="<?php echo $this->url('config', array('action' => 'index')) ?>" class="nav-link nav-toggle">
-                                <i class="icon-settings"></i>
-                                <span class="title">Global Config</span>
-                                <span class="selected"></span>
-                            </a>
-                        </li>
-                        <li class="nav-item start <?php echo ($activeTab == 'users' ? " active open " : ""); ?>">
-                            <a href="<?php echo $this->url('users', array('action' => 'index')) ?>" class="nav-link nav-toggle">
-                                <i class="icon-users"></i>
-                                <span class="title">Users </span>
-                                <span class="selected"></span>
-                            </a>
-                        </li> 
+                        <?php
+                        if($logincontainer->role == 1 || $logincontainer->role == 2){ ?>
+                            <li class="nav-item start <?php echo ($activeTab == 'labs-dashboard' ? " active open " : ""); ?>">
+                                 <a href="/labs/dashboard" class="nav-link nav-toggle">
+                                     <i class="icon-home"></i>
+                                     <span class="title">Labs Dashboard</span>
+                                     <span class="selected"></span>
+                                 </a>
+                                 
+                            </li>
+                        <?php } ?>
+                        <?php
+                        if($logincontainer->role == 1 || $logincontainer->role == 4){ ?>
+                            <li class="nav-item start <?php echo ($activeTab == 'hubs-dashboard' ? " active open " : ""); ?>">
+                                 <a href="/hubs/dashboard" class="nav-link nav-toggle">
+                                     <i class="icon-home"></i>
+                                     <span class="title">Hubs Dashboard</span>
+                                     <span class="selected"></span>
+                                 </a>
+                                 
+                            </li>
+                        <?php } ?>
+                        <?php
+                        if($logincontainer->role == 1 || $logincontainer->role == 3){ ?>
+                            <li class="nav-item start <?php echo ($activeTab == 'clinics-dashboard' ? " active open " : ""); ?>">
+                                 <a href="/clinics/dashboard" class="nav-link nav-toggle">
+                                     <i class="icon-home"></i>
+                                     <span class="title">Clinics Dashboard</span>
+                                     <span class="selected"></span>
+                                 </a>
+                            </li>
+                        <?php } ?>
+                        <?php
+                        if($logincontainer->role == 1){ ?>
+                            <li class="nav-item start <?php echo ($activeTab == 'config' ? " active open " : ""); ?>">
+                                 <a href="<?php echo $this->url('config', array('action' => 'index')) ?>" class="nav-link nav-toggle">
+                                     <i class="icon-settings"></i>
+                                     <span class="title">Global Config</span>
+                                     <span class="selected"></span>
+                                 </a>
+                             </li>
+                             <li class="nav-item start <?php echo ($activeTab == 'users' ? " active open " : ""); ?>">
+                                 <a href="<?php echo $this->url('users', array('action' => 'index')) ?>" class="nav-link nav-toggle">
+                                     <i class="icon-users"></i>
+                                     <span class="title">Users </span>
+                                     <span class="selected"></span>
+                                 </a>
+                             </li>
+                        <?php } ?>
                         <!--
                         <li class="nav-item < ?php echo ($activeTab == 'vl-request' ? " active open " : ""); ?> ">
                             <a href="javascript:;" class="nav-link nav-toggle">

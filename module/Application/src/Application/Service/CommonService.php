@@ -325,7 +325,7 @@ class CommonService {
        // $res = $dbAdapter->query($queryString, $dbAdapter::QUERY_MODE_EXECUTE);
        // return $res;
         
-        $cacheObj = $this->sm->get('Cache\Memcached');
+        $cacheObj = $this->sm->get('Cache\Persistent');
         //\Zend\Debug\Debug::dump($cacheObj);die;
         $cacheId = hash("sha512",$queryString);
         $res = null;
