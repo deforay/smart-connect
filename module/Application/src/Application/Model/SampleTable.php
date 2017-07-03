@@ -201,7 +201,7 @@ class SampleTable extends AbstractTableGateway {
             
             $queryStr = "SELECT COUNT(*) AS `total`, 
 
-                    DATE_FORMAT(DATE(sample_collection_date), '%b-%Y') as 'monthYear',
+                    DATE_FORMAT(DATE(sample_collection_date), '%b-%Y') as 'monthDate',
                     
                     SUM(CASE WHEN vl.result>=1000 THEN 1 ELSE 0 END) as GreaterThan1000,
                     SUM(CASE WHEN vl.result<1000 THEN 1 ELSE 0 END) as LesserThan1000,
@@ -232,13 +232,13 @@ class SampleTable extends AbstractTableGateway {
             $j=0;
             foreach($sampleResult as $sRow){
                 
-                if($sRow["monthYear"] == null) continue;
+                if($sRow["monthDate"] == null) continue;
                 
                 $result['sampleName']['VL (> 1000 cp/ml)'][$j] = $sRow["GreaterThan1000"];
                 $result['sampleName']['VL Not Detected'][$j] = $sRow["TND"];
                 $result['sampleName']['VL (< 1000 cp/ml)'][$j] = $sRow["LesserThan1000"];
                 
-                $result['date'][$j] = $sRow["monthYear"];
+                $result['date'][$j] = $sRow["monthDate"];
                 $j++;
             } 
              
@@ -263,7 +263,7 @@ class SampleTable extends AbstractTableGateway {
             
             $queryStr = "SELECT COUNT(*) AS `total`, 
 
-                        DATE_FORMAT(DATE(sample_collection_date), '%b-%Y') as 'monthYear', 
+                        DATE_FORMAT(DATE(sample_collection_date), '%b-%Y') as 'monthDate', 
                         
                         SUM(CASE WHEN (vl.result>=1000 and vl.patient_gender in('m','M')) THEN 1 ELSE 0 END) as MGreaterThan1000,
                         SUM(CASE WHEN (vl.result<1000 and vl.patient_gender in('m','M')) THEN 1 ELSE 0 END) as MLesserThan1000,
@@ -298,7 +298,7 @@ class SampleTable extends AbstractTableGateway {
             $j=0;
             foreach($sampleResult as $sRow){
                 
-                if($sRow["monthYear"] == null) continue;
+                if($sRow["monthDate"] == null) continue;
                 
                 $result['M']['VL (> 1000 cp/ml)'][$j] = $sRow["MGreaterThan1000"];
                 $result['M']['VL Not Detected'][$j] = $sRow["MTND"];
@@ -312,7 +312,7 @@ class SampleTable extends AbstractTableGateway {
                 $result['Not Specified']['VL Not Detected'][$j] = $sRow["OTND"];
                 $result['Not Specified']['VL (< 1000 cp/ml)'][$j] = $sRow["OLesserThan1000"];
                 
-                $result['date'][$j] = $sRow["monthYear"];
+                $result['date'][$j] = $sRow["monthDate"];
                 $j++;
                 
                 
@@ -341,7 +341,7 @@ class SampleTable extends AbstractTableGateway {
                         
             $queryStr = "SELECT COUNT(*) AS `total`, 
             
-                        DATE_FORMAT(DATE(sample_collection_date), '%b-%Y') as 'monthYear', 
+                        DATE_FORMAT(DATE(sample_collection_date), '%b-%Y') as 'monthDate', 
                         
                         SUM(CASE WHEN (vl.result>=1000 and patient_age_in_years > 18) THEN 1 ELSE 0 END) as A18GreaterThan1000,
                         SUM(CASE WHEN (vl.result<1000 and patient_age_in_years > 18) THEN 1 ELSE 0 END) as A18LesserThan1000,
@@ -374,7 +374,7 @@ class SampleTable extends AbstractTableGateway {
             $j=0;
             foreach($sampleResult as $sRow){
                 
-                if($sRow["monthYear"] == null) continue;
+                if($sRow["monthDate"] == null) continue;
                 
                 $result['>18']['VL (> 1000 cp/ml)'][$j] = $sRow["A18GreaterThan1000"];
                 $result['<18']['VL (> 1000 cp/ml)'][$j] = $sRow["B18GreaterThan1000"];
@@ -385,7 +385,7 @@ class SampleTable extends AbstractTableGateway {
                 $result['>18']['VL (< 1000 cp/ml)'][$j] = $sRow["A18LesserThan1000"];
                 $result['<18']['VL (< 1000 cp/ml)'][$j] = $sRow["B18LesserThan1000"];
                 
-                $result['date'][$j] = $sRow["monthYear"];
+                $result['date'][$j] = $sRow["monthDate"];
                 $j++;
                 
             }           
@@ -466,6 +466,7 @@ class SampleTable extends AbstractTableGateway {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $common = new CommonService($this->sm);
+        
         if(trim($params['fromDate'])!= '' && trim($params['toDate'])!= ''){
             $startMonth = date("Y-m", strtotime(trim($params['fromDate'])));
             $endMonth = date("Y-m", strtotime(trim($params['toDate'])));
@@ -474,38 +475,43 @@ class SampleTable extends AbstractTableGateway {
             $i = 0;
             $completeResultCount = 0;
             $inCompleteResultCount = 0;
-            while($month <= $end){
-                $mnth = date('m', $month);$year = date('Y', $month);$dFormat = date("M-Y", $month);
-                $completeQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
-                                         ->columns(array('total' => new Expression('COUNT(*)')))
-                                         ->where("Month(sample_collection_date)='".$mnth."' AND Year(sample_collection_date)='".$year."'")
-                                         ->where('vl.patient_art_no !="" AND vl.current_regimen !="" AND vl.patient_age_in_years !="" AND vl.patient_gender !=""');
-                if($params['facilityId'] !=''){
-                    $completeQuery = $completeQuery->where(array("vl.lab_id ='".base64_decode($params['facilityId'])."'")); 
-                }
-                $cQueryStr = $sql->getSqlStringForSqlObject($completeQuery);
-                $completeResult = $dbAdapter->query($cQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-                $result['Complete'][$i] = $completeResultCount+$completeResult['total'];
+            
+            
+
+        $queryStr = "SELECT COUNT(*) AS `total`, 
+
+                    DATE_FORMAT(DATE(sample_collection_date), '%b-%Y') as 'monthDate', 
+                    
+                    SUM(CASE WHEN (vl.patient_art_no !='' AND vl.current_regimen !='' AND vl.patient_age_in_years !='' AND vl.patient_gender !='') THEN 1 ELSE 0 END) as CompletedForms,
+                    SUM(CASE WHEN (vl.patient_art_no='' OR vl.current_regimen='' OR vl.patient_age_in_years =''  OR vl.patient_gender='') THEN 1 ELSE 0 END) as IncompleteForms
+                    
+                    
+                    FROM `dash_vl_request_form` AS `vl` 
+                    
+                    WHERE (sample_collection_date is not null AND sample_collection_date != '') 
+                    
+                    AND DATE(sample_collection_date) >= '".$startMonth."-00' 
+                    AND DATE(sample_collection_date) <= '".$endMonth."-00' 
+                    
+                    group by MONTH(sample_collection_date) 
+                    
+                    order by DATE(sample_collection_date)";
+                    
+            //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+            $sampleResult = $common->cacheQuery($queryStr,$dbAdapter);
+            //\Zend\Debug\Debug::dump($sampleResult);
+            $result = array();
+            $j=0;
+            foreach($sampleResult as $sRow){
                 
-                $inCompleteQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
-                                           ->columns(array('total' => new Expression('COUNT(*)')))
-                                           ->where("Month(sample_collection_date)='".$mnth."' AND Year(sample_collection_date)='".$year."'")
-                                           ->where(array('(vl.patient_art_no="" OR vl.current_regimen="" OR vl.patient_age_in_years =""  OR vl.patient_gender="")'));
-                if($params['facilityId'] !=''){
-                    $inCompleteQuery = $inCompleteQuery->where(array("vl.lab_id ='".base64_decode($params['facilityId'])."'")); 
-                }
-                $incQueryStr = $sql->getSqlStringForSqlObject($inCompleteQuery);
-                $inCompleteResult = $dbAdapter->query($incQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-                $result['Incomplete'][$i] = $inCompleteResultCount+$inCompleteResult['total'];
-                if($completeResult['total']!=0 || $inCompleteResult['total']!=0){
-                    $result['date'][$i] = $dFormat;
-                }else if($completeResult['total']==0 && $inCompleteResult['total']==0){
-                    unset($result['Complete'][$i]);
-                    unset($result['Incomplete'][$i]);
-                }
-                $month = strtotime("+1 month", $month);
-                $i++;
+                if($sRow["monthDate"] == null) continue;
+                
+                $result['Complete'][$j] = $sRow["CompletedForms"];
+                $result['Incomplete'][$j] = $sRow["IncompleteForms"];
+                $result['date'][$j] = $sRow["monthDate"];
+                $j++;                
             }
+            //\Zend\Debug\Debug::dump($result);die;
             return $result;
         }
     }
@@ -1267,8 +1273,7 @@ class SampleTable extends AbstractTableGateway {
         }
     }
     
-    public function getClinicDistinicDate($cDate,$lastThirtyDay)
-    {
+    public function getClinicDistinicDate($cDate,$lastThirtyDay){
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $squery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))

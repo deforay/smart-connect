@@ -15,7 +15,7 @@ return array(
         //),
         'Cache\Persistent' => array(
             'adapter' => 'filesystem',
-            'ttl'     => 86400,
+            'ttl'     => 7200,
             'options' => array(
                 'cache_dir' => realpath(__DIR__ . '/../../data/cache/'),
                 'dirPermission' => 0755,
@@ -24,6 +24,32 @@ return array(
             ),
             'plugins' => array('serializer'),
             
+        ),
+        'Cache\Memcached' => array( //can be called directly via SM in the name of 'memcached'
+            'adapter' => array(
+                'name'     =>'memcached',
+                'options'  => array(
+                    'ttl' => 7200, 
+                    'servers'   => array(
+                        array(
+                            '127.0.0.1',11211
+                        )
+                    ),
+                    'namespace'  => 'VLDASHBOARD',
+                    'liboptions' => array (
+                        'COMPRESSION' => true,
+                        'binary_protocol' => true,
+                        'no_block' => true,
+                        'connect_timeout' => 100
+                    )
+                )
+            ),
+            'plugins' => array(
+                'serializer',
+                'exception_handler' => array(
+                    'throw_exceptions' => false
+                ),
+            ),
         ),
     ),
 );
