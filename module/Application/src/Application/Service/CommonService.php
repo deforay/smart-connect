@@ -15,7 +15,7 @@ class CommonService {
 
     public $sm = null;
 
-    public function __construct($sm) {
+    public function __construct($sm=null) {
         $this->sm = $sm;
     }
 

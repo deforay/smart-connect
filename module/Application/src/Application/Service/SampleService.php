@@ -414,4 +414,17 @@ class SampleService {
         $sampleDb = $this->sm->get('SampleTable');
         return $sampleDb->fetchIncompleteBarSampleDetails($params);
     }
+    
+    public function getSampleInfo($params){
+        $dbAdapter = $this->sm->get('Zend\Db\Adapter\Adapter');
+        $sql = new Sql($dbAdapter);
+        $sQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
+				->join(array('fd'=>'facility_details'),'fd.facility_id=vl.facility_id',array('facility_name','facility_code'),'left')
+				->join(array('r_s_t'=>'r_sample_type'),'r_s_t.sample_id=vl.sample_type',array('sample_name'),'left')
+				->join(array('l'=>'facility_details'),'l.facility_id=vl.lab_id',array('labName'=>'facility_name'),'left')
+				->join(array('u'=>'user_details'),'u.user_id=vl.result_approved_by',array('approvedBy'=>'user_name'),'left')
+				->where(array('vl.vl_sample_id'=>$params['id']));
+        $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
+      return $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+    }
 }

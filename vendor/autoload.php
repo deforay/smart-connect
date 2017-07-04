@@ -4,5 +4,7 @@
 
 require_once __DIR__ . '/composer' . '/autoload_real.php';
 require_once __DIR__ . '/phpoffice/phpexcel/Classes/PHPExcel' . '/IOFactory.php';
+require_once __DIR__ . '/tcpdf/tcpdf.php';
+require_once __DIR__ . '/fpdi/fpdi.php';
 
 return ComposerAutoloaderInitb0238f010c9f16ae51dbaab22c36d4e0::getLoader();

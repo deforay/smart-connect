@@ -203,13 +203,12 @@ foreach($sampleType as $samples){
                                                     <i class="fa fa-cogs"></i>Test Results
                                                 </div>
                                                 <div class="tools">
-                                                    
                                                 </div>
             
                                             </div>
                                             <div class="portlet-body">
                                                 <div class="table-toolbar">
-                                                    <table class="table table-striped table-bordered table-hover order-column " id="testResults">
+                                                    <table class="table table-striped table-bordered table-hover order-column" id="testResults">
                                                         <thead>
                                                             <tr>
                                                                 <th> Sample ID </th>
@@ -461,8 +460,8 @@ function searchData(){
         $("#samplesTestedResult").html(data);
         });
     }
-    function getAllTestReason()
-    {
+    
+    function getAllTestReason(){
         sampleType = $("#sampleId").val();
         testResult = $("#testResult").val();
         age = $("#age").val();
@@ -477,6 +476,14 @@ function searchData(){
         });
     }
     
+    function generateResultPDF(id){
+        $.post("<?php echo $this->url('clinics', array('action' => 'generate-result-pdf')); ?>", {id : id},
+        function(data){
+            if(data == "" || data == null || data == undefined){
+                alert('Unable to generate result pdf');
+            }else{
+                window.open('../temporary/'+data,'_blank');
+            }
+        });
+    }
 </script>        
-        
-        

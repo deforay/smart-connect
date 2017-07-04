@@ -1,12 +1,9 @@
-<?php
-$common = new \Application\Service\CommonService();
-?>
-<table class="table table-striped table-bordered table-hover order-column " id="testResults">
+<table class="table table-striped table-bordered table-hover order-column" id="testResults">
     <thead>
         <tr>
             <th> Sample ID </th>
             <th> Date Tested</th>
-            <th> Viral Load <br> (cp/mL) </th>                                                                
+            <th> Viral Load <br> (cp/mL) </th>                                                          
         </tr>
     </thead>
     <tbody>
@@ -20,7 +17,7 @@ $common = new \Application\Service\CommonService();
             ?>
             <tr>
                 <td><?php echo $sampleData['sample_code'];?></td>
-                <td><?php echo $common->humanDateFormat($testedDate[0])." ".$testedDate[1];?></td>
+                <td><?php echo $this->humanDateFormat($testedDate[0])." ".$testedDate[1];?></td>
                 <td><?php echo $sampleData['result'];?></td>
             </tr>
             <?php

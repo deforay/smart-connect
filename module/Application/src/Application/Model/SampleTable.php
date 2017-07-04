@@ -31,7 +31,6 @@ class SampleTable extends AbstractTableGateway {
         
     }
     
-    
     public function fetchQuickStats($params){
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
@@ -1039,7 +1038,7 @@ class SampleTable extends AbstractTableGateway {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
-                ->columns(array('vl_sample_id','sample_code','sample_collection_date','sample_type','sample_testing_date','result_value_log','result_value_absolute','result_value_text','result'))
+                                ->columns(array('vl_sample_id','sample_code','sample_collection_date','sample_type','sample_testing_date','result_value_log','result_value_absolute','result_value_text','result'))
 				->join(array('fd'=>'facility_details'),'fd.facility_id=vl.facility_id',array('facility_name'))
 				->where(array('fd.facility_type'=>'1'));
         $cDate = ''; $lastThirtyDay = '';
@@ -1130,8 +1129,8 @@ class SampleTable extends AbstractTableGateway {
             $row[] = $aRow['sample_code'];
             $row[] = $aRow['sample_collection_date'];
             $row[] = $aRow['sample_testing_date'];
-			$row[] = $aRow['result'];
-			$row[]='<a href="#" class="btn btn-primary btn-xs">View</a>';
+	    $row[] = $aRow['result'];
+	    $row[]='<a href="#" class="btn btn-primary btn-xs">View</a>&nbsp;&nbsp;<a href="javascript:void(0);" class="btn btn-danger btn-xs" onclick="generateResultPDF('.$aRow['vl_sample_id'].');">PDF</a>';
             
             $output['aaData'][] = $row;
         }

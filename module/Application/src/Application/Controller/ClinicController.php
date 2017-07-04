@@ -82,5 +82,20 @@ class ClinicController extends AbstractActionController
             return $viewModel;
         }   
     }
+    
+    public function generateResultPdfAction() {
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $sampleService = $this->getServiceLocator()->get('SampleService');
+            $configService = $this->getServiceLocator()->get('ConfigService');
+            $sampleResult=$sampleService->getSampleInfo($params);
+            $config=$configService->getAllGlobalConfig();
+            $viewModel = new ViewModel();
+            $viewModel->setVariables(array('sampleResult' =>$sampleResult,'config'=>$config))
+                      ->setTerminal(true);
+            return $viewModel;
+        }
+    }
 }
 

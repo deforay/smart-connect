@@ -22,3 +22,50 @@ INSERT INTO `dash_user_roles` (`role_id`, `role_name`, `role_code`, `status`) VA
 (2, 'lab user', 'lu', 'active'),
 (3, 'clinic user', 'cu', 'active'),
 (4, 'hub user', 'hu', 'active');
+
+--Pal 04-July-2017
+update dash_vl_request_form set sample_code= null where sample_code = 'NULL'
+
+update dash_vl_request_form set sample_collection_date= null where sample_collection_date = 'NULL'
+
+update dash_vl_request_form set patient_art_no= null where patient_art_no = 'NULL'
+
+update dash_vl_request_form set patient_first_name= null where patient_first_name = 'NULL'
+
+update dash_vl_request_form set patient_last_name= null where patient_last_name = 'NULL'
+
+update dash_vl_request_form set patient_mobile_number= null where patient_mobile_number = 'NULL'
+
+update dash_vl_request_form set patient_gender= null where patient_gender = 'NULL'
+
+update dash_vl_request_form set request_clinician_name= null where request_clinician_name = 'NULL'
+
+update dash_vl_request_form set sample_received_at_vl_lab_datetime= null where sample_received_at_vl_lab_datetime = 'NULL'
+
+update dash_vl_request_form set sample_tested_datetime= null where sample_tested_datetime = 'NULL'
+
+update dash_vl_request_form set vl_test_platform= null where vl_test_platform = 'NULL'
+
+update dash_vl_request_form set result= null where result = 'NULL'
+
+update dash_vl_request_form set result_value_log= null where result_value_log = 'NULL'
+
+update dash_vl_request_form set result_value_absolute= null where result_value_absolute = 'NULL'
+
+update dash_vl_request_form set result_value_text= null where result_value_text = 'NULL'
+
+update dash_vl_request_form set result_value_absolute_decimal= null where result_value_absolute_decimal = 'NULL'
+
+update dash_vl_request_form set approver_comments= null where approver_comments = 'NULL'
+
+update dash_vl_request_form set last_viral_load_date= null where last_viral_load_date = 'NULL'
+
+update dash_vl_request_form set last_viral_load_result= null where last_viral_load_result = 'NULL'
+
+INSERT INTO `dash_global_config` (`name`, `display_name`, `value`) VALUES ('h_vl_msg', 'Result PDF High Viral Load Message', 'High Viral Load - need assessment for enhanced adherence or clinical assessment for possible switch to second line.'), ('l_vl_msg', 'Result PDF Low Viral Load Message', 'Viral load adequately controlled : continue current regimen');
+
+INSERT INTO `dash_global_config` (`name`, `display_name`, `value`) VALUES ('show_smiley', 'Do you want to show smiley at result pdf?', 'yes');
+
+INSERT INTO `dash_global_config` (`name`, `display_name`, `value`) VALUES ('header', 'Header', 'MINISTRY OF HEALTH');
+
+INSERT INTO `dash_global_config` (`name`, `display_name`, `value`) VALUES ('logo', 'Logo', NULL);

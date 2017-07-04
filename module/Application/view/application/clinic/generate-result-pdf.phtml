@@ -1,0 +1,440 @@
+<?php
+use Zend\Session\Container;
+$alertContainer = new Container('alert');
+$alertContainer->aliasPage = 1;
+$alertContainer->nbPages = count($sampleResult);
+    class MYPDF extends TCPDF {
+        public function setSchemeName($heading,$logo) {
+            $this->heading = $heading;
+            $this->logo = $logo;
+        }
+        
+        public function Header() {
+            // Logo
+            $image_file = APPLICATION_PATH . DIRECTORY_SEPARATOR . 'assets'. DIRECTORY_SEPARATOR . 'img'. DIRECTORY_SEPARATOR . $this->logo;
+            $this->Image($image_file, 12,3, 20, '', 'PNG', '', 'T', false, 300, '', false, false, 0, false, false, false);
+             //Set font
+            $this->SetFont('helvetica', 'B', 20);
+             //Title
+            $this->writeHTMLCell(0,'',26,10,$this->heading,0,1,false,true,'C',true);
+            $this->writeHTMLCell(0,'','','','<br/><hr/>',0,1,false,true,'C',true);
+        }
+        
+        // Page footer
+        public function Footer() {
+            $alertContainer = new Container('alert');
+            // Position at 15 mm from bottom
+            $this->SetY(-15);
+            // Set font
+            $this->SetFont('helvetica', 'I', 8);
+            // Page number
+            $this->Cell(0, 10, 'Page '.$alertContainer->aliasPage.'/'.$alertContainer->nbPages, 0, false, 'C', 0, '', 0, false, 'T', 'M');
+        }
+    }
+    class Pdf_concat extends FPDI {
+	var $files = array();
+     
+	function setFiles($files) {
+	    $this->files = $files;
+	}
+     
+	function concat() {
+	    foreach($this->files AS $file) {
+		 $pagecount = $this->setSourceFile($file);
+		 for ($i = 1; $i <= $pagecount; $i++) {
+		      $tplidx = $this->ImportPage($i);
+		      $s = $this->getTemplatesize($tplidx);
+		      $this->AddPage('P', array($s['w'], $s['h']));
+		      $this->useTemplate($tplidx);
+		 }
+	    }
+	}
+    }
+    $resultFilename = '';
+    if(sizeof($sampleResult)> 0){
+        //set print time
+        $printedTime = date('Y-m-d H:i:s');
+        $expStr=explode(" ",$printedTime);
+        $printDate =$this->humanDateFormat($expStr[0]);
+        $printDateTime = $expStr[1];
+        $page = 1;
+        $pages = array();
+        foreach($sampleResult as $result){
+	    $alertContainer->aliasPage = $page;
+            // create new PDF document
+            $pdf = new MYPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
+            $pdf->setSchemeName($config['header'],'default-logo.png');
+            // set document information
+            $pdf->SetCreator(PDF_CREATOR);
+            $pdf->SetAuthor('VL Dashboard');
+            $pdf->SetTitle('Viral Load Result');
+            //$pdf->SetSubject('TCPDF Tutorial');
+            //$pdf->SetKeywords('TCPDF, PDF, example, test, guide');
+            
+            // set default header data
+            $pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE, PDF_HEADER_STRING);
+            
+            // set header and footer fonts
+            $pdf->setHeaderFont(Array(PDF_FONT_NAME_MAIN, '', PDF_FONT_SIZE_MAIN));
+            $pdf->setFooterFont(Array(PDF_FONT_NAME_DATA, '', PDF_FONT_SIZE_DATA));
+            
+            // set default monospaced font
+            $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+            
+            // set margins
+            //$pdf->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_RIGHT);
+            //$pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
+            //$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+            
+            // set auto page breaks
+            $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+            
+            // set image scale factor
+            $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+            
+            // set font
+            $pdf->SetFont('helvetica', '', 10);
+            
+            $pdf->AddPage();
+            $pdf->SetY(30,true,false);
+            $patientFirstName = '';
+            $patientLastName = '';
+            $patientMobileNumber = '';
+            if($result['patient_first_name']!= NULL && trim($result['patient_first_name'])!= ''){
+                $patientFirstName = ucwords($result['patient_first_name']);
+            }
+            if($result['patient_last_name']!= NULL && trim($result['patient_last_name'])!= ''){
+                $patientLastName = ucwords($result['patient_last_name']);
+            }
+            if($result['patient_mobile_number']!= NULL && trim($result['patient_mobile_number'])!= ''){
+                $patientMobileNumber = $result['patient_mobile_number'];
+            }
+            if(!isset($result['facility_code']) || $result['facility_code'] == NULL || trim($result['facility_code']) == ''){
+               $result['facility_code'] = '';
+            }
+            if(!isset($result['facility_state']) || $result['facility_state'] == NULL || trim($result['facility_state']) == ''){
+               $result['facility_state'] = '';
+            }
+            if(!isset($result['facility_district']) || $result['facility_district'] == NULL || trim($result['facility_district']) == ''){
+               $result['facility_district'] = '';
+            }
+            if(!isset($result['facility_name']) || $result['facility_name'] == NULL || trim($result['facility_name']) == ''){
+               $result['facility_name'] = '';
+            }
+            if(!isset($result['labName'])){
+               $result['labName'] = '';
+            }
+            //set Age
+            $age = 'Unknown';
+            if(isset($result['patient_dob']) && $result['patient_dob']!= NULL && trim($result['patient_dob'])!='' && $result['patient_dob']!='0000-00-00'){
+              $todayDate = strtotime(date('Y-m-d'));
+              $dob = strtotime($result['patient_dob']);
+              $difference = $todayDate - $dob;
+              $seconds_per_year = 60*60*24*365;
+              $age = round($difference / $seconds_per_year);
+            }elseif(isset($result['patient_age_in_years']) && $result['patient_age_in_years']!= NULL && trim($result['patient_age_in_years'])!='' && trim($result['patient_age_in_years']) >0){
+              $age = $result['patient_age_in_years'];
+            }elseif(isset($result['patient_age_in_months']) && $result['patient_age_in_months']!= NULL && trim($result['patient_age_in_months'])!='' && trim($result['patient_age_in_months']) >0){
+              if($result['patient_age_in_months'] > 1){
+                $age = $result['patient_age_in_months'].' months';
+              }else{
+                $age = $result['patient_age_in_months'].' month';
+              }
+            }
+            //sample collection date
+            if(isset($result['sample_collection_date']) && $result['sample_collection_date']!= NULL && trim($result['sample_collection_date'])!='' && $result['sample_collection_date']!='0000-00-00 00:00:00'){
+                $expStr=explode(" ",$result['sample_collection_date']);
+                $result['sample_collection_date']=$this->humanDateFormat($expStr[0]);
+                $sampleCollectionTime = $expStr[1];
+            }else{
+                $result['sample_collection_date']='';
+                $sampleCollectionTime = '';
+            }
+            //sample recieved date
+            $sampleReceivedDate='';
+            $sampleReceivedTime='';
+            if(isset($result['sample_received_at_vl_lab_datetime']) && $result['sample_received_at_vl_lab_datetime']!= NULL && trim($result['sample_received_at_vl_lab_datetime'])!='' && $result['sample_received_at_vl_lab_datetime']!='0000-00-00 00:00:00'){
+              $expStr=explode(" ",$result['sample_received_at_vl_lab_datetime']);
+              $sampleReceivedDate=$this->humanDateFormat($expStr[0]);
+              $sampleReceivedTime =$expStr[1];
+            }
+            //sample tested date
+            if(isset($result['sample_tested_datetime']) && $result['sample_tested_datetime']!= NULL && trim($result['sample_tested_datetime'])!='' && $result['sample_tested_datetime']!='0000-00-00 00:00:00'){
+                $expStr=explode(" ",$result['sample_tested_datetime']);
+                $result['sample_tested_datetime']=$this->humanDateFormat($expStr[0])." ".$expStr[1];
+            }else{
+                $result['sample_tested_datetime']='';
+            }
+            //last viral load test date
+            if(isset($result['last_viral_load_date']) && $result['last_viral_load_date']!= NULL && trim($result['last_viral_load_date'])!='' && $result['last_viral_load_date']!='0000-00-00'){
+                $result['last_viral_load_date']=$this->humanDateFormat($result['last_viral_load_date']);
+            }else{
+                $result['last_viral_load_date']='';
+            }
+            if(!isset($result['patient_gender']) || trim($result['patient_gender'])== ''){
+                $result['patient_gender'] = 'not reported';
+            }
+            if(isset($result['approvedBy']) && trim($result['approvedBy'])!=''){
+                $resultApprovedBy = ucwords($result['approvedBy']);
+            }else{
+                $resultApprovedBy  = '';
+            }
+            $vlResult = '';
+            $smileyContent = '';
+            $showMessage = '';
+            $tndMessage = '';
+            $messageTextSize = '12px';
+            if($result['result']!= NULL && trim($result['result'])!= '') {
+              $resultType = is_numeric($result['result']);
+              if(in_array(strtolower(trim($result['result'])),array("tnd","target not detected"))){
+                $vlResult = 'TND*';
+                $smileyContent = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="/assets/img/smiley_smile.png" alt="smile_face"/>';
+                $showMessage = ucfirst($config['l_vl_msg']);
+                $tndMessage = 'TND* - Target not Detected';
+              }else if(in_array(strtolower(trim($result['result'])),array("failed","fail","no_sample"))){
+                $vlResult = $result['result'];
+                $smileyContent = '';
+                $showMessage = '';
+                $messageTextSize = '14px';
+              }else if(trim($result['result']) > 1000 && $result['result']<=10000000){
+                $vlResult = $result['result'];
+                $smileyContent = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="/assets/img/smiley_frown.png" alt="frown_face"/>';
+                $showMessage = ucfirst($config['h_vl_msg']);
+                $messageTextSize = '15px';
+              }else if(trim($result['result']) <= 1000 && $result['result']>=20){
+                $vlResult = $result['result'];
+                $smileyContent = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="/assets/img/smiley_smile.png" alt="smile_face"/>';
+                $showMessage = ucfirst($config['l_vl_msg']);
+              }else if(trim($result['result'] > 10000000) && $resultType){
+                $vlResult = $result['result'];
+                $smileyContent = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="/assets/img/smiley_frown.png" alt="frown_face"/>';
+                $showMessage = 'Value outside machine detection limit';
+              }else if(trim($result['result'] < 20) && $resultType){
+                $vlResult = $result['result'];
+                $smileyContent = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="/assets/img/smiley_smile.png" alt="smile_face"/>';
+                $showMessage = 'Value outside machine detection limit';
+              }else if(trim($result['result'])=='<20'){
+                $vlResult = '&lt;20';
+                $smileyContent = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="/assets/img/smiley_smile.png" alt="smile_face"/>';
+                $showMessage = ucfirst($config['l_vl_msg']);
+              }else if(trim($result['result'])=='>10000000'){
+                $vlResult = $result['result'];
+                $smileyContent = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="/assets/img/smiley_frown.png" alt="frown_face"/>';
+                $showMessage = ucfirst($config['h_vl_msg']);
+              }else if($result['vl_test_platform']=='Roche'){
+                $chkSign = '';
+                $smileyShow = '';
+                $chkSign = strchr($result['result'],'>');
+                if($chkSign!=''){
+                  $smileyShow =str_replace(">","",$result['result']);
+                  $vlResult = $result['result'];
+                  //$showMessage = 'Invalid value';
+                }
+                $chkSign = '';
+                $chkSign = strchr($result['result'],'<');
+                if($chkSign!=''){
+                  $smileyShow =str_replace("<","",$result['result']);
+                  $vlResult = str_replace("<","&lt;",$result['result']);
+                  //$showMessage = 'Invalid value';
+                }
+                if($smileyShow!='' && $smileyShow <= $config['viral_load_threshold_limit']){
+                  $smileyContent = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="/assets/img/smiley_smile.png" alt="smile_face"/>';
+                }else if($smileyShow!='' && $smileyShow > $config['viral_load_threshold_limit']){
+                  $smileyContent = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="/assets/img/smiley_frown.png" alt="frown_face"/>';
+                }
+              }
+            }
+            if(isset($config['show_smiley']) && trim($config['show_smiley']) == "no"){
+              $smileyContent = '';
+            }
+            if($result['result_status']=='4'){
+              $smileyContent = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="/assets/img/cross.png" alt="rejected"/>';
+            }
+            $html = '';
+            $html.='<table style="padding:0px 2px 2px 2px;">';
+              $html .='<tr>';
+               $html .='<td style="line-height:11px;font-size:11px;font-weight:bold;text-align:left;">SAMPLE NO.</td>';
+               $html .='<td style="line-height:11px;font-size:11px;font-weight:bold;text-align:left;">SAMPLE COLLECTION DATE</td>';
+               $html .='<td style="line-height:11px;font-size:11px;font-weight:bold;text-align:left;">ART (TRACNET) NO.</td>';
+              $html .='</tr>';
+              $html .='<tr>';
+                $html .='<td style="line-height:11px;font-size:11px;text-align:left;">'.$result['sample_code'].'</td>';
+                $html .='<td style="line-height:11px;font-size:11px;text-align:left;">'.$result['sample_collection_date']." ".$sampleCollectionTime.'</td>';
+                $html .='<td style="line-height:11px;font-size:11px;text-align:left;">'.$result['patient_art_no'].'</td>';
+              $html .='</tr>';
+              $html .='<tr>';
+               $html .='<td colspan="3" style="line-height:10px;"></td>';
+              $html .='</tr>';
+              $html .='<tr>';
+               $html .='<td style="line-height:11px;font-size:11px;font-weight:bold;text-align:left;">PATIENT FIRST NAME</td>';
+               $html .='<td style="line-height:11px;font-size:11px;font-weight:bold;text-align:left;">PATIENT LAST NAME</td>';
+               $html .='<td style="line-height:11px;font-size:11px;font-weight:bold;text-align:left;">MOBILE NO.</td>';
+              $html .='</tr>';
+              $html .='<tr>';
+                $html .='<td style="line-height:11px;font-size:11px;text-align:left;">'.$patientFirstName.'</td>';
+                $html .='<td style="line-height:11px;font-size:11px;text-align:left;">'.$patientLastName.'</td>';
+                $html .='<td style="line-height:11px;font-size:11px;text-align:left;">'.$patientMobileNumber.'</td>';
+              $html .='</tr>';
+              $html .='<tr>';
+               $html .='<td colspan="3" style="line-height:10px;"></td>';
+              $html .='</tr>';
+              $html .='<tr>';
+               $html .='<td style="line-height:11px;font-size:11px;font-weight:bold;text-align:left;">AGE</td>';
+               $html .='<td colspan="2" style="line-height:11px;font-size:11px;font-weight:bold;text-align:left;">GENDER</td>';
+              $html .='</tr>';
+              $html .='<tr>';
+                $html .='<td style="line-height:11px;font-size:11px;text-align:left;">'.$age.'</td>';
+                $html .='<td colspan="2" style="line-height:11px;font-size:11px;text-align:left;">'.ucwords(str_replace("_"," ",$result['patient_gender'])).'</td>';
+              $html .='</tr>';
+              $html .='<tr>';
+               $html .='<td colspan="3" style="line-height:10px;"></td>';
+              $html .='</tr>';
+              $html .='<tr>';
+               $html .='<td colspan="3" style="line-height:2px;border-bottom:2px solid #d3d3d3;"></td>';
+              $html .='</tr>';
+              $html .='<tr>';
+               $html .='<td colspan="3" style="line-height:10px;"></td>';
+              $html .='</tr>';
+              $html .='<tr>';
+               $html .='<td style="line-height:11px;font-size:11px;font-weight:bold;text-align:left;">CLINIC/HEALTH CENTER CODE</td>';
+               $html .='<td style="line-height:11px;font-size:11px;font-weight:bold;text-align:left;">Province/State</td>';
+               $html .='<td style="line-height:11px;font-size:11px;font-weight:bold;text-align:left;">District/County</td>';
+              $html .='</tr>';
+              $html .='<tr>';
+                $html .='<td style="line-height:11px;font-size:11px;text-align:left;">'.$result['facility_code'].'</td>';
+                $html .='<td style="line-height:11px;font-size:11px;text-align:left;">'.ucwords($result['facility_state']).'</td>';
+                $html .='<td style="line-height:11px;font-size:11px;text-align:left;">'.ucwords($result['facility_district']).'</td>';
+              $html .='</tr>';
+              $html .='<tr>';
+               $html .='<td colspan="3" style="line-height:10px;"></td>';
+              $html .='</tr>';
+              $html .='<tr>';
+               $html .='<td style="line-height:11px;font-size:11px;font-weight:bold;text-align:left;">CLINIC/HEALTH CENTER NAME</td>';
+               $html .='<td colspan="2" style="line-height:11px;font-size:11px;font-weight:bold;text-align:left;">CLINICAN NAME</td>';
+              $html .='</tr>';
+              $html .='<tr>';
+                $html .='<td style="line-height:11px;font-size:11px;text-align:left;">'.ucwords($result['facility_name']).'</td>';
+                $html .='<td colspan="2" style="line-height:11px;font-size:11px;text-align:left;">'.ucwords($result['request_clinician_name']).'</td>';
+              $html .='</tr>';
+              $html .='<tr>';
+               $html .='<td colspan="3" style="line-height:10px;"></td>';
+              $html .='</tr>';
+              $html .='<tr>';
+               $html .='<td colspan="3" style="line-height:2px;border-bottom:2px solid #d3d3d3;"></td>';
+              $html .='</tr>';
+              $html .='<tr>';
+               $html .='<td colspan="3" style="line-height:10px;"></td>';
+              $html .='</tr>';
+              $html .='<tr>';
+                $html .='<td colspan="3">';
+                 $html .='<table style="padding:2px;">';
+                   $html .='<tr>';
+                    $html .='<td style="line-height:11px;font-size:11px;font-weight:bold;text-align:left;">SAMPLE RECEIPT DATE</td>';
+                    $html .='<td style="line-height:11px;font-size:11px;font-weight:bold;text-align:left;">SAMPLE TEST DATE</td>';
+                    $html .='<td style="line-height:11px;font-size:11px;font-weight:bold;text-align:left;">SPECIMEN TYPE</td>';
+                    $html .='<td style="line-height:11px;font-size:11px;font-weight:bold;text-align:left;">PLATFORM</td>';
+                   $html .='</tr>';
+                   $html .='<tr>';
+                     $html .='<td style="line-height:11px;font-size:11px;text-align:left;">'.$sampleReceivedDate." ".$sampleReceivedTime.'</td>';
+                     $html .='<td style="line-height:11px;font-size:11px;text-align:left;">'.$result['sample_tested_datetime'].'</td>';
+                     $html .='<td style="line-height:11px;font-size:11px;text-align:left;">'.ucwords($result['sample_name']).'</td>';
+                     $html .='<td style="line-height:11px;font-size:11px;text-align:left;">'.ucwords($result['vl_test_platform']).'</td>';
+                   $html .='</tr>';
+                   $html .='<tr>';
+                     $html .='<td colspan="4" style="line-height:16px;"></td>';
+                   $html .='</tr>';
+                   $html .='<tr>';
+                    $html .='<td colspan="3"></td>';
+                    $html .='<td rowspan="3" style="text-align:left;">'.$smileyContent.'</td>';
+                   $html .='</tr>';
+                   $html .='<tr><td colspan="3" style="line-height:26px;font-size:12px;font-weight:bold;text-align:left;background-color:#dbdbdb;">&nbsp;&nbsp;VIRAL LOAD RESULT (copies/ml)&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;&nbsp;&nbsp;&nbsp;'.$result['result'].'</td></tr>';
+                   $html .='<tr><td colspan="3"></td></tr>';
+                 $html .='</table>';
+                $html .='</td>';
+              $html .='</tr>';
+              if(trim($showMessage)!= ''){
+               $html .='<tr>';
+                 $html .='<td colspan="3" style="line-height:13px;font-size:'.$messageTextSize.';text-align:left;">'.$showMessage.'</td>';
+               $html .='</tr>';
+               $html .='<tr>';
+                $html .='<td colspan="3" style="line-height:16px;"></td>';
+               $html .='</tr>';
+             }
+             if(trim($tndMessage)!= ''){
+               $html .='<tr>';
+                 $html .='<td colspan="3" style="line-height:13px;font-size:18px;text-align:left;">'.$tndMessage.'</td>';
+               $html .='</tr>';
+               $html .='<tr>';
+                $html .='<td colspan="3" style="line-height:16px;"></td>';
+               $html .='</tr>';
+             }
+              $html .='<tr>';
+               $html .='<td colspan="3" style="line-height:11px;font-size:11px;font-weight:bold;">APPROVED BY&nbsp;&nbsp;:&nbsp;&nbsp;<span style="font-weight:normal;">'.$resultApprovedBy.'</span></td>';
+              $html .='</tr>';
+              $html .='<tr>';
+               $html .='<td colspan="3" style="line-height:10px;"></td>';
+              $html .='</tr>';
+              if(trim($result['approver_comments'])!= ''){
+                $html .='<tr>';
+                 $html .='<td colspan="3" style="line-height:11px;font-size:11px;font-weight:bold;">LAB COMMENTS&nbsp;&nbsp;:&nbsp;&nbsp;<span style="font-weight:normal;">'.ucfirst($result['approver_comments']).'</span></td>';
+                $html .='</tr>';
+                $html .='<tr>';
+                 $html .='<td colspan="3" style="line-height:10px;"></td>';
+                $html .='</tr>';
+              }
+              $html .='<tr>';
+               $html .='<td colspan="3" style="line-height:2px;border-bottom:2px solid #d3d3d3;"></td>';
+              $html .='</tr>';
+              $html .='<tr>';
+               $html .='<td colspan="3" style="line-height:14px;"></td>';
+              $html .='</tr>';
+              $html .='<tr>';
+               $html .='<td colspan="3" style="line-height:11px;font-size:11px;font-weight:bold;">PREVIOUS RESULTS</td>';
+              $html .='</tr>';
+              $html .='<tr>';
+               $html .='<td colspan="3" style="line-height:8px;"></td>';
+              $html .='</tr>';
+              $html .='<tr>';
+               $html .='<td colspan="3" style="line-height:11px;font-size:11px;font-weight:bold;">Date of Last Viral Load Test&nbsp;&nbsp;:&nbsp;&nbsp;<span style="font-weight:normal;">'.$result['last_viral_load_date'].'</span></td>';
+              $html .='</tr>';
+              $html .='<tr>';
+               $html .='<td colspan="3" style="line-height:11px;font-size:11px;font-weight:bold;">Result of previous viral load(copies/ml)&nbsp;&nbsp;:&nbsp;&nbsp;<span style="font-weight:normal;">'.$result['last_viral_load_result'].'</span></td>';
+              $html .='</tr>';
+              $html .='<tr>';
+               $html .='<td colspan="3" style="line-height:110px;border-bottom:2px solid #d3d3d3;"></td>';
+              $html .='</tr>';
+              $html .='<tr>';
+               $html .='<td colspan="3" style="line-height:2px;"></td>';
+              $html .='</tr>';
+              $html .='<tr>';
+                $html .='<td colspan="3">';
+                 $html .='<table>';
+                  $html .='<tr>';
+                    $html .='<td style="font-size:10px;text-align:left;width:60%;"><img src="/assets/img/smiley_smile.png" alt="smile_face" style="width:10px;height:10px;"/> = VL < = 1000 copies/ml: Continue on current regimen</td>';
+                    $html .='<td style="font-size:10px;text-align:left;">Printed on : '.$printDate.'&nbsp;&nbsp;'.$printDateTime.'</td>';
+                  $html .='</tr>';
+                  $html .='<tr>';
+                    $html .='<td colspan="2" style="font-size:10px;text-align:left;width:60%;"><img src="/assets/img/smiley_frown.png" alt="frown_face" style="width:10px;height:10px;"/> = VL > 1000 copies/ml: copies/ml: Clinical and counselling action required</td>';
+                  $html .='</tr>';
+                 $html .='</table>';
+                $html .='</td>';
+              $html .='</tr>';
+            $html.='</table>';
+            $pdf->writeHTML($html);
+            $pdf->lastPage();
+            $filename = TEMP_UPLOAD_PATH. DIRECTORY_SEPARATOR .'p'.$page. '.pdf';
+            $pdf->Output($filename,"F");
+            $pages[] = $filename;
+         $page++;
+        }
+    }
+    if(count($pages) >0){
+	$resultPdf = new Pdf_concat();
+	$resultPdf->setFiles($pages);
+	$resultPdf->setPrintHeader(false);
+        $resultPdf->setPrintFooter(false);
+	$resultPdf->concat();
+	$resultFilename = 'Viral-Load-Result-'.date('d-M-Y-H-i-s').'.pdf';
+	$resultPdf->Output(TEMP_UPLOAD_PATH. DIRECTORY_SEPARATOR .$resultFilename, "F");
+    }
+echo $resultFilename;
