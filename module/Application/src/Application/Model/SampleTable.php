@@ -89,8 +89,8 @@ class SampleTable extends AbstractTableGateway {
         $quickStats = $this->fetchQuickStats($params);
         $dbAdapter = $this->adapter;$sql = new Sql($dbAdapter);
         $common = new CommonService($this->sm);
-        //$timestamp = time();
-        $timestamp = 1485232311;
+        $timestamp = time();
+        //$timestamp = 1485232311;
         $waitingTotal = 0;$receivedTotal = 0;$testedTotal = 0;$rejectedTotal = 0;
         $waitingResult = array();$receivedResult = array();$tResult = array();$rejectedResult = array();
         
@@ -655,68 +655,52 @@ class SampleTable extends AbstractTableGateway {
         if(trim($params['fromDate'])!= '' && trim($params['toDate'])!= ''){
             $startMonth = date("Y-m", strtotime(trim($params['fromDate'])));
             $endMonth = date("Y-m", strtotime(trim($params['toDate'])));
-            $rsQuery = $sql->select()->from(array('rs'=>'r_sample_type'));
-            $rsQueryStr = $sql->getSqlStringForSqlObject($rsQuery);
-            $sampleTypeResult = $dbAdapter->query($rsQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-            if($sampleTypeResult){
-                $avgResult = array();$j = 0;
-                $start = $month = strtotime($startMonth); $end = strtotime($endMonth);
-                while($month <= $end){
-                    $mnth = date('m', $month);$year = date('Y', $month);$dFormat = date("M-Y", $month);
-                    $i = 0;
-                    foreach($sampleTypeResult as $sample){
-                        $lQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))->columns(array('sample_tested_datetime','sample_collection_date','diff'=>new Expression('DATEDIFF(sample_tested_datetime,sample_collection_date)')))
-                                            ->where("Month(sample_collection_date)='".$mnth."' AND Year(sample_collection_date)='".$year."'")
-                                            ->where(array('vl.sample_tested_datetime IS NOT NULL'))
-                                            ->where('vl.sample_type="'.$sample['sample_id'].'"');
-                        if($params['facilityId'] !=''){
-                            $lQuery = $lQuery->where(array("vl.lab_id ='".base64_decode($params['facilityId'])."'")); 
-                        }
-                        $lQueryStr = $sql->getSqlStringForSqlObject($lQuery);
-                        $lResult = $dbAdapter->query($lQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-                        if(count($lResult)>0){
-                            $total = 0;
-                            foreach($lResult as $data){
-                                $total = $total + $data['diff'];
-                            }
-                            $avgResult[$sample['sample_name']][$i][$j] = round($total/count($lResult));
-                        }else{
-                            $avgResult[$sample['sample_name']][$i][$j] = "null";
-                        }
-                        $i++;
-                    }
-                    //all result
-                    $alQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
-                                   ->columns(array('sample_tested_datetime',
-                                                   'sample_collection_date',
-                                                   'diff'=>new Expression('DATEDIFF(sample_tested_datetime,sample_collection_date)')))
-                                            ->where(array('vl.sample_tested_datetime IS NOT NULL'))
-                                            ->where("MONTH(sample_collection_date)='".$mnth."' AND YEAR(sample_collection_date)='".$year."'");
-                    if($params['facilityId'] !=''){
-                        $alQuery = $alQuery->where(array("vl.lab_id ='".base64_decode($params['facilityId'])."'")); 
-                    }
-                    $alQueryStr = $sql->getSqlStringForSqlObject($alQuery);
-                    $alResult = $dbAdapter->query($alQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-                    if(count($alResult)>0){
-                        $total = 0;
-                        foreach($alResult as $data){
-                            $total = $total + $data['diff'];
-                        }
-                        $avgResult['all'][$j] = round($total/count($alResult));
-                    }else{
-                        $avgResult['all'][$j] = "null";
-                    }
-                    $avgResult['date'][$j] = $dFormat;
-                    $month = strtotime("+1 month", $month);
-                    $j++;
-                }
+
+            
+            $j = 0;
+            $start = $month = strtotime($startMonth);
+            $end = strtotime($endMonth);
+            
+            $queryStr = "SELECT COUNT(*) AS `total`, 
+
+                DATE_FORMAT(DATE(sample_collection_date), '%b-%Y') as 'monthDate', 
+                
+                AVG(DATEDIFF(sample_tested_datetime,sample_collection_date)) as AvgDiff
+                
+                
+                FROM `dash_vl_request_form` AS `vl` 
+                
+                WHERE (sample_collection_date is not null AND sample_collection_date != '') 
+                
+                AND DATE(sample_collection_date) >= '".$startMonth."-00' 
+                AND DATE(sample_collection_date) <= '".$endMonth."-00' 
+                
+                group by MONTH(sample_collection_date) 
+                
+                order by DATE(sample_collection_date)";
+            
+            //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+            $sampleResult = $common->cacheQuery($queryStr,$dbAdapter);
+           
+            //\Zend\Debug\Debug::dump($sampleResult);
+           //  die();
+            
+            $result = array();
+            $j=0;
+            foreach($sampleResult as $sRow){
+                
+                if($sRow["monthDate"] == null) continue;
+                
+                $result['all'][$j] = (isset($sRow["AvgDiff"]) && $sRow["AvgDiff"] > 0 && $sRow["AvgDiff"] != NULL) ? round($sRow["AvgDiff"],2) : "null";
+                
+                $result['date'][$j] = $sRow["monthDate"];
+                $j++;
             }
+            
+            return $result; 
+
         }
-        
-       //\Zend\Debug\Debug::dump($avgResult);die;
-        
-        return $avgResult;
-    }
+}
     public function fetchFacilites($params)
     {
         $dbAdapter = $this->adapter;

@@ -326,7 +326,6 @@ class CommonService {
        // return $res;
         
         $cacheObj = $this->sm->get('Cache\Persistent');
-        //\Zend\Debug\Debug::dump($cacheObj);die;
         $cacheId = hash("sha512",$queryString);
         $res = null;
         try{
