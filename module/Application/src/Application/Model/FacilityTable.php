@@ -62,18 +62,21 @@ class FacilityTable extends AbstractTableGateway {
                            );
 
             $this->insert($newData);
-            return $this->lastInsertValue;            
-
+            return $this->lastInsertValue;
         }
     }
 
-    public function fetchAllLabName()
-    {
+    public function fetchAllLabName(){
+        $logincontainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $fQuery = $sql->select()->from(array('f'=>'facility_details'))
-                        ->join(array('ft'=>'facility_type'),'ft.facility_type_id=f.facility_type')
-                        ->where('ft.facility_type_name="Viral Load Lab"');
+                      ->join(array('ft'=>'facility_type'),'ft.facility_type_id=f.facility_type')
+                      ->where('ft.facility_type_name="Viral Load Lab"');
+        if($logincontainer->role!= 1){
+            $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:0;
+            $fQuery = $fQuery->where('f.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
+        }
         $fQueryStr = $sql->getSqlStringForSqlObject($fQuery);
         $facilityResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         return $facilityResult;

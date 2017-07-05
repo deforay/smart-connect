@@ -259,14 +259,12 @@ class SampleService {
     }
     //lab details start
     //get sample result details
-    public function getSampleResultDetails($params)
-    {
+    public function getSampleResultDetails($params){
         $sampleDb = $this->sm->get('SampleTable');
         return $sampleDb->fetchSampleResultDetails($params);
     }
     //get sample tested result details
-    public function getSampleTestedResultDetails($params)
-    {
+    public function getSampleTestedResultDetails($params){
         $sampleDb = $this->sm->get('SampleTable');
         return $sampleDb->fetchSampleTestedResultDetails($params);
     }
@@ -281,8 +279,7 @@ class SampleService {
         return $sampleDb->fetchSampleTestedResultAgeDetails($params);
     }
     //get sample tested result details
-    public function getSampleTestedResultBasedVolumeDetails($params)
-    {
+    public function getSampleTestedResultBasedVolumeDetails($params){
         $sampleDb = $this->sm->get('SampleTable');
         return $sampleDb->fetchSampleTestedResultBasedVolumeDetails($params);
     }
@@ -303,8 +300,8 @@ class SampleService {
         $sampleDb = $this->sm->get('SampleTable');
         return $sampleDb->fetchLabTurnAroundTime($params);
     }
-    public function getFacilites($params)
-    {
+    
+    public function getFacilites($params){
         $sampleDb = $this->sm->get('SampleTable');
         return $sampleDb->fetchFacilites($params);
     }
