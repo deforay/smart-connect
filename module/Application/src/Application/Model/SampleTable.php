@@ -1134,7 +1134,11 @@ class SampleTable extends AbstractTableGateway {
             $row[] = $aRow['sample_collection_date'];
             $row[] = $aRow['sample_testing_date'];
 	    $row[] = $aRow['result'];
-	    $row[]='<a href="#" class="btn btn-primary btn-xs">View</a>&nbsp;&nbsp;<a href="javascript:void(0);" class="btn btn-danger btn-xs" onclick="generateResultPDF('.$aRow['vl_sample_id'].');">PDF</a>';
+        $display = 'show';
+        if($aRow['result']==""){
+            $display= "none";
+        }
+	    $row[]='<a href="#" class="btn btn-primary btn-xs">View</a>&nbsp;&nbsp;<a href="javascript:void(0);" class="btn btn-danger btn-xs" style="display:'.$display.'" onclick="generateResultPDF('.$aRow['vl_sample_id'].');">PDF</a>';
             
             $output['aaData'][] = $row;
         }
@@ -1322,7 +1326,7 @@ class SampleTable extends AbstractTableGateway {
                                                                         ->where('vl.lab_id="'.$facility['facility_id'].'"');
                                 
                                 if(isset($params['sampleType']) && trim($params['sampleType'])!=''){
-                                        $countQuery = $countQuery->where('rs.sample_id="'.base64_decode(trim($params['sampleType'])).'"');
+                                        $countQuery = $countQuery->where('vl.sample_type="'.base64_decode(trim($params['sampleType'])).'"');
                                 }
                                 if(isset($params['testResult']) && $params['testResult']!=''){
                                     if($params['testResult'] == '<1000'){
@@ -1402,9 +1406,10 @@ class SampleTable extends AbstractTableGateway {
                         $j = 0;
                         foreach($facilityResult as $facility){
                             $countQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))->columns(array('total' => new Expression('COUNT(*)')))
+                                                //->join(array('rs'=>'r_sample_type'),'rs.sample_id=vl.sample_type',array('sample_name'))
                                                                         ->where('vl.lab_id="'.$facility['facility_id'].'"');
                             if(isset($params['sampleType']) && trim($params['sampleType'])!=''){
-                                    $countQuery = $countQuery->where('rs.sample_id="'.base64_decode(trim($params['sampleType'])).'"');
+                                    $countQuery = $countQuery->where('vl.sample_type="'.base64_decode(trim($params['sampleType'])).'"');
                             }
                             if(isset($params['testResult']) && $params['testResult']!=''){
                                 if($params['testResult'] == '<1000'){
