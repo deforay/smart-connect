@@ -11,6 +11,13 @@
        title: {
             text: ''
        },
+       exporting:{
+            chartOptions:{
+                subtitle: {
+                    text:'Samples Tested per Lab',
+                }
+            }
+        },
        credits: {
               enabled: false
        },
@@ -50,7 +57,7 @@
                         fromMonth = fromMonth.replace(" ","-");
                         toMonth = $(".mrp-upperMonth").html();
                         toMonth = toMonth.replace(" ","-");
-                            window.open(e.point.url+'&fromMonth='+fromMonth+'&toMonth='+toMonth+'&lab='+e.point.category, '_blank');
+                            window.open(e.point.url+'fromMonth='+fromMonth+'&toMonth='+toMonth+'&lab='+e.point.category, '_blank');
                         }
                     }
                 }
@@ -70,7 +77,7 @@
               name:'<?php echo $key;?>',
               data:[<?php
                   foreach($condition as $count){
-                      echo '{y:'.$count.',url:"/labs/samples-tested-lab?range='.$range.'"},';
+                      echo '{y:'.$count.',url:"/labs/samples-tested-lab?"},';
                   }
               ?>],
               },

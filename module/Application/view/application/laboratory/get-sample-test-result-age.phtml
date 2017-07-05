@@ -8,6 +8,13 @@
         title: {
             text: ''
         },
+        exporting:{
+            chartOptions:{
+                subtitle: {
+                    text:'Samples Tested based on Age',
+                }
+            }
+        },
        credits: {
               enabled: false
        },
@@ -64,7 +71,7 @@
               name:'<?php echo $key."(".htmlspecialchars($age[$i]).")";?>',
               data:[<?php
                   foreach($condition as $count){
-                     echo '{y:'.$count.',url:"/labs/samples-tested?age='.$age[$i].'&range='.$range.'"},';
+                     echo '{y:'.$count.',url:"/labs/samples-tested?age='.$age[$i].'"},';
                   }
               ?>],
               stack:'<?php echo $age[$i];?>',
