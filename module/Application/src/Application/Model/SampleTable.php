@@ -81,7 +81,6 @@ class SampleTable extends AbstractTableGateway {
             }
         }
         $queryStr = $sql->getSqlStringForSqlObject($query);
-        
         //$result = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $result = $common->cacheQuery($queryStr,$dbAdapter);
         return $result[0];
@@ -829,8 +828,8 @@ class SampleTable extends AbstractTableGateway {
     //end lab dashboard details 
     
     //start clinic details
-    public function fetchOverAllLoadStatus($params)
-    {
+    public function fetchOverAllLoadStatus($params){
+        $logincontainer = new Container('credo');
         $common = new CommonService($this->sm);
         $cDate = date('Y-m-d');
         $lastThirtyDay = date('Y-m-d', strtotime('-30 days'));
@@ -852,6 +851,11 @@ class SampleTable extends AbstractTableGateway {
                         ->where('vl.facility_id !=0');
         if(isset($params['clinicId']) && $params['clinicId']!=''){
             $squery = $squery->where('vl.facility_id="'.base64_decode(trim($params['clinicId'])).'"');
+        }else{
+           if($logincontainer->role!= 1){
+                $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:0;
+                $squery = $squery->where('vl.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
+            } 
         }
         if(isset($params['sampleId']) && $params['sampleId']!=''){
             $squery = $squery->where('vl.sample_type="'.base64_decode(trim($params['sampleId'])).'"');
@@ -878,8 +882,8 @@ class SampleTable extends AbstractTableGateway {
         $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         return $sResult;
     }
-    public function fetchChartOverAllLoadStatus($params)
-    {
+    
+    public function fetchChartOverAllLoadStatus($params){
         $testedTotal = 0;$lessTotal = 0;$gTotal = 0;$overAllTotal = 0;
         //total tested
         $where = '';
@@ -898,7 +902,9 @@ class SampleTable extends AbstractTableGateway {
         
         return array($testedTotal,$lessTotal,$gTotal,$overAllTotal);
     }
+    
     public function fetchSampleTestedReason($params){
+        $logincontainer = new Container('credo');
         $rResult = array();
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
@@ -924,6 +930,11 @@ class SampleTable extends AbstractTableGateway {
                         ->group('tr.test_reason_id');
         if(isset($params['facilityId']) && $params['facilityId']!=''){
             $rQuery = $rQuery->where('vl.facility_id="'.base64_decode(trim($params['facilityId'])).'"');
+        }else{
+            if($logincontainer->role!= 1){
+                $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:0;
+                $rQuery = $rQuery->where('vl.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
+            }
         }
         if(isset($params['sampleId']) && $params['sampleId']!=''){
             $rQuery = $rQuery->where('vl.sample_type="'.base64_decode(trim($params['sampleId'])).'"');
@@ -959,8 +970,9 @@ class SampleTable extends AbstractTableGateway {
         //\Zend\Debug\Debug::dump($rResult);//die;
         return $rResult;
     }
-    public function fetchChartOverAllLoadResult($params,$where)
-    {
+    
+    public function fetchChartOverAllLoadResult($params,$where){
+        $logincontainer = new Container('credo');
         $common = new CommonService($this->sm);
         $cDate = date('Y-m-d');
         $lastThirtyDay = date('Y-m-d', strtotime('-30 days'));
@@ -976,13 +988,18 @@ class SampleTable extends AbstractTableGateway {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $squery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
-        ->columns(array('total' => new Expression('COUNT(*)')))
+                        ->columns(array('total' => new Expression('COUNT(*)')))
                         //->join(array('rst'=>'r_sample_type'),'rst.sample_id=vl.sample_type')
                         ->where(array("DATE(vl.sample_collection_date) <='$cDate'",
                                       "DATE(vl.sample_collection_date) >='$lastThirtyDay'"));
                         //->where('vl.facility_id !=0');
         if(isset($params['clinicId']) && $params['clinicId']!=''){
             $squery = $squery->where('vl.facility_id="'.base64_decode(trim($params['clinicId'])).'"');
+        }else{
+            if($logincontainer->role!= 1){
+                $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:0;
+                $squery = $squery->where('vl.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
+            }
         }
         if(isset($params['sampleId']) && $params['sampleId']!=''){
             $squery = $squery->where('vl.sample_type="'.base64_decode(trim($params['sampleId'])).'"');
@@ -1030,6 +1047,7 @@ class SampleTable extends AbstractTableGateway {
     }
     
     public function fetchAllTestResults($parameters) {
+        $logincontainer = new Container('credo');
         /* Array of database columns which should be read and sent back to DataTables. Use a space where
          * you want to insert a non-database field (for example a counter or static image)
         */
@@ -1125,8 +1143,13 @@ class SampleTable extends AbstractTableGateway {
         {
             $sQuery = $sQuery->where(array("vl.sample_collection_date <='" . $cDate ." 23:59:00". "'", "vl.sample_collection_date >='" . $lastThirtyDay." 00:00:00". "'"));
         }
-        if($parameters['clinicId'] !=''){
+        if(isset($parameters['clinicId']) && $parameters['clinicId'] !=''){
             $sQuery = $sQuery->where(array("vl.facility_id ='".base64_decode(trim($parameters['clinicId']))."'")); 
+        }else{
+            if($logincontainer->role!= 1){
+                $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:0;
+                $sQuery = $sQuery->where('vl.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
+            }
         }
         if(isset($parameters['gender'] ) && trim($parameters['gender'])!=''){
             $sQuery = $sQuery->where(array("vl.patient_gender ='".$parameters['gender']."'")); 
@@ -1185,7 +1208,7 @@ class SampleTable extends AbstractTableGateway {
             "aaData" => array()
         );
         
-		$common = new CommonService($this->sm);
+	$common = new CommonService($this->sm);
         foreach ($rResult as $aRow) {
             $row = array();
 			if(isset($aRow['sample_collection_date']) && trim($aRow['sample_collection_date'])!=""){
@@ -1208,8 +1231,8 @@ class SampleTable extends AbstractTableGateway {
     }
     
     //get sample tested result details
-    public function fetchClinicSampleTestedResults($params)
-    {
+    public function fetchClinicSampleTestedResults($params){
+        $logincontainer = new Container('credo');
         $result = array();
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
@@ -1253,6 +1276,11 @@ class SampleTable extends AbstractTableGateway {
                                                 ->where(array('vl.result<1000'));
                                 if($params['facilityId'] !=''){
                                     $lessThanQuery = $lessThanQuery->where(array("vl.facility_id ='".base64_decode($params['facilityId'])."'")); 
+                                }else{
+                                    if($logincontainer->role!= 1){
+                                        $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:0;
+                                        $lessThanQuery = $lessThanQuery->where('vl.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
+                                    }
                                 }
                                 if(isset($params['gender'] ) && trim($params['gender'])!=''){
                                     $lessThanQuery = $lessThanQuery->where(array("vl.patient_gender ='".$params['gender']."'")); 
@@ -1282,6 +1310,11 @@ class SampleTable extends AbstractTableGateway {
                                                     ->where(array('vl.result>1000'));
                                 if($params['facilityId'] !=''){
                                     $greaterThanQuery = $greaterThanQuery->where(array("vl.facility_id ='".base64_decode($params['facilityId'])."'")); 
+                                }else{
+                                    if($logincontainer->role!= 1){
+                                        $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:0;
+                                        $greaterThanQuery = $greaterThanQuery->where('vl.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
+                                    }
                                 }
                                 if(isset($params['gender'] ) && trim($params['gender'])!=''){
                                     $greaterThanQuery = $greaterThanQuery->where(array("vl.patient_gender ='".$params['gender']."'")); 
@@ -1311,6 +1344,11 @@ class SampleTable extends AbstractTableGateway {
                                                 ->where(array('vl.result'=>'Target Not Detected'));
                                 if($params['facilityId'] !=''){
                                     $notDetectQuery = $notDetectQuery->where(array("vl.facility_id ='".base64_decode($params['facilityId'])."'")); 
+                                }else{
+                                    if($logincontainer->role!= 1){
+                                        $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:0;
+                                        $notDetectQuery = $notDetectQuery->where('vl.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
+                                    }
                                 }
                                 if($params['gender'] !=''){
                                     $notDetectQuery = $notDetectQuery->where(array("vl.patient_gender ='".$params['gender']."'")); 

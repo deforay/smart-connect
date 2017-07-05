@@ -27,8 +27,7 @@ class TestReasonTable extends AbstractTableGateway {
         $this->adapter = $adapter;
     }
     
-    public function fetchAllTestReasonName()
-    {
+    public function fetchAllTestReasonName(){
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $rQuery = $sql->select()->from(array('r'=>'r_vl_test_reasons'));
