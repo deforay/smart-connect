@@ -11,6 +11,13 @@
         title: {
             text: ''
         },
+        exporting:{
+            chartOptions:{
+                subtitle: {
+                    text:'Samples Tested based on Gender',
+                }
+            }
+        },
        credits: {
               enabled: false
        },
@@ -67,7 +74,7 @@
               name:'<?php echo $key."(".$gender[$i].")";?>',
               data:[<?php
                   foreach($condition as $count){
-                      echo '{y:'.$count.',url:"/labs/samples-tested?gender='.$gender[$i].'&range='.$range.'"},';
+                      echo '{y:'.$count.',url:"/labs/samples-tested?gender='.$gender[$i].'"},';
                   }
               ?>],
               stack:'<?php echo $gender[$i];?>',

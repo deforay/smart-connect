@@ -12,6 +12,13 @@
         title: {
             text: ''
         },
+        exporting:{
+            chartOptions:{
+                subtitle: {
+                    text:'Samples Tested',
+                }
+            }
+        },
        credits: {
               enabled: false
        },
@@ -47,7 +54,7 @@
                 point: {
                     events: {
                         click: function (e) {
-                        window.open(e.point.url+'&month='+e.point.category, '_blank');
+                        window.open(e.point.url+'month='+e.point.category, '_blank');
                         }
                     }
                 }
@@ -66,7 +73,7 @@
               name:'<?php echo $key;?>',
               data:[<?php
                   foreach($condition as $count){
-                     echo '{y:'.$count.',url:"/labs/samples-tested?range='.$range.'"},';
+                     echo '{y:'.$count.',url:"/labs/samples-tested?"},';
                   }
               ?>],
               },
