@@ -28,28 +28,35 @@ class UsersTable extends AbstractTableGateway {
     }
     
     public function login($params) {
-        
         $username = $params['email'];
         $password = $params['password'];
-
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->from(array('u' => 'dash_users'))
-                ->join(array('r' => 'dash_user_roles'), 'u.role=r.role_id')
-                ->where(array('email' => $username, 'password' => $password));
+                      ->join(array('r' => 'dash_user_roles'), 'u.role=r.role_id')
+                      ->where(array('email' => $username, 'password' => $password));
         $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
-        
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-        
         $container = new Container('alert');
         $logincontainer = new Container('credo');
         if (count($rResult) > 0) {
+            $userFacilities = array();
+            $mapQuery = $sql->select()->from(array('u_f_map'=>'dash_user_facility_map'))
+                            ->where(array('u_f_map.user_id'=>$rResult[0]["user_id"]));
+            $mapQueryStr = $sql->getSqlStringForSqlObject($mapQuery);
+            $mapResult = $dbAdapter->query($mapQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+            if(isset($mapResult) && count($mapResult) >0){
+                foreach($mapResult as $facilities){
+                    $userFacilities[] = $facilities['facility_id'];
+                }
+            }
             $logincontainer->userId = $rResult[0]["user_id"];
             $logincontainer->name = $rResult[0]["user_name"];
             $logincontainer->mobile = $rResult[0]["mobile"];
             $logincontainer->role = $rResult[0]["role"];
             $logincontainer->email = $rResult[0]["email"];
             //$logincontainer->accessType = $rResult[0]["access_type"];
+            $logincontainer->mappedFacilities = $userFacilities;
             $container->alertMsg = '';
             //die('home');
             if($logincontainer->role == 1 || $logincontainer->role == 2){
@@ -79,6 +86,7 @@ class UsersTable extends AbstractTableGateway {
     }
     
     public function addUser($params){
+        $userId = 0;
         if(isset($params['email']) && trim($params['email'])!="" && trim($params['password'])!=""){
             $newData=array('user_name'=>$params['username'],
                         'email'=>$params['email'],
@@ -89,35 +97,55 @@ class UsersTable extends AbstractTableGateway {
                         //'created_on'=> new Expression('NOW()'),
                         'status'=>'active'
                     );
-        
             $this->insert($newData);
-            return $this->lastInsertValue;
+            $userId = $this->lastInsertValue;
+            if($userId > 0){
+                if(isset($params['facility']) && count($params['facility']) >0){
+                   $dbAdapter = $this->adapter;
+	           $userFacilityMapDb = new UserFacilityMapTable($dbAdapter);
+                   for($f=0;$f<count($params['facility']);$f++){
+                    $userFacilityMapDb->insert(array('user_id'=>$userId,'facility_id'=>$params['facility'][$f]));
+                   }
+                }
+            }
         }
+      return $userId;
     }
     
     public function getUser($userId){
         $dbAdapter = $this->adapter;
-
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->from(array('u' => 'dash_users'))
-        ->join(array('r' => 'dash_user_roles'), 'u.role=r.role_id')
+                      ->join(array('r' => 'dash_user_roles'), 'u.role=r.role_id')
                       ->where("user_id= $userId");
-        
         $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
-
-        $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-        if(count($rResult) > 0){
-            return $rResult[0];
+        $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
+        if($rResult){
+            $userFacilityMapQuery = $sql->select()->from(array('u_f_map' => 'dash_user_facility_map'))
+                                        ->columns(array('facility_id'))
+                                        ->where("u_f_map.user_id= $userId");
+            $userFacilityMapStr = $sql->getSqlStringForSqlObject($userFacilityMapQuery);
+            $rResult['facilities'] = $dbAdapter->query($userFacilityMapStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+            return $rResult;
         }else{
             return false;    
         }
-        
     }    
     
     public function updateUser($params){
         $credoContainer = new Container('credo');
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $userFacilityMapDb = new UserFacilityMapTable($dbAdapter);
         $userId=base64_decode($params['userId']);
         if(trim($params['userId'])!=""){
+            $mapQuery = $sql->select()->from(array('u_f_map'=>'dash_user_facility_map'))
+                            ->where(array('u_f_map.user_id'=>$userId));
+            $mapQueryStr = $sql->getSqlStringForSqlObject($mapQuery);
+            $mapResult = $dbAdapter->query($mapQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+            if(isset($mapResult) && count($mapResult) >0){
+                $userFacilityMapDb->delete(array('user_id'=>$userId));
+            }
             $data=array('user_name'=>$params['username'],
                        'email'=>$params['email'],
                        'mobile'=>$params['mobile'],
@@ -130,6 +158,14 @@ class UsersTable extends AbstractTableGateway {
                 $data['password']=$params['password'];
             }
             $this->update($data,array('user_id' => $userId));
+            //remove user-facility map
+            
+            //update user-facility map
+            if(isset($params['facility']) && count($params['facility']) >0){
+                for($f=0;$f<count($params['facility']);$f++){
+                  $userFacilityMapDb->insert(array('user_id'=>$userId,'facility_id'=>$params['facility'][$f]));
+                }
+            }
             return $userId;
         }
     }    

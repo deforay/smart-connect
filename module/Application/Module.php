@@ -10,7 +10,6 @@
 namespace Application;
 
 
-
 use Application\Model\UsersTable;
 use Application\Model\OrganizationsTable;
 use Application\Model\OrganizationTypesTable;
@@ -26,6 +25,7 @@ use Application\Model\TestReasonTable;
 use Application\Model\SampleTypeTable;
 use Application\Model\GlobalTable;
 use Application\Model\ArtCodeTable;
+use Application\Model\UserFacilityMapTable;
 
 use Application\Service\CommonService;
 use Application\Service\UserService;
@@ -163,6 +163,10 @@ class Module
                 },'ArtCodeTable' => function($sm) {
                     $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
                     $table = new ArtCodeTable($dbAdapter);
+                    return $table;
+                },'UserFacilityMapTable' => function($sm) {
+                    $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+                    $table = new UserFacilityMapTable($dbAdapter);
                     return $table;
                 },
 				

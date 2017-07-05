@@ -23,11 +23,9 @@ class UsersController extends AbstractActionController
       
     }
 
-    public function addAction()
-    {
+    public function addAction(){
         $this->layout()->setVariable('activeTab', 'users');
         $userService = $this->getServiceLocator()->get('UserService');
-        $commonService = $this->getServiceLocator()->get('CommonService');
         
         if($this->getRequest()->isPost()){
             $params=$this->getRequest()->getPost();
@@ -43,6 +41,7 @@ class UsersController extends AbstractActionController
     {
         $this->layout()->setVariable('activeTab', 'users');
         $userService = $this->getServiceLocator()->get('UserService');
+        $commonService = $this->getServiceLocator()->get('CommonService');
         if($this->getRequest()->isPost()){
             $params=$this->getRequest()->getPost();
             $result=$userService->updateUser($params);
@@ -53,8 +52,14 @@ class UsersController extends AbstractActionController
             if($user == false){
                 return $this->_redirect()->toRoute('users'); 
             }else{
+                $params = array();
+                $facilities = array();
                 $roles = $userService->fetchRoles();
-                return new ViewModel(array('user'=>$user,'roles' => $roles));
+                if($user->role!= null && trim($user->role)!= '' && $user->role > 1){
+                   $params['role']=$user->role;
+                   $facilities = $commonService->getRoleFacilities($params);
+                }
+                return new ViewModel(array('user'=>$user,'roles' => $roles,'facilities'=>$facilities));
             }   
         }
     }
@@ -82,7 +87,18 @@ class UsersController extends AbstractActionController
             }   
         }
     }
-
-
+    
+    public function getRoleFacilitiesAction(){
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $commonService = $this->getServiceLocator()->get('CommonService');
+            $result = $commonService->getRoleFacilities($params);
+            $viewModel = new ViewModel();
+            $viewModel->setVariables(array('params'=>$params,'result' => $result))
+                        ->setTerminal(true);
+            return $viewModel;
+        }
+    }
 }
 

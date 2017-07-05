@@ -352,6 +352,10 @@ class CommonService {
         
     }
     
+    public function getRoleFacilities($params){
+        $facilityDb = $this->sm->get('FacilityTable');
+       return $facilityDb->fetchRoleFacilities($params);
+    }
 }
 
 ?>
