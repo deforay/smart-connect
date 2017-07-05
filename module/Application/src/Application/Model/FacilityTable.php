@@ -102,4 +102,21 @@ class FacilityTable extends AbstractTableGateway {
         $facilityResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         return $facilityResult;
     }
+    
+    public function fetchRoleFacilities($params){
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $fQuery = $sql->select()->from(array('f'=>'facility_details'))
+                      ->join(array('ft'=>'facility_type'),'ft.facility_type_id=f.facility_type');
+        if(isset($params['role']) && $params['role'] == 2){
+           $fQuery = $fQuery->where('f.facility_type=2');
+        }else if(isset($params['role']) && $params['role'] == 3){
+           $fQuery = $fQuery->where('f.facility_type IN (1,4)');
+        }else if(isset($params['role']) && $params['role'] == 4){
+           $fQuery = $fQuery->where('f.facility_type=3');  
+        }
+        $fQueryStr = $sql->getSqlStringForSqlObject($fQuery);
+        $facilityResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+        return $facilityResult;
+    }
 }

@@ -1,4 +1,11 @@
-
+                    <?php
+                    $mappedFacilities = array();
+                    if(isset($user['facilities']) && count($user['facilities']) >0){
+                        foreach($user['facilities'] as $row){
+                           $mappedFacilities[] = $row['facility_id'];
+                        }
+                    }
+                    ?>
                     <!-- BEGIN PAGE HEADER-->
                     <!-- BEGIN THEME PANEL -->
                     <!-- END THEME PANEL -->
@@ -32,13 +39,13 @@
 
 
                                 <div class="portlet-body form">
-                                    <form class="form-horizontal" name="addUserInformation" id="addUserInformation" method="post" action="/users/edit" role="form" autocomplete="off">
+                                    <form class="form-horizontal" name="editUserInformation" id="editUserInformation" method="post" action="/users/edit" role="form" autocomplete="off">
                                         <div class="form-body">
                                             <div class="form-group">
                                                 <label class="col-md-3 control-label">Name <span class="font-red-mint">*</span></label>
                                                 <div class="col-md-6">
-                                                    <input type="text" id="username" name="username" class="form-control isRequired" placeholder="" value="<?php echo $user['user_name']; ?>" title="Please enter the name">
-                                                    <input type="hidden" id="userId" name="userId" class="form-control isRequired" placeholder="" value="<?php echo base64_encode($user['user_id']); ?>">
+                                                    <input type="text" id="username" name="username" class="form-control isRequired" placeholder="" value="<?php echo $user->user_name; ?>" title="Please enter the name">
+                                                    <input type="hidden" id="userId" name="userId" class="form-control isRequired" placeholder="" value="<?php echo base64_encode($user->user_id); ?>">
                                                 </div>
                                             </div>
                                             <div class="form-group">
@@ -46,13 +53,12 @@
                                                 <div class="col-md-6">
                                                     <select class="form-control isRequired" name="role" id="role" title="Please select the role">
                                                         <option value="">--Select--</option>
-
                                                         <?php
                                                             $options = [];
                                                             foreach($roles as $r) {
                                                             // $options[$r['access_type_name']][$r['id']] = $r['role_name'];
                                                         ?>
-                                                          <option value="<?php echo $r['role_id']; ?>" <?php echo ($user['role'] == $r['role_id'] ? " selected='selected' " : ""); ?> ><?php echo ucwords($r['role_name']); ?></option>
+                                                          <option value="<?php echo $r['role_id']; ?>" <?php echo ($user->role == $r['role_id'] ? " selected='selected' " : ""); ?> ><?php echo ucwords($r['role_name']); ?></option>
                                                         <?php
                                                        }
                                                        ?>                                                        
@@ -60,17 +66,16 @@
                                                     </select>
                                                 </div>
                                             </div>
-
                                             <div class="form-group">
                                                 <label class="col-md-3 control-label">Email <span class="font-red-mint">*</span></label>
                                                 <div class="col-md-6">
-                                                    <input type="email" id="email" name="email" class="form-control isEmail isRequired" placeholder="" value="<?php echo $user['email']; ?>" title="Please enter valid email">
+                                                    <input type="email" id="email" name="email" class="form-control isEmail isRequired" placeholder="" value="<?php echo $user->email; ?>" title="Please enter valid email">
                                                 </div>
                                             </div>
                                             <div class="form-group">
                                                 <label class="col-md-3 control-label">Mobile <span class="font-red-mint">*</span></label>
                                                 <div class="col-md-6">
-                                                    <input type="tel" id="mobile" name="mobile" class="form-control " placeholder="" value="<?php echo $user['mobile']; ?>" >
+                                                    <input type="tel" id="mobile" name="mobile" class="form-control " placeholder="" value="<?php echo $user->mobile; ?>" >
                                                 </div>
                                             </div>
                                             <div class="form-group">
@@ -80,17 +85,27 @@
                                                 </div>
                                             </div>
                                             <div class="form-group">
+                                                <label class="col-md-3 control-label">Facility </label>
+                                                <div class="col-md-6">
+                                                    <select class="form-control" id="facility" name="facility[]" title="Please select facility" multiple>
+                                                      <?php
+                                                      foreach($facilities as $row){
+                                                      ?>
+                                                        <option value="<?php echo $row['facility_id']; ?>" <?php echo (in_array($row['facility_id'],$mappedFacilities))?'selected="selected"':''; ?>><?php echo ucwords($row['facility_name']); ?></option>
+                                                      <?php } ?>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
                                                 <label class="col-md-3 control-label">Status <span class="font-red-mint">*</span></label>
                                                 <div class="col-md-6">
                                                     <select class="form-control isRequired" name="status" id="status" title="Please select the status">
                                                         <option value="">--Select--</option>
-                                                        <option value="active" "<?php echo ($user['status'] == 'active' ? " selected='selected' " : ""); ?>">Active</option>
-                                                        <option value="inactive" "<?php echo ($user['status'] == 'inactive' ? " selected='selected' " : ""); ?>">Inactive</option>
+                                                        <option value="active" "<?php echo ($user->status == 'active' ? " selected='selected' " : ""); ?>">Active</option>
+                                                        <option value="inactive" "<?php echo ($user->status == 'inactive' ? " selected='selected' " : ""); ?>">Inactive</option>
                                                     </select>
                                                 </div>
-                                            </div>    
-                                                                                     
-                                            
+                                            </div>
                                         </div>
                                         <div class="form-actions">
                                             <div class="row">
@@ -102,24 +117,41 @@
                                         </div>
                                     </form>
                                 </div>
-
-
-                                    
                                 </div>
                             </div>
                             <!-- END EXAMPLE TABLE PORTLET-->
                         </div>
                     </div>
 <script type="text/javascript">
+    $(function () {
+        $('#facility').select2({
+            placeholder: "Select facilities",
+            allowClear: true
+        });
+    });
+    
+    $('#role').on('change',function(){
+        if(this.value!= '' && this.value!= 1){
+            $('#facility').select2('val', '');
+            $.post("<?php echo $this->url('users', array('action' => 'get-role-facilities')); ?>", {role : this.value},
+            function(data){
+                $('#facility').html(data);
+                $('#facility').select2('open');
+            });
+        }else{
+           $('#facility').select2('val', '');
+        }
+    });
+    
     duplicateName = true;
     function validateNow() {
         flag = deforayValidator.init({
-            formId: 'addUserInformation'
+            formId: 'editUserInformation'
         });
         if (flag) {
             if (duplicateName) {
                 $.blockUI();
-                document.getElementById('addUserInformation').submit();
+                document.getElementById('editUserInformation').submit();
             }
         }
     }

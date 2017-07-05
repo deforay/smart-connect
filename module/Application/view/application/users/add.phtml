@@ -1,4 +1,3 @@
-
                     <!-- BEGIN PAGE HEADER-->
                     <!-- BEGIN THEME PANEL -->
                     <!-- END THEME PANEL -->
@@ -48,9 +47,7 @@
                                                         <?php
                                                             $options = [];
                                                             foreach($roles as $r) {
-                                                                
                                                             //$options[$r['access_type_name']][$r['role_id']] = $r['role_name'];
-                                                              
                                                         ?>
                                                           <option value="<?php echo $r['role_id']; ?>"><?php echo ucwords($r['role_name']); ?></option>
                                                         <?php
@@ -78,9 +75,13 @@
                                                     <input type="password" id="password" name="password" class="form-control isRequired" placeholder="" title="Please enter the password">
                                                 </div>
                                             </div>
-
-                                                                                     
-                                            
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">Facility </label>
+                                                <div class="col-md-6">
+                                                    <select class="form-control" id="facility" name="facility[]" title="Please select facility" multiple>
+                                                    </select>
+                                                </div>
+                                            </div>
                                         </div>
                                         <div class="form-actions">
                                             <div class="row">
@@ -99,6 +100,26 @@
                         </div>
                     </div>
 <script type="text/javascript">
+    $(function () {
+        $('#facility').select2({
+            placeholder: "Select facilities",
+            allowClear: true
+        });
+    });
+    
+    $('#role').on('change',function(){
+        if(this.value!= '' && this.value!= 1){
+            $('#facility').select2('val', '');
+            $.post("<?php echo $this->url('users', array('action' => 'get-role-facilities')); ?>", {role : this.value},
+            function(data){
+                $('#facility').html(data);
+                $('#facility').select2('open');
+            });
+        }else{
+           $('#facility').select2('val', '');
+        }
+    });
+    
     duplicateName = true;
     function validateNow() {
         flag = deforayValidator.init({
