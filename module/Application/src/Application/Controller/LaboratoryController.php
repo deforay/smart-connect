@@ -292,12 +292,22 @@ class LaboratoryController extends AbstractActionController
     }
     
     public function getFilterSampleDetailsAction(){
+        //$request = $this->getRequest();
+        //if ($request->isPost()) {
+        //    $params = $request->getPost();
+        //    $sampleService = $this->getServiceLocator()->get('SampleService');
+        //    $result = $sampleService->getFilterSampleDetails($params);
+        //    return $this->getResponse()->setContent(Json::encode($result));
+        //}
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
             $sampleService = $this->getServiceLocator()->get('SampleService');
-            $result = $sampleService->getFilterSampleDetails($params);
-            return $this->getResponse()->setContent(Json::encode($result));
+            $result = $sampleService->getBarSampleDetails($params);
+            $viewModel = new ViewModel();
+            $viewModel->setVariables(array('result' => $result))
+                        ->setTerminal(true);
+            return $viewModel;
         }
     }
     

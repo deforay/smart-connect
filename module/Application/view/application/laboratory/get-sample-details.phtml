@@ -13,8 +13,9 @@
             type: 'pie'
         },
         title: {
-            text: ''
+            text: 'Samples Tested'
         },
+        
         credits: {
               enabled: false
        },
@@ -27,7 +28,7 @@
                 cursor: 'pointer',
                 dataLabels: {
                     enabled: true,
-                    format: '<b>{point.name}</b> : {point.percentage:.1f}%',
+                    format: '<b>{point.name}</b> : {point.percentage:.1f}% ({point.number})',
                     style: {
                         color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
                     }
@@ -43,7 +44,8 @@
                 ?>
                 {
                   name:<?php echo "'".$lab[1]."'";?>,
-                  y:<?php echo $lab[0];?>
+                  y:<?php echo $lab[0];?>,
+                  number:"<?php echo $lab[0]; ?>",
                 },
                 <?php
             }
