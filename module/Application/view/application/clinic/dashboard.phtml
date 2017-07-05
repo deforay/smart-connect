@@ -153,7 +153,7 @@ foreach($sampleType as $samples){
                                     </div>
                                     <div class="actions">
                                         <div class="btn-group">
-                                            <select id="testReason" class="btn white btn-outline btn-circle btn-sm dropdown-toggle">
+                                            <select id="testReason" class="btn white btn-outline btn-circle btn-sm dropdown-toggle" onchange="getAllTestReason();">
                                                 <option value="">Test Reasons</option>
                                                 <?php
                                                 foreach($testReason as $test)
@@ -291,92 +291,12 @@ foreach($sampleType as $samples){
             });
                 $('#dashboard-report-range span').html(moment().subtract('days', 29).format('MMMM D, YYYY') + ' to ' + moment().format('MMMM D, YYYY'));
                 $('#dashboard-report-range').show();
-        
-        
-         
-$('#combochart').highcharts({
-
-        chart: {
-            type: 'column'
-        },
-
-        title: {
-            text: ''
-        },
-
-        xAxis: {
-            categories: ['No. of VL Tested',
-                         'No. of ( < 1000 cp/mL)',
-                         'No. of VL ( > 1000 cp/mL)',
-                         'Lines of Treatment',
-                         'Total 1st Line',
-                         '1st Line ( > 1000 cp/mL)',
-                         'Total 2nd Line',
-                         '2nd Line ( > 1000 cp/mL)',
-                         'Total 3rd Line',
-                         '3rd Line ( > 1000 cp/mL)'
-                         ]
-        },
-
-        yAxis: {
-            allowDecimals: false,
-            min: 0,
-            title: {
-                text: 'Number of Samples'
-            }
-        },
-
-        tooltip: {
-            formatter: function () {
-                return '<b>' + this.x + '</b><br/>' +
-                    this.series.name + ': ' + this.y + '<br/>' +
-                    'Total: ' + this.point.stackTotal;
-            }
-        },
-
-        plotOptions: {
-            column: {
-                stacking: 'normal',
-                dataLabels: {
-                    enabled: true
-                },
-                enableMouseTracking: false
-            }
-        },
-
-        series: [{
-            name: 'Sample',
-            showInLegend: false, 
-            data: [ { y : 70 , color : '#ECD078' },
-                    { y : 45 , color : '#ddef55' },
-                    { y : 28 , color : '#D95B43' },
-                    { y : 15 , color : '#3598DC' },
-                    { y : 26 , color : '#A7DBD8' },
-                    { y : 15 , color : '#D95B43' },
-                    { y : 20 , color : '#53777A' },
-                    { y : 10 , color : '#D95B43' },
-                    { y : 15 , color : '#3598DC' },
-                    { y : 3 , color : '#D95B43' }
-                   ],
-            stack: 'male'
-        }, {
-            name: 'Sample',
-            showInLegend: false, 
-            data: [null, null, null, { y : 20 , color : '#53777A' }, null, null, null, null, null, null],
-            stack: 'male'
-        }, {
-            name: 'Sample',
-            showInLegend: false, 
-            data: [null, null, null, { y : 26 , color : '#A7DBD8' }, null, null, null, null, null, null],
-            stack: 'male'
-        }]
-    });    
+       
      
-     getAllFunction();
+                getAllFunction();
      
 });
-    function getAllFunction()
-    {
+    function getAllFunction(){
         $.blockUI.defaults.css.border = '1px solid grey'; 
         $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
         
@@ -433,7 +353,7 @@ function getOverAllViralLoad()
     adherence = $("#adherence").val();
     $.post("<?php echo $this->url('clinics', array('action' => 'overall-viral-load')); ?>",{sampleCollectionDate:dateRange,clinicId:clinicId,sampleId:sampleId,testResult:testResult,age:age,gender:gender,adherence:adherence},
     function(data) {
-    $("#viralLoadTable").html(data);
+        $("#viralLoadTable").html(data);
     });
 }
 

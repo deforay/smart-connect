@@ -15,7 +15,7 @@ return array(
         //),
         'Cache\Persistent' => array(
             'adapter' => 'filesystem',
-            'ttl'     => 7200,
+            'ttl'     => 86400,
             'options' => array(
                 'cache_dir' => realpath(__DIR__ . '/../../data/cache/'),
                 'dirPermission' => 0755,
@@ -29,7 +29,7 @@ return array(
             'adapter' => array(
                 'name'     =>'memcached',
                 'options'  => array(
-                    'ttl' => 7200, 
+                    'ttl' => 86400, 
                     'servers'   => array(
                         array(
                             '127.0.0.1',11211
