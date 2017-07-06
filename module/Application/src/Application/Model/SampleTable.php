@@ -1655,6 +1655,7 @@ class SampleTable extends AbstractTableGateway {
                                 $countResult[$i] = $dbAdapter->query($cQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
                                 $result[$i][0] = $countResult[$i]['total'];
                                 $result[$i][1] = $facility['facility_name'];
+                                $result[$i][2] = $facility['facility_code'];
                                 $i++;
                         }
                 }
