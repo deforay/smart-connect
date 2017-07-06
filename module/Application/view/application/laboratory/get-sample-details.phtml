@@ -1,8 +1,6 @@
 <?php
 //\Zend\Debug\Debug::dump($result);die;
 ?>
-
-
 <script>
        $(function () {
         $('#piecontainer').highcharts({
@@ -13,7 +11,7 @@
             type: 'pie'
         },
         title: {
-            text: 'Samples Tested'
+            text: 'VL Samples Tested'
         },
         
         credits: {
@@ -28,7 +26,7 @@
                 cursor: 'pointer',
                 dataLabels: {
                     enabled: true,
-                    format: '<b>{point.name}</b> : {point.percentage:.1f}% ({point.number})',
+                    format: '<b>{point.myData}</b> : {point.percentage:.1f}% ({point.number})',
                     style: {
                         color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
                     }
@@ -46,6 +44,7 @@
                   name:<?php echo "'".$lab[1]."'";?>,
                   y:<?php echo $lab[0];?>,
                   number:"<?php echo $lab[0]; ?>",
+                  myData:<?php echo "'".$lab[2]."'";?>,
                 },
                 <?php
             }
