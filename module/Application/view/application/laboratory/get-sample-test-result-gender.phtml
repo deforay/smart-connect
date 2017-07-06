@@ -1,13 +1,24 @@
 <?php
 //Zend\Debug\Debug::dump($result['lab']);die;
+
+
+
+$less1000 = array('M'=>'#088738', 'F' => '#60d18f', 'Not Specified' => '#A5F7C6');
+$more1000 = array('M'=>'#ff1900', 'F' => '#F2786D', 'Not Specified' => '#8C1308');
+
 ?>
 <div id="facilitiesTestedGender"></div>
 <script>
+       
+   
+       
+       
        $(function () {
         $('#facilitiesTestedGender').highcharts({
        chart: {
             type: 'column'
         },
+       
         title: {
             text: ''
         },
@@ -63,12 +74,12 @@
         $gender = array('M','F','Not Specified');
         for($i=0;$i<3;$i++){
               foreach($result[$gender[$i]] as $key=>$condition){
-              if($key!='VL Not Detected'){
-              $range = substr($key,4,6);
-              $range = preg_replace('/\s+/', '', $range);
-              }else{
-              $range = 'nd';
-              }
+                     if($key!='VL Not Detected'){
+                            $range = substr($key,4,6);
+                            $range = preg_replace('/\s+/', '', $range);
+                     }else{
+                            $range = 'nd';
+                     }
               ?>
               {
               name:'<?php echo $key."(".$gender[$i].")";?>',
@@ -78,6 +89,23 @@
                   }
               ?>],
               stack:'<?php echo $gender[$i];?>',
+              
+              <?php
+              if($key == "VL (< 1000 cp/ml)"){
+              
+                     if(isset($less1000[$gender[$i]])) { ?>
+                     
+                            color: '<?php echo $less1000[$gender[$i]]; ?>'
+                     
+                     <?php } else{ ?>
+                            color: '<?php echo $more1000[$gender[$i]]; ?>'
+              <?php }
+              } else { ?>
+                 color: '#ff1900'     
+              <?php
+              }
+              ?>
+              
               
               },
               <?php
