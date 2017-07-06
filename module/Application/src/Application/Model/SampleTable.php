@@ -1411,7 +1411,7 @@ class SampleTable extends AbstractTableGateway {
             }
         }
         
-        $rsQuery = $sql->select()->from(array('rs'=>'r_sample_type'));
+        $rsQuery = $sql->select()->from(array('rs'=>'r_sample_type'))->where(array('rs.status="active"'));
         if(isset($params['sampleType']) && trim($params['sampleType'])!=''){
             $rsQuery = $rsQuery->where('rs.sample_id="'.base64_decode(trim($params['sampleType'])).'"');
         }
@@ -1460,7 +1460,16 @@ class SampleTable extends AbstractTableGateway {
                                 }
                                 $lQueryStr = $sql->getSqlStringForSqlObject($lessThanQuery);
                                 $lessResult[$i] = $dbAdapter->query($lQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-                                $result[$sample['sample_name']]['VL (< 1000 cp/ml)'][$j] = $lessTotal+$lessResult[$i]['total'];
+                                if($sample['sample_name']=='Dry Blood Spot')
+                                {
+                                    $result[$sample['sample_name']]['VL (< 1000 cp/ml)'][$j] = $lessTotal+$lessResult[$i]['total'];
+                                }else{
+                                    if(isset($result['other']['VL (< 1000 cp/ml)'][$j])){
+                                        $result['other']['VL (< 1000 cp/ml)'][$j] = $result['other']['VL (< 1000 cp/ml)'][$j]+$lessTotal+$lessResult[$i]['total'];
+                                    }else{
+                                        $result['other']['VL (< 1000 cp/ml)'][$j] = $lessTotal+$lessResult[$i]['total'];
+                                    }
+                                }
                             }
                             
                             if(isset($params['testResult']) && ($params['testResult']=="" || $params['testResult']=='>1000')){
@@ -1494,7 +1503,16 @@ class SampleTable extends AbstractTableGateway {
                                 }
                                 $gQueryStr = $sql->getSqlStringForSqlObject($greaterThanQuery);
                                 $greaterResult[$i] = $dbAdapter->query($gQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
+                                if($sample['sample_name']=='Dry Blood Spot')
+                                {
                                 $result[$sample['sample_name']]['VL (> 1000 cp/ml)'][$j] = $greaterTotal+$greaterResult[$i]['total'];
+                                }else{
+                                    if(isset($result['other']['VL (> 1000 cp/ml)'][$j])){
+                                        $result['other']['VL (> 1000 cp/ml)'][$j] = $result['other']['VL (> 1000 cp/ml)'][$j]+$greaterTotal+$greaterResult[$i]['total'];
+                                    }else{
+                                        $result['other']['VL (> 1000 cp/ml)'][$j] = $greaterTotal+$greaterResult[$i]['total'];
+                                    }
+                                }
                             }
                             
                             if(isset($params['testResult']) && $params['testResult']==""){
@@ -1528,7 +1546,17 @@ class SampleTable extends AbstractTableGateway {
                                 }
                                 $nQueryStr = $sql->getSqlStringForSqlObject($notDetectQuery);
                                 $notTargetResult[$i] = $dbAdapter->query($nQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
+                                if($sample['sample_name']=='Dry Blood Spot')
+                                {
                                 $result[$sample['sample_name']]['VL Not Detected'][$j] = $notTargetTotal+$notTargetResult[$i]['total'];
+                                }else{
+                                    if(isset($result['other']['VL Not Detected'][$j])){
+                                        $result['other']['VL Not Detected'][$j] = $result['other']['VL Not Detected'][$j]+$notTargetTotal+$notTargetResult[$i]['total'];
+                                    }else{
+                                        $result['other']['VL Not Detected'][$j] = $notTargetTotal+$notTargetResult[$i]['total'];
+                                    }
+                                }
+                                //\Zend\Debug\Debug::dump($result);
                             }
                             $i++;
                         }
