@@ -133,8 +133,21 @@ foreach($sampleType as $samples){
                                     <div class="col-md-6 col-sm-6">
                                     <div id="combochart1" style="min-width: 310px; height: 520px; margin: 0 auto"></div>
                                     </div>
-                                    <div class="col-md-6 col-sm-6" id="viralLoadTable">
-                                    
+                                    <div class="col-md-6 col-sm-6">
+                                       <table class="table table-striped table-bordered table-hover order-column" id="viralLoadTable">
+                                            <thead>
+                                                <tr>
+                                                    <th> Sample ID </th>
+                                                    <th> Date Tested</th>
+                                                    <th> Viral Load <br> (cp/mL) </th>                                                          
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td colspan="3" class="dataTables_empty">Loading data from server</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
                                     </div>
                                 </div>
                             </div>
@@ -234,6 +247,7 @@ foreach($sampleType as $samples){
         
 <script>
     var oTable = null;
+    var oallTable = null;
     $(function () {
         
         $.blockUI.defaults.css.border = '1px solid grey'; 
@@ -306,6 +320,7 @@ foreach($sampleType as $samples){
         getOverAllViralLoad();
         getAllTestReason();
         getTestedSampleResult();
+        overAllViralLoad();
         testResul();
     }
 function testResul()
@@ -326,11 +341,11 @@ function testResul()
         "sAjaxSource": "<?php echo $this->url('clinics',array('action' => 'test-result')); ?>",
         "fnServerData": function ( sSource, aoData, fnCallback ) {
             aoData.push({ "name":"sampleCollectionDate","value": $("#sampleCollectionDate").val()});
-			aoData.push({ "name":"clinicId","value": $("#clinicId").val()});
-			aoData.push({ "name":"sampleId","value": $("#sampleId").val()});
-			aoData.push({ "name":"testResult","value": $("#testResult").val()});
-			aoData.push({ "name":"age","value": $("#age").val()});
-			aoData.push({ "name":"gender","value": $("#gender").val()});
+            aoData.push({ "name":"clinicId","value": $("#clinicId").val()});
+            aoData.push({ "name":"sampleId","value": $("#sampleId").val()});
+            aoData.push({ "name":"testResult","value": $("#testResult").val()});
+            aoData.push({ "name":"age","value": $("#age").val()});
+            aoData.push({ "name":"gender","value": $("#gender").val()});
             $.ajax({
                 "dataType": 'json',
                 "type": "POST",
@@ -341,6 +356,39 @@ function testResul()
         }
     } );
 }
+
+function overAllViralLoad(){
+    oallTable = $('#viralLoadTable').DataTable( {
+        "bProcessing": true,
+	"bServerSide": true,
+        "aoColumns": [
+            {"sClass":"center"},
+            {"sClass":"center"},
+            {"sClass":"center"}
+            ],
+        "iDisplayLength": 10,
+        "aaSorting": [[ 1, "desc" ]],
+
+        "sAjaxSource": "<?php echo $this->url('clinics',array('action' => 'get-over-all-load-status')); ?>",
+        "fnServerData": function ( sSource, aoData, fnCallback ) {
+            aoData.push({ "name":"sampleCollectionDate","value": $("#sampleCollectionDate").val()});
+            aoData.push({ "name":"clinicId","value": $("#clinicId").val()});
+            aoData.push({ "name":"sampleId","value": $("#sampleId").val()});
+            aoData.push({ "name":"testResult","value": $("#testResult").val()});
+            aoData.push({ "name":"age","value": $("#age").val()});
+            aoData.push({ "name":"gender","value": $("#gender").val()});
+            aoData.push({ "name":"adherence","value": $("#adherence").val()});
+            $.ajax({
+                "dataType": 'json',
+                "type": "POST",
+                "url": sSource,
+                "data": aoData,
+                "success": fnCallback
+            });
+        }
+    } );
+}
+
 function getOverAllViralLoad()
 {
     
@@ -353,15 +401,16 @@ function getOverAllViralLoad()
     adherence = $("#adherence").val();
     $.post("<?php echo $this->url('clinics', array('action' => 'overall-viral-load')); ?>",{sampleCollectionDate:dateRange,clinicId:clinicId,sampleId:sampleId,testResult:testResult,age:age,gender:gender,adherence:adherence},
     function(data) {
-        $("#viralLoadTable").html(data);
+        $("#combochart1").html(data);
     });
 }
 
 function searchData(){
     //alert($('#sampleCollectionDate').val());
-            $.blockUI.defaults.css.border = '1px solid grey'; 
-        $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);    
+    $.blockUI.defaults.css.border = '1px solid grey'; 
+    $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);    
     oTable.draw();
+    oallTable.draw();
     getOverAllViralLoad();
     getAllTestReason();
 }

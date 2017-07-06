@@ -35,10 +35,9 @@ class ClinicController extends AbstractActionController
         if ($request->isPost()) {
             $params = $request->getPost();
             $sampleService = $this->getServiceLocator()->get('SampleService');
-            $result = $sampleService->getOverAllLoadStatus($params);
             $chartResult = $sampleService->getChartOverAllLoadStatus($params);
             $viewModel = new ViewModel();
-            $viewModel->setVariables(array('result' => $result,'chartResult'=>$chartResult))
+            $viewModel->setVariables(array('chartResult'=>$chartResult))
                         ->setTerminal(true);
             return $viewModel;
         }
@@ -95,6 +94,16 @@ class ClinicController extends AbstractActionController
             $viewModel->setVariables(array('sampleResult' =>$sampleResult,'config'=>$config))
                       ->setTerminal(true);
             return $viewModel;
+        }
+    }
+    
+    public function getOverAllLoadStatusAction() {
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $sampleService = $this->getServiceLocator()->get('SampleService');
+            $result = $sampleService->getOverAllLoadStatus($params);
+            return $this->getResponse()->setContent(Json::encode($result));
         }
     }
 }
