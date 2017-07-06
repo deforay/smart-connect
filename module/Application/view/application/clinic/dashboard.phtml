@@ -209,15 +209,23 @@ foreach($sampleType as $samples){
                         <div class="col-md-12 col-sm-12">
                             <div class="portlet box">
                                 <div class="portlet-body">
-                                    
                                         <div class="portlet box blue">
                                             <div class="portlet-title">
                                                 <div class="caption">
                                                     <i class="fa fa-cogs"></i>Test Results
                                                 </div>
-                                                <div class="tools">
+                                                <div class="actions" style="width:24%;">
+                                                    <div class="btn-group" style="width:60%;float:left;">
+                                                        <select id="result" class="btn white btn-outline btn-circle btn-sm dropdown-toggle" onchange="fnShowHide();">
+                                                            <option value="">All Sample</option>
+                                                            <option value="result">Test Results</option>
+                                                            <option value="noresult">Samples Waiting</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="tools" style="width:40%;float:right;text-align:right;">
+                                                        <button class="btn btn-default" onclick="exportTestResult();"><span><i class="fa fa-file-excel-o" aria-hidden="true"></i> Excel</span></button>
+                                                    </div>
                                                 </div>
-            
                                             </div>
                                             <div class="portlet-body">
                                                 <div class="table-toolbar">
@@ -309,7 +317,7 @@ foreach($sampleType as $samples){
      
                 getAllFunction();
      
-});
+    });
     function getAllFunction(){
         $.blockUI.defaults.css.border = '1px solid grey'; 
         $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
@@ -323,98 +331,113 @@ foreach($sampleType as $samples){
         overAllViralLoad();
         testResul();
     }
-function testResul()
-{
-    oTable = $('#testResults').DataTable( {
-        "bProcessing": true,
-	"bServerSide": true,
-        "aoColumns": [
-            {"sClass":"center"},
-            {"sClass":"center"},
-            {"sClass":"center"},
-            {"sClass":"center"},
-            {"sClass":"center","bSortable":false}
-            ],
-        "iDisplayLength": 10,
-        "aaSorting": [[ 1, "desc" ]],
-
-        "sAjaxSource": "<?php echo $this->url('clinics',array('action' => 'test-result')); ?>",
-        "fnServerData": function ( sSource, aoData, fnCallback ) {
-            aoData.push({ "name":"sampleCollectionDate","value": $("#sampleCollectionDate").val()});
-            aoData.push({ "name":"clinicId","value": $("#clinicId").val()});
-            aoData.push({ "name":"sampleId","value": $("#sampleId").val()});
-            aoData.push({ "name":"testResult","value": $("#testResult").val()});
-            aoData.push({ "name":"age","value": $("#age").val()});
-            aoData.push({ "name":"gender","value": $("#gender").val()});
-            $.ajax({
-                "dataType": 'json',
-                "type": "POST",
-                "url": sSource,
-                "data": aoData,
-                "success": fnCallback
-            });
-        }
-    } );
-}
-
-function overAllViralLoad(){
-    oallTable = $('#viralLoadTable').DataTable( {
-        "bProcessing": true,
-	"bServerSide": true,
-        "aoColumns": [
-            {"sClass":"center"},
-            {"sClass":"center"},
-            {"sClass":"center"}
-            ],
-        "iDisplayLength": 10,
-        "aaSorting": [[ 1, "desc" ]],
-
-        "sAjaxSource": "<?php echo $this->url('clinics',array('action' => 'get-over-all-load-status')); ?>",
-        "fnServerData": function ( sSource, aoData, fnCallback ) {
-            aoData.push({ "name":"sampleCollectionDate","value": $("#sampleCollectionDate").val()});
-            aoData.push({ "name":"clinicId","value": $("#clinicId").val()});
-            aoData.push({ "name":"sampleId","value": $("#sampleId").val()});
-            aoData.push({ "name":"testResult","value": $("#testResult").val()});
-            aoData.push({ "name":"age","value": $("#age").val()});
-            aoData.push({ "name":"gender","value": $("#gender").val()});
-            aoData.push({ "name":"adherence","value": $("#adherence").val()});
-            $.ajax({
-                "dataType": 'json',
-                "type": "POST",
-                "url": sSource,
-                "data": aoData,
-                "success": fnCallback
-            });
-        }
-    } );
-}
-
-function getOverAllViralLoad()
-{
+    function testResul()
+    {
+        oTable = $('#testResults').DataTable( {
+            "bProcessing": true,
+            "bServerSide": true,
+            "aoColumns": [
+                {"sClass":"center"},
+                {"sClass":"center"},
+                {"sClass":"center"},
+                {"sClass":"center"},
+                {"sClass":"center","bSortable":false}
+                ],
+            "iDisplayLength": 10,
+            "aaSorting": [[ 1, "desc" ]],
     
-    dateRange = $("#sampleCollectionDate").val();
-    clinicId = $("#clinicId").val();
-    sampleId = $("#sampleId").val();
-    testResult = $("#testResult").val();
-    age = $("#age").val();
-    gender = $("#gender").val();
-    adherence = $("#adherence").val();
-    $.post("<?php echo $this->url('clinics', array('action' => 'overall-viral-load')); ?>",{sampleCollectionDate:dateRange,clinicId:clinicId,sampleId:sampleId,testResult:testResult,age:age,gender:gender,adherence:adherence},
-    function(data) {
-        $("#combochart1").html(data);
-    });
-}
+            "sAjaxSource": "<?php echo $this->url('clinics',array('action' => 'test-result')); ?>",
+            "fnServerData": function ( sSource, aoData, fnCallback ) {
+                aoData.push({ "name":"sampleCollectionDate","value": $("#sampleCollectionDate").val()});
+                aoData.push({ "name":"clinicId","value": $("#clinicId").val()});
+                aoData.push({ "name":"sampleId","value": $("#sampleId").val()});
+                aoData.push({ "name":"testResult","value": $("#testResult").val()});
+                aoData.push({ "name":"age","value": $("#age").val()});
+                aoData.push({ "name":"gender","value": $("#gender").val()});
+                aoData.push({ "name":"result","value": $("#result").val()});
+                $.ajax({
+                    "dataType": 'json',
+                    "type": "POST",
+                    "url": sSource,
+                    "data": aoData,
+                    "success": fnCallback
+                });
+            }
+        } );
+    }
+    
+    function overAllViralLoad(){
+        oallTable = $('#viralLoadTable').DataTable( {
+            "bProcessing": true,
+            "bServerSide": true,
+            "aoColumns": [
+                {"sClass":"center"},
+                {"sClass":"center"},
+                {"sClass":"center"}
+                ],
+            "iDisplayLength": 10,
+            "aaSorting": [[ 1, "desc" ]],
+    
+            "sAjaxSource": "<?php echo $this->url('clinics',array('action' => 'get-over-all-load-status')); ?>",
+            "fnServerData": function ( sSource, aoData, fnCallback ) {
+                aoData.push({ "name":"sampleCollectionDate","value": $("#sampleCollectionDate").val()});
+                aoData.push({ "name":"clinicId","value": $("#clinicId").val()});
+                aoData.push({ "name":"sampleId","value": $("#sampleId").val()});
+                aoData.push({ "name":"testResult","value": $("#testResult").val()});
+                aoData.push({ "name":"age","value": $("#age").val()});
+                aoData.push({ "name":"gender","value": $("#gender").val()});
+                aoData.push({ "name":"adherence","value": $("#adherence").val()});
+                $.ajax({
+                    "dataType": 'json',
+                    "type": "POST",
+                    "url": sSource,
+                    "data": aoData,
+                    "success": fnCallback
+                });
+            }
+        } );
+    }
+    
+    function getOverAllViralLoad()
+    {
+        
+        dateRange = $("#sampleCollectionDate").val();
+        clinicId = $("#clinicId").val();
+        sampleId = $("#sampleId").val();
+        testResult = $("#testResult").val();
+        age = $("#age").val();
+        gender = $("#gender").val();
+        adherence = $("#adherence").val();
+        $.post("<?php echo $this->url('clinics', array('action' => 'overall-viral-load')); ?>",{sampleCollectionDate:dateRange,clinicId:clinicId,sampleId:sampleId,testResult:testResult,age:age,gender:gender,adherence:adherence},
+        function(data) {
+            $("#combochart1").html(data);
+        });
+    }
+    
+    function searchData(){
+        //alert($('#sampleCollectionDate').val());
+        $.blockUI.defaults.css.border = '1px solid grey'; 
+        $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);    
+        oTable.draw();
+        oallTable.draw();
+        getOverAllViralLoad();
+        getAllTestReason();
+    }
 
-function searchData(){
-    //alert($('#sampleCollectionDate').val());
-    $.blockUI.defaults.css.border = '1px solid grey'; 
-    $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);    
-    oTable.draw();
-    oallTable.draw();
-    getOverAllViralLoad();
-    getAllTestReason();
-}
-
+    function fnShowHide(){
+        if($('#result').val() == ''){
+            oTable.column(2).visible(true);
+            oTable.column(3).visible(true);
+        }else if($('#result').val() == 'result'){
+            oTable.column(2).visible(true);
+            oTable.column(3).visible(true);
+        }else if($('#result').val() == 'noresult'){
+            oTable.column(2).visible(false);
+            oTable.column(3).visible(false);
+        }
+        searchData();
+    }
+    
     function getTestedSampleResult()
     {
         sampleType = $("#sampleId").val();
@@ -454,5 +477,16 @@ function searchData(){
                 window.open('../temporary/'+data,'_blank');
             }
         });
+    }
+    
+    function exportTestResult(){
+       $.post("<?php echo $this->url('clinics', array('action' => 'export-result-excel')); ?>", {result : $("#result").val()},
+        function(data){
+            if(data == "" || data == null || data == undefined){
+                alert('Unable to export result excel');
+            }else{
+                window.open('../temporary/'+data,'_blank');
+            }
+        }); 
     }
 </script>        
