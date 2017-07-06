@@ -925,9 +925,10 @@ class SampleTable extends AbstractTableGateway {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))->columns(array('sample_code','sample_tested_datetime','result','sample_type'))
+                        ->join(array('fd'=>'facility_details'),'fd.facility_id=vl.facility_id',array('facility_name'))
                         ->join(array('rst'=>'r_sample_type'),'rst.sample_id=vl.sample_type')
                         ->where(array("vl.sample_collection_date <='" . $cDate ." 23:59:00". "'", "vl.sample_collection_date >='" . $lastThirtyDay." 00:00:00". "'"))
-                        ->where('vl.facility_id !=0');
+                        ->where(array('fd.facility_type'=>'1'));
         if(isset($parameters['clinicId']) && $parameters['clinicId']!=''){
             $sQuery = $sQuery->where('vl.facility_id="'.base64_decode(trim($parameters['clinicId'])).'"');
         }else{
@@ -983,8 +984,9 @@ class SampleTable extends AbstractTableGateway {
 
         /* Total data set length */
         $iQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))->columns(array('sample_code','sample_tested_datetime','result','sample_type'))
+                      ->join(array('fd'=>'facility_details'),'fd.facility_id=vl.facility_id',array('facility_name'))
                       ->join(array('rst'=>'r_sample_type'),'rst.sample_id=vl.sample_type')
-                      ->where('vl.facility_id !=0');
+                      ->where(array('fd.facility_type'=>'1'));
         if($logincontainer->role!= 1){
             $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:0;
             $iQuery = $iQuery->where('vl.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
@@ -1272,8 +1274,7 @@ class SampleTable extends AbstractTableGateway {
                                 ->columns(array('vl_sample_id','sample_code','sample_collection_date','sample_type','sample_testing_date','result_value_log','result_value_absolute','result_value_text','result'))
 				->join(array('fd'=>'facility_details'),'fd.facility_id=vl.facility_id',array('facility_name'))
 				->where(array('fd.facility_type'=>'1'));
-        if($cDate!='' && $lastThirtyDay!='')
-        {
+        if($cDate!='' && $lastThirtyDay!=''){
             $sQuery = $sQuery->where(array("vl.sample_collection_date <='" . $cDate ." 23:59:00". "'", "vl.sample_collection_date >='" . $lastThirtyDay." 00:00:00". "'"));
         }
         if(isset($parameters['clinicId']) && $parameters['clinicId'] !=''){
@@ -1285,7 +1286,7 @@ class SampleTable extends AbstractTableGateway {
             }
         }
         if(isset($parameters['gender'] ) && trim($parameters['gender'])!=''){
-            $sQuery = $sQuery->where(array("vl.patient_gender ='".$parameters['gender']."'")); 
+            $sQuery = $sQuery->where(array("vl.patient_gender ='".$parameters['gender']."'"));
         }
         if(isset($parameters['sampleId'] ) && trim($parameters['sampleId'])!=''){
             $sQuery = $sQuery->where('vl.sample_type="'.base64_decode(trim($parameters['sampleId'])).'"');
