@@ -1649,9 +1649,18 @@ class SampleTable extends AbstractTableGateway {
                                           $countQuery = $countQuery->where("vl.patient_age_in_years = 'unknown' OR vl.patient_age_in_years = '' OR vl.patient_age_in_years IS NULL");
                                         }
                                 }
+                                if(isset($params['sampleStatus']) && $params['sampleStatus']!=''){
+                                if($params['sampleStatus'] == 'sample_tested'){
+                                  $countQuery = $countQuery->where("vl.result != 'NULL' AND vl.result IS NOT NULL AND vl.result != ''");
+                                }else if($params['sampleStatus'] == 'samples_not_tested') {
+                                  $countQuery = $countQuery->where("vl.result = 'NULL' or vl.result = null or vl.result = ''");
+                                }else if($params['sampleStatus'] == 'rejected') {
+                                  $countQuery = $countQuery->where("vl.result_status = '4'");
+                                }
+                            }
                                 
                                 $cQueryStr = $sql->getSqlStringForSqlObject($countQuery);
-                                //echo $cQueryStr;die;
+                               // echo $cQueryStr;die;
                                 $countResult[$i] = $dbAdapter->query($cQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
                                 $result[$i][0] = $countResult[$i]['total'];
                                 $result[$i][1] = $facility['facility_name'];
@@ -1738,6 +1747,15 @@ class SampleTable extends AbstractTableGateway {
                                     }else if($params['age'] == 'unknown'){
                                       $countQuery = $countQuery->where("vl.patient_age_in_years = 'unknown' OR vl.patient_age_in_years = '' OR vl.patient_age_in_years IS NULL");
                                     }
+                            }
+                            if(isset($params['sampleStatus']) && $params['sampleStatus']!=''){
+                                if($params['sampleStatus'] == 'sample_tested'){
+                                  $countQuery = $countQuery->where("vl.result != 'NULL' AND vl.result IS NOT NULL AND vl.result != ''");
+                                }else if($params['sampleStatus'] == 'samples_not_tested') {
+                                  $countQuery = $countQuery->where("vl.result = 'NULL' or vl.result = null or vl.result = ''");
+                                }else if($params['sampleStatus'] == 'rejected') {
+                                  $countQuery = $countQuery->where("vl.reason_for_sample_rejection ! = '' AND vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != 0");
+                                }
                             }
                             $cQueryStr = $sql->getSqlStringForSqlObject($countQuery);
                             $lessResult = $dbAdapter->query($cQueryStr." AND vl.result < 1000", $dbAdapter::QUERY_MODE_EXECUTE)->current();

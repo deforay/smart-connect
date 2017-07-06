@@ -128,7 +128,7 @@ if(isset($searchMonth) && trim($searchMonth)!= ''){
                             <div class="form-group col-lg-4">
                                 <label class="control-label">ARV Adherence</label>
                               <select class="form-control" name="adherence" id="adherence">
-                                <option value="">--Select--</option>
+                                <option value="">-- Select --</option>
                                 <option value="good">Good >= 95%</option>
                                 <option value="fair">Fair 85-94%</option>
                                 <option value="poor">Poor < 85%</option>
@@ -165,7 +165,15 @@ if(isset($searchMonth) && trim($searchMonth)!= ''){
                                     }
                                     ?>
                                 </select>
-                              
+                            </div>
+                            <div class="form-group col-lg-4">
+                                <label class="control-label">Sample Status</label>
+                              <select class="form-control" name="sampleStatus" id="sampleStatus">
+                                <option value="all">All Samples</option>
+                                <option value="sample_tested">Samples Tested</option>
+                                <option value="samples_not_tested">Samples Not Tested</option>
+                                <option value="rejected">Samples Rejected</option>
+                              </select>
                             </div>
                             <div class="form-group col-lg-4">
                                 <br>
@@ -237,9 +245,10 @@ if(isset($searchMonth) && trim($searchMonth)!= ''){
         sampleType = $("#sampleType").val();
         currentRegimen = $("#currentRegimen").val();
         adherence = $("#adherence").val();
+        sampleStatus = $("#sampleStatus").val();
         age = $("#age").val();
         
-        $.post("<?php echo $this->url('laboratory', array('action' => 'get-bar-sample-details')); ?>",{testResult:testResult,fromDate:fromDate,toDate:toDate,gender:searchGender,facilityId:facilityId,sampleType:sampleType,currentRegimen:currentRegimen,adherence:adherence,age:age},
+        $.post("<?php echo $this->url('laboratory', array('action' => 'get-bar-sample-details')); ?>",{testResult:testResult,fromDate:fromDate,toDate:toDate,gender:searchGender,facilityId:facilityId,sampleType:sampleType,currentRegimen:currentRegimen,adherence:adherence,age:age,sampleStatus:sampleStatus},
         function(data) {
             $("#barcontainer").html(data);
         });
@@ -255,9 +264,10 @@ if(isset($searchMonth) && trim($searchMonth)!= ''){
         sampleType = $("#sampleType").val();
         currentRegimen = $("#currentRegimen").val();
         adherence = $("#adherence").val();
+        sampleStatus = $("#sampleStatus").val();
         age = $("#age").val();
         
-        $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-details')); ?>",{testResult:testResult,fromDate:fromDate,toDate:toDate,gender:searchGender,facilityId:facilityId,sampleType:sampleType,currentRegimen:currentRegimen,adherence:adherence,age:age},
+        $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-details')); ?>",{testResult:testResult,fromDate:fromDate,toDate:toDate,gender:searchGender,facilityId:facilityId,sampleType:sampleType,currentRegimen:currentRegimen,adherence:adherence,age:age,sampleStatus:sampleStatus},
         function(data) {
             $("#piecontainer").html(data);
         });
@@ -330,9 +340,10 @@ function loadSampleDataTable(){
     sampleType = $("#sampleType").val();
     currentRegimen = $("#currentRegimen").val();
     adherence = $("#adherence").val();
+    sampleStatus = $("#sampleStatus").val();
     age = $("#age").val();
     
-    $.post("<?php echo $this->url('laboratory', array('action' => 'get-filter-sample-details')); ?>",{testResult:testResult,fromDate:fromDate,toDate:toDate,gender:searchGender,facilityId:facilityId,sampleType:sampleType,currentRegimen:currentRegimen,adherence:adherence,age:age},
+    $.post("<?php echo $this->url('laboratory', array('action' => 'get-filter-sample-details')); ?>",{testResult:testResult,fromDate:fromDate,toDate:toDate,gender:searchGender,facilityId:facilityId,sampleType:sampleType,currentRegimen:currentRegimen,adherence:adherence,age:age,sampleStatus:sampleStatus},
     function(data) {
         $("#barChartCountInTable").html(data);
     });
