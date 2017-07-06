@@ -26,7 +26,7 @@ foreach($sampleType as $samples){
                                 <?php
                                 foreach($clinicName as $clinic){
                                     ?>
-                                    <option value="<?php echo base64_encode($clinic['facility_id']);?>"><?php echo $clinic['facility_name'];?></option>
+                                    <option value="<?php echo base64_encode($clinic['facility_id']);?>"><?php echo $clinic['facility_code']." - ".$clinic['facility_name'];?></option>
                                     <?php
                                 }
                                 ?>

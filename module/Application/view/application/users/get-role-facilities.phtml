@@ -2,7 +2,7 @@
 $facilities = '';
 if(isset($result) && count($result) >0){
     foreach($result as $row){
-      $facilities.='<option value="'.$row['facility_id'].'">'.ucwords($row['facility_name']).'</option>';
+      $facilities.='<option value="'.$row['facility_id'].'">'.ucwords($row['facility_name'] ." - ".$row['facility_name']).'</option>';
     }
 }
 echo $facilities;

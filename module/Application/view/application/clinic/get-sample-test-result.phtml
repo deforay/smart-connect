@@ -53,6 +53,9 @@
         series: [
             <?php
             //$name = 'female';
+            $sampleType = array();
+            $sampleType[0]['sample_name'] = 'Dry Blood Spot';
+            $sampleType[1]['sample_name'] = 'Other';
             foreach($sampleType as $sample){
                 if(isset($result[$sample['sample_name']])){
                     foreach($result[$sample['sample_name']] as $key=>$condition){

@@ -77,7 +77,7 @@ if(isset($searchMonth) && trim($searchMonth)!= ''){
                                     <?php
                                     foreach($labName as $lab){
                                     ?>
-                                        <option value="<?php echo base64_encode($lab['facility_id']);?>" <?php echo(isset($labFilter) && trim($labFilter)!= '' && $labFilter == $lab['facility_name'])?'selected="selected"':''; ?>><?php echo $lab['facility_name'];?></option>
+                                        <option value="<?php echo base64_encode($lab['facility_id']);?>" <?php echo(isset($labFilter) && trim($labFilter)!= '' && $labFilter == $lab['facility_name'])?'selected="selected"':''; ?>><?php echo $lab['facility_code']." - ".$lab['facility_name'];?></option>
                                     <?php
                                     }
                                     ?>
@@ -104,7 +104,7 @@ if(isset($searchMonth) && trim($searchMonth)!= ''){
                                     <?php
                                     foreach($clinicName as $clinic){
                                     ?>
-                                    <option value="<?php echo base64_encode($clinic['facility_id']);?>"><?php echo $clinic['facility_name'];?></option>
+                                    <option value="<?php echo base64_encode($clinic['facility_id']);?>"><?php echo $clinic['facility_code']." - ".$clinic['facility_name'];?></option>
                                     <?php
                                     }
                                     ?>
