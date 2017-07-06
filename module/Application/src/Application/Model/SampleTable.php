@@ -925,9 +925,10 @@ class SampleTable extends AbstractTableGateway {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))->columns(array('sample_code','sample_tested_datetime','result','sample_type'))
+                        ->join(array('fd'=>'facility_details'),'fd.facility_id=vl.facility_id',array('facility_name'))
                         ->join(array('rst'=>'r_sample_type'),'rst.sample_id=vl.sample_type')
                         ->where(array("vl.sample_collection_date <='" . $cDate ." 23:59:00". "'", "vl.sample_collection_date >='" . $lastThirtyDay." 00:00:00". "'"))
-                        ->where('vl.facility_id !=0');
+                        ->where(array('fd.facility_type'=>'1'));
         if(isset($parameters['clinicId']) && $parameters['clinicId']!=''){
             $sQuery = $sQuery->where('vl.facility_id="'.base64_decode(trim($parameters['clinicId'])).'"');
         }else{
@@ -983,37 +984,12 @@ class SampleTable extends AbstractTableGateway {
 
         /* Total data set length */
         $iQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))->columns(array('sample_code','sample_tested_datetime','result','sample_type'))
-                        ->join(array('rst'=>'r_sample_type'),'rst.sample_id=vl.sample_type')
-                        ->where(array("vl.sample_collection_date <='" . $cDate ." 23:59:00". "'", "vl.sample_collection_date >='" . $lastThirtyDay." 00:00:00". "'"))
-                        ->where('vl.facility_id !=0');
-        if(isset($parameters['clinicId']) && $parameters['clinicId']!=''){
-            $iQuery = $iQuery->where('vl.facility_id="'.base64_decode(trim($parameters['clinicId'])).'"');
-        }else{
-           if($logincontainer->role!= 1){
-                $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:0;
-                $iQuery = $iQuery->where('vl.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
-            } 
-        }
-        if(isset($parameters['sampleId']) && $parameters['sampleId']!=''){
-            $iQuery = $iQuery->where('vl.sample_type="'.base64_decode(trim($parameters['sampleId'])).'"');
-        }
-        if(isset($parameters['testResult']) && $parameters['testResult']!=''){
-            $iQuery = $iQuery->where('vl.result'.$parameters['testResult']);
-        }
-        
-        if(isset($parameters['gender'] ) && trim($parameters['gender'])!=''){
-            $iQuery = $iQuery->where(array("vl.patient_gender ='".$parameters['gender']."'")); 
-        }
-        if(isset($parameters['age']) && $parameters['age']!=''){
-            $age = explode("-",$parameters['age']);
-            if(isset($age[1])){
-              $iQuery = $iQuery->where(array("vl.patient_age_in_years >='".$age[0]."'","vl.patient_age_in_years <='".$age[1]."'"));
-            }else{
-              $iQuery = $iQuery->where('vl.patient_age_in_years'.$parameters['age']);
-            }
-        }
-        if(isset($parameters['adherence']) && trim($parameters['adherence'])!=''){
-            $iQuery = $iQuery->where(array("vl.arv_adherance_percentage ='".$parameters['adherence']."'")); 
+                      ->join(array('fd'=>'facility_details'),'fd.facility_id=vl.facility_id',array('facility_name'))
+                      ->join(array('rst'=>'r_sample_type'),'rst.sample_id=vl.sample_type')
+                      ->where(array('fd.facility_type'=>'1'));
+        if($logincontainer->role!= 1){
+            $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:0;
+            $iQuery = $iQuery->where('vl.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
         }
         $iQueryStr = $sql->getSqlStringForSqlObject($iQuery);
         $iResult = $dbAdapter->query($iQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -1206,6 +1182,7 @@ class SampleTable extends AbstractTableGateway {
     
     public function fetchAllTestResults($parameters) {
         $logincontainer = new Container('credo');
+        $queryContainer = new Container('query');
         /* Array of database columns which should be read and sent back to DataTables. Use a space where
          * you want to insert a non-database field (for example a counter or static image)
         */
@@ -1281,12 +1258,6 @@ class SampleTable extends AbstractTableGateway {
          * SQL queries
          * Get data to display
         */
-        $dbAdapter = $this->adapter;
-        $sql = new Sql($dbAdapter);
-        $sQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
-                                ->columns(array('vl_sample_id','sample_code','sample_collection_date','sample_type','sample_testing_date','result_value_log','result_value_absolute','result_value_text','result'))
-				->join(array('fd'=>'facility_details'),'fd.facility_id=vl.facility_id',array('facility_name'))
-				->where(array('fd.facility_type'=>'1'));
         $cDate = ''; $lastThirtyDay = '';
 	if(isset($parameters['sampleCollectionDate']) && trim($parameters['sampleCollectionDate'])!= ''){
             $s_c_date = explode("to", $parameters['sampleCollectionDate']);
@@ -1297,8 +1268,13 @@ class SampleTable extends AbstractTableGateway {
               $cDate = trim($s_c_date[1]);
             }
         }
-        if($cDate!='' && $lastThirtyDay!='')
-        {
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $sQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
+                                ->columns(array('vl_sample_id','sample_code','sample_collection_date','sample_type','sample_testing_date','result_value_log','result_value_absolute','result_value_text','result'))
+				->join(array('fd'=>'facility_details'),'fd.facility_id=vl.facility_id',array('facility_name'))
+				->where(array('fd.facility_type'=>'1'));
+        if($cDate!='' && $lastThirtyDay!=''){
             $sQuery = $sQuery->where(array("vl.sample_collection_date <='" . $cDate ." 23:59:00". "'", "vl.sample_collection_date >='" . $lastThirtyDay." 00:00:00". "'"));
         }
         if(isset($parameters['clinicId']) && $parameters['clinicId'] !=''){
@@ -1310,7 +1286,7 @@ class SampleTable extends AbstractTableGateway {
             }
         }
         if(isset($parameters['gender'] ) && trim($parameters['gender'])!=''){
-            $sQuery = $sQuery->where(array("vl.patient_gender ='".$parameters['gender']."'")); 
+            $sQuery = $sQuery->where(array("vl.patient_gender ='".$parameters['gender']."'"));
         }
         if(isset($parameters['sampleId'] ) && trim($parameters['sampleId'])!=''){
             $sQuery = $sQuery->where('vl.sample_type="'.base64_decode(trim($parameters['sampleId'])).'"');
@@ -1326,6 +1302,11 @@ class SampleTable extends AbstractTableGateway {
         if(isset($parameters['adherence']) && trim($parameters['adherence'])!=''){
             $sQuery = $sQuery->where(array("vl.arv_adherance_percentage ='".$parameters['adherence']."'")); 
         }
+        if(isset($parameters['result']) && trim($parameters['result'])=='result'){
+            $sQuery = $sQuery->where("vl.result !='' AND vl.result IS NOT NULL"); 
+        }else if(isset($parameters['result']) && trim($parameters['result'])=='noresult'){
+            $sQuery = $sQuery->where("(vl.result ='' OR vl.result IS NULL)");
+        }
         
         if (isset($sWhere) && $sWhere != "") {
             $sQuery->where($sWhere);
@@ -1334,7 +1315,7 @@ class SampleTable extends AbstractTableGateway {
         if (isset($sOrder) && $sOrder != "") {
             $sQuery->order($sOrder);
         }
-
+        $queryContainer->resultQuery = $sQuery;
         if (isset($sLimit) && isset($sOffset)) {
             $sQuery->limit($sLimit);
             $sQuery->offset($sOffset);
@@ -1352,9 +1333,14 @@ class SampleTable extends AbstractTableGateway {
         $iFilteredTotal = count($aResultFilterTotal);
 
         /* Total data set length */
-        $iQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))->columns(array('vl_sample_id'))
+        $iQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
+                                ->columns(array('vl_sample_id','sample_code','sample_collection_date','sample_type','sample_testing_date','result_value_log','result_value_absolute','result_value_text','result'))
 				->join(array('fd'=>'facility_details'),'fd.facility_id=vl.facility_id',array('facility_name'))
 				->where(array('fd.facility_type'=>'1'));
+        if($logincontainer->role!= 1){
+            $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:0;
+            $iQuery = $iQuery->where('vl.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
+        }
         $iQueryStr = $sql->getSqlStringForSqlObject($iQuery);
         $iResult = $dbAdapter->query($iQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $iTotal = count($iResult);
@@ -1369,7 +1355,7 @@ class SampleTable extends AbstractTableGateway {
 	$common = new CommonService($this->sm);
         foreach ($rResult as $aRow) {
             $row = array();
-			if(isset($aRow['sample_collection_date']) && trim($aRow['sample_collection_date'])!=""){
+	    if(isset($aRow['sample_collection_date']) && trim($aRow['sample_collection_date'])!=""){
                 $xepCollectDate=explode(" ",$aRow['sample_collection_date']);
                 $aRow['sample_collection_date']=$common->humanDateFormat($xepCollectDate[0])." ".$xepCollectDate[1];
             }
@@ -1381,10 +1367,10 @@ class SampleTable extends AbstractTableGateway {
             $row[] = $aRow['sample_collection_date'];
             $row[] = $aRow['sample_testing_date'];
 	    $row[] = $aRow['result'];
-        $display = 'show';
-        if($aRow['result']==""){
-            $display= "none";
-        }
+            $display = 'show';
+            if($aRow['result']==""){
+                $display= "none";
+            }
 	    $row[]='<a href="#" class="btn btn-primary btn-xs">View</a>&nbsp;&nbsp;<a href="javascript:void(0);" class="btn btn-danger btn-xs" style="display:'.$display.'" onclick="generateResultPDF('.$aRow['vl_sample_id'].');">PDF</a>';
             
             $output['aaData'][] = $row;

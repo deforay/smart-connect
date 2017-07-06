@@ -106,5 +106,18 @@ class ClinicController extends AbstractActionController
             return $this->getResponse()->setContent(Json::encode($result));
         }
     }
+    
+    public function exportResultExcelAction() {
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $sampleService = $this->getServiceLocator()->get('SampleService');
+            $file=$sampleService->generateResultExcel($params);
+            $viewModel = new ViewModel();
+            $viewModel->setVariables(array('file' =>$file))
+                      ->setTerminal(true);
+            return $viewModel;
+        }
+    }
 }
 
