@@ -75,11 +75,12 @@ CREATE TABLE `dash_user_facility_map` (
   `map_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
   `facility_id` int(11) NOT NULL
-)
+);
+ALTER TABLE `dash_user_facility_map` ADD PRIMARY KEY(`map_id`);
 
-ALTER TABLE `dash_user_facility_map`
-  MODIFY `map_id` int(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE `dash_user_facility_map` CHANGE `map_id` `map_id` INT(11) NOT NULL AUTO_INCREMENT;
+
   
-alter table dash_user_facility_map add FOREIGN KEY(facility_id) REFERENCES facility_details(facility_id)
+alter table dash_user_facility_map add FOREIGN KEY(facility_id) REFERENCES facility_details(facility_id);
 
-alter table dash_user_facility_map add FOREIGN KEY(user_id) REFERENCES dash_users(user_id)
+alter table dash_user_facility_map add FOREIGN KEY(user_id) REFERENCES dash_users(user_id);

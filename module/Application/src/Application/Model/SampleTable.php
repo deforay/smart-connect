@@ -226,8 +226,8 @@ class SampleTable extends AbstractTableGateway {
                                                     "total" => new Expression('COUNT(*)'),
                                                     "monthDate" => new Expression("DATE_FORMAT(DATE(sample_collection_date), '%b-%Y')"),
                                                     "GreaterThan1000" => new Expression("SUM(CASE WHEN vl.result>=1000 THEN 1 ELSE 0 END)"),
-                                                    "LesserThan1000" => new Expression("SUM(CASE WHEN vl.result<1000 THEN 1 ELSE 0 END)"),
-                                                    "TND" => new Expression("SUM(CASE WHEN vl.result='Target Not Detected' THEN 1 ELSE 0 END)"),
+                                                    "LesserThan1000" => new Expression("SUM(CASE WHEN vl.result<1000 or vl.result='Target Not Detected' THEN 1 ELSE 0 END)"),
+                                                    //"TND" => new Expression("SUM(CASE WHEN vl.result='Target Not Detected' THEN 1 ELSE 0 END)"),
                                              
                                               )
                                             );
@@ -265,7 +265,7 @@ class SampleTable extends AbstractTableGateway {
                 if($sRow["monthDate"] == null) continue;
                 
                 $result['sampleName']['VL (> 1000 cp/ml)'][$j] = $sRow["GreaterThan1000"];
-                $result['sampleName']['VL Not Detected'][$j] = $sRow["TND"];
+                //$result['sampleName']['VL Not Detected'][$j] = $sRow["TND"];
                 $result['sampleName']['VL (< 1000 cp/ml)'][$j] = $sRow["LesserThan1000"];
                 
                 $result['date'][$j] = $sRow["monthDate"];
@@ -298,16 +298,16 @@ class SampleTable extends AbstractTableGateway {
                                                     "monthDate" => new Expression("DATE_FORMAT(DATE(sample_collection_date), '%b-%Y')"),
                                                     
                                                     "MGreaterThan1000" => new Expression("SUM(CASE WHEN (vl.result>=1000 and vl.patient_gender in('m','M')) THEN 1 ELSE 0 END)"),
-                                                    "MLesserThan1000" => new Expression("SUM(CASE WHEN (vl.result<1000 and vl.patient_gender in('m','M')) THEN 1 ELSE 0 END)"),
-                                                    "MTND" => new Expression("SUM(CASE WHEN (vl.result='Target Not Detected' and vl.patient_gender in('m','M')) THEN 1 ELSE 0 END)"),
+                                                    "MLesserThan1000" => new Expression("SUM(CASE WHEN ((vl.result<1000 or vl.result='Target Not Detected') and vl.patient_gender in('m','M')) THEN 1 ELSE 0 END)"),
+                                                    //"MTND" => new Expression("SUM(CASE WHEN (vl.result='Target Not Detected' and vl.patient_gender in('m','M')) THEN 1 ELSE 0 END)"),
                                              
-                                                    "FGreaterThan1000" => new Expression("SUM(CASE WHEN vl.result>=1000 THEN 1 ELSE 0 END)"),
-                                                    "FLesserThan1000" => new Expression("SUM(CASE WHEN vl.result<1000 THEN 1 ELSE 0 END)"),
-                                                    "FTND" => new Expression("SUM(CASE WHEN vl.result='Target Not Detected' THEN 1 ELSE 0 END)"),
+                                                    "FGreaterThan1000" => new Expression("SUM(CASE WHEN vl.result>=1000 and vl.patient_gender in('f','F') THEN 1 ELSE 0 END)"),
+                                                    "FLesserThan1000" => new Expression("SUM(CASE WHEN (vl.result<1000 or vl.result='Target Not Detected') and vl.patient_gender in('f','F') THEN 1 ELSE 0 END)"),
+                                                    //"FTND" => new Expression("SUM(CASE WHEN vl.result='Target Not Detected' and vl.patient_gender in('f','F') THEN 1 ELSE 0 END)"),
 
-                                                    "OGreaterThan1000" => new Expression("SUM(CASE WHEN (vl.result>=1000 and vl.patient_gender in('m','M','f','F')) THEN 1 ELSE 0 END)"),
-                                                    "OLesserThan1000" => new Expression("SUM(CASE WHEN (vl.result<1000 and vl.patient_gender in('m','M','f','F')) THEN 1 ELSE 0 END)"),
-                                                    "OTND" => new Expression("SUM(CASE WHEN (vl.result='Target Not Detected' and vl.patient_gender in('m','M','f','F')) THEN 1 ELSE 0 END)"),
+                                                    "OGreaterThan1000" => new Expression("SUM(CASE WHEN (vl.result>=1000 and vl.patient_gender NOT in('m','M','f','F')) THEN 1 ELSE 0 END)"),
+                                                    "OLesserThan1000" => new Expression("SUM(CASE WHEN ((vl.result<1000 or vl.result='Target Not Detected') and vl.patient_gender NOT in('m','M','f','F')) THEN 1 ELSE 0 END)"),
+                                                    //"OTND" => new Expression("SUM(CASE WHEN (vl.result='Target Not Detected' and vl.patient_gender NOT in('m','M','f','F')) THEN 1 ELSE 0 END)"),
                                              
                                               )
                                             );
@@ -340,15 +340,15 @@ class SampleTable extends AbstractTableGateway {
                 if($sRow["monthDate"] == null) continue;
                 
                 $result['M']['VL (> 1000 cp/ml)'][$j] = $sRow["MGreaterThan1000"];
-                $result['M']['VL Not Detected'][$j] = $sRow["MTND"];
+                //$result['M']['VL Not Detected'][$j] = $sRow["MTND"];
                 $result['M']['VL (< 1000 cp/ml)'][$j] = $sRow["MLesserThan1000"];
  
                 $result['F']['VL (> 1000 cp/ml)'][$j] = $sRow["FGreaterThan1000"];
-                $result['F']['VL Not Detected'][$j] = $sRow["FTND"];
+                //$result['F']['VL Not Detected'][$j] = $sRow["FTND"];
                 $result['F']['VL (< 1000 cp/ml)'][$j] = $sRow["FLesserThan1000"];
 
                 $result['Not Specified']['VL (> 1000 cp/ml)'][$j] = $sRow["OGreaterThan1000"];
-                $result['Not Specified']['VL Not Detected'][$j] = $sRow["OTND"];
+                //$result['Not Specified']['VL Not Detected'][$j] = $sRow["OTND"];
                 $result['Not Specified']['VL (< 1000 cp/ml)'][$j] = $sRow["OLesserThan1000"];
                 
                 $result['date'][$j] = $sRow["monthDate"];
@@ -383,16 +383,16 @@ class SampleTable extends AbstractTableGateway {
                                                     "monthDate" => new Expression("DATE_FORMAT(DATE(sample_collection_date), '%b-%Y')"),
                                                     
                                                     "A18GreaterThan1000" => new Expression("SUM(CASE WHEN (vl.result>=1000 and patient_age_in_years > 18) THEN 1 ELSE 0 END)"),
-                                                    "A18LesserThan1000" => new Expression("SUM(CASE WHEN (vl.result<1000 and patient_age_in_years > 18) THEN 1 ELSE 0 END)"),
-                                                    "A18TND" => new Expression("SUM(CASE WHEN (vl.result='Target Not Detected' and patient_age_in_years > 18) THEN 1 ELSE 0 END)"),
+                                                    "A18LesserThan1000" => new Expression("SUM(CASE WHEN ((vl.result<1000 or vl.result='Target Not Detected') and patient_age_in_years > 18) THEN 1 ELSE 0 END)"),
+                                                    //"A18TND" => new Expression("SUM(CASE WHEN (vl.result='Target Not Detected' and patient_age_in_years > 18) THEN 1 ELSE 0 END)"),
                                              
                                                     "B18GreaterThan1000" => new Expression("SUM(CASE WHEN (vl.result>=1000 and patient_age_in_years < 18) THEN 1 ELSE 0 END)"),
-                                                    "B18LesserThan1000" => new Expression("SUM(CASE WHEN (vl.result<1000 and patient_age_in_years < 18) THEN 1 ELSE 0 END)"),
-                                                    "B18TND" => new Expression("SUM(CASE WHEN (vl.result='Target Not Detected' and patient_age_in_years < 18) THEN 1 ELSE 0 END)"),
+                                                    "B18LesserThan1000" => new Expression("SUM(CASE WHEN ((vl.result<1000 or vl.result='Target Not Detected') and patient_age_in_years < 18) THEN 1 ELSE 0 END)"),
+                                                    //"B18TND" => new Expression("SUM(CASE WHEN (vl.result='Target Not Detected' and patient_age_in_years < 18) THEN 1 ELSE 0 END)"),
 
                                                     "UnknownGreaterThan1000" => new Expression("SUM(CASE WHEN (vl.result>=1000 and (patient_age_in_years is null || patient_age_in_years = '')) THEN 1 ELSE 0 END)"),
-                                                    "UnknownLesserThan1000" => new Expression("SUM(CASE WHEN (vl.result<1000 and (patient_age_in_years is null || patient_age_in_years = '')) THEN 1 ELSE 0 END)"),
-                                                    "UnknownTND" => new Expression("SUM(CASE WHEN (vl.result='Target Not Detected' and (patient_age_in_years is null || patient_age_in_years = '')) THEN 1 ELSE 0 END)"),
+                                                    "UnknownLesserThan1000" => new Expression("SUM(CASE WHEN ((vl.result<1000 or vl.result='Target Not Detected') and (patient_age_in_years is null || patient_age_in_years = '')) THEN 1 ELSE 0 END)"),
+                                                    //"UnknownTND" => new Expression("SUM(CASE WHEN (vl.result='Target Not Detected' and (patient_age_in_years is null || patient_age_in_years = '')) THEN 1 ELSE 0 END)"),
                                              
                                               )
                                             );
@@ -426,8 +426,8 @@ class SampleTable extends AbstractTableGateway {
                 $result['>18']['VL (> 1000 cp/ml)'][$j] = $sRow["A18GreaterThan1000"];
                 $result['<18']['VL (> 1000 cp/ml)'][$j] = $sRow["B18GreaterThan1000"];
                 
-                $result['>18']['VL Not Detected'][$j] = $sRow["A18TND"];
-                $result['<18']['VL Not Detected'][$j] = $sRow["B18TND"];
+               // $result['>18']['VL Not Detected'][$j] = $sRow["A18TND"];
+              //  $result['<18']['VL Not Detected'][$j] = $sRow["B18TND"];
                 
                 $result['>18']['VL (< 1000 cp/ml)'][$j] = $sRow["A18LesserThan1000"];
                 $result['<18']['VL (< 1000 cp/ml)'][$j] = $sRow["B18LesserThan1000"];
@@ -498,10 +498,10 @@ class SampleTable extends AbstractTableGateway {
                     $greaterResult = $dbAdapter->query($lQueryStr." AND vl.result>1000", $dbAdapter::QUERY_MODE_EXECUTE)->current();
                     $result['sampleName']['VL (> 1000 cp/ml)'][$j] = $greaterTotal+$greaterResult['total'];
                     
-                    $notTargetResult = $dbAdapter->query($lQueryStr." AND 'vl.result'='Target Not Detected'", $dbAdapter::QUERY_MODE_EXECUTE)->current();
-                    $result['sampleName']['VL Not Detected'][$j] = $notTargetTotal+$notTargetResult['total'];
+                    //$notTargetResult = $dbAdapter->query($lQueryStr." AND 'vl.result' ='Target Not Detected'", $dbAdapter::QUERY_MODE_EXECUTE)->current();
+                    //$result['sampleName']['VL Not Detected'][$j] = $notTargetTotal+$notTargetResult['total'];
                     
-                    $lessResult = $dbAdapter->query($lQueryStr." AND vl.result<1000", $dbAdapter::QUERY_MODE_EXECUTE)->current();
+                    $lessResult = $dbAdapter->query($lQueryStr." AND (vl.result<1000 or vl.result ='Target Not Detected') ", $dbAdapter::QUERY_MODE_EXECUTE)->current();
                     $result['sampleName']['VL (< 1000 cp/ml)'][$j] = $lessTotal+$lessResult['total'];
                         
                     $result['lab'][$j] = $facility['facility_name'];
@@ -1589,6 +1589,7 @@ class SampleTable extends AbstractTableGateway {
                 $facilityResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
                 if($facilityResult){
                         $i = 0;
+                        $result = array();
                         foreach($facilityResult as $facility){
                                 $countQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))->columns(array('total' => new Expression('COUNT(*)')))
                                                                         ->where('vl.lab_id="'.$facility['facility_id'].'"');
@@ -1677,6 +1678,7 @@ class SampleTable extends AbstractTableGateway {
                 $facilityResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
                 if($facilityResult){
                         $j = 0;
+                        $result = array();
                         foreach($facilityResult as $facility){
                             $countQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))->columns(array('total' => new Expression('COUNT(*)')))
                                                 //->join(array('rs'=>'r_sample_type'),'rs.sample_id=vl.sample_type',array('sample_name'))

@@ -39,16 +39,19 @@
   //Starting Point is "Home", and links to other locations"//
   
   <?php
-  foreach($result as $lab)
-  {
-    ?>
-    ["<?php echo $lab['facility_name'];?>", "<?php echo $lab['latitude'];?>", "<?php echo $lab['longitude'];?>", '<?php echo $this->basePath('assets/img/lab0.png') ?>', '<strong>No. of Samples : "<?php echo $lab['labCount'];?>"</strong>'],
-    <?php
-    foreach($lab['clinic'] as $cName)
-    {
+  foreach($result as $lab){
+    if(isset($lab['latitude']) && $lab['latitude'] != null && $lab['latitude'] != '' && isset($lab['longitude']) && $lab['longitude'] != null && $lab['longitude'] != ''){
         ?>
-        ["<?php echo $cName['facility_name'];?>", "<?php echo $cName['latitude'];?>", "<?php echo $cName['longitude'];?>", '<?php echo $this->basePath('assets/img/clinic.png') ?>', '<strong>No. of Samples : "<?php echo $cName['clinicCount'];?>"</strong>'],
+        ["<?php echo $lab['facility_name'];?>", "<?php echo $lab['latitude'];?>", "<?php echo $lab['longitude'];?>", '<?php echo $this->basePath('assets/img/lab0.png') ?>', '<h5><?php echo $lab['facility_name'];?></h5><span>No. of Samples : <?php echo $lab['labCount'];?></span>'],
         <?php
+        foreach($lab['clinic'] as $cName)
+        {
+            if(isset($cName['latitude']) && $cName['latitude'] != null && $cName['latitude'] != '' && isset($cName['longitude']) && $cName['longitude'] != null && $cName['longitude'] != ''){
+                ?>
+                ["<?php echo $cName['facility_name'];?>", "<?php echo $cName['latitude'];?>", "<?php echo $cName['longitude'];?>", '<?php echo $this->basePath('assets/img/clinic.png') ?>', '<h5><?php echo $cName['facility_name'];?></h5><span>No. of Samples : <?php echo $cName['clinicCount'];?></span>'],
+                <?php
+            }
+        }
     }
   }
   ?>
@@ -71,6 +74,7 @@ function initMap() {
     }
   });
   var markers = [];
+  var prev_infowindow = false;
   var bounds = new google.maps.LatLngBounds();
   // Add the markers and infowindows to the map
   for (var i = 0; i < locations.length; i++) {
@@ -87,6 +91,11 @@ function initMap() {
     });    
     
     google.maps.event.addListener(marker, 'mouseover', function() {
+        if( prev_infowindow ) {
+           prev_infowindow.close();
+        }
+
+        prev_infowindow = this['infowindow'];
         this['infowindow'].open(map, this);
     });    
     
