@@ -54,7 +54,7 @@
             <?php
             //$name = 'female';
             $sampleType = array();
-            $sampleType[0]['sample_name'] = 'Dry Blood Spot';
+            $sampleType[0]['sample_name'] = 'DBS';
             $sampleType[1]['sample_name'] = 'Others';
             foreach($sampleType as $sample){
                 if(isset($result[$sample['sample_name']])){
@@ -75,6 +75,7 @@
             }
             ?>
         ],
+        colors: ['#ff1900','#60d18f'],
     });
     });
 </script>
