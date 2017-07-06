@@ -1435,6 +1435,7 @@ class SampleTable extends AbstractTableGateway {
                 $facilityResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
                 if($facilityResult){
                         $i = 0;
+                        $result = array();
                         foreach($facilityResult as $facility){
                                 $countQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))->columns(array('total' => new Expression('COUNT(*)')))
                                                                         ->where('vl.lab_id="'.$facility['facility_id'].'"');
@@ -1523,6 +1524,7 @@ class SampleTable extends AbstractTableGateway {
                 $facilityResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
                 if($facilityResult){
                         $j = 0;
+                        $result = array();
                         foreach($facilityResult as $facility){
                             $countQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))->columns(array('total' => new Expression('COUNT(*)')))
                                                 //->join(array('rs'=>'r_sample_type'),'rs.sample_id=vl.sample_type',array('sample_name'))
