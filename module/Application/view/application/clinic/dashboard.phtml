@@ -424,6 +424,10 @@ foreach($sampleType as $samples){
         getAllTestReason();
     }
 
+    function searchTestResultData(){
+      oTable.draw();
+    }
+    
     function fnShowHide(){
         if($('#result').val() == ''){
             oTable.column(2).visible(true);
@@ -435,7 +439,7 @@ foreach($sampleType as $samples){
             oTable.column(2).visible(false);
             oTable.column(3).visible(false);
         }
-        searchData();
+        searchTestResultData();
     }
     
     function getTestedSampleResult()
