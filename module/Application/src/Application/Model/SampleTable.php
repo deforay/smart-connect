@@ -732,9 +732,15 @@ class SampleTable extends AbstractTableGateway {
         $sql = new Sql($dbAdapter);
         $common = new CommonService($this->sm);
         if(trim($params['fromDate'])!= '' && trim($params['toDate'])!= ''){
+            $monthyear = date("Y-m");
             $startMonth = date("Y-m", strtotime(trim($params['fromDate'])));
             $endMonth = date("Y-m", strtotime(trim($params['toDate'])));
-            
+            if(strtotime($startMonth) >= strtotime($monthyear)){
+                $startMonth = $endMonth = date("Y-m", strtotime("-1 months"));
+            }else if(strtotime($endMonth) >= strtotime($monthyear)){
+               $endMonth = date("Y-m", strtotime("-1 months")); 
+            }
+            //echo $startMonth.'/'.$endMonth;die;
             $j = 0;
             $start = $month = strtotime($startMonth);
             $end = strtotime($endMonth);
@@ -768,12 +774,10 @@ class SampleTable extends AbstractTableGateway {
             //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             //echo $queryStr;die;
             $sampleResult = $common->cacheQuery($queryStr,$dbAdapter);            
-            
-            
+    
             $result = array();
             $j=0;
             foreach($sampleResult as $sRow){
-                
                 if($sRow["monthDate"] == null) continue;
                 
                 $result['all'][$j] = (isset($sRow["AvgDiff"]) && $sRow["AvgDiff"] > 0 && $sRow["AvgDiff"] != NULL) ? round($sRow["AvgDiff"],2) : "null";
