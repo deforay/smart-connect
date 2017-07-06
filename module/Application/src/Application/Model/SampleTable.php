@@ -1464,10 +1464,10 @@ class SampleTable extends AbstractTableGateway {
                                 {
                                     $result[$sample['sample_name']]['VL (< 1000 cp/ml)'][$j] = $lessTotal+$lessResult[$i]['total'];
                                 }else{
-                                    if(isset($result['other']['VL (< 1000 cp/ml)'][$j])){
-                                        $result['other']['VL (< 1000 cp/ml)'][$j] = $result['other']['VL (< 1000 cp/ml)'][$j]+$lessTotal+$lessResult[$i]['total'];
+                                    if(isset($result['Other']['VL (< 1000 cp/ml)'][$j])){
+                                        $result['Other']['VL (< 1000 cp/ml)'][$j] = $result['Other']['VL (< 1000 cp/ml)'][$j]+$lessTotal+$lessResult[$i]['total'];
                                     }else{
-                                        $result['other']['VL (< 1000 cp/ml)'][$j] = $lessTotal+$lessResult[$i]['total'];
+                                        $result['Other']['VL (< 1000 cp/ml)'][$j] = $lessTotal+$lessResult[$i]['total'];
                                     }
                                 }
                             }
@@ -1507,10 +1507,10 @@ class SampleTable extends AbstractTableGateway {
                                 {
                                 $result[$sample['sample_name']]['VL (> 1000 cp/ml)'][$j] = $greaterTotal+$greaterResult[$i]['total'];
                                 }else{
-                                    if(isset($result['other']['VL (> 1000 cp/ml)'][$j])){
-                                        $result['other']['VL (> 1000 cp/ml)'][$j] = $result['other']['VL (> 1000 cp/ml)'][$j]+$greaterTotal+$greaterResult[$i]['total'];
+                                    if(isset($result['Other']['VL (> 1000 cp/ml)'][$j])){
+                                        $result['Other']['VL (> 1000 cp/ml)'][$j] = $result['Other']['VL (> 1000 cp/ml)'][$j]+$greaterTotal+$greaterResult[$i]['total'];
                                     }else{
-                                        $result['other']['VL (> 1000 cp/ml)'][$j] = $greaterTotal+$greaterResult[$i]['total'];
+                                        $result['Other']['VL (> 1000 cp/ml)'][$j] = $greaterTotal+$greaterResult[$i]['total'];
                                     }
                                 }
                             }
@@ -1550,10 +1550,10 @@ class SampleTable extends AbstractTableGateway {
                                 {
                                 $result[$sample['sample_name']]['VL Not Detected'][$j] = $notTargetTotal+$notTargetResult[$i]['total'];
                                 }else{
-                                    if(isset($result['other']['VL Not Detected'][$j])){
-                                        $result['other']['VL Not Detected'][$j] = $result['other']['VL Not Detected'][$j]+$notTargetTotal+$notTargetResult[$i]['total'];
+                                    if(isset($result['Other']['VL Not Detected'][$j])){
+                                        $result['Other']['VL Not Detected'][$j] = $result['Other']['VL Not Detected'][$j]+$notTargetTotal+$notTargetResult[$i]['total'];
                                     }else{
-                                        $result['other']['VL Not Detected'][$j] = $notTargetTotal+$notTargetResult[$i]['total'];
+                                        $result['Other']['VL Not Detected'][$j] = $notTargetTotal+$notTargetResult[$i]['total'];
                                     }
                                 }
                                 //\Zend\Debug\Debug::dump($result);
