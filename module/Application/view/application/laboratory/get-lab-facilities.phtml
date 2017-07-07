@@ -8,29 +8,33 @@
         <?php
   foreach($result as $lab)
   {
-    ?>
-    {
-    lat: "<?php echo $lab['latitude'];?>",
-    lon:  "<?php echo $lab['longitude'];?>",
-    title: "<?php echo $lab['facility_name'];?>",
-    html: '<h3><?php echo $lab['facility_name'];?></h3>',
-    draggable: false
-    },
+    if(isset($lab['latitude']) && $lab['latitude'] != null && $lab['latitude'] != '' && isset($lab['longitude']) && $lab['longitude'] != null && $lab['longitude'] != ''){
+        ?>
+        {
+            lat: "<?php echo $lab['latitude'];?>",
+            lon:  "<?php echo $lab['longitude'];?>",
+            title: "<?php echo $lab['facility_name'];?>",
+            html: '<h3><?php echo $lab['facility_name'];?></h3>',
+            draggable: false
+        },
     <?php
+    }
   
     foreach($lab['clinic'] as $cName)
     {
+        if(isset($cName['latitude']) && $cName['latitude'] != null && $cName['latitude'] != '' && isset($cName['longitude']) && $cName['longitude'] != null && $cName['longitude'] != ''){
         ?>
-        {
-        lat: "<?php echo $cName['latitude'];?>",
-        lon: "<?php echo $cName['longitude'];?>",
-        title: "<?php echo $cName['facility_name'];?>",
-        html: "<h3><?php echo $cName['facility_name'];?></h3>",
-        zoom: 8,
-        visible: true,
-        draggable: false
-        },
+            {
+                lat: "<?php echo $cName['latitude'];?>",
+                lon: "<?php echo $cName['longitude'];?>",
+                title: "<?php echo $cName['facility_name'];?>",
+                html: "<h3><?php echo $cName['facility_name'];?></h3>",
+                zoom: 8,
+                visible: true,
+                draggable: false
+            },
         <?php
+        }
     }
   }
   ?>
@@ -96,13 +100,14 @@ function initMap() {
         }
 
         prev_infowindow = this['infowindow'];
+        setTimeout("this['infowindow'].close()", 3000)
         this['infowindow'].open(map, this);
     });    
     
     markers.push(marker);
     bounds.extend(marker.getPosition());
     if (i > 0) {
-      var sitepath = new google.maps.Polyline({
+      var sitepath = new google.maps.Map({
         path: [markers[0].getPosition(), marker.getPosition()],
         geodesic: true,
         strokeColor: '#F00',
