@@ -1655,7 +1655,7 @@ class SampleTable extends AbstractTableGateway {
                                 }else if($params['sampleStatus'] == 'samples_not_tested') {
                                   $countQuery = $countQuery->where("vl.result = 'NULL' or vl.result = null or vl.result = ''");
                                 }else if($params['sampleStatus'] == 'rejected') {
-                                  $countQuery = $countQuery->where("vl.result_status = '4'");
+                                  $countQuery = $countQuery->where("vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != 0");
                                 }
                             }
                                 
@@ -1754,7 +1754,7 @@ class SampleTable extends AbstractTableGateway {
                                 }else if($params['sampleStatus'] == 'samples_not_tested') {
                                   $countQuery = $countQuery->where("vl.result = 'NULL' or vl.result = null or vl.result = ''");
                                 }else if($params['sampleStatus'] == 'rejected') {
-                                  $countQuery = $countQuery->where("vl.reason_for_sample_rejection ! = '' AND vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != 0");
+                                  $countQuery = $countQuery->where("vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != 0");
                                 }
                             }
                             $cQueryStr = $sql->getSqlStringForSqlObject($countQuery);
