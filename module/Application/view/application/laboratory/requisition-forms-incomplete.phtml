@@ -90,6 +90,8 @@ if(isset($searchMonth) && trim($searchMonth)!= ''){
 
 <script>
     function generatePieContainer(){
+        $.blockUI.defaults.css.border = '1px solid grey';
+        $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
         fromDate = $('#mrp-lowerDate').val();
         toDate = $('#mrp-upperDate').val();
         lab = $("#labName").val();
@@ -101,6 +103,8 @@ if(isset($searchMonth) && trim($searchMonth)!= ''){
     }
     
     function generateChartContainer(){
+        $.blockUI.defaults.css.border = '1px solid grey';
+        $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
         fromDate = $('#mrp-lowerDate').val();
         toDate = $('#mrp-upperDate').val();
         lab = $("#labName").val();
@@ -122,7 +126,6 @@ if(isset($searchMonth) && trim($searchMonth)!= ''){
                 generateChartContainer();
             });
         }); 
-        
       generatePieContainer();
       generateChartContainer();
     });

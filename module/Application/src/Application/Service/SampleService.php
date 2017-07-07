@@ -392,9 +392,14 @@ class SampleService {
         return $sampleDb->fetchSampleDetails($params);
     }
     
-     public function getBarSampleDetails($params){
+    public function getBarSampleDetails($params){
         $sampleDb = $this->sm->get('SampleTable');
         return $sampleDb->fetchBarSampleDetails($params);
+    }
+    
+    public function getLabFilterSampleDetails($params){
+        $sampleDb = $this->sm->get('SampleTable');
+        return $sampleDb->fetchLabFilterSampleDetails($params);
     }
     
     public function getFilterSampleDetails($params){

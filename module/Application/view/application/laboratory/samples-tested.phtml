@@ -172,7 +172,7 @@ if(isset($searchMonth) && trim($searchMonth)!= ''){
                                 <option value="all">All Samples</option>
                                 <option value="sample_tested">Samples Tested</option>
                                 <option value="samples_not_tested">Samples Not Tested</option>
-                                <option value="rejected">Samples Rejected</option>
+                                <option value="sample_rejected">Samples Rejected</option>
                               </select>
                             </div>
                             <div class="form-group col-lg-4">
@@ -237,18 +237,20 @@ if(isset($searchMonth) && trim($searchMonth)!= ''){
 <script>
     
     function generateBarContainer() {
+        $.blockUI.defaults.css.border = '1px solid grey';
+        $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
         searchGender = '<?php echo $searchGender ?>';
         fromDate = $('#mrp-lowerDate').val();
         toDate = $('#mrp-upperDate').val();
         testResult = $("#testResult").val();
-        facilityId = $("#labName").val();
+        lab = $("#labName").val();
+        clinicId = $("#clinicId").val();
         sampleType = $("#sampleType").val();
         currentRegimen = $("#currentRegimen").val();
         adherence = $("#adherence").val();
-        sampleStatus = $("#sampleStatus").val();
         age = $("#age").val();
-        
-        $.post("<?php echo $this->url('laboratory', array('action' => 'get-bar-sample-details')); ?>",{testResult:testResult,fromDate:fromDate,toDate:toDate,gender:searchGender,facilityId:facilityId,sampleType:sampleType,currentRegimen:currentRegimen,adherence:adherence,age:age,sampleStatus:sampleStatus},
+        sampleStatus = $("#sampleStatus").val();
+        $.post("<?php echo $this->url('laboratory', array('action' => 'get-bar-sample-details')); ?>",{testResult:testResult,fromDate:fromDate,toDate:toDate,gender:searchGender,lab:lab,clinicId:clinicId,sampleType:sampleType,currentRegimen:currentRegimen,adherence:adherence,age:age,sampleStatus:sampleStatus},
         function(data) {
             $("#barcontainer").html(data);
         });
@@ -256,18 +258,20 @@ if(isset($searchMonth) && trim($searchMonth)!= ''){
     
     
     function generatePieContainer(){
+        $.blockUI.defaults.css.border = '1px solid grey';
+        $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
         searchGender = '<?php echo $searchGender ?>';
         fromDate = $('#mrp-lowerDate').val();
         toDate = $('#mrp-upperDate').val();
         testResult = $("#testResult").val();
-        facilityId = $("#labName").val();
+        lab = $("#labName").val();
+        clinicId = $("#clinicId").val();
         sampleType = $("#sampleType").val();
         currentRegimen = $("#currentRegimen").val();
         adherence = $("#adherence").val();
-        sampleStatus = $("#sampleStatus").val();
         age = $("#age").val();
-        
-        $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-details')); ?>",{testResult:testResult,fromDate:fromDate,toDate:toDate,gender:searchGender,facilityId:facilityId,sampleType:sampleType,currentRegimen:currentRegimen,adherence:adherence,age:age,sampleStatus:sampleStatus},
+        sampleStatus = $("#sampleStatus").val();
+        $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-details')); ?>",{testResult:testResult,fromDate:fromDate,toDate:toDate,gender:searchGender,lab:lab,clinicId:clinicId,sampleType:sampleType,currentRegimen:currentRegimen,adherence:adherence,age:age,sampleStatus:sampleStatus},
         function(data) {
             $("#piecontainer").html(data);
         });
@@ -295,59 +299,44 @@ if(isset($searchMonth) && trim($searchMonth)!= ''){
 function searchSampleTestedResult(){
     generatePieContainer();
     generateBarContainer();
-    loadSampleDataTable();
-    //oTable.fnDraw();
+    oTable.fnDraw();
 }
 
 function loadSampleDataTable(){
-    //oTable = $('#sampleDataTable').dataTable({
-    //        "bAutoWidth": false,
-    //        "bProcessing": true,
-    //        "bServerSide": true,
-    //        "aoColumns": [
-    //            {"sClass":"center"},
-    //            {"sClass":"center","bSortable":false},
-    //            {"sClass":"center"},
-    //            {"sClass":"center"}
-    //        ],
-    //        "aaSorting": [[ 0, "desc" ]],
-    //        "sAjaxSource": "<?php echo $this->url('laboratory',array('action' => 'get-filter-sample-details')); ?>",
-    //        "fnServerData": function ( sSource, aoData, fnCallback ) {
-    //            aoData.push({"name": "searchGender", "value": '<?php echo $searchGender ?>'});
-    //            aoData.push({"name": "fromDate", "value": $('#mrp-lowerDate').val()});
-    //            aoData.push({"name": "toDate", "value": $('#mrp-upperDate').val()});
-    //            aoData.push({"name": "testResult", "value": $('#testResult').val()});
-    //            aoData.push({"name": "clinic", "value": $('#clinicId').val()});
-    //            aoData.push({"name": "lab", "value": $('#labName').val()});
-    //            aoData.push({"name": "sampleType", "value": $('#sampleType').val()});
-    //            aoData.push({"name": "currentRegimen", "value": $('#currentRegimen').val()});
-    //            aoData.push({"name": "adherence", "value": $('#adherence').val()});
-    //            aoData.push({"name": "age", "value": $('#age').val()});
-    //            $.ajax({
-    //                "dataType": 'json',
-    //                "type": "POST",
-    //                "url": sSource,
-    //                "data": aoData,
-    //                "success": fnCallback
-    //            });
-    //        }
-    //    } );
-    searchGender = '<?php echo $searchGender ?>';
-    fromDate = $('#mrp-lowerDate').val();
-    toDate = $('#mrp-upperDate').val();
-    testResult = $("#testResult").val();
-    facilityId = $("#labName").val();
-    sampleType = $("#sampleType").val();
-    currentRegimen = $("#currentRegimen").val();
-    adherence = $("#adherence").val();
-    sampleStatus = $("#sampleStatus").val();
-    age = $("#age").val();
-    
-    $.post("<?php echo $this->url('laboratory', array('action' => 'get-filter-sample-details')); ?>",{testResult:testResult,fromDate:fromDate,toDate:toDate,gender:searchGender,facilityId:facilityId,sampleType:sampleType,currentRegimen:currentRegimen,adherence:adherence,age:age,sampleStatus:sampleStatus},
-    function(data) {
-        $("#barChartCountInTable").html(data);
-    });
-    
+    $.blockUI.defaults.css.border = '1px solid grey';
+    $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
+    oTable = $('#sampleDataTable').dataTable({
+        "bAutoWidth": false,
+        "bProcessing": true,
+        "bServerSide": true,
+        "aoColumns": [
+            {"sClass":"center"},
+            {"sClass":"center","bSortable":false},
+            {"sClass":"center","bSortable":false},
+            {"sClass":"center","bSortable":false}
+        ],
+        "aaSorting": [[ 0, "desc" ]],
+        "sAjaxSource": "<?php echo $this->url('laboratory',array('action' => 'get-filter-sample-details')); ?>",
+        "fnServerData": function ( sSource, aoData, fnCallback ) {
+            aoData.push({"name": "fromDate", "value": $('#mrp-lowerDate').val()});
+            aoData.push({"name": "toDate", "value": $('#mrp-upperDate').val()});
+            aoData.push({"name": "lab", "value": $('#labName').val()});
+            aoData.push({"name": "clinicId", "value": $('#clinicId').val()});
+            aoData.push({"name": "sampleType", "value": $('#sampleType').val()});
+            aoData.push({"name": "currentRegimen", "value": $('#currentRegimen').val()});
+            aoData.push({"name": "adherence", "value": $('#adherence').val()});
+            aoData.push({"name": "age", "value": $('#age').val()});
+            aoData.push({"name": "testResult", "value": $('#testResult').val()});
+            aoData.push({"name": "sampleStatus", "value": $('#sampleStatus').val()});
+            $.ajax({
+                "dataType": 'json',
+                "type": "POST",
+                "url": sSource,
+                "data": aoData,
+                "success": fnCallback
+            });
+        }
+    } );
 }
 
 var MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];

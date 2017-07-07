@@ -272,7 +272,7 @@ class LaboratoryController extends AbstractActionController
             $sampleService = $this->getServiceLocator()->get('SampleService');
             $result = $sampleService->getSampleDetails($params);
             $viewModel = new ViewModel();
-            $viewModel->setVariables(array('result' => $result))
+            $viewModel->setVariables(array('params'=>$params,'result' => $result))
                         ->setTerminal(true);
             return $viewModel;
         }
@@ -286,29 +286,29 @@ class LaboratoryController extends AbstractActionController
             $sampleService = $this->getServiceLocator()->get('SampleService');
             $result = $sampleService->getBarSampleDetails($params);
             $viewModel = new ViewModel();
-            $viewModel->setVariables(array('result' => $result))
+            $viewModel->setVariables(array('params'=>$params,'result' => $result))
                         ->setTerminal(true);
             return $viewModel;
         }
     }
     
-    public function getFilterSampleDetailsAction(){
-        //$request = $this->getRequest();
-        //if ($request->isPost()) {
-        //    $params = $request->getPost();
-        //    $sampleService = $this->getServiceLocator()->get('SampleService');
-        //    $result = $sampleService->getFilterSampleDetails($params);
-        //    return $this->getResponse()->setContent(Json::encode($result));
-        //}
+    public function getLabFilterSampleDetailsAction(){
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
             $sampleService = $this->getServiceLocator()->get('SampleService');
-            $result = $sampleService->getBarSampleDetails($params);
-            $viewModel = new ViewModel();
-            $viewModel->setVariables(array('result' => $result))
-                        ->setTerminal(true);
-            return $viewModel;
+            $result = $sampleService->getLabFilterSampleDetails($params);
+            return $this->getResponse()->setContent(Json::encode($result));
+        }
+    }
+    
+    public function getFilterSampleDetailsAction(){
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $sampleService = $this->getServiceLocator()->get('SampleService');
+            $result = $sampleService->getFilterSampleDetails($params);
+            return $this->getResponse()->setContent(Json::encode($result));
         }
     }
     
@@ -391,6 +391,33 @@ class LaboratoryController extends AbstractActionController
             return $viewModel;
         }
     }
+    public function sampleVolumeAction(){
+        $this->layout()->setVariable('activeTab', 'labs-dashboard');
+        $labFilter="";
+        $sampleStatus="";
+        if($this->params()->fromQuery('lab')){
+            $labFilter=$this->params()->fromQuery('lab');
+        }
+        if($this->params()->fromQuery('result')){
+            $sampleStatus=$this->params()->fromQuery('result');
+        }
+        $sampleService = $this->getServiceLocator()->get('SampleService');
+        $labName = $sampleService->getAllLabName();
+        $clinicName = $sampleService->getAllClinicName();
+        $hubName = $sampleService->getAllHubName();
+        $sampleType = $sampleService->getSampleType();
+        $currentRegimen = $sampleService->getAllCurrentRegimen();
+        return new ViewModel(array(
+            'sampleType' => $sampleType,
+            'labName' => $labName,
+            'clinicName' => $clinicName,
+            'hubName' => $hubName,
+            'currentRegimen' => $currentRegimen,
+            'labFilter' => $labFilter,
+            'sampleStatus' => $sampleStatus
+        ));
+    }
+    
     public function getFemalePatientResultAction()
     {
         $request = $this->getRequest();

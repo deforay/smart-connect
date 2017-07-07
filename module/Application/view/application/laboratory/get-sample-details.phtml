@@ -1,6 +1,3 @@
-<?php
-//\Zend\Debug\Debug::dump($result);die;
-?>
 <script>
        $(function () {
         $('#piecontainer').highcharts({
@@ -11,7 +8,7 @@
             type: 'pie'
         },
         title: {
-            text: 'VL Samples Tested'
+            text: '<?php echo(isset($params['fromSrc']) && $params['fromSrc'] == 'sampleVolume')?'Sample Volume':'VL Samples Tested'; ?>'
         },
         
         credits: {
