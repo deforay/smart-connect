@@ -842,5 +842,7 @@ function paintMonths(){
     return Math.round(((val)+ 0.00001) * 100) / 100;
   }
   
-  
-        </script>
+  function doRedirect(lab){
+    window.open('/labs/sample-volume?fromMonth='+$('#mrp-lowerDate').val()+'&toMonth='+$('#mrp-upperDate').val()+'&lab='+lab+'&result='+$("#sampleStatus").val(), '_blank');
+  }
+</script>
