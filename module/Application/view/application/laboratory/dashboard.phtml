@@ -331,7 +331,7 @@ foreach($sampleType as $samples){
 
                     </div>
                     <div class="row">
-                        <div class="col-md-4 col-sm-4">
+                        <div class="col-md-6 col-sm-6">
                             <div class="portlet box blue">
                                 <div class="portlet-title">
                                     <div class="caption">
@@ -339,6 +339,17 @@ foreach($sampleType as $samples){
                                     </div>
                                 </div>
                                 <div class="portlet-body" id="femalePatientPieChart">
+                                </div>
+                            </div>                            
+                        </div>
+                        <div class="col-md-6 col-sm-6">
+                            <div class="portlet box blue">
+                                <div class="portlet-title">
+                                    <div class="caption">
+                                        <span class="caption-subject">Line Of Treatment</span>
+                                    </div>
+                                </div>
+                                <div class="portlet-body" id="lineOfTreatmentPieChart">
                                 </div>
                             </div>                            
                         </div>
@@ -448,14 +459,21 @@ foreach($sampleType as $samples){
             });
         }
         function femalePatient(){
-            
-            sampleType = $("#sampleVolume").val();
             facilityId = $("#labName").val();
             fromDate=$('#mrp-lowerDate').val();
             toDate=$('#mrp-upperDate').val();
-            $.post("<?php echo $this->url('laboratory', array('action' => 'get-female-patient-result')); ?>",{fromDate:fromDate,toDate:toDate,sampleType:sampleType,facilityId:facilityId},
+            $.post("<?php echo $this->url('laboratory', array('action' => 'get-female-patient-result')); ?>",{fromDate:fromDate,toDate:toDate,facilityId:facilityId},
             function(data) {
             $("#femalePatientPieChart").html(data);
+            });
+        }
+        function lineOfTreatment(){
+            facilityId = $("#labName").val();
+            fromDate=$('#mrp-lowerDate').val();
+            toDate=$('#mrp-upperDate').val();
+            $.post("<?php echo $this->url('laboratory', array('action' => 'get-line-of-treatment')); ?>",{fromDate:fromDate,toDate:toDate,facilityId:facilityId},
+            function(data) {
+            $("#lineOfTreatmentPieChart").html(data);
             });
         }
         function getAverageLabTAT()
@@ -503,6 +521,7 @@ foreach($sampleType as $samples){
             getTestedSampleResultBasedGender();
             getTestedSampleResultBasedAge();
             femalePatient();
+            lineOfTreatment();
         }
             
 var MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];

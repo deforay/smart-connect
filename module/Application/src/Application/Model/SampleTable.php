@@ -766,6 +766,45 @@ class SampleTable extends AbstractTableGateway {
             return $femaleTestResult;
         }
     }
+    //get female result
+    public function getLineOfTreatment($params){
+        
+        $logincontainer = new Container('credo');
+        $result = array();
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $common = new CommonService($this->sm);
+        if(trim($params['fromDate'])!= '' && trim($params['toDate'])!= ''){
+            $startMonth = date("Y-m", strtotime(trim($params['fromDate'])));
+            $endMonth = date("Y-m", strtotime(trim($params['toDate'])));
+            $start = $month = strtotime($startMonth);
+            $end = strtotime($endMonth);
+            $queryStr = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
+                                    ->columns(array(
+                                                    "Line_Of_Treatment_1" => new Expression("SUM(CASE WHEN (line_of_treatment = 1) THEN 1 ELSE 0 END)"),
+                                                    "Line_Of_Treatment_2" => new Expression("SUM(CASE WHEN (line_of_treatment = 2) THEN 1 ELSE 0 END)"),
+                                                    "Line_Of_Treatment_3" => new Expression("SUM(CASE WHEN (line_of_treatment = 3) THEN 1 ELSE 0 END)"),
+                                                    "Not_Specified" => new Expression("SUM(CASE WHEN (line_of_treatment!=1 AND line_of_treatment!=2 AND line_of_treatment!=3) THEN 1 ELSE 0 END)"),
+                                              )
+                                            );
+            if(isset($params['facilityId']) && $params['facilityId'] !=''){
+                $queryStr = $queryStr->where(array("vl.lab_id ='".base64_decode($params['facilityId'])."'")); 
+            }else{
+                if($logincontainer->role!= 1){
+                    $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:0;
+                    $queryStr = $queryStr->where('vl.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
+                }
+            }
+            $queryStr = $queryStr->where("
+                        (sample_collection_date is not null AND sample_collection_date != '')
+                        AND DATE(sample_collection_date) >= '".$startMonth."-00' 
+                        AND DATE(sample_collection_date) <= '".$endMonth."-00'");
+                         
+            $queryStr = $sql->getSqlStringForSqlObject($queryStr);
+            $lineOfTreatmentResult = $common->cacheQuery($queryStr,$dbAdapter);
+            return $lineOfTreatmentResult;
+        }
+    }
     
     public function fetchLabTurnAroundTime($params){
         $logincontainer = new Container('credo');
