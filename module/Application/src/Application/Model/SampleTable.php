@@ -1397,182 +1397,84 @@ class SampleTable extends AbstractTableGateway {
             }
         }
         
-        $rsQuery = $sql->select()->from(array('rs'=>'r_sample_type'))->where(array('rs.status="active"'));
-        if(isset($params['sampleType']) && trim($params['sampleType'])!=''){
-            $rsQuery = $rsQuery->where('rs.sample_id="'.base64_decode(trim($params['sampleType'])).'"');
-        }
-        $rsQueryStr = $sql->getSqlStringForSqlObject($rsQuery);
-        $sampleTypeResult = $dbAdapter->query($rsQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-        if($sampleTypeResult){
-            //set datewise query
-            $sResult = $this->getClinicDistinctDate($cDate,$lastThirtyDay);
-            $j = 0;
-            if($sResult){
-                foreach($sResult as $sampleData){
-                    if($sampleData['year']!=NULL){
-                        $date = $sampleData['year']."-".$sampleData['month']."-".$sampleData['day'];
-                        $dFormat = date("d M", strtotime($date));
-                        $i = 0;
-                        $lessTotal = 0;$greaterTotal = 0;$notTargetTotal = 0;
-                        foreach($sampleTypeResult as $sample){
-                            if(isset($params['testResult']) && ($params['testResult']=="" || $params['testResult']=='<1000')){
-                                $lessThanQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))->columns(array('total' => new Expression('COUNT(*)')))
-                                                ->join(array('fd'=>'facility_details'),'fd.facility_id=vl.facility_id',array('facility_name'))
-                                                ->where(array('fd.facility_type'=>'1'))
-                                                ->where(array("vl.sample_collection_date >='" . $date ." 00:00:00". "'", "vl.sample_collection_date <='" . $date." 23:59:00". "'"))
-                                                ->where('vl.sample_type="'.$sample['sample_id'].'"')
-                                                ->where(array('vl.result<1000'));
-                                if($params['facilityId'] !=''){
-                                    $lessThanQuery = $lessThanQuery->where(array("vl.facility_id ='".base64_decode($params['facilityId'])."'")); 
-                                }else{
-                                    if($logincontainer->role!= 1){
-                                        $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:0;
-                                        $lessThanQuery = $lessThanQuery->where('vl.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
-                                    }
-                                }
-                                if(isset($params['gender'] ) && trim($params['gender'])!=''){
-                                    $lessThanQuery = $lessThanQuery->where(array("vl.patient_gender ='".$params['gender']."'")); 
-                                }
-                                if(isset($params['age']) && trim($params['age'])!=''){
-                                    $expAge=explode("-",$params['age']);
-                                    if(trim($expAge[0])!="" && trim($expAge[1])!=""){
-                                        $lessThanQuery=$lessThanQuery->where("(vl.patient_age_in_years>='".$expAge[0]."' AND vl.patient_age_in_years<='".$expAge[1]."')");
-                                    }else{
-                                        $lessThanQuery = $lessThanQuery->where(array("vl.patient_age_in_years >'".$expAge[0]."'"));
-                                    }
-                                }
-                                if(isset($params['adherence']) && trim($params['adherence'])!=''){
-                                    $lessThanQuery = $lessThanQuery->where(array("vl.arv_adherance_percentage ='".$params['adherence']."'")); 
-                                }
-                                $lQueryStr = $sql->getSqlStringForSqlObject($lessThanQuery);
-                                $lessResult[$i] = $dbAdapter->query($lQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-                                if($sample['sample_name']=='Dry Blood Spot')
-                                {
-                                    $result[$sample['sample_name']]['VL (< 1000 cp/ml)'][$j] = $lessTotal+$lessResult[$i]['total'];
-                                }else{
-                                    if(isset($result['Others']['VL (< 1000 cp/ml)'][$j])){
-                                        $result['Others']['VL (< 1000 cp/ml)'][$j] = $result['Others']['VL (< 1000 cp/ml)'][$j]+$lessTotal+$lessResult[$i]['total'];
-                                    }else{
-                                        $result['Others']['VL (< 1000 cp/ml)'][$j] = $lessTotal+$lessResult[$i]['total'];
-                                    }
-                                }
-                            }
-                            
-                            if(isset($params['testResult']) && ($params['testResult']=="" || $params['testResult']=='>1000')){
-                                $greaterThanQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))->columns(array('total' => new Expression('COUNT(*)')))
-                                                    ->join(array('fd'=>'facility_details'),'fd.facility_id=vl.facility_id',array('facility_name'))
-                                                    ->where(array('fd.facility_type'=>'1'))
-                                                    ->where(array("vl.sample_collection_date >='" . $date ." 00:00:00". "'", "vl.sample_collection_date <='" . $date." 23:59:00". "'"))
-                                                    ->where('vl.sample_type="'.$sample['sample_id'].'"')
-                                                    ->where(array('vl.result>1000'));
-                                if($params['facilityId'] !=''){
-                                    $greaterThanQuery = $greaterThanQuery->where(array("vl.facility_id ='".base64_decode($params['facilityId'])."'")); 
-                                }else{
-                                    if($logincontainer->role!= 1){
-                                        $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:0;
-                                        $greaterThanQuery = $greaterThanQuery->where('vl.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
-                                    }
-                                }
-                                if(isset($params['gender'] ) && trim($params['gender'])!=''){
-                                    $greaterThanQuery = $greaterThanQuery->where(array("vl.patient_gender ='".$params['gender']."'")); 
-                                }
-                                if(isset($params['age']) && trim($params['age'])!=''){
-                                    $expAge=explode("-",$params['age']);
-                                    if(trim($expAge[0])!="" && trim($expAge[1])!=""){
-                                        $greaterThanQuery=$greaterThanQuery->where("(vl.patient_age_in_years>='".$expAge[0]."' AND vl.patient_age_in_years<='".$expAge[1]."')");
-                                    }else{
-                                        $greaterThanQuery = $greaterThanQuery->where(array("vl.patient_age_in_years >'".$expAge[0]."'"));
-                                    }
-                                }
-                                if(isset($params['adherence']) && trim($params['adherence'])!=''){
-                                    $greaterThanQuery = $greaterThanQuery->where(array("vl.arv_adherance_percentage ='".$params['adherence']."'")); 
-                                }
-                                $gQueryStr = $sql->getSqlStringForSqlObject($greaterThanQuery);
-                                $greaterResult[$i] = $dbAdapter->query($gQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-                                if($sample['sample_name']=='Dry Blood Spot')
-                                {
-                                $result[$sample['sample_name']]['VL (> 1000 cp/ml)'][$j] = $greaterTotal+$greaterResult[$i]['total'];
-                                }else{
-                                    if(isset($result['Others']['VL (> 1000 cp/ml)'][$j])){
-                                        $result['Others']['VL (> 1000 cp/ml)'][$j] = $result['Others']['VL (> 1000 cp/ml)'][$j]+$greaterTotal+$greaterResult[$i]['total'];
-                                    }else{
-                                        $result['Others']['VL (> 1000 cp/ml)'][$j] = $greaterTotal+$greaterResult[$i]['total'];
-                                    }
-                                }
-                            }
-                            
-                            if(isset($params['testResult']) && $params['testResult']==""){
-                                $notDetectQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))->columns(array('total' => new Expression('COUNT(*)')))
-                                                ->join(array('fd'=>'facility_details'),'fd.facility_id=vl.facility_id',array('facility_name'))
-                                                ->where(array('fd.facility_type'=>'1'))
-                                                ->where(array("vl.sample_collection_date >='" . $date ." 00:00:00". "'", "vl.sample_collection_date <='" . $date." 23:59:00". "'"))
-                                                ->where('vl.sample_type="'.$sample['sample_id'].'"')
-                                                ->where(array('vl.result'=>'Target Not Detected'));
-                                if($params['facilityId'] !=''){
-                                    $notDetectQuery = $notDetectQuery->where(array("vl.facility_id ='".base64_decode($params['facilityId'])."'")); 
-                                }else{
-                                    if($logincontainer->role!= 1){
-                                        $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:0;
-                                        $notDetectQuery = $notDetectQuery->where('vl.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
-                                    }
-                                }
-                                if($params['gender'] !=''){
-                                    $notDetectQuery = $notDetectQuery->where(array("vl.patient_gender ='".$params['gender']."'")); 
-                                }
-                                if(isset($params['age']) && trim($params['age'])!=''){
-                                    $expAge=explode("-",$params['age']);
-                                    if(trim($expAge[0])!="" && trim($expAge[1])!=""){
-                                        $notDetectQuery=$notDetectQuery->where("(vl.patient_age_in_years>='".$expAge[0]."' AND vl.patient_age_in_years<='".$expAge[1]."')");
-                                    }else{
-                                        $notDetectQuery = $notDetectQuery->where(array("vl.patient_age_in_years >'".$expAge[0]."'"));
-                                    }
-                                }
-                                if(isset($params['adherence']) && trim($params['adherence'])!=''){
-                                    $notDetectQuery = $notDetectQuery->where(array("vl.arv_adherance_percentage ='".$params['adherence']."'")); 
-                                }
-                                $nQueryStr = $sql->getSqlStringForSqlObject($notDetectQuery);
-                                $notTargetResult[$i] = $dbAdapter->query($nQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-                                if($sample['sample_name']=='Dry Blood Spot')
-                                {
-                                $result[$sample['sample_name']]['VL Not Detected'][$j] = $notTargetTotal+$notTargetResult[$i]['total'];
-                                }else{
-                                    if(isset($result['Others']['VL Not Detected'][$j])){
-                                        $result['Others']['VL Not Detected'][$j] = $result['Others']['VL Not Detected'][$j]+$notTargetTotal+$notTargetResult[$i]['total'];
-                                    }else{
-                                        $result['Others']['VL Not Detected'][$j] = $notTargetTotal+$notTargetResult[$i]['total'];
-                                    }
-                                }
-                                //\Zend\Debug\Debug::dump($result);
-                            }
-                            $i++;
-                        }
-                        $result['date'][$j] = $dFormat;
-                        $j++;
-                    }
-                }
+        
+        
+
+            $queryStr = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
+                                    ->columns(array(
+                                                    //"total" => new Expression('COUNT(*)'),
+                                                    "day" => new Expression("DATE_FORMAT(DATE(sample_collection_date), '%d-%b-%Y')"),
+                                                    
+                                                    "DBSGreaterThan1000" => new Expression("SUM(CASE WHEN (vl.result >= 1000 and vl.sample_type=8) THEN 1 ELSE 0 END)"),
+                                                    "DBSLesserThan1000" => new Expression("SUM(CASE WHEN ((vl.result < 1000 or vl.result='Target Not Detected') and vl.sample_type=8) THEN 1 ELSE 0 END)"),
+                                                   
+                                                    "OGreaterThan1000" => new Expression("SUM(CASE WHEN vl.result>=1000 and vl.sample_type!=8 THEN 1 ELSE 0 END)"),
+                                                    "OLesserThan1000" => new Expression("SUM(CASE WHEN (vl.result<1000 or vl.result='Target Not Detected') and vl.sample_type!=8 THEN 1 ELSE 0 END)"),
+                                                    
+                                              )
+                                            )
+                                    ->where(array("DATE(vl.sample_collection_date) <='$cDate'", "DATE(vl.sample_collection_date) >='$lastThirtyDay'"));        
+        
+        
+        if($params['facilityId'] !=''){
+            $queryStr = $queryStr->where(array("vl.facility_id ='".base64_decode($params['facilityId'])."'")); 
+        }else{
+            if($logincontainer->role!= 1){
+                $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:0;
+                $queryStr = $queryStr->where('vl.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
             }
-            //\Zend\Debug\Debug::dump($result);die;
-            return $result;
         }
+        if(isset($params['gender'] ) && trim($params['gender'])!=''){
+            $queryStr = $queryStr->where(array("vl.patient_gender ='".$params['gender']."'")); 
+        }
+        if(isset($params['age']) && trim($params['age'])!=''){
+            $expAge=explode("-",$params['age']);
+            if(trim($expAge[0])!="" && trim($expAge[1])!=""){
+                $queryStr=$queryStr->where("(vl.patient_age_in_years>='".$expAge[0]."' AND vl.patient_age_in_years<='".$expAge[1]."')");
+            }else{
+                $queryStr = $queryStr->where(array("vl.patient_age_in_years >'".$expAge[0]."'"));
+            }
+        }
+        if(isset($params['adherence']) && trim($params['adherence'])!=''){
+            $queryStr = $queryStr->where(array("vl.arv_adherance_percentage ='".$params['adherence']."'")); 
+        }
+        
+        
+
+        $queryStr = $queryStr->group(array(new Expression('DATE(sample_collection_date)')));   
+        $queryStr = $queryStr->order(array(new Expression('DATE(sample_collection_date)')));            
+        
+        $queryStr = $sql->getSqlStringForSqlObject($queryStr);
+        
+        //echo $queryStr;//die;
+        
+        $sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+        
+        
+        $result = array();
+        $j=0;
+        
+        
+        //\Zend\Debug\Debug::dump($sampleResult);
+        foreach($sampleResult as $sRow){
+            
+            if($sRow["day"] == null) continue;
+            
+            $result['DBS']['VL (> 1000 cp/ml)'][$j] = $sRow["DBSGreaterThan1000"];
+            $result['DBS']['VL (< 1000 cp/ml)'][$j] = $sRow["DBSLesserThan1000"];
+            $result['Others']['VL (> 1000 cp/ml)'][$j] = $sRow["OGreaterThan1000"];
+            $result['Others']['VL (< 1000 cp/ml)'][$j] = $sRow["OLesserThan1000"];
+
+            
+            $result['date'][$j] = $sRow["day"];
+            $j++;
+        }
+        //\Zend\Debug\Debug::dump($result);
+        return $result;
+        
     }
     
-    public function getClinicDistinctDate($cDate,$lastThirtyDay){
-        $dbAdapter = $this->adapter;
-        $sql = new Sql($dbAdapter);
-        $squery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
-                            ->columns(array(new Expression('DISTINCT YEAR(sample_collection_date) as year,MONTH(sample_collection_date) as month,DAY(sample_collection_date) as day')))
-                            ->join(array('fd'=>'facility_details'),'fd.facility_id=vl.facility_id',array('facility_name'))
-                            ->where(array('fd.facility_type'=>'1'))
-                            ->where('vl.lab_id !=0')
-                            ->order('month ASC')->order('day ASC');
-        if(isset($cDate) && trim($cDate)!= ''){
-            $squery = $squery->where(array("vl.sample_collection_date <='" . $cDate ." 23:59:00". "'", "vl.sample_collection_date >='" . $lastThirtyDay." 00:00:00". "'"));
-        }
-        $sQueryStr = $sql->getSqlStringForSqlObject($squery);
-        $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-        return $sResult;
-    }
-	
+    
     public function fetchSampleDetails($params){
                 $logincontainer = new Container('credo');
 		//\Zend\Debug\Debug::dump($params);
@@ -1649,9 +1551,18 @@ class SampleTable extends AbstractTableGateway {
                                           $countQuery = $countQuery->where("vl.patient_age_in_years = 'unknown' OR vl.patient_age_in_years = '' OR vl.patient_age_in_years IS NULL");
                                         }
                                 }
+                                if(isset($params['sampleStatus']) && $params['sampleStatus']!=''){
+                                if($params['sampleStatus'] == 'sample_tested'){
+                                  $countQuery = $countQuery->where("vl.result != 'NULL' AND vl.result IS NOT NULL AND vl.result != ''");
+                                }else if($params['sampleStatus'] == 'samples_not_tested') {
+                                  $countQuery = $countQuery->where("vl.result = 'NULL' or vl.result = null or vl.result = ''");
+                                }else if($params['sampleStatus'] == 'rejected') {
+                                  $countQuery = $countQuery->where("vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != 0");
+                                }
+                            }
                                 
                                 $cQueryStr = $sql->getSqlStringForSqlObject($countQuery);
-                                //echo $cQueryStr;die;
+                               // echo $cQueryStr;die;
                                 $countResult[$i] = $dbAdapter->query($cQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
                                 $result[$i][0] = $countResult[$i]['total'];
                                 $result[$i][1] = $facility['facility_name'];
@@ -1738,6 +1649,15 @@ class SampleTable extends AbstractTableGateway {
                                     }else if($params['age'] == 'unknown'){
                                       $countQuery = $countQuery->where("vl.patient_age_in_years = 'unknown' OR vl.patient_age_in_years = '' OR vl.patient_age_in_years IS NULL");
                                     }
+                            }
+                            if(isset($params['sampleStatus']) && $params['sampleStatus']!=''){
+                                if($params['sampleStatus'] == 'sample_tested'){
+                                  $countQuery = $countQuery->where("vl.result != 'NULL' AND vl.result IS NOT NULL AND vl.result != ''");
+                                }else if($params['sampleStatus'] == 'samples_not_tested') {
+                                  $countQuery = $countQuery->where("vl.result = 'NULL' or vl.result = null or vl.result = ''");
+                                }else if($params['sampleStatus'] == 'rejected') {
+                                  $countQuery = $countQuery->where("vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != 0");
+                                }
                             }
                             $cQueryStr = $sql->getSqlStringForSqlObject($countQuery);
                             $lessResult = $dbAdapter->query($cQueryStr." AND vl.result < 1000", $dbAdapter::QUERY_MODE_EXECUTE)->current();
