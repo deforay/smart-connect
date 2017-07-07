@@ -333,6 +333,19 @@ foreach($sampleType as $samples){
 
                     </div>
                     <div class="row">
+                        <div class="col-md-4 col-sm-4">
+                            <div class="portlet box blue">
+                                <div class="portlet-title">
+                                    <div class="caption">
+                                        <span class="caption-subject">Female Patient Result</span>
+                                    </div>
+                                </div>
+                                <div class="portlet-body" id="femalePatientPieChart">
+                                </div>
+                            </div>                            
+                        </div>
+                    </div>
+                    <div class="row">
                         <div class="col-md-12 col-sm-12">
                             <div class="portlet box blue">
                                 <div class="portlet-title">
@@ -438,10 +451,20 @@ foreach($sampleType as $samples){
             });
         }
         
+function femalePatient(){
+            
+            sampleType = $("#sampleVolume").val();
+            facilityId = $("#labName").val();
+            fromDate=$('#mrp-lowerDate').val();
+            toDate=$('#mrp-upperDate').val();
+            $.post("<?php echo $this->url('laboratory', array('action' => 'get-female-patient-result')); ?>",{fromDate:fromDate,toDate:toDate,sampleType:sampleType,facilityId:facilityId},
+            function(data) {
+            $("#femalePatientPieChart").html(data);
+            });
+        }
         function doRedirect(lab){
             window.open('/labs/sample-volume?fromMonth='+$('#mrp-lowerDate').val()+'&toMonth='+$('#mrp-upperDate').val()+'&lab='+lab+'&result='+$("#sampleStatus").val(), '_blank');
         }
-        
         function getAverageLabTAT()
         {
             fromDate=$('#mrp-lowerDate').val();
@@ -486,7 +509,8 @@ foreach($sampleType as $samples){
             getTestedSampleResultBasedVolume();
             getTestedSampleResultBasedGender();
             getTestedSampleResultBasedAge();
-        }            
+            femalePatient();
+        }
             
 var MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
