@@ -457,17 +457,17 @@ class LaboratoryController extends AbstractActionController
         }
     }
     
-    public function getLineOfTreatmentAction()
-    {
+    public function getLineOfTreatmentAction(){
         $request = $this->getRequest();
-        if ($request->isPost()) {
-            $params = $request->getPost();
-            $sampleService = $this->getServiceLocator()->get('SampleService');
-	    $result = $sampleService->getLineOfTreatment($params);
-            $viewModel = new ViewModel();
-                      ->setTerminal(true);
-            return $viewModel;
-        }
+        if($request->isPost()) {
+           $params = $request->getPost();
+           $sampleService = $this->getServiceLocator()->get('SampleService');
+           $result = $sampleService->getLineOfTreatment($params);
+           $viewModel = new ViewModel();
+           $viewModel->setVariables(array('result' => $result))
+                       ->setTerminal(true);
+           return $viewModel;
+       }
     }
 }
 
