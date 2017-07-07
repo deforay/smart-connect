@@ -431,5 +431,31 @@ class LaboratoryController extends AbstractActionController
             return $viewModel;
         }
     }
+    
+    public function exportSampleResultExcelAction() {
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $sampleService = $this->getServiceLocator()->get('SampleService');
+            $file=$sampleService->generateSampleResultExcel($params);
+            $viewModel = new ViewModel();
+            $viewModel->setVariables(array('file' =>$file))
+                      ->setTerminal(true);
+            return $viewModel;
+        }
+    }
+    
+    public function exportLabTestedSampleExcelAction() {
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $sampleService = $this->getServiceLocator()->get('SampleService');
+            $file=$sampleService->generateLabTestedSampleExcel($params);
+            $viewModel = new ViewModel();
+            $viewModel->setVariables(array('file' =>$file))
+                      ->setTerminal(true);
+            return $viewModel;
+        }
+    }
 }
 

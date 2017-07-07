@@ -1821,6 +1821,7 @@ class SampleTable extends AbstractTableGateway {
     
     public function fetchLabFilterSampleDetails($parameters){
         $logincontainer = new Container('credo');
+        $queryContainer = new Container('query');
         $common = new CommonService($this->sm);
         /* Array of database columns which should be read and sent back to DataTables. Use a space where
          * you want to insert a non-database field (for example a counter or static image)
@@ -1961,7 +1962,7 @@ class SampleTable extends AbstractTableGateway {
         if (isset($sOrder) && $sOrder != "") {
             $sQuery->order($sOrder);
         }
-
+        $queryContainer->labTestedSampleQuery = $sQuery;
         if (isset($sLimit) && isset($sOffset)) {
             $sQuery->limit($sLimit);
             $sQuery->offset($sOffset);
@@ -2043,7 +2044,7 @@ class SampleTable extends AbstractTableGateway {
         foreach ($rResult as $aRow) {
             $row = array();
             $sampleCollectionDate = '';
-	   if(isset($aRow['sampleCollectionDate']) && trim($aRow['sampleCollectionDate'])!="" && $aRow['sampleCollectionDate']!= '0000-00-00'){
+	    if(isset($aRow['sampleCollectionDate']) && $aRow['sampleCollectionDate']!= null && trim($aRow['sampleCollectionDate'])!="" && $aRow['sampleCollectionDate']!= '0000-00-00'){
                 $sampleCollectionDate = $common->humanDateFormat($aRow['sampleCollectionDate']);
             }
             $row[] = $sampleCollectionDate;
@@ -2057,6 +2058,7 @@ class SampleTable extends AbstractTableGateway {
     
     public function fetchFilterSampleDetails($parameters){
         $logincontainer = new Container('credo');
+        $queryContainer = new Container('query');
         $common = new CommonService($this->sm);
         /* Array of database columns which should be read and sent back to DataTables. Use a space where
          * you want to insert a non-database field (for example a counter or static image)
@@ -2156,7 +2158,7 @@ class SampleTable extends AbstractTableGateway {
         if (isset($sOrder) && $sOrder != "") {
             $sQuery->order($sOrder);
         }
-
+        $queryContainer->sampleResultQuery = $sQuery;
         if (isset($sLimit) && isset($sOffset)) {
             $sQuery->limit($sLimit);
             $sQuery->offset($sOffset);

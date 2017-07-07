@@ -542,4 +542,257 @@ class SampleService {
             return "";
         }
     }
+    
+    public function generateSampleResultExcel($params){
+        $queryContainer = new Container('query');
+        $common = new CommonService();
+        if(isset($queryContainer->sampleResultQuery)){
+            try{
+                $dbAdapter = $this->sm->get('Zend\Db\Adapter\Adapter');
+                $sql = new Sql($dbAdapter);
+                $sQueryStr = $sql->getSqlStringForSqlObject($queryContainer->sampleResultQuery);
+                $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+                if(isset($sResult) && count($sResult)>0){
+                    $excel = new PHPExcel();
+                    $cacheMethod = \PHPExcel_CachedObjectStorageFactory::cache_to_phpTemp;
+                    $cacheSettings = array('memoryCacheSize' => '80MB');
+                    \PHPExcel_Settings::setCacheStorageMethod($cacheMethod, $cacheSettings);
+                    $sheet = $excel->getActiveSheet();
+                    $output = array();
+                    foreach ($sResult as $aRow) {
+                        $row = array();
+                        $countQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))->columns(array('total' => new Expression('COUNT(*)')))
+                                        ->where('vl.lab_id="'.$aRow['facility_id'].'"');
+                        if(isset($params['clinicId']) && trim($params['clinicId'])!=''){
+                            $countQuery = $countQuery->where('vl.facility_id="'.base64_decode(trim($params['clinicId'])).'"');
+                        }
+                        if(isset($params['sampleType']) && trim($params['sampleType'])!=''){
+                            $countQuery = $countQuery->where('vl.sample_type="'.base64_decode(trim($params['sampleType'])).'"');
+                        }
+                        if(isset($params['currentRegimen']) && trim($params['currentRegimen'])!=''){
+                            $countQuery = $countQuery->where('vl.current_regimen="'.base64_decode(trim($params['currentRegimen'])).'"');
+                        }
+                        
+                        if(isset($params['adherence']) && trim($params['adherence'])!=''){
+                            $countQuery = $countQuery->where(array("vl.arv_adherance_percentage ='".$params['adherence']."'")); 
+                        }
+                        
+                        if(trim($params['fromDate'])!= '' && trim($params['toDate'])!= ''){
+                            if(trim($params['fromDate'])!= trim($params['toDate'])){
+                               $countQuery = $countQuery->where(array("vl.sample_collection_date >='" . $startMonth ." 00:00:00". "'", "vl.sample_collection_date <='" .$endMonth." 23:59:00". "'"));
+                            }else{
+                                $fromMonth = date("Y-m", strtotime(trim($params['fromDate'])));
+                                $month = strtotime($fromMonth);
+                                $mnth = date('m', $month);$year = date('Y', $month);
+                                $countQuery = $countQuery->where("Month(sample_collection_date)='".$mnth."' AND Year(sample_collection_date)='".$year."'");
+                            }
+                        }
+                        if(isset($params['age']) && $params['age']!=''){
+                            if($params['age'] == '<18'){
+                              $countQuery = $countQuery->where("vl.patient_age_in_years < 18");
+                            }else if($params['age'] == '>18') {
+                              $countQuery = $countQuery->where("vl.patient_age_in_years > 18");
+                            }else if($params['age'] == 'unknown'){
+                              $countQuery = $countQuery->where("vl.patient_age_in_years = 'unknown' OR vl.patient_age_in_years = '' OR vl.patient_age_in_years IS NULL");
+                            }
+                        }
+                        if(isset($params['sampleStatus']) && $params['sampleStatus'] == 'sample_tested'){
+                            $countQuery = $countQuery->where("vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL'");
+                        }else if(isset($params['sampleStatus']) && $params['sampleStatus'] == 'samples_not_tested') {
+                            $countQuery = $countQuery->where("(vl.result IS NULL OR vl.result = 'NULL' OR vl.result = '')");
+                        }else if(isset($params['sampleStatus']) && $params['sampleStatus'] == 'sample_rejected') {
+                            $countQuery = $countQuery->where("vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0");
+                        }
+                        $cQueryStr = $sql->getSqlStringForSqlObject($countQuery);
+                        $lessResult = $dbAdapter->query($cQueryStr." AND vl.result < 1000", $dbAdapter::QUERY_MODE_EXECUTE)->current();
+                        $suppressedTotal = $lessResult->total;
+                        $greaterResult = $dbAdapter->query($cQueryStr." AND vl.result > 1000", $dbAdapter::QUERY_MODE_EXECUTE)->current();
+                        $notSuppressedTotal = $greaterResult->total;
+                        $rejectionResult = $dbAdapter->query($cQueryStr." AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != 0", $dbAdapter::QUERY_MODE_EXECUTE)->current();
+                        $rejectedTotal = $rejectionResult->total;
+                        $row[] = ucwords($aRow['facility_name']);
+                        $row[] = $suppressedTotal;
+                        $row[] = $notSuppressedTotal;
+                        $row[] = $rejectedTotal;
+                        $output[] = $row;
+                    }
+                    $styleArray = array(
+                        'font' => array(
+                            'bold' => true,
+                        ),
+                        'alignment' => array(
+                            'horizontal' => \PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
+                            'vertical' => \PHPExcel_Style_Alignment::VERTICAL_CENTER,
+                        ),
+                        'borders' => array(
+                            'outline' => array(
+                                'style' => \PHPExcel_Style_Border::BORDER_THIN,
+                            ),
+                        )
+                    );
+                    $borderStyle = array(
+                        'alignment' => array(
+                            'horizontal' => \PHPExcel_Style_Alignment::HORIZONTAL_LEFT,
+                        ),
+                        'borders' => array(
+                            'outline' => array(
+                                'style' => \PHPExcel_Style_Border::BORDER_THIN,
+                            ),
+                        )
+                    );
+                    
+                    $sheet->setCellValue('A1', html_entity_decode('Lab ', ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
+                    $sheet->setCellValue('B1', html_entity_decode('Surpressed ', ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
+                    $sheet->setCellValue('C1', html_entity_decode('Not Surpressed ', ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
+                    $sheet->setCellValue('D1', html_entity_decode('Rejected ', ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
+                   
+                    $sheet->getStyle('A1')->applyFromArray($styleArray);
+                    $sheet->getStyle('B1')->applyFromArray($styleArray);
+                    $sheet->getStyle('C1')->applyFromArray($styleArray);
+                    $sheet->getStyle('D1')->applyFromArray($styleArray);
+                    
+                    $currentRow = 2;
+                    foreach ($output as $rowData) {
+                        $colNo = 0;
+                        foreach ($rowData as $field => $value) {
+                            if (!isset($value)) {
+                                $value = "";
+                            }
+                            if($colNo > 3){
+                                break;
+                            }
+                            if (is_numeric($value)) {
+                                $sheet->getCellByColumnAndRow($colNo, $currentRow)->setValueExplicit(html_entity_decode($value, ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_NUMERIC);
+                            }else{
+                                $sheet->getCellByColumnAndRow($colNo, $currentRow)->setValueExplicit(html_entity_decode($value, ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
+                            }
+                            $cellName = $sheet->getCellByColumnAndRow($colNo, $currentRow)->getColumn();
+                            $sheet->getStyle($cellName . $currentRow)->applyFromArray($borderStyle);
+                            $sheet->getDefaultRowDimension()->setRowHeight(20);
+                            $sheet->getColumnDimensionByColumn($colNo)->setWidth(20);
+                            $sheet->getStyleByColumnAndRow($colNo, $currentRow)->getAlignment()->setWrapText(true);
+                            $colNo++;
+                        }
+                      $currentRow++;
+                    }
+                    $writer = \PHPExcel_IOFactory::createWriter($excel, 'Excel5');
+                    $filename = 'SAMPLE-TEST-RESULT-REPORT--' . date('d-M-Y-H-i-s') . '.xls';
+                    $writer->save(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . $filename);
+                    return $filename;
+                }else{
+                    return "";
+                }
+            }catch (Exception $exc) {
+                error_log("SAMPLE-TEST-RESULT-REPORT--" . $exc->getMessage());
+                error_log($exc->getTraceAsString());
+                return "";
+            }  
+        }else{
+            return "";
+        }
+    }
+    
+    public function generateLabTestedSampleExcel($params){
+        $queryContainer = new Container('query');
+        $common = new CommonService();
+        if(isset($queryContainer->labTestedSampleQuery)){
+            try{
+                $dbAdapter = $this->sm->get('Zend\Db\Adapter\Adapter');
+                $sql = new Sql($dbAdapter);
+                $sQueryStr = $sql->getSqlStringForSqlObject($queryContainer->labTestedSampleQuery);
+                $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+                if(isset($sResult) && count($sResult)>0){
+                    $excel = new PHPExcel();
+                    $cacheMethod = \PHPExcel_CachedObjectStorageFactory::cache_to_phpTemp;
+                    $cacheSettings = array('memoryCacheSize' => '80MB');
+                    \PHPExcel_Settings::setCacheStorageMethod($cacheMethod, $cacheSettings);
+                    $sheet = $excel->getActiveSheet();
+                    $output = array();
+                    foreach ($sResult as $aRow) {
+                        $row = array();
+                        $sampleCollectionDate = '';
+                        if(isset($aRow['sampleCollectionDate']) && $aRow['sampleCollectionDate']!= null && trim($aRow['sampleCollectionDate'])!="" && $aRow['sampleCollectionDate']!= '0000-00-00'){
+                            $sampleCollectionDate = $common->humanDateFormat($aRow['sampleCollectionDate']);
+                        }
+                        $row[] = $sampleCollectionDate;
+                        $row[] = $aRow['samples'];
+                        $row[] = ucwords($aRow['sample_name']);
+                        $row[] = ucwords($aRow['facility_name']);
+                        $output[] = $row;
+                    }
+                    $styleArray = array(
+                        'font' => array(
+                            'bold' => true,
+                        ),
+                        'alignment' => array(
+                            'horizontal' => \PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
+                            'vertical' => \PHPExcel_Style_Alignment::VERTICAL_CENTER,
+                        ),
+                        'borders' => array(
+                            'outline' => array(
+                                'style' => \PHPExcel_Style_Border::BORDER_THIN,
+                            ),
+                        )
+                    );
+                    $borderStyle = array(
+                        'alignment' => array(
+                            'horizontal' => \PHPExcel_Style_Alignment::HORIZONTAL_LEFT,
+                        ),
+                        'borders' => array(
+                            'outline' => array(
+                                'style' => \PHPExcel_Style_Border::BORDER_THIN,
+                            ),
+                        )
+                    );
+                    
+                    $sheet->setCellValue('A1', html_entity_decode('Date ', ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
+                    $sheet->setCellValue('B1', html_entity_decode('No.of Samples ', ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
+                    $sheet->setCellValue('C1', html_entity_decode('Sample Type ', ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
+                    $sheet->setCellValue('D1', html_entity_decode('Clinics ', ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
+                    
+                    $sheet->getStyle('A1')->applyFromArray($styleArray);
+                    $sheet->getStyle('B1')->applyFromArray($styleArray);
+                    $sheet->getStyle('C1')->applyFromArray($styleArray);
+                    $sheet->getStyle('D1')->applyFromArray($styleArray);
+                    
+                    $currentRow = 2;
+                    foreach ($output as $rowData) {
+                        $colNo = 0;
+                        foreach ($rowData as $field => $value) {
+                            if (!isset($value)) {
+                                $value = "";
+                            }
+                            if($colNo > 3){
+                                break;
+                            }
+                            if (is_numeric($value)) {
+                                $sheet->getCellByColumnAndRow($colNo, $currentRow)->setValueExplicit(html_entity_decode($value, ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_NUMERIC);
+                            }else{
+                                $sheet->getCellByColumnAndRow($colNo, $currentRow)->setValueExplicit(html_entity_decode($value, ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
+                            }
+                            $cellName = $sheet->getCellByColumnAndRow($colNo, $currentRow)->getColumn();
+                            $sheet->getStyle($cellName . $currentRow)->applyFromArray($borderStyle);
+                            $sheet->getDefaultRowDimension()->setRowHeight(20);
+                            $sheet->getColumnDimensionByColumn($colNo)->setWidth(20);
+                            $sheet->getStyleByColumnAndRow($colNo, $currentRow)->getAlignment()->setWrapText(true);
+                            $colNo++;
+                        }
+                      $currentRow++;
+                    }
+                    $writer = \PHPExcel_IOFactory::createWriter($excel, 'Excel5');
+                    $filename = 'SAMPLE-TESTED-LAB-REPORT--' . date('d-M-Y-H-i-s') . '.xls';
+                    $writer->save(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . $filename);
+                    return $filename;
+                }else{
+                    return "";
+                }
+            }catch (Exception $exc) {
+                error_log("SAMPLE-TESTED-LAB-REPORT--" . $exc->getMessage());
+                error_log($exc->getTraceAsString());
+                return "";
+            }  
+        }else{
+            return "";
+        }
+    }
 }
