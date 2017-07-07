@@ -264,7 +264,7 @@ class SampleTable extends AbstractTableGateway {
                 
                 if($sRow["monthDate"] == null) continue;
                 
-                $result['sampleName']['VL (> 1000 cp/ml)'][$j] = $sRow["GreaterThan1000"];
+                $result['sampleName']['VL (>= 1000 cp/ml)'][$j] = $sRow["GreaterThan1000"];
                 //$result['sampleName']['VL Not Detected'][$j] = $sRow["TND"];
                 $result['sampleName']['VL (< 1000 cp/ml)'][$j] = $sRow["LesserThan1000"];
                 
@@ -339,15 +339,15 @@ class SampleTable extends AbstractTableGateway {
                 
                 if($sRow["monthDate"] == null) continue;
                 
-                $result['M']['VL (> 1000 cp/ml)'][$j] = $sRow["MGreaterThan1000"];
+                $result['M']['VL (>= 1000 cp/ml)'][$j] = $sRow["MGreaterThan1000"];
                 //$result['M']['VL Not Detected'][$j] = $sRow["MTND"];
                 $result['M']['VL (< 1000 cp/ml)'][$j] = $sRow["MLesserThan1000"];
  
-                $result['F']['VL (> 1000 cp/ml)'][$j] = $sRow["FGreaterThan1000"];
+                $result['F']['VL (>= 1000 cp/ml)'][$j] = $sRow["FGreaterThan1000"];
                 //$result['F']['VL Not Detected'][$j] = $sRow["FTND"];
                 $result['F']['VL (< 1000 cp/ml)'][$j] = $sRow["FLesserThan1000"];
 
-                $result['Not Specified']['VL (> 1000 cp/ml)'][$j] = $sRow["OGreaterThan1000"];
+                $result['Not Specified']['VL (>= 1000 cp/ml)'][$j] = $sRow["OGreaterThan1000"];
                 //$result['Not Specified']['VL Not Detected'][$j] = $sRow["OTND"];
                 $result['Not Specified']['VL (< 1000 cp/ml)'][$j] = $sRow["OLesserThan1000"];
                 
@@ -423,8 +423,8 @@ class SampleTable extends AbstractTableGateway {
                 
                 if($sRow["monthDate"] == null) continue;
                 
-                $result['>18']['VL (> 1000 cp/ml)'][$j] = $sRow["A18GreaterThan1000"];
-                $result['<18']['VL (> 1000 cp/ml)'][$j] = $sRow["B18GreaterThan1000"];
+                $result['>18']['VL (>= 1000 cp/ml)'][$j] = $sRow["A18GreaterThan1000"];
+                $result['<18']['VL (>= 1000 cp/ml)'][$j] = $sRow["B18GreaterThan1000"];
                 
                // $result['>18']['VL Not Detected'][$j] = $sRow["A18TND"];
               //  $result['<18']['VL Not Detected'][$j] = $sRow["B18TND"];
@@ -495,8 +495,8 @@ class SampleTable extends AbstractTableGateway {
                                             ->where(array('vl.lab_id'=>$facility['facility_id']));
                     $lQueryStr = $sql->getSqlStringForSqlObject($lessThanQuery);
                     
-                    $greaterResult = $dbAdapter->query($lQueryStr." AND vl.result>1000", $dbAdapter::QUERY_MODE_EXECUTE)->current();
-                    $result['sampleName']['VL (> 1000 cp/ml)'][$j] = $greaterTotal+$greaterResult['total'];
+                    $greaterResult = $dbAdapter->query($lQueryStr." AND vl.result>=1000", $dbAdapter::QUERY_MODE_EXECUTE)->current();
+                    $result['sampleName']['VL (>= 1000 cp/ml)'][$j] = $greaterTotal+$greaterResult['total'];
                     
                     //$notTargetResult = $dbAdapter->query($lQueryStr." AND 'vl.result' ='Target Not Detected'", $dbAdapter::QUERY_MODE_EXECUTE)->current();
                     //$result['sampleName']['VL Not Detected'][$j] = $notTargetTotal+$notTargetResult['total'];
@@ -1072,7 +1072,7 @@ class SampleTable extends AbstractTableGateway {
         $where = 'vl.result<1000';
         $lessTotal = $this->fetchChartOverAllLoadResult($params,$where);
         //total >1000
-        $where = 'vl.result>1000';
+        $where = 'vl.result>=1000';
         $gTotal = $this->fetchChartOverAllLoadResult($params,$where);
         
         return array($testedTotal,$lessTotal,$gTotal,$overAllTotal);
@@ -1501,9 +1501,9 @@ class SampleTable extends AbstractTableGateway {
             
             if($sRow["day"] == null) continue;
             
-            $result['DBS']['VL (> 1000 cp/ml)'][$j] = $sRow["DBSGreaterThan1000"];
+            $result['DBS']['VL (>= 1000 cp/ml)'][$j] = $sRow["DBSGreaterThan1000"];
             $result['DBS']['VL (< 1000 cp/ml)'][$j] = $sRow["DBSLesserThan1000"];
-            $result['Others']['VL (> 1000 cp/ml)'][$j] = $sRow["OGreaterThan1000"];
+            $result['Others']['VL (>= 1000 cp/ml)'][$j] = $sRow["OGreaterThan1000"];
             $result['Others']['VL (< 1000 cp/ml)'][$j] = $sRow["OLesserThan1000"];
 
             
@@ -1558,7 +1558,7 @@ class SampleTable extends AbstractTableGateway {
                                     if($params['testResult'] == '<1000'){
                                       $countQuery = $countQuery->where("vl.result < 1000");
                                     }else if($params['testResult'] == '>1000') {
-                                      $countQuery = $countQuery->where("vl.result > 1000");
+                                      $countQuery = $countQuery->where("vl.result >= 1000");
                                     }
                                 }
                                 if(isset($params['gender']) && trim($params['gender'])!=''){
@@ -1657,7 +1657,7 @@ class SampleTable extends AbstractTableGateway {
                                 if($params['testResult'] == '<1000'){
                                   $countQuery = $countQuery->where("vl.result < 1000");
                                 }else if($params['testResult'] == '>1000') {
-                                  $countQuery = $countQuery->where("vl.result > 1000");
+                                  $countQuery = $countQuery->where("vl.result >= 1000");
                                 }
                             }
                             if(isset($params['gender']) && trim($params['gender'])!=''){
@@ -1703,7 +1703,7 @@ class SampleTable extends AbstractTableGateway {
                             $cQueryStr = $sql->getSqlStringForSqlObject($countQuery);
                             $lessResult = $dbAdapter->query($cQueryStr." AND vl.result < 1000", $dbAdapter::QUERY_MODE_EXECUTE)->current();
                             $result['sample']['Suppressed'][$j] = $lessResult->total;
-                            $greaterResult = $dbAdapter->query($cQueryStr." AND vl.result > 1000", $dbAdapter::QUERY_MODE_EXECUTE)->current();
+                            $greaterResult = $dbAdapter->query($cQueryStr." AND vl.result >= 1000", $dbAdapter::QUERY_MODE_EXECUTE)->current();
                             $result['sample']['Not Suppressed'][$j] = $greaterResult->total;
                             $rejectionResult = $dbAdapter->query($cQueryStr." AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != 0", $dbAdapter::QUERY_MODE_EXECUTE)->current();
                             $result['sample']['Rejected'][$j] = $rejectionResult->total;
@@ -1741,7 +1741,7 @@ class SampleTable extends AbstractTableGateway {
             if($params['testResult'] == '<1000'){
               $sQuery = $sQuery->where("vl.result < 1000");
             }else if($params['testResult'] == '>1000') {
-              $sQuery = $sQuery->where("vl.result > 1000");
+              $sQuery = $sQuery->where("vl.result >= 1000");
             }
         }
         if(isset($params['gender']) && trim($params['gender'])!=''){
@@ -1807,7 +1807,7 @@ class SampleTable extends AbstractTableGateway {
                     if($params['testResult'] == '<1000'){
                       $sQuery = $sQuery->where("vl.result < 1000");
                     }else if($params['testResult'] == '>1000') {
-                      $sQuery = $sQuery->where("vl.result > 1000");
+                      $sQuery = $sQuery->where("vl.result >= 1000");
                     }
                 }
                 if(isset($params['gender']) && trim($params['gender'])!=''){
@@ -1835,8 +1835,8 @@ class SampleTable extends AbstractTableGateway {
                 $lessResult = $dbAdapter->query($sQueryStr." AND vl.result<1000", $dbAdapter::QUERY_MODE_EXECUTE)->current();
                 $result['rslt']['VL (< 1000 cp/ml)'][$j] = $lessResult->samples;
                 
-                $greaterResult = $dbAdapter->query($sQueryStr." AND vl.result>1000", $dbAdapter::QUERY_MODE_EXECUTE)->current();
-                $result['rslt']['VL (> 1000 cp/ml)'][$j] = $greaterResult->samples;
+                $greaterResult = $dbAdapter->query($sQueryStr." AND vl.result>=1000", $dbAdapter::QUERY_MODE_EXECUTE)->current();
+                $result['rslt']['VL (>= 1000 cp/ml)'][$j] = $greaterResult->samples;
                 
                 $notTargetResult = $dbAdapter->query($sQueryStr." AND 'vl.result'='Target Not Detected'", $dbAdapter::QUERY_MODE_EXECUTE)->current();
                 $result['rslt']['VL Not Detected'][$j] = $notTargetResult->samples;
@@ -1956,7 +1956,7 @@ class SampleTable extends AbstractTableGateway {
             if($parameters['testResult'] == '<1000'){
               $sQuery = $sQuery->where("vl.result < 1000");
             }else if($parameters['testResult'] == '>1000') {
-              $sQuery = $sQuery->where("vl.result > 1000");
+              $sQuery = $sQuery->where("vl.result >= 1000");
             }
         }if(isset($parameters['clinic'] ) && trim($parameters['clinic'])!=''){
             $sQuery = $sQuery->where(array("vl.facility_id ='".base64_decode($parameters['clinic'])."'")); 
@@ -2032,7 +2032,7 @@ class SampleTable extends AbstractTableGateway {
             if($parameters['testResult'] == '<1000'){
               $iQuery = $iQuery->where("vl.result < 1000");
             }else if($parameters['testResult'] == '>1000') {
-              $iQuery = $iQuery->where("vl.result > 1000");
+              $iQuery = $iQuery->where("vl.result >= 1000");
             }
         }if(isset($parameters['clinic'] ) && trim($parameters['clinic'])!=''){
             $iQuery = $iQuery->where(array("vl.facility_id ='".base64_decode($parameters['clinic'])."'")); 
