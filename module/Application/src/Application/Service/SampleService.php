@@ -295,6 +295,16 @@ class SampleService {
         $sampleDb = $this->sm->get('SampleTable');
         return $sampleDb->getSampleVolume($params);
     }
+    public function getFemalePatientResult($params)
+    {
+        $sampleDb = $this->sm->get('SampleTable');
+        return $sampleDb->getFemalePatientResult($params);
+    }
+    public function getLineOfTreatment($params)
+    {
+        $sampleDb = $this->sm->get('SampleTable');
+        return $sampleDb->getLineOfTreatment($params);
+    }
     public function getLabTurnAroundTime($params)
     {
         $sampleDb = $this->sm->get('SampleTable');

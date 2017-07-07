@@ -724,7 +724,86 @@ class SampleTable extends AbstractTableGateway {
         }
        return $result;
     }
-    
+        //get female result
+    public function getFemalePatientResult($params){
+        $logincontainer = new Container('credo');
+        $result = array();
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $common = new CommonService($this->sm);
+        if(trim($params['fromDate'])!= '' && trim($params['toDate'])!= ''){
+            $startMonth = date("Y-m", strtotime(trim($params['fromDate'])));
+            $endMonth = date("Y-m", strtotime(trim($params['toDate'])));
+            $start = $month = strtotime($startMonth);
+            $end = strtotime($endMonth);
+            $queryStr = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
+                                    ->columns(array(
+                                                    //"total" => new Expression("SUM(CASE WHEN (patient_gender != '' AND patient_gender IS NOT NULL AND (patient_gender ='f' || patient_gender ='female' || patient_gender='F' || patient_gender='FEMALE')) THEN 1 ELSE 0 END)"),
+                                                    "Breast_Feeding" => new Expression("SUM(CASE WHEN (is_patient_breastfeeding ='yes' || is_patient_breastfeeding ='Yes' ||  is_patient_breastfeeding ='YES') THEN 1 ELSE 0 END)"),
+                                                    "Not_Breast_Feeding" => new Expression("SUM(CASE WHEN (is_patient_breastfeeding ='no' || is_patient_breastfeeding ='No' ||  is_patient_breastfeeding ='NO') THEN 1 ELSE 0 END)"),
+                                                    "Breast_Feeding_Unknown" => new Expression("SUM(CASE WHEN (is_patient_breastfeeding !='' AND is_patient_breastfeeding IS NOT NULL AND (is_patient_breastfeeding !='no' AND is_patient_breastfeeding !='No' AND  is_patient_breastfeeding !='NO') AND (is_patient_breastfeeding !='yes' AND is_patient_breastfeeding !='Yes' AND  is_patient_breastfeeding !='YES')) THEN 1 ELSE 0 END)"),
+                                                    "Pregnant" => new Expression("SUM(CASE WHEN (is_patient_pregnant ='yes' || is_patient_pregnant ='Yes' ||  is_patient_pregnant ='YES') THEN 1 ELSE 0 END)"),
+                                                    "Not_Pregnant" => new Expression("SUM(CASE WHEN (is_patient_pregnant ='no' || is_patient_pregnant ='No' ||  is_patient_pregnant ='NO') THEN 1 ELSE 0 END)"),
+                                                    "Pregnant_Unknown" => new Expression("SUM(CASE WHEN (is_patient_pregnant !='' AND is_patient_pregnant IS NOT NULL AND (is_patient_pregnant !='no' AND is_patient_pregnant !='No' AND  is_patient_pregnant !='NO') AND (is_patient_pregnant !='yes' AND is_patient_pregnant !='Yes' AND  is_patient_pregnant !='YES')) THEN 1 ELSE 0 END)"),
+                                              )
+                                            );
+            if(isset($params['facilityId']) && $params['facilityId'] !=''){
+                $queryStr = $queryStr->where(array("vl.lab_id ='".base64_decode($params['facilityId'])."'")); 
+            }else{
+                if($logincontainer->role!= 1){
+                    $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:0;
+                    $queryStr = $queryStr->where('vl.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
+                }
+            }
+            $queryStr = $queryStr->where("
+                        (sample_collection_date is not null AND sample_collection_date != '')
+                        AND DATE(sample_collection_date) >= '".$startMonth."-00' 
+                        AND DATE(sample_collection_date) <= '".$endMonth."-00' AND (patient_gender='f' || patient_gender='F' || patient_gender='Female' || patient_gender='FEMALE')");
+                
+            $queryStr = $sql->getSqlStringForSqlObject($queryStr);
+            $femaleTestResult = $common->cacheQuery($queryStr,$dbAdapter);
+            return $femaleTestResult;
+        }
+    }
+    //get female result
+    public function getLineOfTreatment($params){
+        
+        $logincontainer = new Container('credo');
+        $result = array();
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $common = new CommonService($this->sm);
+        if(trim($params['fromDate'])!= '' && trim($params['toDate'])!= ''){
+            $startMonth = date("Y-m", strtotime(trim($params['fromDate'])));
+            $endMonth = date("Y-m", strtotime(trim($params['toDate'])));
+            $start = $month = strtotime($startMonth);
+            $end = strtotime($endMonth);
+            $queryStr = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
+                                    ->columns(array(
+                                                    "Line_Of_Treatment_1" => new Expression("SUM(CASE WHEN (line_of_treatment = 1) THEN 1 ELSE 0 END)"),
+                                                    "Line_Of_Treatment_2" => new Expression("SUM(CASE WHEN (line_of_treatment = 2) THEN 1 ELSE 0 END)"),
+                                                    "Line_Of_Treatment_3" => new Expression("SUM(CASE WHEN (line_of_treatment = 3) THEN 1 ELSE 0 END)"),
+                                                    "Not_Specified" => new Expression("SUM(CASE WHEN (line_of_treatment!=1 AND line_of_treatment!=2 AND line_of_treatment!=3) THEN 1 ELSE 0 END)"),
+                                              )
+                                            );
+            if(isset($params['facilityId']) && $params['facilityId'] !=''){
+                $queryStr = $queryStr->where(array("vl.lab_id ='".base64_decode($params['facilityId'])."'")); 
+            }else{
+                if($logincontainer->role!= 1){
+                    $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:0;
+                    $queryStr = $queryStr->where('vl.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
+                }
+            }
+            $queryStr = $queryStr->where("
+                        (sample_collection_date is not null AND sample_collection_date != '')
+                        AND DATE(sample_collection_date) >= '".$startMonth."-00' 
+                        AND DATE(sample_collection_date) <= '".$endMonth."-00'");
+                         
+            $queryStr = $sql->getSqlStringForSqlObject($queryStr);
+            $lineOfTreatmentResult = $common->cacheQuery($queryStr,$dbAdapter);
+            return $lineOfTreatmentResult;
+        }
+    }
     public function fetchLabTurnAroundTime($params){
         $logincontainer = new Container('credo');
         $dbAdapter = $this->adapter;

@@ -431,7 +431,6 @@ class LaboratoryController extends AbstractActionController
             return $viewModel;
         }
     }
-    
     public function exportSampleResultExcelAction() {
         $request = $this->getRequest();
         if ($request->isPost()) {
@@ -453,6 +452,19 @@ class LaboratoryController extends AbstractActionController
             $file=$sampleService->generateLabTestedSampleExcel($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('file' =>$file))
+                      ->setTerminal(true);
+            return $viewModel;
+        }
+    }
+    
+    public function getLineOfTreatmentAction()
+    {
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $sampleService = $this->getServiceLocator()->get('SampleService');
+	    $result = $sampleService->getLineOfTreatment($params);
+            $viewModel = new ViewModel();
                       ->setTerminal(true);
             return $viewModel;
         }
