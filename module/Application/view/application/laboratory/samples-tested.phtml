@@ -271,7 +271,7 @@ if(isset($searchMonth) && trim($searchMonth)!= ''){
         adherence = $("#adherence").val();
         age = $("#age").val();
         sampleStatus = $("#sampleStatus").val();
-        $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-details')); ?>",{testResult:testResult,fromDate:fromDate,toDate:toDate,gender:searchGender,lab:lab,clinicId:facilityId,sampleType:sampleType,currentRegimen:currentRegimen,adherence:adherence,age:age,sampleStatus:sampleStatus},
+        $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-details')); ?>",{testResult:testResult,fromDate:fromDate,toDate:toDate,gender:searchGender,lab:lab,clinicId:clinicId,sampleType:sampleType,currentRegimen:currentRegimen,adherence:adherence,age:age,sampleStatus:sampleStatus},
         function(data) {
             $("#piecontainer").html(data);
         });
