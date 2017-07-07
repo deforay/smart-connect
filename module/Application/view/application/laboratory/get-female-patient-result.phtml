@@ -1,0 +1,64 @@
+<?php
+//\Zend\Debug\Debug::dump($result[0]);die;
+?>
+<div id="gotoFemalePie"></div>
+
+<script>
+       $(function () {
+        $('#gotoFemalePie').highcharts({
+        chart: {
+            plotBackgroundColor: null,
+            plotBorderWidth: null,
+            plotShadow: false,
+            type: 'pie'
+        },
+        title: {
+            text: ''
+        },
+        exporting:{
+            chartOptions:{
+                subtitle: {
+                    text:'Female Result',
+                }
+            }
+        },
+       credits: {
+              enabled: false
+       },
+        tooltip: {
+            pointFormat: '{series.name}: <b>{point.percentage:.1f}% ({point.number})</b>'
+        },
+        plotOptions: {
+            pie: {
+                allowPointSelect: true,
+                cursor: 'pointer',
+                dataLabels: {
+                    enabled: false,
+                    format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                    style: {
+                        color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                    }
+                },
+                showInLegend: true
+            }
+        },
+        series: [{
+            name: 'Labs',
+            colorByPoint: true,
+            data: [<?php
+            if(count($result)>0 && $result!=''){
+              foreach($result[0] as $key=>$femaleResult){
+                ?>
+                {
+                  name:<?php echo "'".str_replace("_"," ",$key)."'";?>,
+                  y:<?php echo $result[0][$key];?>,
+                  number:<?php echo $result[0][$key];?>
+                },
+                <?php
+            }
+            }
+            ?>]
+        }]
+    });
+    });
+</script>

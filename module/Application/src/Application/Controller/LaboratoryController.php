@@ -24,6 +24,7 @@ class LaboratoryController extends AbstractActionController
                     'labName' => $labName
                 ));
     }
+    
 
     public function samplesAccessionAction()
     {
@@ -384,6 +385,19 @@ class LaboratoryController extends AbstractActionController
             $params = $request->getPost();
             $sampleService = $this->getServiceLocator()->get('SampleService');
             $result = $sampleService->getLabBarSampleDetails($params);
+            $viewModel = new ViewModel();
+            $viewModel->setVariables(array('result' => $result))
+                        ->setTerminal(true);
+            return $viewModel;
+        }
+    }
+    public function getFemalePatientResultAction()
+    {
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $sampleService = $this->getServiceLocator()->get('SampleService');
+            $result = $sampleService->getFemalePatientResult($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('result' => $result))
                         ->setTerminal(true);
