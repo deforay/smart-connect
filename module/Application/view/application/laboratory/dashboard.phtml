@@ -315,14 +315,16 @@ foreach($sampleType as $samples){
                                     <div class="caption">
                                         <span class="caption-subject">Sample Volume</span>
                                     </div>
-                                   <!-- <div class="actions">
+                                   <div class="actions">
                                         <div class="btn-group">
-                                            <select id="sampleVolume" class="btn white btn-outline btn-circle btn-sm dropdown-toggle" onchange="getSampleVolume();">
-                                                <option value="">All Sample Types</option>
-                                                <?php echo $sType;?>
+                                            <select id="sampleStatus" class="btn white btn-outline btn-circle btn-sm dropdown-toggle" onchange="getSampleVolume('change');">
+                                                <option value="">All Samples</option>
+                                                <option value="sample_tested">Samples Tested</option>
+                                                <option value="samples_not_tested">Samples Not Tested</option>
+                                                <option value="sample_rejected">Samples Rejected</option>
                                             </select>
                                         </div>
-                                    </div>-->                                    
+                                    </div>                                 
                                 </div>
                                 <div class="portlet-body" id="pieChartLabResult">
                                 </div>
@@ -423,17 +425,23 @@ foreach($sampleType as $samples){
                 $("#requisitionForms").html(data);
             });
         }
-        function getSampleVolume(){
-            
-            sampleType = $("#sampleVolume").val();
+        
+        function getSampleVolume(formSrc){
+            if(formSrc == 'change'){$.blockUI.defaults.css.border = '1px solid grey';$(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);}
             facilityId = $("#labName").val();
             fromDate=$('#mrp-lowerDate').val();
             toDate=$('#mrp-upperDate').val();
-            $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-volume')); ?>",{fromDate:fromDate,toDate:toDate,sampleType:sampleType,facilityId:facilityId},
+            sampleStatus = $("#sampleStatus").val();
+            $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-volume')); ?>",{fromDate:fromDate,toDate:toDate,facilityId:facilityId,sampleStatus:sampleStatus},
             function(data) {
             $("#pieChartLabResult").html(data);
             });
         }
+        
+        function doRedirect(lab){
+            window.open('/labs/sample-volume?fromMonth='+$('#mrp-lowerDate').val()+'&toMonth='+$('#mrp-upperDate').val()+'&lab='+lab+'&result='+$("#sampleStatus").val(), '_blank');
+        }
+        
         function getAverageLabTAT()
         {
             fromDate=$('#mrp-lowerDate').val();
@@ -471,7 +479,7 @@ foreach($sampleType as $samples){
             
             getSampleResult();
             getRequisitionFormsTested();
-            getSampleVolume();
+            getSampleVolume('load');
             getAverageLabTAT();
             getLabFacilities();
             getTestedSampleResult();

@@ -5,7 +5,7 @@
             type: 'column'
        },
        title: {
-            text: 'VL Samples Tested'
+            text: '<?php echo(isset($params['fromSrc']) && $params['fromSrc'] == 'sampleVolume')?'Sample Volume':'VL Samples Tested'; ?>'
        },
        credits: {
               enabled: false

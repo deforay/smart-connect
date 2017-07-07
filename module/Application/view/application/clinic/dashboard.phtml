@@ -425,6 +425,8 @@ foreach($sampleType as $samples){
     }
 
     function searchTestResultData(){
+      $.blockUI.defaults.css.border = '1px solid grey';
+      $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
       oTable.draw();
     }
     
@@ -473,6 +475,8 @@ foreach($sampleType as $samples){
     }
     
     function generateResultPDF(id){
+        $.blockUI.defaults.css.border = '1px solid grey';
+        $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
         $.post("<?php echo $this->url('clinics', array('action' => 'generate-result-pdf')); ?>", {id : id},
         function(data){
             if(data == "" || data == null || data == undefined){
@@ -484,6 +488,8 @@ foreach($sampleType as $samples){
     }
     
     function exportTestResult(){
+       $.blockUI.defaults.css.border = '1px solid grey';
+       $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI); 
        $.post("<?php echo $this->url('clinics', array('action' => 'export-result-excel')); ?>", {result : $("#result").val()},
         function(data){
             if(data == "" || data == null || data == undefined){

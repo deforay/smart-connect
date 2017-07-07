@@ -1,6 +1,3 @@
-<?php
-//\Zend\Debug\Debug::dump($result);die;
-?>
 <div id="gotoPie"></div>
 
 <script>
@@ -44,12 +41,19 @@
         },
         series: [{
             name: 'Labs',
+            point: {
+              events: {
+                  click: function(e) {
+                     doRedirect(this.name);
+                     e.preventDefault();
+                  }
+              }
+            },
             colorByPoint: true,
             data: [<?php
             if(count($result)>0 && $result!=''){
             foreach($result as $lab){
-                ?>
-                {
+                ?>{
                   name:<?php echo "'".$lab[1]."'";?>,
                   y:<?php echo $lab[0];?>
                 },
