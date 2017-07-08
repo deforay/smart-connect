@@ -1566,9 +1566,9 @@ class SampleTable extends AbstractTableGateway {
                     $endMonth = date("Y-m", strtotime(trim($params['toDate'])))."-31";
                 }
                 $fQuery = $sql->select()->from(array('f'=>'facility_details'))
-                ->join(array('vl'=>'dash_vl_request_form'),'vl.lab_id=f.facility_id',array('lab_id','sample_type','result'))
-                ->where('vl.lab_id !=0')
-                ->group('f.facility_id');
+                                        ->join(array('vl'=>'dash_vl_request_form'),'vl.lab_id=f.facility_id',array('lab_id','sample_type','result'))
+                                        ->where('vl.lab_id !=0')
+                                        ->group('f.facility_id');
                                         
                 if(isset($params['lab']) && trim($params['lab'])!=''){
                     $fQuery = $fQuery->where('f.facility_id="'.base64_decode(trim($params['lab'])).'"');
@@ -1666,10 +1666,9 @@ class SampleTable extends AbstractTableGateway {
                     $endMonth = date("Y-m", strtotime(trim($params['toDate'])))."-31";
                 }
                 $fQuery = $sql->select()->from(array('f'=>'facility_details'))
-                ->join(array('vl'=>'dash_vl_request_form'),'vl.lab_id=f.facility_id',array('lab_id','sample_type','result'))
-                ->where('vl.lab_id !=0')
-                ->group('f.facility_id');
-                                        
+                                        ->join(array('vl'=>'dash_vl_request_form'),'vl.lab_id=f.facility_id',array('lab_id','sample_type','result'))
+                                        ->where('vl.lab_id !=0')
+                                        ->group('f.facility_id');
                 if(isset($params['lab']) && trim($params['lab'])!=''){
                     $fQuery = $fQuery->where('f.facility_id="'.base64_decode(trim($params['lab'])).'"');
                 }else{
@@ -1743,7 +1742,7 @@ class SampleTable extends AbstractTableGateway {
                             $result['sample']['Suppressed'][$j] = $lessResult->total;
                             $greaterResult = $dbAdapter->query($cQueryStr." AND vl.result >= 1000", $dbAdapter::QUERY_MODE_EXECUTE)->current();
                             $result['sample']['Not Suppressed'][$j] = $greaterResult->total;
-                            $rejectionResult = $dbAdapter->query($cQueryStr." AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != 0", $dbAdapter::QUERY_MODE_EXECUTE)->current();
+                            $rejectionResult = $dbAdapter->query($cQueryStr." AND vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0", $dbAdapter::QUERY_MODE_EXECUTE)->current();
                             $result['sample']['Rejected'][$j] = $rejectionResult->total;
                             $result['lab'][$j] = $facility['facility_name'];
                             $j++;
@@ -2327,7 +2326,7 @@ class SampleTable extends AbstractTableGateway {
             $suppressedTotal = $lessResult->total;
             $greaterResult = $dbAdapter->query($cQueryStr." AND vl.result > 1000", $dbAdapter::QUERY_MODE_EXECUTE)->current();
             $notSuppressedTotal = $greaterResult->total;
-            $rejectionResult = $dbAdapter->query($cQueryStr." AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != 0", $dbAdapter::QUERY_MODE_EXECUTE)->current();
+            $rejectionResult = $dbAdapter->query($cQueryStr." AND vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0", $dbAdapter::QUERY_MODE_EXECUTE)->current();
             $rejectedTotal = $rejectionResult->total;
             $row[] = ucwords($aRow['facility_name']);
             $row[] = $suppressedTotal;
