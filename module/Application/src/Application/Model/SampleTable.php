@@ -2357,7 +2357,7 @@ class SampleTable extends AbstractTableGateway {
             $cQueryStr = $sql->getSqlStringForSqlObject($countQuery);
             $lessResult = $dbAdapter->query($cQueryStr." AND vl.result < 1000", $dbAdapter::QUERY_MODE_EXECUTE)->current();
             $suppressedTotal = $lessResult->total;
-            $greaterResult = $dbAdapter->query($cQueryStr." AND vl.result > 1000", $dbAdapter::QUERY_MODE_EXECUTE)->current();
+            $greaterResult = $dbAdapter->query($cQueryStr." AND vl.result >= 1000", $dbAdapter::QUERY_MODE_EXECUTE)->current();
             $notSuppressedTotal = $greaterResult->total;
             $rejectionResult = $dbAdapter->query($cQueryStr." AND vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0", $dbAdapter::QUERY_MODE_EXECUTE)->current();
             $rejectedTotal = $rejectionResult->total;
