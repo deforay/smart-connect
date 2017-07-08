@@ -1,6 +1,3 @@
-<?php
-//print_r($result);die;
-?>
 <script>
        $(function () {
         $('#piecontainer').highcharts({
@@ -11,7 +8,7 @@
             type: 'pie'
         },
         title: {
-            text: ''
+            text: 'Incomplete Fields'
         },
         credits: {
               enabled: false
@@ -24,12 +21,13 @@
                 allowPointSelect: true,
                 cursor: 'pointer',
                 dataLabels: {
-                    enabled: true,
+                    enabled: false,
                     format: '<b>{point.name}</b> : {point.percentage:.1f}%',
                     style: {
                         color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
                     }
-                }
+                },
+                showInLegend: true
             }
         },
         series: [{

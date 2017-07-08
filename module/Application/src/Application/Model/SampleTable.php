@@ -219,8 +219,6 @@ class SampleTable extends AbstractTableGateway {
             
             $sampleTypes = implode(',', $sampleId);
             
-            
-            
             $queryStr = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
                                     ->columns(array(
                                                     "total" => new Expression('COUNT(*)'),
@@ -518,7 +516,6 @@ class SampleTable extends AbstractTableGateway {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $common = new CommonService($this->sm);
-        
         if(trim($params['fromDate'])!= '' && trim($params['toDate'])!= ''){
             $startMonth = date("Y-m", strtotime(trim($params['fromDate'])));
             $endMonth = date("Y-m", strtotime(trim($params['toDate'])));
@@ -527,8 +524,6 @@ class SampleTable extends AbstractTableGateway {
             $i = 0;
             $completeResultCount = 0;
             $inCompleteResultCount = 0;
-            
-            
             
             $queryStr = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
                                     ->columns(array(
@@ -1881,14 +1876,14 @@ class SampleTable extends AbstractTableGateway {
                 }
                 $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
                 //echo $sQueryStr;die;
-                $lessResult = $dbAdapter->query($sQueryStr." AND vl.result<1000", $dbAdapter::QUERY_MODE_EXECUTE)->current();
+                $lessResult = $dbAdapter->query($sQueryStr." AND (vl.result<1000 or vl.result = 'Target Not Detected' or vl.result='tnd')", $dbAdapter::QUERY_MODE_EXECUTE)->current();
                 $result['rslt']['VL (< 1000 cp/ml)'][$j] = $lessResult->samples;
                 
                 $greaterResult = $dbAdapter->query($sQueryStr." AND vl.result>=1000", $dbAdapter::QUERY_MODE_EXECUTE)->current();
                 $result['rslt']['VL (>= 1000 cp/ml)'][$j] = $greaterResult->samples;
                 
-                $notTargetResult = $dbAdapter->query($sQueryStr." AND 'vl.result'='Target Not Detected'", $dbAdapter::QUERY_MODE_EXECUTE)->current();
-                $result['rslt']['VL Not Detected'][$j] = $notTargetResult->samples;
+                //$notTargetResult = $dbAdapter->query($sQueryStr." AND 'vl.result'='Target Not Detected'", $dbAdapter::QUERY_MODE_EXECUTE)->current();
+                //$result['rslt']['VL Not Detected'][$j] = $notTargetResult->samples;
                 $result['date'][$j] = $dFormat;
                 $month = strtotime("+1 month", $month);
               $j++;
