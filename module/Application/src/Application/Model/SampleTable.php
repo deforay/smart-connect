@@ -1508,8 +1508,6 @@ class SampleTable extends AbstractTableGateway {
             }
         }
         
-        
-        
 
             $queryStr = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
                                     ->columns(array(
@@ -1795,10 +1793,14 @@ class SampleTable extends AbstractTableGateway {
             $startMonth = date("Y-m", strtotime(trim($params['fromDate'])))."-01";
             $endMonth = date("Y-m", strtotime(trim($params['toDate'])))."-31";
         }
-        $sQuery = $sql->select()->from(array('rs'=>'r_sample_type'))
-                      ->columns(array('sample_name'))
-                      ->join(array('vl'=>'dash_vl_request_form'),'rs.sample_id=vl.sample_type',array('samples' => new Expression('COUNT(*)')))
-                      ->group('vl.sample_type');
+        
+        $sQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
+                                    ->columns(array(
+                                                    "DBS" => new Expression("SUM(CASE WHEN (vl.sample_type=8) THEN 1 ELSE 0 END)"),
+                                                    "Others" => new Expression("SUM(CASE WHEN vl.result>=1000 and vl.sample_type!=8 THEN 1 ELSE 0 END)"),
+                                              )
+                                            )
+                                    ->where(array("DATE(vl.sample_collection_date) <='$endMonth'", "DATE(vl.sample_collection_date) >='$startMonth'"));        
         if(isset($params['lab']) && trim($params['lab'])!=''){
             $sQuery = $sQuery->where('vl.lab_id="'.base64_decode(trim($params['lab'])).'"');
         }else {
@@ -1830,18 +1832,6 @@ class SampleTable extends AbstractTableGateway {
         if(isset($params['adherence']) && trim($params['adherence'])!=''){
                 $sQuery = $sQuery->where(array("vl.arv_adherance_percentage ='".$params['adherence']."'")); 
         }
-        
-        if(trim($params['fromDate'])!= '' && trim($params['toDate'])!= ''){
-                if(trim($params['fromDate'])!= trim($params['toDate'])){
-                   $sQuery = $sQuery->where(array("vl.sample_collection_date >='" . $startMonth ." 00:00:00". "'", "vl.sample_collection_date <='" .$endMonth." 23:59:00". "'"));
-                }else{
-                    $fromMonth = date("Y-m", strtotime(trim($params['fromDate'])));
-                    $month = strtotime($fromMonth);
-                    $mnth = date('m', $month);$year = date('Y', $month);
-                    $sQuery = $sQuery->where("Month(sample_collection_date)='".$mnth."' AND Year(sample_collection_date)='".$year."'");
-                }
-        }
-        
         if(isset($params['age']) && $params['age']!=''){
                 if($params['age'] == '<18'){
                   $sQuery = $sQuery->where("vl.patient_age_in_years < 18");
@@ -1851,8 +1841,19 @@ class SampleTable extends AbstractTableGateway {
                   $sQuery = $sQuery->where("vl.patient_age_in_years = 'unknown' OR vl.patient_age_in_years = '' OR vl.patient_age_in_years IS NULL");
                 }
         }
-        $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
-        return $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+        
+        $sQuery = $sQuery->group(array(new Expression('DATE(sample_collection_date)')));   
+        $sQuery = $sQuery->order(array(new Expression('DATE(sample_collection_date)')));            
+        
+        $sQuery = $sql->getSqlStringForSqlObject($sQuery);
+        $sampleResult = $dbAdapter->query($sQuery, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+        $result = array();
+        foreach($sampleResult as $count)
+        {
+            $result['DBS'] += $count['DBS'];
+            $result['Others'] += $count['Others'];
+        }
+        return $result;
     }
     
     public function fetchLabBarSampleDetails($params){

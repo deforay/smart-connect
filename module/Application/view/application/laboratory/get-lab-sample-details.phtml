@@ -21,12 +21,13 @@
                 allowPointSelect: true,
                 cursor: 'pointer',
                 dataLabels: {
-                    enabled: true,
+                    enabled: false,
                     format: '<b>{point.name}</b> : {point.percentage:.1f}%',
                     style: {
                         color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
                     }
-                }
+                },
+                showInLegend: true
             }
         },
         series: [{
@@ -34,11 +35,11 @@
             colorByPoint: true,
             data: [<?php
             if(count($result)>0 && $result!=''){
-            foreach($result as $lab){
+            foreach($result as $key=>$lab){
                 ?>
                 {
-                  name:<?php echo "'".$lab['sample_name']."'";?>,
-                  y:<?php echo $lab['samples'];?>
+                  name:<?php echo "'".$key."'";?>,
+                  y:<?php echo $result[$key];?>
                 },
                 <?php
             }
