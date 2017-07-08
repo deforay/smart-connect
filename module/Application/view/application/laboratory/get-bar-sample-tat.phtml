@@ -1,0 +1,61 @@
+<script>
+       $(function () {
+       $('#barcontainer').highcharts({
+       chart: {
+            type: 'column'
+       },
+       title: {
+            text: '<?php echo(isset($params['fromSrc']) && $params['fromSrc'] == 'sampleVolume')?'Sample Volume':'VL Samples Tested'; ?>'
+       },
+       credits: {
+              enabled: false
+       },
+        xAxis: {
+            categories: [<?php
+            if(isset($result['lab']) && count($result['lab'])>0){
+            foreach($result['lab'] as $lab){
+                echo "'".$lab."',";
+            }
+            }
+            ?>]
+        },
+        yAxis: {
+            allowDecimals: false,
+            min: 0,
+            title: {
+                text: ''
+            },
+            labels: { formatter: function() { return this.value; } },
+        },
+        tooltip: {
+            formatter: function () {
+                return '<b>' + this.x + '</b><br/>' +
+                    this.series.name + ': ' + this.y + '<br/>' +
+                    'Total: ' + this.point.stackTotal;
+            }
+        },
+        plotOptions: {
+            column: {
+                stacking: 'normal',
+                pointPadding: 0.2,
+                borderWidth: 0
+            }
+        },
+        series: [<?php
+              foreach($result['sample'] as $key=>$condition){
+              ?>
+              {
+              name:'<?php echo $key;?>',
+              data:[<?php
+                  foreach($condition as $count){
+                      echo '{y:'.$count.'},';
+                  }
+              ?>],
+              },
+              <?php
+              }
+            ?>],
+            colors: ['#60d18f','#ff1900','#333333'],
+    });
+    });
+</script>

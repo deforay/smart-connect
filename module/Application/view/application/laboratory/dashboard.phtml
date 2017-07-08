@@ -504,7 +504,7 @@ foreach($sampleType as $samples){
             fromDate=$('#mrp-lowerDate').val();
             toDate=$('#mrp-upperDate').val();
             facilityId = $("#labName").val();
-            $.post("<?php echo $this->url('laboratory', array('action' => 'get-lab-turn-around-time')); ?>",{fromDate:fromDate,toDate:toDate,facilityId:facilityId},
+            $.post("<?php echo $this->url('laboratory', array('action' => 'get-lab-turn-around-time')); ?>",{fromDate:fromDate,toDate:toDate,facilityId:facilityId,labSelectedText:$("#labName option:selected").text()},
             function(data) {
                 $("#labAverageTat").html(data);
             });
