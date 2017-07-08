@@ -119,5 +119,18 @@ class ClinicController extends AbstractActionController
             return $viewModel;
         }
     }
+    public function testResultViewAction()
+    {
+        $testResultId = base64_decode($this->params()->fromRoute('id'));
+        $sampleService = $this->getServiceLocator()->get('SampleService');
+        $configService = $this->getServiceLocator()->get('ConfigService');
+        $params['id'] = $testResultId;
+        $sampleResult = $sampleService->getSampleInfo($params);
+        $config=$configService->getAllGlobalConfig();
+        return new ViewModel(array(
+                'result' => $sampleResult,'config'=>$config
+            ));
+    }
+    
 }
 

@@ -305,6 +305,11 @@ class SampleService {
         $sampleDb = $this->sm->get('SampleTable');
         return $sampleDb->getLineOfTreatment($params);
     }
+    public function getVlOutComes($params)
+    {
+        $sampleDb = $this->sm->get('SampleTable');
+        return $sampleDb->getVlOutComes($params);
+    }
     public function getLabTurnAroundTime($params)
     {
         $sampleDb = $this->sm->get('SampleTable');

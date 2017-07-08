@@ -1,0 +1,233 @@
+<?php
+$patientFirstName = '';
+$patientLastName = '';
+$patientMobileNumber = '';
+if($result[0]['patient_first_name']!= NULL && trim($result[0]['patient_first_name'])!= ''){
+    $patientFirstName = ucwords($result[0]['patient_first_name']);
+}
+if($result[0]['patient_last_name']!= NULL && trim($result[0]['patient_last_name'])!= ''){
+    $patientLastName = ucwords($result[0]['patient_last_name']);
+}
+if($result[0]['patient_mobile_number']!= NULL && trim($result[0]['patient_mobile_number'])!= ''){
+    $patientMobileNumber = $result[0]['patient_mobile_number'];
+}
+if(!isset($result[0]['facility_code']) || $result[0]['facility_code'] == NULL || trim($result[0]['facility_code']) == ''){
+   $result[0]['facility_code'] = '';
+}
+if(!isset($result[0]['facility_state']) || $result[0]['facility_state'] == NULL || trim($result[0]['facility_state']) == ''){
+   $result[0]['facility_state'] = '';
+}
+if(!isset($result[0]['facility_district']) || $result[0]['facility_district'] == NULL || trim($result[0]['facility_district']) == ''){
+   $result[0]['facility_district'] = '';
+}
+if(!isset($result[0]['facility_name']) || $result[0]['facility_name'] == NULL || trim($result[0]['facility_name']) == ''){
+   $result[0]['facility_name'] = '';
+}
+//set Age
+$age = 'Unknown';
+if(isset($result[0]['patient_dob']) && $result[0]['patient_dob']!= NULL && trim($result[0]['patient_dob'])!='' && $result[0]['patient_dob']!='0000-00-00'){
+  $todayDate = strtotime(date('Y-m-d'));
+  $dob = strtotime($result[0]['patient_dob']);
+  $difference = $todayDate - $dob;
+  $seconds_per_year = 60*60*24*365;
+  $age = round($difference / $seconds_per_year);
+}elseif(isset($result[0]['patient_age_in_years']) && $result[0]['patient_age_in_years']!= NULL && trim($result[0]['patient_age_in_years'])!='' && trim($result[0]['patient_age_in_years']) >0){
+  $age = $result[0]['patient_age_in_years'];
+}elseif(isset($result[0]['patient_age_in_months']) && $result[0]['patient_age_in_months']!= NULL && trim($result[0]['patient_age_in_months'])!='' && trim($result[0]['patient_age_in_months']) >0){
+  if($result[0]['patient_age_in_months'] > 1){
+    $age = $result[0]['patient_age_in_months'].' months';
+  }else{
+    $age = $result[0]['patient_age_in_months'].' month';
+  }
+}
+//sample collection date
+if(isset($result[0]['sample_collection_date']) && $result[0]['sample_collection_date']!= NULL && trim($result[0]['sample_collection_date'])!='' && $result[0]['sample_collection_date']!='0000-00-00 00:00:00'){
+    $expStr=explode(" ",$result[0]['sample_collection_date']);
+    $result[0]['sample_collection_date']=$this->humanDateFormat($expStr[0]);
+    $sampleCollectionTime = $expStr[1];
+}else{
+    $result[0]['sample_collection_date']='';
+    $sampleCollectionTime = '';
+}
+//sample recieved date
+$sampleReceivedDate='';
+$sampleReceivedTime='';
+if(isset($result[0]['sample_received_at_vl_lab_datetime']) && $result[0]['sample_received_at_vl_lab_datetime']!= NULL && trim($result[0]['sample_received_at_vl_lab_datetime'])!='' && $result[0]['sample_received_at_vl_lab_datetime']!='0000-00-00 00:00:00'){
+  $expStr=explode(" ",$result[0]['sample_received_at_vl_lab_datetime']);
+  $sampleReceivedDate=$this->humanDateFormat($expStr[0]);
+  $sampleReceivedTime =$expStr[1];
+}
+//sample tested date
+if(isset($result[0]['sample_tested_datetime']) && $result[0]['sample_tested_datetime']!= NULL && trim($result[0]['sample_tested_datetime'])!='' && $result[0]['sample_tested_datetime']!='0000-00-00 00:00:00'){
+    $expStr=explode(" ",$result[0]['sample_tested_datetime']);
+    $result[0]['sample_tested_datetime']=$this->humanDateFormat($expStr[0])." ".$expStr[1];
+}else{
+    $result[0]['sample_tested_datetime']='';
+}
+//last viral load test date
+if(isset($result[0]['last_viral_load_date']) && $result[0]['last_viral_load_date']!= NULL && trim($result[0]['last_viral_load_date'])!='' && $result[0]['last_viral_load_date']!='0000-00-00'){
+    $result[0]['last_viral_load_date']=$this->humanDateFormat($result[0]['last_viral_load_date']);
+}else{
+    $result[0]['last_viral_load_date']='';
+}
+if(!isset($result[0]['patient_gender']) || trim($result[0]['patient_gender'])== ''){
+    $result[0]['patient_gender'] = 'not reported';
+}
+if(isset($result[0]['approvedBy']) && trim($result[0]['approvedBy'])!=''){
+    $resultApprovedBy = ucwords($result[0]['approvedBy']);
+}else{
+    $resultApprovedBy  = '';
+}
+?>
+<style>
+    .form-control{border:none;}
+    .labelName{font-size:11.5px;font-weight:bold}
+    p{padding:4px;}
+</style>
+<div class="page-bar">
+    <ul class="page-breadcrumb">
+        <li>
+            <a href="/">Dashboard</a>
+            <i class="fa fa-circle"></i>
+        </li>
+        <li>
+            <a href="/users">Clinics</a>
+            <i class="fa fa-circle"></i>
+        </li>
+        <li>
+            <a href="javascript:;">Sample Result View</a>
+        </li>
+    </ul>
+</div>
+<!-- END PAGE BAR -->
+<!-- BEGIN PAGE TITLE-->
+<h3 class="page-title"> Sample Result View
+</h3>
+<!-- END PAGE TITLE-->
+<!-- END PAGE HEADER-->
+<div class="row">
+    <div class="col-md-12">
+        <!-- BEGIN EXAMPLE TABLE PORTLET-->
+        <div class="portlet light bordered">
+            <div class="portlet-body">
+            <div class="portlet-body form">
+                <form class="form-horizontal">
+                <div class="row">
+                    <div class="col-md-4">
+                        <span class="labelName">Sample No.</span>
+                        <p><?php echo $result[0]['sample_code'];?></p>
+                    </div>
+                    <div class="col-md-4">
+                        <span class="labelName">Sample Collection Date</span>
+                        <p><?php echo $result[0]['sample_collection_date'];?></p>
+                    </div>
+                    <div class="col-md-4">
+                        <span class="labelName">ART (TRACNET) No.</span>
+                        <p><?php echo $result[0]['patient_art_no'];?></p>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-4">
+                        <span class="labelName">Patient First Name & Last Name</span>
+                        <p><?php echo $patientFirstName." ".$patientLastName;?></p>
+                    </div>
+                    <div class="col-md-4">
+                        <span class="labelName">Mobile No.</span>
+                        <p><?php echo $patientMobileNumber;?></p>
+                    </div>
+                    <div class="col-md-4">
+                        <span class="labelName">Age</span>
+                        <p><?php echo $age;?></p>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-4">
+                        <span class="labelName">Gender</span>
+                        <p><?php echo ucwords(str_replace("_"," ",$result[0]['patient_gender']));?></p>
+                    </div>
+                    
+                </div>
+                <span style="line-height:2px;border-bottom:2px solid #d3d3d3" class="col-sm-12"></span>
+                
+                <div class="row">
+                    <h6></h6>
+                    <div class="col-md-4">
+                        <span class="labelName">Clinic/Health Center Code</span>
+                        <p><?php echo $result[0]['facility_code'];?></p>
+                    </div>
+                    <div class="col-md-4">
+                        <span class="labelName">Province/State</span>
+                        <p><?php echo ucwords($result[0]['facility_state']);?></p>
+                    </div>
+                    <div class="col-md-4">
+                        <span class="labelName">District/County</span>
+                        <p><?php echo ucwords($result[0]['facility_district']);?></p>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-4">
+                        <span class="labelName">Clinic/Health Center Name</span>
+                        <p><?php echo ucwords($result[0]['facility_name']);?></p>
+                    </div>
+                    <div class="col-md-4">
+                        <span class="labelName">Clinician Name</span>
+                        <p><?php echo ucwords($result[0]['request_clinician_name']);?></p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <span class="labelName">Sample Receipt Date</span>
+                        <p><?php echo $sampleReceivedDate." ".$sampleReceivedTime;?></p>
+                    </div>
+                    <div class="col-md-4">
+                        <span class="labelName">Sample Test Date</span>
+                        <p><?php echo $result[0]['sample_tested_datetime'];?></p>
+                    </div>
+                    <div class="col-md-4">
+                        <span class="labelName">Specimen Type</span>
+                        <p><?php echo ucwords($result[0]['sample_name']);?></p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <span class="labelName">Platform</span>
+                        <p><?php echo ucwords($result[0]['vl_test_platform']);?></p>
+                    </div>
+                    <div class="col-md-4">
+                        <span class="labelName">VIRAL LOAD RESULT (copies/ml)</span>
+                        <p><?php echo $result[0]['result'];?></p>
+                    </div>
+                    <div class="col-md-4">
+                        <span class="labelName">Approved By (copies/ml)</span>
+                        <p><?php echo $resultApprovedBy;?></p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-10">
+                        <span class="labelName">Lab Comments</span>
+                        <p><?php echo ucfirst($result[0]['approver_comments']);?></p>
+                    </div>
+                </div>
+                <span style="line-height:2px;border-bottom:2px solid #d3d3d3" class="col-sm-12"></span>
+                <div class="row">
+                    <h4>Previous Results</h4>
+                    <div class="col-md-4">
+                        <span class="labelName">Date of Last Viral Load Test</span>
+                        <p><?php echo $result[0]['last_viral_load_date'];?></p>
+                    </div>
+                    <div class="col-md-4">
+                        <span class="labelName">Result of previous viral load(copies/ml) </span>
+                        <p><?php echo $result[0]['last_viral_load_result'];?></p>
+                    </div>
+                </div>
+                
+                </form>
+            </div>
+            </div>
+        </div>
+        <!-- END EXAMPLE TABLE PORTLET-->
+    </div>
+</div>

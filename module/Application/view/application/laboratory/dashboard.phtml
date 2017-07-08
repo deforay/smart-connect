@@ -333,7 +333,7 @@ foreach($sampleType as $samples){
 
                     </div>
                     <div class="row">
-                        <div class="col-md-6 col-sm-6">
+                        <div class="col-md-4 col-sm-4">
                             <div class="portlet box blue">
                                 <div class="portlet-title">
                                     <div class="caption">
@@ -344,7 +344,7 @@ foreach($sampleType as $samples){
                                 </div>
                             </div>                            
                         </div>
-                        <div class="col-md-6 col-sm-6">
+                        <div class="col-md-4 col-sm-4">
                             <div class="portlet box blue">
                                 <div class="portlet-title">
                                     <div class="caption">
@@ -352,6 +352,17 @@ foreach($sampleType as $samples){
                                     </div>
                                 </div>
                                 <div class="portlet-body" id="lineOfTreatmentPieChart">
+                                </div>
+                            </div>                            
+                        </div>
+                        <div class="col-md-4 col-sm-4">
+                            <div class="portlet box blue">
+                                <div class="portlet-title">
+                                    <div class="caption">
+                                        <span class="caption-subject">Vl Outcomes</span>
+                                    </div>
+                                </div>
+                                <div class="portlet-body" id="vlOutComePiechart">
                                 </div>
                             </div>                            
                         </div>
@@ -479,6 +490,15 @@ foreach($sampleType as $samples){
             $("#lineOfTreatmentPieChart").html(data);
             });
         }
+        function vlOutComePiechart(){
+            facilityId = $("#labName").val();
+            fromDate=$('#mrp-lowerDate').val();
+            toDate=$('#mrp-upperDate').val();
+            $.post("<?php echo $this->url('laboratory', array('action' => 'get-vl-out-comes')); ?>",{fromDate:fromDate,toDate:toDate,facilityId:facilityId},
+            function(data) {
+            $("#vlOutComePiechart").html(data);
+            });
+        }
         function getAverageLabTAT()
         {
             fromDate=$('#mrp-lowerDate').val();
@@ -525,6 +545,7 @@ foreach($sampleType as $samples){
             getTestedSampleResultBasedAge();
             femalePatient();
             lineOfTreatment();
+            vlOutComePiechart();
         }
             
 var MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
