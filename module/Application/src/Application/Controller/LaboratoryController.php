@@ -243,8 +243,13 @@ class LaboratoryController extends AbstractActionController
             $sampleService = $this->getServiceLocator()->get('SampleService');
             $sampleType = $sampleService->getSampleType();
             $result = $sampleService->getLabTurnAroundTime($params);
+            $labName = '';
+            if($params['labSelectedText']!='' && $params['labSelectedText']!='-- All Labs --'){
+                $lab = explode(" - ",$params['labSelectedText']);
+                $labName = $lab[0];
+            }
             $viewModel = new ViewModel();
-            $viewModel->setVariables(array('result' => $result,'sampleType'=>$sampleType))
+            $viewModel->setVariables(array('result' => $result,'sampleType'=>$sampleType,'labName'=>$labName))
                         ->setTerminal(true);
             return $viewModel;
         }
@@ -480,6 +485,106 @@ class LaboratoryController extends AbstractActionController
                        ->setTerminal(true);
            return $viewModel;
        }
+    }
+    public function getSampleTestedTurnAroundTimeAction(){
+        $this->layout()->setVariable('activeTab', 'labs-dashboard');
+        $gender="";
+        $month="";
+        $range="";
+        $age="";
+        $fromMonth="";
+        $toMonth="";
+        $labFilter="";
+        if($this->params()->fromQuery('gender')){
+            $gender=$this->params()->fromQuery('gender');
+        }
+        if($this->params()->fromQuery('month')){
+            $month=$this->params()->fromQuery('month');
+        }
+        if($this->params()->fromQuery('range')){
+            $range=$this->params()->fromQuery('range');
+        }
+        if($this->params()->fromQuery('age')){
+            $age=$this->params()->fromQuery('age');
+        }
+        if($this->params()->fromQuery('fromMonth')){
+            $fromMonth=$this->params()->fromQuery('fromMonth');
+        }
+        if($this->params()->fromQuery('toMonth')){
+            $toMonth=$this->params()->fromQuery('toMonth');
+        }
+        if($this->params()->fromQuery('lab')){
+            $labFilter=$this->params()->fromQuery('lab');
+        }
+        
+        $sampleService = $this->getServiceLocator()->get('SampleService');
+        $labName = $sampleService->getAllLabName();
+        $clinicName = $sampleService->getAllClinicName();
+        $hubName = $sampleService->getAllHubName();
+        $sampleType = $sampleService->getSampleType();
+        $currentRegimen = $sampleService->getAllCurrentRegimen();
+        return new ViewModel(array(
+                'sampleType' => $sampleType,
+                'labName' => $labName,
+                'clinicName' => $clinicName,
+                'hubName' => $hubName,
+                'currentRegimen' => $currentRegimen,
+                'searchMonth' => $month,
+                'searchGender' => $gender,
+                'searchRange' => $range,
+                'fromMonth' => $fromMonth,
+                'toMonth' => $toMonth,
+                'labFilter' => $labFilter,
+                'age' => $age
+        ));
+    }
+    
+    public function getBarSampleTatAction(){
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $sampleService = $this->getServiceLocator()->get('SampleService');
+            $result = $sampleService->getBarSampleDetails($params);
+            $viewModel = new ViewModel();
+            $viewModel->setVariables(array('params'=>$params,'result' => $result))
+                        ->setTerminal(true);
+            return $viewModel;
+        }
+    }
+    public function getPieSampleTatAction()
+    {
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $sampleService = $this->getServiceLocator()->get('SampleService');
+            $result = $sampleService->getSampleDetails($params);
+            $viewModel = new ViewModel();
+            $viewModel->setVariables(array('params'=>$params,'result' => $result))
+                        ->setTerminal(true);
+            return $viewModel;
+        }
+    }
+    public function getFilterSampleTatAction()
+    {
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $sampleService = $this->getServiceLocator()->get('SampleService');
+            $result = $sampleService->getFilterSampleTatDetails($params);
+            return $this->getResponse()->setContent(Json::encode($result));
+        }
+    }
+    public function exportSampleTestedResultTatexcelAction() {
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $sampleService = $this->getServiceLocator()->get('SampleService');
+            $file=$sampleService->generateLabTestedSampleTatExcel($params);
+            $viewModel = new ViewModel();
+            $viewModel->setVariables(array('file' =>$file))
+                      ->setTerminal(true);
+            return $viewModel;
+        }
     }
 }
 

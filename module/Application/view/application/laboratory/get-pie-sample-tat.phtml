@@ -1,0 +1,53 @@
+<script>
+       $(function () {
+        $('#piecontainer').highcharts({
+        chart: {
+            plotBackgroundColor: null,
+            plotBorderWidth: null,
+            plotShadow: false,
+            type: 'pie'
+        },
+        title: {
+            text: '<?php echo(isset($params['fromSrc']) && $params['fromSrc'] == 'sampleVolume')?'Sample Volume':'VL Samples Tested'; ?>'
+        },
+        
+        credits: {
+              enabled: false
+       },
+        tooltip: {
+            pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+        },
+        plotOptions: {
+            pie: {
+                allowPointSelect: true,
+                cursor: 'pointer',
+                dataLabels: {
+                    enabled: true,
+                    format: '<b>{point.myData}</b> : {point.percentage:.1f}% ({point.number})',
+                    style: {
+                        color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                    }
+                }
+            }
+        },
+        series: [{
+            name: 'Labs',
+            colorByPoint: true,
+            data: [<?php
+            if(count($result)>0 && $result!=''){
+            foreach($result as $lab){
+                ?>
+                {
+                  name:<?php echo "'".$lab[1]."'";?>,
+                  y:<?php echo $lab[0];?>,
+                  number:"<?php echo $lab[0]; ?>",
+                  myData:<?php echo "'".$lab[2]."'";?>,
+                },
+                <?php
+            }
+            }
+            ?>]
+        }]
+    });
+    });
+</script>
