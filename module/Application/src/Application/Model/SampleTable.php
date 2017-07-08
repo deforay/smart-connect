@@ -648,6 +648,7 @@ class SampleTable extends AbstractTableGateway {
         }
         $fQueryStr = $sql->getSqlStringForSqlObject($fQuery);
         $facilityResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+        $result = array();
         if($facilityResult){
                 $j = 0;
                 foreach($facilityResult as $facility){

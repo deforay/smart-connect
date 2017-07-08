@@ -36,6 +36,7 @@ use Application\Service\ConfigService;
 
 use Zend\Mvc\ModuleRouteListener;
 use Zend\Mvc\MvcEvent;
+use Zend\Cache\PatternFactory;
 
 use Zend\Session\Container;
 use Zend\View\Model\ViewModel;
@@ -129,12 +130,20 @@ class Module
                 },
 				'SampleTable' => function($sm) {
                     $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
-                    $table = new SampleTable($dbAdapter,$sm);
+                    $tableObj = new SampleTable($dbAdapter,$sm);
+					$table = PatternFactory::factory('object', [
+						'storage' => $sm->get('Cache\Persistent'),
+						'object' => $tableObj
+					]);   					
                     return $table;
                 },
 				'FacilityTable' => function($sm) {
                     $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
-                    $table = new FacilityTable($dbAdapter);
+                    $tableObj = new FacilityTable($dbAdapter);
+					$table = PatternFactory::factory('object', [
+						'storage' => $sm->get('Cache\Persistent'),
+						'object' => $tableObj
+					]);   					
                     return $table;
                 },
 				'FacilityTypeTable' => function($sm) {
