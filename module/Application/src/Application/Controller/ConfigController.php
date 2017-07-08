@@ -10,7 +10,7 @@ class ConfigController extends AbstractActionController
 {
     public function indexAction()
     {
-        $this->layout()->setVariable('activeTab', 'config');   
+        $this->layout()->setVariable('activeTab', 'config');  
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
@@ -22,6 +22,7 @@ class ConfigController extends AbstractActionController
     
     public function editAction()
     {
+        $this->layout()->setVariable('activeTab', 'config');
         $configService = $this->getServiceLocator()->get('ConfigService');
         $request = $this->getRequest();
         if ($request->isPost()) {

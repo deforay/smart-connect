@@ -174,9 +174,32 @@ class GlobalTable extends AbstractTableGateway {
     }
     
     public function updateConfigDetails($params) {
-        foreach ($params as $fieldName => $fieldValue) {
-	    $updateRes=$this->update(array('value' => $fieldValue), array('name' => $fieldName));
+        $updateRes = 0;
+        $common=new CommonService();
+        //for logo deletion
+        if(isset($params['removedLogoImage']) && trim($params['removedLogoImage']) != "" && file_exists(UPLOAD_PATH . DIRECTORY_SEPARATOR . "logo" . DIRECTORY_SEPARATOR . $params['removedLogoImage'])){
+            unlink(UPLOAD_PATH . DIRECTORY_SEPARATOR . "logo" . DIRECTORY_SEPARATOR . $params['removedLogoImage']);
+            $this->update(array('value'=>''),array('name'=>'logo'));
         }
+        //for logo updation
+        if(isset($_FILES['logo']['name']) && $_FILES['logo']['name']!= ""){
+            if(!file_exists(UPLOAD_PATH . DIRECTORY_SEPARATOR . "logo") && !is_dir(UPLOAD_PATH . DIRECTORY_SEPARATOR . "logo")) {
+                mkdir(UPLOAD_PATH . DIRECTORY_SEPARATOR . "logo");
+            }
+            $extension = strtolower(pathinfo(UPLOAD_PATH . DIRECTORY_SEPARATOR . $_FILES['logo']['name'], PATHINFO_EXTENSION));
+            $string = $common->generateRandomString(6).".";
+            $imageName = "logo".$string.$extension;
+            if (move_uploaded_file($_FILES["logo"]["tmp_name"], UPLOAD_PATH . DIRECTORY_SEPARATOR . "logo" . DIRECTORY_SEPARATOR . $imageName)) {
+                $this->update(array('value'=>$imageName),array('name'=>'logo'));
+            }
+        }
+        //for non-logo field updation
+        foreach ($params as $fieldName => $fieldValue) {
+            if($fieldName!= 'removedLogoImage'){
+	       $updateRes = $this->update(array('value' => $fieldValue), array('name' => $fieldName));
+            }
+        }
+      return $updateRes;
     }
     
 }

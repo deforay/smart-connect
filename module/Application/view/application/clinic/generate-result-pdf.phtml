@@ -12,7 +12,6 @@ $alertContainer->nbPages = count($sampleResult);
         
         public function Header() {
             // Logo
-            $image_file = APPLICATION_PATH . DIRECTORY_SEPARATOR . 'assets'. DIRECTORY_SEPARATOR . 'img'. DIRECTORY_SEPARATOR . $this->logo;
             $this->Image($image_file,20, 13, 15, '', '', '', 'T', false, 300, '', false, false, 0, false, false, false);
              //Set font
             $this->SetFont('helvetica', 'B', 7);
@@ -58,6 +57,11 @@ $alertContainer->nbPages = count($sampleResult);
     }
     $resultFilename = '';
     if(sizeof($sampleResult)> 0){
+        //set logo
+        $defaultLogo = APPLICATION_PATH . DIRECTORY_SEPARATOR . 'assets'. DIRECTORY_SEPARATOR . 'img'. DIRECTORY_SEPARATOR . 'default-logo.png';
+        if(isset($config['logo']) && trim($config['logo']) != "" && file_exists(UPLOAD_PATH . DIRECTORY_SEPARATOR . "logo" . DIRECTORY_SEPARATOR . $config['logo'])){
+            $defaultLogo = APPLICATION_PATH . DIRECTORY_SEPARATOR . 'uploads'. DIRECTORY_SEPARATOR . 'logo'. DIRECTORY_SEPARATOR . $config['logo'];
+        }
         //set print time
         $printedTime = date('Y-m-d H:i:s');
         $expStr=explode(" ",$printedTime);
@@ -72,7 +76,7 @@ $alertContainer->nbPages = count($sampleResult);
 	    $alertContainer->aliasPage = $page;
             // create new PDF document
             $pdf = new MYPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
-            $pdf->setSchemeName($config['header'],'default-logo.png',$result['labName']);
+            $pdf->setSchemeName($config['header'],$defaultLogo,$result['labName']);
             // set document information
             $pdf->SetCreator(PDF_CREATOR);
             $pdf->SetAuthor('VL Dashboard');
