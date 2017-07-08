@@ -278,8 +278,7 @@ class LaboratoryController extends AbstractActionController
         }
     }
     
-    public function getBarSampleDetailsAction()
-    {
+    public function getBarSampleDetailsAction(){
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
@@ -391,6 +390,7 @@ class LaboratoryController extends AbstractActionController
             return $viewModel;
         }
     }
+    
     public function sampleVolumeAction(){
         $this->layout()->setVariable('activeTab', 'labs-dashboard');
         $labFilter="";
@@ -418,8 +418,7 @@ class LaboratoryController extends AbstractActionController
         ));
     }
     
-    public function getFemalePatientResultAction()
-    {
+    public function getFemalePatientResultAction(){
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
@@ -431,6 +430,7 @@ class LaboratoryController extends AbstractActionController
             return $viewModel;
         }
     }
+    
     public function exportSampleResultExcelAction() {
         $request = $this->getRequest();
         if ($request->isPost()) {

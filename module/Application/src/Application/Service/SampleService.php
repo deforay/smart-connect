@@ -386,8 +386,7 @@ class SampleService {
         return $artCodeDb->fetchAllCurrentRegimen();
     }
     
-    public function getSampleDetails($params)
-    {
+    public function getSampleDetails($params){
         $sampleDb = $this->sm->get('SampleTable');
         return $sampleDb->fetchSampleDetails($params);
     }
@@ -618,7 +617,7 @@ class SampleService {
                         $suppressedTotal = $lessResult->total;
                         $greaterResult = $dbAdapter->query($cQueryStr." AND vl.result > 1000", $dbAdapter::QUERY_MODE_EXECUTE)->current();
                         $notSuppressedTotal = $greaterResult->total;
-                        $rejectionResult = $dbAdapter->query($cQueryStr." AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != 0", $dbAdapter::QUERY_MODE_EXECUTE)->current();
+                        $rejectionResult = $dbAdapter->query($cQueryStr." AND vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0", $dbAdapter::QUERY_MODE_EXECUTE)->current();
                         $rejectedTotal = $rejectionResult->total;
                         $row[] = ucwords($aRow['facility_name']);
                         $row[] = $suppressedTotal;

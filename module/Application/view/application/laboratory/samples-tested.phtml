@@ -235,7 +235,6 @@ if(isset($searchMonth) && trim($searchMonth)!= ''){
                     </div>
 
 <script>
-    
     function generateBarContainer() {
         $.blockUI.defaults.css.border = '1px solid grey';
         $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
@@ -256,7 +255,6 @@ if(isset($searchMonth) && trim($searchMonth)!= ''){
         });
     }
     
-    
     function generatePieContainer(){
         $.blockUI.defaults.css.border = '1px solid grey';
         $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
@@ -276,6 +274,7 @@ if(isset($searchMonth) && trim($searchMonth)!= ''){
             $("#piecontainer").html(data);
         });
     }
+    
     var oTable = null;
     $(document).ready(function(){
         $('#piebutton').on('click', function () {
@@ -295,7 +294,6 @@ if(isset($searchMonth) && trim($searchMonth)!= ''){
     });
 
     
-
 function searchSampleTestedResult(){
     generatePieContainer();
     generateBarContainer();
