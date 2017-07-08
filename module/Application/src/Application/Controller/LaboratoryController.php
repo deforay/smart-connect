@@ -151,8 +151,7 @@ class LaboratoryController extends AbstractActionController
         }
     }
     
-    public function getSampleTestResultAction()
-    {
+    public function getSampleTestResultAction(){
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
@@ -165,6 +164,7 @@ class LaboratoryController extends AbstractActionController
             return $viewModel;
         }
     }
+    
     public function getSampleTestResultVolumeAction()
     {
         $request = $this->getRequest();

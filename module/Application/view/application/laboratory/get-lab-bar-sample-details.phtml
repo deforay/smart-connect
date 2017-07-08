@@ -6,7 +6,7 @@
             type: 'column'
         },
         title: {
-            text: ''
+            text: 'VL Samples Tested'
         },
        credits: {
               enabled: false
@@ -44,12 +44,6 @@
         },
         series: [<?php
               foreach($result['rslt'] as $key=>$condition){
-              if($key!='VL Not Detected'){
-                $range = substr($key,4,6);
-                $range = preg_replace('/\s+/', '', $range);
-              }else{
-                $range = 'nd';
-              }
               ?>
               {
               name:'<?php echo $key;?>',
@@ -63,7 +57,7 @@
               }
             ?>
         ],
-        colors: ['#60d18f','#ff1900','#333333'],
+        colors: ['#60d18f','#ff1900'],
     });
     });
 </script>

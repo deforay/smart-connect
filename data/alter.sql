@@ -84,3 +84,8 @@ ALTER TABLE `dash_user_facility_map` CHANGE `map_id` `map_id` INT(11) NOT NULL A
 alter table dash_user_facility_map add FOREIGN KEY(facility_id) REFERENCES facility_details(facility_id);
 
 alter table dash_user_facility_map add FOREIGN KEY(user_id) REFERENCES dash_users(user_id);
+
+
+-- Amit 07 July 2017
+
+ALTER TABLE `dash_vl_request_form` ADD `line_of_treatment` VARCHAR(255) NULL AFTER `treatment_initiation`;
