@@ -1449,7 +1449,7 @@ class SampleTable extends AbstractTableGateway {
             if($aRow['result']==""){
                 $display= "none";
             }
-	    $row[]='<a href="#" class="btn btn-primary btn-xs">View</a>&nbsp;&nbsp;<a href="javascript:void(0);" class="btn btn-danger btn-xs" style="display:'.$display.'" onclick="generateResultPDF('.$aRow['vl_sample_id'].');">PDF</a>';
+	    $row[]='<a href="/clinics/test-result-view/'.base64_encode($aRow['vl_sample_id']).'" class="btn btn-primary btn-xs" target="_blank" style="display:'.$display.'">View</a>&nbsp;&nbsp;<a href="javascript:void(0);" class="btn btn-danger btn-xs" style="display:'.$display.'" onclick="generateResultPDF('.$aRow['vl_sample_id'].');">PDF</a>';
             
             $output['aaData'][] = $row;
         }
