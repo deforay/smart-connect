@@ -1296,8 +1296,8 @@ class SampleTable extends AbstractTableGateway {
         /* Array of database columns which should be read and sent back to DataTables. Use a space where
          * you want to insert a non-database field (for example a counter or static image)
         */
-        $aColumns = array('sample_code','DATE_FORMAT(sample_collection_date,"%d-%b-%Y")','DATE_FORMAT(sample_testing_date,"%d-%b-%Y")','result');
-        $orderColumns = array('sample_code','sample_collection_date','sample_testing_date','result');
+        $aColumns = array('sample_code','DATE_FORMAT(sample_collection_date,"%d-%b-%Y")','rejection_reason_name','DATE_FORMAT(sample_testing_date,"%d-%b-%Y")','result');
+        $orderColumns = array('sample_code','sample_collection_date','rejection_reason_name','sample_testing_date','result');
 
         /*
          * Paging
@@ -1383,6 +1383,7 @@ class SampleTable extends AbstractTableGateway {
         $sQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
                                 ->columns(array('vl_sample_id','sample_code','sample_collection_date','sample_type','sample_testing_date','result_value_log','result_value_absolute','result_value_text','result'))
 				->join(array('fd'=>'facility_details'),'fd.facility_id=vl.facility_id',array('facility_name'))
+				->join(array('r_r_r'=>'r_sample_rejection_reasons'),'r_r_r.rejection_reason_id=vl.reason_for_sample_rejection',array('rejection_reason_name'),'left')
 				->where(array('fd.facility_type'=>'1'));
         if($cDate!='' && $lastThirtyDay!=''){
             $sQuery = $sQuery->where(array("vl.sample_collection_date <='" . $cDate ." 23:59:00". "'", "vl.sample_collection_date >='" . $lastThirtyDay." 00:00:00". "'"));
@@ -1416,6 +1417,8 @@ class SampleTable extends AbstractTableGateway {
             $sQuery = $sQuery->where("vl.result !='' AND vl.result IS NOT NULL"); 
         }else if(isset($parameters['result']) && trim($parameters['result'])=='noresult'){
             $sQuery = $sQuery->where("(vl.result ='' OR vl.result IS NULL)");
+        }else if(isset($parameters['result']) && trim($parameters['result'])=='rejected'){
+            $sQuery = $sQuery->where("vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection!= '' AND vl.reason_for_sample_rejection != 0");
         }
         
         if (isset($sWhere) && $sWhere != "") {
@@ -1446,6 +1449,7 @@ class SampleTable extends AbstractTableGateway {
         $iQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
                                 ->columns(array('vl_sample_id','sample_code','sample_collection_date','sample_type','sample_testing_date','result_value_log','result_value_absolute','result_value_text','result'))
 				->join(array('fd'=>'facility_details'),'fd.facility_id=vl.facility_id',array('facility_name'))
+                                ->join(array('r_r_r'=>'r_sample_rejection_reasons'),'r_r_r.rejection_reason_id=vl.reason_for_sample_rejection',array('rejection_reason_name'),'left')
 				->where(array('fd.facility_type'=>'1'));
         if($logincontainer->role!= 1){
             $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:0;
@@ -1475,6 +1479,7 @@ class SampleTable extends AbstractTableGateway {
             }
             $row[] = $aRow['sample_code'];
             $row[] = $aRow['sample_collection_date'];
+            $row[] = (isset($aRow['rejection_reason_name']))?ucwords($aRow['rejection_reason_name']):'';
             $row[] = $aRow['sample_testing_date'];
 	    $row[] = $aRow['result'];
             $display = 'show';
