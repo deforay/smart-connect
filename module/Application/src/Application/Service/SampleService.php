@@ -474,7 +474,7 @@ class SampleService {
                         }
                         $row[] = $aRow['sample_code'];
                         $row[] = $aRow['sample_collection_date'];
-                        if(trim($params['result']) == 'rejected'){
+                        if(trim($params['result']) == '' || trim($params['result']) == 'rejected'){
                            $row[] = (isset($aRow['rejection_reason_name']))?ucwords($aRow['rejection_reason_name']):'';   
                         }else if(trim($params['result']) == '' || trim($params['result']) == 'result'){
                            $row[] = $aRow['sample_testing_date'];
