@@ -3,43 +3,21 @@
 ?>
 <div id="gmap-polyline"  class="mapChart" style="height:600px !important;"></div>
 <script>
+    
+    
+    var locations = null;
+    
     $(function () {
-    var LocsAv2 = [
-        <?php
-  foreach($result as $lab)
-  {
-    if(isset($lab['latitude']) && $lab['latitude'] != null && $lab['latitude'] != '' && isset($lab['longitude']) && $lab['longitude'] != null && $lab['longitude'] != ''){
-        ?>
-        {
-            lat: "<?php echo $lab['latitude'];?>",
-            lon:  "<?php echo $lab['longitude'];?>",
-            title: "<?php echo $lab['facility_name'];?>",
-            html: '<h3><?php echo $lab['facility_name'];?></h3>',
-            draggable: false
-        },
-    <?php
-    }
-  
-    foreach($lab['clinic'] as $cName)
-    {
-        if(isset($cName['latitude']) && $cName['latitude'] != null && $cName['latitude'] != '' && isset($cName['longitude']) && $cName['longitude'] != null && $cName['longitude'] != ''){
-        ?>
-            {
-                lat: "<?php echo $cName['latitude'];?>",
-                lon: "<?php echo $cName['longitude'];?>",
-                title: "<?php echo $cName['facility_name'];?>",
-                html: "<h3><?php echo $cName['facility_name'];?></h3>",
-                zoom: 8,
-                visible: true,
-                draggable: false
-            },
-        <?php
-        }
-    }
-  }
-  ?>
-];
-    var locations = [
+        initMap();
+    });
+
+  google.maps.event.addDomListener(window, "load", initMap);  
+
+function initMap() {
+    
+    
+    
+locations = [
   //Starting Point is "Home", and links to other locations"//
   
   <?php
@@ -58,23 +36,16 @@
         }
     }
   }
-  ?>
-  //['Mbabne', -26.305201, 31.1349953, '<?php echo $this->basePath('assets/img/lab0.png') ?>', '<strong>No. of Samples : 30</strong>'],
-  //['Big Bend', -26.781057, 31.9284363, '<?php echo $this->basePath('assets/img/clinic.png') ?>', '<strong>No. of Samples : 10</strong>'],
-  //['Simunye', -26.210721, 31.9243163, '<?php echo $this->basePath('assets/img/clinic.png') ?>', '<strong>No. of Samples : 33</strong>'],
-  //['Siteki', -26.434603, 31.9239713, '<?php echo $this->basePath('assets/img/clinic.png') ?>', '<strong>No. of Samples : 40</strong>'],
-  //['Maloma', -26.998871, 31.6534333, '<?php echo $this->basePath('assets/img/clinic.png') ?>', '<strong>No. of Samples : 90</strong>']
-]
-
-function initMap() {
+?>
+];    
 
   var map = new google.maps.Map(document.getElementById('gmap-polyline'), {
     scrollwheel: false,
-    zoom: 13,
+    zoom: 6,
     mapTypeId: google.maps.MapTypeId.ROADMAP,
     center: {
-      lat: 0,
-      lng: 0
+      lat: -18.665700,
+      lng: 35.535093
     }
   });
   var markers = [];
@@ -118,16 +89,6 @@ function initMap() {
     }
   }
   map.fitBounds(bounds);
-}
-google.maps.event.addDomListener(window, "load", initMap);
-initMap();
-    });
-    function getRandomColor() {
-    var letters = '0123456789ABCDEF';
-    var color = '#';
-    for (var i = 0; i < 6; i++ ) {
-        color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
-    }
+}    
+    
 </script>

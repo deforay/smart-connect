@@ -89,3 +89,14 @@ alter table dash_user_facility_map add FOREIGN KEY(user_id) REFERENCES dash_user
 -- Amit 07 July 2017
 
 ALTER TABLE `dash_vl_request_form` ADD `line_of_treatment` VARCHAR(255) NULL AFTER `treatment_initiation`;
+
+
+-- Amit 09 July 2017
+ALTER TABLE `dash_vl_request_form` ADD `sample_reordered` VARCHAR(255) NULL DEFAULT 'no' AFTER `sample_code`;
+ALTER TABLE `dash_vl_request_form` ADD INDEX(`patient_age_in_years `);
+ALTER TABLE `dash_vl_request_form` ADD INDEX(`lab_id`);
+ALTER TABLE `dash_vl_request_form` ADD INDEX(`sample_collection_date`);
+ALTER TABLE `dash_vl_request_form` ADD INDEX(`patient_gender`);
+ALTER TABLE `dash_vl_request_form` ADD INDEX(`sample_tested_datetime`);
+ALTER TABLE `dash_vl_request_form` ADD INDEX(`result`);
+ALTER TABLE `dash_vl_request_form` ADD INDEX(`sample_type`);
