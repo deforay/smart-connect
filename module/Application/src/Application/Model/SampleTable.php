@@ -1138,10 +1138,10 @@ class SampleTable extends AbstractTableGateway {
         $where = 'vl.result!=""';
         $testedTotal = $this->fetchChartOverAllLoadResult($params,$where);
         //total <1000
-        $where = 'vl.result<1000';
+        $where = 'vl.result < 1000';
         $lessTotal = $this->fetchChartOverAllLoadResult($params,$where);
         //total >=1000
-        $where = 'vl.result>=1000';
+        $where = 'vl.result >= 1000';
         $gTotal = $this->fetchChartOverAllLoadResult($params,$where);
         
         return array($testedTotal,$lessTotal,$gTotal,$overAllTotal);
@@ -1215,8 +1215,6 @@ class SampleTable extends AbstractTableGateway {
             $j++;
             
         }
-                    
-        //\Zend\Debug\Debug::dump($rResult);//die;
         return $rResult;
     }
     
@@ -1253,10 +1251,11 @@ class SampleTable extends AbstractTableGateway {
         if(isset($params['sampleId']) && $params['sampleId']!=''){
             $squery = $squery->where('vl.sample_type="'.base64_decode(trim($params['sampleId'])).'"');
         }
-        if(isset($params['testResult']) && $params['testResult']!=''){
-            $squery = $squery->where('vl.result'.$params['testResult']);
-        }
-        
+        //if(isset($params['testResult']) && trim($params['testResult']) == '<1000'){
+        //  $squery = $squery->where("vl.result < 1000");
+        //}else if(isset($params['testResult']) && trim($params['testResult']) == '>=1000') {
+        //  $squery = $squery->where("vl.result >= 1000");
+        //}
         if(isset($params['gender'] ) && trim($params['gender'])!=''){
             $squery = $squery->where(array("vl.patient_gender ='".$params['gender']."'")); 
         }
@@ -1300,8 +1299,8 @@ class SampleTable extends AbstractTableGateway {
         /* Array of database columns which should be read and sent back to DataTables. Use a space where
          * you want to insert a non-database field (for example a counter or static image)
         */
-        $aColumns = array('sample_code','DATE_FORMAT(sample_collection_date,"%d-%b-%Y")','DATE_FORMAT(sample_testing_date,"%d-%b-%Y")','result');
-        $orderColumns = array('sample_code','sample_collection_date','sample_testing_date','result');
+        $aColumns = array('sample_code','DATE_FORMAT(sample_collection_date,"%d-%b-%Y")','rejection_reason_name','DATE_FORMAT(sample_testing_date,"%d-%b-%Y")','result');
+        $orderColumns = array('sample_code','sample_collection_date','rejection_reason_name','sample_testing_date','result');
 
         /*
          * Paging
@@ -1387,6 +1386,7 @@ class SampleTable extends AbstractTableGateway {
         $sQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
                                 ->columns(array('vl_sample_id','sample_code','sample_collection_date','sample_type','sample_testing_date','result_value_log','result_value_absolute','result_value_text','result'))
 				->join(array('fd'=>'facility_details'),'fd.facility_id=vl.facility_id',array('facility_name'))
+				->join(array('r_r_r'=>'r_sample_rejection_reasons'),'r_r_r.rejection_reason_id=vl.reason_for_sample_rejection',array('rejection_reason_name'),'left')
 				->where(array('fd.facility_type'=>'1'));
         if($cDate!='' && $lastThirtyDay!=''){
             $sQuery = $sQuery->where(array("vl.sample_collection_date <='" . $cDate ." 23:59:00". "'", "vl.sample_collection_date >='" . $lastThirtyDay." 00:00:00". "'"));
@@ -1420,6 +1420,8 @@ class SampleTable extends AbstractTableGateway {
             $sQuery = $sQuery->where("vl.result !='' AND vl.result IS NOT NULL"); 
         }else if(isset($parameters['result']) && trim($parameters['result'])=='noresult'){
             $sQuery = $sQuery->where("(vl.result ='' OR vl.result IS NULL)");
+        }else if(isset($parameters['result']) && trim($parameters['result'])=='rejected'){
+            $sQuery = $sQuery->where("vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection!= '' AND vl.reason_for_sample_rejection != 0");
         }
         
         if (isset($sWhere) && $sWhere != "") {
@@ -1450,6 +1452,7 @@ class SampleTable extends AbstractTableGateway {
         $iQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
                                 ->columns(array('vl_sample_id','sample_code','sample_collection_date','sample_type','sample_testing_date','result_value_log','result_value_absolute','result_value_text','result'))
 				->join(array('fd'=>'facility_details'),'fd.facility_id=vl.facility_id',array('facility_name'))
+                                ->join(array('r_r_r'=>'r_sample_rejection_reasons'),'r_r_r.rejection_reason_id=vl.reason_for_sample_rejection',array('rejection_reason_name'),'left')
 				->where(array('fd.facility_type'=>'1'));
         if($logincontainer->role!= 1){
             $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:0;
@@ -1479,6 +1482,7 @@ class SampleTable extends AbstractTableGateway {
             }
             $row[] = $aRow['sample_code'];
             $row[] = $aRow['sample_collection_date'];
+            $row[] = (isset($aRow['rejection_reason_name']))?ucwords($aRow['rejection_reason_name']):'';
             $row[] = $aRow['sample_testing_date'];
 	    $row[] = $aRow['result'];
             $display = 'show';
@@ -1627,22 +1631,20 @@ class SampleTable extends AbstractTableGateway {
                                 if(isset($params['sampleType']) && trim($params['sampleType'])!=''){
                                     $countQuery = $countQuery->where('vl.sample_type="'.base64_decode(trim($params['sampleType'])).'"');
                                 }
-                                if(isset($params['testResult']) && $params['testResult']!=''){
-                                    if($params['testResult'] == '<1000'){
-                                      $countQuery = $countQuery->where("vl.result < 1000");
-                                    }else if($params['testResult'] == '>1000') {
-                                      $countQuery = $countQuery->where("vl.result >= 1000");
-                                    }
+                                if(isset($params['testResult']) && $params['testResult'] == '<1000'){
+                                  $countQuery = $countQuery->where("vl.result < 1000");
+                                }else if(isset($params['testResult']) && $params['testResult'] == '>=1000') {
+                                  $countQuery = $countQuery->where("vl.result >= 1000");
                                 }
                                 if(isset($params['gender']) && trim($params['gender'])!=''){
-                                        $countQuery = $countQuery->where('vl.patient_gender="'.$params['gender'].'"');
+                                    $countQuery = $countQuery->where('vl.patient_gender="'.$params['gender'].'"');
                                 }
                                 if(isset($params['currentRegimen']) && trim($params['currentRegimen'])!=''){
-                                        $countQuery = $countQuery->where('vl.current_regimen="'.base64_decode(trim($params['currentRegimen'])).'"');
+                                    $countQuery = $countQuery->where('vl.current_regimen="'.base64_decode(trim($params['currentRegimen'])).'"');
                                 }
                                 
                                 if(isset($params['adherence']) && trim($params['adherence'])!=''){
-                                        $countQuery = $countQuery->where(array("vl.arv_adherance_percentage ='".$params['adherence']."'")); 
+                                    $countQuery = $countQuery->where(array("vl.arv_adherance_percentage ='".$params['adherence']."'")); 
                                 }
                                 
                                 if(trim($params['fromDate'])!= '' && trim($params['toDate'])!= ''){
@@ -1726,12 +1728,10 @@ class SampleTable extends AbstractTableGateway {
                             if(isset($params['sampleType']) && trim($params['sampleType'])!=''){
                                 $countQuery = $countQuery->where('vl.sample_type="'.base64_decode(trim($params['sampleType'])).'"');
                             }
-                            if(isset($params['testResult']) && $params['testResult']!=''){
-                                if($params['testResult'] == '<1000'){
-                                  $countQuery = $countQuery->where("vl.result < 1000");
-                                }else if($params['testResult'] == '>1000') {
-                                  $countQuery = $countQuery->where("vl.result >= 1000");
-                                }
+                            if(isset($params['testResult']) && $params['testResult'] == '<1000'){
+                              $countQuery = $countQuery->where("vl.result < 1000");
+                            }else if(isset($params['testResult']) && $params['testResult'] == '>=1000') {
+                              $countQuery = $countQuery->where("vl.result >= 1000");
                             }
                             if(isset($params['gender']) && trim($params['gender'])!=''){
                                 $countQuery = $countQuery->where('vl.patient_gender="'.$params['gender'].'"');
@@ -1816,24 +1816,22 @@ class SampleTable extends AbstractTableGateway {
             $sQuery = $sQuery->where('vl.facility_id="'.base64_decode(trim($params['clinicId'])).'"');
         }
         if(isset($params['sampleType']) && trim($params['sampleType'])!=''){
-                $sQuery = $sQuery->where('rs.sample_id="'.base64_decode(trim($params['sampleType'])).'"');
+            $sQuery = $sQuery->where('rs.sample_id="'.base64_decode(trim($params['sampleType'])).'"');
         }
-        if(isset($params['testResult']) && $params['testResult']!=''){
-            if($params['testResult'] == '<1000'){
-              $sQuery = $sQuery->where("vl.result < 1000");
-            }else if($params['testResult'] == '>1000') {
-              $sQuery = $sQuery->where("vl.result >= 1000");
-            }
+        if(isset($params['testResult']) && $params['testResult'] == '<1000'){
+          $sQuery = $sQuery->where("vl.result < 1000");
+        }else if(isset($params['testResult']) && $params['testResult'] == '>=1000') {
+          $sQuery = $sQuery->where("vl.result >= 1000");
         }
         if(isset($params['gender']) && trim($params['gender'])!=''){
-                $sQuery = $sQuery->where('vl.patient_gender="'.$params['gender'].'"');
+            $sQuery = $sQuery->where('vl.patient_gender="'.$params['gender'].'"');
         }
         if(isset($params['currentRegimen']) && trim($params['currentRegimen'])!=''){
-                $sQuery = $sQuery->where('vl.current_regimen="'.base64_decode(trim($params['currentRegimen'])).'"');
+            $sQuery = $sQuery->where('vl.current_regimen="'.base64_decode(trim($params['currentRegimen'])).'"');
         }
         
         if(isset($params['adherence']) && trim($params['adherence'])!=''){
-                $sQuery = $sQuery->where(array("vl.arv_adherance_percentage ='".$params['adherence']."'")); 
+            $sQuery = $sQuery->where(array("vl.arv_adherance_percentage ='".$params['adherence']."'")); 
         }
         if(isset($params['age']) && $params['age']!=''){
                 if($params['age'] == '<18'){
@@ -1887,24 +1885,22 @@ class SampleTable extends AbstractTableGateway {
                     $sQuery = $sQuery->where('vl.facility_id="'.base64_decode(trim($params['clinicId'])).'"');
                 }
                 if(isset($params['sampleType']) && trim($params['sampleType'])!=''){
-                        $sQuery = $sQuery->where('rs.sample_id="'.base64_decode(trim($params['sampleType'])).'"');
+                    $sQuery = $sQuery->where('rs.sample_id="'.base64_decode(trim($params['sampleType'])).'"');
                 }
-                if(isset($params['testResult']) && $params['testResult']!=''){
-                    if($params['testResult'] == '<1000'){
-                      $sQuery = $sQuery->where("vl.result < 1000");
-                    }else if($params['testResult'] == '>1000') {
-                      $sQuery = $sQuery->where("vl.result >= 1000");
-                    }
+                if(isset($params['testResult']) && $params['testResult'] == '<1000'){
+                    $sQuery = $sQuery->where("vl.result < 1000");
+                }else if(isset($params['testResult']) && $params['testResult'] == '>=1000') {
+                    $sQuery = $sQuery->where("vl.result >= 1000");
                 }
                 if(isset($params['gender']) && trim($params['gender'])!=''){
-                        $sQuery = $sQuery->where('vl.patient_gender="'.$params['gender'].'"');
+                    $sQuery = $sQuery->where('vl.patient_gender="'.$params['gender'].'"');
                 }
                 if(isset($params['currentRegimen']) && trim($params['currentRegimen'])!=''){
-                        $sQuery = $sQuery->where('vl.current_regimen="'.base64_decode(trim($params['currentRegimen'])).'"');
+                    $sQuery = $sQuery->where('vl.current_regimen="'.base64_decode(trim($params['currentRegimen'])).'"');
                 }
                 
                 if(isset($params['adherence']) && trim($params['adherence'])!=''){
-                        $sQuery = $sQuery->where(array("vl.arv_adherance_percentage ='".$params['adherence']."'")); 
+                    $sQuery = $sQuery->where(array("vl.arv_adherance_percentage ='".$params['adherence']."'")); 
                 }
                 
                 if(isset($params['age']) && $params['age']!=''){
@@ -2039,13 +2035,13 @@ class SampleTable extends AbstractTableGateway {
             }
         }if(isset($parameters['searchGender'] ) && trim($parameters['searchGender'])!=''){
             $sQuery = $sQuery->where(array("vl.patient_gender ='".$parameters['searchGender']."'")); 
-        }if(isset($parameters['testResult']) && $parameters['testResult']!=''){
-            if($parameters['testResult'] == '<1000'){
-              $sQuery = $sQuery->where("vl.result < 1000");
-            }else if($parameters['testResult'] == '>1000') {
-              $sQuery = $sQuery->where("vl.result >= 1000");
-            }
-        }if(isset($parameters['lab'] ) && trim($parameters['lab'])!=''){
+        }
+        if(isset($parameters['testResult']) && $parameters['testResult'] == '<1000'){
+          $sQuery = $sQuery->where("vl.result < 1000");
+        }else if(isset($parameters['testResult']) && $parameters['testResult'] == '>=1000') {
+          $sQuery = $sQuery->where("vl.result >= 1000");
+        }
+        if(isset($parameters['lab'] ) && trim($parameters['lab'])!=''){
             $sQuery = $sQuery->where(array("vl.lab_id ='".base64_decode($parameters['lab'])."'")); 
         }else{
             if($logincontainer->role!= 1){
@@ -2115,13 +2111,13 @@ class SampleTable extends AbstractTableGateway {
             }
         }if(isset($parameters['searchGender'] ) && trim($parameters['searchGender'])!=''){
             $iQuery = $iQuery->where(array("vl.patient_gender ='".$parameters['searchGender']."'")); 
-        }if(isset($parameters['testResult']) && $parameters['testResult']!=''){
-            if($parameters['testResult'] == '<1000'){
-              $iQuery = $iQuery->where("vl.result < 1000");
-            }else if($parameters['testResult'] == '>1000') {
-              $iQuery = $iQuery->where("vl.result >= 1000");
-            }
-        }if(isset($parameters['lab'] ) && trim($parameters['lab'])!=''){
+        }
+        if(isset($parameters['testResult']) && $parameters['testResult'] == '<1000'){
+          $iQuery = $iQuery->where("vl.result < 1000");
+        }else if(isset($parameters['testResult']) && $parameters['testResult'] == '>=1000'){
+          $iQuery = $iQuery->where("vl.result >= 1000");
+        }
+        if(isset($parameters['lab'] ) && trim($parameters['lab'])!=''){
             $iQuery = $iQuery->where(array("vl.lab_id ='".base64_decode($parameters['lab'])."'")); 
         }else{
             if($logincontainer->role!= 1){

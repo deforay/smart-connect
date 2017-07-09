@@ -218,6 +218,7 @@ foreach($sampleType as $samples){
                                                             <option value="">All Samples</option>
                                                             <option value="result">Samples with Test Results</option>
                                                             <option value="noresult">Samples Awaiting Results</option>
+                                                            <option value="rejected">Rejected Samples</option>
                                                         </select>
                                                     </div>
                                                     <div class="tools" style="width:40%;float:right;text-align:right;">
@@ -232,6 +233,7 @@ foreach($sampleType as $samples){
                                                             <tr>
                                                                 <th> Sample ID </th>
                                                                 <th> Date Collected</th>
+                                                                <th> Rejection Reason</th>
                                                                 <th> Date Tested</th>
                                                                 <th> Viral Load <br> (cp/mL) </th>                                                                
                                                                 <th> Action </th>
@@ -239,7 +241,7 @@ foreach($sampleType as $samples){
                                                         </thead>
                                                         <tbody>
                                                             <tr>
-                                                                <td colspan="5" class="dataTables_empty">Loading data from server</td>
+                                                                <td colspan="6" class="dataTables_empty">Loading data from server</td>
                                                             </tr>
                                                         </tbody>
                                                     </table>
@@ -255,10 +257,8 @@ foreach($sampleType as $samples){
     var oTable = null;
     var oallTable = null;
     $(function () {
-        
         $.blockUI.defaults.css.border = '1px solid grey'; 
         $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
-         
          
         $('#dashboard-report-range').daterangepicker({
                 "ranges": {
@@ -333,6 +333,7 @@ foreach($sampleType as $samples){
             "bProcessing": true,
             "bServerSide": true,
             "aoColumns": [
+                {"sClass":"center"},
                 {"sClass":"center"},
                 {"sClass":"center"},
                 {"sClass":"center"},
@@ -428,12 +429,19 @@ foreach($sampleType as $samples){
         if($('#result').val() == ''){
             oTable.column(2).visible(true);
             oTable.column(3).visible(true);
+            oTable.column(4).visible(true);
         }else if($('#result').val() == 'result'){
-            oTable.column(2).visible(true);
+            oTable.column(2).visible(false);
             oTable.column(3).visible(true);
+            oTable.column(4).visible(true);
         }else if($('#result').val() == 'noresult'){
             oTable.column(2).visible(false);
             oTable.column(3).visible(false);
+            oTable.column(4).visible(false);
+        }else if($('#result').val() == 'rejected'){
+           oTable.column(3).visible(false);
+           oTable.column(4).visible(false);
+           oTable.column(2).visible(true);
         }
         searchTestResultData();
     }

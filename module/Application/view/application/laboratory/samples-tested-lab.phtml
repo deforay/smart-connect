@@ -151,7 +151,7 @@ if(isset($searchMonth) && trim($searchMonth)!= ''){
                                 <label class="control-label">Test Result&nbsp;</label>
                                 <select class="form-control" name="testResult" id="testResult" title="Please choose result">
                                 <option value="">All</option>
-                                <option value=">1000" <?php echo((isset($searchRange) && $searchRange=='>1000') ? "selected='selected'" : "") ?>>> 1000 cp/mL</option>
+                                <option value=">=1000" <?php echo((isset($searchRange) && $searchRange=='>1000') ? "selected='selected'" : "") ?>>>= 1000 cp/mL</option>
                                 <option value="<1000" <?php echo((isset($searchRange) && $searchRange=='<1000') ? "selected='selected'" : "") ?>>< 1000 cp/mL</option>
                               </select>
                             </div>
@@ -285,8 +285,6 @@ if(isset($searchMonth) && trim($searchMonth)!= ''){
       generateBarContainer();
       loadSampleDataTable();
     });
-
-    
 
 function searchSampleTestedResult(){
     generatePieContainer();
