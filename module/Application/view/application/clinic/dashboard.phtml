@@ -1,5 +1,4 @@
 <?php
-
 $sType = '';
 foreach($sampleType as $samples){
     $sType.='<option value="'.base64_encode($samples['sample_id']).'">'.ucwords($samples['sample_name']).'</option>';
@@ -67,7 +66,7 @@ foreach($sampleType as $samples){
                                 <label class="control-label">Test Result&nbsp;</label>
                               <select class="form-control" name="testResult" id="testResult" title="Please choose result">
                                 <option value="">All</option>
-                                <option value=">1000">> 1000 cp/mL</option>
+                                <option value=">=1000">>= 1000 cp/mL</option>
                                 <option value="<1000">< 1000 cp/mL</option>
                               </select>
                             </div>
@@ -169,8 +168,7 @@ foreach($sampleType as $samples){
                                             <select id="testReason" class="btn white btn-outline btn-circle btn-sm dropdown-toggle" onchange="getAllTestReason();">
                                                 <option value="">Test Reasons</option>
                                                 <?php
-                                                foreach($testReason as $test)
-                                                {
+                                                foreach($testReason as $test){
                                                     ?>
                                                     <option value="<?php echo base64_encode($test['test_reason_id']);?>"><?php echo $test['test_reason_name'];?></option>
                                                     <?php
@@ -313,8 +311,6 @@ foreach($sampleType as $samples){
             });
                 $('#dashboard-report-range span').html(moment().subtract('days', 29).format('MMMM D, YYYY') + ' to ' + moment().format('MMMM D, YYYY'));
                 $('#dashboard-report-range').show();
-       
-     
                 getAllFunction();
      
     });
@@ -331,8 +327,8 @@ foreach($sampleType as $samples){
         overAllViralLoad();
         testResul();
     }
-    function testResul()
-    {
+    
+    function testResul(){
         oTable = $('#testResults').DataTable( {
             "bProcessing": true,
             "bServerSide": true,
@@ -398,9 +394,7 @@ foreach($sampleType as $samples){
         } );
     }
     
-    function getOverAllViralLoad()
-    {
-        
+    function getOverAllViralLoad(){
         dateRange = $("#sampleCollectionDate").val();
         clinicId = $("#clinicId").val();
         sampleId = $("#sampleId").val();
@@ -444,8 +438,7 @@ foreach($sampleType as $samples){
         searchTestResultData();
     }
     
-    function getTestedSampleResult()
-    {
+    function getTestedSampleResult(){
         sampleType = $("#sampleId").val();
         testResult = $("#testResult").val();
         age = $("#age").val();
