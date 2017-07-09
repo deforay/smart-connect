@@ -1,3 +1,8 @@
+<?php
+//\Zend\Debug\Debug::dump($result);die;
+$less1000 = array('DBS'=>'#088738', 'Others' => '#60d18f');
+$more1000 = array('DBS'=>'#ff1900', 'Others' => '#F2786D');
+?>
 <div id="samplesTestedVsSupressed"></div>
 
 <script>
@@ -49,7 +54,6 @@
         },
         series: [
             <?php
-            //$name = 'female';
             $sampleType = array();
             $sampleType[0]['sample_name'] = 'DBS';
             $sampleType[1]['sample_name'] = 'Others';
@@ -64,7 +68,22 @@
                             echo $count.",";
                         }
                     ?>],
-                    stack:'<?php echo $sample['sample_name'];?>'
+                    stack:'<?php echo $sample['sample_name'];?>',
+                    <?php
+                     if($key == "VL (< 1000 cp/ml)"){
+                     
+                            if(isset($less1000[$sample['sample_name']])) { ?>
+                            
+                                   color: '<?php echo $less1000[$sample['sample_name']]; ?>'
+                            
+                            <?php } else{ ?>
+                                   color: '<?php echo $more1000[$sample['sample_name']]; ?>'
+                     <?php }
+                     } else { ?>
+                        color: '#ff1900'     
+                     <?php
+                     }
+                     ?>
                     },
                     <?php
                     }

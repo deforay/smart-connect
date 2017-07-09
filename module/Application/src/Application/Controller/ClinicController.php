@@ -121,10 +121,10 @@ class ClinicController extends AbstractActionController
     
     public function testResultViewAction(){
         $this->layout()->setVariable('activeTab', 'clinics-dashboard');
-        $testResultId = base64_decode($this->params()->fromRoute('id'));
+        $params = array();
+        $params['id'] = base64_decode($this->params()->fromRoute('id'));
         $sampleService = $this->getServiceLocator()->get('SampleService');
         $configService = $this->getServiceLocator()->get('ConfigService');
-        $params['id'] = $testResultId;
         $sampleResult = $sampleService->getSampleInfo($params);
         $config=$configService->getAllGlobalConfig();
         return new ViewModel(array(
