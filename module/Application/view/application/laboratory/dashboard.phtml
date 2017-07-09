@@ -372,12 +372,21 @@ foreach($sampleType as $samples){
                             <div class="portlet box blue">
                                 <div class="portlet-title">
                                     <div class="caption ">
-                                        <span class="caption-subject">Facilities</span>
+                                        <span class="caption-subject">All Facilities - Geolocation</span>
                                     </div>
+                                    
+                                    <div class="actions">
+                                        <div class="btn-group">
+                                            <button class="btn btn-danger" onclick="expandMap()"><span>Expand Map</span></button>
+                                        </div>
+                                    </div>   
+                                    
                                 </div>                                
                                 <div class="portlet-body">
                                     <div id="controls-polyline"></div>
-                                    <div id="gmap-polyline-data"  ></div>
+                                    <div id="gmap-polyline-data">
+                                        <div id="gmap-polyline"  class="mapChart" style="height:600px !important;"></div>
+                                    </div>
                                     
                                 </div>
                             </div>
@@ -392,20 +401,25 @@ foreach($sampleType as $samples){
         
         <script>
             
-            var gfxPath = 'https://raw.githubusercontent.com/highslide-software/pattern-fill/master/graphics/';
+            //var gfxPath = 'https://raw.githubusercontent.com/highslide-software/pattern-fill/master/graphics/';
             var dpicker = "";
             var startDate;
             var endDate;
 
+        function expandMap(){
+            window.open("/labs/get-facilities-geolocation?fromDate="+$('#mrp-lowerDate').val()+"&toDate="+$('#mrp-upperDate').val());
+        }    
+            
+            
             
         function getSampleResult(){
             fromDate=$('#mrp-lowerDate').val();
             toDate=$('#mrp-upperDate').val();
             facilityId = $("#labName").val();
-        $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-result')); ?>",{fromDate:fromDate,toDate:toDate,facilityId:facilityId},
-        function(data) {
-            $("#sampleResultDetails").html(data);
-        });
+            $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-result')); ?>",{fromDate:fromDate,toDate:toDate,facilityId:facilityId},
+            function(data) {
+                $("#sampleResultDetails").html(data);
+            });
         }
         function getTestedSampleResult()
         {
@@ -516,14 +530,11 @@ foreach($sampleType as $samples){
             facilityId = $("#labName").val();
             $.post("<?php echo $this->url('laboratory', array('action' => 'get-lab-facilities')); ?>",{fromDate:fromDate,toDate:toDate,facilityId:facilityId},
             function(data) {
-            $("#gmap-polyline-data").html(data);
+                $("#gmap-polyline-data").html(data);
             });
         }
             
             $(function () {
-                $(".fetchAll").on("change", function(){
-                    getEverything();
-                });
                 getEverything();
                 getLabFacilities();
             });
