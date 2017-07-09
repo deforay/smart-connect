@@ -860,9 +860,7 @@ class SampleTable extends AbstractTableGateway {
                                     ->columns(array(
                                                     "total" => new Expression('COUNT(*)'),
                                                     "monthDate" => new Expression("DATE_FORMAT(DATE(sample_collection_date), '%b-%Y')"),
-                                                    
-                                                    "AvgDiff" => new Expression("AVG(DATEDIFF(sample_tested_datetime,sample_collection_date))"),
-                                             
+                                                    "AvgDiff" => new Expression("AVG(TIMESTAMPDIFF(DAY,sample_tested_datetime,sample_collection_date))"),
                                               )
                                             );
             if(isset($params['facilityId']) && $params['facilityId'] !=''){
@@ -881,7 +879,7 @@ class SampleTable extends AbstractTableGateway {
             $queryStr = $queryStr->group(array(new Expression('MONTH(sample_collection_date)')));   
             $queryStr = $queryStr->order(array(new Expression('DATE(sample_collection_date)')));               
             $queryStr = $sql->getSqlStringForSqlObject($queryStr);
-            //echo $queryStr;die;
+            echo $queryStr;die;
             //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             //echo $queryStr;die;
             $sampleResult = $common->cacheQuery($queryStr,$dbAdapter);            
