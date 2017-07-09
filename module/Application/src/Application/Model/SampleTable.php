@@ -860,9 +860,7 @@ class SampleTable extends AbstractTableGateway {
                                     ->columns(array(
                                                     "total" => new Expression('COUNT(*)'),
                                                     "monthDate" => new Expression("DATE_FORMAT(DATE(sample_collection_date), '%b-%Y')"),
-                                                    
-                                                    "AvgDiff" => new Expression("AVG(DATEDIFF(sample_tested_datetime,sample_collection_date))"),
-                                             
+                                                    "AvgDiff" => new Expression("AVG(TIMESTAMPDIFF(DAY,sample_tested_datetime,sample_collection_date))"),
                                               )
                                             );
             if(isset($params['facilityId']) && $params['facilityId'] !=''){
@@ -881,7 +879,7 @@ class SampleTable extends AbstractTableGateway {
             $queryStr = $queryStr->group(array(new Expression('MONTH(sample_collection_date)')));   
             $queryStr = $queryStr->order(array(new Expression('DATE(sample_collection_date)')));               
             $queryStr = $sql->getSqlStringForSqlObject($queryStr);
-            //echo $queryStr;die;
+            echo $queryStr;die;
             //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             //echo $queryStr;die;
             $sampleResult = $common->cacheQuery($queryStr,$dbAdapter);            
@@ -1051,10 +1049,11 @@ class SampleTable extends AbstractTableGateway {
         if(isset($parameters['sampleId']) && $parameters['sampleId']!=''){
             $sQuery = $sQuery->where('vl.sample_type="'.base64_decode(trim($parameters['sampleId'])).'"');
         }
-        if(isset($parameters['testResult']) && $parameters['testResult']!=''){
-            $sQuery = $sQuery->where('vl.result'.$parameters['testResult']);
+        if(isset($parameters['testResult']) && trim($parameters['testResult']) == '<1000'){
+          $sQuery = $sQuery->where("vl.result < 1000");
+        }else if(isset($parameters['testResult']) && trim($parameters['testResult']) == '>=1000') {
+          $sQuery = $sQuery->where("vl.result >= 1000");
         }
-        
         if(isset($parameters['gender'] ) && trim($parameters['gender'])!=''){
             $sQuery = $sQuery->where(array("vl.patient_gender ='".$parameters['gender']."'")); 
         }
@@ -1133,15 +1132,12 @@ class SampleTable extends AbstractTableGateway {
         //total tested
         $where = '';
         $overAllTotal = $this->fetchChartOverAllLoadResult($params,$where);
-        
         $where = 'vl.result!=""';
         $testedTotal = $this->fetchChartOverAllLoadResult($params,$where);
-        
         //total <1000
-    
         $where = 'vl.result<1000';
         $lessTotal = $this->fetchChartOverAllLoadResult($params,$where);
-        //total >1000
+        //total >=1000
         $where = 'vl.result>=1000';
         $gTotal = $this->fetchChartOverAllLoadResult($params,$where);
         
@@ -1184,8 +1180,10 @@ class SampleTable extends AbstractTableGateway {
         if(isset($params['sampleId']) && $params['sampleId']!=''){
             $rQuery = $rQuery->where('vl.sample_type="'.base64_decode(trim($params['sampleId'])).'"');
         }
-        if(isset($params['testResult']) && $params['testResult']!=''){
-            $rQuery = $rQuery->where('vl.result'.$params['testResult']);
+        if(isset($params['testResult']) && trim($params['testResult']) == '<1000'){
+          $rQuery = $rQuery->where("vl.result < 1000");
+        }else if(isset($params['testResult']) && trim($params['testResult']) == '>=1000') {
+          $rQuery = $rQuery->where("vl.result >= 1000");
         }
         if(isset($params['gender'] ) && trim($params['gender'])!=''){
             $rQuery = $rQuery->where(array("vl.patient_gender ='".$params['gender']."'")); 
@@ -1265,7 +1263,7 @@ class SampleTable extends AbstractTableGateway {
             }
         }
         if($where!=''){
-        $squery = $squery->where($where);    
+          $squery = $squery->where($where);  
         }
         $sQueryStr = $sql->getSqlStringForSqlObject($squery);
         //echo $sQueryStr;die;
@@ -1275,8 +1273,7 @@ class SampleTable extends AbstractTableGateway {
     //end clinic details
     
     //get distinict date
-    public function getDistinctDate($cDate,$lastThirtyDay)
-    {
+    public function getDistinctDate($cDate,$lastThirtyDay){
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $squery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))

@@ -17,11 +17,11 @@ class ClinicController extends AbstractActionController
 
     public function dashboardAction()
     {
+         $this->layout()->setVariable('activeTab', 'clinics-dashboard');
         $sampleService = $this->getServiceLocator()->get('SampleService');
         $sampleType = $sampleService->getSampleType();
         $clinicName = $sampleService->getAllClinicName();
-        $testReasonName = $sampleService->getAllTestReasonName();
-        $this->layout()->setVariable('activeTab', 'clinics-dashboard');          
+        $testReasonName = $sampleService->getAllTestReasonName();          
         return new ViewModel(array(
                 'sampleType' => $sampleType,
                 'clinicName' => $clinicName,
@@ -53,8 +53,7 @@ class ClinicController extends AbstractActionController
         }
     }
     
-    public function getSampleTestResultAction()
-    {
+    public function getSampleTestResultAction(){
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
@@ -67,8 +66,8 @@ class ClinicController extends AbstractActionController
             return $viewModel;
         }
     }
-    public function getSampleTestReasonAction()
-    {
+    
+    public function getSampleTestReasonAction(){
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
@@ -119,8 +118,9 @@ class ClinicController extends AbstractActionController
             return $viewModel;
         }
     }
-    public function testResultViewAction()
-    {
+    
+    public function testResultViewAction(){
+        $this->layout()->setVariable('activeTab', 'clinics-dashboard');
         $testResultId = base64_decode($this->params()->fromRoute('id'));
         $sampleService = $this->getServiceLocator()->get('SampleService');
         $configService = $this->getServiceLocator()->get('ConfigService');

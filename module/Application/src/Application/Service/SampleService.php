@@ -323,22 +323,22 @@ class SampleService {
     //lab details end
     
     //clinic details start
-    public function getOverAllLoadStatus($params)
-    {
+    public function getOverAllLoadStatus($params){
         $sampleDb = $this->sm->get('SampleTable');
         return $sampleDb->fetchOverAllLoadStatus($params);
     }
-    public function getChartOverAllLoadStatus($params)
-    {
+    
+    public function getChartOverAllLoadStatus($params){
         $sampleDb = $this->sm->get('SampleTable');
         $result =  $sampleDb->fetchChartOverAllLoadStatus($params);
         return $result;
     }
-    public function fetchSampleTestedReason($params)
-    {
+    
+    public function fetchSampleTestedReason($params){
         $sampleDb = $this->sm->get('SampleTable');
         return $sampleDb->fetchSampleTestedReason($params);
     }
+    
     public function getAllTestReasonName()
     {
         $reasonDb = $this->sm->get('TestReasonTable');
@@ -365,14 +365,12 @@ class SampleService {
         return $facilityDb->fetchAllClinicName();
     }
     
-    public function getAllTestResults($params)
-    {
+    public function getAllTestResults($params){
         $sampleDb = $this->sm->get('SampleTable');
         return $sampleDb->fetchAllTestResults($params);
     }
     
-    public function getClinicSampleTestedResults($params)
-    {
+    public function getClinicSampleTestedResults($params){
         $sampleDb = $this->sm->get('SampleTable');
         return $sampleDb->fetchClinicSampleTestedResults($params);
     }
