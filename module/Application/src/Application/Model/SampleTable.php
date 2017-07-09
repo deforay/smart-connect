@@ -1138,10 +1138,10 @@ class SampleTable extends AbstractTableGateway {
         $where = 'vl.result!=""';
         $testedTotal = $this->fetchChartOverAllLoadResult($params,$where);
         //total <1000
-        $where = 'vl.result<1000';
+        $where = 'vl.result < 1000';
         $lessTotal = $this->fetchChartOverAllLoadResult($params,$where);
         //total >=1000
-        $where = 'vl.result>=1000';
+        $where = 'vl.result >= 1000';
         $gTotal = $this->fetchChartOverAllLoadResult($params,$where);
         
         return array($testedTotal,$lessTotal,$gTotal,$overAllTotal);
@@ -1212,8 +1212,6 @@ class SampleTable extends AbstractTableGateway {
             $j++;
             
         }
-                    
-        //\Zend\Debug\Debug::dump($rResult);//die;
         return $rResult;
     }
     
@@ -1250,10 +1248,11 @@ class SampleTable extends AbstractTableGateway {
         if(isset($params['sampleId']) && $params['sampleId']!=''){
             $squery = $squery->where('vl.sample_type="'.base64_decode(trim($params['sampleId'])).'"');
         }
-        if(isset($params['testResult']) && $params['testResult']!=''){
-            $squery = $squery->where('vl.result'.$params['testResult']);
-        }
-        
+        //if(isset($params['testResult']) && trim($params['testResult']) == '<1000'){
+        //  $squery = $squery->where("vl.result < 1000");
+        //}else if(isset($params['testResult']) && trim($params['testResult']) == '>=1000') {
+        //  $squery = $squery->where("vl.result >= 1000");
+        //}
         if(isset($params['gender'] ) && trim($params['gender'])!=''){
             $squery = $squery->where(array("vl.patient_gender ='".$params['gender']."'")); 
         }
@@ -1624,22 +1623,20 @@ class SampleTable extends AbstractTableGateway {
                                 if(isset($params['sampleType']) && trim($params['sampleType'])!=''){
                                     $countQuery = $countQuery->where('vl.sample_type="'.base64_decode(trim($params['sampleType'])).'"');
                                 }
-                                if(isset($params['testResult']) && $params['testResult']!=''){
-                                    if($params['testResult'] == '<1000'){
-                                      $countQuery = $countQuery->where("vl.result < 1000");
-                                    }else if($params['testResult'] == '>1000') {
-                                      $countQuery = $countQuery->where("vl.result >= 1000");
-                                    }
+                                if(isset($params['testResult']) && $params['testResult'] == '<1000'){
+                                  $countQuery = $countQuery->where("vl.result < 1000");
+                                }else if(isset($params['testResult']) && $params['testResult'] == '>=1000') {
+                                  $countQuery = $countQuery->where("vl.result >= 1000");
                                 }
                                 if(isset($params['gender']) && trim($params['gender'])!=''){
-                                        $countQuery = $countQuery->where('vl.patient_gender="'.$params['gender'].'"');
+                                    $countQuery = $countQuery->where('vl.patient_gender="'.$params['gender'].'"');
                                 }
                                 if(isset($params['currentRegimen']) && trim($params['currentRegimen'])!=''){
-                                        $countQuery = $countQuery->where('vl.current_regimen="'.base64_decode(trim($params['currentRegimen'])).'"');
+                                    $countQuery = $countQuery->where('vl.current_regimen="'.base64_decode(trim($params['currentRegimen'])).'"');
                                 }
                                 
                                 if(isset($params['adherence']) && trim($params['adherence'])!=''){
-                                        $countQuery = $countQuery->where(array("vl.arv_adherance_percentage ='".$params['adherence']."'")); 
+                                    $countQuery = $countQuery->where(array("vl.arv_adherance_percentage ='".$params['adherence']."'")); 
                                 }
                                 
                                 if(trim($params['fromDate'])!= '' && trim($params['toDate'])!= ''){
@@ -1723,12 +1720,10 @@ class SampleTable extends AbstractTableGateway {
                             if(isset($params['sampleType']) && trim($params['sampleType'])!=''){
                                 $countQuery = $countQuery->where('vl.sample_type="'.base64_decode(trim($params['sampleType'])).'"');
                             }
-                            if(isset($params['testResult']) && $params['testResult']!=''){
-                                if($params['testResult'] == '<1000'){
-                                  $countQuery = $countQuery->where("vl.result < 1000");
-                                }else if($params['testResult'] == '>1000') {
-                                  $countQuery = $countQuery->where("vl.result >= 1000");
-                                }
+                            if(isset($params['testResult']) && $params['testResult'] == '<1000'){
+                              $countQuery = $countQuery->where("vl.result < 1000");
+                            }else if(isset($params['testResult']) && $params['testResult'] == '>=1000') {
+                              $countQuery = $countQuery->where("vl.result >= 1000");
                             }
                             if(isset($params['gender']) && trim($params['gender'])!=''){
                                 $countQuery = $countQuery->where('vl.patient_gender="'.$params['gender'].'"');
@@ -1813,24 +1808,22 @@ class SampleTable extends AbstractTableGateway {
             $sQuery = $sQuery->where('vl.facility_id="'.base64_decode(trim($params['clinicId'])).'"');
         }
         if(isset($params['sampleType']) && trim($params['sampleType'])!=''){
-                $sQuery = $sQuery->where('rs.sample_id="'.base64_decode(trim($params['sampleType'])).'"');
+            $sQuery = $sQuery->where('rs.sample_id="'.base64_decode(trim($params['sampleType'])).'"');
         }
-        if(isset($params['testResult']) && $params['testResult']!=''){
-            if($params['testResult'] == '<1000'){
-              $sQuery = $sQuery->where("vl.result < 1000");
-            }else if($params['testResult'] == '>1000') {
-              $sQuery = $sQuery->where("vl.result >= 1000");
-            }
+        if(isset($params['testResult']) && $params['testResult'] == '<1000'){
+          $sQuery = $sQuery->where("vl.result < 1000");
+        }else if(isset($params['testResult']) && $params['testResult'] == '>=1000') {
+          $sQuery = $sQuery->where("vl.result >= 1000");
         }
         if(isset($params['gender']) && trim($params['gender'])!=''){
-                $sQuery = $sQuery->where('vl.patient_gender="'.$params['gender'].'"');
+            $sQuery = $sQuery->where('vl.patient_gender="'.$params['gender'].'"');
         }
         if(isset($params['currentRegimen']) && trim($params['currentRegimen'])!=''){
-                $sQuery = $sQuery->where('vl.current_regimen="'.base64_decode(trim($params['currentRegimen'])).'"');
+            $sQuery = $sQuery->where('vl.current_regimen="'.base64_decode(trim($params['currentRegimen'])).'"');
         }
         
         if(isset($params['adherence']) && trim($params['adherence'])!=''){
-                $sQuery = $sQuery->where(array("vl.arv_adherance_percentage ='".$params['adherence']."'")); 
+            $sQuery = $sQuery->where(array("vl.arv_adherance_percentage ='".$params['adherence']."'")); 
         }
         if(isset($params['age']) && $params['age']!=''){
                 if($params['age'] == '<18'){
@@ -1884,24 +1877,22 @@ class SampleTable extends AbstractTableGateway {
                     $sQuery = $sQuery->where('vl.facility_id="'.base64_decode(trim($params['clinicId'])).'"');
                 }
                 if(isset($params['sampleType']) && trim($params['sampleType'])!=''){
-                        $sQuery = $sQuery->where('rs.sample_id="'.base64_decode(trim($params['sampleType'])).'"');
+                    $sQuery = $sQuery->where('rs.sample_id="'.base64_decode(trim($params['sampleType'])).'"');
                 }
-                if(isset($params['testResult']) && $params['testResult']!=''){
-                    if($params['testResult'] == '<1000'){
-                      $sQuery = $sQuery->where("vl.result < 1000");
-                    }else if($params['testResult'] == '>1000') {
-                      $sQuery = $sQuery->where("vl.result >= 1000");
-                    }
+                if(isset($params['testResult']) && $params['testResult'] == '<1000'){
+                    $sQuery = $sQuery->where("vl.result < 1000");
+                }else if(isset($params['testResult']) && $params['testResult'] == '>=1000') {
+                    $sQuery = $sQuery->where("vl.result >= 1000");
                 }
                 if(isset($params['gender']) && trim($params['gender'])!=''){
-                        $sQuery = $sQuery->where('vl.patient_gender="'.$params['gender'].'"');
+                    $sQuery = $sQuery->where('vl.patient_gender="'.$params['gender'].'"');
                 }
                 if(isset($params['currentRegimen']) && trim($params['currentRegimen'])!=''){
-                        $sQuery = $sQuery->where('vl.current_regimen="'.base64_decode(trim($params['currentRegimen'])).'"');
+                    $sQuery = $sQuery->where('vl.current_regimen="'.base64_decode(trim($params['currentRegimen'])).'"');
                 }
                 
                 if(isset($params['adherence']) && trim($params['adherence'])!=''){
-                        $sQuery = $sQuery->where(array("vl.arv_adherance_percentage ='".$params['adherence']."'")); 
+                    $sQuery = $sQuery->where(array("vl.arv_adherance_percentage ='".$params['adherence']."'")); 
                 }
                 
                 if(isset($params['age']) && $params['age']!=''){
@@ -2036,13 +2027,13 @@ class SampleTable extends AbstractTableGateway {
             }
         }if(isset($parameters['searchGender'] ) && trim($parameters['searchGender'])!=''){
             $sQuery = $sQuery->where(array("vl.patient_gender ='".$parameters['searchGender']."'")); 
-        }if(isset($parameters['testResult']) && $parameters['testResult']!=''){
-            if($parameters['testResult'] == '<1000'){
-              $sQuery = $sQuery->where("vl.result < 1000");
-            }else if($parameters['testResult'] == '>1000') {
-              $sQuery = $sQuery->where("vl.result >= 1000");
-            }
-        }if(isset($parameters['lab'] ) && trim($parameters['lab'])!=''){
+        }
+        if(isset($parameters['testResult']) && $parameters['testResult'] == '<1000'){
+          $sQuery = $sQuery->where("vl.result < 1000");
+        }else if(isset($parameters['testResult']) && $parameters['testResult'] == '>=1000') {
+          $sQuery = $sQuery->where("vl.result >= 1000");
+        }
+        if(isset($parameters['lab'] ) && trim($parameters['lab'])!=''){
             $sQuery = $sQuery->where(array("vl.lab_id ='".base64_decode($parameters['lab'])."'")); 
         }else{
             if($logincontainer->role!= 1){
@@ -2112,13 +2103,13 @@ class SampleTable extends AbstractTableGateway {
             }
         }if(isset($parameters['searchGender'] ) && trim($parameters['searchGender'])!=''){
             $iQuery = $iQuery->where(array("vl.patient_gender ='".$parameters['searchGender']."'")); 
-        }if(isset($parameters['testResult']) && $parameters['testResult']!=''){
-            if($parameters['testResult'] == '<1000'){
-              $iQuery = $iQuery->where("vl.result < 1000");
-            }else if($parameters['testResult'] == '>1000') {
-              $iQuery = $iQuery->where("vl.result >= 1000");
-            }
-        }if(isset($parameters['lab'] ) && trim($parameters['lab'])!=''){
+        }
+        if(isset($parameters['testResult']) && $parameters['testResult'] == '<1000'){
+          $iQuery = $iQuery->where("vl.result < 1000");
+        }else if(isset($parameters['testResult']) && $parameters['testResult'] == '>=1000'){
+          $iQuery = $iQuery->where("vl.result >= 1000");
+        }
+        if(isset($parameters['lab'] ) && trim($parameters['lab'])!=''){
             $iQuery = $iQuery->where(array("vl.lab_id ='".base64_decode($parameters['lab'])."'")); 
         }else{
             if($logincontainer->role!= 1){

@@ -269,8 +269,7 @@ class LaboratoryController extends AbstractActionController
         }
     }
     
-    public function getSampleDetailsAction()
-    {
+    public function getSampleDetailsAction(){
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
