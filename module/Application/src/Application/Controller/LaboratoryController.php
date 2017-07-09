@@ -263,7 +263,7 @@ class LaboratoryController extends AbstractActionController
             $sampleType = $sampleService->getSampleType();
             $result = $sampleService->getFacilites($params);
             $viewModel = new ViewModel();
-            $viewModel->setVariables(array('result' => $result,'sampleType'=>$sampleType))
+            $viewModel->setVariables(array('result' => $result,'sampleType'=>$sampleType,'width'=>$params['width']))
                         ->setTerminal(true);
             return $viewModel;
         }
@@ -598,10 +598,7 @@ class LaboratoryController extends AbstractActionController
             $params['toDate'] = $toDate;
         }
         if($fromDate!='' && $toDate!=''){
-        $sampleService = $this->getServiceLocator()->get('SampleService');
-        $sampleType = $sampleService->getSampleType();
-        $result = $sampleService->getFacilites($params);
-        return new ViewModel(array('result' => $result,'sampleType'=>$sampleType));
+        return new ViewModel(array('fromMonth'=>date('M-Y',strtotime($fromDate)),'toMonth'=>date('M-Y',strtotime($toDate))));
         }else{
             return $this->redirect()->toUrl("/labs/dashboard");
         }

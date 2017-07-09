@@ -1191,6 +1191,9 @@ class SampleTable extends AbstractTableGateway {
         if(isset($params['gender'] ) && trim($params['gender'])!=''){
             $rQuery = $rQuery->where(array("vl.patient_gender ='".$params['gender']."'")); 
         }
+        if(isset($params['testReason'] ) && trim($params['testReason'])!=''){
+            $rQuery = $rQuery->where(array("vl.reason_for_vl_testing ='".base64_decode($params['testReason'])."'")); 
+        }
         if(isset($params['age']) && $params['age']!=''){
             $age = explode("-",$params['age']);
             if(isset($age[1])){
