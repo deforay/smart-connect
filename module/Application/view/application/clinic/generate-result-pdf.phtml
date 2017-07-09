@@ -257,7 +257,7 @@ $alertContainer->nbPages = count($sampleResult);
             if(isset($config['show_smiley']) && trim($config['show_smiley']) == "no"){
               $smileyContent = '';
             }
-            if($result['result_status']=='4'){
+            if($result['reason_for_sample_rejection']!= NULL && trim($result['reason_for_sample_rejection'])!= '' && $result['reason_for_sample_rejection']!= 0){
               $smileyContent = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="/assets/img/cross.png" alt="rejected"/>';
             }
             $html = '';
