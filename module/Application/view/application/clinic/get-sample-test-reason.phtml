@@ -4,93 +4,64 @@
 ?>
 <script>
     $(function () {
-    $('#vlOrderedContainer').highcharts({
+        $('#vlOrderedContainer').highcharts({
         chart: {
-            type: 'column'
+            plotBackgroundColor: null,
+            plotBorderWidth: null,
+            plotShadow: false,
+            type: 'pie'
         },
         title: {
-            text: ''
+            text: 'Samples'
         },
-        xAxis: {
-            categories: [<?php
-            if(isset($result['date']) && count($result['date'])>0){
-            foreach($result['date'] as $date){
-                echo "'".$date."',";
-            }
-            }
-            ?>]
-        },
-        yAxis: {
-            min: 0,
-            title: {
-                text: 'Samples'
-            },
-            stackLabels: {
-                enabled: true,
-                style: {
-                    fontWeight: 'bold',
-                    color: (Highcharts.theme && Highcharts.theme.textColor) || 'gray'
-                }
-            }
+        
+        credits: {
+              enabled: false
+       },
+        tooltip: {
+            pointFormat: '{series.name}: <b>{point.percentage:.1f}% ({point.number})</b>'
         },
         legend: {
-            align: 'right',
-            x: 0,
-            verticalAlign: 'top',
-            y: -3,
-            floating: true,
-            backgroundColor: (Highcharts.theme && Highcharts.theme.background2) || 'white',
-            borderColor: '#CCC',
-            borderWidth: 1,
-            shadow: false
-        },
-        tooltip: {
-            headerFormat: '<b>{point.x}</b><br/>',
-            pointFormat: '{series.name}: {point.y}<br/>Total: {point.stackTotal}'
+            itemMarginBottom: 5,
+            labelFormatter: function () {
+                return '<div ><span style="float:left;font-size:10px;">' + this.name + ' -  </span><span style="font-size:10px; ">'+ this.percentage.toFixed(1)+'% ('+Highcharts.numberFormat(this.y, 0)+')</span></div>';
+            }
         },
         plotOptions: {
-            column: {
-                stacking: 'normal',
+            pie: {
+                allowPointSelect: true,
+                cursor: 'pointer',
                 dataLabels: {
-                    enabled: true,
-                    color: (Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'white',
+                    enabled: false,
+                    format: '<b>{point.myData}</b> : {point.percentage:.1f}% ({point.number})',
                     style: {
-                        textShadow: '0 0 3px black'
+                        color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                    }
+                },
+                showInLegend: true
+            }
+        },
+        series: [{
+            name: 'Clinics',
+            colorByPoint: true,
+            data: [<?php
+            if(count($result)>0){
+                foreach($testReason as $reason){
+                    if(isset($result[$reason['test_reason_name']])){
+                    foreach($result[$reason['test_reason_name']] as $resultTotal){
+                        ?>
+                        {
+                            name:'<?php echo ucwords(($reason['test_reason_name']));?>',
+                            y:<?php echo $resultTotal['total'];?>,
+                            number:<?php echo $resultTotal['total'];?>,
+                        },
+                        <?php
+                    }
                     }
                 }
             }
-        },
-        series: [
-        <?php foreach($testReason as $reason)
-        {
-            $k = 0;
-            ?>
-            {
-                name:'<?php echo ucwords(($reason['test_reason_name']));?>',
-                data:[
-                <?php
-                if(isset($result[$reason['test_reason_name']])){
-                foreach($result[$reason['test_reason_name']] as $total){
-                    if($k<4)
-                    {
-                        echo $total['total'].",";
-                    }else{
-                        echo $total['total'];
-                    }
-                    $k++;
-                    }
-                }
-                ?>
-                ]
-            },
-            <?php
-        }
-        ?>],
-        
-    colors: [
-        '#9CC4E4', '#3A89C9' ,'#1B325F'
-    ]
+            ?>]
+        }]
     });
-    
     });
-    </script>
+</script>
