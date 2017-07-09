@@ -377,14 +377,14 @@ foreach($sampleType as $samples){
                                     
                                     <div class="actions">
                                         <div class="btn-group">
-                                            <button class="btn btn-danger" onclick="expandMap();return false;"><span>Expand Map</span></button>
+                                            <button class="btn btn-danger" onclick="expandMap()"><span>Expand Map</span></button>
                                         </div>
                                     </div>   
                                     
                                 </div>                                
                                 <div class="portlet-body">
                                     <div id="controls-polyline"></div>
-                                    <div id="gmap-polyline-data"  >
+                                    <div id="gmap-polyline-data">
                                         <div id="gmap-polyline"  class="mapChart" style="height:600px !important;"></div>
                                     </div>
                                     
@@ -407,7 +407,7 @@ foreach($sampleType as $samples){
             var endDate;
 
         function expandMap(){
-            alert('Functionality coming soon');
+            window.open("/labs/get-facilities-geolocation?fromDate="+$('#mrp-lowerDate').val()+"&toDate="+$('#mrp-upperDate').val());
         }    
             
             

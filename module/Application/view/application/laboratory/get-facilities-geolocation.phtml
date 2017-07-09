@@ -1,6 +1,23 @@
-<div id="gmap-polyline"  class="mapChart" style="height:600px !important;"></div>
+<div class="row">
+    <div class="col-md-12 col-sm-12">
+        <div class="portlet box blue">
+            <div class="portlet-title">
+                <div class="caption ">
+                    <span class="caption-subject">All Facilities - Geolocation</span>
+                </div>
+            </div>                                
+            <div class="portlet-body">
+                <div id="controls-polyline"></div>
+                <div id="gmap-polyline-data">
+                    <div id="gmap-polyline"  class="mapChart"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://maps.google.com/maps/api/js?libraries=geometry&v=3&key=AIzaSyAFpbfAKFJZ8Ps7yAGIDZtD4EeBlsb_ANA"></script>
+<script src="<?php echo $this->basePath('assets/global/scripts/maplace.min.js'); ?>"></script>
 <script>
-    
     var locations = null;
     
     $(function () {

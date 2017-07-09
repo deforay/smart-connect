@@ -586,5 +586,26 @@ class LaboratoryController extends AbstractActionController
             return $viewModel;
         }
     }
+    public function getFacilitiesGeolocationAction() {
+        $this->layout()->setVariable('activeTab', 'labs-dashboard');
+        $fromDate="";
+        $toDate="";
+        if($this->params()->fromQuery('fromDate')){
+            $fromDate=$this->params()->fromQuery('fromDate');
+            $params['fromDate'] = $fromDate;
+        }
+        if($this->params()->fromQuery('toDate')){
+            $toDate=$this->params()->fromQuery('toDate');
+            $params['toDate'] = $toDate;
+        }
+        if($fromDate!='' && $toDate!=''){
+        $sampleService = $this->getServiceLocator()->get('SampleService');
+        $sampleType = $sampleService->getSampleType();
+        $result = $sampleService->getFacilites($params);
+        return new ViewModel(array('result' => $result,'sampleType'=>$sampleType));
+        }else{
+            return $this->redirect()->toUrl("/labs/dashboard");
+        }
+    }
 }
 
