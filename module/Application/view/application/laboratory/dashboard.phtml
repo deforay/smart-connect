@@ -524,7 +524,8 @@ foreach($sampleType as $samples){
                 $(".fetchAll").on("change", function(){
                     getEverything();
                 });
-                getEverything();    
+                getEverything();
+                getLabFacilities();
             });
             
         function getEverything(){
@@ -538,7 +539,7 @@ foreach($sampleType as $samples){
             getRequisitionFormsTested();
             getSampleVolume('load');
             getAverageLabTAT();
-            getLabFacilities();
+            //getLabFacilities();
             getTestedSampleResult();
             getTestedSampleResultBasedVolume();
             getTestedSampleResultBasedGender();
