@@ -879,7 +879,7 @@ class SampleTable extends AbstractTableGateway {
             $queryStr = $queryStr->group(array(new Expression('MONTH(sample_collection_date)')));   
             $queryStr = $queryStr->order(array(new Expression('DATE(sample_collection_date)')));               
             $queryStr = $sql->getSqlStringForSqlObject($queryStr);
-            echo $queryStr;die;
+            //echo $queryStr;die;
             //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             //echo $queryStr;die;
             $sampleResult = $common->cacheQuery($queryStr,$dbAdapter);            
