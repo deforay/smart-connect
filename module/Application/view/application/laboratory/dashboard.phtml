@@ -534,10 +534,11 @@ foreach($sampleType as $samples){
             });
         }
             
-        $(function () {
-            getEverything();    
-        });
-        
+            $(function () {
+                getEverything();
+                getLabFacilities();
+            });
+            
         function getEverything(){
             $.blockUI.defaults.css.border = '1px solid grey'; 
             $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
@@ -549,7 +550,7 @@ foreach($sampleType as $samples){
             getRequisitionFormsTested();
             getSampleVolume('load');
             getAverageLabTAT();
-            getLabFacilities();
+            //getLabFacilities();
             getTestedSampleResult();
             getTestedSampleResultBasedVolume();
             getTestedSampleResultBasedGender();
