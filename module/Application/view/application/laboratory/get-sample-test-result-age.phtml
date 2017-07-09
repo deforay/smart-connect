@@ -1,3 +1,8 @@
+<?php
+//Zend\Debug\Debug::dump($result);die;
+$less1000 = array('>18'=>'#088738', '<18' => '#60d18f');
+$more1000 = array('>18'=>'#ff1900', '<18' => '#F2786D');
+?>
 <div id="facilitiesTestedAge"></div>
 <script>
        $(function () {
@@ -75,6 +80,22 @@
                   }
               ?>],
               stack:'<?php echo $age[$i];?>',
+              <?php
+              if($key == "VL (< 1000 cp/ml)"){
+              
+                     if(isset($less1000[$age[$i]])) { ?>
+                     
+                            color: '<?php echo $less1000[$age[$i]]; ?>'
+                     
+                     <?php } else{ ?>
+                            color: '<?php echo $more1000[$age[$i]]; ?>'
+              <?php }
+              } else { ?>
+                 color: '#ff1900'     
+              <?php
+              }
+              ?>
+              
               },
               <?php
               }
