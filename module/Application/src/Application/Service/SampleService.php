@@ -476,7 +476,8 @@ class SampleService {
                         $row[] = $aRow['sample_collection_date'];
                         if(trim($params['result']) == '' || trim($params['result']) == 'rejected'){
                            $row[] = (isset($aRow['rejection_reason_name']))?ucwords($aRow['rejection_reason_name']):'';   
-                        }else if(trim($params['result']) == '' || trim($params['result']) == 'result'){
+                        }
+                        if(trim($params['result']) == '' || trim($params['result']) == 'result'){
                            $row[] = $aRow['sample_testing_date'];
                            $row[] = $aRow['result'];
                         }
@@ -519,6 +520,7 @@ class SampleService {
                     }else if(trim($params['result']) == 'rejected'){
                        $sheet->setCellValue('C1', html_entity_decode('Rejection Reason ', ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
                     }
+                    
                     $sheet->getStyle('A1')->applyFromArray($styleArray);
                     $sheet->getStyle('B1')->applyFromArray($styleArray);
                     if(trim($params['result']) == ''){
