@@ -509,26 +509,36 @@ class SampleService {
                     
                     $sheet->setCellValue('A1', html_entity_decode('Sample ID ', ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
                     $sheet->setCellValue('B1', html_entity_decode('Date Collected ', ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
-                    if(trim($params['result']) == 'rejected'){
-                       $sheet->setCellValue('C1', html_entity_decode('Rejection Reason ', ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
-                    }else if(trim($params['result']) == '' || trim($params['result']) == 'result'){
+                    if(trim($params['result']) == ''){
+                        $sheet->setCellValue('C1', html_entity_decode('Rejection Reason ', ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
+                        $sheet->setCellValue('D1', html_entity_decode('Date Tested ', ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
+                        $sheet->setCellValue('E1', html_entity_decode('Viral Load(cp/mL) ', ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
+                    }else if(trim($params['result']) == 'result'){
                        $sheet->setCellValue('C1', html_entity_decode('Date Tested ', ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
                        $sheet->setCellValue('D1', html_entity_decode('Viral Load(cp/mL) ', ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
+                    }else if(trim($params['result']) == 'rejected'){
+                       $sheet->setCellValue('C1', html_entity_decode('Rejection Reason ', ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
                     }
                     $sheet->getStyle('A1')->applyFromArray($styleArray);
                     $sheet->getStyle('B1')->applyFromArray($styleArray);
-                    if(trim($params['result']) == 'rejected'){
-                      $sheet->getStyle('C1')->applyFromArray($styleArray);
-                    }else if(trim($params['result']) == '' || trim($params['result']) == 'result'){
+                    if(trim($params['result']) == ''){
                       $sheet->getStyle('C1')->applyFromArray($styleArray);
                       $sheet->getStyle('D1')->applyFromArray($styleArray);
+                      $sheet->getStyle('E1')->applyFromArray($styleArray);
+                    }else if(trim($params['result']) == 'result'){
+                      $sheet->getStyle('C1')->applyFromArray($styleArray);
+                      $sheet->getStyle('D1')->applyFromArray($styleArray);
+                    }else if(trim($params['result']) == 'rejected'){
+                      $sheet->getStyle('C1')->applyFromArray($styleArray);
                     }
                     $currentRow = 2;
-                    $endColumn = 1;
-                    if(trim($params['result']) == 'rejected'){
-                       $endColumn = 2; 
-                    }else if(trim($params['result']) == '' || trim($params['result']) == 'result'){
+                    $endColumn = 4;
+                    if(trim($params['result']) == 'result'){
                         $endColumn = 3;
+                    }else if(trim($params['result']) == 'noresult'){
+                        $endColumn = 1;
+                    }else if(trim($params['result']) == 'rejected'){
+                       $endColumn = 2; 
                     }
                     foreach ($output as $rowData) {
                         $colNo = 0;

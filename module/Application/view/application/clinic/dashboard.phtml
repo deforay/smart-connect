@@ -427,16 +427,17 @@ foreach($sampleType as $samples){
     
     function fnShowHide(){
         if($('#result').val() == ''){
+            oTable.column(2).visible(true);
             oTable.column(3).visible(true);
             oTable.column(4).visible(true);
         }else if($('#result').val() == 'result'){
             oTable.column(2).visible(false);
-            oTable.column(4).visible(true);
+            oTable.column(3).visible(true);
             oTable.column(4).visible(true);
         }else if($('#result').val() == 'noresult'){
+            oTable.column(2).visible(false);
             oTable.column(3).visible(false);
             oTable.column(4).visible(false);
-            oTable.column(2).visible(false);
         }else if($('#result').val() == 'rejected'){
            oTable.column(3).visible(false);
            oTable.column(4).visible(false);
