@@ -6,12 +6,11 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 use Zend\Session\Container;
 
-class LoginController extends AbstractActionController
-{
+class LoginController extends AbstractActionController{
 
-    public function indexAction()
-    {
+    public function indexAction(){
         $logincontainer = new Container('credo');
+        $configService = $this->getServiceLocator()->get('ConfigService');
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
@@ -22,8 +21,10 @@ class LoginController extends AbstractActionController
         if (isset($logincontainer->userId) && $logincontainer->userId != "") {
             return $this->redirect()->toUrl("labs/dashboard");
         } else {
+            $config=$configService->getAllGlobalConfig();
             $vm = new ViewModel();
-            $vm->setTerminal(true);
+            $vm->setVariables(array('config'=>$config))
+               ->setTerminal(true);
             return $vm;
         }
     }
