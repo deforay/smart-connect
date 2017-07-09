@@ -44,8 +44,12 @@
     <body class=" login">
         <!-- BEGIN LOGO -->
         <div class="logo">
-		  <h1 style="color:#fff;">Smart Connect</h1>
-		  <h5 style="color:#fff;">Dashboard for Enhancement of VL Treatment Cascade</h5>
+	    <?php
+	    if(isset($config['logo']) && trim($config['logo']) != "" && file_exists(UPLOAD_PATH . DIRECTORY_SEPARATOR . "logo" . DIRECTORY_SEPARATOR . $config['logo'])){ ?>
+		<img src="/uploads/logo/<?php echo trim($config['logo']); ?>" style="width:170px;height:175px;">
+	    <?php } ?>
+	    <h1 style="color:#fff;">Smart Connect</h1>
+	    <h5 style="color:#fff;">Dashboard for Enhancement of VL Treatment Cascade</h5>
         </div>
         <!-- END LOGO -->
         <!-- BEGIN LOGIN -->
