@@ -39,7 +39,11 @@ if(isset($searchMonth) && trim($searchMonth)!= ''){
                                 <i class="fa fa-circle"></i>
                             </li>
                             <li>
-                                <a href="javascript:;">Labs Dashboard</a>
+                                <a href="/labs/dashboard">Labs Dashboard</a>
+                                <i class="fa fa-circle"></i>
+                            </li>
+                            <li>
+                                <a href="javascript:;">Sample TAT Page</a>
                             </li>
                         </ul>
                     </div>
@@ -151,9 +155,9 @@ if(isset($searchMonth) && trim($searchMonth)!= ''){
                                         <table class="table table-striped table-bordered table-hover order-column" id="sampleDataTable">
                                             <thead>
                                                 <tr>
-                                                    <th>Month-Year </th>
-                                                    <th> Total No. of Samples Tested </th>
-                                                    <th>Avg TAT </th>
+                                                    <th>Month and Year </th>
+                                                    <th>Total No. of Samples Tested </th>
+                                                    <th>Average TAT in Days</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="barChartCountInTable">

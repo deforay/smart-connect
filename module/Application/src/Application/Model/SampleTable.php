@@ -858,9 +858,9 @@ class SampleTable extends AbstractTableGateway {
             
             $queryStr = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
                                     ->columns(array(
-                                                    "total" => new Expression('COUNT(*)'),
+                                                    //"total" => new Expression('COUNT(*)'),
                                                     "monthDate" => new Expression("DATE_FORMAT(DATE(sample_collection_date), '%b-%Y')"),
-                                                    "AvgDiff" => new Expression("AVG(TIMESTAMPDIFF(DAY,sample_tested_datetime,sample_collection_date))"),
+                                                    "AvgDiff" => new Expression("CAST(ABS(AVG(TIMESTAMPDIFF(DAY,sample_tested_datetime,sample_collection_date))) AS DECIMAL (10,2))"),
                                               )
                                             );
             if(isset($params['facilityId']) && $params['facilityId'] !=''){
@@ -872,14 +872,17 @@ class SampleTable extends AbstractTableGateway {
                 }
             }
             $queryStr = $queryStr->where("
-                        (sample_collection_date is not null AND sample_collection_date != '')
-                        AND DATE(sample_collection_date) >= '".$startMonth."-00' 
-                        AND DATE(sample_collection_date) <= '".$endMonth."-00' ");
+                        (vl.sample_collection_date is not null AND vl.sample_collection_date != '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')
+                        AND (vl.sample_tested_datetime is not null AND vl.sample_tested_datetime != '' AND DATE(vl.sample_tested_datetime) !='1970-01-01' AND DATE(vl.sample_tested_datetime) !='0000-00-00')
+                        AND vl.result is not null
+                        AND vl.result != '' 
+                        AND DATE(vl.sample_collection_date) >= '".$startMonth."-00' 
+                        AND DATE(vl.sample_collection_date) <= '".$endMonth."-00' ");
                 
-            $queryStr = $queryStr->group(array(new Expression('MONTH(sample_collection_date)')));   
-            $queryStr = $queryStr->order(array(new Expression('DATE(sample_collection_date)')));               
+            $queryStr = $queryStr->group(array(new Expression('MONTH(vl.sample_collection_date)')));   
+            $queryStr = $queryStr->order(array(new Expression('DATE(vl.sample_collection_date)')));               
             $queryStr = $sql->getSqlStringForSqlObject($queryStr);
-            echo $queryStr;die;
+            //echo $queryStr;die;
             //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             //echo $queryStr;die;
             $sampleResult = $common->cacheQuery($queryStr,$dbAdapter);            
@@ -2454,7 +2457,7 @@ class SampleTable extends AbstractTableGateway {
                                     ->columns(array(
                                                     "total" => new Expression('COUNT(*)'),
                                                     "monthDate" => new Expression("DATE_FORMAT(DATE(sample_collection_date), '%b-%Y')"),
-                                                    "AvgDiff" => new Expression("AVG(DATEDIFF(sample_tested_datetime,sample_collection_date))"),
+                                                    "AvgDiff" => new Expression("CAST(ABS(AVG(TIMESTAMPDIFF(DAY,sample_tested_datetime,sample_collection_date))) AS DECIMAL (10,2))"),
                                               )
                                             );
         if(isset($parameters['lab']) && $parameters['lab'] !=''){
@@ -2472,7 +2475,10 @@ class SampleTable extends AbstractTableGateway {
             $sQuery = $sQuery->where('vl.sample_type="'.base64_decode(trim($parameters['sampleType'])).'"');
         }
         $sQuery = $sQuery->where("
-                    (sample_collection_date is not null AND sample_collection_date != '')
+                                            (sample_collection_date is not null AND sample_collection_date != '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00')
+                        AND (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')
+                    AND result is not null
+                    AND result != '' 
                     AND DATE(sample_collection_date) >= '".$startMonth."-01' 
                     AND DATE(sample_collection_date) <= '".$endMonth."-31' AND vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL'");
                 
@@ -2508,7 +2514,7 @@ class SampleTable extends AbstractTableGateway {
                                     ->columns(array(
                                                     "total" => new Expression('COUNT(*)'),
                                                     "monthDate" => new Expression("DATE_FORMAT(DATE(sample_collection_date), '%b-%Y')"),
-                                                    "AvgDiff" => new Expression("AVG(DATEDIFF(sample_tested_datetime,sample_collection_date))"),
+                                                    "AvgDiff" => new Expression("CAST(ABS(AVG(TIMESTAMPDIFF(DAY,sample_tested_datetime,sample_collection_date))) AS DECIMAL (10,2))"),
                                               )
                                             );
         if(isset($parameters['lab']) && trim($parameters['lab'])!=''){
@@ -2526,7 +2532,8 @@ class SampleTable extends AbstractTableGateway {
             $iQuery = $iQuery->where('vl.sample_type="'.base64_decode(trim($parameters['sampleType'])).'"');
         }
         $iQuery = $iQuery->where("
-                    (sample_collection_date is not null AND sample_collection_date != '')
+                                            (sample_collection_date is not null AND sample_collection_date != '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00')
+                        AND (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')        
                     AND DATE(sample_collection_date) >= '".$startMonth."-01' 
                     AND DATE(sample_collection_date) <= '".$endMonth."-31' AND vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL'");
         $iQuery = $iQuery->group(array(new Expression('MONTH(sample_collection_date)')));   
