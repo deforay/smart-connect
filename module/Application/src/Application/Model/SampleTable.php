@@ -530,8 +530,8 @@ class SampleTable extends AbstractTableGateway {
                                                     "total" => new Expression('COUNT(*)'),
                                                     "monthDate" => new Expression("DATE_FORMAT(DATE(sample_collection_date), '%b-%Y')"),
                                                     
-                                                    "CompletedForms" => new Expression("SUM(CASE WHEN (vl.patient_art_no !='' AND vl.current_regimen !='' AND vl.patient_age_in_years !='' AND vl.patient_gender !='') THEN 1 ELSE 0 END)"),
-                                                    "IncompleteForms" => new Expression("SUM(CASE WHEN (vl.patient_art_no='' OR vl.current_regimen='' OR vl.patient_age_in_years =''  OR vl.patient_gender='') THEN 1 ELSE 0 END)"),
+                                                    "CompletedForms" => new Expression("SUM(CASE WHEN (vl.patient_art_no !=''  AND vl.patient_age_in_years !='' AND vl.patient_gender !='') THEN 1 ELSE 0 END)"),
+                                                    "IncompleteForms" => new Expression("SUM(CASE WHEN (vl.patient_art_no=''  OR vl.patient_age_in_years =''  OR vl.patient_gender='') THEN 1 ELSE 0 END)"),
                                              
                                               )
                                             );
