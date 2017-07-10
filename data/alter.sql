@@ -100,3 +100,6 @@ ALTER TABLE `dash_vl_request_form` ADD INDEX(`patient_gender`);
 ALTER TABLE `dash_vl_request_form` ADD INDEX(`sample_tested_datetime`);
 ALTER TABLE `dash_vl_request_form` ADD INDEX(`result`);
 ALTER TABLE `dash_vl_request_form` ADD INDEX(`sample_type`);
+
+--saravanan 10-July-2017
+ALTER TABLE `r_vl_test_reasons` ADD `test_reason_code` VARCHAR(255) NULL DEFAULT NULL AFTER `test_reason_name`;
