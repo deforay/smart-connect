@@ -19,6 +19,7 @@ foreach($sampleType as $samples){
                     <br>
                     <br>
                     <div class="row" style="padding-top:10px;padding-bottom:20px;">
+                    <div class="col-md-12">
                         <div class="col-lg-6">
                             <select class="form-control" id="clinicId" name="clinicId">
                                 <option value="">All my Clinics</option>
@@ -42,6 +43,7 @@ foreach($sampleType as $samples){
                                         <input type="hidden" name="sampleCollectionDate" id="sampleCollectionDate" />
                             </div>
                         </div>
+                    </div>
                     </div>
 
                     <div class="row" style="display:none;">
@@ -112,8 +114,7 @@ foreach($sampleType as $samples){
                                 <option value="not_specified">Other</option>
                               </select>
                             </div>
-                            <div class="form-group col-lg-4">
-                                <br>
+                            <div class="form-group col-lg-4" style="margin-top:2.6%;">
                                 <a href="javascript:void(0);" class="btn btn-primary btn-sm"  onclick="searchData();getTestedSampleResult();">Search</a>
                             </div>
                         </div>
