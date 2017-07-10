@@ -6,11 +6,7 @@ foreach($sampleType as $samples){
 ?>
                     <!-- BEGIN PAGE BAR -->
                     <div class="page-bar">
-                        <ul class="page-breadcrumb">
-                            <li>
-                                <a href="/clinics/dashboard">Clinics Dashboard</a>
-                            </li>
-                        </ul>
+                        <h1 class="page-title">Clinics Dashboard</h1>
                     </div>
                     <!-- END PAGE BAR -->
                     <!-- BEGIN PAGE TITLE-->
@@ -19,6 +15,7 @@ foreach($sampleType as $samples){
                     <br>
                     <br>
                     <div class="row" style="padding-top:10px;padding-bottom:20px;">
+                    <div class="col-md-12">
                         <div class="col-lg-6">
                             <select class="form-control" id="clinicId" name="clinicId">
                                 <option value="">All my Clinics</option>
@@ -42,6 +39,7 @@ foreach($sampleType as $samples){
                                         <input type="hidden" name="sampleCollectionDate" id="sampleCollectionDate" />
                             </div>
                         </div>
+                    </div>
                     </div>
 
                     <div class="row" style="display:none;">
@@ -107,13 +105,12 @@ foreach($sampleType as $samples){
                                 <label class="control-label">Gender</label>
                               <select class="form-control" name="gender" id="gender">
                                 <option value=''>--Select--</option>
-                                <option value="male">Male</option>
-                                <option value="female">Female</option>
-                                <option value="other">Other</option>
+                                <option value="M">Male</option>
+                                <option value="F">Female</option>
+                                <option value="not_specified">Other</option>
                               </select>
                             </div>
-                            <div class="form-group col-lg-4">
-                                <br>
+                            <div class="form-group col-lg-4" style="margin-top:2.6%;">
                                 <a href="javascript:void(0);" class="btn btn-primary btn-sm"  onclick="searchData();getTestedSampleResult();">Search</a>
                             </div>
                         </div>

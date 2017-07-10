@@ -32,21 +32,17 @@ if(isset($searchMonth) && trim($searchMonth)!= ''){
                     <!-- BEGIN THEME PANEL -->
                     <!-- END THEME PANEL -->
                     <!-- BEGIN PAGE BAR -->
-                    <div class="page-bar">
-                        <ul class="page-breadcrumb">
+                     <div class="page-bar">
+                        <h1 class="page-title">Samples Test Overview
+                        <ul class="page-breadcrumb pull-right">
                             <li>
-                                <a href="/">Dashboard</a>
-                                <i class="fa fa-circle"></i>
-                            </li>
-                            <li>
-                                <a href="/labs/dashboard">Labs Dashboard</a>
-                                <i class="fa fa-circle"></i>
-                            </li>
-                            <li>
-                                <a href="javascript:;">Sample Test Overview Page</a>
+                                <i class="fa fa-arrow-left"></i>
+                                <a href="/labs/dashboard">Back to Labs Dashboard</a>
                             </li>
                         </ul>
-                    </div>
+                        </h1>
+                    </div>                    
+                   
                     <!-- END PAGE BAR -->
                     <!-- BEGIN PAGE TITLE-->
                     <h3 class="page-title"></h3>
@@ -169,10 +165,18 @@ if(isset($searchMonth) && trim($searchMonth)!= ''){
                                     }
                                     ?>
                                 </select>
-                              
                             </div>
                             <div class="form-group col-lg-4">
-                                <br>
+                                <label class="control-label">Gender</label>
+                              <select class="form-control" name="gender" id="gender">
+                                <option value="">All</option>
+                                <option value="M" <?php echo (isset($searchGender) && $searchGender == 'M')?'selected="selected"':''; ?>>Male</option>
+                                <option value="F" <?php echo (isset($searchGender) && $searchGender == 'F')?'selected="selected"':''; ?>>Female</option>
+                                <option value="not_specified" <?php echo (isset($searchGender) && $searchGender == 'Not Specified')?'selected="selected"':''; ?>>Not Specified</option>
+                              </select>
+                            </div>
+                            <div class="form-group col-lg-4" style="margin-top: 2.6%;">
+                                
                                 <a href="javascript:void(0);" class="btn btn-primary" onclick="searchSampleTestedResult()">Submit</a>
                             </div>
                         </div>
@@ -234,7 +238,7 @@ if(isset($searchMonth) && trim($searchMonth)!= ''){
     function generatePieContainer(){
         $.blockUI.defaults.css.border = '1px solid grey';
         $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
-        searchGender = '<?php echo $searchGender ?>';
+        //searchGender = '<?php echo $searchGender ?>';
         fromDate = $('#mrp-lowerDate').val();
         toDate = $('#mrp-upperDate').val();
         testResult = $("#testResult").val();
@@ -244,7 +248,8 @@ if(isset($searchMonth) && trim($searchMonth)!= ''){
         currentRegimen = $("#currentRegimen").val();
         adherence = $("#adherence").val();
         age = $("#age").val();
-        $.post("<?php echo $this->url('laboratory', array('action' => 'get-lab-sample-details')); ?>",{testResult:testResult,fromDate:fromDate,toDate:toDate,gender:searchGender,lab:lab,clinicId:clinicId,sampleType:sampleType,currentRegimen:currentRegimen,adherence:adherence,age:age},
+        gender = $("#gender").val();
+        $.post("<?php echo $this->url('laboratory', array('action' => 'get-lab-sample-details')); ?>",{testResult:testResult,fromDate:fromDate,toDate:toDate,lab:lab,clinicId:clinicId,sampleType:sampleType,currentRegimen:currentRegimen,adherence:adherence,age:age,gender:gender},
         function(data) {
             $("#piecontainer").html(data);
         });
@@ -253,7 +258,7 @@ if(isset($searchMonth) && trim($searchMonth)!= ''){
     function generateBarContainer(){
         $.blockUI.defaults.css.border = '1px solid grey';
         $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
-        searchGender = '<?php echo $searchGender ?>';
+        //searchGender = '<?php echo $searchGender ?>';
         fromDate = $('#mrp-lowerDate').val();
         toDate = $('#mrp-upperDate').val();
         testResult = $("#testResult").val();
@@ -263,7 +268,8 @@ if(isset($searchMonth) && trim($searchMonth)!= ''){
         currentRegimen = $("#currentRegimen").val();
         adherence = $("#adherence").val();
         age = $("#age").val();
-        $.post("<?php echo $this->url('laboratory', array('action' => 'get-lab-bar-sample-details')); ?>",{testResult:testResult,fromDate:fromDate,toDate:toDate,gender:searchGender,lab:lab,clinicId:clinicId,sampleType:sampleType,currentRegimen:currentRegimen,adherence:adherence,age:age},
+        gender = $("#gender").val();
+        $.post("<?php echo $this->url('laboratory', array('action' => 'get-lab-bar-sample-details')); ?>",{testResult:testResult,fromDate:fromDate,toDate:toDate,lab:lab,clinicId:clinicId,sampleType:sampleType,currentRegimen:currentRegimen,adherence:adherence,age:age,gender:gender},
         function(data) {
             $("#barcontainer").html(data);
         });
@@ -308,7 +314,7 @@ function loadSampleDataTable(){
             "aaSorting": [[ 0, "desc" ]],
             "sAjaxSource": "<?php echo $this->url('laboratory',array('action' => 'get-lab-filter-sample-details')); ?>",
             "fnServerData": function ( sSource, aoData, fnCallback ) {
-                aoData.push({"name": "searchGender", "value": '<?php echo $searchGender ?>'});
+                //aoData.push({"name": "searchGender", "value": '<?php echo $searchGender ?>'});
                 aoData.push({"name": "fromDate", "value": $('#mrp-lowerDate').val()});
                 aoData.push({"name": "toDate", "value": $('#mrp-upperDate').val()});
                 aoData.push({"name": "lab", "value": $('#labName').val()});
@@ -318,6 +324,7 @@ function loadSampleDataTable(){
                 aoData.push({"name": "age", "value": $('#age').val()});
                 aoData.push({"name": "testResult", "value": $('#testResult').val()});
                 aoData.push({"name": "sampleType", "value": $('#sampleType').val()});
+                aoData.push({"name": "gender", "value": $('#gender').val()});
                 $.ajax({
                     "dataType": 'json',
                     "type": "POST",

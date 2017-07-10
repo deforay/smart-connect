@@ -32,21 +32,17 @@ if(isset($searchMonth) && trim($searchMonth)!= ''){
                     <!-- BEGIN THEME PANEL -->
                     <!-- END THEME PANEL -->
                     <!-- BEGIN PAGE BAR -->
-                    <div class="page-bar">
-                        <ul class="page-breadcrumb">
+                     <div class="page-bar">
+                        <h1 class="page-title">Samples Turnaround Time
+                        <ul class="page-breadcrumb pull-right">
                             <li>
-                                <a href="/">Dashboard</a>
-                                <i class="fa fa-circle"></i>
-                            </li>
-                            <li>
-                                <a href="/labs/dashboard">Labs Dashboard</a>
-                                <i class="fa fa-circle"></i>
-                            </li>
-                            <li>
-                                <a href="javascript:;">Sample TAT Page</a>
+                                <i class="fa fa-arrow-left"></i>
+                                <a href="/labs/dashboard">Back to Labs Dashboard</a>
                             </li>
                         </ul>
-                    </div>
+                        </h1>
+                    </div>                    
+                   
                     <!-- END PAGE BAR -->
                     <!-- BEGIN PAGE TITLE-->
                     <h3 class="page-title"></h3>
@@ -115,9 +111,17 @@ if(isset($searchMonth) && trim($searchMonth)!= ''){
                             </div>
                         </div>                                
                         <div class="col-md-12">
-                            
                             <div class="form-group col-lg-4">
-                                <br>
+                                <label class="control-label">Gender</label>
+                              <select class="form-control" name="gender" id="gender">
+                                <option value="">All</option>
+                                <option value="M">Male</option>
+                                <option value="F">Female</option>
+                                <option value="not_specified">Not Specified</option>
+                              </select>
+                            </div>
+                            <div class="form-group col-lg-4" style="margin-top: 2.6%;">
+                                
                                 <a href="javascript:void(0);" class="btn btn-primary" onclick="searchSampleTestedResult()">Submit</a>
                             </div>
                         </div>
@@ -183,7 +187,8 @@ if(isset($searchMonth) && trim($searchMonth)!= ''){
         lab = $("#labName").val();
         clinicId = $("#clinicId").val();
         sampleType = $("#sampleType").val();
-        $.post("<?php echo $this->url('laboratory', array('action' => 'get-bar-sample-tat')); ?>",{fromDate:fromDate,toDate:toDate,lab:lab,clinicId:clinicId,sampleType:sampleType,sampleStatus:'sample_tested'},
+        gender = $("#gender").val();
+        $.post("<?php echo $this->url('laboratory', array('action' => 'get-bar-sample-tat')); ?>",{fromDate:fromDate,toDate:toDate,lab:lab,clinicId:clinicId,sampleType:sampleType,sampleStatus:'sample_tested',gender:gender},
         function(data) {
             $("#barcontainer").html(data);
         });
@@ -198,7 +203,8 @@ if(isset($searchMonth) && trim($searchMonth)!= ''){
         lab = $("#labName").val();
         clinicId = $("#clinicId").val();
         sampleType = $("#sampleType").val();
-        $.post("<?php echo $this->url('laboratory', array('action' => 'get-pie-sample-tat')); ?>",{fromDate:fromDate,toDate:toDate,lab:lab,clinicId:clinicId,sampleType:sampleType,sampleStatus:'sample_tested'},
+        gender = $("#gender").val();
+        $.post("<?php echo $this->url('laboratory', array('action' => 'get-pie-sample-tat')); ?>",{fromDate:fromDate,toDate:toDate,lab:lab,clinicId:clinicId,sampleType:sampleType,sampleStatus:'sample_tested',gender:gender},
         function(data) {
             $("#piecontainer").html(data);
         });
@@ -249,6 +255,7 @@ function loadSampleDataTable(){
             aoData.push({"name": "lab", "value": $('#labName').val()});
             aoData.push({"name": "clinicId", "value": $('#clinicId').val()});
             aoData.push({"name": "sampleType", "value": $('#sampleType').val()});
+            aoData.push({"name": "gender", "value": $('#gender').val()});
             $.ajax({
                 "dataType": 'json',
                 "type": "POST",

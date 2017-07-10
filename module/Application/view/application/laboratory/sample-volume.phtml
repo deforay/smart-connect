@@ -32,21 +32,17 @@ if(isset($searchMonth) && trim($searchMonth)!= ''){
                     <!-- BEGIN THEME PANEL -->
                     <!-- END THEME PANEL -->
                     <!-- BEGIN PAGE BAR -->
-                    <div class="page-bar">
-                        <ul class="page-breadcrumb">
+                     <div class="page-bar">
+                        <h1 class="page-title">Sample Test Volume
+                        <ul class="page-breadcrumb pull-right">
                             <li>
-                                <a href="/">Dashboard</a>
-                                <i class="fa fa-circle"></i>
-                            </li>
-                            <li>
-                                <a href="/labs/dashboard">Labs Dashboard</a>
-                                <i class="fa fa-circle"></i>
-                            </li>
-                            <li>
-                                <a href="javascript:;">Sample Volume Page</a>
+                                <i class="fa fa-arrow-left"></i>
+                                <a href="/labs/dashboard">Back to Labs Dashboard</a>
                             </li>
                         </ul>
-                    </div>
+                        </h1>
+                    </div>                    
+                   
                     <!-- END PAGE BAR -->
                     <!-- BEGIN PAGE TITLE-->
                     <h3 class="page-title"></h3>
@@ -172,7 +168,16 @@ if(isset($searchMonth) && trim($searchMonth)!= ''){
                               </select>
                             </div>
                             <div class="form-group col-lg-4">
-                                <br>
+                                <label class="control-label">Gender</label>
+                              <select class="form-control" name="gender" id="gender">
+                                <option value="">All</option>
+                                <option value="M">Male</option>
+                                <option value="F">Female</option>
+                                <option value="not_specified">Not Specified</option>
+                              </select>
+                            </div>
+                            <div class="form-group col-lg-4" style="margin-top:2.6%;">
+                                
                                 <a href="javascript:void(0);" class="btn btn-primary" onclick="searchSampleVolume()">Submit</a>
                             </div>
                         </div>
@@ -239,7 +244,8 @@ if(isset($searchMonth) && trim($searchMonth)!= ''){
         adherence = $("#adherence").val();
         age = $("#age").val();
         sampleStatus = $("#sampleStatus").val();
-        $.post("<?php echo $this->url('laboratory', array('action' => 'get-bar-sample-details')); ?>",{fromDate:fromDate,toDate:toDate,lab:lab,clinicId:clinicId,sampleType:sampleType,currentRegimen:currentRegimen,adherence:adherence,age:age,sampleStatus:sampleStatus,fromSrc:'sampleVolume'},
+        gender = $("#gender").val();
+        $.post("<?php echo $this->url('laboratory', array('action' => 'get-bar-sample-details')); ?>",{fromDate:fromDate,toDate:toDate,lab:lab,clinicId:clinicId,sampleType:sampleType,currentRegimen:currentRegimen,adherence:adherence,age:age,sampleStatus:sampleStatus,fromSrc:'sampleVolume',gender:gender},
         function(data) {
             $("#barcontainer").html(data);
         });
@@ -257,7 +263,8 @@ if(isset($searchMonth) && trim($searchMonth)!= ''){
         adherence = $("#adherence").val();
         age = $("#age").val();
         sampleStatus = $("#sampleStatus").val();
-        $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-details')); ?>",{fromDate:fromDate,toDate:toDate,lab:lab,clinicId:clinicId,sampleType:sampleType,currentRegimen:currentRegimen,adherence:adherence,age:age,sampleStatus:sampleStatus,fromSrc:'sampleVolume'},
+        gender = $("#gender").val();
+        $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-details')); ?>",{fromDate:fromDate,toDate:toDate,lab:lab,clinicId:clinicId,sampleType:sampleType,currentRegimen:currentRegimen,adherence:adherence,age:age,sampleStatus:sampleStatus,fromSrc:'sampleVolume',gender:gender},
         function(data) {
             $("#piecontainer").html(data);
         });
@@ -311,6 +318,7 @@ function loadSampleDataTable(){
             aoData.push({"name": "adherence", "value": $('#adherence').val()});
             aoData.push({"name": "age", "value": $('#age').val()});
             aoData.push({"name": "sampleStatus", "value": $('#sampleStatus').val()});
+            aoData.push({"name": "gender", "value": $('#gender').val()});
             $.ajax({
                 "dataType": 'json',
                 "type": "POST",
