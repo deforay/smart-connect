@@ -101,14 +101,19 @@ class LaboratoryController extends AbstractActionController
     public function requisitionFormsIncompleteAction(){
         $this->layout()->setVariable('activeTab', 'labs-dashboard');
         $month="";
+        $labFilter = "";
         if($this->params()->fromQuery('month')){
             $month=$this->params()->fromQuery('month');
+        }
+        if($this->params()->fromQuery('lab')){
+            $labFilter=$this->params()->fromQuery('lab');
         }
         $sampleService = $this->getServiceLocator()->get('SampleService');
         $labList = $sampleService->getAllLabName();
         return new ViewModel(array(
             'labList' => $labList,
-            'searchMonth' => $month
+            'searchMonth' => $month,
+            'labFilter' => $labFilter
         ));
     }
     
