@@ -172,6 +172,15 @@ if(isset($searchMonth) && trim($searchMonth)!= ''){
                               </select>
                             </div>
                             <div class="form-group col-lg-4">
+                                <label class="control-label">Gender</label>
+                              <select class="form-control" name="gender" id="gender">
+                                <option value="">All</option>
+                                <option value="M">Male</option>
+                                <option value="F">Female</option>
+                                <option value="not_specified">Not Specified</option>
+                              </select>
+                            </div>
+                            <div class="form-group col-lg-4">
                                 <br>
                                 <a href="javascript:void(0);" class="btn btn-primary" onclick="searchSampleVolume()">Submit</a>
                             </div>
@@ -239,7 +248,8 @@ if(isset($searchMonth) && trim($searchMonth)!= ''){
         adherence = $("#adherence").val();
         age = $("#age").val();
         sampleStatus = $("#sampleStatus").val();
-        $.post("<?php echo $this->url('laboratory', array('action' => 'get-bar-sample-details')); ?>",{fromDate:fromDate,toDate:toDate,lab:lab,clinicId:clinicId,sampleType:sampleType,currentRegimen:currentRegimen,adherence:adherence,age:age,sampleStatus:sampleStatus,fromSrc:'sampleVolume'},
+        gender = $("#gender").val();
+        $.post("<?php echo $this->url('laboratory', array('action' => 'get-bar-sample-details')); ?>",{fromDate:fromDate,toDate:toDate,lab:lab,clinicId:clinicId,sampleType:sampleType,currentRegimen:currentRegimen,adherence:adherence,age:age,sampleStatus:sampleStatus,fromSrc:'sampleVolume',gender:gender},
         function(data) {
             $("#barcontainer").html(data);
         });
@@ -257,7 +267,8 @@ if(isset($searchMonth) && trim($searchMonth)!= ''){
         adherence = $("#adherence").val();
         age = $("#age").val();
         sampleStatus = $("#sampleStatus").val();
-        $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-details')); ?>",{fromDate:fromDate,toDate:toDate,lab:lab,clinicId:clinicId,sampleType:sampleType,currentRegimen:currentRegimen,adherence:adherence,age:age,sampleStatus:sampleStatus,fromSrc:'sampleVolume'},
+        gender = $("#gender").val();
+        $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-details')); ?>",{fromDate:fromDate,toDate:toDate,lab:lab,clinicId:clinicId,sampleType:sampleType,currentRegimen:currentRegimen,adherence:adherence,age:age,sampleStatus:sampleStatus,fromSrc:'sampleVolume',gender:gender},
         function(data) {
             $("#piecontainer").html(data);
         });
@@ -311,6 +322,7 @@ function loadSampleDataTable(){
             aoData.push({"name": "adherence", "value": $('#adherence').val()});
             aoData.push({"name": "age", "value": $('#age').val()});
             aoData.push({"name": "sampleStatus", "value": $('#sampleStatus').val()});
+            aoData.push({"name": "gender", "value": $('#gender').val()});
             $.ajax({
                 "dataType": 'json',
                 "type": "POST",

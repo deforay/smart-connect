@@ -74,6 +74,17 @@ if(isset($searchMonth) && trim($searchMonth)!= ''){
                                     ?>
                                 </select>
                             </div>
+                            <div class="form-group col-lg-4">
+                                <label class="control-label">Gender</label>
+                              <select class="form-control" name="gender" id="gender">
+                                <option value="">All</option>
+                                <option value="M">Male</option>
+                                <option value="F">Female</option>
+                                <option value="not_specified">Not Specified</option>
+                              </select>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
                             <div class="form-group col-lg-4" style="margin-top:26px;">
                                 <a href="javascript:void(0);" class="btn btn-primary" onclick="searchIncompleteSampleResult()">Submit</a>
                             </div>
@@ -99,8 +110,9 @@ if(isset($searchMonth) && trim($searchMonth)!= ''){
         fromDate = $('#mrp-lowerDate').val();
         toDate = $('#mrp-upperDate').val();
         lab = $("#labName").val();
+        gender = $("#gender").val();
         
-        $.post("<?php echo $this->url('laboratory', array('action' => 'get-incomplete-sample-details')); ?>",{fromDate:fromDate,toDate:toDate,lab:lab},
+        $.post("<?php echo $this->url('laboratory', array('action' => 'get-incomplete-sample-details')); ?>",{fromDate:fromDate,toDate:toDate,lab:lab,gender:gender},
         function(data) {
             $("#piecontainer").html(data);
         });
@@ -112,8 +124,8 @@ if(isset($searchMonth) && trim($searchMonth)!= ''){
         fromDate = $('#mrp-lowerDate').val();
         toDate = $('#mrp-upperDate').val();
         lab = $("#labName").val();
-        
-        $.post("<?php echo $this->url('laboratory', array('action' => 'get-incomplete-bar-sample-details')); ?>",{fromDate:fromDate,toDate:toDate,lab:lab},
+        gender = $("#gender").val();
+        $.post("<?php echo $this->url('laboratory', array('action' => 'get-incomplete-bar-sample-details')); ?>",{fromDate:fromDate,toDate:toDate,lab:lab,gender:gender},
         function(data) {
             $("#barcontainer").html(data);
         });

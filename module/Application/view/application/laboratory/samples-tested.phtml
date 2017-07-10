@@ -183,9 +183,9 @@ if(isset($searchMonth) && trim($searchMonth)!= ''){
                                 <label class="control-label">Gender</label>
                               <select class="form-control" name="gender" id="gender">
                                 <option value="">All</option>
-                                <option value="M">Male</option>
-                                <option value="F">Female</option>
-                                <option value="not_specified">Not Specified</option>
+                                <option value="M" <?php echo (isset($searchGender) && $searchGender == 'M')?'selected="selected"':''; ?>>Male</option>
+                                <option value="F" <?php echo (isset($searchGender) && $searchGender == 'F')?'selected="selected"':''; ?>>Female</option>
+                                <option value="not_specified" <?php echo (isset($searchGender) && $searchGender == 'Not Specified')?'selected="selected"':''; ?>>Not Specified</option>
                               </select>
                             </div>
                         </div>
