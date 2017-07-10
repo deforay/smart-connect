@@ -18,7 +18,7 @@
         exporting:{
             chartOptions:{
                 subtitle: {
-                    text:'Vl Outcomes',
+                    text:'VL Suppressed/Not Suppressed',
                 }
             }
         },
@@ -63,12 +63,14 @@
                   y:<?php echo $result[0]['Not_Suppressed'];?>,
                   number:<?php echo $result[0]['Not_Suppressed'];?>,
                   sliced: true,
-                  selected: true
+                  selected: true,
+                  color:'#ff1900',
                 },
                 {
                   name:<?php echo "'Suppressed'";?>,
                   y:<?php echo $result[0]['Suppressed'];?>,
                   number:<?php echo $result[0]['Suppressed'];?>,
+                  color:'#60d18f'
                 },
                 <?php
             }
