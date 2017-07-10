@@ -257,6 +257,7 @@ class Module
         return array(
            'invokables' => array(
               'humanDateFormat' => 'Application\View\Helper\HumanDateFormat',
+              'GetConfigData' => 'Application\View\Helper\GetConfigData'
            ),
         );
     }	
