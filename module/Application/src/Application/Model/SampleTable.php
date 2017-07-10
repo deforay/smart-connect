@@ -1195,8 +1195,8 @@ class SampleTable extends AbstractTableGateway {
         /* Array of database columns which should be read and sent back to DataTables. Use a space where
          * you want to insert a non-database field (for example a counter or static image)
         */
-        $aColumns = array('sample_code','DATE_FORMAT(sample_collection_date,"%d-%b-%Y")','rejection_reason_name','DATE_FORMAT(sample_testing_date,"%d-%b-%Y")','result');
-        $orderColumns = array('sample_code','sample_collection_date','rejection_reason_name','sample_testing_date','result');
+        $aColumns = array('sample_code','facility_name','DATE_FORMAT(sample_collection_date,"%d-%b-%Y")','rejection_reason_name','DATE_FORMAT(sample_testing_date,"%d-%b-%Y")','result');
+        $orderColumns = array('sample_code','facility_name','sample_collection_date','rejection_reason_name','sample_testing_date','result');
 
         /*
          * Paging
@@ -1280,7 +1280,7 @@ class SampleTable extends AbstractTableGateway {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
-                                ->columns(array('vl_sample_id','sample_code','sample_collection_date','sample_type','sample_testing_date','result_value_log','result_value_absolute','result_value_text','result'))
+                                ->columns(array('vl_sample_id','sample_code','sampleCollectionDate'=>new Expression('DATE(sample_collection_date)'),'sample_type','sampleTestingDate'=>new Expression('DATE(sample_testing_date)'),'result_value_log','result_value_absolute','result_value_text','result'))
 				->join(array('fd'=>'facility_details'),'fd.facility_id=vl.facility_id',array('facility_name'))
 				->join(array('r_r_r'=>'r_sample_rejection_reasons'),'r_r_r.rejection_reason_id=vl.reason_for_sample_rejection',array('rejection_reason_name'),'left')
 				->where(array('fd.facility_type'=>'1'));
@@ -1335,18 +1335,18 @@ class SampleTable extends AbstractTableGateway {
 
         $sQueryStr = $sql->getSqlStringForSqlObject($sQuery); // Get the string of the Sql, instead of the Select-instance 
         //echo $sQueryStr;die;
-        $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
+        $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
 
         /* Data set length after filtering */
         $sQuery->reset('limit');
         $sQuery->reset('offset');
         $fQuery = $sql->getSqlStringForSqlObject($sQuery);
-        $aResultFilterTotal = $dbAdapter->query($fQuery, $dbAdapter::QUERY_MODE_EXECUTE);
+        $aResultFilterTotal = $dbAdapter->query($fQuery, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $iFilteredTotal = count($aResultFilterTotal);
 
         /* Total data set length */
         $iQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
-                                ->columns(array('vl_sample_id','sample_code','sample_collection_date','sample_type','sample_testing_date','result_value_log','result_value_absolute','result_value_text','result'))
+                                ->columns(array('vl_sample_id','sample_code','sampleCollectionDate'=>new Expression('DATE(sample_collection_date)'),'sample_type','sampleTestingDate'=>new Expression('DATE(sample_testing_date)'),'result_value_log','result_value_absolute','result_value_text','result'))
 				->join(array('fd'=>'facility_details'),'fd.facility_id=vl.facility_id',array('facility_name'))
                                 ->join(array('r_r_r'=>'r_sample_rejection_reasons'),'r_r_r.rejection_reason_id=vl.reason_for_sample_rejection',array('rejection_reason_name'),'left')
 				->where(array('fd.facility_type'=>'1'));
@@ -1368,18 +1368,19 @@ class SampleTable extends AbstractTableGateway {
 	$common = new CommonService($this->sm);
         foreach ($rResult as $aRow) {
             $row = array();
-	    if(isset($aRow['sample_collection_date']) && trim($aRow['sample_collection_date'])!=""){
-                $xepCollectDate=explode(" ",$aRow['sample_collection_date']);
-                $aRow['sample_collection_date']=$common->humanDateFormat($xepCollectDate[0])." ".$xepCollectDate[1];
+            $sampleCollectionDate = '';
+            $sampleTestedDate = '';
+	    if(isset($aRow['sampleCollectionDate']) && $aRow['sampleCollectionDate']!= NULL && trim($aRow['sampleCollectionDate'])!="" && $aRow['sampleCollectionDate']!= '0000-00-00'){
+                $sampleCollectionDate = $common->humanDateFormat($aRow['sampleCollectionDate']);
             }
-            if(isset($aRow['sample_testing_date']) && trim($aRow['sample_testing_date'])!=""){
-                $xepTestingDate=explode(" ",$aRow['sample_testing_date']);
-                $aRow['sample_testing_date']=$common->humanDateFormat($xepTestingDate[0])." ".$xepTestingDate[1];
+            if(isset($aRow['sampleTestingDate']) && $aRow['sampleTestingDate']!= NULL && trim($aRow['sampleTestingDate'])!="" && $aRow['sampleTestingDate']!= '0000-00-00'){
+                $sampleTestedDate = $common->humanDateFormat($aRow['sampleTestingDate']);
             }
             $row[] = $aRow['sample_code'];
-            $row[] = $aRow['sample_collection_date'];
+            $row[] = ucwords($aRow['facility_name']);
+            $row[] = $sampleCollectionDate;
             $row[] = (isset($aRow['rejection_reason_name']))?ucwords($aRow['rejection_reason_name']):'';
-            $row[] = $aRow['sample_testing_date'];
+            $row[] = $sampleTestedDate;
 	    $row[] = $aRow['result'];
             $display = 'show';
             if($aRow['result']==""){
