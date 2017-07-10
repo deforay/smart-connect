@@ -1636,8 +1636,12 @@ class SampleTable extends AbstractTableGateway {
                                 }else if(isset($params['testResult']) && $params['testResult'] == '>=1000') {
                                   $countQuery = $countQuery->where("vl.result >= 1000");
                                 }
-                                if(isset($params['gender']) && trim($params['gender'])!=''){
-                                    $countQuery = $countQuery->where('vl.patient_gender="'.$params['gender'].'"');
+                                if(isset($params['gender']) && $params['gender']=='F'){
+                                    $countQuery = $countQuery->where("(patient_gender ='f' OR patient_gender ='female' OR patient_gender='F' OR patient_gender='FEMALE')");
+                                }else if(isset($params['gender']) && $params['gender']=='M'){
+                                    $countQuery = $countQuery->where("(patient_gender ='m' OR patient_gender ='male' OR patient_gender='M' OR patient_gender='MALE')");
+                                }else if(isset($params['gender']) && $params['gender']=='not_specified'){
+                                    $countQuery = $countQuery->where("(patient_gender !='m' AND patient_gender !='male' AND patient_gender!='M' AND patient_gender!='MALE') AND (patient_gender !='f' AND patient_gender !='female' AND patient_gender!='F' AND patient_gender!='FEMALE')");
                                 }
                                 if(isset($params['currentRegimen']) && trim($params['currentRegimen'])!=''){
                                     $countQuery = $countQuery->where('vl.current_regimen="'.base64_decode(trim($params['currentRegimen'])).'"');
@@ -1676,7 +1680,7 @@ class SampleTable extends AbstractTableGateway {
                                 }
                                 
                                 $cQueryStr = $sql->getSqlStringForSqlObject($countQuery);
-                               // echo $cQueryStr;die;
+                                //echo $cQueryStr;die;
                                 $countResult[$i] = $dbAdapter->query($cQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
                                 $result[$i][0] = $countResult[$i]['total'];
                                 $result[$i][1] = $facility['facility_name'];
@@ -1733,8 +1737,12 @@ class SampleTable extends AbstractTableGateway {
                             }else if(isset($params['testResult']) && $params['testResult'] == '>=1000') {
                               $countQuery = $countQuery->where("vl.result >= 1000");
                             }
-                            if(isset($params['gender']) && trim($params['gender'])!=''){
-                                $countQuery = $countQuery->where('vl.patient_gender="'.$params['gender'].'"');
+                            if(isset($params['gender']) && $params['gender']=='F'){
+                                $countQuery = $countQuery->where("(patient_gender ='f' OR patient_gender ='female' OR patient_gender='F' OR patient_gender='FEMALE')");
+                            }else if(isset($params['gender']) && $params['gender']=='M'){
+                                $countQuery = $countQuery->where("(patient_gender ='m' OR patient_gender ='male' OR patient_gender='M' OR patient_gender='MALE')");
+                            }else if(isset($params['gender']) && $params['gender']=='not_specified'){
+                                $countQuery = $countQuery->where("(patient_gender !='m' AND patient_gender !='male' AND patient_gender!='M' AND patient_gender!='MALE') AND (patient_gender !='f' AND patient_gender !='female' AND patient_gender!='F' AND patient_gender!='FEMALE')");
                             }
                             if(isset($params['currentRegimen']) && trim($params['currentRegimen'])!=''){
                                 $countQuery = $countQuery->where('vl.current_regimen="'.base64_decode(trim($params['currentRegimen'])).'"');
