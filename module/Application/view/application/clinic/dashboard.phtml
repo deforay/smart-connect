@@ -146,7 +146,6 @@ foreach($sampleType as $samples){
                     
                     <br><br>
                     <div class="row">
-                        
                         <div class="col-md-6 col-sm-6">
                             <div class="portlet box blue">
                                 <div class="portlet-title">
@@ -206,7 +205,7 @@ foreach($sampleType as $samples){
                                                     <div class="btn-group" style="width:60%;float:left;">
                                                         <select id="result" class="btn white btn-outline btn-circle btn-sm dropdown-toggle" onchange="fnShowHide();">
                                                             <option value="">All Samples</option>
-                                                            <option value="result">Samples with Test Results</option>
+                                                            <option value="result" selected="selected">Samples with Test Results</option>
                                                             <option value="noresult">Samples Awaiting Results</option>
                                                             <option value="rejected">Rejected Samples</option>
                                                         </select>
@@ -222,6 +221,7 @@ foreach($sampleType as $samples){
                                                         <thead>
                                                             <tr>
                                                                 <th> Sample ID </th>
+                                                                <th> Clinic Name </th>
                                                                 <th> Date Collected</th>
                                                                 <th> Rejection Reason</th>
                                                                 <th> Date Tested</th>
@@ -231,7 +231,7 @@ foreach($sampleType as $samples){
                                                         </thead>
                                                         <tbody>
                                                             <tr>
-                                                                <td colspan="6" class="dataTables_empty">Loading data from server</td>
+                                                                <td colspan="7" class="dataTables_empty">Loading data from server</td>
                                                             </tr>
                                                         </tbody>
                                                     </table>
@@ -315,6 +315,7 @@ foreach($sampleType as $samples){
         getTestedSampleResult();
         overAllViralLoad();
         testResul();
+        fnShowHide();
     }
     
     function testResul(){
@@ -327,10 +328,11 @@ foreach($sampleType as $samples){
                 {"sClass":"center"},
                 {"sClass":"center"},
                 {"sClass":"center"},
+                {"sClass":"center"},
                 {"sClass":"center","bSortable":false}
                 ],
             "iDisplayLength": 10,
-            "aaSorting": [[ 1, "desc" ]],
+            "aaSorting": [[ 2, "desc" ]],
     
             "sAjaxSource": "<?php echo $this->url('clinics',array('action' => 'test-result')); ?>",
             "fnServerData": function ( sSource, aoData, fnCallback ) {
@@ -398,21 +400,21 @@ foreach($sampleType as $samples){
     
     function fnShowHide(){
         if($('#result').val() == ''){
-            oTable.column(2).visible(true);
             oTable.column(3).visible(true);
             oTable.column(4).visible(true);
+            oTable.column(5).visible(true);
         }else if($('#result').val() == 'result'){
-            oTable.column(2).visible(false);
-            oTable.column(3).visible(true);
+            oTable.column(3).visible(false);
             oTable.column(4).visible(true);
+            oTable.column(5).visible(true);
         }else if($('#result').val() == 'noresult'){
-            oTable.column(2).visible(false);
             oTable.column(3).visible(false);
             oTable.column(4).visible(false);
+            oTable.column(5).visible(false);
         }else if($('#result').val() == 'rejected'){
-           oTable.column(3).visible(false);
            oTable.column(4).visible(false);
-           oTable.column(2).visible(true);
+           oTable.column(5).visible(false);
+           oTable.column(3).visible(true);
         }
         searchTestResultData();
     }

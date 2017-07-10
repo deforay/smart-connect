@@ -2,6 +2,7 @@
 use Zend\Session\Container;
 $container = new Container('alert');
 $logincontainer = new Container('credo');
+$config = $this->GetConfigData();
 ?>
 <!DOCTYPE html>
 <!--[if IE 8]> <html lang="en" class="ie8 no-js"> <![endif]-->
@@ -59,7 +60,14 @@ $logincontainer = new Container('credo');
                 <!-- BEGIN LOGO -->
                 <div class="page-logo">
                     <a href="/">
-                        <img src="<?php echo $this->basePath('assets/layouts/layout/img/logo.png'); ?>" alt="logo" class="logo-default" style="margin-top:-5px;margin-right:5px;"/> <span style="color:#fff;line-height:50px;">Smart Connect</span></a>
+                        <?php
+                        if(isset($config['logo']) && trim($config['logo']) != "" && file_exists(UPLOAD_PATH . DIRECTORY_SEPARATOR . "logo" . DIRECTORY_SEPARATOR . $config['logo'])){ ?>
+                          <img src="<?php echo $this->basePath('uploads/logo/'.$config['logo']); ?>" alt="logo" class="logo-default" style="width:32px;height:32px;margin-top:-5px;margin-right:5px;"/>
+                        <?php } else { ?>
+                          <img src="<?php echo $this->basePath('assets/layouts/layout/img/logo.png'); ?>" alt="logo" class="logo-default" style="margin-top:-5px;margin-right:5px;"/>
+                        <?php } ?>
+                        <span style="color:#fff;line-height:50px;">Smart Connect</span>
+                    </a>
                     <div class="menu-toggler sidebar-toggler"> </div>
                 </div>
                 <!-- END LOGO -->
@@ -69,7 +77,6 @@ $logincontainer = new Container('credo');
                 <!-- BEGIN TOP NAVIGATION MENU -->
                 <span style="color:#ccc;padding:10px;line-height:50px;font-weight:lighter">Development/Test Environment with dummy data</span>
                 <div class="top-menu">
-                    
                     <ul class="nav navbar-nav pull-right">
                         
                         <!-- BEGIN USER LOGIN DROPDOWN -->
