@@ -29,8 +29,7 @@ class ClinicController extends AbstractActionController
             ));
     }
     
-    public function overallViralLoadAction()
-    {
+    public function overallViralLoadAction(){
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
@@ -38,6 +37,19 @@ class ClinicController extends AbstractActionController
             $chartResult = $sampleService->getChartOverAllLoadStatus($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('chartResult'=>$chartResult))
+                        ->setTerminal(true);
+            return $viewModel;
+        }
+    }
+    
+    public function getOverAllLoadStatusAction() {
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $sampleService = $this->getServiceLocator()->get('SampleService');
+            $chartResult = $sampleService->getOverAllLoadStatus($params);
+            $viewModel = new ViewModel();
+            $viewModel->setVariables(array('result'=>$chartResult))
                         ->setTerminal(true);
             return $viewModel;
         }
@@ -93,16 +105,6 @@ class ClinicController extends AbstractActionController
             $viewModel->setVariables(array('sampleResult' =>$sampleResult,'config'=>$config))
                       ->setTerminal(true);
             return $viewModel;
-        }
-    }
-    
-    public function getOverAllLoadStatusAction() {
-        $request = $this->getRequest();
-        if ($request->isPost()) {
-            $params = $request->getPost();
-            $sampleService = $this->getServiceLocator()->get('SampleService');
-            $result = $sampleService->getOverAllLoadStatus($params);
-            return $this->getResponse()->setContent(Json::encode($result));
         }
     }
     

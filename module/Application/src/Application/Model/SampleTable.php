@@ -937,197 +937,85 @@ class SampleTable extends AbstractTableGateway {
                 }
             }
         }
-        //\Zend\Debug\Debug::dump($lResult);die;
         return $lResult;
     }
-    
-    //end lab dashboard details 
+    //end lab dashboard details
     
     //start clinic details
-    public function fetchOverAllLoadStatus($parameters){
+    public function fetchOverAllLoadStatus($params){
         $logincontainer = new Container('credo');
-        $common = new CommonService($this->sm);
-        /* Array of database columns which should be read and sent back to DataTables. Use a space where
-         * you want to insert a non-database field (for example a counter or static image)
-        */
-        $aColumns = array('sample_code','DATE_FORMAT(sample_tested_datetime,"%d-%b-%Y")','result');
-        $orderColumns = array('sample_code','sample_tested_datetime','result');
-
-        /*
-         * Paging
-         */
-        $sLimit = "";
-        if (isset($parameters['iDisplayStart']) && $parameters['iDisplayLength'] != '-1') {
-            $sOffset = $parameters['iDisplayStart'];
-            $sLimit = $parameters['iDisplayLength'];
-        }
-
-        /*
-         * Ordering
-         */
-
-        $sOrder = "";
-        if (isset($parameters['iSortCol_0'])) {
-            for ($i = 0; $i < intval($parameters['iSortingCols']); $i++) {
-                if ($parameters['bSortable_' . intval($parameters['iSortCol_' . $i])] == "true") {
-                    $sOrder .= $orderColumns[intval($parameters['iSortCol_' . $i])] . " " . ( $parameters['sSortDir_' . $i] ) . ",";
-                }
-            }
-            $sOrder = substr_replace($sOrder, "", -1);
-        }
-
-        /*
-         * Filtering
-         * NOTE this does not match the built-in DataTables filtering which does it
-         * word by word on any field. It's possible to do here, but concerned about efficiency
-         * on very large tables, and MySQL's regex functionality is very limited
-         */
-
-        $sWhere = "";
-        if (isset($parameters['sSearch']) && $parameters['sSearch'] != "") {
-            $searchArray = explode(" ", $parameters['sSearch']);
-            $sWhereSub = "";
-            foreach ($searchArray as $search) {
-                if ($sWhereSub == "") {
-                    $sWhereSub .= "(";
-                } else {
-                    $sWhereSub .= " AND (";
-                }
-                $colSize = count($aColumns);
-
-                for ($i = 0; $i < $colSize; $i++) {
-                    if ($i < $colSize - 1) {
-                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search ) . "%' OR ";
-                    } else {
-                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search ) . "%' ";
-                    }
-                }
-                $sWhereSub .= ")";
-            }
-            $sWhere .= $sWhereSub;
-        }
-
-        /* Individual column filtering */
-        for ($i = 0; $i < count($aColumns); $i++) {
-            if (isset($parameters['bSearchable_' . $i]) && $parameters['bSearchable_' . $i] == "true" && $parameters['sSearch_' . $i] != '') {
-                if ($sWhere == "") {
-                    $sWhere .= $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
-                } else {
-                    $sWhere .= " AND " . $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
-                }
-            }
-        }
-
-        /*
-         * SQL queries
-         * Get data to display
-        */
-        $cDate = date('Y-m-d');
-        $lastThirtyDay = date('Y-m-d', strtotime('-30 days'));
-        if(isset($parameters['sampleCollectionDate']) && trim($parameters['sampleCollectionDate'])!= ''){
-            $s_c_date = explode("to", $parameters['sampleCollectionDate']);
-            if (isset($s_c_date[0]) && trim($s_c_date[0]) != "") {
-              $lastThirtyDay = trim($s_c_date[0]);
-            }
-            if (isset($s_c_date[1]) && trim($s_c_date[1]) != "") {
-              $cDate = trim($s_c_date[1]);
-            }
-        }
-        
+        $result = array();
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $sQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))->columns(array('sample_code','sample_tested_datetime','result','sample_type'))
-                        ->join(array('fd'=>'facility_details'),'fd.facility_id=vl.facility_id',array('facility_name'))
-                        ->join(array('rst'=>'r_sample_type'),'rst.sample_id=vl.sample_type')
-                        ->where(array("vl.sample_collection_date <='" . $cDate ." 23:59:00". "'", "vl.sample_collection_date >='" . $lastThirtyDay." 00:00:00". "'"))
-                        ->where(array('fd.facility_type'=>'1'));
-        if(isset($parameters['clinicId']) && $parameters['clinicId']!=''){
-            $sQuery = $sQuery->where('vl.facility_id="'.base64_decode(trim($parameters['clinicId'])).'"');
-        }else{
-           if($logincontainer->role!= 1){
-                $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:0;
-                $sQuery = $sQuery->where('vl.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
-            } 
-        }
-        if(isset($parameters['sampleId']) && $parameters['sampleId']!=''){
-            $sQuery = $sQuery->where('vl.sample_type="'.base64_decode(trim($parameters['sampleId'])).'"');
-        }
-        if(isset($parameters['testResult']) && trim($parameters['testResult']) == '<1000'){
-          $sQuery = $sQuery->where("vl.result < 1000");
-        }else if(isset($parameters['testResult']) && trim($parameters['testResult']) == '>=1000') {
-          $sQuery = $sQuery->where("vl.result >= 1000");
-        }
-        if(isset($parameters['gender'] ) && trim($parameters['gender'])!=''){
-            $sQuery = $sQuery->where(array("vl.patient_gender ='".$parameters['gender']."'")); 
-        }
-        if(isset($parameters['age']) && $parameters['age']!=''){
-            $age = explode("-",$parameters['age']);
-            if(isset($age[1])){
-              $sQuery = $sQuery->where(array("vl.patient_age_in_years >='".$age[0]."'","vl.patient_age_in_years <='".$age[1]."'"));
+        $common = new CommonService($this->sm);
+        if(isset($params['sampleCollectionDate']) && trim($params['sampleCollectionDate'])!= ''){
+            $cDate = date('Y-m-d');
+            $lastThirtyDay = date('Y-m-d', strtotime('-30 days'));
+            if(isset($params['sampleCollectionDate']) && trim($params['sampleCollectionDate'])!= ''){
+                $s_c_date = explode("to", $params['sampleCollectionDate']);
+                if (isset($s_c_date[0]) && trim($s_c_date[0]) != "") {
+                  $lastThirtyDay = trim($s_c_date[0]);
+                }
+                if (isset($s_c_date[1]) && trim($s_c_date[1]) != "") {
+                  $cDate = trim($s_c_date[1]);
+                }
+            }
+            $query = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
+                                    ->columns(array(
+                                                "mTotal" => new Expression("SUM(CASE WHEN (vl.patient_gender in('m','M')) THEN 1 ELSE 0 END)"),
+                                                "mGreaterThanEqual1000" => new Expression("SUM(CASE WHEN (vl.result>=1000 and vl.patient_gender in('m','M')) THEN 1 ELSE 0 END)"),
+                                                "mLesserThan1000" => new Expression("SUM(CASE WHEN ((vl.result<1000 or vl.result='Target Not Detected') and vl.patient_gender in('m','M')) THEN 1 ELSE 0 END)"),
+                                                "fTotal" => new Expression("SUM(CASE WHEN (vl.patient_gender in('f','F')) THEN 1 ELSE 0 END)"),
+                                                "fGreaterThanEqual1000" => new Expression("SUM(CASE WHEN (vl.result>=1000 and vl.patient_gender in('f','F')) THEN 1 ELSE 0 END)"),
+                                                "fLesserThan1000" => new Expression("SUM(CASE WHEN ((vl.result<1000 or vl.result='Target Not Detected') and vl.patient_gender in('f','F')) THEN 1 ELSE 0 END)"),
+                                                "nsTotal" => new Expression("SUM(CASE WHEN (vl.patient_gender NOT in('m','M','f','F')) THEN 1 ELSE 0 END)"),
+                                                "nsGreaterThanEqual1000" => new Expression("SUM(CASE WHEN (vl.result>=1000 and vl.patient_gender NOT in('m','M','f','F')) THEN 1 ELSE 0 END)"),
+                                                "nsLesserThan1000" => new Expression("SUM(CASE WHEN ((vl.result<1000 or vl.result='Target Not Detected') and vl.patient_gender NOT in('m','M','f','F')) THEN 1 ELSE 0 END)")
+                                              )
+                                            )
+                                    ->where(array("DATE(vl.sample_collection_date) <='$cDate'","DATE(vl.sample_collection_date) >='$lastThirtyDay'"));
+            if(isset($params['clinicId']) && $params['clinicId']!=''){
+                $squery = $squery->where('vl.facility_id="'.base64_decode(trim($params['clinicId'])).'"');
             }else{
-              $sQuery = $sQuery->where('vl.patient_age_in_years'.$parameters['age']);
+                if($logincontainer->role!= 1){
+                    $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:0;
+                    $squery = $squery->where('vl.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
+                }
             }
-        }
-        if(isset($parameters['adherence']) && trim($parameters['adherence'])!=''){
-            $sQuery = $sQuery->where(array("vl.arv_adherance_percentage ='".$parameters['adherence']."'")); 
-        }
-        if (isset($sWhere) && $sWhere != "") {
-            $sQuery->where($sWhere);
-        }
-
-        if (isset($sOrder) && $sOrder != "") {
-            $sQuery->order($sOrder);
-        }
-
-        if (isset($sLimit) && isset($sOffset)) {
-            $sQuery->limit($sLimit);
-            $sQuery->offset($sOffset);
-        }
-
-        $sQueryStr = $sql->getSqlStringForSqlObject($sQuery); // Get the string of the Sql, instead of the Select-instance
-        //echo $sQueryStr;die;
-        $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
-
-        /* Data set length after filtering */
-        $sQuery->reset('limit');
-        $sQuery->reset('offset');
-        $fQuery = $sql->getSqlStringForSqlObject($sQuery);
-        $aResultFilterTotal = $dbAdapter->query($fQuery, $dbAdapter::QUERY_MODE_EXECUTE);
-        $iFilteredTotal = count($aResultFilterTotal);
-
-        /* Total data set length */
-        $iQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))->columns(array('sample_code','sample_tested_datetime','result','sample_type'))
-                      ->join(array('fd'=>'facility_details'),'fd.facility_id=vl.facility_id',array('facility_name'))
-                      ->join(array('rst'=>'r_sample_type'),'rst.sample_id=vl.sample_type')
-                      ->where(array('fd.facility_type'=>'1'));
-        if($logincontainer->role!= 1){
-            $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:0;
-            $iQuery = $iQuery->where('vl.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
-        }
-        $iQueryStr = $sql->getSqlStringForSqlObject($iQuery);
-        $iResult = $dbAdapter->query($iQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-        $iTotal = count($iResult);
-        
-        $output = array(
-            "sEcho" => intval($parameters['sEcho']),
-            "iTotalRecords" => $iTotal,
-            "iTotalDisplayRecords" => $iFilteredTotal,
-            "aaData" => array()
-        );
-        
-        foreach ($rResult as $aRow) {
-            $row = array();
-            $testedDate = '';
-	    if($aRow['sample_tested_datetime']!= null && trim($aRow['sample_tested_datetime'])!="" && $aRow['sample_tested_datetime']!= '0000-00-00 00:00:00'){
-                $sampleTestedDateTime = explode(" ",$aRow['sample_tested_datetime']);
-                $testedDate = $common->humanDateFormat($sampleTestedDateTime[0]).' '.$sampleTestedDateTime[1];
+            if(isset($params['sampleId']) && $params['sampleId']!=''){
+                $squery = $squery->where('vl.sample_type="'.base64_decode(trim($params['sampleId'])).'"');
             }
-            $row[] = $aRow['sample_code'];
-            $row[] = $testedDate;
-            $row[] = $aRow['result'];
-            $output['aaData'][] = $row;
+            //if(isset($params['testResult']) && trim($params['testResult']) == '<1000'){
+            //  $squery = $squery->where("vl.result < 1000");
+            //}else if(isset($params['testResult']) && trim($params['testResult']) == '>=1000') {
+            //  $squery = $squery->where("vl.result >= 1000");
+            //}
+            if(isset($params['gender'] ) && trim($params['gender'])!=''){
+                $squery = $squery->where(array("vl.patient_gender ='".$params['gender']."'")); 
+            }
+            if(isset($params['age']) && $params['age']!=''){
+                $age = explode("-",$params['age']);
+                if(isset($age[1])){
+                $squery = $squery->where(array("vl.patient_age_in_years >='".$age[0]."'","vl.patient_age_in_years <='".$age[1]."'"));
+                }else{
+                $squery = $squery->where('vl.patient_age_in_years'.$params['age']);
+                }
+            }
+            $queryStr = $sql->getSqlStringForSqlObject($query);
+            //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+            $sampleResult = $common->cacheQuery($queryStr,$dbAdapter);
+            //set display data
+            $result['maleTotal'] = (isset($sampleResult[0]["mTotal"]))?$sampleResult[0]["mTotal"]:0;
+            $result['maleSurpressed'] = (isset($sampleResult[0]["mLesserThan1000"]))?$sampleResult[0]["mLesserThan1000"]:0;
+            $result['maleNotSurpressed'] = (isset($sampleResult[0]["mGreaterThanEqual1000"]))?$sampleResult[0]["mGreaterThanEqual1000"]:0;
+            $result['femaleTotal'] = (isset($sampleResult[0]["fTotal"]))?$sampleResult[0]["fTotal"]:0;
+            $result['femaleSurpressed'] = (isset($sampleResult[0]["fLesserThan1000"]))?$sampleResult[0]["fLesserThan1000"]:0;
+            $result['femaleNotSurpressed'] = (isset($sampleResult[0]["fGreaterThanEqual1000"]))?$sampleResult[0]["fGreaterThanEqual1000"]:0;
+            $result['notSpecifiedTotal'] = (isset($sampleResult[0]["nsTotal"]))?$sampleResult[0]["nsTotal"]:0;
+            $result['notSpecifiedSurpressed'] = (isset($sampleResult[0]["nsLesserThan1000"]))?$sampleResult[0]["nsLesserThan1000"]:0;
+            $result['notSpecifiedNotSurpressed'] = (isset($sampleResult[0]["nsGreaterThanEqual1000"]))?$sampleResult[0]["nsGreaterThanEqual1000"]:0;
         }
-       return $output;
+      return $result;
     }
     
     public function fetchChartOverAllLoadStatus($params){

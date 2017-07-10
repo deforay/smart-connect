@@ -1,0 +1,79 @@
+<?php
+//print_r($result['maleTotal']);die;
+?>
+<script>
+       $(function () {
+        $('#overall-load-chart').highcharts({
+       chart: {
+            type: 'column'
+        },
+       
+        title: {
+            text: ''
+        },
+        exporting:{
+            chartOptions:{
+                subtitle: {
+                    text:'',
+                }
+            }
+        },
+       credits: {
+              enabled: false
+       },
+        xAxis: {
+            categories: ['Male','Female','Not Specified']
+        },
+        yAxis: {
+            allowDecimals: false,
+            min: 0,
+            title: {
+                text: 'No. of Samples'
+            }
+        },
+        tooltip: {
+            formatter: function () {
+                return '<b>' + this.x + '</b><br/>' +
+                    this.series.name + ': ' + this.y + '<br/>' +
+                    'Total: ' + this.point.stackTotal;
+            }
+        },
+        plotOptions: {
+            column: {
+                stacking: 'normal',
+                pointPadding: 0.2,
+                borderWidth: 0,
+                cursor: 'pointer',
+                point: {
+                    events: {
+                        click: function (e) {
+                            
+                        }
+                    }
+                }
+            }
+        },
+        series: [
+              {
+                     name:'Total',
+                     data:[{y:<?php echo (isset($result['maleTotal']))?$result['maleTotal']:0; ?>},{y:<?php echo (isset($result['femaleTotal']))?$result['femaleTotal']:0; ?>},{y:<?php echo (isset($result['notSpecifiedTotal']))?$result['notSpecifiedTotal']:0; ?>}],
+                     stack:'total',
+                     color: '#3598dc'
+              },
+              {
+                     name:'Surpressed',
+                     data:[{y:<?php echo (isset($result['maleSurpressed']))?$result['maleSurpressed']:0; ?>},{y:<?php echo (isset($result['femaleSurpressed']))?$result['femaleSurpressed']:0; ?>},{y:<?php echo (isset($result['notSpecifiedSurpressed']))?$result['notSpecifiedSurpressed']:0; ?>}],
+                     stack:'male',
+                     color: '#60d18f'
+              },
+              {
+                     name:'Not Surpressed',
+                     data:[{y:<?php echo (isset($result['maleNotSurpressed']))?$result['maleNotSurpressed']:0; ?>},{y:<?php echo (isset($result['femaleNotSurpressed']))?$result['femaleNotSurpressed']:0; ?>},{y:<?php echo (isset($result['notSpecifiedNotSurpressed']))?$result['notSpecifiedNotSurpressed']:0; ?>}],
+                     stack:'female',
+                     color: '#ff1900'
+              },
+        ],
+        colors: ['#3598dc','#ff1900','#60d18f'],
+    });
+    });
+</script>

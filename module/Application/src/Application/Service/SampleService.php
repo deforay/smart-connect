@@ -268,11 +268,12 @@ class SampleService {
         $sampleDb = $this->sm->get('SampleTable');
         return $sampleDb->fetchSampleTestedResultDetails($params);
     }
-    public function getSampleTestedResultGenderDetails($params)
-    {
+    
+    public function getSampleTestedResultGenderDetails($params){
         $sampleDb = $this->sm->get('SampleTable');
         return $sampleDb->fetchSampleTestedResultGenderDetails($params);
     }
+    
     public function getSampleTestedResultAgeDetails($params)
     {
         $sampleDb = $this->sm->get('SampleTable');
