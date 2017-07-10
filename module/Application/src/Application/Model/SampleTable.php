@@ -1202,8 +1202,12 @@ class SampleTable extends AbstractTableGateway {
         }else if(isset($params['testResult']) && trim($params['testResult']) == '>=1000') {
           $rQuery = $rQuery->where("vl.result >= 1000");
         }
-        if(isset($params['gender'] ) && trim($params['gender'])!=''){
-            $rQuery = $rQuery->where(array("vl.patient_gender ='".$params['gender']."'")); 
+        if(isset($params['gender']) && $params['gender']=='F'){
+            $rQuery = $rQuery->where("(patient_gender ='f' OR patient_gender ='female' OR patient_gender='F' OR patient_gender='FEMALE')");
+        }else if(isset($params['gender']) && $params['gender']=='M'){
+            $rQuery = $rQuery->where("(patient_gender ='m' OR patient_gender ='male' OR patient_gender='M' OR patient_gender='MALE')");
+        }else if(isset($params['gender']) && $params['gender']=='not_specified'){
+            $rQuery = $rQuery->where("(patient_gender !='m' AND patient_gender !='male' AND patient_gender!='M' AND patient_gender!='MALE') AND (patient_gender !='f' AND patient_gender !='female' AND patient_gender!='F' AND patient_gender!='FEMALE')");
         }
         if(isset($params['testReason'] ) && trim($params['testReason'])!=''){
             $rQuery = $rQuery->where(array("vl.reason_for_vl_testing ='".base64_decode($params['testReason'])."'")); 
@@ -1270,8 +1274,12 @@ class SampleTable extends AbstractTableGateway {
         //}else if(isset($params['testResult']) && trim($params['testResult']) == '>=1000') {
         //  $squery = $squery->where("vl.result >= 1000");
         //}
-        if(isset($params['gender'] ) && trim($params['gender'])!=''){
-            $squery = $squery->where(array("vl.patient_gender ='".$params['gender']."'")); 
+        if(isset($params['gender']) && $params['gender']=='F'){
+            $squery = $squery->where("(patient_gender ='f' OR patient_gender ='female' OR patient_gender='F' OR patient_gender='FEMALE')");
+        }else if(isset($params['gender']) && $params['gender']=='M'){
+            $squery = $squery->where("(patient_gender ='m' OR patient_gender ='male' OR patient_gender='M' OR patient_gender='MALE')");
+        }else if(isset($params['gender']) && $params['gender']=='not_specified'){
+            $squery = $squery->where("(patient_gender !='m' AND patient_gender !='male' AND patient_gender!='M' AND patient_gender!='MALE') AND (patient_gender !='f' AND patient_gender !='female' AND patient_gender!='F' AND patient_gender!='FEMALE')");
         }
         if(isset($params['age']) && $params['age']!=''){
             $age = explode("-",$params['age']);
@@ -1554,8 +1562,12 @@ class SampleTable extends AbstractTableGateway {
                 $queryStr = $queryStr->where('vl.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
             }
         }
-        if(isset($params['gender'] ) && trim($params['gender'])!=''){
-            $queryStr = $queryStr->where(array("vl.patient_gender ='".$params['gender']."'")); 
+        if(isset($params['gender']) && $params['gender']=='F'){
+            $queryStr = $queryStr->where("(patient_gender ='f' OR patient_gender ='female' OR patient_gender='F' OR patient_gender='FEMALE')");
+        }else if(isset($params['gender']) && $params['gender']=='M'){
+            $queryStr = $queryStr->where("(patient_gender ='m' OR patient_gender ='male' OR patient_gender='M' OR patient_gender='MALE')");
+        }else if(isset($params['gender']) && $params['gender']=='not_specified'){
+            $queryStr = $queryStr->where("(patient_gender !='m' AND patient_gender !='male' AND patient_gender!='M' AND patient_gender!='MALE') AND (patient_gender !='f' AND patient_gender !='female' AND patient_gender!='F' AND patient_gender!='FEMALE')");
         }
         if(isset($params['age']) && trim($params['age'])!=''){
             $expAge=explode("-",$params['age']);
