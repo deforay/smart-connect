@@ -607,6 +607,13 @@ class SampleTable extends AbstractTableGateway {
                 $inCompleteQuery = $inCompleteQuery->where('vl.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
             }
         }
+        if(isset($params['gender']) && $params['gender']=='F'){
+            $inCompleteQuery = $inCompleteQuery->where("vl.patient_gender IN ('f','female','F','FEMALE')");
+        }else if(isset($params['gender']) && $params['gender']=='M'){
+            $inCompleteQuery = $inCompleteQuery->where("vl.patient_gender IN ('m','male','M','MALE')");
+        }else if(isset($params['gender']) && $params['gender']=='not_specified'){
+            $inCompleteQuery = $inCompleteQuery->where("vl.patient_gender NOT IN ('f','female','F','FEMALE','m','male','M','MALE')");
+        }
         $incQueryStr = $sql->getSqlStringForSqlObject($inCompleteQuery);
         $artInCompleteResult = $dbAdapter->query($incQueryStr." AND vl.patient_art_no =''", $dbAdapter::QUERY_MODE_EXECUTE)->current();
         $currentRegimenInCompleteResult = $dbAdapter->query($incQueryStr." AND vl.current_regimen =''", $dbAdapter::QUERY_MODE_EXECUTE)->current();
@@ -641,6 +648,7 @@ class SampleTable extends AbstractTableGateway {
                 $fQuery = $fQuery->where('vl.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
             }
         }
+        
         $fQueryStr = $sql->getSqlStringForSqlObject($fQuery);
         $facilityResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $result = array();
@@ -658,6 +666,13 @@ class SampleTable extends AbstractTableGateway {
                             $mnth = date('m', $month);$year = date('Y', $month);
                             $countQuery = $countQuery->where("Month(sample_collection_date)='".$mnth."' AND Year(sample_collection_date)='".$year."'");
                         }
+                    }
+                    if(isset($params['gender']) && $params['gender']=='F'){
+                        $countQuery = $countQuery->where("vl.patient_gender IN ('f','female','F','FEMALE')");
+                    }else if(isset($params['gender']) && $params['gender']=='M'){
+                        $countQuery = $countQuery->where("vl.patient_gender IN ('m','male','M','MALE')");
+                    }else if(isset($params['gender']) && $params['gender']=='not_specified'){
+                        $countQuery = $countQuery->where("vl.patient_gender NOT IN ('f','female','F','FEMALE','m','male','M','MALE')");
                     }
                     $cQueryStr = $sql->getSqlStringForSqlObject($countQuery);
                     $completeResult = $dbAdapter->query($cQueryStr." AND vl.patient_art_no !='' AND vl.current_regimen !='' AND vl.patient_age_in_years !=''  AND vl.patient_gender != ''", $dbAdapter::QUERY_MODE_EXECUTE)->current();
@@ -704,7 +719,7 @@ class SampleTable extends AbstractTableGateway {
                                         ->where(array("vl.sample_collection_date >='" . $startMonth ." 00:00:00". "'", "vl.sample_collection_date <='" .$endMonth." 23:59:00". "'"))
                                         ->where('vl.lab_id="'.$facility['facility_id'].'"');
                     if(isset($params['sampleStatus']) && $params['sampleStatus'] == 'sample_tested'){
-                        $countQuery = $countQuery->where("vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL'");
+                        $countQuery = $countQuery->where("(vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL') AND (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')");
                     }else if(isset($params['sampleStatus']) && $params['sampleStatus'] == 'samples_not_tested') {
                         $countQuery = $countQuery->where("(vl.result IS NULL OR vl.result = 'NULL' OR vl.result = '')");
                     }else if(isset($params['sampleStatus']) && $params['sampleStatus'] == 'sample_rejected') {
@@ -991,9 +1006,14 @@ class SampleTable extends AbstractTableGateway {
             //}else if(isset($params['testResult']) && trim($params['testResult']) == '>=1000') {
             //  $squery = $squery->where("vl.result >= 1000");
             //}
-            if(isset($params['gender'] ) && trim($params['gender'])!=''){
-                $squery = $squery->where(array("vl.patient_gender ='".$params['gender']."'")); 
-            }
+                if(isset($params['gender']) && $params['gender']=='F'){
+                    $squery = $squery->where("vl.patient_gender IN ('f','female','F','FEMALE')");
+                }else if(isset($params['gender']) && $params['gender']=='M'){
+                    $squery = $squery->where("vl.patient_gender IN ('m','male','M','MALE')");
+                }else if(isset($params['gender']) && $params['gender']=='not_specified'){
+                    $squery = $squery->where("vl.patient_gender NOT IN ('f','female','F','FEMALE','m','male','M','MALE')");
+                }
+
             if(isset($params['age']) && $params['age']!=''){
                 $age = explode("-",$params['age']);
                 if(isset($age[1])){
@@ -1078,11 +1098,11 @@ class SampleTable extends AbstractTableGateway {
           $rQuery = $rQuery->where("vl.result >= 1000");
         }
         if(isset($params['gender']) && $params['gender']=='F'){
-            $rQuery = $rQuery->where("(patient_gender ='f' OR patient_gender ='female' OR patient_gender='F' OR patient_gender='FEMALE')");
+            $rQuery = $rQuery->where("vl.patient_gender IN ('f','female','F','FEMALE')");
         }else if(isset($params['gender']) && $params['gender']=='M'){
-            $rQuery = $rQuery->where("(patient_gender ='m' OR patient_gender ='male' OR patient_gender='M' OR patient_gender='MALE')");
+            $rQuery = $rQuery->where("vl.patient_gender IN ('m','male','M','MALE')");
         }else if(isset($params['gender']) && $params['gender']=='not_specified'){
-            $rQuery = $rQuery->where("(patient_gender !='m' AND patient_gender !='male' AND patient_gender!='M' AND patient_gender!='MALE') AND (patient_gender !='f' AND patient_gender !='female' AND patient_gender!='F' AND patient_gender!='FEMALE')");
+            $rQuery = $rQuery->where("vl.patient_gender NOT IN ('f','female','F','FEMALE','m','male','M','MALE')");
         }
         if(isset($params['testReason'] ) && trim($params['testReason'])!=''){
             $rQuery = $rQuery->where(array("vl.reason_for_vl_testing ='".base64_decode($params['testReason'])."'")); 
@@ -1538,8 +1558,12 @@ class SampleTable extends AbstractTableGateway {
                                 }else if(isset($params['testResult']) && $params['testResult'] == '>=1000') {
                                   $countQuery = $countQuery->where("vl.result >= 1000");
                                 }
-                                if(isset($params['gender']) && trim($params['gender'])!=''){
-                                    $countQuery = $countQuery->where('vl.patient_gender="'.$params['gender'].'"');
+                                if(isset($params['gender']) && $params['gender']=='F'){
+                                    $countQuery = $countQuery->where("vl.patient_gender IN ('f','female','F','FEMALE')");
+                                }else if(isset($params['gender']) && $params['gender']=='M'){
+                                    $countQuery = $countQuery->where("vl.patient_gender IN ('m','male','M','MALE')");
+                                }else if(isset($params['gender']) && $params['gender']=='not_specified'){
+                                    $countQuery = $countQuery->where("vl.patient_gender NOT IN ('f','female','F','FEMALE','m','male','M','MALE')");
                                 }
                                 if(isset($params['currentRegimen']) && trim($params['currentRegimen'])!=''){
                                     $countQuery = $countQuery->where('vl.current_regimen="'.base64_decode(trim($params['currentRegimen'])).'"');
@@ -1570,7 +1594,7 @@ class SampleTable extends AbstractTableGateway {
                                         }
                                 }
                                 if(isset($params['sampleStatus']) && $params['sampleStatus'] == 'sample_tested'){
-                                    $countQuery = $countQuery->where("vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL'");
+                                    $countQuery = $countQuery->where("(vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL') AND (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')");
                                 }else if(isset($params['sampleStatus']) && $params['sampleStatus'] == 'samples_not_tested') {
                                     $countQuery = $countQuery->where("(vl.result IS NULL OR vl.result = 'NULL' OR vl.result = '')");
                                 }else if(isset($params['sampleStatus']) && $params['sampleStatus'] == 'sample_rejected') {
@@ -1635,9 +1659,14 @@ class SampleTable extends AbstractTableGateway {
                             }else if(isset($params['testResult']) && $params['testResult'] == '>=1000') {
                               $countQuery = $countQuery->where("vl.result >= 1000");
                             }
-                            if(isset($params['gender']) && trim($params['gender'])!=''){
-                                $countQuery = $countQuery->where('vl.patient_gender="'.$params['gender'].'"');
+                            if(isset($params['gender']) && $params['gender']=='F'){
+                                $countQuery = $countQuery->where("vl.patient_gender IN ('f','female','F','FEMALE')");
+                            }else if(isset($params['gender']) && $params['gender']=='M'){
+                                $countQuery = $countQuery->where("vl.patient_gender IN ('m','male','M','MALE')");
+                            }else if(isset($params['gender']) && $params['gender']=='not_specified'){
+                                $countQuery = $countQuery->where("vl.patient_gender NOT IN ('f','female','F','FEMALE','m','male','M','MALE')");
                             }
+                            
                             if(isset($params['currentRegimen']) && trim($params['currentRegimen'])!=''){
                                 $countQuery = $countQuery->where('vl.current_regimen="'.base64_decode(trim($params['currentRegimen'])).'"');
                             }
@@ -1667,7 +1696,7 @@ class SampleTable extends AbstractTableGateway {
                                 }
                             }
                             if(isset($params['sampleStatus']) && $params['sampleStatus'] == 'sample_tested'){
-                                $countQuery = $countQuery->where("vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL'");
+                                $countQuery = $countQuery->where("(vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL') AND (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')");
                             }else if(isset($params['sampleStatus']) && $params['sampleStatus'] == 'samples_not_tested') {
                                 $countQuery = $countQuery->where("(vl.result IS NULL OR vl.result = 'NULL' OR vl.result = '')");
                             }else if(isset($params['sampleStatus']) && $params['sampleStatus'] == 'sample_rejected') {
@@ -1725,8 +1754,12 @@ class SampleTable extends AbstractTableGateway {
         }else if(isset($params['testResult']) && $params['testResult'] == '>=1000') {
           $sQuery = $sQuery->where("vl.result >= 1000");
         }
-        if(isset($params['gender']) && trim($params['gender'])!=''){
-            $sQuery = $sQuery->where('vl.patient_gender="'.$params['gender'].'"');
+        if(isset($params['gender']) && $params['gender']=='F'){
+            $sQuery = $sQuery->where("vl.patient_gender IN ('f','female','F','FEMALE')");
+        }else if(isset($params['gender']) && $params['gender']=='M'){
+            $sQuery = $sQuery->where("vl.patient_gender IN ('m','male','M','MALE')");
+        }else if(isset($params['gender']) && $params['gender']=='not_specified'){
+            $sQuery = $sQuery->where("vl.patient_gender NOT IN ('f','female','F','FEMALE','m','male','M','MALE')");
         }
         if(isset($params['currentRegimen']) && trim($params['currentRegimen'])!=''){
             $sQuery = $sQuery->where('vl.current_regimen="'.base64_decode(trim($params['currentRegimen'])).'"');
@@ -1794,8 +1827,12 @@ class SampleTable extends AbstractTableGateway {
                 }else if(isset($params['testResult']) && $params['testResult'] == '>=1000') {
                     $sQuery = $sQuery->where("vl.result >= 1000");
                 }
-                if(isset($params['gender']) && trim($params['gender'])!=''){
-                    $sQuery = $sQuery->where('vl.patient_gender="'.$params['gender'].'"');
+                if(isset($params['gender']) && $params['gender']=='F'){
+                    $sQuery = $sQuery->where("vl.patient_gender IN ('f','female','F','FEMALE')");
+                }else if(isset($params['gender']) && $params['gender']=='M'){
+                    $sQuery = $sQuery->where("vl.patient_gender IN ('m','male','M','MALE')");
+                }else if(isset($params['gender']) && $params['gender']=='not_specified'){
+                    $sQuery = $sQuery->where("vl.patient_gender NOT IN ('f','female','F','FEMALE','m','male','M','MALE')");
                 }
                 if(isset($params['currentRegimen']) && trim($params['currentRegimen'])!=''){
                     $sQuery = $sQuery->where('vl.current_regimen="'.base64_decode(trim($params['currentRegimen'])).'"');
@@ -1935,8 +1972,13 @@ class SampleTable extends AbstractTableGateway {
                 $mnth = date('m', $month);$year = date('Y', $month);
                 $sQuery = $sQuery->where("Month(sample_collection_date)='".$mnth."' AND Year(sample_collection_date)='".$year."'");
             }
-        }if(isset($parameters['searchGender'] ) && trim($parameters['searchGender'])!=''){
-            $sQuery = $sQuery->where(array("vl.patient_gender ='".$parameters['searchGender']."'")); 
+        }
+        if(isset($parameters['gender']) && $parameters['gender']=='F'){
+            $sQuery = $sQuery->where("vl.patient_gender IN ('f','female','F','FEMALE')");
+        }else if(isset($parameters['gender']) && $parameters['gender']=='M'){
+            $sQuery = $sQuery->where("vl.patient_gender IN ('m','male','M','MALE')");
+        }else if(isset($parameters['gender']) && $parameters['gender']=='not_specified'){
+            $sQuery = $sQuery->where("vl.patient_gender NOT IN ('f','female','F','FEMALE','m','male','M','MALE')");
         }
         if(isset($parameters['testResult']) && $parameters['testResult'] == '<1000'){
           $sQuery = $sQuery->where("vl.result < 1000");
@@ -2229,6 +2271,13 @@ class SampleTable extends AbstractTableGateway {
             if(isset($parameters['adherence']) && trim($parameters['adherence'])!=''){
                 $countQuery = $countQuery->where(array("vl.arv_adherance_percentage ='".$parameters['adherence']."'")); 
             }
+            if(isset($parameters['gender']) && $parameters['gender']=='F'){
+                $countQuery = $countQuery->where("vl.patient_gender IN ('f','female','F','FEMALE')");
+            }else if(isset($parameters['gender']) && $parameters['gender']=='M'){
+                $countQuery = $countQuery->where("vl.patient_gender IN ('m','male','M','MALE')");
+            }else if(isset($parameters['gender']) && $parameters['gender']=='not_specified'){
+                $countQuery = $countQuery->where("vl.patient_gender NOT IN ('f','female','F','FEMALE','m','male','M','MALE')");
+            }
             
             if(trim($parameters['fromDate'])!= '' && trim($parameters['toDate'])!= ''){
                 if(trim($parameters['fromDate'])!= trim($parameters['toDate'])){
@@ -2250,7 +2299,7 @@ class SampleTable extends AbstractTableGateway {
                 }
             }
             if(isset($parameters['sampleStatus']) && $parameters['sampleStatus'] == 'sample_tested'){
-                $countQuery = $countQuery->where("vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL'");
+                $countQuery = $countQuery->where("(vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL') AND (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')");
             }else if(isset($parameters['sampleStatus']) && $parameters['sampleStatus'] == 'samples_not_tested') {
                 $countQuery = $countQuery->where("(vl.result IS NULL OR vl.result = 'NULL' OR vl.result = '')");
             }else if(isset($parameters['sampleStatus']) && $parameters['sampleStatus'] == 'sample_rejected') {
@@ -2375,6 +2424,13 @@ class SampleTable extends AbstractTableGateway {
         if(isset($parameters['sampleType']) && trim($parameters['sampleType'])!=''){
             $sQuery = $sQuery->where('vl.sample_type="'.base64_decode(trim($parameters['sampleType'])).'"');
         }
+        if(isset($parameters['gender']) && $parameters['gender']=='F'){
+                $sQuery = $sQuery->where("vl.patient_gender IN ('f','female','F','FEMALE')");
+            }else if(isset($parameters['gender']) && $parameters['gender']=='M'){
+                $sQuery = $sQuery->where("vl.patient_gender IN ('m','male','M','MALE')");
+            }else if(isset($parameters['gender']) && $parameters['gender']=='not_specified'){
+                $sQuery = $sQuery->where("vl.patient_gender NOT IN ('f','female','F','FEMALE','m','male','M','MALE')");
+            }
         $sQuery = $sQuery->where("
                                             (sample_collection_date is not null AND sample_collection_date != '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00')
                         AND (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')
@@ -2432,6 +2488,13 @@ class SampleTable extends AbstractTableGateway {
         if(isset($parameters['sampleType']) && trim($parameters['sampleType'])!=''){
             $iQuery = $iQuery->where('vl.sample_type="'.base64_decode(trim($parameters['sampleType'])).'"');
         }
+        if(isset($parameters['gender']) && $parameters['gender']=='F'){
+                $iQuery = $iQuery->where("vl.patient_gender IN ('f','female','F','FEMALE')");
+            }else if(isset($parameters['gender']) && $parameters['gender']=='M'){
+                $iQuery = $iQuery->where("vl.patient_gender IN ('m','male','M','MALE')");
+            }else if(isset($parameters['gender']) && $parameters['gender']=='not_specified'){
+                $iQuery = $iQuery->where("vl.patient_gender NOT IN ('f','female','F','FEMALE','m','male','M','MALE')");
+            }
         $iQuery = $iQuery->where("
                                             (sample_collection_date is not null AND sample_collection_date != '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00')
                         AND (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')        
