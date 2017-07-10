@@ -227,8 +227,8 @@ class LaboratoryController extends AbstractActionController
             return $viewModel;
         }
     }
-    public function getSampleVolumeAction()
-    {
+    
+    public function getSampleVolumeAction(){
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
