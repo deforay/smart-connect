@@ -40,9 +40,9 @@
     <!-- END HEAD -->
     <body class="login">
 	<?php
-	$margin = '100px';
+	$margin = '142px';
 	 if(isset($config['logo']) && trim($config['logo']) != "" && file_exists(UPLOAD_PATH . DIRECTORY_SEPARATOR . "logo" . DIRECTORY_SEPARATOR . $config['logo'])){
-	  $margin = '30px';
+	  $margin = '64px';
 	 }
 	?>
         <!-- BEGIN LOGO -->
@@ -77,7 +77,7 @@
 				<div class="form-actions">
                     <button type="submit" class="btn red btn-block uppercase">Login</button>
                 </div>				
-				<div class="form-actions">
+		<!--<div class="form-actions">
                     <div class="pull-left">
                         <label class="rememberme check">
                             <input type="checkbox" name="remember" value="1" />Remember me </label>
@@ -85,7 +85,7 @@
                     <div class="pull-right forget-password-block">
                         <a href="javascript:;" id="forget-password" class="forget-password">Forgot Password?</a>
                     </div>
-                </div>
+                </div>-->
             </form>
             <!-- END LOGIN FORM -->
             <!-- BEGIN FORGOT PASSWORD FORM -->
