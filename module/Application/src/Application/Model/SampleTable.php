@@ -714,6 +714,7 @@ class SampleTable extends AbstractTableGateway {
                     $countResult[$i] = $dbAdapter->query($cQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
                     $result[$i][0] = $countResult[$i]['total'];
                     $result[$i][1] = $facility['facility_name'];
+                    $result[$i][2] = $facility['facility_code'];
                     $i++;
                 }
             }
@@ -1335,7 +1336,7 @@ class SampleTable extends AbstractTableGateway {
 
         $sQueryStr = $sql->getSqlStringForSqlObject($sQuery); // Get the string of the Sql, instead of the Select-instance 
         //echo $sQueryStr;die;
-        $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
+        $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
 
         /* Data set length after filtering */
         $sQuery->reset('limit');
