@@ -410,8 +410,6 @@ foreach($sampleType as $samples){
             window.open("/labs/get-facilities-geolocation?fromDate="+$('#mrp-lowerDate').val()+"&toDate="+$('#mrp-upperDate').val());
         }    
             
-            
-            
         function getSampleResult(){
             fromDate=$('#mrp-lowerDate').val();
             toDate=$('#mrp-upperDate').val();
@@ -464,8 +462,8 @@ foreach($sampleType as $samples){
                 $("#samplesTestedResultAge").html(data);
             });
         }
-        function getRequisitionFormsTested()
-        {
+        
+        function getRequisitionFormsTested(){
             fromDate=$('#mrp-lowerDate').val();
             toDate=$('#mrp-upperDate').val();
             facilityId = $("#labName").val();
@@ -877,5 +875,9 @@ function paintMonths(){
   
   function doRedirect(lab){
     window.open('/labs/sample-volume?fromMonth='+$('#mrp-lowerDate').val()+'&toMonth='+$('#mrp-upperDate').val()+'&lab='+lab+'&result='+$("#sampleStatus").val(), '_blank');
+  }
+  
+  function doRequisitionRedirect(month){
+    window.open('/labs/requisition-forms-incomplete?month='+month+'&lab='+$('#labName').val(), '_blank');
   }
 </script>
