@@ -125,7 +125,7 @@ foreach($sampleType as $samples){
                                 <input id="breastfeedingUnreported" name="isBreastfeeding" value="unreported" type="radio"> Unreported
                             </div>
                             <div class="form-group col-lg-4" style="margin-top:10px;">
-                                <a href="javascript:void(0);" class="btn btn-primary btn-sm"  onclick="searchData();getTestedSampleResult();">Search</a>
+                                <a href="javascript:void(0);" class="btn btn-primary btn-sm"  onclick="searchData();getTestedSampleResult();">Submit</a>
                             </div>
                         </div>
                         </div>
@@ -377,8 +377,8 @@ foreach($sampleType as $samples){
         testResult = $("#testResult").val();
         age = $("#age").val();
         gender = $("#gender").val();
-        isPregnant = $("#isPregnant").val();
-        isBreastfeeding = $("#isBreastfeeding").val();
+        isPregnant = $('input[name="isPregnant"]:checked').val();
+        isBreastfeeding = $('input[name="isBreastfeeding"]:checked').val();
         adherence = $("#adherence").val();
         $.post("<?php echo $this->url('clinics', array('action' => 'overall-viral-load')); ?>",{sampleCollectionDate:dateRange,clinicId:clinicId,sampleId:sampleId,testResult:testResult,age:age,gender:gender,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding,adherence:adherence},
         function(data) {
@@ -393,8 +393,8 @@ foreach($sampleType as $samples){
         testResult = $("#testResult").val();
         age = $("#age").val();
         gender = $("#gender").val();
-        isPregnant = $("#isPregnant").val();
-        isBreastfeeding = $("#isBreastfeeding").val();
+        isPregnant = $('input[name="isPregnant"]:checked').val();
+        isBreastfeeding = $('input[name="isBreastfeeding"]:checked').val();
         adherence = $("#adherence").val();
         $.post("<?php echo $this->url('clinics', array('action' => 'get-over-all-load-status')); ?>",{sampleCollectionDate:dateRange,clinicId:clinicId,sampleId:sampleId,testResult:testResult,age:age,gender:gender,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding,adherence:adherence},
         function(data) {
@@ -446,8 +446,8 @@ foreach($sampleType as $samples){
         dateRange = $("#sampleCollectionDate").val();
         clinicId = $("#clinicId").val();
         gender = $("#gender").val();
-        isPregnant = $("#isPregnant").val();
-        isBreastfeeding = $("#isBreastfeeding").val();
+        isPregnant = $('input[name="isPregnant"]:checked').val();
+        isBreastfeeding = $('input[name="isBreastfeeding"]:checked').val();
         adherence = $("#adherence").val();
         $.post("<?php echo $this->url('clinics', array('action' => 'get-sample-test-result')); ?>",{sampleCollectionDate:dateRange,testResult:testResult,sampleType:sampleType,facilityId:clinicId,gender:gender,age:age,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding,adherence:adherence},
         function(data) {
@@ -462,8 +462,8 @@ foreach($sampleType as $samples){
         dateRange = $("#sampleCollectionDate").val();
         clinicId = $("#clinicId").val();
         gender = $("#gender").val();
-        isPregnant = $("#isPregnant").val();
-        isBreastfeeding = $("#isBreastfeeding").val();
+        isPregnant = $('input[name="isPregnant"]:checked').val();
+        isBreastfeeding = $('input[name="isBreastfeeding"]:checked').val();
         adherence = $("#adherence").val();
         testReason = $("#testReason").val();
         $.post("<?php echo $this->url('clinics', array('action' => 'get-sample-test-reason')); ?>",{sampleCollectionDate:dateRange,sampleType:sampleType,facilityId:clinicId,gender:gender,age:age,testResult:testResult,adherence:adherence,testReason:testReason,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding},

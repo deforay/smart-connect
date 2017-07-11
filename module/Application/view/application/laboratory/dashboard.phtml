@@ -155,9 +155,6 @@ foreach($sampleType as $samples){
                     <!-- END PAGE TITLE-->
                     <!-- END PAGE HEADER-->
                     <div class="row" style="padding-top:10px;padding-bottom:20px;">
-                        
-                        
-                        
                         <div class="col-lg-6">
                             <select name="labName" id="labName" class="form-control" title="Please choose lab name">
                                 <option value="">-- All Labs --</option>
@@ -528,10 +525,14 @@ foreach($sampleType as $samples){
             });
         }
             
-            $(function () {
-                getEverything();
-                getLabFacilities();
-            });
+        $(function () {
+            //$('#labName').select2({
+            //    placeholder: "Select labs",
+            //    allowClear: true
+            //});
+            getEverything();
+            getLabFacilities();
+        });
             
         function getEverything(){
             $.blockUI.defaults.css.border = '1px solid grey'; 
