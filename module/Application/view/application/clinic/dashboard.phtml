@@ -110,13 +110,26 @@ foreach($sampleType as $samples){
                                 <option value="not_specified">Other</option>
                               </select>
                             </div>
-                            <div class="form-group col-lg-4" style="margin-top:2.6%;">
+                            <div class="form-group col-lg-4 femaleSection" style="display:none;">
+                                <label class="control-label">Is Patient Pregnant</label><br>
+                                <input id="pregnantYes" name="isPregnant" value="yes" type="radio"> Yes&nbsp;&nbsp;
+                                <input id="pregnantNo" name="isPregnant" value="no" type="radio"> No&nbsp;&nbsp;
+                                <input id="pregnantUnreported" name="isPregnant" value="unreported" type="radio"> Unreported
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group col-lg-4 femaleSection" style="display:none;">
+                                <label class="control-label">Is Patient Breastfeeding</label><br>
+                                <input id="breastfeedingYes" name="isBreastfeeding" value="yes" type="radio"> Yes&nbsp;&nbsp;
+                                <input id="breastfeedingNo" name="isBreastfeeding" value="no" type="radio"> No&nbsp;&nbsp;
+                                <input id="breastfeedingUnreported" name="isBreastfeeding" value="unreported" type="radio"> Unreported
+                            </div>
+                            <div class="form-group col-lg-4" style="margin-top:10px;">
                                 <a href="javascript:void(0);" class="btn btn-primary btn-sm"  onclick="searchData();getTestedSampleResult();">Search</a>
                             </div>
                         </div>
                         </div>
                     </div>
-                    
                     <div class="row">
                         <div class="col-md-6 col-sm-6">
                             <div class="portlet box blue">
@@ -342,6 +355,9 @@ foreach($sampleType as $samples){
                 aoData.push({ "name":"testResult","value": $("#testResult").val()});
                 aoData.push({ "name":"age","value": $("#age").val()});
                 aoData.push({ "name":"gender","value": $("#gender").val()});
+                aoData.push({"name": "isPregnant", "value": $('#isPregnant').val()});
+                aoData.push({"name": "isBreastfeeding", "value": $('#isBreastfeeding').val()});
+                aoData.push({ "name":"adherence","value": $("#adherence").val()});
                 aoData.push({ "name":"result","value": $("#result").val()});
                 $.ajax({
                     "dataType": 'json',
@@ -361,8 +377,10 @@ foreach($sampleType as $samples){
         testResult = $("#testResult").val();
         age = $("#age").val();
         gender = $("#gender").val();
+        isPregnant = $("#isPregnant").val();
+        isBreastfeeding = $("#isBreastfeeding").val();
         adherence = $("#adherence").val();
-        $.post("<?php echo $this->url('clinics', array('action' => 'overall-viral-load')); ?>",{sampleCollectionDate:dateRange,clinicId:clinicId,sampleId:sampleId,testResult:testResult,age:age,gender:gender,adherence:adherence},
+        $.post("<?php echo $this->url('clinics', array('action' => 'overall-viral-load')); ?>",{sampleCollectionDate:dateRange,clinicId:clinicId,sampleId:sampleId,testResult:testResult,age:age,gender:gender,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding,adherence:adherence},
         function(data) {
             $("#combochart1").html(data);
         });
@@ -375,8 +393,10 @@ foreach($sampleType as $samples){
         testResult = $("#testResult").val();
         age = $("#age").val();
         gender = $("#gender").val();
+        isPregnant = $("#isPregnant").val();
+        isBreastfeeding = $("#isBreastfeeding").val();
         adherence = $("#adherence").val();
-        $.post("<?php echo $this->url('clinics', array('action' => 'get-over-all-load-status')); ?>",{sampleCollectionDate:dateRange,clinicId:clinicId,sampleId:sampleId,testResult:testResult,age:age,gender:gender,adherence:adherence},
+        $.post("<?php echo $this->url('clinics', array('action' => 'get-over-all-load-status')); ?>",{sampleCollectionDate:dateRange,clinicId:clinicId,sampleId:sampleId,testResult:testResult,age:age,gender:gender,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding,adherence:adherence},
         function(data) {
             $("#overall-load-chart").html(data);
         });
@@ -426,8 +446,10 @@ foreach($sampleType as $samples){
         dateRange = $("#sampleCollectionDate").val();
         clinicId = $("#clinicId").val();
         gender = $("#gender").val();
+        isPregnant = $("#isPregnant").val();
+        isBreastfeeding = $("#isBreastfeeding").val();
         adherence = $("#adherence").val();
-        $.post("<?php echo $this->url('clinics', array('action' => 'get-sample-test-result')); ?>",{sampleCollectionDate:dateRange,sampleType:sampleType,facilityId:clinicId,gender:gender,age:age,testResult:testResult,adherence:adherence},
+        $.post("<?php echo $this->url('clinics', array('action' => 'get-sample-test-result')); ?>",{sampleCollectionDate:dateRange,testResult:testResult,sampleType:sampleType,facilityId:clinicId,gender:gender,age:age,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding,adherence:adherence},
         function(data) {
         $("#samplesTestedResult").html(data);
         });
@@ -440,9 +462,11 @@ foreach($sampleType as $samples){
         dateRange = $("#sampleCollectionDate").val();
         clinicId = $("#clinicId").val();
         gender = $("#gender").val();
+        isPregnant = $("#isPregnant").val();
+        isBreastfeeding = $("#isBreastfeeding").val();
         adherence = $("#adherence").val();
         testReason = $("#testReason").val();
-        $.post("<?php echo $this->url('clinics', array('action' => 'get-sample-test-reason')); ?>",{sampleCollectionDate:dateRange,sampleType:sampleType,facilityId:clinicId,gender:gender,age:age,testResult:testResult,adherence:adherence,testReason:testReason},
+        $.post("<?php echo $this->url('clinics', array('action' => 'get-sample-test-reason')); ?>",{sampleCollectionDate:dateRange,sampleType:sampleType,facilityId:clinicId,gender:gender,age:age,testResult:testResult,adherence:adherence,testReason:testReason,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding},
         function(data) {
         $("#samplesTestedReason").html(data);
         });
@@ -473,4 +497,16 @@ foreach($sampleType as $samples){
             }
         }); 
     }
+    
+    $('#gender').on('change',function() {
+        if(this.value == 'F'){
+            $('.femaleSection').show();
+        }else{
+           $('.femaleSection').hide();
+           $('#pregnantYes').prop('checked',false);
+           $('#pregnantNo').prop('checked',false);
+           $('#breastfeedingYes').prop('checked',false);
+           $('#breastfeedingNo').prop('checked',false);
+        }
+    });
 </script>        

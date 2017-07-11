@@ -340,8 +340,7 @@ class SampleService {
         return $sampleDb->fetchSampleTestedReason($params);
     }
     
-    public function getAllTestReasonName()
-    {
+    public function getAllTestReasonName(){
         $reasonDb = $this->sm->get('TestReasonTable');
         return $reasonDb->fetchAllTestReasonName();
     }
@@ -409,6 +408,7 @@ class SampleService {
         $sampleDb = $this->sm->get('SampleTable');
         return $sampleDb->fetchFilterSampleDetails($params);
     }
+    
     public function getFilterSampleTatDetails($params){
         $sampleDb = $this->sm->get('SampleTable');
         return $sampleDb->fetchFilterSampleTatDetails($params);

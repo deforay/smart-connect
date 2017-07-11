@@ -81,14 +81,25 @@ if(isset($searchMonth) && trim($searchMonth)!= ''){
                             </div>
                         </div>
                         <div class="col-md-12">
-                            <div class="form-group col-lg-4" style="margin-top:26px;">
+                            <div class="form-group col-lg-4 femaleSection" style="display:none;">
+                                <label class="control-label">Is Patient Pregnant</label><br>
+                                <input id="pregnantYes" name="isPregnant" value="yes" type="radio"> Yes&nbsp;&nbsp;
+                                <input id="pregnantNo" name="isPregnant" value="no" type="radio"> No&nbsp;&nbsp;
+                                <input id="pregnantUnreported" name="isPregnant" value="unreported" type="radio"> Unreported
+                            </div>
+                            <div class="form-group col-lg-4 femaleSection" style="display:none;">
+                                <label class="control-label">Is Patient Breastfeeding</label><br>
+                                <input id="breastfeedingYes" name="isBreastfeeding" value="yes" type="radio"> Yes&nbsp;&nbsp;
+                                <input id="breastfeedingNo" name="isBreastfeeding" value="no" type="radio"> No&nbsp;&nbsp;
+                                <input id="breastfeedingUnreported" name="isBreastfeeding" value="unreported" type="radio"> Unreported
+                            </div>
+                            <div class="form-group col-lg-4" style="margin-top:10px;">
                                 <a href="javascript:void(0);" class="btn btn-primary" onclick="searchIncompleteSampleResult()">Submit</a>
                             </div>
                         </div>
                           </form>
                         </div>
                     </div>
-                    
                     
                     <div class="row" style="margin-bottom:30px;">
                         <div class="col-lg-6">
@@ -107,8 +118,9 @@ if(isset($searchMonth) && trim($searchMonth)!= ''){
         toDate = $('#mrp-upperDate').val();
         lab = $("#labName").val();
         gender = $("#gender").val();
-        
-        $.post("<?php echo $this->url('laboratory', array('action' => 'get-incomplete-sample-details')); ?>",{fromDate:fromDate,toDate:toDate,lab:lab,gender:gender},
+        isPregnant = $("#isPregnant").val();
+        isBreastfeeding = $("#isBreastfeeding").val();
+        $.post("<?php echo $this->url('laboratory', array('action' => 'get-incomplete-sample-details')); ?>",{fromDate:fromDate,toDate:toDate,lab:lab,gender:gender,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding},
         function(data) {
             $("#piecontainer").html(data);
         });
@@ -121,7 +133,9 @@ if(isset($searchMonth) && trim($searchMonth)!= ''){
         toDate = $('#mrp-upperDate').val();
         lab = $("#labName").val();
         gender = $("#gender").val();
-        $.post("<?php echo $this->url('laboratory', array('action' => 'get-incomplete-bar-sample-details')); ?>",{fromDate:fromDate,toDate:toDate,lab:lab,gender:gender},
+        isPregnant = $("#isPregnant").val();
+        isBreastfeeding = $("#isBreastfeeding").val();
+        $.post("<?php echo $this->url('laboratory', array('action' => 'get-incomplete-bar-sample-details')); ?>",{fromDate:fromDate,toDate:toDate,lab:lab,gender:gender,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding},
         function(data) {
             $("#barcontainer").html(data);
         });
@@ -397,7 +411,16 @@ $(function () {
   });
   
 });
-
-  
+$('#gender').on('change',function() {
+    if(this.value == 'F'){
+        $('.femaleSection').show();
+    }else{
+       $('.femaleSection').hide();
+       $('#pregnantYes').prop('checked',false);
+       $('#pregnantNo').prop('checked',false);
+       $('#breastfeedingYes').prop('checked',false);
+       $('#breastfeedingNo').prop('checked',false);
+    }
+});
 </script>
 <script src="<?php echo $this->basePath('assets/js/month-year-rang-picker.js'); ?>" type="text/javascript"></script>

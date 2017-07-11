@@ -240,6 +240,7 @@ class LaboratoryController extends AbstractActionController
             return $viewModel;
         }
     }
+    
     public function getLabTurnAroundTimeAction()
     {
         $request = $this->getRequest();
@@ -490,6 +491,7 @@ class LaboratoryController extends AbstractActionController
            return $viewModel;
        }
     }
+    
     public function getSampleTestedTurnAroundTimeAction(){
         $this->layout()->setVariable('activeTab', 'labs-dashboard');
         $gender="";
@@ -555,8 +557,8 @@ class LaboratoryController extends AbstractActionController
             return $viewModel;
         }
     }
-    public function getPieSampleTatAction()
-    {
+    
+    public function getPieSampleTatAction(){
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
@@ -568,8 +570,8 @@ class LaboratoryController extends AbstractActionController
             return $viewModel;
         }
     }
-    public function getFilterSampleTatAction()
-    {
+    
+    public function getFilterSampleTatAction(){
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
@@ -578,6 +580,7 @@ class LaboratoryController extends AbstractActionController
             return $this->getResponse()->setContent(Json::encode($result));
         }
     }
+    
     public function exportSampleTestedResultTatexcelAction() {
         $request = $this->getRequest();
         if ($request->isPost()) {

@@ -176,8 +176,21 @@ if(isset($searchMonth) && trim($searchMonth)!= ''){
                                 <option value="not_specified">Not Specified</option>
                               </select>
                             </div>
-                            <div class="form-group col-lg-4" style="margin-top:2.6%;">
-                                
+                            <div class="form-group col-lg-4 femaleSection" style="display:none;">
+                                <label class="control-label">Is Patient Pregnant</label><br>
+                                <input id="pregnantYes" name="isPregnant" value="yes" type="radio"> Yes&nbsp;&nbsp;
+                                <input id="pregnantNo" name="isPregnant" value="no" type="radio"> No&nbsp;&nbsp;
+                                <input id="pregnantUnreported" name="isPregnant" value="unreported" type="radio"> Unreported
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group col-lg-4 femaleSection" style="display:none;">
+                                <label class="control-label">Is Patient Breastfeeding</label><br>
+                                <input id="breastfeedingYes" name="isBreastfeeding" value="yes" type="radio"> Yes&nbsp;&nbsp;
+                                <input id="breastfeedingNo" name="isBreastfeeding" value="no" type="radio"> No&nbsp;&nbsp;
+                                <input id="breastfeedingUnreported" name="isBreastfeeding" value="unreported" type="radio"> Unreported
+                            </div>
+                            <div class="form-group col-lg-4" style="margin-top:10px;">
                                 <a href="javascript:void(0);" class="btn btn-primary" onclick="searchSampleVolume()">Submit</a>
                             </div>
                         </div>
@@ -245,7 +258,9 @@ if(isset($searchMonth) && trim($searchMonth)!= ''){
         age = $("#age").val();
         sampleStatus = $("#sampleStatus").val();
         gender = $("#gender").val();
-        $.post("<?php echo $this->url('laboratory', array('action' => 'get-bar-sample-details')); ?>",{fromDate:fromDate,toDate:toDate,lab:lab,clinicId:clinicId,sampleType:sampleType,currentRegimen:currentRegimen,adherence:adherence,age:age,sampleStatus:sampleStatus,fromSrc:'sampleVolume',gender:gender},
+        isPregnant = $("#isPregnant").val();
+        isBreastfeeding = $("#isBreastfeeding").val();
+        $.post("<?php echo $this->url('laboratory', array('action' => 'get-bar-sample-details')); ?>",{fromDate:fromDate,toDate:toDate,lab:lab,clinicId:clinicId,sampleType:sampleType,currentRegimen:currentRegimen,adherence:adherence,age:age,sampleStatus:sampleStatus,fromSrc:'sampleVolume',gender:gender,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding},
         function(data) {
             $("#barcontainer").html(data);
         });
@@ -264,7 +279,9 @@ if(isset($searchMonth) && trim($searchMonth)!= ''){
         age = $("#age").val();
         sampleStatus = $("#sampleStatus").val();
         gender = $("#gender").val();
-        $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-details')); ?>",{fromDate:fromDate,toDate:toDate,lab:lab,clinicId:clinicId,sampleType:sampleType,currentRegimen:currentRegimen,adherence:adherence,age:age,sampleStatus:sampleStatus,fromSrc:'sampleVolume',gender:gender},
+        isPregnant = $("#isPregnant").val();
+        isBreastfeeding = $("#isBreastfeeding").val();
+        $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-details')); ?>",{fromDate:fromDate,toDate:toDate,lab:lab,clinicId:clinicId,sampleType:sampleType,currentRegimen:currentRegimen,adherence:adherence,age:age,sampleStatus:sampleStatus,fromSrc:'sampleVolume',gender:gender,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding},
         function(data) {
             $("#piecontainer").html(data);
         });
@@ -319,6 +336,8 @@ function loadSampleDataTable(){
             aoData.push({"name": "age", "value": $('#age').val()});
             aoData.push({"name": "sampleStatus", "value": $('#sampleStatus').val()});
             aoData.push({"name": "gender", "value": $('#gender').val()});
+            aoData.push({"name": "isPregnant", "value": $('#isPregnant').val()});
+            aoData.push({"name": "isBreastfeeding", "value": $('#isBreastfeeding').val()});
             $.ajax({
                 "dataType": 'json',
                 "type": "POST",
@@ -591,5 +610,17 @@ function exportSampleResult(){
          }
      }); 
 }
+
+$('#gender').on('change',function() {
+    if(this.value == 'F'){
+        $('.femaleSection').show();
+    }else{
+       $('.femaleSection').hide();
+       $('#pregnantYes').prop('checked',false);
+       $('#pregnantNo').prop('checked',false);
+       $('#breastfeedingYes').prop('checked',false);
+       $('#breastfeedingNo').prop('checked',false);
+    }
+});
 </script>
 <script src="<?php echo $this->basePath('assets/js/month-year-rang-picker.js'); ?>" type="text/javascript"></script>
