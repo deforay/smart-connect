@@ -26,21 +26,18 @@ class LaboratoryController extends AbstractActionController
     }
     
 
-    public function samplesAccessionAction()
-    {
+    public function samplesAccessionAction(){
         $this->layout()->setVariable('activeTab', 'labs-dashboard');          
         return new ViewModel();
     }
     
-    public function samplesWaitingAction()
-    {
+    public function samplesWaitingAction(){
         $this->layout()->setVariable('activeTab', 'labs-dashboard');                
         return new ViewModel();
     }
     
     
-    public function samplesRejectedAction()
-    {
+    public function samplesRejectedAction(){
         $this->layout()->setVariable('activeTab', 'labs-dashboard');                 
         return new ViewModel();
     }
@@ -170,8 +167,7 @@ class LaboratoryController extends AbstractActionController
         }
     }
     
-    public function getSampleTestResultVolumeAction()
-    {
+    public function getSampleTestResultVolumeAction(){
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
@@ -184,8 +180,8 @@ class LaboratoryController extends AbstractActionController
             return $viewModel;
         }
     }
-    public function getSampleTestResultGenderAction()
-    {
+    
+    public function getSampleTestResultGenderAction(){
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
@@ -199,8 +195,8 @@ class LaboratoryController extends AbstractActionController
             return $viewModel;
         }
     }
-    public function getSampleTestResultAgeAction()
-    {
+    
+    public function getSampleTestResultAgeAction(){
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
@@ -214,8 +210,8 @@ class LaboratoryController extends AbstractActionController
             return $viewModel;
         }
     }
-    public function getRequisitionFormsAction()
-    {
+    
+    public function getRequisitionFormsAction(){
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
@@ -241,8 +237,7 @@ class LaboratoryController extends AbstractActionController
         }
     }
     
-    public function getLabTurnAroundTimeAction()
-    {
+    public function getLabTurnAroundTimeAction(){
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
@@ -260,8 +255,8 @@ class LaboratoryController extends AbstractActionController
             return $viewModel;
         }
     }
-    public function getLabFacilitiesAction()
-    {
+    
+    public function getLabFacilitiesAction(){
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
@@ -479,6 +474,7 @@ class LaboratoryController extends AbstractActionController
            return $viewModel;
        }
     }
+    
     public function getVlOutComesAction(){
         $request = $this->getRequest();
         if($request->isPost()) {
@@ -593,6 +589,7 @@ class LaboratoryController extends AbstractActionController
             return $viewModel;
         }
     }
+    
     public function getFacilitiesGeolocationAction() {
         $this->layout()->setVariable('activeTab', 'labs-dashboard');
         $fromDate="";

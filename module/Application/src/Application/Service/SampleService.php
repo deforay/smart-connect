@@ -274,45 +274,43 @@ class SampleService {
         return $sampleDb->fetchSampleTestedResultGenderDetails($params);
     }
     
-    public function getSampleTestedResultAgeDetails($params)
-    {
+    public function getSampleTestedResultAgeDetails($params){
         $sampleDb = $this->sm->get('SampleTable');
         return $sampleDb->fetchSampleTestedResultAgeDetails($params);
     }
+    
     //get sample tested result details
     public function getSampleTestedResultBasedVolumeDetails($params){
         $sampleDb = $this->sm->get('SampleTable');
         return $sampleDb->fetchSampleTestedResultBasedVolumeDetails($params);
     }
     //get Requisition Forms tested
-    public function getRequisitionFormsTested($params)
-    {
+    public function getRequisitionFormsTested($params){
         $sampleDb = $this->sm->get('SampleTable');
         return $sampleDb->getRequisitionFormsTested($params);
     }
     //get Requisition Forms tested
-    public function getSampleVolume($params)
-    {
+    public function getSampleVolume($params){
         $sampleDb = $this->sm->get('SampleTable');
         return $sampleDb->getSampleVolume($params);
     }
-    public function getFemalePatientResult($params)
-    {
+    
+    public function getFemalePatientResult($params){
         $sampleDb = $this->sm->get('SampleTable');
         return $sampleDb->getFemalePatientResult($params);
     }
-    public function getLineOfTreatment($params)
-    {
+    
+    public function getLineOfTreatment($params){
         $sampleDb = $this->sm->get('SampleTable');
         return $sampleDb->getLineOfTreatment($params);
     }
-    public function getVlOutComes($params)
-    {
+    
+    public function getVlOutComes($params){
         $sampleDb = $this->sm->get('SampleTable');
         return $sampleDb->getVlOutComes($params);
     }
-    public function getLabTurnAroundTime($params)
-    {
+    
+    public function getLabTurnAroundTime($params){
         $sampleDb = $this->sm->get('SampleTable');
         return $sampleDb->fetchLabTurnAroundTime($params);
     }
@@ -606,8 +604,8 @@ class SampleService {
                         $row = array();
                         $countQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))->columns(array('total' => new Expression('COUNT(*)')))
                                         ->where('vl.lab_id="'.$aRow['facility_id'].'"');
-                        if(isset($params['clinicId']) && trim($params['clinicId'])!=''){
-                            $countQuery = $countQuery->where('vl.facility_id="'.base64_decode(trim($params['clinicId'])).'"');
+                        if(isset($params['clinicId']) && is_array($params['clinicId']) && count($params['clinicId']) >0){
+                            $countQuery = $countQuery->where('vl.facility_id IN ("' . implode('", "', $params['clinicId']) . '")');
                         }
                         if(isset($params['sampleType']) && trim($params['sampleType'])!=''){
                             $countQuery = $countQuery->where('vl.sample_type="'.base64_decode(trim($params['sampleType'])).'"');
@@ -901,7 +899,7 @@ class SampleService {
                             if (!isset($value)) {
                                 $value = "";
                             }
-                            if($colNo > 3){
+                            if($colNo > 2){
                                 break;
                             }
                             if (is_numeric($value)) {
@@ -919,7 +917,7 @@ class SampleService {
                       $currentRow++;
                     }
                     $writer = \PHPExcel_IOFactory::createWriter($excel, 'Excel5');
-                    $filename = 'SAMPLE-TESTED-LAB-REPORT--' . date('d-M-Y-H-i-s') . '.xls';
+                    $filename = 'SAMPLE-TESTED-LAB-TAT-REPORT--' . date('d-M-Y-H-i-s') . '.xls';
                     $writer->save(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . $filename);
                     return $filename;
                 }else{

@@ -15,31 +15,31 @@ foreach($sampleType as $samples){
                     <br>
                     <br>
                     <div class="row" style="padding-top:10px;padding-bottom:20px;">
-                    <div class="col-md-12">
-                        <div class="col-lg-6">
-                            <select class="form-control" id="clinicId" name="clinicId">
-                                <option value="">All my Clinics</option>
-                                <?php
-                                foreach($clinicName as $clinic){
-                                    ?>
-                                    <option value="<?php echo base64_encode($clinic['facility_id']);?>"><?php echo $clinic['facility_code']." - ".$clinic['facility_name'];?></option>
+                        <div class="col-md-12">
+                            <div class="col-lg-6">
+                                <select class="form-control" id="clinicId" name="clinicId[]" multiple title="Please enter clinic name">
+                                    <option value="">All my Clinics</option>
                                     <?php
-                                }
-                                ?>
-                            </select>
-                        </div>
-                        <div class="col-lg-6">
-                            <div id="dashboard-report-range" class="btn btn-sm form-control"
-                                 data-container="body"
-                                 data-placement="bottom"
-                                 data-original-title="Change dashboard date range">
-                                        DATE RANGE&nbsp;&nbsp;&nbsp;&nbsp;<i class="icon-calendar"></i>&nbsp;
-                                        <span class="thin uppercase hidden-xs"></span>&nbsp;
-                                        <i class="fa fa-angle-down"></i>
-                                        <input type="hidden" name="sampleCollectionDate" id="sampleCollectionDate" />
+                                    foreach($clinicName as $clinic){
+                                        ?>
+                                        <option value="<?php echo $clinic['facility_id']; ?>"><?php echo $clinic['facility_code']." - ".$clinic['facility_name'];?></option>
+                                        <?php
+                                    }
+                                    ?>
+                                </select>
+                            </div>
+                            <div class="col-lg-6">
+                                <div id="dashboard-report-range" class="btn btn-sm form-control"
+                                     data-container="body"
+                                     data-placement="bottom"
+                                     data-original-title="Change dashboard date range">
+                                            DATE RANGE&nbsp;&nbsp;&nbsp;&nbsp;<i class="icon-calendar"></i>&nbsp;
+                                            <span class="thin uppercase hidden-xs"></span>&nbsp;
+                                            <i class="fa fa-angle-down"></i>
+                                            <input type="hidden" name="sampleCollectionDate" id="sampleCollectionDate" />
+                                </div>
                             </div>
                         </div>
-                    </div>
                     </div>
 
                     <div class="row" style="display:none;">
@@ -261,7 +261,10 @@ foreach($sampleType as $samples){
     $(function () {
         $.blockUI.defaults.css.border = '1px solid grey'; 
         $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
-         
+        $('#clinicId').select2({
+            placeholder: "Select clinics",
+            allowClear: true
+        });
         $('#dashboard-report-range').daterangepicker({
                 "ranges": {
                     'Today': [moment(), moment()],
@@ -355,8 +358,8 @@ foreach($sampleType as $samples){
                 aoData.push({ "name":"testResult","value": $("#testResult").val()});
                 aoData.push({ "name":"age","value": $("#age").val()});
                 aoData.push({ "name":"gender","value": $("#gender").val()});
-                aoData.push({"name": "isPregnant", "value": $('#isPregnant').val()});
-                aoData.push({"name": "isBreastfeeding", "value": $('#isBreastfeeding').val()});
+                aoData.push({"name": "isPregnant", "value": $('input[name="isPregnant"]:checked').val()});
+                aoData.push({"name": "isBreastfeeding", "value": $('input[name="isBreastfeeding"]:checked').val()});
                 aoData.push({ "name":"adherence","value": $("#adherence").val()});
                 aoData.push({ "name":"result","value": $("#result").val()});
                 $.ajax({

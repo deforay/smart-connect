@@ -72,8 +72,8 @@ class SampleTable extends AbstractTableGateway {
                                                                                     END)")
                                           )
                                         );
-        if(isset($params['facilityId']) && $params['facilityId'] !=''){
-            $query = $query->where(array("vl.lab_id ='".base64_decode($params['facilityId'])."'")); 
+        if(isset($params['facilityId']) && is_array($params['facilityId']) && count($params['facilityId']) >0){
+            $query = $query->where('vl.lab_id IN ("' . implode('", "', $params['facilityId']) . '")');
         }else{
             if($logincontainer->role!= 1){
                 $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:0;
@@ -84,8 +84,6 @@ class SampleTable extends AbstractTableGateway {
         //$result = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $result = $common->cacheQuery($queryStr,$dbAdapter);
         return $result[0];
-        
-        
     }
     
     //start lab dashboard details 
@@ -114,8 +112,8 @@ class SampleTable extends AbstractTableGateway {
                                        ->where("DATE(sample_collection_date) in ($qDates)")
                                        ->group(array("receivedDate"));
                                        
-        if(isset($params['facilityId']) && $params['facilityId'] !=''){
-            $receivedQuery = $receivedQuery->where(array("vl.lab_id ='".base64_decode($params['facilityId'])."'")); 
+        if(isset($params['facilityId']) && is_array($params['facilityId']) && count($params['facilityId']) >0){
+            $receivedQuery = $receivedQuery->where('vl.lab_id IN ("' . implode('", "', $params['facilityId']) . '")');
         }else{
             if($logincontainer->role!= 1){
                 $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:0;
@@ -142,8 +140,8 @@ class SampleTable extends AbstractTableGateway {
                                        ->where("DATE(sample_collection_date) in ($qDates)")
                                        ->group(array("rejectDate"));
                                        
-        if(isset($params['facilityId']) && $params['facilityId'] !=''){
-            $rejectedQuery = $rejectedQuery->where(array("vl.lab_id ='".base64_decode($params['facilityId'])."'")); 
+        if(isset($params['facilityId']) && is_array($params['facilityId']) && count($params['facilityId']) >0){
+            $rejectedQuery = $rejectedQuery->where('vl.lab_id IN ("' . implode('", "', $params['facilityId']) . '")');
         }else{
             if($logincontainer->role!= 1){
                 $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:0;
@@ -167,8 +165,8 @@ class SampleTable extends AbstractTableGateway {
                                        ->where("DATE(sample_tested_datetime) in ($qDates)")
                                        ->group(array("testedDate"));
                                        
-        if(isset($params['facilityId']) && $params['facilityId'] !=''){
-            $testedQuery = $testedQuery->where(array("vl.lab_id ='".base64_decode($params['facilityId'])."'")); 
+        if(isset($params['facilityId']) && is_array($params['facilityId']) && count($params['facilityId']) >0){
+            $testedQuery = $testedQuery->where('vl.lab_id IN ("' . implode('", "', $params['facilityId']) . '")');
         }else{
             if($logincontainer->role!= 1){
                 $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:0;
@@ -229,8 +227,8 @@ class SampleTable extends AbstractTableGateway {
                                              
                                               )
                                             );
-            if(isset($params['facilityId']) && $params['facilityId'] !=''){
-                $queryStr = $queryStr->where(array("vl.lab_id ='".base64_decode($params['facilityId'])."'")); 
+            if(isset($params['facilityId']) && is_array($params['facilityId']) && count($params['facilityId']) >0){
+                $queryStr = $queryStr->where('vl.lab_id IN ("' . implode('", "', $params['facilityId']) . '")');
             }else{
                 if($logincontainer->role!= 1){
                     $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:0;
@@ -251,15 +249,10 @@ class SampleTable extends AbstractTableGateway {
             //echo $queryStr;die;
             //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             $sampleResult = $common->cacheQuery($queryStr,$dbAdapter);
-           
-           // \Zend\Debug\Debug::dump($sampleResult);
-           //  die();
-            
             
             $result = array();
             $j=0;
             foreach($sampleResult as $sRow){
-                
                 if($sRow["monthDate"] == null) continue;
                 
                 $result['sampleName']['VL (>= 1000 cp/ml)'][$j] = $sRow["GreaterThan1000"];
@@ -269,8 +262,6 @@ class SampleTable extends AbstractTableGateway {
                 $result['date'][$j] = $sRow["monthDate"];
                 $j++;
             } 
-             
-             
             return $result;
         }
     }
@@ -288,8 +279,6 @@ class SampleTable extends AbstractTableGateway {
             $end = strtotime($endMonth);
             $j = 0;
             $lessTotal = 0;$greaterTotal = 0;$notTargetTotal = 0;
-            
-            
             $queryStr = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
                                     ->columns(array(
                                                     "total" => new Expression('COUNT(*)'),
@@ -309,8 +298,8 @@ class SampleTable extends AbstractTableGateway {
                                              
                                               )
                                             );
-            if(isset($params['facilityId']) && $params['facilityId'] !=''){
-                $queryStr = $queryStr->where(array("vl.lab_id ='".base64_decode($params['facilityId'])."'")); 
+            if(isset($params['facilityId']) && is_array($params['facilityId']) && count($params['facilityId']) >0){
+                $queryStr = $queryStr->where('vl.lab_id IN ("' . implode('", "', $params['facilityId']) . '")'); 
             }else{
                 if($logincontainer->role!= 1){
                     $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:0;
@@ -329,12 +318,9 @@ class SampleTable extends AbstractTableGateway {
             //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             //echo $queryStr;die;
             $sampleResult = $common->cacheQuery($queryStr,$dbAdapter);
-            
-            
             $result = array();
             $j=0;
             foreach($sampleResult as $sRow){
-                
                 if($sRow["monthDate"] == null) continue;
                 
                 $result['M']['VL (>= 1000 cp/ml)'][$j] = $sRow["MGreaterThan1000"];
@@ -351,8 +337,6 @@ class SampleTable extends AbstractTableGateway {
                 
                 $result['date'][$j] = $sRow["monthDate"];
                 $j++;
-                
-                
             }
             
             return $result;
@@ -394,8 +378,8 @@ class SampleTable extends AbstractTableGateway {
                                              
                                               )
                                             );
-            if(isset($params['facilityId']) && $params['facilityId'] !=''){
-                $queryStr = $queryStr->where(array("vl.lab_id ='".base64_decode($params['facilityId'])."'")); 
+            if(isset($params['facilityId']) && is_array($params['facilityId']) && count($params['facilityId']) >0){
+                $queryStr = $queryStr->where('vl.lab_id IN ("' . implode('", "', $params['facilityId']) . '")');
             }else{
                 if($logincontainer->role!= 1){
                     $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:0;
@@ -455,8 +439,8 @@ class SampleTable extends AbstractTableGateway {
                         ->where(array("DATE(vl.sample_collection_date) <='$endMonth'", "DATE(vl.sample_collection_date) >='$startMonth'"))
                         ->where('vl.lab_id !=0')
                         ->group('vl.lab_id');
-            if(isset($params['facilityId']) && trim($params['facilityId'])!=''){
-                $fQuery = $fQuery->where('vl.lab_id="'.base64_decode(trim($params['facilityId'])).'"');
+            if(isset($params['facilityId']) && is_array($params['facilityId']) && count($params['facilityId']) >0){
+                $fQuery = $fQuery->where('vl.lab_id IN ("' . implode('", "', $params['facilityId']) . '")');
             }else{
                 if($logincontainer->role!= 1){
                     $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:0;
@@ -481,7 +465,7 @@ class SampleTable extends AbstractTableGateway {
             if($facilityResult && $sampleTypeResult){
                 $sampleId = array();
                 foreach($sampleTypeResult as $samples){
-                    $sampleId[] = $samples['sample_id'];
+                   $sampleId[] = $samples['sample_id'];
                 }
                 $j = 0;
                 $lessTotal = 0;$greaterTotal = 0;$notTargetTotal = 0;
@@ -505,7 +489,6 @@ class SampleTable extends AbstractTableGateway {
                     $result['lab'][$j] = $facility['facility_name'];
                     $j++;
                 }
-                //\Zend\Debug\Debug::dump($result);die;
             }
         }
         return $result;
@@ -535,8 +518,8 @@ class SampleTable extends AbstractTableGateway {
                                              
                                               )
                                             );
-            if(isset($params['facilityId']) && $params['facilityId'] !=''){
-                $queryStr = $queryStr->where(array("vl.lab_id ='".base64_decode($params['facilityId'])."'")); 
+            if(isset($params['facilityId']) && is_array($params['facilityId']) && count($params['facilityId']) >0){
+                $queryStr = $queryStr->where('vl.lab_id IN ("' . implode('", "', $params['facilityId']) . '")');
             }else{
                 if($logincontainer->role!= 1){
                     $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:0;
@@ -559,7 +542,6 @@ class SampleTable extends AbstractTableGateway {
             $result = array();
             $j=0;
             foreach($sampleResult as $sRow){
-                
                 if($sRow["monthDate"] == null) continue;
                 
                 $result['Complete'][$j] = (int)$sRow["CompletedForms"];
@@ -567,7 +549,6 @@ class SampleTable extends AbstractTableGateway {
                 $result['date'][$j] = $sRow["monthDate"];
                 $j++;                
             }
-            //\Zend\Debug\Debug::dump($result);die;
             return $result;
         }
     }
@@ -599,8 +580,8 @@ class SampleTable extends AbstractTableGateway {
                 $inCompleteQuery = $inCompleteQuery->where("Month(sample_collection_date)='".$mnth."' AND Year(sample_collection_date)='".$year."'");
             }
         }
-        if(isset($params['lab']) && trim($params['lab'])!=''){
-            $inCompleteQuery = $inCompleteQuery->where('vl.lab_id="'.base64_decode(trim($params['lab'])).'"');
+        if(isset($params['lab']) && is_array($params['lab']) && count($params['lab']) >0){
+            $inCompleteQuery = $inCompleteQuery->where('vl.lab_id IN ("' . implode('", "', $params['lab']) . '")');
         }else{
             if($logincontainer->role!= 1){
                 $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:0;
@@ -655,8 +636,8 @@ class SampleTable extends AbstractTableGateway {
                       ->join(array('vl'=>'dash_vl_request_form'),'vl.lab_id=f.facility_id',array('lab_id','sample_type','result'))
                       ->where('vl.lab_id !=0')
                       ->group('f.facility_id');
-        if(isset($params['lab']) && trim($params['lab'])!=''){
-            $fQuery = $fQuery->where('vl.lab_id="'.base64_decode(trim($params['lab'])).'"');
+        if(isset($params['lab']) && is_array($params['lab']) && count($params['lab']) >0){
+            $fQuery = $fQuery->where('vl.lab_id IN ("' . implode('", "', $params['lab']) . '")');
         }else{
             if($logincontainer->role!= 1){
                 $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:0;
@@ -730,8 +711,8 @@ class SampleTable extends AbstractTableGateway {
                           ->where(array("vl.sample_collection_date <='" . $endMonth ." 23:59:00". "'", "vl.sample_collection_date >='" . $startMonth." 00:00:00". "'"))
                           ->where('vl.lab_id !=0')
                           ->group('vl.lab_id');
-            if(isset($params['facilityId']) && trim($params['facilityId'])!=''){
-                $fQuery = $fQuery->where('vl.lab_id="'.base64_decode(trim($params['facilityId'])).'"');
+            if(isset($params['facilityId']) && is_array($params['facilityId']) && count($params['facilityId']) >0){
+                $fQuery = $fQuery->where('vl.lab_id IN ("' . implode('", "', $params['facilityId']) . '")');
             }else{
                 if($logincontainer->role!= 1){
                     $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:0;
@@ -745,8 +726,8 @@ class SampleTable extends AbstractTableGateway {
                 $result = array();
                 foreach($facilityResult as $facility){
                     $countQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))->columns(array('total' => new Expression('COUNT(*)')))
-                                        ->where(array("vl.sample_collection_date >='" . $startMonth ." 00:00:00". "'", "vl.sample_collection_date <='" .$endMonth." 23:59:00". "'"))
-                                        ->where('vl.lab_id="'.$facility['facility_id'].'"');
+                                      ->where(array("vl.sample_collection_date >='" . $startMonth ." 00:00:00". "'", "vl.sample_collection_date <='" .$endMonth." 23:59:00". "'"))
+                                      ->where('vl.lab_id="'.$facility['facility_id'].'"');
                     if(isset($params['sampleStatus']) && $params['sampleStatus'] == 'sample_tested'){
                         $countQuery = $countQuery->where("(vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL') AND (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')");
                     }else if(isset($params['sampleStatus']) && $params['sampleStatus'] == 'samples_not_tested') {
@@ -765,7 +746,8 @@ class SampleTable extends AbstractTableGateway {
         }
        return $result;
     }
-        //get female result
+    
+    //get female result
     public function getFemalePatientResult($params){
         $logincontainer = new Container('credo');
         $result = array();
@@ -788,8 +770,8 @@ class SampleTable extends AbstractTableGateway {
                                                     "Pregnant_Unknown" => new Expression("SUM(CASE WHEN (is_patient_pregnant !='' AND is_patient_pregnant IS NOT NULL AND (is_patient_pregnant !='no' AND is_patient_pregnant !='No' AND  is_patient_pregnant !='NO') AND (is_patient_pregnant !='yes' AND is_patient_pregnant !='Yes' AND  is_patient_pregnant !='YES')) THEN 1 ELSE 0 END)"),
                                               )
                                             );
-            if(isset($params['facilityId']) && $params['facilityId'] !=''){
-                $queryStr = $queryStr->where(array("vl.lab_id ='".base64_decode($params['facilityId'])."'")); 
+            if(isset($params['facilityId']) && is_array($params['facilityId']) && count($params['facilityId']) >0){
+                $queryStr = $queryStr->where('vl.lab_id IN ("' . implode('", "', $params['facilityId']) . '")');
             }else{
                 if($logincontainer->role!= 1){
                     $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:0;
@@ -806,9 +788,9 @@ class SampleTable extends AbstractTableGateway {
             return $femaleTestResult;
         }
     }
+    
     //get Line Of tratment result
     public function getLineOfTreatment($params){
-        
         $logincontainer = new Container('credo');
         $result = array();
         $dbAdapter = $this->adapter;
@@ -827,8 +809,8 @@ class SampleTable extends AbstractTableGateway {
                                                     "Not_Specified" => new Expression("SUM(CASE WHEN ((line_of_treatment!=1 AND line_of_treatment!=2 AND line_of_treatment!=3) OR (line_of_treatment IS NULL)) THEN 1 ELSE 0 END)"),
                                               )
                                             );
-            if(isset($params['facilityId']) && $params['facilityId'] !=''){
-                $queryStr = $queryStr->where(array("vl.lab_id ='".base64_decode($params['facilityId'])."'")); 
+            if(isset($params['facilityId']) && is_array($params['facilityId']) && count($params['facilityId']) >0){
+                $queryStr = $queryStr->where('vl.lab_id IN ("' . implode('", "', $params['facilityId']) . '")');
             }else{
                 if($logincontainer->role!= 1){
                     $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:0;
@@ -845,9 +827,9 @@ class SampleTable extends AbstractTableGateway {
             return $lineOfTreatmentResult;
         }
     }
+    
     //get vl out comes result
     public function getVlOutComes($params){
-        
         $logincontainer = new Container('credo');
         $result = array();
         $dbAdapter = $this->adapter;
@@ -864,8 +846,8 @@ class SampleTable extends AbstractTableGateway {
                                                     "Not_Suppressed" => new Expression("SUM(CASE WHEN (vl.result >= 1000) THEN 1 ELSE 0 END)"),
                                               )
                                             );
-            if(isset($params['facilityId']) && $params['facilityId'] !=''){
-                $queryStr = $queryStr->where(array("vl.lab_id ='".base64_decode($params['facilityId'])."'")); 
+            if(isset($params['facilityId']) && is_array($params['facilityId']) && count($params['facilityId']) >0){
+                $queryStr = $queryStr->where('vl.lab_id IN ("' . implode('", "', $params['facilityId']) . '")');
             }else{
                 if($logincontainer->role!= 1){
                     $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:0;
@@ -882,6 +864,7 @@ class SampleTable extends AbstractTableGateway {
             return $vlOutComeResult;
         }
     }
+    
     public function fetchLabTurnAroundTime($params){
         $logincontainer = new Container('credo');
         $dbAdapter = $this->adapter;
@@ -908,8 +891,8 @@ class SampleTable extends AbstractTableGateway {
                                                     "AvgDiff" => new Expression("CAST(ABS(AVG(TIMESTAMPDIFF(DAY,sample_tested_datetime,sample_collection_date))) AS DECIMAL (10,2))"),
                                               )
                                             );
-            if(isset($params['facilityId']) && $params['facilityId'] !=''){
-                $queryStr = $queryStr->where(array("vl.lab_id ='".base64_decode($params['facilityId'])."'")); 
+            if(isset($params['facilityId']) && is_array($params['facilityId']) && count($params['facilityId']) >0){
+                $queryStr = $queryStr->where('vl.lab_id IN ("' . implode('", "', $params['facilityId']) . '")');
             }else{
                 if($logincontainer->role!= 1){
                     $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:0;
@@ -959,9 +942,13 @@ class SampleTable extends AbstractTableGateway {
                                                 ->join(array('fd'=>'facility_details'),'fd.facility_id=vl.lab_id',array('facility_name','latitude','longitude'))
                                                 ->where(array("vl.sample_collection_date >='" . $startMonth ." 00:00:00". "'", "vl.sample_collection_date <='" .$endMonth." 23:59:00". "'"))
                                                 ->group('vl.lab_id');
-            if($logincontainer->role!= 1){
-                $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:0;
-                $lQuery = $lQuery->where('vl.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
+            if(isset($params['facilityId']) && is_array($params['facilityId']) && count($params['facilityId']) >0){
+                $lQuery = $lQuery->where('vl.lab_id IN ("' . implode('", "', $params['facilityId']) . '")');
+            }else {
+                if($logincontainer->role!= 1){
+                    $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:0;
+                    $lQuery = $lQuery->where('vl.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
+                }
             }
             $lQueryStr = $sql->getSqlStringForSqlObject($lQuery);
             $lResult = $dbAdapter->query($lQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -1019,8 +1006,8 @@ class SampleTable extends AbstractTableGateway {
                                               )
                                             )
                                     ->where(array("DATE(vl.sample_collection_date) <='$cDate'","DATE(vl.sample_collection_date) >='$lastThirtyDay'"));
-            if(isset($params['clinicId']) && $params['clinicId']!=''){
-                $query = $query->where('vl.facility_id="'.base64_decode(trim($params['clinicId'])).'"');
+            if(isset($params['clinicId']) && is_array($params['clinicId']) && count($params['clinicId']) >0){
+                $query = $query->where('vl.facility_id IN ("' . implode('", "', $params['clinicId']) . '")');
             }else{
                 if($logincontainer->role!= 1){
                     $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:0;
@@ -1126,8 +1113,8 @@ class SampleTable extends AbstractTableGateway {
                         //->where('vl.facility_id !=0')
                         //->where('vl.reason_for_vl_testing="'.$reason['test_reason_id'].'"');
                         ->group('tr.test_reason_id');
-        if(isset($params['facilityId']) && $params['facilityId']!=''){
-            $rQuery = $rQuery->where('vl.facility_id="'.base64_decode(trim($params['facilityId'])).'"');
+        if(isset($params['facilityId']) && is_array($params['facilityId']) && count($params['facilityId']) >0){
+            $rQuery = $rQuery->where('vl.facility_id IN ("' . implode('", "', $params['facilityId']) . '")');
         }else{
             if($logincontainer->role!= 1){
                 $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:0;
@@ -1142,16 +1129,6 @@ class SampleTable extends AbstractTableGateway {
         }else if(isset($params['testResult']) && trim($params['testResult']) == '>=1000') {
           $rQuery = $rQuery->where("vl.result >= 1000");
         }
-        if(isset($params['gender']) && $params['gender']=='F'){
-            $rQuery = $rQuery->where("vl.patient_gender IN ('f','female','F','FEMALE')");
-        }else if(isset($params['gender']) && $params['gender']=='M'){
-            $rQuery = $rQuery->where("vl.patient_gender IN ('m','male','M','MALE')");
-        }else if(isset($params['gender']) && $params['gender']=='not_specified'){
-            $rQuery = $rQuery->where("vl.patient_gender NOT IN ('f','female','F','FEMALE','m','male','M','MALE')");
-        }
-        if(isset($params['testReason'] ) && trim($params['testReason'])!=''){
-            $rQuery = $rQuery->where(array("vl.reason_for_vl_testing ='".base64_decode($params['testReason'])."'")); 
-        }
         if(isset($params['age']) && $params['age']!=''){
             $age = explode("-",$params['age']);
             if(isset($age[1])){
@@ -1160,6 +1137,30 @@ class SampleTable extends AbstractTableGateway {
             $rQuery = $rQuery->where('vl.patient_age_in_years'.$params['age']);
             }
         }
+        if(isset($params['gender']) && $params['gender']=='F'){
+            $rQuery = $rQuery->where("vl.patient_gender IN ('f','female','F','FEMALE')");
+        }else if(isset($params['gender']) && $params['gender']=='M'){
+            $rQuery = $rQuery->where("vl.patient_gender IN ('m','male','M','MALE')");
+        }else if(isset($params['gender']) && $params['gender']=='not_specified'){
+            $rQuery = $rQuery->where("vl.patient_gender NOT IN ('f','female','F','FEMALE','m','male','M','MALE')");
+        }
+        if(isset($params['isPregnant']) && $params['isPregnant']=='yes'){
+            $rQuery = $rQuery->where("vl.is_patient_pregnant = 'yes'");
+        }else if(isset($params['isPregnant']) && $params['isPregnant']=='no'){
+            $rQuery = $rQuery->where("vl.is_patient_pregnant = 'no'"); 
+        }else if(isset($params['isPregnant']) && $params['isPregnant']=='unreported'){
+            $rQuery = $rQuery->where("(vl.is_patient_pregnant IS NULL OR vl.is_patient_pregnant = '' OR vl.is_patient_pregnant = 'Unreported')"); 
+        }
+        if(isset($params['isBreastfeeding']) && $params['isBreastfeeding']=='yes'){
+            $rQuery = $rQuery->where("vl.is_patient_breastfeeding = 'yes'");
+        }else if(isset($params['isBreastfeeding']) && $params['isBreastfeeding']=='no'){
+            $rQuery = $rQuery->where("vl.is_patient_breastfeeding = 'no'"); 
+        }else if(isset($params['isBreastfeeding']) && $params['isBreastfeeding']=='unreported'){
+            $rQuery = $rQuery->where("(vl.is_patient_breastfeeding IS NULL OR vl.is_patient_breastfeeding = '' OR vl.is_patient_breastfeeding = 'Unreported')"); 
+        }
+        if(isset($params['testReason'] ) && trim($params['testReason'])!=''){
+            $rQuery = $rQuery->where(array("vl.reason_for_vl_testing ='".base64_decode($params['testReason'])."'")); 
+        }
         $rQueryStr = $sql->getSqlStringForSqlObject($rQuery);
         //die($rQueryStr);
 
@@ -1167,7 +1168,6 @@ class SampleTable extends AbstractTableGateway {
         $qResult = $common->cacheQuery($rQueryStr,$dbAdapter);
         $j=0;
         foreach($qResult as $r){
-            
             $rResult[$r['test_reason_name']][$j]['total'] = (int)$r['total'];
             $rResult['date'][$j] = $r['monthDate'];
             $j++;
@@ -1198,8 +1198,8 @@ class SampleTable extends AbstractTableGateway {
                         ->where(array("DATE(vl.sample_collection_date) <='$cDate'",
                                       "DATE(vl.sample_collection_date) >='$lastThirtyDay'"));
                         //->where('vl.facility_id !=0');
-        if(isset($params['clinicId']) && $params['clinicId']!=''){
-            $squery = $squery->where('vl.facility_id="'.base64_decode(trim($params['clinicId'])).'"');
+        if(isset($params['clinicId']) && is_array($params['clinicId']) && count($params['clinicId']) >0){
+            $squery = $squery->where('vl.facility_id IN ("' . implode('", "', $params['clinicId']) . '")');
         }else{
             if($logincontainer->role!= 1){
                 $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:0;
@@ -1367,8 +1367,10 @@ class SampleTable extends AbstractTableGateway {
         if($cDate!='' && $lastThirtyDay!=''){
             $sQuery = $sQuery->where(array("vl.sample_collection_date <='" . $cDate ." 23:59:00". "'", "vl.sample_collection_date >='" . $lastThirtyDay." 00:00:00". "'"));
         }
-        if(isset($parameters['clinicId']) && $parameters['clinicId'] !=''){
-            $sQuery = $sQuery->where(array("vl.facility_id ='".base64_decode(trim($parameters['clinicId']))."'")); 
+        if(isset($parameters['clinicId']) && is_array($parameters['clinicId']) && count($parameters['clinicId']) >0){
+            $sQuery = $sQuery->where('vl.facility_id IN ("' . implode('", "', $parameters['clinicId']) . '")');
+        }else if(isset($parameters['clinicId']) && trim($parameters['clinicId']) !=''){
+            $sQuery = $sQuery->where('vl.facility_id IN (' .$parameters['clinicId'] . ')');
         }else{
             if($logincontainer->role!= 1){
                 $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:0;
@@ -1448,9 +1450,15 @@ class SampleTable extends AbstractTableGateway {
 				->join(array('fd'=>'facility_details'),'fd.facility_id=vl.facility_id',array('facility_name'))
                                 ->join(array('r_r_r'=>'r_sample_rejection_reasons'),'r_r_r.rejection_reason_id=vl.reason_for_sample_rejection',array('rejection_reason_name'),'left')
 				->where(array('fd.facility_type'=>'1'));
-        if($logincontainer->role!= 1){
-            $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:0;
-            $iQuery = $iQuery->where('vl.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
+        if(isset($parameters['clinicId']) && is_array($parameters['clinicId']) && count($parameters['clinicId']) >0){
+            $iQuery = $iQuery->where('vl.facility_id IN ("' . implode('", "', $parameters['clinicId']) . '")');
+        }else if(isset($parameters['clinicId']) && trim($parameters['clinicId']) !=''){
+            $iQuery = $iQuery->where('vl.facility_id IN (' .$parameters['clinicId'] . ')');
+        }else{
+            if($logincontainer->role!= 1){
+                $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:0;
+                $iQuery = $iQuery->where('vl.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
+            }
         }
         $iQueryStr = $sql->getSqlStringForSqlObject($iQuery);
         $iResult = $dbAdapter->query($iQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -1526,8 +1534,8 @@ class SampleTable extends AbstractTableGateway {
                                     ->where(array("DATE(vl.sample_collection_date) <='$cDate'", "DATE(vl.sample_collection_date) >='$lastThirtyDay'"));        
         
         
-        if($params['facilityId'] !=''){
-            $queryStr = $queryStr->where(array("vl.facility_id ='".base64_decode($params['facilityId'])."'")); 
+        if(isset($params['facilityId']) && is_array($params['facilityId']) && count($params['facilityId']) >0){
+            $queryStr = $queryStr->where('vl.facility_id IN ("' . implode('", "', $params['facilityId']) . '")');
         }else{
             if($logincontainer->role!= 1){
                 $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:0;
@@ -1571,11 +1579,8 @@ class SampleTable extends AbstractTableGateway {
         $queryStr = $queryStr->order(array(new Expression('DATE(sample_collection_date)')));            
         
         $queryStr = $sql->getSqlStringForSqlObject($queryStr);
-        
         //echo $queryStr;//die;
-        
         $sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-        
         
         $result = array();
         $j=0;
@@ -1586,8 +1591,6 @@ class SampleTable extends AbstractTableGateway {
             $result['DBS']['VL (< 1000 cp/ml)'][$j] = $sRow["DBSLesserThan1000"];
             $result['Others']['VL (>= 1000 cp/ml)'][$j] = $sRow["OGreaterThan1000"];
             $result['Others']['VL (< 1000 cp/ml)'][$j] = $sRow["OLesserThan1000"];
-
-            
             $result['date'][$j] = $sRow["day"];
             $j++;
         }
@@ -1598,8 +1601,6 @@ class SampleTable extends AbstractTableGateway {
     
     public function fetchSampleDetails($params){
                 $logincontainer = new Container('credo');
-		//\Zend\Debug\Debug::dump($params);
-		//die;
                 $result = '';
                 $dbAdapter = $this->adapter;
                 $sql = new Sql($dbAdapter);
@@ -1613,8 +1614,8 @@ class SampleTable extends AbstractTableGateway {
                                         ->where('vl.lab_id !=0')
                                         ->group('f.facility_id');
                                         
-                if(isset($params['lab']) && trim($params['lab'])!=''){
-                    $fQuery = $fQuery->where('f.facility_id="'.base64_decode(trim($params['lab'])).'"');
+                if(isset($params['lab']) && is_array($params['lab']) && count($params['lab']) >0){
+                    $fQuery = $fQuery->where('f.facility_id IN ("' . implode('", "', $params['lab']) . '")');
                 }else{
                     if($logincontainer->role!= 1){
                         $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:0;
@@ -1656,8 +1657,8 @@ class SampleTable extends AbstractTableGateway {
                                 }else if(isset($params['sampleStatus']) && $params['sampleStatus'] == 'sample_rejected') {
                                     $countQuery = $countQuery->where("vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0");
                                 }
-                                if(isset($params['clinicId']) && trim($params['clinicId'])!=''){
-                                    $countQuery = $countQuery->where('vl.facility_id="'.base64_decode(trim($params['clinicId'])).'"');
+                                if(isset($params['facilityId']) && is_array($params['facilityId']) && count($params['facilityId']) >0){
+                                    $countQuery = $countQuery->where('vl.facility_id IN ("' . implode('", "', $params['clinicId']) . '")');
                                 }
                                 if(isset($params['sampleType']) && trim($params['sampleType'])!=''){
                                     $countQuery = $countQuery->where('vl.sample_type="'.base64_decode(trim($params['sampleType'])).'"');
@@ -1705,15 +1706,11 @@ class SampleTable extends AbstractTableGateway {
                                 $i++;
                         }
                 }
-		//\Zend\Debug\Debug::dump($result);
-		//die;
         return $result;
     }
     
     public function fetchBarSampleDetails($params){
             $logincontainer = new Container('credo');
-        //\Zend\Debug\Debug::dump($params);
-		//die;
                 $result = '';
                 $dbAdapter = $this->adapter;
                 $sql = new Sql($dbAdapter);
@@ -1726,8 +1723,8 @@ class SampleTable extends AbstractTableGateway {
                                         ->join(array('vl'=>'dash_vl_request_form'),'vl.lab_id=f.facility_id',array('lab_id','sample_type','result'))
                                         ->where('vl.lab_id !=0')
                                         ->group('f.facility_id');
-                if(isset($params['lab']) && trim($params['lab'])!=''){
-                    $fQuery = $fQuery->where('f.facility_id="'.base64_decode(trim($params['lab'])).'"');
+                if(isset($params['lab']) && is_array($params['lab']) && count($params['lab']) >0){
+                    $fQuery = $fQuery->where('f.facility_id IN ("' . implode('", "', $params['lab']) . '")');
                 }else{
                     if($logincontainer->role!= 1){
                         $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:0;
@@ -1770,8 +1767,8 @@ class SampleTable extends AbstractTableGateway {
                             }else if(isset($params['sampleStatus']) && $params['sampleStatus'] == 'sample_rejected') {
                                 $countQuery = $countQuery->where("vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0");
                             }
-                            if(isset($params['clinicId']) && trim($params['clinicId'])!=''){
-                                $countQuery = $countQuery->where('vl.facility_id="'.base64_decode(trim($params['clinicId'])).'"');
+                            if(isset($params['clinicId']) && is_array($params['clinicId']) && count($params['clinicId']) >0){
+                                $countQuery = $countQuery->where('vl.facility_id IN ("' . implode('", "', $params['clinicId']) . '")');
                             }
                             if(isset($params['sampleType']) && trim($params['sampleType'])!=''){
                                 $countQuery = $countQuery->where('vl.sample_type="'.base64_decode(trim($params['sampleType'])).'"');
@@ -1823,8 +1820,6 @@ class SampleTable extends AbstractTableGateway {
                             $j++;
                         }
                 }
-		//\Zend\Debug\Debug::dump($result);
-		//die;
         return $result;
     }
     
@@ -1844,17 +1839,17 @@ class SampleTable extends AbstractTableGateway {
                                                     "Others" => new Expression("SUM(CASE WHEN vl.result>=1000 and vl.sample_type!=2 THEN 1 ELSE 0 END)"),
                                               )
                                             )
-                                    ->where(array("DATE(vl.sample_collection_date) <='$endMonth'", "DATE(vl.sample_collection_date) >='$startMonth'"));        
-        if(isset($params['lab']) && trim($params['lab'])!=''){
-            $sQuery = $sQuery->where('vl.lab_id="'.base64_decode(trim($params['lab'])).'"');
+                                    ->where(array("DATE(vl.sample_collection_date) <='$endMonth'", "DATE(vl.sample_collection_date) >='$startMonth'"));
+        if(isset($params['lab']) && is_array($params['lab']) && count($params['lab']) >0){
+            $sQuery = $sQuery->where('vl.lab_id IN ("' . implode('", "', $params['lab']) . '")');
         }else {
             if($logincontainer->role!= 1){
                $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:0;
                $sQuery = $sQuery->where('vl.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
             }
         }
-        if(isset($params['clinicId']) && trim($params['clinicId'])!=''){
-            $sQuery = $sQuery->where('vl.facility_id="'.base64_decode(trim($params['clinicId'])).'"');
+        if(isset($params['clinicId']) && is_array($params['clinicId']) && count($params['clinicId']) >0){
+            $sQuery = $sQuery->where('vl.facility_id IN ("' . implode('", "', $params['clinicId']) . '")');
         }
         if(isset($params['sampleType']) && trim($params['sampleType'])!=''){
             $sQuery = $sQuery->where('rs.sample_id="'.base64_decode(trim($params['sampleType'])).'"');
@@ -1931,16 +1926,16 @@ class SampleTable extends AbstractTableGateway {
                 $monthPlus = date('m', $month);$year = date('Y', $month);$dFormat = date("M-Y", $month);
                 $sQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))->columns(array('samples' => new Expression('COUNT(*)')))
                               ->where("Month(sample_collection_date)='".$monthPlus."' AND Year(sample_collection_date)='".$year."'");
-                if(isset($params['lab']) && trim($params['lab'])!=''){
-                    $sQuery = $sQuery->where('vl.lab_id="'.base64_decode(trim($params['lab'])).'"');
+                if(isset($params['lab']) && is_array($params['lab']) && count($params['lab']) >0){
+                    $sQuery = $sQuery->where('vl.lab_id IN ("' . implode('", "', $params['lab']) . '")');
                 }else {
                     if($logincontainer->role!= 1){
                        $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:0;
                        $sQuery = $sQuery->where('vl.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
                     }
                 }
-                if(isset($params['clinicId']) && trim($params['clinicId'])!=''){
-                    $sQuery = $sQuery->where('vl.facility_id="'.base64_decode(trim($params['clinicId'])).'"');
+                if(isset($params['clinicId']) && is_array($params['clinicId']) && count($params['clinicId']) >0){
+                    $sQuery = $sQuery->where('vl.facility_id IN ("' . implode('", "', $params['clinicId']) . '")');
                 }
                 if(isset($params['sampleType']) && trim($params['sampleType'])!=''){
                     $sQuery = $sQuery->where('rs.sample_id="'.base64_decode(trim($params['sampleType'])).'"');
@@ -2136,15 +2131,19 @@ class SampleTable extends AbstractTableGateway {
         }else if(isset($parameters['testResult']) && $parameters['testResult'] == '>=1000') {
           $sQuery = $sQuery->where("vl.result >= 1000");
         }
-        if(isset($parameters['lab'] ) && trim($parameters['lab'])!=''){
-            $sQuery = $sQuery->where(array("vl.lab_id ='".base64_decode($parameters['lab'])."'")); 
+        if(isset($parameters['lab']) && is_array($parameters['lab']) && count($parameters['lab']) >0){
+            $sQuery = $sQuery->where('vl.lab_id IN ("' . implode('", "', $parameters['lab']) . '")');
+        }else if(isset($parameters['lab']) && trim($parameters['lab'])!= ''){
+            $sQuery = $sQuery->where('vl.lab_id IN (' . $parameters['lab'] . ')');
         }else{
             if($logincontainer->role!= 1){
                 $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:0;
                 $sQuery = $sQuery->where('vl.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
             }
-        }if(isset($parameters['clinicId'] ) && trim($parameters['clinicId'])!=''){
-            $sQuery = $sQuery->where(array("vl.facility_id ='".base64_decode($parameters['clinicId'])."'")); 
+        }if(isset($parameters['clinicId']) && is_array($parameters['clinicId']) && count($parameters['clinicId']) >0){
+            $sQuery = $sQuery->where('vl.facility_id IN ("' . implode('", "', $parameters['clinicId']) . '")');
+        }else if(isset($parameters['clinicId']) && trim($parameters['clinicId'])!= ''){
+            $sQuery = $sQuery->where('vl.facility_id IN (' . $parameters['clinicId'] . ')');
         }if(isset($parameters['sampleType']) && trim($parameters['sampleType'])!=''){
             $sQuery = $sQuery->where('vl.sample_type="'.base64_decode(trim($parameters['sampleType'])).'"');
         }if(isset($parameters['currentRegimen']) && trim($parameters['currentRegimen'])!=''){
@@ -2194,8 +2193,10 @@ class SampleTable extends AbstractTableGateway {
                                 ->group(new Expression('DATE(sample_collection_date)'))
                                 ->group('vl.sample_type')
                                 ->group('vl.facility_id');
-        if(isset($parameters['lab'] ) && trim($parameters['lab'])!=''){
-            $iQuery = $iQuery->where(array("vl.lab_id ='".base64_decode($parameters['lab'])."'")); 
+        if(isset($parameters['lab']) && is_array($parameters['lab']) && count($parameters['lab']) >0){
+            $iQuery = $iQuery->where('vl.lab_id IN ("' . implode('", "', $parameters['lab']) . '")');
+        }else if(isset($parameters['lab']) && trim($parameters['lab'])!= ''){
+            $iQuery = $iQuery->where('vl.lab_id IN (' . $parameters['lab'] . ')');
         }else{
             if($logincontainer->role!= 1){
                 $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:0;
@@ -2315,8 +2316,10 @@ class SampleTable extends AbstractTableGateway {
                                 ->join(array('vl'=>'dash_vl_request_form'),'vl.lab_id=f.facility_id',array('lab_id','sample_type','result'))
                                 ->where('vl.lab_id !=0')
                                 ->group('f.facility_id');
-        if(isset($parameters['lab']) && trim($parameters['lab'])!=''){
-            $sQuery = $sQuery->where('f.facility_id="'.base64_decode(trim($parameters['lab'])).'"');
+        if(isset($parameters['lab']) && is_array($parameters['lab']) && count($parameters['lab']) >0){
+            $sQuery = $sQuery->where('f.facility_id IN ("' . implode('", "', $parameters['lab']) . '")');
+        }else if(isset($parameters['lab']) && trim($parameters['lab'])!= ''){
+            $sQuery = $sQuery->where('f.facility_id IN (' . $parameters['lab'] . ')');
         }else{
             if($logincontainer->role!= 1){
                 $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:0;
@@ -2352,8 +2355,10 @@ class SampleTable extends AbstractTableGateway {
                                 ->join(array('vl'=>'dash_vl_request_form'),'vl.lab_id=f.facility_id',array('lab_id','sample_type','result'))
                                 ->where('vl.lab_id !=0')
                                 ->group('f.facility_id');
-        if(isset($parameters['lab']) && trim($parameters['lab'])!=''){
-            $iQuery = $iQuery->where('f.facility_id="'.base64_decode(trim($parameters['lab'])).'"');
+        if(isset($parameters['lab']) && is_array($parameters['lab']) && count($parameters['lab']) >0){
+            $iQuery = $iQuery->where('f.facility_id IN ("' . implode('", "', $parameters['lab']) . '")');
+        }else if(isset($parameters['lab']) && trim($parameters['lab'])!= ''){
+            $iQuery = $iQuery->where('f.facility_id IN (' . $parameters['lab'] . ')');
         }else{
             if($logincontainer->role!= 1){
                 $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:0;
@@ -2401,8 +2406,10 @@ class SampleTable extends AbstractTableGateway {
             }else if(isset($parameters['sampleStatus']) && $parameters['sampleStatus'] == 'sample_rejected') {
                 $countQuery = $countQuery->where("vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0");
             }
-            if(isset($parameters['clinicId']) && trim($parameters['clinicId'])!=''){
-                $countQuery = $countQuery->where('vl.facility_id="'.base64_decode(trim($parameters['clinicId'])).'"');
+            if(isset($parameters['clinicId']) && is_array($parameters['clinicId']) && count($parameters['clinicId']) >0){
+                $countQuery = $countQuery->where('vl.facility_id IN ("' . implode('", "', $parameters['clinicId']) . '")');
+            }else if(isset($parameters['clinicId']) && trim($parameters['clinicId'])!= ''){
+               $countQuery = $countQuery->where('vl.facility_id IN (' . $parameters['clinicId'] . ')'); 
             }
             if(isset($parameters['sampleType']) && trim($parameters['sampleType'])!=''){
                 $countQuery = $countQuery->where('vl.sample_type="'.base64_decode(trim($parameters['sampleType'])).'"');
@@ -2450,6 +2457,7 @@ class SampleTable extends AbstractTableGateway {
         }
        return $output;
     }
+    
     public function fetchFilterSampleTatDetails($parameters){
         $logincontainer = new Container('credo');
         $queryContainer = new Container('query');
@@ -2540,16 +2548,20 @@ class SampleTable extends AbstractTableGateway {
                                                     "AvgDiff" => new Expression("CAST(ABS(AVG(TIMESTAMPDIFF(DAY,sample_tested_datetime,sample_collection_date))) AS DECIMAL (10,2))"),
                                               )
                                             );
-        if(isset($parameters['lab']) && $parameters['lab'] !=''){
-            $sQuery = $sQuery->where(array("vl.lab_id ='".base64_decode($parameters['lab'])."'")); 
+        if(isset($parameters['lab']) && is_array($parameters['lab']) && count($parameters['lab']) >0){
+            $sQuery = $sQuery->where('vl.lab_id IN ("' . implode('", "', $parameters['lab']) . '")');
+        }else if(isset($parameters['lab']) && trim($parameters['lab'])!= ''){
+            $sQuery = $sQuery->where('vl.lab_id IN (' . $parameters['lab'] . ')');
         }else{
             if($logincontainer->role!= 1){
                 $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:0;
                 $sQuery = $sQuery->where('vl.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
             }
         }
-        if(isset($parameters['clinicId']) && trim($parameters['clinicId'])!=''){
-                $sQuery = $sQuery->where('vl.facility_id="'.base64_decode(trim($parameters['clinicId'])).'"');
+        if(isset($parameters['clinicId']) && is_array($parameters['clinicId']) && count($parameters['clinicId']) >0){
+            $sQuery = $sQuery->where('vl.facility_id IN ("' . implode('", "', $parameters['clinicId']) . '")');
+        }else if(isset($parameters['clinicId']) && trim($parameters['clinicId'])!= ''){
+            $sQuery = $sQuery->where('vl.facility_id IN (' . $parameters['clinicId'] . ')');
         }
         if(isset($parameters['sampleType']) && trim($parameters['sampleType'])!=''){
             $sQuery = $sQuery->where('vl.sample_type="'.base64_decode(trim($parameters['sampleType'])).'"');
@@ -2618,8 +2630,10 @@ class SampleTable extends AbstractTableGateway {
                                                     "AvgDiff" => new Expression("CAST(ABS(AVG(TIMESTAMPDIFF(DAY,sample_tested_datetime,sample_collection_date))) AS DECIMAL (10,2))"),
                                               )
                                             );
-        if(isset($parameters['lab']) && trim($parameters['lab'])!=''){
-            $iQuery = $iQuery->where('vl.lab_id="'.base64_decode(trim($parameters['lab'])).'"');
+        if(isset($parameters['lab']) && is_array($parameters['lab']) && count($parameters['lab']) >0){
+            $iQuery = $iQuery->where('vl.lab_id IN ("' . implode('", "', $parameters['lab']) . '")');
+        }else if(isset($parameters['lab']) && trim($parameters['lab'])!= ''){
+            $iQuery = $iQuery->where('vl.lab_id IN (' . $parameters['lab'] . ')');
         }else{
             if($logincontainer->role!= 1){
                 $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:0;

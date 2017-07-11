@@ -156,13 +156,12 @@ foreach($sampleType as $samples){
                     <!-- END PAGE HEADER-->
                     <div class="row" style="padding-top:10px;padding-bottom:20px;">
                         <div class="col-lg-6">
-                            <select name="labName" id="labName" class="form-control" title="Please choose lab name">
+                            <select name="labName[]" id="labName" class="form-control" multiple title="Please choose lab name">
                                 <option value="">-- All Labs --</option>
                                 <?php
-                                foreach($labName as $lab)
-                                {
+                                foreach($labName as $lab){
                                     ?>
-                                    <option value="<?php echo base64_encode($lab['facility_id']);?>"><?php echo $lab['facility_code']." - ".$lab['facility_name'];?></option>
+                                    <option value="<?php echo $lab['facility_id']; ?>"><?php echo $lab['facility_code']." - ".$lab['facility_name'];?></option>
                                     <?php
                                 }
                                 ?>
@@ -202,8 +201,7 @@ foreach($sampleType as $samples){
                                                 <?php echo $sType;?>
                                             </select>
                                         </div>
-                                    </div>                                    
-                                    
+                                    </div>
                                 </div>
                                 <div class="portlet-body" style="cursor:pointer;">
                                     <div id="samplesTestedResult"></div>
@@ -412,11 +410,12 @@ foreach($sampleType as $samples){
                 $("#sampleResultDetails").html(data);
             });
         }
-        function getTestedSampleResult()
-        {
+        
+        function getTestedSampleResult(){
             sampleType = $("#sampleType").val();
             fromDate=$('#mrp-lowerDate').val();
             toDate=$('#mrp-upperDate').val();
+            facilityId = $("#labName").val();
             $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-test-result')); ?>",{fromDate:fromDate,toDate:toDate,sampleType:sampleType,facilityId:facilityId},
             function(data) {
                 $("#samplesTestedResult").html(data);
@@ -433,8 +432,8 @@ foreach($sampleType as $samples){
                 $("#facilitiesTestedValue").html(data);
             });
         }
-        function getTestedSampleResultBasedGender()
-        {
+        
+        function getTestedSampleResultBasedGender(){
             sampleType = '';
             fromDate=$('#mrp-lowerDate').val();
             toDate=$('#mrp-upperDate').val();
@@ -444,8 +443,8 @@ foreach($sampleType as $samples){
                 $("#samplesTestedResultGender").html(data);
             });
         }
-        function getTestedSampleResultBasedAge()
-        {
+        
+        function getTestedSampleResultBasedAge(){
             sampleType = '';
             fromDate=$('#mrp-lowerDate').val();
             toDate=$('#mrp-upperDate').val();
@@ -477,6 +476,7 @@ foreach($sampleType as $samples){
             $("#pieChartLabResult").html(data);
             });
         }
+        
         function femalePatient(){
             facilityId = $("#labName").val();
             fromDate=$('#mrp-lowerDate').val();
@@ -486,6 +486,7 @@ foreach($sampleType as $samples){
             $("#femalePatientPieChart").html(data);
             });
         }
+        
         function lineOfTreatment(){
             facilityId = $("#labName").val();
             fromDate=$('#mrp-lowerDate').val();
@@ -495,6 +496,7 @@ foreach($sampleType as $samples){
             $("#lineOfTreatmentPieChart").html(data);
             });
         }
+        
         function vlOutComePiechart(){
             facilityId = $("#labName").val();
             fromDate=$('#mrp-lowerDate').val();
@@ -504,8 +506,8 @@ foreach($sampleType as $samples){
             $("#vlOutComePiechart").html(data);
             });
         }
-        function getAverageLabTAT()
-        {
+        
+        function getAverageLabTAT(){
             fromDate=$('#mrp-lowerDate').val();
             toDate=$('#mrp-upperDate').val();
             facilityId = $("#labName").val();
@@ -514,8 +516,8 @@ foreach($sampleType as $samples){
                 $("#labAverageTat").html(data);
             });
         }
-        function getLabFacilities()
-        {
+        
+        function getLabFacilities(){
             fromDate=$('#mrp-lowerDate').val();
             toDate=$('#mrp-upperDate').val();
             facilityId = $("#labName").val();
@@ -526,10 +528,10 @@ foreach($sampleType as $samples){
         }
             
         $(function () {
-            //$('#labName').select2({
-            //    placeholder: "Select labs",
-            //    allowClear: true
-            //});
+            $('#labName').select2({
+                placeholder: "Select labs",
+                allowClear: true
+            });
             getEverything();
             getLabFacilities();
         });

@@ -71,12 +71,12 @@ if(isset($searchMonth) && trim($searchMonth)!= ''){
                         <div class="col-md-12">        
                             <div class="form-group col-lg-4">
                                 <label class="control-label">Lab&nbsp;</label>
-                                <select name="labName" id="labName" class="form-control" title="Please choose lab name">
+                                <select name="labName[]" id="labName" class="form-control" multiple title="Please choose lab name">
                                     <option value="">All Labs</option>
                                     <?php
                                     foreach($labName as $lab){
                                     ?>
-                                        <option value="<?php echo base64_encode($lab['facility_id']);?>" <?php echo(isset($labFilter) && trim($labFilter)!= '' && $labFilter == $lab['facility_name'])?'selected="selected"':''; ?>><?php echo $lab['facility_code']." - ".$lab['facility_name'];?></option>
+                                        <option value="<?php echo $lab['facility_id'];?>" <?php echo(isset($labFilter) && trim($labFilter)!= '' && $labFilter == $lab['facility_name'])?'selected="selected"':''; ?>><?php echo $lab['facility_code']." - ".$lab['facility_name'];?></option>
                                     <?php
                                     }
                                     ?>
@@ -98,12 +98,12 @@ if(isset($searchMonth) && trim($searchMonth)!= ''){
                             </div>  -->                          
                             <div class="form-group col-lg-4">
                                 <label class="control-label">Clinic&nbsp;</label>
-                                <select class="form-control" id="clinicId" name="clinicId">
+                                <select class="form-control" id="clinicId" name="clinicId[]" multiple title="Please choose clinic name">
                                     <option value="">All Clinics</option>
                                     <?php
                                     foreach($clinicName as $clinic){
                                     ?>
-                                    <option value="<?php echo base64_encode($clinic['facility_id']);?>"><?php echo $clinic['facility_code']." - ".$clinic['facility_name'];?></option>
+                                    <option value="<?php echo $clinic['facility_id']; ?>"><?php echo $clinic['facility_code']." - ".$clinic['facility_name'];?></option>
                                     <?php
                                     }
                                     ?>
@@ -233,7 +233,7 @@ if(isset($searchMonth) && trim($searchMonth)!= ''){
                                         <table class="table table-striped table-bordered table-hover order-column" id="sampleDataTable">
                                             <thead>
                                                 <tr>
-                                                    <th>lab </th>
+                                                    <th>Lab </th>
                                                     <th>Suppressed </th>
                                                     <th>Not Suppressed </th>
                                                     <th>Rejected </th>
@@ -302,6 +302,14 @@ if(isset($searchMonth) && trim($searchMonth)!= ''){
     
     var oTable = null;
     $(document).ready(function(){
+        $('#labName').select2({
+            placeholder: "Select labs",
+            allowClear: true
+        });
+        $('#clinicId').select2({
+            placeholder: "Select clinics",
+            allowClear: true
+        });
         $('#piebutton').on('click', function () {
             $('#piecontainer').fadeIn(function () {
                 generatePieContainer();
@@ -352,8 +360,8 @@ function loadSampleDataTable(){
             aoData.push({"name": "testResult", "value": $('#testResult').val()});
             aoData.push({"name": "sampleStatus", "value": $('#sampleStatus').val()});
             aoData.push({"name": "gender", "value": $('#gender').val()});
-            aoData.push({"name": "isPregnant", "value": $('#isPregnant').val()});
-            aoData.push({"name": "isBreastfeeding", "value": $('#isBreastfeeding').val()});
+            aoData.push({"name": "isPregnant", "value": $('input[name="isPregnant"]:checked').val()});
+            aoData.push({"name": "isBreastfeeding", "value": $('input[name="isBreastfeeding"]:checked').val()});
             $.ajax({
                 "dataType": 'json',
                 "type": "POST",
@@ -617,7 +625,7 @@ $(function () {
 function exportSampleResult(){
     $.blockUI.defaults.css.border = '1px solid grey';
     $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI); 
-    $.post("<?php echo $this->url('laboratory', array('action' => 'export-sample-result-excel')); ?>", {fromDate:$('#mrp-lowerDate').val(),toDate:$('#mrp-upperDate').val(),lab:$('#labName').val(),clinicId:$('#clinicId').val(),sampleType:$('#sampleType').val(),currentRegimen:$('#currentRegimen').val(),adherence:$('#adherence').val(),age:$('#age').val(),testResult:$('#testResult').val(),sampleStatus:$('#sampleStatus').val()},
+    $.post("<?php echo $this->url('laboratory', array('action' => 'export-sample-result-excel')); ?>", {fromDate:$('#mrp-lowerDate').val(),toDate:$('#mrp-upperDate').val(),clinicId:$('#clinicId').val(),sampleType:$('#sampleType').val(),currentRegimen:$('#currentRegimen').val(),adherence:$('#adherence').val(),age:$('#age').val(),testResult:$('#testResult').val(),sampleStatus:$('#sampleStatus').val()},
      function(data){
          if(data == "" || data == null || data == undefined){
              alert('Unable to export result excel');
