@@ -17,8 +17,7 @@ foreach($sampleType as $samples){
                     <div class="row" style="padding-top:10px;padding-bottom:20px;">
                         <div class="col-md-12">
                             <div class="col-lg-6">
-                                <select class="form-control" id="clinicId" name="clinicId[]" multiple title="Please enter clinic name">
-                                    <option value="">All my Clinics</option>
+                                <select class="form-control" id="clinicId" name="clinicId[]" multiple title="Please select one or more clinics. Leave blank for All">
                                     <?php
                                     foreach($clinicName as $clinic){
                                         ?>
@@ -262,7 +261,7 @@ foreach($sampleType as $samples){
         $.blockUI.defaults.css.border = '1px solid grey'; 
         $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
         $('#clinicId').select2({
-            placeholder: "Select clinics",
+            placeholder: "All Clinics",
             allowClear: true
         });
         $('#dashboard-report-range').daterangepicker({

@@ -156,8 +156,7 @@ foreach($sampleType as $samples){
                     <!-- END PAGE HEADER-->
                     <div class="row" style="padding-top:10px;padding-bottom:20px;">
                         <div class="col-lg-6">
-                            <select name="labName[]" id="labName" class="form-control" multiple title="Please choose lab name">
-                                <option value="">-- All Labs --</option>
+                            <select name="labName[]" id="labName" class="form-control" multiple title="Please select one or more labs. Leave blank for All">
                                 <?php
                                 foreach($labName as $lab){
                                     ?>
@@ -282,7 +281,7 @@ foreach($sampleType as $samples){
                                     </div>
                                 </div>
                                 <div class="portlet-body">
-                                    <div id="labAverageTat"></div>
+                                    <div id="labAverageTat" style="height:450px;"></div>
                                 </div>
                             </div>
                         </div>
@@ -294,7 +293,7 @@ foreach($sampleType as $samples){
                                     </div>
                                 </div>
                                 <div class="portlet-body" id="requisitionForms">
-                                    
+                                    <div id="labDashReqFormBar" style="height:450px;"></div>
                                 </div>
                             </div>                            
                             
@@ -318,6 +317,7 @@ foreach($sampleType as $samples){
                                     </div>                                 
                                 </div>
                                 <div class="portlet-body" id="pieChartLabResult">
+                                    <div id="labDashSampleVolumePie" style="height:450px;"></div>
                                 </div>
                             </div>                            
                         </div>
@@ -332,6 +332,7 @@ foreach($sampleType as $samples){
                                     </div>
                                 </div>
                                 <div class="portlet-body" id="femalePatientPieChart">
+                                    <div id="labDashFemalePie" style="height:450px;"></div>
                                 </div>
                             </div>                            
                         </div>
@@ -343,6 +344,7 @@ foreach($sampleType as $samples){
                                     </div>
                                 </div>
                                 <div class="portlet-body" id="lineOfTreatmentPieChart">
+                                    <div id="labDashLineOfTreatmentPie" style="height:450px;"></div>
                                 </div>
                             </div>                            
                         </div>
@@ -354,6 +356,7 @@ foreach($sampleType as $samples){
                                     </div>
                                 </div>
                                 <div class="portlet-body" id="vlOutComePiechart">
+                                    <div id="labDashVlOutcomePie" style="height:450px;"></div>
                                 </div>
                             </div>                            
                         </div>
@@ -461,7 +464,7 @@ foreach($sampleType as $samples){
             facilityId = $("#labName").val();
             $.post("<?php echo $this->url('laboratory', array('action' => 'get-requisition-forms')); ?>",{fromDate:fromDate,toDate:toDate,facilityId:facilityId},
             function(data) {
-                $("#requisitionForms").html(data);
+                $("#labDashReqFormBar").html(data);
             });
         }
         
@@ -473,7 +476,7 @@ foreach($sampleType as $samples){
             sampleStatus = $("#sampleStatus").val();
             $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-volume')); ?>",{fromDate:fromDate,toDate:toDate,facilityId:facilityId,sampleStatus:sampleStatus},
             function(data) {
-            $("#pieChartLabResult").html(data);
+            $("#labDashSampleVolumePie").html(data);
             });
         }
         
@@ -483,7 +486,7 @@ foreach($sampleType as $samples){
             toDate=$('#mrp-upperDate').val();
             $.post("<?php echo $this->url('laboratory', array('action' => 'get-female-patient-result')); ?>",{fromDate:fromDate,toDate:toDate,facilityId:facilityId},
             function(data) {
-            $("#femalePatientPieChart").html(data);
+                $("#labDashFemalePie").html(data);
             });
         }
         
@@ -493,7 +496,7 @@ foreach($sampleType as $samples){
             toDate=$('#mrp-upperDate').val();
             $.post("<?php echo $this->url('laboratory', array('action' => 'get-line-of-treatment')); ?>",{fromDate:fromDate,toDate:toDate,facilityId:facilityId},
             function(data) {
-            $("#lineOfTreatmentPieChart").html(data);
+                $("#labDashLineOfTreatmentPie").html(data);
             });
         }
         
@@ -503,7 +506,7 @@ foreach($sampleType as $samples){
             toDate=$('#mrp-upperDate').val();
             $.post("<?php echo $this->url('laboratory', array('action' => 'get-vl-out-comes')); ?>",{fromDate:fromDate,toDate:toDate,facilityId:facilityId},
             function(data) {
-            $("#vlOutComePiechart").html(data);
+                $("#labDashVlOutcomePie").html(data);
             });
         }
         
@@ -529,7 +532,7 @@ foreach($sampleType as $samples){
             
         $(function () {
             $('#labName').select2({
-                placeholder: "Select labs",
+                placeholder: "All Labs",
                 allowClear: true
             });
             getEverything();
