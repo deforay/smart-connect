@@ -14,121 +14,115 @@ foreach($sampleType as $samples){
                     <!-- END PAGE HEADER-->
                     <br>
                     <br>
-                    <div class="row" style="padding-top:10px;padding-bottom:20px;">
-                        <div class="col-md-12">
-                            <div class="col-lg-6">
-                                <select class="form-control" id="clinicId" name="clinicId[]" multiple title="Please select one or more clinics. Leave blank for All">
-                                    <?php
-                                    foreach($clinicName as $clinic){
-                                        ?>
-                                        <option value="<?php echo $clinic['facility_id']; ?>"><?php echo $clinic['facility_code']." - ".$clinic['facility_name'];?></option>
+                    <form id="pageFilter" action="#" method="">
+                        <div class="row" style="padding-top:10px;padding-bottom:20px;">
+                            <div class="col-md-12">
+                                <div class="col-lg-6">
+                                    <select class="form-control" id="clinicId" name="clinicId[]" multiple title="Please select one or more clinics. Leave blank for All">
                                         <?php
-                                    }
-                                    ?>
-                                </select>
-                            </div>
-                            <div class="col-lg-6">
-                                <div id="dashboard-report-range" class="btn btn-sm form-control"
-                                     data-container="body"
-                                     data-placement="bottom"
-                                     data-original-title="Change dashboard date range">
-                                            DATE RANGE&nbsp;&nbsp;&nbsp;&nbsp;<i class="icon-calendar"></i>&nbsp;
-                                            <span class="thin uppercase hidden-xs"></span>&nbsp;
-                                            <i class="fa fa-angle-down"></i>
-                                            <input type="hidden" name="sampleCollectionDate" id="sampleCollectionDate" />
+                                        foreach($clinicName as $clinic){
+                                            ?>
+                                            <option value="<?php echo $clinic['facility_id']; ?>"><?php echo $clinic['facility_code']." - ".$clinic['facility_name'];?></option>
+                                            <?php
+                                        }
+                                        ?>
+                                    </select>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row" style="display:none;">
-                        <div class="col-md-12 col-sm-12">
-                            <div class="portlet box blue">
-                                <div class="portlet-title">
-                                    <div class="caption ">
-                                        <span class="caption-subject">Overall Viral Load Status</span>
+                                <div class="col-lg-6">
+                                    <div id="dashboard-report-range" class="btn btn-sm form-control"
+                                         data-container="body"
+                                         data-placement="bottom"
+                                         data-original-title="Change dashboard date range">
+                                                DATE RANGE&nbsp;&nbsp;&nbsp;&nbsp;<i class="icon-calendar"></i>&nbsp;
+                                                <span class="thin uppercase hidden-xs"></span>&nbsp;
+                                                <i class="fa fa-angle-down"></i>
+                                                <input type="hidden" name="sampleCollectionDate" id="sampleCollectionDate" />
                                     </div>
                                 </div>
-                                <div class="portlet-body">
-                                    <div id="combochart" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group col-lg-4">
+                                    <label class="control-label">Test Result&nbsp;</label>
+                                  <select class="form-control" name="testResult" id="testResult" title="Please choose result">
+                                    <option value="">All</option>
+                                    <option value=">=1000">>= 1000 cp/mL</option>
+                                    <option value="<1000">< 1000 cp/mL</option>
+                                  </select>
+                                </div>
+                                <div class="form-group col-lg-4">
+                                    <label class="control-label">Sample Type</label>
+                                  <select class="form-control" name="sampleId" id="sampleId" title="Please choose sample type">
+                                    <option value="">All</option>
+                                    <?php echo $sType;?>
+                                  </select>
+                                </div>
+                                <div class="form-group col-lg-4">
+                                    <label class="control-label">Age Group&nbsp;</label>
+                                  <select class="form-control" name="age" id="age" title="Please choose age group">
+                                    <option value="">-- Age --</option>
+                                    <option value="0-10">0-10</option>
+                                    <option value="10-20">10-20</option>
+                                    <option value="20-30">20-30</option>
+                                    <option value="30-40">30-40</option>
+                                    <option value="40-50">40-50</option>
+                                    <option value="50-60">50-60</option>
+                                    <option value="60-70">60-70</option>
+                                    <option value="70-80">70-80</option>
+                                    <option value="80">Above 80</option>
+                                  </select>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="">
-                        <div class="col-md-12">
-                            <div class="form-group col-lg-4">
-                                <label class="control-label">Test Result&nbsp;</label>
-                              <select class="form-control" name="testResult" id="testResult" title="Please choose result">
-                                <option value="">All</option>
-                                <option value=">=1000">>= 1000 cp/mL</option>
-                                <option value="<1000">< 1000 cp/mL</option>
-                              </select>
-                            </div>
-                            <div class="form-group col-lg-4">
-                                <label class="control-label">Sample Type</label>
-                              <select class="form-control" name="sampleId" id="sampleId" title="Please choose sample type">
-                                <option value="">All</option>
-                                <?php echo $sType;?>
-                              </select>
-                            </div>
-                            <div class="form-group col-lg-4">
-                                <label class="control-label">Age Group&nbsp;</label>
-                              <select class="form-control" name="age" id="age" title="Please choose age group">
-                                <option value="">-- Age --</option>
-                                <option value="0-10">0-10</option>
-                                <option value="10-20">10-20</option>
-                                <option value="20-30">20-30</option>
-                                <option value="30-40">30-40</option>
-                                <option value="40-50">40-50</option>
-                                <option value="50-60">50-60</option>
-                                <option value="60-70">60-70</option>
-                                <option value="70-80">70-80</option>
-                                <option value="80">Above 80</option>
-                              </select>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group col-lg-4">
+                                    <label class="control-label">ARV Adherence</label>
+                                    <select class="form-control" name="adherence" id="adherence">
+                                      <option value=''>--Select--</option>
+                                      <option value="good">Good >= 95%</option>
+                                      <option value="fair">Fair 85-94%</option>
+                                      <option value="poor">Poor < 85%</option>
+                                    </select>
+                                </div>
+                                <div class="form-group col-lg-4">
+                                    <label class="control-label">Gender</label>
+                                  <select class="form-control" name="gender" id="gender">
+                                    <option value=''>--Select--</option>
+                                    <option value="M">Male</option>
+                                    <option value="F">Female</option>
+                                    <option value="not_specified">Other</option>
+                                  </select>
+                                </div>
+                                <div class="form-group col-lg-4 femaleSection" style="display:none;">
+                                    <label class="control-label">Is Patient Pregnant</label><br>
+                                    <input id="pregnantYes" name="isPregnant" value="yes" type="radio"> Yes&nbsp;&nbsp;
+                                    <input id="pregnantNo" name="isPregnant" value="no" type="radio"> No&nbsp;&nbsp;
+                                    <input id="pregnantUnreported" name="isPregnant" value="unreported" type="radio"> Unreported
+                                </div>
                             </div>
                         </div>
-                        <div class="col-md-12">
-                            <div class="form-group col-lg-4">
-                                <label class="control-label">ARV Adherence</label>
-                                <select class="form-control" name="adherence" id="adherence">
-                                  <option value=''>--Select--</option>
-                                  <option value="good">Good >= 95%</option>
-                                  <option value="fair">Fair 85-94%</option>
-                                  <option value="poor">Poor < 85%</option>
-                                </select>
-                            </div>
-                            <div class="form-group col-lg-4">
-                                <label class="control-label">Gender</label>
-                              <select class="form-control" name="gender" id="gender">
-                                <option value=''>--Select--</option>
-                                <option value="M">Male</option>
-                                <option value="F">Female</option>
-                                <option value="not_specified">Other</option>
-                              </select>
-                            </div>
-                            <div class="form-group col-lg-4 femaleSection" style="display:none;">
-                                <label class="control-label">Is Patient Pregnant</label><br>
-                                <input id="pregnantYes" name="isPregnant" value="yes" type="radio"> Yes&nbsp;&nbsp;
-                                <input id="pregnantNo" name="isPregnant" value="no" type="radio"> No&nbsp;&nbsp;
-                                <input id="pregnantUnreported" name="isPregnant" value="unreported" type="radio"> Unreported
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group col-lg-4 femaleSection" style="display:none;">
+                                    <label class="control-label">Is Patient Breastfeeding</label><br>
+                                    <input id="breastfeedingYes" name="isBreastfeeding" value="yes" type="radio"> Yes&nbsp;&nbsp;
+                                    <input id="breastfeedingNo" name="isBreastfeeding" value="no" type="radio"> No&nbsp;&nbsp;
+                                    <input id="breastfeedingUnreported" name="isBreastfeeding" value="unreported" type="radio"> Unreported
+                                </div>
                             </div>
                         </div>
-                        <div class="col-md-12">
-                            <div class="form-group col-lg-4 femaleSection" style="display:none;">
-                                <label class="control-label">Is Patient Breastfeeding</label><br>
-                                <input id="breastfeedingYes" name="isBreastfeeding" value="yes" type="radio"> Yes&nbsp;&nbsp;
-                                <input id="breastfeedingNo" name="isBreastfeeding" value="no" type="radio"> No&nbsp;&nbsp;
-                                <input id="breastfeedingUnreported" name="isBreastfeeding" value="unreported" type="radio"> Unreported
-                            </div>
-                            <div class="form-group col-lg-4" style="margin-top:10px;">
-                                <a href="javascript:void(0);" class="btn btn-primary btn-sm"  onclick="searchData();getTestedSampleResult();">Submit</a>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group col-lg-12" style="text-align:center;margin-top:10px;">
+                                    <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="resetEverything();">Reset</a>&nbsp;&nbsp;
+                                    <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="searchClinicData();">Search</a>
+                                </div>
                             </div>
                         </div>
-                        </div>
-                    </div>
+                    </form>
+                    <hr style="background: #000 !important;border-color:#ccc;">
                     <div class="row">
                         <div class="col-md-6 col-sm-6">
                             <div class="portlet box blue">
@@ -318,6 +312,7 @@ foreach($sampleType as $samples){
                 getAllFunction();
      
     });
+    
     function getAllFunction(){
         $.blockUI.defaults.css.border = '1px solid grey'; 
         $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
@@ -332,7 +327,7 @@ foreach($sampleType as $samples){
         testResul();
         fnShowHide();
     }
-    
+
     function testResul(){
         oTable = $('#testResults').DataTable( {
             "bProcessing": true,
@@ -404,16 +399,24 @@ foreach($sampleType as $samples){
         });
     }
     
-    function searchData(){
+    function searchClinicData(){
         //alert($('#sampleCollectionDate').val());
         $.blockUI.defaults.css.border = '1px solid grey'; 
         $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);    
         oTable.draw();
         getOverAllViralLoad();
         overAllViralLoad();
+        getTestedSampleResult();
         getAllTestReason();
     }
 
+    function resetEverything(){
+        $("#clinicId").select2("val","");
+        $('#pageFilter')[0].reset();
+        searchClinicData();
+        fnShowHide();
+    }
+    
     function searchTestResultData(){
       $.blockUI.defaults.css.border = '1px solid grey';
       $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
