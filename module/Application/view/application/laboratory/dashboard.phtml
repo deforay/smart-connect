@@ -6,8 +6,6 @@ $endMonth = date('m');
 
 $startDate = date('Y-m', strtotime('+1 month', strtotime('-1 year')));
 $endDate=date('Y-m');
-
-
 ?>
 <style>
     .bluebox, .dashboard-stat2{
@@ -154,35 +152,39 @@ foreach($sampleType as $samples){
                     
                     <!-- END PAGE TITLE-->
                     <!-- END PAGE HEADER-->
-                    <div class="row" style="padding-top:10px;padding-bottom:20px;">
-                        <div class="col-lg-6">
-                            <select name="labName[]" id="labName" class="form-control" multiple title="Please select one or more labs. Leave blank for All">
-                                <?php
-                                foreach($labName as $lab){
-                                    ?>
-                                    <option data-name="<?php echo $lab['facility_name']; ?>" value="<?php echo $lab['facility_id']; ?>"><?php echo $lab['facility_code']." - ".$lab['facility_name'];?></option>
+                    <form id="pageFilter" action="#" method="">
+                        <div class="row" style="padding-top:10px;padding-bottom:20px;">
+                            <div class="col-lg-6">
+                                <select name="labName[]" id="labName" class="form-control" multiple title="Please select one or more labs. Leave blank for All">
                                     <?php
-                                }
-                                ?>
-                                
-                            </select>
-                        </div>
-                        <div class="col-lg-3">
-                            <div id="sla-data-range" class="mrp-container form-control">
-                                <span class="mrp-icon"><i class="fa fa-calendar"></i> &nbsp;</span>
-                                <div class="mrp-monthdisplay ">
-                                  <span class="mrp-lowerMonth"><?php echo date('M', strtotime('+1 month', strtotime('-1 year')));; ?> <?php echo $startYear; ?></span>
-                                  <span class="mrp-to"> to </span>
-                                  <span class="mrp-upperMonth"><?php echo date('M'); ?> <?php echo date('Y'); ?></span>
-                                </div>
-                              <input type="hidden" value="<?php echo $startDate; ?>" id="mrp-lowerDate" onchange=""/>
-                              <input type="hidden" value="<?php echo $endDate; ?>" id="mrp-upperDate" />
+                                    foreach($labName as $lab){
+                                        ?>
+                                        <option data-name="<?php echo $lab['facility_name']; ?>" value="<?php echo $lab['facility_id']; ?>"><?php echo $lab['facility_code']." - ".$lab['facility_name'];?></option>
+                                        <?php
+                                    }
+                                    ?>
+                                    
+                                </select>
                             </div>
-                        </div>                        
-                        <div class="col-lg-1">
-                            <a href="javascript:void(0);" class="btn btn-info btn-sm" onclick="getEverything();">Submit</a>
+                            <div class="col-lg-3">
+                                <div id="sla-data-range" class="mrp-container form-control">
+                                    <span class="mrp-icon"><i class="fa fa-calendar"></i> &nbsp;</span>
+                                    <div class="mrp-monthdisplay ">
+                                      <span class="mrp-lowerMonth"><?php echo date('M', strtotime('+1 month', strtotime('-1 year')));; ?> <?php echo $startYear; ?></span>
+                                      <span class="mrp-to"> to </span>
+                                      <span class="mrp-upperMonth"><?php echo date('M'); ?> <?php echo date('Y'); ?></span>
+                                    </div>
+                                  <input type="hidden" value="<?php echo $startDate; ?>" id="mrp-lowerDate" onchange=""/>
+                                  <input type="hidden" value="<?php echo $endDate; ?>" id="mrp-upperDate" />
+                                </div>
+                            </div>                        
+                            <div class="col-lg-3">
+                                <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="resetEverything();">Reset</a>&nbsp;&nbsp;
+                                <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="getEverything();">Search</a>
+                            </div>
                         </div>
-                    </div>
+                    </form>
+                    <hr style="background: #000 !important;border-color:#ccc;">
                     <div class="row">
                         <div id="sampleResultDetails"></div>
                     </div>
@@ -559,7 +561,11 @@ foreach($sampleType as $samples){
             lineOfTreatment();
             vlOutComePiechart();
         }
-            
+           
+        function resetEverything(){
+           $("#labName").select2("val","");
+           getEverything();
+        }
 var MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
 $(function () {
