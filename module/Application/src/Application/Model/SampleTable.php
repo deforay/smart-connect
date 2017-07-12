@@ -59,19 +59,26 @@ class SampleTable extends AbstractTableGateway {
                                 ->columns(
                                           array("Total Samples" => new Expression('COUNT(*)'),
                                           "Gender Missing" => new Expression("SUM(CASE 
-                                                                                    WHEN patient_gender IS NULL OR patient_gender ='' THEN 0
-                                                                                    ELSE 1
+                                                                                    WHEN (patient_gender IS NULL OR patient_gender ='' OR patient_gender ='unreported') THEN 1
+                                                                                    ELSE 0
                                                                                     END)"),
                                           "Age Missing" => new Expression("SUM(CASE 
-                                                                                WHEN patient_age_in_years IS NULL OR patient_age_in_years ='' THEN 0
-                                                                                ELSE 1
+                                                                                WHEN patient_age_in_years IS NULL OR patient_age_in_years ='' THEN 1
+                                                                                ELSE 0
                                                                                 END)"),
-                                          "Results Awaited (> $samplesWaitingFromLastXMonths months)" => new Expression("SUM(CASE
-                                                                                    WHEN (result is NULL OR result ='') AND (sample_collection_date > DATE_SUB(NOW(), INTERVAL $samplesWaitingFromLastXMonths MONTH) AND (reason_for_sample_rejection is NULL or reason_for_sample_rejection ='')) THEN 1
+                                          "No Sample Collection Date" => new Expression("SUM(CASE
+                                                                                    WHEN ((vl.sample_collection_date is null OR vl.sample_collection_date = '' OR DATE(vl.sample_collection_date) ='1970-01-01' OR DATE(vl.sample_collection_date) ='0000-00-00')) THEN 1
                                                                                     ELSE 0
-                                                                                    END)")
+                                                                                    END)"),
+                                         "Results Awaited (> $samplesWaitingFromLastXMonths months)" => new Expression("SUM(CASE
+                                                                                                                                WHEN (result is NULL OR result ='') AND (sample_collection_date > DATE_SUB(NOW(), INTERVAL $samplesWaitingFromLastXMonths MONTH) AND (reason_for_sample_rejection is NULL or reason_for_sample_rejection ='')) THEN 1
+                                                                                                                                ELSE 0
+                                                                                                                                END)")
                                           )
                                         );
+            
+            
+        //$query = $query->where("(vl.sample_collection_date is not null AND vl.sample_collection_date != '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')");
         if(isset($params['facilityId']) && is_array($params['facilityId']) && count($params['facilityId']) >0){
             $query = $query->where('vl.lab_id IN ("' . implode('", "', $params['facilityId']) . '")');
         }else{
@@ -284,16 +291,16 @@ class SampleTable extends AbstractTableGateway {
                                                     "total" => new Expression('COUNT(*)'),
                                                     "monthDate" => new Expression("DATE_FORMAT(DATE(sample_collection_date), '%b-%Y')"),
                                                     
-                                                    "MGreaterThan1000" => new Expression("SUM(CASE WHEN (vl.result>=1000 and vl.patient_gender in('m','M')) THEN 1 ELSE 0 END)"),
-                                                    "MLesserThan1000" => new Expression("SUM(CASE WHEN ((vl.result<1000 or vl.result='Target Not Detected') and vl.patient_gender in('m','M')) THEN 1 ELSE 0 END)"),
+                                                    "MGreaterThan1000" => new Expression("SUM(CASE WHEN (vl.patient_gender is not null and vl.patient_gender !='unreported' and vl.result>=1000 and vl.patient_gender in('m','M')) THEN 1 ELSE 0 END)"),
+                                                    "MLesserThan1000" => new Expression("SUM(CASE WHEN (vl.patient_gender is not null and vl.patient_gender !='unreported'  and (vl.result<1000 or vl.result='Target Not Detected') and vl.patient_gender in('m','M')) THEN 1 ELSE 0 END)"),
                                                     //"MTND" => new Expression("SUM(CASE WHEN (vl.result='Target Not Detected' and vl.patient_gender in('m','M')) THEN 1 ELSE 0 END)"),
                                              
-                                                    "FGreaterThan1000" => new Expression("SUM(CASE WHEN vl.result>=1000 and vl.patient_gender in('f','F') THEN 1 ELSE 0 END)"),
-                                                    "FLesserThan1000" => new Expression("SUM(CASE WHEN (vl.result<1000 or vl.result='Target Not Detected') and vl.patient_gender in('f','F') THEN 1 ELSE 0 END)"),
+                                                    "FGreaterThan1000" => new Expression("SUM(CASE WHEN vl.patient_gender is not null and vl.patient_gender !='unreported'  and vl.result>=1000 and vl.patient_gender in('f','F') THEN 1 ELSE 0 END)"),
+                                                    "FLesserThan1000" => new Expression("SUM(CASE WHEN vl.patient_gender is not null and vl.patient_gender !='unreported'  and (vl.result<1000 or vl.result='Target Not Detected') and vl.patient_gender in('f','F') THEN 1 ELSE 0 END)"),
                                                     //"FTND" => new Expression("SUM(CASE WHEN vl.result='Target Not Detected' and vl.patient_gender in('f','F') THEN 1 ELSE 0 END)"),
 
-                                                    "OGreaterThan1000" => new Expression("SUM(CASE WHEN (vl.result>=1000 and vl.patient_gender NOT in('m','M','f','F')) THEN 1 ELSE 0 END)"),
-                                                    "OLesserThan1000" => new Expression("SUM(CASE WHEN ((vl.result<1000 or vl.result='Target Not Detected') and vl.patient_gender NOT in('m','M','f','F')) THEN 1 ELSE 0 END)"),
+                                                    "OGreaterThan1000" => new Expression("SUM(CASE WHEN (vl.patient_gender is not null and vl.patient_gender !='unreported'  and vl.result>=1000 and vl.patient_gender NOT in('m','M','f','F')) THEN 1 ELSE 0 END)"),
+                                                    "OLesserThan1000" => new Expression("SUM(CASE WHEN (vl.patient_gender is not null and vl.patient_gender !='unreported'  and (vl.result<1000 or vl.result='Target Not Detected') and vl.patient_gender NOT in('m','M','f','F')) THEN 1 ELSE 0 END)"),
                                                     //"OTND" => new Expression("SUM(CASE WHEN (vl.result='Target Not Detected' and vl.patient_gender NOT in('m','M','f','F')) THEN 1 ELSE 0 END)"),
                                              
                                               )
@@ -307,7 +314,7 @@ class SampleTable extends AbstractTableGateway {
                 }
             }
             $queryStr = $queryStr->where("
-                        (sample_collection_date is not null AND sample_collection_date != '')
+                        (vl.sample_collection_date is not null AND vl.sample_collection_date != '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')
                         AND DATE(sample_collection_date) >= '".$startMonth."-00' 
                         AND DATE(sample_collection_date) <= '".$endMonth."-00' ");
                 
