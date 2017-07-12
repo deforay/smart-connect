@@ -374,8 +374,7 @@ class SampleService {
     }
     
     //get all Hub Name
-    public function getAllHubName()
-    {
+    public function getAllHubName(){
         $facilityDb = $this->sm->get('FacilityTable');
         return $facilityDb->fetchAllHubName();
     }
@@ -587,6 +586,10 @@ class SampleService {
     public function generateSampleResultExcel($params){
         $queryContainer = new Container('query');
         $common = new CommonService();
+        if(trim($params['fromDate'])!= '' && trim($params['toDate'])!= ''){
+            $startMonth = date("Y-m", strtotime(trim($params['fromDate'])))."-01";
+            $endMonth = date("Y-m", strtotime(trim($params['toDate'])))."-31";
+        }
         if(isset($queryContainer->sampleResultQuery)){
             try{
                 $dbAdapter = $this->sm->get('Zend\Db\Adapter\Adapter');
@@ -643,6 +646,29 @@ class SampleService {
                             $countQuery = $countQuery->where("(vl.result IS NULL OR vl.result = 'NULL' OR vl.result = '')");
                         }else if(isset($params['sampleStatus']) && $params['sampleStatus'] == 'sample_rejected') {
                             $countQuery = $countQuery->where("vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0");
+                        }
+                        if(isset($params['isPregnant']) && $params['isPregnant']=='yes'){
+                            $countQuery = $countQuery->where("vl.is_patient_pregnant = 'yes'");
+                        }else if(isset($params['isPregnant']) && $params['isPregnant']=='no'){
+                            $countQuery = $countQuery->where("vl.is_patient_pregnant = 'no'"); 
+                        }else if(isset($params['isPregnant']) && $params['isPregnant']=='unreported'){
+                            $countQuery = $countQuery->where("(vl.is_patient_pregnant IS NULL OR vl.is_patient_pregnant = '' OR vl.is_patient_pregnant = 'Unreported')"); 
+                        }
+                        if(isset($params['isBreastfeeding']) && $params['isBreastfeeding']=='yes'){
+                            $countQuery = $countQuery->where("vl.is_patient_breastfeeding = 'yes'");
+                        }else if(isset($params['isBreastfeeding']) && $params['isBreastfeeding']=='no'){
+                            $countQuery = $countQuery->where("vl.is_patient_breastfeeding = 'no'"); 
+                        }else if(isset($params['isBreastfeeding']) && $params['isBreastfeeding']=='unreported'){
+                            $countQuery = $countQuery->where("(vl.is_patient_breastfeeding IS NULL OR vl.is_patient_breastfeeding = '' OR vl.is_patient_breastfeeding = 'Unreported')"); 
+                        }
+                        if(isset($params['lineOfTreatment']) && $params['lineOfTreatment']=='1'){
+                            $countQuery = $countQuery->where("vl.line_of_treatment = '1'");
+                        }else if(isset($params['lineOfTreatment']) && $params['lineOfTreatment']=='2'){
+                            $countQuery = $countQuery->where("vl.line_of_treatment = '2'"); 
+                        }else if(isset($params['lineOfTreatment']) && $params['lineOfTreatment']=='3'){
+                            $countQuery = $countQuery->where("vl.line_of_treatment = '3'"); 
+                        }else if(isset($params['lineOfTreatment']) && $params['lineOfTreatment']=='not_specified'){
+                            $countQuery = $countQuery->where("(vl.line_of_treatment IS NULL OR vl.line_of_treatment = '' OR vl.line_of_treatment = '0')");
                         }
                         $cQueryStr = $sql->getSqlStringForSqlObject($countQuery);
                         $lessResult = $dbAdapter->query($cQueryStr." AND vl.result < 1000", $dbAdapter::QUERY_MODE_EXECUTE)->current();

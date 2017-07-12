@@ -61,7 +61,6 @@ if(isset($labFilter) && trim($labFilter)!= ''){
                             <div class="form-group col-lg-4">
                                 <label class="control-label">Date Range&nbsp;</label>
                               <div id="sla-data-range" class="btn btn-sm form-control col-lg-6 mrp-container ">
-                                
                                 <span class="mrp-icon"><i class="fa fa-calendar"></i> &nbsp;</span>
                                 <div class="mrp-monthdisplay ">
                                   <span class="mrp-lowerMonth"><?php echo $startDisplayDate; ?></span>
@@ -213,7 +212,6 @@ if(isset($labFilter) && trim($labFilter)!= ''){
     function generatePieContainer(){
         $.blockUI.defaults.css.border = '1px solid grey';
         $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
-        searchGender = '<?php echo $searchGender ?>';
         fromDate = $('#mrp-lowerDate').val();
         toDate = $('#mrp-upperDate').val();
         lab = $("#labName").val();

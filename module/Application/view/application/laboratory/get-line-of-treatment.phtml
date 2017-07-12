@@ -1,8 +1,5 @@
-
-
 <script>
-       
-        $('#labDashLineOfTreatmentPie').highcharts({
+       $('#labDashLineOfTreatmentPie').highcharts({
         chart: {
             plotBackgroundColor: null,
             plotBorderWidth: null,
@@ -37,14 +34,24 @@
         },
         plotOptions: {
             pie: {
-                                dataLabels: {
+              allowPointSelect: true,
+              cursor: 'pointer',
+              dataLabels: {
                 distance: -30
               },
-                showInLegend: true
+              showInLegend: true
             }
         },
         series: [{
             name: 'Labs',
+            point: {
+              events: {
+                  click: function(e) {
+                     doLineofTreatmentRedirect(this.name);
+                     e.preventDefault();
+                  }
+              }
+            },
             colorByPoint: true,
             data: [<?php
             if(count($result)>0 && $result!=''){

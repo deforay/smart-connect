@@ -35,6 +35,8 @@
         },
         plotOptions: {
             pie: {
+                allowPointSelect: true,
+                cursor: 'pointer',
                 dataLabels: {
                 distance: -30
               },
@@ -43,6 +45,14 @@
         },
         series: [{
             name: 'Labs',
+            point: {
+              events: {
+                  click: function(e) {
+                     doFemalePatientRedirect(this.name);
+                     e.preventDefault();
+                  }
+              }
+            },
             colorByPoint: true,
             data: [<?php
             if(count($result)>0 && $result!=''){

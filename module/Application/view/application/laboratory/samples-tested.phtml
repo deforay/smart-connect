@@ -148,8 +148,8 @@ if(isset($labFilter) && trim($labFilter)!= ''){
                                 <label class="control-label">Test Result&nbsp;</label>
                                 <select class="form-control" name="testResult" id="testResult" title="Please choose result">
                                 <option value="">All</option>
-                                <option value=">=1000" <?php echo((isset($searchRange) && $searchRange=='>=1000') ? "selected='selected'" : "") ?>>>= 1000 cp/mL</option>
-                                <option value="<1000" <?php echo((isset($searchRange) && $searchRange=='<1000') ? "selected='selected'" : "") ?>>< 1000 cp/mL</option>
+                                <option value=">=1000" <?php echo((isset($result) && $result=='Not Suppressed') ? "selected='selected'" : "") ?>>>= 1000 cp/mL</option>
+                                <option value="<1000" <?php echo((isset($result) && $result=='Suppressed') ? "selected='selected'" : "") ?>>< 1000 cp/mL</option>
                               </select>
                             </div>
                         </div>
@@ -189,25 +189,35 @@ if(isset($labFilter) && trim($labFilter)!= ''){
                         <div class="col-md-12">
                             <div class="form-group col-lg-4 femaleSection" style="display:<?php echo (isset($searchGender) && $searchGender == 'F')?'':'none'; ?>;">
                                 <label class="control-label">Is Patient Pregnant</label><br>
-                                <input id="pregnantYes" name="isPregnant" value="yes" type="radio"> Yes&nbsp;&nbsp;
-                                <input id="pregnantNo" name="isPregnant" value="no" type="radio"> No&nbsp;&nbsp;
-                                <input id="pregnantUnreported" name="isPregnant" value="unreported" type="radio"> Unreported
+                                <input id="pregnantYes" name="isPregnant" value="yes" type="radio" <?php echo(isset($femaleFilter) && $femaleFilter == 'P')?'checked="checked"':''; ?>> Yes&nbsp;&nbsp;
+                                <input id="pregnantNo" name="isPregnant" value="no" type="radio" <?php echo(isset($femaleFilter) && $femaleFilter == 'NP')?'checked="checked"':''; ?>> No&nbsp;&nbsp;
+                                <input id="pregnantUnreported" name="isPregnant" value="unreported" type="radio" <?php echo(isset($femaleFilter) && $femaleFilter == 'PU')?'checked="checked"':''; ?>> Unreported
                             </div>
                             <div class="form-group col-lg-4 femaleSection" style="display:<?php echo (isset($searchGender) && $searchGender == 'F')?'':'none'; ?>;">
                                 <label class="control-label">Is Patient Breastfeeding</label><br>
-                                <input id="breastfeedingYes" name="isBreastfeeding" value="yes" type="radio"> Yes&nbsp;&nbsp;
-                                <input id="breastfeedingNo" name="isBreastfeeding" value="no" type="radio"> No&nbsp;&nbsp;
-                                <input id="breastfeedingUnreported" name="isBreastfeeding" value="unreported" type="radio"> Unreported
+                                <input id="breastfeedingYes" name="isBreastfeeding" value="yes" type="radio" <?php echo(isset($femaleFilter) && $femaleFilter == 'BF')?'checked="checked"':''; ?>> Yes&nbsp;&nbsp;
+                                <input id="breastfeedingNo" name="isBreastfeeding" value="no" type="radio" <?php echo(isset($femaleFilter) && $femaleFilter == 'NBF')?'checked="checked"':''; ?>> No&nbsp;&nbsp;
+                                <input id="breastfeedingUnreported" name="isBreastfeeding" value="unreported" type="radio" <?php echo(isset($femaleFilter) && $femaleFilter == 'BFU')?'checked="checked"':''; ?>> Unreported
                             </div>
                             <div class="form-group col-lg-4">
-                                <a href="javascript:void(0);" class="btn btn-primary" onclick="searchSampleTestedResult()" style="margin-top:10px;">Generate</a>
+                                <label class="control-label">Line of Treatment</label>
+                                <select class="form-control" name="lineOfTreatment" id="lineOfTreatment">
+                                  <option value="">All</option>
+                                  <option value="1" <?php echo (isset($lt) && $lt == 'LOT1')?'selected="selected"':''; ?>>Line of Treatment 1</option>
+                                  <option value="2" <?php echo (isset($lt) && $lt == 'LOT2')?'selected="selected"':''; ?>>Line of Treatment 2</option>
+                                  <option value="3" <?php echo (isset($lt) && $lt == 'LOT3')?'selected="selected"':''; ?>>Line of Treatment 3</option>
+                                  <option value="not_specified" <?php echo (isset($lt) && $lt == 'NS')?'selected="selected"':''; ?>>Not Specified</option>
+                                </select>
                             </div>
                         </div>
-                          </form>
+                        <div class="col-md-12">
+                           <div class="form-group col-lg-4">
+                                <a href="javascript:void(0);" class="btn btn-primary" onclick="searchSampleTestedResult()" style="margin-top:10px;">Generate</a>
+                            </div>
+                         </div>
+                        </form>
                         </div>
                     </div>
-                    
-                    
                     <hr style="background: #000 !important;border-color:#ccc;">
                     
                     <div class="row" style="margin-bottom:30px;">
@@ -262,7 +272,6 @@ if(isset($labFilter) && trim($labFilter)!= ''){
     function generateBarContainer() {
         $.blockUI.defaults.css.border = '1px solid grey';
         $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
-        searchGender = '<?php echo $searchGender ?>';
         fromDate = $('#mrp-lowerDate').val();
         toDate = $('#mrp-upperDate').val();
         testResult = $("#testResult").val();
@@ -276,7 +285,8 @@ if(isset($labFilter) && trim($labFilter)!= ''){
         gender = $("#gender").val();
         isPregnant = $('input[name="isPregnant"]:checked').val();
         isBreastfeeding = $('input[name="isBreastfeeding"]:checked').val();
-        $.post("<?php echo $this->url('laboratory', array('action' => 'get-bar-sample-details')); ?>",{testResult:testResult,fromDate:fromDate,toDate:toDate,gender:searchGender,lab:lab,clinicId:clinicId,sampleType:sampleType,currentRegimen:currentRegimen,adherence:adherence,age:age,sampleStatus:sampleStatus,gender:gender,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding},
+        lineOfTreatment = $("#lineOfTreatment").val();
+        $.post("<?php echo $this->url('laboratory', array('action' => 'get-bar-sample-details')); ?>",{testResult:testResult,fromDate:fromDate,toDate:toDate,lab:lab,clinicId:clinicId,sampleType:sampleType,currentRegimen:currentRegimen,adherence:adherence,age:age,sampleStatus:sampleStatus,gender:gender,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding,lineOfTreatment:lineOfTreatment},
         function(data) {
             $("#barcontainer").html(data);
         });
@@ -285,7 +295,6 @@ if(isset($labFilter) && trim($labFilter)!= ''){
     function generatePieContainer(){
         $.blockUI.defaults.css.border = '1px solid grey';
         $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
-        searchGender = '<?php echo $searchGender ?>';
         fromDate = $('#mrp-lowerDate').val();
         toDate = $('#mrp-upperDate').val();
         testResult = $("#testResult").val();
@@ -299,7 +308,8 @@ if(isset($labFilter) && trim($labFilter)!= ''){
         gender = $("#gender").val();
         isPregnant = $('input[name="isPregnant"]:checked').val();
         isBreastfeeding = $('input[name="isBreastfeeding"]:checked').val();
-        $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-details')); ?>",{testResult:testResult,fromDate:fromDate,toDate:toDate,gender:searchGender,lab:lab,clinicId:clinicId,sampleType:sampleType,currentRegimen:currentRegimen,adherence:adherence,age:age,sampleStatus:sampleStatus,gender:gender,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding},
+        lineOfTreatment = $("#lineOfTreatment").val();
+        $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-details')); ?>",{testResult:testResult,fromDate:fromDate,toDate:toDate,lab:lab,clinicId:clinicId,sampleType:sampleType,currentRegimen:currentRegimen,adherence:adherence,age:age,sampleStatus:sampleStatus,gender:gender,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding,lineOfTreatment:lineOfTreatment},
         function(data) {
             $("#piecontainer").html(data);
         });
@@ -367,6 +377,7 @@ function loadSampleDataTable(){
             aoData.push({"name": "gender", "value": $('#gender').val()});
             aoData.push({"name": "isPregnant", "value": $('input[name="isPregnant"]:checked').val()});
             aoData.push({"name": "isBreastfeeding", "value": $('input[name="isBreastfeeding"]:checked').val()});
+            aoData.push({"name": "lineOfTreatment", "value": $("#lineOfTreatment").val()});
             $.ajax({
                 "dataType": 'json',
                 "type": "POST",
@@ -629,8 +640,10 @@ $(function () {
 
 function exportSampleResult(){
     $.blockUI.defaults.css.border = '1px solid grey';
-    $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI); 
-    $.post("<?php echo $this->url('laboratory', array('action' => 'export-sample-result-excel')); ?>", {fromDate:$('#mrp-lowerDate').val(),toDate:$('#mrp-upperDate').val(),clinicId:$('#clinicId').val(),sampleType:$('#sampleType').val(),currentRegimen:$('#currentRegimen').val(),adherence:$('#adherence').val(),age:$('#age').val(),testResult:$('#testResult').val(),sampleStatus:$('#sampleStatus').val()},
+    $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
+    isPregnant = $('input[name="isPregnant"]:checked').val();
+    isBreastfeeding = $('input[name="isBreastfeeding"]:checked').val();
+    $.post("<?php echo $this->url('laboratory', array('action' => 'export-sample-result-excel')); ?>", {fromDate:$('#mrp-lowerDate').val(),toDate:$('#mrp-upperDate').val(),clinicId:$('#clinicId').val(),sampleType:$('#sampleType').val(),currentRegimen:$('#currentRegimen').val(),adherence:$('#adherence').val(),age:$('#age').val(),testResult:$('#testResult').val(),sampleStatus:$('#sampleStatus').val(),isPregnant:isPregnant,isBreastfeeding:isBreastfeeding,lineOfTreatment:$("#lineOfTreatment").val()},
      function(data){
          if(data == "" || data == null || data == undefined){
              alert('Unable to export result excel');

@@ -51,6 +51,9 @@ class LaboratoryController extends AbstractActionController
         $fromMonth="";
         $toMonth="";
         $labFilter="";
+        $femaleFilter="";
+        $lt="";
+        $result="";
         if($this->params()->fromQuery('gender')){
             $gender=$this->params()->fromQuery('gender');
         }
@@ -72,6 +75,15 @@ class LaboratoryController extends AbstractActionController
         if($this->params()->fromQuery('lab')){
             $labFilter=$this->params()->fromQuery('lab');
         }
+        if($this->params()->fromQuery('femaleFilter')){
+            $femaleFilter=$this->params()->fromQuery('femaleFilter');
+        }
+        if($this->params()->fromQuery('lt')){
+            $lt=$this->params()->fromQuery('lt');
+        }
+        if($this->params()->fromQuery('result')){
+            $result=$this->params()->fromQuery('result');
+        }
         
         $sampleService = $this->getServiceLocator()->get('SampleService');
         $labName = $sampleService->getAllLabName();
@@ -91,7 +103,10 @@ class LaboratoryController extends AbstractActionController
                 'fromMonth' => $fromMonth,
                 'toMonth' => $toMonth,
                 'labFilter' => $labFilter,
-                'age' => $age
+                'age' => $age,
+                'femaleFilter' => $femaleFilter,
+                'lt' => $lt,
+                'result' => $result
         ));
     }
     
@@ -311,7 +326,7 @@ class LaboratoryController extends AbstractActionController
         }
     }
     
-    public function samplesTestedLabAction(){  
+    public function samplesTestedLabAction(){
         $this->layout()->setVariable('activeTab', 'labs-dashboard');
         $gender="";
         $month="";

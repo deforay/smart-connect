@@ -913,4 +913,25 @@ function paintMonths(){
   function doSampleVolumeRedirect(lab){
     window.open('/labs/sample-volume?fromMonth='+$('#mrp-lowerDate').val()+'&toMonth='+$('#mrp-upperDate').val()+'&lab='+lab+'&result='+$("#sampleStatus").val(), '_blank');
   }
+  
+  function doFemalePatientRedirect(field){
+    selectedLabs = $('#labName > option:selected').map(function() {
+    return this.getAttribute('data-name');
+   }).get();
+    window.open('/labs/samples-tested?fromMonth='+$('#mrp-lowerDate').val()+'&toMonth='+$('#mrp-upperDate').val()+'&gender=F&femaleFilter='+field+'&lab='+selectedLabs, '_blank');
+  }
+  
+  function doLineofTreatmentRedirect(field){
+    selectedLabs = $('#labName > option:selected').map(function() {
+    return this.getAttribute('data-name');
+   }).get();
+    window.open('/labs/samples-tested?fromMonth='+$('#mrp-lowerDate').val()+'&toMonth='+$('#mrp-upperDate').val()+'&lt='+field+'&lab='+selectedLabs, '_blank');
+  }
+  
+  function doVLResultRedirect(fieldVal){
+    selectedLabs = $('#labName > option:selected').map(function() {
+    return this.getAttribute('data-name');
+   }).get();
+    window.open('/labs/samples-tested?fromMonth='+$('#mrp-lowerDate').val()+'&toMonth='+$('#mrp-upperDate').val()+'&result='+fieldVal+'&lab='+selectedLabs, '_blank');
+  }
 </script>

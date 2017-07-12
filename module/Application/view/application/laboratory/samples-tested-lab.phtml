@@ -247,7 +247,6 @@ if(isset($searchMonth) && trim($searchMonth)!= ''){
     function generatePieContainer(){
         $.blockUI.defaults.css.border = '1px solid grey';
         $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
-        //searchGender = '<?php echo $searchGender ?>';
         fromDate = $('#mrp-lowerDate').val();
         toDate = $('#mrp-upperDate').val();
         testResult = $("#testResult").val();
@@ -269,7 +268,6 @@ if(isset($searchMonth) && trim($searchMonth)!= ''){
     function generateBarContainer(){
         $.blockUI.defaults.css.border = '1px solid grey';
         $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
-        //searchGender = '<?php echo $searchGender ?>';
         fromDate = $('#mrp-lowerDate').val();
         toDate = $('#mrp-upperDate').val();
         testResult = $("#testResult").val();
