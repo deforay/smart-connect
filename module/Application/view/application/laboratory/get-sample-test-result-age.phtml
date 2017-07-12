@@ -1,5 +1,4 @@
 <?php
-//Zend\Debug\Debug::dump($result);die;
 $less1000 = array('>18'=>'#088738', '<18' => '#60d18f');
 $more1000 = array('>18'=>'#ff1900', '<18' => '#F2786D');
 ?>
@@ -55,7 +54,7 @@ $more1000 = array('>18'=>'#ff1900', '<18' => '#F2786D');
                 point: {
                     events: {
                         click: function (e) {
-                        window.open(e.point.url+'&month='+e.point.category, '_blank');
+                           doSampleTestedBasedonAgeRedirect(e.point.category,e.point.age);
                         }
                     }
                 }
@@ -76,7 +75,7 @@ $more1000 = array('>18'=>'#ff1900', '<18' => '#F2786D');
               name:'<?php echo $key."(".htmlspecialchars($age[$i]).")";?>',
               data:[<?php
                   foreach($condition as $count){
-                     echo '{y:'.$count.',url:"/labs/samples-tested?age='.$age[$i].'"},';
+                     echo '{y:'.$count.',age:"'.$age[$i].'"},';
                   }
               ?>],
               stack:'<?php echo $age[$i];?>',

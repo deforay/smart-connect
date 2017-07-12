@@ -160,7 +160,7 @@ foreach($sampleType as $samples){
                                 <?php
                                 foreach($labName as $lab){
                                     ?>
-                                    <option value="<?php echo $lab['facility_id']; ?>"><?php echo $lab['facility_code']." - ".$lab['facility_name'];?></option>
+                                    <option data-name="<?php echo $lab['facility_name']; ?>" value="<?php echo $lab['facility_id']; ?>"><?php echo $lab['facility_code']." - ".$lab['facility_name'];?></option>
                                     <?php
                                 }
                                 ?>
@@ -405,9 +405,9 @@ foreach($sampleType as $samples){
         }    
             
         function getSampleResult(){
+            facilityId = $("#labName").val();
             fromDate=$('#mrp-lowerDate').val();
             toDate=$('#mrp-upperDate').val();
-            facilityId = $("#labName").val();
             $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-result')); ?>",{fromDate:fromDate,toDate:toDate,facilityId:facilityId},
             function(data) {
                 $("#sampleResultDetails").html(data);
@@ -415,10 +415,10 @@ foreach($sampleType as $samples){
         }
         
         function getTestedSampleResult(){
-            sampleType = $("#sampleType").val();
+            facilityId = $("#labName").val();
             fromDate=$('#mrp-lowerDate').val();
             toDate=$('#mrp-upperDate').val();
-            facilityId = $("#labName").val();
+            sampleType = $("#sampleType").val();
             $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-test-result')); ?>",{fromDate:fromDate,toDate:toDate,sampleType:sampleType,facilityId:facilityId},
             function(data) {
                 $("#samplesTestedResult").html(data);
@@ -426,10 +426,10 @@ foreach($sampleType as $samples){
         }
         
         function getTestedSampleResultBasedVolume(){
-            sampleType = $("#sampleTypeVolume").val();
+            facilityId = $("#labName").val();
             fromDate=$('#mrp-lowerDate').val();
             toDate=$('#mrp-upperDate').val();
-            facilityId = $("#labName").val();
+            sampleType = $("#sampleTypeVolume").val();
             $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-test-result-volume')); ?>",{fromDate:fromDate,toDate:toDate,sampleType:sampleType,facilityId:facilityId},
             function(data) {
                 $("#facilitiesTestedValue").html(data);
@@ -438,9 +438,9 @@ foreach($sampleType as $samples){
         
         function getTestedSampleResultBasedGender(){
             sampleType = '';
+            facilityId = $("#labName").val();
             fromDate=$('#mrp-lowerDate').val();
             toDate=$('#mrp-upperDate').val();
-            facilityId = $("#labName").val();
             $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-test-result-gender')); ?>",{fromDate:fromDate,toDate:toDate,sampleType:sampleType,facilityId:facilityId},
             function(data) {
                 $("#samplesTestedResultGender").html(data);
@@ -449,9 +449,9 @@ foreach($sampleType as $samples){
         
         function getTestedSampleResultBasedAge(){
             sampleType = '';
+            facilityId = $("#labName").val();
             fromDate=$('#mrp-lowerDate').val();
             toDate=$('#mrp-upperDate').val();
-            facilityId = $("#labName").val();
             $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-test-result-age')); ?>",{fromDate:fromDate,toDate:toDate,sampleType:sampleType,facilityId:facilityId},
             function(data) {
                 $("#samplesTestedResultAge").html(data);
@@ -459,9 +459,9 @@ foreach($sampleType as $samples){
         }
         
         function getRequisitionFormsTested(){
+            facilityId = $("#labName").val();
             fromDate=$('#mrp-lowerDate').val();
             toDate=$('#mrp-upperDate').val();
-            facilityId = $("#labName").val();
             $.post("<?php echo $this->url('laboratory', array('action' => 'get-requisition-forms')); ?>",{fromDate:fromDate,toDate:toDate,facilityId:facilityId},
             function(data) {
                 $("#labDashReqFormBar").html(data);
@@ -511,19 +511,19 @@ foreach($sampleType as $samples){
         }
         
         function getAverageLabTAT(){
+            facilityId = $("#labName").val();
             fromDate=$('#mrp-lowerDate').val();
             toDate=$('#mrp-upperDate').val();
-            facilityId = $("#labName").val();
-            $.post("<?php echo $this->url('laboratory', array('action' => 'get-lab-turn-around-time')); ?>",{fromDate:fromDate,toDate:toDate,facilityId:facilityId,labSelectedText:$("#labName option:selected").text()},
+            $.post("<?php echo $this->url('laboratory', array('action' => 'get-lab-turn-around-time')); ?>",{fromDate:fromDate,toDate:toDate,facilityId:facilityId},
             function(data) {
                 $("#labAverageTat").html(data);
             });
         }
         
         function getLabFacilities(){
+            facilityId = $("#labName").val();
             fromDate=$('#mrp-lowerDate').val();
             toDate=$('#mrp-upperDate').val();
-            facilityId = $("#labName").val();
             $.post("<?php echo $this->url('laboratory', array('action' => 'get-lab-facilities')); ?>",{fromDate:fromDate,toDate:toDate,facilityId:facilityId,width:'600px;'},
             function(data) {
                 $("#gmap-polyline-data").html(data);
@@ -875,11 +875,42 @@ function paintMonths(){
     return Math.round(((val)+ 0.00001) * 100) / 100;
   }
   
-  function doRedirect(lab){
-    window.open('/labs/sample-volume?fromMonth='+$('#mrp-lowerDate').val()+'&toMonth='+$('#mrp-upperDate').val()+'&lab='+lab+'&result='+$("#sampleStatus").val(), '_blank');
+  function doSampleTestedRedirect(month){
+    selectedLabs = $('#labName > option:selected').map(function() {
+    return this.getAttribute('data-name');
+   }).get();
+    window.open('/labs/samples-tested?month='+month+'&lab='+selectedLabs, '_blank');
   }
   
-  function doRequisitionRedirect(month){
-    window.open('/labs/requisition-forms-incomplete?month='+month+'&lab='+$('#labName').val(), '_blank');
+  function doSampleTestedBasedonGenderRedirect(month,gender){
+    selectedLabs = $('#labName > option:selected').map(function() {
+    return this.getAttribute('data-name');
+   }).get();
+    window.open('/labs/samples-tested?month='+month+'&gender='+gender+'&lab='+selectedLabs, '_blank');
+  }
+  
+  function doSampleTestedBasedonAgeRedirect(month,age){
+    selectedLabs = $('#labName > option:selected').map(function() {
+    return this.getAttribute('data-name');
+   }).get();
+    window.open('/labs/samples-tested?month='+month+'&age='+age+'&lab='+selectedLabs, '_blank');
+  }
+  
+  function doLabTATRedirect(month){
+    selectedLabs = $('#labName > option:selected').map(function() {
+    return this.getAttribute('data-name');
+   }).get();
+    window.open('/labs/get-sample-tested-turn-around-time?month='+month+'&lab='+selectedLabs, '_blank');
+  }
+  
+  function doRequisitionFormRedirect(month){
+    selectedLabs = $('#labName > option:selected').map(function() {
+    return this.getAttribute('data-name');
+   }).get();
+    window.open('/labs/requisition-forms-incomplete?month='+month+'&lab='+selectedLabs, '_blank');
+  }
+  
+  function doSampleVolumeRedirect(lab){
+    window.open('/labs/sample-volume?fromMonth='+$('#mrp-lowerDate').val()+'&toMonth='+$('#mrp-upperDate').val()+'&lab='+lab+'&result='+$("#sampleStatus").val(), '_blank');
   }
 </script>

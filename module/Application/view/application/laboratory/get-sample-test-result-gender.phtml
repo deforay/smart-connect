@@ -55,7 +55,7 @@ $more1000 = array('M'=>'#ff1900', 'F' => '#F2786D', 'Not Specified' => '#8C1308'
                 point: {
                     events: {
                         click: function (e) {
-                            window.open(e.point.url+'&month='+e.point.category, '_blank');
+                            doSampleTestedBasedonGenderRedirect(e.point.category,e.point.gender);
                         }
                     }
                 }
@@ -76,7 +76,7 @@ $more1000 = array('M'=>'#ff1900', 'F' => '#F2786D', 'Not Specified' => '#8C1308'
               name:'<?php echo $key."(".$gender[$i].")";?>',
               data:[<?php
                   foreach($condition as $count){
-                      echo '{y:'.$count.',url:"/labs/samples-tested?gender='.$gender[$i].'"},';
+                      echo '{y:'.$count.',gender:"'.$gender[$i].'"},';
                   }
               ?>],
               stack:'<?php echo $gender[$i];?>',

@@ -50,8 +50,6 @@
                                                 <div class="col-md-6">
                                                     <select class="form-control" name="type" id="type">
                                                         <option value="">--Select--</option>
-
-                                                        
                                                         <?php foreach($orgTypes as $ot) { ?>
                                                         <option value="<?php echo $ot['id'] ?>"  <?php echo ($org['org_type'] == $ot['id'] ? " selected='selected' " : ""); ?>><?php echo $ot['type'] ?></option>
                                                         <?php } ?>                                                        

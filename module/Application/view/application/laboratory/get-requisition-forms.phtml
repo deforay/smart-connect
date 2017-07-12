@@ -1,6 +1,4 @@
-
 <script>
-
 $('#labDashReqFormBar').highcharts({
         chart: {
             type: 'column'
@@ -63,7 +61,7 @@ $('#labDashReqFormBar').highcharts({
                 point: {
                     events: {
                         click: function (e) {
-                            doRequisitionRedirect(e.point.category);
+                            doRequisitionFormRedirect(e.point.category);
                         }
                     }
                 },

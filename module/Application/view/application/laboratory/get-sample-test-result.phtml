@@ -1,6 +1,3 @@
-<?php
-//\Zend\Debug\Debug::dump($result);die;
-?>
 <div id="samplesTestedVsSupressed"></div>
 
 <script>
@@ -54,7 +51,7 @@
                 point: {
                     events: {
                         click: function (e) {
-                        window.open(e.point.url+'month='+e.point.category, '_blank');
+                            doSampleTestedRedirect(e.point.category);
                         }
                     }
                 }
@@ -63,17 +60,17 @@
         series: [<?php
               foreach($result['sampleName'] as $key=>$condition){
               if($key!='VL Not Detected'){
-              $range = substr($key,4,6);
-              $range = preg_replace('/\s+/', '', $range);
+                $range = substr($key,4,6);
+                $range = preg_replace('/\s+/', '', $range);
               }else{
-              $range = 'nd';
+                $range = 'nd';
               }
               ?>
               {
               name:'<?php echo $key;?>',
               data:[<?php
                   foreach($condition as $count){
-                     echo '{y:'.$count.',url:"/labs/samples-tested?"},';
+                     echo '{y:'.$count.'},';
                   }
               ?>],
               },

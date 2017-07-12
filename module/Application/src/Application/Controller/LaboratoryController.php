@@ -244,13 +244,8 @@ class LaboratoryController extends AbstractActionController
             $sampleService = $this->getServiceLocator()->get('SampleService');
             $sampleType = $sampleService->getSampleType();
             $result = $sampleService->getLabTurnAroundTime($params);
-            $labName = '';
-            if($params['labSelectedText']!='' && $params['labSelectedText']!='-- All Labs --'){
-                $lab = explode(" - ",$params['labSelectedText']);
-                $labName = $lab[0];
-            }
             $viewModel = new ViewModel();
-            $viewModel->setVariables(array('result' => $result,'sampleType'=>$sampleType,'labName'=>$labName))
+            $viewModel->setVariables(array('result' => $result,'sampleType'=>$sampleType))
                         ->setTerminal(true);
             return $viewModel;
         }
@@ -316,8 +311,7 @@ class LaboratoryController extends AbstractActionController
         }
     }
     
-    public function samplesTestedLabAction()
-    {   
+    public function samplesTestedLabAction(){  
         $this->layout()->setVariable('activeTab', 'labs-dashboard');
         $gender="";
         $month="";

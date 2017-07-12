@@ -51,8 +51,7 @@
                 point: {
                     events: {
                         click: function (e) {
-                        labName = '<?php echo $labName;?>';
-                        window.open('/labs/get-sample-tested-turn-around-time?month='+e.point.category+'&lab='+labName, '_blank');
+                          doLabTATRedirect(e.point.category);
                         }
                     }
                 }
