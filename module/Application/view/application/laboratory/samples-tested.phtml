@@ -70,9 +70,8 @@ if(isset($searchMonth) && trim($searchMonth)!= ''){
                         </div>                                
                         <div class="col-md-12">        
                             <div class="form-group col-lg-4">
-                                <label class="control-label">Lab&nbsp;</label>
+                                <label class="control-label">Labs&nbsp;</label>
                                 <select name="labName[]" id="labName" class="form-control" multiple title="Please choose lab name">
-                                    <option value="">All Labs</option>
                                     <?php
                                     foreach($labName as $lab){
                                     ?>
@@ -97,9 +96,8 @@ if(isset($searchMonth) && trim($searchMonth)!= ''){
                                 </select>
                             </div>  -->                          
                             <div class="form-group col-lg-4">
-                                <label class="control-label">Clinic&nbsp;</label>
+                                <label class="control-label">Clinics&nbsp;</label>
                                 <select class="form-control" id="clinicId" name="clinicId[]" multiple title="Please choose clinic name">
-                                    <option value="">All Clinics</option>
                                     <?php
                                     foreach($clinicName as $clinic){
                                     ?>
@@ -198,19 +196,22 @@ if(isset($searchMonth) && trim($searchMonth)!= ''){
                                 <input id="breastfeedingUnreported" name="isBreastfeeding" value="unreported" type="radio"> Unreported
                             </div>
                             <div class="form-group col-lg-4">
-                                <a href="javascript:void(0);" class="btn btn-primary" onclick="searchSampleTestedResult()" style="margin-top:10px;">Submit</a>
+                                <a href="javascript:void(0);" class="btn btn-primary" onclick="searchSampleTestedResult()" style="margin-top:10px;">Generate</a>
                             </div>
                         </div>
                           </form>
                         </div>
                     </div>
                     
+                    
+                    <hr style="background: #000 !important;border-color:#ccc;">
+                    
                     <div class="row" style="margin-bottom:30px;">
                         <div class="col-lg-6">
-                            <div id="piecontainer" style="min-width: 310px; height: 400px; max-width: 100%; margin: 0 auto;padding:1.5%;"></div>
+                            <div id="piecontainer" style="min-width: 310px; height: 600px; max-width: 100%; margin: 0 auto;padding:1.5%;"></div>
                         </div>
                         <div class="col-lg-6">
-                            <div id="barcontainer" style="min-width: 310px; height: 400px; max-width: 100%; margin: 0 auto;padding:1.5%;"></div>
+                            <div id="barcontainer" style="min-width: 310px; height: 600px; max-width: 100%; margin: 0 auto;padding:1.5%;"></div>
                         </div>
                     </div>
 
@@ -303,11 +304,11 @@ if(isset($searchMonth) && trim($searchMonth)!= ''){
     var oTable = null;
     $(document).ready(function(){
         $('#labName').select2({
-            placeholder: "Select labs",
+            placeholder: "All Labs",
             allowClear: true
         });
         $('#clinicId').select2({
-            placeholder: "Select clinics",
+            placeholder: "All Clinics",
             allowClear: true
         });
         $('#piebutton').on('click', function () {

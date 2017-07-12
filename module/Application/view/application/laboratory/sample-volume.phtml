@@ -73,7 +73,6 @@ if(isset($searchMonth) && trim($searchMonth)!= ''){
                             <div class="form-group col-lg-4">
                                 <label class="control-label">Lab&nbsp;</label>
                                 <select name="labName[]" id="labName" class="form-control" multiple title="Please choose lab name">
-                                    <option value="">All Labs</option>
                                     <?php
                                     foreach($labName as $lab){
                                     ?>
@@ -100,7 +99,7 @@ if(isset($searchMonth) && trim($searchMonth)!= ''){
                             <div class="form-group col-lg-4">
                                 <label class="control-label">Clinic&nbsp;</label>
                                 <select class="form-control" id="clinicId" name="clinicId[]" multiple title="Please choose clinic name">
-                                    <option value="">All Clinics</option>
+
                                     <?php
                                     foreach($clinicName as $clinic){
                                     ?>
@@ -290,11 +289,11 @@ if(isset($searchMonth) && trim($searchMonth)!= ''){
     var oTable = null;
     $(document).ready(function(){
         $('#labName').select2({
-            placeholder: "Select labs",
+            placeholder: "All Labs",
             allowClear: true
         });
         $('#clinicId').select2({
-            placeholder: "Select clinics",
+            placeholder: "All clinics",
             allowClear: true
         });
         $('#piebutton').on('click', function () {

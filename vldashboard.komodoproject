@@ -2,5 +2,6 @@
 <!-- Komodo Project File - DO NOT EDIT -->
 <project id="1702af7d-1567-4953-bb10-eabe3dbd571c" kpf_version="5" name="vldashboard.komodoproject">
 <preference-set idref="1702af7d-1567-4953-bb10-eabe3dbd571c" id="project" preftype="project">
+  <long id="prefs_version">1</long>
 </preference-set>
 </project>

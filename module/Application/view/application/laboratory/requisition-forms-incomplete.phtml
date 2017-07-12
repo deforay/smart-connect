@@ -65,7 +65,6 @@ if(isset($labFilter) && trim($labFilter)!= '' && $labFilter!= 'null'){
                             <div class="form-group col-lg-4">
                                 <label class="control-label">Lab&nbsp;</label>
                                 <select name="labName[]" id="labName" class="form-control" multiple title="Please choose lab name">
-                                    <option value="">All Labs</option>
                                     <?php
                                     foreach($labList as $lab){
                                     ?>
@@ -148,7 +147,7 @@ if(isset($labFilter) && trim($labFilter)!= '' && $labFilter!= 'null'){
     
     $(document).ready(function(){
         $('#labName').select2({
-            placeholder: "Select labs",
+            placeholder: "All Labs",
             allowClear: true
         });
         $('#piebutton').on('click', function () {
