@@ -1254,8 +1254,16 @@ class SampleTable extends AbstractTableGateway {
                             ->columns(array(new Expression('DISTINCT YEAR(sample_collection_date) as year,MONTH(sample_collection_date) as month,DAY(sample_collection_date) as day')))
                             //->where('vl.lab_id !=0')
                             ->order('month ASC')->order('day ASC');
-        if(isset($startDate) && trim($startDate)!= ''){
-            $squery = $squery->where(array("vl.sample_collection_date <='" . $endDate ." 23:59:59". "'", "vl.sample_collection_date >='" . $startDate." 00:00:00". "'"));
+        if(isset($startDate) && trim($endDate)!= ''){
+            if(trim($startDate) != trim($endDate)){
+                $squery = $squery->where(array("vl.sample_collection_date <='" . $endDate ." 23:59:59". "'", "vl.sample_collection_date >='" . $startDate." 00:00:00". "'"));
+            }else{
+               $fromMonth = date("Y-m", strtotime(trim($startDate)));
+               $month = strtotime($fromMonth);
+               $mnth = date('m', $month);
+               $year = date('Y', $month);
+               $squery = $squery->where("Month(sample_collection_date)='".$mnth."' AND Year(sample_collection_date)='".$year."'"); 
+            }
         }
         $sQueryStr = $sql->getSqlStringForSqlObject($squery);
         $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -1364,7 +1372,8 @@ class SampleTable extends AbstractTableGateway {
             }else{
                $fromMonth = date("Y-m", strtotime(trim($startDate)));
                $month = strtotime($fromMonth);
-               $mnth = date('m', $month);$year = date('Y', $month);
+               $mnth = date('m', $month);
+               $year = date('Y', $month);
                $sQuery = $sQuery->where("Month(sample_collection_date)='".$mnth."' AND Year(sample_collection_date)='".$year."'"); 
             }
         }
@@ -1482,7 +1491,7 @@ class SampleTable extends AbstractTableGateway {
             $row[] = $sampleTestedDate;
 	    $row[] = $aRow['result'];
             $display = 'show';
-            if($aRow['result']==""){
+            if(trim($aRow['result']) ==""){
                 $display= "none";
             }
 	    $row[]='<a href="/clinics/test-result-view/'.base64_encode($aRow['vl_sample_id']).'" class="btn btn-primary btn-xs" target="_blank">View</a>&nbsp;&nbsp;<a href="javascript:void(0);" class="btn btn-danger btn-xs" style="display:'.$display.'" onclick="generateResultPDF('.$aRow['vl_sample_id'].');">PDF</a>';
@@ -2460,7 +2469,8 @@ class SampleTable extends AbstractTableGateway {
         /* Array of database columns which should be read and sent back to DataTables. Use a space where
          * you want to insert a non-database field (for example a counter or static image)
         */
-        $aColumns = array('vl_sample_id','vl_sample_id','vl_sample_id');
+        $aColumns = array("DATE_FORMAT(sample_collection_date,'%b-%Y')",'vl_sample_id','vl_sample_id');
+        $orderColumns = array('sample_collection_date','vl_sample_id','vl_sample_id');
         /*
          * Paging
          */
@@ -2478,7 +2488,7 @@ class SampleTable extends AbstractTableGateway {
         if (isset($parameters['iSortCol_0'])) {
             for ($i = 0; $i < intval($parameters['iSortingCols']); $i++) {
                 if ($parameters['bSortable_' . intval($parameters['iSortCol_' . $i])] == "true") {
-                    $sOrder .= $aColumns[intval($parameters['iSortCol_' . $i])] . " " . ( $parameters['sSortDir_' . $i] ) . ",";
+                    $sOrder .= $orderColumns[intval($parameters['iSortCol_' . $i])] . " " . ( $parameters['sSortDir_' . $i] ) . ",";
                 }
             }
             $sOrder = substr_replace($sOrder, "", -1);
@@ -2597,14 +2607,13 @@ class SampleTable extends AbstractTableGateway {
             $sQuery->limit($sLimit);
             $sQuery->offset($sOffset);
         }
-        $sQuery = $sQuery->group(array(new Expression('MONTH(sample_collection_date)')));   
+        $sQuery = $sQuery->group(array(new Expression('MONTH(sample_collection_date)')));
         $sQuery = $sQuery->order(array(new Expression('DATE(sample_collection_date)')));  
         
         $queryContainer->sampleResultTestedTATQuery = $sQuery;
          $queryStr = $sql->getSqlStringForSqlObject($sQuery); // Get the string of the Sql, instead of the Select-instance
         //echo $queryStr;die;
         $rResult = $common->cacheQuery($queryStr,$dbAdapter);
-        //\Zend\Debug\Debug::dump($rResult);
 
         /* Data set length after filtering */
         $sQuery->reset('limit');
@@ -2625,10 +2634,12 @@ class SampleTable extends AbstractTableGateway {
             $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:0;
             $iQuery = $iQuery->where('vl.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
         }
+        $iQuery = $iQuery->group(array(new Expression('MONTH(sample_collection_date)')));
+        $iQuery = $iQuery->order(array(new Expression('DATE(sample_collection_date)')));
         $iQueryStr = $sql->getSqlStringForSqlObject($iQuery);
+        //error_log($iQueryStr);die;
         $iResult = $dbAdapter->query($iQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $iTotal = count($iResult);
-        
         $output = array(
             "sEcho" => intval($parameters['sEcho']),
             "iTotalRecords" => $iTotal,
