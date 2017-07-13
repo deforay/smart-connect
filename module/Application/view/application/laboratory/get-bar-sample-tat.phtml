@@ -42,17 +42,19 @@
             }
         },
         series: [<?php
-              foreach($result['sample'] as $key=>$condition){
-              ?>
-              {
-              name:'<?php echo $key;?>',
-              data:[<?php
-                  foreach($condition as $count){
-                      echo '{y:'.$count.'},';
-                  }
-              ?>],
-              },
-              <?php
+              if(isset($result['sample']) && count($result['sample']) >0){
+                     foreach($result['sample'] as $key=>$condition){
+                     ?>
+                     {
+                     name:'<?php echo $key;?>',
+                     data:[<?php
+                         foreach($condition as $count){
+                             echo '{y:'.$count.'},';
+                         }
+                     ?>],
+                     },
+                     <?php
+                     }
               }
             ?>],
             colors: ['#60d18f','#ff1900','#333333'],

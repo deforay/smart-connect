@@ -35,17 +35,17 @@
             name: 'Labs',
             colorByPoint: true,
             data: [<?php
-            if(count($result)>0 && $result!=''){
-            foreach($result as $lab){
-                ?>
-                {
-                  name:<?php echo "'".$lab[2]."'";?>,
-                  y:<?php echo $lab[0];?>,
-                  number:"<?php echo $lab[0]; ?>",
-                  myData:<?php echo "'".$lab[1]."'";?>,
-                },
-                <?php
-            }
+            if(isset($result) && count($result)>0){
+              foreach($result as $lab){
+                  ?>
+                  {
+                    name:<?php echo "'".$lab[2]."'";?>,
+                    y:<?php echo $lab[0];?>,
+                    number:"<?php echo $lab[0]; ?>",
+                    myData:<?php echo "'".$lab[1]."'";?>,
+                  },
+                  <?php
+              }
             }
             ?>]
         }]

@@ -345,20 +345,17 @@ class SampleService {
     //clinic details end
     
     //get all smaple type
-    public function getSampleType()
-    {
+    public function getSampleType(){
         $sampleDb = $this->sm->get('SampleTypeTable');
         return $sampleDb->fetchAllSampleType();
     }
     //get all Lab Name
-    public function getAllLabName()
-    {
+    public function getAllLabName(){
         $facilityDb = $this->sm->get('FacilityTable');
         return $facilityDb->fetchAllLabName();
     }
     //get all Lab Name
-    public function getAllClinicName()
-    {
+    public function getAllClinicName(){
         $facilityDb = $this->sm->get('FacilityTable');
         return $facilityDb->fetchAllClinicName();
     }
@@ -623,7 +620,7 @@ class SampleService {
                         
                         if(trim($params['fromDate'])!= '' && trim($params['toDate'])!= ''){
                             if(trim($params['fromDate'])!= trim($params['toDate'])){
-                               $countQuery = $countQuery->where(array("vl.sample_collection_date >='" . $startMonth ." 00:00:00". "'", "vl.sample_collection_date <='" .$endMonth." 23:59:00". "'"));
+                               $countQuery = $countQuery->where(array("vl.sample_collection_date >='" . $startMonth ." 00:00:00". "'", "vl.sample_collection_date <='" .$endMonth." 23:59:59". "'"));
                             }else{
                                 $fromMonth = date("Y-m", strtotime(trim($params['fromDate'])));
                                 $month = strtotime($fromMonth);
@@ -943,14 +940,14 @@ class SampleService {
                       $currentRow++;
                     }
                     $writer = \PHPExcel_IOFactory::createWriter($excel, 'Excel5');
-                    $filename = 'SAMPLE-TESTED-LAB-TAT-REPORT--' . date('d-M-Y-H-i-s') . '.xls';
+                    $filename = 'LAB-TAT-REPORT--' . date('d-M-Y-H-i-s') . '.xls';
                     $writer->save(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . $filename);
                     return $filename;
                 }else{
                     return "";
                 }
             }catch (Exception $exc) {
-                error_log("SAMPLE-TESTED-LAB-TAT-REPORT--" . $exc->getMessage());
+                error_log("LAB-TAT-REPORT--" . $exc->getMessage());
                 error_log($exc->getTraceAsString());
                 return "";
             }  

@@ -1,5 +1,4 @@
 <script>
-       
         $('#labDashFemalePie').highcharts({
         chart: {
             plotBackgroundColor: null,
@@ -55,7 +54,7 @@
             },
             colorByPoint: true,
             data: [<?php
-            if(count($result)>0 && $result!=''){
+            if(isset($result) && count($result)>0){
               foreach($result[0] as $key=>$femaleResult){
                      $getCode = explode("_",$key);
                      $codeGenerate = array();
@@ -66,7 +65,7 @@
                      }else{
                             $codeGenerate[] =  substr($key, 0, 1);
                      }
-                            $code = implode("",$codeGenerate);
+                     $code = implode("",$codeGenerate);
                 ?>
                 {
                   myData:<?php echo "'".str_replace("_"," ",$key)."'";?>,
@@ -75,7 +74,7 @@
                   number:<?php echo $result[0][$key];?>
                 },
                 <?php
-            }
+              }
             }
             ?>]
         }]

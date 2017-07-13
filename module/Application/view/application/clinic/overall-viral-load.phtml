@@ -46,10 +46,10 @@
         series: [{
             name: 'Sample',
             showInLegend: false, 
-            data: [ { y : <?php echo $chartResult[0]['total'];?> , color : '#ECD078' },
-                    { y : <?php echo $chartResult[1]['total'];?> , color : '#ddef55' },
-                    { y : <?php echo $chartResult[2]['total'];?> , color : '#D95B43' },
-                    { y : <?php echo $chartResult[3]['total'];?> , color : '#3598DC' }
+            data: [ { y : <?php echo (isset($chartResult[0]['total']))?$chartResult[0]['total']:0; ?> , color : '#ECD078' },
+                    { y : <?php echo (isset($chartResult[1]['total']))?$chartResult[1]['total']:0; ?> , color : '#ddef55' },
+                    { y : <?php echo (isset($chartResult[2]['total']))?$chartResult[2]['total']:0; ?> , color : '#D95B43' },
+                    { y : <?php echo (isset($chartResult[3]['total']))?$chartResult[3]['total']:0; ?> , color : '#3598DC' }
                    ],
             stack: 'male'
         }]

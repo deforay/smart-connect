@@ -25,9 +25,9 @@ $more1000 = array('>18'=>'#ff1900', '<18' => '#F2786D');
         xAxis: {
             categories: [<?php
             if(isset($result['date']) && count($result['date'])>0){
-            foreach($result['date'] as $date){
-                echo "'".$date."',";
-            }
+              foreach($result['date'] as $date){
+                  echo "'".$date."',";
+              }
             }
             ?>]
         },
@@ -65,10 +65,10 @@ $more1000 = array('>18'=>'#ff1900', '<18' => '#F2786D');
         for($i=0;$i<count($age);$i++){
               foreach($result[$age[$i]] as $key=>$condition){
               if($key!='VL Not Detected'){
-              $range = substr($key,4,6);
-              $range = preg_replace('/\s+/', '', $range);
+                 $range = substr($key,4,6);
+                 $range = preg_replace('/\s+/', '', $range);
               }else{
-              $range = 'nd';
+                $range = 'nd';
               }
               ?>
               {

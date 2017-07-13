@@ -26,9 +26,9 @@ $more1000 = array('M'=>'#ff1900', 'F' => '#F2786D', 'Not Specified' => '#8C1308'
         xAxis: {
             categories: [<?php
             if(isset($result['date']) && count($result['date'])>0){
-            foreach($result['date'] as $date){
-                echo "'".$date."',";
-            }
+              foreach($result['date'] as $date){
+                  echo "'".$date."',";
+              }
             }
             ?>]
         },

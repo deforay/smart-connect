@@ -399,6 +399,39 @@ foreach($sampleType as $samples){
         });
     }
     
+    function getTestedSampleResult(){
+        sampleType = $("#sampleId").val();
+        testResult = $("#testResult").val();
+        age = $("#age").val();
+        dateRange = $("#sampleCollectionDate").val();
+        clinicId = $("#clinicId").val();
+        gender = $("#gender").val();
+        isPregnant = $('input[name="isPregnant"]:checked').val();
+        isBreastfeeding = $('input[name="isBreastfeeding"]:checked').val();
+        adherence = $("#adherence").val();
+        $.post("<?php echo $this->url('clinics', array('action' => 'get-sample-test-result')); ?>",{sampleCollectionDate:dateRange,testResult:testResult,sampleType:sampleType,facilityId:clinicId,gender:gender,age:age,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding,adherence:adherence},
+        function(data) {
+        $("#samplesTestedResult").html(data);
+        });
+    }
+    
+    function getAllTestReason(){
+        sampleType = $("#sampleId").val();
+        testResult = $("#testResult").val();
+        age = $("#age").val();
+        dateRange = $("#sampleCollectionDate").val();
+        clinicId = $("#clinicId").val();
+        gender = $("#gender").val();
+        isPregnant = $('input[name="isPregnant"]:checked').val();
+        isBreastfeeding = $('input[name="isBreastfeeding"]:checked').val();
+        adherence = $("#adherence").val();
+        testReason = $("#testReason").val();
+        $.post("<?php echo $this->url('clinics', array('action' => 'get-sample-test-reason')); ?>",{sampleCollectionDate:dateRange,sampleType:sampleType,facilityId:clinicId,gender:gender,age:age,testResult:testResult,adherence:adherence,testReason:testReason,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding},
+        function(data) {
+        $("#samplesTestedReason").html(data);
+        });
+    }
+    
     function searchClinicData(){
         //alert($('#sampleCollectionDate').val());
         $.blockUI.defaults.css.border = '1px solid grey'; 
@@ -442,39 +475,6 @@ foreach($sampleType as $samples){
            oTable.column(3).visible(true);
         }
         searchTestResultData();
-    }
-    
-    function getTestedSampleResult(){
-        sampleType = $("#sampleId").val();
-        testResult = $("#testResult").val();
-        age = $("#age").val();
-        dateRange = $("#sampleCollectionDate").val();
-        clinicId = $("#clinicId").val();
-        gender = $("#gender").val();
-        isPregnant = $('input[name="isPregnant"]:checked').val();
-        isBreastfeeding = $('input[name="isBreastfeeding"]:checked').val();
-        adherence = $("#adherence").val();
-        $.post("<?php echo $this->url('clinics', array('action' => 'get-sample-test-result')); ?>",{sampleCollectionDate:dateRange,testResult:testResult,sampleType:sampleType,facilityId:clinicId,gender:gender,age:age,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding,adherence:adherence},
-        function(data) {
-        $("#samplesTestedResult").html(data);
-        });
-    }
-    
-    function getAllTestReason(){
-        sampleType = $("#sampleId").val();
-        testResult = $("#testResult").val();
-        age = $("#age").val();
-        dateRange = $("#sampleCollectionDate").val();
-        clinicId = $("#clinicId").val();
-        gender = $("#gender").val();
-        isPregnant = $('input[name="isPregnant"]:checked').val();
-        isBreastfeeding = $('input[name="isBreastfeeding"]:checked').val();
-        adherence = $("#adherence").val();
-        testReason = $("#testReason").val();
-        $.post("<?php echo $this->url('clinics', array('action' => 'get-sample-test-reason')); ?>",{sampleCollectionDate:dateRange,sampleType:sampleType,facilityId:clinicId,gender:gender,age:age,testResult:testResult,adherence:adherence,testReason:testReason,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding},
-        function(data) {
-        $("#samplesTestedReason").html(data);
-        });
     }
     
     function generateResultPDF(id){

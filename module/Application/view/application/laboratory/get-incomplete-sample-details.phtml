@@ -34,27 +34,27 @@
             name: 'Field',
             colorByPoint: true,
             data: [<?php
-            if(count($result)>0 && $result!=''){
-            foreach($result as $lab){
-              $getCode = explode(" ",$lab['field']);
+            if(isset($result) && count($result)>0){
+              foreach($result as $lab){
+                $getCode = explode(" ",$lab['field']);
                      $codeGenerate = array();
                      if(count($getCode)>0){
                             foreach($getCode as $code){
-                                   $codeGenerate[] = substr($code, 0, 1);
+                                 $codeGenerate[] = substr($code, 0, 1);
                             }
                      }else{
-                            $codeGenerate[] =  substr($lab['field'], 0, 1);
+                          $codeGenerate[] =  substr($lab['field'], 0, 1);
                      }
-                            $code = implode("",$codeGenerate);
-                ?>
-                {
-                  myData:<?php echo "'".$lab['field']."'";?>,
-                  name:<?php echo "'".$code."'";?>,
-                  y:<?php echo $lab['total'];?>,
-                  number:<?php echo $lab['total'];?>
-                },
-                <?php
-            }
+                     $code = implode("",$codeGenerate);
+                  ?>
+                  {
+                    myData:<?php echo "'".$lab['field']."'";?>,
+                    name:<?php echo "'".$code."'";?>,
+                    y:<?php echo $lab['total'];?>,
+                    number:<?php echo $lab['total'];?>
+                  },
+                  <?php
+              }
             }
             ?>]
         }]

@@ -1,6 +1,3 @@
-<?php
-//Zend\Debug\Debug::dump($result);die;
-?>
 <div id="facilitiesTestedVsSuppressed"></div>
 <script>
        $(function () {
@@ -24,9 +21,9 @@
         xAxis: {
             categories: [<?php
             if(isset($result['lab']) && count($result['lab'])>0){
-            foreach($result['lab'] as $lab){
-                echo "'".$lab."',";
-            }
+              foreach($result['lab'] as $lab){
+                  echo "'".$lab."',";
+              }
             }
             ?>]
         },
@@ -64,7 +61,7 @@
             }
         },
         series: [<?php
-        if(isset($result['sampleName']) && $result['sampleName'] != "" && count($result['sampleName']) > 0 ){
+        if(isset($result['sampleName']) && count($result['sampleName']) > 0 ){
              foreach($result['sampleName'] as $key=>$condition){
               if($key!='VL Not Detected'){
                 $range = substr($key,4,6);
@@ -83,10 +80,7 @@
               },
               <?php
               } 
-        }else {
-              echo "";
-        }
-              
+        } 
             ?>],
             colors: ['#ff1900','#60d18f',],
     });

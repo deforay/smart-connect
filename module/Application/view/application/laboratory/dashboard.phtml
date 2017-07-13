@@ -218,7 +218,7 @@ foreach($sampleType as $samples){
                                     </div>
                                     <div class="actions">
                                         <div class="btn-group">
-                                            <select id="sampleTypeVolume" class="btn white btn-outline btn-circle btn-sm dropdown-toggle" onchange="getTestedSampleResultBasedVolume();">
+                                            <select id="sampleTypeVolume" class="btn white btn-outline btn-circle btn-sm dropdown-toggle" onchange="getTestedSampleResultBasedLab();">
                                                 <option value="">All Sample Types</option>
                                                 <?php echo $sType;?>
                                             </select>
@@ -226,7 +226,7 @@ foreach($sampleType as $samples){
                                     </div>                                    
                                 </div>
                                 <div class="portlet-body" style="cursor:pointer;">
-                                    <div id="facilitiesTestedValue"></div>
+                                    <div id="samplesTestedLabResult"></div>
                                 </div>
                             </div>
                         </div>                        
@@ -427,14 +427,14 @@ foreach($sampleType as $samples){
             });
         }
         
-        function getTestedSampleResultBasedVolume(){
+        function getTestedSampleResultBasedLab(){
             facilityId = $("#labName").val();
             fromDate=$('#mrp-lowerDate').val();
             toDate=$('#mrp-upperDate').val();
             sampleType = $("#sampleTypeVolume").val();
             $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-test-result-volume')); ?>",{fromDate:fromDate,toDate:toDate,sampleType:sampleType,facilityId:facilityId},
             function(data) {
-                $("#facilitiesTestedValue").html(data);
+                $("#samplesTestedLabResult").html(data);
             });
         }
         
@@ -457,6 +457,16 @@ foreach($sampleType as $samples){
             $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-test-result-age')); ?>",{fromDate:fromDate,toDate:toDate,sampleType:sampleType,facilityId:facilityId},
             function(data) {
                 $("#samplesTestedResultAge").html(data);
+            });
+        }
+        
+        function getAverageLabTAT(){
+            facilityId = $("#labName").val();
+            fromDate=$('#mrp-lowerDate').val();
+            toDate=$('#mrp-upperDate').val();
+            $.post("<?php echo $this->url('laboratory', array('action' => 'get-lab-turn-around-time')); ?>",{fromDate:fromDate,toDate:toDate,facilityId:facilityId},
+            function(data) {
+                $("#labAverageTat").html(data);
             });
         }
         
@@ -512,16 +522,6 @@ foreach($sampleType as $samples){
             });
         }
         
-        function getAverageLabTAT(){
-            facilityId = $("#labName").val();
-            fromDate=$('#mrp-lowerDate').val();
-            toDate=$('#mrp-upperDate').val();
-            $.post("<?php echo $this->url('laboratory', array('action' => 'get-lab-turn-around-time')); ?>",{fromDate:fromDate,toDate:toDate,facilityId:facilityId},
-            function(data) {
-                $("#labAverageTat").html(data);
-            });
-        }
-        
         function getLabFacilities(){
             facilityId = $("#labName").val();
             fromDate=$('#mrp-lowerDate').val();
@@ -554,7 +554,7 @@ foreach($sampleType as $samples){
             getAverageLabTAT();
             //getLabFacilities();
             getTestedSampleResult();
-            getTestedSampleResultBasedVolume();
+            getTestedSampleResultBasedLab();
             getTestedSampleResultBasedGender();
             getTestedSampleResultBasedAge();
             femalePatient();

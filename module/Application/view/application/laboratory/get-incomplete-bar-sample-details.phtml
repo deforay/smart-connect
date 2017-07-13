@@ -13,9 +13,9 @@
         xAxis: {
             categories: [<?php
             if(isset($result['lab']) && count($result['lab'])>0){
-            foreach($result['lab'] as $lab){
-                echo "'".$lab."',";
-            }
+              foreach($result['lab'] as $lab){
+                  echo "'".$lab."',";
+              }
             }
             ?>]
         },
@@ -42,6 +42,7 @@
             }
         },
         series: [<?php
+        if(isset($result['form']) && count($result['form']) >0){
               foreach($result['form'] as $key=>$condition){
               ?>
               {
@@ -54,6 +55,7 @@
               },
               <?php
               }
+        }
             ?>],
             colors: ['#64ade5','#8877a9'],
     });
