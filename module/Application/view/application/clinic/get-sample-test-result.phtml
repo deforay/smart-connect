@@ -57,7 +57,7 @@ $more1000 = array('DBS'=>'#ff1900', 'Others' => '#F2786D');
             $sampleType[0]['sample_name'] = 'DBS';
             $sampleType[1]['sample_name'] = 'Others';
             foreach($sampleType as $sample){
-                if(isset($result[$sample['sample_name']])){
+                if(isset($result[$sample['sample_name']]) && count($result[$sample['sample_name']]) >0){
                     foreach($result[$sample['sample_name']] as $key=>$condition){
                     ?>
                     {

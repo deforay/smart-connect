@@ -14,9 +14,9 @@
         xAxis: {
             categories: [<?php
             if(isset($result['date']) && count($result['date'])>0){
-            foreach($result['date'] as $date){
-                echo "'".$date."',";
-            }
+              foreach($result['date'] as $date){
+                  echo "'".$date."',";
+              }
             }
             ?>]
         },
@@ -43,6 +43,7 @@
             }
         },
         series: [<?php
+            if(isset($result['rslt']) && count($result['rslt']) >0){
               foreach($result['rslt'] as $key=>$condition){
               ?>
               {
@@ -55,6 +56,7 @@
               },
               <?php
               }
+            }
             ?>
         ],
         colors: ['#60d18f','#ff1900'],

@@ -1,17 +1,20 @@
 <?php
-$receivedTotal = 0;$receivedDate = '';
-$testedTotal = 0;$testedDate = '';
-$rejectedTotal = 0;$rejectedDate = '';
-$quickStats = $result['quickStats'];
-if(count($result['scResult'])>0){
+$receivedTotal = 0;
+$receivedDate = '';
+$testedTotal = 0;
+$testedDate = '';
+$rejectedTotal = 0;
+$rejectedDate = '';
+$quickStats = (isset($result['quickStats'])& count($result['quickStats']) >0)?$result['quickStats']:array();
+if(isset($result['scResult']) && count($result['scResult'])>0){
     $received = end($result['scResult']);
     $receivedTotal = $received['receivedTotal'];
     $receivedDate = $received['receivedDate'];
-}if(count($result['stResult'])>0){
+}if(isset($result['stResult']) && count($result['stResult'])>0){
     $tested = end($result['stResult']);
     $testedTotal = $tested['testedTotal'];
     $testedDate = $tested['testedDate'];
-}if(count($result['srResult'])>0){
+}if(isset($result['srResult']) && count($result['srResult'])>0){
     $reject = end($result['srResult']);
     $rejectedTotal = $reject['rejectTotal'];
     $rejectedDate = $reject['rejectDate'];
@@ -103,79 +106,73 @@ if(count($result['scResult'])>0){
 <script>
     <?php
     if(isset($result['scResult']) && count($result['scResult'])>0){
-        if($receivedTotal>0){
-        ?>
-      
-    $('#samplesReceivedChart').highcharts({
-        chart: {
-            type: 'column',
-            height: 180
-        },
-        title: {
-            text: ''
-        },
-        subtitle: {
-            text: ''
-        },
-        credits: {
-            enabled: false
-        },
-        xAxis: {
-            categories: [
-            <?php
-            foreach($result['scResult'] as $total){
-                echo "'".ucwords($total['date'])."',";
-            }
-            ?>],
-            crosshair: true
-        },
-        yAxis: {
-            min: 0,
-            title: {
-                text: null
+        if($receivedTotal>0){ ?>
+          $('#samplesReceivedChart').highcharts({
+            chart: {
+                type: 'column',
+                height: 180
             },
-            labels: { formatter: function() { return this.value; } },
-        },
-        tooltip: {
-            headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
-            pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
-                '<td style="padding:0"><b>{point.y}</b></td></tr>',
-            footerFormat: '</table>',
-            shared: true,
-            useHTML: true
-        },
-        plotOptions: {
-            column: {
-                pointPadding: 0.2,
-                borderWidth: 0,
-                cursor: 'pointer',
-                //point: {
-                //    events: {
-                //        click: function () {
-                //            window.location.href='/labs/samples-accession';
-                //        }
-                //    }
-                //}                
-            }
-        },
-        series: [{
-            showInLegend: false,  
-            name: 'Samples Received',
-            data: [<?php
-            foreach($result['scResult'] as $total){
-                echo ucwords($total[0]['total']).",";
-            }
-            ?>]
-
-        }],
-        colors : ['#2ab4c0']
-    });
-    <?php } 
-
-    if($testedTotal>0){
-    ?>
-      
-$('#samplesTestedChart').highcharts({
+            title: {
+                text: ''
+            },
+            subtitle: {
+                text: ''
+            },
+            credits: {
+                enabled: false
+            },
+            xAxis: {
+                categories: [
+                <?php
+                foreach($result['scResult'] as $total){
+                    echo "'".ucwords($total['date'])."',";
+                }
+                ?>],
+                crosshair: true
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: null
+                },
+                labels: { formatter: function() { return this.value; } },
+            },
+            tooltip: {
+                headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+                pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                    '<td style="padding:0"><b>{point.y}</b></td></tr>',
+                footerFormat: '</table>',
+                shared: true,
+                useHTML: true
+            },
+            plotOptions: {
+                column: {
+                    pointPadding: 0.2,
+                    borderWidth: 0,
+                    cursor: 'pointer',
+                    //point: {
+                    //    events: {
+                    //        click: function () {
+                    //            window.location.href='/labs/samples-accession';
+                    //        }
+                    //    }
+                    //}                
+                }
+            },
+            series: [{
+                showInLegend: false,  
+                name: 'Samples Received',
+                data: [<?php
+                foreach($result['scResult'] as $total){
+                    echo ucwords($total[0]['total']).",";
+                }
+                ?>]
+    
+            }],
+            colors : ['#2ab4c0']
+        });
+    <?php } if($testedTotal>0){ ?>
+      $('#samplesTestedChart').highcharts({
         chart: {
             type: 'column',
             height: 180
@@ -231,63 +228,61 @@ $('#samplesTestedChart').highcharts({
         }],
         colors : ['#f36a5a']
     });        
-<?php }
-if($rejectedTotal>0){
-?>
-$('#samplesRejectedChart').highcharts({
-        chart: {
-            type: 'column',
-            height: 180
-        },
-        title: {
-            text: ''
-        },
-        subtitle: {
-            text: ''
-        },
-        credits: {
-            enabled: false
-        },
-        xAxis: {
-            categories: [<?php
-            foreach($result['srResult'] as $total){
-                echo "'".ucwords($total['date'])."',";
-            }
-            ?>],
-            crosshair: true
-        },
-        yAxis: {
-            min: 0,
+    <?php } if($rejectedTotal>0){ ?>
+        $('#samplesRejectedChart').highcharts({
+            chart: {
+                type: 'column',
+                height: 180
+            },
             title: {
-                text: null
-            }
-        },
-        tooltip: {
-            headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
-            pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
-                '<td style="padding:0"><b>{point.y}</b></td></tr>',
-            footerFormat: '</table>',
-            shared: true,
-            useHTML: true
-        },
-        plotOptions: {
-            column: {
-                pointPadding: 0.2,
-                borderWidth: 0,
-                cursor: 'pointer',
-            }
-        },
-        series: [{
-            showInLegend: false,  
-            name: 'Samples Rejected',
-            data: [<?php
-            foreach($result['srResult'] as $total){
-                echo ucwords($total[0]['total']).",";
-            }
-            ?>]
-
-        }],
-        colors : ['#5C9BD1']
-    });   
+                text: ''
+            },
+            subtitle: {
+                text: ''
+            },
+            credits: {
+                enabled: false
+            },
+            xAxis: {
+                categories: [<?php
+                foreach($result['srResult'] as $total){
+                    echo "'".ucwords($total['date'])."',";
+                }
+                ?>],
+                crosshair: true
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: null
+                }
+            },
+            tooltip: {
+                headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+                pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                    '<td style="padding:0"><b>{point.y}</b></td></tr>',
+                footerFormat: '</table>',
+                shared: true,
+                useHTML: true
+            },
+            plotOptions: {
+                column: {
+                    pointPadding: 0.2,
+                    borderWidth: 0,
+                    cursor: 'pointer',
+                }
+            },
+            series: [{
+                showInLegend: false,  
+                name: 'Samples Rejected',
+                data: [<?php
+                foreach($result['srResult'] as $total){
+                    echo ucwords($total[0]['total']).",";
+                }
+                ?>]
+    
+            }],
+            colors : ['#5C9BD1']
+        });
     <?php } }?>
 </script>

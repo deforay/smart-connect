@@ -284,6 +284,7 @@ class SampleService {
         $sampleDb = $this->sm->get('SampleTable');
         return $sampleDb->fetchSampleTestedResultBasedVolumeDetails($params);
     }
+    
     //get Requisition Forms tested
     public function getRequisitionFormsTested($params){
         $sampleDb = $this->sm->get('SampleTable');
@@ -603,30 +604,18 @@ class SampleService {
                     foreach ($sResult as $aRow) {
                         $row = array();
                         $countQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))->columns(array('total' => new Expression('COUNT(*)')))
-                                        ->where('vl.lab_id="'.$aRow['facility_id'].'"');
+                                          ->where('vl.lab_id="'.$aRow['facility_id'].'"');
+                        if(trim($params['fromDate'])!= '' && trim($params['toDate'])!= ''){
+                            $countQuery = $countQuery->where(array("vl.sample_collection_date >='" . $startMonth ." 00:00:00". "'", "vl.sample_collection_date <='" .$endMonth." 23:59:59". "'"));
+                        }
                         if(isset($params['clinicId']) && is_array($params['clinicId']) && count($params['clinicId']) >0){
                             $countQuery = $countQuery->where('vl.facility_id IN ("' . implode('", "', $params['clinicId']) . '")');
-                        }
-                        if(isset($params['sampleType']) && trim($params['sampleType'])!=''){
-                            $countQuery = $countQuery->where('vl.sample_type="'.base64_decode(trim($params['sampleType'])).'"');
                         }
                         if(isset($params['currentRegimen']) && trim($params['currentRegimen'])!=''){
                             $countQuery = $countQuery->where('vl.current_regimen="'.base64_decode(trim($params['currentRegimen'])).'"');
                         }
-                        
                         if(isset($params['adherence']) && trim($params['adherence'])!=''){
                             $countQuery = $countQuery->where(array("vl.arv_adherance_percentage ='".$params['adherence']."'")); 
-                        }
-                        
-                        if(trim($params['fromDate'])!= '' && trim($params['toDate'])!= ''){
-                            if(trim($params['fromDate'])!= trim($params['toDate'])){
-                               $countQuery = $countQuery->where(array("vl.sample_collection_date >='" . $startMonth ." 00:00:00". "'", "vl.sample_collection_date <='" .$endMonth." 23:59:59". "'"));
-                            }else{
-                                $fromMonth = date("Y-m", strtotime(trim($params['fromDate'])));
-                                $month = strtotime($fromMonth);
-                                $mnth = date('m', $month);$year = date('Y', $month);
-                                $countQuery = $countQuery->where("Month(sample_collection_date)='".$mnth."' AND Year(sample_collection_date)='".$year."'");
-                            }
                         }
                         if(isset($params['age']) && $params['age']!=''){
                             if($params['age'] == '<18'){
@@ -637,12 +626,22 @@ class SampleService {
                               $countQuery = $countQuery->where("vl.patient_age_in_years = 'unknown' OR vl.patient_age_in_years = '' OR vl.patient_age_in_years IS NULL");
                             }
                         }
+                        if(isset($params['sampleType']) && trim($params['sampleType'])!=''){
+                            $countQuery = $countQuery->where('vl.sample_type="'.base64_decode(trim($params['sampleType'])).'"');
+                        }
                         if(isset($params['sampleStatus']) && $params['sampleStatus'] == 'sample_tested'){
                             $countQuery = $countQuery->where("vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL'");
                         }else if(isset($params['sampleStatus']) && $params['sampleStatus'] == 'samples_not_tested') {
                             $countQuery = $countQuery->where("(vl.result IS NULL OR vl.result = 'NULL' OR vl.result = '')");
                         }else if(isset($params['sampleStatus']) && $params['sampleStatus'] == 'sample_rejected') {
                             $countQuery = $countQuery->where("vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0");
+                        }
+                        if(isset($params['gender']) && $params['gender']=='F'){
+                            $countQuery = $countQuery->where("vl.patient_gender IN ('f','female','F','FEMALE')");
+                        }else if(isset($params['gender']) && $params['gender']=='M'){
+                            $countQuery = $countQuery->where("vl.patient_gender IN ('m','male','M','MALE')");
+                        }else if(isset($params['gender']) && $params['gender']=='not_specified'){
+                            $countQuery = $countQuery->where("vl.patient_gender NOT IN ('f','female','F','FEMALE','m','male','M','MALE')");
                         }
                         if(isset($params['isPregnant']) && $params['isPregnant']=='yes'){
                             $countQuery = $countQuery->where("vl.is_patient_pregnant = 'yes'");
@@ -879,7 +878,7 @@ class SampleService {
                         $row = array();
                         $row[] = $aRow['monthDate'];
                         $row[] = $aRow['total'];
-                        $row[] = round($aRow['AvgDiff'],2);
+                        $row[] = (isset($aRow['AvgDiff']))?round($aRow['AvgDiff'],2):0;
                         $output[] = $row;
                     }
                     $styleArray = array(

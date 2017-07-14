@@ -272,19 +272,19 @@ if(isset($labFilter) && trim($labFilter)!= ''){
         $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
         fromDate = $('#mrp-lowerDate').val();
         toDate = $('#mrp-upperDate').val();
-        testResult = $("#testResult").val();
         lab = $("#labName").val();
         clinicId = $("#clinicId").val();
-        sampleType = $("#sampleType").val();
         currentRegimen = $("#currentRegimen").val();
         adherence = $("#adherence").val();
         age = $("#age").val();
+        testResult = $("#testResult").val();
+        sampleType = $("#sampleType").val();
         sampleStatus = $("#sampleStatus").val();
         gender = $("#gender").val();
         isPregnant = $('input[name="isPregnant"]:checked').val();
         isBreastfeeding = $('input[name="isBreastfeeding"]:checked').val();
         lineOfTreatment = $("#lineOfTreatment").val();
-        $.post("<?php echo $this->url('laboratory', array('action' => 'get-bar-sample-details')); ?>",{testResult:testResult,fromDate:fromDate,toDate:toDate,lab:lab,clinicId:clinicId,sampleType:sampleType,currentRegimen:currentRegimen,adherence:adherence,age:age,sampleStatus:sampleStatus,gender:gender,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding,lineOfTreatment:lineOfTreatment},
+        $.post("<?php echo $this->url('laboratory', array('action' => 'get-bar-sample-details')); ?>",{fromDate:fromDate,toDate:toDate,lab:lab,clinicId:clinicId,currentRegimen:currentRegimen,adherence:adherence,age:age,testResult:testResult,sampleType:sampleType,sampleStatus:sampleStatus,gender:gender,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding,lineOfTreatment:lineOfTreatment},
         function(data) {
             $("#barcontainer").html(data);
         });
@@ -295,19 +295,19 @@ if(isset($labFilter) && trim($labFilter)!= ''){
         $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
         fromDate = $('#mrp-lowerDate').val();
         toDate = $('#mrp-upperDate').val();
-        testResult = $("#testResult").val();
         lab = $("#labName").val();
         clinicId = $("#clinicId").val();
-        sampleType = $("#sampleType").val();
         currentRegimen = $("#currentRegimen").val();
         adherence = $("#adherence").val();
         age = $("#age").val();
+        testResult = $("#testResult").val();
+        sampleType = $("#sampleType").val();
         sampleStatus = $("#sampleStatus").val();
         gender = $("#gender").val();
         isPregnant = $('input[name="isPregnant"]:checked').val();
         isBreastfeeding = $('input[name="isBreastfeeding"]:checked').val();
         lineOfTreatment = $("#lineOfTreatment").val();
-        $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-details')); ?>",{testResult:testResult,fromDate:fromDate,toDate:toDate,lab:lab,clinicId:clinicId,sampleType:sampleType,currentRegimen:currentRegimen,adherence:adherence,age:age,sampleStatus:sampleStatus,gender:gender,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding,lineOfTreatment:lineOfTreatment},
+        $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-details')); ?>",{fromDate:fromDate,toDate:toDate,lab:lab,clinicId:clinicId,currentRegimen:currentRegimen,adherence:adherence,age:age,testResult:testResult,sampleType:sampleType,sampleStatus:sampleStatus,gender:gender,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding,lineOfTreatment:lineOfTreatment},
         function(data) {
             $("#piecontainer").html(data);
         });
@@ -340,332 +340,331 @@ if(isset($labFilter) && trim($labFilter)!= ''){
     });
 
     
-function searchSampleTestedResult(){
-    generatePieContainer();
-    generateBarContainer();
-    oTable.fnDraw();
-}
-
-function resetEverything(){
-    $("#pageFilter")[0].reset();
-    searchSampleTestedResult();
-}
-
-function loadSampleDataTable(){
-    $.blockUI.defaults.css.border = '1px solid grey';
-    $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
-    oTable = $('#sampleDataTable').dataTable({
-        "bAutoWidth": false,
-        "bProcessing": true,
-        "bServerSide": true,
-        "aoColumns": [
-            {"sClass":"center"},
-            {"sClass":"center","bSortable":false},
-            {"sClass":"center","bSortable":false},
-            {"sClass":"center","bSortable":false}
-        ],
-        "aaSorting": [[ 0, "asc" ]],
-        "sAjaxSource": "<?php echo $this->url('laboratory',array('action' => 'get-filter-sample-details')); ?>",
-        "fnServerData": function ( sSource, aoData, fnCallback ) {
-            aoData.push({"name": "fromDate", "value": $('#mrp-lowerDate').val()});
-            aoData.push({"name": "toDate", "value": $('#mrp-upperDate').val()});
-            aoData.push({"name": "lab", "value": $('#labName').val()});
-            aoData.push({"name": "clinicId", "value": $('#clinicId').val()});
-            aoData.push({"name": "sampleType", "value": $('#sampleType').val()});
-            aoData.push({"name": "currentRegimen", "value": $('#currentRegimen').val()});
-            aoData.push({"name": "adherence", "value": $('#adherence').val()});
-            aoData.push({"name": "age", "value": $('#age').val()});
-            aoData.push({"name": "testResult", "value": $('#testResult').val()});
-            aoData.push({"name": "sampleStatus", "value": $('#sampleStatus').val()});
-            aoData.push({"name": "gender", "value": $('#gender').val()});
-            aoData.push({"name": "isPregnant", "value": $('input[name="isPregnant"]:checked').val()});
-            aoData.push({"name": "isBreastfeeding", "value": $('input[name="isBreastfeeding"]:checked').val()});
-            aoData.push({"name": "lineOfTreatment", "value": $("#lineOfTreatment").val()});
-            $.ajax({
-                "dataType": 'json',
-                "type": "POST",
-                "url": sSource,
-                "data": aoData,
-                "success": fnCallback
-            });
-        }
-    } );
-}
-
-var MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-
-$(function () {
-  startMonth = '<?php echo $startMonth; ?>';
-  startYear = '<?php echo $startYear; ?>';
-  endMonth = '<?php echo $endMonth; ?>';
-  endYear = '<?php echo $endYear; ?>';
-  fiscalMonth = 7;
-  //if(startMonth < 10)
-    //startDate = parseInt("" + startYear + '0' + startMonth + "");
-  //else
-    startDate = parseInt("" + startYear  + startMonth + "");
-  //if(endMonth < 10)
-    //endDate = parseInt("" + endYear + '0' + endMonth + "");
-  //else
-    endDate = parseInt("" + endYear + endMonth + "");
-  
-  content = '<div class="row mpr-calendarholder">';
-  calendarCount = endYear - startYear;
-  if(calendarCount == 0)
-    calendarCount++;
-  var d = new Date();
-  for(y = 0; y < 2; y++){
-		content += '<div class="col-xs-6" ><div class="mpr-calendar row" id="mpr-calendar-' + (y+1) + '">'
- 						 + '<h5 class="col-xs-12"><i class="mpr-yeardown fa fa-chevron-circle-left"></i><span>' + (startYear + y).toString() + '</span><i class="mpr-yearup fa fa-chevron-circle-right"></i></h5><div class="mpr-monthsContainer"><div class="mpr-MonthsWrapper">';
-    for(m=0; m < 12; m++){
-      var monthval;
-      if((m+1) < 10)
-        monthval = "0" + (m+1);
-      else
-        monthval = "" + (m+1);
-			content += '<span data-month="' + monthval  + '" class="col-xs-3 mpr-month">' + MONTHS[m] + '</span>';
+    function searchSampleTestedResult(){
+        generatePieContainer();
+        generateBarContainer();
+        oTable.fnDraw();
     }
-    content += '</div></div></div></div>';
-  }
-  content += '<div class="col-xs-1">';
-  //content += '<button class="btn btn-info mpr-fiscal-ytd">Fiscal YTD</button>';
-  //content += '<button class="btn btn-info mpr-ytd">YTD</button>';
-  //content += '<button class="btn btn-info mpr-prev-fiscal">Previous FY</button>';
-  //content += '<button class="btn btn-info mpr-prev-year">Previous Year</button>';
-  content += '<button class="btn btn-info mpr-close">Apply</button>';
-  content += '</div>';
-  content += '</div>';
-  
-  $(document).on('click','.mpr-month',function(e){
-    e.stopPropagation();
-  		$month = $(this);
-    	var monthnum = $month.data('month');
-    	var year = $month.parents('.mpr-calendar').children('h5').children('span').html();
-        if($month.parents('#mpr-calendar-1').size() > 0){
-          //Start Date
-          startDate = parseInt("" + year + monthnum);
-          if(startDate > endDate){
-            
-            if(year != parseInt(endDate/100))
-              $('.mpr-calendar:last h5 span').html(year);
-               endDate = startDate;
-          }
-        }else{
-          //End Date
-          endDate = parseInt("" + year + monthnum);
-          if(startDate > endDate){
-            if(year != parseInt(startDate/100))
-              $('.mpr-calendar:first h5 span').html(year);
-            startDate = endDate;
-          }
-        }
     
-    	paintMonths();
-  });
-  
-  
-  $(document).on('click','.mpr-yearup',function(e){
-        $('.mpr-month').css("color","black");
-    	e.stopPropagation();
-  		var year = parseInt($(this).prev().html());
-    	year++;
-    	$(this).prev().html(""+year);
-   	 	$(this).parents('.mpr-calendar').find('.mpr-MonthsWrapper').fadeOut(175,function(){
-        paintMonths();
-        $(this).parents('.mpr-calendar').find('.mpr-MonthsWrapper').fadeIn(175);
-      });
-  });
-  
-  $(document).on('click','.mpr-yeardown',function(e){
-        $('.mpr-month').css("color","black");
-    	e.stopPropagation();
-  		var year = parseInt($(this).next().html());
-    	year--;
-    	$(this).next().html(""+year);
-   	 	//paintMonths();
-      $(this).parents('.mpr-calendar').find('.mpr-MonthsWrapper').fadeOut(175,function(){
-        paintMonths();
-        $(this).parents('.mpr-calendar').find('.mpr-MonthsWrapper').fadeIn(175);
-      });
-  });
-  
-  $(document).on('click','.mpr-ytd', function(e){
-    e.stopPropagation();
-    var d = new Date();
-    startDate = parseInt(d.getFullYear() + "01");
-    var month = d.getMonth() + 1;
-    if(month < 9)
-      month = "0" + month;
-    endDate = parseInt("" + d.getFullYear() + month);
-    $('.mpr-calendar').each(function(){
-      var $cal = $(this);
-      var year = $('h5 span',$cal).html(d.getFullYear());
-    });
-    $('.mpr-calendar').find('.mpr-MonthsWrapper').fadeOut(175,function(){
-        paintMonths();
-        $('.mpr-calendar').find('.mpr-MonthsWrapper').fadeIn(175);
-    });
-  });
-  
-  $(document).on('click','.mpr-prev-year', function(e){
-    e.stopPropagation();
-    var d = new Date();
-    var year = d.getFullYear()-1;
-    startDate = parseInt(year + "01");
-    endDate = parseInt(year + "12");
-    $('.mpr-calendar').each(function(){
-      var $cal = $(this);
-      $('h5 span',$cal).html(year);
-    });
-    $('.mpr-calendar').find('.mpr-MonthsWrapper').fadeOut(175,function(){
-        paintMonths();
-        $('.mpr-calendar').find('.mpr-MonthsWrapper').fadeIn(175);
-    });
-  });
-  
-  $(document).on('click','.mpr-fiscal-ytd', function(e){
-    e.stopPropagation();
-    var d = new Date();
-    var year;
-    if((d.getMonth()+1) < fiscalMonth)
-      year = d.getFullYear() - 1;
-    else
-      year = d.getFullYear();
-    if(fiscalMonth < 10)
-      fm = "0" + fiscalMonth;
-    else
-      fm = fiscalMonth;
-    if(d.getMonth()+1 < 10)
-      cm = "0" + (d.getMonth()+1);
-    else
-      cm = (d.getMonth()+1);
-    startDate = parseInt("" + year + fm);
-    endDate = parseInt("" + d.getFullYear() + cm);
-    $('.mpr-calendar').each(function(i){
-      var $cal = $(this);
-      if(i == 0)
-      	$('h5 span',$cal).html(year);
-      else
-        $('h5 span',$cal).html(d.getFullYear());
-    });
-    $('.mpr-calendar').find('.mpr-MonthsWrapper').fadeOut(175,function(){
-        paintMonths();
-        $('.mpr-calendar').find('.mpr-MonthsWrapper').fadeIn(175);
-    });
-  });
-  
-  $(document).on('click','.mpr-prev-fiscal', function(){
-    var d = new Date();
-    var year;
-    if((d.getMonth()+1) < fiscalMonth)
-      year = d.getFullYear() - 2;
-    else
-      year = d.getFullYear() - 1;
-    if(fiscalMonth < 10)
-      fm = "0" + fiscalMonth;
-    else
-      fm = fiscalMonth;
-    if(fiscalMonth -1 < 10)
-      efm = "0" + (fiscalMonth-1);
-    else
-      efm = (fiscalMonth-1);
-    startDate = parseInt("" + year + fm);
-    endDate = parseInt("" + (d.getFullYear() - 1) + efm);
-    $('.mpr-calendar').each(function(i){
-      var $cal = $(this);
-      if(i == 0)
-      	$('h5 span',$cal).html(year);
-      else
-        $('h5 span',$cal).html(d.getFullYear()-1);
-    });
-    $('.mpr-calendar').find('.mpr-MonthsWrapper').fadeOut(175,function(){
-        paintMonths();
-        $('.mpr-calendar').find('.mpr-MonthsWrapper').fadeIn(175);
-    });
-  });
-  
-  var mprVisible = false;
-  var mprpopover = $('.mrp-container').popover({
-    container: "body",
-    placement: "bottom",
-    html: true,
-    content: content
-  }).on('show.bs.popover', function () {
-    $('.popover').remove();
-    var waiter = setInterval(function(){
-      if($('.popover').size() > 0){
-        clearInterval(waiter);
-        setViewToCurrentYears();
-    		paintMonths();
-      }
-    },50);
-  }).on('shown.bs.popover', function(){
-    mprVisible = true;
-  }).on('hidden.bs.popover', function(){
-    mprVisible = false;
-  }); 
-  
-  $(document).on('click','.mpr-calendarholder',function(e){
-    e.preventDefault();
-    e.stopPropagation();
-  });
-  $(document).on("click",".mrp-container",function(e){
-    if(mprVisible){
-      e.preventDefault();
-    	e.stopPropagation();
-      mprVisible = false;
+    function resetEverything(){
+        $("#pageFilter")[0].reset();
+        searchSampleTestedResult();
     }
-  });
-  
-  $(document).on("click",function(e){
-   
-    if(mprVisible){
-    	$('.mpr-calendarholder').parents('.popover').fadeOut(200,function(){
-        $('.mpr-calendarholder').parents('.popover').remove();
-        $('.mrp-container').trigger('click');
-      });
-      mprVisible = false;
+    
+    function loadSampleDataTable(){
+        $.blockUI.defaults.css.border = '1px solid grey';
+        $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
+        oTable = $('#sampleDataTable').dataTable({
+            "bAutoWidth": false,
+            "bProcessing": true,
+            "bServerSide": true,
+            "aoColumns": [
+                {"sClass":"center"},
+                {"sClass":"center","bSortable":false},
+                {"sClass":"center","bSortable":false},
+                {"sClass":"center","bSortable":false}
+            ],
+            "aaSorting": [[ 0, "asc" ]],
+            "sAjaxSource": "<?php echo $this->url('laboratory',array('action' => 'get-filter-sample-details')); ?>",
+            "fnServerData": function ( sSource, aoData, fnCallback ) {
+                aoData.push({"name": "fromDate", "value": $('#mrp-lowerDate').val()});
+                aoData.push({"name": "toDate", "value": $('#mrp-upperDate').val()});
+                aoData.push({"name": "lab", "value": $('#labName').val()});
+                aoData.push({"name": "clinicId", "value": $('#clinicId').val()});
+                aoData.push({"name": "currentRegimen", "value": $('#currentRegimen').val()});
+                aoData.push({"name": "adherence", "value": $('#adherence').val()});
+                aoData.push({"name": "age", "value": $('#age').val()});
+                aoData.push({"name": "sampleType", "value": $('#sampleType').val()});
+                aoData.push({"name": "sampleStatus", "value": $('#sampleStatus').val()});
+                aoData.push({"name": "gender", "value": $('#gender').val()});
+                aoData.push({"name": "isPregnant", "value": $('input[name="isPregnant"]:checked').val()});
+                aoData.push({"name": "isBreastfeeding", "value": $('input[name="isBreastfeeding"]:checked').val()});
+                aoData.push({"name": "lineOfTreatment", "value": $("#lineOfTreatment").val()});
+                $.ajax({
+                    "dataType": 'json',
+                    "type": "POST",
+                    "url": sSource,
+                    "data": aoData,
+                    "success": fnCallback
+                });
+            }
+        } );
     }
-  });
-  
-  $(document).on('click','.mpr-close', function(e){
-    //console.log(e);
-    if(mprVisible){
-    	$('.mpr-calendarholder').parents('.popover').fadeOut(200,function(){
-        $('.mpr-calendarholder').parents('.popover').remove();
-        $('.mrp-container').trigger('click');
-      });
-      mprVisible = false;
-    }
-  });
-  
-});
+    
+    var MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+    
+    $(function () {
+        startMonth = '<?php echo $startMonth; ?>';
+        startYear = '<?php echo $startYear; ?>';
+        endMonth = '<?php echo $endMonth; ?>';
+        endYear = '<?php echo $endYear; ?>';
+        fiscalMonth = 7;
+        //if(startMonth < 10)
+          //startDate = parseInt("" + startYear + '0' + startMonth + "");
+        //else
+          startDate = parseInt("" + startYear  + startMonth + "");
+        //if(endMonth < 10)
+          //endDate = parseInt("" + endYear + '0' + endMonth + "");
+        //else
+          endDate = parseInt("" + endYear + endMonth + "");
+        
+        content = '<div class="row mpr-calendarholder">';
+        calendarCount = endYear - startYear;
+        if(calendarCount == 0)
+          calendarCount++;
+        var d = new Date();
+        for(y = 0; y < 2; y++){
+                      content += '<div class="col-xs-6" ><div class="mpr-calendar row" id="mpr-calendar-' + (y+1) + '">'
+                                                       + '<h5 class="col-xs-12"><i class="mpr-yeardown fa fa-chevron-circle-left"></i><span>' + (startYear + y).toString() + '</span><i class="mpr-yearup fa fa-chevron-circle-right"></i></h5><div class="mpr-monthsContainer"><div class="mpr-MonthsWrapper">';
+          for(m=0; m < 12; m++){
+            var monthval;
+            if((m+1) < 10)
+              monthval = "0" + (m+1);
+            else
+              monthval = "" + (m+1);
+                              content += '<span data-month="' + monthval  + '" class="col-xs-3 mpr-month">' + MONTHS[m] + '</span>';
+          }
+          content += '</div></div></div></div>';
+        }
+        content += '<div class="col-xs-1">';
+        //content += '<button class="btn btn-info mpr-fiscal-ytd">Fiscal YTD</button>';
+        //content += '<button class="btn btn-info mpr-ytd">YTD</button>';
+        //content += '<button class="btn btn-info mpr-prev-fiscal">Previous FY</button>';
+        //content += '<button class="btn btn-info mpr-prev-year">Previous Year</button>';
+        content += '<button class="btn btn-info mpr-close">Apply</button>';
+        content += '</div>';
+        content += '</div>';
+        
+        $(document).on('click','.mpr-month',function(e){
+          e.stopPropagation();
+                      $month = $(this);
+              var monthnum = $month.data('month');
+              var year = $month.parents('.mpr-calendar').children('h5').children('span').html();
+              if($month.parents('#mpr-calendar-1').size() > 0){
+                //Start Date
+                startDate = parseInt("" + year + monthnum);
+                if(startDate > endDate){
+                  
+                  if(year != parseInt(endDate/100))
+                    $('.mpr-calendar:last h5 span').html(year);
+                     endDate = startDate;
+                }
+              }else{
+                //End Date
+                endDate = parseInt("" + year + monthnum);
+                if(startDate > endDate){
+                  if(year != parseInt(startDate/100))
+                    $('.mpr-calendar:first h5 span').html(year);
+                  startDate = endDate;
+                }
+              }
+          
+              paintMonths();
+        });
+        
+        
+        $(document).on('click','.mpr-yearup',function(e){
+              $('.mpr-month').css("color","black");
+              e.stopPropagation();
+                      var year = parseInt($(this).prev().html());
+              year++;
+              $(this).prev().html(""+year);
+                      $(this).parents('.mpr-calendar').find('.mpr-MonthsWrapper').fadeOut(175,function(){
+              paintMonths();
+              $(this).parents('.mpr-calendar').find('.mpr-MonthsWrapper').fadeIn(175);
+            });
+        });
+        
+        $(document).on('click','.mpr-yeardown',function(e){
+              $('.mpr-month').css("color","black");
+              e.stopPropagation();
+                      var year = parseInt($(this).next().html());
+              year--;
+              $(this).next().html(""+year);
+                      //paintMonths();
+            $(this).parents('.mpr-calendar').find('.mpr-MonthsWrapper').fadeOut(175,function(){
+              paintMonths();
+              $(this).parents('.mpr-calendar').find('.mpr-MonthsWrapper').fadeIn(175);
+            });
+        });
+        
+        $(document).on('click','.mpr-ytd', function(e){
+          e.stopPropagation();
+          var d = new Date();
+          startDate = parseInt(d.getFullYear() + "01");
+          var month = d.getMonth() + 1;
+          if(month < 9)
+            month = "0" + month;
+          endDate = parseInt("" + d.getFullYear() + month);
+          $('.mpr-calendar').each(function(){
+            var $cal = $(this);
+            var year = $('h5 span',$cal).html(d.getFullYear());
+          });
+          $('.mpr-calendar').find('.mpr-MonthsWrapper').fadeOut(175,function(){
+              paintMonths();
+              $('.mpr-calendar').find('.mpr-MonthsWrapper').fadeIn(175);
+          });
+        });
+        
+        $(document).on('click','.mpr-prev-year', function(e){
+          e.stopPropagation();
+          var d = new Date();
+          var year = d.getFullYear()-1;
+          startDate = parseInt(year + "01");
+          endDate = parseInt(year + "12");
+          $('.mpr-calendar').each(function(){
+            var $cal = $(this);
+            $('h5 span',$cal).html(year);
+          });
+          $('.mpr-calendar').find('.mpr-MonthsWrapper').fadeOut(175,function(){
+              paintMonths();
+              $('.mpr-calendar').find('.mpr-MonthsWrapper').fadeIn(175);
+          });
+        });
+        
+        $(document).on('click','.mpr-fiscal-ytd', function(e){
+          e.stopPropagation();
+          var d = new Date();
+          var year;
+          if((d.getMonth()+1) < fiscalMonth)
+            year = d.getFullYear() - 1;
+          else
+            year = d.getFullYear();
+          if(fiscalMonth < 10)
+            fm = "0" + fiscalMonth;
+          else
+            fm = fiscalMonth;
+          if(d.getMonth()+1 < 10)
+            cm = "0" + (d.getMonth()+1);
+          else
+            cm = (d.getMonth()+1);
+          startDate = parseInt("" + year + fm);
+          endDate = parseInt("" + d.getFullYear() + cm);
+          $('.mpr-calendar').each(function(i){
+            var $cal = $(this);
+            if(i == 0)
+              $('h5 span',$cal).html(year);
+            else
+              $('h5 span',$cal).html(d.getFullYear());
+          });
+          $('.mpr-calendar').find('.mpr-MonthsWrapper').fadeOut(175,function(){
+              paintMonths();
+              $('.mpr-calendar').find('.mpr-MonthsWrapper').fadeIn(175);
+          });
+        });
+        
+        $(document).on('click','.mpr-prev-fiscal', function(){
+          var d = new Date();
+          var year;
+          if((d.getMonth()+1) < fiscalMonth)
+            year = d.getFullYear() - 2;
+          else
+            year = d.getFullYear() - 1;
+          if(fiscalMonth < 10)
+            fm = "0" + fiscalMonth;
+          else
+            fm = fiscalMonth;
+          if(fiscalMonth -1 < 10)
+            efm = "0" + (fiscalMonth-1);
+          else
+            efm = (fiscalMonth-1);
+          startDate = parseInt("" + year + fm);
+          endDate = parseInt("" + (d.getFullYear() - 1) + efm);
+          $('.mpr-calendar').each(function(i){
+            var $cal = $(this);
+            if(i == 0)
+              $('h5 span',$cal).html(year);
+            else
+              $('h5 span',$cal).html(d.getFullYear()-1);
+          });
+          $('.mpr-calendar').find('.mpr-MonthsWrapper').fadeOut(175,function(){
+              paintMonths();
+              $('.mpr-calendar').find('.mpr-MonthsWrapper').fadeIn(175);
+          });
+        });
+        
+        var mprVisible = false;
+        var mprpopover = $('.mrp-container').popover({
+          container: "body",
+          placement: "bottom",
+          html: true,
+          content: content
+        }).on('show.bs.popover', function () {
+          $('.popover').remove();
+          var waiter = setInterval(function(){
+            if($('.popover').size() > 0){
+              clearInterval(waiter);
+              setViewToCurrentYears();
+                      paintMonths();
+            }
+          },50);
+        }).on('shown.bs.popover', function(){
+          mprVisible = true;
+        }).on('hidden.bs.popover', function(){
+          mprVisible = false;
+        }); 
+        
+        $(document).on('click','.mpr-calendarholder',function(e){
+          e.preventDefault();
+          e.stopPropagation();
+        });
+        $(document).on("click",".mrp-container",function(e){
+          if(mprVisible){
+            e.preventDefault();
+              e.stopPropagation();
+            mprVisible = false;
+          }
+        });
+        
+        $(document).on("click",function(e){
+         
+          if(mprVisible){
+              $('.mpr-calendarholder').parents('.popover').fadeOut(200,function(){
+              $('.mpr-calendarholder').parents('.popover').remove();
+              $('.mrp-container').trigger('click');
+            });
+            mprVisible = false;
+          }
+        });
+        
+        $(document).on('click','.mpr-close', function(e){
+          //console.log(e);
+          if(mprVisible){
+              $('.mpr-calendarholder').parents('.popover').fadeOut(200,function(){
+              $('.mpr-calendarholder').parents('.popover').remove();
+              $('.mrp-container').trigger('click');
+            });
+            mprVisible = false;
+          }
+        });
+        
+    });
 
-function exportSampleResult(){
-    $.blockUI.defaults.css.border = '1px solid grey';
-    $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
-    isPregnant = $('input[name="isPregnant"]:checked').val();
-    isBreastfeeding = $('input[name="isBreastfeeding"]:checked').val();
-    $.post("<?php echo $this->url('laboratory', array('action' => 'export-sample-result-excel')); ?>", {fromDate:$('#mrp-lowerDate').val(),toDate:$('#mrp-upperDate').val(),clinicId:$('#clinicId').val(),sampleType:$('#sampleType').val(),currentRegimen:$('#currentRegimen').val(),adherence:$('#adherence').val(),age:$('#age').val(),testResult:$('#testResult').val(),sampleStatus:$('#sampleStatus').val(),isPregnant:isPregnant,isBreastfeeding:isBreastfeeding,lineOfTreatment:$("#lineOfTreatment").val()},
-     function(data){
-         if(data == "" || data == null || data == undefined){
-             alert('Unable to export result excel');
-         }else{
-             window.open('../temporary/'+data,'_blank');
-         }
-     }); 
-}
-
-$('#gender').on('change',function() {
-    if(this.value == 'F'){
-        $('.femaleSection').show();
-    }else{
-       $('.femaleSection').hide();
-       $('#pregnantYes').prop('checked',false);
-       $('#pregnantNo').prop('checked',false);
-       $('#breastfeedingYes').prop('checked',false);
-       $('#breastfeedingNo').prop('checked',false);
+    function exportSampleResult(){
+        $.blockUI.defaults.css.border = '1px solid grey';
+        $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
+        isPregnant = $('input[name="isPregnant"]:checked').val();
+        isBreastfeeding = $('input[name="isBreastfeeding"]:checked').val();
+        $.post("<?php echo $this->url('laboratory', array('action' => 'export-sample-result-excel')); ?>", {fromDate:$('#mrp-lowerDate').val(),toDate:$('#mrp-upperDate').val(),clinicId:$('#clinicId').val(),currentRegimen:$('#currentRegimen').val(),adherence:$('#adherence').val(),age:$('#age').val(),sampleType:$('#sampleType').val(),sampleStatus:$('#sampleStatus').val(),gender:$("#gender").val(),isPregnant:isPregnant,isBreastfeeding:isBreastfeeding,lineOfTreatment:$("#lineOfTreatment").val()},
+         function(data){
+             if(data == "" || data == null || data == undefined){
+                 alert('Unable to export result excel');
+             }else{
+                 window.open('../temporary/'+data,'_blank');
+             }
+         }); 
     }
-});
+    
+    $('#gender').on('change',function() {
+        if(this.value == 'F'){
+            $('.femaleSection').show();
+        }else{
+           $('.femaleSection').hide();
+           $('#pregnantYes').prop('checked',false);
+           $('#pregnantNo').prop('checked',false);
+           $('#breastfeedingYes').prop('checked',false);
+           $('#breastfeedingNo').prop('checked',false);
+        }
+    });
 </script>
 <script src="<?php echo $this->basePath('assets/js/month-year-rang-picker.js'); ?>" type="text/javascript"></script>

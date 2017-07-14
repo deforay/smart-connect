@@ -203,9 +203,8 @@ class LaboratoryController extends AbstractActionController
             $sampleService = $this->getServiceLocator()->get('SampleService');
             $params['gender'] = 'yes';
             $result = $sampleService->getSampleTestedResultGenderDetails($params);
-            $sampleType = $sampleService->getSampleType();
             $viewModel = new ViewModel();
-            $viewModel->setVariables(array('result' => $result,'sampleType'=>$sampleType))
+            $viewModel->setVariables(array('result' => $result))
                         ->setTerminal(true);
             return $viewModel;
         }
@@ -218,7 +217,20 @@ class LaboratoryController extends AbstractActionController
             $sampleService = $this->getServiceLocator()->get('SampleService');
             $params['age'] = 'yes';
             $result = $sampleService->getSampleTestedResultAgeDetails($params);
+            $viewModel = new ViewModel();
+            $viewModel->setVariables(array('result' => $result))
+                        ->setTerminal(true);
+            return $viewModel;
+        }
+    }
+    
+    public function getLabTurnAroundTimeAction(){
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $sampleService = $this->getServiceLocator()->get('SampleService');
             $sampleType = $sampleService->getSampleType();
+            $result = $sampleService->getLabTurnAroundTime($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('result' => $result,'sampleType'=>$sampleType))
                         ->setTerminal(true);
@@ -252,18 +264,43 @@ class LaboratoryController extends AbstractActionController
         }
     }
     
-    public function getLabTurnAroundTimeAction(){
+    public function getFemalePatientResultAction(){
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
             $sampleService = $this->getServiceLocator()->get('SampleService');
-            $sampleType = $sampleService->getSampleType();
-            $result = $sampleService->getLabTurnAroundTime($params);
+            $result = $sampleService->getFemalePatientResult($params);
             $viewModel = new ViewModel();
-            $viewModel->setVariables(array('result' => $result,'sampleType'=>$sampleType))
+            $viewModel->setVariables(array('result' => $result))
                         ->setTerminal(true);
             return $viewModel;
         }
+    }
+    
+    public function getLineOfTreatmentAction(){
+        $request = $this->getRequest();
+        if($request->isPost()) {
+           $params = $request->getPost();
+           $sampleService = $this->getServiceLocator()->get('SampleService');
+           $result = $sampleService->getLineOfTreatment($params);
+           $viewModel = new ViewModel();
+           $viewModel->setVariables(array('result' => $result))
+                       ->setTerminal(true);
+           return $viewModel;
+       }
+    }
+    
+    public function getVlOutComesAction(){
+        $request = $this->getRequest();
+        if($request->isPost()) {
+           $params = $request->getPost();
+           $sampleService = $this->getServiceLocator()->get('SampleService');
+           $result = $sampleService->getVlOutComes($params);
+           $viewModel = new ViewModel();
+           $viewModel->setVariables(array('result' => $result))
+                       ->setTerminal(true);
+           return $viewModel;
+       }
     }
     
     public function getLabFacilitiesAction(){
@@ -274,7 +311,7 @@ class LaboratoryController extends AbstractActionController
             $sampleType = $sampleService->getSampleType();
             $result = $sampleService->getFacilites($params);
             $viewModel = new ViewModel();
-            $viewModel->setVariables(array('result' => $result,'sampleType'=>$sampleType,'width'=>$params['width']))
+            $viewModel->setVariables(array('result' => $result,'width'=>$params['width']))
                         ->setTerminal(true);
             return $viewModel;
         }
@@ -432,19 +469,6 @@ class LaboratoryController extends AbstractActionController
         ));
     }
     
-    public function getFemalePatientResultAction(){
-        $request = $this->getRequest();
-        if ($request->isPost()) {
-            $params = $request->getPost();
-            $sampleService = $this->getServiceLocator()->get('SampleService');
-            $result = $sampleService->getFemalePatientResult($params);
-            $viewModel = new ViewModel();
-            $viewModel->setVariables(array('result' => $result))
-                        ->setTerminal(true);
-            return $viewModel;
-        }
-    }
-    
     public function exportSampleResultExcelAction() {
         $request = $this->getRequest();
         if ($request->isPost()) {
@@ -469,32 +493,6 @@ class LaboratoryController extends AbstractActionController
                       ->setTerminal(true);
             return $viewModel;
         }
-    }
-    
-    public function getLineOfTreatmentAction(){
-        $request = $this->getRequest();
-        if($request->isPost()) {
-           $params = $request->getPost();
-           $sampleService = $this->getServiceLocator()->get('SampleService');
-           $result = $sampleService->getLineOfTreatment($params);
-           $viewModel = new ViewModel();
-           $viewModel->setVariables(array('result' => $result))
-                       ->setTerminal(true);
-           return $viewModel;
-       }
-    }
-    
-    public function getVlOutComesAction(){
-        $request = $this->getRequest();
-        if($request->isPost()) {
-           $params = $request->getPost();
-           $sampleService = $this->getServiceLocator()->get('SampleService');
-           $result = $sampleService->getVlOutComes($params);
-           $viewModel = new ViewModel();
-           $viewModel->setVariables(array('result' => $result))
-                       ->setTerminal(true);
-           return $viewModel;
-       }
     }
     
     public function getSampleTestedTurnAroundTimeAction(){

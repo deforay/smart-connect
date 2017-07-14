@@ -439,22 +439,20 @@ foreach($sampleType as $samples){
         }
         
         function getTestedSampleResultBasedGender(){
-            sampleType = '';
             facilityId = $("#labName").val();
             fromDate=$('#mrp-lowerDate').val();
             toDate=$('#mrp-upperDate').val();
-            $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-test-result-gender')); ?>",{fromDate:fromDate,toDate:toDate,sampleType:sampleType,facilityId:facilityId},
+            $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-test-result-gender')); ?>",{fromDate:fromDate,toDate:toDate,facilityId:facilityId},
             function(data) {
                 $("#samplesTestedResultGender").html(data);
             });
         }
         
         function getTestedSampleResultBasedAge(){
-            sampleType = '';
             facilityId = $("#labName").val();
             fromDate=$('#mrp-lowerDate').val();
             toDate=$('#mrp-upperDate').val();
-            $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-test-result-age')); ?>",{fromDate:fromDate,toDate:toDate,sampleType:sampleType,facilityId:facilityId},
+            $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-test-result-age')); ?>",{fromDate:fromDate,toDate:toDate,facilityId:facilityId},
             function(data) {
                 $("#samplesTestedResultAge").html(data);
             });
@@ -488,7 +486,7 @@ foreach($sampleType as $samples){
             sampleStatus = $("#sampleStatus").val();
             $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-volume')); ?>",{fromDate:fromDate,toDate:toDate,facilityId:facilityId,sampleStatus:sampleStatus},
             function(data) {
-            $("#labDashSampleVolumePie").html(data);
+               $("#labDashSampleVolumePie").html(data);
             });
         }
         

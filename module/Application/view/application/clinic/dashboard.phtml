@@ -53,7 +53,7 @@ foreach($sampleType as $samples){
                                 </div>
                                 <div class="form-group col-lg-4">
                                     <label class="control-label">Sample Type</label>
-                                  <select class="form-control" name="sampleId" id="sampleId" title="Please choose sample type">
+                                  <select class="form-control" name="sampleTypeId" id="sampleTypeId" title="Please choose sample type">
                                     <option value="">All</option>
                                     <?php echo $sType;?>
                                   </select>
@@ -307,10 +307,9 @@ foreach($sampleType as $samples){
                 $('#dashboard-report-range span').html(start.format('MMMM D, YYYY') + ' to ' + end.format('MMMM D, YYYY'));
                 $('#sampleCollectionDate').val(start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
             });
-                $('#dashboard-report-range span').html(moment().subtract('days', 29).format('MMMM D, YYYY') + ' to ' + moment().format('MMMM D, YYYY'));
-                $('#dashboard-report-range').show();
-                getAllFunction();
-     
+            $('#dashboard-report-range span').html(moment().subtract('days', 29).format('MMMM D, YYYY') + ' to ' + moment().format('MMMM D, YYYY'));
+            $('#dashboard-report-range').show();
+            getAllFunction();
     });
     
     function getAllFunction(){
@@ -327,7 +326,72 @@ foreach($sampleType as $samples){
         testResul();
         fnShowHide();
     }
-
+    
+    function getOverAllViralLoad(){
+        clinicId = $("#clinicId").val();
+        dateRange = $("#sampleCollectionDate").val();
+        testResult = $("#testResult").val();
+        sampleTypeId = $("#sampleTypeId").val();
+        age = $("#age").val();
+        adherence = $("#adherence").val();
+        gender = $("#gender").val();
+        isPregnant = $('input[name="isPregnant"]:checked').val();
+        isBreastfeeding = $('input[name="isBreastfeeding"]:checked').val();
+        $.post("<?php echo $this->url('clinics', array('action' => 'overall-viral-load')); ?>",{clinicId:clinicId,sampleCollectionDate:dateRange,testResult:testResult,sampleTypeId:sampleTypeId,age:age,adherence:adherence,gender:gender,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding},
+        function(data) {
+            $("#combochart1").html(data);
+        });
+    }
+    
+    function overAllViralLoad(){
+        clinicId = $("#clinicId").val();
+        dateRange = $("#sampleCollectionDate").val();
+        testResult = $("#testResult").val();
+        sampleTypeId = $("#sampleTypeId").val();
+        age = $("#age").val();
+        adherence = $("#adherence").val();
+        gender = $("#gender").val();
+        isPregnant = $('input[name="isPregnant"]:checked').val();
+        isBreastfeeding = $('input[name="isBreastfeeding"]:checked').val();
+        $.post("<?php echo $this->url('clinics', array('action' => 'get-over-all-load-status')); ?>",{clinicId:clinicId,sampleCollectionDate:dateRange,testResult:testResult,sampleTypeId:sampleTypeId,age:age,adherence:adherence,gender:gender,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding},
+        function(data) {
+            $("#overall-load-chart").html(data);
+        });
+    }
+    
+    function getAllTestReason(){
+        clinicId = $("#clinicId").val();
+        dateRange = $("#sampleCollectionDate").val();
+        testResult = $("#testResult").val();
+        sampleTypeId = $("#sampleTypeId").val();
+        age = $("#age").val();
+        adherence = $("#adherence").val();
+        gender = $("#gender").val();
+        isPregnant = $('input[name="isPregnant"]:checked').val();
+        isBreastfeeding = $('input[name="isBreastfeeding"]:checked').val();
+        testReason = $("#testReason").val();
+        $.post("<?php echo $this->url('clinics', array('action' => 'get-sample-test-reason')); ?>",{clinicId:clinicId,sampleCollectionDate:dateRange,testResult:testResult,sampleTypeId:sampleTypeId,age:age,adherence:adherence,gender:gender,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding,testReason:testReason},
+        function(data) {
+           $("#samplesTestedReason").html(data);
+        });
+    }
+    
+    function getTestedSampleResult(){
+        clinicId = $("#clinicId").val();
+        dateRange = $("#sampleCollectionDate").val();
+        testResult = $("#testResult").val();
+        sampleTypeId = $("#sampleTypeId").val();
+        age = $("#age").val();
+        adherence = $("#adherence").val();
+        gender = $("#gender").val();
+        isPregnant = $('input[name="isPregnant"]:checked').val();
+        isBreastfeeding = $('input[name="isBreastfeeding"]:checked').val();
+        $.post("<?php echo $this->url('clinics', array('action' => 'get-sample-test-result')); ?>",{clinicId:clinicId,sampleCollectionDate:dateRange,testResult:testResult,sampleTypeId:sampleTypeId,age:age,adherence:adherence,gender:gender,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding},
+        function(data) {
+           $("#samplesTestedResult").html(data);
+        });
+    }
+    
     function testResul(){
         oTable = $('#testResults').DataTable( {
             "bProcessing": true,
@@ -348,13 +412,13 @@ foreach($sampleType as $samples){
             "fnServerData": function ( sSource, aoData, fnCallback ) {
                 aoData.push({ "name":"sampleCollectionDate","value": $("#sampleCollectionDate").val()});
                 aoData.push({ "name":"clinicId","value": $("#clinicId").val()});
-                aoData.push({ "name":"sampleId","value": $("#sampleId").val()});
                 aoData.push({ "name":"testResult","value": $("#testResult").val()});
+                aoData.push({ "name":"sampleTypeId","value": $("#sampleTypeId").val()});
                 aoData.push({ "name":"age","value": $("#age").val()});
+                aoData.push({ "name":"adherence","value": $("#adherence").val()});
                 aoData.push({ "name":"gender","value": $("#gender").val()});
                 aoData.push({"name": "isPregnant", "value": $('input[name="isPregnant"]:checked').val()});
                 aoData.push({"name": "isBreastfeeding", "value": $('input[name="isBreastfeeding"]:checked').val()});
-                aoData.push({ "name":"adherence","value": $("#adherence").val()});
                 aoData.push({ "name":"result","value": $("#result").val()});
                 $.ajax({
                     "dataType": 'json',
@@ -367,73 +431,7 @@ foreach($sampleType as $samples){
         } );
     }
     
-    function getOverAllViralLoad(){
-        dateRange = $("#sampleCollectionDate").val();
-        clinicId = $("#clinicId").val();
-        sampleId = $("#sampleId").val();
-        testResult = $("#testResult").val();
-        age = $("#age").val();
-        gender = $("#gender").val();
-        isPregnant = $('input[name="isPregnant"]:checked').val();
-        isBreastfeeding = $('input[name="isBreastfeeding"]:checked').val();
-        adherence = $("#adherence").val();
-        $.post("<?php echo $this->url('clinics', array('action' => 'overall-viral-load')); ?>",{sampleCollectionDate:dateRange,clinicId:clinicId,sampleId:sampleId,testResult:testResult,age:age,gender:gender,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding,adherence:adherence},
-        function(data) {
-            $("#combochart1").html(data);
-        });
-    }
-    
-    function overAllViralLoad(){
-        dateRange = $("#sampleCollectionDate").val();
-        clinicId = $("#clinicId").val();
-        sampleId = $("#sampleId").val();
-        testResult = $("#testResult").val();
-        age = $("#age").val();
-        gender = $("#gender").val();
-        isPregnant = $('input[name="isPregnant"]:checked').val();
-        isBreastfeeding = $('input[name="isBreastfeeding"]:checked').val();
-        adherence = $("#adherence").val();
-        $.post("<?php echo $this->url('clinics', array('action' => 'get-over-all-load-status')); ?>",{sampleCollectionDate:dateRange,clinicId:clinicId,sampleId:sampleId,testResult:testResult,age:age,gender:gender,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding,adherence:adherence},
-        function(data) {
-            $("#overall-load-chart").html(data);
-        });
-    }
-    
-    function getTestedSampleResult(){
-        sampleType = $("#sampleId").val();
-        testResult = $("#testResult").val();
-        age = $("#age").val();
-        dateRange = $("#sampleCollectionDate").val();
-        clinicId = $("#clinicId").val();
-        gender = $("#gender").val();
-        isPregnant = $('input[name="isPregnant"]:checked').val();
-        isBreastfeeding = $('input[name="isBreastfeeding"]:checked').val();
-        adherence = $("#adherence").val();
-        $.post("<?php echo $this->url('clinics', array('action' => 'get-sample-test-result')); ?>",{sampleCollectionDate:dateRange,testResult:testResult,sampleType:sampleType,facilityId:clinicId,gender:gender,age:age,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding,adherence:adherence},
-        function(data) {
-        $("#samplesTestedResult").html(data);
-        });
-    }
-    
-    function getAllTestReason(){
-        sampleType = $("#sampleId").val();
-        testResult = $("#testResult").val();
-        age = $("#age").val();
-        dateRange = $("#sampleCollectionDate").val();
-        clinicId = $("#clinicId").val();
-        gender = $("#gender").val();
-        isPregnant = $('input[name="isPregnant"]:checked').val();
-        isBreastfeeding = $('input[name="isBreastfeeding"]:checked').val();
-        adherence = $("#adherence").val();
-        testReason = $("#testReason").val();
-        $.post("<?php echo $this->url('clinics', array('action' => 'get-sample-test-reason')); ?>",{sampleCollectionDate:dateRange,sampleType:sampleType,facilityId:clinicId,gender:gender,age:age,testResult:testResult,adherence:adherence,testReason:testReason,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding},
-        function(data) {
-        $("#samplesTestedReason").html(data);
-        });
-    }
-    
     function searchClinicData(){
-        //alert($('#sampleCollectionDate').val());
         $.blockUI.defaults.css.border = '1px solid grey'; 
         $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);    
         oTable.draw();

@@ -55,14 +55,18 @@ class ClinicController extends AbstractActionController
         }
     }
     
-    public function testResultAction() {
+    public function getSampleTestReasonAction(){
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
             $sampleService = $this->getServiceLocator()->get('SampleService');
-            $result = $sampleService->getAllTestResults($params);
-            return $this->getResponse()->setContent(Json::encode($result));
-        }
+            $result = $sampleService->fetchSampleTestedReason($params);
+            $testReasonName = $sampleService->getAllTestReasonName();
+            $viewModel = new ViewModel();
+            $viewModel->setVariables(array('result' => $result,'testReason' => $testReasonName))
+                        ->setTerminal(true);
+            return $viewModel;
+        }   
     }
     
     public function getSampleTestResultAction(){
@@ -79,18 +83,14 @@ class ClinicController extends AbstractActionController
         }
     }
     
-    public function getSampleTestReasonAction(){
+    public function testResultAction() {
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
             $sampleService = $this->getServiceLocator()->get('SampleService');
-            $result = $sampleService->fetchSampleTestedReason($params);
-            $testReasonName = $sampleService->getAllTestReasonName();
-            $viewModel = new ViewModel();
-            $viewModel->setVariables(array('result' => $result,'testReason' => $testReasonName))
-                        ->setTerminal(true);
-            return $viewModel;
-        }   
+            $result = $sampleService->getAllTestResults($params);
+            return $this->getResponse()->setContent(Json::encode($result));
+        }
     }
     
     public function generateResultPdfAction() {

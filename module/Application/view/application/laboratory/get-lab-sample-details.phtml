@@ -34,17 +34,17 @@
             name: 'Sample',
             colorByPoint: true,
             data: [<?php
-            if(count($result)>0 && $result!=''){
-            foreach($result as $key=>$lab){
-                ?>
-                {
-                  name:<?php echo "'".$key."'";?>,
-                  myData:<?php echo "'".$key."'";?>,
-                  y:<?php echo $result[$key];?>,
-                  number:<?php echo $result[$key];?>
-                },
-                <?php
-            }
+            if(isset($result) && count($result)>0){
+              foreach($result as $key=>$lab){
+                  ?>
+                  {
+                    name:<?php echo "'".$key."'";?>,
+                    myData:<?php echo "'".$key."'";?>,
+                    y:<?php echo $result[$key];?>,
+                    number:<?php echo $result[$key];?>
+                  },
+                  <?php
+              }
             }
             ?>]
         }]
