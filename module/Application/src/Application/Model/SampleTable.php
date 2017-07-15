@@ -909,10 +909,10 @@ class SampleTable extends AbstractTableGateway {
         if(trim($params['fromDate'])!= '' && trim($params['toDate'])!= ''){
             $startMonth = date("Y-m", strtotime(trim($params['fromDate'])))."-01";
             $endMonth = date("Y-m", strtotime(trim($params['toDate'])))."-31";
-            $lQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))->columns(array('sample_tested_datetime','sample_collection_date','lab_id','labCount' => new \Zend\Db\Sql\Expression("COUNT(vl.lab_id)")))
-                                                ->join(array('fd'=>'facility_details'),'fd.facility_id=vl.lab_id',array('facility_name','latitude','longitude'))
-                                                ->where(array("vl.sample_collection_date >='" . $startMonth ." 00:00:00". "'", "vl.sample_collection_date <='" .$endMonth." 23:59:59". "'"))
-                                                ->group('vl.lab_id');
+            $lQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))->columns(array('lab_id','labCount' => new \Zend\Db\Sql\Expression("COUNT(vl.lab_id)")))
+                                    ->join(array('fd'=>'facility_details'),'fd.facility_id=vl.lab_id',array('facility_name','latitude','longitude'))
+                                    ->where(array("vl.sample_collection_date >='" . $startMonth ." 00:00:00". "'", "vl.sample_collection_date <='" .$endMonth." 23:59:59". "'"))
+                                    ->group('vl.lab_id');
             if(isset($params['facilityId']) && is_array($params['facilityId']) && count($params['facilityId']) >0){
                 $lQuery = $lQuery->where('vl.lab_id IN ("' . implode('", "', $params['facilityId']) . '")');
             }else {
@@ -923,13 +923,14 @@ class SampleTable extends AbstractTableGateway {
             }
             $lQueryStr = $sql->getSqlStringForSqlObject($lQuery);
             $lResult = $dbAdapter->query($lQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-            if(count($lResult)>0){
+            if(isset($lResult) && count($lResult)>0){
                 $i = 0;
                 foreach($lResult as $lab){
-                    if($lab['lab_id']!='' && $lab['lab_id']!=NULL && $lab['lab_id']!=0){
+                    if(trim($lab['lab_id'])!='' && $lab['lab_id']!=NULL && $lab['lab_id']!=0){
                         $lcQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
-                                                 ->columns(array('sample_tested_datetime','sample_collection_date','lab_id','facility_id','vl_sample_id','clinicCount' => new \Zend\Db\Sql\Expression("COUNT(vl.facility_id)")))
+                                                 ->columns(array('facility_id','clinicCount' => new \Zend\Db\Sql\Expression("COUNT(vl.facility_id)")))
                                                  ->join(array('fd'=>'facility_details'),'fd.facility_id=vl.facility_id',array('facility_name','latitude','longitude'))
+                                                 ->where(array("vl.sample_collection_date >='" . $startMonth ." 00:00:00". "'", "vl.sample_collection_date <='" .$endMonth." 23:59:59". "'"))
                                                  ->where(array("vl.lab_id"=>$lab['lab_id'],'fd.facility_type'=>'1'))
                                                  ->group('vl.facility_id');
                         $lcQueryStr = $sql->getSqlStringForSqlObject($lcQuery);

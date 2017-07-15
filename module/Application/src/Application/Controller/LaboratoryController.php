@@ -18,7 +18,7 @@ class LaboratoryController extends AbstractActionController
         $this->layout()->setVariable('activeTab', 'labs-dashboard');
         $sampleService = $this->getServiceLocator()->get('SampleService');
         $sampleType = $sampleService->getSampleType();
-        $labName = $sampleService->getAllLabName();          
+        $labName = $sampleService->getAllLabName();        
         return new ViewModel(array(
                     'sampleType' => $sampleType,
                     'labName' => $labName
@@ -601,16 +601,20 @@ class LaboratoryController extends AbstractActionController
         $this->layout()->setVariable('activeTab', 'labs-dashboard');
         $fromDate="";
         $toDate="";
+        $labFilter="";
         if($this->params()->fromQuery('fromDate')){
             $fromDate=$this->params()->fromQuery('fromDate');
-            $params['fromDate'] = $fromDate;
         }
         if($this->params()->fromQuery('toDate')){
             $toDate=$this->params()->fromQuery('toDate');
-            $params['toDate'] = $toDate;
         }
-        if($fromDate!='' && $toDate!=''){
-        return new ViewModel(array('fromMonth'=>date('M-Y',strtotime($fromDate)),'toMonth'=>date('M-Y',strtotime($toDate))));
+        if($this->params()->fromQuery('lab')){
+          $labFilter=$this->params()->fromQuery('lab');  
+        }
+        $sampleService = $this->getServiceLocator()->get('SampleService');
+        $labName = $sampleService->getAllLabName();
+        if(trim($fromDate)!='' && trim($toDate)!=''){
+           return new ViewModel(array('fromMonth'=>date('M-Y',strtotime($fromDate)),'toMonth'=>date('M-Y',strtotime($toDate)),'labFilter'=>$labFilter,'labName'=>$labName));
         }else{
             return $this->redirect()->toUrl("/labs/dashboard");
         }
