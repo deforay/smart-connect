@@ -518,7 +518,7 @@ foreach($sampleType as $samples){
         facilityId = $("#labName").val();
         fromDate=$('#mrp-lowerDate').val();
         toDate=$('#mrp-upperDate').val();
-        $.post("<?php echo $this->url('laboratory', array('action' => 'get-lab-facilities')); ?>",{fromDate:fromDate,toDate:toDate,facilityId:facilityId,width:'600px;'},
+        $.post("<?php echo $this->url('laboratory', array('action' => 'get-lab-facilities')); ?>",{fromDate:fromDate,toDate:toDate,facilityId:facilityId,height:'600px;'},
         function(data) {
             $("#gmap-polyline-data").html(data);
         });

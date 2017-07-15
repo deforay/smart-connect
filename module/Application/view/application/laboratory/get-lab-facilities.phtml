@@ -16,7 +16,7 @@ if(isset($result['clinic']) && count($result['clinic']) > 0){
     }
 }
 if($available > 0) { ?>
-    <div id="gmap-polyline" class="mapChart" style="height:600px !important;"></div>
+    <div id="gmap-polyline" class="mapChart" style="height:<?php echo $height; ?> !important;"></div>
     <script>
         $(document).ready(function(){
             var map;
@@ -98,5 +98,5 @@ if($available > 0) { ?>
          });
     </script>
 <?php } else { ?>
-    <div style="text-align:center;font-weight:800;"><h5>Sorry..Location not available.</h5></div>
+    <div style="text-align:center;"><h5><strong>Sorry..Location not available.</strong></h5></div>
 <?php } ?>
