@@ -14,7 +14,7 @@
         <meta content="" name="description" />
         <meta content="" name="author" />
         <!-- BEGIN GLOBAL MANDATORY STYLES -->
-        <link href="http://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700&subset=all" rel="stylesheet" type="text/css" />
+        <link href="<?php echo $this->basePath('assets/global/css/google-fonts.css'); ?>" rel="stylesheet" type="text/css" />
         <link href="<?php echo $this->basePath('assets/global/plugins/font-awesome/css/font-awesome.min.css'); ?>" rel="stylesheet" type="text/css" />
         <link href="<?php echo $this->basePath('assets/global/plugins/simple-line-icons/simple-line-icons.min.css'); ?>" rel="stylesheet" type="text/css" />
         <link href="<?php echo $this->basePath('assets/global/plugins/bootstrap/css/bootstrap.min.css'); ?>" rel="stylesheet" type="text/css" />
@@ -34,13 +34,11 @@
         <!-- END PAGE LEVEL STYLES -->
         <!-- BEGIN THEME LAYOUT STYLES -->
         <!-- END THEME LAYOUT STYLES -->
-		<link rel="shortcut icon" href="<?php echo $this->basePath('assets/img/favicon.png'); ?>">
-	
+	<link rel="shortcut icon" href="<?php echo $this->basePath('assets/img/favicon.png'); ?>">
 	</head>
     <!-- END HEAD -->
     <body class="login" style="border:1px solid #5C97BD	;">
-		<img src="/assets/img/Mozambique-PEPFAR-logo.png" style="max-width:70px;margin:5px !important;float:right;clear:both !important;display:block !important;"/><br>
-		
+	<img src="/assets/img/Mozambique-PEPFAR-logo.png" style="max-width:70px;margin:5px !important;float:right;clear:both !important;display:block !important;"/><br>
 	<?php
 	 $margin = '142px';
 	 if(isset($config['logo']) && trim($config['logo']) != "" && file_exists(UPLOAD_PATH . DIRECTORY_SEPARATOR . "logo" . DIRECTORY_SEPARATOR . $config['logo'])){
@@ -90,9 +88,9 @@
                     </div>
                 </div>-->
             </form>
-			<p style="text-align:center;color:#ccc;">Funded by <a href="https://www.taskforce.org/" style="color:#ccc !important;text-decoration:underline;">The Task Force for Global Health</a>  &
+	    <p style="text-align:center;color:#ccc;">Funded by <a href="https://www.taskforce.org/" style="color:#ccc !important;text-decoration:underline;">The Task Force for Global Health</a>  &
                 <a href="https://www.emory.edu/home/index.html"  style="color:#ccc !important;text-decoration:underline;">Emory University / PEPFAR</a>
-				</p>
+	    </p>
             <!-- END REGISTRATION FORM -->
         </div>
 		
