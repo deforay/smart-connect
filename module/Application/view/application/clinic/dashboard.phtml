@@ -442,8 +442,13 @@ foreach($sampleType as $samples){
     }
 
     function resetEverything(){
-        $("#clinicId").select2("val","");
         $('#pageFilter')[0].reset();
+        $('#labName').val('').change();
+        if($('#gender').val() == 'F'){
+          $('.femaleSection').show();  
+        }else{
+          $('.femaleSection').hide();  
+        }
         searchClinicData();
         fnShowHide();
     }

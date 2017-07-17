@@ -75,7 +75,7 @@ if(isset($searchMonth) && trim($searchMonth)!= ''){
                                         <?php
                                         foreach($labName as $lab){
                                         ?>
-                                            <option value="<?php echo $lab['facility_id']; ?>" <?php echo(isset($labFilter) && trim($labFilter)!= '' && $labFilter == $lab['facility_code'])?'selected="selected"':''; ?>><?php echo $lab['facility_code']." - ".$lab['facility_name'];?></option>
+                                            <option value="<?php echo $lab['facility_id']; ?>" <?php echo(isset($labFilter) && $labFilter == $lab['facility_code'])?'selected="selected"':''; ?>><?php echo $lab['facility_code']." - ".$lab['facility_name'];?></option>
                                         <?php
                                         }
                                         ?>
@@ -321,9 +321,14 @@ if(isset($searchMonth) && trim($searchMonth)!= ''){
     }
     
     function resetEverything(){
-        $("#labName").select2("val","");
-        $("#clinicId").select2("val","");
         $('#pageFilter')[0].reset();
+        $('#labName').val('').change();
+        $('#clinicId').val('').change();
+        if($('#gender').val() == 'F'){
+          $('.femaleSection').show();
+        }else{
+          $('.femaleSection').hide();  
+        }
         searchSampleVolume();
     }
     
@@ -340,7 +345,7 @@ if(isset($searchMonth) && trim($searchMonth)!= ''){
                 {"sClass":"center","bSortable":false},
                 {"sClass":"center","bSortable":false}
             ],
-            "aaSorting": [[ 0, "desc" ]],
+            "aaSorting": [[ 0, "asc" ]],
             "sAjaxSource": "<?php echo $this->url('laboratory',array('action' => 'get-filter-sample-details')); ?>",
             "fnServerData": function ( sSource, aoData, fnCallback ) {
                 aoData.push({"name": "fromDate", "value": $('#mrp-lowerDate').val()});

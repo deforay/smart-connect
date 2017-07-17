@@ -83,8 +83,8 @@ if($available > 0) { ?>
                     }
             
                     prev_infowindow = this['infowindow'];
-                    setTimeout("this['infowindow'].close()", 3000)
                     this['infowindow'].open(map, this);
+                    //setTimeout(function() { this['infowindow'].close(); }, 3000);
                 });
                 // Automatically center the map fitting all markers on the screen
                 map.fitBounds(bounds);

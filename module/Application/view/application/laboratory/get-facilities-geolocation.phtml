@@ -23,7 +23,7 @@
 //set selected labs
 $selectedLabs = array();
 if(isset($labFilter) && trim($labFilter)!= ''){
-  $selectedLabs = explode(",",$labFilter);
+ $selectedLabs = explode(",",$labFilter);
 }
  ?>
  <link href="<?php echo $this->basePath('assets/global/css/month-year-rang-picker.css'); ?>" rel="stylesheet" type="text/css" />
@@ -38,7 +38,7 @@ if(isset($labFilter) && trim($labFilter)!= ''){
             <i class="fa fa-circle"></i>
         </li>
         <li>
-            <a href="javascript:;">Facilities Geolocation</a>
+            Facilities Geolocation
         </li>
     </ul>
 </div>
@@ -47,34 +47,37 @@ if(isset($labFilter) && trim($labFilter)!= ''){
 <h3 class="page-title"></h3>
 <!-- END PAGE TITLE-->
 <!-- END PAGE HEADER-->
-<div class="row" style="padding-top:10px;padding-bottom:20px;">
-  <div class="col-lg-6">
-      <select name="labName[]" id="labName" class="form-control" multiple title="Please select one or more labs. Leave blank for All">
-          <?php
-          foreach($labName as $lab){
-              ?>
-              <option data-name="<?php echo $lab['facility_name']; ?>" value="<?php echo $lab['facility_id']; ?>" <?php echo(in_array($lab['facility_id'],$selectedLabs))?'selected="selected"':''; ?>><?php echo $lab['facility_code']." - ".$lab['facility_name'];?></option>
-              <?php
-          }
-          ?>
-      </select>
+<form id="pageFilter" action="#" method="">
+  <div class="row" style="padding-top:10px;padding-bottom:20px;">
+    <div class="col-lg-6">
+        <select name="labName[]" id="labName" class="form-control" multiple title="Please select one or more labs. Leave blank for All">
+            <?php
+            foreach($labName as $lab){
+                ?>
+                <option data-name="<?php echo $lab['facility_name']; ?>" value="<?php echo $lab['facility_id']; ?>" <?php echo(in_array($lab['facility_id'],$selectedLabs))?'selected="selected"':''; ?>><?php echo $lab['facility_code']." - ".$lab['facility_name'];?></option>
+                <?php
+            }
+            ?>
+        </select>
+    </div>
+    <div class="col-lg-3">
+        <div id="sla-data-range" class="mrp-container form-control">
+            <span class="mrp-icon"><i class="fa fa-calendar"></i> &nbsp;</span>
+                    <div class="mrp-monthdisplay ">
+                      <span class="mrp-lowerMonth"><?php echo $startDisplayDate; ?></span>
+                      <span class="mrp-to"> to </span>
+                      <span class="mrp-upperMonth"><?php echo $endDisplayDate; ?></span>
+                    </div>
+                  <input type="hidden" value="<?php echo $startDate; ?>" id="mrp-lowerDate" />
+                  <input type="hidden" value="<?php echo $endDate; ?>" id="mrp-upperDate" />
+        </div>
+    </div>                        
+    <div class="col-lg-3">
+     <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="getLabFacilities();">Search</a>&nbsp;&nbsp;
+     <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="resetEverything();">Reset</a>
+    </div>
   </div>
-  <div class="col-lg-3">
-      <div id="sla-data-range" class="mrp-container form-control">
-          <span class="mrp-icon"><i class="fa fa-calendar"></i> &nbsp;</span>
-                  <div class="mrp-monthdisplay ">
-                    <span class="mrp-lowerMonth"><?php echo $startDisplayDate; ?></span>
-                    <span class="mrp-to"> to </span>
-                    <span class="mrp-upperMonth"><?php echo $endDisplayDate; ?></span>
-                  </div>
-                <input type="hidden" value="<?php echo $startDate; ?>" id="mrp-lowerDate" />
-                <input type="hidden" value="<?php echo $endDate; ?>" id="mrp-upperDate" />
-      </div>
-  </div>                        
-  <div class="col-lg-1">
-   <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="getLabFacilities();">Search</a>
-  </div>
-</div>
+</form>
 <div class="row">
     <div class="col-md-12 col-sm-12">
         <div class="portlet box blue">
@@ -106,7 +109,7 @@ if(isset($labFilter) && trim($labFilter)!= ''){
    function getLabFacilities(){
      $.blockUI.defaults.css.border = '1px solid grey'; 
      $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
-     facilityId = $('#labName').val();
+     facilityId = ($("#labName").val() == null)?'':$("#labName").val();
      fromDate=$('#mrp-lowerDate').val();
      toDate=$('#mrp-upperDate').val();
      $.post("<?php echo $this->url('laboratory', array('action' => 'get-lab-facilities')); ?>",{fromDate:fromDate,toDate:toDate,facilityId:facilityId,height:'900px'},
@@ -115,6 +118,12 @@ if(isset($labFilter) && trim($labFilter)!= ''){
      });
    }
    
+   function resetEverything(){
+     $('#pageFilter')[0].reset();
+     $('#labName').val('').change();
+     getLabFacilities();
+   }
+    
    var MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
    
    $(function () {

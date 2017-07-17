@@ -395,11 +395,7 @@ foreach($sampleType as $samples){
     var dpicker = "";
     var startDate;
     var endDate;
-
-    function expandMap(){
-        window.open("/labs/get-facilities-geolocation?fromDate="+$('#mrp-lowerDate').val()+"&toDate="+$('#mrp-upperDate').val()+"&lab="+$("#labName").val());
-    }    
-        
+   
     function getSampleResult(){
         facilityId = $("#labName").val();
         fromDate=$('#mrp-lowerDate').val();
@@ -535,7 +531,7 @@ foreach($sampleType as $samples){
     function getEverything(){
         $.blockUI.defaults.css.border = '1px solid grey'; 
         $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
-        if( !$('#sampleCollectionDate').val() ) {
+        if(!$('#sampleCollectionDate').val() ) {
           $('#sampleCollectionDate').val(moment().subtract('days', 179).format('YYYY-MM-DD') + ' to ' + moment().format('YYYY-MM-DD'));
         }
         getSampleResult();
@@ -553,8 +549,8 @@ foreach($sampleType as $samples){
     }
        
     function resetEverything(){
-       $("#labName").select2("val","");
        $('#pageFilter')[0].reset();
+       $('#labName').val('').change();
        getEverything();
     }
         
@@ -874,62 +870,51 @@ foreach($sampleType as $samples){
     }
     
     function doSampleTestedRedirect(month){
-      selectedLabs = $('#labName > option:selected').map(function() {
-      return this.getAttribute('data-name');
-     }).get();
+      selectedLabs = ($("#labName").val() == null)?'':$("#labName").val();
       window.open('/labs/samples-tested?month='+month+'&lab='+selectedLabs, '_blank');
     }
     
     function doSampleTestedBasedonGenderRedirect(month,gender){
-      selectedLabs = $('#labName > option:selected').map(function() {
-      return this.getAttribute('data-name');
-     }).get();
+      selectedLabs = ($("#labName").val() == null)?'':$("#labName").val();
       window.open('/labs/samples-tested?month='+month+'&gender='+gender+'&lab='+selectedLabs, '_blank');
     }
     
     function doSampleTestedBasedonAgeRedirect(month,age){
-      selectedLabs = $('#labName > option:selected').map(function() {
-      return this.getAttribute('data-name');
-     }).get();
+      selectedLabs = ($("#labName").val() == null)?'':$("#labName").val();
       window.open('/labs/samples-tested?month='+month+'&age='+age+'&lab='+selectedLabs, '_blank');
     }
     
     function doLabTATRedirect(month){
-      selectedLabs = $('#labName > option:selected').map(function() {
-      return this.getAttribute('data-name');
-     }).get();
+      selectedLabs = ($("#labName").val() == null)?'':$("#labName").val();
       window.open('/labs/get-sample-tested-turn-around-time?month='+month+'&lab='+selectedLabs, '_blank');
     }
     
     function doRequisitionFormRedirect(month){
-      selectedLabs = $('#labName > option:selected').map(function() {
-      return this.getAttribute('data-name');
-     }).get();
+      selectedLabs = ($("#labName").val() == null)?'':$("#labName").val();
       window.open('/labs/requisition-forms-incomplete?month='+month+'&lab='+selectedLabs, '_blank');
     }
     
-    function doSampleVolumeRedirect(lab){
-      window.open('/labs/sample-volume?fromMonth='+$('#mrp-lowerDate').val()+'&toMonth='+$('#mrp-upperDate').val()+'&lab='+lab+'&result='+$("#sampleStatus").val(), '_blank');
+    function doSampleVolumeRedirect(labCode){
+      window.open('/labs/sample-volume?fromMonth='+$('#mrp-lowerDate').val()+'&toMonth='+$('#mrp-upperDate').val()+'&lab='+labCode+'&result='+$("#sampleStatus").val(), '_blank');
     }
     
     function doFemalePatientRedirect(field){
-      selectedLabs = $('#labName > option:selected').map(function() {
-      return this.getAttribute('data-name');
-     }).get();
+      selectedLabs = ($("#labName").val() == null)?'':$("#labName").val();
       window.open('/labs/samples-tested?fromMonth='+$('#mrp-lowerDate').val()+'&toMonth='+$('#mrp-upperDate').val()+'&gender=F&femaleFilter='+field+'&lab='+selectedLabs, '_blank');
     }
     
     function doLineofTreatmentRedirect(field){
-      selectedLabs = $('#labName > option:selected').map(function() {
-      return this.getAttribute('data-name');
-     }).get();
+      selectedLabs = ($("#labName").val() == null)?'':$("#labName").val();
       window.open('/labs/samples-tested?fromMonth='+$('#mrp-lowerDate').val()+'&toMonth='+$('#mrp-upperDate').val()+'&lt='+field+'&lab='+selectedLabs, '_blank');
     }
     
     function doVLResultRedirect(fieldVal){
-      selectedLabs = $('#labName > option:selected').map(function() {
-      return this.getAttribute('data-name');
-     }).get();
+      selectedLabs = ($("#labName").val() == null)?'':$("#labName").val();
       window.open('/labs/samples-tested?fromMonth='+$('#mrp-lowerDate').val()+'&toMonth='+$('#mrp-upperDate').val()+'&result='+fieldVal+'&lab='+selectedLabs, '_blank');
+    }
+    
+    function expandMap(){
+       selectedLabs = ($("#labName").val() == null)?'':$("#labName").val();
+       window.open("/labs/get-facilities-geolocation?fromDate="+$('#mrp-lowerDate').val()+"&toDate="+$('#mrp-upperDate').val()+"&lab="+selectedLabs);
     }
 </script>

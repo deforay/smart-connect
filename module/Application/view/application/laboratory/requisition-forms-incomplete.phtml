@@ -67,7 +67,7 @@ if(isset($labFilter) && trim($labFilter)!= ''){
                                         <?php
                                         foreach($labList as $lab){
                                         ?>
-                                            <option value="<?php echo $lab['facility_id']; ?>" <?php echo(in_array($lab['facility_name'],$selectedLabs))?'selected="selected"':''; ?>><?php echo $lab['facility_name'];?></option>
+                                            <option value="<?php echo $lab['facility_id']; ?>" <?php echo(in_array($lab['facility_id'],$selectedLabs))?'selected="selected"':''; ?>><?php echo $lab['facility_name'];?></option>
                                         <?php
                                         }
                                         ?>
@@ -172,8 +172,13 @@ if(isset($labFilter) && trim($labFilter)!= ''){
     }
     
     function resetEverything(){
-        $("#labName").select2("val","");
         $('#pageFilter')[0].reset();
+        $('#labName').val('').change();
+        if($('#gender').val() == 'F'){
+          $('.femaleSection').show();  
+        }else{
+          $('.femaleSection').hide();  
+        }
         searchIncompleteSampleResult();
     }
     

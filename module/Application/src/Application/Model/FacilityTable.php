@@ -30,7 +30,6 @@ class FacilityTable extends AbstractTableGateway {
     public function saveFacility($params){
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        
         if(!isset($params['vlsm_instance_id']) || $params['vlsm_instance_id'] == ''){
             $params['vlsm_instance_id'] = 'mozambiquedisaopenldr';
         }

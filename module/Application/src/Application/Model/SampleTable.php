@@ -1841,7 +1841,7 @@ class SampleTable extends AbstractTableGateway {
               $sQuery = $sQuery->where("vl.result >= 1000");
             }
             if(isset($params['sampleType']) && trim($params['sampleType'])!=''){
-                $sQuery = $sQuery->where('rs.sample_id="'.base64_decode(trim($params['sampleType'])).'"');
+                $sQuery = $sQuery->where('vl.sample_type="'.base64_decode(trim($params['sampleType'])).'"');
             }
             if(isset($params['gender']) && $params['gender']=='F'){
                 $sQuery = $sQuery->where("vl.patient_gender IN ('f','female','F','FEMALE')");
@@ -1925,7 +1925,7 @@ class SampleTable extends AbstractTableGateway {
                     $sQuery = $sQuery->where("vl.result >= 1000");
                 }
                 if(isset($params['sampleType']) && trim($params['sampleType'])!=''){
-                    $sQuery = $sQuery->where('rs.sample_id="'.base64_decode(trim($params['sampleType'])).'"');
+                    $sQuery = $sQuery->where('vl.sample_type="'.base64_decode(trim($params['sampleType'])).'"');
                 }
                 if(isset($params['gender']) && $params['gender']=='F'){
                     $sQuery = $sQuery->where("vl.patient_gender IN ('f','female','F','FEMALE')");
