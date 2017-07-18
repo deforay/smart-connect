@@ -136,7 +136,7 @@ $alertContainer->nbPages = count($sampleResult);
             }
             //set Age
             $age = 'Unknown';
-            if(isset($result['patient_dob']) && $result['patient_dob']!= NULL && trim($result['patient_dob'])!='' && $result['patient_dob']!='0000-00-00'){
+            if(isset($result['patient_dob']) && $result['patient_dob']!= NULL && trim($result['patient_dob'])!='' && $result['patient_dob']!='0000-00-00' && $result['patient_dob']!='1970-01-01'){
               $todayDate = strtotime(date('Y-m-d'));
               $dob = strtotime($result['patient_dob']);
               $difference = $todayDate - $dob;
@@ -152,31 +152,37 @@ $alertContainer->nbPages = count($sampleResult);
               }
             }
             //sample collection date
+            $sampleCollectionDate='';
+            $sampleCollectionTime='';
             if(isset($result['sample_collection_date']) && $result['sample_collection_date']!= NULL && trim($result['sample_collection_date'])!='' && $result['sample_collection_date']!='0000-00-00 00:00:00'){
                 $expStr=explode(" ",$result['sample_collection_date']);
-                $result['sample_collection_date']=$this->humanDateFormat($expStr[0]);
-                $sampleCollectionTime = $expStr[1];
-            }else{
-                $result['sample_collection_date']='';
-                $sampleCollectionTime = '';
+                if($expStr[0]!= '1970-01-01'){
+                    $sampleCollectionDate = $this->humanDateFormat($expStr[0]);
+                    $sampleCollectionTime = $expStr[1];
+                }
             }
             //sample recieved date
-            $sampleReceivedDate='';
-            $sampleReceivedTime='';
+            $sampleReceivedDate ='';
+            $sampleReceivedTime ='';
             if(isset($result['sample_received_at_vl_lab_datetime']) && $result['sample_received_at_vl_lab_datetime']!= NULL && trim($result['sample_received_at_vl_lab_datetime'])!='' && $result['sample_received_at_vl_lab_datetime']!='0000-00-00 00:00:00'){
               $expStr=explode(" ",$result['sample_received_at_vl_lab_datetime']);
-              $sampleReceivedDate=$this->humanDateFormat($expStr[0]);
-              $sampleReceivedTime =$expStr[1];
+              if($expStr[0]!= '1970-01-01'){
+                $sampleReceivedDate=$this->humanDateFormat($expStr[0]);
+                $sampleReceivedTime =$expStr[1];
+              }
             }
             //sample tested date
+            $sampleTestedDate = '';
+            $sampleTestedTime = '';
             if(isset($result['sample_tested_datetime']) && $result['sample_tested_datetime']!= NULL && trim($result['sample_tested_datetime'])!='' && $result['sample_tested_datetime']!='0000-00-00 00:00:00'){
                 $expStr=explode(" ",$result['sample_tested_datetime']);
-                $result['sample_tested_datetime']=$this->humanDateFormat($expStr[0])." ".$expStr[1];
-            }else{
-                $result['sample_tested_datetime']='';
+                if($expStr[0]!= '1970-01-01'){
+                   $sampleTestedDate=$this->humanDateFormat($expStr[0]);
+                   $sampleTestedTime = $expStr[1];
+                }
             }
             //last viral load test date
-            if(isset($result['last_viral_load_date']) && $result['last_viral_load_date']!= NULL && trim($result['last_viral_load_date'])!='' && $result['last_viral_load_date']!='0000-00-00'){
+            if(isset($result['last_viral_load_date']) && $result['last_viral_load_date']!= NULL && trim($result['last_viral_load_date'])!='' && $result['last_viral_load_date']!='0000-00-00' && $result['last_viral_load_date']!='1970-01-01'){
                 $result['last_viral_load_date']=$this->humanDateFormat($result['last_viral_load_date']);
             }else{
                 $result['last_viral_load_date']='';
@@ -269,7 +275,7 @@ $alertContainer->nbPages = count($sampleResult);
               $html .='</tr>';
               $html .='<tr>';
                 $html .='<td style="line-height:11px;font-size:11px;text-align:left;">'.$result['sample_code'].'</td>';
-                $html .='<td style="line-height:11px;font-size:11px;text-align:left;">'.$result['sample_collection_date']." ".$sampleCollectionTime.'</td>';
+                $html .='<td style="line-height:11px;font-size:11px;text-align:left;">'.$sampleCollectionDate." ".$sampleCollectionTime.'</td>';
                 $html .='<td style="line-height:11px;font-size:11px;text-align:left;">'.$result['patient_art_no'].'</td>';
               $html .='</tr>';
               $html .='<tr>';
@@ -346,7 +352,7 @@ $alertContainer->nbPages = count($sampleResult);
                    $html .='</tr>';
                    $html .='<tr>';
                      $html .='<td style="line-height:11px;font-size:11px;text-align:left;">'.$sampleReceivedDate." ".$sampleReceivedTime.'</td>';
-                     $html .='<td style="line-height:11px;font-size:11px;text-align:left;">'.$result['sample_tested_datetime'].'</td>';
+                     $html .='<td style="line-height:11px;font-size:11px;text-align:left;">'.$sampleTestedDate." ".$sampleTestedTime.'</td>';
                      $html .='<td style="line-height:11px;font-size:11px;text-align:left;">'.ucwords($result['sample_name']).'</td>';
                      $html .='<td style="line-height:11px;font-size:11px;text-align:left;">'.ucwords($result['vl_test_platform']).'</td>';
                    $html .='</tr>';
@@ -367,7 +373,7 @@ $alertContainer->nbPages = count($sampleResult);
                  $html .='<td colspan="3" style="line-height:13px;font-size:'.$messageTextSize.';text-align:left;">'.$showMessage.'</td>';
                $html .='</tr>';
                $html .='<tr>';
-                $html .='<td colspan="3" style="line-height:16px;"></td>';
+                 $html .='<td colspan="3" style="line-height:16px;"></td>';
                $html .='</tr>';
              }
              if(trim($tndMessage)!= ''){
@@ -375,7 +381,7 @@ $alertContainer->nbPages = count($sampleResult);
                  $html .='<td colspan="3" style="line-height:13px;font-size:18px;text-align:left;">'.$tndMessage.'</td>';
                $html .='</tr>';
                $html .='<tr>';
-                $html .='<td colspan="3" style="line-height:16px;"></td>';
+                 $html .='<td colspan="3" style="line-height:16px;"></td>';
                $html .='</tr>';
              }
               $html .='<tr>';
@@ -386,10 +392,10 @@ $alertContainer->nbPages = count($sampleResult);
               $html .='</tr>';
               if(trim($result['approver_comments'])!= ''){
                 $html .='<tr>';
-                 $html .='<td colspan="3" style="line-height:11px;font-size:11px;font-weight:bold;">LAB COMMENTS&nbsp;&nbsp;:&nbsp;&nbsp;<span style="font-weight:normal;">'.ucfirst($result['approver_comments']).'</span></td>';
+                  $html .='<td colspan="3" style="line-height:11px;font-size:11px;font-weight:bold;">LAB COMMENTS&nbsp;&nbsp;:&nbsp;&nbsp;<span style="font-weight:normal;">'.ucfirst($result['approver_comments']).'</span></td>';
                 $html .='</tr>';
                 $html .='<tr>';
-                 $html .='<td colspan="3" style="line-height:10px;"></td>';
+                  $html .='<td colspan="3" style="line-height:10px;"></td>';
                 $html .='</tr>';
               }
               $html .='<tr>';
