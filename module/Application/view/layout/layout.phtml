@@ -469,6 +469,8 @@ $config = $this->GetConfigData();
       });
       
       function clearCache(){
+        $.blockUI.defaults.css.border = '1px solid grey'; 
+        $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
         $.post("<?php echo $this->url('common', array('action' => 'clear-cache')); ?>",{ },
         function(data) {
             //The parameter set to 'true' reloads a fresh copy from the server. Leaving it out will serve the page from cache.
