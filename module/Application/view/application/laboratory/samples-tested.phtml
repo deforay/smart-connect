@@ -92,7 +92,7 @@ if(isset($labFilter) && trim($labFilter)!= ''){
                                         < ?php
                                         foreach($hubName as $hub){
                                         ?>
-                                        <option value="< ?php echo base64_encode($hub['facility_id']);?>">< ?php echo $hub['facility_name'];?></option>
+                                          <option value="< ?php echo base64_encode($hub['facility_id']);?>">< ?php echo $hub['facility_name'];?></option>
                                         < ?php
                                         }
                                         ?>
@@ -104,7 +104,7 @@ if(isset($labFilter) && trim($labFilter)!= ''){
                                         <?php
                                         foreach($clinicName as $clinic){
                                         ?>
-                                        <option value="<?php echo $clinic['facility_id']; ?>"><?php echo $clinic['facility_code']." - ".$clinic['facility_name'];?></option>
+                                          <option value="<?php echo $clinic['facility_id']; ?>"><?php echo $clinic['facility_code']." - ".$clinic['facility_name'];?></option>
                                         <?php
                                         }
                                         ?>

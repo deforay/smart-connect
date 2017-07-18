@@ -1592,7 +1592,6 @@ class SampleTable extends AbstractTableGateway {
                                 ->join(array('vl'=>'dash_vl_request_form'),'vl.lab_id=f.facility_id',array('lab_id','sample_type','result'))
                                 ->where('vl.lab_id !=0')
                                 ->group('f.facility_id');
-                                
         if(isset($params['lab']) && is_array($params['lab']) && count($params['lab']) >0){
             $fQuery = $fQuery->where('f.facility_id IN ("' . implode('", "', $params['lab']) . '")');
         }else{
@@ -1611,7 +1610,7 @@ class SampleTable extends AbstractTableGateway {
                 if(trim($params['fromDate'])!= '' && trim($params['toDate'])!= ''){
                     $countQuery = $countQuery->where(array("vl.sample_collection_date >='" . $startMonth ." 00:00:00". "'", "vl.sample_collection_date <='" .$endMonth." 23:59:59". "'"));
                 }
-                if(isset($params['facilityId']) && is_array($params['facilityId']) && count($params['facilityId']) >0){
+                if(isset($params['clinicId']) && is_array($params['clinicId']) && count($params['clinicId']) >0){
                     $countQuery = $countQuery->where('vl.facility_id IN ("' . implode('", "', $params['clinicId']) . '")');
                 }
                 if(isset($params['currentRegimen']) && trim($params['currentRegimen'])!=''){
