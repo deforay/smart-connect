@@ -471,7 +471,8 @@ $config = $this->GetConfigData();
       function clearCache(){
         $.post("<?php echo $this->url('common', array('action' => 'clear-cache')); ?>",{ },
         function(data) {
-            //nothing to do
+            //The parameter set to 'true' reloads a fresh copy from the server. Leaving it out will serve the page from cache.
+            window.location.reload(true);
         });
       }
     </script>
