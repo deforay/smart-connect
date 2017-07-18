@@ -1,5 +1,5 @@
 <?php
-$type = array('Total','VL Not Surpressed','VL Surpressed');
+$type = array('Total','VL Not Supressed','VL Supressed');
 ?>
 <script>
        $(function () {
@@ -57,9 +57,9 @@ $type = array('Total','VL Not Surpressed','VL Surpressed');
               if(isset($result) && count($result) >0){
                  for($t=0;$t<count($type);$t++){
                      $typeColor = '#3598dc';
-                     if($type[$t] == 'VL Surpressed'){
+                     if($type[$t] == 'VL Supressed'){
                          $typeColor = '#60d18f';   
-                     }else if($type[$t] == 'VL Not Surpressed'){
+                     }else if($type[$t] == 'VL Not Supressed'){
                          $typeColor = '#ff1900';   
                      }
               ?>
