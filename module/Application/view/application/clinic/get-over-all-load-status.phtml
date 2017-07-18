@@ -1,3 +1,6 @@
+<?php
+$type = array('Total','VL Not Surpressed','VL Surpressed');
+?>
 <script>
        $(function () {
         $('#overall-load-chart').highcharts({
@@ -50,27 +53,30 @@
                 //}
             }
         },
-        series: [
+        series: [<?php
+              if(isset($result) && count($result) >0){
+                 for($t=0;$t<count($type);$t++){
+                     $typeColor = '#3598dc';
+                     if($type[$t] == 'VL Surpressed'){
+                         $typeColor = '#60d18f';   
+                     }else if($type[$t] == 'VL Not Surpressed'){
+                         $typeColor = '#ff1900';   
+                     }
+              ?>
               {
-                     name:'Total',
-                     data:[{y:<?php echo (isset($result['maleTotal']))?$result['maleTotal']:0; ?>},{y:<?php echo (isset($result['femaleTotal']))?$result['femaleTotal']:0; ?>},{y:<?php echo (isset($result['notSpecifiedTotal']))?$result['notSpecifiedTotal']:0; ?>}],
-                     stack:'total',
-                     color: '#3598dc'
+                     name:'<?php echo $type[$t]; ?>',
+                     data:[<?php
+                          foreach($result[$type[$t]] as $key=>$val){
+                           ?>
+                            { y:<?php echo $val[0]; ?> },
+                        <?php } ?>
+                     ],
+                     stack:'<?php echo($type[$t] == 'Total')?'total':'others'; ?>',
+                     color: '<?php echo $typeColor; ?>'
               },
-              {
-                     name:'VL Surpressed',
-                     data:[{y:<?php echo (isset($result['maleSurpressed']))?$result['maleSurpressed']:0; ?>},{y:<?php echo (isset($result['femaleSurpressed']))?$result['femaleSurpressed']:0; ?>},{y:<?php echo (isset($result['notSpecifiedSurpressed']))?$result['notSpecifiedSurpressed']:0; ?>}],
-                     stack:'male',
-                     color: '#60d18f'
-              },
-              {
-                     name:'VL Not Surpressed',
-                     data:[{y:<?php echo (isset($result['maleNotSurpressed']))?$result['maleNotSurpressed']:0; ?>},{y:<?php echo (isset($result['femaleNotSurpressed']))?$result['femaleNotSurpressed']:0; ?>},{y:<?php echo (isset($result['notSpecifiedNotSurpressed']))?$result['notSpecifiedNotSurpressed']:0; ?>}],
-                     stack:'female',
-                     color: '#ff1900'
-              },
+         <?php } } ?>
         ],
-        colors: ['#3598dc','#ff1900','#60d18f'],
+        //colors: ['#3598dc','#ff1900','#60d18f'],
     });
     });
 </script>

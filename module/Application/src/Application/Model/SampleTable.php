@@ -1025,15 +1025,19 @@ class SampleTable extends AbstractTableGateway {
             //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             $sampleResult = $common->cacheQuery($queryStr,$dbAdapter);
             //set display data
-            $result['maleTotal'] = (isset($sampleResult[0]["mTotal"]))?$sampleResult[0]["mTotal"]:0;
-            $result['maleSurpressed'] = (isset($sampleResult[0]["mLesserThan1000"]))?$sampleResult[0]["mLesserThan1000"]:0;
-            $result['maleNotSurpressed'] = (isset($sampleResult[0]["mGreaterThanEqual1000"]))?$sampleResult[0]["mGreaterThanEqual1000"]:0;
-            $result['femaleTotal'] = (isset($sampleResult[0]["fTotal"]))?$sampleResult[0]["fTotal"]:0;
-            $result['femaleSurpressed'] = (isset($sampleResult[0]["fLesserThan1000"]))?$sampleResult[0]["fLesserThan1000"]:0;
-            $result['femaleNotSurpressed'] = (isset($sampleResult[0]["fGreaterThanEqual1000"]))?$sampleResult[0]["fGreaterThanEqual1000"]:0;
-            $result['notSpecifiedTotal'] = (isset($sampleResult[0]["nsTotal"]))?$sampleResult[0]["nsTotal"]:0;
-            $result['notSpecifiedSurpressed'] = (isset($sampleResult[0]["nsLesserThan1000"]))?$sampleResult[0]["nsLesserThan1000"]:0;
-            $result['notSpecifiedNotSurpressed'] = (isset($sampleResult[0]["nsGreaterThanEqual1000"]))?$sampleResult[0]["nsGreaterThanEqual1000"]:0;
+            $j = 0;
+            foreach($sampleResult as $sample){
+                $result['Total']['Male'][$j] = (isset($sample["mTotal"]))?$sample["mTotal"]:0;
+                $result['Total']['Female'][$j] = (isset($sample["fTotal"]))?$sample["fTotal"]:0;
+                $result['Total']['Not Specified'][$j] = (isset($sample["nsTotal"]))?$sample["nsTotal"]:0;
+                $result['VL Surpressed']['Male'][$j] = (isset($sample["mLesserThan1000"]))?$sample["mLesserThan1000"]:0;
+                $result['VL Surpressed']['Female'][$j] = (isset($sample["fLesserThan1000"]))?$sample["fLesserThan1000"]:0;
+                $result['VL Surpressed']['Not Specified'][$j] = (isset($sample["nsLesserThan1000"]))?$sample["nsLesserThan1000"]:0;
+                $result['VL Not Surpressed']['Male'][$j] = (isset($sample["mGreaterThanEqual1000"]))?$sample["mGreaterThanEqual1000"]:0;
+                $result['VL Not Surpressed']['Female'][$j] = (isset($sample["fGreaterThanEqual1000"]))?$sample["fGreaterThanEqual1000"]:0;
+                $result['VL Not Surpressed']['Not Specified'][$j] = (isset($sample["nsGreaterThanEqual1000"]))?$sample["nsGreaterThanEqual1000"]:0;
+              $j++;
+            }
         }
       return $result;
     }
