@@ -1030,12 +1030,12 @@ class SampleTable extends AbstractTableGateway {
                 $result['Total']['Male'][$j] = (isset($sample["mTotal"]))?$sample["mTotal"]:0;
                 $result['Total']['Female'][$j] = (isset($sample["fTotal"]))?$sample["fTotal"]:0;
                 $result['Total']['Not Specified'][$j] = (isset($sample["nsTotal"]))?$sample["nsTotal"]:0;
-                $result['VL Supressed']['Male'][$j] = (isset($sample["mLesserThan1000"]))?$sample["mLesserThan1000"]:0;
-                $result['VL Supressed']['Female'][$j] = (isset($sample["fLesserThan1000"]))?$sample["fLesserThan1000"]:0;
+                $result['VL Suppressed']['Male'][$j] = (isset($sample["mLesserThan1000"]))?$sample["mLesserThan1000"]:0;
+                $result['VL Suppressed']['Female'][$j] = (isset($sample["fLesserThan1000"]))?$sample["fLesserThan1000"]:0;
                 $result['VL Supressed']['Not Specified'][$j] = (isset($sample["nsLesserThan1000"]))?$sample["nsLesserThan1000"]:0;
-                $result['VL Not Supressed']['Male'][$j] = (isset($sample["mGreaterThanEqual1000"]))?$sample["mGreaterThanEqual1000"]:0;
-                $result['VL Not Supressed']['Female'][$j] = (isset($sample["fGreaterThanEqual1000"]))?$sample["fGreaterThanEqual1000"]:0;
-                $result['VL Not Supressed']['Not Specified'][$j] = (isset($sample["nsGreaterThanEqual1000"]))?$sample["nsGreaterThanEqual1000"]:0;
+                $result['VL Not Suppressed']['Male'][$j] = (isset($sample["mGreaterThanEqual1000"]))?$sample["mGreaterThanEqual1000"]:0;
+                $result['VL Not Suppressed']['Female'][$j] = (isset($sample["fGreaterThanEqual1000"]))?$sample["fGreaterThanEqual1000"]:0;
+                $result['VL Not Suppressed']['Not Specified'][$j] = (isset($sample["nsGreaterThanEqual1000"]))?$sample["nsGreaterThanEqual1000"]:0;
               $j++;
             }
         }
