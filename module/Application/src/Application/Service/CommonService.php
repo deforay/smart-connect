@@ -321,7 +321,6 @@ class CommonService {
    
     
     public function cacheQuery($queryString,$dbAdapter, $fetchCurrent = false){
-        
        // $res = $dbAdapter->query($queryString, $dbAdapter::QUERY_MODE_EXECUTE);
        // return $res;
         
@@ -350,6 +349,11 @@ class CommonService {
             //return $res;
         }
         
+    }
+    
+    public function clearAllCache($params){
+        $cacheObj = $this->sm->get('Cache\Persistent');
+        return $cacheObj->flush();
     }
     
     public function getRoleFacilities($params){

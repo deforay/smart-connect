@@ -41,10 +41,8 @@ use Zend\Cache\PatternFactory;
 use Zend\Session\Container;
 use Zend\View\Model\ViewModel;
 
-class Module
-{
-    public function onBootstrap(MvcEvent $e)
-    {
+class Module{
+    public function onBootstrap(MvcEvent $e){
         $eventManager        = $e->getApplication()->getEventManager();
         $moduleRouteListener = new ModuleRouteListener();
         $moduleRouteListener->attach($eventManager);
@@ -55,7 +53,6 @@ class Module
         }        
         
     }
-    
     
     public function preSetter(MvcEvent $e) {
         $session = new Container('credo');
@@ -241,18 +238,16 @@ class Module
                 'SampleService' => function($sm) {
                     return new SampleService($sm);
                 },
-				'ConfigService' => function($sm) {
+		'ConfigService' => function($sm) {
                     return new ConfigService($sm);
                 },
             ),
-			'abstract_factories' => array(
-		      'Zend\Cache\Service\StorageCacheAbstractServiceFactory',
-			)
-          
+	    'abstract_factories' => array(
+	        'Zend\Cache\Service\StorageCacheAbstractServiceFactory',
+	    ),
         );
     }
     
-	
     public function getViewHelperConfig(){
         return array(
            'invokables' => array(
@@ -262,8 +257,7 @@ class Module
         );
     }	
 
-    public function getAutoloaderConfig()
-    {
+    public function getAutoloaderConfig(){
         return array(
             'Zend\Loader\StandardAutoloader' => array(
                 'namespaces' => array(

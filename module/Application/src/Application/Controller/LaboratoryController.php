@@ -9,6 +9,7 @@ use Zend\Json\Json;
 class LaboratoryController extends AbstractActionController{
 
     public function indexAction(){
+        $this->layout()->setVariable('activeTab', 'labs-dashboard');
         return new ViewModel();
     }
 

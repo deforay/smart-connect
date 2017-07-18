@@ -180,7 +180,14 @@ $config = $this->GetConfigData();
                                     </li>
                                 </ul>
                             </li>
-                        <?php } ?>
+                        <?php } ?><br>
+                        <li class="nav-item>
+                            <a href="javascript:void(0);" class="nav-link nav-toggle" onclick="clearCache();" style="cursor:pointer;color:#fff;padding-left:6%;">
+                                <i class="fa fa-times"></i>
+                                <span class="title">Clear Cache</span>
+                                <span class="selected"></span>
+                            </a>
+                       </li>
                         <!--
                         <li class="nav-item < ?php echo ($activeTab == 'vl-request' ? " active open " : ""); ?> ">
                             <a href="javascript:;" class="nav-link nav-toggle">
@@ -460,6 +467,13 @@ $config = $this->GetConfigData();
             }
         ?>
       });
+      
+      function clearCache(){
+        $.post("<?php echo $this->url('common', array('action' => 'clear-cache')); ?>",{ },
+        function(data) {
+            //nothing to do
+        });
+      }
     </script>
     </body>
 
