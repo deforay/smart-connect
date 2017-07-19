@@ -180,14 +180,7 @@ $config = $this->GetConfigData();
                                     </li>
                                 </ul>
                             </li>
-                        <?php } ?><br>
-                        <li class="nav-item>
-                            <a href="javascript:void(0);" class="nav-link nav-toggle" onclick="clearCache();" style="cursor:pointer;color:#fff;padding-left:6%;">
-                                <i class="fa fa-times"></i>
-                                <span class="title">Clear Cache</span>
-                                <span class="selected"></span>
-                            </a>
-                       </li>
+                        <?php } ?>
                         <!--
                         <li class="nav-item < ?php echo ($activeTab == 'vl-request' ? " active open " : ""); ?> ">
                             <a href="javascript:;" class="nav-link nav-toggle">
@@ -379,7 +372,6 @@ $config = $this->GetConfigData();
                             </ul>
                         </li>
                     <?php } ?>
-                        
                     </ul>
                     <!-- END SIDEBAR MENU -->
                     <!-- END SIDEBAR MENU -->
@@ -404,9 +396,9 @@ $config = $this->GetConfigData();
         <!-- END CONTAINER -->
         <!-- BEGIN FOOTER -->
         <div class="page-footer">
-            <div class="page-footer-inner" style="font-size:1em;">
-                
-                Smart Connect - The Viral Load Dashboard (Testing Environment with dummy data) | 
+            <div class="page-footer-inner" style="width:100%;font-size:1em;">
+                <a href="javascript:void(0);" onclick="clearCache();" style="font-size:8px;cursor:pointer;color:#fff;">Clear Cache</a>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Smart Connect - The Viral Load Dashboard (Testing Environment with dummy data) | 
                 
                 Funded by <a href="https://www.taskforce.org/" style="color:#ccc;text-decoration:underline;">The Task Force for Global Health</a>  &
                 <a href="https://www.emory.edu/home/index.html"  style="color:#ccc;text-decoration:underline;">Emory University / PEPFAR</a>

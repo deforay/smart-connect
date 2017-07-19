@@ -13,7 +13,7 @@
                                 <i class="fa fa-circle"></i>
                             </li>
                             <li>
-                                <a href="javascript:;">Add</a>
+                                Add
                             </li>
                         </ul>
                     </div>
@@ -45,7 +45,7 @@
                                                     <select class="form-control isRequired" name="role" id="role" title="Please select the role">
                                                         <option value="">--Select--</option>
                                                         <?php
-                                                            $options = [];
+                                                            //$options = [];
                                                             foreach($roles as $r) {
                                                             //$options[$r['access_type_name']][$r['role_id']] = $r['role_name'];
                                                         ?>
@@ -106,18 +106,23 @@
             placeholder: "All Facilities",
             allowClear: true
         });
+        $('#facility').prop('disabled', true);
     });
     
     $('#role').on('change',function(){
         if(this.value!= '' && this.value!= 1){
-            $('#facility').select2('val', '');
+            $.blockUI.defaults.css.border = '1px solid grey'; 
+            $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
+            $('#facility').val('').change();
             $.post("<?php echo $this->url('users', array('action' => 'get-role-facilities')); ?>", {role : this.value},
             function(data){
                 $('#facility').html(data);
+                $('#facility').prop('disabled', false);
                 $('#facility').select2('open');
             });
         }else{
-           $('#facility').select2('val', '');
+           $('#facility').val('').change();
+           $('#facility').prop('disabled', true);
         }
     });
     
