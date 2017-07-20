@@ -10,7 +10,7 @@ class LaboratoryController extends AbstractActionController{
 
     public function indexAction(){
         $this->layout()->setVariable('activeTab', 'labs-dashboard');
-        return new ViewModel();
+        return $this->_redirect()->toUrl('/labs/dashboard'); 
     }
 
     public function dashboardAction(){

@@ -6,13 +6,11 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 use Zend\Json\Json;
 
-class ClinicController extends AbstractActionController
-{
+class ClinicController extends AbstractActionController{
 
-    public function indexAction()
-    {
+    public function indexAction(){
         $this->layout()->setVariable('activeTab', 'clinics-dashboard');          
-        return new ViewModel();
+        return $this->_redirect()->toUrl('/clinics/dashboard'); 
     }
 
     public function dashboardAction()
