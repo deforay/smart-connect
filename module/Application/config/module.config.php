@@ -161,8 +161,23 @@ return array(
         ),
         'factories' => array(
             'translator' => 'Zend\Mvc\Service\TranslatorServiceFactory',
+            //'translator' => 'Zend\I18n\Translator\TranslatorServiceFactory',
         ),
     ),
+    //'aliases' => array(
+    //    'translator' => 'MvcTranslator',
+    //),
+    //'translator' => array(
+    //    'locale' => 'pt_BR',
+    //      'translation_file_patterns' => array(
+    //        array(
+    //          'type' => 'gettext',
+    //          'base_dir' => __DIR__ . '/../languages',
+    //          'pattern' => '%s.mo',
+    //          'text_domain' => 'Application',
+    //        ),
+    //      ),
+    //),
     'controllers' => array(
         'invokables' => array(
             'Application\Controller\Index' => 'Application\Controller\IndexController',

@@ -40,14 +40,19 @@ class UsersTable extends AbstractTableGateway {
         $container = new Container('alert');
         $logincontainer = new Container('credo');
         if (count($rResult) > 0) {
-            $userFacilities = array();
+            $facilities_id = array();
+            $facilities_name = array();
+            $facilities_code = array();
             $mapQuery = $sql->select()->from(array('u_f_map'=>'dash_user_facility_map'))
+                            ->join(array('f' => 'facility_details'), 'f.facility_id=u_f_map.facility_id',array('facility_name','facility_code'))
                             ->where(array('u_f_map.user_id'=>$rResult[0]["user_id"]));
             $mapQueryStr = $sql->getSqlStringForSqlObject($mapQuery);
             $mapResult = $dbAdapter->query($mapQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             if(isset($mapResult) && count($mapResult) >0){
                 foreach($mapResult as $facilities){
-                    $userFacilities[] = $facilities['facility_id'];
+                    $facilities_id[] = $facilities['facility_id'];
+                    $facilities_name[] = $facilities['facility_name'];
+                    $facilities_code[] = $facilities['facility_code'];
                 }
             }
             $logincontainer->userId = $rResult[0]["user_id"];
@@ -56,7 +61,9 @@ class UsersTable extends AbstractTableGateway {
             $logincontainer->role = $rResult[0]["role"];
             $logincontainer->email = $rResult[0]["email"];
             //$logincontainer->accessType = $rResult[0]["access_type"];
-            $logincontainer->mappedFacilities = $userFacilities;
+            $logincontainer->mappedFacilities = $facilities_id;
+            $logincontainer->mappedFacilitiesName = $facilities_name;
+            $logincontainer->mappedFacilitiesCode = $facilities_code;
             $container->alertMsg = '';
             //die('home');
             if($logincontainer->role == 1 || $logincontainer->role == 2){
