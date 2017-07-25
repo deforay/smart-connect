@@ -26,6 +26,11 @@ if(isset($searchMonth) && trim($searchMonth)!= ''){
     $startDisplayDate  = strtoupper(date('M', strtotime('+1 month', strtotime('-1 year')))).' '.date("Y", strtotime("-1 year"));
     $endDisplayDate  = strtoupper(date('M')).' '.date('Y');
 }
+//set selected labs
+$selectedLabs = array();
+if(isset($labFilter) && trim($labFilter)!= ''){
+    $selectedLabs = explode(",",$labFilter);
+}
 ?>
 <link href="<?php echo $this->basePath('assets/global/css/month-year-rang-picker.css'); ?>" rel="stylesheet" type="text/css" />
            <!-- BEGIN PAGE HEADER-->
@@ -75,7 +80,7 @@ if(isset($searchMonth) && trim($searchMonth)!= ''){
                                         <?php
                                         foreach($labName as $lab){
                                         ?>
-                                            <option value="<?php echo $lab['facility_id']; ?>" <?php echo(isset($labFilter) && $labFilter == $lab['facility_code'])?'selected="selected"':''; ?>><?php echo $lab['facility_code']." - ".$lab['facility_name'];?></option>
+                                            <option value="<?php echo $lab['facility_id']; ?>" <?php echo(in_array($lab['facility_code'],$selectedLabs))?'selected="selected"':''; ?>><?php echo $lab['facility_code']." - ".$lab['facility_name'];?></option>
                                         <?php
                                         }
                                         ?>
