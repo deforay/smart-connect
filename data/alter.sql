@@ -103,3 +103,6 @@ ALTER TABLE `dash_vl_request_form` ADD INDEX(`sample_type`);
 
 --saravanan 10-July-2017
 ALTER TABLE `r_vl_test_reasons` ADD `test_reason_code` VARCHAR(255) NULL DEFAULT NULL AFTER `test_reason_name`;
+
+--Pal 26-July-2017
+INSERT INTO `dash_global_config` (`name`, `display_name`, `value`) VALUES ('announcement_msg', 'Announcement Message', NULL);
