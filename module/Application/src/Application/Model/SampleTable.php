@@ -66,10 +66,10 @@ class SampleTable extends AbstractTableGateway {
                                                                                 WHEN patient_age_in_years IS NULL OR patient_age_in_years ='' THEN 1
                                                                                 ELSE 0
                                                                                 END)"),
-                                          "No Sample Collection Date" => new Expression("SUM(CASE
-                                                                                    WHEN ((vl.sample_collection_date is null OR vl.sample_collection_date = '' OR DATE(vl.sample_collection_date) ='1970-01-01' OR DATE(vl.sample_collection_date) ='0000-00-00')) THEN 1
-                                                                                    ELSE 0
-                                                                                    END)"),
+                                          "Results Awaited <br>(< $samplesWaitingFromLastXMonths months)" => new Expression("SUM(CASE
+                                                                                                                                WHEN (result is NULL OR result ='') AND (sample_collection_date < DATE_SUB(NOW(), INTERVAL $samplesWaitingFromLastXMonths MONTH) AND (reason_for_sample_rejection is NULL or reason_for_sample_rejection ='')) THEN 1
+                                                                                                                                ELSE 0
+                                                                                                                                END)"),
                                          "Results Awaited <br>(> $samplesWaitingFromLastXMonths months)" => new Expression("SUM(CASE
                                                                                                                                 WHEN (result is NULL OR result ='') AND (sample_collection_date > DATE_SUB(NOW(), INTERVAL $samplesWaitingFromLastXMonths MONTH) AND (reason_for_sample_rejection is NULL or reason_for_sample_rejection ='')) THEN 1
                                                                                                                                 ELSE 0
@@ -104,7 +104,7 @@ class SampleTable extends AbstractTableGateway {
         $waitingResult = array();$receivedResult = array();$tResult = array();$rejectedResult = array();
         
         $qDates = array();
-        for($i = 0 ;$i < 7;$i++) {
+        for($i = 0 ;$i < 28;$i++) {
             $qDates[] = "'".date('Y-m-d', $timestamp)."'";
             $timestamp -= 24 * 3600;
         }
