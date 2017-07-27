@@ -451,13 +451,6 @@ $config = $this->GetConfigData();
         <!-- page script -->
         <script>
           $(function () {
-              if(document.cookie.indexOf("msg_on") == -1 || getCookie('msg_on') == ''){
-                <?php
-                if(isset($config['announcement_msg']) && trim($config['announcement_msg'])!= ''){ ?>
-                   alert('<?php echo ucfirst($config['announcement_msg']); ?>');
-                   setCookie('msg_on',1);
-                <?php } ?>
-              }
              <?php
                 if (isset($container->alertMsg) && $container->alertMsg != "") {
                     ?>
@@ -468,6 +461,20 @@ $config = $this->GetConfigData();
                 }
             ?>
           });
+          
+          $(document).ajaxStop(function () {
+            setTimeout(showAnnouncementMsg, 1000);
+          });
+          
+          function showAnnouncementMsg(){
+            if(document.cookie.indexOf("msg_on") == -1 || getCookie('msg_on') == ''){
+                    <?php
+                    if(isset($config['announcement_msg']) && trim($config['announcement_msg'])!= ''){ ?>
+                       alert('<?php echo ucfirst($config['announcement_msg']); ?>');
+                       setCookie('msg_on',1);
+                    <?php } ?>
+                }
+          }
           
           function clearCache(){
             $.blockUI.defaults.css.border = '1px solid grey'; 
