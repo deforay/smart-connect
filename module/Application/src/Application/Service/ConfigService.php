@@ -45,7 +45,7 @@ class ConfigService {
     }
     
     public function fetchGlobalValue($globalName){
-        $db = $this->sm->get('GlobalConfigTable');
+        $db = $this->sm->get('GlobalTable');
         return $db->getGlobalValue($globalName);
     }
 }

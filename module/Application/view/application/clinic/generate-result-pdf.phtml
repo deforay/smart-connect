@@ -122,17 +122,17 @@ $alertContainer->nbPages = count($sampleResult);
             if($result['patient_mobile_number']!= NULL && trim($result['patient_mobile_number'])!= ''){
                 $patientMobileNumber = $result['patient_mobile_number'];
             }
+            if(!isset($result['facility_name']) || $result['facility_name'] == NULL || trim($result['facility_name']) == ''){
+               $result['facility_name'] = '';
+            }
             if(!isset($result['facility_code']) || $result['facility_code'] == NULL || trim($result['facility_code']) == ''){
                $result['facility_code'] = '';
             }
-            if(!isset($result['facility_state']) || $result['facility_state'] == NULL || trim($result['facility_state']) == ''){
-               $result['facility_state'] = '';
+            if(!isset($result['provinceName']) || $result['provinceName'] == NULL || trim($result['provinceName']) == ''){
+               $result['provinceName'] = '';
             }
-            if(!isset($result['facility_district']) || $result['facility_district'] == NULL || trim($result['facility_district']) == ''){
-               $result['facility_district'] = '';
-            }
-            if(!isset($result['facility_name']) || $result['facility_name'] == NULL || trim($result['facility_name']) == ''){
-               $result['facility_name'] = '';
+            if(!isset($result['districtName']) || $result['districtName'] == NULL || trim($result['districtName']) == ''){
+               $result['districtName'] = '';
             }
             //set Age
             $age = 'Unknown';
@@ -318,8 +318,8 @@ $alertContainer->nbPages = count($sampleResult);
               $html .='</tr>';
               $html .='<tr>';
                 $html .='<td style="line-height:11px;font-size:11px;text-align:left;">'.$result['facility_code'].'</td>';
-                $html .='<td style="line-height:11px;font-size:11px;text-align:left;">'.ucwords($result['facility_state']).'</td>';
-                $html .='<td style="line-height:11px;font-size:11px;text-align:left;">'.ucwords($result['facility_district']).'</td>';
+                $html .='<td style="line-height:11px;font-size:11px;text-align:left;">'.ucwords($result['provinceName']).'</td>';
+                $html .='<td style="line-height:11px;font-size:11px;text-align:left;">'.ucwords($result['districtName']).'</td>';
               $html .='</tr>';
               $html .='<tr>';
                $html .='<td colspan="3" style="line-height:10px;"></td>';
