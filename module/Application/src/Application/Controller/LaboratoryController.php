@@ -382,6 +382,7 @@ class LaboratoryController extends AbstractActionController{
         $fromMonth="";
         $toMonth="";
         $labFilter="";
+        $params['fromSrc'] = 'tested-lab';
         if($this->params()->fromQuery('gender')){
             $gender=$this->params()->fromQuery('gender');
         }
@@ -403,7 +404,6 @@ class LaboratoryController extends AbstractActionController{
         if($this->params()->fromQuery('lab')){
             $labFilter = $this->params()->fromQuery('lab');
             $params['labNames'] = explode(',',$labFilter);
-            $params['fromSrc'] = 'tested-lab';
         }
         
         $sampleService = $this->getServiceLocator()->get('SampleService');
@@ -462,10 +462,10 @@ class LaboratoryController extends AbstractActionController{
         $params = array();
         $labFilter="";
         $sampleStatus="";
+        $params['fromSrc'] = 'sample-volume';
         if($this->params()->fromQuery('lab')){
             $labFilter=$this->params()->fromQuery('lab');
             $params['labCodes'] = explode(',',$labFilter);
-            $params['fromSrc'] = 'sample-volume';
         }
         if($this->params()->fromQuery('result')){
             $sampleStatus=$this->params()->fromQuery('result');
