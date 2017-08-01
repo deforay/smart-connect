@@ -360,6 +360,16 @@ class CommonService {
         $facilityDb = $this->sm->get('FacilityTable');
        return $facilityDb->fetchRoleFacilities($params);
     }
+    
+    public function getSampleTestedFacilityInfo($params){
+        $facilityDb = $this->sm->get('FacilityTable');
+       return $facilityDb->fetchSampleTestedFacilityInfo($params);
+    }
+    
+    public function getSampleTestedLocationInfo($params){
+        $facilityDb = $this->sm->get('FacilityTable');
+       return $facilityDb->fetchSampleTestedLocationInfo($params);
+    }
 }
 
 ?>

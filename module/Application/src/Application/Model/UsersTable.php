@@ -43,8 +43,10 @@ class UsersTable extends AbstractTableGateway {
             $facilities_id = array();
             $facilities_name = array();
             $facilities_code = array();
+            $provinces = array();
+            $districts = array();
             $mapQuery = $sql->select()->from(array('u_f_map'=>'dash_user_facility_map'))
-                            ->join(array('f' => 'facility_details'), 'f.facility_id=u_f_map.facility_id',array('facility_name','facility_code'))
+                            ->join(array('f' => 'facility_details'), 'f.facility_id=u_f_map.facility_id',array('facility_name','facility_code','facility_state','facility_district'))
                             ->where(array('u_f_map.user_id'=>$rResult[0]["user_id"]));
             $mapQueryStr = $sql->getSqlStringForSqlObject($mapQuery);
             $mapResult = $dbAdapter->query($mapQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -53,7 +55,22 @@ class UsersTable extends AbstractTableGateway {
                     $facilities_id[] = $facilities['facility_id'];
                     $facilities_name[] = $facilities['facility_name'];
                     $facilities_code[] = $facilities['facility_code'];
+                    //set provinces
+                    if($facilities['facility_state']!= null && trim($facilities['facility_state'])!= '' && !in_array($facilities['facility_state'],$provinces)){
+                        $provinces[] = $facilities['facility_state'];
+                    }
+                    //set districts
+                    if($facilities['facility_district']!= null && trim($facilities['facility_district'])!= '' && !in_array($facilities['facility_district'],$districts)){
+                        $districts[] = $facilities['facility_district'];
+                    }
                 }
+            }else{
+               //set 0 by default
+               $facilities_id = array(0);
+               $facilities_name = array(0);
+               $facilities_code = array(0); 
+               $provinces = array(0); 
+               $districts = array(0);
             }
             $logincontainer->userId = $rResult[0]["user_id"];
             $logincontainer->name = $rResult[0]["user_name"];
@@ -64,6 +81,8 @@ class UsersTable extends AbstractTableGateway {
             $logincontainer->mappedFacilities = $facilities_id;
             $logincontainer->mappedFacilitiesName = $facilities_name;
             $logincontainer->mappedFacilitiesCode = $facilities_code;
+            $logincontainer->provinces = $provinces;
+            $logincontainer->districts = $districts;
             $container->alertMsg = '';
             //die('home');
             if($logincontainer->role == 1 || $logincontainer->role == 2){

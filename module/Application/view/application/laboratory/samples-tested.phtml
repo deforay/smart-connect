@@ -31,6 +31,20 @@ $selectedLabs = array();
 if(isset($labFilter) && trim($labFilter)!= ''){
     $selectedLabs = explode(",",$labFilter);
 }
+//set selected provinces
+$selectedProvinces = array();
+if(isset($facilityInfo['selectedProvinces']) && count($facilityInfo['selectedProvinces']) >0){
+    foreach($facilityInfo['selectedProvinces'] as $province){
+        $selectedProvinces[] = $province['location_id'];
+    }
+}
+//set selected districts
+$selectedDistricts = array();
+if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) >0){
+    foreach($facilityInfo['labDistricts'] as $district){
+        $selectedDistricts[] = $district['facility_district'];
+    }
+}
 ?>
 <link href="<?php echo $this->basePath('assets/global/css/month-year-rang-picker.css'); ?>" rel="stylesheet" type="text/css" />
            <!-- BEGIN PAGE HEADER-->
@@ -68,21 +82,41 @@ if(isset($labFilter) && trim($labFilter)!= ''){
                                     </div>
                                   <input type="hidden" value="<?php echo $startDate; ?>" id="mrp-lowerDate" />
                                   <input type="hidden" value="<?php echo $endDate; ?>" id="mrp-upperDate" />
-                                
                                 </div>
-                                </div>                            
+                                </div>
+                                <div class="form-group col-lg-4">
+                                    <label class="control-label">Provinces&nbsp;</label>
+                                    <select name="provinces[]" id="provinces" class="form-control" multiple title="Please choose provinces" onchange="getLocationInfo('provinces');">
+                                        <?php
+                                        if(isset($facilityInfo['provinces']) && count($facilityInfo['provinces']) > 0){
+                                            foreach($facilityInfo['provinces'] as $province){
+                                        ?>
+                                            <option value="<?php echo $province['location_id']; ?>" <?php echo(in_array($province['location_id'],$selectedProvinces))?'selected="selected"':''; ?>><?php echo ucwords($province['location_name']); ?></option>
+                                        <?php } } ?>
+                                    </select>
+                                </div>
+                                <div class="form-group col-lg-4">
+                                    <label class="control-label">Districts&nbsp;</label>
+                                    <select name="districts[]" id="districts" class="form-control" multiple title="Please choose districts" onchange="getLocationInfo('districts');">
+                                        <?php
+                                        if(isset($facilityInfo['provinceDistricts']) && count($facilityInfo['provinceDistricts']) > 0){
+                                            foreach($facilityInfo['provinceDistricts'] as $provinceDistrict){
+                                        ?>
+                                            <option value="<?php echo $provinceDistrict['location_id']; ?>" <?php echo(in_array($provinceDistrict['location_id'],$selectedDistricts))?'selected="selected"':''; ?>><?php echo ucwords($provinceDistrict['location_name']); ?></option>
+                                        <?php } } ?>
+                                    </select>
+                                </div>
                             </div>                                
                             <div class="col-md-12">        
                                 <div class="form-group col-lg-4">
                                     <label class="control-label">Labs&nbsp;</label>
                                     <select name="labName[]" id="labName" class="form-control" multiple title="Please choose lab name">
                                         <?php
-                                        foreach($labName as $lab){
+                                        if(isset($facilityInfo['labs']) && count($facilityInfo['labs']) > 0){
+                                            foreach($facilityInfo['labs'] as $labs){
                                         ?>
-                                            <option value="<?php echo $lab['facility_id'];?>" <?php echo(in_array($lab['facility_id'],$selectedLabs))?'selected="selected"':''; ?>><?php echo $lab['facility_code']." - ".$lab['facility_name'];?></option>
-                                        <?php
-                                        }
-                                        ?>
+                                            <option value="<?php echo $labs['facility_id']; ?>" <?php echo(in_array($labs['facility_id'],$selectedLabs))?'selected="selected"':''; ?>><?php echo ucwords($labs['facility_name']); ?></option>
+                                        <?php } } ?>
                                     </select>
                                 </div>
                                 <!--<div class="form-group col-lg-4">
@@ -102,12 +136,11 @@ if(isset($labFilter) && trim($labFilter)!= ''){
                                     <label class="control-label">Clinics&nbsp;</label>
                                     <select class="form-control" id="clinicId" name="clinicId[]" multiple title="Please choose clinic name">
                                         <?php
-                                        foreach($clinicName as $clinic){
+                                        if(isset($facilityInfo['clinics']) && count($facilityInfo['clinics']) > 0){
+                                            foreach($facilityInfo['clinics'] as $clinics){
                                         ?>
-                                          <option value="<?php echo $clinic['facility_id']; ?>"><?php echo $clinic['facility_code']." - ".$clinic['facility_name'];?></option>
-                                        <?php
-                                        }
-                                        ?>
+                                            <option value="<?php echo $clinics['facility_id']; ?>" <?php echo(in_array($clinics['facility_id'],$selectedLabs))?'selected="selected"':''; ?>><?php echo ucwords($clinics['facility_name']); ?></option>
+                                        <?php } } ?>
                                     </select>
                                 </div>
                                 <div class="form-group col-lg-4">
@@ -117,7 +150,7 @@ if(isset($labFilter) && trim($labFilter)!= ''){
                                         <?php
                                         foreach($currentRegimen as $regimen){
                                         ?>
-                                        <option value="<?php echo base64_encode($regimen['art_code']);?>"><?php echo $regimen['art_code'];?></option>
+                                          <option value="<?php echo base64_encode($regimen['art_code']);?>"><?php echo $regimen['art_code'];?></option>
                                         <?php
                                         }
                                         ?>
@@ -211,8 +244,8 @@ if(isset($labFilter) && trim($labFilter)!= ''){
                             </div>
                             <div class="col-md-12">
                                <div class="form-group col-lg-12" style="text-align:center;margin-top:10px;">
-                                    <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="resetEverything();">Reset</a>&nbsp;&nbsp;
-                                    <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="searchSampleTestedResult()">Search</a>
+                                    <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="searchSampleTestedResult()">Search</a>&nbsp;&nbsp;
+                                    <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="resetEverything();">Reset</a>
                                 </div>
                              </div>
                             </div>
@@ -267,34 +300,13 @@ if(isset($labFilter) && trim($labFilter)!= ''){
                     </div>
 
 <script>
-    function generateBarContainer() {
-        $.blockUI.defaults.css.border = '1px solid grey';
-        $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
-        fromDate = $('#mrp-lowerDate').val();
-        toDate = $('#mrp-upperDate').val();
-        lab = $("#labName").val();
-        clinicId = $("#clinicId").val();
-        currentRegimen = $("#currentRegimen").val();
-        adherence = $("#adherence").val();
-        age = $("#age").val();
-        testResult = $("#testResult").val();
-        sampleType = $("#sampleType").val();
-        sampleStatus = $("#sampleStatus").val();
-        gender = $("#gender").val();
-        isPregnant = $('input[name="isPregnant"]:checked').val();
-        isBreastfeeding = $('input[name="isBreastfeeding"]:checked').val();
-        lineOfTreatment = $("#lineOfTreatment").val();
-        $.post("<?php echo $this->url('laboratory', array('action' => 'get-bar-sample-details')); ?>",{fromDate:fromDate,toDate:toDate,lab:lab,clinicId:clinicId,currentRegimen:currentRegimen,adherence:adherence,age:age,testResult:testResult,sampleType:sampleType,sampleStatus:sampleStatus,gender:gender,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding,lineOfTreatment:lineOfTreatment},
-        function(data) {
-            $("#barcontainer").html(data);
-        });
-    }
-    
     function generatePieContainer(){
         $.blockUI.defaults.css.border = '1px solid grey';
         $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
         fromDate = $('#mrp-lowerDate').val();
         toDate = $('#mrp-upperDate').val();
+        provinces = $("#provinces").val();
+        districts = $("#districts").val();
         lab = $("#labName").val();
         clinicId = $("#clinicId").val();
         currentRegimen = $("#currentRegimen").val();
@@ -307,14 +319,47 @@ if(isset($labFilter) && trim($labFilter)!= ''){
         isPregnant = $('input[name="isPregnant"]:checked').val();
         isBreastfeeding = $('input[name="isBreastfeeding"]:checked').val();
         lineOfTreatment = $("#lineOfTreatment").val();
-        $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-details')); ?>",{fromDate:fromDate,toDate:toDate,lab:lab,clinicId:clinicId,currentRegimen:currentRegimen,adherence:adherence,age:age,testResult:testResult,sampleType:sampleType,sampleStatus:sampleStatus,gender:gender,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding,lineOfTreatment:lineOfTreatment},
+        $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-details')); ?>",{fromDate:fromDate,toDate:toDate,provinces:provinces,districts:districts,lab:lab,clinicId:clinicId,currentRegimen:currentRegimen,adherence:adherence,age:age,testResult:testResult,sampleType:sampleType,sampleStatus:sampleStatus,gender:gender,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding,lineOfTreatment:lineOfTreatment},
         function(data) {
             $("#piecontainer").html(data);
         });
     }
     
+    function generateBarContainer() {
+        $.blockUI.defaults.css.border = '1px solid grey';
+        $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
+        fromDate = $('#mrp-lowerDate').val();
+        toDate = $('#mrp-upperDate').val();
+        provinces = $("#provinces").val();
+        districts = $("#districts").val();
+        lab = $("#labName").val();
+        clinicId = $("#clinicId").val();
+        currentRegimen = $("#currentRegimen").val();
+        adherence = $("#adherence").val();
+        age = $("#age").val();
+        testResult = $("#testResult").val();
+        sampleType = $("#sampleType").val();
+        sampleStatus = $("#sampleStatus").val();
+        gender = $("#gender").val();
+        isPregnant = $('input[name="isPregnant"]:checked').val();
+        isBreastfeeding = $('input[name="isBreastfeeding"]:checked').val();
+        lineOfTreatment = $("#lineOfTreatment").val();
+        $.post("<?php echo $this->url('laboratory', array('action' => 'get-bar-sample-details')); ?>",{fromDate:fromDate,toDate:toDate,provinces:provinces,districts:districts,lab:lab,clinicId:clinicId,currentRegimen:currentRegimen,adherence:adherence,age:age,testResult:testResult,sampleType:sampleType,sampleStatus:sampleStatus,gender:gender,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding,lineOfTreatment:lineOfTreatment},
+        function(data) {
+            $("#barcontainer").html(data);
+        });
+    }
+    
     var oTable = null;
     $(document).ready(function(){
+        $('#provinces').select2({
+            placeholder: "All Provinces",
+            allowClear: true
+        });
+        $('#districts').select2({
+            placeholder: "All Districts",
+            allowClear: true
+        });
         $('#labName').select2({
             placeholder: "All Labs",
             allowClear: true
@@ -334,9 +379,9 @@ if(isset($labFilter) && trim($labFilter)!= ''){
                 generateBarContainer();
             });
         });
-      generatePieContainer();
-      generateBarContainer();
-      loadSampleDataTable();
+       generatePieContainer();
+       generateBarContainer();
+       loadSampleDataTable();
     });
 
     
@@ -348,6 +393,8 @@ if(isset($labFilter) && trim($labFilter)!= ''){
     
     function resetEverything(){
         $("#pageFilter")[0].reset();
+        $('#provinces').val('').change();
+        $('#districts').val('').change();
         $('#labName').val('').change();
         $('#clinicId').val('').change();
         if($('#gender').val() == 'F'){
@@ -376,6 +423,8 @@ if(isset($labFilter) && trim($labFilter)!= ''){
             "fnServerData": function ( sSource, aoData, fnCallback ) {
                 aoData.push({"name": "fromDate", "value": $('#mrp-lowerDate').val()});
                 aoData.push({"name": "toDate", "value": $('#mrp-upperDate').val()});
+                aoData.push({"name": "provinces", "value": $('#provinces').val()});
+                aoData.push({"name": "districts", "value": $('#districts').val()});
                 aoData.push({"name": "lab", "value": $('#labName').val()});
                 aoData.push({"name": "clinicId", "value": $('#clinicId').val()});
                 aoData.push({"name": "currentRegimen", "value": $('#currentRegimen').val()});
@@ -673,5 +722,20 @@ if(isset($labFilter) && trim($labFilter)!= ''){
            $('#breastfeedingNo').prop('checked',false);
         }
     });
+    
+    function getLocationInfo(fromSrc){
+        provinces = ($("#provinces").val() == null || $("#provinces").val() == '')?[]:$("#provinces").val();
+        districts = ($("#districts").val() == null || $("#districts").val() == '')?[]:$("#districts").val();
+        $.post("<?php echo $this->url('laboratory', array('action' => 'get-location-info')); ?>", {provinces:provinces,districts:districts,fromSrc:fromSrc},
+        function(data){
+            if(fromSrc == 'provinces'){ $('#districts').val('').change(); }
+            $('#labName').val('').change();
+            $('#clinicId').val('').change();
+            splitLocationInfo = data.split('##');
+            if(fromSrc == 'provinces'){ $('#districts').html(splitLocationInfo[0]); }
+            $('#labName').html(splitLocationInfo[1]);
+            $('#clinicId').html(splitLocationInfo[2]);
+        });
+    }
 </script>
 <script src="<?php echo $this->basePath('assets/js/month-year-rang-picker.js'); ?>" type="text/javascript"></script>

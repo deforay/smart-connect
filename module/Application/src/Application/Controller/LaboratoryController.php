@@ -43,6 +43,7 @@ class LaboratoryController extends AbstractActionController{
     
     public function samplesTestedAction(){
         $this->layout()->setVariable('activeTab', 'labs-dashboard');
+        $params = array();
         $gender="";
         $month="";
         $range="";
@@ -73,6 +74,7 @@ class LaboratoryController extends AbstractActionController{
         }
         if($this->params()->fromQuery('lab')){
             $labFilter=$this->params()->fromQuery('lab');
+            $params['labs'] = explode(',',$labFilter);
         }
         if($this->params()->fromQuery('femaleFilter')){
             $femaleFilter=$this->params()->fromQuery('femaleFilter');
@@ -83,17 +85,19 @@ class LaboratoryController extends AbstractActionController{
         if($this->params()->fromQuery('result')){
             $result=$this->params()->fromQuery('result');
         }
-        
         $sampleService = $this->getServiceLocator()->get('SampleService');
-        $labName = $sampleService->getAllLabName();
-        $clinicName = $sampleService->getAllClinicName();
+        $commonService = $this->getServiceLocator()->get('CommonService');
+        //$labName = $sampleService->getAllLabName();
+        //$clinicName = $sampleService->getAllClinicName();
         $hubName = $sampleService->getAllHubName();
         $sampleType = $sampleService->getSampleType();
         $currentRegimen = $sampleService->getAllCurrentRegimen();
+        $facilityInfo = $commonService->getSampleTestedFacilityInfo($params);
+        //print_r($facilityInfo);die;
         return new ViewModel(array(
                 'sampleType' => $sampleType,
-                'labName' => $labName,
-                'clinicName' => $clinicName,
+                //'labName' => $labName,
+                //'clinicName' => $clinicName,
                 'hubName' => $hubName,
                 'currentRegimen' => $currentRegimen,
                 'searchMonth' => $month,
@@ -105,12 +109,14 @@ class LaboratoryController extends AbstractActionController{
                 'age' => $age,
                 'femaleFilter' => $femaleFilter,
                 'lt' => $lt,
+                'facilityInfo' => $facilityInfo,
                 'result' => $result
         ));
     }
     
     public function requisitionFormsIncompleteAction(){
         $this->layout()->setVariable('activeTab', 'labs-dashboard');
+        $params = array();
         $month="";
         $labFilter = "";
         if($this->params()->fromQuery('month')){
@@ -118,13 +124,17 @@ class LaboratoryController extends AbstractActionController{
         }
         if($this->params()->fromQuery('lab')){
             $labFilter=$this->params()->fromQuery('lab');
+            $params['labs'] = $labFilter;
         }
         $sampleService = $this->getServiceLocator()->get('SampleService');
-        $labList = $sampleService->getAllLabName();
+        $commonService = $this->getServiceLocator()->get('CommonService');
+        //$labList = $sampleService->getAllLabName();
+        $facilityInfo = $commonService->getSampleTestedFacilityInfo($params);
         return new ViewModel(array(
-            'labList' => $labList,
+            //'labList' => $labList,
             'searchMonth' => $month,
-            'labFilter' => $labFilter
+            'labFilter' => $labFilter,
+            'facilityInfo' => $facilityInfo
         ));
     }
     
@@ -364,6 +374,7 @@ class LaboratoryController extends AbstractActionController{
     
     public function samplesTestedLabAction(){
         $this->layout()->setVariable('activeTab', 'labs-dashboard');
+        $params = array();
         $gender="";
         $month="";
         $range="";
@@ -390,19 +401,23 @@ class LaboratoryController extends AbstractActionController{
             $toMonth=$this->params()->fromQuery('toMonth');
         }
         if($this->params()->fromQuery('lab')){
-            $labFilter=$this->params()->fromQuery('lab');
+            $labFilter = $this->params()->fromQuery('lab');
+            $params['labNames'] = explode(',',$labFilter);
+            $params['fromSrc'] = 'tested-lab';
         }
         
         $sampleService = $this->getServiceLocator()->get('SampleService');
-        $labName = $sampleService->getAllLabName();
-        $clinicName = $sampleService->getAllClinicName();
+        $commonService = $this->getServiceLocator()->get('commonService');
+        //$labName = $sampleService->getAllLabName();
+        //$clinicName = $sampleService->getAllClinicName();
         $hubName = $sampleService->getAllHubName();
         $sampleType = $sampleService->getSampleType();
         $currentRegimen = $sampleService->getAllCurrentRegimen();
+        $facilityInfo = $commonService->getSampleTestedFacilityInfo($params);
         return new ViewModel(array(
                 'sampleType' => $sampleType,
-                'labName' => $labName,
-                'clinicName' => $clinicName,
+                //'labName' => $labName,
+                //'clinicName' => $clinicName,
                 'hubName' => $hubName,
                 'currentRegimen' => $currentRegimen,
                 'searchMonth' => $month,
@@ -411,7 +426,8 @@ class LaboratoryController extends AbstractActionController{
                 'fromMonth' => $fromMonth,
                 'toMonth' => $toMonth,
                 'labFilter' => $labFilter,
-                'age' => $age
+                'age' => $age,
+                'facilityInfo' => $facilityInfo
         ));
     }
     
@@ -443,28 +459,34 @@ class LaboratoryController extends AbstractActionController{
     
     public function sampleVolumeAction(){
         $this->layout()->setVariable('activeTab', 'labs-dashboard');
+        $params = array();
         $labFilter="";
         $sampleStatus="";
         if($this->params()->fromQuery('lab')){
             $labFilter=$this->params()->fromQuery('lab');
+            $params['labCodes'] = explode(',',$labFilter);
+            $params['fromSrc'] = 'sample-volume';
         }
         if($this->params()->fromQuery('result')){
             $sampleStatus=$this->params()->fromQuery('result');
         }
         $sampleService = $this->getServiceLocator()->get('SampleService');
-        $labName = $sampleService->getAllLabName();
-        $clinicName = $sampleService->getAllClinicName();
+        $commonService = $this->getServiceLocator()->get('CommonService');
+        //$labName = $sampleService->getAllLabName();
+        //$clinicName = $sampleService->getAllClinicName();
         $hubName = $sampleService->getAllHubName();
         $sampleType = $sampleService->getSampleType();
         $currentRegimen = $sampleService->getAllCurrentRegimen();
+        $facilityInfo = $commonService->getSampleTestedFacilityInfo($params);
         return new ViewModel(array(
             'sampleType' => $sampleType,
-            'labName' => $labName,
-            'clinicName' => $clinicName,
+            //'labName' => $labName,
+            //'clinicName' => $clinicName,
             'hubName' => $hubName,
             'currentRegimen' => $currentRegimen,
             'labFilter' => $labFilter,
-            'sampleStatus' => $sampleStatus
+            'sampleStatus' => $sampleStatus,
+            'facilityInfo' => $facilityInfo
         ));
     }
     
@@ -496,6 +518,7 @@ class LaboratoryController extends AbstractActionController{
     
     public function getSampleTestedTurnAroundTimeAction(){
         $this->layout()->setVariable('activeTab', 'labs-dashboard');
+        $params = array();
         $gender="";
         $month="";
         $range="";
@@ -523,18 +546,21 @@ class LaboratoryController extends AbstractActionController{
         }
         if($this->params()->fromQuery('lab')){
             $labFilter=$this->params()->fromQuery('lab');
+            $params['labs'] = explode(',',$labFilter);
         }
         
         $sampleService = $this->getServiceLocator()->get('SampleService');
-        $labName = $sampleService->getAllLabName();
-        $clinicName = $sampleService->getAllClinicName();
+        $commonService = $this->getServiceLocator()->get('CommonService');
+        //$labName = $sampleService->getAllLabName();
+        //$clinicName = $sampleService->getAllClinicName();
         $hubName = $sampleService->getAllHubName();
         $sampleType = $sampleService->getSampleType();
         $currentRegimen = $sampleService->getAllCurrentRegimen();
+        $facilityInfo = $commonService->getSampleTestedFacilityInfo($params);
         return new ViewModel(array(
                 'sampleType' => $sampleType,
-                'labName' => $labName,
-                'clinicName' => $clinicName,
+                //'labName' => $labName,
+                //'clinicName' => $clinicName,
                 'hubName' => $hubName,
                 'currentRegimen' => $currentRegimen,
                 'searchMonth' => $month,
@@ -543,7 +569,8 @@ class LaboratoryController extends AbstractActionController{
                 'fromMonth' => $fromMonth,
                 'toMonth' => $toMonth,
                 'labFilter' => $labFilter,
-                'age' => $age
+                'age' => $age,
+                'facilityInfo' => $facilityInfo
         ));
     }
     
@@ -616,6 +643,19 @@ class LaboratoryController extends AbstractActionController{
            return new ViewModel(array('fromMonth'=>date('M-Y',strtotime($fromDate)),'toMonth'=>date('M-Y',strtotime($toDate)),'labFilter'=>$labFilter,'labName'=>$labName));
         }else{
             return $this->redirect()->toUrl("/labs/dashboard");
+        }
+    }
+    
+    public function getLocationInfoAction() {
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $commonService = $this->getServiceLocator()->get('CommonService');
+            $result=$commonService->getSampleTestedLocationInfo($params);
+            $viewModel = new ViewModel();
+            $viewModel->setVariables(array('result' =>$result))
+                      ->setTerminal(true);
+            return $viewModel;
         }
     }
 }
