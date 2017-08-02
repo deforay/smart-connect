@@ -139,7 +139,7 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
                                         if(isset($facilityInfo['clinics']) && count($facilityInfo['clinics']) > 0){
                                             foreach($facilityInfo['clinics'] as $clinics){
                                         ?>
-                                            <option value="<?php echo $clinics['facility_id']; ?>" <?php echo(in_array($clinics['facility_id'],$selectedLabs))?'selected="selected"':''; ?>><?php echo ucwords($clinics['facility_name']); ?></option>
+                                            <option value="<?php echo $clinics['facility_id']; ?>"><?php echo ucwords($clinics['facility_name']); ?></option>
                                         <?php } } ?>
                                     </select>
                                 </div>

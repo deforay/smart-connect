@@ -195,8 +195,12 @@ class FacilityTable extends AbstractTableGateway {
                                      ->columns(array('location_id','location_name'))
                                      ->where('parent_location != 0')
                                      ->order('location_name asc');
-        if($logincontainer->role!= 1){
-            $provinceDistrictQuery = $provinceDistrictQuery->where('l_d.location_id IN ("' . implode('", "', array_values(array_filter($logincontainer->districts))) . '")');
+        if(isset($labProvinces) && count($labProvinces) >0){
+            $provinceDistrictQuery = $provinceDistrictQuery->where('l_d.parent_location IN ("' . implode('", "', array_values(array_filter($labProvinces))) . '")');
+        }else{
+            if($logincontainer->role!= 1){
+                $provinceDistrictQuery = $provinceDistrictQuery->where('l_d.location_id IN ("' . implode('", "', array_values(array_filter($logincontainer->districts))) . '")');
+            }
         }
         $provinceDistrictQueryStr = $sql->getSqlStringForSqlObject($provinceDistrictQuery);
         $facilityInfo['provinceDistricts'] = $dbAdapter->query($provinceDistrictQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -260,13 +264,16 @@ class FacilityTable extends AbstractTableGateway {
                                          ->columns(array('location_id','location_name'))
                                          ->where('parent_location != 0')
                                          ->order('location_name asc');
-            if(isset($params['provinces']) && count($params['provinces']) >0){
-               $provinceDistrictQuery = $provinceDistrictQuery->where('l_d.parent_location IN ("' . implode('", "', $params['provinces']) . '")');
+            if($logincontainer->role!= 1){
+                if(isset($params['provinces']) && count($params['provinces']) >0){
+                   $provinceDistrictQuery = $provinceDistrictQuery->where('l_d.parent_location IN ("' . implode('", "', $params['provinces']) . '") AND l_d.location_id IN ("' . implode('", "', $logincontainer->districts) . '")');  
+                }else{
+                   $provinceDistrictQuery = $provinceDistrictQuery->where('l_d.location_id IN ("' . implode('", "', $logincontainer->districts) . '")'); 
+                }
             }else{
-               if($logincontainer->role!= 1){
-                   $mappedProvinces = (isset($logincontainer->provinces) && count($logincontainer->provinces) >0)?$logincontainer->provinces:array(0);
-                   $provinceDistrictQuery = $provinceDistrictQuery->where('l_d.parent_location IN ("' . implode('", "', array_values(array_filter($mappedProvinces))) . '")');
-               } 
+                if(isset($params['provinces']) && count($params['provinces']) >0){
+                    $provinceDistrictQuery = $provinceDistrictQuery->where('l_d.parent_location IN ("' . implode('", "', $params['provinces']) . '")');
+                }
             }
             $provinceDistrictQueryStr = $sql->getSqlStringForSqlObject($provinceDistrictQuery);
             $locationInfo['provinceDistricts'] = $dbAdapter->query($provinceDistrictQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -283,6 +290,8 @@ class FacilityTable extends AbstractTableGateway {
                         ->order('facility_name asc');
         if(isset($provinceDistricts) && count($provinceDistricts) >0){
            $labQuery = $labQuery->where('f.facility_district IN ("' . implode('", "', $provinceDistricts) . '")');
+        }else if(isset($params['provinces']) && count($params['provinces']) >0){
+           $labQuery = $labQuery->where('f.facility_state IN ("' . implode('", "', $params['provinces']) . '")');
         }else{
             if($logincontainer->role!= 1){
                 $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:array(0);
@@ -298,6 +307,8 @@ class FacilityTable extends AbstractTableGateway {
                            ->order('facility_name asc');
         if(isset($provinceDistricts) && count($provinceDistricts) >0){
            $clinicQuery = $clinicQuery->where('f.facility_district IN ("' . implode('", "', $provinceDistricts) . '")');
+        }else if(isset($params['provinces']) && count($params['provinces']) >0){
+           $clinicQuery = $clinicQuery->where('f.facility_state IN ("' . implode('", "', $params['provinces']) . '")');
         }else{
             if($logincontainer->role!= 1){
                 $mappedDistricts = (isset($logincontainer->districts) && count($logincontainer->districts) >0)?$logincontainer->districts:array(0);
