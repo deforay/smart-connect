@@ -31,6 +31,20 @@ $selectedLabs = array();
 if(isset($labFilter) && trim($labFilter)!= ''){
     $selectedLabs = explode(",",$labFilter);
 }
+//set selected provinces
+$selectedProvinces = array();
+if(isset($facilityInfo['selectedProvinces']) && count($facilityInfo['selectedProvinces']) >0){
+    foreach($facilityInfo['selectedProvinces'] as $province){
+        $selectedProvinces[] = $province['location_id'];
+    }
+}
+//set selected districts
+$selectedDistricts = array();
+if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) >0){
+    foreach($facilityInfo['labDistricts'] as $district){
+        $selectedDistricts[] = $district['facility_district'];
+    }
+}
 ?>
 <link href="<?php echo $this->basePath('assets/global/css/month-year-rang-picker.css'); ?>" rel="stylesheet" type="text/css" />
            <!-- BEGIN PAGE HEADER-->
@@ -56,148 +70,167 @@ if(isset($labFilter) && trim($labFilter)!= ''){
                     <form id="pageFilter" action="#" method="">
                         <div class="row">
                             <div class="col-md-12" style="padding-left:30px;">
-                            <div class="col-md-12">
-                                <div class="form-group col-lg-4">
-                                    <label class="control-label">Date Range&nbsp;</label>
-                                  <div id="sla-data-range" class="btn btn-sm form-control col-lg-6 mrp-container ">
-                                    
-                                    <span class="mrp-icon"><i class="fa fa-calendar"></i> &nbsp;</span>
-                                    <div class="mrp-monthdisplay ">
-                                      <span class="mrp-lowerMonth"><?php echo $startDisplayDate; ?></span>
-                                      <span class="mrp-to"> to </span>
-                                      <span class="mrp-upperMonth"><?php echo $endDisplayDate; ?></span>
+                                <div class="col-md-12">
+                                    <div class="form-group col-lg-4">
+                                        <label class="control-label">Date Range&nbsp;</label>
+                                      <div id="sla-data-range" class="btn btn-sm form-control col-lg-6 mrp-container ">
+                                        
+                                        <span class="mrp-icon"><i class="fa fa-calendar"></i> &nbsp;</span>
+                                        <div class="mrp-monthdisplay ">
+                                          <span class="mrp-lowerMonth"><?php echo $startDisplayDate; ?></span>
+                                          <span class="mrp-to"> to </span>
+                                          <span class="mrp-upperMonth"><?php echo $endDisplayDate; ?></span>
+                                        </div>
+                                      <input type="hidden" value="<?php echo $startDate; ?>" id="mrp-lowerDate" />
+                                      <input type="hidden" value="<?php echo $endDate; ?>" id="mrp-upperDate" />
                                     </div>
-                                  <input type="hidden" value="<?php echo $startDate; ?>" id="mrp-lowerDate" />
-                                  <input type="hidden" value="<?php echo $endDate; ?>" id="mrp-upperDate" />
-                                
-                                </div>
-                                </div>                            
-                            </div>                                
-                            <div class="col-md-12">        
-                                <div class="form-group col-lg-4">
-                                    <label class="control-label">Lab&nbsp;</label>
-                                    <select name="labName[]" id="labName" class="form-control" multiple title="Please choose lab name">
-                                        <?php
-                                        foreach($labName as $lab){
-                                        ?>
-                                            <option value="<?php echo $lab['facility_id'] ;?>" <?php echo(in_array($lab['facility_name'],$selectedLabs))?'selected="selected"':''; ?>><?php echo $lab['facility_code']." - ".$lab['facility_name'];?></option>
-                                        <?php
-                                        }
-                                        ?>
-                                    </select>
-                                </div>
-                                
-                                <!--<div class="form-group col-lg-4">
-                                    <label class="control-label">Hub </label>
-                                    <select class="form-control" id="hub" name="hub">
-                                        <option value="">All Hubs</option>
-                                        < ?php
-                                        foreach($hubName as $hub){
-                                        ?>
-                                        <option value="< ?php echo base64_encode($hub['facility_id']);?>">< ?php echo $hub['facility_name'];?></option>
-                                        < ?php
-                                        }
-                                        ?>
-                                    </select>
-                                </div>  -->                          
-                                <div class="form-group col-lg-4">
-                                    <label class="control-label">Clinic&nbsp;</label>
-                                    <select class="form-control" id="clinicId" name="clinicId[]" multiple title="Please choose clinic name">
-                                        <?php
-                                        foreach($clinicName as $clinic){
-                                        ?>
-                                        <option value="<?php echo $clinic['facility_id']; ?>"><?php echo $clinic['facility_code']." - ".$clinic['facility_name'];?></option>
-                                        <?php
-                                        }
-                                        ?>
-                                    </select>
-                                </div>
-                                <div class="form-group col-lg-4">
-                                    <label class="control-label">Current Regimen</label>
-                                    <select class="form-control" id="currentRegimen" name="currentRegimen">
+                                    </div>
+                                    <div class="form-group col-lg-4">
+                                        <label class="control-label">Provinces&nbsp;</label>
+                                        <select name="provinces[]" id="provinces" class="form-control" multiple title="Please choose provinces" onchange="getLocationInfo('provinces');">
+                                            <?php
+                                            if(isset($facilityInfo['provinces']) && count($facilityInfo['provinces']) > 0){
+                                                foreach($facilityInfo['provinces'] as $province){
+                                            ?>
+                                                <option value="<?php echo $province['location_id']; ?>" <?php echo(in_array($province['location_id'],$selectedProvinces))?'selected="selected"':''; ?>><?php echo ucwords($province['location_name']); ?></option>
+                                            <?php } } ?>
+                                        </select>
+                                    </div>
+                                    <div class="form-group col-lg-4">
+                                        <label class="control-label">Districts&nbsp;</label>
+                                        <select name="districts[]" id="districts" class="form-control" multiple title="Please choose districts" onchange="getLocationInfo('districts');">
+                                            <?php
+                                            if(isset($facilityInfo['provinceDistricts']) && count($facilityInfo['provinceDistricts']) > 0){
+                                                foreach($facilityInfo['provinceDistricts'] as $provinceDistrict){
+                                            ?>
+                                                <option value="<?php echo $provinceDistrict['location_id']; ?>" <?php echo(in_array($provinceDistrict['location_id'],$selectedDistricts))?'selected="selected"':''; ?>><?php echo ucwords($provinceDistrict['location_name']); ?></option>
+                                            <?php } } ?>
+                                        </select>
+                                    </div>
+                                </div>                                
+                                <div class="col-md-12">        
+                                    <div class="form-group col-lg-4">
+                                        <label class="control-label">Lab&nbsp;</label>
+                                        <select name="labName[]" id="labName" class="form-control" multiple title="Please choose lab name">
+                                            <?php
+                                            if(isset($facilityInfo['labs']) && count($facilityInfo['labs']) > 0){
+                                                foreach($facilityInfo['labs'] as $labs){
+                                            ?>
+                                                <option value="<?php echo $labs['facility_id']; ?>" <?php echo(in_array($labs['facility_name'],$selectedLabs))?'selected="selected"':''; ?>><?php echo ucwords($labs['facility_name']); ?></option>
+                                            <?php } } ?>
+                                        </select>
+                                    </div>
+                                    
+                                    <!--<div class="form-group col-lg-4">
+                                        <label class="control-label">Hub </label>
+                                        <select class="form-control" id="hub" name="hub">
+                                            <option value="">All Hubs</option>
+                                            < ?php
+                                            foreach($hubName as $hub){
+                                            ?>
+                                            <option value="< ?php echo base64_encode($hub['facility_id']);?>">< ?php echo $hub['facility_name'];?></option>
+                                            < ?php
+                                            }
+                                            ?>
+                                        </select>
+                                    </div>  -->                          
+                                    <div class="form-group col-lg-4">
+                                        <label class="control-label">Clinic&nbsp;</label>
+                                        <select class="form-control" id="clinicId" name="clinicId[]" multiple title="Please choose clinic name">
+                                            <?php
+                                            if(isset($facilityInfo['clinics']) && count($facilityInfo['clinics']) > 0){
+                                                foreach($facilityInfo['clinics'] as $clinics){
+                                            ?>
+                                                <option value="<?php echo $clinics['facility_id']; ?>"><?php echo ucwords($clinics['facility_name']); ?></option>
+                                            <?php } } ?>
+                                        </select>
+                                    </div>
+                                    <div class="form-group col-lg-4">
+                                        <label class="control-label">Current Regimen</label>
+                                        <select class="form-control" id="currentRegimen" name="currentRegimen">
+                                            <option value="">All</option>
+                                            <?php
+                                            foreach($currentRegimen as $regimen){
+                                            ?>
+                                            <option value="<?php echo base64_encode($regimen['art_code']);?>"><?php echo $regimen['art_code'];?></option>
+                                            <?php
+                                            }
+                                            ?>
+                                        </select>
+                                    </div>
+                                </div>                                
+                                <div class="col-md-12">
+                                    <div class="form-group col-lg-4">
+                                        <label class="control-label">ARV Adherence</label>
+                                      <select class="form-control" name="adherence" id="adherence">
+                                        <option value="">--Select--</option>
+                                        <option value="good">Good >= 95%</option>
+                                        <option value="fair">Fair 85-94%</option>
+                                        <option value="poor">Poor < 85%</option>
+                                      </select>
+                                    </div>
+                                    <div class="form-group col-lg-4">
+                                        <label class="control-label">Age Group</label>
+                                        <select class="form-control" name="age" id="age" title="Please choose age group">
+                                          <option value="">-- Age --</option>
+                                          <option value="<18" <?php echo (isset($age) && $age == '<18')?'selected="selected"':''; ?>> <18</option>
+                                          <option value=">18" <?php echo (isset($age) && $age == '>18')?'selected="selected"':''; ?>> >18</option>
+                                          <option value="unknown"> Unknown</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group col-lg-4">
+                                        <label class="control-label">Test Result&nbsp;</label>
+                                        <select class="form-control" name="testResult" id="testResult" title="Please choose result">
                                         <option value="">All</option>
-                                        <?php
-                                        foreach($currentRegimen as $regimen){
-                                        ?>
-                                        <option value="<?php echo base64_encode($regimen['art_code']);?>"><?php echo $regimen['art_code'];?></option>
-                                        <?php
-                                        }
-                                        ?>
-                                    </select>
+                                        <option value=">=1000" <?php echo((isset($searchRange) && $searchRange=='>1000') ? "selected='selected'" : "") ?>>>= 1000 cp/mL</option>
+                                        <option value="<1000" <?php echo((isset($searchRange) && $searchRange=='<1000') ? "selected='selected'" : "") ?>>< 1000 cp/mL</option>
+                                      </select>
+                                    </div>
                                 </div>
-                            </div>                                
-                            <div class="col-md-12">
-                                <div class="form-group col-lg-4">
-                                    <label class="control-label">ARV Adherence</label>
-                                  <select class="form-control" name="adherence" id="adherence">
-                                    <option value="">--Select--</option>
-                                    <option value="good">Good >= 95%</option>
-                                    <option value="fair">Fair 85-94%</option>
-                                    <option value="poor">Poor < 85%</option>
-                                  </select>
-                                </div>
-                                <div class="form-group col-lg-4">
-                                    <label class="control-label">Age Group</label>
-                                    <select class="form-control" name="age" id="age" title="Please choose age group">
-                                      <option value="">-- Age --</option>
-                                      <option value="<18" <?php echo (isset($age) && $age == '<18')?'selected="selected"':''; ?>> <18</option>
-                                      <option value=">18" <?php echo (isset($age) && $age == '>18')?'selected="selected"':''; ?>> >18</option>
-                                      <option value="unknown"> Unknown</option>
-                                    </select>
-                                </div>
-                                <div class="form-group col-lg-4">
-                                    <label class="control-label">Test Result&nbsp;</label>
-                                    <select class="form-control" name="testResult" id="testResult" title="Please choose result">
-                                    <option value="">All</option>
-                                    <option value=">=1000" <?php echo((isset($searchRange) && $searchRange=='>1000') ? "selected='selected'" : "") ?>>>= 1000 cp/mL</option>
-                                    <option value="<1000" <?php echo((isset($searchRange) && $searchRange=='<1000') ? "selected='selected'" : "") ?>>< 1000 cp/mL</option>
-                                  </select>
-                                </div>
-                            </div>
-                            <div class="col-md-12">
-                                <div class="form-group col-lg-4">
-                                    <label class="control-label">Sample Type</label>
-                                    <select class="form-control" id="sampleType" name="sampleType">
+                                <div class="col-md-12">
+                                    <div class="form-group col-lg-4">
+                                        <label class="control-label">Sample Type</label>
+                                        <select class="form-control" id="sampleType" name="sampleType">
+                                            <option value="">All</option>
+                                            <?php
+                                            foreach($sampleType as $samples){
+                                            ?>
+                                            <option value="<?php echo base64_encode($samples['sample_id']);?>"><?php echo $samples['sample_name'];?></option>
+                                            <?php
+                                            }
+                                            ?>
+                                        </select>
+                                    </div>
+                                    <div class="form-group col-lg-4">
+                                        <label class="control-label">Gender</label>
+                                      <select class="form-control" name="gender" id="gender">
                                         <option value="">All</option>
-                                        <?php
-                                        foreach($sampleType as $samples){
-                                        ?>
-                                        <option value="<?php echo base64_encode($samples['sample_id']);?>"><?php echo $samples['sample_name'];?></option>
-                                        <?php
-                                        }
-                                        ?>
-                                    </select>
+                                        <option value="M" <?php echo (isset($searchGender) && $searchGender == 'M')?'selected="selected"':''; ?>>Male</option>
+                                        <option value="F" <?php echo (isset($searchGender) && $searchGender == 'F')?'selected="selected"':''; ?>>Female</option>
+                                        <option value="not_specified" <?php echo (isset($searchGender) && $searchGender == 'Not Specified')?'selected="selected"':''; ?>>Not Specified</option>
+                                      </select>
+                                    </div>
+                                    <div class="form-group col-lg-4 femaleSection" style="display:none;">
+                                        <label class="control-label">Is Patient Pregnant</label><br>
+                                        <input id="pregnantYes" name="isPregnant" value="yes" type="radio"> Yes&nbsp;&nbsp;
+                                        <input id="pregnantNo" name="isPregnant" value="no" type="radio"> No&nbsp;&nbsp;
+                                        <input id="pregnantUnreported" name="isPregnant" value="unreported" type="radio"> Unreported
+                                    </div>
                                 </div>
-                                <div class="form-group col-lg-4">
-                                    <label class="control-label">Gender</label>
-                                  <select class="form-control" name="gender" id="gender">
-                                    <option value="">All</option>
-                                    <option value="M" <?php echo (isset($searchGender) && $searchGender == 'M')?'selected="selected"':''; ?>>Male</option>
-                                    <option value="F" <?php echo (isset($searchGender) && $searchGender == 'F')?'selected="selected"':''; ?>>Female</option>
-                                    <option value="not_specified" <?php echo (isset($searchGender) && $searchGender == 'Not Specified')?'selected="selected"':''; ?>>Not Specified</option>
-                                  </select>
+                                <div class="col-md-12">
+                                    <div class="form-group col-lg-4 femaleSection" style="display:none;">
+                                        <label class="control-label">Is Patient Breastfeeding</label><br>
+                                        <input id="breastfeedingYes" name="isBreastfeeding" value="yes" type="radio"> Yes&nbsp;&nbsp;
+                                        <input id="breastfeedingNo" name="isBreastfeeding" value="no" type="radio"> No&nbsp;&nbsp;
+                                        <input id="breastfeedingUnreported" name="isBreastfeeding" value="unreported" type="radio"> Unreported
+                                    </div>
                                 </div>
-                                <div class="form-group col-lg-4 femaleSection" style="display:none;">
-                                    <label class="control-label">Is Patient Pregnant</label><br>
-                                    <input id="pregnantYes" name="isPregnant" value="yes" type="radio"> Yes&nbsp;&nbsp;
-                                    <input id="pregnantNo" name="isPregnant" value="no" type="radio"> No&nbsp;&nbsp;
-                                    <input id="pregnantUnreported" name="isPregnant" value="unreported" type="radio"> Unreported
+                                <div class="col-md-12">
+                                   <div class="form-group col-lg-12" style="text-align:center;margin-top:10px;">
+                                        <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="searchSampleTestedLabResult()">Search</a>&nbsp;&nbsp;
+                                        <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="resetEverything();">Reset</a>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-md-12">
-                                <div class="form-group col-lg-4 femaleSection" style="display:none;">
-                                    <label class="control-label">Is Patient Breastfeeding</label><br>
-                                    <input id="breastfeedingYes" name="isBreastfeeding" value="yes" type="radio"> Yes&nbsp;&nbsp;
-                                    <input id="breastfeedingNo" name="isBreastfeeding" value="no" type="radio"> No&nbsp;&nbsp;
-                                    <input id="breastfeedingUnreported" name="isBreastfeeding" value="unreported" type="radio"> Unreported
-                                </div>
-                            </div>
-                            <div class="col-md-12">
-                               <div class="form-group col-lg-12" style="text-align:center;margin-top:10px;">
-                                    <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="resetEverything();">Reset</a>&nbsp;&nbsp;
-                                    <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="searchSampleTestedLabResult()">Search</a>
-                                </div>
-                            </div>
                             </div>
                         </div>
                     </form>
@@ -254,6 +287,8 @@ if(isset($labFilter) && trim($labFilter)!= ''){
         $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
         fromDate = $('#mrp-lowerDate').val();
         toDate = $('#mrp-upperDate').val();
+        provinces = $("#provinces").val();
+        districts = $("#districts").val();
         lab = $("#labName").val();
         clinicId = $("#clinicId").val();
         currentRegimen = $("#currentRegimen").val();
@@ -264,7 +299,7 @@ if(isset($labFilter) && trim($labFilter)!= ''){
         gender = $("#gender").val();
         isPregnant = $('input[name="isPregnant"]:checked').val();
         isBreastfeeding = $('input[name="isBreastfeeding"]:checked').val();
-        $.post("<?php echo $this->url('laboratory', array('action' => 'get-lab-sample-details')); ?>",{fromDate:fromDate,toDate:toDate,lab:lab,clinicId:clinicId,currentRegimen:currentRegimen,adherence:adherence,age:age,testResult:testResult,sampleType:sampleType,gender:gender,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding},
+        $.post("<?php echo $this->url('laboratory', array('action' => 'get-lab-sample-details')); ?>",{fromDate:fromDate,toDate:toDate,provinces:provinces,districts:districts,lab:lab,clinicId:clinicId,currentRegimen:currentRegimen,adherence:adherence,age:age,testResult:testResult,sampleType:sampleType,gender:gender,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding},
         function(data) {
             $("#piecontainer").html(data);
         });
@@ -275,6 +310,8 @@ if(isset($labFilter) && trim($labFilter)!= ''){
         $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
         fromDate = $('#mrp-lowerDate').val();
         toDate = $('#mrp-upperDate').val();
+        provinces = $("#provinces").val();
+        districts = $("#districts").val();
         lab = $("#labName").val();
         clinicId = $("#clinicId").val();
         currentRegimen = $("#currentRegimen").val();
@@ -285,7 +322,7 @@ if(isset($labFilter) && trim($labFilter)!= ''){
         gender = $("#gender").val();
         isPregnant = $('input[name="isPregnant"]:checked').val();
         isBreastfeeding = $('input[name="isBreastfeeding"]:checked').val();
-        $.post("<?php echo $this->url('laboratory', array('action' => 'get-lab-bar-sample-details')); ?>",{fromDate:fromDate,toDate:toDate,lab:lab,clinicId:clinicId,currentRegimen:currentRegimen,adherence:adherence,age:age,testResult:testResult,sampleType:sampleType,gender:gender,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding},
+        $.post("<?php echo $this->url('laboratory', array('action' => 'get-lab-bar-sample-details')); ?>",{fromDate:fromDate,toDate:toDate,provinces:provinces,districts:districts,lab:lab,clinicId:clinicId,currentRegimen:currentRegimen,adherence:adherence,age:age,testResult:testResult,sampleType:sampleType,gender:gender,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding},
         function(data) {
             $("#barcontainer").html(data);
         });
@@ -293,6 +330,14 @@ if(isset($labFilter) && trim($labFilter)!= ''){
     
     var oTable = null;
     $(document).ready(function(){
+        $('#provinces').select2({
+            placeholder: "All Provinces",
+            allowClear: true
+        });
+        $('#districts').select2({
+            placeholder: "All Districts",
+            allowClear: true
+        });
         $('#labName').select2({
             placeholder: "All Labs",
             allowClear: true
@@ -324,6 +369,8 @@ if(isset($labFilter) && trim($labFilter)!= ''){
     
     function resetEverything(){
         $("#pageFilter")[0].reset();
+        $('#provinces').val('').change();
+        $('#districts').val('').change();
         $('#labName').val('').change();
         $('#clinicId').val('').change();
         if($('#gender').val() == 'F'){
@@ -352,6 +399,8 @@ if(isset($labFilter) && trim($labFilter)!= ''){
                 "fnServerData": function ( sSource, aoData, fnCallback ) {
                     aoData.push({"name": "fromDate", "value": $('#mrp-lowerDate').val()});
                     aoData.push({"name": "toDate", "value": $('#mrp-upperDate').val()});
+                    aoData.push({"name": "provinces", "value": $('#provinces').val()});
+                    aoData.push({"name": "districts", "value": $('#districts').val()});
                     aoData.push({"name": "lab", "value": $('#labName').val()});
                     aoData.push({"name": "clinicId", "value": $('#clinicId').val()});
                     aoData.push({"name": "currentRegimen", "value": $('#currentRegimen').val()});
@@ -646,5 +695,20 @@ if(isset($labFilter) && trim($labFilter)!= ''){
            $('#breastfeedingNo').prop('checked',false);
         }
     });
+    
+    function getLocationInfo(fromSrc){
+        provinces = ($("#provinces").val() == null || $("#provinces").val() == '')?[]:$("#provinces").val();
+        districts = ($("#districts").val() == null || $("#districts").val() == '')?[]:$("#districts").val();
+        $.post("<?php echo $this->url('laboratory', array('action' => 'get-location-info')); ?>", {provinces:provinces,districts:districts,fromSrc:fromSrc},
+        function(data){
+            if(fromSrc == 'provinces'){ $('#districts').val('').change(); }
+            $('#labName').val('').change();
+            $('#clinicId').val('').change();
+            splitLocationInfo = data.split('##');
+            if(fromSrc == 'provinces'){ $('#districts').html(splitLocationInfo[0]); }
+            $('#labName').html(splitLocationInfo[1]);
+            $('#clinicId').html(splitLocationInfo[2]);
+        });
+    }
 </script>
 <script src="<?php echo $this->basePath('assets/js/month-year-rang-picker.js'); ?>" type="text/javascript"></script>

@@ -1,0 +1,21 @@
+<?php
+$districts = '';
+$labs = '';
+$clinics = '';
+if(isset($result['provinceDistricts']) && count($result['provinceDistricts']) >0){
+    foreach($result['provinceDistricts'] as $district){
+        $districts.='<option value="'.$district['location_id'].'">'.ucwords($district['location_name']).'</option>';
+    }
+}
+if(isset($result['labs']) && count($result['labs']) >0){
+    foreach($result['labs'] as $lab){
+        $labs.='<option value="'.$lab['facility_id'].'">'.ucwords($lab['facility_name']).'</option>';
+    }
+}
+if(isset($result['clinics']) && count($result['clinics']) >0){
+    foreach($result['clinics'] as $clinic){
+        $clinics.='<option value="'.$clinic['facility_id'].'">'.ucwords($clinic['facility_name']).'</option>';
+    }
+}
+echo $districts.'##'.$labs.'##'.$clinics;
+?>

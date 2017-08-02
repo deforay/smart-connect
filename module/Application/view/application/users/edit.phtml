@@ -73,7 +73,7 @@
                                                       <?php
                                                       foreach($facilities as $row){
                                                       ?>
-                                                        <option value="<?php echo $row['facility_id']; ?>" <?php echo (in_array($row['facility_id'],$mappedFacilities))?'selected="selected"':''; ?>><?php echo ucwords($row['facility_name']); ?></option>
+                                                        <option value="<?php echo $row['facility_id']; ?>" <?php echo (in_array($row['facility_id'],array_values(array_filter($mappedFacilities))))?'selected="selected"':''; ?>><?php echo ucwords($row['facility_name']); ?></option>
                                                       <?php } ?>
                                                     </select>
                                                 </div>
