@@ -26,6 +26,7 @@ use Application\Model\SampleTypeTable;
 use Application\Model\GlobalTable;
 use Application\Model\ArtCodeTable;
 use Application\Model\UserFacilityMapTable;
+use Application\Model\LocationDetailsTable;
 
 use Application\Service\CommonService;
 use Application\Service\UserService;
@@ -33,6 +34,7 @@ use Application\Service\OrganizationService;
 use Application\Service\SourceService;
 use Application\Service\SampleService;
 use Application\Service\ConfigService;
+use Application\Service\FacilityService;
 
 use Zend\Mvc\ModuleRouteListener;
 use Zend\Mvc\MvcEvent;
@@ -267,6 +269,11 @@ class Module{
                     $table = new UserFacilityMapTable($dbAdapter);
                     return $table;
                 },
+				'LocationDetailsTable' => function($sm) {
+                    $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+                    $table = new LocationDetailsTable($dbAdapter);
+                    return $table;
+                },
 				
                 'CommonService' => function($sm) {
                     return new CommonService($sm);
@@ -283,8 +290,11 @@ class Module{
                 'SampleService' => function($sm) {
                     return new SampleService($sm);
                 },
-		'ConfigService' => function($sm) {
+				'ConfigService' => function($sm) {
                     return new ConfigService($sm);
+                },
+				'FacilityService' => function($sm) {
+                    return new FacilityService($sm);
                 },
             ),
 	    'abstract_factories' => array(

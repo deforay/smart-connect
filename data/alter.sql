@@ -276,3 +276,6 @@ update facility_details set facility_district = NULL WHERE facility_district = 0
 
 alter table facility_details add FOREIGN key(facility_state) REFERENCES location_details(location_id)
 alter table facility_details add FOREIGN key(facility_district) REFERENCES location_details(location_id)
+
+--saravanan 01-Aug-2017
+ALTER TABLE `facility_details` ADD `facility_logo` VARCHAR(255) NULL DEFAULT NULL AFTER `status`;

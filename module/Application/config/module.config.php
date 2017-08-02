@@ -152,6 +152,16 @@ return array(
                     ),
                 ),
             ),
+            'facility' => array(
+                'type'    => 'segment',
+                'options' => array(
+                    'route'    => '/facility[/][:action][/:id]',
+                    'defaults' => array(
+                        'controller' => 'Application\Controller\Facility',
+                        'action' => 'index',
+                    ),
+                ),
+            ),
         ),
     ),
     'service_manager' => array(
@@ -191,6 +201,7 @@ return array(
             'Application\Controller\Source' => 'Application\Controller\SourceController',
             'Application\Controller\Common' => 'Application\Controller\CommonController',
             'Application\Controller\Config' => 'Application\Controller\ConfigController',
+            'Application\Controller\Facility' => 'Application\Controller\FacilityController',
         ),
     ),
     'view_manager' => array(

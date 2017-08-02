@@ -19,17 +19,25 @@ use Zend\Db\TableGateway\AbstractTableGateway;
  *
  * @author amit
  */
-class FacilityTypeTable extends AbstractTableGateway {
+class LocationDetailsTable extends AbstractTableGateway {
 
-    protected $table = 'facility_type';
+    protected $table = 'location_details';
 
     public function __construct(Adapter $adapter) {
         $this->adapter = $adapter;
     }
-    public function fetchFacility(){
+    public function fetchLocationDetails(){
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $sQuery = $sql->select()->from(array('f' => 'facility_type'));
+        $sQuery = $sql->select()->from(array('l' => 'location_details'))->where(array('parent_location'=>0));
+        $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
+        $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+        return $rResult;
+    }
+    public function fetchDistrictList($locationId){
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $sQuery = $sql->select()->from(array('l' => 'location_details'))->where(array('parent_location'=>$locationId));
         $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         return $rResult;

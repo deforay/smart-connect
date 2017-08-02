@@ -434,7 +434,7 @@ class SampleService {
         $dbAdapter = $this->sm->get('Zend\Db\Adapter\Adapter');
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
-				->join(array('fd'=>'facility_details'),'fd.facility_id=vl.facility_id',array('facility_name','facility_code'),'left')
+				->join(array('fd'=>'facility_details'),'fd.facility_id=vl.facility_id',array('facility_name','facility_code','facility_logo'),'left')
 				->join(array('l_s'=>'location_details'),'l_s.location_id=fd.facility_state',array('provinceName'=>'location_name'),'left')
 				->join(array('l_d'=>'location_details'),'l_d.location_id=fd.facility_district',array('districtName'=>'location_name'),'left')
 				->join(array('r_s_t'=>'r_sample_type'),'r_s_t.sample_id=vl.sample_type',array('sample_name'),'left')
