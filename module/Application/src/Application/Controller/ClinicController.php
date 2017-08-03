@@ -64,7 +64,7 @@ class ClinicController extends AbstractActionController{
             $viewModel->setVariables(array('result' => $result,'testReason' => $testReasonName))
                         ->setTerminal(true);
             return $viewModel;
-        }   
+        }
     }
     
     public function getSampleTestResultAction(){
