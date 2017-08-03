@@ -40,7 +40,7 @@
                                                   <div class="form-group">
                                                       <label for="facilityName" class="col-lg-4 control-label">Facility Name <span class="font-red-mint">*</span></label>
                                                       <div class="col-lg-7">
-                                                      <input type="text" class="form-control isRequired" id="facilityName" name="facilityName" placeholder="Facility Name" title="Please enter facility name" value="<?php echo $facility->facility_name;?>" onblur="checkNameValidation('facility_details','facility_name',this,null,'The facility name that you entered already exists.Enter another name',null)"/>
+                                                      <input type="text" class="form-control isRequired" id="facilityName" name="facilityName" placeholder="Facility Name" title="Please enter facility name" value="<?php echo $facility->facility_name;?>" onblur="checkNameValidation('facility_details','facility_name',this,'<?php echo "facility_id##" .$facility->facility_id; ?>','The facility name that you entered already exists.Enter another name',null)"/>
                                                       </div>
                                                   </div>
                                                 </div>
@@ -48,7 +48,7 @@
                                                  <div class="form-group">
                                                      <label for="facilityCode" class="col-lg-4 control-label">Facility Code</label>
                                                      <div class="col-lg-7">
-                                                     <input type="text" class="form-control" id="facilityCode" name="facilityCode" placeholder="Facility Code" title="Please enter facility code" value="<?php echo $facility->facility_code;?>" onblur="checkNameValidation('facility_details','facility_code',this,null,'The code that you entered already exists.Try another code',null)"/>
+                                                     <input type="text" class="form-control" id="facilityCode" name="facilityCode" placeholder="Facility Code" title="Please enter facility code" value="<?php echo $facility->facility_code;?>" onblur="checkNameValidation('facility_details','facility_code',this,'<?php echo "facility_id##" .$facility->facility_id; ?>','The code that you entered already exists.Try another code',null)"/>
                                                      </div>
                                                  </div>
                                                </div>
@@ -337,4 +337,21 @@
 	    $(obj).val("");
 	    }
 	}
+    function checkNameValidation(tableName, fieldName, obj, fnct, msg){
+        checkValue = document.getElementById(obj.id).value;
+        if($.trim(checkValue)!= ''){
+            $.post("<?php echo $this->url('common', array('action' => 'index')); ?>", {tableName: tableName, fieldName: fieldName, value: checkValue, fnct: fnct},
+            function(data) {
+                if (data > 0)
+                {
+                    alert(msg);
+                    duplicateName = false;
+                    document.getElementById(obj.id).value = "";
+                }
+                else {
+                    duplicateName = true;
+                }
+            });
+        }
+    }
 </script>
