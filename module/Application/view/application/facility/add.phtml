@@ -10,7 +10,7 @@
                                 <i class="fa fa-circle"></i>
                             </li>
                             <li>
-                                <a href="/users">Facility</a>
+                                <a href="/facility">Facility Details</a>
                                 <i class="fa fa-circle"></i>
                             </li>
                             <li>
@@ -54,9 +54,9 @@
                                             <div class="row">
                                               <div class="col-md-6">
                                                 <div class="form-group">
-                                                    <label for="otherId" class="col-lg-4 control-label">Other Id </label>
+                                                    <label for="otherId" class="col-lg-4 control-label">Other ID </label>
                                                     <div class="col-lg-7">
-                                                    <input type="text" class="form-control" id="otherId" name="otherId" placeholder="Other Id" />
+                                                    <input type="text" class="form-control" id="otherId" name="otherId" placeholder="Other ID" />
                                                     </div>
                                                 </div>
                                               </div>
@@ -64,7 +64,7 @@
                                                 <div class="form-group">
                                                     <label for="facilityType" class="col-lg-4 control-label">Facility Type <span class="font-red-mint">*</span> </label>
                                                     <div class="col-lg-7">
-                                                    <select class="form-control isRequired" id="facilityType" name="facilityType" title="Please select facility type">
+                                                    <select class="form-control isRequired" id="facilityType" name="facilityType" title="Please select facility type" onchange="hideLogoImage(this);">
                                                       <option value=""> -- Select -- </option>
                                                        <?php
                                                        foreach($facilityType as $fType){
@@ -139,7 +139,7 @@
                                                 <div class="form-group">
                                                     <label for="district" class="col-lg-4 control-label">District/County <span class="font-red-mint">*</span></label>
                                                     <div class="col-lg-7">
-                                                    <select name="district" id="district" class="form-control isRequired" title="Please choose district/county">
+                                                    <select name="district" id="districtName" class="form-control isRequired" title="Please choose district/county">
                                                       <option value=""> -- Select -- </option>
                                                       <option value="other">Other</option>
                                                     </select>
@@ -193,7 +193,7 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div class="col-md-6">
+                                                <div class="col-md-6 logo" style="display:none;">
                                                     <div class="form-group">
                                                         <label class="col-lg-4 control-label">Logo</label>
                                                         <div class="col-lg-7">
@@ -209,7 +209,7 @@
                                                                 </div>
                                                             </div>
                                                             <div class="box-body">
-                                                              Please make sure logo image size of: <code>170x175</code>
+                                                              Please make sure logo image size is <code>170px X 175px</code>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -242,6 +242,10 @@
         });
         if (flag) {
             if (duplicateName) {
+                if($('#districtName').val()=='' || $('#districtName').val()=='-- Select --'){
+                    alert("Please choose district");
+                    return false;
+                }
                 $.blockUI();
                 document.getElementById('addFacilityInformation').submit();
             }
@@ -251,18 +255,19 @@
         if(this.value == 'other'){
             $('#provinceNew').show().addClass('isRequired').focus();
         }else{
-            $('#district').val('');
+            $('#districtName').val('');
             $('#provinceNew').hide().removeClass('isRequired').val('');
             $.blockUI.defaults.css.border = '1px solid grey'; 
             $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
             $('#facility').val('').change();
             $.post("<?php echo $this->url('facility', array('action' => 'get-district-list')); ?>", {state : this.value},
             function(data){
-                $('#district').html(data);
+                $('#districtName').html(data);
+                $('#districtName').addClass("isRequired");
             });
         }
     });
-    $('#district').on('change',function(){
+    $('#districtName').on('change',function(){
     if(this.value == 'other'){
       $('#districtNew').show().addClass('isRequired').focus();
     }else{
@@ -292,6 +297,13 @@
                     duplicateName = true;
                 }
             });
+        }
+    }
+    function hideLogoImage(obj){
+        if($("#"+obj.id).val()=='2'){
+            $(".logo").show();
+        }else{
+            $(".logo").hide();
         }
     }
 </script>
