@@ -30,6 +30,7 @@ class SampleService {
         $testStatusDb = $this->sm->get('SampleStatusTable');
         $testReasonDb = $this->sm->get('TestReasonTable');
         $sampleTypeDb = $this->sm->get('SampleTypeTable');
+        $locationDb = $this->sm->get('LocationDetailsTable');
         $dbAdapter = $this->sm->get('Zend\Db\Adapter\Adapter');
         $sql = new Sql($dbAdapter);
         $allowedExtensions = array('xls', 'xlsx', 'csv');
@@ -82,6 +83,24 @@ class SampleService {
                                                   'latitude'=>trim($sheetData[$i]['P']),
                                                   'status'=>trim($sheetData[$i]['Q']),
                                                   );
+                            if(trim($sheetData[$i]['G'])!=''){
+                                $sQueryResult = $this->checkFacilityStateDistrictDetails(trim($sheetData[$i]['G']),0);
+                                if($sQueryResult){
+                                    $facilityData['facility_state'] = $sQueryResult['location_id'];
+                                }else{
+                                    $locationDb->insert(array('parent_location'=>0,'location_name'=>trim($sheetData[$i]['G'])));
+                                    $facilityData['facility_state'] = $locationDb->lastInsertValue;
+                                }
+                            }
+                            if(trim($sheetData[$i]['H'])!=''){
+                                $sQueryResult = $this->checkFacilityStateDistrictDetails(trim($sheetData[$i]['H']),$facilityData['facility_state']);
+                                if($sQueryResult){
+                                    $facilityData['facility_district'] = $sQueryResult['location_id'];
+                                }else{
+                                    $locationDb->insert(array('parent_location'=>$facilityData['facility_state'],'location_name'=>trim($sheetData[$i]['H'])));
+                                    $facilityData['facility_district'] = $locationDb->lastInsertValue;
+                                }
+                            }
                             //check facility type
                             if(trim($sheetData[$i]['R'])!=''){
                                 $facilityTypeDataResult = $this->checkFacilityTypeDetails(trim($sheetData[$i]['R']));
@@ -122,6 +141,24 @@ class SampleService {
                                                   'latitude'=>trim($sheetData[$i]['AG']),
                                                   'status'=>trim($sheetData[$i]['AH']),
                                                   );
+                            if(trim($sheetData[$i]['X'])!=''){
+                                $sQueryResult = $this->checkFacilityStateDistrictDetails(trim($sheetData[$i]['X']),0);
+                                if($sQueryResult){
+                                    $labData['facility_state'] = $sQueryResult['location_id'];
+                                }else{
+                                    $locationDb->insert(array('parent_location'=>0,'location_name'=>trim($sheetData[$i]['X'])));
+                                    $labData['facility_state'] = $locationDb->lastInsertValue;
+                                }
+                            }
+                            if(trim($sheetData[$i]['Y'])!=''){
+                                $sQueryResult = $this->checkFacilityStateDistrictDetails(trim($sheetData[$i]['Y']),$labData['facility_state']);
+                                if($sQueryResult){
+                                    $labData['facility_district'] = $sQueryResult['location_id'];
+                                }else{
+                                    $locationDb->insert(array('parent_location'=>$labData['facility_state'],'location_name'=>trim($sheetData[$i]['Y'])));
+                                    $labData['facility_district'] = $locationDb->lastInsertValue;
+                                }
+                            }
                             //check lab type
                             if(trim($sheetData[$i]['AI'])!=''){
                                 $labTypeDataResult = $this->checkFacilityTypeDetails(trim($sheetData[$i]['AI']));
@@ -211,6 +248,16 @@ class SampleService {
         $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
         $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
         return $sResult;
+    }
+    
+    public function checkFacilityStateDistrictDetails($location,$parent){
+        $dbAdapter = $this->sm->get('Zend\Db\Adapter\Adapter');
+        $sql = new Sql($dbAdapter);
+        $sQuery = $sql->select()->from(array('l'=>'location_details'))
+							->where(array('l.parent_location'=>$parent,'l.location_name'=>trim($location)));
+        $sQuery = $sql->getSqlStringForSqlObject($sQuery);
+        $sQueryResult = $dbAdapter->query($sQuery, $dbAdapter::QUERY_MODE_EXECUTE)->current();
+        return $sQueryResult;
     }
     
     public function checkFacilityDetails($clinicName)
