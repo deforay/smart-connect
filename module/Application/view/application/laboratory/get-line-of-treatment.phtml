@@ -1,3 +1,4 @@
+<?php if(count($result)>0 && $result!=''){ ?>
 <script>
        $('#labDashLineOfTreatmentPie').highcharts({
         chart: {
@@ -56,6 +57,7 @@
             data: [<?php
             if(count($result)>0 && $result!=''){
               foreach($result[0] as $key=>$lineResult){
+                     if($result[0][$key]!='' && $result[0][$key]!=null){
                      $getCode = explode("_",$key);
                      $codeGenerate = array();
                      if(count($getCode)>0){
@@ -75,9 +77,11 @@
                 },
                 <?php
             }
+              }
             }
             ?>]
         }]
     });
     
 </script>
+<?php } ?>
