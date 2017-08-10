@@ -61,6 +61,7 @@
             colorByPoint: true,
             data: [<?php
             if(count($result)>0 && $result!=''){
+                if($result[0]['Not_Suppressed']!='' && $result[0]['Not_Suppressed']!=null){
                 ?>
                 {
                   name:<?php echo "'Not Suppressed'";?>,
@@ -70,6 +71,9 @@
                   selected: true,
                   color:'#ff1900',
                 },
+                <?php }
+                if($result[0]['Suppressed']!='' && $result[0]['Suppressed']!=null){
+                ?>
                 {
                   name:<?php echo "'Suppressed'";?>,
                   y:<?php echo $result[0]['Suppressed'];?>,
@@ -77,6 +81,7 @@
                   color:'#60d18f'
                 },
                 <?php
+                }
             }
             ?>]
         }]
