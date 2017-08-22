@@ -94,7 +94,7 @@ msgstr "Development/Test Environment with dummy data"
 msgid "Log Out"
 msgstr "Log Out"
 
-#: ../view/layout/layout.phtml:134
+#: ../view/layout/layout.phtml:134 ../view/application/laboratory/dashboard.phtml:141
 msgid "Labs Dashboard"
 msgstr "Labs Dashboard"
 
@@ -133,6 +133,26 @@ msgstr "The Task Force for Global Health"
 #: ../view/layout/layout.phtml:406
 msgid "Emory University / PEPFAR"
 msgstr "Emory University / PEPFAR"
+
+#: ../view/application/laboratory/dashboard.phtml:522
+msgid "All Labs"
+msgstr "All Labs"
+
+#: ../view/application/laboratory/dashboard.phtml:155
+msgid "Please select one or more labs. Leave blank for All"
+msgstr "Please select one or more labs. Leave blank for All"
+
+#: ../view/application/laboratory/dashboard.phtml:179
+msgid "Search"
+msgstr "Search"
+
+#: ../view/application/laboratory/dashboard.phtml:180
+msgid "Reset"
+msgstr "Reset"
+
+#: ../view/application/laboratory/dashboard.phtml:155
+msgid "Please select one or more labs. Leave blank for All"
+msgstr "Please select one or more labs. Leave blank for All"
 
 #~ msgid "Skeleton Application"
 #~ msgstr "Aplicação Skeleton"
