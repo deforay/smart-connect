@@ -82,7 +82,44 @@ msgstr "Nenhuma exceção disponível"
 msgid "An error occurred"
 msgstr "Ocorreu um erro"
 
-#: ../view/layout/layout.phtml:65
+#: ../view/application/login/index.phtml:91 
+msgid "Funded by"
+msgstr "Funded by"
+
+#: ../view/application/login/index.phtml:78
+msgid "Login"
+msgstr "Login"
+
+#: ../view/application/login/index.phtml:75 ../view/application/login/index.phtml:76
+msgid "Password"
+msgstr "Password"
+
+#: ../view/application/login/index.phtml:73
+msgid "login@example.com"
+msgstr "login@example.com"
+
+#: ../view/application/login/index.phtml:72
+msgid "Email"
+msgstr "Email"
+
+#: ../view/application/login/index.phtml:68
+msgid "Enter any username and password."
+msgstr "Enter any username and password."
+
+#: ../view/application/login/index.phtml:64
+msgid "Please login to continue."
+msgstr "Please login to continue."
+
+#: ../view/application/login/index.phtml:63
+msgid "Welcome."
+msgstr "Welcome."
+
+
+#: ../view/application/login/index.phtml:55
+msgid "Dashboard for Enhancement of VL Treatment Cascade"
+msgstr "Dashboard for Enhancement of VL Treatment Cascade"
+
+#: ../view/layout/layout.phtml:65 ../view/application/login/index.phtml:54
 msgid "Smart Connect"
 msgstr "Smart Connect"
 
