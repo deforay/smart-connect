@@ -9,6 +9,7 @@
 
 namespace Application;
 
+use Zend\Session\Container;
 
 use Application\Model\UsersTable;
 use Application\Model\OrganizationsTable;
@@ -39,9 +40,7 @@ use Application\Service\FacilityService;
 use Zend\Mvc\ModuleRouteListener;
 use Zend\Mvc\MvcEvent;
 use Zend\Cache\PatternFactory;
-//use Zend\I18n\Translator\Translator;
 
-use Zend\Session\Container;
 use Zend\View\Model\ViewModel;
 
 class Module{
@@ -49,14 +48,12 @@ class Module{
         $eventManager        = $e->getApplication()->getEventManager();
         $moduleRouteListener = new ModuleRouteListener();
         $moduleRouteListener->attach($eventManager);
-        //$translator = $e->getApplication()->getServiceManager()->get('translator');
-	//$translator->setLocale('pt_BR');
-	//echo $_SERVER['HTTP_ACCEPT_LANGUAGE'];die;
         if (php_sapi_name() != 'cli') {
             $eventManager->attach('dispatch', array($this, 'preSetter'), 100);
             //$eventManager->attach(MvcEvent::EVENT_DISPATCH_ERROR, array($this, 'dispatchError'), -999);
         }        
-        
+        // Just a call to the translator, nothing special!
+        //$this->initTranslator($e);
     }
     
     public function preSetter(MvcEvent $e) {
@@ -174,12 +171,16 @@ class Module{
         }
     }
     
+    protected function initTranslator(MvcEvent $event){
+	$serviceManager = $event->getApplication()->getServiceManager();
+	$translator = $serviceManager->get('translator');
+	$translator->setLocale('pt_BR')
+	           ->setFallbackLocale('pt_BR');
+    }
 
-    public function getConfig()
-    {
+    public function getConfig(){
         return include __DIR__ . '/config/module.config.php';
     }
-    
     
     public function getServiceConfig() {
         return array(

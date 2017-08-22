@@ -8,8 +8,7 @@ use Zend\Json\Json;
 
 class ConfigController extends AbstractActionController
 {
-    public function indexAction()
-    {
+    public function indexAction(){
         $this->layout()->setVariable('activeTab', 'config');  
         $request = $this->getRequest();
         if ($request->isPost()) {
