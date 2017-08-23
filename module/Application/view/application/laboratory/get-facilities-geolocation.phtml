@@ -30,15 +30,15 @@ if(isset($labFilter) && trim($labFilter)!= ''){
  <div class="page-bar">
     <ul class="page-breadcrumb">
         <li>
-            <a href="/">Dashboard</a>
+            <a href="/"><?php echo $this->translate('Dashboard'); ?></a>
             <i class="fa fa-circle"></i>
         </li>
         <li>
-            <a href="/labs/dashboard">Labs Dashboard</a>
+            <a href="/labs/dashboard"><?php echo $this->translate('Labs Dashboard'); ?></a>
             <i class="fa fa-circle"></i>
         </li>
         <li>
-            Facilities Geolocation
+            <?php echo $this->translate('Facilities Geolocation'); ?>
         </li>
     </ul>
 </div>
@@ -73,8 +73,8 @@ if(isset($labFilter) && trim($labFilter)!= ''){
         </div>
     </div>                        
     <div class="col-lg-3">
-     <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="getLabFacilities();">Search</a>&nbsp;&nbsp;
-     <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="resetEverything();">Reset</a>
+     <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="getLabFacilities();"><?php echo $this->translate('Search'); ?></a>&nbsp;&nbsp;
+     <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="resetEverything();"><?php echo $this->translate('Reset'); ?></a>
     </div>
   </div>
 </form>

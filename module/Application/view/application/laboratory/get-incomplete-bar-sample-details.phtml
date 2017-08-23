@@ -5,7 +5,7 @@
             type: 'column'
        },
        title: {
-            text: 'Completed VS Incomplete Forms'
+            text: '<?php echo $this->translate('Completed VS Incomplete Forms'); ?>'
        },
        credits: {
               enabled: false
@@ -46,7 +46,7 @@
               foreach($result['form'] as $key=>$condition){
               ?>
               {
-              name:'<?php echo $key;?>',
+              name:'<?php echo $this->translate($key);?>',
               data:[<?php
                   foreach($condition as $count){
                       echo '{y:'.$count.'},';

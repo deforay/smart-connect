@@ -5,7 +5,7 @@
             type: 'column'
        },
        title: {
-            text: '<?php echo(isset($params['fromSrc']) && $params['fromSrc'] == 'sampleVolume')?'Sample Volume':'VL Samples Tested'; ?>'
+            text: '<?php echo $this->translate('VL Samples Tested'); ?>'
        },
        credits: {
               enabled: false
@@ -46,7 +46,7 @@
                      foreach($result['sample'] as $key=>$condition){
                      ?>
                      {
-                     name:'<?php echo $key;?>',
+                     name:'<?php echo $this->translate($key);?>',
                      data:[<?php
                          foreach($condition as $count){
                              echo '{y:'.$count.'},';

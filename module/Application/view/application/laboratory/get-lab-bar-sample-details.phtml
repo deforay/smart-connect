@@ -6,7 +6,7 @@
             type: 'column'
         },
         title: {
-            text: 'VL Samples Tested'
+            text: '<?php echo $this->translate('VL Samples Tested'); ?>'
         },
        credits: {
               enabled: false
@@ -47,7 +47,7 @@
               foreach($result['rslt'] as $key=>$condition){
               ?>
               {
-              name:'<?php echo $key;?>',
+              name:'<?php echo $this->translate($key);?>',
               data:[<?php
                   foreach($condition as $count){
                      echo '{y:'.$count.'},';

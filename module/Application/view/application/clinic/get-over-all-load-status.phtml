@@ -22,13 +22,13 @@ $type = array('Total','Not Suppressed','Suppressed');
               enabled: false
        },
         xAxis: {
-            categories: ['Male','Female','Not Specified']
+            categories: ['<?php echo $this->translate('Male'); ?>','<?php echo $this->translate('Female'); ?>','<?php echo $this->translate('Not Specified'); ?>']
         },
         yAxis: {
             allowDecimals: false,
             min: 0,
             title: {
-                text: 'No. of Samples'
+                text: '<?php echo $this->translate('No. of Samples'); ?>'
             }
         },
         tooltip: {
@@ -64,7 +64,7 @@ $type = array('Total','Not Suppressed','Suppressed');
                      }
               ?>
               {
-                     name:'<?php echo $type[$t]; ?>',
+                     name:'<?php echo $this->translate($type[$t]); ?>',
                      data:[<?php
                           foreach($result[$type[$t]] as $key=>$val){
                            ?>

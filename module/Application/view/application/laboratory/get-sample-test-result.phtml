@@ -67,7 +67,7 @@
                      }
               ?>
               {
-              name:'<?php echo $key;?>',
+              name:'<?php echo $this->translate($key); ?>',
               data:[<?php
                   foreach($condition as $count){
                      echo '{y:'.$count.'},';

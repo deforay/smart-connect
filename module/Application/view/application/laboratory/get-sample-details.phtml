@@ -1,3 +1,6 @@
+<?php
+$heading = (isset($params['fromSrc']) && $params['fromSrc'] == 'sampleVolume')?'Sample Volume':'VL Samples Tested';
+?>
 <script>
        $(function () {
         $('#piecontainer').highcharts({
@@ -8,7 +11,7 @@
             type: 'pie'
         },
         title: {
-            text: '<?php echo(isset($params['fromSrc']) && $params['fromSrc'] == 'sampleVolume')?'Sample Volume':'VL Samples Tested'; ?>'
+            text: '<?php echo $this->translate($heading); ?>'
         },
         
         credits: {

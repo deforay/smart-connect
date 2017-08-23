@@ -28,7 +28,7 @@ $('#labDashReqFormBar').highcharts({
         yAxis: {
             min: 0,
             title: {
-                text: 'Forms'
+                text: '<?php echo $this->translate('Forms'); ?>'
             },
             labels: { formatter: function() { return this.value; } },
             stackLabels: {
@@ -79,11 +79,11 @@ $('#labDashReqFormBar').highcharts({
               if(isset($result['Complete']) && count($result['Complete'])>0){
               ?>
                 {
-                    name: 'Complete',
+                    name: '<?php echo $this->translate('Complete'); ?>',
                     data: [<?php echo implode(",",$result['Complete']);?>]
                 },
                 {
-                    name: 'Incomplete',
+                    name: '<?php echo $this->translate('Incomplete'); ?>',
                     data: [<?php echo implode(",",$result['Incomplete']);?>]
                 },
                 <?php } ?>

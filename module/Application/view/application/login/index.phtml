@@ -51,8 +51,8 @@
 	    if(isset($config['logo']) && trim($config['logo']) != "" && file_exists(UPLOAD_PATH . DIRECTORY_SEPARATOR . "logo" . DIRECTORY_SEPARATOR . $config['logo'])){ ?>
 		<img src="/uploads/logo/<?php echo trim($config['logo']); ?>" style="width:170px;height:175px;">
 	    <?php } ?>
-	    <h1 style="color:#fff;">Smart Connect</h1>
-	    <h5 style="color:#fff;">Dashboard for Enhancement of VL Treatment Cascade</h5>
+	    <h1 style="color:#fff;"><?php echo $this->translate('Smart Connect'); ?></h1>
+	    <h5 style="color:#fff;"><?php echo $this->translate('Dashboard for Enhancement of VL Treatment Cascade'); ?></h5>
         </div>
         <!-- END LOGO -->
         <!-- BEGIN LOGIN -->
@@ -60,22 +60,22 @@
             <!-- BEGIN LOGIN FORM -->
             <form class="login-form" action="" method="post">
                 <div class="form-title">
-                    <span class="form-title">Welcome.</span>
-                    <span class="form-subtitle">Please login to continue.</span>
+                    <span class="form-title"><?php echo $this->translate('Welcome'); ?>.</span>
+                    <span class="form-subtitle"><?php echo $this->translate('Please login to continue'); ?>.</span>
                 </div>
                 <div class="alert alert-danger display-hide">
                     <button class="close" data-close="alert"></button>
-                    <span> Enter any username and password. </span>
+                    <span> <?php echo $this->translate('Enter any username and password'); ?>. </span>
                 </div>
                 <div class="form-group">
                     <!--ie8, ie9 does not support html5 placeholder, so we just show field title for that-->
-                    <label class="control-label visible-ie8 visible-ie9">Email</label>
-                    <input class="form-control form-control-solid placeholder-no-fix" type="text" autocomplete="off" placeholder="login@example.com" name="email"/> </div>
+                    <label class="control-label visible-ie8 visible-ie9"><?php echo $this->translate('Email'); ?></label>
+                    <input class="form-control form-control-solid placeholder-no-fix" type="text" autocomplete="off" placeholder="<?php echo $this->translate('login@example.com'); ?>" name="email"/> </div>
                 <div class="form-group">
-                    <label class="control-label visible-ie8 visible-ie9">Password</label>
-                    <input class="form-control form-control-solid placeholder-no-fix" type="password" autocomplete="off" placeholder="Password" name="password"/> </div>
+                    <label class="control-label visible-ie8 visible-ie9"><?php echo $this->translate('Password'); ?></label>
+                    <input class="form-control form-control-solid placeholder-no-fix" type="password" autocomplete="off" placeholder="<?php echo $this->translate('Password'); ?>" name="password"/> </div>
 				<div class="form-actions">
-                    <button type="submit" class="btn red btn-block uppercase">Login</button>
+                    <button type="submit" class="btn red btn-block uppercase"><?php echo $this->translate('Login'); ?></button>
                 </div>
 				
 		<!--<div class="form-actions">
@@ -88,10 +88,9 @@
                     </div>
                 </div>-->
             </form>
-	    <p style="text-align:center;color:#ccc;">
-		Funded by
-		<a href="https://www.taskforce.org/" style="color:#ccc !important;text-decoration:underline;">The Task Force for Global Health</a>  &
-                <a href="https://www.emory.edu/home/index.html" style="color:#ccc !important;text-decoration:underline;">Emory University / PEPFAR</a>
+	    <p style="text-align:center;color:#ccc;"><?php echo $this->translate('Funded by'); ?>
+		<a href="https://www.taskforce.org/" style="color:#ccc !important;text-decoration:underline;"><?php echo $this->translate('The Task Force for Global Health'); ?></a>  &
+                <a href="https://www.emory.edu/home/index.html" style="color:#ccc !important;text-decoration:underline;"><?php echo $this->translate('Emory University / PEPFAR'); ?></a>
 	    </p>
             <!-- END REGISTRATION FORM -->
         </div>

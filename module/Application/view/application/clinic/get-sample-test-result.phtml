@@ -64,7 +64,7 @@ $more1000 = array('DBS'=>'#ff1900', 'Others' => '#F2786D');
                     foreach($result[$sample['sample_name']] as $key=>$condition){
                     ?>
                     {
-                    name:'<?php echo $sample['sample_name']." - ".$key;?>',
+                    name:'<?php echo $this->translate($sample['sample_name']." - ".$key); ?>',
                     data:[<?php
                         foreach($condition as $count){
                             echo $count.",";

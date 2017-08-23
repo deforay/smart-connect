@@ -41,11 +41,11 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
                     <!-- END THEME PANEL -->
                     <!-- BEGIN PAGE BAR -->
                      <div class="page-bar">
-                        <h1 class="page-title">Requisition Forms Completion
+                        <h1 class="page-title"><?php echo $this->translate('Requisition Forms Completion'); ?>
                         <ul class="page-breadcrumb pull-right">
                             <li>
                                 <i class="fa fa-arrow-left"></i>
-                                <a href="/labs/dashboard">Back to Labs Dashboard</a>
+                                <a href="/labs/dashboard"><?php echo $this->translate('Back to Labs Dashboard'); ?></a>
                             </li>
                         </ul>
                         </h1>
@@ -61,7 +61,7 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
                             <div class="col-md-12" style="padding-left:30px;">
                             <div class="col-md-12">
                                 <div class="form-group col-lg-4">
-                                    <label class="control-label">Date Range&nbsp;</label>
+                                    <label class="control-label"><?php echo $this->translate('Date Range'); ?>&nbsp;</label>
                                   <div id="sla-data-range" class="btn btn-sm form-control col-lg-6 mrp-container ">
                                     
                                     <span class="mrp-icon"><i class="fa fa-calendar"></i> &nbsp;</span>
@@ -76,7 +76,7 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
                                 </div>
                                 </div>
                                 <div class="form-group col-lg-4">
-                                    <label class="control-label">Provinces&nbsp;</label>
+                                    <label class="control-label"><?php echo $this->translate('Provinces'); ?>&nbsp;</label>
                                     <select name="provinces[]" id="provinces" class="form-control" multiple title="Please choose provinces" onchange="getLocationInfo('provinces');">
                                         <?php
                                         if(isset($facilityInfo['provinces']) && count($facilityInfo['provinces']) > 0){
@@ -87,7 +87,7 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
                                     </select>
                                 </div>
                                 <div class="form-group col-lg-4">
-                                    <label class="control-label">Districts&nbsp;</label>
+                                    <label class="control-label"><?php echo $this->translate('Districts'); ?>&nbsp;</label>
                                     <select name="districts[]" id="districts" class="form-control" multiple title="Please choose districts" onchange="getLocationInfo('districts');">
                                         <?php
                                         if(isset($facilityInfo['provinceDistricts']) && count($facilityInfo['provinceDistricts']) > 0){
@@ -100,7 +100,7 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
                             </div>
                             <div class="col-md-12">
                                 <div class="form-group col-lg-4">
-                                    <label class="control-label">Lab&nbsp;</label>
+                                    <label class="control-label"><?php echo $this->translate('Labs'); ?>&nbsp;</label>
                                     <select name="labName[]" id="labName" class="form-control" multiple title="Please choose lab name">
                                         <?php
                                         if(isset($facilityInfo['labs']) && count($facilityInfo['labs']) > 0){
@@ -111,7 +111,7 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
                                     </select>
                                 </div>
                                 <div class="form-group col-lg-4">
-                                  <label class="control-label">Gender</label>
+                                  <label class="control-label"><?php echo $this->translate('Gender'); ?></label>
                                   <select class="form-control" name="gender" id="gender">
                                     <option value="">All</option>
                                     <option value="M">Male</option>
@@ -122,13 +122,13 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
                             </div>
                             <div class="col-md-12">
                                 <div class="form-group col-lg-4 femaleSection" style="display:none;">
-                                    <label class="control-label">Is Patient Pregnant</label><br>
+                                    <label class="control-label"><?php echo $this->translate('Is Patient Pregnant'); ?></label><br>
                                     <input id="pregnantYes" name="isPregnant" value="yes" type="radio"> Yes&nbsp;&nbsp;
                                     <input id="pregnantNo" name="isPregnant" value="no" type="radio"> No&nbsp;&nbsp;
                                     <input id="pregnantUnreported" name="isPregnant" value="unreported" type="radio"> Unreported
                                 </div>
                                 <div class="form-group col-lg-4 femaleSection" style="display:none;">
-                                    <label class="control-label">Is Patient Breastfeeding</label><br>
+                                    <label class="control-label"><?php echo $this->translate('Is Patient Breastfeeding'); ?></label><br>
                                     <input id="breastfeedingYes" name="isBreastfeeding" value="yes" type="radio"> Yes&nbsp;&nbsp;
                                     <input id="breastfeedingNo" name="isBreastfeeding" value="no" type="radio"> No&nbsp;&nbsp;
                                     <input id="breastfeedingUnreported" name="isBreastfeeding" value="unreported" type="radio"> Unreported
@@ -136,8 +136,8 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
                             </div>
                             <div class="col-md-12">
                                 <div class="form-group col-lg-12" style="text-align:center;margin-top:10px;">
-                                    <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="searchIncompleteSampleResult()">Search</a>&nbsp;&nbsp;
-                                    <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="resetEverything();">Reset</a>
+                                    <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="searchIncompleteSampleResult()"><?php echo $this->translate('Search'); ?></a>&nbsp;&nbsp;
+                                    <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="resetEverything();"><?php echo $this->translate('Reset'); ?></a>
                                 </div>
                             </div>
                             </div>

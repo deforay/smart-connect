@@ -138,7 +138,7 @@ foreach($sampleType as $samples){
                     <!-- BEGIN PAGE BAR -->
                     <!-- BEGIN PAGE BAR -->
                     <div class="page-bar">
-                       <h1 class="page-title">Labs Dashboard</h1>
+                       <h1 class="page-title"><?php echo $this->translate('Labs Dashboard'); ?></h1>
                     </div>
 
                     <!-- END PAGE BAR -->
@@ -152,7 +152,7 @@ foreach($sampleType as $samples){
                     <form id="pageFilter" action="#" method="">
                         <div class="row" style="padding-top:10px;padding-bottom:20px;">
                             <div class="col-lg-6">
-                                <select name="labName[]" id="labName" class="form-control" multiple title="Please select one or more labs. Leave blank for All">
+                                <select name="labName[]" id="labName" class="form-control" multiple title="<?php echo $this->translate('Please select one or more labs. Leave blank for All'); ?>">
                                     <?php
                                     foreach($labName as $lab){
                                         ?>
@@ -176,8 +176,8 @@ foreach($sampleType as $samples){
                                 </div>
                             </div>                        
                             <div class="col-lg-3">
-                                <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="getEverything();">Search</a>&nbsp;&nbsp;
-                                <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="resetEverything();">Reset</a>
+                                <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="getEverything();"><?php echo $this->translate('Search'); ?></a>&nbsp;&nbsp;
+                                <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="resetEverything();"><?php echo $this->translate('Reset'); ?></a>
                             </div>
                         </div>
                     </form>
@@ -190,12 +190,12 @@ foreach($sampleType as $samples){
                             <div class="portlet box blue">
                                 <div class="portlet-title">
                                     <div class="caption ">
-                                        <span class="caption-subject">Samples Tested</span>
+                                        <span class="caption-subject"><?php echo $this->translate('Samples Tested'); ?></span>
                                     </div>
                                     <div class="actions">
                                         <div class="btn-group">
                                             <select id="sampleType" class="btn white btn-outline btn-circle btn-sm dropdown-toggle" onchange="getTestedSampleResult()">
-                                                <option value="">All Sample Types</option>
+                                                <option value=""><?php echo $this->translate('All Sample Types'); ?></option>
                                                 <?php echo $sType;?>
                                             </select>
                                         </div>
@@ -211,12 +211,12 @@ foreach($sampleType as $samples){
                             <div class="portlet box blue">
                                 <div class="portlet-title">
                                     <div class="caption ">
-                                        <span class="caption-subject">Samples Tested per Lab</span>
+                                        <span class="caption-subject"><?php echo $this->translate('Samples Tested per Lab'); ?></span>
                                     </div>
                                     <div class="actions">
                                         <div class="btn-group">
                                             <select id="sampleTypeVolume" class="btn white btn-outline btn-circle btn-sm dropdown-toggle" onchange="getTestedSampleResultBasedLab();">
-                                                <option value="">All Sample Types</option>
+                                                <option value=""><?php echo $this->translate('All Sample Types'); ?></option>
                                                 <?php echo $sType;?>
                                             </select>
                                         </div>
@@ -233,12 +233,12 @@ foreach($sampleType as $samples){
                             <div class="portlet box blue">
                                 <div class="portlet-title">
                                     <div class="caption ">
-                                        <span class="caption-subject">Samples Tested based on Gender </span>
+                                        <span class="caption-subject"><?php echo $this->translate('Samples Tested based on Gender'); ?> </span>
                                     </div>
                                     <div class="actions">
                                         <div class="btn-group">
                                             <!--<select id="sampleTypeGender" class="btn white btn-outline btn-circle btn-sm dropdown-toggle" onchange="getTestedSampleResultBasedGender()">-->
-                                            <!--    <option value="">All Sample Types</option>-->
+                                            <!--    <option value="">< ?php echo $this->translate('All Sample Types'); ?></option>-->
                                             <!--    < ?php echo $sType;?>-->
                                             <!--</select>-->
                                         </div>
@@ -254,12 +254,12 @@ foreach($sampleType as $samples){
                             <div class="portlet box blue">
                                 <div class="portlet-title">
                                     <div class="caption ">
-                                        <span class="caption-subject">Samples Tested based on Age</span>
+                                        <span class="caption-subject"><?php echo $this->translate('Samples Tested based on Age'); ?></span>
                                     </div>
                                     <div class="actions">
                                         <div class="btn-group">
                                             <!--<select id="sampleTypeVolumeAge" class="btn white btn-outline btn-circle btn-sm dropdown-toggle" onchange="getTestedSampleResultBasedAge()">-->
-                                            <!--    <option value="">All Sample Types</option>-->
+                                            <!--    <option value="">< ?php echo $this->translate('All Sample Types'); ?></option>-->
                                             <!--    < ?php echo $sType;?>-->
                                             <!--</select>-->
                                         </div>
@@ -275,8 +275,8 @@ foreach($sampleType as $samples){
                         <div class="col-md-4 col-sm-4">
                             <div class="portlet box blue">
                                 <div class="portlet-title">
-                                    <div class="caption ">
-                                        <span class="caption-subject">Laboratory Turnaround Time</span>
+                                    <div class="caption">
+                                        <span class="caption-subject"><?php echo $this->translate('Laboratory Turnaround Time'); ?></span>
                                     </div>
                                 </div>
                                 <div class="portlet-body">
@@ -288,29 +288,27 @@ foreach($sampleType as $samples){
                             <div class="portlet box blue">
                                 <div class="portlet-title">
                                     <div class="caption">
-                                        <span class="caption-subject">Requisition Forms for Testing</span>
+                                        <span class="caption-subject"><?php echo $this->translate('Requisition Forms for Testing'); ?></span>
                                     </div>
                                 </div>
                                 <div class="portlet-body" id="requisitionForms">
                                     <div id="labDashReqFormBar" style="height:450px;"></div>
                                 </div>
-                            </div>                            
-                            
-                            
+                            </div>
                         </div>
                         <div class="col-md-4 col-sm-4">
                             <div class="portlet box blue">
                                 <div class="portlet-title">
                                     <div class="caption">
-                                        <span class="caption-subject">Sample Volume</span>
+                                        <span class="caption-subject"><?php echo $this->translate('Sample Volume'); ?></span>
                                     </div>
                                    <div class="actions">
                                         <div class="btn-group">
                                             <select id="sampleStatus" class="btn white btn-outline btn-circle btn-sm dropdown-toggle" onchange="getSampleVolume('change');">
-                                                <option value="">All Samples</option>
-                                                <option value="sample_tested">Samples Tested</option>
-                                                <option value="samples_not_tested">Samples Not Tested</option>
-                                                <option value="sample_rejected">Samples Rejected</option>
+                                                <option value=""><?php echo $this->translate('All Samples'); ?></option>
+                                                <option value="sample_tested"><?php echo $this->translate('Samples Tested'); ?></option>
+                                                <option value="samples_not_tested"><?php echo $this->translate('Samples Not Tested'); ?></option>
+                                                <option value="sample_rejected"><?php echo $this->translate('Samples Rejected'); ?></option>
                                             </select>
                                         </div>
                                     </div>                                 
@@ -327,7 +325,7 @@ foreach($sampleType as $samples){
                             <div class="portlet box blue">
                                 <div class="portlet-title">
                                     <div class="caption">
-                                        <span class="caption-subject">Female Patients</span>
+                                        <span class="caption-subject"><?php echo $this->translate('Female Patients'); ?></span>
                                     </div>
                                 </div>
                                 <div class="portlet-body" id="femalePatientPieChart">
@@ -339,7 +337,7 @@ foreach($sampleType as $samples){
                             <div class="portlet box blue">
                                 <div class="portlet-title">
                                     <div class="caption">
-                                        <span class="caption-subject">Line Of Treatment</span>
+                                        <span class="caption-subject"><?php echo $this->translate('Line Of Treatment'); ?></span>
                                     </div>
                                 </div>
                                 <div class="portlet-body" id="lineOfTreatmentPieChart">
@@ -351,7 +349,7 @@ foreach($sampleType as $samples){
                             <div class="portlet box blue">
                                 <div class="portlet-title">
                                     <div class="caption">
-                                        <span class="caption-subject">VL Suppressed/Not Suppressed</span>
+                                        <span class="caption-subject"><?php echo $this->translate('VL Suppressed/Not Suppressed'); ?></span>
                                     </div>
                                 </div>
                                 <div class="portlet-body" id="vlOutComePiechart">
@@ -365,12 +363,12 @@ foreach($sampleType as $samples){
                             <div class="portlet box blue">
                                 <div class="portlet-title">
                                     <div class="caption ">
-                                        <span class="caption-subject">All Facilities - Geolocation</span>
+                                        <span class="caption-subject"><?php echo $this->translate('All Facilities - Geolocation'); ?></span>
                                     </div>
                                     
                                     <div class="actions">
                                         <div class="btn-group">
-                                            <button class="btn btn-danger" onclick="expandMap();"><span><i class="fa fa-angle-double-right" aria-hidden="true"></i> Expand Map</span></button>
+                                            <button class="btn btn-danger" onclick="expandMap();"><span><i class="fa fa-angle-double-right" aria-hidden="true"></i> <?php echo $this->translate('Expand Map'); ?></span></button>
                                         </div>
                                     </div>   
                                     
@@ -519,7 +517,7 @@ foreach($sampleType as $samples){
         
     $(function () {
         $('#labName').select2({
-            placeholder: "All Labs",
+            placeholder: "<?php echo $this->translate('All Labs'); ?>",
             allowClear: true
         });
         getEverything();

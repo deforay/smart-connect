@@ -20,13 +20,12 @@ if(isset($result['scResult']) && count($result['scResult'])>0){
     $rejectedDate = $reject['rejectDate'];
 }
 ?>
-
 <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
     <div class="dashboard-stat2" style="cursor:pointer;">
         <div class="display">
             <div class="number">
                 <h3 class="font-purple-soft">
-                    <span style="font-size:23px;">Quick Stats</span>
+                    <span style="font-size:23px;"><?php echo $this->translate('Quick Stats'); ?></span>
                 </h3>
                 
             </div>
@@ -40,7 +39,7 @@ if(isset($result['scResult']) && count($result['scResult'])>0){
             <table class="table table-striped table-hover table-compressed">
                 <?php foreach($quickStats as $statName => $statValue) { ?>
                 <tr>
-                    <th><?php echo $statName ?></th>
+                    <th><?php echo $this->translate($statName) ?></th>
                     <td><?php echo number_format($statValue) ?></td>
                 </tr>
                 <?php } ?>
@@ -56,8 +55,8 @@ if(isset($result['scResult']) && count($result['scResult'])>0){
                 <h3 class="font-green-sharp">
                     <span data-counter="counterup" data-value="<?php echo $receivedTotal; ?>"><?php echo $receivedTotal; ?></span>
                 </h3>
-                <small class="font-green-sharp">SAMPLES COLLECTED</small><br>
-                <small class="font-green-sharp">Last 28 days</small>
+                <small class="font-green-sharp"><?php echo $this->translate('SAMPLES COLLECTED'); ?></small><br>
+                <small class="font-green-sharp"><?php echo $this->translate('Last 28 days'); ?></small>
             </div>
             <div class="icon">
                 <i class="icon-pie-chart"></i>
@@ -68,15 +67,15 @@ if(isset($result['scResult']) && count($result['scResult'])>0){
 </div>
 
 <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
-    <div class="dashboard-stat2 " style="cursor:pointer;" >
+    <div class="dashboard-stat2" style="cursor:pointer;" >
         <div class="display">
             <div class="number">
                 <h3 class="font-blue-sharp">
                     <span data-counter="counterup" data-value="<?php echo $testedTotal; ?>"><?php echo $testedTotal; ?></span>
                 </h3>
-                <small class="font-blue-sharp">SAMPLES TESTED</small><br>
+                <small class="font-blue-sharp"><?php echo $this->translate('SAMPLES TESTED'); ?></small><br>
                 <!--<small class="font-blue-sharp"><?php echo $testedDate;?></small>-->
-                <small class="font-blue-sharp">Last 28 days</small>
+                <small class="font-blue-sharp"><?php echo $this->translate('Last 28 days'); ?></small>
             </div>
             <div class="icon">
                 <i class="icon-pie-chart"></i>
@@ -86,15 +85,15 @@ if(isset($result['scResult']) && count($result['scResult'])>0){
     </div>
 </div>
 <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
-    <div class="dashboard-stat2 " style="cursor:pointer;" >
+    <div class="dashboard-stat2" style="cursor:pointer;">
         <div class="display">
             <div class="number">
                 <h3 class="font-red-haze">
                     <span data-counter="counterup" data-value="<?php echo $rejectedTotal; ?>"><?php echo $rejectedTotal; ?></span>
                 </h3>
-                <small class="font-red-haze">SAMPLES REJECTED</small><br>
+                <small class="font-red-haze"><?php echo $this->translate('SAMPLES REJECTED'); ?></small><br>
                 <!--<small class="font-red-haze"><?php echo $rejectedDate;?></small>-->
-                <small class="font-red-haze">Last 28 days</small>
+                <small class="font-red-haze"><?php echo $this->translate('Last 28 days'); ?></small>
             </div>
             <div class="icon">
                 <i class="icon-pie-chart"></i>
