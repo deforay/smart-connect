@@ -80,7 +80,7 @@
             if(isset($result['all'])){
             ?>
             {
-            name: 'All',
+            name: '<?php echo $this->translate('All'); ?>',
             data: [<?php echo implode(",",$result['all']);?>],
             color : '#1B325F',
         },

@@ -42,7 +42,7 @@ $more1000 = array('>18'=>'#ff1900', '<18' => '#F2786D');
             formatter: function () {
                 return '<b>' + this.x + '</b><br/>' +
                     this.series.name + ': ' + this.y + '<br/>' +
-                    'Total: ' + this.point.stackTotal;
+                    '<?php echo $this->translate('Total'); ?>: ' + this.point.stackTotal;
             }
         },
         plotOptions: {
@@ -70,9 +70,10 @@ $more1000 = array('>18'=>'#ff1900', '<18' => '#F2786D');
               }else{
                 $range = 'nd';
               }
+              $translatedKey = $this->translate($key);
               ?>
               {
-              name:'<?php echo $this->translate($key."(".htmlspecialchars($age[$i]).")"); ?>',
+              name:'<?php echo $translatedKey."(".htmlspecialchars($age[$i]).")"; ?>',
               data:[<?php
                   foreach($condition as $count){
                      echo '{y:'.$count.',age:"'.$age[$i].'"},';

@@ -46,7 +46,7 @@ if(isset($result) && count($result)>0){
             }
         },
         series: [{
-            name: 'Labs',
+            name: '<?php echo $this->translate('Labs'); ?>',
             point: {
               events: {
                   click: function(e) {
@@ -72,10 +72,10 @@ if(isset($result) && count($result)>0){
                      $code = implode("",$codeGenerate);
                 ?>
                 {
-                  myData:<?php echo "'".str_replace("_"," ",$key)."'";?>,
-                  name:<?php echo "'".$code."'";?>,
+                  name:'<?php echo $this->translate($code);?>',
                   y:<?php echo $result[0][$key];?>,
-                  number:<?php echo $result[0][$key];?>
+                  number:<?php echo $result[0][$key];?>,
+                  myData:'<?php echo $this->translate(str_replace("_"," ",$key)); ?>'
                 },
                 <?php
               }

@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: ZendSkeletonApplication\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-08-23 21:32+0530\n"
-"PO-Revision-Date: 2017-08-24 15:43+0530\n"
+"PO-Revision-Date: 2017-08-24 19:48+0530\n"
 "Last-Translator: Diogo Melo <dmelo87@gmail.com>\n"
 "Language-Team: ZF Contibutors <zf-devteam@zend.com>\n"
 "Language: pt\n"
@@ -783,62 +783,101 @@ msgstr "pt-Edit Facility"
 msgid "DEMO"
 msgstr "pt-DEMO"
 
+msgid "Gender Missing"
+msgstr "pt-Gender Missing"
+
+msgid "Age Missing"
+msgstr "pt-Age Missing"
+
+msgid "Results Awaited <br>(< 6 months)"
+msgstr "pt-Results Awaited <br>(< 6 months)"
+
+msgid "Results Awaited <br>(> 6 months)"
+msgstr "pt-Results Awaited <br>(> 6 months)"
+
+msgid "VL (>= 1000 cp/ml)"
+msgstr "pt-VL (>= 1000 cp/ml)"
+
+msgid "VL (< 1000 cp/ml)"
+msgstr "pt-VL (< 1000 cp/ml)"
+
+msgid "VL (>= 1000 cp/ml)(M)"
+msgstr "pt-VL (>= 1000 cp/ml)(M)"
+
+msgid "VL (< 1000 cp/ml)(M)"
+msgstr "pt-VL (< 1000 cp/ml)(M)"
+
+msgid "VL (>= 1000 cp/ml)(F)"
+msgstr "pt-VL (>= 1000 cp/ml)(F)"
+
+msgid "VL (< 1000 cp/ml)(F)"
+msgstr "pt-VL (< 1000 cp/ml)(F)"
+
+msgid "VL (>= 1000 cp/ml)(Not Specified)"
+msgstr "pt-VL (>= 1000 cp/ml)(Not Specified)"
+
+msgid "VL (< 1000 cp/ml)(Not Specified)"
+msgstr "pt-VL (< 1000 cp/ml)(Not Specified)"
+
+msgid "Line Of Treatment 1"
+msgstr "pt-Line Of Treatment 1"
+
+msgid "LOT1"
+msgstr "pt-LOT1"
+
+msgid "Line Of Treatment 2"
+msgstr "pt-Line Of Treatment 2"
+
+msgid "LOT2"
+msgstr "pt-LOT2"
+
+msgid "Line Of Treatment 3"
+msgstr "pt-Line Of Treatment 3"
+
+msgid "LOT3"
+msgstr "pt-LOT3"
+
+msgid "Breast Feeding"
+msgstr "pt-Breast Feeding"
+
+msgid "BF"
+msgstr "pt-BF"
+
+msgid "Not Breast Feeding"
+msgstr "pt-Not Breast Feeding"
+
+msgid "NBF"
+msgstr "pt-NBF"
+
+msgid "Breast Feeding Unknown"
+msgstr "pt-Breast Feeding Unknown"
+
+msgid "BFU"
+msgstr "pt-BFU"
+
+msgid "Pregnant"
+msgstr "pt-Pregnant"
+
+msgid "P"
+msgstr "pt-P"
+
+msgid "Not Pregnant"
+msgstr "pt-Not Pregnant"
+
+msgid "NP"
+msgstr "pt-NP"
+
+msgid "Pregnant Unknown"
+msgstr "pt-Pregnant Unknown"
+
+msgid "PU"
+msgstr "pt-PU"
+
+msgid "Total"
+msgstr "pt-Total"
+
 #~ msgid "Hubs Dashboard"
 #~ msgstr "pt-Hubs Dashboard"
-
-#~ msgid "Gender Missing"
-#~ msgstr "pt-Gender Missing"
-
-#~ msgid "Age Missing"
-#~ msgstr "pt-Age Missing"
-
-#~ msgid "Results Awaited <br>(< 6 months)"
-#~ msgstr "pt-Results Awaited <br>(< 6 months)"
-
-#~ msgid "Results Awaited <br>(> 6 months)"
-#~ msgstr "pt-Results Awaited <br>(> 6 months)"
-
-#~ msgid "VL (>= 1000 cp/ml)"
-#~ msgstr "pt-VL (>= 1000 cp/ml)"
-
-#~ msgid "VL (< 1000 cp/ml)"
-#~ msgstr "pt-VL (< 1000 cp/ml)"
-
-#~ msgid "VL (>= 1000 cp/ml)(M)"
-#~ msgstr "pt-VL (>= 1000 cp/ml)(M)"
-
-#~ msgid "VL (< 1000 cp/ml)(M)"
-#~ msgstr "pt-VL (< 1000 cp/ml)(M)"
-
-#~ msgid "VL (>= 1000 cp/ml)(F)"
-#~ msgstr "pt-VL (>= 1000 cp/ml)(F)"
-
-#~ msgid "VL (< 1000 cp/ml)(F)"
-#~ msgstr "pt-VL (< 1000 cp/ml)(F)"
-
-#~ msgid "VL (>= 1000 cp/ml)(Not Specified)"
-#~ msgstr "pt-VL (>= 1000 cp/ml)(Not Specified)"
-
-#~ msgid "VL (< 1000 cp/ml)(Not Specified)"
-#~ msgstr "pt-VL (< 1000 cp/ml)(Not Specified)"
-
-#~ msgid "VL (< 1000 cp/ml)(>18)"
-#~ msgstr "pt-VL (< 1000 cp/ml)(>18)"
-
-#~ msgid "VL (< 1000 cp/ml)(<18)"
-#~ msgstr "pt-VL (< 1000 cp/ml)(<18)"
-
-#~ msgid "VL (>= 1000 cp/ml)(>18)"
-#~ msgstr "pt-VL (>= 1000 cp/ml)(>18)"
-
-#~ msgid "VL (>= 1000 cp/ml)(<18)"
-#~ msgstr "pt-VL (>= 1000 cp/ml)(<18)"
-
-#~ msgid "All"
-#~ msgstr "pt-All"
-
-#~ msgid "Total"
-#~ msgstr "pt-Total"
 
 #~ msgid "DBS - VL (>= 1000 cp/ml)"
 #~ msgstr "pt-DBS - VL (>= 1000 cp/ml)"

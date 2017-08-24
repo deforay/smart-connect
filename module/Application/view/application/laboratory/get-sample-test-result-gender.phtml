@@ -43,7 +43,7 @@ $more1000 = array('M'=>'#ff1900', 'F' => '#F2786D', 'Not Specified' => '#8C1308'
             formatter: function () {
                 return '<b>' + this.x + '</b><br/>' +
                     this.series.name + ': ' + this.y + '<br/>' +
-                    'Total: ' + this.point.stackTotal;
+                    '<?php echo $this->translate('Total'); ?>: ' + this.point.stackTotal;
             }
         },
         plotOptions: {
