@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: ZendSkeletonApplication\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-08-23 21:32+0530\n"
-"PO-Revision-Date: 2017-08-23 21:33+0530\n"
+"PO-Revision-Date: 2017-08-24 15:43+0530\n"
 "Last-Translator: Diogo Melo <dmelo87@gmail.com>\n"
 "Language-Team: ZF Contibutors <zf-devteam@zend.com>\n"
 "Language: pt\n"
@@ -534,11 +534,8 @@ msgid "The requested controller was unable to dispatch the request."
 msgstr "O controlador requisitado não foi capaz de despachar a requisição."
 
 #: ../view/error/404.phtml:13
-msgid ""
-"The requested controller could not be mapped to an existing controller class."
-msgstr ""
-"O controlador requisitados não pode ser mapeado a uma classe de controlador "
-"existente."
+msgid "The requested controller could not be mapped to an existing controller class."
+msgstr "O controlador requisitados não pode ser mapeado a uma classe de controlador existente."
 
 #: ../view/error/404.phtml:16
 msgid "The requested controller was not dispatchable."
@@ -613,16 +610,174 @@ msgid "Users"
 msgstr "pt-Users"
 
 #: ../view/layout/layout.phtml:180
-msgid "Facility Details"
-msgstr "pt-Facility Details"
+msgid "Facilities"
+msgstr "pt-Facilities"
 
 #: ../view/layout/layout.phtml:402
-msgid ""
-"Smart Connect - The Viral Load Dashboard (Testing Environment with dummy "
-"data) | Funded by"
-msgstr ""
-"pt-Smart Connect - The Viral Load Dashboard (Testing Environment with dummy "
-"data) | Funded by"
+msgid "Smart Connect - The Viral Load Dashboard (Testing Environment with dummy data) | Funded by"
+msgstr "pt-Smart Connect - The Viral Load Dashboard (Testing Environment with dummy data) | Funded by"
+
+msgid "Config"
+msgstr "pt-Config"
+
+msgid "Edit Config"
+msgstr "pt-Edit Config"
+
+msgid "Config Name"
+msgstr "pt-Config Name"
+
+msgid "Value"
+msgstr "pt-Value"
+
+msgid "Sample Waiting Month Range"
+msgstr "pt-Sample Waiting Month Range"
+
+msgid "Announcement Message"
+msgstr "pt-Announcement Message"
+
+msgid "Header"
+msgstr "pt-Header"
+
+msgid "Result PDF High Viral Load Message"
+msgstr "pt-Result PDF High Viral Load Message"
+
+msgid "Result PDF Low Viral Load Message"
+msgstr "pt-Result PDF Low Viral Load Message"
+
+msgid "Do you want to show smiley at result pdf?"
+msgstr "pt-Do you want to show smiley at result pdf?"
+
+msgid "Logo"
+msgstr "pt-Logo"
+
+msgid "Select image"
+msgstr "pt-Select image"
+
+msgid "Change"
+msgstr "pt-Change"
+
+msgid "Clear"
+msgstr "pt-Clear"
+
+msgid "Remove"
+msgstr "pt-Remove"
+
+msgid "Please make sure logo image size of"
+msgstr "pt-Please make sure logo image size of"
+
+msgid "Submit"
+msgstr "pt-Submit"
+
+msgid "Cancel"
+msgstr "pt-Cancel"
+
+msgid "Manage Users"
+msgstr "pt-Manage Users"
+
+msgid "Add New"
+msgstr "pt-Add New"
+
+msgid "User Name"
+msgstr "pt-User Name"
+
+msgid "Role"
+msgstr "pt-Role"
+
+msgid "Mobile"
+msgstr "pt-Mobile"
+
+msgid "Add"
+msgstr "pt-Add"
+
+msgid "Add User"
+msgstr "pt-Add User"
+
+msgid "Name"
+msgstr "pt-Name"
+
+msgid "User Type"
+msgstr "pt-User Type"
+
+msgid "Facility"
+msgstr "pt-Facility"
+
+msgid "Select"
+msgstr "pt-Select"
+
+msgid "All Facilities"
+msgstr "pt-All Facilities"
+
+msgid "Edit"
+msgstr "pt-Edit"
+
+msgid "Edit User"
+msgstr "pt-Edit User"
+
+msgid "Status"
+msgstr "pt-Status"
+
+msgid "Manage Facility"
+msgstr "pt-Manage Facility"
+
+msgid "Facility Code"
+msgstr "pt-Facility Code"
+
+msgid "Facility Name"
+msgstr "pt-Facility Name"
+
+msgid "Facility Type"
+msgstr "pt-Facility Type"
+
+msgid "Add Facility"
+msgstr "pt-Add Facility"
+
+msgid "Other ID"
+msgstr "pt-Other ID"
+
+msgid "Email(s)"
+msgstr "pt-Email(s)"
+
+msgid "Report Email(s)"
+msgstr "pt-Report Email(s)"
+
+msgid "Contact Person"
+msgstr "pt-Contact Person"
+
+msgid "Phone Number"
+msgstr "pt-Phone Number"
+
+msgid "Province/State"
+msgstr "pt-Province/State"
+
+msgid "Enter Province/State"
+msgstr "pt-Enter Province/State"
+
+msgid "District/County"
+msgstr "pt-District/County"
+
+msgid "Enter District/County"
+msgstr "pt-Enter District/County"
+
+msgid "Linked Hub Name (If Applicable)"
+msgstr "pt-Linked Hub Name (If Applicable)"
+
+msgid "Hub Name"
+msgstr "pt-Hub Name"
+
+msgid "Address"
+msgstr "pt-Address"
+
+msgid "Country"
+msgstr "pt-Country"
+
+msgid "Latitude"
+msgstr "pt-Latitude"
+
+msgid "Longitude"
+msgstr "pt-Longitude"
+
+msgid "Edit Facility"
+msgstr "pt-Edit Facility"
 
 #: ../view/layout/layout.phtml:491
 msgid "DEMO"
@@ -709,15 +864,8 @@ msgstr "pt-DEMO"
 #~ msgid "Welcome to %sZend Framework 2%s"
 #~ msgstr "Bem vindo ao %sZend Framework 2%s"
 
-#~ msgid ""
-#~ "Congratulations! You have successfully installed the %sZF2 Skeleton "
-#~ "Application%s. You are currently running Zend Framework version %s. This "
-#~ "skeleton can serve as a simple starting point for you to begin building "
-#~ "your application on ZF2."
-#~ msgstr ""
-#~ "Parabéns! Você instalou a %sAplicação Skeleton ZF2%s com sucesso. Você "
-#~ "está usando a versão %s do Zend Framework. Este esqueleto serve "
-#~ "simplesmente como um ponto de inicio na construção da sua aplicação ZF2."
+#~ msgid "Congratulations! You have successfully installed the %sZF2 Skeleton Application%s. You are currently running Zend Framework version %s. This skeleton can serve as a simple starting point for you to begin building your application on ZF2."
+#~ msgstr "Parabéns! Você instalou a %sAplicação Skeleton ZF2%s com sucesso. Você está usando a versão %s do Zend Framework. Este esqueleto serve simplesmente como um ponto de inicio na construção da sua aplicação ZF2."
 
 #~ msgid "Fork Zend Framework 2 on GitHub"
 #~ msgstr "Replique Zend Framework 2 no GitHub"
@@ -725,19 +873,8 @@ msgstr "pt-DEMO"
 #~ msgid "Follow Development"
 #~ msgstr "Acompanhe o Desenvolvimento"
 
-#~ msgid ""
-#~ "Zend Framework 2 is under active development. If you are interested in "
-#~ "following the development of ZF2, there is a special ZF2 portal on the "
-#~ "official Zend Framework website which provides links to the ZF2 %swiki%s, "
-#~ "%sdev blog%s, %sissue tracker%s, and much more. This is a great resource "
-#~ "for staying up to date with the latest developments!"
-#~ msgstr ""
-#~ "Zend Framework 2 está sob desenvolvimento ativo. Se vocês está "
-#~ "interessado em acompanhar o desenvolvimento do ZF2, tem um portal ZF2 "
-#~ "especial no site oficial do Zend Framework que possui links para ZF2 "
-#~ "%swiki%s, %sdev blog%s, %sissue tracker%s, dentre outros. Este é um "
-#~ "excelente material para se manter atualizado com os últimos "
-#~ "desenvolvimentos!"
+#~ msgid "Zend Framework 2 is under active development. If you are interested in following the development of ZF2, there is a special ZF2 portal on the official Zend Framework website which provides links to the ZF2 %swiki%s, %sdev blog%s, %sissue tracker%s, and much more. This is a great resource for staying up to date with the latest developments!"
+#~ msgstr "Zend Framework 2 está sob desenvolvimento ativo. Se vocês está interessado em acompanhar o desenvolvimento do ZF2, tem um portal ZF2 especial no site oficial do Zend Framework que possui links para ZF2 %swiki%s, %sdev blog%s, %sissue tracker%s, dentre outros. Este é um excelente material para se manter atualizado com os últimos desenvolvimentos!"
 
 #~ msgid "ZF2 Development Portal"
 #~ msgstr "Portal de Desenvolvimento do ZF2"
@@ -745,16 +882,8 @@ msgstr "pt-DEMO"
 #~ msgid "Discover Modules"
 #~ msgstr "Descubra Módulos"
 
-#~ msgid ""
-#~ "The community is working on developing a community site to serve as a "
-#~ "repository and gallery for ZF2 modules. The project is available %son "
-#~ "GitHub%s. The site is currently live and currently contains a list of "
-#~ "some of the modules already available for ZF2."
-#~ msgstr ""
-#~ "A Comunidade está trabalhando em desenvolver um site comunitário para "
-#~ "servir como repositório e galeria de módulos ZF2. O projeto estará "
-#~ "disponível %sem breve no GitHub%s. O site já está online e atualmente "
-#~ "contém uma lista de alguns dos módulos já disponíveis para ZF2."
+#~ msgid "The community is working on developing a community site to serve as a repository and gallery for ZF2 modules. The project is available %son GitHub%s. The site is currently live and currently contains a list of some of the modules already available for ZF2."
+#~ msgstr "A Comunidade está trabalhando em desenvolver um site comunitário para servir como repositório e galeria de módulos ZF2. O projeto estará disponível %sem breve no GitHub%s. O site já está online e atualmente contém uma lista de alguns dos módulos já disponíveis para ZF2."
 
 #~ msgid "Explore ZF2 Modules"
 #~ msgstr "Explore Módulos ZF2"
@@ -762,17 +891,8 @@ msgstr "pt-DEMO"
 #~ msgid "Help &amp; Support"
 #~ msgstr "Ajuda &amp; Suporte"
 
-#~ msgid ""
-#~ "If you need any help or support while developing with ZF2, you may reach "
-#~ "us via IRC: %s#zftalk on Freenode%s. We'd love to hear any questions or "
-#~ "feedback you may have regarding the beta releases. Alternatively, you may "
-#~ "subscribe and post questions to the %smailing lists%s."
-#~ msgstr ""
-#~ "Caso você precise de ajuda ou suporte enquanto desenvolve com ZF2, pode "
-#~ "nos encontrar pelo %s#zftalk on Freenode%s. Vamos gostar muito de ouvir "
-#~ "perguntas e opiniões que você possa ter em relação às versões beta. "
-#~ "Também, você pode se registrar e enviar perguntar para a %slista de e-mail"
-#~ "%s."
+#~ msgid "If you need any help or support while developing with ZF2, you may reach us via IRC: %s#zftalk on Freenode%s. We'd love to hear any questions or feedback you may have regarding the beta releases. Alternatively, you may subscribe and post questions to the %smailing lists%s."
+#~ msgstr "Caso você precise de ajuda ou suporte enquanto desenvolve com ZF2, pode nos encontrar pelo %s#zftalk on Freenode%s. Vamos gostar muito de ouvir perguntas e opiniões que você possa ter em relação às versões beta. Também, você pode se registrar e enviar perguntar para a %slista de e-mail%s."
 
 #~ msgid "Ping us on IRC"
 #~ msgstr "Nos escreva no IRC"

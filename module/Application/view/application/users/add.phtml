@@ -5,21 +5,21 @@
                     <div class="page-bar">
                         <ul class="page-breadcrumb">
                             <li>
-                                <a href="/">Dashboard</a>
+                                <a href="/"><?php echo $this->translate('Dashboard'); ?></a>
                                 <i class="fa fa-circle"></i>
                             </li>
                             <li>
-                                <a href="/users">Users</a>
+                                <a href="/users"><?php echo $this->translate('Users'); ?></a>
                                 <i class="fa fa-circle"></i>
                             </li>
                             <li>
-                                Add
+                                <?php echo $this->translate('Add'); ?>
                             </li>
                         </ul>
                     </div>
                     <!-- END PAGE BAR -->
                     <!-- BEGIN PAGE TITLE-->
-                    <h3 class="page-title"> Add User
+                    <h3 class="page-title"> <?php echo $this->translate('Add User'); ?>
                     </h3>
                     <!-- END PAGE TITLE-->
                     <!-- END PAGE HEADER-->
@@ -34,16 +34,16 @@
                                     <form class="form-horizontal" name="addUserInformation" id="addUserInformation" method="post" action="/users/add" role="form"  autocomplete="off">
                                         <div class="form-body">
                                             <div class="form-group">
-                                                <label class="col-md-3 control-label">Name <span class="font-red-mint">*</span></label>
+                                                <label class="col-md-3 control-label"><?php echo $this->translate('Name'); ?> <span class="font-red-mint">*</span></label>
                                                 <div class="col-md-6">
                                                     <input type="text" id="username" name="username" class="form-control isRequired" placeholder="" title="Please enter the name">
                                                 </div>
                                             </div>
                                             <div class="form-group">
-                                                <label class="col-md-3 control-label">User Type <span class="font-red-mint">*</span></label>
+                                                <label class="col-md-3 control-label"><?php echo $this->translate('User Type'); ?> <span class="font-red-mint">*</span></label>
                                                 <div class="col-md-6">
                                                     <select class="form-control isRequired" name="role" id="role" title="Please select the role">
-                                                        <option value="">--Select--</option>
+                                                        <option value="">--<?php echo $this->translate('Select'); ?>--</option>
                                                         <?php
                                                             //$options = [];
                                                             foreach($roles as $r) {
@@ -57,7 +57,7 @@
                                                 </div>
                                             </div>
                                             <div class="form-group">
-                                                <label class="col-md-3 control-label">Facility </label>
+                                                <label class="col-md-3 control-label"><?php echo $this->translate('Facility'); ?> </label>
                                                 <div class="col-md-6">
                                                     <select class="form-control" id="facility" name="facility[]" title="Please select facility" multiple>
                                                     </select>
@@ -65,19 +65,19 @@
                                             </div>
 
                                             <div class="form-group">
-                                                <label class="col-md-3 control-label">Email <span class="font-red-mint">*</span></label>
+                                                <label class="col-md-3 control-label"><?php echo $this->translate('Email'); ?> <span class="font-red-mint">*</span></label>
                                                 <div class="col-md-6">
                                                     <input type="email" id="email" name="email" class="form-control isEmail isRequired" placeholder="" title="Please enter valid email">
                                                 </div>
                                             </div>
                                             <div class="form-group">
-                                                <label class="col-md-3 control-label">Mobile </label>
+                                                <label class="col-md-3 control-label"><?php echo $this->translate('Mobile'); ?> </label>
                                                 <div class="col-md-6">
                                                     <input type="tel" id="mobile" name="mobile" class="form-control" placeholder="" title="Please enter mobile number">
                                                 </div>
                                             </div>
                                             <div class="form-group">
-                                                <label class="col-md-3 control-label">Password <span class="font-red-mint">*</span></label>
+                                                <label class="col-md-3 control-label"><?php echo $this->translate('Password'); ?> <span class="font-red-mint">*</span></label>
                                                 <div class="col-md-6">
                                                     <input type="password" id="password" name="password" class="form-control isRequired" placeholder="" title="Please enter the password">
                                                 </div>
@@ -87,9 +87,8 @@
                                         <div class="form-actions">
                                             <div class="row">
                                                 <div class="col-md-offset-3 col-md-9">
-                                                    <input type="button" class="btn green" value="Submit" onclick="validateNow();return false;">
-                                                    <a href="<?php echo $this->url('users', array('action' => 'index')); ?>" class="btn default">Cancel</a>
-                                                    
+                                                    <input type="button" class="btn green" value="<?php echo $this->translate('Submit'); ?>" onclick="validateNow();return false;">
+                                                    <a href="<?php echo $this->url('users', array('action' => 'index')); ?>" class="btn default"><?php echo $this->translate('Cancel'); ?></a>
                                                 </div>
                                             </div>
                                         </div>
@@ -103,7 +102,7 @@
 <script type="text/javascript">
     $(function () {
         $('#facility').select2({
-            placeholder: "All Facilities",
+            placeholder: "<?php echo $this->translate('All Facilities'); ?>",
             allowClear: true
         });
         $('#facility').prop('disabled', true);

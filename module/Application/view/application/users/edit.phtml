@@ -13,21 +13,21 @@
                     <div class="page-bar">
                         <ul class="page-breadcrumb">
                             <li>
-                                <a href="/">Dashboard</a>
+                                <a href="/"><?php echo $this->translate('Dashboard'); ?></a>
                                 <i class="fa fa-circle"></i>
                             </li>
                             <li>
-                                <a href="/users">Users</a>
+                                <a href="/users"><?php echo $this->translate('Users'); ?></a>
                                 <i class="fa fa-circle"></i>
                             </li>
                             <li>
-                                Edit
+                                <?php echo $this->translate('Edit'); ?>
                             </li>
                         </ul>
                     </div>
                     <!-- END PAGE BAR -->
                     <!-- BEGIN PAGE TITLE-->
-                    <h3 class="page-title"> Edit User
+                    <h3 class="page-title"> <?php echo $this->translate('Edit User'); ?>
                     </h3>
                     <!-- END PAGE TITLE-->
                     <!-- END PAGE HEADER-->
@@ -36,23 +36,21 @@
                             <!-- BEGIN EXAMPLE TABLE PORTLET-->
                             <div class="portlet light bordered">
                                 <div class="portlet-body">
-
-
                                 <div class="portlet-body form">
                                     <form class="form-horizontal" name="editUserInformation" id="editUserInformation" method="post" action="/users/edit" role="form" autocomplete="off">
                                         <div class="form-body">
                                             <div class="form-group">
-                                                <label class="col-md-3 control-label">Name <span class="font-red-mint">*</span></label>
+                                                <label class="col-md-3 control-label"><?php echo $this->translate('Name'); ?> <span class="font-red-mint">*</span></label>
                                                 <div class="col-md-6">
                                                     <input type="text" id="username" name="username" class="form-control isRequired" placeholder="" value="<?php echo $user->user_name; ?>" title="Please enter the name">
                                                     <input type="hidden" id="userId" name="userId" class="form-control isRequired" placeholder="" value="<?php echo base64_encode($user->user_id); ?>">
                                                 </div>
                                             </div>
                                             <div class="form-group">
-                                                <label class="col-md-3 control-label">User Type <span class="font-red-mint">*</span></label>
+                                                <label class="col-md-3 control-label"><?php echo $this->translate('User Type'); ?> <span class="font-red-mint">*</span></label>
                                                 <div class="col-md-6">
                                                     <select class="form-control isRequired" name="role" id="role" title="Please select the role">
-                                                        <option value="">--Select--</option>
+                                                        <option value="">--<?php echo $this->translate('Select'); ?>--</option>
                                                         <?php
                                                             //$options = [];
                                                             foreach($roles as $r) {
@@ -67,7 +65,7 @@
                                                 </div>
                                             </div>
                                             <div class="form-group">
-                                                <label class="col-md-3 control-label">Facility </label>
+                                                <label class="col-md-3 control-label"><?php echo $this->translate('Facility'); ?> </label>
                                                 <div class="col-md-6">
                                                     <select class="form-control" id="facility" name="facility[]" multiple title="Please select facility">
                                                       <?php
@@ -79,29 +77,29 @@
                                                 </div>
                                             </div>
                                             <div class="form-group">
-                                                <label class="col-md-3 control-label">Email <span class="font-red-mint">*</span></label>
+                                                <label class="col-md-3 control-label"><?php echo $this->translate('Email'); ?> <span class="font-red-mint">*</span></label>
                                                 <div class="col-md-6">
                                                     <input type="email" id="email" name="email" class="form-control isEmail isRequired" placeholder="" value="<?php echo $user->email; ?>" title="Please enter valid email">
                                                 </div>
                                             </div>
                                             <div class="form-group">
-                                                <label class="col-md-3 control-label">Mobile <span class="font-red-mint">*</span></label>
+                                                <label class="col-md-3 control-label"><?php echo $this->translate('Mobile'); ?> <span class="font-red-mint">*</span></label>
                                                 <div class="col-md-6">
                                                     <input type="tel" id="mobile" name="mobile" class="form-control " placeholder="" value="<?php echo $user->mobile; ?>" >
                                                 </div>
                                             </div>
                                             <div class="form-group">
-                                                <label class="col-md-3 control-label">Password </label>
+                                                <label class="col-md-3 control-label"><?php echo $this->translate('Password'); ?> </label>
                                                 <div class="col-md-6">
                                                     <input type="password" id="password" name="password" class="form-control" placeholder="">
                                                 </div>
                                             </div>
                                             
                                             <div class="form-group">
-                                                <label class="col-md-3 control-label">Status <span class="font-red-mint">*</span></label>
+                                                <label class="col-md-3 control-label"><?php echo $this->translate('Status'); ?> <span class="font-red-mint">*</span></label>
                                                 <div class="col-md-6">
                                                     <select class="form-control isRequired" name="status" id="status" title="Please select the status">
-                                                        <option value="">--Select--</option>
+                                                        <option value="">--<?php echo $this->translate('Select'); ?>--</option>
                                                         <option value="active" "<?php echo ($user->status == 'active' ? " selected='selected' " : ""); ?>">Active</option>
                                                         <option value="inactive" "<?php echo ($user->status == 'inactive' ? " selected='selected' " : ""); ?>">Inactive</option>
                                                     </select>
@@ -111,8 +109,8 @@
                                         <div class="form-actions">
                                             <div class="row">
                                                 <div class="col-md-offset-3 col-md-9">
-                                                    <input type="button" class="btn green" value="Submit" onclick="validateNow();return false;">
-                                                    <a href="<?php echo $this->url('users', array('action' => 'index')); ?>" class="btn default">Cancel</a>
+                                                    <input type="button" class="btn green" value="<?php echo $this->translate('Submit'); ?>" onclick="validateNow();return false;">
+                                                    <a href="<?php echo $this->url('users', array('action' => 'index')); ?>" class="btn default"><?php echo $this->translate('Cancel'); ?></a>
                                                 </div>
                                             </div>
                                         </div>
@@ -126,7 +124,7 @@
 <script type="text/javascript">
     $(function () {
         $('#facility').select2({
-            placeholder: "All Facilities",
+            placeholder: "<?php echo $this->translate('All Facilities'); ?>",
             allowClear: true
         });
         <?php

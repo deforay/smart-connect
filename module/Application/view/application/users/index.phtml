@@ -6,11 +6,11 @@
                     <div class="page-bar">
                         <ul class="page-breadcrumb">
                             <li>
-                                <a href="/">Dashboard</a>
+                                <a href="/"><?php echo $this->translate('Dashboard'); ?></a>
                                 <i class="fa fa-circle"></i>
                             </li>
                             <li>
-                                Users
+                                <?php echo $this->translate('Users'); ?>
                             </li>
                         </ul>
                     </div>
@@ -25,15 +25,14 @@
                             <div class="portlet box blue">
                                 <div class="portlet-title">
                                     <div class="caption">
-                                        <i class="fa fa-cogs"></i>Manage Users </div>
+                                        <i class="fa fa-cogs"></i><?php echo $this->translate('Manage Users'); ?> </div>
                                 </div>    
                                 <div class="portlet-body">
                                     <div class="table-toolbar">
                                         <div class="row">
                                             <div class="col-md-12">
                                                 <div class="btn-group pull-right">
-                                                    <a href="/users/add" class="btn sbold green"> Add New
-                                                        <i class="fa fa-plus"></i>
+                                                    <a href="/users/add" class="btn sbold green"> <?php echo $this->translate('Add New'); ?>                                                    <i class="fa fa-plus"></i>
                                                     </a>
                                                 </div>
                                             </div>
@@ -42,11 +41,11 @@
                                         <table id="userTable" class="table table-striped table-bordered table-hover table-checkable order-column">
                                                     <thead>
                                                         <tr>
-                                                            <th> User Name </th>
-                                                            <th> Role </th>
-                                                            <th> Email </th>
-                                                            <th> Mobile </th>
-                                                            <th> Action </th>
+                                                            <th> <?php echo $this->translate('User Name'); ?> </th>
+                                                            <th> <?php echo $this->translate('Role'); ?> </th>
+                                                            <th> <?php echo $this->translate('Email'); ?> </th>
+                                                            <th> <?php echo $this->translate('Mobile'); ?> </th>
+                                                            <th> <?php echo $this->translate('Action'); ?> </th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>

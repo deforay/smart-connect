@@ -6,21 +6,21 @@
                     <div class="page-bar">
                         <ul class="page-breadcrumb">
                             <li>
-                                <a href="/">Dashboard</a>
+                                <a href="/"><?php echo $this->translate('Dashboard'); ?></a>
                                 <i class="fa fa-circle"></i>
                             </li>
                             <li>
-                                <a href="<?php echo $this->url('config', array('action' => 'index')) ?>">Config</a>
+                                <a href="<?php echo $this->url('config', array('action' => 'index')) ?>"><?php echo $this->translate('Config'); ?></a>
                                 <i class="fa fa-circle"></i>
                             </li>
                             <li>
-                                Edit Config
+                                <?php echo $this->translate('Edit Config'); ?>
                             </li>
                         </ul>
                     </div>
                     <!-- END PAGE BAR -->
                     <!-- BEGIN PAGE TITLE-->
-                    <h3 class="page-title"> Edit Config </h3>
+                    <h3 class="page-title"> <?php echo $this->translate('Edit Config'); ?> </h3>
                     <!-- END PAGE TITLE-->
                     <!-- END PAGE HEADER-->
                     <div class="row">
@@ -31,44 +31,44 @@
                                 <div class="portlet-body form">
                                     <form class="form-horizontal" name="editGlobalInformation" id="editGlobalInformation" method="post" role="form" enctype="multipart/form-data" action="<?php echo $this->url('config', array('action' => 'edit')); ?>" autocomplete="off" onsubmit="validateNow();return false;">
                                         <div class="form-group">
-                                            <label class="col-md-3 control-label">Sample Waiting Month Range <span class="font-red-mint">*</span></label>
+                                            <label class="col-md-3 control-label"><?php echo $this->translate('Sample Waiting Month Range'); ?> <span class="font-red-mint">*</span></label>
                                             <div class="col-md-4">
                                                 <input type="text" class="form-control isNumeric isRequired " id="sample_waiting_month_range" name="sample_waiting_month_range" title="Please enter sample waiting month range" value="<?php echo $config["sample_waiting_month_range"]; ?>"/>
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                            <label class="col-md-3 control-label">Announcement Message</label>
+                                            <label class="col-md-3 control-label"><?php echo $this->translate('Announcement Message'); ?></label>
                                             <div class="col-md-4">
                                                 <textarea class="form-control" id="announcement_msg" name="announcement_msg"><?php echo $config["announcement_msg"]; ?></textarea>
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                            <label class="col-md-3 control-label">Header</label>
+                                            <label class="col-md-3 control-label"><?php echo $this->translate('Header'); ?></label>
                                             <div class="col-md-4">
                                                 <input type="text" class="form-control" id="header" name="header" value="<?php echo $config["header"]; ?>"/>
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                            <label class="col-md-3 control-label">Result PDF High Viral Load Message</label>
+                                            <label class="col-md-3 control-label"><?php echo $this->translate('Result PDF High Viral Load Message'); ?></label>
                                             <div class="col-md-4">
                                                 <textarea class="form-control" id="h_vl_msg" name="h_vl_msg"><?php echo $config["h_vl_msg"]; ?></textarea>
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                            <label class="col-md-3 control-label">Result PDF Low Viral Load Message</label>
+                                            <label class="col-md-3 control-label"><?php echo $this->translate('Result PDF Low Viral Load Message'); ?></label>
                                             <div class="col-md-4">
                                                 <textarea class="form-control" id="l_vl_msg" name="l_vl_msg"><?php echo $config["l_vl_msg"]; ?></textarea>
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                            <label class="col-md-3 control-label">Do you want to show smiley at result pdf?</label>
+                                            <label class="col-md-3 control-label"><?php echo $this->translate('Do you want to show smiley at result pdf?'); ?></label>
                                             <div class="col-md-4">
                                                 <input type="radio" id="show_smiley_yes" name="show_smiley" value="yes" <?php echo (isset($config["show_smiley"]) && $config["show_smiley"] == 'yes')?'checked="checked"':''; ?>/> Yes&nbsp;&nbsp;
                                                 <input type="radio" id="show_smiley_no" name="show_smiley" value="no" <?php echo (isset($config["show_smiley"]) && $config["show_smiley"] == 'no')?'checked="checked"':''; ?>/> No
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                            <label class="col-md-3 control-label">Logo</label>
+                                            <label class="col-md-3 control-label"><?php echo $this->translate('Logo'); ?></label>
                                             <div class="col-md-4">
                                                 <div class="fileinput fileinput-new" data-provides="fileinput">
                                                     <div class="fileinput-preview thumbnail" data-trigger="fileinput" style="width: 200px; height: 150px;">
@@ -81,19 +81,19 @@
                                                       <?php } ?>
                                                     </div>
                                                     <div>
-                                                      <span class="btn btn-default btn-file"><span class="fileinput-new">Select image</span><span class="fileinput-exists">Change</span>
+                                                      <span class="btn btn-default btn-file"><span class="fileinput-new"><?php echo $this->translate('Select image'); ?></span><span class="fileinput-exists"><?php echo $this->translate('Change'); ?></span>
                                                       <input type="file" id="logo" name="logo" title="Please select logo image" onchange="getNewImage('<?php echo trim($config['logo']); ?>');">
                                                       </span>
                                                       <?php
                                                       if(isset($config['logo']) && trim($config['logo'])!= '' && file_exists(UPLOAD_PATH . DIRECTORY_SEPARATOR . "logo" . DIRECTORY_SEPARATOR . trim($config['logo']))){
                                                       ?>
-                                                        <a id="clearImage" href="javascript:void(0);" class="btn btn-default" data-dismiss="fileupload" onclick="clearImage('<?php echo trim($config['logo']); ?>')">Clear</a>
+                                                        <a id="clearImage" href="javascript:void(0);" class="btn btn-default" data-dismiss="fileupload" onclick="clearImage('<?php echo trim($config['logo']); ?>')"><?php echo $this->translate('Clear'); ?></a>
                                                       <?php } ?>
-                                                      <a href="#" class="btn btn-default fileinput-exists" data-dismiss="fileinput">Remove</a>
+                                                      <a href="#" class="btn btn-default fileinput-exists" data-dismiss="fileinput"><?php echo $this->translate('Remove'); ?></a>
                                                     </div>
                                                 </div>
                                                 <div class="box-body">
-                                                  Please make sure logo image size of: <code>170x175</code>
+                                                  <?php echo $this->translate('Please make sure logo image size of'); ?>: <code>170x175</code>
                                                 </div>
                                             </div>
                                         </div>
@@ -101,8 +101,8 @@
                                             <div class="row">
                                                 <div class="col-md-offset-3 col-md-9">
                                                     <input type="hidden" name="removedLogoImage" id="removedLogoImage"/>  
-                                                    <button type="submit" class="btn green">Submit</button>
-                                                    <a href="<?php echo $this->url('config', array('action' => 'index')); ?>" class="btn default">Cancel</a>                                                    
+                                                    <button type="submit" class="btn green"><?php echo $this->translate('Submit'); ?></button>
+                                                    <a href="<?php echo $this->url('config', array('action' => 'index')); ?>" class="btn default"><?php echo $this->translate('Cancel'); ?></a>                                                    
                                                 </div>
                                             </div>
                                         </div>
