@@ -45,15 +45,18 @@ use Zend\View\Model\ViewModel;
 
 class Module{
     public function onBootstrap(MvcEvent $e){
+	$languagecontainer = new Container('language');
         $eventManager        = $e->getApplication()->getEventManager();
         $moduleRouteListener = new ModuleRouteListener();
         $moduleRouteListener->attach($eventManager);
         if (php_sapi_name() != 'cli') {
             $eventManager->attach('dispatch', array($this, 'preSetter'), 100);
             //$eventManager->attach(MvcEvent::EVENT_DISPATCH_ERROR, array($this, 'dispatchError'), -999);
-        }        
-        // Just a call to the translator, nothing special!
-        //$this->initTranslator($e);
+        }
+	if(isset($languagecontainer->locale) && $languagecontainer->locale!= ''){
+           // Just a call to the translator, nothing special!
+           $this->initTranslator($e);
+	}
     }
     
     public function preSetter(MvcEvent $e) {
@@ -172,10 +175,11 @@ class Module{
     }
     
     protected function initTranslator(MvcEvent $event){
+	$languagecontainer = new Container('language');
 	$serviceManager = $event->getApplication()->getServiceManager();
 	$translator = $serviceManager->get('translator');
-	$translator->setLocale('pt_BR')
-	           ->setFallbackLocale('pt_BR');
+	$translator->setLocale($languagecontainer->locale)
+		    ->setFallbackLocale($languagecontainer->locale);
     }
 
     public function getConfig(){
@@ -308,7 +312,8 @@ class Module{
         return array(
            'invokables' => array(
               'humanDateFormat' => 'Application\View\Helper\HumanDateFormat',
-              'GetConfigData' => 'Application\View\Helper\GetConfigData'
+              'GetConfigData' => 'Application\View\Helper\GetConfigData',
+              'GetLocaleData' => 'Application\View\Helper\GetLocaleData'
            ),
         );
     }	

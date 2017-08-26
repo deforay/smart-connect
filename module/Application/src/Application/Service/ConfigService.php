@@ -48,6 +48,11 @@ class ConfigService {
         $db = $this->sm->get('GlobalTable');
         return $db->getGlobalValue($globalName);
     }
+    
+    public function getActiveLocales(){
+        $globalDb = $this->sm->get('GlobalTable');
+        return $globalDb->fetchActiveLocales();  
+    }
 }
 ?>
 

@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: ZendSkeletonApplication\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-08-26 00:21+0530\n"
-"PO-Revision-Date: 2017-08-26 11:08+0530\n"
+"PO-Revision-Date: 2017-08-26 14:15+0530\n"
 "Last-Translator: Diogo Melo <dmelo87@gmail.com>\n"
 "Language-Team: ZF Contibutors <zf-devteam@zend.com>\n"
 "Language: pt\n"
@@ -1653,6 +1653,12 @@ msgstr "pt-DBS - VL (< 1000 cp/ml)"
 
 msgid "Others - VL (< 1000 cp/ml)"
 msgstr "pt-Others - VL (< 1000 cp/ml)"
+
+msgid "Language"
+msgstr "pt-Language"
+
+msgid "Please choose instance language"
+msgstr "pt-Please choose instance language"
 
 #~ msgid "Hubs Dashboard"
 #~ msgstr "pt-Hubs Dashboard"

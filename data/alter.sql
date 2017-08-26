@@ -279,3 +279,29 @@ alter table facility_details add FOREIGN key(facility_district) REFERENCES locat
 
 --saravanan 01-Aug-2017
 ALTER TABLE `facility_details` ADD `facility_logo` VARCHAR(255) NULL DEFAULT NULL AFTER `status`;
+
+--Pal 26-Aug-2017
+CREATE TABLE `locale_details` (
+  `locale_id` int(11) NOT NULL,
+  `locale` varchar(45) NOT NULL,
+  `display_name` varchar(45) NOT NULL,
+  `locale_status` varchar(45) NOT NULL DEFAULT 'active'
+)
+
+INSERT INTO `locale_details` (`locale_id`, `locale`, `display_name`, `locale_status`) VALUES
+(1, 'en_US', 'english', 'active'),
+(2, 'pt_BR', 'portuguese', 'active');
+
+ALTER TABLE `locale_details`
+  ADD PRIMARY KEY (`locale_id`);
+  
+ALTER TABLE `locale_details`
+  MODIFY `locale_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  
+INSERT INTO `dash_global_config` (`name`, `display_name`, `value`) VALUES ('language', 'Language', '1');
+
+INSERT INTO `dash_global_config` (`name`, `display_name`, `value`) VALUES ('watermark_text', 'Watermark Text', 'DEMO');
+
+ALTER TABLE `dash_global_config` ADD `status` VARCHAR(45) NOT NULL DEFAULT 'active' AFTER `value`;
+
+UPDATE `dash_global_config` SET `status` = 'inactive' WHERE `dash_global_config`.`name` = 'watermark_text'; 

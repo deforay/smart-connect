@@ -1,3 +1,9 @@
+<?php
+use Zend\Session\Container;
+$languagecontainer = new Container('language');
+$config = $this->GetConfigData();
+$languagecontainer->locale = $this->GetLocaleData('locale',$config['language']);
+?>
 <!DOCTYPE html>
 <!--[if IE 8]> <html lang="en" class="ie8 no-js"> <![endif]-->
 <!--[if IE 9]> <html lang="en" class="ie9 no-js"> <![endif]-->
@@ -5,10 +11,9 @@
 <html lang="en">
     <!--<![endif]-->
     <!-- BEGIN HEAD -->
-
     <head>
         <meta charset="utf-8" />
-        <title>Smart Connect | Dashboard for Enhancement of VL Treatment Cascade</title>
+        <title><?php echo $this->translate('Smart Connect'); ?> | <?php echo $this->translate('Dashboard for Enhancement of VL Treatment Cascade'); ?></title>
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta content="width=device-width, initial-scale=1" name="viewport" />
         <meta content="" name="description" />

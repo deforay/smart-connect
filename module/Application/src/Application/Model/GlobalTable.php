@@ -111,8 +111,8 @@ class GlobalTable extends AbstractTableGateway {
          */
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $sQuery = $sql->select()->from('dash_global_config');
-        //$sQuery=$this->select();
+        $sQuery = $sql->select()->from('dash_global_config')
+                                ->where(array('status'=>'active'));
         if (isset($sWhere) && $sWhere != "") {
             $sQuery->where($sWhere);
         }
@@ -146,12 +146,16 @@ class GlobalTable extends AbstractTableGateway {
             "aaData" => array()
         );
         foreach ($rResult as $aRow) {
+            $currentVal = $aRow['value'];
+            if($aRow['display_name'] == 'Language'){
+              $currentVal = $this->fetchLocaleDetailsById('display_name',$aRow['value']);
+            }
            $row = array();
             $row[] = ucwords($aRow['display_name']);
-            $row[] = ucwords($aRow['value']);
+            $row[] = ucwords($currentVal);
             $output['aaData'][] = $row;
         }
-        return $output;
+       return $output;
     }
     
     public function fetchAllGlobalConfig() {
@@ -201,4 +205,22 @@ class GlobalTable extends AbstractTableGateway {
       return $updateRes;
     }
     
+    public function fetchActiveLocales(){
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $localeQuery = $sql->select()->from(array('locale' => 'locale_details'));
+        $loclaeQueryStr = $sql->getSqlStringForSqlObject($localeQuery);
+       return $dbAdapter->query($loclaeQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+    }
+    
+    public function fetchLocaleDetailsById($column,$localeId){
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $localeQuery = $sql->select()->from(array('locale' => 'locale_details'))
+                                     ->columns(array($column))
+                                     ->where(array('locale.locale_id'=>$localeId));
+        $loclaeQueryStr = $sql->getSqlStringForSqlObject($localeQuery);
+        $localeResult = $dbAdapter->query($loclaeQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
+       return $localeResult->$column;
+    }
 }

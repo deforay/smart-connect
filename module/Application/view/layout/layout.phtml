@@ -2,7 +2,9 @@
 use Zend\Session\Container;
 $container = new Container('alert');
 $logincontainer = new Container('credo');
+$languagecontainer = new Container('language');
 $config = $this->GetConfigData();
+$languagecontainer->locale = $this->GetLocaleData('locale',$config['language']);
 ?>
 <!DOCTYPE html>
 <!--[if IE 8]> <html lang="en" class="ie8 no-js"> <![endif]-->
@@ -13,7 +15,7 @@ $config = $this->GetConfigData();
     <!-- BEGIN HEAD -->
     <head>
         <meta charset="utf-8" />
-        <title>Smart Connect | Dashboard for Enhancement of VL Treatment Cascade</title>
+        <title><?php echo $this->translate('Smart Connect'); ?> | <?php echo $this->translate('Dashboard for Enhancement of VL Treatment Cascade'); ?></title>
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta content="width=device-width, initial-scale=1" name="viewport" />
         <meta content="" name="description" />
@@ -485,10 +487,10 @@ $config = $this->GetConfigData();
             });
           }
           
-          //default configuration
+          //watermark text default configuration
             Highcharts.setOptions({
                 watermark: {
-                    text: '<?php echo $this->translate('DEMO'); ?>',
+                    text: '<?php echo (isset($config['watermark_text']) && trim($config['watermark_text'])!= '')?$this->translate($config['watermark_text']):''; ?>',
                     width: 60,
                     height: 0
                 }

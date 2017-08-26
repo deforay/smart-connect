@@ -6,8 +6,7 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 use Zend\Json\Json;
 
-class ConfigController extends AbstractActionController
-{
+class ConfigController extends AbstractActionController{
     public function indexAction(){
         $this->layout()->setVariable('activeTab', 'config');  
         $request = $this->getRequest();
@@ -19,8 +18,7 @@ class ConfigController extends AbstractActionController
         }
     }
     
-    public function editAction()
-    {
+    public function editAction(){
         $this->layout()->setVariable('activeTab', 'config');
         $configService = $this->getServiceLocator()->get('ConfigService');
         $request = $this->getRequest();
@@ -30,8 +28,10 @@ class ConfigController extends AbstractActionController
             return $this->redirect()->toRoute('config');
         }else{
             $config=$configService->getAllGlobalConfig();
+            $locales=$configService->getActiveLocales();
             return new ViewModel(array(
                 'config' => $config,
+                'locales' => $locales
             ));
         }
     }
