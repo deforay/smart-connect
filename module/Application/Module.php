@@ -53,7 +53,7 @@ class Module{
             //$eventManager->attach(MvcEvent::EVENT_DISPATCH_ERROR, array($this, 'dispatchError'), -999);
         }        
         // Just a call to the translator, nothing special!
-        $this->initTranslator($e);
+        //$this->initTranslator($e);
     }
     
     public function preSetter(MvcEvent $e) {
@@ -270,7 +270,7 @@ class Module{
                     $table = new UserFacilityMapTable($dbAdapter);
                     return $table;
                 },
-				'LocationDetailsTable' => function($sm) {
+		'LocationDetailsTable' => function($sm) {
                     $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
                     $table = new LocationDetailsTable($dbAdapter);
                     return $table;
@@ -291,10 +291,10 @@ class Module{
                 'SampleService' => function($sm) {
                     return new SampleService($sm);
                 },
-				'ConfigService' => function($sm) {
+		'ConfigService' => function($sm) {
                     return new ConfigService($sm);
                 },
-				'FacilityService' => function($sm) {
+		'FacilityService' => function($sm) {
                     return new FacilityService($sm);
                 },
             ),
