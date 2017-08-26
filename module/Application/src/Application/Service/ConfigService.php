@@ -1,9 +1,9 @@
 <?php
 namespace Application\Service;
 
+use Zend\Session\Container;
 use Zend\Db\Adapter\Adapter;
 use Zend\Db\Sql\Sql;
-use Zend\Session\Container;
 
 class ConfigService {
 

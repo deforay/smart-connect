@@ -53,7 +53,7 @@ class Module{
             //$eventManager->attach(MvcEvent::EVENT_DISPATCH_ERROR, array($this, 'dispatchError'), -999);
         }        
         // Just a call to the translator, nothing special!
-        //$this->initTranslator($e);
+        $this->initTranslator($e);
     }
     
     public function preSetter(MvcEvent $e) {

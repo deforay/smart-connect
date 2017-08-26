@@ -18,7 +18,7 @@ foreach($sampleType as $samples){
                         <div class="row" style="padding-top:10px;padding-bottom:20px;">
                             <div class="col-md-12">
                                 <div class="col-lg-6">
-                                    <select class="form-control" id="clinicId" name="clinicId[]" multiple title="Please select one or more clinics. Leave blank for All">
+                                    <select class="form-control" id="clinicId" name="clinicId[]" multiple title="<?php echo $this->translate('Please select one or more clinics. Leave blank for All'); ?>">
                                         <?php
                                         foreach($clinicName as $clinic){
                                             ?>
@@ -45,23 +45,23 @@ foreach($sampleType as $samples){
                             <div class="col-md-12">
                                 <div class="form-group col-lg-4">
                                     <label class="control-label"><?php echo $this->translate('Test Result'); ?>&nbsp;</label>
-                                  <select class="form-control" name="testResult" id="testResult" title="Please choose result">
-                                    <option value="">All</option>
-                                    <option value=">=1000">>= 1000 cp/mL</option>
-                                    <option value="<1000">< 1000 cp/mL</option>
+                                  <select class="form-control" name="testResult" id="testResult" title="<?php echo $this->translate('Please choose result'); ?>">
+                                    <option value=""><?php echo $this->translate('All'); ?></option>
+                                    <option value=">=1000"><?php echo $this->translate('>= 1000 cp/ml'); ?></option>
+                                    <option value="<1000"><?php echo $this->translate('< 1000 cp/ml'); ?></option>
                                   </select>
                                 </div>
                                 <div class="form-group col-lg-4">
                                     <label class="control-label"><?php echo $this->translate('Sample Type'); ?></label>
-                                  <select class="form-control" name="sampleTypeId" id="sampleTypeId" title="Please choose sample type">
-                                    <option value="">All</option>
+                                  <select class="form-control" name="sampleTypeId" id="sampleTypeId" title="<?php echo $this->translate('Please choose sample type'); ?>">
+                                    <option value=""><?php echo $this->translate('All'); ?></option>
                                     <?php echo $sType;?>
                                   </select>
                                 </div>
                                 <div class="form-group col-lg-4">
                                     <label class="control-label"><?php echo $this->translate('Age Group'); ?>&nbsp;</label>
-                                  <select class="form-control" name="age" id="age" title="Please choose age group">
-                                    <option value="">-- Age --</option>
+                                  <select class="form-control" name="age" id="age" title="<?php echo $this->translate('Please choose age group'); ?>">
+                                    <option value="">-- <?php echo $this->translate('Age'); ?> --</option>
                                     <option value="0-10">0-10</option>
                                     <option value="10-20">10-20</option>
                                     <option value="20-30">20-30</option>
@@ -70,7 +70,7 @@ foreach($sampleType as $samples){
                                     <option value="50-60">50-60</option>
                                     <option value="60-70">60-70</option>
                                     <option value="70-80">70-80</option>
-                                    <option value="80">Above 80</option>
+                                    <option value="80"><?php echo $this->translate('Above'); ?> 80</option>
                                   </select>
                                 </div>
                             </div>
@@ -80,26 +80,26 @@ foreach($sampleType as $samples){
                                 <div class="form-group col-lg-4">
                                     <label class="control-label"><?php echo $this->translate('ARV Adherence'); ?></label>
                                     <select class="form-control" name="adherence" id="adherence">
-                                      <option value=''>--Select--</option>
-                                      <option value="good">Good >= 95%</option>
-                                      <option value="fair">Fair 85-94%</option>
-                                      <option value="poor">Poor < 85%</option>
+                                      <option value=''>--<?php echo $this->translate('Select'); ?>--</option>
+                                      <option value="good"><?php echo $this->translate('Good'); ?> >= 95%</option>
+                                      <option value="fair"><?php echo $this->translate('Fair'); ?> 85-94%</option>
+                                      <option value="poor"><?php echo $this->translate('Poor'); ?> < 85%</option>
                                     </select>
                                 </div>
                                 <div class="form-group col-lg-4">
                                     <label class="control-label"><?php echo $this->translate('Gender'); ?></label>
                                   <select class="form-control" name="gender" id="gender">
-                                    <option value=''>--Select--</option>
-                                    <option value="M">Male</option>
-                                    <option value="F">Female</option>
-                                    <option value="not_specified">Other</option>
+                                    <option value=''>--<?php echo $this->translate('Select'); ?>--</option>
+                                    <option value="M"><?php echo $this->translate('Male'); ?></option>
+                                    <option value="F"><?php echo $this->translate('Female'); ?></option>
+                                    <option value="not_specified"><?php echo $this->translate('Other'); ?></option>
                                   </select>
                                 </div>
                                 <div class="form-group col-lg-4 femaleSection" style="display:none;">
                                     <label class="control-label"><?php echo $this->translate('Is Patient Pregnant'); ?></label><br>
-                                    <input id="pregnantYes" name="isPregnant" value="yes" type="radio"> Yes&nbsp;&nbsp;
-                                    <input id="pregnantNo" name="isPregnant" value="no" type="radio"> No&nbsp;&nbsp;
-                                    <input id="pregnantUnreported" name="isPregnant" value="unreported" type="radio"> Unreported
+                                    <input id="pregnantYes" name="isPregnant" value="yes" type="radio"> <?php echo $this->translate('Yes'); ?>&nbsp;&nbsp;
+                                    <input id="pregnantNo" name="isPregnant" value="no" type="radio"> <?php echo $this->translate('No'); ?>&nbsp;&nbsp;
+                                    <input id="pregnantUnreported" name="isPregnant" value="unreported" type="radio"> <?php echo $this->translate('Unreported'); ?>
                                 </div>
                             </div>
                         </div>
@@ -107,9 +107,9 @@ foreach($sampleType as $samples){
                             <div class="col-md-12">
                                 <div class="form-group col-lg-4 femaleSection" style="display:none;">
                                     <label class="control-label"><?php echo $this->translate('Is Patient Breastfeeding'); ?></label><br>
-                                    <input id="breastfeedingYes" name="isBreastfeeding" value="yes" type="radio"> Yes&nbsp;&nbsp;
-                                    <input id="breastfeedingNo" name="isBreastfeeding" value="no" type="radio"> No&nbsp;&nbsp;
-                                    <input id="breastfeedingUnreported" name="isBreastfeeding" value="unreported" type="radio"> Unreported
+                                    <input id="breastfeedingYes" name="isBreastfeeding" value="yes" type="radio"> <?php echo $this->translate('Yes'); ?>&nbsp;&nbsp;
+                                    <input id="breastfeedingNo" name="isBreastfeeding" value="no" type="radio"> <?php echo $this->translate('No'); ?>&nbsp;&nbsp;
+                                    <input id="breastfeedingUnreported" name="isBreastfeeding" value="unreported" type="radio"> <?php echo $this->translate('Unreported'); ?>
                                 </div>
                             </div>
                         </div>
@@ -161,7 +161,7 @@ foreach($sampleType as $samples){
                                     <div class="actions">
                                         <div class="btn-group">
                                             <select id="testReason" class="btn white btn-outline btn-circle btn-sm dropdown-toggle" onchange="getAllTestReason();">
-                                                <option value="">Test Reasons</option>
+                                                <option value=""><?php echo $this->translate('Test Reasons'); ?></option>
                                                 <?php
                                                 foreach($testReason as $test){
                                                     ?>
@@ -195,8 +195,6 @@ foreach($sampleType as $samples){
                                 </div>
                             </div>
                         </div>
-                        
-                        
                     </div>
                     <div class="row">
                         <div class="col-md-12 col-sm-12">
@@ -210,10 +208,10 @@ foreach($sampleType as $samples){
                                                 <div class="actions" style="width:30%;">
                                                     <div class="btn-group" style="width:60%;float:left;">
                                                         <select id="result" class="btn white btn-outline btn-circle btn-sm dropdown-toggle" onchange="fnShowHide();">
-                                                            <option value="">All Samples</option>
-                                                            <option value="result" selected="selected">Samples with Test Results</option>
-                                                            <option value="noresult">Samples Awaiting Results</option>
-                                                            <option value="rejected">Rejected Samples</option>
+                                                            <option value=""><?php echo $this->translate('All Samples'); ?></option>
+                                                            <option value="result" selected="selected"><?php echo $this->translate('Samples with Test Results'); ?></option>
+                                                            <option value="noresult"><?php echo $this->translate('Samples Awaiting Results'); ?></option>
+                                                            <option value="rejected"><?php echo $this->translate('Rejected Samples'); ?></option>
                                                         </select>
                                                     </div>
                                                     <div class="tools" style="width:40%;float:right;text-align:right;">
@@ -231,7 +229,7 @@ foreach($sampleType as $samples){
                                                                 <th> <?php echo $this->translate('Date Collected'); ?></th>
                                                                 <th> <?php echo $this->translate('Rejection Reason'); ?></th>
                                                                 <th> <?php echo $this->translate('Date Tested'); ?></th>
-                                                                <th> <?php echo $this->translate('Viral Load <br> (cp/mL)'); ?> </th>                                                                
+                                                                <th> <?php echo $this->translate('Viral Load <br> (cp/ml)'); ?> </th>                                                                
                                                                 <th> <?php echo $this->translate('Action'); ?> </th>
                                                             </tr>
                                                         </thead>
@@ -251,10 +249,8 @@ foreach($sampleType as $samples){
 <script>
     var oTable = null;
     $(function () {
-        $.blockUI.defaults.css.border = '1px solid grey'; 
-        $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
         $('#clinicId').select2({
-            placeholder: "All Clinics",
+            placeholder: "<?php echo $this->translate('All Clinics'); ?>",
             allowClear: true
         });
         $('#dashboard-report-range').daterangepicker({
@@ -319,9 +315,9 @@ foreach($sampleType as $samples){
             $('#sampleCollectionDate').val(moment().subtract('days', 29).format('YYYY-MM-DD') + ' to ' + moment().format('YYYY-MM-DD'));
         }
         getOverAllViralLoad();
+        overAllViralLoad();
         getAllTestReason();
         getTestedSampleResult();
-        overAllViralLoad();
         testResul();
         fnShowHide();
     }
@@ -436,8 +432,8 @@ foreach($sampleType as $samples){
         oTable.draw();
         getOverAllViralLoad();
         overAllViralLoad();
-        getTestedSampleResult();
         getAllTestReason();
+        getTestedSampleResult();
     }
 
     function resetEverything(){

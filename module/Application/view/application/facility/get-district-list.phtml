@@ -1,13 +1,13 @@
 <?php
 $option = '';
 if(count($result)>0){
-    $option.= '<option value"">-- Select --</option>';
+    $option.= '<option value"">-- '.$this->translate("Select").' --</option>';
     foreach($result as $district){
         $option.='<option value="'.$district['location_id'].'">'.$district['location_name'].'</option>';
     }
-    $option.= '<option value="other">Other</option>';
+    $option.= '<option value="other">'.$this->translate("Other").'</option>';
 }else{
-    $option.= '<option value="other">Other</option>';
+    $option.= '<option value="other">'.$this->translate("Other").'</option>';
 }
 echo $option;
 ?>

@@ -37,7 +37,7 @@
                                                   <div class="form-group">
                                                       <label for="facilityName" class="col-lg-4 control-label"><?php echo $this->translate('Facility Name'); ?> <span class="font-red-mint">*</span></label>
                                                       <div class="col-lg-7">
-                                                      <input type="text" class="form-control isRequired" id="facilityName" name="facilityName" placeholder="<?php echo $this->translate('Facility Name'); ?>" title="Please enter facility name" value="<?php echo $facility->facility_name;?>" onblur="checkNameValidation('facility_details','facility_name',this,'<?php echo "facility_id##" .$facility->facility_id; ?>','The facility name that you entered already exists.Enter another name',null)"/>
+                                                      <input type="text" class="form-control isRequired" id="facilityName" name="facilityName" placeholder="<?php echo $this->translate('Facility Name'); ?>" title="<?php echo $this->translate('Please enter facility name'); ?>" value="<?php echo $facility->facility_name;?>" onblur="checkNameValidation('facility_details','facility_name',this,'<?php echo "facility_id##" .$facility->facility_id; ?>','<?php echo $this->translate('The facility name that you entered already exists.Enter another name'); ?>',null)"/>
                                                       </div>
                                                   </div>
                                                 </div>
@@ -45,7 +45,7 @@
                                                  <div class="form-group">
                                                      <label for="facilityCode" class="col-lg-4 control-label"><?php echo $this->translate('Facility Code'); ?></label>
                                                      <div class="col-lg-7">
-                                                     <input type="text" class="form-control" id="facilityCode" name="facilityCode" placeholder="<?php echo $this->translate('Facility Code'); ?>" title="Please enter facility code" value="<?php echo $facility->facility_code;?>" onblur="checkNameValidation('facility_details','facility_code',this,'<?php echo "facility_id##" .$facility->facility_id; ?>','The code that you entered already exists.Try another code',null)"/>
+                                                     <input type="text" class="form-control" id="facilityCode" name="facilityCode" placeholder="<?php echo $this->translate('Facility Code'); ?>" title="<?php echo $this->translate('Please enter facility code'); ?>" value="<?php echo $facility->facility_code;?>" onblur="checkNameValidation('facility_details','facility_code',this,'<?php echo "facility_id##" .$facility->facility_id; ?>','<?php echo $this->translate('The code that you entered already exists.Try another code'); ?>',null)"/>
                                                      </div>
                                                  </div>
                                                </div>
@@ -64,8 +64,8 @@
                                                 <div class="form-group">
                                                     <label for="facilityType" class="col-lg-4 control-label"><?php echo $this->translate('Facility Type'); ?> <span class="font-red-mint">*</span> </label>
                                                     <div class="col-lg-7">
-                                                    <select class="form-control isRequired" id="facilityType" name="facilityType" title="Please select facility type" onchange="hideLogoImage(this.value)">
-                                                      <option value=""> -- Select -- </option>
+                                                    <select class="form-control isRequired" id="facilityType" name="facilityType" title="<?php echo $this->translate('Please select facility type'); ?>" onchange="hideLogoImage(this.value)">
+                                                      <option value=""> -- <?php echo $this->translate('Select'); ?> -- </option>
                                                        <?php
                                                        foreach($facilityType as $fType){
                                                         ?>
@@ -120,8 +120,8 @@
                                                 <div class="form-group">
                                                     <label for="state" class="col-lg-4 control-label"><?php echo $this->translate('Province/State'); ?> <span class="font-red-mint">*</span></label>
                                                     <div class="col-lg-7">
-                                                    <select name="state" id="state" class="form-control isRequired" title="Please choose province/state" onchange="getDistrictList('change');">
-                                                      <option value=""> -- Select -- </option>
+                                                    <select name="state" id="state" class="form-control isRequired" title="<?php echo $this->translate('Please choose province/state'); ?>" onchange="getDistrictList('change');">
+                                                      <option value=""> -- <?php echo $this->translate('Select'); ?> -- </option>
                                                       <?php
                                                        foreach($facilityLocation as $location){
                                                         ?>
@@ -129,9 +129,9 @@
                                                         <?php
                                                        }
                                                        ?>
-                                                      <option value="other">Other</option>
+                                                      <option value="other"><?php echo $this->translate('Other'); ?></option>
                                                     </select>
-                                                    <input type="text" class="form-control" name="provinceNew" id="provinceNew" placeholder="<?php echo $this->translate('Enter Province/State'); ?>" title="Please enter province/state" style="margin-top:4px;display:none;"/>
+                                                    <input type="text" class="form-control" name="provinceNew" id="provinceNew" placeholder="<?php echo $this->translate('Enter Province/State'); ?>" title="<?php echo $this->translate('Please enter province/state'); ?>" style="margin-top:4px;display:none;"/>
                                                     </div>
                                                 </div>
                                               </div>
@@ -139,11 +139,11 @@
                                                 <div class="form-group">
                                                     <label for="district" class="col-lg-4 control-label"><?php echo $this->translate('District/County'); ?> <span class="font-red-mint">*</span></label>
                                                     <div class="col-lg-7">
-                                                    <select name="district" id="districtName" class="form-control isRequired" title="Please choose district/county">
-                                                      <option value=""> -- Select -- </option>
-                                                      <option value="other">Other</option>
+                                                    <select name="district" id="districtName" class="form-control isRequired" title="<?php echo $this->translate('Please choose district/county'); ?>">
+                                                      <option value=""> -- <?php echo $this->translate('Select'); ?> -- </option>
+                                                      <option value="other"><?php echo $this->translate('Other'); ?></option>
                                                     </select>
-                                                    <input type="text" class="form-control" name="districtNew" id="districtNew" placeholder="<?php echo $this->translate('Enter District/County'); ?>" title="Please enter district/county" style="margin-top:4px;display:none;"/>
+                                                    <input type="text" class="form-control" name="districtNew" id="districtNew" placeholder="<?php echo $this->translate('Enter District/County'); ?>" title="<?php echo $this->translate('Please enter district/county'); ?>" style="margin-top:4px;display:none;"/>
                                                     </div>
                                                 </div>
                                               </div>
@@ -153,7 +153,7 @@
                                                     <div class="form-group">
                                                         <label for="hubName" class="col-lg-4 control-label"><?php echo $this->translate('Linked Hub Name (If Applicable)'); ?></label>
                                                         <div class="col-lg-7">
-                                                        <input type="text" class="form-control" id="hubName" name="hubName" placeholder="<?php echo $this->translate('Hub Name'); ?>" title="Please enter hub name" value="<?php echo $facility->facility_hub_name;?>" />
+                                                        <input type="text" class="form-control" id="hubName" name="hubName" placeholder="<?php echo $this->translate('Hub Name'); ?>" title="<?php echo $this->translate('Please enter hub name'); ?>" value="<?php echo $facility->facility_hub_name;?>" />
                                                         </div>
                                                     </div>
                                                 </div>
@@ -179,7 +179,7 @@
                                                     <div class="form-group">
                                                         <label for="latitude" class="col-lg-4 control-label"><?php echo $this->translate('Latitude'); ?></label>
                                                         <div class="col-lg-7">
-                                                        <input type="text" class="form-control checkNum" id="latitude" name="latitude" placeholder="<?php echo $this->translate('Latitude'); ?>" title="Please enter latitude" value="<?php echo $facility->latitude;?>"/>
+                                                        <input type="text" class="form-control checkNum" id="latitude" name="latitude" placeholder="<?php echo $this->translate('Latitude'); ?>" title="<?php echo $this->translate('Please enter latitude'); ?>" value="<?php echo $facility->latitude;?>"/>
                                                         </div>
                                                     </div>
                                                   </div>
@@ -189,7 +189,7 @@
                                                     <div class="form-group">
                                                         <label for="longitude" class="col-lg-4 control-label"><?php echo $this->translate('Longitude'); ?></label>
                                                         <div class="col-lg-7">
-                                                        <input type="text" class="form-control checkNum" id="longitude" name="longitude" placeholder="<?php echo $this->translate('Longitude'); ?>" title="Please enter longitude" value="<?php echo $facility->longitude;?>"/>
+                                                        <input type="text" class="form-control checkNum" id="longitude" name="longitude" placeholder="<?php echo $this->translate('Longitude'); ?>" title="<?php echo $this->translate('Please enter longitude'); ?>" value="<?php echo $facility->longitude;?>"/>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -197,10 +197,10 @@
                                                     <div class="form-group">
                                                         <label for="longitude" class="col-lg-4 control-label"><?php echo $this->translate('Status'); ?></label>
                                                         <div class="col-lg-7">
-                                                        <select class="form-control isRequired" name="status" id="status" title="Please select the status">
-                                                        <option value="">--Select--</option>
-                                                        <option value="active" "<?php echo ($facility->status == 'active' ? " selected='selected' " : ""); ?>">Active</option>
-                                                        <option value="inactive" "<?php echo ($facility->status == 'inactive' ? " selected='selected' " : ""); ?>">Inactive</option>
+                                                        <select class="form-control isRequired" name="status" id="status" title="<?php echo $this->translate('Please select the status'); ?>">
+                                                        <option value="">--<?php echo $this->translate('Select'); ?>--</option>
+                                                        <option value="active" "<?php echo ($facility->status == 'active' ? " selected='selected' " : ""); ?>"><?php echo $this->translate('Active'); ?></option>
+                                                        <option value="inactive" "<?php echo ($facility->status == 'inactive' ? " selected='selected' " : ""); ?>"><?php echo $this->translate('Inactive'); ?></option>
                                                     </select>
                                                         </div>
                                                     </div>
@@ -225,7 +225,7 @@
                                                                 ?>
                                                                 </div>
                                                                 <div>
-                                                                <span class="btn btn-default btn-file"><span class="fileinput-new"><?php echo $this->translate('Select image'); ?></span><span class="fileinput-exists"><?php echo $this->translate('Change'); ?></span><input type="file" id="logo" name="logo" title="Please choose logo" onclick="getLogo();" onchange="fileValidation(this)"></span>
+                                                                <span class="btn btn-default btn-file"><span class="fileinput-new"><?php echo $this->translate('Select image'); ?></span><span class="fileinput-exists"><?php echo $this->translate('Change'); ?></span><input type="file" id="logo" name="logo" title="<?php echo $this->translate('Please choose logo'); ?>" onclick="getLogo();" onchange="fileValidation(this)"></span>
                                                                 <?php
                                                                 if(trim($facility->facility_logo)!= '' && file_exists(UPLOAD_PATH . DIRECTORY_SEPARATOR . "facility" . DIRECTORY_SEPARATOR . trim($facility->facility_id) . DIRECTORY_SEPARATOR . trim($facility->facility_logo))){
                                                                 ?>
@@ -236,19 +236,19 @@
                                                                 <a href="#" class="btn btn-default fileinput-exists" data-dismiss="fileinput"><?php echo $this->translate('Remove'); ?></a>
                                                                 </div>
                                                                 <?php
-                                                                if(trim($facility->facility_logo)!= '' && file_exists(UPLOAD_PATH . DIRECTORY_SEPARATOR . "head_office_employee" . DIRECTORY_SEPARATOR . trim($facility->facility_id) . DIRECTORY_SEPARATOR . trim($facility->facility_logo))){ ?>
-                                                                <input type="hidden" name="existLogo" id="existLogo" value="<?php echo $facility->facility_logo; ?>"/>
+                                                                if(trim($facility->facility_logo)!= '' && file_exists(UPLOAD_PATH . DIRECTORY_SEPARATOR . "facility" . DIRECTORY_SEPARATOR . trim($facility->facility_id) . DIRECTORY_SEPARATOR . trim($facility->facility_logo))){ ?>
+                                                                  <input type="hidden" name="existLogo" id="existLogo" value="<?php echo $facility->facility_logo; ?>"/>
                                                                 <?php
                                                                 }
                                                                 ?>
                                                                 <input type="hidden" name="removedLogo" id="removedLogo" value="<?php
                                                                 if(trim($facility->facility_logo)!= '' && file_exists(UPLOAD_PATH . DIRECTORY_SEPARATOR . "facility" . DIRECTORY_SEPARATOR . trim($facility->facility_id) . DIRECTORY_SEPARATOR . trim($facility->facility_logo))){
-                                                                echo $facility->facility_logo;
+                                                                  echo $facility->facility_logo;
                                                                 }
                                                                 ?>"/>
                                                             </div>
                                                             <div class="box-body">
-                                                              Please make sure logo image size is <code>170px X 175px</code>
+                                                              <?php echo $this->translate('Please make sure logo image size of'); ?> <code>170px X 175px</code>
                                                             </div>
                                                             </div>
                                                             
@@ -263,7 +263,6 @@
                                                     <input type="hidden" name="facilityId" id="facilityId" value="<?php echo base64_encode($facility->facility_id);?>"/>
                                                     <input type="button" class="btn green" value="<?php echo $this->translate('Submit'); ?>" onclick="validateNow();return false;">
                                                     <a href="<?php echo $this->url('facility', array('action' => 'index')); ?>" class="btn default"><?php echo $this->translate('Cancel'); ?></a>
-                                                    
                                                 </div>
                                             </div>
                                         </div>

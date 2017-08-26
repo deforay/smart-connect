@@ -42,14 +42,14 @@
                                             <div class="form-group">
                                                 <label class="col-md-3 control-label"><?php echo $this->translate('Name'); ?> <span class="font-red-mint">*</span></label>
                                                 <div class="col-md-6">
-                                                    <input type="text" id="username" name="username" class="form-control isRequired" placeholder="" value="<?php echo $user->user_name; ?>" title="Please enter the name">
+                                                    <input type="text" id="username" name="username" class="form-control isRequired" placeholder="" value="<?php echo $user->user_name; ?>" title="<?php echo $this->translate('Please enter the name'); ?>">
                                                     <input type="hidden" id="userId" name="userId" class="form-control isRequired" placeholder="" value="<?php echo base64_encode($user->user_id); ?>">
                                                 </div>
                                             </div>
                                             <div class="form-group">
                                                 <label class="col-md-3 control-label"><?php echo $this->translate('User Type'); ?> <span class="font-red-mint">*</span></label>
                                                 <div class="col-md-6">
-                                                    <select class="form-control isRequired" name="role" id="role" title="Please select the role">
+                                                    <select class="form-control isRequired" name="role" id="role" title="<?php echo $this->translate('Please select the role'); ?>">
                                                         <option value="">--<?php echo $this->translate('Select'); ?>--</option>
                                                         <?php
                                                             //$options = [];
@@ -67,7 +67,7 @@
                                             <div class="form-group">
                                                 <label class="col-md-3 control-label"><?php echo $this->translate('Facility'); ?> </label>
                                                 <div class="col-md-6">
-                                                    <select class="form-control" id="facility" name="facility[]" multiple title="Please select facility">
+                                                    <select class="form-control" id="facility" name="facility[]" multiple title="<?php echo $this->translate('Please select facility'); ?>">
                                                       <?php
                                                       foreach($facilities as $row){
                                                       ?>
@@ -79,11 +79,11 @@
                                             <div class="form-group">
                                                 <label class="col-md-3 control-label"><?php echo $this->translate('Email'); ?> <span class="font-red-mint">*</span></label>
                                                 <div class="col-md-6">
-                                                    <input type="email" id="email" name="email" class="form-control isEmail isRequired" placeholder="" value="<?php echo $user->email; ?>" title="Please enter valid email">
+                                                    <input type="email" id="email" name="email" class="form-control isEmail isRequired" placeholder="" value="<?php echo $user->email; ?>" title="<?php echo $this->translate('Please enter valid email'); ?>">
                                                 </div>
                                             </div>
                                             <div class="form-group">
-                                                <label class="col-md-3 control-label"><?php echo $this->translate('Mobile'); ?> <span class="font-red-mint">*</span></label>
+                                                <label class="col-md-3 control-label"><?php echo $this->translate('Mobile'); ?> </label>
                                                 <div class="col-md-6">
                                                     <input type="tel" id="mobile" name="mobile" class="form-control " placeholder="" value="<?php echo $user->mobile; ?>" >
                                                 </div>
@@ -98,10 +98,10 @@
                                             <div class="form-group">
                                                 <label class="col-md-3 control-label"><?php echo $this->translate('Status'); ?> <span class="font-red-mint">*</span></label>
                                                 <div class="col-md-6">
-                                                    <select class="form-control isRequired" name="status" id="status" title="Please select the status">
+                                                    <select class="form-control isRequired" name="status" id="status" title="<?php echo $this->translate('Please select the status'); ?>">
                                                         <option value="">--<?php echo $this->translate('Select'); ?>--</option>
-                                                        <option value="active" "<?php echo ($user->status == 'active' ? " selected='selected' " : ""); ?>">Active</option>
-                                                        <option value="inactive" "<?php echo ($user->status == 'inactive' ? " selected='selected' " : ""); ?>">Inactive</option>
+                                                        <option value="active" "<?php echo ($user->status == 'active' ? " selected='selected' " : ""); ?>"><?php echo $this->translate('Active'); ?></option>
+                                                        <option value="inactive" "<?php echo ($user->status == 'inactive' ? " selected='selected' " : ""); ?>"><?php echo $this->translate('Inactive'); ?></option>
                                                     </select>
                                                 </div>
                                             </div>

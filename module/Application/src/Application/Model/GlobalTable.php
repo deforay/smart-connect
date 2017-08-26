@@ -26,7 +26,6 @@ class GlobalTable extends AbstractTableGateway {
         $this->adapter = $adapter;
     }
     
-    
     public function getGlobalValue($globalName) {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);

@@ -12,7 +12,7 @@ class HumanDateFormat extends AbstractHelper implements ServiceLocatorAwareInter
         return $this;  
     }
     
-    public function getServiceLocator(){  
+    public function getServiceLocator(){
         return $this->serviceLocator;  
     }
     // $inputFormat = yyyy-mm-dd

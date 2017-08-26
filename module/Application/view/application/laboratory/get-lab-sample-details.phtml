@@ -38,10 +38,10 @@
               foreach($result as $key=>$lab){
                   ?>
                   {
-                    name:<?php echo "'".$key."'";?>,
-                    myData:<?php echo "'".$key."'";?>,
+                    name:'<?php echo $this->translate($key); ?>',
                     y:<?php echo $result[$key];?>,
-                    number:<?php echo $result[$key];?>
+                    number:<?php echo $result[$key];?>,
+                    myData:'<?php echo $this->translate($key); ?>'
                   },
                   <?php
               }

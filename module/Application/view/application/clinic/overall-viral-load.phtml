@@ -13,8 +13,8 @@
         },
         xAxis: {
             categories: ['<?php echo $this->translate('VL Tested'); ?>',
-                         '<?php echo $this->translate('< 1000 cp/mL'); ?>',
-                         '<?php echo $this->translate('>= 1000 cp/mL'); ?>',
+                         '<?php echo $this->translate('< 1000 cp/ml'); ?>',
+                         '<?php echo $this->translate('>= 1000 cp/ml'); ?>',
                          '<?php echo $this->translate('Total Samples'); ?>'
                          ]
         },
@@ -31,7 +31,7 @@
             formatter: function () {
                 return '<b>' + this.x + '</b><br/>' +
                     this.series.name + ': ' + this.y + '<br/>' +
-                    'Total: ' + this.point.stackTotal;
+                    '<?php echo $this->translate('Total'); ?>: ' + this.point.stackTotal;
             }
         },
 

@@ -28,21 +28,19 @@
                             <!-- BEGIN EXAMPLE TABLE PORTLET-->
                             <div class="portlet light bordered">
                                 <div class="portlet-body">
-
-
                                 <div class="portlet-body form">
                                     <form class="form-horizontal" name="addUserInformation" id="addUserInformation" method="post" action="/users/add" role="form"  autocomplete="off">
                                         <div class="form-body">
                                             <div class="form-group">
                                                 <label class="col-md-3 control-label"><?php echo $this->translate('Name'); ?> <span class="font-red-mint">*</span></label>
                                                 <div class="col-md-6">
-                                                    <input type="text" id="username" name="username" class="form-control isRequired" placeholder="" title="Please enter the name">
+                                                    <input type="text" id="username" name="username" class="form-control isRequired" placeholder="" title="<?php echo $this->translate('Please enter the name'); ?>">
                                                 </div>
                                             </div>
                                             <div class="form-group">
                                                 <label class="col-md-3 control-label"><?php echo $this->translate('User Type'); ?> <span class="font-red-mint">*</span></label>
                                                 <div class="col-md-6">
-                                                    <select class="form-control isRequired" name="role" id="role" title="Please select the role">
+                                                    <select class="form-control isRequired" name="role" id="role" title="<?php echo $this->translate('Please select the role'); ?>">
                                                         <option value="">--<?php echo $this->translate('Select'); ?>--</option>
                                                         <?php
                                                             //$options = [];
@@ -59,7 +57,7 @@
                                             <div class="form-group">
                                                 <label class="col-md-3 control-label"><?php echo $this->translate('Facility'); ?> </label>
                                                 <div class="col-md-6">
-                                                    <select class="form-control" id="facility" name="facility[]" title="Please select facility" multiple>
+                                                    <select class="form-control" id="facility" name="facility[]" title="<?php echo $this->translate('Please select facility'); ?>" multiple>
                                                     </select>
                                                 </div>
                                             </div>
@@ -67,19 +65,19 @@
                                             <div class="form-group">
                                                 <label class="col-md-3 control-label"><?php echo $this->translate('Email'); ?> <span class="font-red-mint">*</span></label>
                                                 <div class="col-md-6">
-                                                    <input type="email" id="email" name="email" class="form-control isEmail isRequired" placeholder="" title="Please enter valid email">
+                                                    <input type="email" id="email" name="email" class="form-control isEmail isRequired" placeholder="" title="<?php echo $this->translate('Please enter valid email'); ?>">
                                                 </div>
                                             </div>
                                             <div class="form-group">
                                                 <label class="col-md-3 control-label"><?php echo $this->translate('Mobile'); ?> </label>
                                                 <div class="col-md-6">
-                                                    <input type="tel" id="mobile" name="mobile" class="form-control" placeholder="" title="Please enter mobile number">
+                                                    <input type="tel" id="mobile" name="mobile" class="form-control" placeholder="" title="<?php echo $this->translate('Please enter mobile number'); ?>">
                                                 </div>
                                             </div>
                                             <div class="form-group">
                                                 <label class="col-md-3 control-label"><?php echo $this->translate('Password'); ?> <span class="font-red-mint">*</span></label>
                                                 <div class="col-md-6">
-                                                    <input type="password" id="password" name="password" class="form-control isRequired" placeholder="" title="Please enter the password">
+                                                    <input type="password" id="password" name="password" class="form-control isRequired" placeholder="" title="<?php echo $this->translate('Please enter the password'); ?>">
                                                 </div>
                                             </div>
                                             

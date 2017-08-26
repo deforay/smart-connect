@@ -36,7 +36,7 @@
             }
         },
         series: [{
-            name: 'Clinics',
+            name: '<?php echo $this->translate('Clinics'); ?>',
             colorByPoint: true,
             data: [<?php
             if(isset($result) && count($result)>0){
@@ -45,10 +45,10 @@
                     foreach($result[$reason['test_reason_name']] as $resultTotal){
                         ?>
                         {
-                            myData:'<?php echo ucwords(($reason['test_reason_name']));?>',
                             name:'<?php echo ucwords(($reason['test_reason_code']));?>',
                             y:<?php echo $resultTotal['total'];?>,
                             number:<?php echo $resultTotal['total'];?>,
+                            myData:'<?php echo ucwords(($reason['test_reason_name']));?>'
                         },
                         <?php
                     }

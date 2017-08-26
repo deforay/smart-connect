@@ -453,7 +453,7 @@ $config = $this->GetConfigData();
              <?php
                 if (isset($container->alertMsg) && $container->alertMsg != "") {
                     ?>
-                    alert("<?php echo $container->alertMsg; ?>");
+                    alert("<?php echo $this->translate($container->alertMsg); ?>");
                     <?php
                     $container->alertMsg = "";
                     unset($container->alertMsg);

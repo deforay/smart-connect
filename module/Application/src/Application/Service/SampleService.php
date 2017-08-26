@@ -561,10 +561,10 @@ class SampleService {
                     if(trim($params['result']) == ''){
                         $sheet->setCellValue('D1', html_entity_decode('Rejection Reason ', ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
                         $sheet->setCellValue('E1', html_entity_decode('Date Tested ', ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
-                        $sheet->setCellValue('F1', html_entity_decode('Viral Load(cp/mL) ', ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
+                        $sheet->setCellValue('F1', html_entity_decode('Viral Load(cp/ml) ', ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
                     }else if(trim($params['result']) == 'result'){
                        $sheet->setCellValue('D1', html_entity_decode('Date Tested ', ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
-                       $sheet->setCellValue('E1', html_entity_decode('Viral Load(cp/mL) ', ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
+                       $sheet->setCellValue('E1', html_entity_decode('Viral Load(cp/ml) ', ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
                     }else if(trim($params['result']) == 'rejected'){
                        $sheet->setCellValue('D1', html_entity_decode('Rejection Reason ', ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
                     }

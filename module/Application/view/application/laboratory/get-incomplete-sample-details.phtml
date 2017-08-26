@@ -31,7 +31,7 @@
             }
         },
         series: [{
-            name: 'Field',
+            name: '<?php echo $this->translate('Field'); ?>',
             colorByPoint: true,
             data: [<?php
             if(isset($result) && count($result)>0){
@@ -48,10 +48,10 @@
                      $code = implode("",$codeGenerate);
                   ?>
                   {
-                    myData:<?php echo "'".$lab['field']."'";?>,
-                    name:<?php echo "'".$code."'";?>,
+                    name:'<?php echo $this->translate($code); ?>',
                     y:<?php echo $lab['total'];?>,
-                    number:<?php echo $lab['total'];?>
+                    number:<?php echo $lab['total'];?>,
+                    myData:'<?php echo $this->translate($lab['field']); ?>'
                   },
                   <?php
               }

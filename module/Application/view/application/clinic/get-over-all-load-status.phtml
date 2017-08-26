@@ -35,7 +35,7 @@ $type = array('Total','Not Suppressed','Suppressed');
             formatter: function () {
                 return '<b>' + this.x + '</b><br/>' +
                     this.series.name + ': ' + this.y + '<br/>' +
-                    'Total: ' + this.point.stackTotal;
+                    '<?php echo $this->translate('Total'); ?>: ' + this.point.stackTotal;
             }
         },
         plotOptions: {

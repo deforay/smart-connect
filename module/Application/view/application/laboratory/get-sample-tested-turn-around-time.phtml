@@ -87,7 +87,7 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
                                 </div>
                                 <div class="form-group col-lg-4">
                                     <label class="control-label"><?php echo $this->translate('Provinces'); ?>&nbsp;</label>
-                                    <select name="provinces[]" id="provinces" class="form-control" multiple title="Please choose provinces" onchange="getLocationInfo('provinces');">
+                                    <select name="provinces[]" id="provinces" class="form-control" multiple title="<?php echo $this->translate('Please choose provinces'); ?>" onchange="getLocationInfo('provinces');">
                                         <?php
                                         if(isset($facilityInfo['provinces']) && count($facilityInfo['provinces']) > 0){
                                             foreach($facilityInfo['provinces'] as $province){
@@ -98,7 +98,7 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
                                 </div>
                                 <div class="form-group col-lg-4">
                                     <label class="control-label"><?php echo $this->translate('Districts'); ?>&nbsp;</label>
-                                    <select name="districts[]" id="districts" class="form-control" multiple title="Please choose districts" onchange="getLocationInfo('districts');">
+                                    <select name="districts[]" id="districts" class="form-control" multiple title="<?php echo $this->translate('Please choose districts'); ?>" onchange="getLocationInfo('districts');">
                                         <?php
                                         if(isset($facilityInfo['provinceDistricts']) && count($facilityInfo['provinceDistricts']) > 0){
                                             foreach($facilityInfo['provinceDistricts'] as $provinceDistrict){
@@ -111,7 +111,7 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
                             <div class="col-md-12">        
                                 <div class="form-group col-lg-4">
                                     <label class="control-label"><?php echo $this->translate('Labs'); ?>&nbsp;</label>
-                                    <select name="labName[]" id="labName" class="form-control" multiple title="Please choose lab name">
+                                    <select name="labName[]" id="labName" class="form-control" multiple title="<?php echo $this->translate('Please choose labs'); ?>">
                                         <?php
                                         if(isset($facilityInfo['labs']) && count($facilityInfo['labs']) > 0){
                                             foreach($facilityInfo['labs'] as $labs){
@@ -122,7 +122,7 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
                                 </div>
                                 <div class="form-group col-lg-4">
                                     <label class="control-label"><?php echo $this->translate('Clinics'); ?>&nbsp;</label>
-                                    <select class="form-control" id="clinicId" name="clinicId[]" multiple title="Please choose clinic name">
+                                    <select class="form-control" id="clinicId" name="clinicId[]" multiple title="<?php echo $this->translate('Please choose clinics'); ?>">
                                         <?php
                                         if(isset($facilityInfo['clinics']) && count($facilityInfo['clinics']) > 0){
                                             foreach($facilityInfo['clinics'] as $clinics){
@@ -134,11 +134,11 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
                                 <div class="form-group col-lg-4">
                                     <label class="control-label"><?php echo $this->translate('Sample Type'); ?></label>
                                     <select class="form-control" id="sampleType" name="sampleType">
-                                        <option value="">All</option>
+                                        <option value=""><?php echo $this->translate('All'); ?></option>
                                         <?php
                                         foreach($sampleType as $samples){
                                         ?>
-                                        <option value="<?php echo base64_encode($samples['sample_id']);?>"><?php echo $samples['sample_name'];?></option>
+                                         <option value="<?php echo base64_encode($samples['sample_id']);?>"><?php echo $samples['sample_name'];?></option>
                                         <?php
                                         }
                                         ?>
@@ -147,25 +147,25 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
                             </div>                                
                             <div class="col-md-12">
                                 <div class="form-group col-lg-4">
-                                    <label class="control-label"><?php echo $this->translate('Gender'); ?></label>
+                                  <label class="control-label"><?php echo $this->translate('Gender'); ?></label>
                                   <select class="form-control" name="gender" id="gender">
-                                    <option value="">All</option>
-                                    <option value="M">Male</option>
-                                    <option value="F">Female</option>
-                                    <option value="not_specified">Not Specified</option>
+                                    <option value=""><?php echo $this->translate('All'); ?></option>
+                                    <option value="M"><?php echo $this->translate('Male'); ?></option>
+                                    <option value="F"><?php echo $this->translate('Female'); ?></option>
+                                    <option value="not_specified"><?php echo $this->translate('Not Specified'); ?></option>
                                   </select>
                                 </div>
                                 <div class="form-group col-lg-4 femaleSection" style="display:<?php echo (isset($searchGender) && $searchGender == 'F')?'':'none'; ?>;">
                                     <label class="control-label"><?php echo $this->translate('Is Patient Pregnant'); ?></label><br>
-                                    <input id="pregnantYes" name="isPregnant" value="yes" type="radio"> Yes&nbsp;&nbsp;
-                                    <input id="pregnantNo" name="isPregnant" value="no" type="radio"> No&nbsp;&nbsp;
-                                    <input id="pregnantUnreported" name="isPregnant" value="unreported" type="radio"> Unreported
+                                    <input id="pregnantYes" name="isPregnant" value="yes" type="radio"> <?php echo $this->translate('Yes'); ?>&nbsp;&nbsp;
+                                    <input id="pregnantNo" name="isPregnant" value="no" type="radio"> <?php echo $this->translate('No'); ?>&nbsp;&nbsp;
+                                    <input id="pregnantUnreported" name="isPregnant" value="unreported" type="radio"> <?php echo $this->translate('Unreported'); ?>
                                 </div>
                                 <div class="form-group col-lg-4 femaleSection" style="display:<?php echo (isset($searchGender) && $searchGender == 'F')?'':'none'; ?>;">
                                     <label class="control-label"><?php echo $this->translate('Is Patient Breastfeeding'); ?></label><br>
-                                    <input id="breastfeedingYes" name="isBreastfeeding" value="yes" type="radio"> Yes&nbsp;&nbsp;
-                                    <input id="breastfeedingNo" name="isBreastfeeding" value="no" type="radio"> No&nbsp;&nbsp;
-                                    <input id="breastfeedingUnreported" name="isBreastfeeding" value="unreported" type="radio"> Unreported
+                                    <input id="breastfeedingYes" name="isBreastfeeding" value="yes" type="radio"> <?php echo $this->translate('Yes'); ?>&nbsp;&nbsp;
+                                    <input id="breastfeedingNo" name="isBreastfeeding" value="no" type="radio"> <?php echo $this->translate('No'); ?>&nbsp;&nbsp;
+                                    <input id="breastfeedingUnreported" name="isBreastfeeding" value="unreported" type="radio"> <?php echo $this->translate('Unreported'); ?>
                                 </div>
                             </div>
                             <div class="col-md-12">
@@ -223,7 +223,6 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
                             <!-- END EXAMPLE TABLE PORTLET-->
                         </div>
                     </div>
-
 <script>
     function generatePieContainer(){
         $.blockUI.defaults.css.border = '1px solid grey';
@@ -266,19 +265,19 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
     var oTable = null;
     $(document).ready(function(){
         $('#provinces').select2({
-            placeholder: "All provinces",
+            placeholder: "<?php echo $this->translate('All Provinces'); ?>",
             allowClear: true
         });
         $('#districts').select2({
-            placeholder: "All districts",
+            placeholder: "<?php echo $this->translate('All Districts'); ?>",
             allowClear: true
         });
         $('#labName').select2({
-            placeholder: "All labs",
+            placeholder: "<?php echo $this->translate('All Labs'); ?>",
             allowClear: true
         });
         $('#clinicId').select2({
-            placeholder: "All clinics",
+            placeholder: "<?php echo $this->translate('All Clinics'); ?>",
             allowClear: true
         });
         $('#piebutton').on('click', function () {

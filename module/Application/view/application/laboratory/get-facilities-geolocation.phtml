@@ -50,7 +50,7 @@ if(isset($labFilter) && trim($labFilter)!= ''){
 <form id="pageFilter" action="#" method="">
   <div class="row" style="padding-top:10px;padding-bottom:20px;">
     <div class="col-lg-6">
-        <select name="labName[]" id="labName" class="form-control" multiple title="Please select one or more labs. Leave blank for All">
+        <select name="labName[]" id="labName" class="form-control" multiple title="<?php echo $this->translate('Please select one or more labs. Leave blank for All'); ?>">
             <?php
             foreach($labName as $lab){
                 ?>
@@ -100,7 +100,7 @@ if(isset($labFilter) && trim($labFilter)!= ''){
    var locations = null;
    $(function () {
      $('#labName').select2({
-        placeholder: "All Labs",
+        placeholder: "<?php echo $this->translate('All Labs'); ?>",
         allowClear: true
      });
      getLabFacilities();

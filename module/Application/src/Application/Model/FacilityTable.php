@@ -50,7 +50,7 @@ class FacilityTable extends AbstractTableGateway {
                         'facility_type'=>$params['facilityType'],
                         'status'=>'active',
                     );
-			if(isset($params['provinceNew']) && $params['provinceNew']!='')
+			if(isset($params['provinceNew']) && trim($params['provinceNew'])!='')
 			{
 				$sQuery = $sql->select()->from(array('l'=>'location_details'))
 							->where(array('l.location_name'=>trim($params['provinceNew'])));
@@ -63,7 +63,7 @@ class FacilityTable extends AbstractTableGateway {
 					$facilityData['facility_state'] = $locationDb->lastInsertValue;
 				}
 			}
-			if(isset($params['districtNew']) && $params['districtNew']!='')
+			if(isset($params['districtNew']) && trim($params['districtNew'])!='')
 			{
 				$sQuery = $sql->select()->from(array('l'=>'location_details'))
 							->where(array('l.location_name'=>trim($params['districtNew']),'l.parent_location'=>$facilityData['facility_state']));
@@ -79,22 +79,21 @@ class FacilityTable extends AbstractTableGateway {
 			
             $this->insert($facilityData);
             $facilityId = $this->lastInsertValue;
-			//\Zend\Debug\Debug::dump($_FILES);die;
             if (isset($_FILES['logo']['name']) && $_FILES['logo']['name'] != '') {
-				if (!file_exists(UPLOAD_PATH . DIRECTORY_SEPARATOR . "facility") && !is_dir(UPLOAD_PATH . DIRECTORY_SEPARATOR . "facility")) {
-					mkdir(UPLOAD_PATH . DIRECTORY_SEPARATOR . "facility");
-				}
-				if (!file_exists(UPLOAD_PATH . DIRECTORY_SEPARATOR . "facility" . DIRECTORY_SEPARATOR . $facilityId) && !is_dir(UPLOAD_PATH . DIRECTORY_SEPARATOR . "facility". DIRECTORY_SEPARATOR . $facilityId)) {
-					mkdir(UPLOAD_PATH . DIRECTORY_SEPARATOR . "facility". DIRECTORY_SEPARATOR . $facilityId);
-				}
-				$extension = strtolower(pathinfo(UPLOAD_PATH . DIRECTORY_SEPARATOR . $_FILES['logo']['name'], PATHINFO_EXTENSION));
-				$fName = str_replace(" ","",$params['facilityName']);
-				$imageName = $fName .  ".". $extension;
-				if (move_uploaded_file($_FILES["logo"]["tmp_name"], UPLOAD_PATH . DIRECTORY_SEPARATOR . "facility" . DIRECTORY_SEPARATOR . $facilityId . DIRECTORY_SEPARATOR . $imageName)) {
-					$imageData = array('facility_logo' => $imageName);
-					$this->update($imageData, array("facility_id" => $lastInsertedId));
-				}
-			}
+                if (!file_exists(UPLOAD_PATH . DIRECTORY_SEPARATOR . "facility") && !is_dir(UPLOAD_PATH . DIRECTORY_SEPARATOR . "facility")) {
+                    mkdir(UPLOAD_PATH . DIRECTORY_SEPARATOR . "facility");
+                }
+                if (!file_exists(UPLOAD_PATH . DIRECTORY_SEPARATOR . "facility" . DIRECTORY_SEPARATOR . $facilityId) && !is_dir(UPLOAD_PATH . DIRECTORY_SEPARATOR . "facility". DIRECTORY_SEPARATOR . $facilityId)) {
+                    mkdir(UPLOAD_PATH . DIRECTORY_SEPARATOR . "facility". DIRECTORY_SEPARATOR . $facilityId);
+                }
+                $extension = strtolower(pathinfo(UPLOAD_PATH . DIRECTORY_SEPARATOR . $_FILES['logo']['name'], PATHINFO_EXTENSION));
+                $fName = str_replace(" ","",$params['facilityName']);
+                $imageName = $fName .  ".". $extension;
+                if (move_uploaded_file($_FILES["logo"]["tmp_name"], UPLOAD_PATH . DIRECTORY_SEPARATOR . "facility" . DIRECTORY_SEPARATOR . $facilityId . DIRECTORY_SEPARATOR . $imageName)) {
+                    $imageData = array('facility_logo' => $imageName);
+                    $this->update($imageData, array("facility_id" => $lastInsertedId));
+                }
+            }
         }
       return $facilityId;
     }
@@ -227,12 +226,12 @@ class FacilityTable extends AbstractTableGateway {
 	
 	public function fetchFacility($facilityId)
 	{
-		$dbAdapter = $this->adapter;
+	$dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->from(array('f'=>'facility_details'))->where(array('facility_id'=>$facilityId));
-		$sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
-		$rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-		return $rResult;
+        $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
+        $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
+        return $rResult;
 	}
 	public function updateFacility($params){
         $dbAdapter = $this->adapter;
@@ -247,7 +246,7 @@ class FacilityTable extends AbstractTableGateway {
                         'report_email'=>$params['reportEmail'],
                         'contact_person'=>$params['contactPerson'],
                         'facility_mobile_numbers'=>$params['phoneNo'],
-						'facility_state'=>$params['state'],
+			'facility_state'=>$params['state'],
                         'facility_district'=>$params['district'],
                         'address'=>$params['address'],
                         'country'=>$params['country'],
@@ -257,7 +256,7 @@ class FacilityTable extends AbstractTableGateway {
                         'facility_type'=>$params['facilityType'],
                         'status'=>$params['status'],
                     );
-			if(isset($params['provinceNew']) && $params['provinceNew']!='')
+			if(isset($params['provinceNew']) && trim($params['provinceNew'])!='')
 			{
 				$sQuery = $sql->select()->from(array('l'=>'location_details'))
 							->where(array('l.location_name'=>trim($params['provinceNew'])));
@@ -270,7 +269,7 @@ class FacilityTable extends AbstractTableGateway {
 					$facilityData['facility_state'] = $locationDb->lastInsertValue;
 				}
 			}
-			if(isset($params['districtNew']) && $params['districtNew']!='')
+			if(isset($params['districtNew']) && trim($params['districtNew'])!='')
 			{
 				$sQuery = $sql->select()->from(array('l'=>'location_details'))
 							->where(array('l.location_name'=>trim($params['districtNew']),'l.parent_location'=>$facilityData['facility_state']));
@@ -286,28 +285,28 @@ class FacilityTable extends AbstractTableGateway {
 			
             $this->update($facilityData,array('facility_id'=>base64_decode($params['facilityId'])));
             $facilityId = base64_decode($params['facilityId']);
-			if (isset($param['existLogo']) && $param['existLogo'] == '') {
-				if (file_exists(UPLOAD_PATH . DIRECTORY_SEPARATOR . "facility" . DIRECTORY_SEPARATOR . $facilityId . DIRECTORY_SEPARATOR . $params['removedLogo'])) {
-					unlink(UPLOAD_PATH . DIRECTORY_SEPARATOR . "facility" . DIRECTORY_SEPARATOR . $facilityId . DIRECTORY_SEPARATOR . $params['removedLogo']);
-					$imageData = array('facility_logo' => '');
-					$result = $this->update($imageData, array("facility_id" => $facilityId));
-				}
-			}
+            if (isset($param['existLogo']) && trim($param['existLogo']) == '') {
+                if (file_exists(UPLOAD_PATH . DIRECTORY_SEPARATOR . "facility" . DIRECTORY_SEPARATOR . $facilityId . DIRECTORY_SEPARATOR . $params['removedLogo'])) {
+                    unlink(UPLOAD_PATH . DIRECTORY_SEPARATOR . "facility" . DIRECTORY_SEPARATOR . $facilityId . DIRECTORY_SEPARATOR . $params['removedLogo']);
+                    $imageData = array('facility_logo' => '');
+                    $result = $this->update($imageData, array("facility_id" => $facilityId));
+                }
+            }
             if (isset($_FILES['logo']['name']) && $_FILES['logo']['name'] != '') {
-				if (!file_exists(UPLOAD_PATH . DIRECTORY_SEPARATOR . "facility") && !is_dir(UPLOAD_PATH . DIRECTORY_SEPARATOR . "facility")) {
-					mkdir(UPLOAD_PATH . DIRECTORY_SEPARATOR . "facility");
-				}
-				if (!file_exists(UPLOAD_PATH . DIRECTORY_SEPARATOR . "facility" . DIRECTORY_SEPARATOR . $facilityId) && !is_dir(UPLOAD_PATH . DIRECTORY_SEPARATOR . "facility". DIRECTORY_SEPARATOR . $facilityId)) {
-					mkdir(UPLOAD_PATH . DIRECTORY_SEPARATOR . "facility". DIRECTORY_SEPARATOR . $facilityId);
-				}
-				$extension = strtolower(pathinfo(UPLOAD_PATH . DIRECTORY_SEPARATOR . $_FILES['logo']['name'], PATHINFO_EXTENSION));
-				$fName = str_replace(" ","",$params['facilityName']);
-				$imageName = $fName .  ".". $extension;
-				if (move_uploaded_file($_FILES["logo"]["tmp_name"], UPLOAD_PATH . DIRECTORY_SEPARATOR . "facility" . DIRECTORY_SEPARATOR . $facilityId . DIRECTORY_SEPARATOR . $imageName)) {
-					$imageData = array('facility_logo' => $imageName);
-					$this->update($imageData, array("facility_id" => $facilityId));
-				}
-			}
+                if (!file_exists(UPLOAD_PATH . DIRECTORY_SEPARATOR . "facility") && !is_dir(UPLOAD_PATH . DIRECTORY_SEPARATOR . "facility")) {
+                    mkdir(UPLOAD_PATH . DIRECTORY_SEPARATOR . "facility");
+                }
+                if (!file_exists(UPLOAD_PATH . DIRECTORY_SEPARATOR . "facility" . DIRECTORY_SEPARATOR . $facilityId) && !is_dir(UPLOAD_PATH . DIRECTORY_SEPARATOR . "facility". DIRECTORY_SEPARATOR . $facilityId)) {
+                    mkdir(UPLOAD_PATH . DIRECTORY_SEPARATOR . "facility". DIRECTORY_SEPARATOR . $facilityId);
+                }
+                $extension = strtolower(pathinfo(UPLOAD_PATH . DIRECTORY_SEPARATOR . $_FILES['logo']['name'], PATHINFO_EXTENSION));
+                $fName = str_replace(" ","",$params['facilityName']);
+                $imageName = $fName .  ".". $extension;
+                if (move_uploaded_file($_FILES["logo"]["tmp_name"], UPLOAD_PATH . DIRECTORY_SEPARATOR . "facility" . DIRECTORY_SEPARATOR . $facilityId . DIRECTORY_SEPARATOR . $imageName)) {
+                    $imageData = array('facility_logo' => $imageName);
+                    $this->update($imageData, array("facility_id" => $facilityId));
+                }
+            }
         }
       return $facilityId;
     }
