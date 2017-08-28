@@ -101,7 +101,7 @@ class SampleTable extends AbstractTableGateway {
         
         $waitingTotal = 0;$receivedTotal = 0;$testedTotal = 0;$rejectedTotal = 0;
         $waitingResult = array();$receivedResult = array();$tResult = array();$rejectedResult = array();
-        if(isset($params['frmSource']) && $params['frmSource'] == 'daterange'){
+        if(trim($params['fltrDate'])!= ''){
             if(trim($params['fromDate'])!= '' && trim($params['toDate'])!= ''){
                $startMonth = date("Y-m", strtotime(trim($params['fromDate'])))."-01";
                $endMonth = date("Y-m", strtotime(trim($params['toDate'])))."-31";
@@ -129,7 +129,7 @@ class SampleTable extends AbstractTableGateway {
                 $receivedQuery = $receivedQuery->where('vl.lab_id IN ("' . implode('", "', array_values(array_filter($mappedFacilities))) . '")');
             }
         }
-        if(isset($params['frmSource']) && $params['frmSource'] == 'daterange'){
+        if(trim($params['fltrDate'])!= ''){
             if(trim($params['fromDate'])!= '' && trim($params['toDate'])!= ''){
                 $receivedQuery = $receivedQuery->where(array("DATE(vl.sample_collection_date) <='$endMonth'", "DATE(vl.sample_collection_date) >='$startMonth'"));
             }
@@ -162,7 +162,7 @@ class SampleTable extends AbstractTableGateway {
                 $rejectedQuery = $rejectedQuery->where('vl.lab_id IN ("' . implode('", "', array_values(array_filter($mappedFacilities))) . '")');
             }
         }
-        if(isset($params['frmSource']) && $params['frmSource'] == 'daterange'){
+        if(trim($params['fltrDate'])!= ''){
             if(trim($params['fromDate'])!= '' && trim($params['toDate'])!= ''){
                 $rejectedQuery = $rejectedQuery->where(array("DATE(vl.sample_collection_date) <='$endMonth'", "DATE(vl.sample_collection_date) >='$startMonth'"));
             }
@@ -192,7 +192,7 @@ class SampleTable extends AbstractTableGateway {
                 $testedQuery = $testedQuery->where('vl.lab_id IN ("' . implode('", "', array_values(array_filter($mappedFacilities))) . '")');
             }
         }
-        if(isset($params['frmSource']) && $params['frmSource'] == 'daterange'){
+        if(trim($params['fltrDate'])!= ''){
             if(trim($params['fromDate'])!= '' && trim($params['toDate'])!= ''){
                 $testedQuery = $testedQuery->where(array("DATE(vl.sample_tested_datetime) <='$endMonth'", "DATE(vl.sample_tested_datetime) >='$startMonth'"));
             }

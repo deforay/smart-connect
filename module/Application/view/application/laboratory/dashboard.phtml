@@ -184,8 +184,8 @@ foreach($sampleType as $samples){
                     <hr style="background: #000 !important;border-color:#ccc;">
                     <div class="row" style="margin-bottom:20px;">
                         <div class="col-md-12 col-sm-12" style="text-align:center;">
-                            <a id="showDateRange" href="javascript:void(0);" style="text-decoration:underline;"><i class="fa fa-chevron-down" aria-hidden="true"></i> Show Date Range</a>
-                            <a id="closeDateRange" href="javascript:void(0);" style="text-decoration:underline;display:none;"><i class="fa fa-chevron-up" aria-hidden="true"></i> Close Date Range</a>
+                            <a id="showDateRange" href="javascript:void(0);" style="text-decoration:underline;"><i class="fa fa-chevron-down" aria-hidden="true"></i> Show Date Filter</a>
+                            <a id="closeDateRange" href="javascript:void(0);" style="text-decoration:underline;display:none;"><i class="fa fa-chevron-up" aria-hidden="true"></i> Close Date Filter</a>
                         </div>
                     </div>
                     <form id="dateFilter" action="#" method="">
@@ -418,11 +418,11 @@ foreach($sampleType as $samples){
    
     function getSampleResult(frmSource){
         facilityId = $("#labName").val();
-        fromDate=(frmSource == 'daterange')?$('#fltr-lowerDate').val():$('#mrp-lowerDate').val();
-        toDate=(frmSource == 'daterange')?$('#fltr-upperDate').val():$('#mrp-upperDate').val();
+        fromDate=($('#fltr-lowerDate').val()!= '')?$('#fltr-lowerDate').val():$('#mrp-lowerDate').val();
+        toDate=($('#fltr-lowerDate').val()!= '')?$('#fltr-upperDate').val():$('#mrp-upperDate').val();
         if($.trim(fromDate) == ''){ alert('Please choose date range'); return false; }
         if(frmSource!= 'load'){$.blockUI.defaults.css.border = '1px solid grey'; $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);}
-        $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-result')); ?>",{frmSource:frmSource,fromDate:fromDate,toDate:toDate,facilityId:facilityId},
+        $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-result')); ?>",{fltrDate:$('#fltr-lowerDate').val(),fromDate:fromDate,toDate:toDate,facilityId:facilityId},
         function(data) {
             $("#sampleResultDetails").html(data);
         });

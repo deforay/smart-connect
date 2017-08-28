@@ -58,7 +58,7 @@ if(isset($result['scResult']) && count($result['scResult'])>0){
                 <small class="font-green-sharp"><?php echo $this->translate('SAMPLES COLLECTED'); ?></small><br>
                 <!--<small class="font-blue-sharp"><?php echo $receivedDate;?></small>-->
                 <?php
-                if($params['frmSource']!= 'daterange'){
+                if(trim($params['fltrDate'])== ''){
                 ?>
                    <small class="font-green-sharp"><?php echo $this->translate('Last 28 days'); ?></small>
                 <?php } ?>
@@ -81,7 +81,7 @@ if(isset($result['scResult']) && count($result['scResult'])>0){
                 <small class="font-blue-sharp"><?php echo $this->translate('SAMPLES TESTED'); ?></small><br>
                 <!--<small class="font-blue-sharp"><?php echo $testedDate;?></small>-->
                 <?php
-                if($params['frmSource']!= 'daterange'){
+                if(trim($params['fltrDate'])== ''){
                 ?>
                   <small class="font-blue-sharp"><?php echo $this->translate('Last 28 days'); ?></small>
                 <?php } ?>
@@ -103,7 +103,7 @@ if(isset($result['scResult']) && count($result['scResult'])>0){
                 <small class="font-red-haze"><?php echo $this->translate('SAMPLES REJECTED'); ?></small><br>
                 <!--<small class="font-red-haze"><?php echo $rejectedDate;?></small>-->
                 <?php
-                if($params['frmSource']!= 'daterange'){
+                if(trim($params['fltrDate'])== ''){
                 ?>
                    <small class="font-red-haze"><?php echo $this->translate('Last 28 days'); ?></small>
                 <?php } ?>
