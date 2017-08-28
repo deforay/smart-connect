@@ -179,7 +179,7 @@ class Module{
 	$serviceManager = $event->getApplication()->getServiceManager();
 	$translator = $serviceManager->get('translator');
 	$translator->setLocale($languagecontainer->locale)
-		    ->setFallbackLocale($languagecontainer->locale);
+	           ->setFallbackLocale('en_US');
     }
 
     public function getConfig(){

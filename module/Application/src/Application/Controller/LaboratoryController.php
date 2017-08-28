@@ -171,7 +171,7 @@ class LaboratoryController extends AbstractActionController{
             $sampleService = $this->getServiceLocator()->get('SampleService');
             $result = $sampleService->getSampleResultDetails($params);
             $viewModel = new ViewModel();
-            $viewModel->setVariables(array('result' => $result))
+            $viewModel->setVariables(array('params'=>$params,'result' => $result))
                         ->setTerminal(true);
             return $viewModel;
         }

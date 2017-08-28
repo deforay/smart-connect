@@ -167,10 +167,10 @@ return array(
     'service_manager' => array(
         'abstract_factories' => array(
             'Zend\Cache\Service\StorageCacheAbstractServiceFactory',
-            'Zend\Log\LoggerAbstractServiceFactory',
+            'Zend\Log\LoggerAbstractServiceFactory'
         ),
         'factories' => array(
-            'translator' => 'Zend\Mvc\Service\TranslatorServiceFactory',
+            'translator' => 'Zend\Mvc\Service\TranslatorServiceFactory'
         ),
     ),
     'translator' => array(

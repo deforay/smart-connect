@@ -56,7 +56,12 @@ if(isset($result['scResult']) && count($result['scResult'])>0){
                     <span data-counter="counterup" data-value="<?php echo $receivedTotal; ?>"><?php echo $receivedTotal; ?></span>
                 </h3>
                 <small class="font-green-sharp"><?php echo $this->translate('SAMPLES COLLECTED'); ?></small><br>
-                <small class="font-green-sharp"><?php echo $this->translate('Last 28 days'); ?></small>
+                <!--<small class="font-blue-sharp"><?php echo $receivedDate;?></small>-->
+                <?php
+                if($params['frmSource']!= 'daterange'){
+                ?>
+                   <small class="font-green-sharp"><?php echo $this->translate('Last 28 days'); ?></small>
+                <?php } ?>
             </div>
             <div class="icon">
                 <i class="icon-pie-chart"></i>
@@ -75,7 +80,11 @@ if(isset($result['scResult']) && count($result['scResult'])>0){
                 </h3>
                 <small class="font-blue-sharp"><?php echo $this->translate('SAMPLES TESTED'); ?></small><br>
                 <!--<small class="font-blue-sharp"><?php echo $testedDate;?></small>-->
-                <small class="font-blue-sharp"><?php echo $this->translate('Last 28 days'); ?></small>
+                <?php
+                if($params['frmSource']!= 'daterange'){
+                ?>
+                  <small class="font-blue-sharp"><?php echo $this->translate('Last 28 days'); ?></small>
+                <?php } ?>
             </div>
             <div class="icon">
                 <i class="icon-pie-chart"></i>
@@ -93,7 +102,11 @@ if(isset($result['scResult']) && count($result['scResult'])>0){
                 </h3>
                 <small class="font-red-haze"><?php echo $this->translate('SAMPLES REJECTED'); ?></small><br>
                 <!--<small class="font-red-haze"><?php echo $rejectedDate;?></small>-->
-                <small class="font-red-haze"><?php echo $this->translate('Last 28 days'); ?></small>
+                <?php
+                if($params['frmSource']!= 'daterange'){
+                ?>
+                   <small class="font-red-haze"><?php echo $this->translate('Last 28 days'); ?></small>
+                <?php } ?>
             </div>
             <div class="icon">
                 <i class="icon-pie-chart"></i>
@@ -160,7 +173,7 @@ if(isset($result['scResult']) && count($result['scResult'])>0){
             },
             series: [{
                 showInLegend: false,  
-                name: 'Samples Received',
+                name: '<?php echo $this->translate('Samples Received'); ?>',
                 data: [<?php
                 foreach($result['scResult'] as $total){
                     echo ucwords($total[0]['total']).",";
@@ -217,7 +230,7 @@ if(isset($result['scResult']) && count($result['scResult'])>0){
         },
         series: [{
             showInLegend: false,  
-            name: 'Samples Tested',
+            name: '<?php echo $this->translate('Samples Tested'); ?>',
             data: [<?php
             foreach($result['stResult'] as $total){
                 echo ucwords($total[0]['total']).",";
@@ -273,7 +286,7 @@ if(isset($result['scResult']) && count($result['scResult'])>0){
             },
             series: [{
                 showInLegend: false,  
-                name: 'Samples Rejected',
+                name: '<?php echo $this->translate('Samples Rejected'); ?>',
                 data: [<?php
                 foreach($result['srResult'] as $total){
                     echo ucwords($total[0]['total']).",";
