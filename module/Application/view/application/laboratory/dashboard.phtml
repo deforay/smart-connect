@@ -420,7 +420,7 @@ foreach($sampleType as $samples){
         facilityId = $("#labName").val();
         fromDate=($('#fltr-lowerDate').val()!= '')?$('#fltr-lowerDate').val():$('#mrp-lowerDate').val();
         toDate=($('#fltr-lowerDate').val()!= '')?$('#fltr-upperDate').val():$('#mrp-upperDate').val();
-        if($.trim(fromDate) == ''){ alert('Please choose date range'); return false; }
+        if(frmSource == 'daterange' && $('#fltr-lowerDate').val() == ''){ alert('Please choose date range'); return false; }
         if(frmSource!= 'load'){$.blockUI.defaults.css.border = '1px solid grey'; $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);}
         $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-result')); ?>",{fltrDate:$('#fltr-lowerDate').val(),fromDate:fromDate,toDate:toDate,facilityId:facilityId},
         function(data) {
