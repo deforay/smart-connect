@@ -184,8 +184,8 @@ foreach($sampleType as $samples){
                     <hr style="background: #000 !important;border-color:#ccc;">
                     <div class="row" style="margin-bottom:20px;">
                         <div class="col-md-12 col-sm-12" style="text-align:center;">
-                            <a id="showDateRange" href="javascript:void(0);"><i class="fa fa-chevron-down" aria-hidden="true"></i> Show Date Range</a>
-                            <a id="closeDateRange" href="javascript:void(0);" style="display:none;"><i class="fa fa-chevron-up" aria-hidden="true"></i> Close Date Range</a>
+                            <a id="showDateRange" href="javascript:void(0);" style="text-decoration:underline;"><i class="fa fa-chevron-down" aria-hidden="true"></i> Show Date Range</a>
+                            <a id="closeDateRange" href="javascript:void(0);" style="text-decoration:underline;display:none;"><i class="fa fa-chevron-up" aria-hidden="true"></i> Close Date Range</a>
                         </div>
                     </div>
                     <form id="dateFilter" action="#" method="">
@@ -1164,7 +1164,7 @@ foreach($sampleType as $samples){
         var endyear = parseInt(fltrEndDate / 100);
         var endmonth = parseInt(safeRound((fltrEndDate / 100 - endyear)) * 100);
         $('.fltr-monthdisplay .fltr-lowerMonth').html(MONTHS[startmonth - 1] + " " + startyear);
-        $('.fltr-monthdisplay .fltr-to').html('to');
+        $('.fltr-monthdisplay .fltr-to').html('TO');
         $('.fltr-monthdisplay .fltr-upperMonth').html(MONTHS[endmonth - 1] + " " + endyear);
         //$('#fltr-lowerDate').val(fltrStartDate);
         //$('#fltr-upperDate').val(fltrEndDate);
