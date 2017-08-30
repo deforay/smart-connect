@@ -40,7 +40,7 @@ class CommonController extends AbstractActionController{
         if ($request->isPost()) {
             $params = $request->getPost();
             $common = $this->getServiceLocator()->get('CommonService');
-            $result = $common->clearAllCache($params);
+            $result = $common->clearAllCache();
         }
         $viewModel = new ViewModel();
         $viewModel->setVariables(array('result' => $result))

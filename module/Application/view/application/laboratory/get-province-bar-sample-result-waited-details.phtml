@@ -1,0 +1,63 @@
+<script>
+       $(function () {
+       $('#provincebarcontainer').highcharts({
+       chart: {
+            type: 'column'
+       },
+       title: {
+            text: '<?php echo $this->translate('Sample Result Awaited (Province-wise)'); ?>'
+       },
+       credits: {
+              enabled: false
+       },
+        xAxis: {
+            categories: [<?php
+            if(isset($result['province']) && count($result['province'])>0){
+              foreach($result['province'] as $province){
+                  echo "'".$province."',";
+              }
+            }
+            ?>]
+        },
+        yAxis: {
+            allowDecimals: false,
+            min: 0,
+            title: {
+                text: ''
+            },
+            labels: { formatter: function() { return this.value; } },
+        },
+        tooltip: {
+            formatter: function () {
+                return '<b>' + this.x + '</b><br/>' +
+                    this.series.name + ': ' + this.y
+            }
+        },
+        plotOptions: {
+            column: {
+                stacking: 'normal',
+                pointPadding: 0.2,
+                borderWidth: 0
+            }
+        },
+        series: [<?php
+           if(isset($result['sample']) && count($result['sample']) >0){
+              foreach($result['sample'] as $key=>$condition){
+              ?>
+              {
+              showInLegend: false,
+              name:'<?php echo $this->translate($key);?>',
+              data:[<?php
+                  foreach($condition as $count){
+                     echo '{y:'.$count.'},';
+                  }
+              ?>],
+              },
+              <?php
+              }
+           }
+            ?>],
+            colors: ['#7cb5ec'],
+    });
+    });
+</script>

@@ -351,7 +351,7 @@ class CommonService {
         
     }
     
-    public function clearAllCache($params){
+    public function clearAllCache(){
         $cacheObj = $this->sm->get('Cache\Persistent');
         return $cacheObj->flush();
     }

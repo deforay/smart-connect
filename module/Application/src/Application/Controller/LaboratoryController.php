@@ -658,5 +658,82 @@ class LaboratoryController extends AbstractActionController{
             return $viewModel;
         }
     }
+    
+    public function sampleResultAwaitedAction() {
+        $this->layout()->setVariable('activeTab', 'labs-dashboard');
+        $params = array();
+        $frmSource="";
+        $labFilter="";
+        if($this->params()->fromQuery('src')){
+            $frmSource = $this->params()->fromQuery('src');
+        }
+        if($this->params()->fromQuery('lab')){
+            $labFilter=$this->params()->fromQuery('lab');
+            $params['labs'] = explode(',',$labFilter);
+        }
+        $sampleService = $this->getServiceLocator()->get('SampleService');
+        $commonService = $this->getServiceLocator()->get('CommonService');
+        $hubName = $sampleService->getAllHubName();
+        $sampleType = $sampleService->getSampleType();
+        $currentRegimen = $sampleService->getAllCurrentRegimen();
+        $facilityInfo = $commonService->getSampleTestedFacilityInfo($params);
+        return new ViewModel(array(
+            'frmSource' => $frmSource,
+            'labFilter' => $labFilter,
+            'sampleType' => $sampleType,
+            'hubName' => $hubName,
+            'currentRegimen' => $currentRegimen,
+            'facilityInfo' => $facilityInfo
+        ));
+    }
+    
+    public function getProvinceBarSampleResultWaitedDetailsAction() {
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $sampleService = $this->getServiceLocator()->get('SampleService');
+            $result=$sampleService->getProvinceBarSampleResultWaitedDetails($params);
+            $viewModel = new ViewModel();
+            $viewModel->setVariables(array('result' =>$result))
+                      ->setTerminal(true);
+            return $viewModel;
+        }
+    }
+    
+    public function getFacilityBarSampleResultWaitedDetailsAction() {
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $sampleService = $this->getServiceLocator()->get('SampleService');
+            $result=$sampleService->getFacilityBarSampleResultWaitedDetails($params);
+            $viewModel = new ViewModel();
+            $viewModel->setVariables(array('result' =>$result))
+                      ->setTerminal(true);
+            return $viewModel;
+        }
+    }
+    
+    public function getFilterSampleWaitedResultDetailsAction(){
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $parameters = $request->getPost();
+            $sampleService = $this->getServiceLocator()->get('SampleService');
+            $result = $sampleService->getFilterSampleResultWaitedDetails($parameters);
+            return $this->getResponse()->setContent(Json::encode($result));
+        }
+    }
+    
+    public function exportSampleResultAwaitedAction() {
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $sampleService = $this->getServiceLocator()->get('SampleService');
+            $file=$sampleService->generateSampleResultAwaitedExcel($params);
+            $viewModel = new ViewModel();
+            $viewModel->setVariables(array('file' =>$file))
+                      ->setTerminal(true);
+            return $viewModel;
+        }
+    }
 }
 
