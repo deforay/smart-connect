@@ -1005,29 +1005,29 @@ class SampleService {
         }
     }
     
-    public function getProvinceBarSampleResultWaitedDetails($params){
+    public function getProvinceBarSampleResultAwaitedDetails($params){
         $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->fetchProvinceBarSampleResultWaitedDetails($params);
+        return $sampleDb->fetchProvinceBarSampleResultAwaitedDetails($params);
     }
     
-    public function getFacilityBarSampleResultWaitedDetails($params){
+    public function getFacilityBarSampleResultAwaitedDetails($params){
         $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->fetchFacilityBarSampleResultWaitedDetails($params);
+        return $sampleDb->fetchFacilityBarSampleResultAwaitedDetails($params);
     }
     
-    public function getFilterSampleResultWaitedDetails($parameters){
+    public function getFilterSampleResultAwaitedDetails($parameters){
         $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->fetchFilterSampleResultWaitedDetails($parameters);
+        return $sampleDb->fetchFilterSampleResultAwaitedDetails($parameters);
     }
     
-    public function generateSampleResultAwaitedExcel($params){
+    public function generateResultsAwaitedSampleExcel($params){
         $queryContainer = new Container('query');
         $common = new CommonService();
-        if(isset($queryContainer->sampleResultAwaitedQuery)){
+        if(isset($queryContainer->resultsAwaitedQuery)){
             try{
                 $dbAdapter = $this->sm->get('Zend\Db\Adapter\Adapter');
                 $sql = new Sql($dbAdapter);
-                $sQueryStr = $sql->getSqlStringForSqlObject($queryContainer->sampleResultAwaitedQuery);
+                $sQueryStr = $sql->getSqlStringForSqlObject($queryContainer->resultsAwaitedQuery);
                 $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
                 if(isset($sResult) && count($sResult)>0){
                     $excel = new PHPExcel();
@@ -1077,7 +1077,7 @@ class SampleService {
                     $sheet->setCellValue('B1', html_entity_decode('Collection Date ', ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
                     $sheet->setCellValue('C1', html_entity_decode('Facility ', ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
                     $sheet->setCellValue('D1', html_entity_decode('Sample Type ', ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
-                    $sheet->setCellValue('E1', html_entity_decode('Lab Name ', ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
+                    $sheet->setCellValue('E1', html_entity_decode('Lab ', ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
                     $sheet->setCellValue('F1', html_entity_decode('Sample Received at Lab ', ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
                     
                     $sheet->getStyle('A1')->applyFromArray($styleArray);
@@ -1112,14 +1112,14 @@ class SampleService {
                       $currentRow++;
                     }
                     $writer = \PHPExcel_IOFactory::createWriter($excel, 'Excel5');
-                    $filename = 'SAMPLE-RESULT-AWAITED--' . date('d-M-Y-H-i-s') . '.xls';
+                    $filename = 'RESULTS-AWAITED--' . date('d-M-Y-H-i-s') . '.xls';
                     $writer->save(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . $filename);
                     return $filename;
                 }else{
                     return "";
                 }
             }catch (Exception $exc) {
-                error_log("SAMPLE-RESULT-AWAITED--" . $exc->getMessage());
+                error_log("RESULTS-AWAITED--" . $exc->getMessage());
                 error_log($exc->getTraceAsString());
                 return "";
             }  

@@ -19,7 +19,7 @@ if(isset($labFilter) && trim($labFilter)!= ''){
                     <!-- END THEME PANEL -->
                     <!-- BEGIN PAGE BAR -->
                      <div class="page-bar">
-                        <h1 class="page-title"><?php echo $this->translate('Samples Result Awaited Overview'); ?>
+                        <h1 class="page-title"><?php echo $this->translate('Results Awaited Overview'); ?>
                         <ul class="page-breadcrumb pull-right">
                             <li>
                                 <i class="fa fa-arrow-left"></i>
@@ -199,22 +199,22 @@ if(isset($labFilter) && trim($labFilter)!= ''){
                             <div class="portlet box blue">
                                 <div class="portlet-title">
                                     <div class="caption">
-                                        <i class="fa fa-cogs"></i><?php echo $this->translate('Samples Waiting'); ?>
+                                        <i class="fa fa-cogs"></i><?php echo $this->translate('Results Awaited'); ?>
                                     </div>
                                     <div class="tools">
-                                        <button class="btn btn-default" onclick="exportSampleResultAwaited();"><span><i class="fa fa-file-excel-o" aria-hidden="true"></i> <?php echo $this->translate('Excel'); ?></span></button>
+                                        <button class="btn btn-default" onclick="exportResultsAwaited();"><span><i class="fa fa-file-excel-o" aria-hidden="true"></i> <?php echo $this->translate('Excel'); ?></span></button>
                                     </div>
                                 </div>
                                 <div class="portlet-body">
                                     <div class="table-toolbar">
-                                        <table class="table table-striped table-bordered table-hover order-column" id="samplesWaitingDataTable">
+                                        <table class="table table-striped table-bordered table-hover order-column" id="resultsAwaitedDataTable">
                                             <thead>
                                                 <tr>
                                                     <th><?php echo $this->translate('Sample ID'); ?> </th>
                                                     <th><?php echo $this->translate('Collection Date'); ?> </th>
                                                     <th><?php echo $this->translate('Facility'); ?> </th>
                                                     <th><?php echo $this->translate('Sample Type'); ?> </th>
-                                                    <th><?php echo $this->translate('Lab Name'); ?> </th>
+                                                    <th><?php echo $this->translate('Lab'); ?> </th>
                                                     <th><?php echo $this->translate('Sample Recieved at Lab'); ?> </th>
                                                 </tr>
                                             </thead>
@@ -248,7 +248,7 @@ if(isset($labFilter) && trim($labFilter)!= ''){
         gender = $("#gender").val();
         isPregnant = $('input[name="isPregnant"]:checked').val();
         isBreastfeeding = $('input[name="isBreastfeeding"]:checked').val();
-        $.post("<?php echo $this->url('laboratory', array('action' => 'get-province-bar-sample-result-waited-details')); ?>",{frmSource:'<?php echo $frmSource; ?>',fromDate:fromDate,toDate:toDate,provinces:provinces,districts:districts,lab:lab,clinicId:clinicId,currentRegimen:currentRegimen,age:age,sampleType:sampleType,gender:gender,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding},
+        $.post("<?php echo $this->url('laboratory', array('action' => 'get-province-bar-sample-result-awaited-details')); ?>",{frmSource:'<?php echo $frmSource; ?>',fromDate:fromDate,toDate:toDate,provinces:provinces,districts:districts,lab:lab,clinicId:clinicId,currentRegimen:currentRegimen,age:age,sampleType:sampleType,gender:gender,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding},
         function(data) {
             $("#provincebarcontainer").html(data);
         });
@@ -269,7 +269,7 @@ if(isset($labFilter) && trim($labFilter)!= ''){
         gender = $("#gender").val();
         isPregnant = $('input[name="isPregnant"]:checked').val();
         isBreastfeeding = $('input[name="isBreastfeeding"]:checked').val();
-        $.post("<?php echo $this->url('laboratory', array('action' => 'get-facility-bar-sample-result-waited-details')); ?>",{frmSource:'<?php echo $frmSource; ?>',fromDate:fromDate,toDate:toDate,provinces:provinces,districts:districts,lab:lab,clinicId:clinicId,currentRegimen:currentRegimen,age:age,sampleType:sampleType,gender:gender,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding},
+        $.post("<?php echo $this->url('laboratory', array('action' => 'get-facility-bar-sample-result-awaited-details')); ?>",{frmSource:'<?php echo $frmSource; ?>',fromDate:fromDate,toDate:toDate,provinces:provinces,districts:districts,lab:lab,clinicId:clinicId,currentRegimen:currentRegimen,age:age,sampleType:sampleType,gender:gender,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding},
         function(data) {
             $("#facilitybarcontainer").html(data);
         });
@@ -295,7 +295,7 @@ if(isset($labFilter) && trim($labFilter)!= ''){
         });
        generateProvinceBarContainer();
        generateFacilityBarContainer();
-       loadSamplesWaitingDataTable();
+       loadResultsAwaitedDataTable();
     });
 
     function searchSampleTestedLabResult(){
@@ -323,10 +323,10 @@ if(isset($labFilter) && trim($labFilter)!= ''){
         searchSampleTestedLabResult();
     }
     
-    function loadSamplesWaitingDataTable(){
+    function loadResultsAwaitedDataTable(){
         $.blockUI.defaults.css.border = '1px solid grey';
         $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
-        oTable = $('#samplesWaitingDataTable').dataTable({
+        oTable = $('#resultsAwaitedDataTable').dataTable({
                 "bAutoWidth": false,
                 "bProcessing": true,
                 "bServerSide": true,
@@ -339,7 +339,7 @@ if(isset($labFilter) && trim($labFilter)!= ''){
                     {"sClass":"center"}
                 ],
                 "aaSorting": [[ 1, "desc" ]],
-                "sAjaxSource": "<?php echo $this->url('laboratory',array('action' => 'get-filter-sample-waited-result-details')); ?>",
+                "sAjaxSource": "<?php echo $this->url('laboratory',array('action' => 'get-filter-sample-result-awaited-details')); ?>",
                 "fnServerData": function ( sSource, aoData, fnCallback ) {
                     aoData.push({"name": "frmSource", "value": "<?php echo $frmSource; ?>"});
                     aoData.push({"name": "fromDate", "value": $('#mrp-lowerDate').val()});
@@ -703,10 +703,10 @@ if(isset($labFilter) && trim($labFilter)!= ''){
         });
     }
     
-    function exportSampleResultAwaited(){
+    function exportResultsAwaited(){
         $.blockUI.defaults.css.border = '1px solid grey';
         $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
-        $.post("<?php echo $this->url('laboratory', array('action' => 'export-sample-result-awaited')); ?>", { },
+        $.post("<?php echo $this->url('laboratory', array('action' => 'export-results-awaited-sample')); ?>", { },
          function(data){
              if(data == "" || data == null || data == undefined){
                  alert('Unable to export result excel');

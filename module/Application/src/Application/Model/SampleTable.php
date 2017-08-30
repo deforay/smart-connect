@@ -2679,7 +2679,7 @@ class SampleTable extends AbstractTableGateway {
        return $output;
     }
     
-    public function fetchProvinceBarSampleResultWaitedDetails($params){
+    public function fetchProvinceBarSampleResultAwaitedDetails($params){
         $logincontainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
@@ -2773,14 +2773,14 @@ class SampleTable extends AbstractTableGateway {
                 $countQueryStr = $sql->getSqlStringForSqlObject($countQuery);
                 $countResult  = $dbAdapter->query($countQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
                 $result['province'][$p] = ucwords($province['location_name']);
-                $result['sample']['Samples Waiting'][$p] = (isset($countResult->total))?$countResult->total:0;
+                $result['sample']['Results Awaited'][$p] = (isset($countResult->total))?$countResult->total:0;
               $p++;
             }
         }
       return $result;
     }
     
-    public function fetchFacilityBarSampleResultWaitedDetails($params){
+    public function fetchFacilityBarSampleResultAwaitedDetails($params){
         $logincontainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
@@ -2873,14 +2873,14 @@ class SampleTable extends AbstractTableGateway {
                 $countQueryStr = $sql->getSqlStringForSqlObject($countQuery);
                 $countResult  = $dbAdapter->query($countQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
                 $result['lab'][$l] = ucwords($lab['facility_name']);
-                $result['sample']['Samples Waiting'][$l] = (isset($countResult->total))?$countResult->total:0;
+                $result['sample']['Results Awaited'][$l] = (isset($countResult->total))?$countResult->total:0;
               $l++;
             }
         }
       return $result;
     }
     
-    public function fetchFilterSampleResultWaitedDetails($parameters){
+    public function fetchFilterSampleResultAwaitedDetails($parameters){
         $logincontainer = new Container('credo');
         $queryContainer = new Container('query');
         $common = new CommonService($this->sm);
@@ -3047,7 +3047,7 @@ class SampleTable extends AbstractTableGateway {
             $sQuery->offset($sOffset);
         }
         
-        $queryContainer->sampleResultAwaitedQuery = $sQuery;
+        $queryContainer->resultsAwaitedQuery = $sQuery;
         $queryStr = $sql->getSqlStringForSqlObject($sQuery); // Get the string of the Sql, instead of the Select-instance
         //echo $queryStr;die;
         $rResult = $common->cacheQuery($queryStr,$dbAdapter);

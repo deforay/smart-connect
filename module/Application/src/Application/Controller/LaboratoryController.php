@@ -687,12 +687,12 @@ class LaboratoryController extends AbstractActionController{
         ));
     }
     
-    public function getProvinceBarSampleResultWaitedDetailsAction() {
+    public function getProvinceBarSampleResultAwaitedDetailsAction() {
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
             $sampleService = $this->getServiceLocator()->get('SampleService');
-            $result=$sampleService->getProvinceBarSampleResultWaitedDetails($params);
+            $result=$sampleService->getProvinceBarSampleResultAwaitedDetails($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('result' =>$result))
                       ->setTerminal(true);
@@ -700,12 +700,12 @@ class LaboratoryController extends AbstractActionController{
         }
     }
     
-    public function getFacilityBarSampleResultWaitedDetailsAction() {
+    public function getFacilityBarSampleResultAwaitedDetailsAction() {
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
             $sampleService = $this->getServiceLocator()->get('SampleService');
-            $result=$sampleService->getFacilityBarSampleResultWaitedDetails($params);
+            $result=$sampleService->getFacilityBarSampleResultAwaitedDetails($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('result' =>$result))
                       ->setTerminal(true);
@@ -713,22 +713,22 @@ class LaboratoryController extends AbstractActionController{
         }
     }
     
-    public function getFilterSampleWaitedResultDetailsAction(){
+    public function getFilterSampleResultAwaitedDetailsAction(){
         $request = $this->getRequest();
         if ($request->isPost()) {
             $parameters = $request->getPost();
             $sampleService = $this->getServiceLocator()->get('SampleService');
-            $result = $sampleService->getFilterSampleResultWaitedDetails($parameters);
+            $result = $sampleService->getFilterSampleResultAwaitedDetails($parameters);
             return $this->getResponse()->setContent(Json::encode($result));
         }
     }
     
-    public function exportSampleResultAwaitedAction() {
+    public function exportResultsAwaitedSampleAction() {
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
             $sampleService = $this->getServiceLocator()->get('SampleService');
-            $file=$sampleService->generateSampleResultAwaitedExcel($params);
+            $file=$sampleService->generateResultsAwaitedSampleExcel($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('file' =>$file))
                       ->setTerminal(true);
