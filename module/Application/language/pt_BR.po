@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: ZendSkeletonApplication\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-08-26 00:21+0530\n"
-"PO-Revision-Date: 2017-08-30 17:04+0530\n"
+"PO-Revision-Date: 2017-08-31 13:25+0530\n"
 "Last-Translator: Diogo Melo <dmelo87@gmail.com>\n"
 "Language-Team: ZF Contibutors <zf-devteam@zend.com>\n"
 "Language: pt\n"
@@ -488,7 +488,7 @@ msgstr "Fim do relatório"
 #: ../view/application/laboratory/samples-tested.phtml:217
 #: ../view/application/laboratory/samples-tested.phtml:229
 msgid "Not Specified"
-msgstr "(NÃ£o especificado) (NE)"
+msgstr "(Não especificado) (NE)"
 
 #: ../view/application/clinic/get-over-all-load-status.phtml:31
 #: ../view/application/laboratory/samples-tested-lab.phtml:266
@@ -944,7 +944,7 @@ msgstr "Novo utilizador"
 #: ../view/application/laboratory/get-facilities-geolocation.phtml:37
 #: ../view/layout/layout.phtml:132
 msgid "Labs Dashboard"
-msgstr "Painel dos LaboratÃ³rios"
+msgstr "Painel dos Laboratórios"
 
 #: ../view/application/laboratory/dashboard.phtml:155
 #: ../view/application/laboratory/get-facilities-geolocation.phtml:53
@@ -965,11 +965,11 @@ msgstr "Todos tipos de Amostras"
 
 #: ../view/application/laboratory/dashboard.phtml:214
 msgid "Samples Tested per Lab"
-msgstr "Amostras testadas por LaboratÃ³rio"
+msgstr "Amostras testadas por Laboratório"
 
 #: ../view/application/laboratory/dashboard.phtml:236
 msgid "Samples Tested based on Gender"
-msgstr "Amostras testadas por GÃ©nero"
+msgstr "Amostras testadas por Género"
 
 #: ../view/application/laboratory/dashboard.phtml:257
 msgid "Samples Tested based on Age"
@@ -981,7 +981,7 @@ msgstr "Tempo de Resposta Laboratorial"
 
 #: ../view/application/laboratory/dashboard.phtml:291
 msgid "Requisition Forms for Testing"
-msgstr "FormulÃ¡rios de requisiÃ§Ã£o para Testes"
+msgstr "Formulários de requisição para Testes"
 
 #: ../view/application/laboratory/dashboard.phtml:303
 msgid "Sample Volume"
@@ -1009,11 +1009,11 @@ msgstr "Linha de Tratamento"
 
 #: ../view/application/laboratory/dashboard.phtml:352
 msgid "VL Suppressed/Not Suppressed"
-msgstr "Carga Viral Suprimida/NÃ£o suprimida"
+msgstr "Carga Viral Suprimida/Não suprimida"
 
 #: ../view/application/laboratory/dashboard.phtml:366
 msgid "All Facilities - Geolocation"
-msgstr "Todos Locais - GeolocalizaÃ§Ã£o"
+msgstr "Todos Locais - Geolocalização"
 
 #: ../view/application/laboratory/dashboard.phtml:371
 msgid "Expand Map"
@@ -1027,7 +1027,7 @@ msgstr "Expandir o mapa"
 #: ../view/application/laboratory/samples-tested-lab.phtml:342
 #: ../view/application/laboratory/samples-tested.phtml:364
 msgid "All Labs"
-msgstr "Todos LaboratÃ³rios"
+msgstr "Todos Laboratórios"
 
 #: ../view/application/laboratory/get-bar-sample-tat.phtml:8
 #: ../view/application/laboratory/get-lab-bar-sample-details.phtml:9
@@ -1076,7 +1076,7 @@ msgstr "Media dos TRL em dias"
 
 #: ../view/application/laboratory/get-requisition-forms.phtml:31
 msgid "Forms"
-msgstr "FormulÃ¡rios"
+msgstr "Formulários"
 
 #: ../view/application/laboratory/get-requisition-forms.phtml:82
 msgid "Complete"
@@ -1098,7 +1098,7 @@ msgstr "AMOSTRAS COLHIDAS"
 #: ../view/application/laboratory/get-sample-result.phtml:78
 #: ../view/application/laboratory/get-sample-result.phtml:96
 msgid "Last 28 days"
-msgstr "NOS ÃšLTIMOS 28 DIAS"
+msgstr "NOS ÚLTIMOS 28 DIAS"
 
 #: ../view/application/laboratory/get-sample-result.phtml:76
 msgid "SAMPLES TESTED"
@@ -1279,7 +1279,7 @@ msgstr "2 a Linha de Tratamento (LT 2)"
 
 #: ../view/application/laboratory/samples-tested.phtml:228
 msgid "Line Of Treatment 3"
-msgstr "3 a Linha de Tratamento  (LT 3)"
+msgstr "3 a Linha de Tratamento (LT 3)"
 
 #: ../view/application/login/index.phtml:55
 msgid "Dashboard for Enhancement of VL Treatment Cascade"
@@ -1402,26 +1402,26 @@ msgstr "Ocorreu um erro 404"
 
 #: ../view/error/404.phtml:10
 msgid "The requested controller was unable to dispatch the request."
-msgstr "O controlador requisitado nÃ£o foi capaz de despachar a requisiÃ§Ã£o."
+msgstr "O controlador requisitado não foi capaz de despachar a requisição."
 
 #: ../view/error/404.phtml:13
 msgid ""
 "The requested controller could not be mapped to an existing controller class."
 msgstr ""
-"O controlador requisitados nÃ£o pode ser mapeado a uma classe de controlador "
+"O controlador requisitados não pode ser mapeado a uma classe de controlador "
 "existente."
 
 #: ../view/error/404.phtml:16
 msgid "The requested controller was not dispatchable."
-msgstr "O controlador requisitado nÃ£o foi despachado."
+msgstr "O controlador requisitado não foi despachado."
 
 #: ../view/error/404.phtml:19
 msgid "The requested URL could not be matched by routing."
-msgstr "A URL requisitada nÃ£o pode ser encontrada em uma rota."
+msgstr "A URL requisitada não pode ser encontrada em uma rota."
 
 #: ../view/error/404.phtml:22
 msgid "We cannot determine at this time why a 404 was generated."
-msgstr "NÃ£o foi possÃ­vel determinar o motivo do 404 ter ocorrido."
+msgstr "Não foi possível determinar o motivo do 404 ter ocorrido."
 
 #: ../view/error/404.phtml:34
 msgid "Controller"
@@ -1434,7 +1434,7 @@ msgstr "resolve como %s"
 
 #: ../view/error/404.phtml:53 ../view/error/index.phtml:8
 msgid "Additional information"
-msgstr "InformaÃ§Ã£o adicional"
+msgstr "Informação adicional"
 
 #: ../view/error/404.phtml:56 ../view/error/404.phtml:81
 #: ../view/error/index.phtml:11 ../view/error/index.phtml:36
@@ -1449,15 +1449,15 @@ msgstr "Mensagem"
 #: ../view/error/404.phtml:64 ../view/error/404.phtml:89
 #: ../view/error/index.phtml:19 ../view/error/index.phtml:44
 msgid "Stack trace"
-msgstr "Pilha de execuÃ§Ã£o"
+msgstr "Pilha de execução"
 
 #: ../view/error/404.phtml:75 ../view/error/index.phtml:30
 msgid "Previous exceptions"
-msgstr "ExceÃ§Ãµes anteriores"
+msgstr "Exceções anteriores"
 
 #: ../view/error/404.phtml:109 ../view/error/index.phtml:64
 msgid "No Exception available"
-msgstr "Nenhuma exceÃ§Ã£o disponÃ­vel"
+msgstr "Nenhuma exceção disponível"
 
 #: ../view/error/index.phtml:1
 msgid "An error occurred"
@@ -1510,7 +1510,7 @@ msgid "Clinic"
 msgstr "pt-Clinic"
 
 msgid "Gender Missing"
-msgstr "FSR sem o GÃ©nero preenchido"
+msgstr "FSR sem o Género preenchido"
 
 msgid "Age Missing"
 msgstr "FSR sem a Idade  preenchida"
@@ -1564,31 +1564,31 @@ msgid "BF"
 msgstr "pt-BF"
 
 msgid "Not Breast Feeding"
-msgstr "NÃ£o lactante"
+msgstr "Não lactante"
 
 msgid "NBF"
 msgstr "pt-NBF"
 
 msgid "Breast Feeding Unknown"
-msgstr "NÃ£o se sabe se Ã© lactante"
+msgstr "Não se sabe se é lactante"
 
 msgid "BFU"
 msgstr "pt-BFU"
 
 msgid "Pregnant"
-msgstr "GrÃ¡vida"
+msgstr "Grávida"
 
 msgid "P"
 msgstr "pt-P"
 
 msgid "Not Pregnant"
-msgstr "NÃ£o estÃ¡ GrÃ¡vida"
+msgstr "Não está Grávida"
 
 msgid "NP"
 msgstr "pt-NP"
 
 msgid "Pregnant Unknown"
-msgstr "NÃ£o se sabe se estÃ¡ GrÃ¡vida"
+msgstr "Não se sabe se está Grávida"
 
 msgid "PU"
 msgstr "pt-PU"
@@ -1641,14 +1641,38 @@ msgstr "pt-Please choose instance language"
 msgid "Samples Received"
 msgstr "pt-Samples Received"
 
+msgid "Choose your date"
+msgstr "pt-Choose your date"
+
+msgid "Show Date Filter"
+msgstr "pt-Show Date Filter"
+
+msgid "Close Date Filter"
+msgstr "pt-Close Date Filter"
+
+msgid "Results Awaited Overview"
+msgstr "pt-Results Awaited Overview"
+
+msgid "Results Awaited (Province-wise)"
+msgstr "pt-Results Awaited (Province-wise)"
+
+msgid "Results Awaited"
+msgstr "pt-Results Awaited"
+
+msgid "Results Awaited (VL Laboratory-wise)"
+msgstr "pt-Results Awaited (VL Laboratory-wise)"
+
+msgid "Sample Recieved at Lab"
+msgstr "pt-Sample Recieved at Lab"
+
 #~ msgid "Hubs Dashboard"
 #~ msgstr "pt-Hubs Dashboard"
 
 #~ msgid "Skeleton Application"
-#~ msgstr "AplicaÃ§Ã£o Skeleton"
+#~ msgstr "Aplicação Skeleton"
 
 #~ msgid "Home"
-#~ msgstr "InÃ­cio"
+#~ msgstr "Início"
 
 #~ msgid "All rights reserved."
 #~ msgstr "Todos os direitos reservados."
@@ -1662,9 +1686,9 @@ msgstr "pt-Samples Received"
 #~ "skeleton can serve as a simple starting point for you to begin building "
 #~ "your application on ZF2."
 #~ msgstr ""
-#~ "ParabÃ©ns! VocÃª instalou a %sAplicaÃ§Ã£o Skeleton ZF2%s com sucesso. VocÃª "
-#~ "estÃ¡ usando a versÃ£o %s do Zend Framework. Este esqueleto serve "
-#~ "simplesmente como um ponto de inicio na construÃ§Ã£o da sua aplicaÃ§Ã£o ZF2."
+#~ "Parabéns! Você instalou a %sAplicação Skeleton ZF2%s com sucesso. Você está "
+#~ "usando a versão %s do Zend Framework. Este esqueleto serve simplesmente "
+#~ "como um ponto de inicio na construção da sua aplicação ZF2."
 
 #~ msgid "Fork Zend Framework 2 on GitHub"
 #~ msgstr "Replique Zend Framework 2 no GitHub"
@@ -1679,17 +1703,17 @@ msgstr "pt-Samples Received"
 #~ "%sdev blog%s, %sissue tracker%s, and much more. This is a great resource "
 #~ "for staying up to date with the latest developments!"
 #~ msgstr ""
-#~ "Zend Framework 2 estÃ¡ sob desenvolvimento ativo. Se vocÃªs "
-#~ "estÃ¡ interessado em acompanhar o desenvolvimento do ZF2, tem um portal ZF2 "
-#~ "especial no site oficial do Zend Framework que possui links para ZF2 %swiki"
-#~ "%s, %sdev blog%s, %sissue tracker%s, dentre outros. Este Ã© um excelente "
-#~ "material para se manter atualizado com os Ãºltimos desenvolvimentos!"
+#~ "Zend Framework 2 está sob desenvolvimento ativo. Se vocês está interessado "
+#~ "em acompanhar o desenvolvimento do ZF2, tem um portal ZF2 especial no site "
+#~ "oficial do Zend Framework que possui links para ZF2 %swiki%s, %sdev blog%s, "
+#~ "%sissue tracker%s, dentre outros. Este é um excelente material para se "
+#~ "manter atualizado com os últimos desenvolvimentos!"
 
 #~ msgid "ZF2 Development Portal"
 #~ msgstr "Portal de Desenvolvimento do ZF2"
 
 #~ msgid "Discover Modules"
-#~ msgstr "Descubra MÃ³dulos"
+#~ msgstr "Descubra Módulos"
 
 #~ msgid ""
 #~ "The community is working on developing a community site to serve as a "
@@ -1697,14 +1721,13 @@ msgstr "pt-Samples Received"
 #~ "%s. The site is currently live and currently contains a list of some of the "
 #~ "modules already available for ZF2."
 #~ msgstr ""
-#~ "A Comunidade estÃ¡ trabalhando em desenvolver um site comunitÃ¡rio para "
-#~ "servir como repositÃ³rio e galeria de mÃ³dulos ZF2. O projeto "
-#~ "estarÃ¡ disponÃ­vel %sem breve no GitHub%s. O site jÃ¡ estÃ¡ online e "
-#~ "atualmente contÃ©m uma lista de alguns dos mÃ³dulos jÃ¡ disponÃ­veis para "
-#~ "ZF2."
+#~ "A Comunidade está trabalhando em desenvolver um site comunitário para "
+#~ "servir como repositório e galeria de módulos ZF2. O projeto estará "
+#~ "disponível %sem breve no GitHub%s. O site já está online e atualmente "
+#~ "contém uma lista de alguns dos módulos já disponíveis para ZF2."
 
 #~ msgid "Explore ZF2 Modules"
-#~ msgstr "Explore MÃ³dulos ZF2"
+#~ msgstr "Explore Módulos ZF2"
 
 #~ msgid "Help &amp; Support"
 #~ msgstr "Ajuda &amp; Suporte"
@@ -1715,14 +1738,13 @@ msgstr "pt-Samples Received"
 #~ "feedback you may have regarding the beta releases. Alternatively, you may "
 #~ "subscribe and post questions to the %smailing lists%s."
 #~ msgstr ""
-#~ "Caso vocÃª precise de ajuda ou suporte enquanto desenvolve com ZF2, pode "
-#~ "nos encontrar pelo %s#zftalk on Freenode%s. Vamos gostar muito de ouvir "
-#~ "perguntas e opiniÃµes que vocÃª possa ter em relaÃ§Ã£o Ã s versÃµes beta. "
-#~ "TambÃ©m, vocÃª pode se registrar e enviar perguntar para a %slista de e-mail"
-#~ "%s."
+#~ "Caso você precise de ajuda ou suporte enquanto desenvolve com ZF2, pode nos "
+#~ "encontrar pelo %s#zftalk on Freenode%s. Vamos gostar muito de ouvir "
+#~ "perguntas e opiniões que você possa ter em relação às versões beta. Também, "
+#~ "você pode se registrar e enviar perguntar para a %slista de e-mail%s."
 
 #~ msgid "Ping us on IRC"
 #~ msgstr "Nos escreva no IRC"
 
 #~ msgid "Exception"
-#~ msgstr "ExceÃ§Ã£o"
+#~ msgstr "Exceção"

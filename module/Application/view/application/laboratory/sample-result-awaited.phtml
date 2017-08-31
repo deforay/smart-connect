@@ -45,7 +45,7 @@ if(isset($labFilter) && trim($labFilter)!= ''){
                                         <span class="mrp-icon"><i class="fa fa-calendar"></i> &nbsp;</span>
                                         <div class="mrp-monthdisplay ">
                                           <span class="mrp-lowerMonth"></span>
-                                          <span class="mrp-to mrp-temp-placeholder"> Choose your date </span>
+                                          <span class="mrp-to mrp-temp-placeholder"> <?php echo $this->translate('Choose your date'); ?> </span>
                                           <span class="mrp-upperMonth"></span>
                                         </div>
                                       <input type="hidden" value="" id="mrp-lowerDate" />
@@ -175,7 +175,7 @@ if(isset($labFilter) && trim($labFilter)!= ''){
                                 </div>
                                 <div class="col-md-12">
                                    <div class="form-group col-lg-12" style="text-align:center;margin-top:10px;">
-                                        <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="searchSampleTestedLabResult()"><?php echo $this->translate('Search'); ?></a>&nbsp;&nbsp;
+                                        <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="searchResultsAwaitedSample()"><?php echo $this->translate('Search'); ?></a>&nbsp;&nbsp;
                                         <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="resetEverything();"><?php echo $this->translate('Reset'); ?></a>
                                     </div>
                                 </div>
@@ -192,7 +192,7 @@ if(isset($labFilter) && trim($labFilter)!= ''){
                         </div>
                     </div>
 
-                        <br>
+                    <br>
                     <div class="row">
                         <div class="col-md-12">
                             <!-- BEGIN EXAMPLE TABLE PORTLET-->
@@ -298,7 +298,7 @@ if(isset($labFilter) && trim($labFilter)!= ''){
        loadResultsAwaitedDataTable();
     });
 
-    function searchSampleTestedLabResult(){
+    function searchResultsAwaitedSample(){
         generateProvinceBarContainer();
         generateFacilityBarContainer();
         oTable.fnDraw();
@@ -307,7 +307,7 @@ if(isset($labFilter) && trim($labFilter)!= ''){
     function resetEverything(){
         $("#pageFilter")[0].reset();
         $('.mrp-monthdisplay .mrp-lowerMonth').html('');
-        $('.mrp-monthdisplay .mrp-to').html('Choose your date');
+        $('.mrp-monthdisplay .mrp-to').html('<?php echo $this->translate('Choose your date'); ?>');
         $('.mrp-monthdisplay .mrp-upperMonth').html('');
         $('#mrp-lowerDate').val('');
         $('#mrp-upperDate').val('');
@@ -320,7 +320,7 @@ if(isset($labFilter) && trim($labFilter)!= ''){
         }else{
           $('.femaleSection').hide();  
         }
-        searchSampleTestedLabResult();
+        searchResultsAwaitedSample();
     }
     
     function loadResultsAwaitedDataTable(){

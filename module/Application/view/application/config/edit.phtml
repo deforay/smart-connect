@@ -75,8 +75,8 @@
                                         <div class="form-group">
                                             <label class="col-md-3 control-label"><?php echo $this->translate('Do you want to show smiley at result pdf?'); ?></label>
                                             <div class="col-md-4">
-                                                <input type="radio" id="show_smiley_yes" name="show_smiley" value="yes" <?php echo (isset($config["show_smiley"]) && $config["show_smiley"] == 'yes')?'checked="checked"':''; ?>/> Yes&nbsp;&nbsp;
-                                                <input type="radio" id="show_smiley_no" name="show_smiley" value="no" <?php echo (isset($config["show_smiley"]) && $config["show_smiley"] == 'no')?'checked="checked"':''; ?>/> No
+                                                <input type="radio" id="show_smiley_yes" name="show_smiley" value="yes" <?php echo (isset($config["show_smiley"]) && $config["show_smiley"] == 'yes')?'checked="checked"':''; ?>/> <?php echo $this->translate('Yes'); ?>&nbsp;&nbsp;
+                                                <input type="radio" id="show_smiley_no" name="show_smiley" value="no" <?php echo (isset($config["show_smiley"]) && $config["show_smiley"] == 'no')?'checked="checked"':''; ?>/> <?php echo $this->translate('No'); ?>
                                             </div>
                                         </div>
                                         <div class="form-group">

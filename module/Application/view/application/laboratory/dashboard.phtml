@@ -190,8 +190,8 @@ foreach($sampleType as $samples){
                     <hr style="background: #000 !important;border-color:#ccc;">
                     <div class="row" style="margin-bottom:20px;">
                         <div class="col-md-12 col-sm-12" style="text-align:center;">
-                            <a id="showDateRange" href="javascript:void(0);" style="text-decoration:underline;"><i class="fa fa-chevron-down" aria-hidden="true"></i> Show Date Filter</a>
-                            <a id="closeDateRange" href="javascript:void(0);" style="text-decoration:underline;display:none;"><i class="fa fa-chevron-up" aria-hidden="true"></i> Close Date Filter</a>
+                            <a id="showDateRange" href="javascript:void(0);" style="color:#0d68e0;box-shadow: 1px 2px 12px rgb(173, 200, 222);border-radius: 10px;padding: 2px;"><i class="fa fa-chevron-down" aria-hidden="true"></i> <?php echo $this->translate('Show Date Filter'); ?></a>
+                            <a id="closeDateRange" href="javascript:void(0);" style="color:#0d68e0;display:none;box-shadow: 1px 2px 12px rgb(173, 200, 222);border-radius: 10px;padding: 2px;"><i class="fa fa-chevron-up" aria-hidden="true"></i> <?php echo $this->translate('Close Date Filter'); ?></a>
                         </div>
                     </div>
                     <form id="dateFilter" action="#" method="">
@@ -201,7 +201,7 @@ foreach($sampleType as $samples){
                                     <span class="fltr-icon"><i class="fa fa-calendar"></i> &nbsp;</span>
                                     <div class="fltr-monthdisplay ">
                                       <span class="fltr-lowerMonth"></span>
-                                      <span class="fltr-to fltr-temp-placeholder">Choose your date</span>
+                                      <span class="fltr-to fltr-temp-placeholder"><?php echo $this->translate('Choose your date'); ?></span>
                                       <span class="fltr-upperMonth"></span>
                                     </div>
                                   <input type="hidden" value="" id="fltr-lowerDate" onchange=""/>
@@ -1188,8 +1188,6 @@ foreach($sampleType as $samples){
         }
         $('#fltr-lowerDate').val(startyear+'-'+startmonth);
         $('#fltr-upperDate').val(endyear+'-'+endmonth);
-       
-        
             if(startyear == parseInt($('.fltr-calendar:first h5 span').html()))
                     //$('.fltr-calendar:first .fltr-selected:first').css("background","#40667A");
             
@@ -1260,19 +1258,19 @@ foreach($sampleType as $samples){
     }
     
     $("#showDateRange").click(function(){
-        $("#showDateRange").hide();
-        $("#closeDateRange,.fltr-date-range").show();
+        $("#showDateRange").hide(300);
+        $("#closeDateRange,.fltr-date-range").show(300);
     });
     
     $("#closeDateRange").click(function(){
-        $("#closeDateRange,.fltr-date-range").hide();
-        $("#showDateRange").show();
+        $("#closeDateRange,.fltr-date-range").hide(300);
+        $("#showDateRange").show(300);
     });
     
     function resetDateFilter(){
        $('#dateFilter')[0].reset();
        $('.fltr-monthdisplay .fltr-lowerMonth').html('');
-       $('.fltr-monthdisplay .fltr-to').html('Choose your date');
+       $('.fltr-monthdisplay .fltr-to').html('<?php echo $this->translate('Choose your date'); ?>');
        $('.fltr-monthdisplay .fltr-upperMonth').html('');
        $('#fltr-lowerDate').val('');
        $('#fltr-upperDate').val('');

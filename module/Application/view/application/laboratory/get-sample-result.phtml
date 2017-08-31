@@ -34,7 +34,7 @@ if(isset($result['scResult']) && count($result['scResult'])>0){
                 <i class="icon-pie-chart"></i>
             </div>
         </div>
-        <div id="samplesWaitingChart" width="210" height="170" style="max-height:200px !important;">
+        <div id="resultAwaitedChart" width="210" height="170" style="max-height:200px !important;">
             <table class="table table-striped table-hover table-compressed">
                 <?php foreach($quickStats as $statName => $statValue) {
                     if(strpos($statName,'(<')!= false){
