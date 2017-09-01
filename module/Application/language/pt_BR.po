@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: ZendSkeletonApplication\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-08-26 00:21+0530\n"
-"PO-Revision-Date: 2017-08-31 13:25+0530\n"
+"PO-Revision-Date: 2017-08-31 18:25+0530\n"
 "Last-Translator: Diogo Melo <dmelo87@gmail.com>\n"
 "Language-Team: ZF Contibutors <zf-devteam@zend.com>\n"
 "Language: pt\n"
@@ -21,7 +21,7 @@ msgstr "Painel das Unidades Sanitárias"
 
 #: ../view/application/clinic/dashboard.phtml:21
 msgid "Please select one or more clinics. Leave blank for All"
-msgstr "pt-Please select one or more clinics. Leave blank for All"
+msgstr "Please select one or more clinics. Leave blank for All"
 
 #: ../view/application/clinic/dashboard.phtml:36
 #: ../view/application/laboratory/get-sample-tested-turn-around-time.phtml:75
@@ -36,13 +36,13 @@ msgstr "Intervalo de datas"
 #: ../view/application/laboratory/samples-tested-lab.phtml:182
 #: ../view/application/laboratory/samples-tested.phtml:180
 msgid "Test Result"
-msgstr "pt-Test Result"
+msgstr "Test Result"
 
 #: ../view/application/clinic/dashboard.phtml:48
 #: ../view/application/laboratory/samples-tested-lab.phtml:183
 #: ../view/application/laboratory/samples-tested.phtml:181
 msgid "Please choose result"
-msgstr "pt-Please choose result"
+msgstr "Please choose result"
 
 #: ../view/application/clinic/dashboard.phtml:49
 #: ../view/application/clinic/dashboard.phtml:57
@@ -72,7 +72,7 @@ msgstr "Todos"
 #, fuzzy
 #| msgid ">=1000 cp/ml"
 msgid ">= 1000 cp/ml"
-msgstr "pt->=1000 cp/ml"
+msgstr ">=1000 cp/ml"
 
 #: ../view/application/clinic/dashboard.phtml:51
 #: ../view/application/clinic/overall-viral-load.phtml:16
@@ -81,7 +81,7 @@ msgstr "pt->=1000 cp/ml"
 #, fuzzy
 #| msgid "<1000 cp/ml"
 msgid "< 1000 cp/ml"
-msgstr "pt-<1000 cp/ml"
+msgstr "<1000 cp/ml"
 
 #: ../view/application/clinic/dashboard.phtml:55
 #: ../view/application/clinic/generate-result-pdf.phtml:227
@@ -91,25 +91,25 @@ msgstr "pt-<1000 cp/ml"
 #: ../view/application/laboratory/samples-tested-lab.phtml:267
 #: ../view/application/laboratory/samples-tested.phtml:190
 msgid "Sample Type"
-msgstr "pt-Sample Type"
+msgstr "Sample Type"
 
 #: ../view/application/clinic/dashboard.phtml:56
 msgid "Please choose sample type"
-msgstr "pt-Please choose sample type"
+msgstr "Please choose sample type"
 
 #: ../view/application/clinic/dashboard.phtml:62
 #: ../view/application/laboratory/sample-volume.phtml:174
 #: ../view/application/laboratory/samples-tested-lab.phtml:173
 #: ../view/application/laboratory/samples-tested.phtml:171
 msgid "Age Group"
-msgstr "pt-Age Group"
+msgstr "Age Group"
 
 #: ../view/application/clinic/dashboard.phtml:63
 #: ../view/application/laboratory/sample-volume.phtml:175
 #: ../view/application/laboratory/samples-tested-lab.phtml:174
 #: ../view/application/laboratory/samples-tested.phtml:172
 msgid "Please choose age group"
-msgstr "pt-Please choose age group"
+msgstr "Please choose age group"
 
 #: ../view/application/clinic/dashboard.phtml:64
 #: ../view/application/clinic/test-result-view.phtml:132
@@ -117,18 +117,18 @@ msgstr "pt-Please choose age group"
 #: ../view/application/laboratory/samples-tested-lab.phtml:175
 #: ../view/application/laboratory/samples-tested.phtml:173
 msgid "Age"
-msgstr "pt-Age"
+msgstr "Age"
 
 #: ../view/application/clinic/dashboard.phtml:73
 msgid "Above"
-msgstr "pt-Above"
+msgstr "Above"
 
 #: ../view/application/clinic/dashboard.phtml:81
 #: ../view/application/laboratory/sample-volume.phtml:165
 #: ../view/application/laboratory/samples-tested-lab.phtml:164
 #: ../view/application/laboratory/samples-tested.phtml:162
 msgid "ARV Adherence"
-msgstr "pt-ARV Adherence"
+msgstr "ARV Adherence"
 
 #: ../view/application/clinic/dashboard.phtml:83
 #: ../view/application/clinic/dashboard.phtml:92
@@ -153,21 +153,21 @@ msgstr "Selecionar"
 #: ../view/application/laboratory/samples-tested-lab.phtml:167
 #: ../view/application/laboratory/samples-tested.phtml:165
 msgid "Good"
-msgstr "pt-Good"
+msgstr "Good"
 
 #: ../view/application/clinic/dashboard.phtml:85
 #: ../view/application/laboratory/sample-volume.phtml:169
 #: ../view/application/laboratory/samples-tested-lab.phtml:168
 #: ../view/application/laboratory/samples-tested.phtml:166
 msgid "Fair"
-msgstr "pt-Fair"
+msgstr "Fair"
 
 #: ../view/application/clinic/dashboard.phtml:86
 #: ../view/application/laboratory/sample-volume.phtml:170
 #: ../view/application/laboratory/samples-tested-lab.phtml:169
 #: ../view/application/laboratory/samples-tested.phtml:167
 msgid "Poor"
-msgstr "pt-Poor"
+msgstr "Poor"
 
 #: ../view/application/clinic/dashboard.phtml:90
 #: ../view/application/clinic/test-result-view.phtml:139
@@ -177,7 +177,7 @@ msgstr "pt-Poor"
 #: ../view/application/laboratory/samples-tested-lab.phtml:205
 #: ../view/application/laboratory/samples-tested.phtml:212
 msgid "Gender"
-msgstr "pt-Gender"
+msgstr "Gender"
 
 #: ../view/application/clinic/dashboard.phtml:93
 #: ../view/application/clinic/get-over-all-load-status.phtml:25
@@ -187,7 +187,7 @@ msgstr "pt-Gender"
 #: ../view/application/laboratory/samples-tested-lab.phtml:208
 #: ../view/application/laboratory/samples-tested.phtml:215
 msgid "Male"
-msgstr "pt-Male"
+msgstr "Male"
 
 #: ../view/application/clinic/dashboard.phtml:94
 #: ../view/application/clinic/get-over-all-load-status.phtml:25
@@ -197,7 +197,7 @@ msgstr "pt-Male"
 #: ../view/application/laboratory/samples-tested-lab.phtml:209
 #: ../view/application/laboratory/samples-tested.phtml:216
 msgid "Female"
-msgstr "pt-Female"
+msgstr "Female"
 
 #: ../view/application/clinic/dashboard.phtml:95
 #: ../view/application/facility/add.phtml:132
@@ -207,7 +207,7 @@ msgstr "pt-Female"
 #: ../view/application/facility/get-district-list.phtml:8
 #: ../view/application/facility/get-district-list.phtml:10
 msgid "Other"
-msgstr "pt-Other"
+msgstr "Other"
 
 #: ../view/application/clinic/dashboard.phtml:99
 #: ../view/application/laboratory/get-sample-tested-turn-around-time.phtml:159
@@ -231,7 +231,7 @@ msgstr "A paciente está Grávida"
 #: ../view/application/laboratory/samples-tested.phtml:234
 #: ../view/application/laboratory/samples-tested.phtml:240
 msgid "Yes"
-msgstr "pt-Yes"
+msgstr "Yes"
 
 #: ../view/application/clinic/dashboard.phtml:101
 #: ../view/application/clinic/dashboard.phtml:111
@@ -246,7 +246,7 @@ msgstr "pt-Yes"
 #: ../view/application/laboratory/samples-tested.phtml:235
 #: ../view/application/laboratory/samples-tested.phtml:241
 msgid "No"
-msgstr "pt-No"
+msgstr "No"
 
 #: ../view/application/clinic/dashboard.phtml:102
 #: ../view/application/clinic/dashboard.phtml:112
@@ -261,7 +261,7 @@ msgstr "pt-No"
 #: ../view/application/laboratory/samples-tested.phtml:236
 #: ../view/application/laboratory/samples-tested.phtml:242
 msgid "Unreported"
-msgstr "pt-Unreported"
+msgstr "Unreported"
 
 #: ../view/application/clinic/dashboard.phtml:109
 #: ../view/application/laboratory/get-sample-tested-turn-around-time.phtml:165
@@ -304,7 +304,7 @@ msgstr "Carga Viral Solicitada"
 
 #: ../view/application/clinic/dashboard.phtml:164
 msgid "Test Reasons"
-msgstr "pt-Test Reasons"
+msgstr "Test Reasons"
 
 #: ../view/application/clinic/dashboard.phtml:185
 msgid "VL Suppression"
@@ -323,15 +323,15 @@ msgstr "Todas Amostras"
 
 #: ../view/application/clinic/dashboard.phtml:212
 msgid "Samples with Test Results"
-msgstr "pt-Samples with Test Results"
+msgstr "Samples with Test Results"
 
 #: ../view/application/clinic/dashboard.phtml:213
 msgid "Samples Awaiting Results"
-msgstr "pt-Samples Awaiting Results"
+msgstr "Samples Awaiting Results"
 
 #: ../view/application/clinic/dashboard.phtml:214
 msgid "Rejected Samples"
-msgstr "pt-Rejected Samples"
+msgstr "Rejected Samples"
 
 #: ../view/application/clinic/dashboard.phtml:218
 #: ../view/application/laboratory/get-sample-tested-turn-around-time.phtml:199
@@ -355,7 +355,7 @@ msgstr "Data da Colheita"
 
 #: ../view/application/clinic/dashboard.phtml:230
 msgid "Rejection Reason"
-msgstr "pt-Rejection Reason"
+msgstr "Rejection Reason"
 
 #: ../view/application/clinic/dashboard.phtml:231
 msgid "Date Tested"
@@ -363,7 +363,7 @@ msgstr "Data de Teste"
 
 #: ../view/application/clinic/dashboard.phtml:232
 msgid "Viral Load <br> (cp/ml)"
-msgstr "pt-Viral Load <br> (cp/ml)"
+msgstr "Viral Load <br> (cp/ml)"
 
 #: ../view/application/clinic/dashboard.phtml:233
 #: ../view/application/facility/index.phtml:49
@@ -408,7 +408,7 @@ msgstr "Razão para a aplicação"
 #: ../view/application/clinic/generate-result-pdf.phtml:239
 #: ../view/application/clinic/generate-result-pdf.phtml:278
 msgid "Routine"
-msgstr "pt-Routine"
+msgstr "Routine"
 
 #: ../view/application/clinic/generate-result-pdf.phtml:245
 msgid "Current ART Regimen"
@@ -420,7 +420,7 @@ msgstr "Tratamento de Primeira linha"
 
 #: ../view/application/clinic/generate-result-pdf.phtml:251
 msgid "Regimen"
-msgstr "pt-Regimen"
+msgstr "Regimen"
 
 #: ../view/application/clinic/generate-result-pdf.phtml:257
 msgid "First Viral Load"
@@ -470,7 +470,7 @@ msgstr "Carga Viral (CAP/CTM)"
 
 #: ../view/application/clinic/generate-result-pdf.phtml:293
 msgid "copies/ml"
-msgstr "pt-copies/ml"
+msgstr "copies/ml"
 
 #: ../view/application/clinic/generate-result-pdf.phtml:296
 msgid "Log Value"
@@ -507,7 +507,7 @@ msgstr "No. de Amostras"
 #: ../view/application/laboratory/get-sample-test-result-volume.phtml:41
 #: ../view/application/laboratory/get-sample-test-result.phtml:41
 msgid "Total"
-msgstr "pt-Total"
+msgstr "Total"
 
 #: ../view/application/clinic/get-sample-test-reason.phtml:39
 #: ../view/application/laboratory/get-sample-tested-turn-around-time.phtml:124
@@ -524,7 +524,7 @@ msgstr ""
 
 #: ../view/application/clinic/overall-viral-load.phtml:15
 msgid "VL Tested"
-msgstr "pt-VL Tested"
+msgstr "VL Tested"
 
 #: ../view/application/clinic/overall-viral-load.phtml:18
 msgid "Total Samples"
@@ -532,91 +532,91 @@ msgstr "Total de amostras"
 
 #: ../view/application/clinic/overall-viral-load.phtml:26
 msgid "Number of Samples"
-msgstr "pt-Number of Samples"
+msgstr "Number of Samples"
 
 #: ../view/application/clinic/test-result-view.phtml:87
 msgid "Sample Overview"
-msgstr "pt-Sample Overview"
+msgstr "Sample Overview"
 
 #: ../view/application/clinic/test-result-view.phtml:90
 msgid "CLOSE"
-msgstr "pt-CLOSE"
+msgstr "CLOSE"
 
 #: ../view/application/clinic/test-result-view.phtml:109
 msgid "Sample No"
-msgstr "pt-Sample No"
+msgstr "Sample No"
 
 #: ../view/application/clinic/test-result-view.phtml:113
 msgid "Sample Collection Date"
-msgstr "pt-Sample Collection Date"
+msgstr "Sample Collection Date"
 
 #: ../view/application/clinic/test-result-view.phtml:117
 msgid "ART (TRACNET) No"
-msgstr "pt-ART (TRACNET) No"
+msgstr "ART (TRACNET) No"
 
 #: ../view/application/clinic/test-result-view.phtml:124
 msgid "Patient First Name & Last Name"
-msgstr "pt-Patient First Name & Last Name"
+msgstr "Patient First Name & Last Name"
 
 #: ../view/application/clinic/test-result-view.phtml:128
 msgid "Mobile No"
-msgstr "pt-Mobile No"
+msgstr "Mobile No"
 
 #: ../view/application/clinic/test-result-view.phtml:148
 msgid "Clinic/Health Center Code"
-msgstr "pt-Clinic/Health Center Code"
+msgstr "Clinic/Health Center Code"
 
 #: ../view/application/clinic/test-result-view.phtml:152
 #: ../view/application/facility/add.phtml:121
 #: ../view/application/facility/edit.phtml:121
 msgid "Province/State"
-msgstr "pt-Province/State"
+msgstr "Province/State"
 
 #: ../view/application/clinic/test-result-view.phtml:156
 #: ../view/application/facility/add.phtml:140
 #: ../view/application/facility/edit.phtml:140
 msgid "District/County"
-msgstr "pt-District/County"
+msgstr "District/County"
 
 #: ../view/application/clinic/test-result-view.phtml:163
 msgid "Clinic/Health Center Name"
-msgstr "pt-Clinic/Health Center Name"
+msgstr "Clinic/Health Center Name"
 
 #: ../view/application/clinic/test-result-view.phtml:167
 msgid "Clinician Name"
-msgstr "pt-Clinician Name"
+msgstr "Clinician Name"
 
 #: ../view/application/clinic/test-result-view.phtml:173
 msgid "Sample Receipt Date"
-msgstr "pt-Sample Receipt Date"
+msgstr "Sample Receipt Date"
 
 #: ../view/application/clinic/test-result-view.phtml:177
 msgid "Sample Test Date"
-msgstr "pt-Sample Test Date"
+msgstr "Sample Test Date"
 
 #: ../view/application/clinic/test-result-view.phtml:181
 msgid "Specimen Type"
-msgstr "pt-Specimen Type"
+msgstr "Specimen Type"
 
 #: ../view/application/clinic/test-result-view.phtml:187
 msgid "Platform"
-msgstr "pt-Platform"
+msgstr "Platform"
 
 #: ../view/application/clinic/test-result-view.phtml:191
 msgid "VIRAL LOAD RESULT (copies/ml)"
-msgstr "pt-VIRAL LOAD RESULT (copies/ml)"
+msgstr "VIRAL LOAD RESULT (copies/ml)"
 
 #: ../view/application/clinic/test-result-view.phtml:195
 msgid "Approved By (copies/ml)"
-msgstr "pt-Approved By (copies/ml)"
+msgstr "Approved By (copies/ml)"
 
 #: ../view/application/clinic/test-result-view.phtml:201
 msgid "Lab Comments"
-msgstr "pt-Lab Comments"
+msgstr "Lab Comments"
 
 #: ../view/application/clinic/test-result-view.phtml:213
 msgid "Result of previous viral load(copies/ml)"
-msgstr "pt-Result of previous viral load(copies/ml)"
+msgstr "Result of previous viral load(copies/ml)"
 
 #: ../view/application/config/edit.phtml:9
 #: ../view/application/config/index.phtml:6
@@ -627,13 +627,13 @@ msgstr "pt-Result of previous viral load(copies/ml)"
 #: ../view/application/users/add.phtml:8 ../view/application/users/edit.phtml:16
 #: ../view/application/users/index.phtml:9
 msgid "Dashboard"
-msgstr "pt-Dashboard"
+msgstr "Dashboard"
 
 #: ../view/application/config/edit.phtml:13
 #: ../view/application/config/index.phtml:10
 #: ../view/application/config/index.phtml:18
 msgid "Config"
-msgstr "pt-Config"
+msgstr "Config"
 
 #: ../view/application/config/edit.phtml:17
 #: ../view/application/config/edit.phtml:23
@@ -679,24 +679,24 @@ msgstr "Logotipo"
 #: ../view/application/facility/add.phtml:205
 #: ../view/application/facility/edit.phtml:228
 msgid "Select image"
-msgstr "pt-Select image"
+msgstr "Select image"
 
 #: ../view/application/config/edit.phtml:84
 #: ../view/application/facility/add.phtml:205
 #: ../view/application/facility/edit.phtml:228
 msgid "Change"
-msgstr "pt-Change"
+msgstr "Change"
 
 #: ../view/application/config/edit.phtml:90
 #: ../view/application/facility/edit.phtml:232
 msgid "Clear"
-msgstr "pt-Clear"
+msgstr "Clear"
 
 #: ../view/application/config/edit.phtml:92
 #: ../view/application/facility/add.phtml:208
 #: ../view/application/facility/edit.phtml:236
 msgid "Remove"
-msgstr "pt-Remove"
+msgstr "Remove"
 
 #: ../view/application/config/edit.phtml:96
 #: ../view/application/facility/add.phtml:212
@@ -732,12 +732,12 @@ msgstr "Valor"
 #: ../view/application/facility/edit.phtml:13
 #: ../view/application/facility/index.phtml:12 ../view/layout/layout.phtml:180
 msgid "Facilities"
-msgstr "pt-Facilities"
+msgstr "Facilities"
 
 #: ../view/application/facility/add.phtml:17
 #: ../view/application/users/add.phtml:16
 msgid "Add"
-msgstr "pt-Add"
+msgstr "Add"
 
 #: ../view/application/facility/add.phtml:23
 msgid "Add Facility"
@@ -759,17 +759,17 @@ msgstr "Por favor selecione o nome do local"
 #: ../view/application/facility/add.phtml:40
 #: ../view/application/facility/edit.phtml:40
 msgid "The facility name that you entered already exists.Enter another name"
-msgstr "pt-The facility name that you entered already exists.Enter another name"
+msgstr "The facility name that you entered already exists.Enter another name"
 
 #: ../view/application/facility/add.phtml:48
 #: ../view/application/facility/edit.phtml:48
 msgid "Please enter facility code"
-msgstr "pt-Please enter facility code"
+msgstr "Please enter facility code"
 
 #: ../view/application/facility/add.phtml:48
 #: ../view/application/facility/edit.phtml:48
 msgid "The code that you entered already exists.Try another code"
-msgstr "pt-The code that you entered already exists.Try another code"
+msgstr "The code that you entered already exists.Try another code"
 
 #: ../view/application/facility/add.phtml:57
 #: ../view/application/facility/add.phtml:59
@@ -797,7 +797,7 @@ msgstr "Email(s)"
 #: ../view/application/facility/add.phtml:93
 #: ../view/application/facility/edit.phtml:93
 msgid "Report Email(s)"
-msgstr "pt-Report Email(s)"
+msgstr "Report Email(s)"
 
 #: ../view/application/facility/add.phtml:103
 #: ../view/application/facility/add.phtml:105
@@ -821,12 +821,12 @@ msgstr "Por favor escolha Provincia"
 #: ../view/application/facility/add.phtml:134
 #: ../view/application/facility/edit.phtml:134
 msgid "Enter Province/State"
-msgstr "pt-Enter Provincia"
+msgstr "Enter Provincia"
 
 #: ../view/application/facility/add.phtml:134
 #: ../view/application/facility/edit.phtml:134
 msgid "Please enter province/state"
-msgstr "pt-Please enter province/state"
+msgstr "Please enter province/state"
 
 #: ../view/application/facility/add.phtml:142
 #: ../view/application/facility/edit.phtml:142
@@ -836,12 +836,12 @@ msgstr "Por favor escolha o Distrito"
 #: ../view/application/facility/add.phtml:146
 #: ../view/application/facility/edit.phtml:146
 msgid "Enter District/County"
-msgstr "pt-Enter Distrito"
+msgstr "Enter Distrito"
 
 #: ../view/application/facility/add.phtml:146
 #: ../view/application/facility/edit.phtml:146
 msgid "Please enter district/county"
-msgstr "pt-Please enter district/county"
+msgstr "Please enter district/county"
 
 #: ../view/application/facility/add.phtml:154
 #: ../view/application/facility/edit.phtml:154
@@ -851,12 +851,12 @@ msgstr "Nome do distrito de referência (Se aplicavel)"
 #: ../view/application/facility/add.phtml:156
 #: ../view/application/facility/edit.phtml:156
 msgid "Hub Name"
-msgstr "pt-Hub Name"
+msgstr "Hub Name"
 
 #: ../view/application/facility/add.phtml:156
 #: ../view/application/facility/edit.phtml:156
 msgid "Please enter hub name"
-msgstr "pt-Please enter hub name"
+msgstr "Please enter hub name"
 
 #: ../view/application/facility/add.phtml:162
 #: ../view/application/facility/add.phtml:164
@@ -882,7 +882,7 @@ msgstr "Latitude"
 #: ../view/application/facility/add.phtml:182
 #: ../view/application/facility/edit.phtml:182
 msgid "Please enter latitude"
-msgstr "pt-Please enter latitude"
+msgstr "Please enter latitude"
 
 #: ../view/application/facility/add.phtml:190
 #: ../view/application/facility/add.phtml:192
@@ -894,21 +894,21 @@ msgstr "Longitude"
 #: ../view/application/facility/add.phtml:192
 #: ../view/application/facility/edit.phtml:192
 msgid "Please enter longitude"
-msgstr "pt-Please enter longitude"
+msgstr "Please enter longitude"
 
 #: ../view/application/facility/add.phtml:206
 #: ../view/application/facility/edit.phtml:228
 msgid "Please choose logo"
-msgstr "pt-Please choose logo"
+msgstr "Please choose logo"
 
 #: ../view/application/facility/edit.phtml:17
 #: ../view/application/users/edit.phtml:24
 msgid "Edit"
-msgstr "pt-Edit"
+msgstr "Edit"
 
 #: ../view/application/facility/edit.phtml:23
 msgid "Edit Facility"
-msgstr "pt-Edit Facility"
+msgstr "Edit Facility"
 
 #: ../view/application/facility/edit.phtml:198
 #: ../view/application/facility/index.phtml:48
@@ -924,12 +924,12 @@ msgstr "Por favor selecione o status"
 #: ../view/application/facility/edit.phtml:202
 #: ../view/application/users/edit.phtml:103
 msgid "Active"
-msgstr "pt-Active"
+msgstr "Active"
 
 #: ../view/application/facility/edit.phtml:203
 #: ../view/application/users/edit.phtml:104
 msgid "Inactive"
-msgstr "pt-Inactive"
+msgstr "Inactive"
 
 #: ../view/application/facility/index.phtml:27
 msgid "Manage Facility"
@@ -949,7 +949,7 @@ msgstr "Painel dos Laboratórios"
 #: ../view/application/laboratory/dashboard.phtml:155
 #: ../view/application/laboratory/get-facilities-geolocation.phtml:53
 msgid "Please select one or more labs. Leave blank for All"
-msgstr "pt-Please select one or more labs. Leave blank for All"
+msgstr "Please select one or more labs. Leave blank for All"
 
 #: ../view/application/laboratory/dashboard.phtml:193
 #: ../view/application/laboratory/dashboard.phtml:309
@@ -991,13 +991,13 @@ msgstr "Quantidade de amostras"
 #: ../view/application/laboratory/sample-volume.phtml:202
 #: ../view/application/laboratory/samples-tested.phtml:207
 msgid "Samples Not Tested"
-msgstr "pt-Samples Not Tested"
+msgstr "Samples Not Tested"
 
 #: ../view/application/laboratory/dashboard.phtml:311
 #: ../view/application/laboratory/sample-volume.phtml:203
 #: ../view/application/laboratory/samples-tested.phtml:208
 msgid "Samples Rejected"
-msgstr "pt-Samples Rejected"
+msgstr "Samples Rejected"
 
 #: ../view/application/laboratory/dashboard.phtml:328
 msgid "Female Patients"
@@ -1033,11 +1033,11 @@ msgstr "Todos Laboratórios"
 #: ../view/application/laboratory/get-lab-bar-sample-details.phtml:9
 #: ../view/application/laboratory/get-pie-sample-tat.phtml:11
 msgid "VL Samples Tested"
-msgstr "pt-VL Samples Tested"
+msgstr "VL Samples Tested"
 
 #: ../view/application/laboratory/get-facilities-geolocation.phtml:41
 msgid "Facilities Geolocation"
-msgstr "pt-Facilities Geolocation"
+msgstr "Facilities Geolocation"
 
 #: ../view/application/laboratory/get-female-patient-result.phtml:49
 #: ../view/application/laboratory/get-line-of-treatment.phtml:47
@@ -1051,7 +1051,7 @@ msgstr "pt-Facilities Geolocation"
 #: ../view/application/laboratory/samples-tested-lab.phtml:113
 #: ../view/application/laboratory/samples-tested.phtml:112
 msgid "Labs"
-msgstr "pt-Labs"
+msgstr "Labs"
 
 #: ../view/application/laboratory/get-incomplete-bar-sample-details.phtml:8
 msgid "Completed VS Incomplete Forms"
@@ -1063,11 +1063,11 @@ msgstr "Campos incompletos"
 
 #: ../view/application/laboratory/get-incomplete-sample-details.phtml:34
 msgid "Field"
-msgstr "pt-Field"
+msgstr "Field"
 
 #: ../view/application/laboratory/get-lab-sample-details.phtml:11
 msgid "Sample Type Volume"
-msgstr "pt-Sample Type Volume"
+msgstr "Sample Type Volume"
 
 #: ../view/application/laboratory/get-lab-turn-around-time.phtml:35
 #: ../view/application/laboratory/get-sample-tested-turn-around-time.phtml:210
@@ -1138,7 +1138,7 @@ msgstr "Provincias"
 #: ../view/application/laboratory/samples-tested-lab.phtml:90
 #: ../view/application/laboratory/samples-tested.phtml:89
 msgid "Please choose provinces"
-msgstr "pt-Please choose provinces"
+msgstr "Please choose provinces"
 
 #: ../view/application/laboratory/get-sample-tested-turn-around-time.phtml:100
 #: ../view/application/laboratory/requisition-forms-incomplete.phtml:90
@@ -1154,7 +1154,7 @@ msgstr "Distritos"
 #: ../view/application/laboratory/samples-tested-lab.phtml:101
 #: ../view/application/laboratory/samples-tested.phtml:100
 msgid "Please choose districts"
-msgstr "pt-Please choose districts"
+msgstr "Please choose districts"
 
 #: ../view/application/laboratory/get-sample-tested-turn-around-time.phtml:114
 #: ../view/application/laboratory/requisition-forms-incomplete.phtml:104
@@ -1169,14 +1169,14 @@ msgstr "Laboratórios"
 #: ../view/application/laboratory/samples-tested-lab.phtml:139
 #: ../view/application/laboratory/samples-tested.phtml:137
 msgid "Please choose clinics"
-msgstr "pt-Please choose clinics"
+msgstr "Please choose clinics"
 
 #: ../view/application/laboratory/get-sample-tested-turn-around-time.phtml:196
 #: ../view/application/laboratory/sample-volume.phtml:255
 #: ../view/application/laboratory/samples-tested-lab.phtml:254
 #: ../view/application/laboratory/samples-tested.phtml:270
 msgid "Samples"
-msgstr "pt-Samples"
+msgstr "Samples"
 
 #: ../view/application/laboratory/get-sample-tested-turn-around-time.phtml:208
 msgid "Month and Year"
@@ -1232,30 +1232,30 @@ msgstr "Regime Actual"
 #: ../view/application/laboratory/samples-tested-lab.phtml:178
 #: ../view/application/laboratory/samples-tested.phtml:176
 msgid "Unknown"
-msgstr "pt-Unknown"
+msgstr "Unknown"
 
 #: ../view/application/laboratory/sample-volume.phtml:198
 #: ../view/application/laboratory/samples-tested.phtml:203
 msgid "Sample Status"
-msgstr "pt-Sample Status"
+msgstr "Sample Status"
 
 #: ../view/application/laboratory/sample-volume.phtml:267
 #: ../view/application/laboratory/samples-tested.phtml:282
 msgid "Lab"
-msgstr "pt-Lab"
+msgstr "Lab"
 
 #: ../view/application/laboratory/sample-volume.phtml:270
 #: ../view/application/laboratory/samples-tested.phtml:285
 msgid "Rejected"
-msgstr "pt-Rejected"
+msgstr "Rejected"
 
 #: ../view/application/laboratory/samples-tested-lab.phtml:55
 msgid "Samples Test Overview"
-msgstr "pt-Samples Test Overview"
+msgstr "Samples Test Overview"
 
 #: ../view/application/laboratory/samples-tested-lab.phtml:125
 msgid "Hub"
-msgstr "pt-Hub"
+msgstr "Hub"
 
 #: ../view/application/laboratory/samples-tested-lab.phtml:265
 msgid "Date"
@@ -1315,20 +1315,20 @@ msgstr "Aceder"
 
 #: ../view/application/login/index.phtml:91
 msgid "Funded by"
-msgstr "pt-Funded by"
+msgstr "Funded by"
 
 #: ../view/application/login/index.phtml:92 ../view/layout/layout.phtml:403
 msgid "The Task Force for Global Health"
-msgstr "pt-The Task Force for Global Health"
+msgstr "The Task Force for Global Health"
 
 #: ../view/application/login/index.phtml:93 ../view/layout/layout.phtml:404
 msgid "Emory University / PEPFAR"
-msgstr "pt-Emory University / PEPFAR"
+msgstr "Emory University / PEPFAR"
 
 #: ../view/application/users/add.phtml:12 ../view/application/users/edit.phtml:20
 #: ../view/application/users/index.phtml:13 ../view/layout/layout.phtml:175
 msgid "Users"
-msgstr "pt-Users"
+msgstr "Users"
 
 #: ../view/application/users/add.phtml:22
 msgid "Add User"
@@ -1356,7 +1356,7 @@ msgstr "Local"
 
 #: ../view/application/users/add.phtml:60 ../view/application/users/edit.phtml:70
 msgid "Please select facility"
-msgstr "pt-Please select facility"
+msgstr "Please select facility"
 
 #: ../view/application/users/add.phtml:68 ../view/application/users/edit.phtml:82
 msgid "Please enter valid email"
@@ -1369,7 +1369,7 @@ msgstr "Móvel/Portátil"
 
 #: ../view/application/users/add.phtml:74
 msgid "Please enter mobile number"
-msgstr "pt-Please enter mobile number"
+msgstr "Please enter mobile number"
 
 #: ../view/application/users/add.phtml:80
 msgid "Please enter the password"
@@ -1378,11 +1378,11 @@ msgstr "Por favor insira a senha"
 #: ../view/application/users/add.phtml:103
 #: ../view/application/users/edit.phtml:127
 msgid "All Facilities"
-msgstr "pt-Todos Facilities"
+msgstr "Todos Facilities"
 
 #: ../view/application/users/edit.phtml:30
 msgid "Edit User"
-msgstr "pt-Edit User"
+msgstr "Edit User"
 
 #: ../view/application/users/index.phtml:28
 msgid "Manage Users"
@@ -1484,12 +1484,12 @@ msgid ""
 "Smart Connect - The Viral Load Dashboard (Testing Environment with dummy data) "
 "| Funded by"
 msgstr ""
-"pt-Smart Connect - The Viral Load Dashboard (Testing Environment with dummy "
-"data) | Funded by"
+"Smart Connect - The Viral Load Dashboard (Testing Environment with dummy data) "
+"| Funded by"
 
 #: ../view/layout/layout.phtml:491
 msgid "DEMO"
-msgstr "pt-DEMO"
+msgstr "DEMO"
 
 msgid "Facility details added successfully"
 msgstr "Detalhes da unidade adicionados com sucesso"
@@ -1498,7 +1498,7 @@ msgid "Facility details updated successfully"
 msgstr "Detalhes da unidade actualizados com sucesso"
 
 msgid "Config details updated successfully"
-msgstr "pt-Config details updated successfully"
+msgstr "Config details updated successfully"
 
 msgid "User details added successfully"
 msgstr "Detalhes do utilizador adicionados com sucesso"
@@ -1507,7 +1507,7 @@ msgid "User details updated successfully"
 msgstr "Detalhes do utilizador actualizados com sucesso"
 
 msgid "Clinic"
-msgstr "pt-Clinic"
+msgstr "Clinic"
 
 msgid "Gender Missing"
 msgstr "FSR sem o Género preenchido"
@@ -1528,73 +1528,73 @@ msgid "VL (< 1000 cp/ml)"
 msgstr "CV (< 1000 cp/ml)"
 
 msgid "VL (>= 1000 cp/ml)(M)"
-msgstr "pt-VL (>= 1000 cp/ml)(M)"
+msgstr "VL (>= 1000 cp/ml)(M)"
 
 msgid "VL (< 1000 cp/ml)(M)"
-msgstr "pt-VL (< 1000 cp/ml)(M)"
+msgstr "VL (< 1000 cp/ml)(M)"
 
 msgid "VL (>= 1000 cp/ml)(F)"
-msgstr "pt-VL (>= 1000 cp/ml)(F)"
+msgstr "VL (>= 1000 cp/ml)(F)"
 
 msgid "VL (< 1000 cp/ml)(F)"
-msgstr "pt-VL (< 1000 cp/ml)(F)"
+msgstr "VL (< 1000 cp/ml)(F)"
 
 msgid "VL (>= 1000 cp/ml)(Not Specified)"
-msgstr "pt-VL (>= 1000 cp/ml)(Not Specified)"
+msgstr "VL (>= 1000 cp/ml)(Not Specified)"
 
 msgid "VL (< 1000 cp/ml)(Not Specified)"
-msgstr "pt-VL (< 1000 cp/ml)(Not Specified)"
+msgstr "VL (< 1000 cp/ml)(Not Specified)"
 
 msgid "LOT1"
-msgstr "pt-LOT1"
+msgstr "LOT1"
 
 msgid "LOT2"
-msgstr "pt-LOT2"
+msgstr "LOT2"
 
 msgid "LOT3"
-msgstr "pt-LOT3"
+msgstr "LOT3"
 
 msgid "NS"
-msgstr "pt-NS"
+msgstr "NS"
 
 msgid "Breast Feeding"
 msgstr "Lactante"
 
 msgid "BF"
-msgstr "pt-BF"
+msgstr "BF"
 
 msgid "Not Breast Feeding"
 msgstr "Não lactante"
 
 msgid "NBF"
-msgstr "pt-NBF"
+msgstr "NBF"
 
 msgid "Breast Feeding Unknown"
 msgstr "Não se sabe se é lactante"
 
 msgid "BFU"
-msgstr "pt-BFU"
+msgstr "BFU"
 
 msgid "Pregnant"
 msgstr "Grávida"
 
 msgid "P"
-msgstr "pt-P"
+msgstr "P"
 
 msgid "Not Pregnant"
 msgstr "Não está Grávida"
 
 msgid "NP"
-msgstr "pt-NP"
+msgstr "NP"
 
 msgid "Pregnant Unknown"
 msgstr "Não se sabe se está Grávida"
 
 msgid "PU"
-msgstr "pt-PU"
+msgstr "PU"
 
 msgid "DBS"
-msgstr "pt-DBS"
+msgstr "DBS"
 
 msgid "Others"
 msgstr "Outros"
@@ -1603,70 +1603,70 @@ msgid "Patient ART No"
 msgstr "No. ART do Paciente"
 
 msgid "PAN"
-msgstr "pt-PAN"
+msgstr "PAN"
 
 msgid "CR"
-msgstr "pt-CR"
+msgstr "CR"
 
 msgid "Patient Age in Years"
 msgstr "Idade do paciente em anos"
 
 msgid "PAiY"
-msgstr "pt-PAiY"
+msgstr "PAiY"
 
 msgid "Patient Gender"
 msgstr "Género do Paciente"
 
 msgid "PG"
-msgstr "pt-PG"
+msgstr "PG"
 
 msgid "DBS - VL (>= 1000 cp/ml)"
-msgstr "pt-DBS - VL (>= 1000 cp/ml)"
+msgstr "DBS - VL (>= 1000 cp/ml)"
 
 msgid "Others - VL (>= 1000 cp/ml)"
 msgstr "Outros - VL (>= 1000 cp/ml)"
 
 msgid "DBS - VL (< 1000 cp/ml)"
-msgstr "pt-DBS - VL (< 1000 cp/ml)"
+msgstr "DBS - VL (< 1000 cp/ml)"
 
 msgid "Others - VL (< 1000 cp/ml)"
 msgstr "Outros - VL (< 1000 cp/ml)"
 
 msgid "Language"
-msgstr "pt-Language"
+msgstr "Language"
 
 msgid "Please choose instance language"
-msgstr "pt-Please choose instance language"
+msgstr "Please choose instance language"
 
 msgid "Samples Received"
-msgstr "pt-Samples Received"
+msgstr "Samples Received"
 
-msgid "Choose your date"
-msgstr "pt-Choose your date"
+msgid "Choose Date Range"
+msgstr "Choose Date Range"
 
 msgid "Show Date Filter"
-msgstr "pt-Show Date Filter"
+msgstr "Show Date Filter"
 
 msgid "Close Date Filter"
-msgstr "pt-Close Date Filter"
+msgstr "Close Date Filter"
 
 msgid "Results Awaited Overview"
-msgstr "pt-Results Awaited Overview"
+msgstr "Results Awaited Overview"
 
 msgid "Results Awaited (Province-wise)"
-msgstr "pt-Results Awaited (Province-wise)"
+msgstr "Results Awaited (Province-wise)"
 
 msgid "Results Awaited"
-msgstr "pt-Results Awaited"
+msgstr "Results Awaited"
 
 msgid "Results Awaited (VL Laboratory-wise)"
-msgstr "pt-Results Awaited (VL Laboratory-wise)"
+msgstr "Results Awaited (VL Laboratory-wise)"
 
 msgid "Sample Recieved at Lab"
-msgstr "pt-Sample Recieved at Lab"
+msgstr "Sample Recieved at Lab"
 
 #~ msgid "Hubs Dashboard"
-#~ msgstr "pt-Hubs Dashboard"
+#~ msgstr "Hubs Dashboard"
 
 #~ msgid "Skeleton Application"
 #~ msgstr "Aplicação Skeleton"

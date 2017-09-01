@@ -99,13 +99,13 @@ class SampleTable extends AbstractTableGateway {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $common = new CommonService($this->sm);
-        
         $waitingTotal = 0;$receivedTotal = 0;$testedTotal = 0;$rejectedTotal = 0;
         $waitingResult = array();$receivedResult = array();$tResult = array();$rejectedResult = array();
-        if(trim($params['fltrDate'])!= ''){
-            if(trim($params['fromDate'])!= '' && trim($params['toDate'])!= ''){
-               $startMonth = date("Y-m", strtotime(trim($params['fromDate'])))."-01";
-               $endMonth = date("Y-m", strtotime(trim($params['toDate'])))."-31";
+        if(trim($params['filterDate'])!= ''){
+            $splitDate = explode('to',$params['filterDate']);
+            if(trim($splitDate[0])!= '' && trim($splitDate[1])!= ''){
+               $startDate = date("Y-m-d", strtotime(trim($splitDate[0])));
+               $endDate = date("Y-m-d", strtotime(trim($splitDate[1])));
             }
         }else{
             $timestamp = time();
@@ -130,9 +130,9 @@ class SampleTable extends AbstractTableGateway {
                 $receivedQuery = $receivedQuery->where('vl.lab_id IN ("' . implode('", "', array_values(array_filter($mappedFacilities))) . '")');
             }
         }
-        if(trim($params['fltrDate'])!= ''){
-            if(trim($params['fromDate'])!= '' && trim($params['toDate'])!= ''){
-                $receivedQuery = $receivedQuery->where(array("DATE(vl.sample_collection_date) <='$endMonth'", "DATE(vl.sample_collection_date) >='$startMonth'"));
+        if(trim($params['filterDate'])!= ''){
+            if(trim($startDate)!= '' && trim($endDate)!= ''){
+                $receivedQuery = $receivedQuery->where(array("DATE(vl.sample_collection_date) <='$endDate'", "DATE(vl.sample_collection_date) >='$startDate'"));
             }
         }else{
             $receivedQuery = $receivedQuery->where("DATE(sample_collection_date) IN ($qDates)");
@@ -163,9 +163,9 @@ class SampleTable extends AbstractTableGateway {
                 $rejectedQuery = $rejectedQuery->where('vl.lab_id IN ("' . implode('", "', array_values(array_filter($mappedFacilities))) . '")');
             }
         }
-        if(trim($params['fltrDate'])!= ''){
-            if(trim($params['fromDate'])!= '' && trim($params['toDate'])!= ''){
-                $rejectedQuery = $rejectedQuery->where(array("DATE(vl.sample_collection_date) <='$endMonth'", "DATE(vl.sample_collection_date) >='$startMonth'"));
+        if(trim($params['filterDate'])!= ''){
+            if(trim($startDate)!= '' && trim($endDate)!= ''){
+                $rejectedQuery = $rejectedQuery->where(array("DATE(vl.sample_collection_date) <='$endDate'", "DATE(vl.sample_collection_date) >='$startDate'"));
             }
         }else{
             $rejectedQuery = $rejectedQuery->where("DATE(sample_collection_date) IN ($qDates)");
@@ -193,9 +193,9 @@ class SampleTable extends AbstractTableGateway {
                 $testedQuery = $testedQuery->where('vl.lab_id IN ("' . implode('", "', array_values(array_filter($mappedFacilities))) . '")');
             }
         }
-        if(trim($params['fltrDate'])!= ''){
-            if(trim($params['fromDate'])!= '' && trim($params['toDate'])!= ''){
-                $testedQuery = $testedQuery->where(array("DATE(vl.sample_tested_datetime) <='$endMonth'", "DATE(vl.sample_tested_datetime) >='$startMonth'"));
+        if(trim($params['filterDate'])!= ''){
+            if(trim($startDate)!= '' && trim($endDate)!= ''){
+                $testedQuery = $testedQuery->where(array("DATE(vl.sample_tested_datetime) <='$endDate'", "DATE(vl.sample_tested_datetime) >='$startDate'"));
             }
         }else{
             $testedQuery = $testedQuery->where("DATE(sample_tested_datetime) IN ($qDates)");
@@ -2692,9 +2692,9 @@ class SampleTable extends AbstractTableGateway {
         }
         $pQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
                       ->columns(array())
-                      ->join(array('f'=>'facility_details'),'f.facility_id=vl.lab_id',array())
+                      ->join(array('f'=>'facility_details'),'f.facility_id=vl.facility_id',array())
                       ->join(array('l_d'=>'location_details'),'l_d.location_id=f.facility_state',array('location_id','location_name'))
-                      ->where('vl.lab_id !=0')
+                      ->where('vl.facility_id !=0')
                       ->group('f.facility_state');
         if(isset($params['provinces']) && is_array($params['provinces']) && count($params['provinces']) >0){
             $pQuery = $pQuery->where('f.facility_state IN ("' . implode('", "', $params['provinces']) . '")');
@@ -2702,13 +2702,8 @@ class SampleTable extends AbstractTableGateway {
         if(isset($params['districts']) && is_array($params['districts']) && count($params['districts']) >0){
             $pQuery = $pQuery->where('f.facility_district IN ("' . implode('", "', $params['districts']) . '")');
         }
-        if(isset($params['lab']) && is_array($params['lab']) && count($params['lab']) >0){
-            $pQuery = $pQuery->where('f.facility_id IN ("' . implode('", "', $params['lab']) . '")');
-        }else{
-            if($logincontainer->role!= 1){
-                $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:array();
-                $pQuery = $pQuery->where('f.facility_id IN ("' . implode('", "', array_values(array_filter($mappedFacilities))) . '")');
-            }
+        if(isset($params['clinicId']) && is_array($params['clinicId']) && count($params['clinicId']) >0){
+            $pQuery = $pQuery->where('vl.facility_id IN ("' . implode('", "', $params['clinicId']) . '")');
         }
         $pQueryStr = $sql->getSqlStringForSqlObject($pQuery);
         $pResult  = $dbAdapter->query($pQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -2720,7 +2715,7 @@ class SampleTable extends AbstractTableGateway {
                                           array("total" => new Expression("SUM(CASE WHEN (result is NULL OR result ='') AND (reason_for_sample_rejection is NULL or reason_for_sample_rejection ='') THEN 1
                                                                               ELSE 0
                                                                               END)")))
-                             ->join(array('f'=>'facility_details'),'f.facility_id=vl.lab_id',array())
+                             ->join(array('f'=>'facility_details'),'f.facility_id=vl.facility_id',array())
                              ->where(array('f.facility_state'=>$province['location_id']));
                 if(trim($params['fromDate'])!= '' && trim($params['toDate'])!= ''){
                     $countQuery = $countQuery->where(array("vl.sample_collection_date >='" . $startMonth ." 00:00:00". "'", "vl.sample_collection_date <='" .$endMonth." 23:59:59". "'"));
@@ -2731,8 +2726,13 @@ class SampleTable extends AbstractTableGateway {
                        $countQuery = $countQuery->where("(vl.sample_collection_date > DATE_SUB(NOW(), INTERVAL $samplesWaitingFromLastXMonths MONTH))");  
                     }
                 }
-                if(isset($params['clinicId']) && is_array($params['clinicId']) && count($params['clinicId']) >0){
-                    $countQuery = $countQuery->where('vl.facility_id IN ("' . implode('", "', $params['clinicId']) . '")');
+                if(isset($params['lab']) && is_array($params['lab']) && count($params['lab']) >0){
+                    $countQuery = $countQuery->where('vl.lab_id IN ("' . implode('", "', $params['lab']) . '")');
+                }else{
+                    if($logincontainer->role!= 1){
+                        $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:array();
+                        $countQuery = $countQuery->where('vl.lab_id IN ("' . implode('", "', array_values(array_filter($mappedFacilities))) . '")');
+                    }
                 }
                 if(isset($params['currentRegimen']) && trim($params['currentRegimen'])!=''){
                     $countQuery = $countQuery->where('vl.current_regimen="'.base64_decode(trim($params['currentRegimen'])).'"');

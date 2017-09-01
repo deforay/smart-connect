@@ -45,7 +45,7 @@ if(isset($labFilter) && trim($labFilter)!= ''){
                                         <span class="mrp-icon"><i class="fa fa-calendar"></i> &nbsp;</span>
                                         <div class="mrp-monthdisplay ">
                                           <span class="mrp-lowerMonth"></span>
-                                          <span class="mrp-to mrp-temp-placeholder"> <?php echo $this->translate('Choose your date'); ?> </span>
+                                          <span class="mrp-to mrp-temp-placeholder"> <?php echo $this->translate('Choose Date Range'); ?> </span>
                                           <span class="mrp-upperMonth"></span>
                                         </div>
                                       <input type="hidden" value="" id="mrp-lowerDate" />
@@ -307,7 +307,7 @@ if(isset($labFilter) && trim($labFilter)!= ''){
     function resetEverything(){
         $("#pageFilter")[0].reset();
         $('.mrp-monthdisplay .mrp-lowerMonth').html('');
-        $('.mrp-monthdisplay .mrp-to').html('<?php echo $this->translate('Choose your date'); ?>');
+        $('.mrp-monthdisplay .mrp-to').html('<?php echo $this->translate('Choose Date Range'); ?>');
         $('.mrp-monthdisplay .mrp-upperMonth').html('');
         $('#mrp-lowerDate').val('');
         $('#mrp-upperDate').val('');
