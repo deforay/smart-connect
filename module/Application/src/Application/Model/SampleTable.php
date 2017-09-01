@@ -101,8 +101,8 @@ class SampleTable extends AbstractTableGateway {
         $common = new CommonService($this->sm);
         $waitingTotal = 0;$receivedTotal = 0;$testedTotal = 0;$rejectedTotal = 0;
         $waitingResult = array();$receivedResult = array();$tResult = array();$rejectedResult = array();
-        if(trim($params['filterDate'])!= ''){
-            $splitDate = explode('to',$params['filterDate']);
+        if(trim($params['daterange'])!= ''){
+            $splitDate = explode('to',$params['daterange']);
             if(trim($splitDate[0])!= '' && trim($splitDate[1])!= ''){
                $startDate = date("Y-m-d", strtotime(trim($splitDate[0])));
                $endDate = date("Y-m-d", strtotime(trim($splitDate[1])));
@@ -130,7 +130,7 @@ class SampleTable extends AbstractTableGateway {
                 $receivedQuery = $receivedQuery->where('vl.lab_id IN ("' . implode('", "', array_values(array_filter($mappedFacilities))) . '")');
             }
         }
-        if(trim($params['filterDate'])!= ''){
+        if(trim($params['daterange'])!= ''){
             if(trim($startDate)!= '' && trim($endDate)!= ''){
                 $receivedQuery = $receivedQuery->where(array("DATE(vl.sample_collection_date) <='$endDate'", "DATE(vl.sample_collection_date) >='$startDate'"));
             }
@@ -163,7 +163,7 @@ class SampleTable extends AbstractTableGateway {
                 $rejectedQuery = $rejectedQuery->where('vl.lab_id IN ("' . implode('", "', array_values(array_filter($mappedFacilities))) . '")');
             }
         }
-        if(trim($params['filterDate'])!= ''){
+        if(trim($params['daterange'])!= ''){
             if(trim($startDate)!= '' && trim($endDate)!= ''){
                 $rejectedQuery = $rejectedQuery->where(array("DATE(vl.sample_collection_date) <='$endDate'", "DATE(vl.sample_collection_date) >='$startDate'"));
             }
@@ -193,7 +193,7 @@ class SampleTable extends AbstractTableGateway {
                 $testedQuery = $testedQuery->where('vl.lab_id IN ("' . implode('", "', array_values(array_filter($mappedFacilities))) . '")');
             }
         }
-        if(trim($params['filterDate'])!= ''){
+        if(trim($params['daterange'])!= ''){
             if(trim($startDate)!= '' && trim($endDate)!= ''){
                 $testedQuery = $testedQuery->where(array("DATE(vl.sample_tested_datetime) <='$endDate'", "DATE(vl.sample_tested_datetime) >='$startDate'"));
             }
@@ -2686,9 +2686,12 @@ class SampleTable extends AbstractTableGateway {
         $result = array();
         $globalDb = new \Application\Model\GlobalTable($this->adapter);
         $samplesWaitingFromLastXMonths = $globalDb->getGlobalValue('sample_waiting_month_range');
-        if(trim($params['fromDate'])!= '' && trim($params['toDate'])!= ''){
-            $startMonth = date("Y-m", strtotime(trim($params['fromDate'])))."-01";
-            $endMonth = date("Y-m", strtotime(trim($params['toDate'])))."-31";
+        if(isset($params['daterange']) && trim($params['daterange'])!= ''){
+            $splitDate = explode('to',$params['daterange']);
+            if(trim($splitDate[0])!= '' && trim($splitDate[1])!= ''){
+               $startDate = date("Y-m-d", strtotime(trim($splitDate[0])));
+               $endDate = date("Y-m-d", strtotime(trim($splitDate[1])));
+            }
         }
         $pQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
                       ->columns(array())
@@ -2717,8 +2720,10 @@ class SampleTable extends AbstractTableGateway {
                                                                               END)")))
                              ->join(array('f'=>'facility_details'),'f.facility_id=vl.facility_id',array())
                              ->where(array('f.facility_state'=>$province['location_id']));
-                if(trim($params['fromDate'])!= '' && trim($params['toDate'])!= ''){
-                    $countQuery = $countQuery->where(array("vl.sample_collection_date >='" . $startMonth ." 00:00:00". "'", "vl.sample_collection_date <='" .$endMonth." 23:59:59". "'"));
+                if(isset($params['daterange']) && trim($params['daterange'])!= ''){
+                    if(trim($splitDate[0])!= '' && trim($splitDate[1])!= ''){
+                        $countQuery = $countQuery->where(array("vl.sample_collection_date >='" . $startDate ." 00:00:00". "'", "vl.sample_collection_date <='" .$endDate." 23:59:59". "'"));
+                    }
                 }else{
                     if(isset($params['frmSource']) && trim($params['frmSource']) == '<'){
                        $countQuery = $countQuery->where("(vl.sample_collection_date < DATE_SUB(NOW(), INTERVAL $samplesWaitingFromLastXMonths MONTH))");
@@ -2787,9 +2792,12 @@ class SampleTable extends AbstractTableGateway {
         $result = array();
         $globalDb = new \Application\Model\GlobalTable($this->adapter);
         $samplesWaitingFromLastXMonths = $globalDb->getGlobalValue('sample_waiting_month_range');
-        if(trim($params['fromDate'])!= '' && trim($params['toDate'])!= ''){
-            $startMonth = date("Y-m", strtotime(trim($params['fromDate'])))."-01";
-            $endMonth = date("Y-m", strtotime(trim($params['toDate'])))."-31";
+        if(isset($params['daterange']) && trim($params['daterange'])!= ''){
+            $splitDate = explode('to',$params['daterange']);
+            if(trim($splitDate[0])!= '' && trim($splitDate[1])!= ''){
+               $startDate = date("Y-m-d", strtotime(trim($splitDate[0])));
+               $endDate = date("Y-m-d", strtotime(trim($splitDate[1])));
+            }
         }
         $labQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
                       ->columns(array())
@@ -2803,11 +2811,11 @@ class SampleTable extends AbstractTableGateway {
             $labQuery = $labQuery->where('f.facility_district IN ("' . implode('", "', $params['districts']) . '")');
         }
         if(isset($params['lab']) && is_array($params['lab']) && count($params['lab']) >0){
-            $labQuery = $labQuery->where('f.facility_id IN ("' . implode('", "', $params['lab']) . '")');
+            $labQuery = $labQuery->where('vl.lab_id IN ("' . implode('", "', $params['lab']) . '")');
         }else{
             if($logincontainer->role!= 1){
                 $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:array();
-                $labQuery = $labQuery->where('f.facility_id IN ("' . implode('", "', array_values(array_filter($mappedFacilities))) . '")');
+                $labQuery = $labQuery->where('vl.lab_id IN ("' . implode('", "', array_values(array_filter($mappedFacilities))) . '")');
             }
         }
         $labQueryStr = $sql->getSqlStringForSqlObject($labQuery);
@@ -2821,9 +2829,11 @@ class SampleTable extends AbstractTableGateway {
                                                                               ELSE 0
                                                                               END)")))
                              ->join(array('f'=>'facility_details'),'f.facility_id=vl.lab_id',array())
-                             ->where(array('f.facility_id'=>$lab['facility_id']));
-                if(trim($params['fromDate'])!= '' && trim($params['toDate'])!= ''){
-                    $countQuery = $countQuery->where(array("vl.sample_collection_date >='" . $startMonth ." 00:00:00". "'", "vl.sample_collection_date <='" .$endMonth." 23:59:59". "'"));
+                             ->where(array('vl.lab_id'=>$lab['facility_id']));
+                if(isset($params['daterange']) && trim($params['daterange'])!= ''){
+                    if(trim($splitDate[0])!= '' && trim($splitDate[1])!= ''){
+                        $countQuery = $countQuery->where(array("vl.sample_collection_date >='" . $startDate ." 00:00:00". "'", "vl.sample_collection_date <='" .$endDate." 23:59:59". "'"));
+                    }
                 }else{
                     if(isset($params['frmSource']) && trim($params['frmSource']) == '<'){
                        $countQuery = $countQuery->where("(vl.sample_collection_date < DATE_SUB(NOW(), INTERVAL $samplesWaitingFromLastXMonths MONTH))");
@@ -2960,9 +2970,12 @@ class SampleTable extends AbstractTableGateway {
          * SQL queries
          * Get data to display
         */
-        if(trim($parameters['fromDate'])!= '' && trim($parameters['toDate'])!= ''){
-            $startMonth = date("Y-m", strtotime(trim($parameters['fromDate'])))."-01";
-            $endMonth = date("Y-m", strtotime(trim($parameters['toDate'])))."-31";
+        if(isset($parameters['daterange']) && trim($parameters['daterange'])!= ''){
+            $splitDate = explode('to',$parameters['daterange']);
+            if(trim($splitDate[0])!= '' && trim($splitDate[1])!= ''){
+               $startDate = date("Y-m-d", strtotime(trim($splitDate[0])));
+               $endDate = date("Y-m-d", strtotime(trim($splitDate[1])));
+            }
         }
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
@@ -2972,8 +2985,10 @@ class SampleTable extends AbstractTableGateway {
                                 ->join(array('rs'=>'r_sample_type'),'rs.sample_id=vl.sample_type',array('sample_name'),'left')
                                 ->join(array('l'=>'facility_details'),'l.facility_id=vl.lab_id',array('labName'=>'facility_name'))
                                 ->where('(result IS NULL OR result ="") AND (reason_for_sample_rejection IS NULL OR reason_for_sample_rejection ="")');
-        if(trim($parameters['fromDate'])!= '' && trim($parameters['toDate'])!= ''){
-            $sQuery = $sQuery->where("(vl.sample_collection_date >='" . $startMonth ." 00:00:00' AND vl.sample_collection_date <='" .$endMonth." 23:59:59')");
+        if(isset($parameters['daterange']) && trim($parameters['daterange'])!= ''){
+            if(trim($splitDate[0])!= '' && trim($splitDate[1])!= ''){
+                $sQuery = $sQuery->where(array("vl.sample_collection_date >='" . $startDate ." 00:00:00". "'", "vl.sample_collection_date <='" .$endDate." 23:59:59". "'"));
+            }
         }else{
             if(isset($parameters['frmSource']) && trim($parameters['frmSource']) == '<'){
                 $sQuery = $sQuery->where("(vl.sample_collection_date < DATE_SUB(NOW(), INTERVAL $samplesWaitingFromLastXMonths MONTH))");
@@ -2982,10 +2997,10 @@ class SampleTable extends AbstractTableGateway {
             }
         }
         if(isset($parameters['provinces']) && trim($parameters['provinces'])!= ''){
-            $sQuery = $sQuery->where('l.facility_state IN (' . $parameters['provinces'] . ')');
+            $sQuery = $sQuery->where('f.facility_state IN (' . $parameters['provinces'] . ')');
         }
         if(isset($parameters['districts']) && trim($parameters['districts'])!= ''){
-            $sQuery = $sQuery->where('l.facility_district IN (' . $parameters['districts'] . ')');
+            $sQuery = $sQuery->where('f.facility_district IN (' . $parameters['districts'] . ')');
         }
         if(isset($parameters['lab']) && trim($parameters['lab'])!= ''){
             $sQuery = $sQuery->where('vl.lab_id IN (' . $parameters['lab'] . ')');

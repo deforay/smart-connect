@@ -666,8 +666,7 @@ class LaboratoryController extends AbstractActionController{
         $labFilter="";
         if($this->params()->fromQuery('src')){
             $frmSource = $this->params()->fromQuery('src');
-        }
-        if($this->params()->fromQuery('lab')){
+        }if($this->params()->fromQuery('lab')){
             $labFilter=$this->params()->fromQuery('lab');
             $params['labs'] = explode(',',$labFilter);
         }
