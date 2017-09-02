@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: ZendSkeletonApplication\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-08-26 00:21+0530\n"
-"PO-Revision-Date: 2017-08-31 18:25+0530\n"
+"PO-Revision-Date: 2017-09-01 21:08+0530\n"
 "Last-Translator: Diogo Melo <dmelo87@gmail.com>\n"
 "Language-Team: ZF Contibutors <zf-devteam@zend.com>\n"
 "Language: pt\n"
@@ -904,7 +904,7 @@ msgstr "Please choose logo"
 #: ../view/application/facility/edit.phtml:17
 #: ../view/application/users/edit.phtml:24
 msgid "Edit"
-msgstr "Edit"
+msgstr "Editar"
 
 #: ../view/application/facility/edit.phtml:23
 msgid "Edit Facility"

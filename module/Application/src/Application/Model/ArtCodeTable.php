@@ -2,10 +2,8 @@
 
 namespace Application\Model;
 
-use Zend\Session\Container;
 use Zend\Db\Adapter\Adapter;
 use Zend\Db\Sql\Sql;
-use Zend\Db\Sql\Expression;
 use Zend\Db\TableGateway\AbstractTableGateway;
 
 /*
@@ -27,8 +25,7 @@ class ArtCodeTable extends AbstractTableGateway {
         $this->adapter = $adapter;
     }
     
-    public function fetchAllCurrentRegimen()
-    {
+    public function fetchAllCurrentRegimen(){
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $rQuery = $sql->select()->from(array('r'=>'r_art_code_details'));

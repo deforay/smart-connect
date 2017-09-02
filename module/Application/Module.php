@@ -301,6 +301,7 @@ class Module{
 		'FacilityService' => function($sm) {
                     return new FacilityService($sm);
                 },
+		'translator' => 'Zend\Mvc\Service\TranslatorServiceFactory',
             ),
 	    'abstract_factories' => array(
 	        'Zend\Cache\Service\StorageCacheAbstractServiceFactory',

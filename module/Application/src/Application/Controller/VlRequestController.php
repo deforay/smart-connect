@@ -20,7 +20,7 @@ class VlRequestController extends AbstractActionController
         if ($request->isPost()) {
             $params = $request->getPost();            
             $sampleService = $this->getServiceLocator()->get('SampleService');
-            $sampleService->UploadSampleResultFile($params);
+            $sampleService->uploadSampleResultFile($params);
             return $this->redirect()->toRoute("vl-request");
         }else{
             $sourceService = $this->getServiceLocator()->get('SourceService');

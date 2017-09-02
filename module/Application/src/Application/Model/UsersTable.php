@@ -7,6 +7,7 @@ use Zend\Db\Adapter\Adapter;
 use Zend\Db\Sql\Sql;
 use Zend\Db\Sql\Expression;
 use Zend\Db\TableGateway\AbstractTableGateway;
+use Application\Service\CommonService;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -103,12 +104,10 @@ class UsersTable extends AbstractTableGateway {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->from(array('u' => 'dash_users'))
-                ->join(array('r' => 'dash_user_roles'), 'u.role=r.role_id');
-        
+                      ->join(array('r' => 'dash_user_roles'), 'u.role=r.role_id');
         $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         return $rResult;
-    
     }
     
     public function addUser($params){
@@ -309,7 +308,6 @@ class UsersTable extends AbstractTableGateway {
             "iTotalDisplayRecords" => $iFilteredTotal,
             "aaData" => array()
         );
-        
         foreach ($rResult as $aRow) {
             $row = array();
             $row[] = ucwords($aRow['user_name']);
