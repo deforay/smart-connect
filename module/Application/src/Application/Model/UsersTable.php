@@ -23,9 +23,11 @@ use Application\Service\CommonService;
 class UsersTable extends AbstractTableGateway {
 
     protected $table = 'dash_users';
+    public $sm = null;
 
-    public function __construct(Adapter $adapter) {
+    public function __construct(Adapter $adapter, $sm=null) {
         $this->adapter = $adapter;
+        $this->sm = $sm;
     }
     
     public function login($params) {
@@ -196,6 +198,7 @@ class UsersTable extends AbstractTableGateway {
     }    
     
     public function fetchAllUsers($parameters) {
+        $common = new CommonService($this->sm);
         /* Array of database columns which should be read and sent back to DataTables. Use a space where
          * you want to insert a non-database field (for example a counter or static image)
          */
@@ -308,14 +311,15 @@ class UsersTable extends AbstractTableGateway {
             "iTotalDisplayRecords" => $iFilteredTotal,
             "aaData" => array()
         );
+        
+        $buttText = $common->translate('Edit');
         foreach ($rResult as $aRow) {
             $row = array();
             $row[] = ucwords($aRow['user_name']);
             $row[] = ucfirst($aRow['role_name']);
             $row[] = $aRow['email'];
             $row[] = $aRow['mobile'];
-            
-            $row[] = '<a href="./edit/' . base64_encode($aRow['user_id']) . '" class="btn green" style="margin-right: 2px;" title="Edit"><i class="fa fa-pencil"> Edit</i></a>';
+            $row[] = '<a href="./edit/' . base64_encode($aRow['user_id']) . '" class="btn green" style="margin-right: 2px;" title="'.$buttText.'"><i class="fa fa-pencil"> '.$buttText.'</i></a>';
             
             $output['aaData'][] = $row;
         }

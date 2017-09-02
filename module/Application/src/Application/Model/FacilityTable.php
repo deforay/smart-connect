@@ -7,6 +7,7 @@ use Zend\Db\Adapter\Adapter;
 use Zend\Db\Sql\Sql;
 use Zend\Db\Sql\Expression;
 use Zend\Db\TableGateway\AbstractTableGateway;
+use Application\Service\CommonService;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -22,9 +23,11 @@ use Zend\Db\TableGateway\AbstractTableGateway;
 class FacilityTable extends AbstractTableGateway {
 
     protected $table = 'facility_details';
+    public $sm = null;
 
-    public function __construct(Adapter $adapter) {
+    public function __construct(Adapter $adapter, $sm=null) {
         $this->adapter = $adapter;
+	$this->sm = $sm;
     }
     
     public function addFacility($params){
@@ -99,6 +102,7 @@ class FacilityTable extends AbstractTableGateway {
     }
     
     public function fetchAllFacility($parameters) {
+	$common = new CommonService($this->sm);
         /* Array of database columns which should be read and sent back to DataTables. Use a space where
          * you want to insert a non-database field (for example a counter or static image)
          */
@@ -211,14 +215,15 @@ class FacilityTable extends AbstractTableGateway {
             "iTotalDisplayRecords" => $iFilteredTotal,
             "aaData" => array()
         );
-        
+	
+        $buttText = $common->translate('Edit');
         foreach ($rResult as $aRow) {
             $row = array();
             $row[] = $aRow['facility_code'];
             $row[] = ucwords($aRow['facility_name']);
             $row[] = ucwords($aRow['facility_type_name']);
             $row[] = ucwords($aRow['status']);
-            $row[] = '<a href="edit/' . base64_encode($aRow['facility_id']) . '" class="btn green" style="margin-right: 2px;" title="Edit"><i class="fa fa-pencil"> Edit</i></a>';
+            $row[] = '<a href="edit/' . base64_encode($aRow['facility_id']) . '" class="btn green" style="margin-right: 2px;" title="'.$buttText.'"><i class="fa fa-pencil"> '.$buttText.'</i></a>';
             $output['aaData'][] = $row;
         }
         return $output;

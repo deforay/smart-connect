@@ -191,7 +191,7 @@ class Module{
             'factories' => array(
                 'UsersTable' => function($sm) {
                     $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
-                    $table = new UsersTable($dbAdapter);
+                    $table = new UsersTable($dbAdapter,$sm);
                     return $table;
                 },
 				'OrganizationsTable' => function($sm) {
@@ -235,7 +235,7 @@ class Module{
                 },
 				'FacilityTable' => function($sm) {
                     $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
-                    $tableObj = new FacilityTable($dbAdapter);
+                    $tableObj = new FacilityTable($dbAdapter,$sm);
 					$table = PatternFactory::factory('object', [
 						'storage' => $sm->get('Cache\Persistent'),
 						'object' => $tableObj
@@ -263,7 +263,7 @@ class Module{
                     return $table;
                 },'GlobalTable' => function($sm) {
                     $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
-                    $table = new GlobalTable($dbAdapter);
+                    $table = new GlobalTable($dbAdapter,$sm);
                     return $table;
                 },'ArtCodeTable' => function($sm) {
                     $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');

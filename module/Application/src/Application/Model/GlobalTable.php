@@ -21,9 +21,11 @@ use Application\Service\CommonService;
 class GlobalTable extends AbstractTableGateway {
 
     protected $table = 'dash_global_config';
+    public $sm = null;
 
-    public function __construct(Adapter $adapter) {
+    public function __construct(Adapter $adapter, $sm=null) {
         $this->adapter = $adapter;
+        $this->sm = $sm;
     }
     
     public function getGlobalValue($globalName) {
@@ -36,6 +38,7 @@ class GlobalTable extends AbstractTableGateway {
     }
     
     public function fetchAllConfig($parameters) {
+        $common = new CommonService($this->sm);
         /* Array of database columns which should be read and sent back to DataTables. Use a space where
          * you want to insert a non-database field (for example a counter or static image)
          */
@@ -151,7 +154,7 @@ class GlobalTable extends AbstractTableGateway {
               $currentVal = $this->fetchLocaleDetailsById('display_name',$aRow['value']);
             }
            $row = array();
-            $row[] = ucwords($aRow['display_name']);
+            $row[] = ucwords($common->translate($aRow['display_name']));
             $row[] = ucwords($currentVal);
             $output['aaData'][] = $row;
         }

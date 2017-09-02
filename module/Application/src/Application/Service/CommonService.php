@@ -171,7 +171,6 @@ class CommonService {
         return $tempmailDb->insertTempMailDetails($to, $subject, $message, $fromMail, $fromName,$cc,$bcc);
     }
     
-
     public function sendTempMail() {
         try {
             $tempDb = $this->sm->get('TempMailTable');
@@ -369,6 +368,11 @@ class CommonService {
     public function getSampleTestedLocationInfo($params){
         $facilityDb = $this->sm->get('FacilityTable');
        return $facilityDb->fetchSampleTestedLocationInfo($params);
+    }
+    
+    public function translate($text){
+        $translateObj = $this->sm->get('translator');
+        return $translateObj->translate($text);
     }
 }
 
