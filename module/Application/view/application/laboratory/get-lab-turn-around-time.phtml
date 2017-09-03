@@ -10,15 +10,12 @@
         exporting:{
             chartOptions:{
                 subtitle: {
-                    text:'Laboratory Turnaround Time',
+                    text:'<?php echo $this->translate('Laboratory Turnaround Time'); ?>',
                 }
             }
         },
-        subtitle: {
-            text: ''
-        },
         credits: {
-              enabled: false
+            enabled: false
         },
         xAxis: {
             //categories: ["21 Mar", "22 Mar", "23 Mar", "24 Mar", "25 Mar", "26 Mar", "27 Mar"]
@@ -80,7 +77,8 @@
             if(isset($result['all'])){
             ?>
             {
-            name: '<?php echo $this->translate('All'); ?>',
+            showInLegend: false,
+            name: '<?php echo $this->translate('Days'); ?>',
             data: [<?php echo implode(",",$result['all']);?>],
             color : '#1B325F',
         },
@@ -107,11 +105,11 @@
         //]
     });
     function getRandomColor() {
-    var letters = '0123456789ABCDEF';
-    var color = '#';
-    for (var i = 0; i < 6; i++ ) {
-        color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
+        var letters = '0123456789ABCDEF';
+        var color = '#';
+        for (var i = 0; i < 6; i++ ) {
+            color += letters[Math.floor(Math.random() * 16)];
+        }
+        return color;
     }
 </script>

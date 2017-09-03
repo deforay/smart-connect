@@ -23,9 +23,12 @@
             allowDecimals: false,
             min: 0,
             title: {
-                text: ''
+                text: '<?php echo $this->translate('No. of Samples');?>'
             },
             labels: { formatter: function() { return this.value; } },
+        },
+        legend: {
+              enabled: true
         },
         tooltip: {
             formatter: function () {
@@ -57,7 +60,7 @@
               }
            }
             ?>],
-            colors: ['#434348'],
+            colors: ['#434348']
     });
     });
 </script>

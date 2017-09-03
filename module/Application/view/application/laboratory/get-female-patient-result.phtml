@@ -15,7 +15,7 @@ if(isset($result) && count($result)>0){
         exporting:{
             chartOptions:{
                 subtitle: {
-                    text:'Female Patients',
+                    text:'<?php echo $this->translate('Female Patients'); ?>',
                 }
             }
         },
@@ -46,7 +46,7 @@ if(isset($result) && count($result)>0){
             }
         },
         series: [{
-            name: '<?php echo $this->translate('Labs'); ?>',
+            name: '<?php echo $this->translate('Samples'); ?>',
             point: {
               events: {
                   click: function(e) {

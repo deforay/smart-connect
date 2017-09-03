@@ -219,16 +219,6 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
                                 </div>
                             </div>
                             <div class="col-md-12">
-                                <div class="form-group col-lg-4">
-                                    <label class="control-label"><?php echo $this->translate('Line of Treatment'); ?></label>
-                                    <select class="form-control" name="lineOfTreatment" id="lineOfTreatment">
-                                      <option value=""><?php echo $this->translate('All'); ?></option>
-                                      <option value="1" <?php echo (isset($lt) && $lt == 'LOT1')?'selected="selected"':''; ?>><?php echo $this->translate('Line Of Treatment 1'); ?></option>
-                                      <option value="2" <?php echo (isset($lt) && $lt == 'LOT2')?'selected="selected"':''; ?>><?php echo $this->translate('Line Of Treatment 2'); ?></option>
-                                      <option value="3" <?php echo (isset($lt) && $lt == 'LOT3')?'selected="selected"':''; ?>><?php echo $this->translate('Line Of Treatment 3'); ?></option>
-                                      <option value="not_specified" <?php echo (isset($lt) && $lt == 'NS')?'selected="selected"':''; ?>><?php echo $this->translate('Not Specified'); ?></option>
-                                    </select>
-                                </div>
                                 <div class="form-group col-lg-4 femaleSection" style="display:<?php echo (isset($searchGender) && $searchGender == 'F')?'':'none'; ?>;">
                                     <label class="control-label"><?php echo $this->translate('Is Patient Pregnant'); ?></label><br>
                                     <input id="pregnantYes" name="isPregnant" value="yes" type="radio" <?php echo(isset($femaleFilter) && $femaleFilter == 'P')?'checked="checked"':''; ?>> <?php echo $this->translate('Yes'); ?>&nbsp;&nbsp;
@@ -240,6 +230,16 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
                                     <input id="breastfeedingYes" name="isBreastfeeding" value="yes" type="radio" <?php echo(isset($femaleFilter) && $femaleFilter == 'BF')?'checked="checked"':''; ?>> <?php echo $this->translate('Yes'); ?>&nbsp;&nbsp;
                                     <input id="breastfeedingNo" name="isBreastfeeding" value="no" type="radio" <?php echo(isset($femaleFilter) && $femaleFilter == 'NBF')?'checked="checked"':''; ?>> <?php echo $this->translate('No'); ?>&nbsp;&nbsp;
                                     <input id="breastfeedingUnreported" name="isBreastfeeding" value="unreported" type="radio" <?php echo(isset($femaleFilter) && $femaleFilter == 'BFU')?'checked="checked"':''; ?>> <?php echo $this->translate('Unreported'); ?>
+                                </div>
+                                <div class="form-group col-lg-4">
+                                    <label class="control-label"><?php echo $this->translate('Line of Treatment'); ?></label>
+                                    <select class="form-control" name="lineOfTreatment" id="lineOfTreatment">
+                                      <option value=""><?php echo $this->translate('All'); ?></option>
+                                      <option value="1" <?php echo (isset($lt) && $lt == 'LOT1')?'selected="selected"':''; ?>><?php echo $this->translate('Line Of Treatment 1'); ?></option>
+                                      <option value="2" <?php echo (isset($lt) && $lt == 'LOT2')?'selected="selected"':''; ?>><?php echo $this->translate('Line Of Treatment 2'); ?></option>
+                                      <option value="3" <?php echo (isset($lt) && $lt == 'LOT3')?'selected="selected"':''; ?>><?php echo $this->translate('Line Of Treatment 3'); ?></option>
+                                      <option value="not_specified" <?php echo (isset($lt) && $lt == 'NS')?'selected="selected"':''; ?>><?php echo $this->translate('Not Specified'); ?></option>
+                                    </select>
                                 </div>
                             </div>
                             <div class="col-md-12">
@@ -267,7 +267,7 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
                             <div class="portlet box blue">
                                 <div class="portlet-title">
                                     <div class="caption">
-                                        <i class="fa fa-cogs"></i><?php echo $this->translate('Samples'); ?>
+                                        <i class="fa fa-cogs"></i><?php echo $this->translate('Samples Tested'); ?>
                                     </div>
                                     <div class="tools">
                                         <button class="btn btn-default" onclick="exportSampleResult();"><span><i class="fa fa-file-excel-o" aria-hidden="true"></i> <?php echo $this->translate('Excel'); ?></span></button>

@@ -27,11 +27,11 @@
               dataLabels: {
                 distance: -30
               },
-                showInLegend: true
+              showInLegend: true
             }
         },
         series: [{
-            name: 'Sample',
+            name: '<?php echo $this->translate('Samples'); ?>',
             colorByPoint: true,
             data: [<?php
             if(isset($result) && count($result)>0){

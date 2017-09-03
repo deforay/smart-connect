@@ -2,10 +2,10 @@
 $less1000 = array('>18'=>'#088738', '<18' => '#60d18f');
 $more1000 = array('>18'=>'#ff1900', '<18' => '#F2786D');
 ?>
-<div id="facilitiesTestedAge"></div>
+<div id="samplesTestedVsAge"></div>
 <script>
        $(function () {
-        $('#facilitiesTestedAge').highcharts({
+       $('#samplesTestedVsAge').highcharts({
        chart: {
             type: 'column'
         },
@@ -15,7 +15,7 @@ $more1000 = array('>18'=>'#ff1900', '<18' => '#F2786D');
         exporting:{
             chartOptions:{
                 subtitle: {
-                    text:'Samples Tested based on Age',
+                    text:'<?php echo $this->translate('Samples Tested based on Age'); ?>',
                 }
             }
         },
@@ -35,7 +35,7 @@ $more1000 = array('>18'=>'#ff1900', '<18' => '#F2786D');
             allowDecimals: false,
             min: 0,
             title: {
-                text: ''
+                text: '<?php echo $this->translate('No. of Samples'); ?>'
             }
         },
         tooltip: {

@@ -13,7 +13,7 @@
         exporting:{
             chartOptions:{
                 subtitle: {
-                    text:'Line Of Treatment',
+                    text:'<?php echo $this->translate('Line Of Treatment'); ?>',
                 }
             }
         },
@@ -44,7 +44,7 @@
             }
         },
         series: [{
-            name: '<?php echo $this->translate('Labs'); ?>',
+            name: '<?php echo $this->translate('Samples'); ?>',
             point: {
               events: {
                   click: function(e) {

@@ -26,7 +26,7 @@ $heading = (isset($params['fromSrc']) && $params['fromSrc'] == 'sampleVolume')?'
             allowDecimals: false,
             min: 0,
             title: {
-                text: ''
+                text: '<?php echo $this->translate('No. of Samples'); ?>'
             },
             labels: { formatter: function() { return this.value; } },
         },

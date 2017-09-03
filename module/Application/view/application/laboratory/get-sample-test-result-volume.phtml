@@ -11,7 +11,7 @@
        exporting:{
             chartOptions:{
                 subtitle: {
-                    text:'Samples Tested per Lab',
+                    text:'<?php echo $this->translate('Samples Tested per Lab'); ?>',
                 }
             }
         },
@@ -31,7 +31,7 @@
             allowDecimals: false,
             min: 0,
             title: {
-                text: ''
+                text: '<?php echo $this->translate('No. of Samples'); ?>'
             }
         },
         tooltip: {

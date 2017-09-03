@@ -67,7 +67,7 @@ if(isset($result['scResult']) && count($result['scResult'])>0){
                 <small class="font-green-sharp"><?php echo $this->translate('SAMPLES COLLECTED'); ?></small><br>
                 <!--<small class="font-blue-sharp"><?php echo $receivedDate;?></small>-->
                 <?php
-                if(trim($params['filterDate'])== ''){
+                if(trim($params['daterange'])== ''){
                 ?>
                    <small class="font-green-sharp"><?php echo $this->translate('Last 28 days'); ?></small>
                 <?php } ?>
@@ -90,7 +90,7 @@ if(isset($result['scResult']) && count($result['scResult'])>0){
                 <small class="font-blue-sharp"><?php echo $this->translate('SAMPLES TESTED'); ?></small><br>
                 <!--<small class="font-blue-sharp"><?php echo $testedDate;?></small>-->
                 <?php
-                if(trim($params['filterDate'])== ''){
+                if(trim($params['daterange'])== ''){
                 ?>
                   <small class="font-blue-sharp"><?php echo $this->translate('Last 28 days'); ?></small>
                 <?php } ?>
@@ -112,7 +112,7 @@ if(isset($result['scResult']) && count($result['scResult'])>0){
                 <small class="font-red-haze"><?php echo $this->translate('SAMPLES REJECTED'); ?></small><br>
                 <!--<small class="font-red-haze"><?php echo $rejectedDate;?></small>-->
                 <?php
-                if(trim($params['filterDate'])== ''){
+                if(trim($params['daterange'])== ''){
                 ?>
                    <small class="font-red-haze"><?php echo $this->translate('Last 28 days'); ?></small>
                 <?php } ?>
@@ -136,8 +136,12 @@ if(isset($result['scResult']) && count($result['scResult'])>0){
             title: {
                 text: ''
             },
-            subtitle: {
-                text: ''
+            exporting:{
+                chartOptions:{
+                    subtitle: {
+                        text:'<?php echo $this->translate('SAMPLES COLLECTED'); ?>',
+                    }
+                }
             },
             credits: {
                 enabled: false
@@ -154,7 +158,7 @@ if(isset($result['scResult']) && count($result['scResult'])>0){
             yAxis: {
                 min: 0,
                 title: {
-                    text: null
+                    text: ''
                 },
                 labels: { formatter: function() { return this.value; } },
             },
@@ -169,20 +173,12 @@ if(isset($result['scResult']) && count($result['scResult'])>0){
             plotOptions: {
                 column: {
                     pointPadding: 0.2,
-                    borderWidth: 0,
-                    cursor: 'pointer',
-                    //point: {
-                    //    events: {
-                    //        click: function () {
-                    //            window.location.href='/labs/samples-accession';
-                    //        }
-                    //    }
-                    //}                
+                    borderWidth: 0
                 }
             },
             series: [{
                 showInLegend: false,  
-                name: '<?php echo $this->translate('Samples Received'); ?>',
+                name: '<?php echo $this->translate('Samples'); ?>',
                 data: [<?php
                 foreach($result['scResult'] as $total){
                     echo ucwords($total[0]['total']).",";
@@ -201,8 +197,12 @@ if(isset($result['scResult']) && count($result['scResult'])>0){
         title: {
             text: ''
         },
-        subtitle: {
-            text: ''
+        exporting:{
+            chartOptions:{
+                subtitle: {
+                    text:'<?php echo $this->translate('SAMPLES TESTED'); ?>',
+                }
+            }
         },
         credits: {
             enabled: false
@@ -218,7 +218,7 @@ if(isset($result['scResult']) && count($result['scResult'])>0){
         yAxis: {
             min: 0,
             title: {
-                text: null
+                text: ''
             },
             labels: { formatter: function() { return this.value; } },
         },
@@ -233,13 +233,12 @@ if(isset($result['scResult']) && count($result['scResult'])>0){
         plotOptions: {
             column: {
                 pointPadding: 0.2,
-                borderWidth: 0,
-                cursor: 'pointer',
+                borderWidth: 0
             }
         },
         series: [{
             showInLegend: false,  
-            name: '<?php echo $this->translate('Samples Tested'); ?>',
+            name: '<?php echo $this->translate('Samples'); ?>',
             data: [<?php
             foreach($result['stResult'] as $total){
                 echo ucwords($total[0]['total']).",";
@@ -258,8 +257,12 @@ if(isset($result['scResult']) && count($result['scResult'])>0){
             title: {
                 text: ''
             },
-            subtitle: {
-                text: ''
+            exporting:{
+                chartOptions:{
+                    subtitle: {
+                        text:'<?php echo $this->translate('SAMPLES REJECTED'); ?>',
+                    }
+                }
             },
             credits: {
                 enabled: false
@@ -275,7 +278,7 @@ if(isset($result['scResult']) && count($result['scResult'])>0){
             yAxis: {
                 min: 0,
                 title: {
-                    text: null
+                    text: ''
                 }
             },
             tooltip: {
@@ -289,13 +292,12 @@ if(isset($result['scResult']) && count($result['scResult'])>0){
             plotOptions: {
                 column: {
                     pointPadding: 0.2,
-                    borderWidth: 0,
-                    cursor: 'pointer',
+                    borderWidth: 0
                 }
             },
             series: [{
-                showInLegend: false,  
-                name: '<?php echo $this->translate('Samples Rejected'); ?>',
+                showInLegend: false,
+                name: '<?php echo $this->translate('Samples'); ?>',
                 data: [<?php
                 foreach($result['srResult'] as $total){
                     echo ucwords($total[0]['total']).",";

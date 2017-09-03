@@ -13,7 +13,6 @@ $heading = (isset($params['fromSrc']) && $params['fromSrc'] == 'sampleVolume')?'
         title: {
             text: '<?php echo $this->translate($heading); ?>'
         },
-        
         credits: {
               enabled: false
        },
@@ -35,7 +34,7 @@ $heading = (isset($params['fromSrc']) && $params['fromSrc'] == 'sampleVolume')?'
             }
         },
         series: [{
-            name: '<?php echo $this->translate('Labs'); ?>',
+            name: '<?php echo $this->translate('Samples'); ?>',
             colorByPoint: true,
             data: [<?php
             if(isset($result) && count($result)>0){

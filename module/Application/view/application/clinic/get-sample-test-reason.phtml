@@ -11,6 +11,13 @@
         title: {
             text: ''
         },
+        exporting:{
+            chartOptions:{
+                subtitle: {
+                    text:'<?php echo $this->translate('VL Ordered'); ?>',
+                }
+            }
+        },
         credits: {
             enabled: false
        },
@@ -36,7 +43,7 @@
             }
         },
         series: [{
-            name: '<?php echo $this->translate('Clinics'); ?>',
+            name: '<?php echo $this->translate('Samples'); ?>',
             colorByPoint: true,
             data: [<?php
             if(isset($result) && count($result)>0){

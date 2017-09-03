@@ -3,7 +3,7 @@ $type = array('Total','Not Suppressed','Suppressed');
 ?>
 <script>
        $(function () {
-        $('#overall-load-chart').highcharts({
+        $('#overall-vl-status-based-gender').highcharts({
        chart: {
             type: 'column'
         },
@@ -14,7 +14,7 @@ $type = array('Total','Not Suppressed','Suppressed');
         exporting:{
             chartOptions:{
                 subtitle: {
-                    text:'',
+                    text:'<?php echo $this->translate('Overall Viral Load Status based on Gender'); ?>',
                 }
             }
         },
@@ -33,9 +33,9 @@ $type = array('Total','Not Suppressed','Suppressed');
         },
         tooltip: {
             formatter: function () {
+                var tipTxt = (this.series.name!= 'Total')?'<?php echo $this->translate('Total'); ?>: ' + this.point.stackTotal:'';
                 return '<b>' + this.x + '</b><br/>' +
-                    this.series.name + ': ' + this.y + '<br/>' +
-                    '<?php echo $this->translate('Total'); ?>: ' + this.point.stackTotal;
+                    this.series.name + ': ' + this.y + '<br/>' + tipTxt;
             }
         },
         plotOptions: {

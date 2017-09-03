@@ -1665,6 +1665,9 @@ msgstr "Results Awaited (VL Laboratory-wise)"
 msgid "Sample Recieved at Lab"
 msgstr "Sample Recieved at Lab"
 
+msgid "Sorry..Location not available"
+msgstr "Sorry..Location not available"
+
 #~ msgid "Hubs Dashboard"
 #~ msgstr "Hubs Dashboard"
 

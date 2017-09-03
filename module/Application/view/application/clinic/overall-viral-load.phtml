@@ -1,12 +1,19 @@
 <script>
     $(function () {
-     $('#combochart1').highcharts({
+     $('#overall-vl-status').highcharts({
         chart: {
             type: 'column'
         },
 
         title: {
             text: ''
+        },
+        exporting:{
+            chartOptions:{
+                subtitle: {
+                    text:'<?php echo $this->translate('Overall Viral Load Status'); ?>',
+                }
+            }
         },
         credits: {
             enabled: false
@@ -46,7 +53,7 @@
         },
 
         series: [{
-            name: 'Sample',
+            name: '<?php echo $this->translate('Sample'); ?>',
             showInLegend: false, 
             data: [ { y : <?php echo (isset($chartResult[0]['total']))?$chartResult[0]['total']:0; ?> , color : '#ECD078' },
                     { y : <?php echo (isset($chartResult[1]['total']))?$chartResult[1]['total']:0; ?> , color : '#ddef55' },

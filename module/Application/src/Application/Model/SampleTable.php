@@ -31,7 +31,6 @@ class SampleTable extends AbstractTableGateway {
         
     }
     
-    
     public function fetchQuickStats($params){
         $logincontainer = new Container('credo');
         $dbAdapter = $this->adapter;
@@ -1487,6 +1486,8 @@ class SampleTable extends AbstractTableGateway {
         );
         
 	$common = new CommonService($this->sm);
+        $viewText = $common->translate('View');
+        $pdfText = $common->translate('PDF');
         foreach ($rResult as $aRow) {
             $row = array();
             $sampleCollectionDate = '';
@@ -1507,7 +1508,7 @@ class SampleTable extends AbstractTableGateway {
             if(trim($aRow['result']) ==""){
                 $display= "none";
             }
-	    $row[]='<a href="/clinics/test-result-view/'.base64_encode($aRow['vl_sample_id']).'" class="btn btn-primary btn-xs" target="_blank">View</a>&nbsp;&nbsp;<a href="javascript:void(0);" class="btn btn-danger btn-xs" style="display:'.$display.'" onclick="generateResultPDF('.$aRow['vl_sample_id'].');">PDF</a>';
+	    $row[]='<a href="/clinics/test-result-view/'.base64_encode($aRow['vl_sample_id']).'" class="btn btn-primary btn-xs" target="_blank">'.$viewText.'</a>&nbsp;&nbsp;<a href="javascript:void(0);" class="btn btn-danger btn-xs" style="display:'.$display.'" onclick="generateResultPDF('.$aRow['vl_sample_id'].');">'.$pdfText.'</a>';
             $output['aaData'][] = $row;
         }
         return $output;

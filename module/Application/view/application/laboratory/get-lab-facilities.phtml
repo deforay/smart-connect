@@ -45,7 +45,7 @@ if($available > 0) { ?>
                  lon: "<?php echo $labInfo['longitude']; ?>",
                  title: "<?php echo ucwords($labInfo['facility_name']);?>",
                  icon : "<?php echo $this->basePath('assets/img/lab0.png') ?>",
-                 label : "<h5><?php echo ucwords($labInfo['facility_name']);?></h5><span>No. of Samples : <?php echo $labInfo['labCount']; ?></span>"
+                 label : "<h5><?php echo ucwords($labInfo['facility_name']);?></h5><span><?php echo $this->translate('No. of Samples'); ?> : <?php echo $labInfo['labCount']; ?></span>"
                 },
                 <?php } } } ?>
                 //clinics
@@ -59,7 +59,7 @@ if($available > 0) { ?>
                  lon: "<?php echo $clinicInfo['longitude']; ?>",
                  title: "<?php echo ucwords($clinicInfo['facility_name']);?>",
                  icon : "<?php echo $this->basePath('assets/img/clinic.png') ?>",
-                 label : "<h5><?php echo ucwords($clinicInfo['facility_name']);?></h5><span>No. of Samples : <?php echo $clinicInfo['clinicCount']; ?></span>"
+                 label : "<h5><?php echo ucwords($clinicInfo['facility_name']);?></h5><span><?php echo $this->translate('No. of Samples'); ?> : <?php echo $clinicInfo['clinicCount']; ?></span>"
                 },
                 <?php } } } ?>
             ];
@@ -98,5 +98,5 @@ if($available > 0) { ?>
          });
     </script>
 <?php } else { ?>
-    <div style="text-align:center;"><h5><strong>Sorry..Location not available.</strong></h5></div>
+    <div style="text-align:center;"><h5><strong><?php echo $this->translate('Sorry..Location not available'); ?>.</strong></h5></div>
 <?php } ?>

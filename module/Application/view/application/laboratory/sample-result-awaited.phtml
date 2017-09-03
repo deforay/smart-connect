@@ -345,6 +345,10 @@ if(isset($labFilter) && trim($labFilter)!= ''){
         $('input[name="daterange"]').val('');
     });
     
+    $('#daterange').on('cancel.daterangepicker', function(ev, picker) {
+        $('#daterange').val('');
+    });
+
     function searchResultsAwaitedSample(){
         generateProvinceBarContainer();
         generateFacilityBarContainer();

@@ -12,7 +12,7 @@
         exporting:{
             chartOptions:{
                 subtitle: {
-                    text:'Sample Volume',
+                    text:'<?php echo $this->translate('Sample Volume'); ?>',
                 }
             }
         },
@@ -41,7 +41,7 @@
             }
         },
         series: [{
-            name: '<?php echo $this->translate('Labs'); ?>',
+            name: '<?php echo $this->translate('Samples'); ?>',
             point: {
               events: {
                   click: function(e) {

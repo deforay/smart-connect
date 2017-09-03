@@ -2,16 +2,22 @@
 $less1000 = array('DBS'=>'#088738', 'Others' => '#60d18f');
 $more1000 = array('DBS'=>'#ff1900', 'Others' => '#F2786D');
 ?>
-<div id="samplesTestedVsSupressed"></div>
-
+<div id="samplesTestedVsSuppressed"></div>
 <script>
        $(function () {
-        $('#samplesTestedVsSupressed').highcharts({
+        $('#samplesTestedVsSuppressed').highcharts({
         chart: {
             type: 'column'
         },
         title: {
             text: ''
+        },
+        exporting:{
+            chartOptions:{
+                subtitle: {
+                    text:'<?php echo $this->translate('VL Suppression'); ?>',
+                }
+            }
         },
         credits: {
             enabled: false
@@ -29,14 +35,14 @@ $more1000 = array('DBS'=>'#ff1900', 'Others' => '#F2786D');
             allowDecimals: false,
             min: 0,
             title: {
-                text: ''
+                text: '<?php echo $this->translate('No. of Samples'); ?>'
             }
         },
         tooltip: {
             formatter: function () {
                 return '<b>' + this.x + '</b><br/>' +
                     this.series.name + ': ' + this.y + '<br/>' +
-                    'Total: ' + this.point.stackTotal;
+                    '<?php echo $this->translate('Total'); ?>: ' + this.point.stackTotal;
             }
         },
         plotOptions: {

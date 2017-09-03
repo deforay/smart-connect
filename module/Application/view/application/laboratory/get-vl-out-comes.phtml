@@ -1,6 +1,4 @@
-
 <script>
-       
         $('#labDashVlOutcomePie').highcharts({
         chart: {
             plotBackgroundColor: null,
@@ -14,7 +12,7 @@
         exporting:{
             chartOptions:{
                 subtitle: {
-                    text:'VL Suppressed/Not Suppressed',
+                    text:'<?php echo $this->translate('VL Suppressed/Not Suppressed'); ?>',
                 }
             }
         },
@@ -49,7 +47,7 @@
             }
         },
         series: [{
-            name: '<?php echo $this->translate('Labs'); ?>',
+            name: '<?php echo $this->translate('Samples'); ?>',
             point: {
               events: {
                   click: function(e) {
