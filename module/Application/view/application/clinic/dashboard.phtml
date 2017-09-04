@@ -29,14 +29,14 @@ foreach($sampleType as $samples){
                                     </select>
                                 </div>
                                 <div class="col-lg-6">
-                                    <div id="dashboard-report-range" class="btn btn-sm form-control"
+                                    <div id="dashboard-range" class="btn btn-sm form-control"
                                         data-container="body"
                                         data-placement="bottom"
                                         data-original-title="Change dashboard date range">
                                         <?php echo $this->translate('Date Range'); ?>&nbsp;&nbsp;&nbsp;&nbsp;<i class="icon-calendar"></i>&nbsp;
                                         <span class="thin uppercase hidden-xs"></span>&nbsp;
                                         <i class="fa fa-angle-down"></i>
-                                        <input type="hidden" name="sampleCollectionDate" id="sampleCollectionDate" />
+                                        <input type="hidden" name="sampleCollectionDate" id="sampleCollectionDate"/>
                                     </div>
                                 </div>
                             </div>
@@ -246,63 +246,39 @@ foreach($sampleType as $samples){
                     </div>
 <script>
     var oTable = null;
-    $(function () {
+    $(function() {
+        var start = moment().subtract(12, 'months');
+        var end = moment();
+        
+        function cb(start, end) {
+            $('#dashboard-range span').html(start.format('MMM D, YYYY') + ' to ' + end.format('MMM D, YYYY'));
+            $('#sampleCollectionDate').val(start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
+        }
+
         $('#clinicId').select2({
             placeholder: "<?php echo $this->translate('All Clinics'); ?>",
             allowClear: true
         });
-        $('#dashboard-report-range').daterangepicker({
-                "ranges": {
-                    'Today': [moment(), moment()],
-                    'Yesterday': [moment().subtract('days', 1), moment().subtract('days', 1)],
-                    'Last 7 Days': [moment().subtract('days', 6), moment()],
-                    'Last 30 Days': [moment().subtract('days', 29), moment()],
-                    'This Month': [moment().startOf('month'), moment().endOf('month')],
-                    'Last Month': [moment().subtract('month', 1).startOf('month'), moment().subtract('month', 1).endOf('month')]
-                },
-                "locale": {
-                    "format": "YYYY-MM-DD",
-                    "separator": " to ",
-                    "applyLabel": "Apply",
-                    "cancelLabel": "Cancel",
-                    "fromLabel": "From",
-                    "toLabel": "To",
-                    "customRangeLabel": "Custom",
-                    "daysOfWeek": [
-                        "Su",
-                        "Mo",
-                        "Tu",
-                        "We",
-                        "Th",
-                        "Fr",
-                        "Sa"
-                    ],
-                    "monthNames": [
-                        "January",
-                        "February",
-                        "March",
-                        "April",
-                        "May",
-                        "June",
-                        "July",
-                        "August",
-                        "September",
-                        "October",
-                        "November",
-                        "December"
-                    ],
-                    //"firstDay": 1
-                },
-                //"startDate": "11/08/2015",
-                //"endDate": "11/14/2015",
-                opens: "left",
-            }, function(start, end, label) {
-                $('#dashboard-report-range span').html(start.format('MMMM D, YYYY') + ' to ' + end.format('MMMM D, YYYY'));
-                $('#sampleCollectionDate').val(start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
-            });
-            $('#dashboard-report-range span').html(moment().subtract('days', 29).format('MMMM D, YYYY') + ' to ' + moment().format('MMMM D, YYYY'));
-            $('#dashboard-report-range').show();
-            getAllFunction();
+        
+        $('#dashboard-range').daterangepicker({
+            format: 'DD-MMM-YYYY',
+            separator: ' to ',
+            startDate: start,
+            endDate: end,
+            maxDate:moment(),
+            ranges: {
+               'Today': [moment(), moment()],
+               'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+               'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+               'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+               'This Month': [moment().startOf('month'), moment().endOf('month')],
+               'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+            },
+            opens: "left"
+        }, cb);
+        cb(start, end);
+        $('#dashboard-range').show();
+        getAllFunction();
     });
     
     function getAllFunction(){

@@ -640,9 +640,8 @@ class SampleService {
         if(trim($params['fromDate'])!= '' && trim($params['toDate'])!= ''){
             $startMonth = date("Y-m", strtotime(trim($params['fromDate'])))."-01";
             $endMonth = date("Y-m", strtotime(trim($params['toDate'])))."-31";
-        }
-        if(isset($queryContainer->sampleResultQuery)){
-            try{
+            if(isset($queryContainer->sampleResultQuery)){
+             try{
                 $dbAdapter = $this->sm->get('Zend\Db\Adapter\Adapter');
                 $sql = new Sql($dbAdapter);
                 $sQueryStr = $sql->getSqlStringForSqlObject($queryContainer->sampleResultQuery);
@@ -798,13 +797,16 @@ class SampleService {
                 }else{
                     return "";
                 }
-            }catch (Exception $exc) {
+             }catch (Exception $exc) {
                 error_log("SAMPLE-TEST-RESULT-REPORT--" . $exc->getMessage());
                 error_log($exc->getTraceAsString());
                 return "";
-            }  
+             }  
+            }else{
+                return "";
+            }
         }else{
-            return "";
+           return "";
         }
     }
     

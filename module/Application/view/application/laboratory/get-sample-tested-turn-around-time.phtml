@@ -603,8 +603,8 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
     
     function exportSampleResult(){
         $.blockUI.defaults.css.border = '1px solid grey';
-        $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI); 
-        $.post("<?php echo $this->url('laboratory', array('action' => 'export-sample-tested-result-tatexcel')); ?>", { },
+        $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
+        $.post("<?php echo $this->url('laboratory', array('action' => 'export-sample-tested-result-tat-excel')); ?>", { },
          function(data){
              if(data == "" || data == null || data == undefined){
                  alert('Unable to export result excel');

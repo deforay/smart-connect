@@ -610,7 +610,7 @@ class LaboratoryController extends AbstractActionController{
         }
     }
     
-    public function exportSampleTestedResultTatexcelAction() {
+    public function exportSampleTestedResultTatExcelAction() {
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();

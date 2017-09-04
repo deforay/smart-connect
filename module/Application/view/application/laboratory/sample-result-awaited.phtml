@@ -31,7 +31,15 @@ if(isset($labFilter) && trim($labFilter)!= ''){
                                 <div class="col-md-12">
                                     <div class="form-group col-lg-4">
                                         <label class="control-label"><?php echo $this->translate('Date Range'); ?>&nbsp;</label>
-                                        <input type="text" class="form-control" id="daterange" name="daterange" placeholder="<?php echo $this->translate('Choose Date Range'); ?>" title="<?php echo $this->translate('Please choose date range'); ?>"/>
+                                        <div id="daterange-container" class="btn btn-sm form-control"
+                                            data-container="body"
+                                            data-placement="bottom"
+                                            data-original-title="Change date range">
+                                            <i class="icon-calendar"></i>&nbsp;
+                                            <span class="thin uppercase hidden-xs"></span>&nbsp;
+                                            <i class="fa fa-angle-down"></i>
+                                            <input type="hidden" name="daterange" id="daterange"/>
+                                        </div>
                                     </div>
                                     <div class="form-group col-lg-4">
                                         <label class="control-label"><?php echo $this->translate('Provinces'); ?>&nbsp;</label>
@@ -295,7 +303,15 @@ if(isset($labFilter) && trim($labFilter)!= ''){
             } );
     }
     
-    $(document).ready(function(){
+    $(function() {
+        var start = moment().subtract(12, 'months');
+        var end = moment();
+        
+        function cb(start, end) {
+            $('#daterange-container span').html(start.format('MMM D, YYYY') + ' to ' + end.format('MMM D, YYYY'));
+            $('#daterange').val(start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
+        }
+    
         $('#provinces').select2({
             placeholder: "<?php echo $this->translate('All Provinces'); ?>",
             allowClear: true
@@ -312,21 +328,8 @@ if(isset($labFilter) && trim($labFilter)!= ''){
             placeholder: "<?php echo $this->translate('All Clinics'); ?>",
             allowClear: true
         });
-       generateProvinceBarContainer();
-       generateFacilityBarContainer();
-       loadResultsAwaitedDataTable();
-    });
-
-    $(function() {
-        var start = moment().subtract(29, 'days');
-        var end = moment();
         
-        function cb(start, end) {
-            startDate = start.format('YYYY-MM-DD');
-            endDate = end.format('YYYY-MM-DD');
-        }
-    
-        $('input[name="daterange"]').daterangepicker({
+        $('#daterange-container').daterangepicker({
             format: 'DD-MMM-YYYY',
             separator: ' to ',
             startDate: start,
@@ -342,11 +345,12 @@ if(isset($labFilter) && trim($labFilter)!= ''){
             }
         }, cb);
         cb(start, end);
+        $('#dashboard-range').show();
+        $('#daterange-container span').html('Choose Date Range');
         $('input[name="daterange"]').val('');
-    });
-    
-    $('#daterange').on('cancel.daterangepicker', function(ev, picker) {
-        $('#daterange').val('');
+        generateProvinceBarContainer();
+        generateFacilityBarContainer();
+        loadResultsAwaitedDataTable();
     });
 
     function searchResultsAwaitedSample(){
@@ -357,6 +361,8 @@ if(isset($labFilter) && trim($labFilter)!= ''){
     
     function resetEverything(){
         $("#pageFilter")[0].reset();
+        $('#daterange-container span').html('Choose Date Range');
+        $('input[name="daterange"]').val('');
         $('#provinces').val('').change();
         $('#districts').val('').change();
         $('#labName').val('').change();

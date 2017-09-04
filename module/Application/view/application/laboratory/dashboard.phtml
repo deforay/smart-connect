@@ -134,7 +134,7 @@ $endDate=date('Y-m');
   font-size:<?php echo(isset($languagecontainer->locale) && $languagecontainer->locale == 'en_US')?'14':'13'; ?>px;
 }
 @media screen and (max-width: 987px){
-    #daterange{
+    #daterange-container{
         width:100% !important;
         margin-left:0% !important;
     }
@@ -200,9 +200,17 @@ foreach($sampleType as $samples){
                         </div>
                     </div>
                     <form id="dateFilter" action="#" method="">
-                        <div class="date-range-filter row" style="margin-bottom:20px;display:none;">
+                        <div class="daterange-container row" style="margin-bottom:20px;display:none;">
                             <div class="col-md-9 col-sm-9">
-                                <input id="daterange" name="daterange" class="form-control" placeholder="<?php echo $this->translate('Choose Date Range'); ?>" title="<?php echo $this->translate('Please choose date range'); ?>" style="text-align:center;width:72%;margin-left:28%;"/>
+                                <div id="daterange-container" class="btn btn-sm form-control"
+                                    data-container="body"
+                                    data-placement="bottom"
+                                    data-original-title="Change date range" style="text-align:center;width:72%;margin-left:28%;">
+                                    <i class="icon-calendar"></i>&nbsp;
+                                    <span class="thin uppercase hidden-xs"></span>&nbsp;
+                                    <i class="fa fa-angle-down"></i>
+                                    <input type="hidden" name="daterange" id="daterange"/>
+                                </div>
                             </div>
                             <div class="col-lg-3">
                                 <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="getSampleResult('daterange');"><?php echo $this->translate('Search'); ?></a>&nbsp;&nbsp;
@@ -412,7 +420,6 @@ foreach($sampleType as $samples){
     <script src="<?php echo $this->basePath('assets/pages/scripts/dashboard.js'); ?>" type="text/javascript"></script>
     <script>
     //var gfxPath = 'https://raw.githubusercontent.com/highslide-software/pattern-fill/master/graphics/';
-    var dpicker = "";
     var startDate;
     var endDate;
    
@@ -543,24 +550,21 @@ foreach($sampleType as $samples){
         });
     }
         
-    $(function () {
+    $(function() {
+        var start = moment().subtract(12, 'months');
+        var end = moment();
+        
+        function cb(start, end) {
+            $('#daterange-container span').html(start.format('MMM D, YYYY') + ' to ' + end.format('MMM D, YYYY'));
+            $('#daterange').val(start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
+        }
+    
         $('#labName').select2({
             placeholder: "<?php echo $this->translate('All Labs'); ?>",
             allowClear: true
         });
-        getEverything();
-    });
-    
-    $(function() {
-        var start = moment().subtract(29, 'days');
-        var end = moment();
         
-        function cb(start, end) {
-            startDate = start.format('YYYY-MM-DD');
-            endDate = end.format('YYYY-MM-DD');
-        }
-    
-        $('input[name="daterange"]').daterangepicker({
+        $('#daterange-container').daterangepicker({
             format: 'DD-MMM-YYYY',
             separator: ' to ',
             startDate: start,
@@ -576,11 +580,10 @@ foreach($sampleType as $samples){
             }
         }, cb);
         cb(start, end);
+        $('#dashboard-range').show();
+        $('#daterange-container span').html('Choose Date Range');
         $('input[name="daterange"]').val('');
-    });
-    
-    $('#daterange').on('cancel.daterangepicker', function(ev, picker) {
-        $('#daterange').val('');
+        getEverything();
     });
     
     function getEverything(){
@@ -979,16 +982,18 @@ foreach($sampleType as $samples){
     
     $("#showDateRange").click(function(){
         $("#showDateRange").hide();
-        $("#closeDateRange,.date-range-filter").show();
+        $("#closeDateRange,.daterange-container").show();
     });
     
     $("#closeDateRange").click(function(){
-        $("#closeDateRange,.date-range-filter").hide();
+        $("#closeDateRange,.daterange-container").hide();
         $("#showDateRange").show();
     });
     
     function resetDateFilter(){
        $('#dateFilter')[0].reset();
+       $('#daterange-container span').html('Choose Date Range');
+       $('input[name="daterange"]').val('');
        getSampleResult('reset');
     }
 </script>
