@@ -581,7 +581,7 @@ foreach($sampleType as $samples){
         }, cb);
         cb(start, end);
         $('#dashboard-range').show();
-        $('#daterange-container span').html('Choose Date Range');
+        $('#daterange-container span').html('<?php echo $this->translate('Choose Date Range'); ?>');
         $('input[name="daterange"]').val('');
         getEverything();
     });
@@ -992,7 +992,7 @@ foreach($sampleType as $samples){
     
     function resetDateFilter(){
        $('#dateFilter')[0].reset();
-       $('#daterange-container span').html('Choose Date Range');
+       $('#daterange-container span').html('<?php echo $this->translate('Choose Date Range'); ?>');
        $('input[name="daterange"]').val('');
        getSampleResult('reset');
     }

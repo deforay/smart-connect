@@ -346,7 +346,7 @@ if(isset($labFilter) && trim($labFilter)!= ''){
         }, cb);
         cb(start, end);
         $('#dashboard-range').show();
-        $('#daterange-container span').html('Choose Date Range');
+        $('#daterange-container span').html('<?php echo $this->translate('Choose Date Range'); ?>');
         $('input[name="daterange"]').val('');
         generateProvinceBarContainer();
         generateFacilityBarContainer();
@@ -361,7 +361,7 @@ if(isset($labFilter) && trim($labFilter)!= ''){
     
     function resetEverything(){
         $("#pageFilter")[0].reset();
-        $('#daterange-container span').html('Choose Date Range');
+        $('#daterange-container span').html('<?php echo $this->translate('Choose Date Range'); ?>');
         $('input[name="daterange"]').val('');
         $('#provinces').val('').change();
         $('#districts').val('').change();
