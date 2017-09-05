@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: ZendSkeletonApplication\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-08-26 00:21+0530\n"
-"PO-Revision-Date: 2017-09-05 11:10+0530\n"
+"PO-Revision-Date: 2017-09-05 12:02+0530\n"
 "Last-Translator: Diogo Melo <dmelo87@gmail.com>\n"
 "Language-Team: ZF Contibutors <zf-devteam@zend.com>\n"
 "Language: pt\n"
@@ -1526,22 +1526,22 @@ msgid "VL (< 1000 cp/ml)"
 msgstr "CV (< 1000 cp/ml)"
 
 msgid "VL (>= 1000 cp/ml)(M)"
-msgstr "VL (>= 1000 cp/ml)(M)"
+msgstr "CV (>= 1000 cp/ml)(M)"
 
 msgid "VL (< 1000 cp/ml)(M)"
-msgstr "VL (< 1000 cp/ml)(M)"
+msgstr "CV (< 1000 cp/ml)(M)"
 
 msgid "VL (>= 1000 cp/ml)(F)"
-msgstr "VL (>= 1000 cp/ml)(F)"
+msgstr "CV (>= 1000 cp/ml)(F)"
 
 msgid "VL (< 1000 cp/ml)(F)"
-msgstr "VL (< 1000 cp/ml)(F)"
+msgstr "CV (< 1000 cp/ml)(F)"
 
 msgid "VL (>= 1000 cp/ml)(Not Specified)"
-msgstr "VL (>= 1000 cp/ml)(Not Specified)"
+msgstr "CV (>= 1000 cp/ml)(Não especificado)"
 
 msgid "VL (< 1000 cp/ml)(Not Specified)"
-msgstr "VL (< 1000 cp/ml)(Not Specified)"
+msgstr "CV (< 1000 cp/ml)(Não especificado)"
 
 msgid "LOT1"
 msgstr "LT1"
@@ -1619,16 +1619,16 @@ msgid "PG"
 msgstr "GP"
 
 msgid "DBS - VL (>= 1000 cp/ml)"
-msgstr "DBS - VL (>= 1000 cp/ml)"
+msgstr "DBS - CV (>= 1000 cp/ml)"
 
 msgid "Others - VL (>= 1000 cp/ml)"
-msgstr "Outros - VL (>= 1000 cp/ml)"
+msgstr "Outros - CV (>= 1000 cp/ml)"
 
 msgid "DBS - VL (< 1000 cp/ml)"
-msgstr "DBS - VL (< 1000 cp/ml)"
+msgstr "DBS - CV (< 1000 cp/ml)"
 
 msgid "Others - VL (< 1000 cp/ml)"
-msgstr "Outros - VL (< 1000 cp/ml)"
+msgstr "Outros - CV (< 1000 cp/ml)"
 
 msgid "Language"
 msgstr "Idioma"
