@@ -699,6 +699,32 @@ class LaboratoryController extends AbstractActionController{
         }
     }
     
+    public function getDistrictBarSampleResultAwaitedDetailsAction() {
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $sampleService = $this->getServiceLocator()->get('SampleService');
+            $result=$sampleService->getDistrictBarSampleResultAwaitedDetails($params);
+            $viewModel = new ViewModel();
+            $viewModel->setVariables(array('result' =>$result))
+                      ->setTerminal(true);
+            return $viewModel;
+        }
+    }
+    
+    public function getClinicBarSampleResultAwaitedDetailsAction() {
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $sampleService = $this->getServiceLocator()->get('SampleService');
+            $result=$sampleService->getClinicBarSampleResultAwaitedDetails($params);
+            $viewModel = new ViewModel();
+            $viewModel->setVariables(array('result' =>$result))
+                      ->setTerminal(true);
+            return $viewModel;
+        }
+    }
+    
     public function getFacilityBarSampleResultAwaitedDetailsAction() {
         $request = $this->getRequest();
         if ($request->isPost()) {

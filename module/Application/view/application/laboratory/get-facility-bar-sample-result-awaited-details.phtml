@@ -1,66 +1,81 @@
 <script>
        $(function () {
-       $('#facilitybarcontainer').highcharts({
-       chart: {
-            type: 'column'
-       },
-       title: {
-            text: '<?php echo $this->translate('Results Awaited (VL Laboratory-wise)'); ?>'
-       },
-       credits: {
-              enabled: false
-       },
-        xAxis: {
-            categories: [<?php
-            if(isset($result['lab']) && count($result['lab'])>0){
-              foreach($result['lab'] as $lab){
-                  echo "'".$lab."',";
-              }
-            }
-            ?>]
-        },
-        yAxis: {
-            allowDecimals: false,
-            min: 0,
-            title: {
-                text: '<?php echo $this->translate('No. of Samples');?>'
-            },
-            labels: { formatter: function() { return this.value; } },
-        },
-        legend: {
-              enabled: true
-        },
-        tooltip: {
-            formatter: function () {
-                return '<b>' + this.x + '</b><br/>' +
-                    this.series.name + ': ' + this.y
-            }
-        },
-        plotOptions: {
-            column: {
-                stacking: 'normal',
-                pointPadding: 0.2,
-                borderWidth: 0
-            }
-        },
-        series: [<?php
-           if(isset($result['sample']) && count($result['sample']) >0){
-              foreach($result['sample'] as $key=>$condition){
-              ?>
-              {
-              showInLegend: false,
-              name:'<?php echo $this->translate('Samples');?>',
-              data:[<?php
-                  foreach($condition as $count){
-                     echo '{y:'.$count.'},';
-                  }
-              ?>],
+              $('#facilitybarcontainer').highcharts({
+              chart: {
+                   type: 'column'
               },
-              <?php
-              }
-           }
-            ?>],
-            colors: ['#434348']
-    });
-    });
+              title: {
+                   text: '<?php echo $this->translate('Results Awaited (VL Laboratory-wise)'); ?>'
+              },
+              credits: {
+                     enabled: false
+              },
+               xAxis: {
+                   categories: [<?php
+                   if(isset($result['lab']) && count($result['lab'])>0){
+                     foreach($result['lab'] as $lab){
+                         echo "'".$lab."',";
+                     }
+                   }
+                   ?>]
+               },
+               yAxis: {
+                   allowDecimals: false,
+                   min: 0,
+                   title: {
+                       text: '<?php echo $this->translate('No. of Samples');?>'
+                   },
+                   labels: { formatter: function() { return this.value; } },
+               },
+               legend: {
+                     enabled: true
+               },
+               tooltip: {
+                   formatter: function () {
+                       return '<b>' + this.x + '</b><br/>' +
+                           this.series.name + ': ' + this.y
+                   }
+               },
+               plotOptions: {
+                   column: {
+                       stacking: 'normal',
+                       pointPadding: 0.2,
+                       borderWidth: 0
+                   },
+                   series:{
+                            cursor: 'pointer',
+                            point:{
+                               events: {
+                                   click: function(e) {
+                                      for (var i = 0; i < this.series.data.length; i++) {
+                                          this.series.data[i].update({ color: '#7cb5ec' }, true, false);
+                                      }
+                                      this.update({ color: '#f1948a' }, true, false)
+                                      generateDistrictBarContainer(e.point.category,'lab');
+                                      generateClinicBarContainer(e.point.category,'','lab');
+                                   }
+                                } 
+                            }
+                   }
+               },
+               series: [<?php
+                  if(isset($result['sample']) && count($result['sample']) >0){
+                     foreach($result['sample'] as $key=>$condition){
+                     ?>
+                     {
+                     showInLegend: false,
+                     name:'<?php echo $this->translate('Samples');?>',
+                     data:[<?php
+                         foreach($condition as $count){
+                            echo '{y:'.$count.'},';
+                         }
+                     ?>],
+                     },
+                     <?php
+                     }
+                  }
+                   ?>],
+                   colors: ['#434348']
+           });
+     });
 </script>

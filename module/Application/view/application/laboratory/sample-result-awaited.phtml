@@ -172,7 +172,7 @@ if(isset($labFilter) && trim($labFilter)!= ''){
                         </div>
                     </form>
                     <hr style="background: #000 !important;border-color:#ccc;">
-                    <div class="row" style="margin-bottom:30px;">
+                    <div class="row">
                         <div class="col-lg-6">
                             <div id="provincebarcontainer" style="min-width: 310px; height: 400px; max-width: 100%; margin: 0 auto;padding:1.5%;"></div>
                         </div>
@@ -180,7 +180,17 @@ if(isset($labFilter) && trim($labFilter)!= ''){
                             <div id="facilitybarcontainer" style="min-width: 310px; height: 400px; max-width: 100%; margin: 0 auto;padding:1.5%;"></div>
                         </div>
                     </div>
-
+                    <br>
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div id="districtbarcontainer" style="min-width: 90%; height: 400px; max-width: 100%; margin: 0 auto;padding:1.5%;"></div>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-bottom:30px;">
+                        <div class="col-lg-12">
+                            <div id="clinicbarcontainer" style="min-width: 90%; height: 400px; max-width: 100%; margin: 0 auto;padding:1.5%;"></div>
+                        </div>
+                    </div>
                     <br>
                     <div class="row">
                         <div class="col-md-12">
@@ -262,45 +272,85 @@ if(isset($labFilter) && trim($labFilter)!= ''){
         });
     }
     
+    function generateDistrictBarContainer(srcVal,src){
+        $.blockUI.defaults.css.border = '1px solid grey';
+        $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
+        daterange = $('#daterange').val();
+        provinces = $("#provinces").val();
+        districts = $("#districts").val();
+        lab = $("#labName").val();
+        clinicId = $("#clinicId").val();
+        currentRegimen = $("#currentRegimen").val();
+        age = $("#age").val();
+        sampleType = $("#sampleType").val();
+        gender = $("#gender").val();
+        isPregnant = $('input[name="isPregnant"]:checked').val();
+        isBreastfeeding = $('input[name="isBreastfeeding"]:checked').val();
+        $.post("<?php echo $this->url('laboratory', array('action' => 'get-district-bar-sample-result-awaited-details')); ?>",{frmSource:'<?php echo $frmSource; ?>',daterange:daterange,provinces:provinces,districts:districts,lab:lab,clinicId:clinicId,currentRegimen:currentRegimen,age:age,sampleType:sampleType,gender:gender,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding,srcVal:srcVal,src:src},
+        function(data) {
+            $("#districtbarcontainer").html(data);
+        });
+    }
+    
+    function generateClinicBarContainer(srcVal,src){
+        $.blockUI.defaults.css.border = '1px solid grey';
+        $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
+        daterange = $('#daterange').val();
+        provinces = $("#provinces").val();
+        districts = $("#districts").val();
+        lab = $("#labName").val();
+        clinicId = $("#clinicId").val();
+        currentRegimen = $("#currentRegimen").val();
+        age = $("#age").val();
+        sampleType = $("#sampleType").val();
+        gender = $("#gender").val();
+        isPregnant = $('input[name="isPregnant"]:checked').val();
+        isBreastfeeding = $('input[name="isBreastfeeding"]:checked').val();
+        $.post("<?php echo $this->url('laboratory', array('action' => 'get-clinic-bar-sample-result-awaited-details')); ?>",{frmSource:'<?php echo $frmSource; ?>',daterange:daterange,provinces:provinces,districts:districts,lab:lab,clinicId:clinicId,currentRegimen:currentRegimen,age:age,sampleType:sampleType,gender:gender,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding,srcVal:srcVal,src:src},
+        function(data) {
+            $("#clinicbarcontainer").html(data);
+        });
+    }
+    
     function loadResultsAwaitedDataTable(){
         $.blockUI.defaults.css.border = '1px solid grey';
         $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
         oTable = $('#resultsAwaitedDataTable').dataTable({
-                "bAutoWidth": false,
-                "bProcessing": true,
-                "bServerSide": true,
-                "aoColumns": [
-                    {"sClass":"center"},
-                    {"sClass":"center"},
-                    {"sClass":"center"},
-                    {"sClass":"center"},
-                    {"sClass":"center"},
-                    {"sClass":"center"}
-                ],
-                "aaSorting": [[ 1, "desc" ]],
-                "sAjaxSource": "<?php echo $this->url('laboratory',array('action' => 'get-filter-sample-result-awaited-details')); ?>",
-                "fnServerData": function ( sSource, aoData, fnCallback ) {
-                    aoData.push({"name": "frmSource", "value": "<?php echo $frmSource; ?>"});
-                    aoData.push({"name": "daterange", "value": $('#daterange').val()});
-                    aoData.push({"name": "provinces", "value": $('#provinces').val()});
-                    aoData.push({"name": "districts", "value": $('#districts').val()});
-                    aoData.push({"name": "lab", "value": $('#labName').val()});
-                    aoData.push({"name": "clinicId", "value": $('#clinicId').val()});
-                    aoData.push({"name": "currentRegimen", "value": $('#currentRegimen').val()});
-                    aoData.push({"name": "age", "value": $('#age').val()});
-                    aoData.push({"name": "sampleType", "value": $('#sampleType').val()});
-                    aoData.push({"name": "gender", "value": $('#gender').val()});
-                    aoData.push({"name": "isPregnant", "value": $('input[name="isPregnant"]:checked').val()});
-                    aoData.push({"name": "isBreastfeeding", "value": $('input[name="isBreastfeeding"]:checked').val()});
-                    $.ajax({
-                        "dataType": 'json',
-                        "type": "POST",
-                        "url": sSource,
-                        "data": aoData,
-                        "success": fnCallback
-                    });
-                }
-            } );
+            "bAutoWidth": false,
+            "bProcessing": true,
+            "bServerSide": true,
+            "aoColumns": [
+                {"sClass":"center"},
+                {"sClass":"center"},
+                {"sClass":"center"},
+                {"sClass":"center"},
+                {"sClass":"center"},
+                {"sClass":"center"}
+            ],
+            "aaSorting": [[ 1, "desc" ]],
+            "sAjaxSource": "<?php echo $this->url('laboratory',array('action' => 'get-filter-sample-result-awaited-details')); ?>",
+            "fnServerData": function ( sSource, aoData, fnCallback ) {
+                aoData.push({"name": "frmSource", "value": "<?php echo $frmSource; ?>"});
+                aoData.push({"name": "daterange", "value": $('#daterange').val()});
+                aoData.push({"name": "provinces", "value": $('#provinces').val()});
+                aoData.push({"name": "districts", "value": $('#districts').val()});
+                aoData.push({"name": "lab", "value": $('#labName').val()});
+                aoData.push({"name": "clinicId", "value": $('#clinicId').val()});
+                aoData.push({"name": "currentRegimen", "value": $('#currentRegimen').val()});
+                aoData.push({"name": "age", "value": $('#age').val()});
+                aoData.push({"name": "sampleType", "value": $('#sampleType').val()});
+                aoData.push({"name": "gender", "value": $('#gender').val()});
+                aoData.push({"name": "isPregnant", "value": $('input[name="isPregnant"]:checked').val()});
+                aoData.push({"name": "isBreastfeeding", "value": $('input[name="isBreastfeeding"]:checked').val()});
+                $.ajax({
+                    "dataType": 'json',
+                    "type": "POST",
+                    "url": sSource,
+                    "data": aoData,
+                    "success": fnCallback
+                });
+            }
+        } );
     }
     
     $(function() {
@@ -350,12 +400,16 @@ if(isset($labFilter) && trim($labFilter)!= ''){
         $('input[name="daterange"]').val('');
         generateProvinceBarContainer();
         generateFacilityBarContainer();
+        generateDistrictBarContainer('','load');
+        generateClinicBarContainer('','load');
         loadResultsAwaitedDataTable();
     });
 
     function searchResultsAwaitedSample(){
         generateProvinceBarContainer();
         generateFacilityBarContainer();
+        generateDistrictBarContainer('','search');
+        generateClinicBarContainer('','search');
         oTable.fnDraw();
     }
     

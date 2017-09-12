@@ -1017,6 +1017,16 @@ class SampleService {
         return $sampleDb->fetchProvinceBarSampleResultAwaitedDetails($params);
     }
     
+    public function getDistrictBarSampleResultAwaitedDetails($params){
+        $sampleDb = $this->sm->get('SampleTable');
+        return $sampleDb->fetchDistrictBarSampleResultAwaitedDetails($params);
+    }
+    
+    public function getClinicBarSampleResultAwaitedDetails($params){
+        $sampleDb = $this->sm->get('SampleTable');
+        return $sampleDb->fetchClinicBarSampleResultAwaitedDetails($params);
+    }
+    
     public function getFacilityBarSampleResultAwaitedDetails($params){
         $sampleDb = $this->sm->get('SampleTable');
         return $sampleDb->fetchFacilityBarSampleResultAwaitedDetails($params);

@@ -1,20 +1,27 @@
 <script>
        $(function () {
-              $('#provincebarcontainer').highcharts({
+              $('#districtbarcontainer').highcharts({
               chart: {
                    type: 'column'
               },
               title: {
-                   text: '<?php echo $this->translate('Results Awaited (Province-wise)'); ?>'
+                   text: '<?php echo $this->translate('Results Awaited (District-wise)'); ?>'
+              },
+              exporting:{
+                     sourceWidth: 1200,
+                     sourceHeight: 400,
+                     chartOptions:{
+                         subtitle:null
+                     }
               },
               credits: {
                      enabled: false
               },
                xAxis: {
                    categories: [<?php
-                   if(isset($result['province']) && count($result['province'])>0){
-                     foreach($result['province'] as $province){
-                         echo "'".$province."',";
+                   if(isset($result['district']) && count($result['district'])>0){
+                     foreach($result['district'] as $district){
+                         echo "'".$district."',";
                      }
                    }
                    ?>]
@@ -51,8 +58,7 @@
                                           this.series.data[i].update({ color: '#7cb5ec' }, true, false);
                                       }
                                       this.update({ color: '#f1948a' }, true, false)
-                                      generateDistrictBarContainer(e.point.category,'province');
-                                      generateClinicBarContainer(e.point.category,'','province');
+                                      generateClinicBarContainer(e.point.category,'district');
                                    }
                                 } 
                             }

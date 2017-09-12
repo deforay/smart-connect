@@ -229,75 +229,72 @@ class FacilityTable extends AbstractTableGateway {
         return $output;
     }
 	
-	public function fetchFacility($facilityId)
-	{
+    public function fetchFacility($facilityId){
 	$dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->from(array('f'=>'facility_details'))->where(array('facility_id'=>$facilityId));
         $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
         return $rResult;
-	}
-	public function updateFacility($params){
+    }
+	
+    public function updateFacility($params){
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $locationDb = new LocationDetailsTable($dbAdapter);
         if(trim($params['facilityName']!='')){
             $facilityData=array('facility_name'=>$params['facilityName'],
-                        'facility_code'=>$params['facilityCode'],
-                        'vlsm_instance_id'=>'mozambiquedisaopenldr',
-                        'other_id'=>$params['otherId'],
-                        'facility_emails'=>$params['email'],
-                        'report_email'=>$params['reportEmail'],
-                        'contact_person'=>$params['contactPerson'],
-                        'facility_mobile_numbers'=>$params['phoneNo'],
-			'facility_state'=>$params['state'],
-                        'facility_district'=>$params['district'],
-                        'address'=>$params['address'],
-                        'country'=>$params['country'],
-                        'facility_hub_name'=>$params['hubName'],
-                        'latitude'=>$params['latitude'],
-                        'longitude'=>$params['longitude'],
-                        'facility_type'=>$params['facilityType'],
-                        'status'=>$params['status'],
-                    );
-			if(isset($params['provinceNew']) && trim($params['provinceNew'])!='')
-			{
-				$sQuery = $sql->select()->from(array('l'=>'location_details'))
-							->where(array('l.location_name'=>trim($params['provinceNew'])));
-				$sQuery = $sql->getSqlStringForSqlObject($sQuery);
-				$sQueryResult = $dbAdapter->query($sQuery, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-				if($sQueryResult){
-					$facilityData['facility_state'] = $sQueryResult['location_id'];
-				}else{
-					$locationDb->insert(array('parent_location'=>0,'location_name'=>trim($params['provinceNew'])));
-					$facilityData['facility_state'] = $locationDb->lastInsertValue;
-				}
-			}
-			if(isset($params['districtNew']) && trim($params['districtNew'])!='')
-			{
-				$sQuery = $sql->select()->from(array('l'=>'location_details'))
-							->where(array('l.location_name'=>trim($params['districtNew']),'l.parent_location'=>$facilityData['facility_state']));
-				$sQuery = $sql->getSqlStringForSqlObject($sQuery);
-				$sQueryResult = $dbAdapter->query($sQuery, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-				if($sQueryResult){
-					$facilityData['facility_district'] = $sQueryResult['location_id'];
-				}else{
-					$locationDb->insert(array('parent_location'=>$facilityData['facility_state'],'location_name'=>trim($params['districtNew'])));
-					$facilityData['facility_district'] = $locationDb->lastInsertValue;
-				}
-			}
-			
+		'facility_code'=>$params['facilityCode'],
+		'vlsm_instance_id'=>'mozambiquedisaopenldr',
+		'other_id'=>$params['otherId'],
+		'facility_emails'=>$params['email'],
+		'report_email'=>$params['reportEmail'],
+		'contact_person'=>$params['contactPerson'],
+		'facility_mobile_numbers'=>$params['phoneNo'],
+		'facility_state'=>$params['state'],
+		'facility_district'=>$params['district'],
+		'address'=>$params['address'],
+		'country'=>$params['country'],
+		'facility_hub_name'=>$params['hubName'],
+		'latitude'=>$params['latitude'],
+		'longitude'=>$params['longitude'],
+		'facility_type'=>$params['facilityType'],
+		'status'=>$params['status'],
+	    );
+	    if(isset($params['provinceNew']) && trim($params['provinceNew'])!=''){
+		    $sQuery = $sql->select()->from(array('l'=>'location_details'))
+					    ->where(array('l.location_name'=>trim($params['provinceNew'])));
+		    $sQuery = $sql->getSqlStringForSqlObject($sQuery);
+		    $sQueryResult = $dbAdapter->query($sQuery, $dbAdapter::QUERY_MODE_EXECUTE)->current();
+		    if($sQueryResult){
+			    $facilityData['facility_state'] = $sQueryResult['location_id'];
+		    }else{
+			    $locationDb->insert(array('parent_location'=>0,'location_name'=>trim($params['provinceNew'])));
+			    $facilityData['facility_state'] = $locationDb->lastInsertValue;
+		    }
+	    }
+	    if(isset($params['districtNew']) && trim($params['districtNew'])!=''){
+		    $sQuery = $sql->select()->from(array('l'=>'location_details'))
+					    ->where(array('l.location_name'=>trim($params['districtNew']),'l.parent_location'=>$facilityData['facility_state']));
+		    $sQuery = $sql->getSqlStringForSqlObject($sQuery);
+		    $sQueryResult = $dbAdapter->query($sQuery, $dbAdapter::QUERY_MODE_EXECUTE)->current();
+		    if($sQueryResult){
+			    $facilityData['facility_district'] = $sQueryResult['location_id'];
+		    }else{
+			    $locationDb->insert(array('parent_location'=>$facilityData['facility_state'],'location_name'=>trim($params['districtNew'])));
+			    $facilityData['facility_district'] = $locationDb->lastInsertValue;
+		    }
+	    }
             $this->update($facilityData,array('facility_id'=>base64_decode($params['facilityId'])));
             $facilityId = base64_decode($params['facilityId']);
-            if (isset($param['existLogo']) && trim($param['existLogo']) == '') {
+            if(isset($param['existLogo']) && trim($param['existLogo']) == '') {
                 if (file_exists(UPLOAD_PATH . DIRECTORY_SEPARATOR . "facility" . DIRECTORY_SEPARATOR . $facilityId . DIRECTORY_SEPARATOR . $params['removedLogo'])) {
                     unlink(UPLOAD_PATH . DIRECTORY_SEPARATOR . "facility" . DIRECTORY_SEPARATOR . $facilityId . DIRECTORY_SEPARATOR . $params['removedLogo']);
                     $imageData = array('facility_logo' => '');
                     $result = $this->update($imageData, array("facility_id" => $facilityId));
                 }
             }
-            if (isset($_FILES['logo']['name']) && $_FILES['logo']['name'] != '') {
+            if(isset($_FILES['logo']['name']) && $_FILES['logo']['name'] != '') {
                 if (!file_exists(UPLOAD_PATH . DIRECTORY_SEPARATOR . "facility") && !is_dir(UPLOAD_PATH . DIRECTORY_SEPARATOR . "facility")) {
                     mkdir(UPLOAD_PATH . DIRECTORY_SEPARATOR . "facility");
                 }
@@ -608,5 +605,21 @@ class FacilityTable extends AbstractTableGateway {
         //echo $clinicQueryStr;die;
         $locationInfo['clinics'] = $dbAdapter->query($clinicQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
       return $locationInfo;
+    }
+    
+    public function fatchLocationInfoByName($name){
+	$dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $locationQuery = $sql->select()->from(array('l_d'=>'location_details'))->where(array('l_d.location_name'=>$name));
+        $locationQueryStr = $sql->getSqlStringForSqlObject($locationQuery);
+      return $dbAdapter->query($locationQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
+    }
+    
+    public function fatchFacilityInfoByName($name){
+	$dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $facilityQuery = $sql->select()->from(array('f'=>'facility_details'))->where(array('f.facility_name'=>$name));
+        $facilityQueryStr = $sql->getSqlStringForSqlObject($facilityQuery);
+      return $dbAdapter->query($facilityQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
     }
 }
