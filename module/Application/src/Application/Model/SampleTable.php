@@ -2671,7 +2671,7 @@ class SampleTable extends AbstractTableGateway {
         $pQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
                       ->columns(array())
                       ->join(array('f'=>'facility_details'),'f.facility_id=vl.facility_id',array())
-                      ->join(array('l_d'=>'location_details'),'l_d.location_id=f.facility_state',array('location_id','location_name'))
+                      ->join(array('l_d'=>'location_details'),'l_d.location_id=f.facility_state',array('location_id','location_name'),'left')
                       ->where('vl.facility_id !=0')
                       ->group('f.facility_state');
         if(isset($params['provinces']) && is_array($params['provinces']) && count($params['provinces']) >0){
@@ -2752,7 +2752,7 @@ class SampleTable extends AbstractTableGateway {
                 }
                 $countQueryStr = $sql->getSqlStringForSqlObject($countQuery);
                 $countResult  = $dbAdapter->query($countQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-                $result['province'][$p] = $province['location_name'];
+                $result['province'][$p] = ($province['location_name']!= null && $province['location_name']!= '')?$province['location_name']:'Not Specified';
                 $result['sample']['Results Awaited'][$p] = (isset($countResult->total))?$countResult->total:0;
               $p++;
             }
@@ -2774,13 +2774,17 @@ class SampleTable extends AbstractTableGateway {
         $dQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
                       ->columns(array())
                       ->join(array('f'=>'facility_details'),'f.facility_id=vl.facility_id',array())
-                      ->join(array('f_p_l_d'=>'location_details'),'f_p_l_d.location_id=f.facility_state',array())
-                      ->join(array('f_d_l_d'=>'location_details'),'f_d_l_d.location_id=f.facility_district',array('location_id','location_name'))
+                      ->join(array('f_p_l_d'=>'location_details'),'f_p_l_d.location_id=f.facility_state',array(),'left')
+                      ->join(array('f_d_l_d'=>'location_details'),'f_d_l_d.location_id=f.facility_district',array('location_id','location_name'),'left')
                       ->where('vl.facility_id !=0')
                       ->group('f.facility_district');
         if(isset($params['srcVal']) && trim($params['srcVal'])!= '' && $params['src'] == 'province'){
-            $locationInfo = $facilityDb->fatchLocationInfoByName($params['srcVal']);
-            $dQuery = $dQuery->where(array('f.facility_state'=>$locationInfo->location_id));
+            if($params['srcVal'] == 'Not Specified'){
+                $dQuery = $dQuery->where('f.facility_state IS NULL OR f.facility_state = ""');
+            }else{
+                $locationInfo = $facilityDb->fatchLocationInfoByName($params['srcVal']);
+                $dQuery = $dQuery->where(array('f.facility_state'=>$locationInfo->location_id));
+            }
         }else if(isset($params['provinces']) && is_array($params['provinces']) && count($params['provinces']) >0){
             $dQuery = $dQuery->where('f.facility_state IN ("' . implode('", "', $params['provinces']) . '")');
         }
@@ -2878,7 +2882,7 @@ class SampleTable extends AbstractTableGateway {
                 }
                 $countQueryStr = $sql->getSqlStringForSqlObject($countQuery);
                 $countResult  = $dbAdapter->query($countQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-                $result['district'][$d] = $district['location_name'];
+                $result['district'][$d] = ($district['location_name']!= null && $district['location_name']!= '')?$district['location_name']:'Not Specified';
                 $result['sample']['Results Awaited'][$d] = (isset($countResult->total))?$countResult->total:0;
               $d++;
             }
@@ -2900,19 +2904,27 @@ class SampleTable extends AbstractTableGateway {
         $clinicQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
                       ->columns(array())
                       ->join(array('f'=>'facility_details'),'f.facility_id=vl.facility_id',array('facility_id','facility_name'))
-                      ->join(array('f_p_l_d'=>'location_details'),'f_p_l_d.location_id=f.facility_state',array())
-                      ->join(array('f_d_l_d'=>'location_details'),'f_d_l_d.location_id=f.facility_district',array())
+                      ->join(array('f_p_l_d'=>'location_details'),'f_p_l_d.location_id=f.facility_state',array(),'left')
+                      ->join(array('f_d_l_d'=>'location_details'),'f_d_l_d.location_id=f.facility_district',array(),'left')
                       ->where('vl.facility_id !=0')
                       ->group('vl.facility_id');
         if(isset($params['srcVal']) && trim($params['srcVal'])!= '' && $params['src'] == 'province'){
-            $locationInfo = $facilityDb->fatchLocationInfoByName($params['srcVal']);
-            $clinicQuery = $clinicQuery->where(array('f.facility_state'=>$locationInfo->location_id));
+            if($params['srcVal'] == 'Not Specified'){
+                $clinicQuery = $clinicQuery->where('f.facility_state IS NULL OR f.facility_state = ""');
+            }else{
+                $locationInfo = $facilityDb->fatchLocationInfoByName($params['srcVal']);
+                $clinicQuery = $clinicQuery->where(array('f.facility_state'=>$locationInfo->location_id));
+            }
         }else if(isset($params['provinces']) && is_array($params['provinces']) && count($params['provinces']) >0){
             $clinicQuery = $clinicQuery->where('f.facility_state IN ("' . implode('", "', $params['provinces']) . '")');
         }
         if(isset($params['srcVal']) && trim($params['srcVal'])!= '' && $params['src'] == 'district'){
-            $locationInfo = $facilityDb->fatchLocationInfoByName($params['srcVal']);
-            $clinicQuery = $clinicQuery->where(array('f.facility_district'=>$locationInfo->location_id));
+            if($params['srcVal'] == 'Not Specified'){
+                $clinicQuery = $clinicQuery->where('f.facility_district IS NULL OR f.facility_district = ""');
+            }else{
+               $locationInfo = $facilityDb->fatchLocationInfoByName($params['srcVal']);
+               $clinicQuery = $clinicQuery->where(array('f.facility_district'=>$locationInfo->location_id));
+            }
         }else if(isset($params['districts']) && is_array($params['districts']) && count($params['districts']) >0){
             $clinicQuery = $clinicQuery->where('f.facility_district IN ("' . implode('", "', $params['districts']) . '")');
         }

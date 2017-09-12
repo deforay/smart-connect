@@ -21,7 +21,7 @@
                    categories: [<?php
                    if(isset($result['district']) && count($result['district'])>0){
                      foreach($result['district'] as $district){
-                         echo "'".$district."',";
+                         echo "'".$this->translate($district)."',";
                      }
                    }
                    ?>]
