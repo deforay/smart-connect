@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: ZendSkeletonApplication\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-08-26 00:21+0530\n"
-"PO-Revision-Date: 2017-09-05 12:02+0530\n"
+"PO-Revision-Date: 2017-09-12 12:37+0530\n"
 "Last-Translator: Diogo Melo <dmelo87@gmail.com>\n"
 "Language-Team: ZF Contibutors <zf-devteam@zend.com>\n"
 "Language: pt\n"
@@ -1663,11 +1663,17 @@ msgstr "Resultados pendentes (Por Laboratorio de CV)"
 msgid "Sample Recieved at Lab"
 msgstr "Amostras recebidas por Laboratorio"
 
+msgid "Overall Viral Load Status based on Gender"
+msgstr "Overall Viral Load Status based on Gender"
+
 msgid "Sorry..Location not available"
 msgstr "Sorry..Location not available"
 
-msgid "Overall Viral Load Status based on Gender"
-msgstr "Status total de Carga Viral por Género"
+msgid "Results Awaited (District-wise)"
+msgstr "Results Awaited (District-wise)"
+
+msgid "Results Awaited (Health Center-wise)"
+msgstr "Results Awaited (Health Center-wise)"
 
 #~ msgid "Hubs Dashboard"
 #~ msgstr "Hubs Dashboard"
