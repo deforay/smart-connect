@@ -990,16 +990,14 @@ foreach($sampleType as $samples){
       window.open('/labs/samples-tested?month='+month+'&age='+age+'&lab='+selectedLabs, '_blank');
     }
     
-    function doSampleTestedBasedonPregnantPatientRedirect(month,resultLabel){
+    function doSampleTestedBasedonPregnantPatientRedirect(month){
       selectedLabs = ($("#labName").val() == null)?'':$("#labName").val();
-      resultVal = (resultLabel == 'VL (>= 1000 cp/ml)')?'Not Suppressed':'Suppressed';
-      window.open('/labs/samples-tested?month='+month+'&gender=F&femaleFilter=P&result='+resultVal+'&lab='+selectedLabs, '_blank');
+      window.open('/labs/samples-tested?month='+month+'&gender=F&femaleFilter=P&lab='+selectedLabs, '_blank');
     }
     
-    function doSampleTestedBasedonBreastFeedingPatientRedirect(month,resultLabel){
+    function doSampleTestedBasedonBreastfeedingPatientRedirect(month){
       selectedLabs = ($("#labName").val() == null)?'':$("#labName").val();
-      resultVal = (resultLabel == 'VL (>= 1000 cp/ml)')?'Not Suppressed':'Suppressed';
-      window.open('/labs/samples-tested?month='+month+'&gender=F&femaleFilter=BF&result='+resultVal+'&lab='+selectedLabs, '_blank');  
+      window.open('/labs/samples-tested?month='+month+'&gender=F&femaleFilter=BF&lab='+selectedLabs, '_blank');  
     }
     
     function doLabTATRedirect(month){
