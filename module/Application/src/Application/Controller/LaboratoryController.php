@@ -760,5 +760,32 @@ class LaboratoryController extends AbstractActionController{
             return $viewModel;
         }
     }
+    
+    public function getSampleTestResultPregnantAction() {
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $sampleService = $this->getServiceLocator()->get('SampleService');
+            $params['gender'] = 'yes';
+            $result = $sampleService->getSampleTestedResultPregnantPatientDetails($params);
+            $viewModel = new ViewModel();
+            $viewModel->setVariables(array('result' => $result))
+                        ->setTerminal(true);
+            return $viewModel;
+        }
+    }
+    
+    public function getSampleTestResultBreastFeedingAction() {
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $sampleService = $this->getServiceLocator()->get('SampleService');
+            $params['gender'] = 'yes';
+            $result = $sampleService->getSampleTestedResultBreastFeedingPatientDetails($params);
+            $viewModel = new ViewModel();
+            $viewModel->setVariables(array('result' => $result))
+                        ->setTerminal(true);
+            return $viewModel;
+        }
+    }
 }
-

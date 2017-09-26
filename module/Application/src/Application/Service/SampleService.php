@@ -1145,4 +1145,14 @@ class SampleService {
             return "";
         }
     }
+    
+    public function getSampleTestedResultPregnantPatientDetails($params){
+        $sampleDb = $this->sm->get('SampleTable');
+        return $sampleDb->fetchSampleTestedResultPregnantPatientDetails($params);
+    }
+    
+    public function getSampleTestedResultBreastFeedingPatientDetails($params){
+        $sampleDb = $this->sm->get('SampleTable');
+        return $sampleDb->fetchSampleTestedResultBreastFeedingPatientDetails($params);
+    }
 }

@@ -246,7 +246,7 @@ foreach($sampleType as $samples){
                         <div class="col-md-6 col-sm-6">
                             <div class="portlet box blue">
                                 <div class="portlet-title">
-                                    <div class="caption ">
+                                    <div class="caption">
                                         <span class="caption-subject"><?php echo $this->translate('Samples Tested per Lab'); ?></span>
                                     </div>
                                     <div class="actions">
@@ -268,7 +268,7 @@ foreach($sampleType as $samples){
                         <div class="col-md-6 col-sm-6">
                             <div class="portlet box blue">
                                 <div class="portlet-title">
-                                    <div class="caption ">
+                                    <div class="caption">
                                         <span class="caption-subject"><?php echo $this->translate('Samples Tested based on Gender'); ?> </span>
                                     </div>
                                     <div class="actions">
@@ -289,7 +289,7 @@ foreach($sampleType as $samples){
                         <div class="col-md-6 col-sm-6">
                             <div class="portlet box blue">
                                 <div class="portlet-title">
-                                    <div class="caption ">
+                                    <div class="caption">
                                         <span class="caption-subject"><?php echo $this->translate('Samples Tested based on Age'); ?></span>
                                     </div>
                                     <div class="actions">
@@ -306,6 +306,28 @@ foreach($sampleType as $samples){
                                 <!--</div>-->
                             </div>
                         </div>                        
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 col-sm-6">
+                            <div class="portlet box blue">
+                                <div class="portlet-title">
+                                    <div class="caption">
+                                        <span class="caption-subject"><?php echo $this->translate('Samples Tested based on Female Patient (Pregnant)'); ?></span>
+                                    </div>
+                                </div>
+                                <div id="samplesTestedResultPregnantPatient"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6">
+                            <div class="portlet box blue">
+                                <div class="portlet-title">
+                                    <div class="caption">
+                                        <span class="caption-subject"><?php echo $this->translate('Samples Tested based on Female Patient (Breast Feeding)'); ?></span>
+                                    </div>
+                                </div>
+                                <div id="samplesTestedResultBreastFeedingPatient"></div>
+                            </div>
+                        </div>
                     </div>
                     <div class="row">
                         <div class="col-md-4 col-sm-4">
@@ -398,7 +420,7 @@ foreach($sampleType as $samples){
                         <div class="col-md-12 col-sm-12">
                             <div class="portlet box blue">
                                 <div class="portlet-title">
-                                    <div class="caption ">
+                                    <div class="caption">
                                         <span class="caption-subject"><?php echo $this->translate('All Facilities - Geolocation'); ?></span>
                                     </div>
                                     
@@ -475,6 +497,26 @@ foreach($sampleType as $samples){
         $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-test-result-age')); ?>",{fromDate:fromDate,toDate:toDate,facilityId:facilityId},
         function(data) {
             $("#samplesTestedResultAge").html(data);
+        });
+    }
+    
+    function getTestedSampleResultBasedonPregnantPatient(){
+        facilityId = $("#labName").val();
+        fromDate=$('#mrp-lowerDate').val();
+        toDate=$('#mrp-upperDate').val();
+        $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-test-result-pregnant')); ?>",{fromDate:fromDate,toDate:toDate,facilityId:facilityId},
+        function(data) {
+            $("#samplesTestedResultPregnantPatient").html(data);
+        });
+    }
+    
+    function getTestedSampleResultBasedonBreastFeedingPatient(){
+        facilityId = $("#labName").val();
+        fromDate=$('#mrp-lowerDate').val();
+        toDate=$('#mrp-upperDate').val();
+        $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-test-result-breast-feeding')); ?>",{fromDate:fromDate,toDate:toDate,facilityId:facilityId},
+        function(data) {
+            $("#samplesTestedResultBreastFeedingPatient").html(data);
         });
     }
     
@@ -601,6 +643,8 @@ foreach($sampleType as $samples){
         getTestedSampleResultBasedLab();
         getTestedSampleResultBasedGender();
         getTestedSampleResultBasedAge();
+        getTestedSampleResultBasedonPregnantPatient();
+        getTestedSampleResultBasedonBreastFeedingPatient();
         femalePatient();
         lineOfTreatment();
         vlOutComePiechart();
@@ -944,6 +988,18 @@ foreach($sampleType as $samples){
     function doSampleTestedBasedonAgeRedirect(month,age){
       selectedLabs = ($("#labName").val() == null)?'':$("#labName").val();
       window.open('/labs/samples-tested?month='+month+'&age='+age+'&lab='+selectedLabs, '_blank');
+    }
+    
+    function doSampleTestedBasedonPregnantPatientRedirect(month,resultLabel){
+      selectedLabs = ($("#labName").val() == null)?'':$("#labName").val();
+      resultVal = (resultLabel == 'VL (>= 1000 cp/ml)')?'Not Suppressed':'Suppressed';
+      window.open('/labs/samples-tested?month='+month+'&gender=F&femaleFilter=P&result='+resultVal+'&lab='+selectedLabs, '_blank');
+    }
+    
+    function doSampleTestedBasedonBreastFeedingPatientRedirect(month,resultLabel){
+      selectedLabs = ($("#labName").val() == null)?'':$("#labName").val();
+      resultVal = (resultLabel == 'VL (>= 1000 cp/ml)')?'Not Suppressed':'Suppressed';
+      window.open('/labs/samples-tested?month='+month+'&gender=F&femaleFilter=BF&result='+resultVal+'&lab='+selectedLabs, '_blank');  
     }
     
     function doLabTATRedirect(month){

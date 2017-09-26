@@ -3342,4 +3342,114 @@ class SampleTable extends AbstractTableGateway {
         }
        return $output;
     }
+    
+    public function fetchSampleTestedResultPregnantPatientDetails($params){
+        $logincontainer = new Container('credo');
+        $result = array();
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $common = new CommonService($this->sm);
+        if(trim($params['fromDate'])!= '' && trim($params['toDate'])!= ''){
+            $startMonth = date("Y-m", strtotime(trim($params['fromDate'])))."-01";
+            $endMonth = date("Y-m", strtotime(trim($params['toDate'])))."-31";
+            $j = 0;
+            $lessTotal = 0;
+            $greaterTotal = 0;
+            $notTargetTotal = 0;
+            $queryStr = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
+                                    ->columns(array(
+                                                    "monthDate" => new Expression("DATE_FORMAT(DATE(sample_collection_date), '%b-%Y')"),
+                                                    
+                                                    "greaterThan1000" => new Expression("SUM(CASE WHEN (vl.is_patient_pregnant in('yes','Yes','YES') and vl.result>=1000) THEN 1 ELSE 0 END)"),
+                                                    "lesserThan1000" => new Expression("SUM(CASE WHEN (vl.is_patient_pregnant in('yes','Yes','YES') and (vl.result<1000 or vl.result='Target Not Detected')) THEN 1 ELSE 0 END)")
+                                              )
+                                            );
+            if(isset($params['facilityId']) && is_array($params['facilityId']) && count($params['facilityId']) >0){
+                $queryStr = $queryStr->where('vl.lab_id IN ("' . implode('", "', $params['facilityId']) . '")'); 
+            }else{
+                if($logincontainer->role!= 1){
+                    $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:array();
+                    $queryStr = $queryStr->where('vl.lab_id IN ("' . implode('", "', array_values(array_filter($mappedFacilities))) . '")');
+                }
+            }
+            $queryStr = $queryStr->where("
+                        (vl.sample_collection_date is not null AND vl.sample_collection_date != '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')
+                        AND DATE(sample_collection_date) >= '".$startMonth."'
+                        AND DATE(sample_collection_date) <= '".$endMonth."' ");
+                
+            $queryStr = $queryStr->group(array(new Expression('MONTH(sample_collection_date)')));   
+            $queryStr = $queryStr->order(array(new Expression('DATE(sample_collection_date)')));               
+            $queryStr = $sql->getSqlStringForSqlObject($queryStr);
+            //echo $queryStr;die;
+            //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+            //echo $queryStr;die;
+            $sampleResult = $common->cacheQuery($queryStr,$dbAdapter);
+            $j=0;
+            foreach($sampleResult as $sRow){
+                if($sRow["monthDate"] == null) continue;
+                $result['sampleName']['VL (>= 1000 cp/ml)'][$j] = (isset($sRow["greaterThan1000"]))?$sRow["greaterThan1000"]:0;
+                $result['sampleName']['VL (< 1000 cp/ml)'][$j] = (isset($sRow["lesserThan1000"]))?$sRow["lesserThan1000"]:0;
+                
+                $result['date'][$j] = $sRow["monthDate"];
+                $j++;
+            }
+            
+        }
+      return $result;
+    }
+    
+    public function fetchSampleTestedResultBreastFeedingPatientDetails($params){
+        $logincontainer = new Container('credo');
+        $result = array();
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $common = new CommonService($this->sm);
+        if(trim($params['fromDate'])!= '' && trim($params['toDate'])!= ''){
+            $startMonth = date("Y-m", strtotime(trim($params['fromDate'])))."-01";
+            $endMonth = date("Y-m", strtotime(trim($params['toDate'])))."-31";
+            $j = 0;
+            $lessTotal = 0;
+            $greaterTotal = 0;
+            $notTargetTotal = 0;
+            $queryStr = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
+                                    ->columns(array(
+                                                    "monthDate" => new Expression("DATE_FORMAT(DATE(sample_collection_date), '%b-%Y')"),
+                                                    
+                                                    "greaterThan1000" => new Expression("SUM(CASE WHEN (vl.is_patient_breastfeeding in('yes','Yes','YES') and vl.result>=1000) THEN 1 ELSE 0 END)"),
+                                                    "lesserThan1000" => new Expression("SUM(CASE WHEN (vl.is_patient_breastfeeding in('yes','Yes','YES') and (vl.result<1000 or vl.result='Target Not Detected')) THEN 1 ELSE 0 END)")
+                                              )
+                                            );
+            if(isset($params['facilityId']) && is_array($params['facilityId']) && count($params['facilityId']) >0){
+                $queryStr = $queryStr->where('vl.lab_id IN ("' . implode('", "', $params['facilityId']) . '")'); 
+            }else{
+                if($logincontainer->role!= 1){
+                    $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:array();
+                    $queryStr = $queryStr->where('vl.lab_id IN ("' . implode('", "', array_values(array_filter($mappedFacilities))) . '")');
+                }
+            }
+            $queryStr = $queryStr->where("
+                        (vl.sample_collection_date is not null AND vl.sample_collection_date != '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')
+                        AND DATE(sample_collection_date) >= '".$startMonth."'
+                        AND DATE(sample_collection_date) <= '".$endMonth."' ");
+                
+            $queryStr = $queryStr->group(array(new Expression('MONTH(sample_collection_date)')));   
+            $queryStr = $queryStr->order(array(new Expression('DATE(sample_collection_date)')));               
+            $queryStr = $sql->getSqlStringForSqlObject($queryStr);
+            //echo $queryStr;die;
+            //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+            //echo $queryStr;die;
+            $sampleResult = $common->cacheQuery($queryStr,$dbAdapter);
+            $j=0;
+            foreach($sampleResult as $sRow){
+                if($sRow["monthDate"] == null) continue;
+                $result['sampleName']['VL (>= 1000 cp/ml)'][$j] = (isset($sRow["greaterThan1000"]))?$sRow["greaterThan1000"]:0;
+                $result['sampleName']['VL (< 1000 cp/ml)'][$j] = (isset($sRow["lesserThan1000"]))?$sRow["lesserThan1000"]:0;
+                
+                $result['date'][$j] = $sRow["monthDate"];
+                $j++;
+            }
+            
+        }
+      return $result;
+    }
 }

@@ -193,7 +193,7 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
                                         <?php
                                         foreach($sampleType as $samples){
                                         ?>
-                                        <option value="<?php echo base64_encode($samples['sample_id']);?>"><?php echo $samples['sample_name'];?></option>
+                                          <option value="<?php echo base64_encode($samples['sample_id']);?>"><?php echo $samples['sample_name'];?></option>
                                         <?php
                                         }
                                         ?>
@@ -298,7 +298,6 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
                             <!-- END EXAMPLE TABLE PORTLET-->
                         </div>
                     </div>
-
 <script>
     function generatePieContainer(){
         $.blockUI.defaults.css.border = '1px solid grey';
