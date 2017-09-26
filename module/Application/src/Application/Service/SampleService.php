@@ -1151,8 +1151,8 @@ class SampleService {
         return $sampleDb->fetchSampleTestedResultPregnantPatientDetails($params);
     }
     
-    public function getSampleTestedResultBreastFeedingPatientDetails($params){
+    public function getSampleTestedResultBreastfeedingPatientDetails($params){
         $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->fetchSampleTestedResultBreastFeedingPatientDetails($params);
+        return $sampleDb->fetchSampleTestedResultBreastfeedingPatientDetails($params);
     }
 }

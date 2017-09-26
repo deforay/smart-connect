@@ -312,7 +312,7 @@ foreach($sampleType as $samples){
                             <div class="portlet box blue">
                                 <div class="portlet-title">
                                     <div class="caption">
-                                        <span class="caption-subject"><?php echo $this->translate('Samples Tested based on Female Patient (Pregnant)'); ?></span>
+                                        <span class="caption-subject"><?php echo $this->translate('Samples Tested - Pregnant'); ?></span>
                                     </div>
                                 </div>
                                 <div id="samplesTestedResultPregnantPatient"></div>
@@ -322,10 +322,10 @@ foreach($sampleType as $samples){
                             <div class="portlet box blue">
                                 <div class="portlet-title">
                                     <div class="caption">
-                                        <span class="caption-subject"><?php echo $this->translate('Samples Tested based on Female Patient (Breast Feeding)'); ?></span>
+                                        <span class="caption-subject"><?php echo $this->translate('Samples Tested - Breastfeeding'); ?></span>
                                     </div>
                                 </div>
-                                <div id="samplesTestedResultBreastFeedingPatient"></div>
+                                <div id="samplesTestedResultBreastfeedingPatient"></div>
                             </div>
                         </div>
                     </div>
@@ -510,13 +510,13 @@ foreach($sampleType as $samples){
         });
     }
     
-    function getTestedSampleResultBasedonBreastFeedingPatient(){
+    function getTestedSampleResultBasedonBreastfeedingPatient(){
         facilityId = $("#labName").val();
         fromDate=$('#mrp-lowerDate').val();
         toDate=$('#mrp-upperDate').val();
-        $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-test-result-breast-feeding')); ?>",{fromDate:fromDate,toDate:toDate,facilityId:facilityId},
+        $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-test-result-breastfeeding')); ?>",{fromDate:fromDate,toDate:toDate,facilityId:facilityId},
         function(data) {
-            $("#samplesTestedResultBreastFeedingPatient").html(data);
+            $("#samplesTestedResultBreastfeedingPatient").html(data);
         });
     }
     
@@ -644,7 +644,7 @@ foreach($sampleType as $samples){
         getTestedSampleResultBasedGender();
         getTestedSampleResultBasedAge();
         getTestedSampleResultBasedonPregnantPatient();
-        getTestedSampleResultBasedonBreastFeedingPatient();
+        getTestedSampleResultBasedonBreastfeedingPatient();
         femalePatient();
         lineOfTreatment();
         vlOutComePiechart();

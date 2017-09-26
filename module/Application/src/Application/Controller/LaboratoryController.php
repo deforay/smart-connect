@@ -775,13 +775,13 @@ class LaboratoryController extends AbstractActionController{
         }
     }
     
-    public function getSampleTestResultBreastFeedingAction() {
+    public function getSampleTestResultBreastfeedingAction() {
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
             $sampleService = $this->getServiceLocator()->get('SampleService');
             $params['gender'] = 'yes';
-            $result = $sampleService->getSampleTestedResultBreastFeedingPatientDetails($params);
+            $result = $sampleService->getSampleTestedResultBreastfeedingPatientDetails($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('result' => $result))
                         ->setTerminal(true);

@@ -3398,7 +3398,7 @@ class SampleTable extends AbstractTableGateway {
       return $result;
     }
     
-    public function fetchSampleTestedResultBreastFeedingPatientDetails($params){
+    public function fetchSampleTestedResultBreastfeedingPatientDetails($params){
         $logincontainer = new Container('credo');
         $result = array();
         $dbAdapter = $this->adapter;
