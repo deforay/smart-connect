@@ -133,10 +133,20 @@ $endDate=date('Y-m');
   padding:<?php echo(isset($languagecontainer->locale) && $languagecontainer->locale == 'en_US')?'8':'3'; ?>px;
   font-size:<?php echo(isset($languagecontainer->locale) && $languagecontainer->locale == 'en_US')?'14':'13'; ?>px;
 }
-@media screen and (max-width: 987px){
+@media screen and (min-width:320px) and (max-width: 760px){
     #daterange-container{
         width:100% !important;
+    }
+    #showDateRange,#closeDateRange{
         margin-left:0% !important;
+    }
+}
+@media screen and (min-width:761px) and (max-width: 970px){
+    #daterange-container{
+        width:100% !important;
+    }
+    #showDateRange,#closeDateRange{
+        margin-left:52% !important;
     }
 }
 </style>
@@ -195,26 +205,24 @@ foreach($sampleType as $samples){
                     <hr style="background: #000 !important;border-color:#ccc;">
                     <div class="row" style="margin-bottom:20px;">
                         <div class="col-md-12 col-sm-12" style="text-align:center;">
-                            <a id="showDateRange" href="javascript:void(0);" style="color:#0d68e0;box-shadow: 1px 2px 12px rgb(173, 200, 222);border-radius: 12px;padding: 2px 10px 2px 10px;"><i class="fa fa-chevron-down" aria-hidden="true"></i> <?php echo $this->translate('Show Date Filter'); ?></a>
-                            <a id="closeDateRange" href="javascript:void(0);" style="color:#0d68e0;display:none;box-shadow: 1px 2px 12px rgb(173, 200, 222);border-radius: 12px;padding: 2px 10px 2px 10px;"><i class="fa fa-chevron-up" aria-hidden="true"></i> <?php echo $this->translate('Close Date Filter'); ?></a>
+                            <a id="showDateRange" href="javascript:void(0);" style="color:#0d68e0;box-shadow: 1px 2px 12px rgb(173, 200, 222);border-radius: 12px;padding: 2px 10px 2px 10px;margin-left:26%;"><i class="fa fa-chevron-down" aria-hidden="true"></i> <?php echo $this->translate('Show Date Filter'); ?></a>
+                            <a id="closeDateRange" href="javascript:void(0);" style="color:#0d68e0;display:none;box-shadow: 1px 2px 12px rgb(173, 200, 222);border-radius: 12px;padding: 2px 10px 2px 10px;margin-left:26%;"><i class="fa fa-chevron-up" aria-hidden="true"></i> <?php echo $this->translate('Close Date Filter'); ?></a>
                         </div>
                     </div>
                     <form id="dateFilter" action="#" method="">
                         <div class="daterange-container row" style="margin-bottom:20px;display:none;">
-                            <div class="col-md-9 col-sm-9">
+                            <div class="col-md-12 col-sm-12" style="text-align:right;">
                                 <div id="daterange-container" class="btn btn-sm form-control"
                                     data-container="body"
                                     data-placement="bottom"
-                                    data-original-title="Change date range" style="text-align:center;width:72%;margin-left:28%;">
+                                    data-original-title="Change date range" style="text-align:center;width:50%;">
                                     <i class="icon-calendar"></i>&nbsp;
                                     <span class="thin uppercase hidden-xs"></span>&nbsp;
                                     <i class="fa fa-angle-down"></i>
                                     <input type="hidden" name="daterange" id="daterange"/>
-                                </div>
-                            </div>
-                            <div class="col-lg-3">
+                                </div>&nbsp;&nbsp;
                                 <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="getSampleResult('daterange');"><?php echo $this->translate('Search'); ?></a>&nbsp;&nbsp;
-                                <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="resetDateFilter();"><?php echo $this->translate('Reset'); ?></a>
+                                <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="resetDateFilter();" style="margin-right:5.8%;"><?php echo $this->translate('Reset'); ?></a>
                             </div>
                         </div>
                     </form>
@@ -280,9 +288,9 @@ foreach($sampleType as $samples){
                                         </div>
                                     </div>  
                                 </div>
-                                <!--<div class="portlet-body" style="cursor:pointer;" onclick="document.location.href='/labs/samples-tested'">-->
+                                <div class="portlet-body">
                                     <div id="samplesTestedResultGender"></div>
-                                <!--</div>-->
+                                </div>
                             </div>
                         </div>
                         
@@ -301,9 +309,9 @@ foreach($sampleType as $samples){
                                         </div>
                                     </div>                           
                                 </div>
-                                <!--<div class="portlet-body" style="cursor:pointer;" onclick="document.location.href='/labs/samples-tested'">-->
+                                <div class="portlet-body">
                                     <div id="samplesTestedResultAge"></div>
-                                <!--</div>-->
+                                </div>
                             </div>
                         </div>                        
                     </div>
@@ -315,7 +323,9 @@ foreach($sampleType as $samples){
                                         <span class="caption-subject"><?php echo $this->translate('Samples Tested - Pregnant'); ?></span>
                                     </div>
                                 </div>
-                                <div id="samplesTestedResultPregnantPatient"></div>
+                                <div class="portlet-body">
+                                    <div id="samplesTestedResultPregnantPatient"></div>
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-6 col-sm-6">
@@ -325,7 +335,9 @@ foreach($sampleType as $samples){
                                         <span class="caption-subject"><?php echo $this->translate('Samples Tested - Breastfeeding'); ?></span>
                                     </div>
                                 </div>
-                                <div id="samplesTestedResultBreastfeedingPatient"></div>
+                                <div class="portlet-body">
+                                    <div id="samplesTestedResultBreastfeedingPatient"></div>
+                                </div>
                             </div>
                         </div>
                     </div>
