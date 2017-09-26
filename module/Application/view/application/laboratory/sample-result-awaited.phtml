@@ -273,6 +273,7 @@ if(isset($labFilter) && trim($labFilter)!= ''){
     }
     
     function generateDistrictBarContainer(srcVal,src){
+        if(src == 'province'){ window.scrollTo(0,document.documentElement.offsetHeight-(window.innerHeight+1200)); }
         $.blockUI.defaults.css.border = '1px solid grey';
         $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
         daterange = $('#daterange').val();
@@ -293,6 +294,7 @@ if(isset($labFilter) && trim($labFilter)!= ''){
     }
     
     function generateClinicBarContainer(srcVal,src){
+        if(src == 'district'){ window.scrollTo(0,document.documentElement.offsetHeight-(window.innerHeight+800)); }
         $.blockUI.defaults.css.border = '1px solid grey';
         $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
         daterange = $('#daterange').val();
