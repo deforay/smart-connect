@@ -157,6 +157,24 @@ $languagecontainer->locale = $this->GetLocaleData('locale',$config['language']);
                                  </a>
                             </li>
                         <?php } ?>
+                        
+                        <?php if($logincontainer->role == 1){ ?>
+                            <li class="nav-item <?php echo ($activeTab == 'duplicate-data') ? " active open " : ""; ?>">
+                                <a href="javascript:;" class="nav-link nav-toggle">
+                                    <i class="icon-settings"></i>
+                                    <span class="title"><?php echo $this->translate('Data Management'); ?></span>
+                                    <span class="arrow"></span>
+                                </a>
+                                <ul class="sub-menu">
+                                    <li class="nav-item start <?php echo ($activeTab == 'duplicate-data') ? " active open" : ""; ?>">
+                                        <a href="<?php echo $this->url('duplicate-data') ?>" class="nav-link ">
+                                          <i class="fa fa-angle-right"></i> <span class="title"><?php echo $this->translate('Duplicate Data'); ?></span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        <?php } ?>
+                        
                         <?php
                         if($logincontainer->role == 1){ ?>
                             <li class="nav-item <?php echo ($activeTab == 'config' || $activeTab == 'users' || $activeTab == 'facility') ? " active open " : ""; ?>">

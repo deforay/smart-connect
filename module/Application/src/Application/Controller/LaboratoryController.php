@@ -766,7 +766,6 @@ class LaboratoryController extends AbstractActionController{
         if ($request->isPost()) {
             $params = $request->getPost();
             $sampleService = $this->getServiceLocator()->get('SampleService');
-            $params['gender'] = 'yes';
             $result = $sampleService->getSampleTestedResultPregnantPatientDetails($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('result' => $result))
@@ -780,7 +779,6 @@ class LaboratoryController extends AbstractActionController{
         if ($request->isPost()) {
             $params = $request->getPost();
             $sampleService = $this->getServiceLocator()->get('SampleService');
-            $params['gender'] = 'yes';
             $result = $sampleService->getSampleTestedResultBreastfeedingPatientDetails($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('result' => $result))

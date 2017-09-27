@@ -1155,4 +1155,14 @@ class SampleService {
         $sampleDb = $this->sm->get('SampleTable');
         return $sampleDb->fetchSampleTestedResultBreastfeedingPatientDetails($params);
     }
+    
+    public function getAllSamples($parameters){
+        $sampleDb = $this->sm->get('SampleTable');
+        return $sampleDb->fetchAllSamples($parameters);
+    }
+    
+    public function removeDuplicateSampleRows($params){
+        $sampleDb = $this->sm->get('SampleTable');
+        return $sampleDb->removeDuplicateSampleRows($params);
+    }
 }

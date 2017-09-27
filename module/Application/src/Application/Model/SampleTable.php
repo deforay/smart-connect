@@ -1491,7 +1491,7 @@ class SampleTable extends AbstractTableGateway {
 	    $row[]='<a href="/clinics/test-result-view/'.base64_encode($aRow['vl_sample_id']).'" class="btn btn-primary btn-xs" target="_blank">'.$viewText.'</a>&nbsp;&nbsp;<a href="javascript:void(0);" class="btn btn-danger btn-xs" style="display:'.$display.'" onclick="generateResultPDF('.$aRow['vl_sample_id'].');">'.$pdfText.'</a>';
             $output['aaData'][] = $row;
         }
-        return $output;
+       return $output;
     }
     
     //get sample tested result details
@@ -3378,7 +3378,7 @@ class SampleTable extends AbstractTableGateway {
                         AND DATE(sample_collection_date) <= '".$endMonth."' ");
                 
             $queryStr = $queryStr->group(array(new Expression('MONTH(sample_collection_date)')));   
-            $queryStr = $queryStr->order(array(new Expression('DATE(sample_collection_date)')));               
+            $queryStr = $queryStr->order(array(new Expression('DATE(sample_collection_date)')));             
             $queryStr = $sql->getSqlStringForSqlObject($queryStr);
             //echo $queryStr;die;
             //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -3451,5 +3451,348 @@ class SampleTable extends AbstractTableGateway {
             
         }
       return $result;
+    }
+    
+    public function fetchAllSamples($parameters){
+        $logincontainer = new Container('credo');
+        $queryContainer = new Container('query');
+        /* Array of database columns which should be read and sent back to DataTables. Use a space where
+         * you want to insert a non-database field (for example a counter or static image)
+        */
+        $aColumns = array('sample_code','DATE_FORMAT(sample_collection_date,"%d-%b-%Y")','batch_code','patient_art_no','patient_first_name','patient_last_name','facility_name','f_p_l_d.location_name','f_d_l_d.location_name','sample_name','result','status_name');
+        $orderColumns = array('vl_sample_id','sample_code','sample_collection_date','batch_code','patient_art_no','patient_first_name','facility_name','f_p_l_d.location_name','f_d_l_d.location_name','sample_name','result','status_name');
+
+        /*
+         * Paging
+         */
+        $sLimit = "";
+        if (isset($parameters['iDisplayStart']) && $parameters['iDisplayLength'] != '-1') {
+            $sOffset = $parameters['iDisplayStart'];
+            $sLimit = $parameters['iDisplayLength'];
+        }
+
+        /*
+         * Ordering
+         */
+
+        $sOrder = "";
+        if (isset($parameters['iSortCol_0'])) {
+            for ($i = 0; $i < intval($parameters['iSortingCols']); $i++) {
+                if ($parameters['bSortable_' . intval($parameters['iSortCol_' . $i])] == "true") {
+                    $sOrder .= $orderColumns[intval($parameters['iSortCol_' . $i])] . " " . ( $parameters['sSortDir_' . $i] ) . ",";
+                }
+            }
+            $sOrder = substr_replace($sOrder, "", -1);
+        }
+
+        /*
+         * Filtering
+         * NOTE this does not match the built-in DataTables filtering which does it
+         * word by word on any field. It's possible to do here, but concerned about efficiency
+         * on very large tables, and MySQL's regex functionality is very limited
+         */
+
+        $sWhere = "";
+        if (isset($parameters['sSearch']) && $parameters['sSearch'] != "") {
+            $searchArray = explode(" ", $parameters['sSearch']);
+            $sWhereSub = "";
+            foreach ($searchArray as $search) {
+                if ($sWhereSub == "") {
+                    $sWhereSub .= "(";
+                } else {
+                    $sWhereSub .= " AND (";
+                }
+                $colSize = count($aColumns);
+
+                for ($i = 0; $i < $colSize; $i++) {
+                    if ($i < $colSize - 1) {
+                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search ) . "%' OR ";
+                    } else {
+                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search ) . "%' ";
+                    }
+                }
+                $sWhereSub .= ")";
+            }
+            $sWhere .= $sWhereSub;
+        }
+
+        /* Individual column filtering */
+        for ($i = 0; $i < count($aColumns); $i++) {
+            if (isset($parameters['bSearchable_' . $i]) && $parameters['bSearchable_' . $i] == "true" && $parameters['sSearch_' . $i] != '') {
+                if ($sWhere == "") {
+                    $sWhere .= $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
+                } else {
+                    $sWhere .= " AND " . $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
+                }
+            }
+        }
+
+        /*
+         * SQL queries
+         * Get data to display
+        */
+        $startDate = '';
+        $endDate = '';
+	if(isset($parameters['sampleCollectionDate']) && trim($parameters['sampleCollectionDate'])!= ''){
+            $s_c_date = explode("to", $parameters['sampleCollectionDate']);
+            if(isset($s_c_date[0]) && trim($s_c_date[0]) != "") {
+              $startDate = trim($s_c_date[0]);
+            }
+            if(isset($s_c_date[1]) && trim($s_c_date[1]) != "") {
+              $endDate = trim($s_c_date[1]);
+            }
+        }
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $sQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
+                                ->columns(array('vl_sample_id','sample_code','facility_id','patient_first_name','patient_last_name','patient_art_no','sampleCollectionDate'=>new Expression('DATE(sample_collection_date)'),'result'))
+                                ->join(array('rss'=>'r_sample_status'),'rss.status_id=vl.result_status',array('status_name'))
+                                ->join(array('b'=>'batch_details'),'b.batch_id=vl.sample_batch_id',array('batch_code'),'left')
+                                ->join(array('f'=>'facility_details'),'f.facility_id=vl.facility_id',array('facility_name'),'left')
+                                ->join(array('f_p_l_d'=>'location_details'),'f_p_l_d.location_id=f.facility_state',array('province'=>'location_name'),'left')
+                                ->join(array('f_d_l_d'=>'location_details'),'f_d_l_d.location_id=f.facility_district',array('district'=>'location_name'),'left')
+                                ->join(array('rs'=>'r_sample_type'),'rs.sample_id=vl.sample_type',array('sample_name'),'left')
+                                //->group('sample_code')
+                                //->group('facility_id')
+                                //->having('COUNT(*) > 1');
+                                ->where('sample_code in
+(select sample_code from dash_vl_request_form group by sample_code,facility_id having count(*) > 1)');
+        if (isset($sWhere) && $sWhere != "") {
+            $sQuery->where($sWhere);
+        }
+
+        if (isset($sOrder) && $sOrder != "") {
+            $sQuery->order($sOrder);
+        }
+        $queryContainer->resultQuery = $sQuery;
+        if (isset($sLimit) && isset($sOffset)) {
+            $sQuery->limit($sLimit);
+            $sQuery->offset($sOffset);
+        }
+
+        $sQueryStr = $sql->getSqlStringForSqlObject($sQuery); // Get the string of the Sql, instead of the Select-instance 
+        //echo $sQueryStr;die;
+        $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+
+        /* Data set length after filtering */
+        $sQuery->reset('limit');
+        $sQuery->reset('offset');
+        $fQuery = $sql->getSqlStringForSqlObject($sQuery);
+        $aResultFilterTotal = $dbAdapter->query($fQuery, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+        $iFilteredTotal = count($aResultFilterTotal);
+
+        /* Total data set length */
+        $iQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
+                                ->columns(array('vl_sample_id','sample_code','facility_id','patient_first_name','patient_last_name','patient_art_no','sampleCollectionDate'=>new Expression('DATE(sample_collection_date)'),'result'))
+                                ->join(array('rss'=>'r_sample_status'),'rss.status_id=vl.result_status',array('status_name'))
+                                ->join(array('b'=>'batch_details'),'b.batch_id=vl.sample_batch_id',array('batch_code'),'left')
+                                ->join(array('f'=>'facility_details'),'f.facility_id=vl.facility_id',array('facility_name'),'left')
+                                ->join(array('f_p_l_d'=>'location_details'),'f_p_l_d.location_id=f.facility_state',array('province'=>'location_name'),'left')
+                                ->join(array('f_d_l_d'=>'location_details'),'f_d_l_d.location_id=f.facility_district',array('district'=>'location_name'),'left')
+                                ->join(array('rs'=>'r_sample_type'),'rs.sample_id=vl.sample_type',array('sample_name'),'left')
+                                //->group('sample_code')
+                                //->group('facility_id')
+                                //->having('COUNT(*) > 1');
+                                ->where('sample_code in
+(select sample_code from dash_vl_request_form group by sample_code,facility_id having count(*) > 1)');
+        $iQueryStr = $sql->getSqlStringForSqlObject($iQuery);
+        $iResult = $dbAdapter->query($iQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+        $iTotal = count($iResult);
+        
+        $output = array(
+            "sEcho" => intval($parameters['sEcho']),
+            "iTotalRecords" => $iTotal,
+            "iTotalDisplayRecords" => $iFilteredTotal,
+            "aaData" => array()
+        );
+        
+	$common = new CommonService($this->sm);
+        foreach ($rResult as $aRow) {
+            $sampleCollectionDate = '';
+            if(isset($aRow['sampleCollectionDate']) && $aRow['sampleCollectionDate']!= NULL && trim($aRow['sampleCollectionDate'])!="" && $aRow['sampleCollectionDate']!= '0000-00-00'){
+                $sampleCollectionDate = $common->humanDateFormat($aRow['sampleCollectionDate']);
+            }
+            $row = array();
+            $row[]='<input type="checkbox" name="duplicate-select[]" class="'.$aRow['sample_code'].'" id="'.$aRow['vl_sample_id'].'" value="'.$aRow['vl_sample_id'].'" onchange="duplicateCheck(this);"/>';
+	    $row[]=$aRow['sample_code'];
+            $row[]=$sampleCollectionDate;
+            $row[]=(isset($aRow['batch_code']))?$aRow['batch_code']:'';
+            $row[]=$aRow['patient_art_no'];
+            $row[]=ucwords($aRow['patient_first_name'].' ' .$aRow['patient_last_name']);
+            $row[]=(isset($aRow['facility_name']))?ucwords($aRow['facility_name']):'';
+            $row[]=(isset($aRow['province']))?ucwords($aRow['province']):'';
+            $row[]=(isset($aRow['district']))?ucwords($aRow['district']):'';
+            $row[]=(isset($aRow['sample_name']))?ucwords($aRow['sample_name']):'';
+            $row[]=$aRow['result'];
+            $row[]=ucwords($aRow['status_name']);
+            $row[]='<a href="javascript:void(0);" class="btn btn-primary btn-xs">Edit</a>';
+            $output['aaData'][] = $row;
+        }
+       return $output;
+    }
+    
+    public function removeDuplicateSampleRows($params){
+        $response = 0;
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $removedSamplesDb = new \Application\Model\RemovedSamplesTable($this->adapter);
+        if(trim($params['rows'])!= ''){
+            $duplicateSamples = explode(',',$params['rows']);
+            for($r=0;$r<count($duplicateSamples);$r++){
+                $rQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
+                              ->where(array('vl.vl_sample_id'=>$duplicateSamples[$r]));
+                $rQueryStr = $sql->getSqlStringForSqlObject($rQuery);
+                $rResult = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
+                if($rResult){
+                    $data = array(
+                                'vl_sample_id'=>$rResult->vl_sample_id,
+                                'vlsm_instance_id'=>$rResult->vlsm_instance_id,
+                                'vlsm_country_id'=>$rResult->vlsm_country_id,
+                                'serial_no'=>$rResult->serial_no,
+                                'facility_id'=>$rResult->facility_id,
+                                'facility_sample_id'=>$rResult->facility_sample_id,
+                                'sample_batch_id'=>$rResult->sample_batch_id,
+                                'sample_code_key'=>$rResult->sample_code_key,
+                                'sample_code_format'=>$rResult->sample_code_format,
+                                'sample_code'=>$rResult->sample_code,
+                                'sample_reordered'=>$rResult->sample_reordered,
+                                'test_urgency'=>$rResult->test_urgency,
+                                'patient_first_name'=>$rResult->patient_first_name,
+                                'patient_last_name'=>$rResult->patient_last_name,
+                                'patient_nationality'=>$rResult->patient_nationality,
+                                'patient_art_no'=>$rResult->patient_art_no,
+                                'patient_dob'=>$rResult->patient_dob,
+                                'patient_gender'=>$rResult->facility_sample_id,
+                                'patient_mobile_number'=>$rResult->patient_mobile_number,
+                                'patient_location'=>$rResult->patient_location,
+                                'patient_address'=>$rResult->patient_address,
+                                'patient_art_date'=>$rResult->patient_art_date,
+                                'sample_collection_date'=>$rResult->sample_collection_date,
+                                'sample_type'=>$rResult->sample_type,
+                                'is_patient_new'=>$rResult->is_patient_new,
+                                'treatment_initiation'=>$rResult->treatment_initiation,
+                                'line_of_treatment'=>$rResult->line_of_treatment,
+                                'current_regimen'=>$rResult->current_regimen,
+                                'date_of_initiation_of_current_regimen'=>$rResult->date_of_initiation_of_current_regimen,
+                                'is_patient_pregnant'=>$rResult->is_patient_pregnant,
+                                'is_patient_breastfeeding'=>$rResult->is_patient_breastfeeding,
+                                'pregnancy_trimester'=>$rResult->pregnancy_trimester,
+                                'arv_adherance_percentage'=>$rResult->arv_adherance_percentage,
+                                'is_adherance_poor'=>$rResult->is_adherance_poor,
+                                'consent_to_receive_sms'=>$rResult->consent_to_receive_sms,
+                                'number_of_enhanced_sessions'=>$rResult->number_of_enhanced_sessions,
+                                'last_vl_date_routine'=>$rResult->last_vl_date_routine,
+                                'last_vl_result_routine'=>$rResult->last_vl_result_routine,
+                                'last_vl_sample_type_routine'=>$rResult->last_vl_sample_type_routine,
+                                'last_vl_date_failure_ac'=>$rResult->last_vl_date_failure_ac,
+                                'last_vl_result_failure_ac'=>$rResult->last_vl_result_failure_ac,
+                                'last_vl_sample_type_failure_ac'=>$rResult->last_vl_sample_type_failure_ac,
+                                'last_vl_date_failure'=>$rResult->last_vl_date_failure,
+                                'last_vl_result_failure'=>$rResult->last_vl_result_failure,
+                                'last_vl_sample_type_failure'=>$rResult->last_vl_sample_type_failure,
+                                'request_clinician_name'=>$rResult->request_clinician_name,
+                                'request_clinician_phone_number'=>$rResult->request_clinician_phone_number,
+                                'sample_testing_date'=>$rResult->sample_testing_date,
+                                'vl_focal_person'=>$rResult->vl_focal_person,
+                                'vl_focal_person_phone_number'=>$rResult->vl_focal_person_phone_number,
+                                'sample_received_at_vl_lab_datetime'=>$rResult->sample_received_at_vl_lab_datetime,
+                                'result_dispatched_datetime'=>$rResult->result_dispatched_datetime,
+                                'is_sample_rejected'=>$rResult->is_sample_rejected,
+                                'sample_rejection_facility'=>$rResult->sample_rejection_facility,
+                                'reason_for_sample_rejection'=>$rResult->reason_for_sample_rejection,
+                                'request_created_by'=>$rResult->request_created_by,
+                                'request_created_datetime'=>$rResult->request_created_datetime,
+                                'last_modified_by'=>$rResult->last_modified_by,
+                                'last_modified_datetime'=>$rResult->last_modified_datetime,
+                                'patient_other_id'=>$rResult->patient_other_id,
+                                'patient_age_in_years'=>$rResult->patient_age_in_years,
+                                'patient_age_in_months'=>$rResult->patient_age_in_months,
+                                'treatment_initiated_date'=>$rResult->treatment_initiated_date,
+                                'patient_anc_no'=>$rResult->patient_anc_no,
+                                'treatment_details'=>$rResult->treatment_details,
+                                'lab_name'=>$rResult->lab_name,
+                                'lab_id'=>$rResult->lab_id,
+                                'lab_code'=>$rResult->lab_code,
+                                'lab_contact_person'=>$rResult->lab_contact_person,
+                                'lab_phone_number'=>$rResult->lab_phone_number,
+                                'sample_tested_datetime'=>$rResult->sample_tested_datetime,
+                                'result_value_log'=>$rResult->result_value_log,
+                                'result_value_absolute'=>$rResult->result_value_absolute,
+                                'result_value_text'=>$rResult->result_value_text,
+                                'result_value_absolute_decimal'=>$rResult->result_value_absolute_decimal,
+                                'result'=>$rResult->result,
+                                'approver_comments'=>$rResult->approver_comments,
+                                'result_approved_by'=>$rResult->result_approved_by,
+                                'result_approved_datetime'=>$rResult->result_approved_datetime,
+                                'result_reviewed_by'=>$rResult->result_reviewed_by,
+                                'result_reviewed_datetime'=>$rResult->result_reviewed_datetime,
+                                'test_methods'=>$rResult->test_methods,
+                                'contact_complete_status'=>$rResult->contact_complete_status,
+                                'last_viral_load_date'=>$rResult->last_viral_load_date,
+                                'last_viral_load_result'=>$rResult->last_viral_load_result,
+                                'last_vl_result_in_log'=>$rResult->last_vl_result_in_log,
+                                'reason_for_vl_testing'=>$rResult->reason_for_vl_testing,
+                                'drug_substitution'=>$rResult->drug_substitution,
+                                'sample_collected_by'=>$rResult->sample_collected_by,
+                                'vl_test_platform'=>$rResult->vl_test_platform,
+                                'facility_support_partner'=>$rResult->facility_support_partner,
+                                'has_patient_changed_regimen'=>$rResult->has_patient_changed_regimen,
+                                'reason_for_regimen_change'=>$rResult->reason_for_regimen_change,
+                                'regimen_change_date'=>$rResult->regimen_change_date,
+                                'plasma_conservation_temperature'=>$rResult->plasma_conservation_temperature,
+                                'plasma_conservation_duration'=>$rResult->plasma_conservation_duration,
+                                'physician_name'=>$rResult->physician_name,
+                                'date_test_ordered_by_physician'=>$rResult->date_test_ordered_by_physician,
+                                'vl_test_number'=>$rResult->vl_test_number,
+                                'date_dispatched_from_clinic_to_lab'=>$rResult->date_dispatched_from_clinic_to_lab,
+                                'result_printed_datetime'=>$rResult->result_printed_datetime,
+                                'result_sms_sent_datetime'=>$rResult->result_sms_sent_datetime,
+                                'is_request_mail_sent'=>$rResult->is_request_mail_sent,
+                                'is_result_mail_sent'=>$rResult->is_result_mail_sent,
+                                'is_result_sms_sent'=>$rResult->is_result_sms_sent,
+                                'test_request_export'=>$rResult->test_request_export,
+                                'test_request_import'=>$rResult->test_request_import,
+                                'test_result_export'=>$rResult->test_result_export,
+                                'test_result_import'=>$rResult->test_result_import,
+                                'result_status'=>$rResult->result_status,
+                                'import_machine_file_name'=>$rResult->import_machine_file_name,
+                                'manual_result_entry'=>$rResult->manual_result_entry,
+                                'source'=>$rResult->source,
+                                'ward'=>$rResult->ward,
+                                'art_cd_cells'=>$rResult->art_cd_cells,
+                                'art_cd_date'=>$rResult->art_cd_date,
+                                'who_clinical_stage'=>$rResult->who_clinical_stage,
+                                'reason_testing_png'=>$rResult->reason_testing_png,
+                                'tech_name_png'=>$rResult->tech_name_png,
+                                'qc_tech_name'=>$rResult->qc_tech_name,
+                                'qc_tech_sign'=>$rResult->qc_tech_sign,
+                                'qc_date'=>$rResult->qc_date,
+                                'whole_blood_ml'=>$rResult->whole_blood_ml,
+                                'whole_blood_vial'=>$rResult->whole_blood_vial,
+                                'plasma_ml'=>$rResult->plasma_ml,
+                                'plasma_vial'=>$rResult->plasma_vial,
+                                'plasma_process_time'=>$rResult->plasma_process_time,
+                                'plasma_process_tech'=>$rResult->plasma_process_tech,
+                                'batch_quality'=>$rResult->batch_quality,
+                                'sample_test_quality'=>$rResult->sample_test_quality,
+                                'failed_test_date'=>$rResult->failed_test_date,
+                                'failed_test_tech'=>$rResult->failed_test_tech,
+                                'failed_vl_result'=>$rResult->failed_vl_result,
+                                'failed_batch_quality'=>$rResult->failed_batch_quality,
+                                'failed_sample_test_quality'=>$rResult->failed_sample_test_quality,
+                                'failed_batch_id'=>$rResult->failed_batch_id,
+                                'clinic_date'=>$rResult->clinic_date,
+                                'report_date'=>$rResult->report_date,
+                                'sample_to_transport'=>$rResult->sample_to_transport
+                            );
+                    $isInserted = $removedSamplesDb->insert($data);
+                    if($isInserted){
+                        $response = $this->delete(array('vl_sample_id'=>$rResult->vl_sample_id));
+                    }
+                }
+            }
+            
+        }
+      return $response;
     }
 }

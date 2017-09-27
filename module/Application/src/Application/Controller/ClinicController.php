@@ -132,4 +132,3 @@ class ClinicController extends AbstractActionController{
     }
     
 }
-

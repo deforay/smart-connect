@@ -1,0 +1,201 @@
+<?php
+use Zend\Session\Container;
+$languagecontainer = new Container('language');
+?>
+    <style>
+        .col-sm-12{
+            overflow-x:scroll;
+            overflow-y:hidden;
+        }
+        .oddTxt{
+            background-color:#ecf1ef !important;
+        }
+        .evenTxt{
+            background-color:#fffff2 !important;
+        }
+        #selectedSamples{
+            font-size:13px;
+            background-color: #fff;
+            box-shadow: 1px 2px 1px #b9abab;
+            border-radius: 50px;
+            padding: 5px;
+        }
+    </style>
+    <!-- BEGIN PAGE BAR -->
+    <div class="page-bar">
+        <h1 class="page-title"><?php echo $this->translate('Duplicate Data'); ?></h1>
+    </div>
+    <!-- END PAGE BAR -->
+    <!-- BEGIN PAGE TITLE-->
+    <!-- END PAGE TITLE-->
+    <!-- END PAGE HEADER-->
+    <br>
+    <br>
+    <div class="row">
+        <div class="col-md-6 col-sm-6">
+          <input type="hidden" id="removedSamples" name="removedSamples"/>
+          <span id="selectedSamples">0 Sample(s) Selected</span>&nbsp;&nbsp;<a href="javascript:void(0);" id="remove-btn" class="btn btn-danger btn-sm" onclick="confirmSamplesRemoval();" disabled style="pointer-events:none;">Remove Selected Samples</a>
+        </div>
+    </div><br>
+    <div class="row">
+        <div class="col-md-12 col-sm-12">
+            <div class="portlet box">
+                <div class="portlet-body">
+                        <div class="portlet box blue">
+                            <div class="portlet-title">
+                                <div class="caption">
+                                    <i class="fa fa-cogs"></i><?php echo $this->translate('Samples'); ?>
+                                </div>
+                            </div>
+                            <div class="portlet-body">
+                                <div class="table-toolbar">
+                                    <table class="table table-striped table-bordered table-hover order-column" id="allSamples">
+                                        <thead>
+                                            <tr>
+                                                <th> # </th>
+                                                <th> <?php echo $this->translate('Sample ID'); ?> </th>
+                                                <th> <?php echo $this->translate('Date Collected'); ?></th>
+                                                <th> <?php echo $this->translate('Batch Code'); ?> </th>
+                                                <th> <?php echo $this->translate('Unique ART No.'); ?> </th>
+                                                <th> <?php echo $this->translate('Patient\'s Name'); ?> </th>
+                                                <th> <?php echo $this->translate('Facility Name'); ?> </th>
+                                                <th> <?php echo $this->translate('Province\State'); ?> </th>
+                                                <th> <?php echo $this->translate('District\County'); ?> </th>
+                                                <th> <?php echo $this->translate('Sample Type'); ?></th>
+                                                <th> <?php echo $this->translate('Viral Load(cp/ml)'); ?> </th>
+                                                <th> <?php echo $this->translate('Status'); ?> </th>
+                                                <th> <?php echo $this->translate('Action'); ?> </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td colspan="13" class="dataTables_empty">Loading data from server</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                </div>
+            </div>
+        </div>                        
+    </div>
+<script>
+    var oTable = null;
+    oTableLastSampleRow = [];
+    oTableLastSampleRowColor = [];
+    removedSampleRow = [];
+    $(function() {
+        oTable = $('#allSamples').DataTable( {
+            "bProcessing": true,
+            //"bServerSide": true,
+            "aoColumns": [
+                {"sClass":"center","bSortable":false},
+                {"sClass":"center"},
+                {"sClass":"center"},
+                {"sClass":"center"},
+                {"sClass":"center"},
+                {"sClass":"center"},
+                {"sClass":"center"},
+                {"sClass":"center"},
+                {"sClass":"center"},
+                {"sClass":"center"},
+                {"sClass":"center"},
+                {"sClass":"center"},
+                {"sClass":"center","bSortable":false}
+            ],
+            "iDisplayLength": 10,
+            "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                if($.inArray(aData[1], oTableLastSampleRow) == -1){
+                    oTableLastSampleRow = [];
+                    oTableLastSampleRow.push(aData[1]);
+                    if($.inArray("#ecf1ef", oTableLastSampleRowColor) == -1){
+                        oTableLastSampleRowColor = [];
+		        oTableLastSampleRowColor.push("#ecf1ef");
+                        $(nRow).attr("class","");
+                        $(nRow).addClass("oddTxt");
+                        //$('.sorting_1').css('background-color','#ecf1ef !important');
+                    }else{
+                        oTableLastSampleRowColor = [];
+		        oTableLastSampleRowColor.push("#fffff2");
+                        $(nRow).attr("class","");
+                        $(nRow).addClass("evenTxt");
+                        //$('.sorting_1').css('background-color','#fffff2 !important');
+                    }
+                }else{
+                    if($.inArray("#ecf1ef", oTableLastSampleRowColor) == -1){
+                        $(nRow).attr("class","");
+                        $(nRow).addClass("evenTxt");
+                        //$('.sorting_1').css('background-color','#fffff2 !important');
+                    }if($.inArray("#fffff2", oTableLastSampleRowColor) == -1){
+                        $(nRow).attr("class","");
+                        $(nRow).addClass("oddTxt");
+                        //$('.sorting_1').css('background-color','#ecf1ef !important');
+                    }
+                }
+	    },
+            "aaSorting": [[ 1, "desc" ]],
+            "sAjaxSource": "<?php echo $this->url('duplicate-data'); ?>",
+            "fnServerData": function ( sSource, aoData, fnCallback ) {
+                $.ajax({
+                    "dataType": 'json',
+                    "type": "POST",
+                    "url": sSource,
+                    "data": aoData,
+                    "success": fnCallback
+                });
+            }
+        } );
+    });
+ 
+    function duplicateCheck(obj){
+        var rowClass = $(obj).attr('class');
+        var rowId = $(obj).attr('id');
+        var rowValue = $(obj).attr('value');
+        if($('#'+rowId).is(':checked')){
+            removedSampleRow.push(rowValue);
+            notChecked = 0;
+            $('.'+rowClass).each(function() {
+                if(this.id!= rowId){
+                   if(!$('#'+this.id).is(':checked')){
+                       notChecked+=1;
+                   }
+                }
+            });
+            if(notChecked == 1){
+                $('.'+rowClass).each(function() {
+                    if(!$('#'+this.id).is(':checked')){
+                        $('#'+this.id).prop('disabled',true);
+                    }
+                })
+            }
+        }else{
+            var sampleIndex = removedSampleRow.indexOf(rowValue);
+            removedSampleRow.splice(sampleIndex, 1);
+            $('.'+rowClass).prop('disabled',false);
+        }
+        //style part
+        if(removedSampleRow.length >0){
+          $('#remove-btn').css('pointer-events','auto');
+          $('#remove-btn').removeAttr('disabled');
+        }else{
+          $('#remove-btn').css('pointer-events','none');
+          $('#remove-btn').prop('disabled',true);
+        }
+        $('#removedSamples').val(removedSampleRow);
+        $('#selectedSamples').html('('+removedSampleRow.length+') Sample(s) Selected');
+    }
+    
+    function confirmSamplesRemoval(){
+        //$.blockUI.defaults.css.border = '1px solid grey';
+        //$(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
+        $.post("<?php echo $this->url('duplicate-data', array('action' => 'remove')); ?>", {rows : $('#removedSamples').val()},
+        function(data){
+            if(data == 0){
+                alert('OOPS..Error while removing duplicate samples');
+            }else{
+                oTable.draw();
+            }
+        });
+    }
+</script>

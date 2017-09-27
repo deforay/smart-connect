@@ -28,6 +28,7 @@ use Application\Model\GlobalTable;
 use Application\Model\ArtCodeTable;
 use Application\Model\UserFacilityMapTable;
 use Application\Model\LocationDetailsTable;
+use Application\Model\RemovedSamplesTable;
 
 use Application\Service\CommonService;
 use Application\Service\UserService;
@@ -277,6 +278,11 @@ class Module{
 		'LocationDetailsTable' => function($sm) {
                     $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
                     $table = new LocationDetailsTable($dbAdapter);
+                    return $table;
+                },
+		'RemovedSamplesTable' => function($sm) {
+                    $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+                    $table = new RemovedSamplesTable($dbAdapter);
                     return $table;
                 },
 				
