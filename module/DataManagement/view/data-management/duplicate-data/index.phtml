@@ -105,7 +105,7 @@ $languagecontainer = new Container('language');
     $(document).ready(function(){
         oTable = $('#allSamples').DataTable({
             "bProcessing": true,
-            "bServerSide": false,
+            "bServerSide": true,
             "aoColumns": [
                 {"sClass":"txtCenter","bSortable":false},
                 {"sClass":"center"},
@@ -151,7 +151,13 @@ $languagecontainer = new Container('language');
                     }
                 }
 	    },
-            "fnDrawCallback": function( oSettings ) { },
+            "fnDrawCallback": function( oSettings ) {
+                $('input:checkbox').each(function () {
+                    if($.inArray(this.id, removedSampleRow)!= -1){
+                        $('#'+this.id).prop('checked',true);
+                    }
+                });
+            },
             "aaSorting": [[ 1, "desc" ]],
             "sAjaxSource": "<?php echo $this->url('duplicate-data'); ?>",
             "fnServerData": function ( sSource, aoData, fnCallback ) {
@@ -213,8 +219,7 @@ $languagecontainer = new Container('language');
             if(data == 0){
                 alert('OOPS..Error while removing duplicate samples');
             }else{
-                //oTable.draw();
-                location.reload();
+                oTable.draw();
             }
         });
     }
