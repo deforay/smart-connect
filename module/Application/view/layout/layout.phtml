@@ -42,7 +42,11 @@ $languagecontainer->locale = $this->GetLocaleData('locale',$config['language']);
         <link href="<?php echo $this->basePath('assets/global/plugins/datatables/datatables.min.css'); ?>" rel="stylesheet" type="text/css" />
         <link href="<?php echo $this->basePath('assets/global/plugins/datatables/plugins/bootstrap/datatables.bootstrap.css'); ?>" rel="stylesheet" type="text/css" />         
         <link href="<?php echo $this->basePath('assets/global/plugins/select2/css/select2.min.css'); ?>" rel="stylesheet" type="text/css" />      
-        
+        <style>
+            <?php if($activeTab !='duplicate-data') { ?>
+              table.dataTable td.sorting_1,table.dataTable td.sorting_2,table.dataTable td.sorting_3,table.dataTable th.sorting_1,table.dataTable th.sorting_2,table.dataTable th.sorting_3{background:#fbfcfd!important}
+            <?php } ?>
+        </style>
         <!-- END THEME LAYOUT STYLES -->
         <link rel="shortcut icon" href="favicon.ico" />
 
