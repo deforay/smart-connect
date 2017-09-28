@@ -3555,7 +3555,7 @@ class SampleTable extends AbstractTableGateway {
                                 //->group('sample_code')
                                 //->group('facility_id')
                                 //->having('COUNT(*) > 1');
-                                ->where('sample_code in (select sample_code from dash_vl_request_form group by facility_id,sample_code having count(*) > 1)');
+                                ->where('sample_code in (select sample_code from dash_vl_request_form group by sample_code,facility_id having count(*) > 1)');
         if (isset($sWhere) && $sWhere != "") {
             $sQuery->where($sWhere);
         }
@@ -3592,7 +3592,7 @@ class SampleTable extends AbstractTableGateway {
                                 //->group('sample_code')
                                 //->group('facility_id')
                                 //->having('COUNT(*) > 1');
-                                ->where('sample_code in (select sample_code from dash_vl_request_form group by facility_id,sample_code having count(*) > 1)');
+                                ->where('sample_code in (select sample_code from dash_vl_request_form group by sample_code,facility_id having count(*) > 1)');
         $iQueryStr = $sql->getSqlStringForSqlObject($iQuery);
         $iResult = $dbAdapter->query($iQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $iTotal = count($iResult);

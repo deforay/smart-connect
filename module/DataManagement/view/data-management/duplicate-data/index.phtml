@@ -151,6 +151,7 @@ $languagecontainer = new Container('language');
                     }
                 }
 	    },
+            "fnDrawCallback": function( oSettings ) { },
             "aaSorting": [[ 1, "desc" ]],
             "sAjaxSource": "<?php echo $this->url('duplicate-data'); ?>",
             "fnServerData": function ( sSource, aoData, fnCallback ) {
