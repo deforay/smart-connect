@@ -3555,8 +3555,7 @@ class SampleTable extends AbstractTableGateway {
                                 //->group('sample_code')
                                 //->group('facility_id')
                                 //->having('COUNT(*) > 1');
-                                ->where('sample_code in
-(select sample_code from dash_vl_request_form group by sample_code,facility_id having count(*) > 1)');
+                                ->where('sample_code in (select sample_code from dash_vl_request_form group by facility_id,sample_code having count(*) > 1)');
         if (isset($sWhere) && $sWhere != "") {
             $sQuery->where($sWhere);
         }
@@ -3593,8 +3592,7 @@ class SampleTable extends AbstractTableGateway {
                                 //->group('sample_code')
                                 //->group('facility_id')
                                 //->having('COUNT(*) > 1');
-                                ->where('sample_code in
-(select sample_code from dash_vl_request_form group by sample_code,facility_id having count(*) > 1)');
+                                ->where('sample_code in (select sample_code from dash_vl_request_form group by facility_id,sample_code having count(*) > 1)');
         $iQueryStr = $sql->getSqlStringForSqlObject($iQuery);
         $iResult = $dbAdapter->query($iQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $iTotal = count($iResult);
@@ -3636,7 +3634,7 @@ class SampleTable extends AbstractTableGateway {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $removedSamplesDb = new \Application\Model\RemovedSamplesTable($this->adapter);
-        if(trim($params['rows'])!= ''){
+        if(isset($params['rows']) && trim($params['rows'])!= ''){
             $duplicateSamples = explode(',',$params['rows']);
             for($r=0;$r<count($duplicateSamples);$r++){
                 $rQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
@@ -3785,8 +3783,8 @@ class SampleTable extends AbstractTableGateway {
                                 'report_date'=>$rResult->report_date,
                                 'sample_to_transport'=>$rResult->sample_to_transport
                             );
-                    $isInserted = $removedSamplesDb->insert($data);
-                    if($isInserted){
+                    $hasInserted = $removedSamplesDb->insert($data);
+                    if($hasInserted){
                         $response = $this->delete(array('vl_sample_id'=>$rResult->vl_sample_id));
                     }
                 }

@@ -7,6 +7,9 @@ $languagecontainer = new Container('language');
             overflow-x:scroll;
             overflow-y:hidden;
         }
+        .txtCenter{
+            text-align:center;
+        }
         .oddTxt{
             background-color:#ecf1ef !important;
         }
@@ -16,9 +19,24 @@ $languagecontainer = new Container('language');
         #selectedSamples{
             font-size:13px;
             background-color: #fff;
-            box-shadow: 1px 2px 1px #b9abab;
-            border-radius: 50px;
+            -moz-box-shadow: 0px 0px 1px #b9abab;
+            -webkit-box-shadow: 0px 0px 1px #b9abab;
+            -o-box-shadow: 0px 0px 1px #b9abab;
+            -ms-box-shadow: 0px 0px 1px #b9abab;
+            box-shadow: 0px 0px 1px #b9abab;
+            -moz-border-radius:50px;
+            -webkit-border-radius:50px;
+            -o-border-radius:50px;
+            -ms-border-radius:50px;
+            border-radius:50px;
             padding: 5px;
+        }
+        input[type=checkbox] {
+          -ms-transform: scale(1.4);
+          -moz-transform: scale(1.4);
+          -webkit-transform: scale(1.4);
+          -o-transform: scale(1.4);
+           padding: 10px;
         }
     </style>
     <!-- BEGIN PAGE BAR -->
@@ -29,7 +47,6 @@ $languagecontainer = new Container('language');
     <!-- BEGIN PAGE TITLE-->
     <!-- END PAGE TITLE-->
     <!-- END PAGE HEADER-->
-    <br>
     <br>
     <div class="row">
         <div class="col-md-6 col-sm-6">
@@ -52,7 +69,7 @@ $languagecontainer = new Container('language');
                                     <table class="table table-striped table-bordered table-hover order-column" id="allSamples">
                                         <thead>
                                             <tr>
-                                                <th> # </th>
+                                                <th>&nbsp;&nbsp;&nbsp;&nbsp;# </th>
                                                 <th> <?php echo $this->translate('Sample ID'); ?> </th>
                                                 <th> <?php echo $this->translate('Date Collected'); ?></th>
                                                 <th> <?php echo $this->translate('Batch Code'); ?> </th>
@@ -85,12 +102,12 @@ $languagecontainer = new Container('language');
     oTableLastSampleRow = [];
     oTableLastSampleRowColor = [];
     removedSampleRow = [];
-    $(function() {
-        oTable = $('#allSamples').DataTable( {
+    $(document).ready(function(){
+        oTable = $('#allSamples').DataTable({
             "bProcessing": true,
-            //"bServerSide": true,
+            "bServerSide": false,
             "aoColumns": [
-                {"sClass":"center","bSortable":false},
+                {"sClass":"txtCenter","bSortable":false},
                 {"sClass":"center"},
                 {"sClass":"center"},
                 {"sClass":"center"},
@@ -145,9 +162,9 @@ $languagecontainer = new Container('language');
                     "success": fnCallback
                 });
             }
-        } );
+        });
     });
- 
+    
     function duplicateCheck(obj){
         var rowClass = $(obj).attr('class');
         var rowId = $(obj).attr('id');
@@ -182,6 +199,7 @@ $languagecontainer = new Container('language');
           $('#remove-btn').css('pointer-events','none');
           $('#remove-btn').prop('disabled',true);
         }
+        //set count to display
         $('#removedSamples').val(removedSampleRow);
         $('#selectedSamples').html('('+removedSampleRow.length+') Sample(s) Selected');
     }
@@ -194,7 +212,8 @@ $languagecontainer = new Container('language');
             if(data == 0){
                 alert('OOPS..Error while removing duplicate samples');
             }else{
-                oTable.draw();
+                //oTable.draw();
+                location.reload();
             }
         });
     }
