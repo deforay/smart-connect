@@ -51,7 +51,7 @@ $languagecontainer = new Container('language');
     <div class="row">
         <div class="col-md-6 col-sm-6">
           <input type="hidden" id="removedSamples" name="removedSamples"/>
-          <span id="selectedSamples">0 Sample(s) Selected</span>&nbsp;&nbsp;<a href="javascript:void(0);" id="remove-btn" class="btn btn-danger btn-sm" onclick="confirmSamplesRemoval();" disabled style="pointer-events:none;">Remove Selected Samples</a>
+          <span id="selectedSamples">0 <?php echo $this->translate('Sample(s) Selected'); ?></span>&nbsp;&nbsp;<a href="javascript:void(0);" id="remove-btn" class="btn btn-danger btn-sm" onclick="confirmSamplesRemoval();" disabled style="pointer-events:none;"><?php echo $this->translate('Remove Selected Samples'); ?></a>
         </div>
     </div><br>
     <div class="row">
@@ -208,7 +208,7 @@ $languagecontainer = new Container('language');
         }
         //set count to display
         $('#removedSamples').val(removedSampleRow);
-        $('#selectedSamples').html('('+removedSampleRow.length+') Sample(s) Selected');
+        $('#selectedSamples').html('('+removedSampleRow.length+') <?php echo $this->translate('Sample(s) Selected'); ?>');
     }
     
     function confirmSamplesRemoval(){
@@ -217,12 +217,12 @@ $languagecontainer = new Container('language');
         $.post("<?php echo $this->url('duplicate-data', array('action' => 'remove')); ?>", {rows : $('#removedSamples').val()},
         function(data){
             if(data == 0){
-                alert('OOPS..Error while removing duplicate samples');
+                alert('<?php echo $this->translate('OOPS..Error while removing duplicate samples'); ?>');
             }else{
-                //reset removedSampleRow array 
+                //reset removedSampleRow array
                 removedSampleRow = [];
                 $('#removedSamples').val('');
-                $('#selectedSamples').html('('+removedSampleRow.length+') Sample(s) Selected');
+                $('#selectedSamples').html('('+removedSampleRow.length+') <?php echo $this->translate('Sample(s) Selected'); ?>');
                 $('#remove-btn').css('pointer-events','none');
                 $('#remove-btn').prop('disabled',true);
                 oTable.draw();

@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: ZendSkeletonApplication\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-08-26 00:21+0530\n"
-"PO-Revision-Date: 2017-09-29 12:33+0530\n"
+"PO-Revision-Date: 2017-09-29 20:42+0530\n"
 "Last-Translator: Diogo Melo <dmelo87@gmail.com>\n"
 "Language-Team: ZF Contibutors <zf-devteam@zend.com>\n"
 "Language: pt\n"
@@ -1676,31 +1676,31 @@ msgid "Results Awaited (Health Center-wise)"
 msgstr "Resultados pendentes (Por Unidade Sanitária)"
 
 msgid "Samples Tested - Pregnant"
-msgstr "Samples Tested - Pregnant"
+msgstr "Amostras testadas - Mulheres gravidas"
 
 msgid "Samples Tested - Breastfeeding"
-msgstr "Samples Tested - Breastfeeding"
+msgstr "Amostras testadas - Mulheres lactantes"
 
 msgid "Data Management"
-msgstr "Data Management"
+msgstr "Gestão de Dados"
 
 msgid "Duplicate Data"
-msgstr "Duplicate Data"
+msgstr "Dados duplicados"
 
 msgid "Sample(s) Selected"
-msgstr "Sample(s) Selected"
+msgstr "Amostra (s) selecionada (s)"
 
 msgid "Remove Selected Samples"
-msgstr "Remove Selected Samples"
+msgstr "Remover amostras selecionadas"
 
 msgid "OOPS..Error while removing duplicate samples"
-msgstr "OOPS..Error while removing duplicate samples"
+msgstr "OOPS ... Erro ao remover amostras duplicadas"
 
 msgid "Batch Code"
-msgstr "Batch Code"
+msgstr "Código do lote"
 
 msgid "Patient's Name"
-msgstr "Patient's Name"
+msgstr "Nome do paciente"
 
 #~ msgid "Hubs Dashboard"
 #~ msgstr "Hubs Dashboard"
