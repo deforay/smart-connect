@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: ZendSkeletonApplication\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-08-26 00:21+0530\n"
-"PO-Revision-Date: 2017-09-12 14:45+0530\n"
+"PO-Revision-Date: 2017-09-29 12:33+0530\n"
 "Last-Translator: Diogo Melo <dmelo87@gmail.com>\n"
 "Language-Team: ZF Contibutors <zf-devteam@zend.com>\n"
 "Language: pt\n"
@@ -359,8 +359,8 @@ msgid "Date Tested"
 msgstr "Data de Teste"
 
 #: ../view/application/clinic/dashboard.phtml:232
-msgid "Viral Load <br> (cp/ml)"
-msgstr "Carga Viral <br> (cp/ml)"
+msgid "Viral Load (cp/ml)"
+msgstr "Carga Viral (cp/ml)"
 
 #: ../view/application/clinic/dashboard.phtml:233
 #: ../view/application/facility/index.phtml:49
@@ -1674,6 +1674,33 @@ msgstr "Resultados pendentes (Por Distrito)"
 
 msgid "Results Awaited (Health Center-wise)"
 msgstr "Resultados pendentes (Por Unidade Sanitária)"
+
+msgid "Samples Tested - Pregnant"
+msgstr "Samples Tested - Pregnant"
+
+msgid "Samples Tested - Breastfeeding"
+msgstr "Samples Tested - Breastfeeding"
+
+msgid "Data Management"
+msgstr "Data Management"
+
+msgid "Duplicate Data"
+msgstr "Duplicate Data"
+
+msgid "Sample(s) Selected"
+msgstr "Sample(s) Selected"
+
+msgid "Remove Selected Samples"
+msgstr "Remove Selected Samples"
+
+msgid "OOPS..Error while removing duplicate samples"
+msgstr "OOPS..Error while removing duplicate samples"
+
+msgid "Batch Code"
+msgstr "Batch Code"
+
+msgid "Patient's Name"
+msgstr "Patient's Name"
 
 #~ msgid "Hubs Dashboard"
 #~ msgstr "Hubs Dashboard"

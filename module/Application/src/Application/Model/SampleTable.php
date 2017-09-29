@@ -3605,6 +3605,7 @@ class SampleTable extends AbstractTableGateway {
         );
         
 	$common = new CommonService($this->sm);
+        $buttText = $common->translate('Edit');
         foreach ($rResult as $aRow) {
             $sampleCollectionDate = '';
             if(isset($aRow['sampleCollectionDate']) && $aRow['sampleCollectionDate']!= NULL && trim($aRow['sampleCollectionDate'])!="" && $aRow['sampleCollectionDate']!= '0000-00-00'){
@@ -3623,7 +3624,7 @@ class SampleTable extends AbstractTableGateway {
             $row[]=(isset($aRow['sample_name']))?ucwords($aRow['sample_name']):'';
             $row[]=$aRow['result'];
             $row[]=ucwords($aRow['status_name']);
-            $row[]='<a href="javascript:void(0);" class="btn btn-primary btn-xs">Edit</a>';
+            $row[]='<a href="javascript:void(0);" class="btn green" title="Edit">'.$buttText.'</a>';
             $output['aaData'][] = $row;
         }
        return $output;
