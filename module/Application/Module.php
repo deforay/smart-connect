@@ -129,7 +129,7 @@ class Module{
 			$e->getApplication()->getEventManager()->attach(MvcEvent::EVENT_ROUTE, $stopCallBack, -10000);
 			return $response;
 		}
-		//redirect to respective dashboard in-case of passing invalid url params
+		//clinic/lab dashboard re-direction, in-case of passing invalid url params
 		if($session->role!= 1){
 		    $mappedFacilities = (isset($session->mappedFacilities) && count($session->mappedFacilities) >0)?$session->mappedFacilities:array();
 		    $mappedFacilitiesName = (isset($session->mappedFacilitiesName) && count($session->mappedFacilitiesName) >0)?$session->mappedFacilitiesName:array();
@@ -148,7 +148,7 @@ class Module{
 			}
 		    }
 		    if($redirect == true){
-			//set redirect
+			//set redirect path
 			$response = $e->getResponse();
 			if($session->role == 2){
 			    $response->getHeaders()->addHeaderLine('Location', '/labs/dashboard');
