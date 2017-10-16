@@ -669,11 +669,17 @@ class SampleService {
                         if(isset($params['adherence']) && trim($params['adherence'])!=''){
                             $countQuery = $countQuery->where(array("vl.arv_adherance_percentage ='".$params['adherence']."'")); 
                         }
-                        if(isset($params['age']) && $params['age']!=''){
-                            if($params['age'] == '<18'){
-                              $countQuery = $countQuery->where("vl.patient_age_in_years < 18");
-                            }else if($params['age'] == '>18') {
-                              $countQuery = $countQuery->where("vl.patient_age_in_years > 18");
+                        if(isset($params['age']) && trim($params['age'])!=''){
+                            if($params['age'] == '<2'){
+                              $countQuery = $countQuery->where("vl.patient_age_in_years < 2");
+                            }else if($params['age'] == '2to5') {
+                              $countQuery = $countQuery->where("vl.patient_age_in_years > 2 AND vl.patient_age_in_years <= 5");
+                            }else if($params['age'] == '6to14') {
+                              $countQuery = $countQuery->where("vl.patient_age_in_years > 6 AND vl.patient_age_in_years <= 14");
+                            }else if($params['age'] == '15to49') {
+                              $countQuery = $countQuery->where("vl.patient_age_in_years > 15 AND vl.patient_age_in_years <= 49");
+                            }else if($params['age'] == '>50'){
+                              $countQuery = $countQuery->where("vl.patient_age_in_years > 50");
                             }else if($params['age'] == 'unknown'){
                               $countQuery = $countQuery->where("vl.patient_age_in_years = 'unknown' OR vl.patient_age_in_years = '' OR vl.patient_age_in_years IS NULL");
                             }

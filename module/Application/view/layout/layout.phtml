@@ -484,6 +484,12 @@ $languagecontainer->locale = $this->GetLocaleData('locale',$config['language']);
             ?>
           });
           
+          $(document).ready(function () {
+                $("body").on("contextmenu",function(e){
+                  return false;
+                });
+          });
+          
           $(document).ajaxStop(function () {
             setTimeout(showAnnouncementMsg, 2000);
           });

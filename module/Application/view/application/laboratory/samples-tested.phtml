@@ -171,8 +171,11 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
                                     <label class="control-label"><?php echo $this->translate('Age Group'); ?></label>
                                     <select class="form-control" name="age" id="age" title="<?php echo $this->translate('Please choose age group'); ?>">
                                       <option value="">-- <?php echo $this->translate('Age'); ?> --</option>
-                                      <option value="<18" <?php echo (isset($age) && $age == '<18')?'selected="selected"':''; ?>> <18</option>
-                                      <option value=">18" <?php echo (isset($age) && $age == '>18')?'selected="selected"':''; ?>> >18</option>
+                                      <option value="<2"> <2</option>
+                                      <option value="2to5"> 2 - 5</option>
+                                      <option value="6to14"> 6 - 14</option>
+                                      <option value="15to49"> 15 - 49</option>
+                                      <option value=">50"> >50</option>
                                       <option value="unknown"> <?php echo $this->translate('Unknown'); ?></option>
                                     </select>
                                 </div>

@@ -71,7 +71,7 @@ if($available > 0) { ?>
                 marker = new google.maps.Marker({
                     position: position,
                     map: map,
-                    title: markers[i]['title'],
+                    //title: markers[i]['title'],
                     icon : markers[i]['icon']
                 });
                 marker['infowindow'] = new google.maps.InfoWindow({
@@ -83,8 +83,8 @@ if($available > 0) { ?>
                     }
             
                     prev_infowindow = this['infowindow'];
-                    this['infowindow'].open(map, this);
-                    //setTimeout(function() { this['infowindow'].close(); }, 3000);
+                    prev_infowindow.open(map, this);
+                    setTimeout(function() { prev_infowindow.close(); }, 3000);
                 });
                 // Automatically center the map fitting all markers on the screen
                 map.fitBounds(bounds);
