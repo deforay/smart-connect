@@ -261,7 +261,6 @@
             $('#provinceNew').hide().removeClass('isRequired').val('');
             $.blockUI.defaults.css.border = '1px solid grey'; 
             $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
-            $('#facility').val('').change();
             $.post("<?php echo $this->url('facility', array('action' => 'get-district-list')); ?>", {state : this.value},
             function(data){
                 $('#districtName').html(data);
