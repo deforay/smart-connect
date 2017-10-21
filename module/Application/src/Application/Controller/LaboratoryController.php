@@ -219,13 +219,13 @@ class LaboratoryController extends AbstractActionController{
         }
     }
     
-    public function getSampleTestResultAgeAction(){
+    public function getSampleTestResultAgeGroupAction(){
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
             $sampleService = $this->getServiceLocator()->get('SampleService');
             $params['age'] = 'yes';
-            $result = $sampleService->getSampleTestedResultAgeDetails($params);
+            $result = $sampleService->getSampleTestedResultAgeGroupDetails($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('result' => $result))
                         ->setTerminal(true);

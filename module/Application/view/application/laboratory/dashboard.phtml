@@ -289,7 +289,7 @@ foreach($sampleType as $samples){
                                     </div>  
                                 </div>
                                 <div class="portlet-body">
-                                    <div id="samplesTestedResultGender"></div>
+                                    <div id="samplesTestedResultGender" style="height:450px;"></div>
                                 </div>
                             </div>
                         </div>
@@ -298,19 +298,25 @@ foreach($sampleType as $samples){
                             <div class="portlet box blue">
                                 <div class="portlet-title">
                                     <div class="caption">
-                                        <span class="caption-subject"><?php echo $this->translate('Samples Tested based on Age'); ?></span>
+                                        <span class="caption-subject"><?php echo $this->translate('Laboratory Turnaround Time'); ?></span>
                                     </div>
-                                    <div class="actions">
-                                        <div class="btn-group">
-                                            <!--<select id="sampleTypeVolumeAge" class="btn white btn-outline btn-circle btn-sm dropdown-toggle" onchange="getTestedSampleResultBasedAge()">-->
-                                            <!--    <option value="">< ?php echo $this->translate('All Sample Types'); ?></option>-->
-                                            <!--    < ?php echo $sType;?>-->
-                                            <!--</select>-->
-                                        </div>
-                                    </div>                           
                                 </div>
                                 <div class="portlet-body">
-                                    <div id="samplesTestedResultAge"></div>
+                                    <div id="labAverageTat" style="height:450px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12 col-sm-12">
+                            <div class="portlet box blue">
+                                <div class="portlet-title">
+                                    <div class="caption">
+                                        <span class="caption-subject"><?php echo $this->translate('Samples Tested based on Age'); ?></span>
+                                    </div>                     
+                                </div>
+                                <div class="portlet-body">
+                                    <div id="samplesTestedResultAgeGroup"></div>
                                 </div>
                             </div>
                         </div>                        
@@ -342,19 +348,7 @@ foreach($sampleType as $samples){
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-4 col-sm-4">
-                            <div class="portlet box blue">
-                                <div class="portlet-title">
-                                    <div class="caption">
-                                        <span class="caption-subject"><?php echo $this->translate('Laboratory Turnaround Time'); ?></span>
-                                    </div>
-                                </div>
-                                <div class="portlet-body">
-                                    <div id="labAverageTat" style="height:450px;"></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4 col-sm-4">
+                        <div class="col-md-6 col-sm-6">
                             <div class="portlet box blue">
                                 <div class="portlet-title">
                                     <div class="caption">
@@ -366,7 +360,7 @@ foreach($sampleType as $samples){
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-4 col-sm-4">
+                        <div class="col-md-6 col-sm-6">
                             <div class="portlet box blue">
                                 <div class="portlet-title">
                                     <div class="caption">
@@ -502,13 +496,13 @@ foreach($sampleType as $samples){
         });
     }
     
-    function getTestedSampleResultBasedAge(){
+    function getTestedSampleResultBasedAgeGroup(){
         facilityId = $("#labName").val();
         fromDate=$('#mrp-lowerDate').val();
         toDate=$('#mrp-upperDate').val();
-        $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-test-result-age')); ?>",{fromDate:fromDate,toDate:toDate,facilityId:facilityId},
+        $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-test-result-age-group')); ?>",{fromDate:fromDate,toDate:toDate,facilityId:facilityId},
         function(data) {
-            $("#samplesTestedResultAge").html(data);
+            $("#samplesTestedResultAgeGroup").html(data);
         });
     }
     
@@ -654,7 +648,7 @@ foreach($sampleType as $samples){
         getTestedSampleResult();
         getTestedSampleResultBasedLab();
         getTestedSampleResultBasedGender();
-        getTestedSampleResultBasedAge();
+        getTestedSampleResultBasedAgeGroup();
         getTestedSampleResultBasedonPregnantPatient();
         getTestedSampleResultBasedonBreastfeedingPatient();
         femalePatient();

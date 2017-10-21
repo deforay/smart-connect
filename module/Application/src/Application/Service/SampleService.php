@@ -323,9 +323,9 @@ class SampleService {
         return $sampleDb->fetchSampleTestedResultGenderDetails($params);
     }
     
-    public function getSampleTestedResultAgeDetails($params){
+    public function getSampleTestedResultAgeGroupDetails($params){
         $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->fetchSampleTestedResultAgeDetails($params);
+        return $sampleDb->fetchSampleTestedResultAgeGroupDetails($params);
     }
     
     //get sample tested result details
@@ -673,11 +673,11 @@ class SampleService {
                             if($params['age'] == '<2'){
                               $countQuery = $countQuery->where("vl.patient_age_in_years < 2");
                             }else if($params['age'] == '2to5') {
-                              $countQuery = $countQuery->where("vl.patient_age_in_years > 2 AND vl.patient_age_in_years <= 5");
+                              $countQuery = $countQuery->where("vl.patient_age_in_years >= 2 AND vl.patient_age_in_years <= 5");
                             }else if($params['age'] == '6to14') {
-                              $countQuery = $countQuery->where("vl.patient_age_in_years > 6 AND vl.patient_age_in_years <= 14");
+                              $countQuery = $countQuery->where("vl.patient_age_in_years >= 6 AND vl.patient_age_in_years <= 14");
                             }else if($params['age'] == '15to49') {
-                              $countQuery = $countQuery->where("vl.patient_age_in_years > 15 AND vl.patient_age_in_years <= 49");
+                              $countQuery = $countQuery->where("vl.patient_age_in_years >= 15 AND vl.patient_age_in_years <= 49");
                             }else if($params['age'] == '>50'){
                               $countQuery = $countQuery->where("vl.patient_age_in_years > 50");
                             }else if($params['age'] == 'unknown'){

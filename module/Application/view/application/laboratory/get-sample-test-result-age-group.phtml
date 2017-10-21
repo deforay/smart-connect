@@ -1,0 +1,107 @@
+<?php
+$lt1000 = array('<2'=>'#088738', '2-5' => '#7fb17f', '6-14' => '#60D18F', '15-49' => '#A5F7C6', '>50' => '#b2d0b2');
+$gt1000 = array('<2'=>'#ff1900', '2-5' => '#ac2710', '6-14' => '#f8745d', '15-49' => '#fa9c8b', '>50' => '#fcc3b9');
+?>
+<div id="samplesTestedVsAgeGroup"></div>
+<script>
+       $(function () {
+       $('#samplesTestedVsAgeGroup').highcharts({
+       chart: {
+            type: 'column'
+        },
+        title: {
+            text: ''
+        },
+        exporting:{
+            chartOptions:{
+                subtitle: {
+                    text:'<?php echo $this->translate('Samples Tested based on Age'); ?>',
+                }
+            }
+        },
+       credits: {
+              enabled: false
+       },
+        xAxis: {
+            categories: [<?php
+            if(isset($result['date']) && count($result['date'])>0){
+              foreach($result['date'] as $date){
+                  echo "'".$date."',";
+              }
+            }
+            ?>]
+        },
+        yAxis: {
+            allowDecimals: false,
+            min: 0,
+            title: {
+                text: '<?php echo $this->translate('No. of Samples'); ?>'
+            }
+        },
+        tooltip: {
+            formatter: function () {
+                return '<b>' + this.x + '</b><br/>' +
+                    this.series.name + ': ' + this.y + '<br/>' +
+                    '<?php echo $this->translate('Total'); ?>: ' + this.point.stackTotal;
+            }
+        },
+        plotOptions: {
+            column: {
+                stacking: 'normal',
+                pointPadding: 0.2,
+                borderWidth: 0,
+                cursor: 'pointer',
+                point: {
+                    events: {
+                        click: function (e) {
+                           doSampleTestedBasedonAgeRedirect(e.point.category,e.point.age);
+                        }
+                    }
+                }
+            }
+        },
+        series: [<?php
+        $age = array('<2','2-5','6-14','15-49','>50');
+        for($i=0;$i<count($age);$i++){
+              foreach($result[$age[$i]] as $key=>$condition){
+              if($key!='VL Not Detected'){
+                 $range = substr($key,4,6);
+                 $range = preg_replace('/\s+/', '', $range);
+              }else{
+                $range = 'nd';
+              }
+              $translatedKey = $this->translate($key);
+              ?>
+              {
+              name:'<?php echo $translatedKey."(".htmlspecialchars($age[$i]).")"; ?>',
+              data:[<?php
+                  foreach($condition as $count){
+                     echo '{y:'.$count.',age:"'.$age[$i].'"},';
+                  }
+              ?>],
+              stack:'<?php echo $age[$i];?>',
+              <?php
+              if($key == "VL (< 1000 cp/ml)"){
+              
+                     if(isset($lt1000[$age[$i]])) { ?>
+                     
+                            color: '<?php echo $lt1000[$age[$i]]; ?>'
+                     
+                     <?php } else{ ?>
+                            color: '<?php echo $gt1000[$age[$i]]; ?>'
+              <?php }
+              } else { ?>
+                 color: '#ff1900'
+              <?php
+              }
+              ?>
+              
+              },
+              <?php
+              }
+        }
+            ?>
+        ]
+    });
+    });
+</script>

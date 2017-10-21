@@ -496,12 +496,11 @@ $languagecontainer->locale = $this->GetLocaleData('locale',$config['language']);
           
           function showAnnouncementMsg(){
             if(document.cookie.indexOf("msg_on") == -1 || getCookie('msg_on') == ''){
-                    <?php
-                    if(isset($config['announcement_msg']) && trim($config['announcement_msg'])!= ''){ ?>
-                       alert('<?php echo ucfirst($config['announcement_msg']); ?>');
-                       setCookie('msg_on',1);
-                    <?php } ?>
-                }
+                <?php if(isset($config['announcement_msg']) && trim($config['announcement_msg'])!= ''){ ?>
+                   alert('<?php echo ucfirst($config['announcement_msg']); ?>');
+                   setCookie('msg_on',1);
+                <?php } ?>
+            }
           }
           
           function clearCache(){

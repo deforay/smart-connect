@@ -353,7 +353,7 @@ class SampleTable extends AbstractTableGateway {
       return $result;
     }
     
-    public function fetchSampleTestedResultAgeDetails($params){
+    public function fetchSampleTestedResultAgeGroupDetails($params){
         $logincontainer = new Container('credo');
         $result = array();
         $dbAdapter = $this->adapter;
@@ -371,18 +371,20 @@ class SampleTable extends AbstractTableGateway {
                                                     "total" => new Expression('COUNT(*)'),
                                                     "monthDate" => new Expression("DATE_FORMAT(DATE(sample_collection_date), '%b-%Y')"),
                                                     
-                                                    "A18GreaterThan1000" => new Expression("SUM(CASE WHEN (vl.result>=1000 and patient_age_in_years > 18) THEN 1 ELSE 0 END)"),
-                                                    "A18LesserThan1000" => new Expression("SUM(CASE WHEN ((vl.result<1000 or vl.result='Target Not Detected') and patient_age_in_years > 18) THEN 1 ELSE 0 END)"),
-                                                    //"A18TND" => new Expression("SUM(CASE WHEN (vl.result='Target Not Detected' and patient_age_in_years > 18) THEN 1 ELSE 0 END)"),
+                                                    "AgeLt2VLGt1000" => new Expression("SUM(CASE WHEN (vl.result>=1000 and patient_age_in_years < 2) THEN 1 ELSE 0 END)"),
+                                                    "AgeLt2VLLt1000" => new Expression("SUM(CASE WHEN ((vl.result<1000 or vl.result='Target Not Detected') and patient_age_in_years < 2) THEN 1 ELSE 0 END)"),
                                              
-                                                    "B18GreaterThan1000" => new Expression("SUM(CASE WHEN (vl.result>=1000 and patient_age_in_years < 18) THEN 1 ELSE 0 END)"),
-                                                    "B18LesserThan1000" => new Expression("SUM(CASE WHEN ((vl.result<1000 or vl.result='Target Not Detected') and patient_age_in_years < 18) THEN 1 ELSE 0 END)"),
-                                                    //"B18TND" => new Expression("SUM(CASE WHEN (vl.result='Target Not Detected' and patient_age_in_years < 18) THEN 1 ELSE 0 END)"),
-
-                                                    "UnknownGreaterThan1000" => new Expression("SUM(CASE WHEN (vl.result>=1000 and (patient_age_in_years is null || patient_age_in_years = '')) THEN 1 ELSE 0 END)"),
-                                                    "UnknownLesserThan1000" => new Expression("SUM(CASE WHEN ((vl.result<1000 or vl.result='Target Not Detected') and (patient_age_in_years is null || patient_age_in_years = '')) THEN 1 ELSE 0 END)"),
-                                                    //"UnknownTND" => new Expression("SUM(CASE WHEN (vl.result='Target Not Detected' and (patient_age_in_years is null || patient_age_in_years = '')) THEN 1 ELSE 0 END)"),
-                                             
+                                                    "AgeGte2Lte5VLGt1000" => new Expression("SUM(CASE WHEN (vl.result>=1000 and (patient_age_in_years >= 2 and patient_age_in_years <= 5)) THEN 1 ELSE 0 END)"),
+                                                    "AgeGte2Lte5VLLt1000" => new Expression("SUM(CASE WHEN ((vl.result<1000 or vl.result='Target Not Detected') and (patient_age_in_years >= 2 and patient_age_in_years <= 5)) THEN 1 ELSE 0 END)"),
+                                                    
+                                                    "AgeGte6Lte14VLGt1000" => new Expression("SUM(CASE WHEN (vl.result>=1000 and (patient_age_in_years >= 6 and patient_age_in_years <= 14)) THEN 1 ELSE 0 END)"),
+                                                    "AgeGte6Lte14VLLt1000" => new Expression("SUM(CASE WHEN ((vl.result<1000 or vl.result='Target Not Detected') and (patient_age_in_years >= 6 and patient_age_in_years <= 14)) THEN 1 ELSE 0 END)"),
+                                                    
+                                                    "AgeGte15Lte49VLGt1000" => new Expression("SUM(CASE WHEN (vl.result>=1000 and (patient_age_in_years >= 15 and patient_age_in_years <= 49)) THEN 1 ELSE 0 END)"),
+                                                    "AgeGte15Lte49VLLt1000" => new Expression("SUM(CASE WHEN ((vl.result<1000 or vl.result='Target Not Detected') and (patient_age_in_years >= 15 and patient_age_in_years <= 49)) THEN 1 ELSE 0 END)"),
+                                                    
+                                                    "AgeGt50VLGt1000" => new Expression("SUM(CASE WHEN (vl.result>=1000 and patient_age_in_years > 50) THEN 1 ELSE 0 END)"),
+                                                    "AgeGt50VLLt1000" => new Expression("SUM(CASE WHEN ((vl.result<1000 or vl.result='Target Not Detected') and patient_age_in_years > 50) THEN 1 ELSE 0 END)")
                                               )
                                             );
             if(isset($params['facilityId']) && is_array($params['facilityId']) && count($params['facilityId']) >0){
@@ -409,14 +411,17 @@ class SampleTable extends AbstractTableGateway {
             foreach($sampleResult as $sRow){
                 if($sRow["monthDate"] == null) continue;
                 
-                $result['>18']['VL (>= 1000 cp/ml)'][$j] = $sRow["A18GreaterThan1000"];
-                $result['<18']['VL (>= 1000 cp/ml)'][$j] = $sRow["B18GreaterThan1000"];
+                $result['<2']['VL (>= 1000 cp/ml)'][$j] = $sRow["AgeLt2VLGt1000"];
+                $result['2-5']['VL (>= 1000 cp/ml)'][$j] = $sRow["AgeGte2Lte5VLGt1000"];
+                $result['6-14']['VL (>= 1000 cp/ml)'][$j] = $sRow["AgeGte6Lte14VLGt1000"];
+                $result['15-49']['VL (>= 1000 cp/ml)'][$j] = $sRow["AgeGte15Lte49VLGt1000"];
+                $result['>50']['VL (>= 1000 cp/ml)'][$j] = $sRow["AgeGt50VLGt1000"];
                 
-               // $result['>18']['VL Not Detected'][$j] = $sRow["A18TND"];
-              //  $result['<18']['VL Not Detected'][$j] = $sRow["B18TND"];
-                
-                $result['>18']['VL (< 1000 cp/ml)'][$j] = $sRow["A18LesserThan1000"];
-                $result['<18']['VL (< 1000 cp/ml)'][$j] = $sRow["B18LesserThan1000"];
+                $result['<2']['VL (< 1000 cp/ml)'][$j] = $sRow["AgeLt2VLLt1000"];
+                $result['2-5']['VL (< 1000 cp/ml)'][$j] = $sRow["AgeGte2Lte5VLLt1000"];
+                $result['6-14']['VL (< 1000 cp/ml)'][$j] = $sRow["AgeGte6Lte14VLLt1000"];
+                $result['15-49']['VL (< 1000 cp/ml)'][$j] = $sRow["AgeGte15Lte49VLLt1000"];
+                $result['>50']['VL (< 1000 cp/ml)'][$j] = $sRow["AgeGt50VLLt1000"];
                 
                 $result['date'][$j] = $sRow["monthDate"];
                 $j++;
@@ -1647,11 +1652,11 @@ class SampleTable extends AbstractTableGateway {
                     if($params['age'] == '<2'){
                       $countQuery = $countQuery->where("vl.patient_age_in_years < 2");
                     }else if($params['age'] == '2to5') {
-                      $countQuery = $countQuery->where("vl.patient_age_in_years > 2 AND vl.patient_age_in_years <= 5");
+                      $countQuery = $countQuery->where("vl.patient_age_in_years >= 2 AND vl.patient_age_in_years <= 5");
                     }else if($params['age'] == '6to14') {
-                      $countQuery = $countQuery->where("vl.patient_age_in_years > 6 AND vl.patient_age_in_years <= 14");
+                      $countQuery = $countQuery->where("vl.patient_age_in_years >= 6 AND vl.patient_age_in_years <= 14");
                     }else if($params['age'] == '15to49') {
-                      $countQuery = $countQuery->where("vl.patient_age_in_years > 15 AND vl.patient_age_in_years <= 49");
+                      $countQuery = $countQuery->where("vl.patient_age_in_years >= 15 AND vl.patient_age_in_years <= 49");
                     }else if($params['age'] == '>50'){
                       $countQuery = $countQuery->where("vl.patient_age_in_years > 50");
                     }else if($params['age'] == 'unknown'){
@@ -1768,11 +1773,11 @@ class SampleTable extends AbstractTableGateway {
                     if($params['age'] == '<2'){
                       $countQuery = $countQuery->where("vl.patient_age_in_years < 2");
                     }else if($params['age'] == '2to5') {
-                      $countQuery = $countQuery->where("vl.patient_age_in_years > 2 AND vl.patient_age_in_years <= 5");
+                      $countQuery = $countQuery->where("vl.patient_age_in_years >= 2 AND vl.patient_age_in_years <= 5");
                     }else if($params['age'] == '6to14') {
-                      $countQuery = $countQuery->where("vl.patient_age_in_years > 6 AND vl.patient_age_in_years <= 14");
+                      $countQuery = $countQuery->where("vl.patient_age_in_years >= 6 AND vl.patient_age_in_years <= 14");
                     }else if($params['age'] == '15to49') {
-                      $countQuery = $countQuery->where("vl.patient_age_in_years > 15 AND vl.patient_age_in_years <= 49");
+                      $countQuery = $countQuery->where("vl.patient_age_in_years >= 15 AND vl.patient_age_in_years <= 49");
                     }else if($params['age'] == '>50'){
                       $countQuery = $countQuery->where("vl.patient_age_in_years > 50");
                     }else if($params['age'] == 'unknown'){
@@ -1883,11 +1888,11 @@ class SampleTable extends AbstractTableGateway {
                 if($params['age'] == '<2'){
                   $sQuery = $sQuery->where("vl.patient_age_in_years < 2");
                 }else if($params['age'] == '2to5') {
-                  $sQuery = $sQuery->where("vl.patient_age_in_years > 2 AND vl.patient_age_in_years <= 5");
+                  $sQuery = $sQuery->where("vl.patient_age_in_years >= 2 AND vl.patient_age_in_years <= 5");
                 }else if($params['age'] == '6to14') {
-                  $sQuery = $sQuery->where("vl.patient_age_in_years > 6 AND vl.patient_age_in_years <= 14");
+                  $sQuery = $sQuery->where("vl.patient_age_in_years >= 6 AND vl.patient_age_in_years <= 14");
                 }else if($params['age'] == '15to49') {
-                  $sQuery = $sQuery->where("vl.patient_age_in_years > 15 AND vl.patient_age_in_years <= 49");
+                  $sQuery = $sQuery->where("vl.patient_age_in_years >= 15 AND vl.patient_age_in_years <= 49");
                 }else if($params['age'] == '>50'){
                   $sQuery = $sQuery->where("vl.patient_age_in_years > 50");
                 }else if($params['age'] == 'unknown'){
@@ -1978,11 +1983,11 @@ class SampleTable extends AbstractTableGateway {
                     if($params['age'] == '<2'){
                       $sQuery = $sQuery->where("vl.patient_age_in_years < 2");
                     }else if($params['age'] == '2to5') {
-                      $sQuery = $sQuery->where("vl.patient_age_in_years > 2 AND vl.patient_age_in_years <= 5");
+                      $sQuery = $sQuery->where("vl.patient_age_in_years >= 2 AND vl.patient_age_in_years <= 5");
                     }else if($params['age'] == '6to14') {
-                      $sQuery = $sQuery->where("vl.patient_age_in_years > 6 AND vl.patient_age_in_years <= 14");
+                      $sQuery = $sQuery->where("vl.patient_age_in_years >= 6 AND vl.patient_age_in_years <= 14");
                     }else if($params['age'] == '15to49') {
-                      $sQuery = $sQuery->where("vl.patient_age_in_years > 15 AND vl.patient_age_in_years <= 49");
+                      $sQuery = $sQuery->where("vl.patient_age_in_years >= 15 AND vl.patient_age_in_years <= 49");
                     }else if($params['age'] == '>50'){
                       $sQuery = $sQuery->where("vl.patient_age_in_years > 50");
                     }else if($params['age'] == 'unknown'){
@@ -2157,11 +2162,11 @@ class SampleTable extends AbstractTableGateway {
             if($parameters['age'] == '<2'){
               $sQuery = $sQuery->where("vl.patient_age_in_years < 2");
             }else if($parameters['age'] == '2to5') {
-              $sQuery = $sQuery->where("vl.patient_age_in_years > 2 AND vl.patient_age_in_years <= 5");
+              $sQuery = $sQuery->where("vl.patient_age_in_years >= 2 AND vl.patient_age_in_years <= 5");
             }else if($parameters['age'] == '6to14') {
-              $sQuery = $sQuery->where("vl.patient_age_in_years > 6 AND vl.patient_age_in_years <= 14");
+              $sQuery = $sQuery->where("vl.patient_age_in_years >= 6 AND vl.patient_age_in_years <= 14");
             }else if($parameters['age'] == '15to49') {
-              $sQuery = $sQuery->where("vl.patient_age_in_years > 15 AND vl.patient_age_in_years <= 49");
+              $sQuery = $sQuery->where("vl.patient_age_in_years >= 15 AND vl.patient_age_in_years <= 49");
             }else if($parameters['age'] == '>50'){
               $sQuery = $sQuery->where("vl.patient_age_in_years > 50");
             }else if($parameters['age'] == 'unknown'){
@@ -2426,11 +2431,11 @@ class SampleTable extends AbstractTableGateway {
                 if($parameters['age'] == '<2'){
                   $countQuery = $countQuery->where("vl.patient_age_in_years < 2");
                 }else if($parameters['age'] == '2to5') {
-                  $countQuery = $countQuery->where("vl.patient_age_in_years > 2 AND vl.patient_age_in_years <= 5");
+                  $countQuery = $countQuery->where("vl.patient_age_in_years >= 2 AND vl.patient_age_in_years <= 5");
                 }else if($parameters['age'] == '6to14') {
-                  $countQuery = $countQuery->where("vl.patient_age_in_years > 6 AND vl.patient_age_in_years <= 14");
+                  $countQuery = $countQuery->where("vl.patient_age_in_years >= 6 AND vl.patient_age_in_years <= 14");
                 }else if($parameters['age'] == '15to49') {
-                  $countQuery = $countQuery->where("vl.patient_age_in_years > 15 AND vl.patient_age_in_years <= 49");
+                  $countQuery = $countQuery->where("vl.patient_age_in_years >= 15 AND vl.patient_age_in_years <= 49");
                 }else if($parameters['age'] == '>50'){
                   $countQuery = $countQuery->where("vl.patient_age_in_years > 50");
                 }else if($parameters['age'] == 'unknown'){
@@ -2757,11 +2762,11 @@ class SampleTable extends AbstractTableGateway {
                     if($params['age'] == '<2'){
                       $countQuery = $countQuery->where("vl.patient_age_in_years < 2");
                     }else if($params['age'] == '2to5') {
-                      $countQuery = $countQuery->where("vl.patient_age_in_years > 2 AND vl.patient_age_in_years <= 5");
+                      $countQuery = $countQuery->where("vl.patient_age_in_years >= 2 AND vl.patient_age_in_years <= 5");
                     }else if($params['age'] == '6to14') {
-                      $countQuery = $countQuery->where("vl.patient_age_in_years > 6 AND vl.patient_age_in_years <= 14");
+                      $countQuery = $countQuery->where("vl.patient_age_in_years >= 6 AND vl.patient_age_in_years <= 14");
                     }else if($params['age'] == '15to49') {
-                      $countQuery = $countQuery->where("vl.patient_age_in_years > 15 AND vl.patient_age_in_years <= 49");
+                      $countQuery = $countQuery->where("vl.patient_age_in_years >= 15 AND vl.patient_age_in_years <= 49");
                     }else if($params['age'] == '>50'){
                       $countQuery = $countQuery->where("vl.patient_age_in_years > 50");
                     }else if($params['age'] == 'unknown'){
@@ -2893,11 +2898,11 @@ class SampleTable extends AbstractTableGateway {
                     if($params['age'] == '<2'){
                       $countQuery = $countQuery->where("vl.patient_age_in_years < 2");
                     }else if($params['age'] == '2to5') {
-                      $countQuery = $countQuery->where("vl.patient_age_in_years > 2 AND vl.patient_age_in_years <= 5");
+                      $countQuery = $countQuery->where("vl.patient_age_in_years >= 2 AND vl.patient_age_in_years <= 5");
                     }else if($params['age'] == '6to14') {
-                      $countQuery = $countQuery->where("vl.patient_age_in_years > 6 AND vl.patient_age_in_years <= 14");
+                      $countQuery = $countQuery->where("vl.patient_age_in_years >= 6 AND vl.patient_age_in_years <= 14");
                     }else if($params['age'] == '15to49') {
-                      $countQuery = $countQuery->where("vl.patient_age_in_years > 15 AND vl.patient_age_in_years <= 49");
+                      $countQuery = $countQuery->where("vl.patient_age_in_years >= 15 AND vl.patient_age_in_years <= 49");
                     }else if($params['age'] == '>50'){
                       $countQuery = $countQuery->where("vl.patient_age_in_years > 50");
                     }else if($params['age'] == 'unknown'){
@@ -3035,11 +3040,11 @@ class SampleTable extends AbstractTableGateway {
                     if($params['age'] == '<2'){
                       $countQuery = $countQuery->where("vl.patient_age_in_years < 2");
                     }else if($params['age'] == '2to5') {
-                      $countQuery = $countQuery->where("vl.patient_age_in_years > 2 AND vl.patient_age_in_years <= 5");
+                      $countQuery = $countQuery->where("vl.patient_age_in_years >= 2 AND vl.patient_age_in_years <= 5");
                     }else if($params['age'] == '6to14') {
-                      $countQuery = $countQuery->where("vl.patient_age_in_years > 6 AND vl.patient_age_in_years <= 14");
+                      $countQuery = $countQuery->where("vl.patient_age_in_years >= 6 AND vl.patient_age_in_years <= 14");
                     }else if($params['age'] == '15to49') {
-                      $countQuery = $countQuery->where("vl.patient_age_in_years > 15 AND vl.patient_age_in_years <= 49");
+                      $countQuery = $countQuery->where("vl.patient_age_in_years >= 15 AND vl.patient_age_in_years <= 49");
                     }else if($params['age'] == '>50'){
                       $countQuery = $countQuery->where("vl.patient_age_in_years > 50");
                     }else if($params['age'] == 'unknown'){
@@ -3142,11 +3147,11 @@ class SampleTable extends AbstractTableGateway {
                     if($params['age'] == '<2'){
                       $countQuery = $countQuery->where("vl.patient_age_in_years < 2");
                     }else if($params['age'] == '2to5') {
-                      $countQuery = $countQuery->where("vl.patient_age_in_years > 2 AND vl.patient_age_in_years <= 5");
+                      $countQuery = $countQuery->where("vl.patient_age_in_years >= 2 AND vl.patient_age_in_years <= 5");
                     }else if($params['age'] == '6to14') {
-                      $countQuery = $countQuery->where("vl.patient_age_in_years > 6 AND vl.patient_age_in_years <= 14");
+                      $countQuery = $countQuery->where("vl.patient_age_in_years >= 6 AND vl.patient_age_in_years <= 14");
                     }else if($params['age'] == '15to49') {
-                      $countQuery = $countQuery->where("vl.patient_age_in_years > 15 AND vl.patient_age_in_years <= 49");
+                      $countQuery = $countQuery->where("vl.patient_age_in_years >= 15 AND vl.patient_age_in_years <= 49");
                     }else if($params['age'] == '>50'){
                       $countQuery = $countQuery->where("vl.patient_age_in_years > 50");
                     }else if($params['age'] == 'unknown'){
@@ -3313,11 +3318,11 @@ class SampleTable extends AbstractTableGateway {
             if($parameters['age'] == '<2'){
               $sQuery = $sQuery->where("vl.patient_age_in_years < 2");
             }else if($parameters['age'] == '2to5') {
-              $sQuery = $sQuery->where("vl.patient_age_in_years > 2 AND vl.patient_age_in_years <= 5");
+              $sQuery = $sQuery->where("vl.patient_age_in_years >= 2 AND vl.patient_age_in_years <= 5");
             }else if($parameters['age'] == '6to14') {
-              $sQuery = $sQuery->where("vl.patient_age_in_years > 6 AND vl.patient_age_in_years <= 14");
+              $sQuery = $sQuery->where("vl.patient_age_in_years >= 6 AND vl.patient_age_in_years <= 14");
             }else if($parameters['age'] == '15to49') {
-              $sQuery = $sQuery->where("vl.patient_age_in_years > 15 AND vl.patient_age_in_years <= 49");
+              $sQuery = $sQuery->where("vl.patient_age_in_years >= 15 AND vl.patient_age_in_years <= 49");
             }else if($parameters['age'] == '>50'){
               $sQuery = $sQuery->where("vl.patient_age_in_years > 50");
             }else if($parameters['age'] == 'unknown'){
