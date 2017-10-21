@@ -62,18 +62,15 @@ foreach($sampleType as $samples){
                                 </div>
                                 <div class="form-group col-lg-4">
                                     <label class="control-label"><?php echo $this->translate('Age Group'); ?>&nbsp;</label>
-                                  <select class="form-control" name="age" id="age" title="<?php echo $this->translate('Please choose age group'); ?>">
-                                    <option value="">-- <?php echo $this->translate('Age'); ?> --</option>
-                                    <option value="0-10">0-10</option>
-                                    <option value="10-20">10-20</option>
-                                    <option value="20-30">20-30</option>
-                                    <option value="30-40">30-40</option>
-                                    <option value="40-50">40-50</option>
-                                    <option value="50-60">50-60</option>
-                                    <option value="60-70">60-70</option>
-                                    <option value="70-80">70-80</option>
-                                    <option value="80"><?php echo $this->translate('Above'); ?> 80</option>
-                                  </select>
+                                    <select class="form-control" name="age" id="age" title="<?php echo $this->translate('Please choose age group'); ?>">
+                                      <option value="">-- <?php echo $this->translate('Age'); ?> --</option>
+                                      <option value="<2"> <2</option>
+                                      <option value="2to5"> 2 - 5</option>
+                                      <option value="6to14"> 6 - 14</option>
+                                      <option value="15to49"> 15 - 49</option>
+                                      <option value=">50"> >50</option>
+                                      <option value="unknown"> <?php echo $this->translate('Unknown'); ?></option>
+                                    </select>
                                 </div>
                             </div>
                         </div>
@@ -402,6 +399,18 @@ foreach($sampleType as $samples){
         } );
     }
     
+    $('#gender').on('change',function() {
+        if(this.value == 'F'){
+            $('.femaleSection').show();
+        }else{
+           $('.femaleSection').hide();
+           $('#pregnantYes').prop('checked',false);
+           $('#pregnantNo').prop('checked',false);
+           $('#breastfeedingYes').prop('checked',false);
+           $('#breastfeedingNo').prop('checked',false);
+        }
+    });
+    
     function searchClinicData(){
         $.blockUI.defaults.css.border = '1px solid grey';
         $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
@@ -478,16 +487,4 @@ foreach($sampleType as $samples){
             }
         }); 
     }
-    
-    $('#gender').on('change',function() {
-        if(this.value == 'F'){
-            $('.femaleSection').show();
-        }else{
-           $('.femaleSection').hide();
-           $('#pregnantYes').prop('checked',false);
-           $('#pregnantNo').prop('checked',false);
-           $('#breastfeedingYes').prop('checked',false);
-           $('#breastfeedingNo').prop('checked',false);
-        }
-    });
 </script>        

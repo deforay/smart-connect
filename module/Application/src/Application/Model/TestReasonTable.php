@@ -2,10 +2,8 @@
 
 namespace Application\Model;
 
-use Zend\Session\Container;
 use Zend\Db\Adapter\Adapter;
 use Zend\Db\Sql\Sql;
-use Zend\Db\Sql\Expression;
 use Zend\Db\TableGateway\AbstractTableGateway;
 
 /*
@@ -32,7 +30,6 @@ class TestReasonTable extends AbstractTableGateway {
         $sql = new Sql($dbAdapter);
         $rQuery = $sql->select()->from(array('r'=>'r_vl_test_reasons'));
         $rQueryStr = $sql->getSqlStringForSqlObject($rQuery);
-        $rResult = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-        return $rResult;
+       return $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
     }
 }

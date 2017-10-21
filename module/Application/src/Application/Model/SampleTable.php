@@ -296,17 +296,17 @@ class SampleTable extends AbstractTableGateway {
                                                     "total" => new Expression('COUNT(*)'),
                                                     "monthDate" => new Expression("DATE_FORMAT(DATE(sample_collection_date), '%b-%Y')"),
                                                     
-                                                    "MGreaterThan1000" => new Expression("SUM(CASE WHEN (vl.patient_gender is not null and vl.patient_gender !='unreported' and vl.result>=1000 and vl.patient_gender in('m','M')) THEN 1 ELSE 0 END)"),
-                                                    "MLesserThan1000" => new Expression("SUM(CASE WHEN (vl.patient_gender is not null and vl.patient_gender !='unreported'  and (vl.result<1000 or vl.result='Target Not Detected') and vl.patient_gender in('m','M')) THEN 1 ELSE 0 END)"),
-                                                    //"MTND" => new Expression("SUM(CASE WHEN (vl.result='Target Not Detected' and vl.patient_gender in('m','M')) THEN 1 ELSE 0 END)"),
+                                                    "MGreaterThan1000" => new Expression("SUM(CASE WHEN (vl.patient_gender is not null and vl.patient_gender !='unreported' and vl.result>=1000 and vl.patient_gender in('m','Male','M','MALE')) THEN 1 ELSE 0 END)"),
+                                                    "MLesserThan1000" => new Expression("SUM(CASE WHEN (vl.patient_gender is not null and vl.patient_gender !='unreported'  and (vl.result<1000 or vl.result='Target Not Detected') and vl.patient_gender in('m','Male','M','MALE')) THEN 1 ELSE 0 END)"),
+                                                    //"MTND" => new Expression("SUM(CASE WHEN (vl.result='Target Not Detected' and vl.patient_gender in('m','Male','M','MALE')) THEN 1 ELSE 0 END)"),
                                              
-                                                    "FGreaterThan1000" => new Expression("SUM(CASE WHEN vl.patient_gender is not null and vl.patient_gender !='unreported'  and vl.result>=1000 and vl.patient_gender in('f','F') THEN 1 ELSE 0 END)"),
-                                                    "FLesserThan1000" => new Expression("SUM(CASE WHEN vl.patient_gender is not null and vl.patient_gender !='unreported'  and (vl.result<1000 or vl.result='Target Not Detected') and vl.patient_gender in('f','F') THEN 1 ELSE 0 END)"),
-                                                    //"FTND" => new Expression("SUM(CASE WHEN vl.result='Target Not Detected' and vl.patient_gender in('f','F') THEN 1 ELSE 0 END)"),
+                                                    "FGreaterThan1000" => new Expression("SUM(CASE WHEN vl.patient_gender is not null and vl.patient_gender !='unreported'  and vl.result>=1000 and vl.patient_gender in('f','Female','F','FEMALE') THEN 1 ELSE 0 END)"),
+                                                    "FLesserThan1000" => new Expression("SUM(CASE WHEN vl.patient_gender is not null and vl.patient_gender !='unreported'  and (vl.result<1000 or vl.result='Target Not Detected') and vl.patient_gender in('f','Female','F','FEMALE') THEN 1 ELSE 0 END)"),
+                                                    //"FTND" => new Expression("SUM(CASE WHEN vl.result='Target Not Detected' and vl.patient_gender in('f','Female','F','FEMALE') THEN 1 ELSE 0 END)"),
 
-                                                    "OGreaterThan1000" => new Expression("SUM(CASE WHEN (vl.patient_gender is not null and vl.patient_gender !='unreported'  and vl.result>=1000 and vl.patient_gender NOT in('m','M','f','F')) THEN 1 ELSE 0 END)"),
-                                                    "OLesserThan1000" => new Expression("SUM(CASE WHEN (vl.patient_gender is not null and vl.patient_gender !='unreported'  and (vl.result<1000 or vl.result='Target Not Detected') and vl.patient_gender NOT in('m','M','f','F')) THEN 1 ELSE 0 END)"),
-                                                    //"OTND" => new Expression("SUM(CASE WHEN (vl.result='Target Not Detected' and vl.patient_gender NOT in('m','M','f','F')) THEN 1 ELSE 0 END)"),
+                                                    "OGreaterThan1000" => new Expression("SUM(CASE WHEN (vl.patient_gender is not null and vl.patient_gender !='unreported'  and vl.result>=1000 and vl.patient_gender NOT in('m','Male','M','MALE','f','Female','F','FEMALE')) THEN 1 ELSE 0 END)"),
+                                                    "OLesserThan1000" => new Expression("SUM(CASE WHEN (vl.patient_gender is not null and vl.patient_gender !='unreported'  and (vl.result<1000 or vl.result='Target Not Detected') and vl.patient_gender NOT in('m','Male','M','MALE','f','Female','F','FEMALE')) THEN 1 ELSE 0 END)"),
+                                                    //"OTND" => new Expression("SUM(CASE WHEN (vl.result='Target Not Detected' and vl.patient_gender NOT in('m','Male','M','MALE','f','Female','F','FEMALE')) THEN 1 ELSE 0 END)"),
                                              
                                               )
                                             );
@@ -981,15 +981,15 @@ class SampleTable extends AbstractTableGateway {
             }
             $query = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
                                     ->columns(array(
-                                                "mTotal" => new Expression("SUM(CASE WHEN (vl.patient_gender in('m','M')) THEN 1 ELSE 0 END)"),
-                                                "mGreaterThanEqual1000" => new Expression("SUM(CASE WHEN (vl.result>=1000 and vl.patient_gender in('m','M')) THEN 1 ELSE 0 END)"),
-                                                "mLesserThan1000" => new Expression("SUM(CASE WHEN ((vl.result<1000 or vl.result='Target Not Detected') and vl.patient_gender in('m','M')) THEN 1 ELSE 0 END)"),
-                                                "fTotal" => new Expression("SUM(CASE WHEN (vl.patient_gender in('f','F')) THEN 1 ELSE 0 END)"),
-                                                "fGreaterThanEqual1000" => new Expression("SUM(CASE WHEN (vl.result>=1000 and vl.patient_gender in('f','F')) THEN 1 ELSE 0 END)"),
-                                                "fLesserThan1000" => new Expression("SUM(CASE WHEN ((vl.result<1000 or vl.result='Target Not Detected') and vl.patient_gender in('f','F')) THEN 1 ELSE 0 END)"),
-                                                "nsTotal" => new Expression("SUM(CASE WHEN (vl.patient_gender NOT in('m','M','f','F')) THEN 1 ELSE 0 END)"),
-                                                "nsGreaterThanEqual1000" => new Expression("SUM(CASE WHEN (vl.result>=1000 and vl.patient_gender NOT in('m','M','f','F')) THEN 1 ELSE 0 END)"),
-                                                "nsLesserThan1000" => new Expression("SUM(CASE WHEN ((vl.result<1000 or vl.result='Target Not Detected') and vl.patient_gender NOT in('m','M','f','F')) THEN 1 ELSE 0 END)")
+                                                "mTotal" => new Expression("SUM(CASE WHEN (vl.patient_gender in('m','Male','M','MALE')) THEN 1 ELSE 0 END)"),
+                                                "mGreaterThanEqual1000" => new Expression("SUM(CASE WHEN (vl.result>=1000 and vl.patient_gender in('m','Male','M','MALE')) THEN 1 ELSE 0 END)"),
+                                                "mLesserThan1000" => new Expression("SUM(CASE WHEN ((vl.result<1000 or vl.result='Target Not Detected') and vl.patient_gender in('m','Male','M','MALE')) THEN 1 ELSE 0 END)"),
+                                                "fTotal" => new Expression("SUM(CASE WHEN (vl.patient_gender in('f','Female','F','FEMALE')) THEN 1 ELSE 0 END)"),
+                                                "fGreaterThanEqual1000" => new Expression("SUM(CASE WHEN (vl.result>=1000 and vl.patient_gender in('f','Female','F','FEMALE')) THEN 1 ELSE 0 END)"),
+                                                "fLesserThan1000" => new Expression("SUM(CASE WHEN ((vl.result<1000 or vl.result='Target Not Detected') and vl.patient_gender in('f','Female','F','FEMALE')) THEN 1 ELSE 0 END)"),
+                                                "nsTotal" => new Expression("SUM(CASE WHEN (vl.patient_gender NOT in('m','Male','M','MALE','f','Female','F','FEMALE')) THEN 1 ELSE 0 END)"),
+                                                "nsGreaterThanEqual1000" => new Expression("SUM(CASE WHEN (vl.result>=1000 and vl.patient_gender NOT in('m','Male','M','MALE','f','Female','F','FEMALE')) THEN 1 ELSE 0 END)"),
+                                                "nsLesserThan1000" => new Expression("SUM(CASE WHEN ((vl.result<1000 or vl.result='Target Not Detected') and vl.patient_gender NOT in('m','Male','M','MALE','f','Female','F','FEMALE')) THEN 1 ELSE 0 END)")
                                               )
                                             )
                                     ->where(array("DATE(vl.sample_collection_date) <='$endDate'","DATE(vl.sample_collection_date) >='$startDate'"));
@@ -1009,12 +1009,19 @@ class SampleTable extends AbstractTableGateway {
             if(isset($params['sampleTypeId']) && $params['sampleTypeId']!=''){
                 $query = $query->where('vl.sample_type="'.base64_decode(trim($params['sampleTypeId'])).'"');
             }
-            if(isset($params['age']) && $params['age']!=''){
-                $age = explode("-",$params['age']);
-                if(isset($age[1])){
-                  $query = $query->where(array("vl.patient_age_in_years >='".$age[0]."'","vl.patient_age_in_years <='".$age[1]."'"));
-                }else{
-                  $query = $query->where('vl.patient_age_in_years'.$params['age']);
+            if(isset($params['age']) && trim($params['age'])!=''){
+                if($params['age'] == '<2'){
+                    $query = $query->where("vl.patient_age_in_years < 2");
+                }else if($params['age'] == '2to5') {
+                    $query = $query->where("vl.patient_age_in_years >= 2 AND vl.patient_age_in_years <= 5");
+                }else if($params['age'] == '6to14') {
+                    $query = $query->where("vl.patient_age_in_years >= 6 AND vl.patient_age_in_years <= 14");
+                }else if($params['age'] == '15to49') {
+                    $query = $query->where("vl.patient_age_in_years >= 15 AND vl.patient_age_in_years <= 49");
+                }else if($params['age'] == '>50'){
+                    $query = $query->where("vl.patient_age_in_years > 50");
+                }else if($params['age'] == 'unknown'){
+                    $query = $query->where("vl.patient_age_in_years = 'unknown' OR vl.patient_age_in_years = '' OR vl.patient_age_in_years IS NULL");
                 }
             }
             if(isset($params['adherence']) && trim($params['adherence'])!=''){
@@ -1119,11 +1126,18 @@ class SampleTable extends AbstractTableGateway {
                 $rQuery = $rQuery->where('vl.sample_type="'.base64_decode(trim($params['sampleTypeId'])).'"');
             }
             if(isset($params['age']) && trim($params['age'])!=''){
-                $age = explode("-",$params['age']);
-                if(isset($age[1])){
-                  $rQuery = $rQuery->where(array("vl.patient_age_in_years >='".$age[0]."'","vl.patient_age_in_years <='".$age[1]."'"));
-                }else{
-                  $rQuery = $rQuery->where('vl.patient_age_in_years'.$params['age']);
+                if($params['age'] == '<2'){
+                    $rQuery = $rQuery->where("vl.patient_age_in_years < 2");
+                }else if($params['age'] == '2to5') {
+                    $rQuery = $rQuery->where("vl.patient_age_in_years >= 2 AND vl.patient_age_in_years <= 5");
+                }else if($params['age'] == '6to14') {
+                    $rQuery = $rQuery->where("vl.patient_age_in_years >= 6 AND vl.patient_age_in_years <= 14");
+                }else if($params['age'] == '15to49') {
+                    $rQuery = $rQuery->where("vl.patient_age_in_years >= 15 AND vl.patient_age_in_years <= 49");
+                }else if($params['age'] == '>50'){
+                    $rQuery = $rQuery->where("vl.patient_age_in_years > 50");
+                }else if($params['age'] == 'unknown'){
+                    $rQuery = $rQuery->where("vl.patient_age_in_years = 'unknown' OR vl.patient_age_in_years = '' OR vl.patient_age_in_years IS NULL");
                 }
             }
             if(isset($params['adherence']) && trim($params['adherence'])!=''){
@@ -1207,11 +1221,18 @@ class SampleTable extends AbstractTableGateway {
                 $squery = $squery->where(array("vl.arv_adherance_percentage ='".$params['adherence']."'")); 
             }
             if(isset($params['age']) && $params['age']!=''){
-                $age = explode("-",$params['age']);
-                if(isset($age[1])){
-                   $squery = $squery->where(array("vl.patient_age_in_years >='".$age[0]."'","vl.patient_age_in_years <='".$age[1]."'"));
-                }else{
-                   $squery = $squery->where('vl.patient_age_in_years'.$params['age']);
+                if($params['age'] == '<2'){
+                    $squery = $squery->where("vl.patient_age_in_years < 2");
+                }else if($params['age'] == '2to5') {
+                    $squery = $squery->where("vl.patient_age_in_years >= 2 AND vl.patient_age_in_years <= 5");
+                }else if($params['age'] == '6to14') {
+                    $squery = $squery->where("vl.patient_age_in_years >= 6 AND vl.patient_age_in_years <= 14");
+                }else if($params['age'] == '15to49') {
+                    $squery = $squery->where("vl.patient_age_in_years >= 15 AND vl.patient_age_in_years <= 49");
+                }else if($params['age'] == '>50'){
+                    $squery = $squery->where("vl.patient_age_in_years > 50");
+                }else if($params['age'] == 'unknown'){
+                    $squery = $squery->where("vl.patient_age_in_years = 'unknown' OR vl.patient_age_in_years = '' OR vl.patient_age_in_years IS NULL");
                 }
             }
             if(isset($params['gender']) && $params['gender']=='F'){
@@ -1386,11 +1407,18 @@ class SampleTable extends AbstractTableGateway {
             $sQuery = $sQuery->where('vl.sample_type="'.base64_decode(trim($parameters['sampleTypeId'])).'"');
         }
         if(isset($parameters['age']) && trim($parameters['age'])!=''){
-            $expAge=explode("-",$parameters['age']);
-            if(trim($expAge[0])!="" && trim($expAge[1])!=""){
-                $sQuery=$sQuery->where("(vl.patient_age_in_years>='".$expAge[0]."' AND vl.patient_age_in_years<='".$expAge[1]."')");
-            }else{
-                $sQuery = $sQuery->where(array("vl.patient_age_in_years >'".$expAge[0]."'"));
+            if($parameters['age'] == '<2'){
+                $sQuery = $sQuery->where("vl.patient_age_in_years < 2");
+            }else if($parameters['age'] == '2to5') {
+                $sQuery = $sQuery->where("vl.patient_age_in_years >= 2 AND vl.patient_age_in_years <= 5");
+            }else if($parameters['age'] == '6to14') {
+                $sQuery = $sQuery->where("vl.patient_age_in_years >= 6 AND vl.patient_age_in_years <= 14");
+            }else if($parameters['age'] == '15to49') {
+                $sQuery = $sQuery->where("vl.patient_age_in_years >= 15 AND vl.patient_age_in_years <= 49");
+            }else if($parameters['age'] == '>50'){
+                $sQuery = $sQuery->where("vl.patient_age_in_years > 50");
+            }else if($parameters['age'] == 'unknown'){
+                $sQuery = $sQuery->where("vl.patient_age_in_years = 'unknown' OR vl.patient_age_in_years = '' OR vl.patient_age_in_years IS NULL");
             }
         }
         if(isset($parameters['adherence']) && trim($parameters['adherence'])!=''){
@@ -1545,11 +1573,18 @@ class SampleTable extends AbstractTableGateway {
                 $queryStr = $queryStr->where('vl.sample_type="'.base64_decode(trim($params['sampleTypeId'])).'"');
             }
             if(isset($params['age']) && trim($params['age'])!=''){
-                $expAge=explode("-",$params['age']);
-                if(trim($expAge[0])!="" && trim($expAge[1])!=""){
-                    $queryStr=$queryStr->where("(vl.patient_age_in_years>='".$expAge[0]."' AND vl.patient_age_in_years<='".$expAge[1]."')");
-                }else{
-                    $queryStr = $queryStr->where(array("vl.patient_age_in_years >'".$expAge[0]."'"));
+                if($params['age'] == '<2'){
+                    $queryStr = $queryStr->where("vl.patient_age_in_years < 2");
+                }else if($params['age'] == '2to5') {
+                    $queryStr = $queryStr->where("vl.patient_age_in_years >= 2 AND vl.patient_age_in_years <= 5");
+                }else if($params['age'] == '6to14') {
+                    $queryStr = $queryStr->where("vl.patient_age_in_years >= 6 AND vl.patient_age_in_years <= 14");
+                }else if($params['age'] == '15to49') {
+                    $queryStr = $queryStr->where("vl.patient_age_in_years >= 15 AND vl.patient_age_in_years <= 49");
+                }else if($params['age'] == '>50'){
+                    $queryStr = $queryStr->where("vl.patient_age_in_years > 50");
+                }else if($params['age'] == 'unknown'){
+                    $queryStr = $queryStr->where("vl.patient_age_in_years = 'unknown' OR vl.patient_age_in_years = '' OR vl.patient_age_in_years IS NULL");
                 }
             }
             if(isset($params['adherence']) && trim($params['adherence'])!=''){
