@@ -295,11 +295,13 @@
             }
         }
     }
+    
     function getDistrictList(val){
         if($('#state').val() == 'other'){
             $('#provinceNew').show().addClass('isRequired').focus();
+            $('#districtName').html('<option value=""> -- Select -- </option><option value="other">Other</option>');
+            $('#districtNew').hide().removeClass('isRequired').val('');
         }else{
-            $('#districtName').val('');
             $('#provinceNew').hide().removeClass('isRequired').val('');
             $.blockUI.defaults.css.border = '1px solid grey'; 
             $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
@@ -308,23 +310,26 @@
                 $('#districtName').html(data);
                 $('#districtName').addClass("isRequired");
                 if(val=='load'){
-                $('#districtName').val('<?php echo $facility->facility_district;?>');
+                  $('#districtName').val('<?php echo $facility->facility_district;?>');
                 }
+                $('#districtNew').hide().removeClass('isRequired').val('');
             });
         }
     }
+    
     $('#districtName').on('change',function(){
-    if(this.value == 'other'){
-      $('#districtNew').show().addClass('isRequired').focus();
-    }else{
-      $('#districtNew').hide().removeClass('isRequired').val('');
-    }
-  });
+        if(this.value == 'other'){
+          $('#districtNew').show().addClass('isRequired').focus();
+        }else{
+          $('#districtNew').hide().removeClass('isRequired').val('');
+        }
+   });
+    
     function clearLogo() {
-    $('#fileinputDiv').fileinput('clear');
-    $("#oldLogo").addClass("hide");
-    $("#logo").addClass("isRequired");
-    document.getElementById('existLogo').value = '';
+        $('#fileinputDiv').fileinput('clear');
+        $("#oldLogo").addClass("hide");
+        $("#logo").addClass("isRequired");
+        document.getElementById('existLogo').value = '';
     }
 
     function getLogo() {
@@ -332,14 +337,16 @@
         $("#logo").addClass("isRequired");
         document.getElementById('existLogo').value = '';
     }
+    
     function fileValidation(obj) {
-	    var fileExtension = ['jpeg', 'jpg', 'png', 'gif', 'bmp'];
-            if ($.inArray($(obj).val().split('.').pop().toLowerCase(), fileExtension) == -1 && $(obj).val()!="")
-	    {
-            alert("Only '.jpeg','.jpg', '.png', '.gif', '.bmp' formats are allowed.");
-	    $(obj).val("");
-	    }
-	}
+        var fileExtension = ['jpeg', 'jpg', 'png', 'gif', 'bmp'];
+        if ($.inArray($(obj).val().split('.').pop().toLowerCase(), fileExtension) == -1 && $(obj).val()!="")
+        {
+        alert("Only '.jpeg','.jpg', '.png', '.gif', '.bmp' formats are allowed.");
+        $(obj).val("");
+        }
+    }
+    
     function checkNameValidation(tableName, fieldName, obj, fnct, msg){
         checkValue = document.getElementById(obj.id).value;
         if($.trim(checkValue)!= ''){
@@ -357,6 +364,7 @@
             });
         }
     }
+    
     function hideLogoImage(value){
         if(value=='2'){
             $(".logo").show();

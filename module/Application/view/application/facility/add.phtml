@@ -251,11 +251,13 @@
             }
         }
     }
+    
     $('#state').on('change',function(){
         if(this.value == 'other'){
             $('#provinceNew').show().addClass('isRequired').focus();
+            $('#districtName').html('<option value=""> -- Select -- </option><option value="other">Other</option>');
+            $('#districtNew').hide().removeClass('isRequired').val('');
         }else{
-            $('#districtName').val('');
             $('#provinceNew').hide().removeClass('isRequired').val('');
             $.blockUI.defaults.css.border = '1px solid grey'; 
             $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
@@ -264,16 +266,19 @@
             function(data){
                 $('#districtName').html(data);
                 $('#districtName').addClass("isRequired");
+                $('#districtNew').hide().removeClass('isRequired').val('');
             });
         }
     });
+    
     $('#districtName').on('change',function(){
-    if(this.value == 'other'){
-      $('#districtNew').show().addClass('isRequired').focus();
-    }else{
-      $('#districtNew').hide().removeClass('isRequired').val('');
-    }
-  });
+        if(this.value == 'other'){
+          $('#districtNew').show().addClass('isRequired').focus();
+        }else{
+          $('#districtNew').hide().removeClass('isRequired').val('');
+        }
+    });
+    
     function fileValidation(obj) {
 	    var fileExtension = ['jpeg', 'jpg', 'png', 'gif', 'bmp'];
             if ($.inArray($(obj).val().split('.').pop().toLowerCase(), fileExtension) == -1 && $(obj).val()!="")
