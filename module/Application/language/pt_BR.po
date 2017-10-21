@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: ZendSkeletonApplication\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-08-26 00:21+0530\n"
-"PO-Revision-Date: 2017-10-21 14:08+0530\n"
+"PO-Revision-Date: 2017-10-21 14:20+0530\n"
 "Last-Translator: Diogo Melo <dmelo87@gmail.com>\n"
 "Language-Team: ZF Contibutors <zf-devteam@zend.com>\n"
 "Language: pt\n"
@@ -1555,19 +1555,19 @@ msgstr "LT3"
 msgid "NS"
 msgstr "NE"
 
-msgid "Breast Feeding"
+msgid "Breastfeeding"
 msgstr "Lactante"
 
 msgid "BF"
 msgstr "L"
 
-msgid "Not Breast Feeding"
+msgid "Not Breastfeeding"
 msgstr "Não lactante"
 
 msgid "NBF"
 msgstr "NL"
 
-msgid "Breast Feeding Unknown"
+msgid "Breastfeeding Unknown"
 msgstr "Não se sabe se é lactante"
 
 msgid "BFU"
