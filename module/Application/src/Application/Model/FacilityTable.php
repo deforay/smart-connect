@@ -51,35 +51,31 @@ class FacilityTable extends AbstractTableGateway {
                         'latitude'=>$params['latitude'],
                         'longitude'=>$params['longitude'],
                         'facility_type'=>$params['facilityType'],
-                        'status'=>'active',
+                        'status'=>'active'
                     );
-			if(isset($params['provinceNew']) && trim($params['provinceNew'])!='')
-			{
-				$sQuery = $sql->select()->from(array('l'=>'location_details'))
-							->where(array('l.location_name'=>trim($params['provinceNew'])));
-				$sQuery = $sql->getSqlStringForSqlObject($sQuery);
-				$sQueryResult = $dbAdapter->query($sQuery, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-				if($sQueryResult){
-					$facilityData['facility_state'] = $sQueryResult['location_id'];
-				}else{
-					$locationDb->insert(array('parent_location'=>0,'location_name'=>trim($params['provinceNew'])));
-					$facilityData['facility_state'] = $locationDb->lastInsertValue;
-				}
+		    if(isset($params['provinceNew']) && trim($params['provinceNew'])!=''){
+			$sQuery = $sql->select()->from(array('l'=>'location_details'))
+						->where(array('l.location_name'=>trim($params['provinceNew']),'l.parent_location'=>0));
+			$sQuery = $sql->getSqlStringForSqlObject($sQuery);
+			$sQueryResult = $dbAdapter->query($sQuery, $dbAdapter::QUERY_MODE_EXECUTE)->current();
+			if($sQueryResult){
+			    $facilityData['facility_state'] = $sQueryResult['location_id'];
+			}else{
+			    $locationDb->insert(array('parent_location'=>0,'location_name'=>trim($params['provinceNew'])));
+			    $facilityData['facility_state'] = $locationDb->lastInsertValue;
 			}
-			if(isset($params['districtNew']) && trim($params['districtNew'])!='')
-			{
-				$sQuery = $sql->select()->from(array('l'=>'location_details'))
-							->where(array('l.location_name'=>trim($params['districtNew']),'l.parent_location'=>$facilityData['facility_state']));
-				$sQuery = $sql->getSqlStringForSqlObject($sQuery);
-				$sQueryResult = $dbAdapter->query($sQuery, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-				if($sQueryResult){
-					$facilityData['facility_district'] = $sQueryResult['location_id'];
-				}else{
-					$locationDb->insert(array('parent_location'=>$facilityData['facility_state'],'location_name'=>trim($params['districtNew'])));
-					$facilityData['facility_district'] = $locationDb->lastInsertValue;
-				}
+		    }if(isset($params['districtNew']) && trim($params['districtNew'])!=''){
+			$sQuery = $sql->select()->from(array('l'=>'location_details'))
+						->where(array('l.location_name'=>trim($params['districtNew']),'l.parent_location'=>$facilityData['facility_state']));
+			$sQuery = $sql->getSqlStringForSqlObject($sQuery);
+			$sQueryResult = $dbAdapter->query($sQuery, $dbAdapter::QUERY_MODE_EXECUTE)->current();
+			if($sQueryResult){
+			    $facilityData['facility_district'] = $sQueryResult['location_id'];
+			}else{
+			    $locationDb->insert(array('parent_location'=>$facilityData['facility_state'],'location_name'=>trim($params['districtNew'])));
+			    $facilityData['facility_district'] = $locationDb->lastInsertValue;
 			}
-			
+		    }
             $this->insert($facilityData);
             $facilityId = $this->lastInsertValue;
             if (isset($_FILES['logo']['name']) && $_FILES['logo']['name'] != '') {
@@ -259,31 +255,30 @@ class FacilityTable extends AbstractTableGateway {
 		'latitude'=>$params['latitude'],
 		'longitude'=>$params['longitude'],
 		'facility_type'=>$params['facilityType'],
-		'status'=>$params['status'],
+		'status'=>$params['status']
 	    );
 	    if(isset($params['provinceNew']) && trim($params['provinceNew'])!=''){
-		    $sQuery = $sql->select()->from(array('l'=>'location_details'))
-					    ->where(array('l.location_name'=>trim($params['provinceNew'])));
-		    $sQuery = $sql->getSqlStringForSqlObject($sQuery);
-		    $sQueryResult = $dbAdapter->query($sQuery, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-		    if($sQueryResult){
-			    $facilityData['facility_state'] = $sQueryResult['location_id'];
-		    }else{
-			    $locationDb->insert(array('parent_location'=>0,'location_name'=>trim($params['provinceNew'])));
-			    $facilityData['facility_state'] = $locationDb->lastInsertValue;
-		    }
-	    }
-	    if(isset($params['districtNew']) && trim($params['districtNew'])!=''){
-		    $sQuery = $sql->select()->from(array('l'=>'location_details'))
-					    ->where(array('l.location_name'=>trim($params['districtNew']),'l.parent_location'=>$facilityData['facility_state']));
-		    $sQuery = $sql->getSqlStringForSqlObject($sQuery);
-		    $sQueryResult = $dbAdapter->query($sQuery, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-		    if($sQueryResult){
-			    $facilityData['facility_district'] = $sQueryResult['location_id'];
-		    }else{
-			    $locationDb->insert(array('parent_location'=>$facilityData['facility_state'],'location_name'=>trim($params['districtNew'])));
-			    $facilityData['facility_district'] = $locationDb->lastInsertValue;
-		    }
+		$sQuery = $sql->select()->from(array('l'=>'location_details'))
+					->where(array('l.location_name'=>trim($params['provinceNew']),'l.parent_location'=>0));
+		$sQuery = $sql->getSqlStringForSqlObject($sQuery);
+		$sQueryResult = $dbAdapter->query($sQuery, $dbAdapter::QUERY_MODE_EXECUTE)->current();
+		if($sQueryResult){
+		    $facilityData['facility_state'] = $sQueryResult['location_id'];
+		}else{
+		    $locationDb->insert(array('parent_location'=>0,'location_name'=>trim($params['provinceNew'])));
+		    $facilityData['facility_state'] = $locationDb->lastInsertValue;
+		}
+	    }if(isset($params['districtNew']) && trim($params['districtNew'])!=''){
+		$sQuery = $sql->select()->from(array('l'=>'location_details'))
+					->where(array('l.location_name'=>trim($params['districtNew']),'l.parent_location'=>$facilityData['facility_state']));
+		$sQuery = $sql->getSqlStringForSqlObject($sQuery);
+		$sQueryResult = $dbAdapter->query($sQuery, $dbAdapter::QUERY_MODE_EXECUTE)->current();
+		if($sQueryResult){
+		    $facilityData['facility_district'] = $sQueryResult['location_id'];
+		}else{
+		    $locationDb->insert(array('parent_location'=>$facilityData['facility_state'],'location_name'=>trim($params['districtNew'])));
+		    $facilityData['facility_district'] = $locationDb->lastInsertValue;
+		}
 	    }
             $this->update($facilityData,array('facility_id'=>base64_decode($params['facilityId'])));
             $facilityId = base64_decode($params['facilityId']);
