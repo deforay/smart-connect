@@ -459,7 +459,7 @@ foreach($sampleType as $samples){
         $.post("<?php echo $this->url('clinics', array('action' => 'generate-result-pdf')); ?>", {id : id},
         function(data){
             if(data == "" || data == null || data == undefined){
-                alert('Unable to generate result pdf');
+                alert('<?php echo $this->translate('Unable to generate pdf'); ?>');
             }else{
                 window.open('../temporary/'+data,'_blank');
             }
@@ -472,7 +472,7 @@ foreach($sampleType as $samples){
        $.post("<?php echo $this->url('clinics', array('action' => 'export-result-excel')); ?>", {result : $("#result").val()},
         function(data){
             if(data == "" || data == null || data == undefined){
-                alert('Unable to export result excel');
+                alert('<?php echo $this->translate('Unable to export excel'); ?>');
             }else{
                 window.open('../temporary/'+data,'_blank');
             }

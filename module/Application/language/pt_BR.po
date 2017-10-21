@@ -1702,6 +1702,12 @@ msgstr "Código do lote"
 msgid "Patient's Name"
 msgstr "Nome do paciente"
 
+msgid "Unable to generate pdf"
+msgstr "Unable to generate pdf"
+
+msgid "Unable to export excel"
+msgstr "Unable to export excel"
+
 #~ msgid "Hubs Dashboard"
 #~ msgstr "Hubs Dashboard"
 

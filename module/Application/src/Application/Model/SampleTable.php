@@ -946,7 +946,7 @@ class SampleTable extends AbstractTableGateway {
             if(isset($lResult) && count($lResult)>0){
                 $i = 0;
                 foreach($lResult as $lab){
-                    if(trim($lab['lab_id'])!='' && $lab['lab_id']!=NULL && $lab['lab_id']!=0){
+                    if($lab['lab_id']!=NULL && trim($lab['lab_id'])!='' && $lab['lab_id']!=0){
                         $lcQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
                                                  ->columns(array('facility_id','clinicCount' => new \Zend\Db\Sql\Expression("COUNT(vl.facility_id)")))
                                                  ->join(array('f'=>'facility_details'),'f.facility_id=vl.facility_id',array('facility_name','latitude','longitude'))

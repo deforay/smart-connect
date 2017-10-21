@@ -706,7 +706,7 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
         $.post("<?php echo $this->url('laboratory', array('action' => 'export-sample-result-excel')); ?>", {fromDate:$('#mrp-lowerDate').val(),toDate:$('#mrp-upperDate').val(),clinicId:$('#clinicId').val(),currentRegimen:$('#currentRegimen').val(),adherence:$('#adherence').val(),age:$('#age').val(),sampleType:$('#sampleType').val(),sampleStatus:$('#sampleStatus').val(),gender:$("#gender").val(),isPregnant:isPregnant,isBreastfeeding:isBreastfeeding,lineOfTreatment:$("#lineOfTreatment").val()},
          function(data){
              if(data == "" || data == null || data == undefined){
-                 alert('Unable to export result excel');
+                 alert('<?php echo $this->translate('Unable to export excel'); ?>');
              }else{
                  window.open('../temporary/'+data,'_blank');
              }
