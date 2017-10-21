@@ -2,37 +2,38 @@
 $patientFirstName = '';
 $patientLastName = '';
 $patientMobileNumber = '';
-if($result[0]['patient_first_name']!= NULL && trim($result[0]['patient_first_name'])!= ''){
+//set patient details
+if(isset($result[0]['patient_first_name']) && $result[0]['patient_first_name']!= NULL && trim($result[0]['patient_first_name'])!= ''){
     $patientFirstName = ucwords($result[0]['patient_first_name']);
-}
-if($result[0]['patient_last_name']!= NULL && trim($result[0]['patient_last_name'])!= ''){
+}if(isset($result[0]['patient_last_name']) && $result[0]['patient_last_name']!= NULL && trim($result[0]['patient_last_name'])!= ''){
     $patientLastName = ucwords($result[0]['patient_last_name']);
-}
-if($result[0]['patient_mobile_number']!= NULL && trim($result[0]['patient_mobile_number'])!= ''){
+}if(isset($result[0]['patient_mobile_number']) && $result[0]['patient_mobile_number']!= NULL && trim($result[0]['patient_mobile_number'])!= ''){
     $patientMobileNumber = $result[0]['patient_mobile_number'];
 }
+//set facility details
 if(!isset($result[0]['facility_name']) || $result[0]['facility_name'] == NULL || trim($result[0]['facility_name']) == ''){
    $result[0]['facility_name'] = '';
-}
-if(!isset($result[0]['facility_code']) || $result[0]['facility_code'] == NULL || trim($result[0]['facility_code']) == ''){
+}if(!isset($result[0]['facility_code']) || $result[0]['facility_code'] == NULL || trim($result[0]['facility_code']) == ''){
    $result[0]['facility_code'] = '';
-}
-if(!isset($result[0]['provinceName']) || $result[0]['provinceName'] == NULL || trim($result[0]['provinceName']) == ''){
+}if(!isset($result[0]['provinceName']) || $result[0]['provinceName'] == NULL || trim($result[0]['provinceName']) == ''){
    $result[0]['provinceName'] = '';
-}
-if(!isset($result[0]['districtName']) || $result[0]['districtName'] == NULL || trim($result[0]['districtName']) == ''){
+}if(!isset($result[0]['districtName']) || $result[0]['districtName'] == NULL || trim($result[0]['districtName']) == ''){
    $result[0]['districtName'] = '';
+}
+//set gender
+if(!isset($result[0]['patient_gender']) || trim($result[0]['patient_gender'])== ''){
+    $result[0]['patient_gender'] = 'not reported';
 }
 //set Age
 $age = 'Unknown';
 if(isset($result[0]['patient_dob']) && $result[0]['patient_dob']!= NULL && trim($result[0]['patient_dob'])!='' && $result[0]['patient_dob']!='0000-00-00'){
-  $todayDate = strtotime(date('Y-m-d'));
-  $dob = strtotime($result[0]['patient_dob']);
-  $difference = $todayDate - $dob;
-  $seconds_per_year = 60*60*24*365;
-  $age = round($difference / $seconds_per_year);
+    $todayDate = strtotime(date('Y-m-d'));
+    $dob = strtotime($result[0]['patient_dob']);
+    $difference = $todayDate - $dob;
+    $seconds_per_year = 60*60*24*365;
+    $age = round($difference / $seconds_per_year);
 }elseif(isset($result[0]['patient_age_in_years']) && $result[0]['patient_age_in_years']!= NULL && trim($result[0]['patient_age_in_years'])!='' && trim($result[0]['patient_age_in_years']) >0){
-  $age = $result[0]['patient_age_in_years'];
+    $age = $result[0]['patient_age_in_years'];
 }elseif(isset($result[0]['patient_age_in_months']) && $result[0]['patient_age_in_months']!= NULL && trim($result[0]['patient_age_in_months'])!='' && trim($result[0]['patient_age_in_months']) >0){
   if($result[0]['patient_age_in_months'] > 1){
     $age = $result[0]['patient_age_in_months'].' months';
@@ -41,37 +42,27 @@ if(isset($result[0]['patient_dob']) && $result[0]['patient_dob']!= NULL && trim(
   }
 }
 //sample collection date
+$sampleCollectionDate = '';
 if(isset($result[0]['sample_collection_date']) && $result[0]['sample_collection_date']!= NULL && trim($result[0]['sample_collection_date'])!='' && $result[0]['sample_collection_date']!='0000-00-00 00:00:00'){
     $expStr=explode(" ",$result[0]['sample_collection_date']);
-    $result[0]['sample_collection_date']=$this->humanDateFormat($expStr[0]);
-    $sampleCollectionTime = $expStr[1];
-}else{
-    $result[0]['sample_collection_date']='';
-    $sampleCollectionTime = '';
+    $sampleCollectionDate=$this->humanDateFormat($expStr[0]).' '.$expStr[1];
 }
 //sample recieved date
 $sampleReceivedDate='';
-$sampleReceivedTime='';
 if(isset($result[0]['sample_received_at_vl_lab_datetime']) && $result[0]['sample_received_at_vl_lab_datetime']!= NULL && trim($result[0]['sample_received_at_vl_lab_datetime'])!='' && $result[0]['sample_received_at_vl_lab_datetime']!='0000-00-00 00:00:00'){
   $expStr=explode(" ",$result[0]['sample_received_at_vl_lab_datetime']);
-  $sampleReceivedDate=$this->humanDateFormat($expStr[0]);
-  $sampleReceivedTime =$expStr[1];
+  $sampleReceivedDate=$this->humanDateFormat($expStr[0]).' '.$expStr[1];
 }
 //sample tested date
+$sampleTestedDate = '';
 if(isset($result[0]['sample_tested_datetime']) && $result[0]['sample_tested_datetime']!= NULL && trim($result[0]['sample_tested_datetime'])!='' && $result[0]['sample_tested_datetime']!='0000-00-00 00:00:00'){
     $expStr=explode(" ",$result[0]['sample_tested_datetime']);
-    $result[0]['sample_tested_datetime']=$this->humanDateFormat($expStr[0])." ".$expStr[1];
-}else{
-    $result[0]['sample_tested_datetime']='';
+    $sampleTestedDate=$this->humanDateFormat($expStr[0])." ".$expStr[1];
 }
 //last viral load test date
+$lastViralLoadDate = '';
 if(isset($result[0]['last_viral_load_date']) && $result[0]['last_viral_load_date']!= NULL && trim($result[0]['last_viral_load_date'])!='' && $result[0]['last_viral_load_date']!='0000-00-00'){
-    $result[0]['last_viral_load_date']=$this->humanDateFormat($result[0]['last_viral_load_date']);
-}else{
-    $result[0]['last_viral_load_date']='';
-}
-if(!isset($result[0]['patient_gender']) || trim($result[0]['patient_gender'])== ''){
-    $result[0]['patient_gender'] = 'not reported';
+    $lastViralLoadDate=$this->humanDateFormat($result[0]['last_viral_load_date']);
 }
 $resultApprovedBy = '';
 if(isset($result[0]['approvedBy']) && trim($result[0]['approvedBy'])!=''){
@@ -111,7 +102,7 @@ if(isset($result[0]['approvedBy']) && trim($result[0]['approvedBy'])!=''){
                     </div>
                     <div class="col-md-4">
                         <span class="labelName"><?php echo $this->translate('Sample Collection Date'); ?></span>
-                        <p><?php echo $result[0]['sample_collection_date'];?></p>
+                        <p><?php echo $sampleCollectionDate; ?></p>
                     </div>
                     <div class="col-md-4">
                         <span class="labelName"><?php echo $this->translate('ART (TRACNET) No'); ?>.</span>
@@ -171,11 +162,11 @@ if(isset($result[0]['approvedBy']) && trim($result[0]['approvedBy'])!=''){
                 <div class="row">
                     <div class="col-md-4">
                         <span class="labelName"><?php echo $this->translate('Sample Receipt Date'); ?></span>
-                        <p><?php echo $sampleReceivedDate." ".$sampleReceivedTime;?></p>
+                        <p><?php echo $sampleReceivedDate; ?></p>
                     </div>
                     <div class="col-md-4">
                         <span class="labelName"><?php echo $this->translate('Sample Test Date'); ?></span>
-                        <p><?php echo $result[0]['sample_tested_datetime'];?></p>
+                        <p><?php echo $sampleTestedDate; ?></p>
                     </div>
                     <div class="col-md-4">
                         <span class="labelName"><?php echo $this->translate('Specimen Type'); ?></span>
@@ -207,7 +198,7 @@ if(isset($result[0]['approvedBy']) && trim($result[0]['approvedBy'])!=''){
                     <h4><?php echo $this->translate('Previous Result'); ?></h4>
                     <div class="col-md-4">
                         <span class="labelName"><?php echo $this->translate('Date of Last Viral Load Test'); ?></span>
-                        <p><?php echo $result[0]['last_viral_load_date'];?></p>
+                        <p><?php echo $lastViralLoadDate; ?></p>
                     </div>
                     <div class="col-md-4">
                         <span class="labelName"><?php echo $this->translate('Result of previous viral load(copies/ml)'); ?> </span>
