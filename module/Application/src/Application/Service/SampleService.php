@@ -379,8 +379,7 @@ class SampleService {
     
     public function getChartOverAllLoadStatus($params){
         $sampleDb = $this->sm->get('SampleTable');
-        $result =  $sampleDb->fetchChartOverAllLoadStatus($params);
-        return $result;
+        return $sampleDb->fetchChartOverAllLoadStatus($params);
     }
     
     public function fetchSampleTestedReason($params){
@@ -410,9 +409,9 @@ class SampleService {
         return $facilityDb->fetchAllClinicName();
     }
     
-    public function getAllTestResults($params){
+    public function getAllTestResults($parameters){
         $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->fetchAllTestResults($params);
+        return $sampleDb->fetchAllTestResults($parameters);
     }
     
     public function getClinicSampleTestedResults($params){
@@ -443,19 +442,19 @@ class SampleService {
         return $sampleDb->fetchBarSampleDetails($params);
     }
     
-    public function getLabFilterSampleDetails($params){
+    public function getLabFilterSampleDetails($parameters){
         $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->fetchLabFilterSampleDetails($params);
+        return $sampleDb->fetchLabFilterSampleDetails($parameters);
     }
     
-    public function getFilterSampleDetails($params){
+    public function getFilterSampleDetails($parameters){
         $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->fetchFilterSampleDetails($params);
+        return $sampleDb->fetchFilterSampleDetails($parameters);
     }
     
-    public function getFilterSampleTatDetails($params){
+    public function getFilterSampleTatDetails($parameters){
         $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->fetchFilterSampleTatDetails($params);
+        return $sampleDb->fetchFilterSampleTatDetails($parameters);
     }
     
     public function getLabSampleDetails($params){
@@ -669,20 +668,27 @@ class SampleService {
                         if(isset($params['adherence']) && trim($params['adherence'])!=''){
                             $countQuery = $countQuery->where(array("vl.arv_adherance_percentage ='".$params['adherence']."'")); 
                         }
-                        if(isset($params['age']) && trim($params['age'])!=''){
-                            if($params['age'] == '<2'){
-                              $countQuery = $countQuery->where("vl.patient_age_in_years < 2");
-                            }else if($params['age'] == '2to5') {
-                              $countQuery = $countQuery->where("vl.patient_age_in_years >= 2 AND vl.patient_age_in_years <= 5");
-                            }else if($params['age'] == '6to14') {
-                              $countQuery = $countQuery->where("vl.patient_age_in_years >= 6 AND vl.patient_age_in_years <= 14");
-                            }else if($params['age'] == '15to49') {
-                              $countQuery = $countQuery->where("vl.patient_age_in_years >= 15 AND vl.patient_age_in_years <= 49");
-                            }else if($params['age'] == '>50'){
-                              $countQuery = $countQuery->where("vl.patient_age_in_years > 50");
-                            }else if($params['age'] == 'unknown'){
-                              $countQuery = $countQuery->where("vl.patient_age_in_years = 'unknown' OR vl.patient_age_in_years = '' OR vl.patient_age_in_years IS NULL");
+                        //print_r($params['age']);die;
+                        if(isset($params['age']) && is_array($params['age']) && count($params['age']) > 0){
+                            $where = '';
+                            for($a=0;$a<count($params['age']);$a++){
+                                if(trim($where)!= ''){ $where.= ' OR '; }
+                                if($params['age'][$a] == '<2'){
+                                  $where.= "(vl.patient_age_in_years < 2)";
+                                }else if($params['age'][$a] == '2to5') {
+                                  $where.= "(vl.patient_age_in_years >= 2 AND vl.patient_age_in_years <= 5)";
+                                }else if($params['age'][$a] == '6to14') {
+                                  $where.= "(vl.patient_age_in_years >= 6 AND vl.patient_age_in_years <= 14)";
+                                }else if($params['age'][$a] == '15to49') {
+                                  $where.= "(vl.patient_age_in_years >= 15 AND vl.patient_age_in_years <= 49)";
+                                }else if($params['age'][$a] == '>=50'){
+                                  $where.= "(vl.patient_age_in_years >= 50)";
+                                }else if($params['age'][$a] == 'unknown'){
+                                  $where.= "(vl.patient_age_in_years = 'unknown' OR vl.patient_age_in_years = '' OR vl.patient_age_in_years IS NULL)";
+                                }
                             }
+                          $where = '('.$where.')';
+                          $countQuery = $countQuery->where($where);
                         }
                         if(isset($params['sampleType']) && trim($params['sampleType'])!=''){
                             $countQuery = $countQuery->where('vl.sample_type="'.base64_decode(trim($params['sampleType'])).'"');

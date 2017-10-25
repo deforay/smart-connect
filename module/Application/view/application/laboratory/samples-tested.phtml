@@ -169,13 +169,12 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
                                 </div>
                                 <div class="form-group col-lg-4">
                                     <label class="control-label"><?php echo $this->translate('Age Group'); ?></label>
-                                    <select class="form-control" name="age" id="age" title="<?php echo $this->translate('Please choose age group'); ?>">
-                                      <option value="">-- <?php echo $this->translate('Age'); ?> --</option>
-                                      <option value="<2" <?php echo((isset($age) && $age =='<2')) ? "selected='selected'" : ""; ?>> <2</option>
+                                    <select class="form-control" name="age[]" id="age" multiple title="<?php echo $this->translate('Please choose age group'); ?>">
+                                      <option value="<2" <?php echo((isset($age) && $age =='<2')) ? "selected='selected'" : ""; ?>> < 2</option>
                                       <option value="2to5" <?php echo((isset($age) && $age =='2-5')) ? "selected='selected'" : ""; ?>> 2 - 5</option>
                                       <option value="6to14" <?php echo((isset($age) && $age =='6-14')) ? "selected='selected'" : ""; ?>> 6 - 14</option>
                                       <option value="15to49" <?php echo((isset($age) && $age =='15-49')) ? "selected='selected'" : ""; ?>> 15 - 49</option>
-                                      <option value=">50" <?php echo((isset($age) && $age =='>50')) ? "selected='selected'" : ""; ?>> >50</option>
+                                      <option value=">=50" <?php echo((isset($age) && $age =='>=50')) ? "selected='selected'" : ""; ?>> >= 50</option>
                                       <option value="unknown"> <?php echo $this->translate('Unknown'); ?></option>
                                     </select>
                                 </div>
@@ -370,6 +369,10 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
             placeholder: "<?php echo $this->translate('All Clinics'); ?>",
             allowClear: true
         });
+        $('#age').select2({
+            placeholder: "<?php echo $this->translate('All'); ?>",
+            allowClear: true
+        });
         $('#piebutton').on('click', function () {
             $('#piecontainer').fadeIn(function () {
                 generatePieContainer();
@@ -399,6 +402,7 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
         $('#districts').val('').change();
         $('#labName').val('').change();
         $('#clinicId').val('').change();
+        $('#age').val('').change();
         if($('#gender').val() == 'F'){
           $('.femaleSection').show();
         }else{
@@ -698,21 +702,6 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
         
     });
 
-    function exportSampleResult(){
-        $.blockUI.defaults.css.border = '1px solid grey';
-        $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
-        isPregnant = $('input[name="isPregnant"]:checked').val();
-        isBreastfeeding = $('input[name="isBreastfeeding"]:checked').val();
-        $.post("<?php echo $this->url('laboratory', array('action' => 'export-sample-result-excel')); ?>", {fromDate:$('#mrp-lowerDate').val(),toDate:$('#mrp-upperDate').val(),clinicId:$('#clinicId').val(),currentRegimen:$('#currentRegimen').val(),adherence:$('#adherence').val(),age:$('#age').val(),sampleType:$('#sampleType').val(),sampleStatus:$('#sampleStatus').val(),gender:$("#gender").val(),isPregnant:isPregnant,isBreastfeeding:isBreastfeeding,lineOfTreatment:$("#lineOfTreatment").val()},
-         function(data){
-             if(data == "" || data == null || data == undefined){
-                 alert('<?php echo $this->translate('Unable to export excel'); ?>');
-             }else{
-                 window.open('../temporary/'+data,'_blank');
-             }
-         }); 
-    }
-    
     $('#gender').on('change',function() {
         if(this.value == 'F'){
             $('.femaleSection').show();
@@ -738,6 +727,21 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
             $('#labName').html(splitLocationInfo[1]);
             $('#clinicId').html(splitLocationInfo[2]);
         });
+    }
+    
+    function exportSampleResult(){
+        $.blockUI.defaults.css.border = '1px solid grey';
+        $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
+        isPregnant = $('input[name="isPregnant"]:checked').val();
+        isBreastfeeding = $('input[name="isBreastfeeding"]:checked').val();
+        $.post("<?php echo $this->url('laboratory', array('action' => 'export-sample-result-excel')); ?>", {fromDate:$('#mrp-lowerDate').val(),toDate:$('#mrp-upperDate').val(),clinicId:$('#clinicId').val(),currentRegimen:$('#currentRegimen').val(),adherence:$('#adherence').val(),age:$('#age').val(),sampleType:$('#sampleType').val(),sampleStatus:$('#sampleStatus').val(),gender:$("#gender").val(),isPregnant:isPregnant,isBreastfeeding:isBreastfeeding,lineOfTreatment:$("#lineOfTreatment").val()},
+         function(data){
+             if(data == "" || data == null || data == undefined){
+                 alert('<?php echo $this->translate('Unable to export excel'); ?>');
+             }else{
+                 window.open('../temporary/'+data,'_blank');
+             }
+         }); 
     }
 </script>
 <script src="<?php echo $this->basePath('assets/js/month-year-rang-picker.js'); ?>" type="text/javascript"></script>

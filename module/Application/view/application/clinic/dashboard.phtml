@@ -62,13 +62,12 @@ foreach($sampleType as $samples){
                                 </div>
                                 <div class="form-group col-lg-4">
                                     <label class="control-label"><?php echo $this->translate('Age Group'); ?>&nbsp;</label>
-                                    <select class="form-control" name="age" id="age" title="<?php echo $this->translate('Please choose age group'); ?>">
-                                      <option value="">-- <?php echo $this->translate('Age'); ?> --</option>
-                                      <option value="<2"> <2</option>
+                                    <select class="form-control" name="age[]" id="age" multiple title="<?php echo $this->translate('Please choose age group'); ?>">
+                                      <option value="<2"> < 2</option>
                                       <option value="2to5"> 2 - 5</option>
                                       <option value="6to14"> 6 - 14</option>
                                       <option value="15to49"> 15 - 49</option>
-                                      <option value=">50"> >50</option>
+                                      <option value=">=50"> >= 50</option>
                                       <option value="unknown"> <?php echo $this->translate('Unknown'); ?></option>
                                     </select>
                                 </div>
@@ -259,6 +258,11 @@ foreach($sampleType as $samples){
             allowClear: true
         });
         
+        $('#age').select2({
+            placeholder: "<?php echo $this->translate('All'); ?>",
+            allowClear: true
+        });
+        
         $('#dashboard-range').daterangepicker({
             format: 'DD-MMM-YYYY',
             separator: ' to ',
@@ -426,6 +430,7 @@ foreach($sampleType as $samples){
         $('#dashboard-range span').html(moment().subtract(12, 'months').format('MMM D, YYYY') + ' to ' + moment().format('MMM D, YYYY'));
         $('#sampleCollectionDate').val(moment().subtract(12, 'months').format('YYYY-MM-DD') + ' to ' + moment().format('YYYY-MM-DD'));
         $('#labName').val('').change();
+        $('#age').val('').change();
         if($('#gender').val() == 'F'){
           $('.femaleSection').show();  
         }else{

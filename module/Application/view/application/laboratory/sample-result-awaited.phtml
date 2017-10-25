@@ -118,13 +118,12 @@ if(isset($labFilter) && trim($labFilter)!= ''){
                                 <div class="col-md-12">
                                     <div class="form-group col-lg-4">
                                         <label class="control-label"><?php echo $this->translate('Age Group'); ?></label>
-                                        <select class="form-control" name="age" id="age" title="<?php echo $this->translate('Please choose age group'); ?>">
-                                          <option value="">-- <?php echo $this->translate('Age'); ?> --</option>
-                                          <option value="<2"> <2</option>
+                                        <select class="form-control" name="age[]" id="age" multiple title="<?php echo $this->translate('Please choose age group'); ?>">
+                                          <option value="<2"> < 2</option>
                                           <option value="2to5"> 2 - 5</option>
                                           <option value="6to14"> 6 - 14</option>
                                           <option value="15to49"> 15 - 49</option>
-                                          <option value=">50"> >50</option>
+                                          <option value=">=50"> >= 50</option>
                                           <option value="unknown"> <?php echo $this->translate('Unknown'); ?></option>
                                         </select>
                                     </div>
@@ -383,6 +382,10 @@ if(isset($labFilter) && trim($labFilter)!= ''){
             placeholder: "<?php echo $this->translate('All Clinics'); ?>",
             allowClear: true
         });
+        $('#age').select2({
+            placeholder: "<?php echo $this->translate('All'); ?>",
+            allowClear: true
+        });
         
         $('#daterange-container').daterangepicker({
             format: 'DD-MMM-YYYY',
@@ -426,6 +429,7 @@ if(isset($labFilter) && trim($labFilter)!= ''){
         $('#districts').val('').change();
         $('#labName').val('').change();
         $('#clinicId').val('').change();
+        $('#age').val('').change();
         if($('#gender').val() == 'F'){
           $('.femaleSection').show();  
         }else{

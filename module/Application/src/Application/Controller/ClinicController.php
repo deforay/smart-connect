@@ -83,9 +83,9 @@ class ClinicController extends AbstractActionController{
     public function testResultAction() {
         $request = $this->getRequest();
         if ($request->isPost()) {
-            $params = $request->getPost();
+            $parameters = $request->getPost();
             $sampleService = $this->getServiceLocator()->get('SampleService');
-            $result = $sampleService->getAllTestResults($params);
+            $result = $sampleService->getAllTestResults($parameters);
             return $this->getResponse()->setContent(Json::encode($result));
         }
     }

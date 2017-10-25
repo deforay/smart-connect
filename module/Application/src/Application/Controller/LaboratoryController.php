@@ -224,7 +224,6 @@ class LaboratoryController extends AbstractActionController{
         if ($request->isPost()) {
             $params = $request->getPost();
             $sampleService = $this->getServiceLocator()->get('SampleService');
-            $params['age'] = 'yes';
             $result = $sampleService->getSampleTestedResultAgeGroupDetails($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('result' => $result))
@@ -355,9 +354,9 @@ class LaboratoryController extends AbstractActionController{
     public function getLabFilterSampleDetailsAction(){
         $request = $this->getRequest();
         if ($request->isPost()) {
-            $params = $request->getPost();
+            $parameters = $request->getPost();
             $sampleService = $this->getServiceLocator()->get('SampleService');
-            $result = $sampleService->getLabFilterSampleDetails($params);
+            $result = $sampleService->getLabFilterSampleDetails($parameters);
             return $this->getResponse()->setContent(Json::encode($result));
         }
     }
@@ -365,9 +364,9 @@ class LaboratoryController extends AbstractActionController{
     public function getFilterSampleDetailsAction(){
         $request = $this->getRequest();
         if ($request->isPost()) {
-            $params = $request->getPost();
+            $parameters = $request->getPost();
             $sampleService = $this->getServiceLocator()->get('SampleService');
-            $result = $sampleService->getFilterSampleDetails($params);
+            $result = $sampleService->getFilterSampleDetails($parameters);
             return $this->getResponse()->setContent(Json::encode($result));
         }
     }
@@ -603,9 +602,9 @@ class LaboratoryController extends AbstractActionController{
     public function getFilterSampleTatAction(){
         $request = $this->getRequest();
         if ($request->isPost()) {
-            $params = $request->getPost();
+            $parameters = $request->getPost();
             $sampleService = $this->getServiceLocator()->get('SampleService');
-            $result = $sampleService->getFilterSampleTatDetails($params);
+            $result = $sampleService->getFilterSampleTatDetails($parameters);
             return $this->getResponse()->setContent(Json::encode($result));
         }
     }
