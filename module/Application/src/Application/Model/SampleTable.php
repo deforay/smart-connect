@@ -884,7 +884,7 @@ class SampleTable extends AbstractTableGateway {
                                     ->columns(array(
                                                     //"total" => new Expression('COUNT(*)'),
                                                     "monthDate" => new Expression("DATE_FORMAT(DATE(sample_collection_date), '%b-%Y')"),
-                                                    "AvgDiff" => new Expression("CAST(ABS(AVG(TIMESTAMPDIFF(DAY,sample_tested_datetime,sample_collection_date))) AS DECIMAL (10,2))"),
+                                                    "AvgDiff" => new Expression("CAST(ABS(AVG(TIMESTAMPDIFF(DAY,result_approved_datetime,sample_collection_date))) AS DECIMAL (10,2))"),
                                               )
                                             );
             if(isset($params['facilityId']) && is_array($params['facilityId']) && count($params['facilityId']) >0){
@@ -897,14 +897,14 @@ class SampleTable extends AbstractTableGateway {
             }
             $queryStr = $queryStr->where("
                         (vl.sample_collection_date is not null AND vl.sample_collection_date != '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')
-                        AND (vl.sample_tested_datetime is not null AND vl.sample_tested_datetime != '' AND DATE(vl.sample_tested_datetime) !='1970-01-01' AND DATE(vl.sample_tested_datetime) !='0000-00-00')
+                        AND (vl.result_approved_datetime is not null AND vl.result_approved_datetime != '' AND DATE(vl.result_approved_datetime) !='1970-01-01' AND DATE(vl.result_approved_datetime) !='0000-00-00')
                         AND vl.result is not null
                         AND vl.result != ''
-                        AND DATE(vl.sample_collection_date) >= '".$startMonth."'
-                        AND DATE(vl.sample_collection_date) <= '".$endMonth."' ");
+                        AND DATE(vl.result_approved_datetime) >= '".$startMonth."'
+                        AND DATE(vl.result_approved_datetime) <= '".$endMonth."' ");
                 
-            $queryStr = $queryStr->group(array(new Expression('MONTH(vl.sample_collection_date)')));   
-            $queryStr = $queryStr->order(array(new Expression('DATE(vl.sample_collection_date)')));               
+            $queryStr = $queryStr->group(array(new Expression('MONTH(vl.result_approved_datetime)')));   
+            $queryStr = $queryStr->order(array(new Expression('DATE(vl.result_approved_datetime)')));               
             $queryStr = $sql->getSqlStringForSqlObject($queryStr);
             //echo $queryStr;die;
             //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
