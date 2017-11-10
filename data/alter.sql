@@ -108,7 +108,7 @@ ALTER TABLE `r_vl_test_reasons` ADD `test_reason_code` VARCHAR(255) NULL DEFAULT
 INSERT INTO `dash_global_config` (`name`, `display_name`, `value`) VALUES ('announcement_msg', 'Announcement Message', NULL);
 
 --Pal 28-July-2017
-ALTER TABLE `facility_details` CHANGE `facility_state` `facility_state` INT(11) NULL DEFAULT NULL, CHANGE `facility_district` `facility_district` INT(11) NULL DEFAULT NULL
+ALTER TABLE `facility_details` CHANGE `facility_state` `facility_state` INT(11) NULL DEFAULT NULL, CHANGE `facility_district` `facility_district` INT(11) NULL DEFAULT NULL;
 
 CREATE TABLE `location_details` (
   `location_id` int(11) NOT NULL,
@@ -117,7 +117,7 @@ CREATE TABLE `location_details` (
   `location_code` varchar(255) DEFAULT NULL,
   `latitude` varchar(255) DEFAULT NULL,
   `longitude` varchar(255) DEFAULT NULL
-)
+);
 
 ALTER TABLE `location_details`
   ADD PRIMARY KEY (`location_id`);
@@ -125,7 +125,7 @@ ALTER TABLE `location_details`
 ALTER TABLE `location_details`
   MODIFY `location_id` int(11) NOT NULL AUTO_INCREMENT;
   
-alter table location_details add FOREIGN key(parent_location) REFERENCES location_details(location_id)
+alter table location_details add FOREIGN key(parent_location) REFERENCES location_details(location_id);
 
 ALTER TABLE `facility_details` CHANGE `facility_state` `facility_state` INT(11) NULL DEFAULT NULL, CHANGE `facility_district` `facility_district` INT(11) NULL DEFAULT NULL;
 
@@ -133,12 +133,12 @@ INSERT INTO `location_details` (`location_id`, `parent_location`, `location_name
 (1, 0, 'Zambezia', NULL, NULL, NULL),
 (2, 1, 'Quelimane', NULL, NULL, NULL),
 (3, 1, 'Chinde', NULL, NULL, NULL),
-(5, 1, 'Gurué', NULL, NULL, NULL),
+(5, 1, 'Guruï¿½', NULL, NULL, NULL),
 (6, 1, 'Maganja da Costa', NULL, NULL, NULL),
 (7, 1, 'Ile', NULL, NULL, NULL),
 (8, 1, 'Pebane', NULL, NULL, NULL),
 (9, 1, 'Inhassunge', NULL, NULL, NULL),
-(10, 1, 'Gilé', NULL, NULL, NULL),
+(10, 1, 'Gilï¿½', NULL, NULL, NULL),
 (11, 1, 'Mocubela', NULL, NULL, NULL),
 (12, 1, 'Nicoadala', NULL, NULL, NULL),
 (13, 1, 'Lugela', NULL, NULL, NULL),
@@ -152,7 +152,7 @@ INSERT INTO `location_details` (`location_id`, `parent_location`, `location_name
 (21, 1, 'Molumbo', NULL, NULL, NULL),
 (22, 1, 'Mopeia', NULL, NULL, NULL),
 (23, 0, 'Tete', NULL, NULL, NULL),
-(24, 23, 'Ang¢nia', NULL, NULL, NULL),
+(24, 23, 'Angï¿½nia', NULL, NULL, NULL),
 (25, 23, 'Cahora Bassa', NULL, NULL, NULL),
 (26, 23, 'Changara', NULL, NULL, NULL),
 (27, 23, 'Chifunde', NULL, NULL, NULL),
@@ -191,7 +191,7 @@ INSERT INTO `location_details` (`location_id`, `parent_location`, `location_name
 (60, 59, 'Angoche', NULL, NULL, NULL),
 (61, 59, 'Cidade de Nampula', NULL, NULL, NULL),
 (62, 59, 'Erati', NULL, NULL, NULL),
-(63, 59, 'Ilha de Mo‡ambique', NULL, NULL, NULL),
+(63, 59, 'Ilha de Moï¿½ambique', NULL, NULL, NULL),
 (64, 59, 'Lalaua', NULL, NULL, NULL),
 (65, 59, 'Larde', NULL, NULL, NULL),
 (66, 59, 'Liupo', NULL, NULL, NULL),
@@ -214,7 +214,7 @@ INSERT INTO `location_details` (`location_id`, `parent_location`, `location_name
 (83, 0, 'Maputo Provincia', NULL, NULL, NULL),
 (84, 83, 'Boane', NULL, NULL, NULL),
 (85, 83, 'Magude', NULL, NULL, NULL),
-(86, 83, 'Manhi‡a', NULL, NULL, NULL),
+(86, 83, 'Manhiï¿½a', NULL, NULL, NULL),
 (87, 83, 'Marracuene', NULL, NULL, NULL),
 (88, 83, 'Matola', NULL, NULL, NULL),
 (89, 83, 'Matutine', NULL, NULL, NULL),
@@ -269,13 +269,13 @@ INSERT INTO `location_details` (`location_id`, `parent_location`, `location_name
 (138, 129, 'Palma', NULL, NULL, NULL),
 (139, 129, 'Pemba', NULL, NULL, NULL);
 
-update facility_details set facility_state = NULL WHERE facility_state = 0
+update facility_details set facility_state = NULL WHERE facility_state = 0;
 
-update facility_details set facility_district = NULL WHERE facility_district = 0
+update facility_details set facility_district = NULL WHERE facility_district = 0;
 
 
-alter table facility_details add FOREIGN key(facility_state) REFERENCES location_details(location_id)
-alter table facility_details add FOREIGN key(facility_district) REFERENCES location_details(location_id)
+alter table facility_details add FOREIGN key(facility_state) REFERENCES location_details(location_id);
+alter table facility_details add FOREIGN key(facility_district) REFERENCES location_details(location_id);
 
 --saravanan 01-Aug-2017
 ALTER TABLE `facility_details` ADD `facility_logo` VARCHAR(255) NULL DEFAULT NULL AFTER `status`;
@@ -286,7 +286,7 @@ CREATE TABLE `locale_details` (
   `locale` varchar(45) NOT NULL,
   `display_name` varchar(45) NOT NULL,
   `locale_status` varchar(45) NOT NULL DEFAULT 'active'
-)
+);
 
 INSERT INTO `locale_details` (`locale_id`, `locale`, `display_name`, `locale_status`) VALUES
 (1, 'en_US', 'english', 'active'),
@@ -359,96 +359,13 @@ CREATE TABLE `removed_samples` (
   `sample_testing_date` datetime DEFAULT NULL,
   `vl_focal_person` varchar(255) DEFAULT NULL,
   `vl_focal_person_phone_number` varchar(255) DEFAULT NULL,
-  `sample_received_at_vl_lab_datetime` datetime DEFAULT NULL,
-  `result_dispatched_datetime` datetime DEFAULT NULL,
-  `is_sample_rejected` varchar(255) DEFAULT NULL,
-  `sample_rejection_facility` int(11) DEFAULT NULL,
-  `reason_for_sample_rejection` int(11) DEFAULT NULL,
-  `request_created_by` int(11) DEFAULT NULL,
-  `request_created_datetime` datetime DEFAULT NULL,
-  `last_modified_by` int(11) DEFAULT NULL,
-  `last_modified_datetime` datetime DEFAULT NULL,
-  `patient_other_id` varchar(255) DEFAULT NULL,
-  `patient_age_in_years` varchar(255) DEFAULT NULL,
-  `patient_age_in_months` varchar(255) DEFAULT NULL,
-  `treatment_initiated_date` date DEFAULT NULL,
-  `patient_anc_no` varchar(255) DEFAULT NULL,
-  `treatment_details` text,
-  `lab_name` varchar(255) DEFAULT NULL,
-  `lab_id` int(11) DEFAULT NULL,
-  `lab_code` int(11) DEFAULT NULL,
-  `lab_contact_person` varchar(255) DEFAULT NULL,
-  `lab_phone_number` varchar(255) DEFAULT NULL,
-  `sample_tested_datetime` datetime DEFAULT NULL,
-  `result_value_log` varchar(255) DEFAULT NULL,
-  `result_value_absolute` varchar(255) DEFAULT NULL,
-  `result_value_text` varchar(255) DEFAULT NULL,
-  `result_value_absolute_decimal` varchar(255) DEFAULT NULL,
-  `result` varchar(255) DEFAULT NULL,
-  `approver_comments` text,
-  `result_approved_by` varchar(255) DEFAULT NULL,
-  `result_approved_datetime` datetime DEFAULT NULL,
-  `result_reviewed_by` varchar(255) DEFAULT NULL,
-  `result_reviewed_datetime` datetime DEFAULT NULL,
-  `test_methods` varchar(255) DEFAULT NULL,
-  `contact_complete_status` varchar(255) DEFAULT NULL,
-  `last_viral_load_date` date DEFAULT NULL,
-  `last_viral_load_result` varchar(255) DEFAULT NULL,
-  `last_vl_result_in_log` varchar(255) DEFAULT NULL,
-  `reason_for_vl_testing` varchar(255) DEFAULT NULL,
-  `drug_substitution` varchar(255) DEFAULT NULL,
-  `sample_collected_by` varchar(255) DEFAULT NULL,
-  `vl_test_platform` varchar(255) DEFAULT NULL,
-  `facility_support_partner` varchar(255) DEFAULT NULL,
-  `has_patient_changed_regimen` varchar(45) DEFAULT NULL,
-  `reason_for_regimen_change` varchar(255) DEFAULT NULL,
-  `regimen_change_date` date DEFAULT NULL,
-  `plasma_conservation_temperature` float DEFAULT NULL,
-  `plasma_conservation_duration` varchar(45) DEFAULT NULL,
-  `physician_name` varchar(255) DEFAULT NULL,
-  `date_test_ordered_by_physician` date DEFAULT NULL,
-  `vl_test_number` varchar(45) DEFAULT NULL,
-  `date_dispatched_from_clinic_to_lab` datetime DEFAULT NULL,
-  `result_printed_datetime` datetime DEFAULT NULL,
-  `result_sms_sent_datetime` datetime DEFAULT NULL,
-  `is_request_mail_sent` varchar(45) NOT NULL DEFAULT 'no',
-  `is_result_mail_sent` varchar(45) NOT NULL DEFAULT 'no',
-  `is_result_sms_sent` varchar(45) NOT NULL DEFAULT 'no',
-  `test_request_export` int(11) NOT NULL DEFAULT '0',
-  `test_request_import` int(11) NOT NULL DEFAULT '0',
-  `test_result_export` int(11) NOT NULL DEFAULT '0',
-  `test_result_import` int(11) NOT NULL DEFAULT '0',
-  `result_status` int(11) NOT NULL,
-  `import_machine_file_name` varchar(255) DEFAULT NULL,
-  `manual_result_entry` varchar(255) DEFAULT NULL,
-  `source` varchar(500) DEFAULT 'manual',
-  `ward` varchar(255) DEFAULT NULL,
-  `art_cd_cells` varchar(255) DEFAULT NULL,
-  `art_cd_date` date DEFAULT NULL,
-  `who_clinical_stage` varchar(255) DEFAULT NULL,
-  `reason_testing_png` text,
-  `tech_name_png` varchar(255) DEFAULT NULL,
-  `qc_tech_name` varchar(255) DEFAULT NULL,
-  `qc_tech_sign` varchar(255) DEFAULT NULL,
-  `qc_date` varchar(255) DEFAULT NULL,
-  `whole_blood_ml` varchar(50) DEFAULT NULL,
-  `whole_blood_vial` varchar(50) DEFAULT NULL,
-  `plasma_ml` varchar(50) DEFAULT NULL,
-  `plasma_vial` varchar(50) DEFAULT NULL,
-  `plasma_process_time` varchar(255) DEFAULT NULL,
-  `plasma_process_tech` varchar(255) DEFAULT NULL,
-  `batch_quality` varchar(255) DEFAULT NULL,
-  `sample_test_quality` varchar(255) DEFAULT NULL,
-  `failed_test_date` datetime DEFAULT NULL,
-  `failed_test_tech` varchar(255) DEFAULT NULL,
-  `failed_vl_result` varchar(255) DEFAULT NULL,
-  `failed_batch_quality` varchar(255) DEFAULT NULL,
-  `failed_sample_test_quality` varchar(255) DEFAULT NULL,
-  `failed_batch_id` varchar(255) DEFAULT NULL,
-  `clinic_date` date DEFAULT NULL,
-  `report_date` date DEFAULT NULL,
-  `sample_to_transport` varchar(255) DEFAULT NULL
-)
+ALTER TABLE `dash_vl_request_form` ADD `sample_registered_at_lab` DATETIME NULL AFTER `sample_collection_date`;
 
-ALTER TABLE `removed_samples`
-  ADD PRIMARY KEY (`vl_sample_id`);
+
+
+-- Amit Oct 23 2017
+
+ALTER TABLE `dash_vl_request_form` ADD `sample_registered_at_lab` DATETIME NULL AFTER `sample_collection_date`;
+
+
+
