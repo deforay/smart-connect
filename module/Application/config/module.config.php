@@ -72,6 +72,16 @@ return array(
                     ),
                 ),
             ),
+            'summary' => array(
+                'type' => 'segment',
+                'options' => array(
+                    'route' => '/summary[/][:action][/:id]',
+                    'defaults' => array(
+                        'controller' => 'Application\Controller\Summary',
+                        'action' => 'index',
+                    ),
+                ),
+            ),
             'clinics' => array(
                 'type' => 'segment',
                 'options' => array(
@@ -197,6 +207,7 @@ return array(
             'Application\Controller\Common' => 'Application\Controller\CommonController',
             'Application\Controller\Config' => 'Application\Controller\ConfigController',
             'Application\Controller\Facility' => 'Application\Controller\FacilityController',
+            'Application\Controller\Summary' => 'Application\Controller\SummaryController'
         ),
     ),
     'view_manager' => array(

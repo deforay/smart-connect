@@ -37,6 +37,7 @@ use Application\Service\SourceService;
 use Application\Service\SampleService;
 use Application\Service\ConfigService;
 use Application\Service\FacilityService;
+use Application\Service\SummaryService;
 
 use Zend\Mvc\ModuleRouteListener;
 use Zend\Mvc\MvcEvent;
@@ -301,10 +302,13 @@ class Module{
                 'SampleService' => function($sm) {
                     return new SampleService($sm);
                 },
-		'ConfigService' => function($sm) {
+				'SummaryService' => function($sm) {
+                    return new SummaryService($sm);
+                },
+				'ConfigService' => function($sm) {
                     return new ConfigService($sm);
                 },
-		'FacilityService' => function($sm) {
+				'FacilityService' => function($sm) {
                     return new FacilityService($sm);
                 },
 		'translator' => 'Zend\Mvc\Service\TranslatorServiceFactory',

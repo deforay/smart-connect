@@ -130,8 +130,19 @@ $languagecontainer->locale = $this->GetLocaleData('locale',$config['language']);
                         </li>
                         <!-- DOC: To remove the search box from the sidebar you just need to completely remove the below "sidebar-search-wrapper" LI element -->
                         <?php
+                        if($logincontainer->role == 1){ ?>
+                            <li class="nav-item start <?php echo ($activeTab == 'summary-dashboard' ? " active open " : ""); ?>">
+                                 <a href="/summary/" class="nav-link nav-toggle">
+                                     <i class="icon-home"></i>
+                                     <span class="title"><?php echo $this->translate('Summary'); ?></span>
+                                     <span class="selected"></span>
+                                 </a>
+                                 
+                            </li>
+                        <?php } ?>
+                        <?php
                         if($logincontainer->role == 1 || $logincontainer->role == 2){ ?>
-                            <li class="nav-item start <?php echo ($activeTab == 'labs-dashboard' ? " active open " : ""); ?>">
+                            <li class="nav-item <?php echo ($activeTab == 'labs-dashboard' ? " active open" : ""); ?>">
                                  <a href="/labs/dashboard" class="nav-link nav-toggle">
                                      <i class="icon-home"></i>
                                      <span class="title"><?php echo $this->translate('Labs Dashboard'); ?></span>
