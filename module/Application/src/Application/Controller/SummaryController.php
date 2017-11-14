@@ -17,8 +17,10 @@ class SummaryController extends AbstractActionController{
         $this->layout()->setVariable('activeTab', 'summary-dashboard');
         $sampleService = $this->getServiceLocator()->get('SummaryService');
         $summaryTabResult = $sampleService->fetchSummaryTabDetails();    
+        $keySummaryIndicatorsResult = $sampleService->getKeySummaryIndicatorsDetails();    
         return new ViewModel(array(
-                    'summaryTabInfo' => $summaryTabResult
+                    'summaryTabInfo' => $summaryTabResult,
+                    'keySummaryIndicators' => $keySummaryIndicatorsResult
         ));
     }
     

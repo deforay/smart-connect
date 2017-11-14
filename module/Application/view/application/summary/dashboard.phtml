@@ -305,9 +305,67 @@ $endDate=date('Y-m');
     <div role="tabpanel" class="tab-pane fade" id="messages">
         Message
     </div>
-    
   </div>
-  </div>
+<br>
+<br>
+<div class="row">
+                            <div class="col-md-12 col-sm-12">                     
+                            
+                            
+                            <div class="portlet box">
+                                
+                                        <div class="portlet box blue">
+                                            <div class="portlet-title">
+                                                <div class="caption" id="blockTitle">
+                                                    <i class="fa fa-cogs"></i><?php echo $this->translate('SUMMARY OF KEY INDICATORS'); ?>
+                                                </div>
+                                            </div>
+                                            <div class="portlet-body">
+                                                <div class="table-toolbar" id="keyIndicatorsSummary">
+                                                    <table class="table table-striped table-bordered table-hover order-column" id="keyIndicatorsSummary">
+                                                        <thead>
+                                                            <tr>
+                                                                <th> <?php echo $this->translate('Months'); ?> </th>
+                                                                <th> <?php echo $this->translate('Jan \'17'); ?> </th>
+                                                                <th> <?php echo $this->translate('Feb \'17'); ?> </th>
+                                                                <th> <?php echo $this->translate('Mar \'17'); ?> </th>
+                                                                <th> <?php echo $this->translate('Apr \'17'); ?> </th>
+                                                                <th> <?php echo $this->translate('May \'17'); ?> </th>
+                                                                <th> <?php echo $this->translate('jun \'17'); ?> </th>
+                                                                <th> <?php echo $this->translate('Jul \'17'); ?> </th>
+                                                                <th> <?php echo $this->translate('Aug \'17'); ?> </th>
+                                                                <th> <?php echo $this->translate('Sep \'17'); ?> </th>
+                                                                <th> <?php echo $this->translate('Oct \'17'); ?> </th>
+                                                                <th> <?php echo $this->translate('Nov \'17'); ?> </th>
+                                                                <th> <?php echo $this->translate('Dec \'17'); ?> </th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <?php foreach($keySummaryIndicators as $key=>$indicators){ ?>
+                                                            <tr>
+                                                                <td><?php echo $this->translate(strtoupper(str_replace('-',' ',$key)));?></td>
+                                                                <?php foreach($indicators['month'] as $months){ ?>
+                                                                <td><?php echo $months;?></td>
+                                                                
+                                                                <?php } ?>
+                                                            </tr>
+                                                            <?php } ?>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                
+                                            </div>
+                                        </div>
+                                
+                            </div>
+
+                        </div>
+                        
+
+                        
+
+</div>
+</div>
                     
    
     

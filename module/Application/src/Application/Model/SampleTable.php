@@ -4466,6 +4466,43 @@ class SampleTable extends AbstractTableGateway {
             return $result;
     }
     
+    public function fetchKeySummaryIndicatorsDetails(){
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $common = new CommonService($this->sm);
+        $year=date('Y');
+        $summaryResult=array();
+        $month=6;
+        for($month=1;$month<=12;$month++){
+            $samplesReceivedSummaryQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
+                                ->columns(
+                                          array(
+                                                "total_samples_received" => new Expression("(COUNT(*))"),
+                                                "total_samples_tested" => new Expression("(SUM(CASE WHEN (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END))"),
+                                                "total_samples_pending" => new Expression("(SUM(CASE WHEN (sample_tested_datetime is null OR sample_tested_datetime = '' OR DATE(sample_tested_datetime) ='1970-01-01' OR DATE(sample_tested_datetime) ='0000-00-00' OR DATE(sample_tested_datetime) ='0') THEN 1 ELSE 0 END))"),
+                                                "total_samples_rejected" => new Expression("(SUM(CASE WHEN (reason_for_sample_rejection !='' AND reason_for_sample_rejection !='0' AND reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END))"),
+                                                "suppressed_samples_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (vl.result < 1000) THEN 1 ELSE 0 END)/COUNT(*))*100),2)"),
+                                                "rejected_samples_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (vl.reason_for_sample_rejection !='' AND vl.reason_for_sample_rejection !='0' AND vl.reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END)/COUNT(*))*100),2)"),
+                                                )
+                                          )
+                                ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date != '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00'
+                                    AND MONTH(sample_collection_date) = '".$month."' 
+                                    AND YEAR(sample_collection_date) = '".$year."')");
+                                
+            $samplesReceivedSummaryCacheQuery = $sql->getSqlStringForSqlObject($samplesReceivedSummaryQuery);
+           
+            $samplesReceivedSummaryResult = $common->cacheQuery($samplesReceivedSummaryCacheQuery,$dbAdapter);
+            //\Zend\Debug\Debug::dump($samplesReceivedSummaryResult);die;
+            $summaryResult['samples-received']['month'][$month]=$samplesReceivedSummaryResult[0]["total_samples_received"];
+            $summaryResult['samples-tested']['month'][$month]=$samplesReceivedSummaryResult[0]["total_samples_tested"];
+            $summaryResult['valid-tested']['month'][$month]=$samplesReceivedSummaryResult[0]["total_samples_tested"] - $samplesReceivedSummaryResult[0]["total_samples_rejected"];
+            $summaryResult['suppression-rate']['month'][$month]=$samplesReceivedSummaryResult[0]["suppressed_samples_percentage"].' %';
+            $summaryResult['rejection-rate']['month'][$month]=$samplesReceivedSummaryResult[0]["rejected_samples_percentage"].' %';
+        }
+         //\Zend\Debug\Debug::dump($summaryResult);die;
+        return $summaryResult;
+    }
+    
 
     
 }

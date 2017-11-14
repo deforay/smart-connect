@@ -42,4 +42,9 @@ class SummaryService {
         $sampleDb = $this->sm->get('SampleTable');
         return $sampleDb->fetchSamplesReceivedGraphDetails($params);
     }
+    
+    public function getKeySummaryIndicatorsDetails(){
+        $sampleDb = $this->sm->get('SampleTable');
+        return $sampleDb->fetchKeySummaryIndicatorsDetails();
+    }
 }
