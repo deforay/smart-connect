@@ -1,0 +1,109 @@
+<div id="suppressionRateGraphicalData"></div>
+<script>
+       $(function () {
+       
+       $('#suppressionRateGraphicalData').highcharts({
+    chart: {
+        zoomType: 'xy'
+    },
+    title: {
+        text: ''
+    },
+    subtitle: {
+        text: ''
+    },
+    exporting:{
+            chartOptions:{
+                subtitle: {
+                    text:'<?php echo $this->translate('Suppression Rate Data'); ?>',
+                }
+            }
+        },
+    xAxis: [{
+        categories: [<?php
+            if(isset($result['date']) && count($result['date'])>0){
+              foreach($result['date'] as $date){
+                  echo "'".$date."',";
+              }
+            }
+            ?>],
+        crosshair: true
+    }],
+    yAxis: [{ // Primary yAxis
+        allowDecimals: false,
+        min: 0,
+        labels: {
+            format: '{value}%',
+            style: {
+                color: Highcharts.getOptions().colors[1]
+            }
+        },
+        title: {
+            text: 'Suppression Rate',
+            style: {
+                color: Highcharts.getOptions().colors[1]
+            }
+        }
+    }, { // Secondary yAxis
+        allowDecimals: false,
+        min: 0,
+        title: {
+            text: 'Valid Tests',
+            style: {
+                color: Highcharts.getOptions().colors[0]
+            }
+        },
+        labels: {
+            format: '{value}',
+            style: {
+                color: Highcharts.getOptions().colors[0]
+            }
+        },
+        opposite: true
+    }],
+    tooltip: {
+        shared: true
+    },
+    legend: {
+        layout: 'vertical',
+        align: 'left',
+        x: 120,
+        verticalAlign: 'top',
+        y: 100,
+        floating: true,
+        backgroundColor: (Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#FFFFFF'
+    },
+    series: [{
+        name: 'Valid Tests (L)',
+        type: 'column',
+        yAxis: 1,
+        data: [
+        <?php if(isset($result['valid_results']) && count($result['valid_results']) >0){
+              foreach($result['valid_results'] as $validResult){                     
+              echo $validResult.',';
+              }
+              ?>
+       <?php  } ?>
+        ],
+        tooltip: {
+            valueSuffix: ' '
+        }
+
+    }, {
+        name: 'Suppression Rate (R)',
+        type: 'spline',
+        data: [
+        <?php if(isset($result['samples_rate']) && count($result['samples_rate']) >0){
+              foreach($result['samples_rate'] as $samplesRate){                     
+              echo $samplesRate.',';
+              }
+              ?>
+       <?php  } ?>
+        ],
+        tooltip: {
+            valueSuffix: '%'
+        }
+    }]
+});
+    });
+</script>

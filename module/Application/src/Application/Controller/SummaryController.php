@@ -57,6 +57,40 @@ class SummaryController extends AbstractActionController{
             return $viewModel;
         }
     }
+    
+    public function suppressionRateDistrictAction() {
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $parameters = $request->getPost();
+            $sampleService = $this->getServiceLocator()->get('SummaryService');
+            $result = $sampleService->getAllSuppressionRateByDistrict($parameters);
+            return $this->getResponse()->setContent(Json::encode($result));
+        }
+    }
+    
+    public function suppressionRateFacilityAction() {
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $parameters = $request->getPost();
+            $sampleService = $this->getServiceLocator()->get('SummaryService');
+            $result = $sampleService->getAllSuppressionRateByFacility($parameters);
+            return $this->getResponse()->setContent(Json::encode($result));
+        }
+    }
+    
+    public function suppressionRateGraphAction() {
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $sampleService = $this->getServiceLocator()->get('SummaryService');
+            $result = $sampleService->getSuppressionRateGraphDetails($params);
+            $viewModel = new ViewModel();
+            $viewModel->setVariables(array(
+                                    'result' => $result
+                                    ))->setTerminal(true);
+            return $viewModel;
+        }
+    }
 
     
 }
