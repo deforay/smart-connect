@@ -156,16 +156,22 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
                                   </select>
                                 </div>
                                 <div class="form-group col-lg-4 femaleSection" style="display:<?php echo (isset($searchGender) && $searchGender == 'F')?'':'none'; ?>;">
-                                    <label class="control-label"><?php echo $this->translate('Is Patient Pregnant'); ?></label><br>
-                                    <input id="pregnantYes" name="isPregnant" value="yes" type="radio"> <?php echo $this->translate('Yes'); ?>&nbsp;&nbsp;
-                                    <input id="pregnantNo" name="isPregnant" value="no" type="radio"> <?php echo $this->translate('No'); ?>&nbsp;&nbsp;
-                                    <input id="pregnantUnreported" name="isPregnant" value="unreported" type="radio"> <?php echo $this->translate('Unreported'); ?>
+                                    <label class="control-label"><?php echo $this->translate('Is Patient Pregnant'); ?></label>
+                                    <select class="form-control" name="isPregnant" id="isPregnant">
+                                      <option value=""><?php echo $this->translate('All'); ?></option>  
+                                      <option value="yes"><?php echo $this->translate('Yes'); ?></option>
+                                      <option value="no"><?php echo $this->translate('No'); ?></option>
+                                      <option value="unreported"><?php echo $this->translate('Unreported'); ?></option>
+                                    </select>
                                 </div>
                                 <div class="form-group col-lg-4 femaleSection" style="display:<?php echo (isset($searchGender) && $searchGender == 'F')?'':'none'; ?>;">
-                                    <label class="control-label"><?php echo $this->translate('Is Patient Breastfeeding'); ?></label><br>
-                                    <input id="breastfeedingYes" name="isBreastfeeding" value="yes" type="radio"> <?php echo $this->translate('Yes'); ?>&nbsp;&nbsp;
-                                    <input id="breastfeedingNo" name="isBreastfeeding" value="no" type="radio"> <?php echo $this->translate('No'); ?>&nbsp;&nbsp;
-                                    <input id="breastfeedingUnreported" name="isBreastfeeding" value="unreported" type="radio"> <?php echo $this->translate('Unreported'); ?>
+                                    <label class="control-label"><?php echo $this->translate('Is Patient Breastfeeding'); ?></label>
+                                    <select class="form-control" name="isBreastfeeding" id="isBreastfeeding">
+                                      <option value=""><?php echo $this->translate('All'); ?></option>  
+                                      <option value="yes"><?php echo $this->translate('Yes'); ?></option>
+                                      <option value="no"><?php echo $this->translate('No'); ?></option>
+                                      <option value="unreported"><?php echo $this->translate('Unreported'); ?></option>
+                                    </select>
                                 </div>
                             </div>
                             <div class="col-md-12">
@@ -234,8 +240,8 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
         clinicId = $("#clinicId").val();
         sampleType = $("#sampleType").val();
         gender = $("#gender").val();
-        isPregnant = $('input[name="isPregnant"]:checked').val();
-        isBreastfeeding = $('input[name="isBreastfeeding"]:checked').val();
+        isPregnant = $("#isPregnant").val();
+        isBreastfeeding = $("#isBreastfeeding").val();
         $.post("<?php echo $this->url('laboratory', array('action' => 'get-pie-sample-tat')); ?>",{fromDate:fromDate,toDate:toDate,provinces:provinces,districts:districts,lab:lab,clinicId:clinicId,sampleType:sampleType,sampleStatus:'sample_tested',gender:gender,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding},
         function(data) {
             $("#piecontainer").html(data);
@@ -253,8 +259,8 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
         clinicId = $("#clinicId").val();
         sampleType = $("#sampleType").val();
         gender = $("#gender").val();
-        isPregnant = $('input[name="isPregnant"]:checked').val();
-        isBreastfeeding = $('input[name="isBreastfeeding"]:checked').val();
+        isPregnant = $("#isPregnant").val();
+        isBreastfeeding = $("#isBreastfeeding").val();
         $.post("<?php echo $this->url('laboratory', array('action' => 'get-bar-sample-tat')); ?>",{fromDate:fromDate,toDate:toDate,provinces:provinces,districts:districts,lab:lab,clinicId:clinicId,sampleType:sampleType,sampleStatus:'sample_tested',gender:gender,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding},
         function(data) {
             $("#barcontainer").html(data);
@@ -290,9 +296,9 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
                 generateBarContainer();
             });
         });
-       generatePieContainer();
-       generateBarContainer();
-       loadSampleDataTable();
+        generatePieContainer();
+        generateBarContainer();
+        loadSampleDataTable();
     });
 
     
@@ -339,8 +345,8 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
                 aoData.push({"name": "clinicId", "value": $('#clinicId').val()});
                 aoData.push({"name": "sampleType", "value": $('#sampleType').val()});
                 aoData.push({"name": "gender", "value": $('#gender').val()});
-                aoData.push({"name": "isPregnant", "value": $('input[name="isPregnant"]:checked').val()});
-                aoData.push({"name": "isBreastfeeding", "value": $('input[name="isBreastfeeding"]:checked').val()});
+                aoData.push({"name": "isPregnant", "value": $("#isPregnant").val()});
+                aoData.push({"name": "isBreastfeeding", "value": $("#isBreastfeeding").val()});
                 $.ajax({
                     "dataType": 'json',
                     "type": "POST",
@@ -619,10 +625,8 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
             $('.femaleSection').show();
         }else{
            $('.femaleSection').hide();
-           $('#pregnantYes').prop('checked',false);
-           $('#pregnantNo').prop('checked',false);
-           $('#breastfeedingYes').prop('checked',false);
-           $('#breastfeedingNo').prop('checked',false);
+           $("#isPregnant").val('');
+           $("#isBreastfeeding").val('');
         }
     });
     

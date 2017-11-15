@@ -1,6 +1,6 @@
 <?php
-$lt1000 = array('<2'=>'#088738', '2-5' => '#7fb17f', '6-14' => '#60D18F', '15-49' => '#A5F7C6', '>50' => '#b2d0b2');
-$gt1000 = array('<2'=>'#ff1900', '2-5' => '#ac2710', '6-14' => '#f8745d', '15-49' => '#fa9c8b', '>50' => '#fcc3b9');
+$lt1000 = array('Age < 2'=>'#088738', 'Age 2-5' => '#7fb17f', 'Age 6-14' => '#60D18F', 'Age 15-49' => '#A5F7C6', 'Age > 50' => '#b2d0b2');
+$gt1000 = array('Age < 2'=>'#ff1900', 'Age 2-5' => '#ac2710', 'Age 6-14' => '#f8745d', 'Age 15-49' => '#fa9c8b', 'Age > 50' => '#fcc3b9');
 ?>
 <div id="samplesTestedVsAgeGroup"></div>
 <script>
@@ -54,14 +54,14 @@ $gt1000 = array('<2'=>'#ff1900', '2-5' => '#ac2710', '6-14' => '#f8745d', '15-49
                 point: {
                     events: {
                         click: function (e) {
-                           doSampleTestedBasedonAgeRedirect(e.point.category,e.point.age);
+                           doSampleTestedBasedonAgeRedirect(e.point.category,e.point.age.replace('Age ', ''));
                         }
                     }
                 }
             }
         },
         series: [<?php
-        $age = array('<2','2-5','6-14','15-49','>50');
+        $age = array('Age < 2','Age 2-5','Age 6-14','Age 15-49','Age > 50');
         for($i=0;$i<count($age);$i++){
               foreach($result[$age[$i]] as $key=>$condition){
               if($key!='VL Not Detected'){

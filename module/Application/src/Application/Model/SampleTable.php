@@ -58,6 +58,10 @@ class SampleTable extends AbstractTableGateway {
         $query = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
                                 ->columns(
                                           array("Total Samples" => new Expression('COUNT(*)'),
+                                          "Sample Tested" => new Expression("SUM(CASE 
+                                                                                WHEN ((vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL') AND (sample_tested_datetime IS NOT NULL AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) THEN 1
+                                                                                ELSE 0
+                                                                                END)"),
                                           "Gender Missing" => new Expression("SUM(CASE 
                                                                                     WHEN (patient_gender IS NULL OR patient_gender ='' OR patient_gender ='unreported') THEN 1
                                                                                     ELSE 0
@@ -70,7 +74,7 @@ class SampleTable extends AbstractTableGateway {
                                                                                                                                 WHEN (result is NULL OR result ='') AND (sample_collection_date < DATE_SUB(NOW(), INTERVAL $samplesWaitingFromLastXMonths MONTH) AND (reason_for_sample_rejection is NULL or reason_for_sample_rejection ='')) THEN 1
                                                                                                                                 ELSE 0
                                                                                                                                 END)"),
-                                         "Results Awaited <br>(> $samplesWaitingFromLastXMonths months)" => new Expression("SUM(CASE
+                                          "Results Awaited <br>(> $samplesWaitingFromLastXMonths months)" => new Expression("SUM(CASE
                                                                                                                                 WHEN (result is NULL OR result ='') AND (sample_collection_date > DATE_SUB(NOW(), INTERVAL $samplesWaitingFromLastXMonths MONTH) AND (reason_for_sample_rejection is NULL or reason_for_sample_rejection ='')) THEN 1
                                                                                                                                 ELSE 0
                                                                                                                                 END)")
@@ -366,7 +370,7 @@ class SampleTable extends AbstractTableGateway {
             $lessTotal = 0;
             $greaterTotal = 0;
             $notTargetTotal = 0;
-            $queryStr = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
+            $query = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
                                     ->columns(array(
                                                     "total" => new Expression('COUNT(*)'),
                                                     "monthDate" => new Expression("DATE_FORMAT(DATE(sample_collection_date), '%b-%Y')"),
@@ -388,21 +392,41 @@ class SampleTable extends AbstractTableGateway {
                                               )
                                             );
             if(isset($params['facilityId']) && is_array($params['facilityId']) && count($params['facilityId']) >0){
-                $queryStr = $queryStr->where('vl.lab_id IN ("' . implode('", "', $params['facilityId']) . '")');
+                $query = $query->where('vl.lab_id IN ("' . implode('", "', $params['facilityId']) . '")');
             }else{
                 if($logincontainer->role!= 1){
                     $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:array();
-                    $queryStr = $queryStr->where('vl.lab_id IN ("' . implode('", "', array_values(array_filter($mappedFacilities))) . '")');
+                    $query = $query->where('vl.lab_id IN ("' . implode('", "', array_values(array_filter($mappedFacilities))) . '")');
                 }
             }
-            $queryStr = $queryStr->where("
+            $query = $query->where("
                         (sample_collection_date is not null AND sample_collection_date != '')
                         AND DATE(sample_collection_date) >= '".$startMonth."'
                         AND DATE(sample_collection_date) <= '".$endMonth."' ");
-                
-            $queryStr = $queryStr->group(array(new Expression('MONTH(sample_collection_date)')));   
-            $queryStr = $queryStr->order(array(new Expression('DATE(sample_collection_date)')));               
-            $queryStr = $sql->getSqlStringForSqlObject($queryStr);
+            if(isset($params['age']) && count($params['age']) > 0){
+                $where = '';
+                for($a=0;$a<count($params['age']);$a++){
+                    if(trim($where)!= ''){ $where.= ' OR '; }
+                    if($params['age'][$a] == '<2'){
+                      $where.= "(vl.patient_age_in_years < 2)";
+                    }else if($params['age'][$a] == '2to5') {
+                      $where.= "(vl.patient_age_in_years >= 2 AND vl.patient_age_in_years <= 5)";
+                    }else if($params['age'][$a] == '6to14') {
+                      $where.= "(vl.patient_age_in_years >= 6 AND vl.patient_age_in_years <= 14)";
+                    }else if($params['age'][$a] == '15to49') {
+                      $where.= "(vl.patient_age_in_years >= 15 AND vl.patient_age_in_years <= 49)";
+                    }else if($params['age'][$a] == '>=50'){
+                      $where.= "(vl.patient_age_in_years >= 50)";
+                    }else if($params['age'][$a] == 'unknown'){
+                      $where.= "(vl.patient_age_in_years = 'unknown' OR vl.patient_age_in_years = '' OR vl.patient_age_in_years IS NULL)";
+                    }
+                }
+              $where = '('.$where.')';
+              $query = $query->where($where);
+            }
+            $query = $query->group(array(new Expression('MONTH(sample_collection_date)')));   
+            $query = $query->order(array(new Expression('DATE(sample_collection_date)')));               
+            $queryStr = $sql->getSqlStringForSqlObject($query);
             //echo $queryStr;die;
             //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             //echo $queryStr;die;
@@ -411,17 +435,17 @@ class SampleTable extends AbstractTableGateway {
             foreach($sampleResult as $sRow){
                 if($sRow["monthDate"] == null) continue;
                 
-                $result['<2']['VL (>= 1000 cp/ml)'][$j] = $sRow["AgeLt2VLGt1000"];
-                $result['2-5']['VL (>= 1000 cp/ml)'][$j] = $sRow["AgeGte2Lte5VLGt1000"];
-                $result['6-14']['VL (>= 1000 cp/ml)'][$j] = $sRow["AgeGte6Lte14VLGt1000"];
-                $result['15-49']['VL (>= 1000 cp/ml)'][$j] = $sRow["AgeGte15Lte49VLGt1000"];
-                $result['>50']['VL (>= 1000 cp/ml)'][$j] = $sRow["AgeGt50VLGt1000"];
+                $result['Age < 2']['VL (>= 1000 cp/ml)'][$j] = $sRow["AgeLt2VLGt1000"];
+                $result['Age 2-5']['VL (>= 1000 cp/ml)'][$j] = $sRow["AgeGte2Lte5VLGt1000"];
+                $result['Age 6-14']['VL (>= 1000 cp/ml)'][$j] = $sRow["AgeGte6Lte14VLGt1000"];
+                $result['Age 15-49']['VL (>= 1000 cp/ml)'][$j] = $sRow["AgeGte15Lte49VLGt1000"];
+                $result['Age > 50']['VL (>= 1000 cp/ml)'][$j] = $sRow["AgeGt50VLGt1000"];
                 
-                $result['<2']['VL (< 1000 cp/ml)'][$j] = $sRow["AgeLt2VLLt1000"];
-                $result['2-5']['VL (< 1000 cp/ml)'][$j] = $sRow["AgeGte2Lte5VLLt1000"];
-                $result['6-14']['VL (< 1000 cp/ml)'][$j] = $sRow["AgeGte6Lte14VLLt1000"];
-                $result['15-49']['VL (< 1000 cp/ml)'][$j] = $sRow["AgeGte15Lte49VLLt1000"];
-                $result['>50']['VL (< 1000 cp/ml)'][$j] = $sRow["AgeGt50VLLt1000"];
+                $result['Age < 2']['VL (< 1000 cp/ml)'][$j] = $sRow["AgeLt2VLLt1000"];
+                $result['Age 2-5']['VL (< 1000 cp/ml)'][$j] = $sRow["AgeGte2Lte5VLLt1000"];
+                $result['Age 6-14']['VL (< 1000 cp/ml)'][$j] = $sRow["AgeGte6Lte14VLLt1000"];
+                $result['Age 15-49']['VL (< 1000 cp/ml)'][$j] = $sRow["AgeGte15Lte49VLLt1000"];
+                $result['Age > 50']['VL (< 1000 cp/ml)'][$j] = $sRow["AgeGt50VLLt1000"];
                 
                 $result['date'][$j] = $sRow["monthDate"];
                 $j++;

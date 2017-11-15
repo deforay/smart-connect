@@ -133,6 +133,16 @@ $endDate=date('Y-m');
   padding:<?php echo(isset($languagecontainer->locale) && $languagecontainer->locale == 'en_US')?'8':'3'; ?>px;
   font-size:<?php echo(isset($languagecontainer->locale) && $languagecontainer->locale == 'en_US')?'14':'13'; ?>px;
 }
+.select2-search__field,.select2-selection__rendered{
+    color:#333;
+    text-align:center;
+}
+.select2-container--default{
+    width:100% !important;
+}
+.select2-selection--multiple{
+    border-radius:50px !important;
+}
 @media screen and (min-width:320px) and (max-width: 760px){
     #daterange-container{
         width:100% !important;
@@ -313,7 +323,19 @@ foreach($sampleType as $samples){
                                 <div class="portlet-title">
                                     <div class="caption">
                                         <span class="caption-subject"><?php echo $this->translate('Samples Tested based on Age'); ?></span>
-                                    </div>                     
+                                    </div>
+                                    <div class="actions" style="width:20%;">
+                                        <div class="btn-group" style="width:100%;">
+                                            <select id="age" name="age[]" class="form-control" multiple title="<?php echo $this->translate('Please choose age group'); ?>" onchange="getTestedSampleResultBasedAgeGroup();">
+                                                <option value="<2"> < 2</option>
+                                                <option value="2to5"> 2 - 5</option>
+                                                <option value="6to14"> 6 - 14</option>
+                                                <option value="15to49"> 15 - 49</option>
+                                                <option value=">=50"> >= 50</option>
+                                                <option value="unknown"> <?php echo $this->translate('Unknown'); ?></option>
+                                            </select>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="portlet-body">
                                     <div id="samplesTestedResultAgeGroup"></div>
@@ -500,7 +522,8 @@ foreach($sampleType as $samples){
         facilityId = $("#labName").val();
         fromDate=$('#mrp-lowerDate').val();
         toDate=$('#mrp-upperDate').val();
-        $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-test-result-age-group')); ?>",{fromDate:fromDate,toDate:toDate,facilityId:facilityId},
+        age = ($('#age').val() == null)?[]:$('#age').val();
+        $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-test-result-age-group')); ?>",{fromDate:fromDate,toDate:toDate,facilityId:facilityId,age:age},
         function(data) {
             $("#samplesTestedResultAgeGroup").html(data);
         });
@@ -609,6 +632,11 @@ foreach($sampleType as $samples){
     
         $('#labName').select2({
             placeholder: "<?php echo $this->translate('All Labs'); ?>",
+            allowClear: true
+        });
+        
+        $('#age').select2({
+            placeholder: "<?php echo $this->translate('All Age Group'); ?>",
             allowClear: true
         });
         

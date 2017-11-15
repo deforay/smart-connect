@@ -34,9 +34,14 @@ if(isset($result['scResult']) && count($result['scResult'])>0){
                 <i class="icon-pie-chart"></i>
             </div>
         </div>
-        <div id="resultAwaitedChart" width="210" height="170" style="max-height:200px !important;">
+        <div id="resultAwaitedChart" width="210" height="170" style="max-height:340px !important;">
             <table class="table table-striped table-hover table-compressed">
-                <?php foreach($quickStats as $statName => $statValue) {
+                <?php
+                $totalSample = 0;
+                $samplePercentage = '';
+                foreach($quickStats as $statName => $statValue) {
+                    if($statName == 'Total Samples'){ $totalSample = $statValue; }
+                    if($statName!= 'Total Samples'){ $samplePercentage = ' ('.round(($statValue/$totalSample)*100,2).'%)'; }
                     if(strpos($statName,'(<')!= false){
                         $statName = '<a href="javascript:void(0);" onclick="doSampleResultAwaitedRedirect(\'<\');">'.$this->translate($statName).'</a>';
                         $statValue = '<a href="javascript:void(0);" onclick="doSampleResultAwaitedRedirect(\'<\');">'.number_format($statValue).'</a>';
@@ -47,10 +52,10 @@ if(isset($result['scResult']) && count($result['scResult'])>0){
                         $statName = $this->translate($statName);
                         $statValue = number_format($statValue);
                     }
-                    ?>
+                ?>
                 <tr>
                     <th><?php echo $statName; ?></th>
-                    <td><?php echo $statValue; ?></td>
+                    <td><?php echo $statValue.$samplePercentage; ?></td>
                 </tr>
                 <?php } ?>
             </table>
