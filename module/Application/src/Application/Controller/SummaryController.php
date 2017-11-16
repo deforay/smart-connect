@@ -15,9 +15,9 @@ class SummaryController extends AbstractActionController{
 
     public function dashboardAction(){
         $this->layout()->setVariable('activeTab', 'summary-dashboard');
-        $sampleService = $this->getServiceLocator()->get('SummaryService');
-        $summaryTabResult = $sampleService->fetchSummaryTabDetails();    
-        $keySummaryIndicatorsResult = $sampleService->getKeySummaryIndicatorsDetails();    
+        $summaryService = $this->getServiceLocator()->get('SummaryService');
+        $summaryTabResult = $summaryService->fetchSummaryTabDetails();    
+        $keySummaryIndicatorsResult = $summaryService->getKeySummaryIndicatorsDetails();    
         return new ViewModel(array(
                     'summaryTabInfo' => $summaryTabResult,
                     'keySummaryIndicators' => $keySummaryIndicatorsResult
@@ -28,8 +28,8 @@ class SummaryController extends AbstractActionController{
         $request = $this->getRequest();
         if ($request->isPost()) {
             $parameters = $request->getPost();
-            $sampleService = $this->getServiceLocator()->get('SummaryService');
-            $result = $sampleService->getAllSamplesReceivedByDistrict($parameters);
+            $summaryService = $this->getServiceLocator()->get('SummaryService');
+            $result = $summaryService->getAllSamplesReceivedByDistrict($parameters);
             return $this->getResponse()->setContent(Json::encode($result));
         }
     }
@@ -38,8 +38,8 @@ class SummaryController extends AbstractActionController{
         $request = $this->getRequest();
         if ($request->isPost()) {
             $parameters = $request->getPost();
-            $sampleService = $this->getServiceLocator()->get('SummaryService');
-            $result = $sampleService->getAllSamplesReceivedByFacility($parameters);
+            $summaryService = $this->getServiceLocator()->get('SummaryService');
+            $result = $summaryService->getAllSamplesReceivedByFacility($parameters);
             return $this->getResponse()->setContent(Json::encode($result));
         }
     }
@@ -48,8 +48,8 @@ class SummaryController extends AbstractActionController{
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            $sampleService = $this->getServiceLocator()->get('SummaryService');
-            $result = $sampleService->getSamplesReceivedGraphDetails($params);
+            $summaryService = $this->getServiceLocator()->get('SummaryService');
+            $result = $summaryService->getSamplesReceivedGraphDetails($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array(
                                     'result' => $result
@@ -62,8 +62,8 @@ class SummaryController extends AbstractActionController{
         $request = $this->getRequest();
         if ($request->isPost()) {
             $parameters = $request->getPost();
-            $sampleService = $this->getServiceLocator()->get('SummaryService');
-            $result = $sampleService->getAllSuppressionRateByDistrict($parameters);
+            $summaryService = $this->getServiceLocator()->get('SummaryService');
+            $result = $summaryService->getAllSuppressionRateByDistrict($parameters);
             return $this->getResponse()->setContent(Json::encode($result));
         }
     }
@@ -72,8 +72,8 @@ class SummaryController extends AbstractActionController{
         $request = $this->getRequest();
         if ($request->isPost()) {
             $parameters = $request->getPost();
-            $sampleService = $this->getServiceLocator()->get('SummaryService');
-            $result = $sampleService->getAllSuppressionRateByFacility($parameters);
+            $summaryService = $this->getServiceLocator()->get('SummaryService');
+            $result = $summaryService->getAllSuppressionRateByFacility($parameters);
             return $this->getResponse()->setContent(Json::encode($result));
         }
     }
@@ -82,8 +82,8 @@ class SummaryController extends AbstractActionController{
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            $sampleService = $this->getServiceLocator()->get('SummaryService');
-            $result = $sampleService->getSuppressionRateGraphDetails($params);
+            $summaryService = $this->getServiceLocator()->get('SummaryService');
+            $result = $summaryService->getSuppressionRateGraphDetails($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array(
                                     'result' => $result

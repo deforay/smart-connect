@@ -4473,17 +4473,17 @@ class SampleTable extends AbstractTableGateway {
                                 ->columns(
                                           array(
                                                 "monthDate" => new Expression("DATE_FORMAT(DATE(sample_collection_date), '%b-%Y')"),
-                                                "total_dbs" => new Expression("SUM(CASE WHEN (sample_name='Dry Blood Spot') THEN 1 ELSE 0 END)"),
-                                                "total_plasma" => new Expression("SUM(CASE WHEN (sample_name='Plasma') THEN 1 ELSE 0 END)")
+                                                "total_dbs" => new Expression("SUM(CASE WHEN (sample_type=2) THEN 1 ELSE 0 END)"),
+                                                "total_plasma" => new Expression("SUM(CASE WHEN (sample_type=11) THEN 1 ELSE 0 END)"),
+                                                "total_others" => new Expression("SUM(CASE WHEN (sample_type!= 2 AND sample_type!= 11 AND sample_type IS NOT NULL AND sample_type!= '') THEN 1 ELSE 0 END)")
                                                 )
                                           )                                
                                 ->join(array('rs'=>'r_sample_type'),'rs.sample_id=vl.sample_type',array('sample_name'),'left')
                                
                             ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date != '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')
                                     AND DATE(sample_collection_date) >= '".$startMonth."' 
-                                    AND DATE(sample_collection_date) <= '".$endMonth."'
-                                    AND rs.sample_name IN ('Plasma','Dry Blood Spot')")
-                            ->group(array(new Expression("DATE_FORMAT(DATE(sample_collection_date), '%b-%Y')")))   
+                                    AND DATE(sample_collection_date) <= '".$endMonth."'")
+                            ->group(array(new Expression("DATE_FORMAT(DATE(sample_collection_date), '%b-%Y')")))  
                             ->order(array(new Expression('DATE(sample_collection_date)')));   
             
             $queryStr = $sql->getSqlStringForSqlObject($sQuery);
@@ -4496,6 +4496,7 @@ class SampleTable extends AbstractTableGateway {
                 if($sRow["monthDate"] == null) continue;
                 $result['sampleName']['dbs'][$j] = (isset($sRow["total_dbs"]))?$sRow["total_dbs"]:0;
                 $result['sampleName']['plasma'][$j] = (isset($sRow["total_plasma"]))?$sRow["total_plasma"]:0;
+                $result['sampleName']['others'][$j] = (isset($sRow["total_others"]))?$sRow["total_others"]:0;
                 $result['date'][$j] = $sRow["monthDate"];
                 $j++;
             }
