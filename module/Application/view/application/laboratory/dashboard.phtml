@@ -341,7 +341,7 @@ foreach($sampleType as $samples){
                                     <div id="samplesTestedResultAgeGroup"></div>
                                 </div>
                             </div>
-                        </div>                        
+                        </div>            
                     </div>
                     <div class="row">
                         <div class="col-md-6 col-sm-6">
@@ -374,7 +374,17 @@ foreach($sampleType as $samples){
                             <div class="portlet box blue">
                                 <div class="portlet-title">
                                     <div class="caption">
-                                        <span class="caption-subject"><?php echo $this->translate('Requisition Forms for Testing'); ?></span>
+                                        <span class="caption-subject"><?php echo $this->translate('Request Form Completeness'); ?></span>
+                                    </div>
+                                    <div class="actions" style="width:50%;">
+                                        <div class="btn-group" style="width:100%;">
+                                            <select id="formFields" name="formFields[]" class="form-control" multiple title="<?php echo $this->translate('Please choose form fields'); ?>" onchange="getRequisitionFormsTested();">
+                                                <option value="patient_art_no">ART No.</option>
+                                                <option value="patient_age_in_years"> Age</option>
+                                                <option value="patient_gender"> Gender</option>
+                                                <option value="line_of_treatment"> Line of Treatment</option>
+                                            </select>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="portlet-body" id="requisitionForms">
@@ -561,9 +571,10 @@ foreach($sampleType as $samples){
     
     function getRequisitionFormsTested(){
         facilityId = $("#labName").val();
-        fromDate=$('#mrp-lowerDate').val();
-        toDate=$('#mrp-upperDate').val();
-        $.post("<?php echo $this->url('laboratory', array('action' => 'get-requisition-forms')); ?>",{fromDate:fromDate,toDate:toDate,facilityId:facilityId},
+        fromDate = $('#mrp-lowerDate').val();
+        toDate = $('#mrp-upperDate').val();
+        formFields = ($('#formFields').val() == null)?['patient_art_no','patient_age_in_years','patient_gender','line_of_treatment']:$('#formFields').val();
+        $.post("<?php echo $this->url('laboratory', array('action' => 'get-requisition-forms')); ?>",{fromDate:fromDate,toDate:toDate,facilityId:facilityId,formFields:formFields},
         function(data) {
             $("#labDashReqFormBar").html(data);
         });
@@ -638,6 +649,23 @@ foreach($sampleType as $samples){
         $('#age').select2({
             placeholder: "<?php echo $this->translate('All Age Group'); ?>",
             allowClear: true
+        });
+        
+        $('#age').on('select2:close', function (evt) {
+            var uldiv = $(this).siblings('span.select2').find('ul');
+            var count = uldiv.find('li').length - 1;
+            uldiv.html("<li>"+count+" items selected</li>");
+        });
+        
+        $('#formFields').select2({
+            placeholder: "<?php echo $this->translate('All'); ?>",
+            allowClear: true
+        });
+        
+        $('#formFields').on('select2:close', function (evt) {
+            var uldiv = $(this).siblings('span.select2').find('ul');
+            var count = uldiv.find('li').length - 1;
+            uldiv.html("<li>"+count+" items selected</li>");
         });
         
         $('#daterange-container').daterangepicker({

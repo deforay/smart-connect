@@ -9,7 +9,7 @@ $('#labDashReqFormBar').highcharts({
         exporting:{
             chartOptions:{
                 subtitle: {
-                    text:'<?php echo $this->translate('Requisition Forms for Testing'); ?>',
+                    text:'<?php echo $this->translate('Request Form Completeness'); ?>',
                 }
             }
         },
@@ -76,7 +76,7 @@ $('#labDashReqFormBar').highcharts({
         },
         series: [
               <?php
-              if(isset($result['Complete']) && count($result['Complete'])>0){
+              if(isset($result['Incomplete']) && isset($result['Complete'])){
               ?>
                 {
                     name: '<?php echo $this->translate('Complete'); ?>',
