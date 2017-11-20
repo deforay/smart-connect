@@ -205,8 +205,8 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
         </a>
     </li>
     <li role="presentation">
-        <a href="#messages" aria-controls="messages" role="tab" data-toggle="tab">
-            <h6>Reg All</h6>
+        <a href="#allRegimenTab" aria-controls="messages" role="tab" data-toggle="tab">
+            <h6 style="margin-top:30px;">Reg All</h6>
             All Regimens
         </a>
     </li>
@@ -534,8 +534,76 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
             </div>
         </div>
     </div>
-    <div role="tabpanel" class="tab-pane fade" id="messages">
-        Coming Soon
+    <div role="tabpanel" class="tab-pane fade" id="allRegimenTab">
+        <div class="row">                 
+            <div class="col-md-12 col-sm-12">
+                <div class="portlet box">
+                    <div class="portlet-body">
+                        <table class="table">
+                            <thead>
+                              <tr>
+                                <td colspan="9" style="font-size:11px;">By Line of Regimen</td>
+                              </tr>
+                              <tr>
+                                <th></th>
+                                <th colspan="2" style="text-align:center;font-size:11px;">1st Line</th>
+                                <th colspan="2" style="text-align:center;font-size:11px;">2nd Line</th>
+                                <th colspan="2" style="text-align:center;font-size:11px;">Others</th>
+                                <th colspan="2" style="text-align:center;font-size:11px;">Total</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr>
+                                <th style="text-align:center;font-size:11px;">Results</th>
+                                <td style="text-align:center;font-size:11px;">#</td>
+                                <td style="text-align:center;font-size:11px;">%</td>
+                                <td style="text-align:center;font-size:11px;">#</td>
+                                <td style="text-align:center;font-size:11px;">%</td>
+                                <td style="text-align:center;font-size:11px;">#</td>
+                                <td style="text-align:center;font-size:11px;">%</td>
+                                <td style="text-align:center;font-size:11px;">#</td>
+                                <td style="text-align:center;font-size:11px;">%</td>
+                              </tr>
+                              <tr>
+                                <td style="text-align:center;font-size:11px;">NS</td>
+                                <td style="text-align:center;font-size:11px;"><?php echo $allLineofRegimenInfo[0]['1stLineofNotSuppressed']; ?></td>
+                                <td style="text-align:center;font-size:11px;"><?php echo ($allLineofRegimenInfo[0]['1stLineofNotSuppressed'] >0)?round((($allLineofRegimenInfo[0]['1stLineofNotSuppressed']/($allLineofRegimenInfo[0]['1stLineofNotSuppressed']+$allLineofRegimenInfo[0]['1stLineofSuppressed']))*100),2):''; ?></td>
+                                <td style="text-align:center;font-size:11px;"><?php echo $allLineofRegimenInfo[0]['2ndLineofNotSuppressed']; ?></td>
+                                <td style="text-align:center;font-size:11px;"><?php echo ($allLineofRegimenInfo[0]['2ndLineofNotSuppressed'] >0)?round((($allLineofRegimenInfo[0]['2ndLineofNotSuppressed']/($allLineofRegimenInfo[0]['2ndLineofNotSuppressed']+$allLineofRegimenInfo[0]['2ndLineofSuppressed']))*100),2):''; ?></td>
+                                <td style="text-align:center;font-size:11px;"><?php echo $allLineofRegimenInfo[0]['otherLineofNotSuppressed']; ?></td>
+                                <td style="text-align:center;font-size:11px;"><?php echo ($allLineofRegimenInfo[0]['otherLineofNotSuppressed'] >0)?round((($allLineofRegimenInfo[0]['otherLineofNotSuppressed']/($allLineofRegimenInfo[0]['otherLineofNotSuppressed']+$allLineofRegimenInfo[0]['otherLineofSuppressed']))*100),2):''; ?></td>
+                                <td style="text-align:center;font-size:11px;"><?php echo $allLineofRegimenInfo[0]['1stLineofNotSuppressed']+$allLineofRegimenInfo[0]['2ndLineofNotSuppressed']+$allLineofRegimenInfo[0]['otherLineofNotSuppressed']; ?></td>
+                                <td style="text-align:center;font-size:11px;"><?php echo (($allLineofRegimenInfo[0]['1stLineofNotSuppressed']+$allLineofRegimenInfo[0]['2ndLineofNotSuppressed']+$allLineofRegimenInfo[0]['otherLineofNotSuppressed']) > 0)?round(((($allLineofRegimenInfo[0]['1stLineofNotSuppressed']+$allLineofRegimenInfo[0]['2ndLineofNotSuppressed']+$allLineofRegimenInfo[0]['otherLineofNotSuppressed'])/($allLineofRegimenInfo[0]['1stLineofNotSuppressed']+$allLineofRegimenInfo[0]['2ndLineofNotSuppressed']+$allLineofRegimenInfo[0]['otherLineofNotSuppressed']+$allLineofRegimenInfo[0]['1stLineofSuppressed']+$allLineofRegimenInfo[0]['2ndLineofSuppressed']+$allLineofRegimenInfo[0]['otherLineofSuppressed']))*100),2):''; ?></td>
+                              </tr>
+                              <tr>
+                                <td style="text-align:center;font-size:11px;">S</td>
+                                <td style="text-align:center;font-size:11px;"><?php echo $allLineofRegimenInfo[0]['1stLineofSuppressed']; ?></td>
+                                <td style="text-align:center;font-size:11px;"><?php echo ($allLineofRegimenInfo[0]['1stLineofSuppressed'] >0)?round((($allLineofRegimenInfo[0]['1stLineofSuppressed']/($allLineofRegimenInfo[0]['1stLineofSuppressed']+$allLineofRegimenInfo[0]['1stLineofNotSuppressed']))*100),2):''; ?></td>
+                                <td style="text-align:center;font-size:11px;"><?php echo $allLineofRegimenInfo[0]['2ndLineofSuppressed']; ?></td>
+                                <td style="text-align:center;font-size:11px;"><?php echo ($allLineofRegimenInfo[0]['2ndLineofSuppressed'] >0)?round((($allLineofRegimenInfo[0]['2ndLineofSuppressed']/($allLineofRegimenInfo[0]['2ndLineofSuppressed']+$allLineofRegimenInfo[0]['2ndLineofNotSuppressed']))*100),2):''; ?></td>
+                                <td style="text-align:center;font-size:11px;"><?php echo $allLineofRegimenInfo[0]['otherLineofSuppressed']; ?></td>
+                                <td style="text-align:center;font-size:11px;"><?php echo ($allLineofRegimenInfo[0]['otherLineofSuppressed'] >0)?round((($allLineofRegimenInfo[0]['otherLineofSuppressed']/($allLineofRegimenInfo[0]['otherLineofSuppressed']+$allLineofRegimenInfo[0]['otherLineofNotSuppressed']))*100),2):''; ?></td>
+                                <td style="text-align:center;font-size:11px;"><?php echo $allLineofRegimenInfo[0]['1stLineofSuppressed']+$allLineofRegimenInfo[0]['2ndLineofSuppressed']+$allLineofRegimenInfo[0]['otherLineofSuppressed']; ?></td>
+                                <td style="text-align:center;font-size:11px;"><?php echo (($allLineofRegimenInfo[0]['1stLineofSuppressed']+$allLineofRegimenInfo[0]['2ndLineofSuppressed']+$allLineofRegimenInfo[0]['otherLineofSuppressed']) > 0)?round(((($allLineofRegimenInfo[0]['1stLineofSuppressed']+$allLineofRegimenInfo[0]['2ndLineofSuppressed']+$allLineofRegimenInfo[0]['otherLineofSuppressed'])/($allLineofRegimenInfo[0]['1stLineofSuppressed']+$allLineofRegimenInfo[0]['2ndLineofSuppressed']+$allLineofRegimenInfo[0]['otherLineofSuppressed']+$allLineofRegimenInfo[0]['1stLineofNotSuppressed']+$allLineofRegimenInfo[0]['2ndLineofNotSuppressed']+$allLineofRegimenInfo[0]['otherLineofNotSuppressed']))*100),2):''; ?></td>
+                              </tr>
+                              <tr>
+                                <th style="text-align:center;font-size:11px;">Total</th>
+                                <td style="text-align:center;font-size:11px;"><?php echo $allLineofRegimenInfo[0]['1stLineofNotSuppressed']+$allLineofRegimenInfo[0]['1stLineofSuppressed']; ?></td>
+                                <td style="text-align:center;font-size:11px;"></td>
+                                <td style="text-align:center;font-size:11px;"><?php echo $allLineofRegimenInfo[0]['2ndLineofNotSuppressed']+$allLineofRegimenInfo[0]['2ndLineofSuppressed']; ?></td>
+                                <td style="text-align:center;font-size:11px;"></td>
+                                <td style="text-align:center;font-size:11px;"><?php echo $allLineofRegimenInfo[0]['otherLineofNotSuppressed']+$allLineofRegimenInfo[0]['otherLineofSuppressed']; ?></td>
+                                <td style="text-align:center;font-size:11px;"></td>
+                                <td style="text-align:center;font-size:11px;"><?php echo ($allLineofRegimenInfo[0]['1stLineofNotSuppressed']+$allLineofRegimenInfo[0]['2ndLineofNotSuppressed']+$allLineofRegimenInfo[0]['otherLineofNotSuppressed'])+($allLineofRegimenInfo[0]['1stLineofSuppressed']+$allLineofRegimenInfo[0]['2ndLineofSuppressed']+$allLineofRegimenInfo[0]['otherLineofSuppressed']); ?></td>
+                                <td style="text-align:center;font-size:11px;"></td>
+                              </tr>
+                            </tbody>
+                        </table>
+                        <hr style="border-bottom:1px solid #2D5F8B;">
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
   </div>
 </div>

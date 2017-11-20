@@ -5251,7 +5251,7 @@ class SampleTable extends AbstractTableGateway {
             $prtlaRejectionResult = $common->cacheQuery($queryStr." AND vl.reason_for_sample_rejection = 17",$dbAdapter);
             $result['rejection']['ACC - Laboratory Accident'][$j] = (isset($accRejectionResult[0]['rejections']))?$accRejectionResult[0]['rejections']:0;
             $result['rejection']['INS - Insufficient Sample'][$j] = (isset($insRejectionResult[0]['rejections']))?$insRejectionResult[0]['rejections']:0;
-            $result['rejection']['PRTLA -'][$j] = $prtlaRejectionResult[0]['rejections']?$prtlaRejectionResult[0]['rejections']:0;
+            $result['rejection']['PRTLA -'][$j] = (isset($prtlaRejectionResult[0]['rejections']))?$prtlaRejectionResult[0]['rejections']:0;
             $result['date'][$j] = $monthYearFormat;
           $start = strtotime("+1 month", $start);
           $j++;
@@ -5451,5 +5451,27 @@ class SampleTable extends AbstractTableGateway {
                 $j++;
             }
         return $result;  
+    }
+    
+    public function fetchAllLineOfRegimenDetails(){
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $common = new CommonService($this->sm);
+        $sQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
+                                ->columns(
+                                          array(
+                                                "1stLineofSuppressed" => new Expression("(SUM(CASE WHEN ((vl.result < 1000 or vl.result='Target Not Detected') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.line_of_treatment = 1) THEN 1 ELSE 0 END))"),
+                                                "1stLineofNotSuppressed" => new Expression("(SUM(CASE WHEN (vl.result > 1000 AND vl.result!= 'Target Not Detected' AND vl.result IS NOT NULL AND vl.result!= '' AND vl.line_of_treatment = 1) THEN 1 ELSE 0 END))"),
+                                                "2ndLineofSuppressed" => new Expression("(SUM(CASE WHEN ((vl.result < 1000 or vl.result='Target Not Detected') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.line_of_treatment = 2) THEN 1 ELSE 0 END))"),
+                                                "2ndLineofNotSuppressed" => new Expression("(SUM(CASE WHEN (vl.result > 1000 AND vl.result!= 'Target Not Detected' AND vl.result IS NOT NULL AND vl.result!= '' AND vl.line_of_treatment = 2) THEN 1 ELSE 0 END))"),
+                                                "otherLineofSuppressed" => new Expression("(SUM(CASE WHEN ((vl.result < 1000 or vl.result='Target Not Detected') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.line_of_treatment!= 1 AND vl.line_of_treatment!= 2) THEN 1 ELSE 0 END))"),
+                                                "otherLineofNotSuppressed" => new Expression("(SUM(CASE WHEN (vl.result > 1000 AND vl.result!= 'Target Not Detected' AND vl.result IS NOT NULL AND vl.result!= '' AND vl.line_of_treatment!= 1 AND vl.line_of_treatment!= 2) THEN 1 ELSE 0 END))")
+                                                )
+                                          );
+        $queryStr = $sql->getSqlStringForSqlObject($sQuery);
+        //echo $queryStr;die;
+        //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+        $allLineofRegimenResult = $common->cacheQuery($queryStr,$dbAdapter);
+       return $allLineofRegimenResult;
     }
 }

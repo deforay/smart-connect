@@ -87,4 +87,9 @@ class SummaryService {
         $sampleDb = $this->sm->get('SampleTable');
       return $sampleDb->fetchRegimenGroupBarChartDetails($params);
     }
+    
+    public function getAllLineOfRegimenDetails(){
+        $sampleDb = $this->sm->get('SampleTable');
+      return $sampleDb->fetchAllLineOfRegimenDetails();
+    }
 }
