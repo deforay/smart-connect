@@ -4064,9 +4064,6 @@ class SampleTable extends AbstractTableGateway {
      * Details Tab Details Data like
         * Total samples
         * % of Suppressed
-        * % of Rejected
-        * % of Regimen in 1st Line
-        * Reg All Regimen 
     
     */
     public function getSummaryTabDetails(){
@@ -4083,6 +4080,8 @@ class SampleTable extends AbstractTableGateway {
                                 "unsuppressed_samples_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (vl.result >= 1000) THEN 1 ELSE 0 END)/COUNT(*))*100),2)"),
                                 "rejected_samples" => new Expression("SUM(CASE WHEN (vl.reason_for_sample_rejection !='' AND vl.reason_for_sample_rejection !='0' AND vl.reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END)"),
                                 "rejected_samples_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (vl.reason_for_sample_rejection !='' AND vl.reason_for_sample_rejection !='0' AND vl.reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END)/COUNT(*))*100),2)"),
+                                "all_current_regimen_samples" => new Expression("SUM(CASE WHEN (vl.line_of_treatment != 0 AND vl.line_of_treatment IS NOT NULL AND vl.line_of_treatment!= '') THEN 1 ELSE 0 END)"),
+                                "1st_line_of_current_regimen_samples" => new Expression("SUM(CASE WHEN (vl.line_of_treatment = 1) THEN 1 ELSE 0 END)"),
                                 ))
                                 ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date != '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')");
           
@@ -4094,8 +4093,6 @@ class SampleTable extends AbstractTableGateway {
     
     /* Samples Received District*/
     public function fetchAllSamplesReceivedByDistrict($parameters){
-        $logincontainer = new Container('credo');
-        $queryContainer = new Container('query');
         /* Array of database columns which should be read and sent back to DataTables. Use a space where
          * you want to insert a non-database field (for example a counter or static image)
         */
@@ -4208,7 +4205,7 @@ class SampleTable extends AbstractTableGateway {
         if (isset($sOrder) && $sOrder != "") {
             $sQuery->order($sOrder);
         }
-        $queryContainer->resultQuery = $sQuery;
+       
         if (isset($sLimit) && isset($sOffset)) {
             $sQuery->limit($sLimit);
             $sQuery->offset($sOffset);
@@ -4257,8 +4254,6 @@ class SampleTable extends AbstractTableGateway {
             "aaData" => array()
         );
         
-	$common = new CommonService($this->sm);
-        $buttText = $common->translate('Edit');
         foreach ($rResult as $aRow) {
            
             $row = array();
@@ -4278,8 +4273,6 @@ class SampleTable extends AbstractTableGateway {
     }
     
     public function fetchAllSamplesReceivedByFacility($parameters){
-        $logincontainer = new Container('credo');
-        $queryContainer = new Container('query');
         /* Array of database columns which should be read and sent back to DataTables. Use a space where
          * you want to insert a non-database field (for example a counter or static image)
         */
@@ -4392,7 +4385,7 @@ class SampleTable extends AbstractTableGateway {
         if (isset($sOrder) && $sOrder != "") {
             $sQuery->order($sOrder);
         }
-        $queryContainer->resultQuery = $sQuery;
+        
         if (isset($sLimit) && isset($sOffset)) {
             $sQuery->limit($sLimit);
             $sQuery->offset($sOffset);
@@ -4442,10 +4435,7 @@ class SampleTable extends AbstractTableGateway {
             "aaData" => array()
         );
         
-	$common = new CommonService($this->sm);
-        
         foreach ($rResult as $aRow) {
-           
             $row = array();
             
             $row[]=$aRow['district'];            
@@ -4542,8 +4532,6 @@ class SampleTable extends AbstractTableGateway {
     }
     
     public function fetchAllSuppressionRateByDistrict($parameters){
-        $logincontainer = new Container('credo');
-        $queryContainer = new Container('query');
         /* Array of database columns which should be read and sent back to DataTables. Use a space where
          * you want to insert a non-database field (for example a counter or static image)
         */
@@ -4654,7 +4642,7 @@ class SampleTable extends AbstractTableGateway {
         if (isset($sOrder) && $sOrder != "") {
             $sQuery->order($sOrder);
         }
-        $queryContainer->resultQuery = $sQuery;
+        
         if (isset($sLimit) && isset($sOffset)) {
             $sQuery->limit($sLimit);
             $sQuery->offset($sOffset);
@@ -4701,11 +4689,7 @@ class SampleTable extends AbstractTableGateway {
             "iTotalDisplayRecords" => $iFilteredTotal,
             "aaData" => array()
         );
-        
-	$common = new CommonService($this->sm);
-        $buttText = $common->translate('Edit');
         foreach ($rResult as $aRow) {
-           
             $row = array();
             
             $row[]=$aRow['district'];            
@@ -4714,15 +4698,12 @@ class SampleTable extends AbstractTableGateway {
             $row[]=$aRow['total_samples_tested']-$aRow['total_suppressed_samples'];            
             $row[]=$aRow['total_suppressed_samples_percentage'].'%'; 
             
-           
             $output['aaData'][] = $row;
         }
        return $output;
     }
     
     public function fetchAllSuppressionRateByFacility($parameters){
-        $logincontainer = new Container('credo');
-        $queryContainer = new Container('query');
         /* Array of database columns which should be read and sent back to DataTables. Use a space where
          * you want to insert a non-database field (for example a counter or static image)
         */
@@ -4833,7 +4814,7 @@ class SampleTable extends AbstractTableGateway {
         if (isset($sOrder) && $sOrder != "") {
             $sQuery->order($sOrder);
         }
-        $queryContainer->resultQuery = $sQuery;
+        
         if (isset($sLimit) && isset($sOffset)) {
             $sQuery->limit($sLimit);
             $sQuery->offset($sOffset);
@@ -4880,20 +4861,15 @@ class SampleTable extends AbstractTableGateway {
             "iTotalDisplayRecords" => $iFilteredTotal,
             "aaData" => array()
         );
-        
-        $common = new CommonService($this->sm);
-        $buttText = $common->translate('Edit');
         foreach ($rResult as $aRow) {
-           
             $row = array();
             
             $row[]=$aRow['district'];            
             $row[]=$aRow['facility_name'];            
-            $row[]=$aRow['total_samples_tested']-$aRow['total_samples_rejected'];            
+            $row[]=$aRow['total_samples_tested']-$aRow['total_samples_rejected'];        
             $row[]=$aRow['total_suppressed_samples'];            
-            $row[]=$aRow['total_samples_tested']-$aRow['total_suppressed_samples'];            
+            $row[]=$aRow['total_samples_tested']-$aRow['total_suppressed_samples'];          
             $row[]=$aRow['total_suppressed_samples_percentage'].'%'; 
-            
            
             $output['aaData'][] = $row;
         }
@@ -4942,6 +4918,538 @@ class SampleTable extends AbstractTableGateway {
             return $result;
     }
 
+    public function fetchAllSamplesRejectedByDistrict($parameters){
+        /* Array of database columns which should be read and sent back to DataTables. Use a space where
+         * you want to insert a non-database field (for example a counter or static image)
+        */
+        $aColumns = array('f_d_l_d.location_name');
+        $orderColumns = array('f_d_l_d.location_name','location_id','location_id','location_id');
 
+        /*
+         * Paging
+         */
+        $sLimit = "";
+        if (isset($parameters['iDisplayStart']) && $parameters['iDisplayLength'] != '-1') {
+            $sOffset = $parameters['iDisplayStart'];
+            $sLimit = $parameters['iDisplayLength'];
+        }
+
+        /*
+         * Ordering
+         */
+
+        $sOrder = "";
+        if (isset($parameters['iSortCol_0'])) {
+            for ($i = 0; $i < intval($parameters['iSortingCols']); $i++) {
+                if ($parameters['bSortable_' . intval($parameters['iSortCol_' . $i])] == "true") {
+                    $sOrder .= $orderColumns[intval($parameters['iSortCol_' . $i])] . " " . ( $parameters['sSortDir_' . $i] ) . ",";
+                }
+            }
+            $sOrder = substr_replace($sOrder, "", -1);
+        }
+
+        /*
+         * Filtering
+         * NOTE this does not match the built-in DataTables filtering which does it
+         * word by word on any field. It's possible to do here, but concerned about efficiency
+         * on very large tables, and MySQL's regex functionality is very limited
+         */
+
+        $sWhere = "";
+        if (isset($parameters['sSearch']) && $parameters['sSearch'] != "") {
+            $searchArray = explode(" ", $parameters['sSearch']);
+            $sWhereSub = "";
+            foreach ($searchArray as $search) {
+                if ($sWhereSub == "") {
+                    $sWhereSub .= "(";
+                } else {
+                    $sWhereSub .= " AND (";
+                }
+                $colSize = count($aColumns);
+
+                for ($i = 0; $i < $colSize; $i++) {
+                    
+                    if ($i < $colSize - 1) {
+                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search ) . "%' OR ";
+                    } else {
+                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search ) . "%' ";
+                    }
+                   
+                }
+                $sWhereSub .= ")";
+            }
+            $sWhere .= $sWhereSub;
+        }
+
+        /* Individual column filtering */
+        for ($i = 0; $i < count($aColumns); $i++) {
+            if (isset($parameters['bSearchable_' . $i]) && $parameters['bSearchable_' . $i] == "true" && $parameters['sSearch_' . $i] != '') {
+                
+                    if ($sWhere == "") {
+                        $sWhere .= $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
+                    } else {
+                        $sWhere .= " AND " . $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
+                    }
+               
+            }
+        }
+
+        /*
+         * SQL queries
+         * Get data to display
+        */
+        
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $sQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
+                                ->columns(
+                                          array(
+                                                "total_samples_received" => new Expression('COUNT(*)'),
+                                                "total_samples_rejected" => new Expression("(SUM(CASE WHEN (reason_for_sample_rejection !='' AND reason_for_sample_rejection !='0' AND reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END))"),
+                                                )
+                                          )
+                                ->join(array('f'=>'facility_details'),'f.facility_id=vl.facility_id',array('facility_name'))
+                                ->join(array('f_d_l_d'=>'location_details'),'f_d_l_d.location_id=f.facility_district',array('district'=>'location_name'))
+                                ->join(array('rs'=>'r_sample_type'),'rs.sample_id=vl.sample_type',array('sample_name'),'left')
+                                ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date != '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')")
+                                ->group('f.facility_district');
+                                
+        if (isset($sWhere) && $sWhere != "") {
+            $sQuery->where($sWhere);
+        }
+
+        if (isset($sOrder) && $sOrder != "") {
+            $sQuery->order($sOrder);
+        }
     
+        if (isset($sLimit) && isset($sOffset)) {
+            $sQuery->limit($sLimit);
+            $sQuery->offset($sOffset);
+        }
+
+        $sQueryStr = $sql->getSqlStringForSqlObject($sQuery); // Get the string of the Sql, instead of the Select-instance 
+        //echo $sQueryStr;die;
+        $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+
+        /* Data set length after filtering */
+        $sQuery->reset('limit');
+        $sQuery->reset('offset');
+        $fQuery = $sql->getSqlStringForSqlObject($sQuery);
+        $aResultFilterTotal = $dbAdapter->query($fQuery, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+        $iFilteredTotal = count($aResultFilterTotal);
+
+        /* Total data set length */
+        $iQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
+                                ->columns(
+                                          array(
+                                                "total_samples_received" => new Expression('COUNT(*)'),
+                                                "total_samples_rejected" => new Expression("(SUM(CASE WHEN (reason_for_sample_rejection !='' AND reason_for_sample_rejection !='0' AND reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END))"),
+                                                )
+                                          )
+                                ->join(array('f'=>'facility_details'),'f.facility_id=vl.facility_id',array('facility_name'))
+                                ->join(array('f_d_l_d'=>'location_details'),'f_d_l_d.location_id=f.facility_district',array('district'=>'location_name'))
+                                ->join(array('rs'=>'r_sample_type'),'rs.sample_id=vl.sample_type',array('sample_name'),'left')
+                                ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date != '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')")
+                                ->group('f.facility_district');
+        $iQueryStr = $sql->getSqlStringForSqlObject($iQuery);
+        $iResult = $dbAdapter->query($iQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+        $iTotal = count($iResult);
+        
+        $output = array(
+            "sEcho" => intval($parameters['sEcho']),
+            "iTotalRecords" => $iTotal,
+            "iTotalDisplayRecords" => $iFilteredTotal,
+            "aaData" => array()
+        );
+        
+        foreach ($rResult as $aRow) {
+            $row = array();
+            
+            $row[] = $aRow['district'];          
+            $row[] = $aRow['total_samples_received'];            
+            $row[] = $aRow['total_samples_rejected'];
+            $row[] = ($aRow['total_samples_received'] > 0 && $aRow['total_samples_rejected'] > 0)?round(($aRow['total_samples_rejected']/$aRow['total_samples_received'])*100,2):0;
+            $output['aaData'][] = $row;
+        }
+       return $output;
+    }
+
+    public function fecthAllSamplesRejectedByFacility($parameters){
+        /* Array of database columns which should be read and sent back to DataTables. Use a space where
+         * you want to insert a non-database field (for example a counter or static image)
+        */
+        $aColumns = array('f_d_l_d.location_name','f.facility_name');
+        $orderColumns = array('f_d_l_d.location_name','f.facility_name','location_id','location_id');
+
+        /*
+         * Paging
+         */
+        $sLimit = "";
+        if (isset($parameters['iDisplayStart']) && $parameters['iDisplayLength'] != '-1') {
+            $sOffset = $parameters['iDisplayStart'];
+            $sLimit = $parameters['iDisplayLength'];
+        }
+
+        /*
+         * Ordering
+         */
+
+        $sOrder = "";
+        if (isset($parameters['iSortCol_0'])) {
+            for ($i = 0; $i < intval($parameters['iSortingCols']); $i++) {
+                if ($parameters['bSortable_' . intval($parameters['iSortCol_' . $i])] == "true") {
+                    $sOrder .= $orderColumns[intval($parameters['iSortCol_' . $i])] . " " . ( $parameters['sSortDir_' . $i] ) . ",";
+                }
+            }
+            $sOrder = substr_replace($sOrder, "", -1);
+        }
+
+        /*
+         * Filtering
+         * NOTE this does not match the built-in DataTables filtering which does it
+         * word by word on any field. It's possible to do here, but concerned about efficiency
+         * on very large tables, and MySQL's regex functionality is very limited
+         */
+
+        $sWhere = "";
+        if (isset($parameters['sSearch']) && $parameters['sSearch'] != "") {
+            $searchArray = explode(" ", $parameters['sSearch']);
+            $sWhereSub = "";
+            foreach ($searchArray as $search) {
+                if ($sWhereSub == "") {
+                    $sWhereSub .= "(";
+                } else {
+                    $sWhereSub .= " AND (";
+                }
+                $colSize = count($aColumns);
+
+                for ($i = 0; $i < $colSize; $i++) {
+                    
+                    if ($i < $colSize - 1) {
+                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search ) . "%' OR ";
+                    } else {
+                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search ) . "%' ";
+                    }
+                   
+                }
+                $sWhereSub .= ")";
+            }
+            $sWhere .= $sWhereSub;
+        }
+
+        /* Individual column filtering */
+        for ($i = 0; $i < count($aColumns); $i++) {
+            if (isset($parameters['bSearchable_' . $i]) && $parameters['bSearchable_' . $i] == "true" && $parameters['sSearch_' . $i] != '') {
+                
+                    if ($sWhere == "") {
+                        $sWhere .= $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
+                    } else {
+                        $sWhere .= " AND " . $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
+                    }
+               
+            }
+        }
+
+        /*
+         * SQL queries
+         * Get data to display
+        */
+        
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $sQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
+                                ->columns(
+                                          array(
+                                                "total_samples_received" => new Expression('COUNT(*)'),
+                                                "total_samples_rejected" => new Expression("(SUM(CASE WHEN (reason_for_sample_rejection !='' AND reason_for_sample_rejection !='0' AND reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END))"),
+                                                )
+                                          )
+                                ->join(array('f'=>'facility_details'),'f.facility_id=vl.facility_id',array('facility_name'))
+                                ->join(array('f_d_l_d'=>'location_details'),'f_d_l_d.location_id=f.facility_district',array('district'=>'location_name'))
+                                ->join(array('rs'=>'r_sample_type'),'rs.sample_id=vl.sample_type',array('sample_name'),'left')
+                                ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date != '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')")
+                                ->group('f.facility_id');
+                                
+        if (isset($sWhere) && $sWhere != "") {
+            $sQuery->where($sWhere);
+        }
+
+        if (isset($sOrder) && $sOrder != "") {
+            $sQuery->order($sOrder);
+        }
+    
+        if (isset($sLimit) && isset($sOffset)) {
+            $sQuery->limit($sLimit);
+            $sQuery->offset($sOffset);
+        }
+
+        $sQueryStr = $sql->getSqlStringForSqlObject($sQuery); // Get the string of the Sql, instead of the Select-instance 
+        //echo $sQueryStr;die;
+        $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+
+        /* Data set length after filtering */
+        $sQuery->reset('limit');
+        $sQuery->reset('offset');
+        $fQuery = $sql->getSqlStringForSqlObject($sQuery);
+        $aResultFilterTotal = $dbAdapter->query($fQuery, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+        $iFilteredTotal = count($aResultFilterTotal);
+
+        /* Total data set length */
+        $iQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
+                                ->columns(
+                                          array(
+                                                "total_samples_received" => new Expression('COUNT(*)'),
+                                                "total_samples_rejected" => new Expression("(SUM(CASE WHEN (reason_for_sample_rejection !='' AND reason_for_sample_rejection !='0' AND reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END))"),
+                                                )
+                                          )
+                                ->join(array('f'=>'facility_details'),'f.facility_id=vl.facility_id',array('facility_name'))
+                                ->join(array('f_d_l_d'=>'location_details'),'f_d_l_d.location_id=f.facility_district',array('district'=>'location_name'))
+                                ->join(array('rs'=>'r_sample_type'),'rs.sample_id=vl.sample_type',array('sample_name'),'left')
+                                ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date != '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')")
+                                ->group('f.facility_id');
+        $iQueryStr = $sql->getSqlStringForSqlObject($iQuery);
+        $iResult = $dbAdapter->query($iQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+        $iTotal = count($iResult);
+        
+        $output = array(
+            "sEcho" => intval($parameters['sEcho']),
+            "iTotalRecords" => $iTotal,
+            "iTotalDisplayRecords" => $iFilteredTotal,
+            "aaData" => array()
+        );
+        
+        foreach ($rResult as $aRow) {
+            $row = array();
+            
+            $row[] = $aRow['district']; 
+            $row[] = $aRow['facility_name'];          
+            $row[] = $aRow['total_samples_received'];    
+            $row[] = ($aRow['total_samples_received'] > 0 && $aRow['total_samples_rejected'] > 0)?round(($aRow['total_samples_rejected']/$aRow['total_samples_received'])*100,2):0;
+            $output['aaData'][] = $row;
+        }
+       return $output;
+    }
+    
+    public function fetchSamplesRejectedBarChartDetails($params){
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $result=array();
+        $common = new CommonService($this->sm);
+        $start = strtotime(date("Y", strtotime("-1 year")).'-'.date('m', strtotime('+1 month', strtotime('-1 year'))));
+        $end = strtotime(date('Y').'-'.date('m'));
+        $j = 0;
+        while($start <= $end){
+            $month = date('m', $start);$year = date('Y', $start);$monthYearFormat = date("M-Y", $start);
+            $sQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
+                          ->columns(array('rejections' => new Expression('COUNT(*)')))                    
+                          ->join(array('r_r_r'=>'r_sample_rejection_reasons'),'r_r_r.rejection_reason_id=vl.reason_for_sample_rejection',array('rejection_reason_name'))
+                          ->where("Month(sample_collection_date)='".$month."' AND Year(sample_collection_date)='".$year."'");
+            $queryStr = $sql->getSqlStringForSqlObject($sQuery);
+            //$rejectionResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+            $accRejectionResult = $common->cacheQuery($queryStr." AND vl.reason_for_sample_rejection = 20",$dbAdapter);
+            $insRejectionResult = $common->cacheQuery($queryStr." AND vl.reason_for_sample_rejection = 3",$dbAdapter);
+            $prtlaRejectionResult = $common->cacheQuery($queryStr." AND vl.reason_for_sample_rejection = 17",$dbAdapter);
+            $result['rejection']['ACC - Laboratory Accident'][$j] = (isset($accRejectionResult[0]['rejections']))?$accRejectionResult[0]['rejections']:0;
+            $result['rejection']['INS - Insufficient Sample'][$j] = (isset($insRejectionResult[0]['rejections']))?$insRejectionResult[0]['rejections']:0;
+            $result['rejection']['PRTLA -'][$j] = $prtlaRejectionResult[0]['rejections']?$prtlaRejectionResult[0]['rejections']:0;
+            $result['date'][$j] = $monthYearFormat;
+          $start = strtotime("+1 month", $start);
+          $j++;
+        }
+        return $result;
+    }
+    
+    public function fetchRegimenGroupSamplesDetails($parameters){
+        /* Array of database columns which should be read and sent back to DataTables. Use a space where
+         * you want to insert a non-database field (for example a counter or static image)
+        */
+        $aColumns = array('current_regimen');
+        $orderColumns = array('current_regimen','vl_sample_id','vl_sample_id','vl_sample_id','vl_sample_id','vl_sample_id','vl_sample_id');
+
+        /*
+         * Paging
+         */
+        $sLimit = "";
+        if (isset($parameters['iDisplayStart']) && $parameters['iDisplayLength'] != '-1') {
+            $sOffset = $parameters['iDisplayStart'];
+            $sLimit = $parameters['iDisplayLength'];
+        }
+
+        /*
+         * Ordering
+         */
+
+        $sOrder = "";
+        if (isset($parameters['iSortCol_0'])) {
+            for ($i = 0; $i < intval($parameters['iSortingCols']); $i++) {
+                if ($parameters['bSortable_' . intval($parameters['iSortCol_' . $i])] == "true") {
+                    $sOrder .= $orderColumns[intval($parameters['iSortCol_' . $i])] . " " . ( $parameters['sSortDir_' . $i] ) . ",";
+                }
+            }
+            $sOrder = substr_replace($sOrder, "", -1);
+        }
+
+        /*
+         * Filtering
+         * NOTE this does not match the built-in DataTables filtering which does it
+         * word by word on any field. It's possible to do here, but concerned about efficiency
+         * on very large tables, and MySQL's regex functionality is very limited
+         */
+
+        $sWhere = "";
+        if (isset($parameters['sSearch']) && $parameters['sSearch'] != "") {
+            $searchArray = explode(" ", $parameters['sSearch']);
+            $sWhereSub = "";
+            foreach ($searchArray as $search) {
+                if ($sWhereSub == "") {
+                    $sWhereSub .= "(";
+                } else {
+                    $sWhereSub .= " AND (";
+                }
+                $colSize = count($aColumns);
+
+                for ($i = 0; $i < $colSize; $i++) {
+                    
+                    if ($i < $colSize - 1) {
+                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search ) . "%' OR ";
+                    } else {
+                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search ) . "%' ";
+                    }
+                   
+                }
+                $sWhereSub .= ")";
+            }
+            $sWhere .= $sWhereSub;
+        }
+
+        /* Individual column filtering */
+        for ($i = 0; $i < count($aColumns); $i++) {
+            if (isset($parameters['bSearchable_' . $i]) && $parameters['bSearchable_' . $i] == "true" && $parameters['sSearch_' . $i] != '') {
+                
+                    if ($sWhere == "") {
+                        $sWhere .= $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
+                    } else {
+                        $sWhere .= " AND " . $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
+                    }
+               
+            }
+        }
+
+        /*
+         * SQL queries
+         * Get data to display
+        */
+        
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $sQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
+                                ->columns(
+                                          array(
+                                                "total_samples" => new Expression('COUNT(*)'),
+                                                "total_samples_received" => new Expression("(SUM(CASE WHEN (vl.sample_collection_date is not null AND vl.sample_collection_date != '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00') THEN 1 ELSE 0 END))"),
+                                                "total_samples_tested" => new Expression("(SUM(CASE WHEN (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END))"),
+                                                "total_samples_rejected" => new Expression("(SUM(CASE WHEN (reason_for_sample_rejection !='' AND reason_for_sample_rejection !='0' AND reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END))"),
+                                                "total_suppressed_samples" => new Expression("(SUM(CASE WHEN ((vl.result < 1000 or vl.result='Target Not Detected') AND vl.result IS NOT NULL AND vl.result!= '') THEN 1 ELSE 0 END))"),
+                                                'current_regimen'
+                                                )
+                                          )
+                                ->join(array('f'=>'facility_details'),'f.facility_id=vl.facility_id',array('facility_name'))
+                                ->where(array('vl.line_of_treatment'=>1))
+                                ->group('vl.current_regimen');
+                                
+        if (isset($sWhere) && $sWhere != "") {
+            $sQuery->where($sWhere);
+        }
+
+        if (isset($sOrder) && $sOrder != "") {
+            $sQuery->order($sOrder);
+        }
+    
+        if (isset($sLimit) && isset($sOffset)) {
+            $sQuery->limit($sLimit);
+            $sQuery->offset($sOffset);
+        }
+
+        $sQueryStr = $sql->getSqlStringForSqlObject($sQuery); // Get the string of the Sql, instead of the Select-instance 
+        //echo $sQueryStr;die;
+        $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+
+        /* Data set length after filtering */
+        $sQuery->reset('limit');
+        $sQuery->reset('offset');
+        $fQuery = $sql->getSqlStringForSqlObject($sQuery);
+        $aResultFilterTotal = $dbAdapter->query($fQuery, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+        $iFilteredTotal = count($aResultFilterTotal);
+
+        /* Total data set length */
+        $iQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
+                                ->columns(
+                                          array(
+                                                "total_samples" => new Expression('COUNT(*)'),
+                                                "total_samples_received" => new Expression("(SUM(CASE WHEN (vl.sample_collection_date is not null AND vl.sample_collection_date != '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00') THEN 1 ELSE 0 END))"),
+                                                "total_samples_tested" => new Expression("(SUM(CASE WHEN (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END))"),
+                                                "total_samples_rejected" => new Expression("(SUM(CASE WHEN (reason_for_sample_rejection !='' AND reason_for_sample_rejection !='0' AND reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END))"),
+                                                "total_suppressed_samples" => new Expression("(SUM(CASE WHEN ((vl.result < 1000 or vl.result='Target Not Detected') AND vl.result IS NOT NULL AND vl.result!= '') THEN 1 ELSE 0 END))"),
+                                                'current_regimen'
+                                                )
+                                          )
+                                ->join(array('f'=>'facility_details'),'f.facility_id=vl.facility_id',array('facility_name'))
+                                ->where(array('vl.line_of_treatment'=>1))
+                                ->group('vl.current_regimen');
+        $iQueryStr = $sql->getSqlStringForSqlObject($iQuery);
+        $iResult = $dbAdapter->query($iQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+        $iTotal = count($iResult);
+        
+        $output = array(
+            "sEcho" => intval($parameters['sEcho']),
+            "iTotalRecords" => $iTotal,
+            "iTotalDisplayRecords" => $iFilteredTotal,
+            "aaData" => array()
+        );
+        
+        foreach ($rResult as $aRow) {
+            $row = array();
+            
+            $diffofSampleTestedRejected = ((int)$aRow['total_samples_tested'] - (int)$aRow['total_samples_rejected']);
+            $row[] = $aRow['current_regimen'];
+            $row[] = $aRow['total_samples_received'];
+            $row[] = $aRow['total_samples_tested'];
+            $row[] = ((int)$aRow['total_samples_tested'] - (int)$aRow['total_samples_rejected']);
+            $row[] = $aRow['total_suppressed_samples'];           
+            $row[] = ($aRow['total_suppressed_samples'] > 0 && $diffofSampleTestedRejected > 0)?round((($aRow['total_suppressed_samples']/$diffofSampleTestedRejected)*100),2).'%':'0%';
+            $row[] = ($parameters['t_received'] > 0 && $aRow['total_samples_received'] >0)?round((($aRow['total_samples_received']/$parameters['t_received'])*100),2).'%':'0%';
+            $output['aaData'][] = $row;
+        }
+       return $output;
+    }
+    
+    public function fetchRegimenGroupBarChartDetails($params){
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $common = new CommonService($this->sm);
+        $sQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
+                                ->columns(
+                                          array(
+                                                "current_regimen",
+                                                "total_samples_tested" => new Expression("(SUM(CASE WHEN (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END))"),
+                                                "total_samples_rejected" => new Expression("(SUM(CASE WHEN (reason_for_sample_rejection !='' AND reason_for_sample_rejection !='0' AND reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END))"),
+                                                "total_suppressed_samples_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN ((vl.result < 1000 or vl.result='Target Not Detected') AND vl.result IS NOT NULL AND vl.result!= '') THEN 1 ELSE 0 END)/COUNT(*))*100),2)")
+                                                )
+                                          )
+                                ->where(array('vl.line_of_treatment'=>1))
+                                ->group('vl.current_regimen');
+            $queryStr = $sql->getSqlStringForSqlObject($sQuery);
+            //echo $queryStr;die;
+            //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+            $sampleResult = $common->cacheQuery($queryStr,$dbAdapter);
+            $j=0;
+            $result=array();
+            foreach($sampleResult as $sRow){
+                $result['valid_results'][$j] = (isset($sRow["total_samples_tested"]) && isset($sRow["total_samples_rejected"]))?($sRow["total_samples_tested"]-$sRow["total_samples_rejected"]):0;
+                $result['samples_rate'][$j] = (isset($sRow["total_suppressed_samples_percentage"]))?$sRow["total_suppressed_samples_percentage"]:0;
+                $result['current_regimen'][$j] = $sRow["current_regimen"];
+                $j++;
+            }
+        return $result;  
+    }
 }

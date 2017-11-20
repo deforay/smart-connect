@@ -92,5 +92,61 @@ class SummaryController extends AbstractActionController{
         }
     }
 
+    public function samplesRejectedDistrictAction() {
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $parameters = $request->getPost();
+            $summaryService = $this->getServiceLocator()->get('SummaryService');
+            $result = $summaryService->getAllSamplesRejectedByDistrict($parameters);
+            return $this->getResponse()->setContent(Json::encode($result));
+        }
+    }
     
+    public function samplesRejectedFacilityAction() {
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $parameters = $request->getPost();
+            $summaryService = $this->getServiceLocator()->get('SummaryService');
+            $result = $summaryService->getAllSamplesRejectedByFacility($parameters);
+            return $this->getResponse()->setContent(Json::encode($result));
+        }
+    }
+    
+    public function getSamplesRejectedBarChartAction() {
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $summaryService = $this->getServiceLocator()->get('SummaryService');
+            $result = $summaryService->getSamplesRejectedBarChartDetails($params);
+            $viewModel = new ViewModel();
+            $viewModel->setVariables(array(
+                                    'result' => $result
+                                    ))->setTerminal(true);
+            return $viewModel;
+        }
+    }
+    
+    public function getRegimenGroupDetailsAction() {
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $parameters = $request->getPost();
+            $summaryService = $this->getServiceLocator()->get('SummaryService');
+            $result = $summaryService->getRegimenGroupSamplesDetails($parameters);
+            return $this->getResponse()->setContent(Json::encode($result));
+        }
+    }
+    
+    public function getRegimenGroupBarChartAction() {
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $summaryService = $this->getServiceLocator()->get('SummaryService');
+            $result = $summaryService->getRegimenGroupBarChartDetails($params);
+            $viewModel = new ViewModel();
+            $viewModel->setVariables(array(
+                                    'result' => $result
+                                    ))->setTerminal(true);
+            return $viewModel;
+        }
+    }
 }

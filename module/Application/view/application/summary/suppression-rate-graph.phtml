@@ -19,6 +19,9 @@
                 }
             }
         },
+    credits: {
+              enabled: false
+       },
     xAxis: [{
         categories: [<?php
             if(isset($result['date']) && count($result['date'])>0){
@@ -48,7 +51,7 @@
         allowDecimals: false,
         min: 0,
         title: {
-            text: 'Valid Tests',
+            text: 'Valid Results',
             style: {
                 color: Highcharts.getOptions().colors[0]
             }
@@ -64,23 +67,15 @@
     tooltip: {
         shared: true
     },
-    legend: {
-        layout: 'vertical',
-        align: 'left',
-        x: 120,
-        verticalAlign: 'top',
-        y: 100,
-        floating: true,
-        backgroundColor: (Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#FFFFFF'
-    },
+    
     series: [{
-        name: 'Valid Tests (L)',
+        name: 'Valid Results (R)',
         type: 'column',
         yAxis: 1,
         data: [
         <?php if(isset($result['valid_results']) && count($result['valid_results']) >0){
               foreach($result['valid_results'] as $validResult){                     
-              echo $validResult.',';
+                echo $validResult.',';
               }
               ?>
        <?php  } ?>
@@ -90,12 +85,12 @@
         }
 
     }, {
-        name: 'Suppression Rate (R)',
+        name: 'Suppression Rate (L)',
         type: 'spline',
         data: [
         <?php if(isset($result['samples_rate']) && count($result['samples_rate']) >0){
               foreach($result['samples_rate'] as $samplesRate){                     
-              echo $samplesRate.',';
+                echo $samplesRate.',';
               }
               ?>
        <?php  } ?>

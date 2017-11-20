@@ -58,9 +58,33 @@ class SummaryService {
         return $sampleDb->fetchAllSuppressionRateByFacility($params);
     }
     
-    
     public function getSuppressionRateGraphDetails($params){
         $sampleDb = $this->sm->get('SampleTable');
         return $sampleDb->fetchSuppressionRateGraphDetails($params);
+    }
+    
+    public function getAllSamplesRejectedByDistrict($parameters){
+       $sampleDb = $this->sm->get('SampleTable');
+      return $sampleDb->fetchAllSamplesRejectedByDistrict($parameters); 
+    }
+    
+    public function getAllSamplesRejectedByFacility($parameters){
+       $sampleDb = $this->sm->get('SampleTable');
+      return $sampleDb->fecthAllSamplesRejectedByFacility($parameters); 
+    }
+    
+    public function getSamplesRejectedBarChartDetails($params){
+        $sampleDb = $this->sm->get('SampleTable');
+      return $sampleDb->fetchSamplesRejectedBarChartDetails($params);
+    }
+    
+    public function getRegimenGroupSamplesDetails($parameters){
+        $sampleDb = $this->sm->get('SampleTable');
+      return $sampleDb->fetchRegimenGroupSamplesDetails($parameters);
+    }
+    
+    public function getRegimenGroupBarChartDetails($params){
+        $sampleDb = $this->sm->get('SampleTable');
+      return $sampleDb->fetchRegimenGroupBarChartDetails($params);
     }
 }
