@@ -5488,12 +5488,11 @@ class SampleTable extends AbstractTableGateway {
                                                 "totalNotSuppressed" => new Expression("(SUM(CASE WHEN (vl.result > 1000 AND vl.result!= 'Target Not Detected' AND vl.result IS NOT NULL AND vl.result!= '') THEN 1 ELSE 0 END))")
                                                 )
                                           )
-                                ->where(array('vl.line_of_treatment'=>1))
-                                ->group('vl.current_regimen');
+                                ->where(array('vl.line_of_treatment'=>1));
         $queryStr = $sql->getSqlStringForSqlObject($sQuery);
         //$1stLineofRegimenResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-        $adult1stLineofRegimenResult = $common->cacheQuery($queryStr.' order by validResults desc limit 8',$dbAdapter);
-        $paeds1stLineofRegimenResult = $common->cacheQuery($queryStr.' order by validResults desc limit 9,8',$dbAdapter);
+        $adult1stLineofRegimenResult = $common->cacheQuery($queryStr." AND patient_age_in_years IS NOT NULL AND patient_age_in_years!= '' AND patient_age_in_years > 18 group by current_regimen order by validResults desc limit 8",$dbAdapter);
+        $paeds1stLineofRegimenResult = $common->cacheQuery($queryStr." AND patient_age_in_years IS NOT NULL AND patient_age_in_years!= '' AND patient_age_in_years <= 18 group by current_regimen order by validResults desc limit 8",$dbAdapter);
        return array('adult1stLineofRegimenResult'=>$adult1stLineofRegimenResult,'paeds1stLineofRegimenResult'=>$paeds1stLineofRegimenResult);
     }
 }
