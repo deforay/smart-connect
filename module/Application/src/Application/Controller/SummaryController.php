@@ -16,13 +16,15 @@ class SummaryController extends AbstractActionController{
     public function dashboardAction(){
         $this->layout()->setVariable('activeTab', 'summary-dashboard');
         $summaryService = $this->getServiceLocator()->get('SummaryService');
-        $summaryTabResult = $summaryService->fetchSummaryTabDetails();    
+        $summaryTabResult = $summaryService->fetchSummaryTabDetails(); 
         $keySummaryIndicatorsResult = $summaryService->getKeySummaryIndicatorsDetails();
         $allLineofRegimenResult = $summaryService->getAllLineOfRegimenDetails();
+        $firstLineofRegimenResult = $summaryService->getAdult1stLineOfRegimenDetails();
         return new ViewModel(array(
                     'summaryTabInfo' => $summaryTabResult,
                     'keySummaryIndicators' => $keySummaryIndicatorsResult,
-                    'allLineofRegimenInfo' => $allLineofRegimenResult
+                    'allLineofRegimenInfo' => $allLineofRegimenResult,
+                    'firstLineofRegimenResult'=>$firstLineofRegimenResult
         ));
     }
     

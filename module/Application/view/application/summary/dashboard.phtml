@@ -600,6 +600,128 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
                             </tbody>
                         </table>
                         <hr style="border-bottom:1px solid #2D5F8B;">
+                        <?php
+                           $adult1stLineofRegimenTotal = (isset($firstLineofRegimenResult['adult1stLineofRegimenResult']) && count($firstLineofRegimenResult['adult1stLineofRegimenResult']) >0)?(2*count($firstLineofRegimenResult['adult1stLineofRegimenResult']))+1:0;
+                        ?>
+                        <table class="table">
+                            <thead>
+                              <tr>
+                                <td colspan="<?php echo $adult1stLineofRegimenTotal; ?>" style="font-size:11px;">By first line regimens [Adult & Paeds]</td>
+                              </tr>
+                              <tr>
+                                <th colspan="<?php echo $adult1stLineofRegimenTotal; ?>" style="text-align:center;font-size:11px;">1st Line (ADULT)</th>
+                              </tr>
+                              <tr>
+                                <th></th>
+                                <?php
+                                foreach($firstLineofRegimenResult['adult1stLineofRegimenResult'] as $adult1stLineofRegimen){
+                                ?>
+                                   <th colspan="2" style="font-size:11px;"><?php echo $adult1stLineofRegimen['current_regimen']; ?></th>
+                                <?php } ?>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr>
+                                <th style="text-align:center;font-size:11px;">Results</th>
+                                <?php
+                                foreach($firstLineofRegimenResult['adult1stLineofRegimenResult'] as $adult1stLineofRegimenLabel){
+                                ?>
+                                   <td style="text-align:center;font-size:11px;">#</td>
+                                   <td style="text-align:center;font-size:11px;">%</td>
+                                <?php } ?>
+                              </tr>
+                              <tr>
+                                <td style="text-align:center;font-size:11px;">NS</td>
+                                <?php
+                                foreach($firstLineofRegimenResult['adult1stLineofRegimenResult'] as $adult1stLineofRegimenNotSuppressed){
+                                ?>
+                                    <td style="text-align:center;font-size:11px;"><?php echo (isset($adult1stLineofRegimenNotSuppressed['totalNotSuppressed']))?$adult1stLineofRegimenNotSuppressed['totalNotSuppressed']:0; ?></td>
+                                    <td style="text-align:center;font-size:11px;"><?php echo(isset($adult1stLineofRegimenNotSuppressed['totalNotSuppressed']) && $adult1stLineofRegimenNotSuppressed['totalNotSuppressed'] >0)?round(((($adult1stLineofRegimenNotSuppressed['totalNotSuppressed']/($adult1stLineofRegimenNotSuppressed['totalNotSuppressed']+$adult1stLineofRegimenNotSuppressed['totalSuppressed']))*100)),2):''; ?></td>
+                                <?php } ?>
+                              </tr>
+                              <tr>
+                                <td style="text-align:center;font-size:11px;">S</td>
+                                <?php
+                                foreach($firstLineofRegimenResult['adult1stLineofRegimenResult'] as $adult1stLineofRegimenSuppressed){
+                                ?>
+                                   <td style="text-align:center;font-size:11px;"><?php echo (isset($adult1stLineofRegimenSuppressed['totalSuppressed']))?$adult1stLineofRegimenSuppressed['totalSuppressed']:0; ?></td>
+                                   <td style="text-align:center;font-size:11px;"><?php echo(isset($adult1stLineofRegimenSuppressed['totalSuppressed']) && $adult1stLineofRegimenSuppressed['totalSuppressed'] >0)?round(((($adult1stLineofRegimenSuppressed['totalSuppressed']/($adult1stLineofRegimenSuppressed['totalSuppressed']+$adult1stLineofRegimenSuppressed['totalNotSuppressed']))*100)),2):''; ?></td>
+                                <?php } ?>
+                              </tr>
+                              <tr>
+                                <th style="text-align:center;font-size:11px;">Total</th>
+                                <?php
+                                foreach($firstLineofRegimenResult['adult1stLineofRegimenResult'] as $adult1stLineofRegimenGrandTotal){
+                                    $adult1stLineNotSuppressed = (isset($adult1stLineofRegimenGrandTotal['totalNotSuppressed']))?$adult1stLineofRegimenGrandTotal['totalNotSuppressed']:0;
+                                    $adult1stLineSuppressed = (isset($adult1stLineofRegimenGrandTotal['totalSuppressed']))?$adult1stLineofRegimenGrandTotal['totalSuppressed']:0;
+                                ?>
+                                   <td style="text-align:center;font-size:11px;"><?php echo $adult1stLineNotSuppressed+$adult1stLineSuppressed; ?></td>
+                                   <td style="text-align:center;font-size:11px;"></td>
+                                <?php } ?>
+                              </tr>
+                            </tbody>
+                        </table>
+                        <?php
+                           $paeds1stLineofRegimenTotal = (isset($firstLineofRegimenResult['paeds1stLineofRegimenResult']) && count($firstLineofRegimenResult['paeds1stLineofRegimenResult']) >0)?(2*count($firstLineofRegimenResult['paeds1stLineofRegimenResult']))+1:0;
+                        ?>
+                        <table class="table">
+                            <thead>
+                              <tr>
+                                <td colspan="<?php echo $paeds1stLineofRegimenTotal; ?>"></td>
+                              </tr>
+                              <tr>
+                                <th colspan="<?php echo $paeds1stLineofRegimenTotal; ?>" style="text-align:center;font-size:11px;">1st Line (PAEDS)</th>
+                              </tr>
+                              <tr>
+                                <th></th>
+                                <?php
+                                foreach($firstLineofRegimenResult['paeds1stLineofRegimenResult'] as $paeds1stLineofRegimen){
+                                ?>
+                                   <th colspan="2" style="font-size:11px;"><?php echo $paeds1stLineofRegimen['current_regimen']; ?></th>
+                                <?php } ?>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr>
+                                <th style="text-align:center;font-size:11px;">Results</th>
+                                <?php
+                                foreach($firstLineofRegimenResult['paeds1stLineofRegimenResult'] as $paeds1stLineofRegimenLabel){
+                                ?>
+                                   <td style="text-align:center;font-size:11px;">#</td>
+                                   <td style="text-align:center;font-size:11px;">%</td>
+                                <?php } ?>
+                              </tr>
+                              <tr>
+                                <td style="text-align:center;font-size:11px;">NS</td>
+                                <?php
+                                foreach($firstLineofRegimenResult['paeds1stLineofRegimenResult'] as $paeds1stLineofRegimenNotSuppressed){
+                                ?>
+                                    <td style="text-align:center;font-size:11px;"><?php echo (isset($paeds1stLineofRegimenNotSuppressed['totalNotSuppressed']))?$paeds1stLineofRegimenNotSuppressed['totalNotSuppressed']:0; ?></td>
+                                    <td style="text-align:center;font-size:11px;"><?php echo(isset($paeds1stLineofRegimenNotSuppressed['totalNotSuppressed']) && $paeds1stLineofRegimenNotSuppressed['totalNotSuppressed'] >0)?round(((($paeds1stLineofRegimenNotSuppressed['totalNotSuppressed']/($paeds1stLineofRegimenNotSuppressed['totalNotSuppressed']+$paeds1stLineofRegimenNotSuppressed['totalSuppressed']))*100)),2):''; ?></td>
+                                <?php } ?>
+                              </tr>
+                              <tr>
+                                <td style="text-align:center;font-size:11px;">S</td>
+                                <?php
+                                foreach($firstLineofRegimenResult['paeds1stLineofRegimenResult'] as $paeds1stLineofRegimenSuppressed){
+                                ?>
+                                   <td style="text-align:center;font-size:11px;"><?php echo (isset($paeds1stLineofRegimenSuppressed['totalSuppressed']))?$paeds1stLineofRegimenSuppressed['totalSuppressed']:0; ?></td>
+                                   <td style="text-align:center;font-size:11px;"><?php echo(isset($paeds1stLineofRegimenSuppressed['totalSuppressed']) && $paeds1stLineofRegimenSuppressed['totalSuppressed'] >0)?round(((($paeds1stLineofRegimenSuppressed['totalSuppressed']/($paeds1stLineofRegimenSuppressed['totalSuppressed']+$paeds1stLineofRegimenSuppressed['totalNotSuppressed']))*100)),2):''; ?></td>
+                                <?php } ?>
+                              </tr>
+                              <tr>
+                                <th style="text-align:center;font-size:11px;">Total</th>
+                                <?php
+                                foreach($firstLineofRegimenResult['paeds1stLineofRegimenResult'] as $paeds1stLineofRegimenTotal){
+                                    $paeds1stLineNotSuppressed = (isset($paeds1stLineofRegimenTotal['totalNotSuppressed']))?$paeds1stLineofRegimenTotal['totalNotSuppressed']:0;
+                                    $paeds1stLineSuppressed = (isset($paeds1stLineofRegimenTotal['totalSuppressed']))?$paeds1stLineofRegimenTotal['totalSuppressed']:0;
+                                ?>
+                                   <td style="text-align:center;font-size:11px;"><?php echo $paeds1stLineNotSuppressed+$paeds1stLineSuppressed; ?></td>
+                                   <td style="text-align:center;font-size:11px;"></td>
+                                <?php } ?>
+                              </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -610,66 +732,53 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
 <br>
 <br>
 <div class="row">
-                            <div class="col-md-12 col-sm-12">                     
-                            
-                            
-                            <div class="portlet box">
-                                
-                                        <div class="portlet box blue">
-                                            <div class="portlet-title">
-                                                <div class="caption" id="blockTitle">
-                                                    <i class="fa fa-cogs"></i><?php echo $this->translate('SUMMARY OF KEY INDICATORS'); ?>
-                                                </div>
-                                            </div>
-                                            <div class="portlet-body">
-                                                <div class="table-toolbar" id="keyIndicatorsSummary">
-                                                    <table class="table table-striped table-bordered table-hover order-column" id="keyIndicatorsSummary">
-                                                        <thead>
-                                                            <tr>
-                                                                <th> <?php echo $this->translate('Months'); ?> </th>
-                                                                <th> <?php echo $this->translate('Jan \'17'); ?> </th>
-                                                                <th> <?php echo $this->translate('Feb \'17'); ?> </th>
-                                                                <th> <?php echo $this->translate('Mar \'17'); ?> </th>
-                                                                <th> <?php echo $this->translate('Apr \'17'); ?> </th>
-                                                                <th> <?php echo $this->translate('May \'17'); ?> </th>
-                                                                <th> <?php echo $this->translate('jun \'17'); ?> </th>
-                                                                <th> <?php echo $this->translate('Jul \'17'); ?> </th>
-                                                                <th> <?php echo $this->translate('Aug \'17'); ?> </th>
-                                                                <th> <?php echo $this->translate('Sep \'17'); ?> </th>
-                                                                <th> <?php echo $this->translate('Oct \'17'); ?> </th>
-                                                                <th> <?php echo $this->translate('Nov \'17'); ?> </th>
-                                                                <th> <?php echo $this->translate('Dec \'17'); ?> </th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            <?php foreach($keySummaryIndicators as $key=>$indicators){ ?>
-                                                            <tr>
-                                                                <td><?php echo $this->translate(strtoupper(str_replace('-',' ',$key)));?></td>
-                                                                <?php foreach($indicators['month'] as $months){ ?>
-                                                                <td><?php echo $months;?></td>
-                                                                
-                                                                <?php } ?>
-                                                            </tr>
-                                                            <?php } ?>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                                
-                                            </div>
-                                        </div>
-                                
-                            </div>
-
-                        </div>
-                        
-
-                        
-
-</div>
-
+    <div class="col-md-12 col-sm-12">
+        <div class="portlet box">
+            <div class="portlet box blue">
+                <div class="portlet-title">
+                    <div class="caption" id="blockTitle">
+                        <i class="fa fa-cogs"></i><?php echo $this->translate('SUMMARY OF KEY INDICATORS'); ?>
+                    </div>
+                </div>
+                <div class="portlet-body">
+                    <div class="table-toolbar" id="keyIndicatorsSummary">
+                        <table class="table table-striped table-bordered table-hover order-column" id="keyIndicatorsSummary">
+                            <thead>
+                                <tr>
+                                    <th> <?php echo $this->translate('Months'); ?> </th>
+                                    <th> <?php echo $this->translate('Jan \'17'); ?> </th>
+                                    <th> <?php echo $this->translate('Feb \'17'); ?> </th>
+                                    <th> <?php echo $this->translate('Mar \'17'); ?> </th>
+                                    <th> <?php echo $this->translate('Apr \'17'); ?> </th>
+                                    <th> <?php echo $this->translate('May \'17'); ?> </th>
+                                    <th> <?php echo $this->translate('jun \'17'); ?> </th>
+                                    <th> <?php echo $this->translate('Jul \'17'); ?> </th>
+                                    <th> <?php echo $this->translate('Aug \'17'); ?> </th>
+                                    <th> <?php echo $this->translate('Sep \'17'); ?> </th>
+                                    <th> <?php echo $this->translate('Oct \'17'); ?> </th>
+                                    <th> <?php echo $this->translate('Nov \'17'); ?> </th>
+                                    <th> <?php echo $this->translate('Dec \'17'); ?> </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach($keySummaryIndicators as $key=>$indicators){ ?>
+                                <tr>
+                                    <td><?php echo $this->translate(strtoupper(str_replace('-',' ',$key)));?></td>
+                                    <?php foreach($indicators['month'] as $months){ ?>
+                                    <td><?php echo $months;?></td>
+                                    
+                                    <?php } ?>
+                                </tr>
+                                <?php } ?>
+                            </tbody>
+                        </table>
+                    </div>
                     
-   
-    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
     <script src="<?php echo $this->basePath('assets/pages/scripts/dashboard.js'); ?>" type="text/javascript"></script>
     

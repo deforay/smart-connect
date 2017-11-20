@@ -5474,4 +5474,26 @@ class SampleTable extends AbstractTableGateway {
         $allLineofRegimenResult = $common->cacheQuery($queryStr,$dbAdapter);
        return $allLineofRegimenResult;
     }
+    
+    public function fetchAdult1stLineOfRegimenDetails(){
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $common = new CommonService($this->sm);
+        $sQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
+                                ->columns(
+                                          array(
+                                                "current_regimen",
+                                                "validResults"=>new Expression("(SUM(CASE WHEN (vl.result IS NOT NULL AND vl.result!= '') THEN 1 ELSE 0 END))"),
+                                                "totalSuppressed" => new Expression("(SUM(CASE WHEN ((vl.result < 1000 or vl.result='Target Not Detected') AND vl.result IS NOT NULL AND vl.result!= '') THEN 1 ELSE 0 END))"),
+                                                "totalNotSuppressed" => new Expression("(SUM(CASE WHEN (vl.result > 1000 AND vl.result!= 'Target Not Detected' AND vl.result IS NOT NULL AND vl.result!= '') THEN 1 ELSE 0 END))")
+                                                )
+                                          )
+                                ->where(array('vl.line_of_treatment'=>1))
+                                ->group('vl.current_regimen');
+        $queryStr = $sql->getSqlStringForSqlObject($sQuery);
+        //$1stLineofRegimenResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+        $adult1stLineofRegimenResult = $common->cacheQuery($queryStr.' order by validResults desc limit 8',$dbAdapter);
+        $paeds1stLineofRegimenResult = $common->cacheQuery($queryStr.' order by validResults desc limit 9,8',$dbAdapter);
+       return array('adult1stLineofRegimenResult'=>$adult1stLineofRegimenResult,'paeds1stLineofRegimenResult'=>$paeds1stLineofRegimenResult);
+    }
 }

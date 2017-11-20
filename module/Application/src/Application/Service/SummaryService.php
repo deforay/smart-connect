@@ -92,4 +92,9 @@ class SummaryService {
         $sampleDb = $this->sm->get('SampleTable');
       return $sampleDb->fetchAllLineOfRegimenDetails();
     }
+    
+    public function getAdult1stLineOfRegimenDetails(){
+        $sampleDb = $this->sm->get('SampleTable');
+      return $sampleDb->fetchAdult1stLineOfRegimenDetails();
+    }
 }
