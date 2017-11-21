@@ -245,10 +245,10 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
                                             <div class="portlet-body">
                                                     <div class="form-group">                                
                                                     <div class="col-md-12 text-center">
-                                                                <label for="districtWiseSamplesReceivedSummaryCheckbox" onclick="toggleSummary('districtWiseSamplesReceivedSummary','facilityWiseSamplesReceivedSummary');">
+                                                                <label for="" onclick="toggleSummary('districtWiseSamplesReceivedSummary','facilityWiseSamplesReceivedSummary');">
                                                                     <input type="radio" id="districtWiseSamplesReceivedSummaryCheckbox" name="showSampleReceivedSummaryType" value="yes" checked="checked"> District
                                                                 </label>
-                                                                <label for="facilityWiseSamplesReceivedSummaryCheckbox" onclick="toggleSummary('facilityWiseSamplesReceivedSummary','districtWiseSamplesReceivedSummary');">
+                                                                <label for="" onclick="toggleSummary('facilityWiseSamplesReceivedSummary','districtWiseSamplesReceivedSummary');">
                                                                     <input type="radio" id="facilityWiseSamplesReceivedSummaryCheckbox" name="showSampleReceivedSummaryType" value="no" > Facilities
                                                                 </label>
                                                     </div>
@@ -334,14 +334,14 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
                                                 </div>
                                             </div>
                                             <div class="portlet-body">
-                                                    <div class="form-group">                                
+                                                    <div class="form-group">                              
                                                     <div class="col-md-12 text-center">
-                                                                <label for="districtWiseSuppressionRateSummaryCheckbox" onclick="toggleSummary('districtWiseSuppressionRateSummary','facilityWiseSuppressionRateSummary');">
-                                                                    <input type="radio" id="districtWiseSuppressionRateSummaryCheckbox" name="showSampleSuppressionSummaryType" value="yes" checked="checked"> District
-                                                                </label>
-                                                                <label for="facilityWiseSuppressionRateSummaryCheckbox" onclick="toggleSummary('facilityWiseSuppressionRateSummary','districtWiseSuppressionRateSummary');">
-                                                                    <input type="radio" id="facilityWiseSuppressionRateSummaryCheckbox" name="showSampleSuppressionSummaryType" value="no" > Facilities
-                                                                </label>
+                                                        <label for="" onclick="toggleSummary('districtWiseSuppressionRateSummary','facilityWiseSuppressionRateSummary');">
+                                                            <input type="radio" id="districtWiseSuppressionRateSummaryCheckbox" name="showSampleSuppressionSummaryType" value="yes" checked="checked"> District
+                                                        </label>
+                                                        <label for="" onclick="toggleSummary('facilityWiseSuppressionRateSummary','districtWiseSuppressionRateSummary');">
+                                                            <input type="radio" id="facilityWiseSuppressionRateSummaryCheckbox" name="showSampleSuppressionSummaryType" value="no" > Facilities
+                                                        </label>
                                                     </div>
                                                 </div>
 
@@ -412,7 +412,6 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
                        
                         <div class="col-md-6 col-sm-6">
                             <div class="portlet box">
-                                
                                         <div class="portlet box blue">
                                             <div class="portlet-title">
                                                 <div class="caption" id="samplesRejectedBlockTitle">
@@ -422,10 +421,10 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
                                             <div class="portlet-body">
                                                     <div class="form-group">                                
                                                     <div class="col-md-12 text-center">
-                                                        <label for="districtWiseSamplesReceivedSummaryCheckbox" onclick="toggleSummary('districtWiseSamplesRejectedSummary','facilityWiseSamplesRejectedSummary');">
+                                                        <label for="" onclick="toggleSummary('districtWiseSamplesRejectedSummary','facilityWiseSamplesRejectedSummary');">
                                                             <input type="radio" id="districtWiseSamplesRejectedSummaryCheckbox" name="showSampleRejectedSummaryType" value="yes" checked="checked"> District
                                                         </label>
-                                                        <label for="facilityWiseSamplesReceivedSummaryCheckbox" onclick="toggleSummary('facilityWiseSamplesRejectedSummary','districtWiseSamplesRejectedSummary');">
+                                                        <label for="" onclick="toggleSummary('facilityWiseSamplesRejectedSummary','districtWiseSamplesRejectedSummary');">
                                                             <input type="radio" id="facilityWiseSamplesRejectedSummaryCheckbox" name="showSampleRejectedSummaryType" value="no" > Facilities
                                                         </label>
                                                     </div>
@@ -477,75 +476,59 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
                     </div>
     </div>
     <div role="tabpanel" class="tab-pane fade" id="currentRegimenTab">
-        <!-- [ Togglable tabs ] -->
-        <!-- Nav tabs -->
-         <div class="row">               
-            <div class="col-md-12 col-sm-12" style="text-align:center;padding-left:0 !important;padding-right:0 !important;">
-                <div class="btn-group" data-toggle="btns">
-                  <a class="btn btn-default active" href="#regimengroups" data-toggle="tab" style="text-transform:uppercase;">Regimen Groups</a>
-                  <a class="btn btn-default" href="#durationonart" data-toggle="tab" style="text-transform:uppercase;">Duration On ART</a>
+        <div class="row">                   
+            <div class="col-md-12 col-sm-12">
+                <div class="portlet box blue">
+                    <div class="portlet-title">
+                        <div class="caption">
+                            <span class="caption-subject"><?php echo $this->translate('Regimen Groups'); ?></span>
+                        </div>
+                    </div>
+                    <div class="portlet-body" style="cursor:pointer;">
+                        <div id="regimenGroupBarChartContainer"></div>
+                    </div>
                 </div>
             </div>
         </div>
-        <!-- Tab panes -->
-        <div class="row">             
-            <div class="col-md-12 col-sm-12" style="text-align:center;padding-left:0;padding-right:0;">
-                <div class="tab-content" style="border:none;">
-                  <div class="tab-pane active" id="regimengroups">
-                    <div class="col-md-6 col-sm-6" style="padding-left:0 !important;">
-                        <div class="portlet box blue">
-                                <div class="portlet-title">
-                                    <div class="caption">
-                                        <span class="caption-subject"><?php echo $this->translate('Regimen Groups'); ?></span>
-                                    </div>
-                                </div>
-                                <div class="portlet-body" style="cursor:pointer;">
-                                    <div id="regimenGroupBarChartContainer"></div>
-                                </div>
-                            </div>
-                    </div>
-                    <div class="col-md-6 col-sm-6" style="padding-right:0 !important;">
-                        <div class="portlet box">
-                            <div class="portlet box blue">
-                                <div class="portlet-title">
-                                    <div class="caption">
-                                        <i class="fa fa-cogs"></i><?php echo $this->translate('Regimen Groups Summary'); ?>
-                                    </div>
-                                </div>
-                                <div class="portlet-body">
-                                    <table class="table table-striped table-bordered table-hover order-column" id="regimenGroupsDataTable">
-                                        <thead>
-                                            <tr>
-                                                <th> <?php echo $this->translate('Regimen'); ?> </th>
-                                                <th> <?php echo $this->translate('Samples Received'); ?> </th>
-                                                <th> <?php echo $this->translate('Samples Tested'); ?></th>
-                                                <th> <?php echo $this->translate('Valid Results'); ?></th>
-                                                <th> <?php echo $this->translate('Number Suppressed'); ?></th>
-                                                <th> <?php echo $this->translate('Suppression Rate'); ?></th>
-                                                <th> <?php echo $this->translate('Percentage of Samples(%)'); ?> </th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td colspan="7" class="dataTables_empty">Loading data from server</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
+        <div class="row">                   
+            <div class="col-md-12 col-sm-12">
+                <div class="portlet box">
+                    <div class="portlet box blue">
+                        <div class="portlet-title">
+                            <div class="caption">
+                                <i class="fa fa-cogs"></i><?php echo $this->translate('Regimen Groups Summary'); ?>
                             </div>
                         </div>
+                        <div class="portlet-body">
+                            <table class="table table-striped table-bordered table-hover order-column" id="regimenGroupsDataTable">
+                                <thead>
+                                    <tr>
+                                        <th> <?php echo $this->translate('Regimen'); ?> </th>
+                                        <th> <?php echo $this->translate('Samples Received'); ?> </th>
+                                        <th> <?php echo $this->translate('Samples Tested'); ?></th>
+                                        <th> <?php echo $this->translate('Valid Results'); ?></th>
+                                        <th> <?php echo $this->translate('Number Suppressed'); ?></th>
+                                        <th> <?php echo $this->translate('Suppression Rate'); ?></th>
+                                        <th> <?php echo $this->translate('Percentage of Samples(%)'); ?> </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td colspan="7" class="dataTables_empty">Loading data from server</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                  </div>
-                  <div class="tab-pane" id="durationonart"> Coming Soon </div>
                 </div>
             </div>
         </div>
     </div>
     <div role="tabpanel" class="tab-pane fade" id="allRegimenTab">
-        <div class="row">                 
+        <div class="row">              
             <div class="col-md-12 col-sm-12">
-                <div class="portlet box">
-                    <div class="portlet-body">
+                <div class="portlet box" style="margin-bottom:0;">
+                    <div class="portlet-body" style="margin-bottom:0;padding-bottom:0;">
                         <table class="table">
                             <thead>
                               <tr>
