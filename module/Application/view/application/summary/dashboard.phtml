@@ -169,6 +169,12 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
     border-right: 1px solid #ccc;
     padding:15px;
 }
+.page-content{
+   background-color:#fff !important;
+}
+.tabPercentageVal{
+    font-weight:600;
+}
 </style>
 
 <div class="page-bar">
@@ -182,25 +188,25 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
 <ul class="nav nav-tabs nav-justified" role="tablist">
     <li role="presentation" class="active">
         <a href="#samplesReceivedTab" aria-controls="samplesReceivedTab" role="tab" data-toggle="tab">
-            <h3><?php echo number_format($summaryTabInfo[0]["total_samples_received"]);?></h3>
+            <h3 class="tabPercentageVal"><?php echo number_format($summaryTabInfo[0]["total_samples_received"]);?></h3>
             <?php echo $this->translate('Samples Received'); ?>
         </a>
     </li>
     <li role="presentation">
         <a href="#suppressionRateTab" aria-controls="suppressionRateTab" role="tab" data-toggle="tab">
-            <h3><?php echo number_format($summaryTabInfo[0]["suppressed_samples_percentage"], 2);?>%</h3>            
+            <h3 class="tabPercentageVal"><?php echo number_format($summaryTabInfo[0]["suppressed_samples_percentage"], 2);?>%</h3>            
             <?php echo $this->translate('Suppression Rate'); ?>
         </a>
     </li>
     <li role="presentation">
         <a href="#samplesRejectedTab" aria-controls="messages" role="tab" data-toggle="tab">
-            <h3><?php echo number_format($summaryTabInfo[0]["rejected_samples_percentage"], 2);?>%</h3>
+            <h3 class="tabPercentageVal"><?php echo number_format($summaryTabInfo[0]["rejected_samples_percentage"], 2);?>%</h3>
             Rejection Rate
         </a>
     </li>
     <li role="presentation">
         <a href="#currentRegimenTab" aria-controls="messages" role="tab" data-toggle="tab">
-            <h3><?php echo $firstLineCurrentRegimenPercentage; ?>% <span style="font-size:14px;">on 1st Line</span></h3>
+            <h3 class="tabPercentageVal"><?php echo $firstLineCurrentRegimenPercentage; ?>% <span style="font-size:14px;">on 1st Line</span></h3>
             Current Regimen
         </a>
     </li>
@@ -240,10 +246,10 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
                                                     <div class="form-group">                                
                                                     <div class="col-md-12 text-center">
                                                                 <label for="districtWiseSamplesReceivedSummaryCheckbox" onclick="toggleSummary('districtWiseSamplesReceivedSummary','facilityWiseSamplesReceivedSummary');">
-                                                                    <input type="radio" id="districtWiseSamplesReceivedSummaryCheckbox" name="showSummaryType" value="yes" checked> District
+                                                                    <input type="radio" id="districtWiseSamplesReceivedSummaryCheckbox" name="showSampleReceivedSummaryType" value="yes" checked="checked"> District
                                                                 </label>
                                                                 <label for="facilityWiseSamplesReceivedSummaryCheckbox" onclick="toggleSummary('facilityWiseSamplesReceivedSummary','districtWiseSamplesReceivedSummary');">
-                                                                    <input type="radio" id="facilityWiseSamplesReceivedSummaryCheckbox" name="showSummaryType" value="no" > Facilities
+                                                                    <input type="radio" id="facilityWiseSamplesReceivedSummaryCheckbox" name="showSampleReceivedSummaryType" value="no" > Facilities
                                                                 </label>
                                                     </div>
                                                 </div>
@@ -331,10 +337,10 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
                                                     <div class="form-group">                                
                                                     <div class="col-md-12 text-center">
                                                                 <label for="districtWiseSuppressionRateSummaryCheckbox" onclick="toggleSummary('districtWiseSuppressionRateSummary','facilityWiseSuppressionRateSummary');">
-                                                                    <input type="radio" id="districtWiseSuppressionRateSummaryCheckbox" name="showSummaryType" value="yes" checked> District
+                                                                    <input type="radio" id="districtWiseSuppressionRateSummaryCheckbox" name="showSampleSuppressionSummaryType" value="yes" checked="checked"> District
                                                                 </label>
                                                                 <label for="facilityWiseSuppressionRateSummaryCheckbox" onclick="toggleSummary('facilityWiseSuppressionRateSummary','districtWiseSuppressionRateSummary');">
-                                                                    <input type="radio" id="facilityWiseSuppressionRateSummaryCheckbox" name="showSummaryType" value="no" > Facilities
+                                                                    <input type="radio" id="facilityWiseSuppressionRateSummaryCheckbox" name="showSampleSuppressionSummaryType" value="no" > Facilities
                                                                 </label>
                                                     </div>
                                                 </div>
@@ -417,10 +423,10 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
                                                     <div class="form-group">                                
                                                     <div class="col-md-12 text-center">
                                                         <label for="districtWiseSamplesReceivedSummaryCheckbox" onclick="toggleSummary('districtWiseSamplesRejectedSummary','facilityWiseSamplesRejectedSummary');">
-                                                            <input type="radio" id="districtWiseSamplesRejectedSummaryCheckbox" name="showSummaryType" value="yes" checked> District
+                                                            <input type="radio" id="districtWiseSamplesRejectedSummaryCheckbox" name="showSampleRejectedSummaryType" value="yes" checked="checked"> District
                                                         </label>
                                                         <label for="facilityWiseSamplesReceivedSummaryCheckbox" onclick="toggleSummary('facilityWiseSamplesRejectedSummary','districtWiseSamplesRejectedSummary');">
-                                                            <input type="radio" id="facilityWiseSamplesRejectedSummaryCheckbox" name="showSummaryType" value="no" > Facilities
+                                                            <input type="radio" id="facilityWiseSamplesRejectedSummaryCheckbox" name="showSampleRejectedSummaryType" value="no" > Facilities
                                                         </label>
                                                     </div>
                                                 </div>
@@ -503,7 +509,7 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
                             <div class="portlet box blue">
                                 <div class="portlet-title">
                                     <div class="caption">
-                                        <i class="fa fa-cogs"></i><?php echo $this->translate('Regimen Groups'); ?>
+                                        <i class="fa fa-cogs"></i><?php echo $this->translate('Regimen Groups Summary'); ?>
                                     </div>
                                 </div>
                                 <div class="portlet-body">
@@ -600,7 +606,7 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
                               </tr>
                             </tbody>
                         </table>
-                        <hr style="border-bottom:1px solid #337ab7;">
+                        <hr style="border-bottom:1px solid #3598dc;">
                         <?php $adult1stLineofTreatmentTotal = (isset($allCollapsibleLineofTreatmentResult['adult1stLineofTreatmentResult']) && count($allCollapsibleLineofTreatmentResult['adult1stLineofTreatmentResult']) >0)?count($allCollapsibleLineofTreatmentResult['adult1stLineofTreatmentResult']):0; ?>
                         <table class="table">
                             <thead>
@@ -767,7 +773,7 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
                               </tr>
                             </tbody>
                         </table>
-                        <hr style="border-bottom:1px solid #337ab7;">
+                        <hr style="border-bottom:1px solid #3598dc;">
                         <?php $adult2ndLineofTreatmentTotal = (isset($allCollapsibleLineofTreatmentResult['adult2ndLineofTreatmentResult']) && count($allCollapsibleLineofTreatmentResult['adult2ndLineofTreatmentResult']) >0)?count($allCollapsibleLineofTreatmentResult['adult2ndLineofTreatmentResult']):0; ?>
                         <table class="table">
                             <thead>
@@ -934,7 +940,7 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
                               </tr>
                             </tbody>
                         </table>
-                        <hr style="border-bottom:1px solid #337ab7;">
+                        <hr style="border-bottom:1px solid #3598dc;">
                     </div>
                 </div>
             </div>
@@ -964,7 +970,7 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
                                     <th> Mar '<?php echo date('y');?> </th>
                                     <th> Apr '<?php echo date('y');?> </th>
                                     <th> May '<?php echo date('y');?> </th>
-                                    <th> jun '<?php echo date('y');?> </th>
+                                    <th> Jun '<?php echo date('y');?> </th>
                                     <th> Jul '<?php echo date('y');?> </th>
                                     <th> Aug '<?php echo date('y');?> </th>
                                     <th> Sep '<?php echo date('y');?> </th>
