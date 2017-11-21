@@ -18,13 +18,13 @@ class SummaryController extends AbstractActionController{
         $summaryService = $this->getServiceLocator()->get('SummaryService');
         $summaryTabResult = $summaryService->fetchSummaryTabDetails(); 
         $keySummaryIndicatorsResult = $summaryService->getKeySummaryIndicatorsDetails();
-        $allLineofRegimenResult = $summaryService->getAllLineOfRegimenDetails();
-        $firstLineofRegimenResult = $summaryService->getAdult1stLineOfRegimenDetails();
+        $allLineofTreatmentResult = $summaryService->getAllLineOfTreatmentDetails();
+        $allCollapsibleLineofTreatmentResult = $summaryService->getAllCollapsibleLineOfTreatmentDetails();
         return new ViewModel(array(
                     'summaryTabInfo' => $summaryTabResult,
                     'keySummaryIndicators' => $keySummaryIndicatorsResult,
-                    'allLineofRegimenInfo' => $allLineofRegimenResult,
-                    'firstLineofRegimenResult'=>$firstLineofRegimenResult
+                    'allLineofTreatmentInfo' => $allLineofTreatmentResult,
+                    'allCollapsibleLineofTreatmentResult'=>$allCollapsibleLineofTreatmentResult
         ));
     }
     

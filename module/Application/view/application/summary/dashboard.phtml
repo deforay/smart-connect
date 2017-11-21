@@ -230,7 +230,6 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
                        
                         <div class="col-md-6 col-sm-6">
                             <div class="portlet box">
-                                
                                         <div class="portlet box blue">
                                             <div class="portlet-title">
                                                 <div class="caption" id="samplesReceivedBlockTitle">
@@ -259,12 +258,13 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
                                                                 <th> <?php echo $this->translate('Samples Pending'); ?></th>
                                                                 <th> <?php echo $this->translate('Samples Rejected'); ?></th>
                                                                 <th> <?php echo $this->translate('DBS(%)'); ?> </th>                                                              
-                                                                <th> <?php echo $this->translate('Plasma'); ?> </th>
+                                                                <th> <?php echo $this->translate('Plasma(%)'); ?> </th>
+                                                                <th> <?php echo $this->translate('Others(%)'); ?> </th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
                                                             <tr>
-                                                                <td colspan="7" class="dataTables_empty">Loading data from server</td>
+                                                                <td colspan="8" class="dataTables_empty">Loading data from server</td>
                                                             </tr>
                                                         </tbody>
                                                     </table>
@@ -281,12 +281,13 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
                                                                 <th> <?php echo $this->translate('Samples Pending'); ?></th>
                                                                 <th> <?php echo $this->translate('Samples Rejected'); ?></th>
                                                                 <th> <?php echo $this->translate('DBS(%)'); ?> </th>                                                              
-                                                                <th> <?php echo $this->translate('Plasma'); ?> </th>
+                                                                <th> <?php echo $this->translate('Plasma(%)'); ?> </th>
+                                                                <th> <?php echo $this->translate('Others(%)'); ?> </th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
                                                             <tr>
-                                                                <td colspan="7" class="dataTables_empty">Loading data from server</td>
+                                                                <td colspan="9" class="dataTables_empty">Loading data from server</td>
                                                             </tr>
                                                         </tbody>
                                                     </table>
@@ -566,162 +567,374 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
                               </tr>
                               <tr>
                                 <td style="text-align:center;font-size:11px;">NS</td>
-                                <td style="text-align:center;font-size:11px;"><?php echo $allLineofRegimenInfo[0]['1stLineofNotSuppressed']; ?></td>
-                                <td style="text-align:center;font-size:11px;"><?php echo ($allLineofRegimenInfo[0]['1stLineofNotSuppressed'] >0)?round((($allLineofRegimenInfo[0]['1stLineofNotSuppressed']/($allLineofRegimenInfo[0]['1stLineofNotSuppressed']+$allLineofRegimenInfo[0]['1stLineofSuppressed']))*100),2):''; ?></td>
-                                <td style="text-align:center;font-size:11px;"><?php echo $allLineofRegimenInfo[0]['2ndLineofNotSuppressed']; ?></td>
-                                <td style="text-align:center;font-size:11px;"><?php echo ($allLineofRegimenInfo[0]['2ndLineofNotSuppressed'] >0)?round((($allLineofRegimenInfo[0]['2ndLineofNotSuppressed']/($allLineofRegimenInfo[0]['2ndLineofNotSuppressed']+$allLineofRegimenInfo[0]['2ndLineofSuppressed']))*100),2):''; ?></td>
-                                <td style="text-align:center;font-size:11px;"><?php echo $allLineofRegimenInfo[0]['otherLineofNotSuppressed']; ?></td>
-                                <td style="text-align:center;font-size:11px;"><?php echo ($allLineofRegimenInfo[0]['otherLineofNotSuppressed'] >0)?round((($allLineofRegimenInfo[0]['otherLineofNotSuppressed']/($allLineofRegimenInfo[0]['otherLineofNotSuppressed']+$allLineofRegimenInfo[0]['otherLineofSuppressed']))*100),2):''; ?></td>
-                                <td style="text-align:center;font-size:11px;"><?php echo $allLineofRegimenInfo[0]['1stLineofNotSuppressed']+$allLineofRegimenInfo[0]['2ndLineofNotSuppressed']+$allLineofRegimenInfo[0]['otherLineofNotSuppressed']; ?></td>
-                                <td style="text-align:center;font-size:11px;"><?php echo (($allLineofRegimenInfo[0]['1stLineofNotSuppressed']+$allLineofRegimenInfo[0]['2ndLineofNotSuppressed']+$allLineofRegimenInfo[0]['otherLineofNotSuppressed']) > 0)?round(((($allLineofRegimenInfo[0]['1stLineofNotSuppressed']+$allLineofRegimenInfo[0]['2ndLineofNotSuppressed']+$allLineofRegimenInfo[0]['otherLineofNotSuppressed'])/($allLineofRegimenInfo[0]['1stLineofNotSuppressed']+$allLineofRegimenInfo[0]['2ndLineofNotSuppressed']+$allLineofRegimenInfo[0]['otherLineofNotSuppressed']+$allLineofRegimenInfo[0]['1stLineofSuppressed']+$allLineofRegimenInfo[0]['2ndLineofSuppressed']+$allLineofRegimenInfo[0]['otherLineofSuppressed']))*100),2):''; ?></td>
+                                <td style="text-align:center;font-size:11px;"><?php echo $allLineofTreatmentInfo[0]['1stLineofNotSuppressed']; ?></td>
+                                <td style="text-align:center;font-size:11px;"><?php echo ($allLineofTreatmentInfo[0]['1stLineofNotSuppressed'] >0)?round((($allLineofTreatmentInfo[0]['1stLineofNotSuppressed']/($allLineofTreatmentInfo[0]['1stLineofNotSuppressed']+$allLineofTreatmentInfo[0]['1stLineofSuppressed']))*100),2):''; ?></td>
+                                <td style="text-align:center;font-size:11px;"><?php echo $allLineofTreatmentInfo[0]['2ndLineofNotSuppressed']; ?></td>
+                                <td style="text-align:center;font-size:11px;"><?php echo ($allLineofTreatmentInfo[0]['2ndLineofNotSuppressed'] >0)?round((($allLineofTreatmentInfo[0]['2ndLineofNotSuppressed']/($allLineofTreatmentInfo[0]['2ndLineofNotSuppressed']+$allLineofTreatmentInfo[0]['2ndLineofSuppressed']))*100),2):''; ?></td>
+                                <td style="text-align:center;font-size:11px;"><?php echo $allLineofTreatmentInfo[0]['otherLineofNotSuppressed']; ?></td>
+                                <td style="text-align:center;font-size:11px;"><?php echo ($allLineofTreatmentInfo[0]['otherLineofNotSuppressed'] >0)?round((($allLineofTreatmentInfo[0]['otherLineofNotSuppressed']/($allLineofTreatmentInfo[0]['otherLineofNotSuppressed']+$allLineofTreatmentInfo[0]['otherLineofSuppressed']))*100),2):''; ?></td>
+                                <td style="text-align:center;font-size:11px;"><?php echo $allLineofTreatmentInfo[0]['1stLineofNotSuppressed']+$allLineofTreatmentInfo[0]['2ndLineofNotSuppressed']+$allLineofTreatmentInfo[0]['otherLineofNotSuppressed']; ?></td>
+                                <td style="text-align:center;font-size:11px;"><?php echo (($allLineofTreatmentInfo[0]['1stLineofNotSuppressed']+$allLineofTreatmentInfo[0]['2ndLineofNotSuppressed']+$allLineofTreatmentInfo[0]['otherLineofNotSuppressed']) > 0)?round(((($allLineofTreatmentInfo[0]['1stLineofNotSuppressed']+$allLineofTreatmentInfo[0]['2ndLineofNotSuppressed']+$allLineofTreatmentInfo[0]['otherLineofNotSuppressed'])/($allLineofTreatmentInfo[0]['1stLineofNotSuppressed']+$allLineofTreatmentInfo[0]['2ndLineofNotSuppressed']+$allLineofTreatmentInfo[0]['otherLineofNotSuppressed']+$allLineofTreatmentInfo[0]['1stLineofSuppressed']+$allLineofTreatmentInfo[0]['2ndLineofSuppressed']+$allLineofTreatmentInfo[0]['otherLineofSuppressed']))*100),2):''; ?></td>
                               </tr>
                               <tr>
                                 <td style="text-align:center;font-size:11px;">S</td>
-                                <td style="text-align:center;font-size:11px;"><?php echo $allLineofRegimenInfo[0]['1stLineofSuppressed']; ?></td>
-                                <td style="text-align:center;font-size:11px;"><?php echo ($allLineofRegimenInfo[0]['1stLineofSuppressed'] >0)?round((($allLineofRegimenInfo[0]['1stLineofSuppressed']/($allLineofRegimenInfo[0]['1stLineofSuppressed']+$allLineofRegimenInfo[0]['1stLineofNotSuppressed']))*100),2):''; ?></td>
-                                <td style="text-align:center;font-size:11px;"><?php echo $allLineofRegimenInfo[0]['2ndLineofSuppressed']; ?></td>
-                                <td style="text-align:center;font-size:11px;"><?php echo ($allLineofRegimenInfo[0]['2ndLineofSuppressed'] >0)?round((($allLineofRegimenInfo[0]['2ndLineofSuppressed']/($allLineofRegimenInfo[0]['2ndLineofSuppressed']+$allLineofRegimenInfo[0]['2ndLineofNotSuppressed']))*100),2):''; ?></td>
-                                <td style="text-align:center;font-size:11px;"><?php echo $allLineofRegimenInfo[0]['otherLineofSuppressed']; ?></td>
-                                <td style="text-align:center;font-size:11px;"><?php echo ($allLineofRegimenInfo[0]['otherLineofSuppressed'] >0)?round((($allLineofRegimenInfo[0]['otherLineofSuppressed']/($allLineofRegimenInfo[0]['otherLineofSuppressed']+$allLineofRegimenInfo[0]['otherLineofNotSuppressed']))*100),2):''; ?></td>
-                                <td style="text-align:center;font-size:11px;"><?php echo $allLineofRegimenInfo[0]['1stLineofSuppressed']+$allLineofRegimenInfo[0]['2ndLineofSuppressed']+$allLineofRegimenInfo[0]['otherLineofSuppressed']; ?></td>
-                                <td style="text-align:center;font-size:11px;"><?php echo (($allLineofRegimenInfo[0]['1stLineofSuppressed']+$allLineofRegimenInfo[0]['2ndLineofSuppressed']+$allLineofRegimenInfo[0]['otherLineofSuppressed']) > 0)?round(((($allLineofRegimenInfo[0]['1stLineofSuppressed']+$allLineofRegimenInfo[0]['2ndLineofSuppressed']+$allLineofRegimenInfo[0]['otherLineofSuppressed'])/($allLineofRegimenInfo[0]['1stLineofSuppressed']+$allLineofRegimenInfo[0]['2ndLineofSuppressed']+$allLineofRegimenInfo[0]['otherLineofSuppressed']+$allLineofRegimenInfo[0]['1stLineofNotSuppressed']+$allLineofRegimenInfo[0]['2ndLineofNotSuppressed']+$allLineofRegimenInfo[0]['otherLineofNotSuppressed']))*100),2):''; ?></td>
+                                <td style="text-align:center;font-size:11px;"><?php echo $allLineofTreatmentInfo[0]['1stLineofSuppressed']; ?></td>
+                                <td style="text-align:center;font-size:11px;"><?php echo ($allLineofTreatmentInfo[0]['1stLineofSuppressed'] >0)?round((($allLineofTreatmentInfo[0]['1stLineofSuppressed']/($allLineofTreatmentInfo[0]['1stLineofSuppressed']+$allLineofTreatmentInfo[0]['1stLineofNotSuppressed']))*100),2):''; ?></td>
+                                <td style="text-align:center;font-size:11px;"><?php echo $allLineofTreatmentInfo[0]['2ndLineofSuppressed']; ?></td>
+                                <td style="text-align:center;font-size:11px;"><?php echo ($allLineofTreatmentInfo[0]['2ndLineofSuppressed'] >0)?round((($allLineofTreatmentInfo[0]['2ndLineofSuppressed']/($allLineofTreatmentInfo[0]['2ndLineofSuppressed']+$allLineofTreatmentInfo[0]['2ndLineofNotSuppressed']))*100),2):''; ?></td>
+                                <td style="text-align:center;font-size:11px;"><?php echo $allLineofTreatmentInfo[0]['otherLineofSuppressed']; ?></td>
+                                <td style="text-align:center;font-size:11px;"><?php echo ($allLineofTreatmentInfo[0]['otherLineofSuppressed'] >0)?round((($allLineofTreatmentInfo[0]['otherLineofSuppressed']/($allLineofTreatmentInfo[0]['otherLineofSuppressed']+$allLineofTreatmentInfo[0]['otherLineofNotSuppressed']))*100),2):''; ?></td>
+                                <td style="text-align:center;font-size:11px;"><?php echo $allLineofTreatmentInfo[0]['1stLineofSuppressed']+$allLineofTreatmentInfo[0]['2ndLineofSuppressed']+$allLineofTreatmentInfo[0]['otherLineofSuppressed']; ?></td>
+                                <td style="text-align:center;font-size:11px;"><?php echo (($allLineofTreatmentInfo[0]['1stLineofSuppressed']+$allLineofTreatmentInfo[0]['2ndLineofSuppressed']+$allLineofTreatmentInfo[0]['otherLineofSuppressed']) > 0)?round(((($allLineofTreatmentInfo[0]['1stLineofSuppressed']+$allLineofTreatmentInfo[0]['2ndLineofSuppressed']+$allLineofTreatmentInfo[0]['otherLineofSuppressed'])/($allLineofTreatmentInfo[0]['1stLineofSuppressed']+$allLineofTreatmentInfo[0]['2ndLineofSuppressed']+$allLineofTreatmentInfo[0]['otherLineofSuppressed']+$allLineofTreatmentInfo[0]['1stLineofNotSuppressed']+$allLineofTreatmentInfo[0]['2ndLineofNotSuppressed']+$allLineofTreatmentInfo[0]['otherLineofNotSuppressed']))*100),2):''; ?></td>
                               </tr>
                               <tr>
                                 <th style="text-align:center;font-size:11px;">Total</th>
-                                <td style="text-align:center;font-size:11px;"><?php echo $allLineofRegimenInfo[0]['1stLineofNotSuppressed']+$allLineofRegimenInfo[0]['1stLineofSuppressed']; ?></td>
+                                <td style="text-align:center;font-size:11px;"><?php echo $allLineofTreatmentInfo[0]['1stLineofNotSuppressed']+$allLineofTreatmentInfo[0]['1stLineofSuppressed']; ?></td>
                                 <td style="text-align:center;font-size:11px;"></td>
-                                <td style="text-align:center;font-size:11px;"><?php echo $allLineofRegimenInfo[0]['2ndLineofNotSuppressed']+$allLineofRegimenInfo[0]['2ndLineofSuppressed']; ?></td>
+                                <td style="text-align:center;font-size:11px;"><?php echo $allLineofTreatmentInfo[0]['2ndLineofNotSuppressed']+$allLineofTreatmentInfo[0]['2ndLineofSuppressed']; ?></td>
                                 <td style="text-align:center;font-size:11px;"></td>
-                                <td style="text-align:center;font-size:11px;"><?php echo $allLineofRegimenInfo[0]['otherLineofNotSuppressed']+$allLineofRegimenInfo[0]['otherLineofSuppressed']; ?></td>
+                                <td style="text-align:center;font-size:11px;"><?php echo $allLineofTreatmentInfo[0]['otherLineofNotSuppressed']+$allLineofTreatmentInfo[0]['otherLineofSuppressed']; ?></td>
                                 <td style="text-align:center;font-size:11px;"></td>
-                                <td style="text-align:center;font-size:11px;"><?php echo ($allLineofRegimenInfo[0]['1stLineofNotSuppressed']+$allLineofRegimenInfo[0]['2ndLineofNotSuppressed']+$allLineofRegimenInfo[0]['otherLineofNotSuppressed'])+($allLineofRegimenInfo[0]['1stLineofSuppressed']+$allLineofRegimenInfo[0]['2ndLineofSuppressed']+$allLineofRegimenInfo[0]['otherLineofSuppressed']); ?></td>
+                                <td style="text-align:center;font-size:11px;"><?php echo ($allLineofTreatmentInfo[0]['1stLineofNotSuppressed']+$allLineofTreatmentInfo[0]['2ndLineofNotSuppressed']+$allLineofTreatmentInfo[0]['otherLineofNotSuppressed'])+($allLineofTreatmentInfo[0]['1stLineofSuppressed']+$allLineofTreatmentInfo[0]['2ndLineofSuppressed']+$allLineofTreatmentInfo[0]['otherLineofSuppressed']); ?></td>
                                 <td style="text-align:center;font-size:11px;"></td>
                               </tr>
                             </tbody>
                         </table>
                         <hr style="border-bottom:1px solid #337ab7;">
-                        <?php
-                           $adult1stLineofRegimenTotal = (isset($firstLineofRegimenResult['adult1stLineofRegimenResult']) && count($firstLineofRegimenResult['adult1stLineofRegimenResult']) >0)?(2*count($firstLineofRegimenResult['adult1stLineofRegimenResult']))+1:0;
-                        ?>
+                        <?php $adult1stLineofTreatmentTotal = (isset($allCollapsibleLineofTreatmentResult['adult1stLineofTreatmentResult']) && count($allCollapsibleLineofTreatmentResult['adult1stLineofTreatmentResult']) >0)?count($allCollapsibleLineofTreatmentResult['adult1stLineofTreatmentResult']):0; ?>
                         <table class="table">
                             <thead>
                               <tr>
-                                <td colspan="<?php echo $adult1stLineofRegimenTotal; ?>" style="font-size:11px;">By first line regimens [Adult & Paeds]</td>
+                                <td colspan="<?php echo ($adult1stLineofTreatmentTotal > 0)?(2*$adult1stLineofTreatmentTotal)+3:3; ?>" style="font-size:11px;">By first line regimens [Adult & Paeds]</td>
                               </tr>
                               <tr>
-                                <th colspan="<?php echo $adult1stLineofRegimenTotal; ?>" style="text-align:center;font-size:11px;">1st Line (ADULT)</th>
+                                <th colspan="<?php echo ($adult1stLineofTreatmentTotal > 0)?(2*$adult1stLineofTreatmentTotal)+3:3; ?>" style="text-align:center;font-size:11px;">1st Line (ADULT)</th>
                               </tr>
                               <tr>
                                 <th></th>
                                 <?php
-                                foreach($firstLineofRegimenResult['adult1stLineofRegimenResult'] as $adult1stLineofRegimen){
+                                if(isset($allCollapsibleLineofTreatmentResult['adult1stLineofTreatmentResult']) && count($allCollapsibleLineofTreatmentResult['adult1stLineofTreatmentResult']) >0){
+                                   foreach($allCollapsibleLineofTreatmentResult['adult1stLineofTreatmentResult'] as $adult1stLineofTreatment){
                                 ?>
-                                   <th colspan="2" style="font-size:11px;"><?php echo $adult1stLineofRegimen['current_regimen']; ?></th>
-                                <?php } ?>
+                                   <th colspan="2" style="font-size:11px;"><?php echo $adult1stLineofTreatment['current_regimen']; ?></th>
+                                <?php } }?>
+                                <th colspan="2" style="text-align:center;font-size:11px;">Others</th>
                               </tr>
                             </thead>
                             <tbody>
                               <tr>
                                 <th style="text-align:center;font-size:11px;">Results</th>
                                 <?php
-                                foreach($firstLineofRegimenResult['adult1stLineofRegimenResult'] as $adult1stLineofRegimenLabel){
+                                if(isset($allCollapsibleLineofTreatmentResult['adult1stLineofTreatmentResult']) && count($allCollapsibleLineofTreatmentResult['adult1stLineofTreatmentResult']) >0){
+                                   foreach($allCollapsibleLineofTreatmentResult['adult1stLineofTreatmentResult'] as $adult1stLineofTreatmentLabel){
                                 ?>
                                    <td style="text-align:center;font-size:11px;">#</td>
                                    <td style="text-align:center;font-size:11px;">%</td>
-                                <?php } ?>
+                                <?php } } ?>
+                                <td style="text-align:center;font-size:11px;">#</td>
+                                <td style="text-align:center;font-size:11px;">%</td>
                               </tr>
                               <tr>
                                 <td style="text-align:center;font-size:11px;">NS</td>
                                 <?php
-                                foreach($firstLineofRegimenResult['adult1stLineofRegimenResult'] as $adult1stLineofRegimenNotSuppressed){
+                                if(isset($allCollapsibleLineofTreatmentResult['adult1stLineofTreatmentResult']) && count($allCollapsibleLineofTreatmentResult['adult1stLineofTreatmentResult']) >0){
+                                    foreach($allCollapsibleLineofTreatmentResult['adult1stLineofTreatmentResult'] as $adult1stLineofTreatmentNotSuppressed){
                                 ?>
-                                    <td style="text-align:center;font-size:11px;"><?php echo (isset($adult1stLineofRegimenNotSuppressed['totalNotSuppressed']))?$adult1stLineofRegimenNotSuppressed['totalNotSuppressed']:0; ?></td>
-                                    <td style="text-align:center;font-size:11px;"><?php echo(isset($adult1stLineofRegimenNotSuppressed['totalNotSuppressed']) && $adult1stLineofRegimenNotSuppressed['totalNotSuppressed'] >0)?round(((($adult1stLineofRegimenNotSuppressed['totalNotSuppressed']/($adult1stLineofRegimenNotSuppressed['totalNotSuppressed']+$adult1stLineofRegimenNotSuppressed['totalSuppressed']))*100)),2):''; ?></td>
-                                <?php } ?>
+                                    <td style="text-align:center;font-size:11px;"><?php echo (isset($adult1stLineofTreatmentNotSuppressed['totalNotSuppressed']))?$adult1stLineofTreatmentNotSuppressed['totalNotSuppressed']:0; ?></td>
+                                    <td style="text-align:center;font-size:11px;"><?php echo(isset($adult1stLineofTreatmentNotSuppressed['totalNotSuppressed']) && $adult1stLineofTreatmentNotSuppressed['totalNotSuppressed'] >0)?round(((($adult1stLineofTreatmentNotSuppressed['totalNotSuppressed']/($adult1stLineofTreatmentNotSuppressed['totalNotSuppressed']+$adult1stLineofTreatmentNotSuppressed['totalSuppressed']))*100)),2):''; ?></td>
+                                <?php } } ?>
+                                <?php
+                                $totalAdult1stLineofTreatmentOthersNotSuppressed = 0;
+                                $totalAdult1stLineofTreatmentOthersSuppressed = 0;
+                                if(isset($allCollapsibleLineofTreatmentResult['adult1stLineofTreatmentOthersResult']) && count($allCollapsibleLineofTreatmentResult['adult1stLineofTreatmentOthersResult']) >0){
+                                    foreach($allCollapsibleLineofTreatmentResult['adult1stLineofTreatmentOthersResult'] as $adult1stLineofTreatmentOthersNotSuppressed){
+                                        $totalAdult1stLineofTreatmentOthersNotSuppressed+= $adult1stLineofTreatmentOthersNotSuppressed['totalNotSuppressed'];
+                                        $totalAdult1stLineofTreatmentOthersSuppressed+= $adult1stLineofTreatmentOthersNotSuppressed['totalSuppressed'];
+                                    }
+                                }
+                                ?>
+                                <td style="text-align:center;font-size:11px;"><?php echo $totalAdult1stLineofTreatmentOthersNotSuppressed; ?></td>
+                                <td style="text-align:center;font-size:11px;"><?php echo ($totalAdult1stLineofTreatmentOthersNotSuppressed >0)?round((($totalAdult1stLineofTreatmentOthersNotSuppressed/($totalAdult1stLineofTreatmentOthersNotSuppressed+$totalAdult1stLineofTreatmentOthersSuppressed))*100),2):''; ?></td>
                               </tr>
                               <tr>
                                 <td style="text-align:center;font-size:11px;">S</td>
                                 <?php
-                                foreach($firstLineofRegimenResult['adult1stLineofRegimenResult'] as $adult1stLineofRegimenSuppressed){
+                                if(isset($allCollapsibleLineofTreatmentResult['adult1stLineofTreatmentResult']) && count($allCollapsibleLineofTreatmentResult['adult1stLineofTreatmentResult']) >0){
+                                    foreach($allCollapsibleLineofTreatmentResult['adult1stLineofTreatmentResult'] as $adult1stLineofTreatmentSuppressed){
                                 ?>
-                                   <td style="text-align:center;font-size:11px;"><?php echo (isset($adult1stLineofRegimenSuppressed['totalSuppressed']))?$adult1stLineofRegimenSuppressed['totalSuppressed']:0; ?></td>
-                                   <td style="text-align:center;font-size:11px;"><?php echo(isset($adult1stLineofRegimenSuppressed['totalSuppressed']) && $adult1stLineofRegimenSuppressed['totalSuppressed'] >0)?round(((($adult1stLineofRegimenSuppressed['totalSuppressed']/($adult1stLineofRegimenSuppressed['totalSuppressed']+$adult1stLineofRegimenSuppressed['totalNotSuppressed']))*100)),2):''; ?></td>
-                                <?php } ?>
+                                   <td style="text-align:center;font-size:11px;"><?php echo (isset($adult1stLineofTreatmentSuppressed['totalSuppressed']))?$adult1stLineofTreatmentSuppressed['totalSuppressed']:0; ?></td>
+                                   <td style="text-align:center;font-size:11px;"><?php echo(isset($adult1stLineofTreatmentSuppressed['totalSuppressed']) && $adult1stLineofTreatmentSuppressed['totalSuppressed'] >0)?round(((($adult1stLineofTreatmentSuppressed['totalSuppressed']/($adult1stLineofTreatmentSuppressed['totalSuppressed']+$adult1stLineofTreatmentSuppressed['totalNotSuppressed']))*100)),2):''; ?></td>
+                                <?php } }?>
+                                <td style="text-align:center;font-size:11px;"><?php echo $totalAdult1stLineofTreatmentOthersSuppressed; ?></td>
+                                <td style="text-align:center;font-size:11px;"><?php echo ($totalAdult1stLineofTreatmentOthersSuppressed >0)?round((($totalAdult1stLineofTreatmentOthersSuppressed/($totalAdult1stLineofTreatmentOthersSuppressed+$totalAdult1stLineofTreatmentOthersNotSuppressed))*100),2):''; ?></td>
                               </tr>
                               <tr>
                                 <th style="text-align:center;font-size:11px;">Total</th>
                                 <?php
-                                foreach($firstLineofRegimenResult['adult1stLineofRegimenResult'] as $adult1stLineofRegimenGrandTotal){
-                                    $adult1stLineNotSuppressed = (isset($adult1stLineofRegimenGrandTotal['totalNotSuppressed']))?$adult1stLineofRegimenGrandTotal['totalNotSuppressed']:0;
-                                    $adult1stLineSuppressed = (isset($adult1stLineofRegimenGrandTotal['totalSuppressed']))?$adult1stLineofRegimenGrandTotal['totalSuppressed']:0;
+                                if(isset($allCollapsibleLineofTreatmentResult['adult1stLineofTreatmentResult']) && count($allCollapsibleLineofTreatmentResult['adult1stLineofTreatmentResult']) >0){
+                                  foreach($allCollapsibleLineofTreatmentResult['adult1stLineofTreatmentResult'] as $adult1stLineofTreatmentGrandTotal){
+                                    $adult1stLineNotSuppressed = (isset($adult1stLineofTreatmentGrandTotal['totalNotSuppressed']))?$adult1stLineofTreatmentGrandTotal['totalNotSuppressed']:0;
+                                    $adult1stLineSuppressed = (isset($adult1stLineofTreatmentGrandTotal['totalSuppressed']))?$adult1stLineofTreatmentGrandTotal['totalSuppressed']:0;
                                 ?>
                                    <td style="text-align:center;font-size:11px;"><?php echo $adult1stLineNotSuppressed+$adult1stLineSuppressed; ?></td>
                                    <td style="text-align:center;font-size:11px;"></td>
-                                <?php } ?>
+                                <?php } } ?>
+                                 <td style="text-align:center;font-size:11px;"><?php echo $totalAdult1stLineofTreatmentOthersNotSuppressed+$totalAdult1stLineofTreatmentOthersSuppressed; ?></td>
+                                 <td style="text-align:center;font-size:11px;"></td>
                               </tr>
                             </tbody>
                         </table>
-                        <?php
-                           $paeds1stLineofRegimenTotal = (isset($firstLineofRegimenResult['paeds1stLineofRegimenResult']) && count($firstLineofRegimenResult['paeds1stLineofRegimenResult']) >0)?(2*count($firstLineofRegimenResult['paeds1stLineofRegimenResult']))+1:0;
-                        ?>
+                        <?php $paeds1stLineofTreatmentTotal = (isset($allCollapsibleLineofTreatmentResult['paeds1stLineofTreatmentResult']) && count($allCollapsibleLineofTreatmentResult['paeds1stLineofTreatmentResult']) >0)?count($allCollapsibleLineofTreatmentResult['paeds1stLineofTreatmentResult']):0; ?>
                         <table class="table">
                             <thead>
                               <tr>
-                                <td colspan="<?php echo $paeds1stLineofRegimenTotal; ?>"></td>
+                                <td colspan="<?php echo ($paeds1stLineofTreatmentTotal > 0)?(2*$paeds1stLineofTreatmentTotal)+3:3; ?>"></td>
                               </tr>
                               <tr>
-                                <th colspan="<?php echo $paeds1stLineofRegimenTotal; ?>" style="text-align:center;font-size:11px;">1st Line (PAEDS)</th>
+                                <th colspan="<?php echo ($paeds1stLineofTreatmentTotal > 0)?(2*$paeds1stLineofTreatmentTotal)+3:3; ?>" style="text-align:center;font-size:11px;">1st Line (PAEDS)</th>
                               </tr>
                               <tr>
                                 <th></th>
                                 <?php
-                                foreach($firstLineofRegimenResult['paeds1stLineofRegimenResult'] as $paeds1stLineofRegimen){
+                                if(isset($allCollapsibleLineofTreatmentResult['paeds1stLineofTreatmentResult']) && count($allCollapsibleLineofTreatmentResult['paeds1stLineofTreatmentResult']) >0){
+                                   foreach($allCollapsibleLineofTreatmentResult['paeds1stLineofTreatmentResult'] as $paeds1stLineofTreatment){
                                 ?>
-                                   <th colspan="2" style="font-size:11px;"><?php echo $paeds1stLineofRegimen['current_regimen']; ?></th>
-                                <?php } ?>
+                                   <th colspan="2" style="font-size:11px;"><?php echo $paeds1stLineofTreatment['current_regimen']; ?></th>
+                                <?php } } ?>
+                                <th colspan="2" style="text-align:center;font-size:11px;">Others</th>
                               </tr>
                             </thead>
                             <tbody>
                               <tr>
                                 <th style="text-align:center;font-size:11px;">Results</th>
                                 <?php
-                                foreach($firstLineofRegimenResult['paeds1stLineofRegimenResult'] as $paeds1stLineofRegimenLabel){
+                                if(isset($allCollapsibleLineofTreatmentResult['paeds1stLineofTreatmentResult']) && count($allCollapsibleLineofTreatmentResult['paeds1stLineofTreatmentResult']) >0){
+                                    foreach($allCollapsibleLineofTreatmentResult['paeds1stLineofTreatmentResult'] as $paeds1stLineofTreatmentLabel){
                                 ?>
                                    <td style="text-align:center;font-size:11px;">#</td>
                                    <td style="text-align:center;font-size:11px;">%</td>
-                                <?php } ?>
+                                <?php } } ?>
+                                <td style="text-align:center;font-size:11px;">#</td>
+                                <td style="text-align:center;font-size:11px;">%</td>
                               </tr>
                               <tr>
                                 <td style="text-align:center;font-size:11px;">NS</td>
                                 <?php
-                                foreach($firstLineofRegimenResult['paeds1stLineofRegimenResult'] as $paeds1stLineofRegimenNotSuppressed){
+                                if(isset($allCollapsibleLineofTreatmentResult['paeds1stLineofTreatmentResult']) && count($allCollapsibleLineofTreatmentResult['paeds1stLineofTreatmentResult']) >0){
+                                    foreach($allCollapsibleLineofTreatmentResult['paeds1stLineofTreatmentResult'] as $paeds1stLineofTreatmentNotSuppressed){
                                 ?>
-                                    <td style="text-align:center;font-size:11px;"><?php echo (isset($paeds1stLineofRegimenNotSuppressed['totalNotSuppressed']))?$paeds1stLineofRegimenNotSuppressed['totalNotSuppressed']:0; ?></td>
-                                    <td style="text-align:center;font-size:11px;"><?php echo(isset($paeds1stLineofRegimenNotSuppressed['totalNotSuppressed']) && $paeds1stLineofRegimenNotSuppressed['totalNotSuppressed'] >0)?round(((($paeds1stLineofRegimenNotSuppressed['totalNotSuppressed']/($paeds1stLineofRegimenNotSuppressed['totalNotSuppressed']+$paeds1stLineofRegimenNotSuppressed['totalSuppressed']))*100)),2):''; ?></td>
-                                <?php } ?>
+                                    <td style="text-align:center;font-size:11px;"><?php echo (isset($paeds1stLineofTreatmentNotSuppressed['totalNotSuppressed']))?$paeds1stLineofTreatmentNotSuppressed['totalNotSuppressed']:0; ?></td>
+                                    <td style="text-align:center;font-size:11px;"><?php echo(isset($paeds1stLineofTreatmentNotSuppressed['totalNotSuppressed']) && $paeds1stLineofTreatmentNotSuppressed['totalNotSuppressed'] >0)?round(((($paeds1stLineofTreatmentNotSuppressed['totalNotSuppressed']/($paeds1stLineofTreatmentNotSuppressed['totalNotSuppressed']+$paeds1stLineofTreatmentNotSuppressed['totalSuppressed']))*100)),2):''; ?></td>
+                                <?php } } ?>
+                                <?php
+                                $totalPaeds1stLineofTreatmentOthersNotSuppressed = 0;
+                                $totalPaeds1stLineofTreatmentOthersSuppressed = 0;
+                                if(isset($allCollapsibleLineofTreatmentResult['paeds1stLineofTreatmentOthersResult']) && count($allCollapsibleLineofTreatmentResult['paeds1stLineofTreatmentOthersResult']) >0){
+                                    foreach($allCollapsibleLineofTreatmentResult['paeds1stLineofTreatmentOthersResult'] as $paeds1stLineofTreatmentOthersSuppressedNotSuppressed){
+                                        $totalPaeds1stLineofTreatmentOthersNotSuppressed+= $paeds1stLineofTreatmentOthersSuppressedNotSuppressed['totalNotSuppressed'];
+                                        $totalPaeds1stLineofTreatmentOthersSuppressed+= $paeds1stLineofTreatmentOthersSuppressedNotSuppressed['totalSuppressed'];
+                                    }
+                                }
+                                ?>
+                                <td style="text-align:center;font-size:11px;"><?php echo $totalPaeds1stLineofTreatmentOthersNotSuppressed; ?></td>
+                                <td style="text-align:center;font-size:11px;"><?php echo ($totalPaeds1stLineofTreatmentOthersNotSuppressed >0)?round((($totalPaeds1stLineofTreatmentOthersNotSuppressed/($totalPaeds1stLineofTreatmentOthersNotSuppressed+$totalPaeds1stLineofTreatmentOthersSuppressed))*100),2):''; ?></td>
                               </tr>
                               <tr>
                                 <td style="text-align:center;font-size:11px;">S</td>
                                 <?php
-                                foreach($firstLineofRegimenResult['paeds1stLineofRegimenResult'] as $paeds1stLineofRegimenSuppressed){
+                                if(isset($allCollapsibleLineofTreatmentResult['paeds1stLineofTreatmentResult']) && count($allCollapsibleLineofTreatmentResult['paeds1stLineofTreatmentResult']) >0){
+                                    foreach($allCollapsibleLineofTreatmentResult['paeds1stLineofTreatmentResult'] as $paeds1stLineofTreatmentSuppressed){
                                 ?>
-                                   <td style="text-align:center;font-size:11px;"><?php echo (isset($paeds1stLineofRegimenSuppressed['totalSuppressed']))?$paeds1stLineofRegimenSuppressed['totalSuppressed']:0; ?></td>
-                                   <td style="text-align:center;font-size:11px;"><?php echo(isset($paeds1stLineofRegimenSuppressed['totalSuppressed']) && $paeds1stLineofRegimenSuppressed['totalSuppressed'] >0)?round(((($paeds1stLineofRegimenSuppressed['totalSuppressed']/($paeds1stLineofRegimenSuppressed['totalSuppressed']+$paeds1stLineofRegimenSuppressed['totalNotSuppressed']))*100)),2):''; ?></td>
-                                <?php } ?>
+                                   <td style="text-align:center;font-size:11px;"><?php echo (isset($paeds1stLineofTreatmentSuppressed['totalSuppressed']))?$paeds1stLineofTreatmentSuppressed['totalSuppressed']:0; ?></td>
+                                   <td style="text-align:center;font-size:11px;"><?php echo(isset($paeds1stLineofTreatmentSuppressed['totalSuppressed']) && $paeds1stLineofTreatmentSuppressed['totalSuppressed'] >0)?round(((($paeds1stLineofTreatmentSuppressed['totalSuppressed']/($paeds1stLineofTreatmentSuppressed['totalSuppressed']+$paeds1stLineofTreatmentSuppressed['totalNotSuppressed']))*100)),2):''; ?></td>
+                                <?php } } ?>
+                                <td style="text-align:center;font-size:11px;"><?php echo $totalPaeds1stLineofTreatmentOthersSuppressed; ?></td>
+                                <td style="text-align:center;font-size:11px;"><?php echo ($totalPaeds1stLineofTreatmentOthersSuppressed >0)?round((($totalPaeds1stLineofTreatmentOthersSuppressed/($totalPaeds1stLineofTreatmentOthersSuppressed+$totalPaeds1stLineofTreatmentOthersNotSuppressed))*100),2):''; ?></td>
                               </tr>
                               <tr>
                                 <th style="text-align:center;font-size:11px;">Total</th>
                                 <?php
-                                foreach($firstLineofRegimenResult['paeds1stLineofRegimenResult'] as $paeds1stLineofRegimenTotal){
-                                    $paeds1stLineNotSuppressed = (isset($paeds1stLineofRegimenTotal['totalNotSuppressed']))?$paeds1stLineofRegimenTotal['totalNotSuppressed']:0;
-                                    $paeds1stLineSuppressed = (isset($paeds1stLineofRegimenTotal['totalSuppressed']))?$paeds1stLineofRegimenTotal['totalSuppressed']:0;
+                                if(isset($allCollapsibleLineofTreatmentResult['paeds1stLineofTreatmentResult']) && count($allCollapsibleLineofTreatmentResult['paeds1stLineofTreatmentResult']) >0){
+                                   foreach($allCollapsibleLineofTreatmentResult['paeds1stLineofTreatmentResult'] as $paeds1stLineofTreatmentTotal){
+                                    $paeds1stLineNotSuppressed = (isset($paeds1stLineofTreatmentTotal['totalNotSuppressed']))?$paeds1stLineofTreatmentTotal['totalNotSuppressed']:0;
+                                    $paeds1stLineSuppressed = (isset($paeds1stLineofTreatmentTotal['totalSuppressed']))?$paeds1stLineofTreatmentTotal['totalSuppressed']:0;
                                 ?>
                                    <td style="text-align:center;font-size:11px;"><?php echo $paeds1stLineNotSuppressed+$paeds1stLineSuppressed; ?></td>
                                    <td style="text-align:center;font-size:11px;"></td>
-                                <?php } ?>
+                                <?php } } ?>
+                                <td style="text-align:center;font-size:11px;"><?php echo $totalPaeds1stLineofTreatmentOthersNotSuppressed+$totalPaeds1stLineofTreatmentOthersSuppressed; ?></td>
+                                <td style="text-align:center;font-size:11px;"></td>
                               </tr>
                             </tbody>
                         </table>
+                        <hr style="border-bottom:1px solid #337ab7;">
+                        <?php $adult2ndLineofTreatmentTotal = (isset($allCollapsibleLineofTreatmentResult['adult2ndLineofTreatmentResult']) && count($allCollapsibleLineofTreatmentResult['adult2ndLineofTreatmentResult']) >0)?count($allCollapsibleLineofTreatmentResult['adult2ndLineofTreatmentResult']):0; ?>
+                        <table class="table">
+                            <thead>
+                              <tr>
+                                <td colspan="<?php echo ($adult2ndLineofTreatmentTotal > 0)?(2*$adult2ndLineofTreatmentTotal)+3:3; ?>" style="font-size:11px;">By second line regimens [Adult & Paeds] & Others</td>
+                              </tr>
+                              <tr>
+                                <th colspan="<?php echo ($adult2ndLineofTreatmentTotal > 0)?(2*$adult2ndLineofTreatmentTotal)+3:3; ?>" style="text-align:center;font-size:11px;">2nd Line (ADULT)</th>
+                              </tr>
+                              <tr>
+                                <th></th>
+                                <?php
+                                if(isset($allCollapsibleLineofTreatmentResult['adult2ndLineofTreatmentResult']) && count($allCollapsibleLineofTreatmentResult['adult2ndLineofTreatmentResult']) >0){
+                                   foreach($allCollapsibleLineofTreatmentResult['adult2ndLineofTreatmentResult'] as $adult2ndLineofTreatment){
+                                ?>
+                                   <th colspan="2" style="font-size:11px;"><?php echo $adult2ndLineofTreatment['current_regimen']; ?></th>
+                                <?php } }?>
+                                <th colspan="2" style="text-align:center;font-size:11px;">Others</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr>
+                                <th style="text-align:center;font-size:11px;">Results</th>
+                                <?php
+                                if(isset($allCollapsibleLineofTreatmentResult['adult2ndLineofTreatmentResult']) && count($allCollapsibleLineofTreatmentResult['adult2ndLineofTreatmentResult']) >0){
+                                   foreach($allCollapsibleLineofTreatmentResult['adult2ndLineofTreatmentResult'] as $adult2ndLineofTreatmentLabel){
+                                ?>
+                                   <td style="text-align:center;font-size:11px;">#</td>
+                                   <td style="text-align:center;font-size:11px;">%</td>
+                                <?php } } ?>
+                                <td style="text-align:center;font-size:11px;">#</td>
+                                <td style="text-align:center;font-size:11px;">%</td>
+                              </tr>
+                              <tr>
+                                <td style="text-align:center;font-size:11px;">NS</td>
+                                <?php
+                                if(isset($allCollapsibleLineofTreatmentResult['adult2ndLineofTreatmentResult']) && count($allCollapsibleLineofTreatmentResult['adult2ndLineofTreatmentResult']) >0){
+                                    foreach($allCollapsibleLineofTreatmentResult['adult2ndLineofTreatmentResult'] as $adult2ndLineofTreatmentNotSuppressed){
+                                ?>
+                                    <td style="text-align:center;font-size:11px;"><?php echo (isset($adult2ndLineofTreatmentNotSuppressed['totalNotSuppressed']))?$adult2ndLineofTreatmentNotSuppressed['totalNotSuppressed']:0; ?></td>
+                                    <td style="text-align:center;font-size:11px;"><?php echo(isset($adult2ndLineofTreatmentNotSuppressed['totalNotSuppressed']) && $adult2ndLineofTreatmentNotSuppressed['totalNotSuppressed'] >0)?round(((($adult2ndLineofTreatmentNotSuppressed['totalNotSuppressed']/($adult2ndLineofTreatmentNotSuppressed['totalNotSuppressed']+$adult2ndLineofTreatmentNotSuppressed['totalSuppressed']))*100)),2):''; ?></td>
+                                <?php } } ?>
+                                <?php
+                                $totalAdult2ndLineofTreatmentOthersNotSuppressed = 0;
+                                $totalAdult2ndLineofTreatmentOthersSuppressed = 0;
+                                if(isset($allCollapsibleLineofTreatmentResult['adult2ndLineofTreatmentOthersResult']) && count($allCollapsibleLineofTreatmentResult['adult2ndLineofTreatmentOthersResult']) >0){
+                                    foreach($allCollapsibleLineofTreatmentResult['adult2ndLineofTreatmentOthersResult'] as $adult2ndLineofTreatmentOthersNotSuppressed){
+                                        $totalAdult2ndLineofTreatmentOthersNotSuppressed+= $adult2ndLineofTreatmentOthersNotSuppressed['totalNotSuppressed'];
+                                        $totalAdult2ndLineofTreatmentOthersSuppressed+= $adult2ndLineofTreatmentOthersNotSuppressed['totalSuppressed'];
+                                    }
+                                }
+                                ?>
+                                <td style="text-align:center;font-size:11px;"><?php echo $totalAdult2ndLineofTreatmentOthersNotSuppressed; ?></td>
+                                <td style="text-align:center;font-size:11px;"><?php echo ($totalAdult2ndLineofTreatmentOthersNotSuppressed >0)?round((($totalAdult2ndLineofTreatmentOthersNotSuppressed/($totalAdult2ndLineofTreatmentOthersNotSuppressed+$totalAdult2ndLineofTreatmentOthersSuppressed))*100),2):''; ?></td>
+                              </tr>
+                              <tr>
+                                <td style="text-align:center;font-size:11px;">S</td>
+                                <?php
+                                if(isset($allCollapsibleLineofTreatmentResult['adult2ndLineofTreatmentResult']) && count($allCollapsibleLineofTreatmentResult['adult2ndLineofTreatmentResult']) >0){
+                                    foreach($allCollapsibleLineofTreatmentResult['adult2ndLineofTreatmentResult'] as $adult2ndLineofTreatmentSuppressed){
+                                ?>
+                                   <td style="text-align:center;font-size:11px;"><?php echo (isset($adult2ndLineofTreatmentSuppressed['totalSuppressed']))?$adult2ndLineofTreatmentSuppressed['totalSuppressed']:0; ?></td>
+                                   <td style="text-align:center;font-size:11px;"><?php echo(isset($adult2ndLineofTreatmentSuppressed['totalSuppressed']) && $adult2ndLineofTreatmentSuppressed['totalSuppressed'] >0)?round(((($adult2ndLineofTreatmentSuppressed['totalSuppressed']/($adult2ndLineofTreatmentSuppressed['totalSuppressed']+$adult2ndLineofTreatmentSuppressed['totalNotSuppressed']))*100)),2):''; ?></td>
+                                <?php } }?>
+                                <td style="text-align:center;font-size:11px;"><?php echo $totalAdult2ndLineofTreatmentOthersSuppressed; ?></td>
+                                <td style="text-align:center;font-size:11px;"><?php echo ($totalAdult2ndLineofTreatmentOthersSuppressed >0)?round((($totalAdult2ndLineofTreatmentOthersSuppressed/($totalAdult2ndLineofTreatmentOthersSuppressed+$totalAdult2ndLineofTreatmentOthersNotSuppressed))*100),2):''; ?></td>
+                              </tr>
+                              <tr>
+                                <th style="text-align:center;font-size:11px;">Total</th>
+                                <?php
+                                if(isset($allCollapsibleLineofTreatmentResult['adult2ndLineofTreatmentResult']) && count($allCollapsibleLineofTreatmentResult['adult2ndLineofTreatmentResult']) >0){
+                                  foreach($allCollapsibleLineofTreatmentResult['adult2ndLineofTreatmentResult'] as $adult2ndLineofTreatmentGrandTotal){
+                                    $adult2ndLineNotSuppressed = (isset($adult2ndLineofTreatmentGrandTotal['totalNotSuppressed']))?$adult2ndLineofTreatmentGrandTotal['totalNotSuppressed']:0;
+                                    $adult2ndLineSuppressed = (isset($adult2ndLineofTreatmentGrandTotal['totalSuppressed']))?$adult2ndLineofTreatmentGrandTotal['totalSuppressed']:0;
+                                ?>
+                                   <td style="text-align:center;font-size:11px;"><?php echo $adult2ndLineNotSuppressed+$adult2ndLineSuppressed; ?></td>
+                                   <td style="text-align:center;font-size:11px;"></td>
+                                <?php } } ?>
+                                 <td style="text-align:center;font-size:11px;"><?php echo $totalAdult2ndLineofTreatmentOthersNotSuppressed+$totalAdult2ndLineofTreatmentOthersSuppressed; ?></td>
+                                 <td style="text-align:center;font-size:11px;"></td>
+                              </tr>
+                            </tbody>
+                        </table>
+                        <?php $paeds2ndLineofTreatmentTotal = (isset($allCollapsibleLineofTreatmentResult['paeds2ndLineofTreatmentResult']) && count($allCollapsibleLineofTreatmentResult['paeds2ndLineofTreatmentResult']) >0)?count($allCollapsibleLineofTreatmentResult['paeds2ndLineofTreatmentResult']):0; ?>
+                        <table class="table">
+                            <thead>
+                              <tr>
+                                <td colspan="<?php echo ($paeds2ndLineofTreatmentTotal > 0)?(2*$paeds2ndLineofTreatmentTotal)+3:3; ?>"></td>
+                              </tr>
+                              <tr>
+                                <th colspan="<?php echo ($paeds2ndLineofTreatmentTotal > 0)?(2*$paeds2ndLineofTreatmentTotal)+3:3; ?>" style="text-align:center;font-size:11px;">2nd Line (PAEDS)</th>
+                              </tr>
+                              <tr>
+                                <th></th>
+                                <?php
+                                if(isset($allCollapsibleLineofTreatmentResult['paeds2ndLineofTreatmentResult']) && count($allCollapsibleLineofTreatmentResult['paeds2ndLineofTreatmentResult']) >0){
+                                   foreach($allCollapsibleLineofTreatmentResult['paeds2ndLineofTreatmentResult'] as $paeds2ndLineofTreatment){
+                                ?>
+                                   <th colspan="2" style="font-size:11px;"><?php echo $paeds2ndLineofTreatment['current_regimen']; ?></th>
+                                <?php } } ?>
+                                <th colspan="2" style="text-align:center;font-size:11px;">Others</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr>
+                                <th style="text-align:center;font-size:11px;">Results</th>
+                                <?php
+                                if(isset($allCollapsibleLineofTreatmentResult['paeds2ndLineofTreatmentResult']) && count($allCollapsibleLineofTreatmentResult['paeds2ndLineofTreatmentResult']) >0){
+                                    foreach($allCollapsibleLineofTreatmentResult['paeds2ndLineofTreatmentResult'] as $paeds2ndLineofTreatmentLabel){
+                                ?>
+                                   <td style="text-align:center;font-size:11px;">#</td>
+                                   <td style="text-align:center;font-size:11px;">%</td>
+                                <?php } } ?>
+                                <td style="text-align:center;font-size:11px;">#</td>
+                                <td style="text-align:center;font-size:11px;">%</td>
+                              </tr>
+                              <tr>
+                                <td style="text-align:center;font-size:11px;">NS</td>
+                                <?php
+                                if(isset($allCollapsibleLineofTreatmentResult['paeds2ndLineofTreatmentResult']) && count($allCollapsibleLineofTreatmentResult['paeds2ndLineofTreatmentResult']) >0){
+                                    foreach($allCollapsibleLineofTreatmentResult['paeds2ndLineofTreatmentResult'] as $paeds2ndLineofTreatmentNotSuppressed){
+                                ?>
+                                    <td style="text-align:center;font-size:11px;"><?php echo (isset($paeds2ndLineofTreatmentNotSuppressed['totalNotSuppressed']))?$paeds2ndLineofTreatmentNotSuppressed['totalNotSuppressed']:0; ?></td>
+                                    <td style="text-align:center;font-size:11px;"><?php echo(isset($paeds2ndLineofTreatmentNotSuppressed['totalNotSuppressed']) && $paeds2ndLineofTreatmentNotSuppressed['totalNotSuppressed'] >0)?round(((($paeds2ndLineofTreatmentNotSuppressed['totalNotSuppressed']/($paeds2ndLineofTreatmentNotSuppressed['totalNotSuppressed']+$paeds2ndLineofTreatmentNotSuppressed['totalSuppressed']))*100)),2):''; ?></td>
+                                <?php } } ?>
+                                <?php
+                                $totalPaeds2ndLineofTreatmentOthersNotSuppressed = 0;
+                                $totalPaeds2ndLineofTreatmentOthersSuppressed = 0;
+                                if(isset($allCollapsibleLineofTreatmentResult['paeds2ndLineofTreatmentOthersResult']) && count($allCollapsibleLineofTreatmentResult['paeds2ndLineofTreatmentOthersResult']) >0){
+                                    foreach($allCollapsibleLineofTreatmentResult['paeds2ndLineofTreatmentOthersResult'] as $paeds2ndLineofTreatmentOthersSuppressedNotSuppressed){
+                                        $totalPaeds2ndLineofTreatmentOthersNotSuppressed+= $paeds2ndLineofTreatmentOthersSuppressedNotSuppressed['totalNotSuppressed'];
+                                        $totalPaeds2ndLineofTreatmentOthersSuppressed+= $paeds2ndLineofTreatmentOthersSuppressedNotSuppressed['totalSuppressed'];
+                                    }
+                                }
+                                ?>
+                                <td style="text-align:center;font-size:11px;"><?php echo $totalPaeds2ndLineofTreatmentOthersNotSuppressed; ?></td>
+                                <td style="text-align:center;font-size:11px;"><?php echo ($totalPaeds2ndLineofTreatmentOthersNotSuppressed >0)?round((($totalPaeds2ndLineofTreatmentOthersNotSuppressed/($totalPaeds2ndLineofTreatmentOthersNotSuppressed+$totalPaeds2ndLineofTreatmentOthersSuppressed))*100),2):''; ?></td>
+                              </tr>
+                              <tr>
+                                <td style="text-align:center;font-size:11px;">S</td>
+                                <?php
+                                if(isset($allCollapsibleLineofTreatmentResult['paeds2ndLineofTreatmentResult']) && count($allCollapsibleLineofTreatmentResult['paeds2ndLineofTreatmentResult']) >0){
+                                    foreach($allCollapsibleLineofTreatmentResult['paeds2ndLineofTreatmentResult'] as $paeds2ndLineofTreatmentSuppressed){
+                                ?>
+                                   <td style="text-align:center;font-size:11px;"><?php echo (isset($paeds2ndLineofTreatmentSuppressed['totalSuppressed']))?$paeds2ndLineofTreatmentSuppressed['totalSuppressed']:0; ?></td>
+                                   <td style="text-align:center;font-size:11px;"><?php echo(isset($paeds2ndLineofTreatmentSuppressed['totalSuppressed']) && $paeds2ndLineofTreatmentSuppressed['totalSuppressed'] >0)?round(((($paeds2ndLineofTreatmentSuppressed['totalSuppressed']/($paeds2ndLineofTreatmentSuppressed['totalSuppressed']+$paeds2ndLineofTreatmentSuppressed['totalNotSuppressed']))*100)),2):''; ?></td>
+                                <?php } } ?>
+                                <td style="text-align:center;font-size:11px;"><?php echo $totalPaeds2ndLineofTreatmentOthersSuppressed; ?></td>
+                                <td style="text-align:center;font-size:11px;"><?php echo ($totalPaeds2ndLineofTreatmentOthersSuppressed >0)?round((($totalPaeds2ndLineofTreatmentOthersSuppressed/($totalPaeds2ndLineofTreatmentOthersSuppressed+$totalPaeds2ndLineofTreatmentOthersNotSuppressed))*100),2):''; ?></td>
+                              </tr>
+                              <tr>
+                                <th style="text-align:center;font-size:11px;">Total</th>
+                                <?php
+                                if(isset($allCollapsibleLineofTreatmentResult['paeds2ndLineofTreatmentResult']) && count($allCollapsibleLineofTreatmentResult['paeds2ndLineofTreatmentResult']) >0){
+                                   foreach($allCollapsibleLineofTreatmentResult['paeds2ndLineofTreatmentResult'] as $paeds2ndLineofTreatmentTotal){
+                                    $paeds2ndLineNotSuppressed = (isset($paeds2ndLineofTreatmentTotal['totalNotSuppressed']))?$paeds2ndLineofTreatmentTotal['totalNotSuppressed']:0;
+                                    $paeds2ndLineSuppressed = (isset($paeds2ndLineofTreatmentTotal['totalSuppressed']))?$paeds2ndLineofTreatmentTotal['totalSuppressed']:0;
+                                ?>
+                                   <td style="text-align:center;font-size:11px;"><?php echo $paeds2ndLineNotSuppressed+$paeds2ndLineSuppressed; ?></td>
+                                   <td style="text-align:center;font-size:11px;"></td>
+                                <?php } } ?>
+                                <td style="text-align:center;font-size:11px;"><?php echo $totalPaeds2ndLineofTreatmentOthersNotSuppressed+$totalPaeds2ndLineofTreatmentOthersSuppressed; ?></td>
+                                <td style="text-align:center;font-size:11px;"></td>
+                              </tr>
+                            </tbody>
+                        </table>
+                        <hr style="border-bottom:1px solid #337ab7;">
                     </div>
                 </div>
             </div>
@@ -746,18 +959,18 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
                             <thead>
                                 <tr>
                                     <th> <?php echo $this->translate('Months'); ?> </th>
-                                    <th> <?php echo $this->translate('Jan \'17'); ?> </th>
-                                    <th> <?php echo $this->translate('Feb \'17'); ?> </th>
-                                    <th> <?php echo $this->translate('Mar \'17'); ?> </th>
-                                    <th> <?php echo $this->translate('Apr \'17'); ?> </th>
-                                    <th> <?php echo $this->translate('May \'17'); ?> </th>
-                                    <th> <?php echo $this->translate('jun \'17'); ?> </th>
-                                    <th> <?php echo $this->translate('Jul \'17'); ?> </th>
-                                    <th> <?php echo $this->translate('Aug \'17'); ?> </th>
-                                    <th> <?php echo $this->translate('Sep \'17'); ?> </th>
-                                    <th> <?php echo $this->translate('Oct \'17'); ?> </th>
-                                    <th> <?php echo $this->translate('Nov \'17'); ?> </th>
-                                    <th> <?php echo $this->translate('Dec \'17'); ?> </th>
+                                    <th> Jan '<?php echo date('y');?> </th>
+                                    <th> Feb '<?php echo date('y');?> </th>
+                                    <th> Mar '<?php echo date('y');?> </th>
+                                    <th> Apr '<?php echo date('y');?> </th>
+                                    <th> May '<?php echo date('y');?> </th>
+                                    <th> jun '<?php echo date('y');?> </th>
+                                    <th> Jul '<?php echo date('y');?> </th>
+                                    <th> Aug '<?php echo date('y');?> </th>
+                                    <th> Sep '<?php echo date('y');?> </th>
+                                    <th> Oct '<?php echo date('y');?> </th>
+                                    <th> Nov '<?php echo date('y');?> </th>
+                                    <th> Dec '<?php echo date('y');?> </th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -815,7 +1028,8 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
                     "scrollX": true,
                     "aoColumns": [
                         {"sClass":"center"},
-                        {"sClass":"center"},
+                        {"sClass":"center","bSortable":false},
+                        {"sClass":"center","bSortable":false},
                         {"sClass":"center","bSortable":false},
                         {"sClass":"center","bSortable":false},
                         {"sClass":"center","bSortable":false},
@@ -838,13 +1052,13 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
                 });
             }
             
-            
             function facilityWiseSamplesReceivedSummaryFn(){
                 oTableSamplesReceivedFacility = $('#samplesReceivedFacility').DataTable( {
                     "bProcessing": true,
                     "bServerSide": true,
                     "scrollX": true,
                     "aoColumns": [
+                        {"sClass":"center"},
                         {"sClass":"center"},
                         {"sClass":"center","bSortable":false},
                         {"sClass":"center","bSortable":false},
@@ -877,7 +1091,7 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
                     "scrollX": true,
                     "aoColumns": [
                         {"sClass":"center"},
-                        {"sClass":"center"},
+                        {"sClass":"center","bSortable":false},
                         {"sClass":"center","bSortable":false},
                         {"sClass":"center","bSortable":false},
                         {"sClass":"center","bSortable":false}
@@ -962,7 +1176,7 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
                     "scrollX": true,
                     "aoColumns": [
                         {"sClass":"center"},
-                        {"sClass":"center","bSortable":false},
+                        {"sClass":"center"},
                         {"sClass":"center","bSortable":false},
                         {"sClass":"center","bSortable":false}
                         ],

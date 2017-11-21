@@ -88,13 +88,13 @@ class SummaryService {
       return $sampleDb->fetchRegimenGroupBarChartDetails($params);
     }
     
-    public function getAllLineOfRegimenDetails(){
+    public function getAllLineOfTreatmentDetails(){
         $sampleDb = $this->sm->get('SampleTable');
-      return $sampleDb->fetchAllLineOfRegimenDetails();
+      return $sampleDb->fetchAllLineOfTreatmentDetails();
     }
     
-    public function getAdult1stLineOfRegimenDetails(){
+    public function getAllCollapsibleLineOfTreatmentDetails(){
         $sampleDb = $this->sm->get('SampleTable');
-      return $sampleDb->fetchAdult1stLineOfRegimenDetails();
+      return $sampleDb->fetchAllCollapsibleLineOfTreatmentDetails();
     }
 }

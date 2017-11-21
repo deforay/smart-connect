@@ -4064,7 +4064,6 @@ class SampleTable extends AbstractTableGateway {
      * Details Tab Details Data like
         * Total samples
         * % of Suppressed
-    
     */
     public function getSummaryTabDetails(){
         $logincontainer = new Container('credo');
@@ -4097,7 +4096,7 @@ class SampleTable extends AbstractTableGateway {
          * you want to insert a non-database field (for example a counter or static image)
         */
         $aColumns = array('f_d_l_d.location_name');
-        $orderColumns = array('f_d_l_d.location_name');
+        $orderColumns = array('f_d_l_d.location_name','f_d_l_d.location_id','f_d_l_d.location_id','f_d_l_d.location_id','f_d_l_d.location_id','f_d_l_d.location_id','f_d_l_d.location_id','f_d_l_d.location_id');
 
         /*
          * Paging
@@ -4186,18 +4185,16 @@ class SampleTable extends AbstractTableGateway {
                                                 "total_samples_tested" => new Expression("(SUM(CASE WHEN (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END))"),
                                                 "total_samples_pending" => new Expression("(SUM(CASE WHEN (sample_tested_datetime is null OR sample_tested_datetime = '' OR DATE(sample_tested_datetime) ='1970-01-01' OR DATE(sample_tested_datetime) ='0000-00-00' OR DATE(sample_tested_datetime) ='0') THEN 1 ELSE 0 END))"),
                                                 "total_samples_rejected" => new Expression("(SUM(CASE WHEN (reason_for_sample_rejection !='' AND reason_for_sample_rejection !='0' AND reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END))"),
-                                                "total_dbs_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (sample_name='Dry Blood Spot') THEN 1 ELSE 0 END)/COUNT(*))*100),2)"),
-                                                "total_plasma_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (sample_name='Plasma') THEN 1 ELSE 0 END)/COUNT(*))*100),2)")
+                                                "total_dbs_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (sample_type = 2) THEN 1 ELSE 0 END)/COUNT(*))*100),2)"),
+                                                "total_plasma_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (sample_type = 11) THEN 1 ELSE 0 END)/COUNT(*))*100),2)"),
+                                                "total_others_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (sample_type IS NOT NULL AND sample_type!= '' AND sample_type!= 2 AND sample_type!= 11) THEN 1 ELSE 0 END)/COUNT(*))*100),2)")
                                                 )
                                           )
-                                //->join(array('rss'=>'r_sample_status'),'rss.status_id=vl.result_status',array('status_name'))
-                                ->join(array('f'=>'facility_details'),'f.facility_id=vl.facility_id',array('facility_name'),'left')
-                                ->join(array('f_d_l_d'=>'location_details'),'f_d_l_d.location_id=f.facility_district',array('district'=>'location_name'),'left')
-                                ->join(array('rs'=>'r_sample_type'),'rs.sample_id=vl.sample_type',array('sample_name'),'left')
+                                ->join(array('f'=>'facility_details'),'f.facility_id=vl.facility_id',array('facility_name'))
+                                ->join(array('f_d_l_d'=>'location_details'),'f_d_l_d.location_id=f.facility_district',array('district'=>'location_name'))
+                                ->join(array('rs'=>'r_sample_type'),'rs.sample_id=vl.sample_type',array('sample_name'))
                                 ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date != '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')")
                                 ->group('f.facility_district');
-                                //->having('COUNT(*) > 1');
-                                
         if (isset($sWhere) && $sWhere != "") {
             $sQuery->where($sWhere);
         }
@@ -4234,13 +4231,14 @@ class SampleTable extends AbstractTableGateway {
                                                 "total_samples_tested" => new Expression("(SUM(CASE WHEN (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END))"),
                                                 "total_samples_pending" => new Expression("(SUM(CASE WHEN (sample_tested_datetime is null OR sample_tested_datetime = '' OR DATE(sample_tested_datetime) ='1970-01-01' OR DATE(sample_tested_datetime) ='0000-00-00' OR DATE(sample_tested_datetime) ='0') THEN 1 ELSE 0 END))"),
                                                 "total_samples_rejected" => new Expression("(SUM(CASE WHEN (reason_for_sample_rejection !='' AND reason_for_sample_rejection !='0' AND reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END))"),
-                                                "total_dbs_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (sample_name='Dry Blood Spot') THEN 1 ELSE 0 END)/COUNT(*))*100),2)"),
-                                                "total_plasma_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (sample_name='Plasma') THEN 1 ELSE 0 END)/COUNT(*))*100),2)")
+                                                "total_dbs_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (sample_type = 2) THEN 1 ELSE 0 END)/COUNT(*))*100),2)"),
+                                                "total_plasma_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (sample_type = 11) THEN 1 ELSE 0 END)/COUNT(*))*100),2)"),
+                                                "total_others_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (sample_type IS NOT NULL AND sample_type!= '' AND sample_type!= 2 AND sample_type!= 11) THEN 1 ELSE 0 END)/COUNT(*))*100),2)")
                                                 )
-                                          )                                
-                                ->join(array('f'=>'facility_details'),'f.facility_id=vl.facility_id',array('facility_name'),'left')
-                                ->join(array('f_d_l_d'=>'location_details'),'f_d_l_d.location_id=f.facility_district',array('district'=>'location_name'),'left')
-                                ->join(array('rs'=>'r_sample_type'),'rs.sample_id=vl.sample_type',array('sample_name'),'left')
+                                          )
+                                ->join(array('f'=>'facility_details'),'f.facility_id=vl.facility_id',array('facility_name'))
+                                ->join(array('f_d_l_d'=>'location_details'),'f_d_l_d.location_id=f.facility_district',array('district'=>'location_name'))
+                                ->join(array('rs'=>'r_sample_type'),'rs.sample_id=vl.sample_type',array('sample_name'))
                                 ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date != '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')")
                                 ->group('f.facility_district');
         $iQueryStr = $sql->getSqlStringForSqlObject($iQuery);
@@ -4255,18 +4253,16 @@ class SampleTable extends AbstractTableGateway {
         );
         
         foreach ($rResult as $aRow) {
-           
             $row = array();
             
-            $row[]=$aRow['district'];            
-            $row[]=$aRow['total_samples_received'];            
+            $row[]=$aRow['district'];         
+            $row[]=$aRow['total_samples_received'];    
             $row[]=$aRow['total_samples_tested'];            
             $row[]=$aRow['total_samples_pending'];            
             $row[]=$aRow['total_samples_rejected'];            
             $row[]=$aRow['total_dbs_percentage'].'%';            
-            $row[]=$aRow['total_plasma_percentage'].'%';            
-            
-           
+            $row[]=$aRow['total_plasma_percentage'].'%';
+            $row[]=$aRow['total_others_percentage'].'%';
             $output['aaData'][] = $row;
         }
        return $output;
@@ -4277,7 +4273,7 @@ class SampleTable extends AbstractTableGateway {
          * you want to insert a non-database field (for example a counter or static image)
         */
         $aColumns = array('f_d_l_d.location_name','facility_name');
-        $orderColumns = array('f_d_l_d.location_name','facility_name');
+        $orderColumns = array('f_d_l_d.location_name','facility_name','f_d_l_d.location_id','f_d_l_d.location_id','f_d_l_d.location_id','f_d_l_d.location_id','f_d_l_d.location_id','f_d_l_d.location_id','f_d_l_d.location_id');
 
         /*
          * Paging
@@ -4366,18 +4362,16 @@ class SampleTable extends AbstractTableGateway {
                                                 "total_samples_tested" => new Expression("(SUM(CASE WHEN (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END))"),
                                                 "total_samples_pending" => new Expression("(SUM(CASE WHEN (sample_tested_datetime is null OR sample_tested_datetime = '' OR DATE(sample_tested_datetime) ='1970-01-01' OR DATE(sample_tested_datetime) ='0000-00-00' OR DATE(sample_tested_datetime) ='0') THEN 1 ELSE 0 END))"),
                                                 "total_samples_rejected" => new Expression("(SUM(CASE WHEN (reason_for_sample_rejection !='' AND reason_for_sample_rejection !='0' AND reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END))"),
-                                                "total_dbs_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (sample_name='Dry Blood Spot') THEN 1 ELSE 0 END)/COUNT(*))*100),2)"),
-                                                "total_plasma_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (sample_name='Plasma') THEN 1 ELSE 0 END)/COUNT(*))*100),2)")
+                                                "total_dbs_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (sample_type = 2) THEN 1 ELSE 0 END)/COUNT(*))*100),2)"),
+                                                "total_plasma_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (sample_type = 11) THEN 1 ELSE 0 END)/COUNT(*))*100),2)"),
+                                                "total_others_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (sample_type IS NOT NULL AND sample_type!= '' AND sample_type!= 2 AND sample_type!= 11) THEN 1 ELSE 0 END)/COUNT(*))*100),2)")
                                                 )
                                           )
-                                //->join(array('rss'=>'r_sample_status'),'rss.status_id=vl.result_status',array('status_name'))
-                                ->join(array('f'=>'facility_details'),'f.facility_id=vl.facility_id',array('facility_name'),'left')
-                                ->join(array('f_d_l_d'=>'location_details'),'f_d_l_d.location_id=f.facility_district',array('district'=>'location_name'),'left')
-                                ->join(array('rs'=>'r_sample_type'),'rs.sample_id=vl.sample_type',array('sample_name'),'left')
+                                ->join(array('f'=>'facility_details'),'f.facility_id=vl.facility_id',array('facility_name'))
+                                ->join(array('f_d_l_d'=>'location_details'),'f_d_l_d.location_id=f.facility_district',array('district'=>'location_name'))
+                                ->join(array('rs'=>'r_sample_type'),'rs.sample_id=vl.sample_type',array('sample_name'))
                                 ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date != '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')")
                                 ->group('vl.facility_id');
-                                //->having('COUNT(*) > 1');
-                                
         if (isset($sWhere) && $sWhere != "") {
             $sQuery->where($sWhere);
         }
@@ -4414,14 +4408,14 @@ class SampleTable extends AbstractTableGateway {
                                                 "total_samples_tested" => new Expression("(SUM(CASE WHEN (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END))"),
                                                 "total_samples_pending" => new Expression("(SUM(CASE WHEN (sample_tested_datetime is null OR sample_tested_datetime = '' OR DATE(sample_tested_datetime) ='1970-01-01' OR DATE(sample_tested_datetime) ='0000-00-00' OR DATE(sample_tested_datetime) ='0') THEN 1 ELSE 0 END))"),
                                                 "total_samples_rejected" => new Expression("(SUM(CASE WHEN (reason_for_sample_rejection !='' AND reason_for_sample_rejection !='0' AND reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END))"),
-                                                "total_dbs_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (sample_name='Dry Blood Spot') THEN 1 ELSE 0 END)/COUNT(*))*100),2)"),
-                                                "total_plasma_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (sample_name='Plasma') THEN 1 ELSE 0 END)/COUNT(*))*100),2)")
+                                                "total_dbs_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (sample_type = 2) THEN 1 ELSE 0 END)/COUNT(*))*100),2)"),
+                                                "total_plasma_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (sample_type = 11) THEN 1 ELSE 0 END)/COUNT(*))*100),2)"),
+                                                "total_others_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (sample_type IS NOT NULL AND sample_type!= '' AND sample_type!= 2 AND sample_type!= 11) THEN 1 ELSE 0 END)/COUNT(*))*100),2)")
                                                 )
                                           )
-                                //->join(array('rss'=>'r_sample_status'),'rss.status_id=vl.result_status',array('status_name'))
-                                ->join(array('f'=>'facility_details'),'f.facility_id=vl.facility_id',array('facility_name'),'left')
-                                ->join(array('f_d_l_d'=>'location_details'),'f_d_l_d.location_id=f.facility_district',array('district'=>'location_name'),'left')
-                                ->join(array('rs'=>'r_sample_type'),'rs.sample_id=vl.sample_type',array('sample_name'),'left')
+                                ->join(array('f'=>'facility_details'),'f.facility_id=vl.facility_id',array('facility_name'))
+                                ->join(array('f_d_l_d'=>'location_details'),'f_d_l_d.location_id=f.facility_district',array('district'=>'location_name'))
+                                ->join(array('rs'=>'r_sample_type'),'rs.sample_id=vl.sample_type',array('sample_name'))
                                 ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date != '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')")
                                 ->group('vl.facility_id');
         $iQueryStr = $sql->getSqlStringForSqlObject($iQuery);
@@ -4437,17 +4431,16 @@ class SampleTable extends AbstractTableGateway {
         
         foreach ($rResult as $aRow) {
             $row = array();
-            
             $row[]=$aRow['district'];            
             $row[]=$aRow['facility_name'];            
-            $row[]=$aRow['total_samples_received'];            
+            $row[]=$aRow['total_samples_received'];          
             $row[]=$aRow['total_samples_tested'];            
             $row[]=$aRow['total_samples_pending'];            
             $row[]=$aRow['total_samples_rejected'];            
             $row[]=$aRow['total_dbs_percentage'].'%';            
-            $row[]=$aRow['total_plasma_percentage'].'%';            
+            $row[]=$aRow['total_plasma_percentage'].'%';
+            $row[]=$aRow['total_others_percentage'].'%';
             
-           
             $output['aaData'][] = $row;
         }
        return $output;
@@ -4456,11 +4449,15 @@ class SampleTable extends AbstractTableGateway {
     public function fetchSamplesReceivedGraphDetails($params){
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
+        $result=array();
         $common = new CommonService($this->sm);
-        $startMonth = date('Y')."-01-01";
-        $endMonth = date('Y')."-12-31";
-        $sQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
-                                ->columns(
+        $start = strtotime(date("Y", strtotime("-1 year")).'-'.date('m', strtotime('+1 month', strtotime('-1 year'))));
+        $end = strtotime(date('Y').'-'.date('m'));
+        $j=0;
+        while($start <= $end){
+            $month = date('m', $start);$year = date('Y', $start);$monthYearFormat = date("M-Y", $start);
+            $sQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
+                                    ->columns(
                                           array(
                                                 "monthDate" => new Expression("DATE_FORMAT(DATE(sample_collection_date), '%b-%Y')"),
                                                 "total_dbs" => new Expression("SUM(CASE WHEN (sample_type=2) THEN 1 ELSE 0 END)"),
@@ -4468,40 +4465,30 @@ class SampleTable extends AbstractTableGateway {
                                                 "total_others" => new Expression("SUM(CASE WHEN (sample_type!= 2 AND sample_type!= 11 AND sample_type IS NOT NULL AND sample_type!= '') THEN 1 ELSE 0 END)")
                                                 )
                                           )                                
-                                ->join(array('rs'=>'r_sample_type'),'rs.sample_id=vl.sample_type',array('sample_name'),'left')
-                               
-                            ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date != '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')
-                                    AND DATE(sample_collection_date) >= '".$startMonth."' 
-                                    AND DATE(sample_collection_date) <= '".$endMonth."'")
-                            ->group(array(new Expression("DATE_FORMAT(DATE(sample_collection_date), '%b-%Y')")))  
-                            ->order(array(new Expression('DATE(sample_collection_date)')));   
-            
+                                    ->join(array('rs'=>'r_sample_type'),'rs.sample_id=vl.sample_type',array('sample_name'))
+                                    ->where("Month(sample_collection_date)='".$month."' AND Year(sample_collection_date)='".$year."'");
             $queryStr = $sql->getSqlStringForSqlObject($sQuery);
             //echo $queryStr;die;
             //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             $sampleResult = $common->cacheQuery($queryStr,$dbAdapter);
-            $j=0;
-            $result=array();
-            foreach($sampleResult as $sRow){
-                if($sRow["monthDate"] == null) continue;
-                $result['sampleName']['dbs'][$j] = (isset($sRow["total_dbs"]))?$sRow["total_dbs"]:0;
-                $result['sampleName']['plasma'][$j] = (isset($sRow["total_plasma"]))?$sRow["total_plasma"]:0;
-                $result['sampleName']['others'][$j] = (isset($sRow["total_others"]))?$sRow["total_others"]:0;
-                $result['date'][$j] = $sRow["monthDate"];
-                $j++;
-            }
-            
-            return $result;
+            $result['sampleName']['dbs'][$j] = (isset($sampleResult[0]["total_dbs"]))?$sampleResult[0]["total_dbs"]:0;
+            $result['sampleName']['plasma'][$j] = (isset($sampleResult[0]["total_plasma"]))?$sampleResult[0]["total_plasma"]:0;
+            $result['sampleName']['others'][$j] = (isset($sampleResult[0]["total_others"]))?$sampleResult[0]["total_others"]:0;
+            $result['date'][$j] = $monthYearFormat;
+           $start = strtotime("+1 month", $start);
+           $j++;
+        }
+       return $result;
     }
     
     public function fetchKeySummaryIndicatorsDetails(){
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $common = new CommonService($this->sm);
-        $year=date('Y');
+        $year = date('Y');
         $summaryResult=array();
-        $month=6;
-        for($month=1;$month<=12;$month++){
+        $months = 12;
+        for($month=1;$month<=$months;$month++){
             $samplesReceivedSummaryQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
                                 ->columns(
                                           array(
@@ -4520,14 +4507,12 @@ class SampleTable extends AbstractTableGateway {
             $samplesReceivedSummaryCacheQuery = $sql->getSqlStringForSqlObject($samplesReceivedSummaryQuery);
            
             $samplesReceivedSummaryResult = $common->cacheQuery($samplesReceivedSummaryCacheQuery,$dbAdapter);
-            //\Zend\Debug\Debug::dump($samplesReceivedSummaryResult);die;
             $summaryResult['samples-received']['month'][$month]=$samplesReceivedSummaryResult[0]["total_samples_received"];
             $summaryResult['samples-tested']['month'][$month]=$samplesReceivedSummaryResult[0]["total_samples_tested"];
             $summaryResult['valid-tested']['month'][$month]=$samplesReceivedSummaryResult[0]["total_samples_tested"] - $samplesReceivedSummaryResult[0]["total_samples_rejected"];
             $summaryResult['suppression-rate']['month'][$month]=$samplesReceivedSummaryResult[0]["suppressed_samples_percentage"].' %';
             $summaryResult['rejection-rate']['month'][$month]=$samplesReceivedSummaryResult[0]["rejected_samples_percentage"].' %';
         }
-        
         return $summaryResult;
     }
     
@@ -4536,7 +4521,7 @@ class SampleTable extends AbstractTableGateway {
          * you want to insert a non-database field (for example a counter or static image)
         */
         $aColumns = array('f_d_l_d.location_name');
-        $orderColumns = array('f_d_l_d.location_name');
+        $orderColumns = array('f_d_l_d.location_name','f_d_l_d.location_id','f_d_l_d.location_id','f_d_l_d.location_id','f_d_l_d.location_id');
 
         /*
          * Paging
@@ -4627,13 +4612,10 @@ class SampleTable extends AbstractTableGateway {
                                                 "total_suppressed_samples_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (vl.result < 1000) THEN 1 ELSE 0 END)/COUNT(*))*100),2)")
                                                 )
                                           )
-                                //->join(array('rss'=>'r_sample_status'),'rss.status_id=vl.result_status',array('status_name'))
-                                ->join(array('f'=>'facility_details'),'f.facility_id=vl.facility_id',array('facility_name'),'left')
-                                ->join(array('f_d_l_d'=>'location_details'),'f_d_l_d.location_id=f.facility_district',array('district'=>'location_name'),'left')
-                                ->join(array('rs'=>'r_sample_type'),'rs.sample_id=vl.sample_type',array('sample_name'),'left')
+                                ->join(array('f'=>'facility_details'),'f.facility_id=vl.facility_id',array('facility_name'))
+                                ->join(array('f_d_l_d'=>'location_details'),'f_d_l_d.location_id=f.facility_district',array('district'=>'location_name'))
                                 ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date != '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')")
                                 ->group('f.facility_district');
-                                //->having('COUNT(*) > 1');
                                 
         if (isset($sWhere) && $sWhere != "") {
             $sQuery->where($sWhere);
@@ -4673,10 +4655,8 @@ class SampleTable extends AbstractTableGateway {
                                                 "total_suppressed_samples_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (vl.result < 1000) THEN 1 ELSE 0 END)/COUNT(*))*100),2)")
                                                 )
                                           )
-                                //->join(array('rss'=>'r_sample_status'),'rss.status_id=vl.result_status',array('status_name'))
-                                ->join(array('f'=>'facility_details'),'f.facility_id=vl.facility_id',array('facility_name'),'left')
-                                ->join(array('f_d_l_d'=>'location_details'),'f_d_l_d.location_id=f.facility_district',array('district'=>'location_name'),'left')
-                                ->join(array('rs'=>'r_sample_type'),'rs.sample_id=vl.sample_type',array('sample_name'),'left')
+                                ->join(array('f'=>'facility_details'),'f.facility_id=vl.facility_id',array('facility_name'))
+                                ->join(array('f_d_l_d'=>'location_details'),'f_d_l_d.location_id=f.facility_district',array('district'=>'location_name'))
                                 ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date != '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')")
                                 ->group('f.facility_district');
         $iQueryStr = $sql->getSqlStringForSqlObject($iQuery);
@@ -4708,7 +4688,7 @@ class SampleTable extends AbstractTableGateway {
          * you want to insert a non-database field (for example a counter or static image)
         */
         $aColumns = array('f_d_l_d.location_name','facility_name');
-        $orderColumns = array('f_d_l_d.location_name','facility_name');
+        $orderColumns = array('f_d_l_d.location_name','facility_name','f_d_l_d.location_id','f_d_l_d.location_id','f_d_l_d.location_id','f_d_l_d.location_id');
 
         /*
          * Paging
@@ -4799,13 +4779,10 @@ class SampleTable extends AbstractTableGateway {
                                                 "total_suppressed_samples_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (vl.result < 1000) THEN 1 ELSE 0 END)/COUNT(*))*100),2)")
                                                 )
                                           )
-                                //->join(array('rss'=>'r_sample_status'),'rss.status_id=vl.result_status',array('status_name'))
-                                ->join(array('f'=>'facility_details'),'f.facility_id=vl.facility_id',array('facility_name'),'left')
-                                ->join(array('f_d_l_d'=>'location_details'),'f_d_l_d.location_id=f.facility_district',array('district'=>'location_name'),'left')
-                                ->join(array('rs'=>'r_sample_type'),'rs.sample_id=vl.sample_type',array('sample_name'),'left')
+                                ->join(array('f'=>'facility_details'),'f.facility_id=vl.facility_id',array('facility_name'))
+                                ->join(array('f_d_l_d'=>'location_details'),'f_d_l_d.location_id=f.facility_district',array('district'=>'location_name'))
                                 ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date != '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')")
-                                ->group('f.facility_district');
-                                //->having('COUNT(*) > 1');
+                                ->group('vl.facility_id');
                                 
         if (isset($sWhere) && $sWhere != "") {
             $sQuery->where($sWhere);
@@ -4845,12 +4822,10 @@ class SampleTable extends AbstractTableGateway {
                                                 "total_suppressed_samples_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (vl.result < 1000) THEN 1 ELSE 0 END)/COUNT(*))*100),2)")
                                                 )
                                           )
-                                //->join(array('rss'=>'r_sample_status'),'rss.status_id=vl.result_status',array('status_name'))
-                                ->join(array('f'=>'facility_details'),'f.facility_id=vl.facility_id',array('facility_name'),'left')
-                                ->join(array('f_d_l_d'=>'location_details'),'f_d_l_d.location_id=f.facility_district',array('district'=>'location_name'),'left')
-                                ->join(array('rs'=>'r_sample_type'),'rs.sample_id=vl.sample_type',array('sample_name'),'left')
+                                ->join(array('f'=>'facility_details'),'f.facility_id=vl.facility_id',array('facility_name'))
+                                ->join(array('f_d_l_d'=>'location_details'),'f_d_l_d.location_id=f.facility_district',array('district'=>'location_name'))
                                 ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date != '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')")
-                                ->group('f.facility_district');
+                               ->group('vl.facility_id');
         $iQueryStr = $sql->getSqlStringForSqlObject($iQuery);
         $iResult = $dbAdapter->query($iQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $iTotal = count($iResult);
@@ -4879,43 +4854,34 @@ class SampleTable extends AbstractTableGateway {
     public function fetchSuppressionRateGraphDetails($params){
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
+        $result=array();
         $common = new CommonService($this->sm);
-        $startMonth = date('Y')."-01-01";
-        $endMonth = date('Y')."-12-31";
-        $sQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
-                                ->columns(
-                                          array(
-                                                "monthDate" => new Expression("DATE_FORMAT(DATE(sample_collection_date), '%b-%Y')"),
-                                                "total_samples_tested" => new Expression("(SUM(CASE WHEN (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END))"),
-                                                "total_samples_rejected" => new Expression("(SUM(CASE WHEN (reason_for_sample_rejection !='' AND reason_for_sample_rejection !='0' AND reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END))"),
-                                                "total_suppressed_samples" => new Expression("(SUM(CASE WHEN (vl.result < 1000) THEN 1 ELSE 0 END))"),
-                                                "total_suppressed_samples_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (vl.result < 1000) THEN 1 ELSE 0 END)/COUNT(*))*100),2)")
-                                                )
-                                          )                                
-                                
-                               
-                            ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date != '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00'
-                                    AND DATE(sample_collection_date) >= '".$startMonth."' 
-                                    AND DATE(sample_collection_date) <= '".$endMonth."'
-                                    )")
-                            ->group(array(new Expression("DATE_FORMAT(DATE(sample_collection_date), '%b-%Y')")))   
-                            ->order(array(new Expression('DATE(sample_collection_date)')));   
-            
+        $start = strtotime(date("Y", strtotime("-1 year")).'-'.date('m', strtotime('+1 month', strtotime('-1 year'))));
+        $end = strtotime(date("Y-m", strtotime("-2 months")));
+        $j=0;
+        while($start <= $end){
+            $month = date('m', $start);$year = date('Y', $start);$monthYearFormat = date("M-Y", $start);
+            $sQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
+                                    ->columns(
+                                              array(
+                                                    "total_samples_tested" => new Expression("(SUM(CASE WHEN (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END))"),
+                                                    "total_samples_rejected" => new Expression("(SUM(CASE WHEN (reason_for_sample_rejection !='' AND reason_for_sample_rejection !='0' AND reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END))"),
+                                                    "total_suppressed_samples" => new Expression("(SUM(CASE WHEN (vl.result < 1000) THEN 1 ELSE 0 END))"),
+                                                    "total_suppressed_samples_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (vl.result < 1000) THEN 1 ELSE 0 END)/COUNT(*))*100),2)")
+                                                    )
+                                              )
+                                    ->where("Month(sample_collection_date)='".$month."' AND Year(sample_collection_date)='".$year."'");
             $queryStr = $sql->getSqlStringForSqlObject($sQuery);
             //echo $queryStr;die;
             //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             $sampleResult = $common->cacheQuery($queryStr,$dbAdapter);
-            $j=0;
-            $result=array();
-            foreach($sampleResult as $sRow){
-                if($sRow["monthDate"] == null) continue;
-                $result['valid_results'][$j] = (isset($sRow["total_samples_tested"]) && isset($sRow["total_samples_rejected"]))?($sRow["total_samples_tested"]-$sRow["total_samples_rejected"]):0;
-                $result['samples_rate'][$j] = (isset($sRow["total_suppressed_samples_percentage"]))?$sRow["total_suppressed_samples_percentage"]:0;
-                $result['date'][$j] = $sRow["monthDate"];
-                $j++;
-            }
-            
-            return $result;
+            $result['valid_results'][$j] = (isset($sampleResult[0]["total_samples_tested"]) && isset($sampleResult[0]["total_samples_rejected"]))?($sampleResult[0]["total_samples_tested"]-$sampleResult[0]["total_samples_rejected"]):0;
+            $result['samples_rate'][$j] = (isset($sampleResult[0]["total_suppressed_samples_percentage"]))?$sampleResult[0]["total_suppressed_samples_percentage"]:0;
+            $result['date'][$j] = $monthYearFormat;
+           $start = strtotime("+1 month", $start);
+           $j++;
+        }
+       return $result;
     }
 
     public function fetchAllSamplesRejectedByDistrict($parameters){
@@ -4923,7 +4889,7 @@ class SampleTable extends AbstractTableGateway {
          * you want to insert a non-database field (for example a counter or static image)
         */
         $aColumns = array('f_d_l_d.location_name');
-        $orderColumns = array('f_d_l_d.location_name','location_id','location_id','location_id');
+        $orderColumns = array('f_d_l_d.location_name','f_d_l_d.location_id','f_d_l_d.location_id','f_d_l_d.location_id');
 
         /*
          * Paging
@@ -5010,7 +4976,6 @@ class SampleTable extends AbstractTableGateway {
                                           )
                                 ->join(array('f'=>'facility_details'),'f.facility_id=vl.facility_id',array('facility_name'))
                                 ->join(array('f_d_l_d'=>'location_details'),'f_d_l_d.location_id=f.facility_district',array('district'=>'location_name'))
-                                ->join(array('rs'=>'r_sample_type'),'rs.sample_id=vl.sample_type',array('sample_name'),'left')
                                 ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date != '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')")
                                 ->group('f.facility_district');
                                 
@@ -5048,7 +5013,6 @@ class SampleTable extends AbstractTableGateway {
                                           )
                                 ->join(array('f'=>'facility_details'),'f.facility_id=vl.facility_id',array('facility_name'))
                                 ->join(array('f_d_l_d'=>'location_details'),'f_d_l_d.location_id=f.facility_district',array('district'=>'location_name'))
-                                ->join(array('rs'=>'r_sample_type'),'rs.sample_id=vl.sample_type',array('sample_name'),'left')
                                 ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date != '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')")
                                 ->group('f.facility_district');
         $iQueryStr = $sql->getSqlStringForSqlObject($iQuery);
@@ -5079,7 +5043,7 @@ class SampleTable extends AbstractTableGateway {
          * you want to insert a non-database field (for example a counter or static image)
         */
         $aColumns = array('f_d_l_d.location_name','f.facility_name');
-        $orderColumns = array('f_d_l_d.location_name','f.facility_name','location_id','location_id');
+        $orderColumns = array('f_d_l_d.location_name','f.facility_name','f_d_l_d.location_id','f_d_l_d.location_id');
 
         /*
          * Paging
@@ -5166,7 +5130,6 @@ class SampleTable extends AbstractTableGateway {
                                           )
                                 ->join(array('f'=>'facility_details'),'f.facility_id=vl.facility_id',array('facility_name'))
                                 ->join(array('f_d_l_d'=>'location_details'),'f_d_l_d.location_id=f.facility_district',array('district'=>'location_name'))
-                                ->join(array('rs'=>'r_sample_type'),'rs.sample_id=vl.sample_type',array('sample_name'),'left')
                                 ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date != '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')")
                                 ->group('f.facility_id');
                                 
@@ -5204,7 +5167,6 @@ class SampleTable extends AbstractTableGateway {
                                           )
                                 ->join(array('f'=>'facility_details'),'f.facility_id=vl.facility_id',array('facility_name'))
                                 ->join(array('f_d_l_d'=>'location_details'),'f_d_l_d.location_id=f.facility_district',array('district'=>'location_name'))
-                                ->join(array('rs'=>'r_sample_type'),'rs.sample_id=vl.sample_type',array('sample_name'),'left')
                                 ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date != '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')")
                                 ->group('f.facility_id');
         $iQueryStr = $sql->getSqlStringForSqlObject($iQuery);
@@ -5256,7 +5218,7 @@ class SampleTable extends AbstractTableGateway {
           $start = strtotime("+1 month", $start);
           $j++;
         }
-        return $result;
+       return $result;
     }
     
     public function fetchRegimenGroupSamplesDetails($parameters){
@@ -5453,7 +5415,7 @@ class SampleTable extends AbstractTableGateway {
         return $result;  
     }
     
-    public function fetchAllLineOfRegimenDetails(){
+    public function fetchAllLineOfTreatmentDetails(){
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $common = new CommonService($this->sm);
@@ -5461,21 +5423,21 @@ class SampleTable extends AbstractTableGateway {
                                 ->columns(
                                           array(
                                                 "1stLineofSuppressed" => new Expression("(SUM(CASE WHEN ((vl.result < 1000 or vl.result='Target Not Detected') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.line_of_treatment = 1) THEN 1 ELSE 0 END))"),
-                                                "1stLineofNotSuppressed" => new Expression("(SUM(CASE WHEN (vl.result > 1000 AND vl.result!= 'Target Not Detected' AND vl.result IS NOT NULL AND vl.result!= '' AND vl.line_of_treatment = 1) THEN 1 ELSE 0 END))"),
+                                                "1stLineofNotSuppressed" => new Expression("(SUM(CASE WHEN (vl.result >= 1000 AND vl.result!= 'Target Not Detected' AND vl.result IS NOT NULL AND vl.result!= '' AND vl.line_of_treatment = 1) THEN 1 ELSE 0 END))"),
                                                 "2ndLineofSuppressed" => new Expression("(SUM(CASE WHEN ((vl.result < 1000 or vl.result='Target Not Detected') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.line_of_treatment = 2) THEN 1 ELSE 0 END))"),
-                                                "2ndLineofNotSuppressed" => new Expression("(SUM(CASE WHEN (vl.result > 1000 AND vl.result!= 'Target Not Detected' AND vl.result IS NOT NULL AND vl.result!= '' AND vl.line_of_treatment = 2) THEN 1 ELSE 0 END))"),
+                                                "2ndLineofNotSuppressed" => new Expression("(SUM(CASE WHEN (vl.result >= 1000 AND vl.result!= 'Target Not Detected' AND vl.result IS NOT NULL AND vl.result!= '' AND vl.line_of_treatment = 2) THEN 1 ELSE 0 END))"),
                                                 "otherLineofSuppressed" => new Expression("(SUM(CASE WHEN ((vl.result < 1000 or vl.result='Target Not Detected') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.line_of_treatment!= 1 AND vl.line_of_treatment!= 2) THEN 1 ELSE 0 END))"),
-                                                "otherLineofNotSuppressed" => new Expression("(SUM(CASE WHEN (vl.result > 1000 AND vl.result!= 'Target Not Detected' AND vl.result IS NOT NULL AND vl.result!= '' AND vl.line_of_treatment!= 1 AND vl.line_of_treatment!= 2) THEN 1 ELSE 0 END))")
+                                                "otherLineofNotSuppressed" => new Expression("(SUM(CASE WHEN (vl.result >= 1000 AND vl.result!= 'Target Not Detected' AND vl.result IS NOT NULL AND vl.result!= '' AND vl.line_of_treatment!= 1 AND vl.line_of_treatment!= 2) THEN 1 ELSE 0 END))")
                                                 )
                                           );
         $queryStr = $sql->getSqlStringForSqlObject($sQuery);
         //echo $queryStr;die;
         //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-        $allLineofRegimenResult = $common->cacheQuery($queryStr,$dbAdapter);
-       return $allLineofRegimenResult;
+        $allLineofTreatmentResult = $common->cacheQuery($queryStr,$dbAdapter);
+       return $allLineofTreatmentResult;
     }
     
-    public function fetchAdult1stLineOfRegimenDetails(){
+    public function fetchAllCollapsibleLineOfTreatmentDetails(){
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $common = new CommonService($this->sm);
@@ -5485,14 +5447,22 @@ class SampleTable extends AbstractTableGateway {
                                                 "current_regimen",
                                                 "validResults"=>new Expression("(SUM(CASE WHEN (vl.result IS NOT NULL AND vl.result!= '') THEN 1 ELSE 0 END))"),
                                                 "totalSuppressed" => new Expression("(SUM(CASE WHEN ((vl.result < 1000 or vl.result='Target Not Detected') AND vl.result IS NOT NULL AND vl.result!= '') THEN 1 ELSE 0 END))"),
-                                                "totalNotSuppressed" => new Expression("(SUM(CASE WHEN (vl.result > 1000 AND vl.result!= 'Target Not Detected' AND vl.result IS NOT NULL AND vl.result!= '') THEN 1 ELSE 0 END))")
+                                                "totalNotSuppressed" => new Expression("(SUM(CASE WHEN (vl.result >= 1000 AND vl.result!= 'Target Not Detected' AND vl.result IS NOT NULL AND vl.result!= '') THEN 1 ELSE 0 END))")
                                                 )
-                                          )
-                                ->where(array('vl.line_of_treatment'=>1));
+                                          );
         $queryStr = $sql->getSqlStringForSqlObject($sQuery);
-        //$1stLineofRegimenResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-        $adult1stLineofRegimenResult = $common->cacheQuery($queryStr." AND patient_age_in_years IS NOT NULL AND patient_age_in_years!= '' AND patient_age_in_years > 18 group by current_regimen order by validResults desc limit 8",$dbAdapter);
-        $paeds1stLineofRegimenResult = $common->cacheQuery($queryStr." AND patient_age_in_years IS NOT NULL AND patient_age_in_years!= '' AND patient_age_in_years <= 18 group by current_regimen order by validResults desc limit 8",$dbAdapter);
-       return array('adult1stLineofRegimenResult'=>$adult1stLineofRegimenResult,'paeds1stLineofRegimenResult'=>$paeds1stLineofRegimenResult);
+        //lineofTreatmentResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+        $adult1stLineofTreatmentResult = $common->cacheQuery($queryStr." Where line_of_treatment = 1 AND patient_age_in_years IS NOT NULL AND patient_age_in_years!= '' AND patient_age_in_years >= 18 group by current_regimen order by validResults desc limit 9",$dbAdapter);
+        $adult1stLineofTreatmentOthersResult = $common->cacheQuery($queryStr." Where line_of_treatment = 1 AND patient_age_in_years IS NOT NULL AND patient_age_in_years!= '' AND patient_age_in_years >= 18 group by current_regimen order by validResults desc limit 10,18446744073709551615",$dbAdapter);
+        
+        $paeds1stLineofTreatmentResult = $common->cacheQuery($queryStr." Where line_of_treatment = 1 AND patient_age_in_years IS NOT NULL AND patient_age_in_years!= '' AND patient_age_in_years < 18 group by current_regimen order by validResults desc limit 9",$dbAdapter);
+        $paeds1stLineofTreatmentOthersResult = $common->cacheQuery($queryStr." Where line_of_treatment = 1 AND patient_age_in_years IS NOT NULL AND patient_age_in_years!= '' AND patient_age_in_years < 18 group by current_regimen order by validResults desc limit 10,18446744073709551615",$dbAdapter);
+        
+        $adult2ndLineofTreatmentResult = $common->cacheQuery($queryStr." Where line_of_treatment = 2 AND patient_age_in_years IS NOT NULL AND patient_age_in_years!= '' AND patient_age_in_years >= 18 group by current_regimen order by validResults desc limit 9",$dbAdapter);
+        $adult2ndLineofTreatmentOthersResult = $common->cacheQuery($queryStr." Where line_of_treatment = 2 AND patient_age_in_years IS NOT NULL AND patient_age_in_years!= '' AND patient_age_in_years >= 18 group by current_regimen order by validResults desc limit 10,18446744073709551615",$dbAdapter);
+        
+        $paeds2ndLineofTreatmentResult = $common->cacheQuery($queryStr." Where line_of_treatment = 2 AND patient_age_in_years IS NOT NULL AND patient_age_in_years!= '' AND patient_age_in_years < 18 group by current_regimen order by validResults desc limit 9",$dbAdapter);
+        $paeds2ndLineofTreatmentOthersResult = $common->cacheQuery($queryStr." Where line_of_treatment = 2 AND patient_age_in_years IS NOT NULL AND patient_age_in_years!= '' AND patient_age_in_years < 18 group by current_regimen order by validResults desc limit 10,18446744073709551615",$dbAdapter);
+       return array('adult1stLineofTreatmentResult'=>$adult1stLineofTreatmentResult,'adult1stLineofTreatmentOthersResult'=>$adult1stLineofTreatmentOthersResult,'paeds1stLineofTreatmentResult'=>$paeds1stLineofTreatmentResult,'paeds1stLineofTreatmentOthersResult'=>$paeds1stLineofTreatmentOthersResult,'adult2ndLineofTreatmentResult'=>$adult2ndLineofTreatmentResult,'adult2ndLineofTreatmentOthersResult'=>$adult2ndLineofTreatmentOthersResult,'paeds2ndLineofTreatmentResult'=>$paeds2ndLineofTreatmentResult,'paeds2ndLineofTreatmentOthersResult'=>$paeds2ndLineofTreatmentOthersResult);
     }
 }
