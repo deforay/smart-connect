@@ -1579,16 +1579,13 @@ class SampleTable extends AbstractTableGateway {
             if(isset($aRow['sampleTestingDate']) && $aRow['sampleTestingDate']!= NULL && trim($aRow['sampleTestingDate'])!="" && $aRow['sampleTestingDate']!= '0000-00-00'){
                 $sampleTestedDate = $common->humanDateFormat($aRow['sampleTestingDate']);
             }
+            $display = (trim($aRow['result']) == "")?'none':'block';
             $row[] = $aRow['sample_code'];
             $row[] = ucwords($aRow['facility_name']);
             $row[] = $sampleCollectionDate;
             $row[] = (isset($aRow['rejection_reason_name']))?ucwords($aRow['rejection_reason_name']):'';
             $row[] = $sampleTestedDate;
 	    $row[] = $aRow['result'];
-            $display = 'show';
-            if(trim($aRow['result']) ==""){
-                $display= "none";
-            }
 	    $row[]='<a href="/clinics/test-result-view/'.base64_encode($aRow['vl_sample_id']).'" class="btn btn-primary btn-xs" target="_blank">'.$viewText.'</a>&nbsp;&nbsp;<a href="javascript:void(0);" class="btn btn-danger btn-xs" style="display:'.$display.'" onclick="generateResultPDF('.$aRow['vl_sample_id'].');">'.$pdfText.'</a>';
             $output['aaData'][] = $row;
         }

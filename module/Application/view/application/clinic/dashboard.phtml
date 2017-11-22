@@ -300,7 +300,7 @@ foreach($sampleType as $samples){
         overAllViralLoad();
         getAllTestReason();
         getTestedSampleResult();
-        testResul();
+        loadTestResult();
         fnShowHide();
     }
     
@@ -369,7 +369,7 @@ foreach($sampleType as $samples){
         });
     }
     
-    function testResul(){
+    function loadTestResult(){
         oTable = $('#testResults').DataTable( {
             "bProcessing": true,
             "bServerSide": true,
