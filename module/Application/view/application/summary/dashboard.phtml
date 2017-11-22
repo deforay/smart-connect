@@ -220,260 +220,237 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
 </ul>
 <div class="tab-content">
     <div role="tabpanel" class="tab-pane fade in active" id="samplesReceivedTab">
-                <div class="row">                   
-                    <div class="col-md-6 col-sm-6">
-                            <div class="portlet box blue">
-                                <div class="portlet-title">
-                                    <div class="caption">
-                                        <span class="caption-subject"><?php echo $this->translate('Samples Received'); ?></span>
+        <div class="row">                   
+            <div class="col-md-6 col-sm-6">
+                <div class="portlet box blue">
+                    <div class="portlet-title">
+                        <div class="caption">
+                            <span class="caption-subject"><?php echo $this->translate('Samples Received'); ?></span>
+                        </div>
+                    </div>
+                    <div class="portlet-body" style="cursor:pointer;">
+                        <div id="samplesReceivedGraphContainer"></div>
+                    </div>
+                </div>
+            </div>
+               
+            <div class="col-md-6 col-sm-6">
+                <div class="portlet box">
+                    <div class="portlet box blue">
+                        <div class="portlet-title">
+                            <div class="caption" id="samplesReceivedBlockTitle">
+                                <i class="fa fa-cogs"></i><?php echo $this->translate('Districts/Facility Wise Samples Received Summary'); ?>
+                            </div>
+                        </div>
+                        <div class="portlet-body">
+                            <div class="form-group">                                
+                                <div class="col-md-12 text-center">
+                                    <div class="btn-group" data-toggle="btns" style="margin-bottom:10px;">
+                                        <a class="btn btn-default active" href="#districtWiseSamplesReceivedSummary" data-toggle="tab" onclick="toggleSummary('districtWiseSamplesReceivedSummary','facilityWiseSamplesReceivedSummary');" style="font-size:13px;padding:4px 12px;">Districts</a>
+                                        <a class="btn btn-default" href="#facilityWiseSamplesReceivedSummary" data-toggle="tab" onclick="toggleSummary('facilityWiseSamplesReceivedSummary','districtWiseSamplesReceivedSummary');" style="font-size:13px;padding:4px 12px;">Facilities</a>
                                     </div>
                                 </div>
-                                <div class="portlet-body" style="cursor:pointer;">
-                                    <div id="samplesReceivedGraphContainer"></div>
+                            </div>
+                            <div class="tab-content" style="border:none;">
+                                <div class="tab-pane active" id="districtWiseSamplesReceivedSummary">
+                                    <table class="table table-striped table-bordered table-hover" id="samplesReceivedDistrict">
+                                        <thead>
+                                            <tr>
+                                                <th> <?php echo $this->translate('District'); ?> </th>
+                                                <th> <?php echo $this->translate('Samples Received'); ?> </th>
+                                                <th> <?php echo $this->translate('Samples Tested'); ?></th>
+                                                <th> <?php echo $this->translate('Samples Pending'); ?></th>
+                                                <th> <?php echo $this->translate('Samples Rejected'); ?></th>
+                                                <th> <?php echo $this->translate('DBS'); ?>(%) </th>                                                              
+                                                <th> <?php echo $this->translate('Plasma'); ?>(%) </th>
+                                                <th> <?php echo $this->translate('Others'); ?>(%) </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td colspan="8" class="dataTables_empty">Loading data from server</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="tab-pane" id="facilityWiseSamplesReceivedSummary">
+                                    <table class="table table-striped table-bordered table-hover" id="samplesReceivedFacility">
+                                        <thead>
+                                            <tr>
+                                                <th> <?php echo $this->translate('District'); ?> </th>
+                                                <th> <?php echo $this->translate('Facility'); ?> </th>
+                                                <th> <?php echo $this->translate('Samples Received'); ?> </th>
+                                                <th> <?php echo $this->translate('Samples Tested'); ?></th>
+                                                <th> <?php echo $this->translate('Samples Pending'); ?></th>
+                                                <th> <?php echo $this->translate('Samples Rejected'); ?></th>
+                                                <th> <?php echo $this->translate('DBS'); ?>(%) </th>                                                              
+                                                <th> <?php echo $this->translate('Plasma'); ?>(%) </th>
+                                                <th> <?php echo $this->translate('Others'); ?>(%) </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td colspan="9" class="dataTables_empty">Loading data from server</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         </div>
-                       
-                        <div class="col-md-6 col-sm-6">
-                            <div class="portlet box">
-                                        <div class="portlet box blue">
-                                            <div class="portlet-title">
-                                                <div class="caption" id="samplesReceivedBlockTitle">
-                                                    <i class="fa fa-cogs"></i><?php echo $this->translate('Facility Wise Samples Received Summary'); ?>
-                                                </div>
-                                            </div>
-                                            <div class="portlet-body">
-                                                    <div class="form-group">                                
-                                                    <div class="col-md-12 text-center">
-                                                                <label for="" onclick="toggleSummary('districtWiseSamplesReceivedSummary','facilityWiseSamplesReceivedSummary');">
-                                                                    <input type="radio" id="districtWiseSamplesReceivedSummaryCheckbox" name="showSampleReceivedSummaryType" value="yes" checked="checked"> District
-                                                                </label>
-                                                                <label for="" onclick="toggleSummary('facilityWiseSamplesReceivedSummary','districtWiseSamplesReceivedSummary');">
-                                                                    <input type="radio" id="facilityWiseSamplesReceivedSummaryCheckbox" name="showSampleReceivedSummaryType" value="no" > Facilities
-                                                                </label>
-                                                    </div>
-                                                </div>
-
-                                                <div class="table-toolbar" id="districtWiseSamplesReceivedSummary">
-                                                    <table class="table table-striped table-bordered table-hover" id="samplesReceivedDistrict">
-                                                        <thead>
-                                                            <tr>
-                                                                <th> <?php echo $this->translate('District'); ?> </th>
-                                                                <th> <?php echo $this->translate('Samples Received'); ?> </th>
-                                                                <th> <?php echo $this->translate('Samples Tested'); ?></th>
-                                                                <th> <?php echo $this->translate('Samples Pending'); ?></th>
-                                                                <th> <?php echo $this->translate('Samples Rejected'); ?></th>
-                                                                <th> <?php echo $this->translate('DBS(%)'); ?> </th>                                                              
-                                                                <th> <?php echo $this->translate('Plasma(%)'); ?> </th>
-                                                                <th> <?php echo $this->translate('Others(%)'); ?> </th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            <tr>
-                                                                <td colspan="8" class="dataTables_empty">Loading data from server</td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-
-                                                <div class="table-toolbar" id="facilityWiseSamplesReceivedSummary">
-                                                    <table class="table table-striped table-bordered table-hover" id="samplesReceivedFacility">
-                                                        <thead>
-                                                            <tr>
-                                                                <th> <?php echo $this->translate('District'); ?> </th>
-                                                                <th> <?php echo $this->translate('Facility'); ?> </th>
-                                                                <th> <?php echo $this->translate('Samples Received'); ?> </th>
-                                                                <th> <?php echo $this->translate('Samples Tested'); ?></th>
-                                                                <th> <?php echo $this->translate('Samples Pending'); ?></th>
-                                                                <th> <?php echo $this->translate('Samples Rejected'); ?></th>
-                                                                <th> <?php echo $this->translate('DBS(%)'); ?> </th>                                                              
-                                                                <th> <?php echo $this->translate('Plasma(%)'); ?> </th>
-                                                                <th> <?php echo $this->translate('Others(%)'); ?> </th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            <tr>
-                                                                <td colspan="9" class="dataTables_empty">Loading data from server</td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                                
-                                            </div>
-                                        </div>
-                                
-                            </div>
-
-                        </div>
-                        
                     </div>
-
+                </div>
+            </div>
+        </div>
     </div>
     <div role="tabpanel" class="tab-pane fade" id="suppressionRateTab">
-                        <div class="row">                   
-                    <div class="col-md-6 col-sm-6">
-                            <div class="portlet box blue">
-                                <div class="portlet-title">
-                                    <div class="caption">
-                                        <span class="caption-subject"><?php echo $this->translate('Suppression Rate'); ?></span>
+        <div class="row">                   
+            <div class="col-md-6 col-sm-6">
+                <div class="portlet box blue">
+                    <div class="portlet-title">
+                        <div class="caption">
+                            <span class="caption-subject"><?php echo $this->translate('Suppression Rate'); ?></span>
+                        </div>
+                    </div>
+                    <div class="portlet-body" style="cursor:pointer;">
+                        <div id="suppressionRateGraphContainer"></div>
+                    </div>
+                </div>
+            </div>
+               
+            <div class="col-md-6 col-sm-6">
+                <div class="portlet box">
+                    <div class="portlet box blue">
+                        <div class="portlet-title">
+                            <div class="caption" id="suppressionRateBlockTitle">
+                                <i class="fa fa-cogs"></i><?php echo $this->translate('Facility Wise Suppression Rate Summary'); ?>
+                            </div>
+                        </div>
+                        <div class="portlet-body">
+                            <div class="form-group">                                
+                                <div class="col-md-12 text-center">
+                                    <div class="btn-group" data-toggle="btns" style="margin-bottom:10px;">
+                                        <a class="btn btn-default active" href="#districtWiseSuppressionRateSummary" data-toggle="tab" onclick="toggleSummary('districtWiseSuppressionRateSummary','facilityWiseSuppressionRateSummary');" style="font-size:13px;padding:4px 12px;">Districts</a>
+                                        <a class="btn btn-default" href="#facilityWiseSuppressionRateSummary" data-toggle="tab" onclick="toggleSummary('facilityWiseSuppressionRateSummary','districtWiseSuppressionRateSummary');" style="font-size:13px;padding:4px 12px;">Facilities</a>
                                     </div>
                                 </div>
-                                <div class="portlet-body" style="cursor:pointer;">
-                                    <div id="suppressionRateGraphContainer"></div>
+                            </div>
+                            <div class="tab-content" style="border:none;">
+                                <div class="tab-pane active" id="districtWiseSuppressionRateSummary">
+                                    <table class="table table-striped table-bordered table-hover" id="suppressionRateDistrict">
+                                        <thead>
+                                            <tr>
+                                                <th> <?php echo $this->translate('District'); ?> </th>
+                                                <th> <?php echo $this->translate('Valid Results'); ?> </th>
+                                                <th> <?php echo $this->translate('Suppressed Results'); ?></th>
+                                                <th> <?php echo $this->translate('Non Suppressed Results'); ?></th>
+                                                <th> <?php echo $this->translate('Samples Rejected'); ?></th>                                                                
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td colspan="5" class="dataTables_empty">Loading data from server</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="tab-pane" id="facilityWiseSuppressionRateSummary">
+                                    <table class="table table-striped table-bordered table-hover" id="suppressionRateFacility">
+                                        <thead>
+                                            <tr>
+                                                <th> <?php echo $this->translate('District'); ?> </th>
+                                                <th> <?php echo $this->translate('Facility'); ?> </th>
+                                                <th> <?php echo $this->translate('Valid Results'); ?> </th>
+                                                <th> <?php echo $this->translate('Suppressed Results'); ?></th>
+                                                <th> <?php echo $this->translate('Non Suppressed Results'); ?></th>
+                                                <th> <?php echo $this->translate('Samples Rejected'); ?></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td colspan="6" class="dataTables_empty">Loading data from server</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         </div>
-                       
-                        <div class="col-md-6 col-sm-6">
-                            <div class="portlet box">
-                                
-                                        <div class="portlet box blue">
-                                            <div class="portlet-title">
-                                                <div class="caption" id="suppressionRateBlockTitle">
-                                                    <i class="fa fa-cogs"></i><?php echo $this->translate('Facility Wise Suppression Rate Summary'); ?>
-                                                </div>
-                                            </div>
-                                            <div class="portlet-body">
-                                                    <div class="form-group">                              
-                                                    <div class="col-md-12 text-center">
-                                                        <label for="" onclick="toggleSummary('districtWiseSuppressionRateSummary','facilityWiseSuppressionRateSummary');">
-                                                            <input type="radio" id="districtWiseSuppressionRateSummaryCheckbox" name="showSampleSuppressionSummaryType" value="yes" checked="checked"> District
-                                                        </label>
-                                                        <label for="" onclick="toggleSummary('facilityWiseSuppressionRateSummary','districtWiseSuppressionRateSummary');">
-                                                            <input type="radio" id="facilityWiseSuppressionRateSummaryCheckbox" name="showSampleSuppressionSummaryType" value="no" > Facilities
-                                                        </label>
-                                                    </div>
-                                                </div>
-
-                                                <div class="table-toolbar" id="districtWiseSuppressionRateSummary">
-                                                    <table class="table table-striped table-bordered table-hover" id="suppressionRateDistrict">
-                                                        <thead>
-                                                            <tr>
-                                                                <th> <?php echo $this->translate('District'); ?> </th>
-                                                                <th> <?php echo $this->translate('Valid Results'); ?> </th>
-                                                                <th> <?php echo $this->translate('Suppressed Results'); ?></th>
-                                                                <th> <?php echo $this->translate('Non Suppressed Results'); ?></th>
-                                                                <th> <?php echo $this->translate('Samples Rejected'); ?></th>                                                                
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            <tr>
-                                                                <td colspan="5" class="dataTables_empty">Loading data from server</td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-
-                                                <div class="table-toolbar" id="facilityWiseSuppressionRateSummary">
-                                                    <table class="table table-striped table-bordered table-hover" id="suppressionRateFacility">
-                                                        <thead>
-                                                            <tr>
-                                                                <th> <?php echo $this->translate('District'); ?> </th>
-                                                                <th> <?php echo $this->translate('Facility'); ?> </th>
-                                                                <th> <?php echo $this->translate('Valid Results'); ?> </th>
-                                                                <th> <?php echo $this->translate('Suppressed Results'); ?></th>
-                                                                <th> <?php echo $this->translate('Non Suppressed Results'); ?></th>
-                                                                <th> <?php echo $this->translate('Samples Rejected'); ?></th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            <tr>
-                                                                <td colspan="6" class="dataTables_empty">Loading data from server</td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                                
-                                            </div>
-                                        </div>
-                                
-                            </div>
-
-                        </div>
-                        
                     </div>
-
-
+                </div>
+            </div>
+        </div>
     </div>
     <div role="tabpanel" class="tab-pane fade" id="samplesRejectedTab">
         <div class="row">                   
-                    <div class="col-md-6 col-sm-6">
-                            <div class="portlet box blue">
-                                <div class="portlet-title">
-                                    <div class="caption">
-                                        <span class="caption-subject"><?php echo $this->translate('Samples Rejected'); ?></span>
+            <div class="col-md-6 col-sm-6">
+                <div class="portlet box blue">
+                    <div class="portlet-title">
+                        <div class="caption">
+                            <span class="caption-subject"><?php echo $this->translate('Samples Rejected'); ?></span>
+                        </div>
+                    </div>
+                    <div class="portlet-body" style="cursor:pointer;">
+                        <div id="samplesRejectedBarChartContainer"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-sm-6">
+                <div class="portlet box">
+                    <div class="portlet box blue">
+                        <div class="portlet-title">
+                            <div class="caption" id="samplesRejectedBlockTitle">
+                                <i class="fa fa-cogs"></i><?php echo $this->translate('District Wise Samples Rejected Summary'); ?>
+                            </div>
+                        </div>
+                        <div class="portlet-body">
+                            <div class="form-group">                                
+                                <div class="col-md-12 text-center">
+                                    <div class="btn-group" data-toggle="btns" style="margin-bottom:10px;">
+                                        <a class="btn btn-default active" href="#districtWiseSamplesRejectedSummary" data-toggle="tab" onclick="toggleSummary('districtWiseSamplesRejectedSummary','facilityWiseSamplesRejectedSummary');" style="font-size:13px;padding:4px 12px;">Districts</a>
+                                        <a class="btn btn-default" href="#facilityWiseSamplesRejectedSummary" data-toggle="tab" onclick="toggleSummary('facilityWiseSamplesRejectedSummary','districtWiseSamplesRejectedSummary');" style="font-size:13px;padding:4px 12px;">Facilities</a>
                                     </div>
                                 </div>
-                                <div class="portlet-body" style="cursor:pointer;">
-                                    <div id="samplesRejectedBarChartContainer"></div>
+                            </div>
+                            <div class="tab-content" style="border:none;">
+                                <div class="tab-pane active" id="districtWiseSamplesRejectedSummary">
+                                    <table class="table table-striped table-bordered table-hover" id="samplesRejectedDistrict">
+                                        <thead>
+                                            <tr>
+                                                <th> <?php echo $this->translate('District'); ?> </th>
+                                                <th> <?php echo $this->translate('Samples Received'); ?> </th>
+                                                <th> <?php echo $this->translate('Samples Rejected'); ?></th>
+                                                <th> <?php echo $this->translate('Rejection Rate(%)'); ?> </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td colspan="4" class="dataTables_empty">Loading data from server</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="tab-pane" id="facilityWiseSamplesRejectedSummary">
+                                    <table class="table table-striped table-bordered table-hover" id="samplesRejectedFacility">
+                                        <thead>
+                                            <tr>
+                                                <th> <?php echo $this->translate('District'); ?> </th>
+                                                <th> <?php echo $this->translate('Facility'); ?> </th>
+                                                <th> <?php echo $this->translate('Samples Received'); ?> </th>
+                                                <th> <?php echo $this->translate('Rejection Rate(%)'); ?> </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td colspan="4" class="dataTables_empty">Loading data from server</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         </div>
-                       
-                        <div class="col-md-6 col-sm-6">
-                            <div class="portlet box">
-                                        <div class="portlet box blue">
-                                            <div class="portlet-title">
-                                                <div class="caption" id="samplesRejectedBlockTitle">
-                                                    <i class="fa fa-cogs"></i><?php echo $this->translate('District Wise Samples Rejected Summary'); ?>
-                                                </div>
-                                            </div>
-                                            <div class="portlet-body">
-                                                    <div class="form-group">                                
-                                                    <div class="col-md-12 text-center">
-                                                        <label for="" onclick="toggleSummary('districtWiseSamplesRejectedSummary','facilityWiseSamplesRejectedSummary');">
-                                                            <input type="radio" id="districtWiseSamplesRejectedSummaryCheckbox" name="showSampleRejectedSummaryType" value="yes" checked="checked"> District
-                                                        </label>
-                                                        <label for="" onclick="toggleSummary('facilityWiseSamplesRejectedSummary','districtWiseSamplesRejectedSummary');">
-                                                            <input type="radio" id="facilityWiseSamplesRejectedSummaryCheckbox" name="showSampleRejectedSummaryType" value="no" > Facilities
-                                                        </label>
-                                                    </div>
-                                                </div>
-
-                                                <div class="table-toolbar" id="districtWiseSamplesRejectedSummary">
-                                                    <table class="table table-striped table-bordered table-hover" id="samplesRejectedDistrict">
-                                                        <thead>
-                                                            <tr>
-                                                                <th> <?php echo $this->translate('District'); ?> </th>
-                                                                <th> <?php echo $this->translate('Samples Received'); ?> </th>
-                                                                <th> <?php echo $this->translate('Samples Rejected'); ?></th>
-                                                                <th> <?php echo $this->translate('Rejection Rate(%)'); ?> </th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            <tr>
-                                                                <td colspan="4" class="dataTables_empty">Loading data from server</td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-
-                                                <div class="table-toolbar" id="facilityWiseSamplesRejectedSummary">
-                                                    <table class="table table-striped table-bordered table-hover" id="samplesRejectedFacility">
-                                                        <thead>
-                                                            <tr>
-                                                                <th> <?php echo $this->translate('District'); ?> </th>
-                                                                <th> <?php echo $this->translate('Facility'); ?> </th>
-                                                                <th> <?php echo $this->translate('Samples Received'); ?> </th>
-                                                                <th> <?php echo $this->translate('Rejection Rate(%)'); ?> </th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            <tr>
-                                                                <td colspan="4" class="dataTables_empty">Loading data from server</td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                                
-                                            </div>
-                                        </div>
-                                
-                            </div>
-
-                        </div>
-                        
                     </div>
+                </div>
+            </div>
+        </div>
     </div>
     <div role="tabpanel" class="tab-pane fade" id="currentRegimenTab">
         <div class="row">                   
@@ -932,7 +909,6 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
   </div>
 </div>
 <br>
-<br>
 <div class="row">
     <div class="col-md-12 col-sm-12">
         <div class="portlet box">
@@ -975,304 +951,302 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
                             </tbody>
                         </table>
                     </div>
-                    
                 </div>
             </div>
         </div>
     </div>
 </div>
+<script src="<?php echo $this->basePath('assets/pages/scripts/dashboard.js'); ?>" type="text/javascript"></script>
+<script type="text/javascript">
+    var oTableSamplesReceivedDistrict = null;
+    var oTableSamplesReceivedFacility = null;
+    var oTableSuppressionRateDistrict = null;
+    var oTableSuppressionRateFacility = null;
+    var oTableSamplesRejectedDistrict = null;
+    var oTableSamplesRejectedFacility = null;
+    var otableRegimenGroups = null;
+    $(function() {
+      toggleSummary('districtWiseSamplesReceivedSummary','facilityWiseSamplesReceivedSummary');
+      toggleSummary('districtWiseSuppressionRateSummary','facilityWiseSuppressionRateSummary');
+      toggleSummary('districtWiseSamplesRejectedSummary','facilityWiseSamplesRejectedSummary');
+      
+      getSamplesReceivedGraphInfo();
+      getSuppressionRateGraphInfo();
+      getSamplesRejectedBarChartInfo();
+      getRegimenGroupBarChartInfo();
+      
+      districtWiseSamplesReceivedSummaryFn();
+      facilityWiseSamplesReceivedSummaryFn();
+      districtWiseSuppressionRateSummaryFn();
+      facilityWiseSuppressionRateSummaryFn();
+      districtWiseSamplesRejectedSummaryFn();
+      facilityWiseSamplesRejectedSummaryFn();
+      regimenGroupsSummaryFn();
+    });
+    
+    function districtWiseSamplesReceivedSummaryFn(){
+        oTableSamplesReceivedDistrict = $('#samplesReceivedDistrict').DataTable( {
+            "bProcessing": true,
+            "bServerSide": true,
+            "scrollX": true,
+            "autoWidth": false,
+            "aoColumns": [
+                {"sClass":"center"},
+                {"sClass":"center","bSortable":false},
+                {"sClass":"center","bSortable":false},
+                {"sClass":"center","bSortable":false},
+                {"sClass":"center","bSortable":false},
+                {"sClass":"center","bSortable":false},
+                {"sClass":"center","bSortable":false},
+                {"sClass":"center","bSortable":false}
+                ],
+            "iDisplayLength": 10,
+            "aaSorting": [[ 0, "asc" ]],
+            "pagingType": "simple",
+            "sAjaxSource": "<?php echo $this->url('summary',array('action' => 'samples-received-district')); ?>",
+            "fnServerData": function ( sSource, aoData, fnCallback ) {                
+                $.ajax({
+                    "dataType": 'json',
+                    "type": "POST",
+                    "url": sSource,
+                    "data": aoData,
+                    "success": fnCallback
+                });
+            }
+        });
+    }
+    
+    function facilityWiseSamplesReceivedSummaryFn(){
+        oTableSamplesReceivedFacility = $('#samplesReceivedFacility').DataTable( {
+            "bProcessing": true,
+            "bServerSide": true,
+            "scrollX": true,
+            "autoWidth": false,
+            "aoColumns": [
+                {"sClass":"center"},
+                {"sClass":"center"},
+                {"sClass":"center","bSortable":false},
+                {"sClass":"center","bSortable":false},
+                {"sClass":"center","bSortable":false},
+                {"sClass":"center","bSortable":false},
+                {"sClass":"center","bSortable":false},
+                {"sClass":"center","bSortable":false},
+                {"sClass":"center","bSortable":false}
+                ],
+            "iDisplayLength": 10,
+            "aaSorting": [[ 0, "asc" ]],
+            "pagingType": "simple",
+            "sAjaxSource": "<?php echo $this->url('summary',array('action' => 'samples-received-facility')); ?>",
+            "fnServerData": function ( sSource, aoData, fnCallback ) {                
+                $.ajax({
+                    "dataType": 'json',
+                    "type": "POST",
+                    "url": sSource,
+                    "data": aoData,
+                    "success": fnCallback
+                });
+            }
+        });
+    }
 
-    <script src="<?php echo $this->basePath('assets/pages/scripts/dashboard.js'); ?>" type="text/javascript"></script>
+    function districtWiseSuppressionRateSummaryFn(){
+        oTableSuppressionRateDistrict = $('#suppressionRateDistrict').DataTable( {
+            "bProcessing": true,
+            "bServerSide": true,
+            "scrollX": true,
+            "autoWidth": false,
+            "aoColumns": [
+                {"sClass":"center"},
+                {"sClass":"center","bSortable":false},
+                {"sClass":"center","bSortable":false},
+                {"sClass":"center","bSortable":false},
+                {"sClass":"center","bSortable":false}
+                ],
+            "iDisplayLength": 10,
+            "aaSorting": [[ 0, "asc" ]],
+            "pagingType": "simple",
+            "sAjaxSource": "<?php echo $this->url('summary',array('action' => 'suppression-rate-district')); ?>",
+            "fnServerData": function ( sSource, aoData, fnCallback ) {                
+                $.ajax({
+                    "dataType": 'json',
+                    "type": "POST",
+                    "url": sSource,
+                    "data": aoData,
+                    "success": fnCallback
+                });
+            }
+        });
+    }
     
-    <script type="text/javascript">
-            var oTableSamplesReceivedDistrict = null;
-            var oTableSamplesReceivedFacility = null;
-            var oTableSuppressionRateDistrict = null;
-            var oTableSuppressionRateFacility = null;
-            var oTableSamplesRejectedDistrict = null;
-            var oTableSamplesRejectedFacility = null;
-            var otableRegimenGroups = null;
-            $(function() {
-              districtWiseSamplesReceivedSummaryFn();
-              facilityWiseSamplesReceivedSummaryFn();
-              districtWiseSuppressionRateSummaryFn();
-              facilityWiseSuppressionRateSummaryFn();
-              districtWiseSamplesRejectedSummaryFn();
-              facilityWiseSamplesRejectedSummaryFn();
-              regimenGroupsSummaryFn();
-              
-              toggleSummary('districtWiseSamplesReceivedSummary','facilityWiseSamplesReceivedSummary');
-              toggleSummary('districtWiseSuppressionRateSummary','facilityWiseSuppressionRateSummary');
-              toggleSummary('districtWiseSamplesRejectedSummary','facilityWiseSamplesRejectedSummary');
-              getSamplesReceivedGraphInfo();
-              getSuppressionRateGraphInfo();
-              getSamplesRejectedBarChartInfo();
-              getRegimenGroupBarChartInfo();
-            });
-            
-            function districtWiseSamplesReceivedSummaryFn(){
-                oTableSamplesReceivedDistrict = $('#samplesReceivedDistrict').DataTable( {
-                    "bProcessing": true,
-                    "bServerSide": true,
-                    "scrollX": true,
-                    "autoWidth": false,
-                    "aoColumns": [
-                        {"sClass":"center"},
-                        {"sClass":"center","bSortable":false},
-                        {"sClass":"center","bSortable":false},
-                        {"sClass":"center","bSortable":false},
-                        {"sClass":"center","bSortable":false},
-                        {"sClass":"center","bSortable":false},
-                        {"sClass":"center","bSortable":false},
-                        {"sClass":"center","bSortable":false}
-                        ],
-                    "iDisplayLength": 10,
-                    "aaSorting": [[ 0, "asc" ]],
-                    "pagingType": "simple",
-                    "sAjaxSource": "<?php echo $this->url('summary',array('action' => 'samples-received-district')); ?>",
-                    "fnServerData": function ( sSource, aoData, fnCallback ) {                
-                        $.ajax({
-                            "dataType": 'json',
-                            "type": "POST",
-                            "url": sSource,
-                            "data": aoData,
-                            "success": fnCallback
-                        });
-                    }
-                });
-            }
-            
-            function facilityWiseSamplesReceivedSummaryFn(){
-                oTableSamplesReceivedFacility = $('#samplesReceivedFacility').DataTable( {
-                    "bProcessing": true,
-                    "bServerSide": true,
-                    "scrollX": true,
-                    "autoWidth": false,
-                    "aoColumns": [
-                        {"sClass":"center"},
-                        {"sClass":"center"},
-                        {"sClass":"center","bSortable":false},
-                        {"sClass":"center","bSortable":false},
-                        {"sClass":"center","bSortable":false},
-                        {"sClass":"center","bSortable":false},
-                        {"sClass":"center","bSortable":false},
-                        {"sClass":"center","bSortable":false},
-                        {"sClass":"center","bSortable":false}
-                        ],
-                    "iDisplayLength": 10,
-                    "aaSorting": [[ 0, "asc" ]],
-                    "pagingType": "simple",
-                    "sAjaxSource": "<?php echo $this->url('summary',array('action' => 'samples-received-facility')); ?>",
-                    "fnServerData": function ( sSource, aoData, fnCallback ) {                
-                        $.ajax({
-                            "dataType": 'json',
-                            "type": "POST",
-                            "url": sSource,
-                            "data": aoData,
-                            "success": fnCallback
-                        });
-                    }
-                });
-            }
     
-            function districtWiseSuppressionRateSummaryFn(){
-                oTableSuppressionRateDistrict = $('#suppressionRateDistrict').DataTable( {
-                    "bProcessing": true,
-                    "bServerSide": true,
-                    "scrollX": true,
-                    "autoWidth": false,
-                    "aoColumns": [
-                        {"sClass":"center"},
-                        {"sClass":"center","bSortable":false},
-                        {"sClass":"center","bSortable":false},
-                        {"sClass":"center","bSortable":false},
-                        {"sClass":"center","bSortable":false}
-                        ],
-                    "iDisplayLength": 10,
-                    "aaSorting": [[ 0, "asc" ]],
-                    "pagingType": "simple",
-                    "sAjaxSource": "<?php echo $this->url('summary',array('action' => 'suppression-rate-district')); ?>",
-                    "fnServerData": function ( sSource, aoData, fnCallback ) {                
-                        $.ajax({
-                            "dataType": 'json',
-                            "type": "POST",
-                            "url": sSource,
-                            "data": aoData,
-                            "success": fnCallback
-                        });
-                    }
+    function facilityWiseSuppressionRateSummaryFn(){
+        oTableSuppressionRateFacility = $('#suppressionRateFacility').DataTable( {
+            "bProcessing": true,
+            "bServerSide": true,
+            "scrollX": true,
+            "autoWidth": false,
+            "aoColumns": [
+                {"sClass":"center"},
+                {"sClass":"center"},
+                {"sClass":"center","bSortable":false},
+                {"sClass":"center","bSortable":false},
+                {"sClass":"center","bSortable":false},
+                {"sClass":"center","bSortable":false}
+                ],
+            "iDisplayLength": 10,
+            "aaSorting": [[ 0, "asc" ]],
+            "pagingType": "simple",
+            "sAjaxSource": "<?php echo $this->url('summary',array('action' => 'suppression-rate-facility')); ?>",
+            "fnServerData": function ( sSource, aoData, fnCallback ) {                
+                $.ajax({
+                    "dataType": 'json',
+                    "type": "POST",
+                    "url": sSource,
+                    "data": aoData,
+                    "success": fnCallback
                 });
             }
-            
-            
-            function facilityWiseSuppressionRateSummaryFn(){
-                oTableSuppressionRateFacility = $('#suppressionRateFacility').DataTable( {
-                    "bProcessing": true,
-                    "bServerSide": true,
-                    "scrollX": true,
-                    "autoWidth": false,
-                    "aoColumns": [
-                        {"sClass":"center"},
-                        {"sClass":"center"},
-                        {"sClass":"center","bSortable":false},
-                        {"sClass":"center","bSortable":false},
-                        {"sClass":"center","bSortable":false},
-                        {"sClass":"center","bSortable":false}
-                        ],
-                    "iDisplayLength": 10,
-                    "aaSorting": [[ 0, "asc" ]],
-                    "pagingType": "simple",
-                    "sAjaxSource": "<?php echo $this->url('summary',array('action' => 'suppression-rate-facility')); ?>",
-                    "fnServerData": function ( sSource, aoData, fnCallback ) {                
-                        $.ajax({
-                            "dataType": 'json',
-                            "type": "POST",
-                            "url": sSource,
-                            "data": aoData,
-                            "success": fnCallback
-                        });
-                    }
+        });
+    }
+
+    function districtWiseSamplesRejectedSummaryFn(){
+        oTableSamplesRejectedDistrict = $('#samplesRejectedDistrict').DataTable( {
+            "bProcessing": true,
+            "bServerSide": true,
+            //"scrollX": true,
+            "autoWidth": false,
+            "aoColumns": [
+                {"sClass":"center"},
+                {"sClass":"center","bSortable":false},
+                {"sClass":"center","bSortable":false},
+                {"sClass":"center","bSortable":false}
+                ],
+            "iDisplayLength": 10,
+            "aaSorting": [[ 0, "asc" ]],
+            "pagingType": "simple",
+            "sAjaxSource": "<?php echo $this->url('summary',array('action' => 'samples-rejected-district')); ?>",
+            "fnServerData": function ( sSource, aoData, fnCallback ) {                
+                $.ajax({
+                    "dataType": 'json',
+                    "type": "POST",
+                    "url": sSource,
+                    "data": aoData,
+                    "success": fnCallback
                 });
             }
+        });
+    }
     
-            function districtWiseSamplesRejectedSummaryFn(){
-                oTableSamplesRejectedDistrict = $('#samplesRejectedDistrict').DataTable( {
-                    "bProcessing": true,
-                    "bServerSide": true,
-                    //"scrollX": true,
-                    "autoWidth": false,
-                    "aoColumns": [
-                        {"sClass":"center"},
-                        {"sClass":"center","bSortable":false},
-                        {"sClass":"center","bSortable":false},
-                        {"sClass":"center","bSortable":false}
-                        ],
-                    "iDisplayLength": 10,
-                    "aaSorting": [[ 0, "asc" ]],
-                    "pagingType": "simple",
-                    "sAjaxSource": "<?php echo $this->url('summary',array('action' => 'samples-rejected-district')); ?>",
-                    "fnServerData": function ( sSource, aoData, fnCallback ) {                
-                        $.ajax({
-                            "dataType": 'json',
-                            "type": "POST",
-                            "url": sSource,
-                            "data": aoData,
-                            "success": fnCallback
-                        });
-                    }
+    function facilityWiseSamplesRejectedSummaryFn(){
+        oTableSamplesRejectedDistrict = $('#samplesRejectedFacility').DataTable( {
+            "bProcessing": true,
+            "bServerSide": true,
+            //"scrollX": true,
+            "autoWidth": false,
+            "aoColumns": [
+                {"sClass":"center"},
+                {"sClass":"center"},
+                {"sClass":"center","bSortable":false},
+                {"sClass":"center","bSortable":false}
+                ],
+            "iDisplayLength": 10,
+            "aaSorting": [[ 0, "asc" ]],
+            "pagingType": "simple",
+            "sAjaxSource": "<?php echo $this->url('summary',array('action' => 'samples-rejected-facility')); ?>",
+            "fnServerData": function ( sSource, aoData, fnCallback ) {                
+                $.ajax({
+                    "dataType": 'json',
+                    "type": "POST",
+                    "url": sSource,
+                    "data": aoData,
+                    "success": fnCallback
                 });
             }
-            
-            function facilityWiseSamplesRejectedSummaryFn(){
-                oTableSamplesRejectedDistrict = $('#samplesRejectedFacility').DataTable( {
-                    "bProcessing": true,
-                    "bServerSide": true,
-                    //"scrollX": true,
-                    "autoWidth": false,
-                    "aoColumns": [
-                        {"sClass":"center"},
-                        {"sClass":"center"},
-                        {"sClass":"center","bSortable":false},
-                        {"sClass":"center","bSortable":false}
-                        ],
-                    "iDisplayLength": 10,
-                    "aaSorting": [[ 0, "asc" ]],
-                    "pagingType": "simple",
-                    "sAjaxSource": "<?php echo $this->url('summary',array('action' => 'samples-rejected-facility')); ?>",
-                    "fnServerData": function ( sSource, aoData, fnCallback ) {                
-                        $.ajax({
-                            "dataType": 'json',
-                            "type": "POST",
-                            "url": sSource,
-                            "data": aoData,
-                            "success": fnCallback
-                        });
-                    }
+        });
+    }
+    
+    function regimenGroupsSummaryFn(){
+        otableRegimenGroups = $('#regimenGroupsDataTable').DataTable( {
+            "bProcessing": true,
+            "bServerSide": true,
+            //"scrollX": true,
+            "autoWidth": false,
+            "aoColumns": [
+                {"sClass":"center"},
+                {"sClass":"center","bSortable":false},
+                {"sClass":"center","bSortable":false},
+                {"sClass":"center","bSortable":false},
+                {"sClass":"center","bSortable":false},
+                {"sClass":"center","bSortable":false},
+                {"sClass":"center","bSortable":false}
+                ],
+            "iDisplayLength": 10,
+            "aaSorting": [[ 0, "asc" ]],
+            "pagingType": "simple",
+            "sAjaxSource": "<?php echo $this->url('summary',array('action' => 'get-regimen-group-details')); ?>",
+            "fnServerData": function ( sSource, aoData, fnCallback ) {
+                aoData.push({"name": "t_received", "value": '<?php echo $summaryTabInfo[0]["total_samples_received"]; ?>'});
+                $.ajax({
+                    "dataType": 'json',
+                    "type": "POST",
+                    "url": sSource,
+                    "data": aoData,
+                    "success": fnCallback
                 });
             }
-            
-            function regimenGroupsSummaryFn(){
-                otableRegimenGroups = $('#regimenGroupsDataTable').DataTable( {
-                    "bProcessing": true,
-                    "bServerSide": true,
-                    //"scrollX": true,
-                    "autoWidth": false,
-                    "aoColumns": [
-                        {"sClass":"center"},
-                        {"sClass":"center","bSortable":false},
-                        {"sClass":"center","bSortable":false},
-                        {"sClass":"center","bSortable":false},
-                        {"sClass":"center","bSortable":false},
-                        {"sClass":"center","bSortable":false},
-                        {"sClass":"center","bSortable":false}
-                        ],
-                    "iDisplayLength": 10,
-                    "aaSorting": [[ 0, "asc" ]],
-                    "pagingType": "simple",
-                    "sAjaxSource": "<?php echo $this->url('summary',array('action' => 'get-regimen-group-details')); ?>",
-                    "fnServerData": function ( sSource, aoData, fnCallback ) {
-                        aoData.push({"name": "t_received", "value": '<?php echo $summaryTabInfo[0]["total_samples_received"]; ?>'});
-                        $.ajax({
-                            "dataType": 'json',
-                            "type": "POST",
-                            "url": sSource,
-                            "data": aoData,
-                            "success": fnCallback
-                        });
-                    }
-                });
-            }
-            
-            function toggleSummary(showId,hideId){
-                $("#"+showId).show();
-                $("#"+hideId).hide();
-                if(showId==='districtWiseSamplesReceivedSummary'){
-                    $("#samplesReceivedBlockTitle").html("<i class='fa fa-cogs'></i><?php echo $this->translate('District Wise Samples Received Summary'); ?>");
-                }else if(showId==='facilityWiseSamplesReceivedSummary'){
-                    $("#samplesReceivedBlockTitle").html("<i class='fa fa-cogs'></i><?php echo $this->translate('Facility Wise Samples Received Summary'); ?>");
-                }else if(showId==='districtWiseSuppressionRateSummary'){
-                    $("#suppressionRateBlockTitle").html("<i class='fa fa-cogs'></i><?php echo $this->translate('District Wise Suppression Rate Summary'); ?>");
-                }else if(showId==='facilityWiseSuppressionRateSummary'){
-                    $("#suppressionRateBlockTitle").html("<i class='fa fa-cogs'></i><?php echo $this->translate('Facility Wise Suppression Rate Summary'); ?>");
-                }else if(showId==='districtWiseSamplesRejectedSummary'){
-                    $("#samplesRejectedBlockTitle").html("<i class='fa fa-cogs'></i><?php echo $this->translate('District Wise Samples Rejected Summary'); ?>");
-                }else if(showId==='facilityWiseSamplesRejectedSummary'){
-                    $("#samplesRejectedBlockTitle").html("<i class='fa fa-cogs'></i><?php echo $this->translate('Facility Wise Samples Rejected Summary'); ?>");
-                }
-               
-            }
-            
-            $('[data-toggle="btns"] .btn').on('click', function(){
-                var $this = $(this);
-                $this.parent().find('.active').removeClass('active');
-                $this.addClass('active');
-            });
-            
-            function getSamplesReceivedGraphInfo(){
-                $.post("<?php echo $this->url('summary', array('action' => 'samples-received-graph')); ?>",{},
-                function(data) {
-                    $("#samplesReceivedGraphContainer").html(data);
-                });
-            }
-            
-            function getSuppressionRateGraphInfo(){
-                $.post("<?php echo $this->url('summary', array('action' => 'suppression-rate-graph')); ?>",{},
-                function(data) {
-                    $("#suppressionRateGraphContainer").html(data);
-                });
-            }
-            
-            function getSamplesRejectedBarChartInfo(){
-                $.post("<?php echo $this->url('summary', array('action' => 'get-samples-rejected-bar-chart')); ?>",{},
-                function(data) {
-                    $("#samplesRejectedBarChartContainer").html(data);
-                });
-            }
-            
-            function getRegimenGroupBarChartInfo(){
-                $.post("<?php echo $this->url('summary', array('action' => 'get-regimen-group-bar-chart')); ?>",{},
-                function(data) {
-                    $("#regimenGroupBarChartContainer").html(data);
-                });
-            }
-    </script>
+        });
+    }
+    
+    function toggleSummary(showId,hideId){
+        $("#"+showId).show();
+        $("#"+hideId).hide();
+        if(showId==='districtWiseSamplesReceivedSummary'){
+            $("#samplesReceivedBlockTitle").html("<i class='fa fa-cogs'></i><?php echo $this->translate('District Wise Samples Received Summary'); ?>");
+        }else if(showId==='facilityWiseSamplesReceivedSummary'){
+            $("#samplesReceivedBlockTitle").html("<i class='fa fa-cogs'></i><?php echo $this->translate('Facility Wise Samples Received Summary'); ?>");
+        }else if(showId==='districtWiseSuppressionRateSummary'){
+            $("#suppressionRateBlockTitle").html("<i class='fa fa-cogs'></i><?php echo $this->translate('District Wise Suppression Rate Summary'); ?>");
+        }else if(showId==='facilityWiseSuppressionRateSummary'){
+            $("#suppressionRateBlockTitle").html("<i class='fa fa-cogs'></i><?php echo $this->translate('Facility Wise Suppression Rate Summary'); ?>");
+        }else if(showId==='districtWiseSamplesRejectedSummary'){
+            $("#samplesRejectedBlockTitle").html("<i class='fa fa-cogs'></i><?php echo $this->translate('District Wise Samples Rejected Summary'); ?>");
+        }else if(showId==='facilityWiseSamplesRejectedSummary'){
+            $("#samplesRejectedBlockTitle").html("<i class='fa fa-cogs'></i><?php echo $this->translate('Facility Wise Samples Rejected Summary'); ?>");
+        }
+       
+    }
+    
+    $('[data-toggle="btns"] .btn').on('click', function(){
+        var $this = $(this);
+        $this.parent().find('.active').removeClass('active');
+        $this.addClass('active');
+    });
+    
+    function getSamplesReceivedGraphInfo(){
+        $.post("<?php echo $this->url('summary', array('action' => 'samples-received-graph')); ?>",{},
+        function(data) {
+            $("#samplesReceivedGraphContainer").html(data);
+        });
+    }
+    
+    function getSuppressionRateGraphInfo(){
+        $.post("<?php echo $this->url('summary', array('action' => 'suppression-rate-graph')); ?>",{},
+        function(data) {
+            $("#suppressionRateGraphContainer").html(data);
+        });
+    }
+    
+    function getSamplesRejectedBarChartInfo(){
+        $.post("<?php echo $this->url('summary', array('action' => 'get-samples-rejected-bar-chart')); ?>",{},
+        function(data) {
+            $("#samplesRejectedBarChartContainer").html(data);
+        });
+    }
+    
+    function getRegimenGroupBarChartInfo(){
+        $.post("<?php echo $this->url('summary', array('action' => 'get-regimen-group-bar-chart')); ?>",{},
+        function(data) {
+            $("#regimenGroupBarChartContainer").html(data);
+        });
+    }
+</script>
