@@ -536,7 +536,7 @@ class SampleTable extends AbstractTableGateway {
         if(trim($params['fromDate'])!= '' && trim($params['toDate'])!= ''){
             $startMonth = date("Y-m", strtotime(trim($params['fromDate'])))."-01";
             $endMonth = date("Y-m", strtotime(trim($params['toDate'])))."-31";
-            $incompleteQuery = "SUM(CASE WHEN (vl.patient_art_no IS NULL OR vl.patient_art_no='' OR vl.patient_age_in_years IS NULL OR vl.patient_age_in_years ='' OR vl.patient_gender IS NULL OR vl.patient_gender='' OR vl.line_of_treatment IS NOT NULL OR vl.line_of_treatment !='') THEN 1 ELSE 0 END)";
+            $incompleteQuery = "SUM(CASE WHEN (vl.patient_art_no IS NULL OR vl.patient_art_no='' OR vl.patient_age_in_years IS NULL OR vl.patient_age_in_years ='' OR vl.patient_gender IS NULL OR vl.patient_gender='' OR vl.current_regimen IS NOT NULL OR vl.current_regimen !='') THEN 1 ELSE 0 END)";
             if(isset($params['formFields']) && count($params['formFields']) >0){
                 $incompleteQuery = '';
                 for($f=0;$f<count($params['formFields']);$f++){
@@ -554,7 +554,7 @@ class SampleTable extends AbstractTableGateway {
                                                     "total" => new Expression('COUNT(*)'),
                                                     "monthDate" => new Expression("DATE_FORMAT(DATE(sample_collection_date), '%b-%Y')"),
                                                     
-                                                    "CompletedForms" => new Expression("SUM(CASE WHEN (vl.patient_art_no IS NOT NULL AND vl.patient_art_no !='' AND vl.patient_age_in_years IS NOT NULL AND vl.patient_age_in_years !='' AND vl.patient_gender IS NOT NULL AND vl.patient_gender !='' AND vl.line_of_treatment IS NOT NULL AND vl.line_of_treatment !='') THEN 1 ELSE 0 END)"),
+                                                    "CompletedForms" => new Expression("SUM(CASE WHEN (vl.patient_art_no IS NOT NULL AND vl.patient_art_no !='' AND vl.patient_age_in_years IS NOT NULL AND vl.patient_age_in_years !='' AND vl.patient_gender IS NOT NULL AND vl.patient_gender !='' AND vl.current_regimen IS NOT NULL AND vl.current_regimen !='') THEN 1 ELSE 0 END)"),
                                                     "IncompleteForms" => new Expression("SUM(CASE WHEN ($incompleteQuery) THEN 1 ELSE 0 END)"),
                                              
                                               )
@@ -600,7 +600,7 @@ class SampleTable extends AbstractTableGateway {
         $result = array();
         $common = new CommonService($this->sm);
         $i =0;$j =1;$k =2;$l =3;
-        $result[$i]['field'] = 'Patient ART No';
+        $result[$i]['field'] = 'Patient ART Number';
         $result[$j]['field'] = 'Current Regimen';
         $result[$k]['field'] = 'Patient Age in Years';
         $result[$l]['field'] = 'Patient Gender';
@@ -5444,18 +5444,18 @@ class SampleTable extends AbstractTableGateway {
                                                                 "total_samples_tested" => new Expression("(SUM(CASE WHEN (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END))"),
                                                                 "total_samples_pending" => new Expression("(SUM(CASE WHEN (sample_tested_datetime is null OR sample_tested_datetime = '' OR DATE(sample_tested_datetime) ='1970-01-01' OR DATE(sample_tested_datetime) ='0000-00-00' OR DATE(sample_tested_datetime) ='0') THEN 1 ELSE 0 END))"),
                                                                 "total_samples_rejected" => new Expression("(SUM(CASE WHEN (reason_for_sample_rejection !='' AND reason_for_sample_rejection !='0' AND reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END))"),
-                                                                "suppressed_samples_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (vl.result < 1000 or vl.result='Target Not Detected) THEN 1 ELSE 0 END)/COUNT(*))*100),2)"),
+                                                                "suppressed_samples_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (vl.result < 1000 or vl.result='Target Not Detected') THEN 1 ELSE 0 END)/COUNT(*))*100),2)"),
                                                                 "rejected_samples_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (vl.reason_for_sample_rejection !='' AND vl.reason_for_sample_rejection !='0' AND vl.reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END)/COUNT(*))*100),2)"),
                                                                 )
                                                         )
                                                ->where("Month(sample_collection_date)='".$month."' AND Year(sample_collection_date)='".$year."'");
             $samplesReceivedSummaryCacheQuery = $sql->getSqlStringForSqlObject($samplesReceivedSummaryQuery);
             $samplesReceivedSummaryResult = $common->cacheQuery($samplesReceivedSummaryCacheQuery,$dbAdapter);
-            $summaryResult['sample']['samples-received']['month'][$j]=$samplesReceivedSummaryResult[0]["total_samples_received"];
-            $summaryResult['sample']['samples-tested']['month'][$j]=$samplesReceivedSummaryResult[0]["total_samples_tested"];
-            $summaryResult['sample']['valid-tested']['month'][$j]=$samplesReceivedSummaryResult[0]["total_samples_tested"] - $samplesReceivedSummaryResult[0]["total_samples_rejected"];
-            $summaryResult['sample']['suppression-rate']['month'][$j]=$samplesReceivedSummaryResult[0]["suppressed_samples_percentage"].' %';
-            $summaryResult['sample']['rejection-rate']['month'][$j]=$samplesReceivedSummaryResult[0]["rejected_samples_percentage"].' %';
+            $summaryResult['sample']['samples-received']['month'][$j] = (isset($samplesReceivedSummaryResult[0]["total_samples_received"]))?$samplesReceivedSummaryResult[0]["total_samples_received"]:0;
+            $summaryResult['sample']['samples-tested']['month'][$j] = (isset($samplesReceivedSummaryResult[0]["total_samples_tested"]))?$samplesReceivedSummaryResult[0]["total_samples_tested"]:0;
+            $summaryResult['sample']['valid-tested']['month'][$j] = $samplesReceivedSummaryResult[0]["total_samples_tested"] - $samplesReceivedSummaryResult[0]["total_samples_rejected"];
+            $summaryResult['sample']['suppression-rate']['month'][$j] = (isset($samplesReceivedSummaryResult[0]["suppressed_samples_percentage"]) && $samplesReceivedSummaryResult[0]["suppressed_samples_percentage"] >0)?$samplesReceivedSummaryResult[0]["suppressed_samples_percentage"].' %':'';
+            $summaryResult['sample']['rejection-rate']['month'][$j] = (isset($samplesReceivedSummaryResult[0]["rejected_samples_percentage"]) && $samplesReceivedSummaryResult[0]["rejected_samples_percentage"] >0)?$samplesReceivedSummaryResult[0]["rejected_samples_percentage"].' %':'';
             $summaryResult['month'][$j] = $monthYearFormat;
           $start = strtotime("+1 month", $start);
           $j++;

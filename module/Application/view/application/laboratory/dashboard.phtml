@@ -382,7 +382,7 @@ foreach($sampleType as $samples){
                                                 <option value="patient_art_no">Patient ART Number</option>
                                                 <option value="patient_age_in_years"> Patient Age</option>
                                                 <option value="patient_gender"> Patient Gender</option>
-                                                <option value="line_of_treatment"> Line of Treatment</option>
+                                                <option value="current_regimen"> Line of Treatment</option>
                                             </select>
                                         </div>
                                     </div>
@@ -573,7 +573,7 @@ foreach($sampleType as $samples){
         facilityId = $("#labName").val();
         fromDate = $('#mrp-lowerDate').val();
         toDate = $('#mrp-upperDate').val();
-        formFields = ($('#formFields').val() == null)?['patient_art_no','patient_age_in_years','patient_gender','line_of_treatment']:$('#formFields').val();
+        formFields = ($('#formFields').val() == null)?['patient_art_no','patient_age_in_years','patient_gender','current_regimen']:$('#formFields').val();
         $.post("<?php echo $this->url('laboratory', array('action' => 'get-requisition-forms')); ?>",{fromDate:fromDate,toDate:toDate,facilityId:facilityId,formFields:formFields},
         function(data) {
             $("#labDashReqFormBar").html(data);
