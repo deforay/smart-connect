@@ -21,7 +21,6 @@ class SummaryService {
     public function getServiceManager() {
         return $this->sm;
     }
-    
         
     public function fetchSummaryTabDetails(){
         $sampleDb = $this->sm->get('SampleTable');
@@ -38,9 +37,9 @@ class SummaryService {
         return $sampleDb->fetchAllSamplesReceivedByFacility($params);
     }
     
-    public function getSamplesReceivedGraphDetails($params){
+    public function getSamplesReceivedBarChartDetails($params){
         $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->fetchSamplesReceivedGraphDetails($params);
+        return $sampleDb->fetchSamplesReceivedBarChartDetails($params);
     }
     
     public function getKeySummaryIndicatorsDetails(){
@@ -58,9 +57,9 @@ class SummaryService {
         return $sampleDb->fetchAllSuppressionRateByFacility($params);
     }
     
-    public function getSuppressionRateGraphDetails($params){
+    public function getSuppressionRateBarChartDetails($params){
         $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->fetchSuppressionRateGraphDetails($params);
+        return $sampleDb->fetchSuppressionRateBarChartDetails($params);
     }
     
     public function getAllSamplesRejectedByDistrict($parameters){

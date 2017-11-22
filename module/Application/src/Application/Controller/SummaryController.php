@@ -48,12 +48,12 @@ class SummaryController extends AbstractActionController{
         }
     }
     
-    public function samplesReceivedGraphAction() {
+    public function getSamplesReceivedBarChartAction() {
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
             $summaryService = $this->getServiceLocator()->get('SummaryService');
-            $result = $summaryService->getSamplesReceivedGraphDetails($params);
+            $result = $summaryService->getSamplesReceivedBarChartDetails($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array(
                                     'result' => $result
@@ -82,12 +82,12 @@ class SummaryController extends AbstractActionController{
         }
     }
     
-    public function suppressionRateGraphAction() {
+    public function getSuppressionRateBarChartAction() {
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
             $summaryService = $this->getServiceLocator()->get('SummaryService');
-            $result = $summaryService->getSuppressionRateGraphDetails($params);
+            $result = $summaryService->getSuppressionRateBarChartDetails($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array(
                                     'result' => $result

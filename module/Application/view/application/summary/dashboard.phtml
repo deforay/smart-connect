@@ -229,7 +229,7 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
                         </div>
                     </div>
                     <div class="portlet-body" style="cursor:pointer;">
-                        <div id="samplesReceivedGraphContainer"></div>
+                        <div id="samplesReceivedBarChartContainer"></div>
                     </div>
                 </div>
             </div>
@@ -312,7 +312,7 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
                         </div>
                     </div>
                     <div class="portlet-body" style="cursor:pointer;">
-                        <div id="suppressionRateGraphContainer"></div>
+                        <div id="suppressionRateBarChartContainer"></div>
                     </div>
                 </div>
             </div>
@@ -970,8 +970,8 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
       toggleSummary('districtWiseSuppressionRateSummary','facilityWiseSuppressionRateSummary');
       toggleSummary('districtWiseSamplesRejectedSummary','facilityWiseSamplesRejectedSummary');
       
-      getSamplesReceivedGraphInfo();
-      getSuppressionRateGraphInfo();
+      getSamplesReceivedBarChartInfo();
+      getSuppressionRateBarChartInfo();
       getSamplesRejectedBarChartInfo();
       getRegimenGroupBarChartInfo();
       
@@ -1216,23 +1216,17 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
        
     }
     
-    $('[data-toggle="btns"] .btn').on('click', function(){
-        var $this = $(this);
-        $this.parent().find('.active').removeClass('active');
-        $this.addClass('active');
-    });
-    
-    function getSamplesReceivedGraphInfo(){
-        $.post("<?php echo $this->url('summary', array('action' => 'samples-received-graph')); ?>",{},
+    function getSamplesReceivedBarChartInfo(){
+        $.post("<?php echo $this->url('summary', array('action' => 'get-samples-received-bar-chart')); ?>",{},
         function(data) {
-            $("#samplesReceivedGraphContainer").html(data);
+            $("#samplesReceivedBarChartContainer").html(data);
         });
     }
     
-    function getSuppressionRateGraphInfo(){
-        $.post("<?php echo $this->url('summary', array('action' => 'suppression-rate-graph')); ?>",{},
+    function getSuppressionRateBarChartInfo(){
+        $.post("<?php echo $this->url('summary', array('action' => 'get-suppression-rate-bar-chart')); ?>",{},
         function(data) {
-            $("#suppressionRateGraphContainer").html(data);
+            $("#suppressionRateBarChartContainer").html(data);
         });
     }
     
@@ -1249,4 +1243,10 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
             $("#regimenGroupBarChartContainer").html(data);
         });
     }
+    
+    $('[data-toggle="btns"] .btn').on('click', function(){
+        var $this = $(this);
+        $this.parent().find('.active').removeClass('active');
+        $this.addClass('active');
+    });
 </script>
