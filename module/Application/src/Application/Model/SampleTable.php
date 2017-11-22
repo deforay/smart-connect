@@ -839,7 +839,7 @@ class SampleTable extends AbstractTableGateway {
                                                     "Line_Of_Treatment_1" => new Expression("SUM(CASE WHEN (line_of_treatment = 1) THEN 1 ELSE 0 END)"),
                                                     "Line_Of_Treatment_2" => new Expression("SUM(CASE WHEN (line_of_treatment = 2) THEN 1 ELSE 0 END)"),
                                                     "Line_Of_Treatment_3" => new Expression("SUM(CASE WHEN (line_of_treatment = 3) THEN 1 ELSE 0 END)"),
-                                                    "Not_Specified" => new Expression("SUM(CASE WHEN ((line_of_treatment!=1 AND line_of_treatment!=2 AND line_of_treatment!=3) OR (line_of_treatment IS NULL)) THEN 1 ELSE 0 END)"),
+                                                    "Not_Specified" => new Expression("SUM(CASE WHEN ((line_of_treatment NOT IN(1,2,3)) OR (line_of_treatment IS NULL) OR (line_of_treatment= '')) THEN 1 ELSE 0 END)"),
                                               )
                                             );
             if(isset($params['facilityId']) && is_array($params['facilityId']) && count($params['facilityId']) >0){
@@ -873,7 +873,7 @@ class SampleTable extends AbstractTableGateway {
             $endMonth = date("Y-m", strtotime(trim($params['toDate'])))."-31";
             $queryStr = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
                                     ->columns(array(
-                                                    "Suppressed" => new Expression("SUM(CASE WHEN (vl.result < 1000) THEN 1 ELSE 0 END)"),
+                                                    "Suppressed" => new Expression("SUM(CASE WHEN (vl.result < 1000 or vl.result='Target Not Detected') THEN 1 ELSE 0 END)"),
                                                     "Not_Suppressed" => new Expression("SUM(CASE WHEN (vl.result >= 1000) THEN 1 ELSE 0 END)"),
                                               )
                                             );
@@ -1038,7 +1038,7 @@ class SampleTable extends AbstractTableGateway {
                 }
             }
             //if(isset($params['testResult']) && trim($params['testResult']) == '<1000'){
-            //  $squery = $squery->where("vl.result < 1000");
+            //  $squery = $squery->where("vl.result < 1000 or vl.result='Target Not Detected'");
             //}else if(isset($params['testResult']) && trim($params['testResult']) == '>=1000') {
             //  $squery = $squery->where("vl.result >= 1000");
             //}
@@ -1124,7 +1124,7 @@ class SampleTable extends AbstractTableGateway {
         $where = 'vl.result!=""';
         $testedTotal = $this->fetchChartOverAllLoadResult($params,$where);
         //total <1000
-        $where = 'vl.result < 1000';
+        $where = 'vl.result < 1000 or vl.result="Target Not Detected"';
         $lessTotal = $this->fetchChartOverAllLoadResult($params,$where);
         //total >=1000
         $where = 'vl.result >= 1000';
@@ -1162,7 +1162,7 @@ class SampleTable extends AbstractTableGateway {
                 }
             }
             if(isset($params['testResult']) && trim($params['testResult']) == '<1000'){
-              $rQuery = $rQuery->where("vl.result < 1000");
+              $rQuery = $rQuery->where("vl.result < 1000 or vl.result='Target Not Detected'");
             }else if(isset($params['testResult']) && trim($params['testResult']) == '>=1000') {
               $rQuery = $rQuery->where("vl.result >= 1000");
             }
@@ -1261,7 +1261,7 @@ class SampleTable extends AbstractTableGateway {
                 }
             }
             //if(isset($params['testResult']) && trim($params['testResult']) == '<1000'){
-            //  $squery = $squery->where("vl.result < 1000");
+            //  $squery = $squery->where("vl.result < 1000 or vl.result='Target Not Detected'");
             //}else if(isset($params['testResult']) && trim($params['testResult']) == '>=1000') {
             //  $squery = $squery->where("vl.result >= 1000");
             //}
@@ -1457,7 +1457,7 @@ class SampleTable extends AbstractTableGateway {
             }
         }
         if(isset($parameters['testResult']) && trim($parameters['testResult']) == '<1000'){
-            $sQuery = $sQuery->where("vl.result < 1000");
+            $sQuery = $sQuery->where("vl.result < 1000 or vl.result='Target Not Detected'");
         }else if(isset($parameters['testResult']) && trim($parameters['testResult']) == '>=1000') {
             $sQuery = $sQuery->where("vl.result >= 1000");
         }
@@ -1631,7 +1631,7 @@ class SampleTable extends AbstractTableGateway {
                 }
             }
             if(isset($params['testResult']) && trim($params['testResult']) == '<1000'){
-              $queryStr = $queryStr->where("vl.result < 1000");
+              $queryStr = $queryStr->where("vl.result < 1000 or vl.result='Target Not Detected'");
             }else if(isset($params['testResult']) && trim($params['testResult']) == '>=1000') {
               $queryStr = $queryStr->where("vl.result >= 1000");
             }
@@ -1779,7 +1779,7 @@ class SampleTable extends AbstractTableGateway {
                   $countQuery = $countQuery->where($where);
                 }
                 if(isset($params['testResult']) && $params['testResult'] == '<1000'){
-                  $countQuery = $countQuery->where("vl.result < 1000");
+                  $countQuery = $countQuery->where("vl.result < 1000 or vl.result='Target Not Detected'");
                 }else if(isset($params['testResult']) && $params['testResult'] == '>=1000') {
                   $countQuery = $countQuery->where("vl.result >= 1000");
                 }
@@ -1907,7 +1907,7 @@ class SampleTable extends AbstractTableGateway {
                   $countQuery = $countQuery->where($where);
                 }
                 if(isset($params['testResult']) && $params['testResult'] == '<1000'){
-                   $countQuery = $countQuery->where("vl.result < 1000");
+                   $countQuery = $countQuery->where("vl.result < 1000 or vl.result='Target Not Detected'");
                 }else if(isset($params['testResult']) && $params['testResult'] == '>=1000') {
                    $countQuery = $countQuery->where("vl.result >= 1000");
                 }
@@ -1953,7 +1953,7 @@ class SampleTable extends AbstractTableGateway {
                 }
                 $cQueryStr = $sql->getSqlStringForSqlObject($countQuery);
                 //echo $cQueryStr;die;
-                $lessResult = $dbAdapter->query($cQueryStr." AND vl.result < 1000", $dbAdapter::QUERY_MODE_EXECUTE)->current();
+                $lessResult = $dbAdapter->query($cQueryStr." AND (vl.result < 1000 or vl.result='Target Not Detected')", $dbAdapter::QUERY_MODE_EXECUTE)->current();
                 $result['sample']['Suppressed'][$j] = $lessResult->total;
                 $greaterResult = $dbAdapter->query($cQueryStr." AND vl.result >= 1000", $dbAdapter::QUERY_MODE_EXECUTE)->current();
                 $result['sample']['Not Suppressed'][$j] = $greaterResult->total;
@@ -2030,7 +2030,7 @@ class SampleTable extends AbstractTableGateway {
               $sQuery = $sQuery->where($where);
             }
             if(isset($params['testResult']) && $params['testResult'] == '<1000'){
-              $sQuery = $sQuery->where("vl.result < 1000");
+              $sQuery = $sQuery->where("vl.result < 1000 or vl.result='Target Not Detected'");
             }else if(isset($params['testResult']) && $params['testResult'] == '>=1000') {
               $sQuery = $sQuery->where("vl.result >= 1000");
             }
@@ -2132,7 +2132,7 @@ class SampleTable extends AbstractTableGateway {
                   $sQuery = $sQuery->where($where);
                 }
                 if(isset($params['testResult']) && $params['testResult'] == '<1000'){
-                    $sQuery = $sQuery->where("vl.result < 1000");
+                    $sQuery = $sQuery->where("vl.result < 1000 or vl.result='Target Not Detected'");
                 }else if(isset($params['testResult']) && $params['testResult'] == '>=1000') {
                     $sQuery = $sQuery->where("vl.result >= 1000");
                 }
@@ -2319,7 +2319,7 @@ class SampleTable extends AbstractTableGateway {
           $sQuery = $sQuery->where($where);
         }
         if(isset($parameters['testResult']) && $parameters['testResult'] == '<1000'){
-          $sQuery = $sQuery->where("vl.result < 1000");
+          $sQuery = $sQuery->where("vl.result < 1000 or vl.result='Target Not Detected'");
         }else if(isset($parameters['testResult']) && $parameters['testResult'] == '>=1000') {
           $sQuery = $sQuery->where("vl.result >= 1000");
         }
@@ -2638,7 +2638,7 @@ class SampleTable extends AbstractTableGateway {
             }
             $cQueryStr = $sql->getSqlStringForSqlObject($countQuery);
             //echo $cQueryStr;die;
-            $lessResult = $dbAdapter->query($cQueryStr." AND vl.result < 1000", $dbAdapter::QUERY_MODE_EXECUTE)->current();
+            $lessResult = $dbAdapter->query($cQueryStr." AND (vl.result < 1000 or vl.result='Target Not Detected')", $dbAdapter::QUERY_MODE_EXECUTE)->current();
             $suppressedTotal = $lessResult->total;
             $greaterResult = $dbAdapter->query($cQueryStr." AND vl.result >= 1000", $dbAdapter::QUERY_MODE_EXECUTE)->current();
             $notSuppressedTotal = $greaterResult->total;
@@ -4067,8 +4067,8 @@ class SampleTable extends AbstractTableGateway {
         $queryStr = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
                                 ->columns(array(
                                 "total_samples_received" => new Expression("COUNT(*)"),
-                                "suppressed_samples" => new Expression("SUM(CASE WHEN (vl.result < 1000) THEN 1 ELSE 0 END)"),
-                                "suppressed_samples_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (vl.result < 1000) THEN 1 ELSE 0 END)/COUNT(*))*100),2)"),
+                                "suppressed_samples" => new Expression("SUM(CASE WHEN (vl.result < 1000 or vl.result='Target Not Detected') THEN 1 ELSE 0 END)"),
+                                "suppressed_samples_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (vl.result < 1000 or vl.result='Target Not Detected') THEN 1 ELSE 0 END)/COUNT(*))*100),2)"),
                                 "unsuppressed_samples" => new Expression("SUM(CASE WHEN (vl.result >= 1000) THEN 1 ELSE 0 END)"),
                                 "unsuppressed_samples_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (vl.result >= 1000) THEN 1 ELSE 0 END)/COUNT(*))*100),2)"),
                                 "rejected_samples" => new Expression("SUM(CASE WHEN (vl.reason_for_sample_rejection !='' AND vl.reason_for_sample_rejection !='0' AND vl.reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END)"),
@@ -4567,8 +4567,8 @@ class SampleTable extends AbstractTableGateway {
                                                 'result',                                               
                                                 "total_samples_tested" => new Expression("(SUM(CASE WHEN (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END))"),
                                                 "total_samples_rejected" => new Expression("(SUM(CASE WHEN (reason_for_sample_rejection !='' AND reason_for_sample_rejection !='0' AND reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END))"),
-                                                "total_suppressed_samples" => new Expression("(SUM(CASE WHEN (vl.result < 1000) THEN 1 ELSE 0 END))"),
-                                                "total_suppressed_samples_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (vl.result < 1000) THEN 1 ELSE 0 END)/COUNT(*))*100),2)")
+                                                "total_suppressed_samples" => new Expression("(SUM(CASE WHEN (vl.result < 1000 or vl.result='Target Not Detected') THEN 1 ELSE 0 END))"),
+                                                "total_suppressed_samples_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (vl.result < 1000 or vl.result='Target Not Detected') THEN 1 ELSE 0 END)/COUNT(*))*100),2)")
                                                 )
                                           )
                                 ->join(array('f'=>'facility_details'),'f.facility_id=vl.facility_id',array('facility_name'))
@@ -4610,8 +4610,8 @@ class SampleTable extends AbstractTableGateway {
                                                 'result',                                               
                                                 "total_samples_tested" => new Expression("(SUM(CASE WHEN (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END))"),
                                                 "total_samples_rejected" => new Expression("(SUM(CASE WHEN (reason_for_sample_rejection !='' AND reason_for_sample_rejection !='0' AND reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END))"),
-                                                "total_suppressed_samples" => new Expression("(SUM(CASE WHEN (vl.result < 1000) THEN 1 ELSE 0 END))"),
-                                                "total_suppressed_samples_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (vl.result < 1000) THEN 1 ELSE 0 END)/COUNT(*))*100),2)")
+                                                "total_suppressed_samples" => new Expression("(SUM(CASE WHEN (vl.result < 1000 or vl.result='Target Not Detected') THEN 1 ELSE 0 END))"),
+                                                "total_suppressed_samples_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (vl.result < 1000 or vl.result='Target Not Detected') THEN 1 ELSE 0 END)/COUNT(*))*100),2)")
                                                 )
                                           )
                                 ->join(array('f'=>'facility_details'),'f.facility_id=vl.facility_id',array('facility_name'))
@@ -4734,8 +4734,8 @@ class SampleTable extends AbstractTableGateway {
                                                 'result',                                               
                                                 "total_samples_tested" => new Expression("(SUM(CASE WHEN (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END))"),
                                                 "total_samples_rejected" => new Expression("(SUM(CASE WHEN (reason_for_sample_rejection !='' AND reason_for_sample_rejection !='0' AND reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END))"),
-                                                "total_suppressed_samples" => new Expression("(SUM(CASE WHEN (vl.result < 1000) THEN 1 ELSE 0 END))"),
-                                                "total_suppressed_samples_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (vl.result < 1000) THEN 1 ELSE 0 END)/COUNT(*))*100),2)")
+                                                "total_suppressed_samples" => new Expression("(SUM(CASE WHEN (vl.result < 1000 or vl.result='Target Not Detected') THEN 1 ELSE 0 END))"),
+                                                "total_suppressed_samples_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (vl.result < 1000 or vl.result='Target Not Detected') THEN 1 ELSE 0 END)/COUNT(*))*100),2)")
                                                 )
                                           )
                                 ->join(array('f'=>'facility_details'),'f.facility_id=vl.facility_id',array('facility_name'))
@@ -4777,8 +4777,8 @@ class SampleTable extends AbstractTableGateway {
                                                 'result',                                               
                                                 "total_samples_tested" => new Expression("(SUM(CASE WHEN (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END))"),
                                                 "total_samples_rejected" => new Expression("(SUM(CASE WHEN (reason_for_sample_rejection !='' AND reason_for_sample_rejection !='0' AND reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END))"),
-                                                "total_suppressed_samples" => new Expression("(SUM(CASE WHEN (vl.result < 1000) THEN 1 ELSE 0 END))"),
-                                                "total_suppressed_samples_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (vl.result < 1000) THEN 1 ELSE 0 END)/COUNT(*))*100),2)")
+                                                "total_suppressed_samples" => new Expression("(SUM(CASE WHEN (vl.result < 1000 or vl.result='Target Not Detected') THEN 1 ELSE 0 END))"),
+                                                "total_suppressed_samples_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (vl.result < 1000 or vl.result='Target Not Detected') THEN 1 ELSE 0 END)/COUNT(*))*100),2)")
                                                 )
                                           )
                                 ->join(array('f'=>'facility_details'),'f.facility_id=vl.facility_id',array('facility_name'))
@@ -4825,8 +4825,8 @@ class SampleTable extends AbstractTableGateway {
                                               array(
                                                     "total_samples_tested" => new Expression("(SUM(CASE WHEN (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END))"),
                                                     "total_samples_rejected" => new Expression("(SUM(CASE WHEN (reason_for_sample_rejection !='' AND reason_for_sample_rejection !='0' AND reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END))"),
-                                                    "total_suppressed_samples" => new Expression("(SUM(CASE WHEN (vl.result < 1000) THEN 1 ELSE 0 END))"),
-                                                    "total_suppressed_samples_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (vl.result < 1000) THEN 1 ELSE 0 END)/COUNT(*))*100),2)")
+                                                    "total_suppressed_samples" => new Expression("(SUM(CASE WHEN (vl.result < 1000 or vl.result='Target Not Detected') THEN 1 ELSE 0 END))"),
+                                                    "total_suppressed_samples_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (vl.result < 1000 or vl.result='Target Not Detected') THEN 1 ELSE 0 END)/COUNT(*))*100),2)")
                                                     )
                                               )
                                     ->where("Month(sample_collection_date)='".$month."' AND Year(sample_collection_date)='".$year."'");
@@ -5382,11 +5382,11 @@ class SampleTable extends AbstractTableGateway {
                                 ->columns(
                                           array(
                                                 "1stLineofSuppressed" => new Expression("(SUM(CASE WHEN ((vl.result < 1000 or vl.result='Target Not Detected') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.line_of_treatment = 1) THEN 1 ELSE 0 END))"),
-                                                "1stLineofNotSuppressed" => new Expression("(SUM(CASE WHEN (vl.result >= 1000 AND vl.result!= 'Target Not Detected' AND vl.result IS NOT NULL AND vl.result!= '' AND vl.line_of_treatment = 1) THEN 1 ELSE 0 END))"),
+                                                "1stLineofNotSuppressed" => new Expression("(SUM(CASE WHEN (vl.result >= 1000 AND vl.result IS NOT NULL AND vl.result!= '' AND vl.line_of_treatment = 1) THEN 1 ELSE 0 END))"),
                                                 "2ndLineofSuppressed" => new Expression("(SUM(CASE WHEN ((vl.result < 1000 or vl.result='Target Not Detected') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.line_of_treatment = 2) THEN 1 ELSE 0 END))"),
-                                                "2ndLineofNotSuppressed" => new Expression("(SUM(CASE WHEN (vl.result >= 1000 AND vl.result!= 'Target Not Detected' AND vl.result IS NOT NULL AND vl.result!= '' AND vl.line_of_treatment = 2) THEN 1 ELSE 0 END))"),
-                                                "otherLineofSuppressed" => new Expression("(SUM(CASE WHEN ((vl.result < 1000 or vl.result='Target Not Detected') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.line_of_treatment!= 1 AND vl.line_of_treatment!= 2) THEN 1 ELSE 0 END))"),
-                                                "otherLineofNotSuppressed" => new Expression("(SUM(CASE WHEN (vl.result >= 1000 AND vl.result!= 'Target Not Detected' AND vl.result IS NOT NULL AND vl.result!= '' AND vl.line_of_treatment!= 1 AND vl.line_of_treatment!= 2) THEN 1 ELSE 0 END))")
+                                                "2ndLineofNotSuppressed" => new Expression("(SUM(CASE WHEN (vl.result >= 1000 AND vl.result IS NOT NULL AND vl.result!= '' AND vl.line_of_treatment = 2) THEN 1 ELSE 0 END))"),
+                                                "otherLineofSuppressed" => new Expression("(SUM(CASE WHEN ((vl.result < 1000 or vl.result='Target Not Detected') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.line_of_treatment NOT IN(1,2)) THEN 1 ELSE 0 END))"),
+                                                "otherLineofNotSuppressed" => new Expression("(SUM(CASE WHEN (vl.result >= 1000 AND vl.result IS NOT NULL AND vl.result!= '' AND vl.line_of_treatment NOT IN(1,2)) THEN 1 ELSE 0 END))")
                                                 )
                                           );
         $queryStr = $sql->getSqlStringForSqlObject($sQuery);
@@ -5406,7 +5406,7 @@ class SampleTable extends AbstractTableGateway {
                                                 "current_regimen",
                                                 "validResults"=>new Expression("(SUM(CASE WHEN (vl.result IS NOT NULL AND vl.result!= '') THEN 1 ELSE 0 END))"),
                                                 "totalSuppressed" => new Expression("(SUM(CASE WHEN ((vl.result < 1000 or vl.result='Target Not Detected') AND vl.result IS NOT NULL AND vl.result!= '') THEN 1 ELSE 0 END))"),
-                                                "totalNotSuppressed" => new Expression("(SUM(CASE WHEN (vl.result >= 1000 AND vl.result!= 'Target Not Detected' AND vl.result IS NOT NULL AND vl.result!= '') THEN 1 ELSE 0 END))")
+                                                "totalNotSuppressed" => new Expression("(SUM(CASE WHEN (vl.result >= 1000 AND vl.result IS NOT NULL AND vl.result!= '') THEN 1 ELSE 0 END))")
                                                 )
                                           );
         $queryStr = $sql->getSqlStringForSqlObject($sQuery);
@@ -5423,7 +5423,7 @@ class SampleTable extends AbstractTableGateway {
         $paeds2ndLineofTreatmentResult = $common->cacheQuery($queryStr." Where line_of_treatment = 2 AND patient_age_in_years IS NOT NULL AND patient_age_in_years!= '' AND patient_age_in_years < 18 group by current_regimen order by validResults desc limit 8",$dbAdapter);
         $paeds2ndLineofTreatmentOthersResult = $common->cacheQuery($queryStr." Where line_of_treatment = 2 AND patient_age_in_years IS NOT NULL AND patient_age_in_years!= '' AND patient_age_in_years < 18 group by current_regimen order by validResults desc limit 9,18446744073709551615",$dbAdapter);
         
-        $otherLineofTreatmentResult = $common->cacheQuery($queryStr." Where line_of_treatment!= 1 AND line_of_treatment!= 2 group by current_regimen",$dbAdapter);
+        $otherLineofTreatmentResult = $common->cacheQuery($queryStr." Where line_of_treatment NOT IN(1,2) group by current_regimen",$dbAdapter);
        return array('adult1stLineofTreatmentResult'=>$adult1stLineofTreatmentResult,'adult1stLineofTreatmentOthersResult'=>$adult1stLineofTreatmentOthersResult,'paeds1stLineofTreatmentResult'=>$paeds1stLineofTreatmentResult,'paeds1stLineofTreatmentOthersResult'=>$paeds1stLineofTreatmentOthersResult,'adult2ndLineofTreatmentResult'=>$adult2ndLineofTreatmentResult,'adult2ndLineofTreatmentOthersResult'=>$adult2ndLineofTreatmentOthersResult,'paeds2ndLineofTreatmentResult'=>$paeds2ndLineofTreatmentResult,'paeds2ndLineofTreatmentOthersResult'=>$paeds2ndLineofTreatmentOthersResult,'otherLineofTreatmentResult'=>$otherLineofTreatmentResult);
     }
     
@@ -5444,7 +5444,7 @@ class SampleTable extends AbstractTableGateway {
                                                                 "total_samples_tested" => new Expression("(SUM(CASE WHEN (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END))"),
                                                                 "total_samples_pending" => new Expression("(SUM(CASE WHEN (sample_tested_datetime is null OR sample_tested_datetime = '' OR DATE(sample_tested_datetime) ='1970-01-01' OR DATE(sample_tested_datetime) ='0000-00-00' OR DATE(sample_tested_datetime) ='0') THEN 1 ELSE 0 END))"),
                                                                 "total_samples_rejected" => new Expression("(SUM(CASE WHEN (reason_for_sample_rejection !='' AND reason_for_sample_rejection !='0' AND reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END))"),
-                                                                "suppressed_samples_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (vl.result < 1000) THEN 1 ELSE 0 END)/COUNT(*))*100),2)"),
+                                                                "suppressed_samples_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (vl.result < 1000 or vl.result='Target Not Detected) THEN 1 ELSE 0 END)/COUNT(*))*100),2)"),
                                                                 "rejected_samples_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (vl.reason_for_sample_rejection !='' AND vl.reason_for_sample_rejection !='0' AND vl.reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END)/COUNT(*))*100),2)"),
                                                                 )
                                                         )
