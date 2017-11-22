@@ -536,13 +536,16 @@ class SampleTable extends AbstractTableGateway {
         if(trim($params['fromDate'])!= '' && trim($params['toDate'])!= ''){
             $startMonth = date("Y-m", strtotime(trim($params['fromDate'])))."-01";
             $endMonth = date("Y-m", strtotime(trim($params['toDate'])))."-31";
-            $incompleteQuery = "SUM(CASE WHEN (vl.patient_art_no IS NULL OR vl.patient_art_no='' OR vl.patient_age_in_years IS NULL OR vl.patient_age_in_years ='' OR vl.patient_gender IS NULL OR vl.patient_gender='' OR vl.current_regimen IS NOT NULL OR vl.current_regimen !='') THEN 1 ELSE 0 END)";
+            $incompleteQuery = "vl.patient_art_no IS NULL OR vl.patient_art_no='' OR vl.patient_age_in_years IS NULL OR vl.patient_age_in_years ='' OR vl.patient_gender IS NULL OR vl.patient_gender='' OR vl.current_regimen IS NOT NULL OR vl.current_regimen !=''";
+            $completeQuery = "vl.patient_art_no IS NOT NULL AND vl.patient_art_no !='' AND vl.patient_age_in_years IS NOT NULL AND vl.patient_age_in_years !='' AND vl.patient_gender IS NOT NULL AND vl.patient_gender !='' AND vl.current_regimen IS NOT NULL AND vl.current_regimen !=''";
             if(isset($params['formFields']) && count($params['formFields']) >0){
                 $incompleteQuery = '';
+                $completeQuery = '';
                 for($f=0;$f<count($params['formFields']);$f++){
                     if(trim($params['formFields'][$f])!= ''){
                        $incompleteQuery.= 'vl.'.$params['formFields'][$f].' IS NULL OR vl.'.$params['formFields'][$f].'=""';
-                       if((count($params['formFields']) - $f) > 1){ $incompleteQuery.= ' OR ';}
+                       $completeQuery.= 'vl.'.$params['formFields'][$f].' IS NOT NULL AND vl.'.$params['formFields'][$f].'!=""';
+                       if((count($params['formFields']) - $f) > 1){ $incompleteQuery.= ' OR '; $completeQuery.=' AND '; }
                     }  
                 }
             }
@@ -554,7 +557,7 @@ class SampleTable extends AbstractTableGateway {
                                                     "total" => new Expression('COUNT(*)'),
                                                     "monthDate" => new Expression("DATE_FORMAT(DATE(sample_collection_date), '%b-%Y')"),
                                                     
-                                                    "CompletedForms" => new Expression("SUM(CASE WHEN (vl.patient_art_no IS NOT NULL AND vl.patient_art_no !='' AND vl.patient_age_in_years IS NOT NULL AND vl.patient_age_in_years !='' AND vl.patient_gender IS NOT NULL AND vl.patient_gender !='' AND vl.current_regimen IS NOT NULL AND vl.current_regimen !='') THEN 1 ELSE 0 END)"),
+                                                    "CompletedForms" => new Expression("SUM(CASE WHEN ($completeQuery) THEN 1 ELSE 0 END)"),
                                                     "IncompleteForms" => new Expression("SUM(CASE WHEN ($incompleteQuery) THEN 1 ELSE 0 END)"),
                                              
                                               )
@@ -577,7 +580,6 @@ class SampleTable extends AbstractTableGateway {
             $queryStr = $sql->getSqlStringForSqlObject($queryStr);
             //echo $queryStr;die;
             //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-            //echo $queryStr;die;
             $sampleResult = $common->cacheQuery($queryStr,$dbAdapter);
             $j=0;
             if(isset($sampleResult) && count($sampleResult) > 0){
@@ -655,10 +657,10 @@ class SampleTable extends AbstractTableGateway {
         $currentRegimenInCompleteResult = $dbAdapter->query($incQueryStr." AND (vl.current_regimen IS NULL OR vl.current_regimen ='')", $dbAdapter::QUERY_MODE_EXECUTE)->current();
         $ageInYearsInCompleteResult = $dbAdapter->query($incQueryStr." AND (vl.patient_age_in_years IS NULL OR vl.patient_age_in_years ='')", $dbAdapter::QUERY_MODE_EXECUTE)->current();
         $patientGenderInCompleteResult = $dbAdapter->query($incQueryStr." AND (vl.patient_gender IS NULL OR vl.patient_gender ='')", $dbAdapter::QUERY_MODE_EXECUTE)->current();
-        $result[$i]['total'] = $artInCompleteResult->total;
-        $result[$j]['total'] = $currentRegimenInCompleteResult->total;
-        $result[$k]['total'] = $ageInYearsInCompleteResult->total;
-        $result[$l]['total'] = $patientGenderInCompleteResult->total;
+        $result[$i]['total'] = (isset($artInCompleteResult->total))?$artInCompleteResult->total:0;
+        $result[$j]['total'] = (isset($currentRegimenInCompleteResult->total))?$currentRegimenInCompleteResult->total:0;
+        $result[$k]['total'] = (isset($ageInYearsInCompleteResult->total))?$ageInYearsInCompleteResult->total:0;
+        $result[$l]['total'] = (isset($patientGenderInCompleteResult->total))?$patientGenderInCompleteResult->total:0;
        return $result;
     }
     
