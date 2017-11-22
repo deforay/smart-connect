@@ -180,44 +180,41 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
 <div class="page-bar">
     <h1 class="page-title"><?php echo $this->translate('Summary'); ?></h1>
 </div>
-
-<br>
-<br>
-
+<br><br>
+KEY METRICS
 <div class="tabbable">
-<ul class="nav nav-tabs nav-justified" role="tablist">
-    <li role="presentation" class="active">
-        <a href="#samplesReceivedTab" aria-controls="samplesReceivedTab" role="tab" data-toggle="tab">
-            <h3 class="tabPercentageVal"><?php echo number_format($summaryTabInfo[0]["total_samples_received"]);?></h3>
-            <?php echo $this->translate('Samples Received'); ?>
-        </a>
-    </li>
-    <li role="presentation">
-        <a href="#suppressionRateTab" aria-controls="suppressionRateTab" role="tab" data-toggle="tab">
-            <h3 class="tabPercentageVal"><?php echo number_format($summaryTabInfo[0]["suppressed_samples_percentage"], 2);?>%</h3>            
-            <?php echo $this->translate('Suppression Rate'); ?>
-        </a>
-    </li>
-    <li role="presentation">
-        <a href="#samplesRejectedTab" aria-controls="messages" role="tab" data-toggle="tab">
-            <h3 class="tabPercentageVal"><?php echo number_format($summaryTabInfo[0]["rejected_samples_percentage"], 2);?>%</h3>
-            Rejection Rate
-        </a>
-    </li>
-    <li role="presentation">
-        <a href="#currentRegimenTab" aria-controls="messages" role="tab" data-toggle="tab">
-            <h3 class="tabPercentageVal"><?php echo $firstLineCurrentRegimenPercentage; ?>% <span style="font-size:14px;">on 1st Line</span></h3>
-            Current Regimen
-        </a>
-    </li>
-    <li role="presentation">
-        <a href="#allRegimenTab" aria-controls="messages" role="tab" data-toggle="tab">
-            <h6 style="margin-top:30px;">Reg All</h6>
-            All Regimens
-        </a>
-    </li>
-    
-</ul>
+    <ul class="nav nav-tabs nav-justified" role="tablist">
+        <li role="presentation" class="active">
+            <a href="#samplesReceivedTab" aria-controls="samplesReceivedTab" role="tab" data-toggle="tab">
+                <h3 class="tabPercentageVal"><?php echo number_format($summaryTabInfo[0]["total_samples_received"]);?></h3>
+                <?php echo $this->translate('Samples Received'); ?>
+            </a>
+        </li>
+        <li role="presentation">
+            <a href="#suppressionRateTab" aria-controls="suppressionRateTab" role="tab" data-toggle="tab">
+                <h3 class="tabPercentageVal"><?php echo number_format($summaryTabInfo[0]["suppressed_samples_percentage"], 2);?>%</h3>            
+                <?php echo $this->translate('Suppression Rate'); ?>
+            </a>
+        </li>
+        <li role="presentation">
+            <a href="#samplesRejectedTab" aria-controls="messages" role="tab" data-toggle="tab">
+                <h3 class="tabPercentageVal"><?php echo number_format($summaryTabInfo[0]["rejected_samples_percentage"], 2);?>%</h3>
+                Rejection Rate
+            </a>
+        </li>
+        <li role="presentation">
+            <a href="#currentRegimenTab" aria-controls="messages" role="tab" data-toggle="tab">
+                <h3 class="tabPercentageVal"><?php echo $firstLineCurrentRegimenPercentage; ?>% <span style="font-size:14px;">on 1st Line</span></h3>
+                Current Regimen
+            </a>
+        </li>
+        <li role="presentation">
+            <a href="#allRegimenTab" aria-controls="messages" role="tab" data-toggle="tab">
+                <h6 style="margin-top:30px;">Reg All</h6>
+                All Regimens
+            </a>
+        </li>
+    </ul>
 <div class="tab-content">
     <div role="tabpanel" class="tab-pane fade in active" id="samplesReceivedTab">
         <div class="row">                   
@@ -821,10 +818,11 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
                         <table class="table">
                             <thead>
                               <tr>
-                                <td colspan="<?php echo ($paeds2ndLineofTreatmentTotal > 0)?(2*$paeds2ndLineofTreatmentTotal)+3:3; ?>"></td>
+                                <td colspan="<?php echo ($paeds2ndLineofTreatmentTotal > 0)?(2*$paeds2ndLineofTreatmentTotal)+5:3; ?>"></td>
                               </tr>
                               <tr>
                                 <th colspan="<?php echo ($paeds2ndLineofTreatmentTotal > 0)?(2*$paeds2ndLineofTreatmentTotal)+3:3; ?>" style="text-align:center;font-size:11px;">2nd Line (PAEDS)</th>
+                                <th colspan="2" style="text-align:center;font-size:11px;">Others</th>
                               </tr>
                               <tr>
                                 <th></th>
@@ -835,6 +833,7 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
                                    <th colspan="2" style="font-size:11px;"><?php echo $paeds2ndLineofTreatment['current_regimen']; ?></th>
                                 <?php } } ?>
                                 <th colspan="2" style="text-align:center;font-size:11px;">Others</th>
+                                <th colspan="2" style="text-align:center;font-size:11px;">Other</th>
                               </tr>
                             </thead>
                             <tbody>
@@ -847,6 +846,8 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
                                    <td style="text-align:center;font-size:11px;">#</td>
                                    <td style="text-align:center;font-size:11px;">%</td>
                                 <?php } } ?>
+                                <td style="text-align:center;font-size:11px;">#</td>
+                                <td style="text-align:center;font-size:11px;">%</td>
                                 <td style="text-align:center;font-size:11px;">#</td>
                                 <td style="text-align:center;font-size:11px;">%</td>
                               </tr>
@@ -871,6 +872,18 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
                                 ?>
                                 <td style="text-align:center;font-size:11px;"><?php echo $totalPaeds2ndLineofTreatmentOthersNotSuppressed; ?></td>
                                 <td style="text-align:center;font-size:11px;"><?php echo ($totalPaeds2ndLineofTreatmentOthersNotSuppressed >0)?round((($totalPaeds2ndLineofTreatmentOthersNotSuppressed/($totalPaeds2ndLineofTreatmentOthersNotSuppressed+$totalPaeds2ndLineofTreatmentOthersSuppressed))*100),2):''; ?></td>
+                                <?php
+                                $totalOtherLineofTreatmentNotSuppressed = 0;
+                                $totalOtherLineofTreatmentSuppressed = 0;
+                                if(isset($allCollapsibleLineofTreatmentResult['otherLineofTreatmentResult']) && count($allCollapsibleLineofTreatmentResult['otherLineofTreatmentResult']) >0){
+                                    foreach($allCollapsibleLineofTreatmentResult['otherLineofTreatmentResult'] as $otherLineofTreatmentSuppressedNotSuppressed){
+                                        $totalOtherLineofTreatmentNotSuppressed+= $otherLineofTreatmentSuppressedNotSuppressed['totalNotSuppressed'];
+                                        $totalOtherLineofTreatmentSuppressed+= $otherLineofTreatmentSuppressedNotSuppressed['totalSuppressed'];
+                                    }
+                                }
+                                ?>
+                                <td style="text-align:center;font-size:11px;"><?php echo $totalOtherLineofTreatmentNotSuppressed; ?></td>
+                                <td style="text-align:center;font-size:11px;"><?php echo ($totalOtherLineofTreatmentNotSuppressed >0)?round((($totalOtherLineofTreatmentNotSuppressed/($totalOtherLineofTreatmentNotSuppressed+$totalOtherLineofTreatmentSuppressed))*100),2):''; ?></td>
                               </tr>
                               <tr>
                                 <td style="text-align:center;font-size:11px;">S</td>
@@ -883,6 +896,8 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
                                 <?php } } ?>
                                 <td style="text-align:center;font-size:11px;"><?php echo $totalPaeds2ndLineofTreatmentOthersSuppressed; ?></td>
                                 <td style="text-align:center;font-size:11px;"><?php echo ($totalPaeds2ndLineofTreatmentOthersSuppressed >0)?round((($totalPaeds2ndLineofTreatmentOthersSuppressed/($totalPaeds2ndLineofTreatmentOthersSuppressed+$totalPaeds2ndLineofTreatmentOthersNotSuppressed))*100),2):''; ?></td>
+                                <td style="text-align:center;font-size:11px;"><?php echo $totalOtherLineofTreatmentSuppressed; ?></td>
+                                <td style="text-align:center;font-size:11px;"><?php echo ($totalOtherLineofTreatmentSuppressed >0)?round((($totalOtherLineofTreatmentSuppressed/($totalOtherLineofTreatmentSuppressed+$totalOtherLineofTreatmentNotSuppressed))*100),2):''; ?></td>
                               </tr>
                               <tr>
                                 <th style="text-align:center;font-size:11px;">Total</th>
@@ -896,6 +911,8 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
                                    <td style="text-align:center;font-size:11px;"></td>
                                 <?php } } ?>
                                 <td style="text-align:center;font-size:11px;"><?php echo $totalPaeds2ndLineofTreatmentOthersNotSuppressed+$totalPaeds2ndLineofTreatmentOthersSuppressed; ?></td>
+                                <td style="text-align:center;font-size:11px;"></td>
+                                <td style="text-align:center;font-size:11px;"><?php echo $totalOtherLineofTreatmentNotSuppressed+$totalOtherLineofTreatmentSuppressed; ?></td>
                                 <td style="text-align:center;font-size:11px;"></td>
                               </tr>
                             </tbody>
@@ -924,27 +941,17 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
                             <thead>
                                 <tr>
                                     <th> <?php echo $this->translate('Months'); ?> </th>
-                                    <th> Jan '<?php echo date('y');?> </th>
-                                    <th> Feb '<?php echo date('y');?> </th>
-                                    <th> Mar '<?php echo date('y');?> </th>
-                                    <th> Apr '<?php echo date('y');?> </th>
-                                    <th> May '<?php echo date('y');?> </th>
-                                    <th> Jun '<?php echo date('y');?> </th>
-                                    <th> Jul '<?php echo date('y');?> </th>
-                                    <th> Aug '<?php echo date('y');?> </th>
-                                    <th> Sep '<?php echo date('y');?> </th>
-                                    <th> Oct '<?php echo date('y');?> </th>
-                                    <th> Nov '<?php echo date('y');?> </th>
-                                    <th> Dec '<?php echo date('y');?> </th>
+                                    <?php foreach($keySummaryIndicators['month'] as $key=>$month){ ?>
+                                        <th> <?php echo $month ;?> </th>
+                                    <?php } ?>
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php foreach($keySummaryIndicators as $key=>$indicators){ ?>
+                                <?php foreach($keySummaryIndicators['sample'] as $key=>$indicators){ ?>
                                 <tr>
                                     <td><?php echo $this->translate(strtoupper(str_replace('-',' ',$key)));?></td>
                                     <?php foreach($indicators['month'] as $months){ ?>
-                                    <td><?php echo $months;?></td>
-                                    
+                                       <td><?php echo $months;?></td>
                                     <?php } ?>
                                 </tr>
                                 <?php } ?>
