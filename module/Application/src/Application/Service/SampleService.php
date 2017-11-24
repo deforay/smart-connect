@@ -56,6 +56,7 @@ class SampleService {
                     for ($i = 2; $i <= $count; $i++) {
                         if(trim($sheetData[$i]['A']) != '' && trim($sheetData[$i]['B']) != '') {
                             $sampleCode = trim($sheetData[$i]['A']);
+                            $instanceCode = trim($sheetData[$i]['B']);
                             $data = array('sample_code'=>$sampleCode,
                                           'vlsm_instance_id'=>trim($sheetData[$i]['B']),
                                           'source'=>$params['sourceName'],
@@ -224,7 +225,7 @@ class SampleService {
                             }
                             
                             //check existing sample code
-                            $sampleCode = $this->checkSampleCode($sampleCode);
+                            $sampleCode = $this->checkSampleCode($sampleCode,$instanceCode);
                             if($sampleCode){
                                 //sample data update
                                 $sampleDb->update($data,array('vl_sample_id'=>$sampleCode['vl_sample_id']));
@@ -242,10 +243,10 @@ class SampleService {
             }
     }
     
-    public function checkSampleCode($sampleCode){
+    public function checkSampleCode($sampleCode,$instanceCode){
         $dbAdapter = $this->sm->get('Zend\Db\Adapter\Adapter');
         $sql = new Sql($dbAdapter);
-        $sQuery = $sql->select()->from('dash_vl_request_form')->where(array('sample_code' => $sampleCode));
+        $sQuery = $sql->select()->from('dash_vl_request_form')->where(array('sample_code' => $sampleCode,'vlsm_instance_id'=>$instanceCode));
         $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
         $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
         return $sResult;
