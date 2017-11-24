@@ -508,10 +508,6 @@ $languagecontainer->locale = $this->GetLocaleData('locale',$config['language']);
                 $("body").on("contextmenu",function(e){
                   //return false;
                 });
-                $(".sidebar-search", sidebar).removeClass("open");
-                if ($('body').hasClass("page-sidebar-fixed")) {
-                    sidebarMenu.trigger("mouseleave");
-                }
           });
           
           $('body').on('click', '.sidebar-toggler', function (e) {
