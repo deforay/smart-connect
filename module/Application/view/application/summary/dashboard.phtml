@@ -977,6 +977,9 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
       toggleSummary('districtWiseSuppressionRateSummary','facilityWiseSuppressionRateSummary');
       toggleSummary('districtWiseSamplesRejectedSummary','facilityWiseSamplesRejectedSummary');
       
+      $.blockUI.defaults.css.border = '1px solid grey';
+      $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
+
       getSamplesReceivedBarChartInfo();
       getSuppressionRateBarChartInfo();
       getSamplesRejectedBarChartInfo();
