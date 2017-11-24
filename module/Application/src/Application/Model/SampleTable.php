@@ -5166,12 +5166,16 @@ class SampleTable extends AbstractTableGateway {
                           ->where("Month(sample_collection_date)='".$month."' AND Year(sample_collection_date)='".$year."'");
             $queryStr = $sql->getSqlStringForSqlObject($sQuery);
             //$rejectionResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-            $accRejectionResult = $common->cacheQuery($queryStr." AND vl.reason_for_sample_rejection = 20",$dbAdapter);
             $insRejectionResult = $common->cacheQuery($queryStr." AND vl.reason_for_sample_rejection = 3",$dbAdapter);
+            $accRejectionResult = $common->cacheQuery($queryStr." AND vl.reason_for_sample_rejection = 20",$dbAdapter);
             $prtlaRejectionResult = $common->cacheQuery($queryStr." AND vl.reason_for_sample_rejection = 17",$dbAdapter);
-            $result['rejection']['ACC - Laboratory Accident'][$j] = (isset($accRejectionResult[0]['rejections']))?$accRejectionResult[0]['rejections']:0;
+            $errtcRejectionResult = $common->cacheQuery($queryStr." AND vl.reason_for_sample_rejection = 26",$dbAdapter);
+            $othersRejectionResult = $common->cacheQuery($queryStr." AND vl.reason_for_sample_rejection is not null AND vl.reason_for_sample_rejection!= '' AND vl.reason_for_sample_rejection NOT IN(0,3,20,17,26)",$dbAdapter);
             $result['rejection']['INS - Insufficient Sample'][$j] = (isset($insRejectionResult[0]['rejections']))?$insRejectionResult[0]['rejections']:0;
+            $result['rejection']['ACC - Laboratory Accident'][$j] = (isset($accRejectionResult[0]['rejections']))?$accRejectionResult[0]['rejections']:0;
             $result['rejection']['PRTLA -'][$j] = (isset($prtlaRejectionResult[0]['rejections']))?$prtlaRejectionResult[0]['rejections']:0;
+            $result['rejection']['ERRTC - Error tecnico'][$j] = (isset($errtcRejectionResult[0]['rejections']))?$errtcRejectionResult[0]['rejections']:0;
+            $result['rejection']['Others'][$j] = (isset($othersRejectionResult[0]['rejections']))?$othersRejectionResult[0]['rejections']:0;
             $result['date'][$j] = $monthYearFormat;
           $start = strtotime("+1 month", $start);
           $j++;

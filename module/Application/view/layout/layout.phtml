@@ -46,6 +46,15 @@ $languagecontainer->locale = $this->GetLocaleData('locale',$config['language']);
             <?php if($activeTab !='duplicate-data') { ?>
               table.dataTable td.sorting_1,table.dataTable td.sorting_2,table.dataTable td.sorting_3,table.dataTable th.sorting_1,table.dataTable th.sorting_2,table.dataTable th.sorting_3{background:#fbfcfd!important}
             <?php } ?>
+            .resize-page-logo{
+                width:auto !important;
+            }
+            .manage-logo-default{
+                margin-top:8px !important;
+            }
+            .hide-default-text{
+                display:none;
+            }
         </style>
         <!-- END THEME LAYOUT STYLES -->
         <link rel="shortcut icon" href="favicon.ico" />
@@ -54,21 +63,21 @@ $languagecontainer->locale = $this->GetLocaleData('locale',$config['language']);
     </head>
     <!-- END HEAD -->
 
-    <body class="page-header-fixed page-sidebar-closed-hide-logo page-container-bg-solid page-content-white">
+    <body class="page-header-fixed page-container-bg-solid page-content-white page-sidebar-closed">
         <!-- BEGIN HEADER -->
         <div class="page-header navbar navbar-fixed-top">
             <!-- BEGIN HEADER INNER -->
             <div class="page-header-inner ">
                 <!-- BEGIN LOGO -->
-                <div class="page-logo">
+                <div class="page-logo resize-page-logo">
                     <a href="/">
                         <?php
                         if(isset($config['logo']) && trim($config['logo']) != "" && file_exists(UPLOAD_PATH . DIRECTORY_SEPARATOR . "logo" . DIRECTORY_SEPARATOR . $config['logo'])){ ?>
-                          <img src="<?php echo $this->basePath('uploads/logo/'.$config['logo']); ?>" alt="logo" class="logo-default" style="width:32px;height:32px;margin-top:-5px;margin-right:5px;"/>
+                          <img src="<?php echo $this->basePath('uploads/logo/'.$config['logo']); ?>" alt="logo" class="logo-default manage-logo-default" style="width:32px;height:32px;margin-top:-5px;margin-right:5px;"/>
                         <?php } else { ?>
-                          <img src="<?php echo $this->basePath('assets/layouts/layout/img/logo.png'); ?>" alt="logo" class="logo-default" style="margin-top:-5px;margin-right:5px;"/>
+                          <img src="<?php echo $this->basePath('assets/layouts/layout/img/logo.png'); ?>" alt="logo" class="logo-default manage-logo-default" style="margin-top:-5px;margin-right:5px;"/>
                         <?php } ?>
-                        <span style="color:#fff;line-height:50px;"><?php echo $this->translate('Smart Connect'); ?></span>
+                        <span class="default-logo-text hide-default-text" style="color:#fff;line-height:50px;"><?php echo $this->translate('Smart Connect'); ?></span>
                     </a>
                     <div class="menu-toggler sidebar-toggler"> </div>
                 </div>
@@ -121,7 +130,7 @@ $languagecontainer->locale = $this->GetLocaleData('locale',$config['language']);
                     <!-- DOC: Set data-auto-scroll="false" to disable the sidebar from auto scrolling/focusing -->
                     <!-- DOC: Set data-keep-expand="true" to keep the submenues expanded -->
                     <!-- DOC: Set data-auto-speed="200" to adjust the sub menu slide up/down speed -->
-                    <ul class="page-sidebar-menu  page-header-fixed page-sidebar-menu-light " data-keep-expanded="false" data-auto-scroll="true" data-slide-speed="200" style="padding-top: 20px">
+                    <ul class="page-sidebar-menu page-header-fixed page-sidebar-menu-light page-sidebar-menu-closed" data-keep-expanded="false" data-auto-scroll="true" data-slide-speed="200" style="padding-top: 20px">
                         <!-- DOC: To remove the sidebar toggler from the sidebar you just need to completely remove the below "sidebar-toggler-wrapper" LI element -->
                         <li class="sidebar-toggler-wrapper hide">
                             <!-- BEGIN SIDEBAR TOGGLER BUTTON -->
@@ -499,8 +508,27 @@ $languagecontainer->locale = $this->GetLocaleData('locale',$config['language']);
                 $("body").on("contextmenu",function(e){
                   //return false;
                 });
+                $(".sidebar-search", sidebar).removeClass("open");
+                if ($('body').hasClass("page-sidebar-fixed")) {
+                    sidebarMenu.trigger("mouseleave");
+                }
           });
           
+          $('body').on('click', '.sidebar-toggler', function (e) {
+             var body = $('body');
+             if (body.hasClass("page-sidebar-closed")) {
+                $('.page-logo').removeClass('resize-page-logo');
+                $('.page-logo').css('width','235px !important');
+                $('.default-logo-text').removeClass('hide-default-text');
+                $('.logo-default').removeClass('manage-logo-default');
+             }else{
+                $('.page-logo').addClass('resize-page-logo');
+                $('.page-logo').css('width','auto !important');
+                $('.default-logo-text').addClass('hide-default-text');
+                $('.logo-default').addClass('manage-logo-default');
+             }
+          });
+           
           $(document).ajaxStop(function () {
             setTimeout(showAnnouncementMsg, 2000);
           });
