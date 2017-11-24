@@ -391,10 +391,10 @@ var Layout = function () {
     // Hanles sidebar toggler
     var handleSidebarToggler = function () {
         var body = $('body');
-        if ($.cookie && $.cookie('sidebar_closed') === '1' && App.getViewPort().width >= resBreakpointMd) {
-            $('body').addClass('page-sidebar-closed');
-            $('.page-sidebar-menu').addClass('page-sidebar-menu-closed');
-        }
+        //if ($.cookie && $.cookie('sidebar_closed') === '1' && App.getViewPort().width >= resBreakpointMd) {
+        //    $('body').addClass('page-sidebar-closed');
+        //    $('.page-sidebar-menu').addClass('page-sidebar-menu-closed');
+        //}
 
         // handle sidebar show/hide
         $('body').on('click', '.sidebar-toggler', function (e) {
@@ -405,18 +405,18 @@ var Layout = function () {
             if (body.hasClass("page-sidebar-closed")) {
                 body.removeClass("page-sidebar-closed");
                 sidebarMenu.removeClass("page-sidebar-menu-closed");
-                if ($.cookie) {
-                    $.cookie('sidebar_closed', '0');
-                }
+                //if ($.cookie) {
+                //    $.cookie('sidebar_closed', '0');
+                //}
             } else {
                 body.addClass("page-sidebar-closed");
                 sidebarMenu.addClass("page-sidebar-menu-closed");
                 if (body.hasClass("page-sidebar-fixed")) {
                     sidebarMenu.trigger("mouseleave");
                 }
-                if ($.cookie) {
-                    $.cookie('sidebar_closed', '1');
-                }
+                //if ($.cookie) {
+                //    $.cookie('sidebar_closed', '1');
+                //}
             }
 
             $(window).trigger('resize');

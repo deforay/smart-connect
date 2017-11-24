@@ -180,7 +180,7 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
 <div class="page-bar">
     <h1 class="page-title"><?php echo $this->translate('Summary'); ?></h1>
 </div>
-<br><br>
+<br>
 <h4>KEY METRICS</h4>
 <div class="tabbable">
     <ul class="nav nav-tabs nav-justified" role="tablist">
@@ -250,7 +250,7 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
                             </div>
                             <div class="tab-content" style="border:none;">
                                 <div class="tab-pane active" id="districtWiseSamplesReceivedSummary">
-                                    <table class="table table-striped table-bordered table-hover" id="samplesReceivedDistrict">
+                                    <table class="table table-striped table-bordered table-hover order-column" id="samplesReceivedDistrict">
                                         <thead>
                                             <tr>
                                                 <th> <?php echo $this->translate('District'); ?> </th>
@@ -271,7 +271,7 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
                                     </table>
                                 </div>
                                 <div class="tab-pane" id="facilityWiseSamplesReceivedSummary">
-                                    <table class="table table-striped table-bordered table-hover" id="samplesReceivedFacility">
+                                    <table class="table table-striped table-bordered table-hover order-column" id="samplesReceivedFacility">
                                         <thead>
                                             <tr>
                                                 <th> <?php echo $this->translate('District'); ?> </th>
@@ -333,7 +333,7 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
                             </div>
                             <div class="tab-content" style="border:none;">
                                 <div class="tab-pane active" id="districtWiseSuppressionRateSummary">
-                                    <table class="table table-striped table-bordered table-hover" id="suppressionRateDistrict">
+                                    <table class="table table-striped table-bordered table-hover order-column" id="suppressionRateDistrict">
                                         <thead>
                                             <tr>
                                                 <th> <?php echo $this->translate('District'); ?> </th>
@@ -351,7 +351,7 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
                                     </table>
                                 </div>
                                 <div class="tab-pane" id="facilityWiseSuppressionRateSummary">
-                                    <table class="table table-striped table-bordered table-hover" id="suppressionRateFacility">
+                                    <table class="table table-striped table-bordered table-hover order-column" id="suppressionRateFacility">
                                         <thead>
                                             <tr>
                                                 <th> <?php echo $this->translate('District'); ?> </th>
@@ -409,7 +409,7 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
                             </div>
                             <div class="tab-content" style="border:none;">
                                 <div class="tab-pane active" id="districtWiseSamplesRejectedSummary">
-                                    <table class="table table-striped table-bordered table-hover" id="samplesRejectedDistrict">
+                                    <table class="table table-striped table-bordered table-hover order-column" id="samplesRejectedDistrict">
                                         <thead>
                                             <tr>
                                                 <th> <?php echo $this->translate('District'); ?> </th>
@@ -426,7 +426,7 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
                                     </table>
                                 </div>
                                 <div class="tab-pane" id="facilityWiseSamplesRejectedSummary">
-                                    <table class="table table-striped table-bordered table-hover" id="samplesRejectedFacility">
+                                    <table class="table table-striped table-bordered table-hover order-column" id="samplesRejectedFacility">
                                         <thead>
                                             <tr>
                                                 <th> <?php echo $this->translate('District'); ?> </th>
@@ -474,7 +474,7 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
                             </div>
                         </div>
                         <div class="portlet-body">
-                            <table class="table table-striped table-bordered table-hover" id="regimenGroupsDataTable">
+                            <table class="table table-striped table-bordered table-hover order-column" id="regimenGroupsDataTable">
                                 <thead>
                                     <tr>
                                         <th> <?php echo $this->translate('Regimen'); ?> </th>
@@ -995,8 +995,8 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
         oTableSamplesReceivedDistrict = $('#samplesReceivedDistrict').DataTable( {
             "bProcessing": true,
             "bServerSide": true,
-            "scrollX": true,
-            "autoWidth": false,
+            "bAutoWidth": false,
+            "sScrollX": true,
             "aoColumns": [
                 {"sClass":"center"},
                 {"sClass":"center","bSortable":false},
@@ -1027,8 +1027,8 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
         oTableSamplesReceivedFacility = $('#samplesReceivedFacility').DataTable( {
             "bProcessing": true,
             "bServerSide": true,
-            "scrollX": true,
-            "autoWidth": false,
+            "bAutoWidth": false,
+            "sScrollX": true,
             "aoColumns": [
                 {"sClass":"center"},
                 {"sClass":"center"},
@@ -1060,8 +1060,8 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
         oTableSuppressionRateDistrict = $('#suppressionRateDistrict').DataTable( {
             "bProcessing": true,
             "bServerSide": true,
-            "scrollX": true,
-            "autoWidth": false,
+            "bAutoWidth": false,
+            //"sScrollX": true,
             "aoColumns": [
                 {"sClass":"center"},
                 {"sClass":"center","bSortable":false},
@@ -1090,8 +1090,8 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
         oTableSuppressionRateFacility = $('#suppressionRateFacility').DataTable( {
             "bProcessing": true,
             "bServerSide": true,
-            "scrollX": true,
-            "autoWidth": false,
+            "bAutoWidth": false,
+            "scrollX":true,
             "aoColumns": [
                 {"sClass":"center"},
                 {"sClass":"center"},
@@ -1120,8 +1120,8 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
         oTableSamplesRejectedDistrict = $('#samplesRejectedDistrict').DataTable( {
             "bProcessing": true,
             "bServerSide": true,
-            //"scrollX": true,
-            "autoWidth": false,
+            "bAutoWidth": false,
+            //"scrollX":true,
             "aoColumns": [
                 {"sClass":"center"},
                 {"sClass":"center","bSortable":false},
@@ -1148,8 +1148,8 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
         oTableSamplesRejectedDistrict = $('#samplesRejectedFacility').DataTable( {
             "bProcessing": true,
             "bServerSide": true,
-            //"scrollX": true,
-            "autoWidth": false,
+            "bAutoWidth": false,
+            //"scrollX":true,
             "aoColumns": [
                 {"sClass":"center"},
                 {"sClass":"center"},
@@ -1176,8 +1176,8 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
         otableRegimenGroups = $('#regimenGroupsDataTable').DataTable( {
             "bProcessing": true,
             "bServerSide": true,
-            //"scrollX": true,
-            "autoWidth": false,
+            "bAutoWidth": false,
+            //"scrollX":true,
             "aoColumns": [
                 {"sClass":"center"},
                 {"sClass":"center","bSortable":false},
