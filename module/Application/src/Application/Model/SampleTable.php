@@ -58,7 +58,7 @@ class SampleTable extends AbstractTableGateway {
         $query = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
                                 ->columns(
                                           array("Total Samples" => new Expression('COUNT(*)'),
-                                          "Sample Tested" => new Expression("SUM(CASE 
+                                          "Samples Tested" => new Expression("SUM(CASE 
                                                                                 WHEN ((vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL') AND (sample_tested_datetime IS NOT NULL AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) THEN 1
                                                                                 ELSE 0
                                                                                 END)"),
@@ -4265,8 +4265,8 @@ class SampleTable extends AbstractTableGateway {
         /* Array of database columns which should be read and sent back to DataTables. Use a space where
          * you want to insert a non-database field (for example a counter or static image)
         */
-        $aColumns = array('f_d_l_d.location_name','facility_name');
-        $orderColumns = array('f_d_l_d.location_name','facility_name','f_d_l_d.location_id','f_d_l_d.location_id','f_d_l_d.location_id','f_d_l_d.location_id','f_d_l_d.location_id','f_d_l_d.location_id','f_d_l_d.location_id');
+        $aColumns = array('facility_name','f_d_l_d.location_name');
+        $orderColumns = array('facility_name','f_d_l_d.location_name','f_d_l_d.location_id','f_d_l_d.location_id','f_d_l_d.location_id','f_d_l_d.location_id','f_d_l_d.location_id','f_d_l_d.location_id','f_d_l_d.location_id');
 
         /*
          * Paging
@@ -4424,8 +4424,8 @@ class SampleTable extends AbstractTableGateway {
         
         foreach ($rResult as $aRow) {
             $row = array();
+            $row[]= "<span style='white-space:nowrap !important;' >".$aRow['facility_name']."</span>";
             $row[]=$aRow['district'];            
-            $row[]=$aRow['facility_name'];            
             $row[]=$aRow['total_samples_received'];          
             $row[]=$aRow['total_samples_tested'];            
             $row[]=$aRow['total_samples_pending'];            
@@ -4645,8 +4645,8 @@ class SampleTable extends AbstractTableGateway {
         /* Array of database columns which should be read and sent back to DataTables. Use a space where
          * you want to insert a non-database field (for example a counter or static image)
         */
-        $aColumns = array('f_d_l_d.location_name','facility_name');
-        $orderColumns = array('f_d_l_d.location_name','facility_name','f_d_l_d.location_id','f_d_l_d.location_id','f_d_l_d.location_id','f_d_l_d.location_id');
+        $aColumns = array('facility_name','f_d_l_d.location_name');
+        $orderColumns = array('facility_name','f_d_l_d.location_name','f_d_l_d.location_id','f_d_l_d.location_id','f_d_l_d.location_id','f_d_l_d.location_id');
 
         /*
          * Paging
@@ -4797,8 +4797,9 @@ class SampleTable extends AbstractTableGateway {
         foreach ($rResult as $aRow) {
             $row = array();
             
-            $row[]=$aRow['district'];            
-            $row[]=$aRow['facility_name'];            
+                   
+            $row[]= "<span style='white-space:nowrap !important;' >".$aRow['facility_name']."</span>";
+            $row[]=$aRow['district'];     
             $row[]=$aRow['total_samples_tested']-$aRow['total_samples_rejected'];        
             $row[]=$aRow['total_suppressed_samples'];            
             $row[]=$aRow['total_samples_tested']-$aRow['total_suppressed_samples'];          
@@ -5000,8 +5001,8 @@ class SampleTable extends AbstractTableGateway {
         /* Array of database columns which should be read and sent back to DataTables. Use a space where
          * you want to insert a non-database field (for example a counter or static image)
         */
-        $aColumns = array('f_d_l_d.location_name','f.facility_name');
-        $orderColumns = array('f_d_l_d.location_name','f.facility_name','f_d_l_d.location_id','f_d_l_d.location_id');
+        $aColumns = array('f.facility_name','f_d_l_d.location_name');
+        $orderColumns = array('f.facility_name','f_d_l_d.location_name','f_d_l_d.location_id','f_d_l_d.location_id');
 
         /*
          * Paging
@@ -5141,8 +5142,8 @@ class SampleTable extends AbstractTableGateway {
         foreach ($rResult as $aRow) {
             $row = array();
             
+            $row[]= "<span style='white-space:nowrap !important;' >".$aRow['facility_name']."</span>";      
             $row[] = $aRow['district']; 
-            $row[] = $aRow['facility_name'];          
             $row[] = $aRow['total_samples_received'];    
             $row[] = ($aRow['total_samples_received'] > 0 && $aRow['total_samples_rejected'] > 0)?round(($aRow['total_samples_rejected']/$aRow['total_samples_received'])*100,2):0;
             $output['aaData'][] = $row;

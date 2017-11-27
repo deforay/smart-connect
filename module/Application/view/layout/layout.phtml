@@ -55,6 +55,9 @@ $languagecontainer->locale = $this->GetLocaleData('locale',$config['language']);
             .hide-default-text{
                 display:none;
             }
+            .scroll-to-top>i {
+                color: #ff7a7a !important;
+            }
         </style>
         <!-- END THEME LAYOUT STYLES -->
         <link rel="shortcut icon" href="favicon.ico" />
@@ -73,9 +76,9 @@ $languagecontainer->locale = $this->GetLocaleData('locale',$config['language']);
                     <a href="/">
                         <?php
                         if(isset($config['logo']) && trim($config['logo']) != "" && file_exists(UPLOAD_PATH . DIRECTORY_SEPARATOR . "logo" . DIRECTORY_SEPARATOR . $config['logo'])){ ?>
-                          <img src="<?php echo $this->basePath('uploads/logo/'.$config['logo']); ?>" alt="logo" class="logo-default manage-logo-default" style="width:32px;height:32px;margin-top:-5px;margin-right:5px;"/>
+                          <img src="<?php echo $this->basePath('uploads/logo/'.$config['logo']); ?>" alt="logo" class="logo-default manage-logo-default" style="max-width:32px;max-height:32px;margin-top:-5px;margin-right:5px;"/>
                         <?php } else { ?>
-                          <img src="<?php echo $this->basePath('assets/layouts/layout/img/logo.png'); ?>" alt="logo" class="logo-default manage-logo-default" style="margin-top:-5px;margin-right:5px;"/>
+                          <img src="<?php echo $this->basePath('assets/layouts/layout/img/logo.png'); ?>" alt="logo" class="logo-default manage-logo-default" style="max-width:32px;max-height:32px;margin-top:-5px;margin-right:5px;margin-left:-10px;"/>
                         <?php } ?>
                         <span class="default-logo-text hide-default-text" style="color:#fff;line-height:50px;"><?php echo $this->translate('Smart Connect'); ?></span>
                     </a>
@@ -142,7 +145,7 @@ $languagecontainer->locale = $this->GetLocaleData('locale',$config['language']);
                         if($logincontainer->role == 1){ ?>
                             <li class="nav-item start <?php echo ($activeTab == 'summary-dashboard' ? " active open " : ""); ?>">
                                  <a href="/summary/" class="nav-link nav-toggle">
-                                     <i class="icon-home"></i>
+                                     <i class="icon-layers"></i>
                                      <span class="title"><?php echo $this->translate('Summary'); ?></span>
                                      <span class="selected"></span>
                                  </a>
@@ -153,7 +156,7 @@ $languagecontainer->locale = $this->GetLocaleData('locale',$config['language']);
                         if($logincontainer->role == 1 || $logincontainer->role == 2){ ?>
                             <li class="nav-item <?php echo ($activeTab == 'labs-dashboard' ? " active open" : ""); ?>">
                                  <a href="/labs/dashboard" class="nav-link nav-toggle">
-                                     <i class="icon-home"></i>
+                                     <i class="icon-chemistry"></i>
                                      <span class="title"><?php echo $this->translate('Labs Dashboard'); ?></span>
                                      <span class="selected"></span>
                                  </a>
@@ -175,7 +178,7 @@ $languagecontainer->locale = $this->GetLocaleData('locale',$config['language']);
                         if($logincontainer->role == 1 || $logincontainer->role == 3){ ?>
                             <li class="nav-item <?php echo ($activeTab == 'clinics-dashboard' ? " active open " : ""); ?>">
                                  <a href="/clinics/dashboard" class="nav-link nav-toggle">
-                                     <i class="icon-home"></i>
+                                     <i class="icon-plus"></i>
                                      <span class="title"><?php echo $this->translate('Clinics Dashboard'); ?></span>
                                      <span class="selected"></span>
                                  </a>
@@ -185,7 +188,7 @@ $languagecontainer->locale = $this->GetLocaleData('locale',$config['language']);
                         <?php if($logincontainer->role == 1){ ?>
                             <li class="nav-item <?php echo ($activeTab == 'duplicate-data') ? " active open " : ""; ?>">
                                 <a href="javascript:;" class="nav-link nav-toggle">
-                                    <i class="icon-settings"></i>
+                                    <i class="icon-briefcase"></i>
                                     <span class="title"><?php echo $this->translate('Data Management'); ?></span>
                                     <span class="arrow"></span>
                                 </a>
@@ -203,7 +206,7 @@ $languagecontainer->locale = $this->GetLocaleData('locale',$config['language']);
                         if($logincontainer->role == 1){ ?>
                             <li class="nav-item <?php echo ($activeTab == 'config' || $activeTab == 'users' || $activeTab == 'facility') ? " active open " : ""; ?>">
                                 <a href="javascript:;" class="nav-link nav-toggle">
-                                    <i class="icon-settings"></i>
+                                    <i class="icon-equalizer"></i>
                                     <span class="title"><?php echo $this->translate('Admin'); ?></span>
                                     <span class="arrow"></span>
                                 </a>
