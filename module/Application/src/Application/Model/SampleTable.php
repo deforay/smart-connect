@@ -5154,6 +5154,21 @@ class SampleTable extends AbstractTableGateway {
     public function fetchSamplesRejectedBarChartDetails($params){
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
+        $mostRejectionReasons = array();
+        $mostRejectionQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
+                                  ->columns(array('rejections' => new Expression('COUNT(*)')))                    
+                                  ->join(array('r_r_r'=>'r_sample_rejection_reasons'),'r_r_r.rejection_reason_id=vl.reason_for_sample_rejection',array('rejection_reason_id'))
+                                  ->group('vl.reason_for_sample_rejection')
+                                  ->order('rejections DESC')
+                                  ->limit(4);
+        $mostRejectionQueryStr = $sql->getSqlStringForSqlObject($mostRejectionQuery);
+        $mostRejectionResult = $dbAdapter->query($mostRejectionQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+        if(isset($mostRejectionResult) && count($mostRejectionResult) >0){
+            foreach($mostRejectionResult as $rejectionReason){
+                $mostRejectionReasons[] = $rejectionReason['rejection_reason_id'];
+            }
+          $mostRejectionReasons[] = 0;
+        }
         $result=array();
         $common = new CommonService($this->sm);
         $start = strtotime(date("Y", strtotime("-1 year")).'-'.date('m', strtotime('+1 month', strtotime('-1 year'))));
@@ -5161,23 +5176,22 @@ class SampleTable extends AbstractTableGateway {
         $j = 0;
         while($start <= $end){
             $month = date('m', $start);$year = date('Y', $start);$monthYearFormat = date("M-Y", $start);
-            $sQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
-                          ->columns(array('rejections' => new Expression('COUNT(*)')))                    
-                          ->join(array('r_r_r'=>'r_sample_rejection_reasons'),'r_r_r.rejection_reason_id=vl.reason_for_sample_rejection',array('rejection_reason_name'))
-                          ->where("Month(sample_collection_date)='".$month."' AND Year(sample_collection_date)='".$year."'");
-            $queryStr = $sql->getSqlStringForSqlObject($sQuery);
-            //$rejectionResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-            $insRejectionResult = $common->cacheQuery($queryStr." AND vl.reason_for_sample_rejection = 3",$dbAdapter);
-            $accRejectionResult = $common->cacheQuery($queryStr." AND vl.reason_for_sample_rejection = 20",$dbAdapter);
-            $prtlaRejectionResult = $common->cacheQuery($queryStr." AND vl.reason_for_sample_rejection = 17",$dbAdapter);
-            $errtcRejectionResult = $common->cacheQuery($queryStr." AND vl.reason_for_sample_rejection = 26",$dbAdapter);
-            $othersRejectionResult = $common->cacheQuery($queryStr." AND vl.reason_for_sample_rejection is not null AND vl.reason_for_sample_rejection!= '' AND vl.reason_for_sample_rejection NOT IN(0,3,20,17,26)",$dbAdapter);
-            $result['rejection']['INS - Insufficient Sample'][$j] = (isset($insRejectionResult[0]['rejections']))?$insRejectionResult[0]['rejections']:0;
-            $result['rejection']['ACC - Laboratory Accident'][$j] = (isset($accRejectionResult[0]['rejections']))?$accRejectionResult[0]['rejections']:0;
-            $result['rejection']['PRTLA -'][$j] = (isset($prtlaRejectionResult[0]['rejections']))?$prtlaRejectionResult[0]['rejections']:0;
-            $result['rejection']['ERRTC - Error tecnico'][$j] = (isset($errtcRejectionResult[0]['rejections']))?$errtcRejectionResult[0]['rejections']:0;
-            $result['rejection']['Others'][$j] = (isset($othersRejectionResult[0]['rejections']))?$othersRejectionResult[0]['rejections']:0;
-            $result['date'][$j] = $monthYearFormat;
+            for($m=0;$m<count($mostRejectionReasons);$m++){
+                $rejectionQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
+                                      ->columns(array('rejections' => new Expression('COUNT(*)')))                    
+                                      ->join(array('r_r_r'=>'r_sample_rejection_reasons'),'r_r_r.rejection_reason_id=vl.reason_for_sample_rejection',array('rejection_reason_name'))
+                                      ->where("Month(sample_collection_date)='".$month."' AND Year(sample_collection_date)='".$year."'");
+                if($mostRejectionReasons[$m] == 0){
+                    $rejectionQuery = $rejectionQuery->where('vl.reason_for_sample_rejection is not null and vl.reason_for_sample_rejection!= "" and vl.reason_for_sample_rejection NOT IN("' . implode('", "', $mostRejectionReasons) . '")');
+                }else{
+                   $rejectionQuery = $rejectionQuery->where('vl.reason_for_sample_rejection = "'.$mostRejectionReasons[$m].'"'); 
+                }
+                $rejectionQueryStr = $sql->getSqlStringForSqlObject($rejectionQuery);
+                $rejectionResult = $common->cacheQuery($rejectionQueryStr ,$dbAdapter);
+                $rejectionReasonName = ($mostRejectionReasons[$m] == 0)?'Others':$rejectionResult[0]['rejection_reason_name'];
+                $result['rejection'][$rejectionReasonName][$j] = (isset($rejectionResult[0]['rejections']))?$rejectionResult[0]['rejections']:0;
+                $result['date'][$j] = $monthYearFormat;
+            }
           $start = strtotime("+1 month", $start);
           $j++;
         }
