@@ -29,6 +29,7 @@ use Application\Model\ArtCodeTable;
 use Application\Model\UserFacilityMapTable;
 use Application\Model\LocationDetailsTable;
 use Application\Model\RemovedSamplesTable;
+use Application\Model\SampleRejectionReasonTable;
 
 use Application\Service\CommonService;
 use Application\Service\UserService;
@@ -284,6 +285,11 @@ class Module{
 		'RemovedSamplesTable' => function($sm) {
                     $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
                     $table = new RemovedSamplesTable($dbAdapter);
+                    return $table;
+                },
+		'SampleRejectionReasonTable' => function($sm) {
+                    $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+                    $table = new SampleRejectionReasonTable($dbAdapter);
                     return $table;
                 },
 				
