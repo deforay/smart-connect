@@ -550,15 +550,28 @@ $languagecontainer->locale = $this->GetLocaleData('locale',$config['language']);
                 window.location.reload(true);
             });
           }
-          
+            
+          //export - only visible legends
+          Highcharts.wrap(Highcharts.Chart.prototype, 'init', function (proceed, options, callback) {
+                if (options.chart && options.chart.forExport && options.series) {
+                    $.each(options.series, function () {
+                        if (this.visible === false) {
+                            this.showInLegend = false;
+                        }
+                    });
+                }
+                return proceed.call(this, options, callback);
+           });
+            
           //watermark text default configuration
-            Highcharts.setOptions({
+           Highcharts.setOptions({
                 watermark: {
                     text: '<?php echo (isset($config['watermark_text']) && trim($config['watermark_text'])!= '')?$this->translate($config['watermark_text']):''; ?>',
                     width: 60,
                     height: 0
                 }
-            });
+           });
+            
             jQuery(".checkNum").keydown(function (e) {
                 // Allow: backspace, delete, tab, escape, enter and .
                 if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||

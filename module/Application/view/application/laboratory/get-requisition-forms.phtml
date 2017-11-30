@@ -75,15 +75,16 @@ $('#labDashReqFormBar').highcharts({
             }
         },
         series: [
-              <?php
-              if(isset($result['Incomplete']) && isset($result['Complete'])){
-              ?>
+              <?php if(isset($result['Complete'])){ ?>
                 {
                     name: '<?php echo $this->translate('Complete'); ?>',
+                    <?php if(array_sum($result['Complete']) == 0) { ?> visible: false,<?php } ?>
                     data: [<?php echo implode(",",$result['Complete']);?>]
                 },
+                <?php } if(isset($result['Incomplete'])){ ?>
                 {
                     name: '<?php echo $this->translate('Incomplete'); ?>',
+                    <?php if(array_sum($result['Incomplete']) == 0) { ?> visible: false,<?php } ?>
                     data: [<?php echo implode(",",$result['Incomplete']);?>]
                 },
                 <?php } ?>
