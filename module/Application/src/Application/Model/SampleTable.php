@@ -916,7 +916,6 @@ class SampleTable extends AbstractTableGateway {
             $startMonth = date("Y-m", strtotime(trim($startMonth)))."-01";
             $endMonth = date("Y-m", strtotime(trim($endMonth)))."-31";
             //echo $startMonth.'/'.$endMonth;die;
-            $j = 0;
             $queryStr = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
                                     ->columns(array(
                                                     //"total" => new Expression('COUNT(*)'),
