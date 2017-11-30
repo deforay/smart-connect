@@ -1,115 +1,161 @@
 <div id="labAverageTat"></div>
 <script>
-    $('#labAverageTat').highcharts({
-        chart: {
-            type: 'line'
-        },
-        title: {
-            text: ''
-        },
-        exporting:{
-            chartOptions:{
-                subtitle: {
-                    text:'<?php echo $this->translate('Laboratory Turnaround Time'); ?>',
-                }
+$('#labAverageTat').highcharts( {
+    chart: {
+        zoomType: 'xy',
+        marginTop: 100
+    },
+    legend: {
+        align: 'center',
+        x: 0,
+        verticalAlign: 'top',
+        y: 30,
+        floating: true,
+        backgroundColor: (Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#FFFFFF'
+    },
+    title: {
+        text: ''
+    },
+    exporting:{
+        chartOptions:{
+            subtitle: {
+                text:'<?php echo $this->translate('Laboratory Turnaround Time'); ?>',
             }
-        },
-        credits: {
-            enabled: false
-        },
-        xAxis: {
-            //categories: ["21 Mar", "22 Mar", "23 Mar", "24 Mar", "25 Mar", "26 Mar", "27 Mar"]
-            categories: [<?php
+        }
+    },
+    credits: {
+        enabled: false
+    },
+    xAxis: [{
+        categories: [<?php
        if(isset($result['date']) && count($result['date'])>0){
             foreach($result['date'] as $date){
                 echo "'".$date."',";
             }
        }
-            ?>]
+            ?>],
+        crosshair: true
+    }],
+    yAxis: [{ // Primary yAxis
+        gridLineWidth: 0,
+        title: {
+            text: '<?php echo $this->translate('Samples Collected'); ?>',
+            style: {
+                
+            }
         },
-        yAxis: {
-            title: {
-                text: '<?php echo $this->translate('Average TAT in Days'); ?>'
-            },
-            labels: { formatter: function() { return this.value; } },
-            plotLines: [{
-                    value: 16,
-                    color: 'red',
-                    width: 2
-                }]
+        labels: {
+            format: '{value}',
+            style: {
+                
+            }
         },
-        plotOptions: {
-            line: {
-                dataLabels: {
-                    enabled: true
+        opposite: true
+
+    },{ // Secondary yAxis
+        labels: {
+            format: '{value}',
+            style: {
+                
+            }
+        },
+        title: {
+            text: '<?php echo $this->translate('Average TAT in Days'); ?>',
+            style: {
+                
+            }
+        },
+        
+
+    },  { // Tertiary yAxis
+        gridLineWidth: 0,
+        title: {
+            text: '<?php echo $this->translate('Samples Pending'); ?>',
+            style: {
+                
+            }
+        },
+        labels: {
+            format: '{value}',
+            style: {
+                
+            }
+        },
+        opposite: true
+    }],
+    tooltip: {
+        shared: true
+    },
+    series: [{
+        name: 'Samples Collected',
+            type: 'column',
+            data: [
+            <?php if(isset($result['samples_collected']) && count($result['samples_collected']) >0){
+                  foreach($result['samples_collected'] as $samplesCollected){        
+                    echo $samplesCollected.',';
+                  }
+                  ?>
+           <?php  } ?>
+            ],
+            tooltip: {
+                valueSuffix: ' '
+            }
+    }, {
+        name: 'Samples Pending',
+            type: 'column',
+            yAxis: 2,
+            data: [
+            <?php if(isset($result['samples_pending']) && count($result['samples_pending']) >0){
+                  foreach($result['samples_pending'] as $samplesPending){       
+                    echo $samplesPending.',';
+                  }
+                  ?>
+           <?php  } ?>
+            ],
+            tooltip: {
+                valueSuffix: ' '
+            }
+    },
+    <?php
+        foreach($sampleType as $sample){
+            if(isset($result[$sample['sample_name']])){
+                foreach($result[$sample['sample_name']] as $key=>$condition){
+                ?>
+                {
+                name:'<?php echo $sample['sample_name'];?>',
+                type: 'spline',
+                yAxis: 1,
+                data:[<?php
+                    foreach($condition as $count){
+                        echo $count.",";
+                    }
+                ?>],
+                color : getRandomColor(),
+                visible:false
                 },
-                cursor: 'pointer',
-                point: {
-                    events: {
-                        click: function (e) {
-                          doLabTATRedirect(e.point.category);
-                        }
-                    }
+                <?php
                 }
             }
-        },
-        
-        series: [
-            <?php
-            foreach($sampleType as $sample){
-                if(isset($result[$sample['sample_name']])){
-                    foreach($result[$sample['sample_name']] as $key=>$condition){
-                    ?>
-                    {
-                    name:'<?php echo $sample['sample_name'];?>',
-                    data:[<?php
-                        foreach($condition as $count){
-                            echo $count.",";
-                        }
-                    ?>],
-                    color : getRandomColor(),
-                    visible:false
-                    },
-                    <?php
-                    }
-                }
-            }
-            if(isset($result['all'])){
-            ?>
-            {
-            showInLegend: false,
-            name: '<?php echo $this->translate('Days'); ?>',
-            data: [<?php echo implode(",",$result['all']);?>],
-            color : '#1B325F',
-        },
-        <?php } ?>
-        ],
-        
-        
-        //series: [{
-        //    name: 'Plasma',
-        //    data: [14,16,15,13,16,17,15],
-        //    color : '#64ade5',
-        //    visible : false
-        //},{
-        //    name: 'DBS',
-        //    data: [15,17,19,10,16,11,12],
-        //    color : '#8877a9',
-        //    visible : false
-        //},{
-        //    name: 'All',
-        //    data: [14.5,16.5,17,11.5,16,14,13.5],
-        //    color : '#1B325F'
-        //}
-        //
-        //]
-    });
-    function getRandomColor() {
-        var letters = '0123456789ABCDEF';
-        var color = '#';
-        for (var i = 0; i < 6; i++ ) {
-            color += letters[Math.floor(Math.random() * 16)];
         }
-        return color;
+        if(isset($result['all'])){
+        ?>
+        {
+        //showInLegend: false,
+        name: '<?php echo $this->translate('TAT'); ?>',
+        type: 'spline',
+        yAxis: 1,
+        data: [<?php echo implode(",",$result['all']);?>],
+        color : '#1B325F',
+        }
+       <?php } ?>
+    ]
+});
+function getRandomColor() {
+    var letters = '0123456789ABCDEF';
+    var color = '#';
+    for (var i = 0; i < 6; i++ ) {
+        color += letters[Math.floor(Math.random() * 16)];
     }
+    return color;
+}
 </script>

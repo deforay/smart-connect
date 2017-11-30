@@ -920,6 +920,8 @@ class SampleTable extends AbstractTableGateway {
             $queryStr = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
                                     ->columns(array(
                                                     //"total" => new Expression('COUNT(*)'),
+                                                    "month" => new Expression("MONTH(sample_collection_date)"),
+                                                    "year" => new Expression("YEAR(sample_collection_date)"),
                                                     "monthDate" => new Expression("DATE_FORMAT(DATE(sample_collection_date), '%b-%Y')"),
                                                     "AvgDiff" => new Expression("CAST(ABS(AVG(TIMESTAMPDIFF(DAY,result_approved_datetime,sample_collection_date))) AS DECIMAL (10,2))"),
                                               )
@@ -943,14 +945,35 @@ class SampleTable extends AbstractTableGateway {
             $queryStr = $queryStr->group(array(new Expression('MONTH(vl.result_approved_datetime)')));   
             $queryStr = $queryStr->order(array(new Expression('DATE(vl.result_approved_datetime)')));               
             $queryStr = $sql->getSqlStringForSqlObject($queryStr);
-            //echo $queryStr;die;
             //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-            //echo $queryStr;die;
             $sampleResult = $common->cacheQuery($queryStr,$dbAdapter);
             $j=0;
             foreach($sampleResult as $sRow){
                 if($sRow["monthDate"] == null) continue;
-                $result['all'][$j] = (isset($sRow["AvgDiff"]) && $sRow["AvgDiff"] > 0 && $sRow["AvgDiff"] != NULL) ? round($sRow["AvgDiff"],2) : 0;
+                $subQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
+                                ->columns(array(
+                                                "total_samples_collected" => new Expression('COUNT(*)'),
+                                                "total_samples_pending" => new Expression("(SUM(CASE WHEN (result is null OR result = '') AND (reason_for_sample_rejection is null OR reason_for_sample_rejection = '') THEN 1 ELSE 0 END))"),
+                                              )
+                                            );
+                if(isset($params['facilityId']) && is_array($params['facilityId']) && count($params['facilityId']) >0){
+                    $subQuery = $subQuery->where('vl.lab_id IN ("' . implode('", "', $params['facilityId']) . '")');
+                }else{
+                    if($logincontainer->role!= 1){
+                        $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:array();
+                        $subQuery = $subQuery->where('vl.lab_id IN ("' . implode('", "', array_values(array_filter($mappedFacilities))) . '")');
+                    }
+                }
+                $subQuery = $subQuery->where("
+                        (vl.sample_collection_date is not null AND vl.sample_collection_date != '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')
+                        AND MONTH(vl.sample_collection_date) = '".$sRow['month']."'
+                        AND YEAR(vl.sample_collection_date) = '".$sRow['year']."' ");   
+                $subQueryStr = $sql->getSqlStringForSqlObject($subQuery);
+                $subQueryResult = $common->cacheQuery($subQueryStr,$dbAdapter);
+                //print_r($subQueryResult);die;
+                $result['all'][$j] = (isset($sRow["AvgDiff"]) && $sRow["AvgDiff"] != NULL && $sRow["AvgDiff"] > 0) ? round($sRow["AvgDiff"],2) : 0;
+                $result['samples_collected'][$j] = (isset($subQueryResult[0]['total_samples_collected']) && $subQueryResult[0]['total_samples_collected'] != NULL) ? $subQueryResult[0]['total_samples_collected'] : 0;
+                $result['samples_pending'][$j] = (isset($subQueryResult[0]['total_samples_pending']) && $subQueryResult[0]['total_samples_pending'] != NULL) ? $subQueryResult[0]['total_samples_pending'] : 0;
                 $result['date'][$j] = $sRow["monthDate"];
                 $j++;
             }
@@ -1341,9 +1364,9 @@ class SampleTable extends AbstractTableGateway {
             }else{
                $fromMonth = date("Y-m", strtotime(trim($startDate)));
                $month = strtotime($fromMonth);
-               $mnth = date('m', $month);
+               $m = date('m', $month);
                $year = date('Y', $month);
-               $squery = $squery->where("Month(sample_collection_date)='".$mnth."' AND Year(sample_collection_date)='".$year."'"); 
+               $squery = $squery->where("Month(sample_collection_date)='".$m."' AND Year(sample_collection_date)='".$year."'"); 
             }
         }
         $sQueryStr = $sql->getSqlStringForSqlObject($squery);
@@ -5441,7 +5464,7 @@ class SampleTable extends AbstractTableGateway {
         $paeds2ndLineofTreatmentResult = $common->cacheQuery($queryStr." Where line_of_treatment = 2 AND patient_age_in_years IS NOT NULL AND patient_age_in_years!= '' AND patient_age_in_years < 18 group by current_regimen order by validResults desc limit 8",$dbAdapter);
         $paeds2ndLineofTreatmentOthersResult = $common->cacheQuery($queryStr." Where line_of_treatment = 2 AND patient_age_in_years IS NOT NULL AND patient_age_in_years!= '' AND patient_age_in_years < 18 group by current_regimen order by validResults desc limit 9,18446744073709551615",$dbAdapter);
         
-        $otherLineofTreatmentResult = $common->cacheQuery($queryStr." Where line_of_treatment NOT IN(1,2) group by current_regimen",$dbAdapter);
+        $otherLineofTreatmentResult = $common->cacheQuery($queryStr." Where line_of_treatment is not null AND line_of_treatment!= '' AND line_of_treatment NOT IN(1,2) group by current_regimen",$dbAdapter);
        return array('adult1stLineofTreatmentResult'=>$adult1stLineofTreatmentResult,'adult1stLineofTreatmentOthersResult'=>$adult1stLineofTreatmentOthersResult,'paeds1stLineofTreatmentResult'=>$paeds1stLineofTreatmentResult,'paeds1stLineofTreatmentOthersResult'=>$paeds1stLineofTreatmentOthersResult,'adult2ndLineofTreatmentResult'=>$adult2ndLineofTreatmentResult,'adult2ndLineofTreatmentOthersResult'=>$adult2ndLineofTreatmentOthersResult,'paeds2ndLineofTreatmentResult'=>$paeds2ndLineofTreatmentResult,'paeds2ndLineofTreatmentOthersResult'=>$paeds2ndLineofTreatmentOthersResult,'otherLineofTreatmentResult'=>$otherLineofTreatmentResult);
     }
     
