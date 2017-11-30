@@ -32,6 +32,7 @@ class SampleService {
         $testReasonDb = $this->sm->get('TestReasonTable');
         $sampleTypeDb = $this->sm->get('SampleTypeTable');
         $locationDb = $this->sm->get('LocationDetailsTable');
+        $sampleRjtReasonDb = $this->sm->get('SampleRejectionReasonTable');
         $dbAdapter = $this->sm->get('Zend\Db\Adapter\Adapter');
         $sql = new Sql($dbAdapter);
         $allowedExtensions = array('xls', 'xlsx', 'csv');
@@ -65,6 +66,14 @@ class SampleService {
                                           'sample_collection_date'=>(trim($sheetData[$i]['U'])!='' ? trim($sheetData[$i]['U']) :  NULL),
                                           'sample_registered_at_lab'=>(trim($sheetData[$i]['AS'])!='' ? trim($sheetData[$i]['AS']) :  NULL),
                                           'line_of_treatment'=>(trim($sheetData[$i]['AT'])!='' ? trim($sheetData[$i]['AT']) :  NULL),
+                                          'is_sample_rejected'=>(trim($sheetData[$i]['AU'])!='' ? trim($sheetData[$i]['AU']) :  NULL),
+                                          'is_patient_pregnant'=>(trim($sheetData[$i]['AX'])!='' ? trim($sheetData[$i]['AX']) :  NULL),
+                                          'is_patient_breastfeeding'=>(trim($sheetData[$i]['AY'])!='' ? trim($sheetData[$i]['AY']) :  NULL),
+                                          'patient_art_no'=>(trim($sheetData[$i]['AZ'])!='' ? trim($sheetData[$i]['AZ']) :  NULL),
+                                          'date_of_initiation_of_current_regimen'=>(trim($sheetData[$i]['BA'])!='' ? trim($sheetData[$i]['BA']) :  NULL),
+                                          'arv_adherance_percentage'=>(trim($sheetData[$i]['BB'])!='' ? trim($sheetData[$i]['BB']) :  NULL),
+                                          'is_adherance_poor'=>(trim($sheetData[$i]['BC'])!='' ? trim($sheetData[$i]['BC']) :  NULL),
+                                          'result_approved_datetime'=>(trim($sheetData[$i]['BD'])!='' ? trim($sheetData[$i]['BD']) :  NULL),
                                           'sample_tested_datetime'=>(trim($sheetData[$i]['AJ'])!='' ? trim($sheetData[$i]['AJ']) :  NULL),
                                           'result_value_log'=>(trim($sheetData[$i]['AK'])!='' ? trim($sheetData[$i]['AK']) :  NULL),
                                           'result_value_absolute'=>(trim($sheetData[$i]['AL'])!='' ? trim($sheetData[$i]['AL']) :  NULL),
@@ -225,6 +234,19 @@ class SampleService {
                             }else{
                                 $data['sample_type'] = NULL;
                             }
+                            //check sample rejection reason
+                            if(trim($sheetData[$i]['AV'])!=''){
+                                $sampleRejectionReason = $this->checkSampleRejectionReason(trim($sheetData[$i]['AV']));
+                                if($sampleRejectionReason){
+                                    $sampleRjtReasonDb->update(array('rejection_reason_name'=>trim($sheetData[$i]['AV']),'rejection_reason_status'=>trim($sheetData[$i]['AW'])),array('rejection_reason_id'=>$sampleRejectionReason['rejection_reason_id']));
+                                    $data['reason_for_sample_rejection'] = $sampleRejectionReason['rejection_reason_id'];
+                                }else{
+                                    $sampleRjtReasonDb->insert(array('rejection_reason_name'=>trim($sheetData[$i]['AV']),'rejection_reason_status'=>trim($sheetData[$i]['AW'])));
+                                    $data['reason_for_sample_rejection'] = $sampleRjtReasonDb->lastInsertValue;
+                                }
+                            }else{
+                                $data['reason_for_sample_rejection'] = NULL;
+                            }
                             
                             //check existing sample code
                             $sampleCode = $this->checkSampleCode($sampleCode,$instanceCode);
@@ -305,6 +327,15 @@ class SampleService {
         $dbAdapter = $this->sm->get('Zend\Db\Adapter\Adapter');
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->from('r_sample_type')->where(array('sample_name' => $sampleType));
+        $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
+        $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
+        return $sResult;
+    }
+    public function checkSampleRejectionReason($rejectReasonName)
+    {
+        $dbAdapter = $this->sm->get('Zend\Db\Adapter\Adapter');
+        $sql = new Sql($dbAdapter);
+        $sQuery = $sql->select()->from('r_sample_rejection_reasons')->where(array('rejection_reason_name' => $rejectReasonName));
         $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
         $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
         return $sResult;
