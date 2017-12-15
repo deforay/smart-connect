@@ -1025,7 +1025,31 @@ class SampleTable extends AbstractTableGateway {
     //end lab dashboard details
     
     //start clinic details
-    public function fetchOverAllLoadStatus($params){
+    public function fetchOverallViralLoadStatus($params){
+        $testedTotal = 0;
+        $notTestedTotal = 0;
+        $lessTotal = 0;
+        $gTotal = 0;
+        $overAllTotal = 0;
+        //total samples
+        $where = '';
+        $overAllTotal = $this->fetchOverallViralLoadResult($params,$where);
+        //total tested samples
+        $where = '((vl.result !="" AND vl.result IS NOT NULL) OR (vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection!= "" AND vl.reason_for_sample_rejection != 0))';
+        $testedTotal = $this->fetchOverallViralLoadResult($params,$where);
+        //total not tested samples
+        $where = '((vl.result = "" OR vl.result IS NULL) AND (vl.reason_for_sample_rejection IS NULL OR vl.reason_for_sample_rejection = "" OR vl.reason_for_sample_rejection = 0))';
+        $notTestedTotal = $this->fetchOverallViralLoadResult($params,$where);
+        //total VL <1000
+        $where = '(vl.result < 1000 OR vl.result="Target Not Detected")';
+        $lessTotal = $this->fetchOverallViralLoadResult($params,$where);
+        //total VL >=1000
+        $where = 'vl.result >= 1000';
+        $gTotal = $this->fetchOverallViralLoadResult($params,$where);
+      return array($testedTotal,$notTestedTotal,$lessTotal,$gTotal,$overAllTotal);
+    }
+    
+    public function fetchViralLoadStatusBasedOnAge($params){
         $logincontainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
@@ -1137,25 +1161,6 @@ class SampleTable extends AbstractTableGateway {
       return $result;
     }
     
-    public function fetchChartOverAllLoadStatus($params){
-        $testedTotal = 0;
-        $lessTotal = 0;
-        $gTotal = 0;
-        $overAllTotal = 0;
-        //total tested
-        $where = '';
-        $overAllTotal = $this->fetchChartOverAllLoadResult($params,$where);
-        $where = 'vl.result!=""';
-        $testedTotal = $this->fetchChartOverAllLoadResult($params,$where);
-        //total <1000
-        $where = 'vl.result < 1000 or vl.result="Target Not Detected"';
-        $lessTotal = $this->fetchChartOverAllLoadResult($params,$where);
-        //total >=1000
-        $where = 'vl.result >= 1000';
-        $gTotal = $this->fetchChartOverAllLoadResult($params,$where);
-      return array($testedTotal,$lessTotal,$gTotal,$overAllTotal);
-    }
-    
     public function fetchSampleTestedReason($params){
         $logincontainer = new Container('credo');
         $dbAdapter = $this->adapter;
@@ -1256,7 +1261,7 @@ class SampleTable extends AbstractTableGateway {
         return $rResult;
     }
     
-    public function fetchChartOverAllLoadResult($params,$where){
+    public function fetchOverallViralLoadResult($params,$where){
         $logincontainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
@@ -1272,10 +1277,9 @@ class SampleTable extends AbstractTableGateway {
             }
             $squery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
                             ->columns(array('total' => new Expression('COUNT(*)')))
-                            //->join(array('rst'=>'r_sample_type'),'rst.sample_id=vl.sample_type')
+                            //->join(array('rs'=>'r_sample_type'),'rs.sample_id=vl.sample_type')
                             ->where(array("DATE(vl.sample_collection_date) <='$endDate'",
                                           "DATE(vl.sample_collection_date) >='$startDate'"));
-                            //->where('vl.facility_id !=0');
             if(isset($params['clinicId']) && is_array($params['clinicId']) && count($params['clinicId']) >0){
                 $squery = $squery->where('vl.facility_id IN ("' . implode('", "', $params['clinicId']) . '")');
             }else{
@@ -1594,21 +1598,21 @@ class SampleTable extends AbstractTableGateway {
         foreach ($rResult as $aRow) {
             $row = array();
             $sampleCollectionDate = '';
-            $sampleTestedDate = '';
 	    if(isset($aRow['sampleCollectionDate']) && $aRow['sampleCollectionDate']!= NULL && trim($aRow['sampleCollectionDate'])!="" && $aRow['sampleCollectionDate']!= '0000-00-00'){
                 $sampleCollectionDate = $common->humanDateFormat($aRow['sampleCollectionDate']);
             }
+            $sampleTestedDate = '';
             if(isset($aRow['sampleTestingDate']) && $aRow['sampleTestingDate']!= NULL && trim($aRow['sampleTestingDate'])!="" && $aRow['sampleTestingDate']!= '0000-00-00'){
                 $sampleTestedDate = $common->humanDateFormat($aRow['sampleTestingDate']);
             }
-            $display = (trim($aRow['result']) == "")?'none':'block';
+            $pdfButtCss = ($aRow['result'] == null || trim($aRow['result']) == "")?'display:none':'';
             $row[] = $aRow['sample_code'];
             $row[] = ucwords($aRow['facility_name']);
             $row[] = $sampleCollectionDate;
             $row[] = (isset($aRow['rejection_reason_name']))?ucwords($aRow['rejection_reason_name']):'';
             $row[] = $sampleTestedDate;
 	    $row[] = $aRow['result'];
-	    $row[]='<a href="/clinics/test-result-view/'.base64_encode($aRow['vl_sample_id']).'" class="btn btn-primary btn-xs" target="_blank">'.$viewText.'</a>&nbsp;&nbsp;<a href="javascript:void(0);" class="btn btn-danger btn-xs" style="display:'.$display.'" onclick="generateResultPDF('.$aRow['vl_sample_id'].');">'.$pdfText.'</a>';
+	    $row[]='<a href="/clinics/test-result-view/'.base64_encode($aRow['vl_sample_id']).'" class="btn btn-primary btn-xs" target="_blank">'.$viewText.'</a>&nbsp;&nbsp;<a href="javascript:void(0);" class="btn btn-danger btn-xs" style="'.$pdfButtCss.'" onclick="generateResultPDF('.$aRow['vl_sample_id'].');">'.$pdfText.'</a>';
             $output['aaData'][] = $row;
         }
        return $output;
@@ -1656,7 +1660,13 @@ class SampleTable extends AbstractTableGateway {
             }else if(isset($params['testResult']) && trim($params['testResult']) == '>=1000') {
               $queryStr = $queryStr->where("vl.result >= 1000");
             }
-            if(isset($params['sampleTypeId']) && $params['sampleTypeId']!=''){
+            if(isset($params['frmSrc']) && $params['frmSrc'] =='change'){
+                if(isset($params['sampleType']) && $params['sampleType'] == 'dbs'){
+                    $queryStr = $queryStr->where('vl.sample_type IN(2)');
+                }else if(isset($params['sampleType']) && $params['sampleType'] == 'others'){
+                    $queryStr = $queryStr->where('vl.sample_type NOT IN(2)');
+                }
+            }else if(isset($params['sampleTypeId']) && $params['sampleTypeId']!=''){
                 $queryStr = $queryStr->where('vl.sample_type="'.base64_decode(trim($params['sampleTypeId'])).'"');
             }
             //print_r($params['age']);die;
@@ -4081,28 +4091,25 @@ class SampleTable extends AbstractTableGateway {
     }
     
     public function getSummaryTabDetails(){
-        $logincontainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $common = new CommonService($this->sm);
         $queryStr = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
-                                ->columns(array(
-                                "total_samples_received" => new Expression("COUNT(*)"),
-                                "suppressed_samples" => new Expression("SUM(CASE WHEN (vl.result < 1000 or vl.result='Target Not Detected') THEN 1 ELSE 0 END)"),
-                                "suppressed_samples_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (vl.result < 1000 or vl.result='Target Not Detected') THEN 1 ELSE 0 END)/COUNT(*))*100),2)"),
-                                "unsuppressed_samples" => new Expression("SUM(CASE WHEN (vl.result >= 1000) THEN 1 ELSE 0 END)"),
-                                "unsuppressed_samples_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (vl.result >= 1000) THEN 1 ELSE 0 END)/COUNT(*))*100),2)"),
-                                "rejected_samples" => new Expression("SUM(CASE WHEN (vl.reason_for_sample_rejection !='' AND vl.reason_for_sample_rejection !='0' AND vl.reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END)"),
-                                "rejected_samples_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (vl.reason_for_sample_rejection !='' AND vl.reason_for_sample_rejection !='0' AND vl.reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END)/COUNT(*))*100),2)"),
-                                "all_current_regimen_samples" => new Expression("SUM(CASE WHEN (vl.line_of_treatment != 0 AND vl.line_of_treatment IS NOT NULL AND vl.line_of_treatment!= '') THEN 1 ELSE 0 END)"),
-                                "1st_line_of_current_regimen_samples" => new Expression("SUM(CASE WHEN (vl.line_of_treatment = 1) THEN 1 ELSE 0 END)"),
-                                ))
-                                ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date != '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')");
-          
-            $queryStr = $sql->getSqlStringForSqlObject($queryStr);
-            //echo $queryStr;die;
-            $summaryResult = $common->cacheQuery($queryStr,$dbAdapter);
-            return $summaryResult;
+                            ->columns(array(
+                            "total_samples_received" => new Expression("COUNT(*)"),
+                            "suppressed_samples" => new Expression("SUM(CASE WHEN (vl.result < 1000 or vl.result='Target Not Detected') THEN 1 ELSE 0 END)"),
+                            "suppressed_samples_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (vl.result < 1000 or vl.result='Target Not Detected') THEN 1 ELSE 0 END)/COUNT(*))*100),2)"),
+                            "unsuppressed_samples" => new Expression("SUM(CASE WHEN (vl.result >= 1000) THEN 1 ELSE 0 END)"),
+                            "unsuppressed_samples_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (vl.result >= 1000) THEN 1 ELSE 0 END)/COUNT(*))*100),2)"),
+                            "rejected_samples" => new Expression("SUM(CASE WHEN (vl.reason_for_sample_rejection !='' AND vl.reason_for_sample_rejection !='0' AND vl.reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END)"),
+                            "rejected_samples_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (vl.reason_for_sample_rejection !='' AND vl.reason_for_sample_rejection !='0' AND vl.reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END)/COUNT(*))*100),2)"),
+                            "all_current_regimen_samples" => new Expression("SUM(CASE WHEN (vl.line_of_treatment != 0 AND vl.line_of_treatment IS NOT NULL AND vl.line_of_treatment!= '') THEN 1 ELSE 0 END)"),
+                            "1st_line_of_current_regimen_samples" => new Expression("SUM(CASE WHEN (vl.line_of_treatment = 1) THEN 1 ELSE 0 END)"),
+                            ))
+                            ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date != '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')");
+        $queryStr = $sql->getSqlStringForSqlObject($queryStr);
+        $summaryResult = $common->cacheQuery($queryStr,$dbAdapter);
+      return $summaryResult;
     }
     
     /* Samples Received District*/

@@ -188,7 +188,11 @@ foreach($sampleType as $samples){
                                     </div>
                                     <div class="actions">
                                         <div class="btn-group">
-                                            
+                                            <select id="sampleType" class="btn white btn-outline btn-circle btn-sm dropdown-toggle" onchange="getTestedSampleResult('change');">
+                                                <option value=""><?php echo $this->translate('All Samples'); ?></option>
+                                                <option value="dbs"><?php echo $this->translate('DBS'); ?></option>
+                                                <option value="others"><?php echo $this->translate('Others'); ?></option>
+                                            </select>
                                         </div>
                                     </div>
                                 </div>
@@ -296,15 +300,15 @@ foreach($sampleType as $samples){
         if( !$('#sampleCollectionDate').val() ) {
             $('#sampleCollectionDate').val(moment().subtract('days', 29).format('YYYY-MM-DD') + ' to ' + moment().format('YYYY-MM-DD'));
         }
-        getOverAllViralLoad();
-        overAllViralLoad();
+        getOverAllViralLoadStatus();
+        getOverAllViralLoadbasedonGender();
         getAllTestReason();
-        getTestedSampleResult();
+        getTestedSampleResult('load');
         loadTestResult();
         fnShowHide();
     }
     
-    function getOverAllViralLoad(){
+    function getOverAllViralLoadStatus(){
         clinicId = $("#clinicId").val();
         dateRange = $("#sampleCollectionDate").val();
         testResult = $("#testResult").val();
@@ -314,13 +318,13 @@ foreach($sampleType as $samples){
         gender = $("#gender").val();
         isPregnant = $("#isPregnant").val();
         isBreastfeeding = $("#isBreastfeeding").val();
-        $.post("<?php echo $this->url('clinics', array('action' => 'overall-viral-load')); ?>",{clinicId:clinicId,sampleCollectionDate:dateRange,testResult:testResult,sampleTypeId:sampleTypeId,age:age,adherence:adherence,gender:gender,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding},
+        $.post("<?php echo $this->url('clinics', array('action' => 'get-overall-viral-load-status')); ?>",{clinicId:clinicId,sampleCollectionDate:dateRange,testResult:testResult,sampleTypeId:sampleTypeId,age:age,adherence:adherence,gender:gender,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding},
         function(data) {
             $("#overall-vl-status").html(data);
         });
     }
     
-    function overAllViralLoad(){
+    function getOverAllViralLoadbasedonGender(){
         clinicId = $("#clinicId").val();
         dateRange = $("#sampleCollectionDate").val();
         testResult = $("#testResult").val();
@@ -330,7 +334,7 @@ foreach($sampleType as $samples){
         gender = $("#gender").val();
         isPregnant = $("#isPregnant").val();
         isBreastfeeding = $("#isBreastfeeding").val();
-        $.post("<?php echo $this->url('clinics', array('action' => 'get-over-all-load-status')); ?>",{clinicId:clinicId,sampleCollectionDate:dateRange,testResult:testResult,sampleTypeId:sampleTypeId,age:age,adherence:adherence,gender:gender,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding},
+        $.post("<?php echo $this->url('clinics', array('action' => 'get-viral-load-status-based-on-age')); ?>",{clinicId:clinicId,sampleCollectionDate:dateRange,testResult:testResult,sampleTypeId:sampleTypeId,age:age,adherence:adherence,gender:gender,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding},
         function(data) {
             $("#overall-vl-status-based-gender").html(data);
         });
@@ -353,17 +357,20 @@ foreach($sampleType as $samples){
         });
     }
     
-    function getTestedSampleResult(){
-        clinicId = $("#clinicId").val();
-        dateRange = $("#sampleCollectionDate").val();
-        testResult = $("#testResult").val();
-        sampleTypeId = $("#sampleTypeId").val();
-        age = $("#age").val();
-        adherence = $("#adherence").val();
-        gender = $("#gender").val();
-        isPregnant = $("#isPregnant").val();
-        isBreastfeeding = $("#isBreastfeeding").val();
-        $.post("<?php echo $this->url('clinics', array('action' => 'get-sample-test-result')); ?>",{clinicId:clinicId,sampleCollectionDate:dateRange,testResult:testResult,sampleTypeId:sampleTypeId,age:age,adherence:adherence,gender:gender,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding},
+    function getTestedSampleResult(frmSrc){
+        var clinicId = $("#clinicId").val();
+        var dateRange = $("#sampleCollectionDate").val();
+        var testResult = $("#testResult").val();
+        var sampleTypeId = $("#sampleTypeId").val();
+        var age = $("#age").val();
+        var adherence = $("#adherence").val();
+        var gender = $("#gender").val();
+        var isPregnant = $("#isPregnant").val();
+        var isBreastfeeding = $("#isBreastfeeding").val();
+        var sampleType = $("#sampleType").val();
+        $.blockUI.defaults.css.border = '1px solid grey';
+        $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
+        $.post("<?php echo $this->url('clinics', array('action' => 'get-sample-test-result')); ?>",{clinicId:clinicId,sampleCollectionDate:dateRange,testResult:testResult,sampleTypeId:sampleTypeId,age:age,adherence:adherence,gender:gender,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding,sampleType:sampleType,frmSrc:frmSrc},
         function(data) {
            $("#samplesTestedResult").html(data);
         });
@@ -422,10 +429,10 @@ foreach($sampleType as $samples){
         $.blockUI.defaults.css.border = '1px solid grey';
         $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
         oTable.draw();
-        getOverAllViralLoad();
-        overAllViralLoad();
+        getOverAllViralLoadStatus();
+        getOverAllViralLoadbasedonGender();
         getAllTestReason();
-        getTestedSampleResult();
+        getTestedSampleResult('search');
     }
 
     function resetEverything(){

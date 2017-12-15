@@ -406,14 +406,14 @@ class SampleService {
     //lab details end
     
     //clinic details start
-    public function getOverAllLoadStatus($params){
+    public function getOverallViralLoadStatus($params){
         $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->fetchOverAllLoadStatus($params);
+        return $sampleDb->fetchOverallViralLoadStatus($params);
     }
     
-    public function getChartOverAllLoadStatus($params){
+    public function getViralLoadStatusBasedOnAge($params){
         $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->fetchChartOverAllLoadStatus($params);
+        return $sampleDb->fetchViralLoadStatusBasedOnAge($params);
     }
     
     public function fetchSampleTestedReason($params){
@@ -515,12 +515,14 @@ class SampleService {
         $dbAdapter = $this->sm->get('Zend\Db\Adapter\Adapter');
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
-				->join(array('fd'=>'facility_details'),'fd.facility_id=vl.facility_id',array('facility_name','facility_code','facility_logo'),'left')
-				->join(array('l_s'=>'location_details'),'l_s.location_id=fd.facility_state',array('provinceName'=>'location_name'),'left')
-				->join(array('l_d'=>'location_details'),'l_d.location_id=fd.facility_district',array('districtName'=>'location_name'),'left')
-				->join(array('r_s_t'=>'r_sample_type'),'r_s_t.sample_id=vl.sample_type',array('sample_name'),'left')
+				->join(array('f'=>'facility_details'),'f.facility_id=vl.facility_id',array('facility_name','facility_code','facility_logo'),'left')
+				->join(array('l_s'=>'location_details'),'l_s.location_id=f.facility_state',array('provinceName'=>'location_name'),'left')
+				->join(array('l_d'=>'location_details'),'l_d.location_id=f.facility_district',array('districtName'=>'location_name'),'left')
+				->join(array('rs'=>'r_sample_type'),'rs.sample_id=vl.sample_type',array('sample_name'),'left')
 				->join(array('l'=>'facility_details'),'l.facility_id=vl.lab_id',array('labName'=>'facility_name'),'left')
 				->join(array('u'=>'user_details'),'u.user_id=vl.result_approved_by',array('approvedBy'=>'user_name'),'left')
+                                ->join(array('r_r_r'=>'r_sample_rejection_reasons'),'r_r_r.rejection_reason_id=vl.reason_for_sample_rejection',array('rejection_reason_name'),'left')
+                                ->join(array('rej_f'=>'facility_details'),'rej_f.facility_id=vl.sample_rejection_facility',array('rejectionFacilityName'=>'facility_name'),'left')
 				->where(array('vl.vl_sample_id'=>$params['id']));
         $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
       return $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();

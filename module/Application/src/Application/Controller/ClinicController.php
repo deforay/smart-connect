@@ -26,12 +26,12 @@ class ClinicController extends AbstractActionController{
             ));
     }
     
-    public function overallViralLoadAction(){
+    public function getOverallViralLoadStatusAction(){
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
             $sampleService = $this->getServiceLocator()->get('SampleService');
-            $chartResult = $sampleService->getChartOverAllLoadStatus($params);
+            $chartResult = $sampleService->getOverallViralLoadStatus($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('chartResult'=>$chartResult))
                         ->setTerminal(true);
@@ -39,12 +39,12 @@ class ClinicController extends AbstractActionController{
         }
     }
     
-    public function getOverAllLoadStatusAction() {
+    public function getViralLoadStatusBasedOnAgeAction() {
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
             $sampleService = $this->getServiceLocator()->get('SampleService');
-            $chartResult = $sampleService->getOverAllLoadStatus($params);
+            $chartResult = $sampleService->getViralLoadStatusBasedOnAge($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('result'=>$chartResult))
                         ->setTerminal(true);
@@ -123,11 +123,9 @@ class ClinicController extends AbstractActionController{
         $params = array();
         $params['id'] = base64_decode($this->params()->fromRoute('id'));
         $sampleService = $this->getServiceLocator()->get('SampleService');
-        $configService = $this->getServiceLocator()->get('ConfigService');
         $sampleResult = $sampleService->getSampleInfo($params);
-        $config=$configService->getAllGlobalConfig();
         return new ViewModel(array(
-                'result' => $sampleResult,'config'=>$config
+                'result' => $sampleResult
             ));
     }
     

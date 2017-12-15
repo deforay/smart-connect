@@ -21,7 +21,7 @@ if(!isset($result[0]['facility_name']) || $result[0]['facility_name'] == NULL ||
    $result[0]['districtName'] = '';
 }
 //set gender
-if(!isset($result[0]['patient_gender']) || trim($result[0]['patient_gender'])== ''){
+if(!isset($result[0]['patient_gender']) || $result[0]['patient_gender'] == NULL || trim($result[0]['patient_gender'])== ''){
     $result[0]['patient_gender'] = 'not reported';
 }
 //set Age
@@ -71,7 +71,7 @@ if(isset($result[0]['approvedBy']) && trim($result[0]['approvedBy'])!=''){
 ?>
 <style>
     .form-control{border:none;}
-    .labelName{font-size:11.5px;font-weight:bold}
+    .labelTxt{font-size:11.5px;font-weight:bold}
     p{padding:4px;}
 </style>
  <div class="page-bar">
@@ -97,37 +97,37 @@ if(isset($result[0]['approvedBy']) && trim($result[0]['approvedBy'])!=''){
                 <form class="form-horizontal">
                 <div class="row">
                     <div class="col-md-4">
-                        <span class="labelName"><?php echo $this->translate('Sample No'); ?>.</span>
+                        <span class="labelTxt"><?php echo $this->translate('Sample No'); ?>.</span>
                         <p><?php echo $result[0]['sample_code'];?></p>
                     </div>
                     <div class="col-md-4">
-                        <span class="labelName"><?php echo $this->translate('Sample Collection Date'); ?></span>
+                        <span class="labelTxt"><?php echo $this->translate('Sample Collection Date'); ?></span>
                         <p><?php echo $sampleCollectionDate; ?></p>
                     </div>
                     <div class="col-md-4">
-                        <span class="labelName"><?php echo $this->translate('ART (TRACNET) No'); ?>.</span>
+                        <span class="labelTxt"><?php echo $this->translate('ART (TRACNET) No'); ?>.</span>
                         <p><?php echo $result[0]['patient_art_no'];?></p>
                     </div>
                 </div>
                 
                 <div class="row">
                     <div class="col-md-4">
-                        <span class="labelName"><?php echo $this->translate('Patient First Name & Last Name'); ?></span>
+                        <span class="labelTxt"><?php echo $this->translate('Patient First Name & Last Name'); ?></span>
                         <p><?php echo $patientFirstName." ".$patientLastName;?></p>
                     </div>
                     <div class="col-md-4">
-                        <span class="labelName"><?php echo $this->translate('Mobile No'); ?>.</span>
+                        <span class="labelTxt"><?php echo $this->translate('Mobile No'); ?>.</span>
                         <p><?php echo $patientMobileNumber;?></p>
                     </div>
                     <div class="col-md-4">
-                        <span class="labelName"><?php echo $this->translate('Age'); ?></span>
+                        <span class="labelTxt"><?php echo $this->translate('Age'); ?></span>
                         <p><?php echo $age;?></p>
                     </div>
                 </div>
                 
                 <div class="row">
                     <div class="col-md-4">
-                        <span class="labelName"><?php echo $this->translate('Gender'); ?></span>
+                        <span class="labelTxt"><?php echo $this->translate('Gender'); ?></span>
                         <p><?php echo ucwords(str_replace("_"," ",$result[0]['patient_gender']));?></p>
                     </div>
                 </div>
@@ -136,60 +136,73 @@ if(isset($result[0]['approvedBy']) && trim($result[0]['approvedBy'])!=''){
                 <div class="row">
                     <h6></h6>
                     <div class="col-md-4">
-                        <span class="labelName"><?php echo $this->translate('Clinic/Health Center Code'); ?></span>
+                        <span class="labelTxt"><?php echo $this->translate('Clinic/Health Center Code'); ?></span>
                         <p><?php echo $result[0]['facility_code'];?></p>
                     </div>
                     <div class="col-md-4">
-                        <span class="labelName"><?php echo $this->translate('Province/State'); ?></span>
+                        <span class="labelTxt"><?php echo $this->translate('Province/State'); ?></span>
                         <p><?php echo ucwords($result[0]['provinceName']);?></p>
                     </div>
                     <div class="col-md-4">
-                        <span class="labelName"><?php echo $this->translate('District/County'); ?></span>
+                        <span class="labelTxt"><?php echo $this->translate('District/County'); ?></span>
                         <p><?php echo ucwords($result[0]['districtName']);?></p>
                     </div>
                 </div>
                 
                 <div class="row">
                     <div class="col-md-4">
-                        <span class="labelName"><?php echo $this->translate('Clinic/Health Center Name'); ?></span>
+                        <span class="labelTxt"><?php echo $this->translate('Clinic/Health Center Name'); ?></span>
                         <p><?php echo ucwords($result[0]['facility_name']);?></p>
                     </div>
                     <div class="col-md-4">
-                        <span class="labelName"><?php echo $this->translate('Clinician Name'); ?></span>
+                        <span class="labelTxt"><?php echo $this->translate('Clinician Name'); ?></span>
                         <p><?php echo ucwords($result[0]['request_clinician_name']);?></p>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-4">
-                        <span class="labelName"><?php echo $this->translate('Sample Receipt Date'); ?></span>
+                        <span class="labelTxt"><?php echo $this->translate('Sample Receipt Date'); ?></span>
                         <p><?php echo $sampleReceivedDate; ?></p>
                     </div>
                     <div class="col-md-4">
-                        <span class="labelName"><?php echo $this->translate('Sample Test Date'); ?></span>
+                        <span class="labelTxt"><?php echo $this->translate('Sample Test Date'); ?></span>
                         <p><?php echo $sampleTestedDate; ?></p>
                     </div>
                     <div class="col-md-4">
-                        <span class="labelName"><?php echo $this->translate('Specimen Type'); ?></span>
+                        <span class="labelTxt"><?php echo $this->translate('Specimen Type'); ?></span>
                         <p><?php echo ucwords($result[0]['sample_name']);?></p>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-4">
-                        <span class="labelName"><?php echo $this->translate('Platform'); ?></span>
-                        <p><?php echo ucwords($result[0]['vl_test_platform']);?></p>
-                    </div>
-                    <div class="col-md-4">
-                        <span class="labelName"><?php echo $this->translate('VIRAL LOAD RESULT (copies/ml)'); ?></span>
-                        <p><?php echo $result[0]['result'];?></p>
-                    </div>
-                    <div class="col-md-4">
-                        <span class="labelName"><?php echo $this->translate('Approved By (copies/ml)'); ?></span>
-                        <p><?php echo $resultApprovedBy;?></p>
-                    </div>
+                    <?php if($result[0]['reason_for_sample_rejection']!= null && trim($result[0]['reason_for_sample_rejection'])!= '' && (int)$result[0]['reason_for_sample_rejection'] > 0){ ?>
+                        <div class="col-md-4">
+                            <span class="labelTxt"><?php echo $this->translate('Sample Rejection'); ?></span>
+                            <p><?php echo ucwords($result[0]['rejection_reason_name']);?></p>
+                        </div>
+                        <?php if(isset($result[0]['rejectionFacilityName']) && $result[0]['rejectionFacilityName']!= null && trim($result[0]['rejectionFacilityName'])!= ''){ ?>
+                            <div class="col-md-4">
+                                <span class="labelTxt"><?php echo $this->translate('Rejection Facility'); ?></span>
+                                <p><?php echo ucwords($result[0]['rejectionFacilityName']);?></p>
+                            </div>
+                        <?php } ?>
+                    <?php } else { ?>
+                        <div class="col-md-4">
+                            <span class="labelTxt"><?php echo $this->translate('Platform'); ?></span>
+                            <p><?php echo ucwords($result[0]['vl_test_platform']);?></p>
+                        </div>
+                        <div class="col-md-4">
+                            <span class="labelTxt"><?php echo $this->translate('VIRAL LOAD RESULT (copies/ml)'); ?></span>
+                            <p><?php echo $result[0]['result'];?></p>
+                        </div>
+                        <div class="col-md-4">
+                            <span class="labelTxt"><?php echo $this->translate('Approved By'); ?></span>
+                            <p><?php echo $resultApprovedBy;?></p>
+                        </div>
+                    <?php } ?>
                 </div>
                 <div class="row">
                     <div class="col-md-10">
-                        <span class="labelName"><?php echo $this->translate('Lab Comments'); ?></span>
+                        <span class="labelTxt"><?php echo $this->translate('Lab Comments'); ?></span>
                         <p><?php echo ucfirst($result[0]['approver_comments']);?></p>
                     </div>
                 </div>
@@ -197,11 +210,11 @@ if(isset($result[0]['approvedBy']) && trim($result[0]['approvedBy'])!=''){
                 <div class="row">
                     <h4><?php echo $this->translate('Previous Result'); ?></h4>
                     <div class="col-md-4">
-                        <span class="labelName"><?php echo $this->translate('Date of Last Viral Load Test'); ?></span>
+                        <span class="labelTxt"><?php echo $this->translate('Date of Last Viral Load Test'); ?></span>
                         <p><?php echo $lastViralLoadDate; ?></p>
                     </div>
                     <div class="col-md-4">
-                        <span class="labelName"><?php echo $this->translate('Result of previous viral load(copies/ml)'); ?> </span>
+                        <span class="labelTxt"><?php echo $this->translate('Result of previous viral load(copies/ml)'); ?> </span>
                         <p><?php echo $result[0]['last_viral_load_result'];?></p>
                     </div>
                 </div>
