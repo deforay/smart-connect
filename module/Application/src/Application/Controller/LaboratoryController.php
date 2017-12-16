@@ -515,7 +515,7 @@ class LaboratoryController extends AbstractActionController{
         }
     }
     
-    public function getSampleTestedTurnAroundTimeAction(){
+    public function samplesTestedTurnAroundTimeAction(){
         $this->layout()->setVariable('activeTab', 'labs-dashboard');
         $params = array();
         $gender="";
@@ -550,16 +550,12 @@ class LaboratoryController extends AbstractActionController{
         
         $sampleService = $this->getServiceLocator()->get('SampleService');
         $commonService = $this->getServiceLocator()->get('CommonService');
-        //$labName = $sampleService->getAllLabName();
-        //$clinicName = $sampleService->getAllClinicName();
         $hubName = $sampleService->getAllHubName();
         $sampleType = $sampleService->getSampleType();
         $currentRegimen = $sampleService->getAllCurrentRegimen();
         $facilityInfo = $commonService->getSampleTestedFacilityInfo($params);
         return new ViewModel(array(
                 'sampleType' => $sampleType,
-                //'labName' => $labName,
-                //'clinicName' => $clinicName,
                 'hubName' => $hubName,
                 'currentRegimen' => $currentRegimen,
                 'searchMonth' => $month,

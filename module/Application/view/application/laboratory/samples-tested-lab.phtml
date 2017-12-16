@@ -271,14 +271,19 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
                                             <thead>
                                                 <tr>
                                                     <th><?php echo $this->translate('Date'); ?> </th>
-                                                    <th><?php echo $this->translate('No. of Samples'); ?> </th>
+                                                    <th><?php echo $this->translate('Samples Collected'); ?> </th>
+                                                    <th><?php echo $this->translate('Samples Tested'); ?> </th>
+                                                    <th><?php echo $this->translate('Samples Pending'); ?> </th>
+                                                    <th><?php echo $this->translate('Samples Suppressed'); ?> </th>
+                                                    <th><?php echo $this->translate('Samples Not Suppressed'); ?> </th>
+                                                    <th><?php echo $this->translate('Samples Rejected'); ?> </th>
                                                     <th><?php echo $this->translate('Sample Type'); ?> </th>
                                                     <th><?php echo $this->translate('Clinics'); ?> </th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 <tr>
-                                                    <td colspan="4" class="dataTables_empty">Loading data from server</td>
+                                                    <td colspan="9" class="dataTables_empty">Loading data from server</td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -293,20 +298,20 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
     function generatePieContainer(){
         $.blockUI.defaults.css.border = '1px solid grey';
         $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
-        fromDate = $('#mrp-lowerDate').val();
-        toDate = $('#mrp-upperDate').val();
-        provinces = $("#provinces").val();
-        districts = $("#districts").val();
-        lab = $("#labName").val();
-        clinicId = $("#clinicId").val();
-        currentRegimen = $("#currentRegimen").val();
-        adherence = $("#adherence").val();
-        age = $("#age").val();
-        testResult = $("#testResult").val();
-        sampleType = $("#sampleType").val();
-        gender = $("#gender").val();
-        isPregnant = $("#isPregnant").val();
-        isBreastfeeding = $("#isBreastfeeding").val();
+        var fromDate = $('#mrp-lowerDate').val();
+        var toDate = $('#mrp-upperDate').val();
+        var provinces = $("#provinces").val();
+        var districts = $("#districts").val();
+        var lab = $("#labName").val();
+        var clinicId = $("#clinicId").val();
+        var currentRegimen = $("#currentRegimen").val();
+        var adherence = $("#adherence").val();
+        var age = $("#age").val();
+        var testResult = $("#testResult").val();
+        var sampleType = $("#sampleType").val();
+        var gender = $("#gender").val();
+        var isPregnant = $("#isPregnant").val();
+        var isBreastfeeding = $("#isBreastfeeding").val();
         $.post("<?php echo $this->url('laboratory', array('action' => 'get-lab-sample-details')); ?>",{fromDate:fromDate,toDate:toDate,provinces:provinces,districts:districts,lab:lab,clinicId:clinicId,currentRegimen:currentRegimen,adherence:adherence,age:age,testResult:testResult,sampleType:sampleType,gender:gender,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding},
         function(data) {
             $("#piecontainer").html(data);
@@ -316,20 +321,20 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
     function generateBarContainer(){
         $.blockUI.defaults.css.border = '1px solid grey';
         $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
-        fromDate = $('#mrp-lowerDate').val();
-        toDate = $('#mrp-upperDate').val();
-        provinces = $("#provinces").val();
-        districts = $("#districts").val();
-        lab = $("#labName").val();
-        clinicId = $("#clinicId").val();
-        currentRegimen = $("#currentRegimen").val();
-        adherence = $("#adherence").val();
-        age = $("#age").val();
-        testResult = $("#testResult").val();
-        sampleType = $("#sampleType").val();
-        gender = $("#gender").val();
-        isPregnant = $("#isPregnant").val();
-        isBreastfeeding = $("#isBreastfeeding").val();
+        var fromDate = $('#mrp-lowerDate').val();
+        var toDate = $('#mrp-upperDate').val();
+        var provinces = $("#provinces").val();
+        var districts = $("#districts").val();
+        var lab = $("#labName").val();
+        var clinicId = $("#clinicId").val();
+        var currentRegimen = $("#currentRegimen").val();
+        var adherence = $("#adherence").val();
+        var age = $("#age").val();
+        var testResult = $("#testResult").val();
+        var sampleType = $("#sampleType").val();
+        var gender = $("#gender").val();
+        var isPregnant = $("#isPregnant").val();
+        var isBreastfeeding = $("#isBreastfeeding").val();
         $.post("<?php echo $this->url('laboratory', array('action' => 'get-lab-bar-sample-details')); ?>",{fromDate:fromDate,toDate:toDate,provinces:provinces,districts:districts,lab:lab,clinicId:clinicId,currentRegimen:currentRegimen,adherence:adherence,age:age,testResult:testResult,sampleType:sampleType,gender:gender,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding},
         function(data) {
             $("#barcontainer").html(data);
@@ -403,6 +408,11 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
                 "bServerSide": true,
                 "aoColumns": [
                     {"sClass":"center"},
+                    {"sClass":"center","bSortable":false},
+                    {"sClass":"center","bSortable":false},
+                    {"sClass":"center","bSortable":false},
+                    {"sClass":"center","bSortable":false},
+                    {"sClass":"center","bSortable":false},
                     {"sClass":"center","bSortable":false},
                     {"sClass":"center"},
                     {"sClass":"center"}
@@ -695,17 +705,17 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
     });
     
     function getLocationInfo(fromSrc){
-        provinces = ($("#provinces").val() == null || $("#provinces").val() == '')?[]:$("#provinces").val();
-        districts = ($("#districts").val() == null || $("#districts").val() == '')?[]:$("#districts").val();
+        var provinces = ($("#provinces").val() == null || $("#provinces").val() == '')?[]:$("#provinces").val();
+        var districts = ($("#districts").val() == null || $("#districts").val() == '')?[]:$("#districts").val();
         $.post("<?php echo $this->url('laboratory', array('action' => 'get-location-info')); ?>", {provinces:provinces,districts:districts,fromSrc:fromSrc},
         function(data){
             if(fromSrc == 'provinces'){ $('#districts').val('').change(); }
             $('#labName').val('').change();
             $('#clinicId').val('').change();
-            splitLocationInfo = data.split('##');
-            if(fromSrc == 'provinces'){ $('#districts').html(splitLocationInfo[0]); }
-            $('#labName').html(splitLocationInfo[1]);
-            $('#clinicId').html(splitLocationInfo[2]);
+            var locationInfoArray = data.split('##');
+            if(fromSrc == 'provinces'){ $('#districts').html(locationInfoArray[0]); }
+            $('#labName').html(locationInfoArray[1]);
+            $('#clinicId').html(locationInfoArray[2]);
         });
     }
     

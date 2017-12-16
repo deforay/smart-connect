@@ -673,8 +673,6 @@ class SampleService {
         $translator = $this->sm->get('translator');
         $common = new CommonService();
         if(trim($params['fromDate'])!= '' && trim($params['toDate'])!= ''){
-            $startMonth = date("Y-m", strtotime(trim($params['fromDate'])))."-01";
-            $endMonth = date("Y-m", strtotime(trim($params['toDate'])))."-31";
             if(isset($queryContainer->sampleResultQuery)){
              try{
                 $dbAdapter = $this->sm->get('Zend\Db\Adapter\Adapter');
@@ -690,93 +688,13 @@ class SampleService {
                     $output = array();
                     foreach ($sResult as $aRow) {
                         $row = array();
-                        $countQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))->columns(array('total' => new Expression('COUNT(*)')))
-                                          ->where('vl.lab_id="'.$aRow['facility_id'].'"');
-                        if(trim($params['fromDate'])!= '' && trim($params['toDate'])!= ''){
-                            $countQuery = $countQuery->where(array("vl.sample_collection_date >='" . $startMonth ." 00:00:00". "'", "vl.sample_collection_date <='" .$endMonth." 23:59:59". "'"));
-                        }
-                        if(isset($params['clinicId']) && is_array($params['clinicId']) && count($params['clinicId']) >0){
-                            $countQuery = $countQuery->where('vl.facility_id IN ("' . implode('", "', $params['clinicId']) . '")');
-                        }
-                        if(isset($params['currentRegimen']) && trim($params['currentRegimen'])!=''){
-                            $countQuery = $countQuery->where('vl.current_regimen="'.base64_decode(trim($params['currentRegimen'])).'"');
-                        }
-                        if(isset($params['adherence']) && trim($params['adherence'])!=''){
-                            $countQuery = $countQuery->where(array("vl.arv_adherance_percentage ='".$params['adherence']."'")); 
-                        }
-                        //print_r($params['age']);die;
-                        if(isset($params['age']) && is_array($params['age']) && count($params['age']) > 0){
-                            $where = '';
-                            for($a=0;$a<count($params['age']);$a++){
-                                if(trim($where)!= ''){ $where.= ' OR '; }
-                                if($params['age'][$a] == '<2'){
-                                  $where.= "(vl.patient_age_in_years < 2)";
-                                }else if($params['age'][$a] == '2to5') {
-                                  $where.= "(vl.patient_age_in_years >= 2 AND vl.patient_age_in_years <= 5)";
-                                }else if($params['age'][$a] == '6to14') {
-                                  $where.= "(vl.patient_age_in_years >= 6 AND vl.patient_age_in_years <= 14)";
-                                }else if($params['age'][$a] == '15to49') {
-                                  $where.= "(vl.patient_age_in_years >= 15 AND vl.patient_age_in_years <= 49)";
-                                }else if($params['age'][$a] == '>=50'){
-                                  $where.= "(vl.patient_age_in_years >= 50)";
-                                }else if($params['age'][$a] == 'unknown'){
-                                  $where.= "(vl.patient_age_in_years = 'unknown' OR vl.patient_age_in_years = '' OR vl.patient_age_in_years IS NULL)";
-                                }
-                            }
-                          $where = '('.$where.')';
-                          $countQuery = $countQuery->where($where);
-                        }
-                        if(isset($params['sampleType']) && trim($params['sampleType'])!=''){
-                            $countQuery = $countQuery->where('vl.sample_type="'.base64_decode(trim($params['sampleType'])).'"');
-                        }
-                        if(isset($params['sampleStatus']) && $params['sampleStatus'] == 'sample_tested'){
-                            $countQuery = $countQuery->where("vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL'");
-                        }else if(isset($params['sampleStatus']) && $params['sampleStatus'] == 'samples_not_tested') {
-                            $countQuery = $countQuery->where("(vl.result IS NULL OR vl.result = 'NULL' OR vl.result = '')");
-                        }else if(isset($params['sampleStatus']) && $params['sampleStatus'] == 'sample_rejected') {
-                            $countQuery = $countQuery->where("vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0");
-                        }
-                        if(isset($params['gender']) && $params['gender']=='F'){
-                            $countQuery = $countQuery->where("vl.patient_gender IN ('f','female','F','FEMALE')");
-                        }else if(isset($params['gender']) && $params['gender']=='M'){
-                            $countQuery = $countQuery->where("vl.patient_gender IN ('m','male','M','MALE')");
-                        }else if(isset($params['gender']) && $params['gender']=='not_specified'){
-                            $countQuery = $countQuery->where("vl.patient_gender NOT IN ('f','female','F','FEMALE','m','male','M','MALE')");
-                        }
-                        if(isset($params['isPregnant']) && $params['isPregnant']=='yes'){
-                            $countQuery = $countQuery->where("vl.is_patient_pregnant = 'yes'");
-                        }else if(isset($params['isPregnant']) && $params['isPregnant']=='no'){
-                            $countQuery = $countQuery->where("vl.is_patient_pregnant = 'no'"); 
-                        }else if(isset($params['isPregnant']) && $params['isPregnant']=='unreported'){
-                            $countQuery = $countQuery->where("(vl.is_patient_pregnant IS NULL OR vl.is_patient_pregnant = '' OR vl.is_patient_pregnant = 'Unreported')"); 
-                        }
-                        if(isset($params['isBreastfeeding']) && $params['isBreastfeeding']=='yes'){
-                            $countQuery = $countQuery->where("vl.is_patient_breastfeeding = 'yes'");
-                        }else if(isset($params['isBreastfeeding']) && $params['isBreastfeeding']=='no'){
-                            $countQuery = $countQuery->where("vl.is_patient_breastfeeding = 'no'"); 
-                        }else if(isset($params['isBreastfeeding']) && $params['isBreastfeeding']=='unreported'){
-                            $countQuery = $countQuery->where("(vl.is_patient_breastfeeding IS NULL OR vl.is_patient_breastfeeding = '' OR vl.is_patient_breastfeeding = 'Unreported')"); 
-                        }
-                        if(isset($params['lineOfTreatment']) && $params['lineOfTreatment']=='1'){
-                            $countQuery = $countQuery->where("vl.line_of_treatment = '1'");
-                        }else if(isset($params['lineOfTreatment']) && $params['lineOfTreatment']=='2'){
-                            $countQuery = $countQuery->where("vl.line_of_treatment = '2'"); 
-                        }else if(isset($params['lineOfTreatment']) && $params['lineOfTreatment']=='3'){
-                            $countQuery = $countQuery->where("vl.line_of_treatment = '3'"); 
-                        }else if(isset($params['lineOfTreatment']) && $params['lineOfTreatment']=='not_specified'){
-                            $countQuery = $countQuery->where("(vl.line_of_treatment IS NULL OR vl.line_of_treatment = '' OR vl.line_of_treatment = '0')");
-                        }
-                        $cQueryStr = $sql->getSqlStringForSqlObject($countQuery);
-                        $lessResult = $dbAdapter->query($cQueryStr." AND vl.result < 1000", $dbAdapter::QUERY_MODE_EXECUTE)->current();
-                        $suppressedTotal = $lessResult->total;
-                        $greaterResult = $dbAdapter->query($cQueryStr." AND vl.result >= 1000", $dbAdapter::QUERY_MODE_EXECUTE)->current();
-                        $notSuppressedTotal = $greaterResult->total;
-                        $rejectionResult = $dbAdapter->query($cQueryStr." AND vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0", $dbAdapter::QUERY_MODE_EXECUTE)->current();
-                        $rejectedTotal = $rejectionResult->total;
                         $row[] = ucwords($aRow['facility_name']);
-                        $row[] = $suppressedTotal;
-                        $row[] = $notSuppressedTotal;
-                        $row[] = $rejectedTotal;
+                        $row[] = $aRow['total_samples_received'];
+                        $row[] = $aRow['total_samples_tested'];
+                        $row[] = $aRow['total_samples_pending'];
+                        $row[] = $aRow['suppressed_samples'];
+                        $row[] = $aRow['not_suppressed_samples'];
+                        $row[] = $aRow['rejected_samples'];
                         $output[] = $row;
                     }
                     $styleArray = array(
@@ -805,14 +723,20 @@ class SampleService {
                     );
                     
                     $sheet->setCellValue('A1', html_entity_decode($translator->translate('Lab'), ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
-                    $sheet->setCellValue('B1', html_entity_decode($translator->translate('Suppressed'), ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
-                    $sheet->setCellValue('C1', html_entity_decode($translator->translate('Not Suppressed'), ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
-                    $sheet->setCellValue('D1', html_entity_decode($translator->translate('Rejected'), ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
+                    $sheet->setCellValue('B1', html_entity_decode($translator->translate('Samples Collected'), ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
+                    $sheet->setCellValue('C1', html_entity_decode($translator->translate('Samples Tested'), ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
+                    $sheet->setCellValue('D1', html_entity_decode($translator->translate('Samples Pending'), ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
+                    $sheet->setCellValue('E1', html_entity_decode($translator->translate('Samples Suppressed'), ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
+                    $sheet->setCellValue('F1', html_entity_decode($translator->translate('Samples Not Suppressed'), ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
+                    $sheet->setCellValue('G1', html_entity_decode($translator->translate('Samples Rejected'), ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
                    
                     $sheet->getStyle('A1')->applyFromArray($styleArray);
                     $sheet->getStyle('B1')->applyFromArray($styleArray);
                     $sheet->getStyle('C1')->applyFromArray($styleArray);
                     $sheet->getStyle('D1')->applyFromArray($styleArray);
+                    $sheet->getStyle('E1')->applyFromArray($styleArray);
+                    $sheet->getStyle('F1')->applyFromArray($styleArray);
+                    $sheet->getStyle('G1')->applyFromArray($styleArray);
                     
                     $currentRow = 2;
                     foreach ($output as $rowData) {
@@ -821,7 +745,7 @@ class SampleService {
                             if (!isset($value)) {
                                 $value = "";
                             }
-                            if($colNo > 3){
+                            if($colNo > 6){
                                 break;
                             }
                             if (is_numeric($value)) {
@@ -882,7 +806,12 @@ class SampleService {
                             $sampleCollectionDate = $common->humanDateFormat($aRow['sampleCollectionDate']);
                         }
                         $row[] = $sampleCollectionDate;
-                        $row[] = $aRow['samples'];
+                        $row[] = $aRow['total_samples_received'];
+                        $row[] = $aRow['total_samples_tested'];
+                        $row[] = $aRow['total_samples_pending'];
+                        $row[] = $aRow['suppressed_samples'];
+                        $row[] = $aRow['not_suppressed_samples'];
+                        $row[] = $aRow['rejected_samples'];
                         $row[] = ucwords($aRow['sample_name']);
                         $row[] = ucwords($aRow['facility_name']);
                         $output[] = $row;
@@ -913,14 +842,24 @@ class SampleService {
                     );
                     
                     $sheet->setCellValue('A1', html_entity_decode($translator->translate('Date'), ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
-                    $sheet->setCellValue('B1', html_entity_decode($translator->translate('No. of Samples'), ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
-                    $sheet->setCellValue('C1', html_entity_decode($translator->translate('Sample Type'), ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
-                    $sheet->setCellValue('D1', html_entity_decode($translator->translate('Clinics'), ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
+                    $sheet->setCellValue('B1', html_entity_decode($translator->translate('Samples Collected'), ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
+                    $sheet->setCellValue('C1', html_entity_decode($translator->translate('Samples Tested'), ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
+                    $sheet->setCellValue('D1', html_entity_decode($translator->translate('Samples Pending'), ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
+                    $sheet->setCellValue('E1', html_entity_decode($translator->translate('Samples Suppressed'), ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
+                    $sheet->setCellValue('F1', html_entity_decode($translator->translate('Samples Not Suppressed'), ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
+                    $sheet->setCellValue('G1', html_entity_decode($translator->translate('Samples Rejected'), ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
+                    $sheet->setCellValue('H1', html_entity_decode($translator->translate('Sample Type'), ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
+                    $sheet->setCellValue('I1', html_entity_decode($translator->translate('Clinics'), ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
                     
                     $sheet->getStyle('A1')->applyFromArray($styleArray);
                     $sheet->getStyle('B1')->applyFromArray($styleArray);
                     $sheet->getStyle('C1')->applyFromArray($styleArray);
                     $sheet->getStyle('D1')->applyFromArray($styleArray);
+                    $sheet->getStyle('E1')->applyFromArray($styleArray);
+                    $sheet->getStyle('F1')->applyFromArray($styleArray);
+                    $sheet->getStyle('G1')->applyFromArray($styleArray);
+                    $sheet->getStyle('H1')->applyFromArray($styleArray);
+                    $sheet->getStyle('I1')->applyFromArray($styleArray);
                     
                     $currentRow = 2;
                     foreach ($output as $rowData) {
@@ -929,7 +868,7 @@ class SampleService {
                             if (!isset($value)) {
                                 $value = "";
                             }
-                            if($colNo > 3){
+                            if($colNo > 8){
                                 break;
                             }
                             if (is_numeric($value)) {
@@ -982,7 +921,12 @@ class SampleService {
                     foreach ($sResult as $aRow) {
                         $row = array();
                         $row[] = $aRow['monthDate'];
-                        $row[] = $aRow['total'];
+                        $row[] = $aRow['total_samples_received'];
+                        $row[] = $aRow['total_samples_tested'];
+                        $row[] = $aRow['total_samples_pending'];
+                        $row[] = $aRow['suppressed_samples'];
+                        $row[] = $aRow['not_suppressed_samples'];
+                        $row[] = $aRow['rejected_samples'];
                         $row[] = (isset($aRow['AvgDiff']))?round($aRow['AvgDiff'],2):0;
                         $output[] = $row;
                     }
@@ -1012,12 +956,22 @@ class SampleService {
                     );
                     
                     $sheet->setCellValue('A1', html_entity_decode($translator->translate('Month and Year'), ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
-                    $sheet->setCellValue('B1', html_entity_decode($translator->translate('Total No. of Samples Tested'), ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
-                    $sheet->setCellValue('C1', html_entity_decode($translator->translate('Average TAT in Days'), ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
+                    $sheet->setCellValue('B1', html_entity_decode($translator->translate('Samples Collected'), ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
+                    $sheet->setCellValue('C1', html_entity_decode($translator->translate('Samples Tested'), ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
+                    $sheet->setCellValue('D1', html_entity_decode($translator->translate('Samples Pending'), ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
+                    $sheet->setCellValue('E1', html_entity_decode($translator->translate('Samples Suppressed'), ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
+                    $sheet->setCellValue('F1', html_entity_decode($translator->translate('Samples Not Suppressed'), ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
+                    $sheet->setCellValue('G1', html_entity_decode($translator->translate('Samples Rejected'), ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
+                    $sheet->setCellValue('H1', html_entity_decode($translator->translate('Average TAT in Days'), ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
                     
                     $sheet->getStyle('A1')->applyFromArray($styleArray);
                     $sheet->getStyle('B1')->applyFromArray($styleArray);
                     $sheet->getStyle('C1')->applyFromArray($styleArray);
+                    $sheet->getStyle('D1')->applyFromArray($styleArray);
+                    $sheet->getStyle('E1')->applyFromArray($styleArray);
+                    $sheet->getStyle('F1')->applyFromArray($styleArray);
+                    $sheet->getStyle('G1')->applyFromArray($styleArray);
+                    $sheet->getStyle('H1')->applyFromArray($styleArray);
                     
                     $currentRow = 2;
                     foreach ($output as $rowData) {
@@ -1026,7 +980,7 @@ class SampleService {
                             if (!isset($value)) {
                                 $value = "";
                             }
-                            if($colNo > 2){
+                            if($colNo > 7){
                                 break;
                             }
                             if (is_numeric($value)) {

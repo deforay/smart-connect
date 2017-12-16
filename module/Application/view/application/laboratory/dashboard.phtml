@@ -1069,7 +1069,7 @@ foreach($sampleType as $samples){
     
     function doLabTATRedirect(month){
       selectedLabs = ($("#labName").val() == null)?'':$("#labName").val();
-      window.open('/labs/get-sample-tested-turn-around-time?month='+month+'&lab='+selectedLabs, '_blank');
+      window.open('/labs/samples-tested-turn-around-time?month='+month+'&lab='+selectedLabs, '_blank');
     }
     
     function doRequisitionFormRedirect(month){
