@@ -1,10 +1,10 @@
 <?php
 if(isset($searchMonth) && trim($searchMonth)!= ''){
     $splitSearchMonth = explode("-",$searchMonth);
-    $startDate = $endDate = $splitSearchMonth[1].'-'.date('m', strtotime($splitSearchMonth[0]));
+    $startDate = $endDate = $splitSearchMonth[1].' '.date('m', strtotime($splitSearchMonth[0]));
     $startMonth = $endMonth = date('m', strtotime($splitSearchMonth[0]));
     $startYear = $endYear = $splitSearchMonth[1];
-    $startDisplayDate = $endDisplayDate = $searchMonth;
+    $startDisplayDate = $endDisplayDate = str_replace('-',' ',$searchMonth);
 }else{
     $startDate = date("Y", strtotime("-1 year")).'-'.date('m', strtotime('+1 month', strtotime('-1 year')));
     $endDate = date('Y').'-'.date('m');
@@ -162,14 +162,14 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
     function generatePieContainer(){
         $.blockUI.defaults.css.border = '1px solid grey';
         $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
-        fromDate = $('#mrp-lowerDate').val();
-        toDate = $('#mrp-upperDate').val();
-        provinces = $("#provinces").val();
-        districts = $("#districts").val();
-        lab = $("#labName").val();
-        gender = $("#gender").val();
-        isPregnant = $("#isPregnant").val();
-        isBreastfeeding = $("#isBreastfeeding").val();
+        var fromDate = $('#mrp-lowerDate').val();
+        var toDate = $('#mrp-upperDate').val();
+        var provinces = $("#provinces").val();
+        var districts = $("#districts").val();
+        var lab = $("#labName").val();
+        var gender = $("#gender").val();
+        var isPregnant = $("#isPregnant").val();
+        var isBreastfeeding = $("#isBreastfeeding").val();
         $.post("<?php echo $this->url('laboratory', array('action' => 'get-incomplete-sample-details')); ?>",{fromDate:fromDate,toDate:toDate,provinces:provinces,districts:districts,lab:lab,gender:gender,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding},
         function(data) {
             $("#piecontainer").html(data);
@@ -179,14 +179,14 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
     function generateChartContainer(){
         $.blockUI.defaults.css.border = '1px solid grey';
         $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
-        fromDate = $('#mrp-lowerDate').val();
-        toDate = $('#mrp-upperDate').val();
-        provinces = $("#provinces").val();
-        districts = $("#districts").val();
-        lab = $("#labName").val();
-        gender = $("#gender").val();
-        isPregnant = $("#isPregnant").val();
-        isBreastfeeding = $("#isBreastfeeding").val();
+        var fromDate = $('#mrp-lowerDate').val();
+        var toDate = $('#mrp-upperDate').val();
+        var provinces = $("#provinces").val();
+        var districts = $("#districts").val();
+        var lab = $("#labName").val();
+        var gender = $("#gender").val();
+        var isPregnant = $("#isPregnant").val();
+        var isBreastfeeding = $("#isBreastfeeding").val();
         $.post("<?php echo $this->url('laboratory', array('action' => 'get-incomplete-bar-sample-details')); ?>",{fromDate:fromDate,toDate:toDate,provinces:provinces,districts:districts,lab:lab,gender:gender,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding},
         function(data) {
             $("#barcontainer").html(data);

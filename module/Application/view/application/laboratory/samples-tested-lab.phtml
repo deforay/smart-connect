@@ -1,10 +1,10 @@
 <?php
 if(isset($searchMonth) && trim($searchMonth)!= ''){
     $splitSearchMonth = explode("-",$searchMonth);
-    $startDate = $endDate = $splitSearchMonth[1].'-'.date('m', strtotime($splitSearchMonth[0]));
+    $startDate = $endDate = $splitSearchMonth[1].' '.date('m', strtotime($splitSearchMonth[0]));
     $startMonth = $endMonth = date('m', strtotime($splitSearchMonth[0]));
     $startYear = $endYear = $splitSearchMonth[1];
-    $startDisplayDate = $endDisplayDate = $searchMonth;
+    $startDisplayDate = $endDisplayDate = str_replace('-',' ',$searchMonth);
 }else if((isset($fromMonth) && trim($fromMonth)!= '') && (isset($toMonth) && trim($toMonth)!= '')){
     $splitFromMonth = explode("-",$fromMonth);
     $startDate = $splitFromMonth[1].'-'.date('m', strtotime($splitFromMonth[0]));

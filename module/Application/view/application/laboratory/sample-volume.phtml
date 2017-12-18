@@ -1,21 +1,21 @@
 <?php
 if(isset($searchMonth) && trim($searchMonth)!= ''){
     $splitSearchMonth = explode("-",$searchMonth);
-    $startDate = $endDate = $splitSearchMonth[1].'-'.date('m', strtotime($splitSearchMonth[0]));
+    $startDate = $endDate = $splitSearchMonth[1].' '.date('m', strtotime($splitSearchMonth[0]));
     $startMonth = $endMonth = date('m', strtotime($splitSearchMonth[0]));
     $startYear = $endYear = $splitSearchMonth[1];
-    $startDisplayDate = $endDisplayDate = $searchMonth;
+    $startDisplayDate = $endDisplayDate = str_replace('-',' ',$searchMonth);
 }else if((isset($fromMonth) && trim($fromMonth)!= '') && (isset($toMonth) && trim($toMonth)!= '')){
     $splitFromMonth = explode("-",$fromMonth);
-    $startDate = $splitFromMonth[1].'-'.date('m', strtotime($splitFromMonth[0]));
-    $startMonth = date('m', strtotime($splitFromMonth[0]));
-    $startYear = $splitFromMonth[1];
-    $startDisplayDate = $fromMonth;
+    $startDate = $splitFromMonth[1].'-'.$splitFromMonth[0];
+    $startMonth = $splitFromMonth[1];
+    $startYear = $splitFromMonth[0];
+    $startDisplayDate = date("M", mktime(0, 0, 0, $splitFromMonth[1])).' '.$splitFromMonth[0];
     $splitToMonth = explode("-",$toMonth);
-    $endDate = $splitToMonth[1].'-'.date('m', strtotime($splitToMonth[0]));
-    $endMonth = date('m', strtotime($splitToMonth[0]));
-    $endYear = $splitToMonth[1];
-    $endDisplayDate = $toMonth;
+    $endDate = $splitToMonth[1].'-'.$splitToMonth[0];
+    $endMonth = $splitToMonth[1];
+    $endYear = $splitToMonth[0];
+    $endDisplayDate = date("M", mktime(0, 0, 0, $splitToMonth[1])).' '.$splitToMonth[0];
 }else{
     $startDate = date("Y", strtotime("-1 year")).'-'.date('m', strtotime('+1 month', strtotime('-1 year')));
     $endDate = date('Y').'-'.date('m');
