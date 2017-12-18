@@ -1,6 +1,6 @@
 <div id="labAverageTat"></div>
 <script>
-$('#labAverageTat').highcharts( {
+$('#labAverageTat').highcharts({
     chart: {
         zoomType: 'xy',
         marginTop: 100
@@ -38,16 +38,15 @@ $('#labAverageTat').highcharts( {
     }],
     yAxis: [{ // Primary yAxis
         gridLineWidth: 0,
+        allowDecimals: false,
         title: {
-            text: '<?php echo $this->translate('Samples Collected'); ?>',
+            text: '<?php echo $this->translate('No. of Samples'); ?>',
             style: {
-                
             }
         },
         labels: {
             format: '{value}',
             style: {
-                
             }
         },
         opposite: true
@@ -56,67 +55,37 @@ $('#labAverageTat').highcharts( {
         labels: {
             format: '{value}',
             style: {
-                
             }
         },
         title: {
             text: '<?php echo $this->translate('Average TAT in Days'); ?>',
             style: {
-                
             }
         },
-        
-
-    },  { // Tertiary yAxis
-        gridLineWidth: 0,
-        title: {
-            text: '<?php echo $this->translate('Samples Pending'); ?>',
-            style: {
-                
-            }
-        },
-        labels: {
-            format: '{value}',
-            style: {
-                
-            }
-        },
-        opposite: true
+        min: 0
     }],
     tooltip: {
-        shared: true
+        formatter: function () {
+            return '<b>' + this.x + '</b><br/>' +
+                this.series.name + ': ' + this.y
+        }
     },
-    series: [{
-        name: 'Samples Collected',
-            type: 'column',
-            data: [
-            <?php if(isset($result['samples_collected']) && count($result['samples_collected']) >0){
-                  foreach($result['samples_collected'] as $samplesCollected){        
-                    echo $samplesCollected.',';
+    series: [<?php
+           if(isset($result['sample']) && count($result['sample']) >0){
+              foreach($result['sample'] as $key=>$condition){
+              ?>
+              {
+              name:'<?php echo $this->translate($key);?>',
+              type:'column',
+              data:[<?php
+                  foreach($condition as $count){
+                     echo '{y:'.$count.'},';
                   }
-                  ?>
-           <?php  } ?>
-            ],
-            tooltip: {
-                valueSuffix: ' '
-            }
-    }, {
-        name: 'Samples Pending',
-            type: 'column',
-            yAxis: 2,
-            data: [
-            <?php if(isset($result['samples_pending']) && count($result['samples_pending']) >0){
-                  foreach($result['samples_pending'] as $samplesPending){       
-                    echo $samplesPending.',';
-                  }
-                  ?>
-           <?php  } ?>
-            ],
-            tooltip: {
-                valueSuffix: ' '
-            }
-    },
-    <?php
+              ?>],
+              },
+              <?php
+              }
+           }
         foreach($sampleType as $sample){
             if(isset($result[$sample['sample_name']])){
                 foreach($result[$sample['sample_name']] as $key=>$condition){
@@ -156,6 +125,6 @@ function getRandomColor() {
     for (var i = 0; i < 6; i++ ) {
         color += letters[Math.floor(Math.random() * 16)];
     }
-    return color;
+  return color;
 }
 </script>

@@ -915,46 +915,50 @@ class SampleTable extends AbstractTableGateway {
             }
             $startMonth = date("Y-m", strtotime(trim($startMonth)))."-01";
             $endMonth = date("Y-m", strtotime(trim($endMonth)))."-31";
-            //echo $startMonth.'/'.$endMonth;die;
-            $queryStr = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
-                                    ->columns(array(
-                                                    //"total" => new Expression('COUNT(*)'),
-                                                    "month" => new Expression("MONTH(sample_collection_date)"),
-                                                    "year" => new Expression("YEAR(sample_collection_date)"),
-                                                    "monthDate" => new Expression("DATE_FORMAT(DATE(sample_collection_date), '%b-%Y')"),
-                                                    "AvgDiff" => new Expression("CAST(ABS(AVG(TIMESTAMPDIFF(DAY,result_approved_datetime,sample_collection_date))) AS DECIMAL (10,2))"),
-                                              )
-                                            );
-            if(isset($params['facilityId']) && is_array($params['facilityId']) && count($params['facilityId']) >0){
-                $queryStr = $queryStr->where('vl.lab_id IN ("' . implode('", "', $params['facilityId']) . '")');
-            }else{
-                if($logincontainer->role!= 1){
-                    $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:array();
-                    $queryStr = $queryStr->where('vl.lab_id IN ("' . implode('", "', array_values(array_filter($mappedFacilities))) . '")');
-                }
-            }
-            $queryStr = $queryStr->where("
+            $query = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
+                            ->columns(array(
+                                            "month" => new Expression("MONTH(sample_collection_date)"),
+                                            "year" => new Expression("YEAR(sample_collection_date)"),
+                                            "monthDate" => new Expression("DATE_FORMAT(DATE(sample_collection_date), '%b-%Y')"),
+                                            "AvgDiff" => new Expression("CAST(ABS(AVG(TIMESTAMPDIFF(DAY,result_approved_datetime,sample_collection_date))) AS DECIMAL (10,2))"),
+                                      )
+                                    );
+            $query = $query->where("
                         (vl.sample_collection_date is not null AND vl.sample_collection_date != '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')
                         AND (vl.result_approved_datetime is not null AND vl.result_approved_datetime != '' AND DATE(vl.result_approved_datetime) !='1970-01-01' AND DATE(vl.result_approved_datetime) !='0000-00-00')
                         AND vl.result is not null
                         AND vl.result != ''
                         AND DATE(vl.result_approved_datetime) >= '".$startMonth."'
                         AND DATE(vl.result_approved_datetime) <= '".$endMonth."' ");
-                
-            $queryStr = $queryStr->group(array(new Expression('MONTH(vl.result_approved_datetime)')));   
-            $queryStr = $queryStr->order(array(new Expression('DATE(vl.result_approved_datetime)')));               
-            $queryStr = $sql->getSqlStringForSqlObject($queryStr);
+            if(isset($params['facilityId']) && is_array($params['facilityId']) && count($params['facilityId']) >0){
+                $query = $query->where('vl.lab_id IN ("' . implode('", "', $params['facilityId']) . '")');
+            }else{
+                if($logincontainer->role!= 1){
+                    $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:array();
+                    $query = $query->where('vl.lab_id IN ("' . implode('", "', array_values(array_filter($mappedFacilities))) . '")');
+                }
+            }
+            $query = $query->group(array(new Expression('YEAR(vl.result_approved_datetime)')));
+            $query = $query->group(array(new Expression('MONTH(vl.result_approved_datetime)')));
+            $query = $query->order(array(new Expression('DATE(vl.sample_collection_date) ASC')));
+            $queryStr = $sql->getSqlStringForSqlObject($query);
             //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             $sampleResult = $common->cacheQuery($queryStr,$dbAdapter);
             $j=0;
+            $monthDateArray = array();
             foreach($sampleResult as $sRow){
-                if($sRow["monthDate"] == null) continue;
+                if($sRow["monthDate"] == null || in_array($sRow["monthDate"],$monthDateArray)) continue;
+                $monthDateArray[] = $sRow["monthDate"];
                 $subQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
                                 ->columns(array(
                                                 "total_samples_collected" => new Expression('COUNT(*)'),
                                                 "total_samples_pending" => new Expression("(SUM(CASE WHEN (result is null OR result = '') AND (reason_for_sample_rejection is null OR reason_for_sample_rejection = '') THEN 1 ELSE 0 END))"),
                                               )
                                             );
+                $subQuery = $subQuery->where("
+                        (vl.sample_collection_date is not null AND vl.sample_collection_date != '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')
+                        AND MONTH(vl.sample_collection_date) = '".$sRow['month']."'
+                        AND YEAR(vl.sample_collection_date) = '".$sRow['year']."' ");
                 if(isset($params['facilityId']) && is_array($params['facilityId']) && count($params['facilityId']) >0){
                     $subQuery = $subQuery->where('vl.lab_id IN ("' . implode('", "', $params['facilityId']) . '")');
                 }else{
@@ -963,16 +967,11 @@ class SampleTable extends AbstractTableGateway {
                         $subQuery = $subQuery->where('vl.lab_id IN ("' . implode('", "', array_values(array_filter($mappedFacilities))) . '")');
                     }
                 }
-                $subQuery = $subQuery->where("
-                        (vl.sample_collection_date is not null AND vl.sample_collection_date != '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')
-                        AND MONTH(vl.sample_collection_date) = '".$sRow['month']."'
-                        AND YEAR(vl.sample_collection_date) = '".$sRow['year']."' ");   
                 $subQueryStr = $sql->getSqlStringForSqlObject($subQuery);
                 $subQueryResult = $common->cacheQuery($subQueryStr,$dbAdapter);
-                //print_r($subQueryResult);die;
                 $result['all'][$j] = (isset($sRow["AvgDiff"]) && $sRow["AvgDiff"] != NULL && $sRow["AvgDiff"] > 0) ? round($sRow["AvgDiff"],2) : 0;
-                $result['samples_collected'][$j] = (isset($subQueryResult[0]['total_samples_collected']) && $subQueryResult[0]['total_samples_collected'] != NULL) ? $subQueryResult[0]['total_samples_collected'] : 0;
-                $result['samples_pending'][$j] = (isset($subQueryResult[0]['total_samples_pending']) && $subQueryResult[0]['total_samples_pending'] != NULL) ? $subQueryResult[0]['total_samples_pending'] : 0;
+                $result['sample']['Samples Collected'][$j] = (isset($subQueryResult[0]['total_samples_collected']) && $subQueryResult[0]['total_samples_collected'] != NULL) ? $subQueryResult[0]['total_samples_collected'] : 0;
+                $result['sample']['Samples Pending'][$j] = (isset($subQueryResult[0]['total_samples_pending']) && $subQueryResult[0]['total_samples_pending'] != NULL) ? $subQueryResult[0]['total_samples_pending'] : 0;
                 $result['date'][$j] = $sRow["monthDate"];
                 $j++;
             }
