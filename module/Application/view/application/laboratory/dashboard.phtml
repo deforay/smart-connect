@@ -421,7 +421,7 @@ foreach($sampleType as $samples){
 
                     </div>
                     <div class="row">
-                        <div class="col-md-4 col-sm-4">
+                        <div class="col-md-6 col-sm-6">
                             <div class="portlet box blue">
                                 <div class="portlet-title">
                                     <div class="caption">
@@ -433,7 +433,7 @@ foreach($sampleType as $samples){
                                 </div>
                             </div>                            
                         </div>
-                        <div class="col-md-4 col-sm-4">
+                        <div class="col-md-6 col-sm-6">
                             <div class="portlet box blue">
                                 <div class="portlet-title">
                                     <div class="caption">
@@ -445,18 +445,6 @@ foreach($sampleType as $samples){
                                 </div>
                             </div>                            
                         </div>
-                        <div class="col-md-4 col-sm-4">
-                            <div class="portlet box blue">
-                                <div class="portlet-title">
-                                    <div class="caption">
-                                        <span class="caption-subject"><?php echo $this->translate('VL Suppressed/Not Suppressed'); ?></span>
-                                    </div>
-                                </div>
-                                <div class="portlet-body" id="vlOutComePiechart">
-                                    <div id="labDashVlOutcomePie" style="height:450px;"></div>
-                                </div>
-                            </div>                            
-                        </div>
                     </div>
                     <div class="row">
                         <div class="col-md-12 col-sm-12">
@@ -465,13 +453,11 @@ foreach($sampleType as $samples){
                                     <div class="caption">
                                         <span class="caption-subject"><?php echo $this->translate('All Facilities - Geolocation'); ?></span>
                                     </div>
-                                    
                                     <div class="actions">
                                         <div class="btn-group">
                                             <button class="btn btn-danger" onclick="expandMap();"><span><i class="fa fa-angle-double-right" aria-hidden="true"></i> <?php echo $this->translate('Expand Map'); ?></span></button>
                                         </div>
-                                    </div>   
-                                    
+                                    </div>
                                 </div>                                
                                 <div class="portlet-body">
                                     <div id="controls-polyline"></div>
@@ -617,16 +603,6 @@ foreach($sampleType as $samples){
         });
     }
     
-    function vlOutComePiechart(){
-        var facilityId = $("#labName").val();
-        var fromDate=$('#mrp-lowerDate').val();
-        var toDate=$('#mrp-upperDate').val();
-        $.post("<?php echo $this->url('laboratory', array('action' => 'get-vl-out-comes')); ?>",{fromDate:fromDate,toDate:toDate,facilityId:facilityId},
-        function(data) {
-            $("#labDashVlOutcomePie").html(data);
-        });
-    }
-    
     function getLabFacilities(){
         var facilityId = $("#labName").val();
         var fromDate=$('#mrp-lowerDate').val();
@@ -714,7 +690,6 @@ foreach($sampleType as $samples){
         getTestedSampleResultBasedonBreastfeedingPatient();
         femalePatient();
         lineOfTreatment();
-        vlOutComePiechart();
     }
        
     function resetEverything(){
@@ -1089,11 +1064,6 @@ foreach($sampleType as $samples){
     function doLineofTreatmentRedirect(field){
       var selectedLabs = ($("#labName").val() == null)?'':$("#labName").val();
       window.open('/labs/samples-tested?fromMonth='+$('#mrp-lowerDate').val()+'&toMonth='+$('#mrp-upperDate').val()+'&lt='+field+'&lab='+selectedLabs, '_blank');
-    }
-    
-    function doVLResultRedirect(fieldVal){
-      var selectedLabs = ($("#labName").val() == null)?'':$("#labName").val();
-      window.open('/labs/samples-tested?fromMonth='+$('#mrp-lowerDate').val()+'&toMonth='+$('#mrp-upperDate').val()+'&result='+fieldVal+'&lab='+selectedLabs, '_blank');
     }
     
     function expandMap(){
