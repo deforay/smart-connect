@@ -36,7 +36,7 @@ $('#labAverageTat').highcharts({
             ?>],
         crosshair: true
     }],
-    yAxis: [{ // Primary yAxis
+    yAxis: [{ 
         gridLineWidth: 0,
         allowDecimals: false,
         title: {
@@ -51,7 +51,7 @@ $('#labAverageTat').highcharts({
         },
         opposite: true
 
-    },{ // Secondary yAxis
+    },{
         labels: {
             format: '{value}',
             style: {
@@ -77,6 +77,15 @@ $('#labAverageTat').highcharts({
               {
               name:'<?php echo $this->translate($key);?>',
               type:'column',
+              cursor: 'pointer',
+                point: {
+                    events: {
+                        click: function(e) {
+                            doLabTATRedirect(this.category);
+                            e.preventDefault();
+                        }
+                    }
+                },
               data:[<?php
                   foreach($condition as $count){
                      echo '{y:'.$count.'},';
@@ -94,6 +103,15 @@ $('#labAverageTat').highcharts({
                 name:'<?php echo $sample['sample_name'];?>',
                 type: 'spline',
                 yAxis: 1,
+                cursor: 'pointer',
+                point: {
+                    events: {
+                        click: function(e) {
+                            doLabTATRedirect(this.category);
+                            e.preventDefault();
+                        }
+                    }
+                },
                 data:[<?php
                     foreach($condition as $count){
                         echo $count.",";
@@ -113,6 +131,15 @@ $('#labAverageTat').highcharts({
         name: '<?php echo $this->translate('TAT'); ?>',
         type: 'spline',
         yAxis: 1,
+        cursor: 'pointer',
+            point: {
+                events: {
+                    click: function(e) {
+                        doLabTATRedirect(this.category);
+                        e.preventDefault();
+                    }
+                }
+            },
         data: [<?php echo implode(",",$result['all']);?>],
         color : '#1B325F',
         }

@@ -1038,42 +1038,42 @@ foreach($sampleType as $samples){
     }
     
     function doSampleResultAwaitedRedirect(frmSource){
-       selectedLabs = ($("#labName").val() == null)?'':$("#labName").val();
+       var selectedLabs = ($("#labName").val() == null)?'':$("#labName").val();
        window.open("/labs/sample-result-awaited?src="+frmSource+"&lab="+selectedLabs);
     }
     
     function doSampleTestedRedirect(month){
-      selectedLabs = ($("#labName").val() == null)?'':$("#labName").val();
+      var selectedLabs = ($("#labName").val() == null)?'':$("#labName").val();
       window.open('/labs/samples-tested?month='+month+'&lab='+selectedLabs, '_blank');
     }
     
     function doSampleTestedBasedonGenderRedirect(month,gender){
-      selectedLabs = ($("#labName").val() == null)?'':$("#labName").val();
+      var selectedLabs = ($("#labName").val() == null)?'':$("#labName").val();
       window.open('/labs/samples-tested?month='+month+'&gender='+gender+'&lab='+selectedLabs, '_blank');
     }
     
     function doSampleTestedBasedonAgeRedirect(month,age){
-      selectedLabs = ($("#labName").val() == null)?'':$("#labName").val();
+      var selectedLabs = ($("#labName").val() == null)?'':$("#labName").val();
       window.open('/labs/samples-tested?month='+month+'&age='+age+'&lab='+selectedLabs, '_blank');
     }
     
     function doSampleTestedBasedonPregnantPatientRedirect(month){
-      selectedLabs = ($("#labName").val() == null)?'':$("#labName").val();
+      var selectedLabs = ($("#labName").val() == null)?'':$("#labName").val();
       window.open('/labs/samples-tested?month='+month+'&gender=F&femaleFilter=P&lab='+selectedLabs, '_blank');
     }
     
     function doSampleTestedBasedonBreastfeedingPatientRedirect(month){
-      selectedLabs = ($("#labName").val() == null)?'':$("#labName").val();
+      var selectedLabs = ($("#labName").val() == null)?'':$("#labName").val();
       window.open('/labs/samples-tested?month='+month+'&gender=F&femaleFilter=BF&lab='+selectedLabs, '_blank');  
     }
     
     function doLabTATRedirect(month){
-      selectedLabs = ($("#labName").val() == null)?'':$("#labName").val();
+      var selectedLabs = ($("#labName").val() == null)?'':$("#labName").val();
       window.open('/labs/samples-tested-turn-around-time?month='+month+'&lab='+selectedLabs, '_blank');
     }
     
     function doRequisitionFormRedirect(month){
-      selectedLabs = ($("#labName").val() == null)?'':$("#labName").val();
+      var selectedLabs = ($("#labName").val() == null)?'':$("#labName").val();
       window.open('/labs/requisition-forms-incomplete?month='+month+'&lab='+selectedLabs, '_blank');
     }
     
@@ -1082,22 +1082,22 @@ foreach($sampleType as $samples){
     }
     
     function doFemalePatientRedirect(field){
-      selectedLabs = ($("#labName").val() == null)?'':$("#labName").val();
+      var selectedLabs = ($("#labName").val() == null)?'':$("#labName").val();
       window.open('/labs/samples-tested?fromMonth='+$('#mrp-lowerDate').val()+'&toMonth='+$('#mrp-upperDate').val()+'&gender=F&femaleFilter='+field+'&lab='+selectedLabs, '_blank');
     }
     
     function doLineofTreatmentRedirect(field){
-      selectedLabs = ($("#labName").val() == null)?'':$("#labName").val();
+      var selectedLabs = ($("#labName").val() == null)?'':$("#labName").val();
       window.open('/labs/samples-tested?fromMonth='+$('#mrp-lowerDate').val()+'&toMonth='+$('#mrp-upperDate').val()+'&lt='+field+'&lab='+selectedLabs, '_blank');
     }
     
     function doVLResultRedirect(fieldVal){
-      selectedLabs = ($("#labName").val() == null)?'':$("#labName").val();
+      var selectedLabs = ($("#labName").val() == null)?'':$("#labName").val();
       window.open('/labs/samples-tested?fromMonth='+$('#mrp-lowerDate').val()+'&toMonth='+$('#mrp-upperDate').val()+'&result='+fieldVal+'&lab='+selectedLabs, '_blank');
     }
     
     function expandMap(){
-       selectedLabs = ($("#labName").val() == null)?'':$("#labName").val();
+       var selectedLabs = ($("#labName").val() == null)?'':$("#labName").val();
        window.open("/labs/get-facilities-geolocation?fromDate="+$('#mrp-lowerDate').val()+"&toDate="+$('#mrp-upperDate').val()+"&lab="+selectedLabs);
     }
     
