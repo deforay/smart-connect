@@ -71,9 +71,18 @@ class FacilityService {
         $db = $this->sm->get('LocationDetailsTable');
         return $db->fetchLocationDetails();
     }
-    public function getDistrictList($locationId)
-    {
+    public function getDistrictList($locationId){
         $db = $this->sm->get('LocationDetailsTable');
         return $db->fetchDistrictList($locationId);
+    }
+    
+    public function getAllDistrictsList(){
+        $db = $this->sm->get('LocationDetailsTable');
+        return $db->fetchAllDistrictsList();
+    }
+    
+    public function getFacilityByDistrict($districtId) {
+        $db = $this->sm->get('FacilityTable');
+        return $db->fetchFacilityByDistrict($districtId);
     }
 }

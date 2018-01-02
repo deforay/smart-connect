@@ -42,4 +42,13 @@ class LocationDetailsTable extends AbstractTableGateway {
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         return $rResult;
     }
+    
+    public function fetchAllDistrictsList(){
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $sQuery = $sql->select()->from(array('l' => 'location_details'))->where(array("parent_location <> 0"));
+        $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
+        $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+        return $rResult;
+    }
 }

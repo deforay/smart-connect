@@ -5586,4 +5586,108 @@ class SampleTable extends AbstractTableGateway {
         }
       return $summaryResult;
     }
+    
+    ////////////////////////////////////////////
+    /////////*** Turnaround Time Page ***///////
+    ///////////////////////////////////////////
+
+    public function getTATbyProvince($provinceID, $startDate, $endDate){
+      $dbAdapter = $this->adapter;
+      $sql = new Sql($dbAdapter);
+      $squery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
+      ->columns(
+          array(
+            "Collection_Receive"  => new Expression("AVG(DATEDIFF(IF(`sample_received_at_vl_lab_datetime`='',NULL,IF(DATE(`sample_received_at_vl_lab_datetime`)='1970-01-01',NULL,IF(DATE(`sample_received_at_vl_lab_datetime`)='0000-00-00',NULL,IFNULL(`sample_received_at_vl_lab_datetime`,NULL)))), IF(`sample_collection_date`='',NULL,IF(DATE(`sample_collection_date`)='1970-01-01',NULL,IF(DATE(`sample_collection_date`)='0000-00-00',NULL, IFNULL(`sample_collection_date`,NULL))))))"),
+            "Receive_Register"    => new Expression("AVG(DATEDIFF(IF(`sample_registered_at_lab`='',NULL,IF(DATE(`sample_registered_at_lab`)='1970-01-01',NULL,IF(DATE(`sample_registered_at_lab`)='0000-00-00',NULL,IFNULL(`sample_registered_at_lab`,NULL)))), IF(`sample_received_at_vl_lab_datetime`='',NULL,IF(DATE(`sample_received_at_vl_lab_datetime`)='1970-01-01',NULL,IF(DATE(`sample_received_at_vl_lab_datetime`)='0000-00-00',NULL, IFNULL(`sample_received_at_vl_lab_datetime`,NULL))))))"),
+            "Register_Analysis"   => new Expression("AVG(DATEDIFF(IF(`sample_tested_datetime`='',NULL,IF(DATE(`sample_tested_datetime`)='1970-01-01',NULL,IF(DATE(`sample_tested_datetime`)='0000-00-00',NULL,IFNULL(`sample_tested_datetime`,NULL)))), IF(`sample_registered_at_lab`='',NULL,IF(DATE(`sample_registered_at_lab`)='1970-01-01',NULL,IF(DATE(`sample_registered_at_lab`)='0000-00-00',NULL, IFNULL(`sample_registered_at_lab`,NULL))))))"),
+            "Analysis_Authorise"  => new Expression("AVG(DATEDIFF(IF(`result_approved_datetime`='',NULL,IF(DATE(`result_approved_datetime`)='1970-01-01',NULL,IF(DATE(`result_approved_datetime`)='0000-00-00',NULL,IFNULL(`result_approved_datetime`,NULL)))), IF(`sample_tested_datetime`='',NULL,IF(DATE(`sample_tested_datetime`)='1970-01-01',NULL,IF(DATE(`sample_tested_datetime`)='0000-00-00',NULL, IFNULL(sample_tested_datetime,NULL))))))")
+          )
+        )
+      ->join('facility_details', 'facility_details.facility_id = vl.facility_id')
+      ->where(
+          array(
+            "sample_tested_datetime >= '$startDate' AND sample_tested_datetime <= '$endDate'",
+            "facility_details.facility_id = vl.facility_id AND facility_details.facility_state = '$provinceID'"
+          )
+      );
+      $sQueryStr = $sql->getSqlStringForSqlObject($squery);
+      $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+      return $sResult;
+    }
+    
+    public function getTATbyLab($labID, $startDate, $endDate){
+      $dbAdapter = $this->adapter;
+      $sql = new Sql($dbAdapter);
+      $squery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
+      ->columns(
+          array(
+            "Collection_Receive"  => new Expression("AVG(DATEDIFF(IF(`sample_received_at_vl_lab_datetime`='',NULL,IF(DATE(`sample_received_at_vl_lab_datetime`)='1970-01-01',NULL,IF(DATE(`sample_received_at_vl_lab_datetime`)='0000-00-00',NULL,IFNULL(`sample_received_at_vl_lab_datetime`,NULL)))), IF(`sample_collection_date`='',NULL,IF(DATE(`sample_collection_date`)='1970-01-01',NULL,IF(DATE(`sample_collection_date`)='0000-00-00',NULL, IFNULL(`sample_collection_date`,NULL))))))"),
+            "Receive_Register"    => new Expression("AVG(DATEDIFF(IF(`sample_registered_at_lab`='',NULL,IF(DATE(`sample_registered_at_lab`)='1970-01-01',NULL,IF(DATE(`sample_registered_at_lab`)='0000-00-00',NULL,IFNULL(`sample_registered_at_lab`,NULL)))), IF(`sample_received_at_vl_lab_datetime`='',NULL,IF(DATE(`sample_received_at_vl_lab_datetime`)='1970-01-01',NULL,IF(DATE(`sample_received_at_vl_lab_datetime`)='0000-00-00',NULL, IFNULL(`sample_received_at_vl_lab_datetime`,NULL))))))"),
+            "Register_Analysis"   => new Expression("AVG(DATEDIFF(IF(`sample_tested_datetime`='',NULL,IF(DATE(`sample_tested_datetime`)='1970-01-01',NULL,IF(DATE(`sample_tested_datetime`)='0000-00-00',NULL,IFNULL(`sample_tested_datetime`,NULL)))), IF(`sample_registered_at_lab`='',NULL,IF(DATE(`sample_registered_at_lab`)='1970-01-01',NULL,IF(DATE(`sample_registered_at_lab`)='0000-00-00',NULL, IFNULL(`sample_registered_at_lab`,NULL))))))"),
+            "Analysis_Authorise"  => new Expression("AVG(DATEDIFF(IF(`result_approved_datetime`='',NULL,IF(DATE(`result_approved_datetime`)='1970-01-01',NULL,IF(DATE(`result_approved_datetime`)='0000-00-00',NULL,IFNULL(`result_approved_datetime`,NULL)))), IF(`sample_tested_datetime`='',NULL,IF(DATE(`sample_tested_datetime`)='1970-01-01',NULL,IF(DATE(`sample_tested_datetime`)='0000-00-00',NULL, IFNULL(sample_tested_datetime,NULL))))))")
+          )
+      )
+      ->join('facility_details', 'facility_details.facility_id = vl.facility_id')
+      ->where(
+          array(
+            "sample_tested_datetime >= '$startDate' AND sample_tested_datetime <= '$endDate'",
+            "facility_details.facility_id = vl.facility_id AND vl.sample_code LIKE '"."%".$labID."%"."'"
+          )
+      );
+      $sQueryStr = $sql -> getSqlStringForSqlObject($squery);
+      $sResult   = $dbAdapter -> query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE) -> toArray();
+      return $sResult;
+    }
+    
+    public function getTATbyDistrict($districtID, $startDate, $endDate){
+      $dbAdapter = $this->adapter;
+      $sql = new Sql($dbAdapter);
+      $squery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
+      ->columns(
+          array(
+            "Collection_Receive"  => new Expression("AVG(DATEDIFF(IF(`sample_received_at_vl_lab_datetime`='',NULL,IF(DATE(`sample_received_at_vl_lab_datetime`)='1970-01-01',NULL,IF(DATE(`sample_received_at_vl_lab_datetime`)='0000-00-00',NULL,IFNULL(`sample_received_at_vl_lab_datetime`,NULL)))), IF(`sample_collection_date`='',NULL,IF(DATE(`sample_collection_date`)='1970-01-01',NULL,IF(DATE(`sample_collection_date`)='0000-00-00',NULL, IFNULL(`sample_collection_date`,NULL))))))"),
+            "Receive_Register"    => new Expression("AVG(DATEDIFF(IF(`sample_registered_at_lab`='',NULL,IF(DATE(`sample_registered_at_lab`)='1970-01-01',NULL,IF(DATE(`sample_registered_at_lab`)='0000-00-00',NULL,IFNULL(`sample_registered_at_lab`,NULL)))), IF(`sample_received_at_vl_lab_datetime`='',NULL,IF(DATE(`sample_received_at_vl_lab_datetime`)='1970-01-01',NULL,IF(DATE(`sample_received_at_vl_lab_datetime`)='0000-00-00',NULL, IFNULL(`sample_received_at_vl_lab_datetime`,NULL))))))"),
+            "Register_Analysis"   => new Expression("AVG(DATEDIFF(IF(`sample_tested_datetime`='',NULL,IF(DATE(`sample_tested_datetime`)='1970-01-01',NULL,IF(DATE(`sample_tested_datetime`)='0000-00-00',NULL,IFNULL(`sample_tested_datetime`,NULL)))), IF(`sample_registered_at_lab`='',NULL,IF(DATE(`sample_registered_at_lab`)='1970-01-01',NULL,IF(DATE(`sample_registered_at_lab`)='0000-00-00',NULL, IFNULL(`sample_registered_at_lab`,NULL))))))"),
+            "Analysis_Authorise"  => new Expression("AVG(DATEDIFF(IF(`result_approved_datetime`='',NULL,IF(DATE(`result_approved_datetime`)='1970-01-01',NULL,IF(DATE(`result_approved_datetime`)='0000-00-00',NULL,IFNULL(`result_approved_datetime`,NULL)))), IF(`sample_tested_datetime`='',NULL,IF(DATE(`sample_tested_datetime`)='1970-01-01',NULL,IF(DATE(`sample_tested_datetime`)='0000-00-00',NULL, IFNULL(sample_tested_datetime,NULL))))))")
+          )
+      )
+      ->join('facility_details', 'facility_details.facility_id = vl.facility_id')
+      ->where(
+          array(
+            "sample_tested_datetime >= '$startDate' AND sample_tested_datetime <= '$endDate'",
+            "facility_details.facility_id = vl.facility_id AND facility_details.facility_district = '$districtID'"
+          )
+      );
+      $sQueryStr = $sql->getSqlStringForSqlObject($squery);
+      $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+      return $sResult;
+    }
+    
+    public function getTATbyClinic($clinicID, $startDate, $endDate){
+      $dbAdapter = $this->adapter;
+      $sql = new Sql($dbAdapter);
+      $squery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
+      ->columns(
+          array(
+            "Collection_Receive"  => new Expression("AVG(DATEDIFF(IF(`sample_received_at_vl_lab_datetime`='',NULL,IF(DATE(`sample_received_at_vl_lab_datetime`)='1970-01-01',NULL,IF(DATE(`sample_received_at_vl_lab_datetime`)='0000-00-00',NULL,IFNULL(`sample_received_at_vl_lab_datetime`,NULL)))), IF(`sample_collection_date`='',NULL,IF(DATE(`sample_collection_date`)='1970-01-01',NULL,IF(DATE(`sample_collection_date`)='0000-00-00',NULL, IFNULL(`sample_collection_date`,NULL))))))"),
+            "Receive_Register"    => new Expression("AVG(DATEDIFF(IF(`sample_registered_at_lab`='',NULL,IF(DATE(`sample_registered_at_lab`)='1970-01-01',NULL,IF(DATE(`sample_registered_at_lab`)='0000-00-00',NULL,IFNULL(`sample_registered_at_lab`,NULL)))), IF(`sample_received_at_vl_lab_datetime`='',NULL,IF(DATE(`sample_received_at_vl_lab_datetime`)='1970-01-01',NULL,IF(DATE(`sample_received_at_vl_lab_datetime`)='0000-00-00',NULL, IFNULL(`sample_received_at_vl_lab_datetime`,NULL))))))"),
+            "Register_Analysis" => new Expression("AVG(DATEDIFF(IF(`sample_tested_datetime`='',NULL,IF(DATE(`sample_tested_datetime`)='1970-01-01',NULL,IF(DATE(`sample_tested_datetime`)='0000-00-00',NULL,IFNULL(`sample_tested_datetime`,NULL)))), IF(`sample_registered_at_lab`='',NULL,IF(DATE(`sample_registered_at_lab`)='1970-01-01',NULL,IF(DATE(`sample_registered_at_lab`)='0000-00-00',NULL, IFNULL(`sample_registered_at_lab`,NULL))))))"),
+            "Analysis_Authorise"  => new Expression("AVG(DATEDIFF(IF(`result_approved_datetime`='',NULL,IF(DATE(`result_approved_datetime`)='1970-01-01',NULL,IF(DATE(`result_approved_datetime`)='0000-00-00',NULL,IFNULL(`result_approved_datetime`,NULL)))), IF(`sample_tested_datetime`='',NULL,IF(DATE(`sample_tested_datetime`)='1970-01-01',NULL,IF(DATE(`sample_tested_datetime`)='0000-00-00',NULL, IFNULL(sample_tested_datetime,NULL))))))")
+          )
+      )
+      ->join('facility_details', 'facility_details.facility_id = vl.facility_id')
+      ->where(
+          array(
+            "sample_tested_datetime >= '$startDate' AND sample_tested_datetime <= '$endDate'",
+            "facility_details.facility_id = vl.facility_id AND vl.facility_id = '$clinicID'"
+          )
+      );
+      $sQueryStr = $sql -> getSqlStringForSqlObject($squery);
+      $sResult   = $dbAdapter -> query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE) -> toArray();
+      return $sResult;
+    }
+    
+    /////////////////////////////////////////////
+    /////////*** Turnaround Time Page ***////////
+    ////////////////////////////////////////////
 }

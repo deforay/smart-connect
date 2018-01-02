@@ -385,7 +385,7 @@ class FacilityTable extends AbstractTableGateway {
         $fQuery = $sql->select()->from(array('f'=>'facility_details'))
                         ->join(array('ft'=>'facility_type'),'ft.facility_type_id=f.facility_type')
                         ->where('ft.facility_type_name="hub"');
-        if($logincontainer->role!= 1){
+        if($logincontainer->role != 1){
             $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:array();
             $fQuery = $fQuery->where('f.facility_id IN ("' . implode('", "', array_values(array_filter($mappedFacilities))) . '")');
         }
@@ -449,7 +449,7 @@ class FacilityTable extends AbstractTableGateway {
                              ->columns(array('location_id','location_name'))
                              ->where(array('parent_location'=>0))
                              ->order('location_name asc');
-        if($logincontainer->role!= 1){
+        if($logincontainer->role != 1){
             $provinceQuery = $provinceQuery->where('l_d.location_id IN ("' . implode('", "', array_values(array_filter($logincontainer->provinces))) . '")');
         }
         $provinceQueryStr = $sql->getSqlStringForSqlObject($provinceQuery);
@@ -479,7 +479,7 @@ class FacilityTable extends AbstractTableGateway {
         if(isset($labProvinces) && count($labProvinces) >0){
             $provinceDistrictQuery = $provinceDistrictQuery->where('l_d.parent_location IN ("' . implode('", "', array_values(array_filter($labProvinces))) . '")');
         }else{
-            if($logincontainer->role!= 1){
+            if($logincontainer->role != 1){
                 $provinceDistrictQuery = $provinceDistrictQuery->where('l_d.location_id IN ("' . implode('", "', array_values(array_filter($logincontainer->districts))) . '")');
             }
         }
@@ -507,7 +507,7 @@ class FacilityTable extends AbstractTableGateway {
         if(isset($labDistricts) && count(array_values(array_filter($labDistricts))) >0){
            $labQuery = $labQuery->where('f.facility_district IN ("' . implode('", "', array_values(array_filter($labDistricts))) . '")');
         }else{
-            if($logincontainer->role!= 1){
+            if($logincontainer->role != 1){
                 $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:array(0);
                 $labQuery = $labQuery->where('f.facility_id IN ("' . implode('", "', array_values(array_filter($mappedFacilities))) . '")');
             }
@@ -522,7 +522,7 @@ class FacilityTable extends AbstractTableGateway {
         if(isset($labDistricts) && count(array_values(array_filter($labDistricts))) >0){
            $clinicQuery = $clinicQuery->where('f.facility_district IN ("' . implode('", "', array_values(array_filter($labDistricts))) . '")');
         }else{
-            if($logincontainer->role!= 1){
+            if($logincontainer->role != 1){
                 $mappedDistricts = (isset($logincontainer->districts) && count($logincontainer->districts) >0)?$logincontainer->districts:array(0);
                 $clinicQuery = $clinicQuery->where('f.facility_district IN ("' . implode('", "', array_values(array_filter($mappedDistricts))) . '")');
             }
@@ -616,5 +616,13 @@ class FacilityTable extends AbstractTableGateway {
         $facilityQuery = $sql->select()->from(array('f'=>'facility_details'))->where(array('f.facility_name'=>$name));
         $facilityQueryStr = $sql->getSqlStringForSqlObject($facilityQuery);
       return $dbAdapter->query($facilityQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
+    }
+    
+    public function fetchFacilityByDistrict($districtId){
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $sQuery = $sql->select()->from(array('f' => 'facility_details'))->where(array("facility_district" => $districtId));
+        $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
+        return $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
     }
 }

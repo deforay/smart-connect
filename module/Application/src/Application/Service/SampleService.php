@@ -460,8 +460,7 @@ class SampleService {
     }
     
     //get all Current Regimen
-    public function getAllCurrentRegimen()
-    {
+    public function getAllCurrentRegimen(){
         $artCodeDb = $this->sm->get('ArtCodeTable');
         return $artCodeDb->fetchAllCurrentRegimen();
     }
@@ -1167,4 +1166,131 @@ class SampleService {
         $sampleDb = $this->sm->get('SampleTable');
         return $sampleDb->removeDuplicateSampleRows($params);
     }
+    
+    ////////////////////////////////////////
+    /////////*** Turnaround Time ***///////
+    ///////////////////////////////////////
+
+    public function getTATbyProvince($facilities,$startDate,$endDate){
+        set_time_limit(10000);
+        $result = array();
+        $time = array();
+        $sampleDb = $this->sm->get('SampleTable');
+        foreach ($facilities as $facility) {
+          $time = $sampleDb->getTATbyProvince($facility['location_id'],$startDate,$endDate);
+          foreach ($time as $key) {
+            $collect_receive    = $key['Collection_Receive'];
+            $receive_register   = $key['Receive_Register'];
+            $register_analysis  = $key['Register_Analysis'];
+            $analysis_authorise = $key['Analysis_Authorise'];
+          }
+          $result[] = array(
+              "facility"           => $facility['location_name'],
+              "facility_id"        => $facility['location_id'],
+              "category"           => 0,
+              "collect_receive"    => round($collect_receive,1),
+              "receive_register"   => round($receive_register,1),
+              "register_analysis"  => round($register_analysis,1),
+              "analysis_authorise" => round($analysis_authorise,1)
+          );
+        }
+        return $result;
+    }
+    
+    public function getTATbyLab($facilities,$startDate,$endDate){
+        set_time_limit(10000);
+        $result = array();
+        $time = array();
+        $sampleDb = $this->sm->get('SampleTable');
+        foreach ($facilities as $facility) {
+          $time = $sampleDb->getTATbyLab($facility['location_id'],$startDate,$endDate);
+          foreach ($time as $key) {
+            $collect_receive    = $key['Collection_Receive'];
+            $receive_register   = $key['Receive_Register'];
+            $register_analysis  = $key['Register_Analysis'];
+            $analysis_authorise = $key['Analysis_Authorise'];
+          }
+          $result[] = array(
+              "facility"           => $facility['location_name'],
+              "facility_id"        => $facility['location_id'],
+              "category"           => 1,
+              "collect_receive"    => round($collect_receive,1),
+              "receive_register"   => round($receive_register,1),
+              "register_analysis"  => round($register_analyisis,1),
+              "analysis_authorise" => round($analysis_authorise,1)
+          );
+        }
+        return $result;
+    }
+    
+    public function getTATbyDistrict($facilities,$startDate,$endDate){
+        set_time_limit(10000);
+        $result = array();
+        $time = array();
+        $sampleDb = $this->sm->get('SampleTable');
+        foreach ($facilities as $facility) {
+          $time = $sampleDb->getTATbyDistrict($facility['location_id'],$startDate,$endDate);
+          foreach ($time as $key) {
+            $collect_receive    = $key['Collection_Receive'];
+            $receive_register   = $key['Receive_Register'];
+            $register_analysis  = $key['Register_Analysis'];
+            $analysis_authorise = $key['Analysis_Authorise'];
+          }
+          $result[] = array(
+              "facility"           => $facility['location_name'],
+              "facility_id"        => $facility['location_id'],
+              "category"           => 0,
+              "collect_receive"    => round($collect_receive,1),
+              "receive_register"   => round($receive_register,1),
+              "register_analysis"  => round($register_analysis,1),
+              "analysis_authorise" => round($analysis_authorise,1)
+          );
+        }
+        return $result;
+    }
+    
+    public function getTATbyClinic($facilities,$startDate,$endDate){
+        set_time_limit(10000);
+        $result = array();
+        $time = array();
+        $sampleDb = $this->sm->get('SampleTable');
+        foreach ($facilities as $facility) {
+          $time = $sampleDb->getTATbyClinic($facility['facility_id'],$startDate,$endDate);
+          foreach ($time as $key) {
+            $collect_receive    = $key['Collection_Receive'];
+            $receive_register   = $key['Receive_Register'];
+            $register_analysis  = $key['Register_Analysis'];
+            $analysis_authorise = $key['Analysis_Authorise'];
+          }
+          $result[] = array(
+              "facility"           => $facility['facility_name'],
+              "facility_id"        => $facility['facility_id'],
+              "category"           => 1,
+              "collect_receive"    => round($collect_receive,1),
+              "receive_register"   => round($receive_register,1),
+              "register_analysis"  => round($register_analysis,1),
+              "analysis_authorise" => round($analysis_authorise,1)
+          );
+        }
+        return $result;
+    }
+    
+    public function getTATForAllDistrictsInProvince($facilityId,$startDate,$endDate){
+      $result = array();
+      $sampleDb = $this->sm->get('SampleTable');
+
+      return $result;
+    }
+
+    public function getTATForAllClinicsInDistrict($facilityId,$startDate,$endDate){
+      $result = array();
+      $sampleDb = $this->sm->get('SampleTable');
+
+      return $result;
+    }
+
+
+    ////////////////////////////////////////
+    ////////*** Turnaround Time ***////////
+    ///////////////////////////////////////
 }

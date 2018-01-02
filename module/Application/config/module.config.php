@@ -172,6 +172,16 @@ return array(
                     ),
                 ),
             ),
+            'times' => array(
+                'type' => 'segment',
+                'options' => array(
+                    'route' => '/times[/][:action][/:id]',
+                    'defaults' => array(
+                        'controller' => 'Application\Controller\Time',
+                        'action' => 'index',
+                    ),
+                ),
+            ),
         ),
     ),
     'service_manager' => array(
@@ -207,7 +217,8 @@ return array(
             'Application\Controller\Common' => 'Application\Controller\CommonController',
             'Application\Controller\Config' => 'Application\Controller\ConfigController',
             'Application\Controller\Facility' => 'Application\Controller\FacilityController',
-            'Application\Controller\Summary' => 'Application\Controller\SummaryController'
+            'Application\Controller\Summary' => 'Application\Controller\SummaryController',
+            'Application\Controller\Time' => 'Application\Controller\TimeController'
         ),
     ),
     'view_manager' => array(
