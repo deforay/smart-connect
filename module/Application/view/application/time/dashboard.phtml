@@ -121,7 +121,6 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
                                       </select>
                                   </div>
                               </div>
-
                               <div class="col-md-12">
                                   <div class="form-group col-lg-12" style="text-align:center;margin-top:10px;">
                                       <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="searchTATData();"><?php echo $this->translate('Search'); ?></a>&nbsp;&nbsp;
@@ -132,39 +131,7 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
                         </div>
                         <hr style="background: #000 !important;border-color:#ccc;">
                     </form>
-                    <div id="page-data-viewer">
-                      <div class="container">
-                        <div class="row time-box" id="row-default" style="height:400px">
-                            <div class="col-md-6 col-sm-12 table-container" style="height:100%; margin:0px; padding-top:15px; overflow-y: auto">
-                                <table id="timeTable" class="time-table table table-hover table-bordered table-dark" style="width: 100% !important">
-                                </table>
-                                <div class="scrolltable" style="display:none">
-                                    <table class="header"><thead><th>Provincias</th><th>Colheita-Recepcao</th><th>Recepcao-Registo</th><th>Registo-Analise</th><th>Analise-Emissao</th><th>Total</th></thead></table>
-                                    <div class="body scrollbar" id="style-3">
-                                        <table>
-                                          <tbody>
-                                          </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6 col-sm-12 chart-container" style="position:relative; padding: 0; ">
-                                <a id="a-btl-display-table" href="javascript:toogleTable('1'); ">
-                                  <span id="btl-display" style="position: absolute; top:20; left 10; z-index:999; cursor:pointer">
-                                    <i class="fa fa-bars" aria-hidden="true"></i>
-                                  </span>
-                                </a>
-                                <a id="a-btl-display-table" style="display:none" href="javascript:fnExcelReport('#timeTable','#a-btl-display-table'); ">
-                                  <span id="btl-display" style="position: absolute; top:20; left 20; z-index:999; cursor:pointer">
-                                    <i class="fa fa-download"></i><?php echo $this->translate('Download table'); ?>
-                                  </span>
-                                </a>
-                                <div id="container" style="width:100%; min-width:100%;max-width:100%; height: 400px; padding:0 !important; margin: 0"></div>
-                            </div>
-                        </div>
-                      </div>
-                    </div>
-                    <br><br>
+                    <div id="page-data-viewer"></div>
 <script type="text/javascript">
     $(function() {
         $('#provinces').select2({
