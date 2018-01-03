@@ -1,7 +1,6 @@
 <?php
   use Zend\Session\Container;
   $languagecontainer = new Container('language');
-
 if(isset($searchMonth) && trim($searchMonth)!= ''){
     $splitSearchMonth = explode("-",$searchMonth);
     $startDate = $endDate = $splitSearchMonth[1].'-'.date('m', strtotime($splitSearchMonth[0]));
@@ -28,11 +27,6 @@ if(isset($searchMonth) && trim($searchMonth)!= ''){
     $endYear = date('Y');
     $startDisplayDate  = strtoupper(date('M', strtotime('+1 month', strtotime('-1 year')))).' '.date("Y", strtotime("-1 year"));
     $endDisplayDate  = strtoupper(date('M')).' '.date('Y');
-}
-//set selected labs
-$selectedLabs = array();
-if(isset($labFilter) && trim($labFilter)!= ''){
-    $selectedLabs = explode(",",$labFilter);
 }
 //set selected provinces
 $selectedProvinces = array();
@@ -94,7 +88,6 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
                                     </div>
                                   </div>
                               </div>
-
                               <div class="col-md-12">
                                   <div class="form-group col-lg-4">
                                     <label class="control-label"><?php echo $this->translate('Clinics'); ?>&nbsp;</label>
@@ -108,17 +101,6 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
                                         }
                                       } ?>
                                     </select>
-                                  </div>
-                                  <div class="form-group col-lg-4" style="display: none">
-                                      <label class="control-label"><?php echo $this->translate('Labs'); ?>&nbsp;</label>
-                                      <select name="labName[]" id="labName" class="form-control" multiple title="<?php echo $this->translate('Please choose labs'); ?>">
-                                          <?php
-                                          if(isset($facilityInfo['labs']) && count($facilityInfo['labs']) > 0){
-                                              foreach($facilityInfo['labs'] as $labs){
-                                          ?>
-                                              <option value="<?php echo $labs['facility_id']; ?>" <?php echo(in_array($labs['facility_id'],$selectedLabs))?'selected="selected"':''; ?>><?php echo ucwords($labs['facility_name']); ?></option>
-                                          <?php } } ?>
-                                      </select>
                                   </div>
                               </div>
                               <div class="col-md-12">
@@ -234,7 +216,7 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
         clinicNames: clinicNames
       },
       function(data) {
-          $('#page-data-viewer').html(data);
+        $('#page-data-viewer').html(data);
       });
     }
 
@@ -565,10 +547,10 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
         var districts = ($("#districts").val() == null || $("#districts").val() == '')?[]:$("#districts").val();
         $.post("<?php echo $this->url('laboratory', array('action' => 'get-location-info')); ?>", {provinces:provinces,districts:districts,fromSrc:fromSrc},
         function(data){
+            var splitLocationInfo = data.split('##');
             if(fromSrc == 'provinces'){ $('#districts').val('').change(); }
             $('#labName').val('').change();
             $('#clinics').val('').change();
-            var splitLocationInfo = data.split('##');
             if(fromSrc == 'provinces'){ $('#districts').html(splitLocationInfo[0]); }
             $('#labName').html(splitLocationInfo[1]);
             $('#clinics').html(splitLocationInfo[2]);
