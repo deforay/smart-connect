@@ -1,46 +1,31 @@
 <?php
-  use Zend\Session\Container;
-  $languagecontainer = new Container('language');
+use Zend\Session\Container;
+$languagecontainer = new Container('language');
+$startDate = '';
+$endDate = '';
 if(isset($searchMonth) && trim($searchMonth)!= ''){
     $splitSearchMonth = explode("-",$searchMonth);
-    $startDate = $endDate = $splitSearchMonth[1].'-'.date('m', strtotime($splitSearchMonth[0]));
-    $startMonth = $endMonth = date('m', strtotime($splitSearchMonth[0]));
-    $startYear = $endYear = $splitSearchMonth[1];
-    $startDisplayDate = $endDisplayDate = $searchMonth;
-}else if((isset($fromMonth) && trim($fromMonth)!= '') && (isset($toMonth) && trim($toMonth)!= '')){
-    $splitFromMonth = explode("-",$fromMonth);
-    $startDate = $splitFromMonth[1].'-'.date('m', strtotime($splitFromMonth[0]));
-    $startMonth = date('m', strtotime($splitFromMonth[0]));
-    $startYear = $splitFromMonth[1];
-    $startDisplayDate = $fromMonth;
-    $splitToMonth = explode("-",$toMonth);
-    $endDate = $splitToMonth[1].'-'.date('m', strtotime($splitToMonth[0]));
-    $endMonth = date('m', strtotime($splitToMonth[0]));
-    $endYear = $splitToMonth[1];
-    $endDisplayDate = $toMonth;
-}else{
-    $startDate = date("Y", strtotime("-1 year")).'-'.date('m', strtotime('+1 month', strtotime('-1 year')));
-    $endDate = date('Y').'-'.date('m');
-    $startMonth = date('m', strtotime('+1 month', strtotime('-1 year')));
-    $endMonth = date('m');
-    $startYear = date("Y", strtotime("-1 year"));
-    $endYear = date('Y');
-    $startDisplayDate  = strtoupper(date('M', strtotime('+1 month', strtotime('-1 year')))).' '.date("Y", strtotime("-1 year"));
-    $endDisplayDate  = strtoupper(date('M')).' '.date('Y');
+    $startDate = $splitSearchMonth[1].'-'.date('m', strtotime($splitSearchMonth[0])).'-01';
+    $endDate = date('Y-m-t',strtotime($splitSearchMonth[1].'-'.date('m', strtotime($splitSearchMonth[0])).'-01'));
+}else if(isset($searchRange) && trim($searchRange)!= ''){
+   $splitSearchRange = explode("to",$searchRange);
+   $startDate = $splitSearchRange[0];
+   $endDate = $splitSearchRange[1];
 }
 //set selected provinces
 $selectedProvinces = array();
-if(isset($facilityInfo['selectedProvinces']) && count($facilityInfo['selectedProvinces']) >0){
-    foreach($facilityInfo['selectedProvinces'] as $province){
-        $selectedProvinces[] = $province['location_id'];
-    }
+if(isset($provinceFilter) && trim($provinceFilter)!= ''){
+  $selectedProvinces[] = $provinceFilter;
 }
 //set selected districts
 $selectedDistricts = array();
-if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) >0){
-    foreach($facilityInfo['labDistricts'] as $district){
-        $selectedDistricts[] = $district['facility_district'];
-    }
+if(isset($districtFilter) && trim($districtFilter)!= ''){
+  $selectedDistricts[] = $districtFilter;
+}
+//set selected labs
+$selectedLabs = array();
+if(isset($labFilter) && trim($labFilter)!= ''){
+  $selectedLabs = explode(",",$labFilter);
 }
 ?>
                     <!-- BEGIN PAGE BAR -->
@@ -59,8 +44,8 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
                                       <label class="control-label"><?php echo $this->translate('Provinces'); ?>&nbsp;</label>
                                       <select name="provinces[]" id="provinces" class="form-control" multiple title="<?php echo $this->translate('Please choose provinces'); ?>" onchange="getLocationInfo('provinces');">
                                           <?php
-                                          if(isset($facilityInfo['provinces']) && count($facilityInfo['provinces']) > 0){
-                                              foreach($facilityInfo['provinces'] as $province){
+                                          if(isset($provinces) && count($provinces) > 0){
+                                              foreach($provinces as $province){
                                           ?>
                                               <option value="<?php echo $province['location_id']; ?>" <?php echo(in_array($province['location_id'],$selectedProvinces))?'selected="selected"':''; ?>><?php echo ucwords($province['location_name']); ?></option>
                                           <?php } } ?>
@@ -70,10 +55,10 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
                                       <label class="control-label"><?php echo $this->translate('Districts'); ?>&nbsp;</label>
                                       <select name="districts[]" id="districts" class="form-control" multiple title="<?php echo $this->translate('Please choose districts'); ?>" onchange="getLocationInfo('districts');">
                                           <?php
-                                          if(isset($facilityInfo['provinceDistricts']) && count($facilityInfo['provinceDistricts']) > 0){
-                                              foreach($facilityInfo['provinceDistricts'] as $provinceDistrict){
+                                          if(isset($districts) && count($districts) > 0){
+                                              foreach($districts as $district){
                                           ?>
-                                              <option value="<?php echo $provinceDistrict['location_id']; ?>" <?php echo(in_array($provinceDistrict['location_id'],$selectedDistricts))?'selected="selected"':''; ?>><?php echo ucwords($provinceDistrict['location_name']); ?></option>
+                                              <option value="<?php echo $district['location_id']; ?>" <?php echo(in_array($district['location_id'],$selectedDistricts))?'selected="selected"':''; ?>><?php echo ucwords($district['location_name']); ?></option>
                                           <?php } } ?>
                                       </select>
                                   </div>
@@ -93,14 +78,25 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
                                     <label class="control-label"><?php echo $this->translate('Clinics'); ?>&nbsp;</label>
                                     <select class="form-control" id="clinics" name="clinics[]" multiple title="<?php echo $this->translate('Please choose clinics'); ?>">
                                       <?php
-                                      if(isset($facilityInfo['clinics']) && count($facilityInfo['clinics']) > 0){
-                                        foreach($facilityInfo['clinics'] as $clinics){
+                                      if(isset($clinics) && count($clinics) > 0){
+                                        foreach($clinics as $clinic){
                                           ?>
-                                          <option value="<?php echo $clinics['facility_id']; ?>"><?php echo ucwords($clinics['facility_name']); ?></option>
+                                          <option value="<?php echo $clinic['facility_id']; ?>"><?php echo ucwords($clinic['facility_name']); ?></option>
                                           <?php
                                         }
                                       } ?>
                                     </select>
+                                  </div>
+                                  <div class="form-group col-lg-4">
+                                      <label class="control-label"><?php echo $this->translate('Labs'); ?>&nbsp;</label>
+                                      <select name="labs[]" id="labs" class="form-control" multiple title="<?php echo $this->translate('Please choose labs'); ?>">
+                                          <?php
+                                          if(isset($labs) && count($labs) > 0){
+                                              foreach($labs as $lab){
+                                          ?>
+                                              <option value="<?php echo $lab['facility_id']; ?>" <?php echo(in_array($lab['facility_id'],$selectedLabs))?'selected="selected"':''; ?>><?php echo ucwords($lab['facility_name']); ?></option>
+                                          <?php } } ?>
+                                      </select>
                                   </div>
                               </div>
                               <div class="col-md-12">
@@ -128,15 +124,22 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
             placeholder: "<?php echo $this->translate('All Clinics'); ?>",
             allowClear: true
         });
-        
-        var start = moment().subtract(12, 'months');
-        var end = moment();
-
+        $('#labs').select2({
+            placeholder: "<?php echo $this->translate('All Labs'); ?>",
+            allowClear: true
+        });
+        //getLocationInfo('load');
+        <?php if(trim($startDate)!= ''){ ?>
+          var start = moment('<?php echo $startDate; ?>', "YYYY-MM-DD");
+          var end = moment('<?php echo $endDate; ?>', "YYYY-MM-DD");
+        <?php } else { ?>
+          var start = moment().subtract(12, 'months');
+          var end = moment();
+        <?php } ?>
         function cb(start, end) {
             $('#dashboard-range span').html(start.format('MMM D, YYYY') + ' to ' + end.format('MMM D, YYYY'));
             $('#sampleCollectionDate').val(start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
         }
-
         $('#dashboard-range').daterangepicker({
             format: 'DD-MMM-YYYY',
             separator: ' to ',
@@ -153,11 +156,11 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
             },
             opens: "left"
         }, cb);
-        cb(start, end);
+        cb(start,end);
         $('#dashboard-range').show();
         setProgress();
         <?php
-          if(isset($_GET['facility']) && isset($_GET['category'])){
+          if(isset($_GET['place'])){
         ?>
             getTATfromURL();
         <?php
@@ -174,41 +177,43 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
         $.blockUI.defaults.css.border = '1px solid grey';
         $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
         if( !$('#sampleCollectionDate').val() ) {
-            $('#sampleCollectionDate').val(moment().subtract('days', 29).format('YYYY-MM-DD') + ' to ' + moment().format('YYYY-MM-DD'));
+          $('#sampleCollectionDate').val(moment().subtract('days', 29).format('YYYY-MM-DD') + ' to ' + moment().format('YYYY-MM-DD'));
         }
     }
 
     function defaultTAT(){
         var dateRange = $("#sampleCollectionDate").val();
+        var lab = ($("#labs").val() == null || $("#labs").val() == '')?[]:$("#labs").val();
         var category  = $("input:radio[name='optradio']:checked").val();
-        $.post("<?php echo $this->url('times', array('action' => 'get-tat-default')); ?>",{sampleCollectionDate:dateRange,category:category},
+        $.post("<?php echo $this->url('times', array('action' => 'get-tat-default')); ?>",{sampleCollectionDate:dateRange,lab:lab,category:category},
         function(data) {
             $("#page-data-viewer").html(data);
         });
     }
 
-
     function getTATfromURL(){
-      var dateRange = $("#sampleCollectionDate").val();
       $.post("<?php echo $this->url('times', array('action' => 'get-tat-from-url')); ?>",{
-          facility:'<?php if(isset($_GET['facility'])){echo $_GET['facility'];}?>',
-          category:'<?php if(isset($_GET['category'])){echo $_GET['category'];}?>',
-          place:   '<?php if(isset($_GET['place'])){echo $_GET['place'];}?>',
-          sampleCollectionDate: dateRange
-      }
-      ,
+          province: ($("#provinces").val() == null || $("#provinces").val() == '')?'':$("#provinces").val().join(','),
+          district: ($("#districts").val() == null || $("#districts").val() == '')?'':$("#districts").val().join(','),
+          facility: ($("#clinics").val() == null || $("#clinics").val() == '')?[]:$("#clinics").val(),
+          lab: ($("#labs").val() == null || $("#labs").val() == '')?[]:$("#labs").val(),
+          category: '<?php if(isset($_GET['category'])){echo $_GET['category'];}?>',
+          place: '<?php if(isset($_GET['place'])){echo $_GET['place'];}?>',
+          sampleCollectionDate: $("#sampleCollectionDate").val()
+      },
       function(data) {
           $("#page-data-viewer").html(data);
       });
     }
 
-    function getTATfromSearchField(provinces,districts,clinics,dateRange,category,provinceNames,districtNames,clinicNames){
+    function getTATfromSearchField(provinces,districts,clinics,labs,dateRange,category,provinceNames,districtNames,clinicNames){
       setProgress();
       $.post("<?php echo $this->url('times', array('action' => 'get-tat-from-search-field')); ?>",
       {
         provinces:provinces,
         districts:districts,
         clinics:clinics,
+        labs:labs,
         sampleCollectionDate:dateRange,
         category:category,
         provinceNames:provinceNames,
@@ -224,6 +229,7 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
       var provinceIDs   = $("#provinces").val();
       var districtIDs   = $("#districts").val();
       var clinicIDs     = $("#clinics").val();
+      var labIDs        = $("#labs").val();
       var dateRange     = $("#sampleCollectionDate").val();
       var category      = $("input:radio[name='optradio']:checked").val();
       var provinceNames = [];
@@ -242,7 +248,7 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
       for(var i=0; i < clinics.length; i++){
         clinicNames[i] = clinics[i].text;
       }
-      getTATfromSearchField(provinceIDs,districtIDs,clinicIDs,dateRange,category,provinceNames,districtNames,clinicNames);
+      getTATfromSearchField(provinceIDs,districtIDs,clinicIDs,labIDs,dateRange,category,provinceNames,districtNames,clinicNames);
     }
 
     $('#btl-display-table').click(function(){
@@ -303,244 +309,9 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
         $('#provinces').val('').change();
         $('#districts').val('').change();
         $('#clinics').val('').change();
+        $('#labs').val('').change();
         searchTATData();
     }
-
-    var MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-
-    $(function () {
-      startMonth = '<?php echo $startMonth; ?>';
-      startYear = '<?php echo $startYear; ?>';
-      endMonth = '<?php echo $endMonth; ?>';
-      endYear = '<?php echo $endYear; ?>';
-      fiscalMonth = 7;
-      startDate = parseInt("" + startYear  + startMonth + "");
-      endDate = parseInt("" + endYear + endMonth + "");
-
-      content = '<div class="row mpr-calendarholder">';
-      calendarCount = endYear - startYear;
-      if(calendarCount == 0)
-        calendarCount++;
-      var d = new Date();
-      for(y = 0; y < 2; y++){
-                    content += '<div class="col-xs-6" ><div class="mpr-calendar row" id="mpr-calendar-' + (y+1) + '">'
-                                                     + '<h5 class="col-xs-12"><i class="mpr-yeardown fa fa-chevron-circle-left"></i><span>' + (startYear + y).toString() + '</span><i class="mpr-yearup fa fa-chevron-circle-right"></i></h5><div class="mpr-monthsContainer"><div class="mpr-MonthsWrapper">';
-        for(m=0; m < 12; m++){
-          var monthval;
-          if((m+1) < 10)
-            monthval = "0" + (m+1);
-          else
-            monthval = "" + (m+1);
-                            content += '<span data-month="' + monthval  + '" class="col-xs-3 mpr-month">' + MONTHS[m] + '</span>';
-        }
-        content += '</div></div></div></div>';
-      }
-      content += '<div class="col-xs-1">';
-      content += '<button class="btn btn-info mpr-close">Apply</button>';
-      content += '</div>';
-      content += '</div>';
-
-      $(document).on('click','.mpr-month',function(e){
-        e.stopPropagation();
-            $month = $(this);
-            var monthnum = $month.data('month');
-            var year = $month.parents('.mpr-calendar').children('h5').children('span').html();
-            if($month.parents('#mpr-calendar-1').size() > 0){
-              //Start Date
-              startDate = parseInt("" + year + monthnum);
-              if(startDate > endDate){
-
-                if(year != parseInt(endDate/100))
-                  $('.mpr-calendar:last h5 span').html(year);
-                   endDate = startDate;
-              }
-            }else{
-              //End Date
-              endDate = parseInt("" + year + monthnum);
-              if(startDate > endDate){
-                if(year != parseInt(startDate/100))
-                  $('.mpr-calendar:first h5 span').html(year);
-                startDate = endDate;
-              }
-            }
-
-            paintMonths();
-      });
-
-
-      $(document).on('click','.mpr-yearup',function(e){
-            $('.mpr-month').css("color","black");
-            e.stopPropagation();
-            var year = parseInt($(this).prev().html());
-            year++;
-            $(this).prev().html(""+year);
-                    $(this).parents('.mpr-calendar').find('.mpr-MonthsWrapper').fadeOut(175,function(){
-            paintMonths();
-            $(this).parents('.mpr-calendar').find('.mpr-MonthsWrapper').fadeIn(175);
-          });
-      });
-
-      $(document).on('click','.mpr-yeardown',function(e){
-            $('.mpr-month').css("color","black");
-            e.stopPropagation();
-                    var year = parseInt($(this).next().html());
-            year--;
-            $(this).next().html(""+year);
-                    //paintMonths();
-          $(this).parents('.mpr-calendar').find('.mpr-MonthsWrapper').fadeOut(175,function(){
-            paintMonths();
-            $(this).parents('.mpr-calendar').find('.mpr-MonthsWrapper').fadeIn(175);
-          });
-      });
-
-      $(document).on('click','.mpr-ytd', function(e){
-        e.stopPropagation();
-        var d = new Date();
-        startDate = parseInt(d.getFullYear() + "01");
-        var month = d.getMonth() + 1;
-        if(month < 9)
-          month = "0" + month;
-        endDate = parseInt("" + d.getFullYear() + month);
-        $('.mpr-calendar').each(function(){
-          var $cal = $(this);
-          var year = $('h5 span',$cal).html(d.getFullYear());
-        });
-        $('.mpr-calendar').find('.mpr-MonthsWrapper').fadeOut(175,function(){
-            paintMonths();
-            $('.mpr-calendar').find('.mpr-MonthsWrapper').fadeIn(175);
-        });
-      });
-
-      $(document).on('click','.mpr-prev-year', function(e){
-        e.stopPropagation();
-        var d = new Date();
-        var year = d.getFullYear()-1;
-        startDate = parseInt(year + "01");
-        endDate = parseInt(year + "12");
-        $('.mpr-calendar').each(function(){
-          var $cal = $(this);
-          $('h5 span',$cal).html(year);
-        });
-        $('.mpr-calendar').find('.mpr-MonthsWrapper').fadeOut(175,function(){
-            paintMonths();
-            $('.mpr-calendar').find('.mpr-MonthsWrapper').fadeIn(175);
-        });
-      });
-
-      $(document).on('click','.mpr-fiscal-ytd', function(e){
-        e.stopPropagation();
-        var d = new Date();
-        var year;
-        if((d.getMonth()+1) < fiscalMonth)
-          year = d.getFullYear() - 1;
-        else
-          year = d.getFullYear();
-        if(fiscalMonth < 10)
-          fm = "0" + fiscalMonth;
-        else
-          fm = fiscalMonth;
-        if(d.getMonth()+1 < 10)
-          cm = "0" + (d.getMonth()+1);
-        else
-          cm = (d.getMonth()+1);
-        startDate = parseInt("" + year + fm);
-        endDate = parseInt("" + d.getFullYear() + cm);
-        $('.mpr-calendar').each(function(i){
-          var $cal = $(this);
-          if(i == 0)
-            $('h5 span',$cal).html(year);
-          else
-            $('h5 span',$cal).html(d.getFullYear());
-        });
-        $('.mpr-calendar').find('.mpr-MonthsWrapper').fadeOut(175,function(){
-            paintMonths();
-            $('.mpr-calendar').find('.mpr-MonthsWrapper').fadeIn(175);
-        });
-      });
-
-      $(document).on('click','.mpr-prev-fiscal', function(){
-        var d = new Date();
-        var year;
-        if((d.getMonth()+1) < fiscalMonth)
-          year = d.getFullYear() - 2;
-        else
-          year = d.getFullYear() - 1;
-        if(fiscalMonth < 10)
-          fm = "0" + fiscalMonth;
-        else
-          fm = fiscalMonth;
-        if(fiscalMonth -1 < 10)
-          efm = "0" + (fiscalMonth-1);
-        else
-          efm = (fiscalMonth-1);
-        startDate = parseInt("" + year + fm);
-        endDate = parseInt("" + (d.getFullYear() - 1) + efm);
-        $('.mpr-calendar').each(function(i){
-          var $cal = $(this);
-          if(i == 0)
-            $('h5 span',$cal).html(year);
-          else
-            $('h5 span',$cal).html(d.getFullYear()-1);
-        });
-        $('.mpr-calendar').find('.mpr-MonthsWrapper').fadeOut(175,function(){
-            paintMonths();
-            $('.mpr-calendar').find('.mpr-MonthsWrapper').fadeIn(175);
-        });
-      });
-
-      var mprVisible = false;
-      var mprpopover = $('.mrp-container').popover({
-        container: "body",
-        placement: "bottom",
-        html: true,
-        content: content
-      }).on('show.bs.popover', function () {
-        $('.popover').remove();
-        var waiter = setInterval(function(){
-          if($('.popover').size() > 0){
-            clearInterval(waiter);
-            setViewToCurrentYears();
-                    paintMonths();
-          }
-        },50);
-      }).on('shown.bs.popover', function(){
-        mprVisible = true;
-      }).on('hidden.bs.popover', function(){
-        mprVisible = false;
-      });
-
-      $(document).on('click','.mpr-calendarholder',function(e){
-        e.preventDefault();
-        e.stopPropagation();
-      });
-      $(document).on("click",".mrp-container",function(e){
-        if(mprVisible){
-          e.preventDefault();
-            e.stopPropagation();
-          mprVisible = false;
-        }
-      });
-
-      $(document).on("click",function(e){
-        if(mprVisible){
-            $('.mpr-calendarholder').parents('.popover').fadeOut(200,function(){
-            $('.mpr-calendarholder').parents('.popover').remove();
-            $('.mrp-container').trigger('click');
-          });
-          mprVisible = false;
-        }
-      });
-
-      $(document).on('click','.mpr-close', function(e){
-        if(mprVisible){
-            $('.mpr-calendarholder').parents('.popover').fadeOut(200,function(){
-            $('.mpr-calendarholder').parents('.popover').remove();
-            $('.mrp-container').trigger('click');
-          });
-          mprVisible = false;
-        }
-      });
-    });
 
     function getLocationInfo(fromSrc){
         var provinces = ($("#provinces").val() == null || $("#provinces").val() == '')?[]:$("#provinces").val();
@@ -549,10 +320,10 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
         function(data){
             var splitLocationInfo = data.split('##');
             if(fromSrc == 'provinces'){ $('#districts').val('').change(); }
-            $('#labName').val('').change();
+            $('#labs').val('').change();
             $('#clinics').val('').change();
             if(fromSrc == 'provinces'){ $('#districts').html(splitLocationInfo[0]); }
-            $('#labName').html(splitLocationInfo[1]);
+            $('#labs').html(splitLocationInfo[1]);
             $('#clinics').html(splitLocationInfo[2]);
         });
     }

@@ -10,13 +10,13 @@
       $('#page-data-viewer').html(
         '<div class="container">'+
             '<h4><?php echo $this->translate("Tempo de resposta por provincia"); ?></h4>'+
-            getRow('<?php generateTable($results,'provinceTable',0);?>','provinceChart')+
+            getRow('<?php generateTable($results,'provinceTable',0,$labs,$daterange); ?>','provinceChart')+
         +'</div>'
       );
       generateChart('provinceTable','provinceChart','Provinces Chart',<?php getSeries($results)?>,'PROVINCES');
       $('.clickable').click(function(){
         if($(this).attr('data-category') != 2){
-          window.location.href='/times/dashboard?facility='+$(this).attr('id')+'&category='+$(this).attr('data-category')+'&place='+$(this).attr('data-place');
+          window.location.href='/times/dashboard?province='+$(this).attr('id')+'&lab='+$(this).attr('data-labs')+'&range='+$(this).attr('data-date-range')+'&category='+$(this).attr('data-category')+'&place='+$(this).attr('data-place');
         }
       });
     });
@@ -77,7 +77,7 @@
                           if ($categoryNext == 0 || $categoryNext == 1) {
                         ?>
                             click: function () {
-                              window.location.href='/times/dashboard?facility='+this.id+'&category=<?php echo $categoryNext; ?>&place='+this.category;
+                              window.location.href='/times/dashboard?province='+this.id+'&lab=<?php echo $labs; ?>&range=<?php echo $daterange; ?>&category=<?php echo $categoryNext; ?>&place='+this.category;
                             }
                         <?php
                           }
@@ -185,7 +185,7 @@
     ] ";
   }
 
-  function generateTable($result,$idTable,$facilityCategory){
+  function generateTable($result,$idTable,$facilityCategory,$labs,$daterange){
     $cont = 0;
     $tableHeader = '';
     $tableBody = '';
@@ -203,7 +203,7 @@
                       .'</thead>'
                     .'</table>';
     foreach ($result as $key) {
-      $tableBody .= '<tr class="clickable" id="'.$key['facility_id'].'" data-category="'.$facilityCategory.'" data-place="'.$key['facility'].'">'
+      $tableBody .= '<tr class="clickable" id="'.$key['facility_id'].'" data-labs="'.$labs.'" data-date-range="'.$daterange.'" data-category="'.$facilityCategory.'" data-place="'.$key['facility'].'">'
                       .'<td id="td-'.$cont.'-0">'.$key['facility'].'</td>'
                       .'<td id="td-'.$cont.'-1">'.$key['collect_receive'].'</td>'
                       .'<td id="td-'.$cont.'-2">'.$key['receive_register'].'</td>'
@@ -224,6 +224,5 @@
                 .'</table>'
             .'</div>'
          .'</div>';
-
   }
 ?>

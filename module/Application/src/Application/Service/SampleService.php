@@ -1171,13 +1171,13 @@ class SampleService {
     /////////*** Turnaround Time ***///////
     ///////////////////////////////////////
 
-    public function getTATbyProvince($facilities,$startDate,$endDate){
+    public function getTATbyProvince($facilities,$labs,$startDate,$endDate){
         set_time_limit(10000);
         $result = array();
         $time = array();
         $sampleDb = $this->sm->get('SampleTable');
         foreach ($facilities as $facility) {
-          $time = $sampleDb->getTATbyProvince($facility['location_id'],$startDate,$endDate);
+          $time = $sampleDb->getTATbyProvince($facility['location_id'],$labs,$startDate,$endDate);
           foreach ($time as $key) {
             $collect_receive    = $key['Collection_Receive'];
             $receive_register   = $key['Receive_Register'];
@@ -1197,39 +1197,13 @@ class SampleService {
         return $result;
     }
     
-    public function getTATbyLab($facilities,$startDate,$endDate){
+    public function getTATbyDistrict($facilities,$labs,$startDate,$endDate){
         set_time_limit(10000);
         $result = array();
         $time = array();
         $sampleDb = $this->sm->get('SampleTable');
         foreach ($facilities as $facility) {
-          $time = $sampleDb->getTATbyLab($facility['location_id'],$startDate,$endDate);
-          foreach ($time as $key) {
-            $collect_receive    = $key['Collection_Receive'];
-            $receive_register   = $key['Receive_Register'];
-            $register_analysis  = $key['Register_Analysis'];
-            $analysis_authorise = $key['Analysis_Authorise'];
-          }
-          $result[] = array(
-              "facility"           => $facility['location_name'],
-              "facility_id"        => $facility['location_id'],
-              "category"           => 1,
-              "collect_receive"    => round($collect_receive,1),
-              "receive_register"   => round($receive_register,1),
-              "register_analysis"  => round($register_analyisis,1),
-              "analysis_authorise" => round($analysis_authorise,1)
-          );
-        }
-        return $result;
-    }
-    
-    public function getTATbyDistrict($facilities,$startDate,$endDate){
-        set_time_limit(10000);
-        $result = array();
-        $time = array();
-        $sampleDb = $this->sm->get('SampleTable');
-        foreach ($facilities as $facility) {
-          $time = $sampleDb->getTATbyDistrict($facility['location_id'],$startDate,$endDate);
+          $time = $sampleDb->getTATbyDistrict($facility['location_id'],$labs,$startDate,$endDate);
           foreach ($time as $key) {
             $collect_receive    = $key['Collection_Receive'];
             $receive_register   = $key['Receive_Register'];
@@ -1249,13 +1223,13 @@ class SampleService {
         return $result;
     }
     
-    public function getTATbyClinic($facilities,$startDate,$endDate){
+    public function getTATbyClinic($facilities,$labs,$startDate,$endDate){
         set_time_limit(10000);
         $result = array();
         $time = array();
         $sampleDb = $this->sm->get('SampleTable');
         foreach ($facilities as $facility) {
-          $time = $sampleDb->getTATbyClinic($facility['facility_id'],$startDate,$endDate);
+          $time = $sampleDb->getTATbyClinic($facility['facility_id'],$labs,$startDate,$endDate);
           foreach ($time as $key) {
             $collect_receive    = $key['Collection_Receive'];
             $receive_register   = $key['Receive_Register'];
@@ -1275,21 +1249,6 @@ class SampleService {
         return $result;
     }
     
-    public function getTATForAllDistrictsInProvince($facilityId,$startDate,$endDate){
-      $result = array();
-      $sampleDb = $this->sm->get('SampleTable');
-
-      return $result;
-    }
-
-    public function getTATForAllClinicsInDistrict($facilityId,$startDate,$endDate){
-      $result = array();
-      $sampleDb = $this->sm->get('SampleTable');
-
-      return $result;
-    }
-
-
     ////////////////////////////////////////
     ////////*** Turnaround Time ***////////
     ///////////////////////////////////////

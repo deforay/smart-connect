@@ -12,15 +12,15 @@
         <?php
           if(!empty($resultProvinces)){  ?>
             '<h4><?php echo $this->translate('TAT by Province'); ?></h4>'+
-            getRow('<?php generateTable($resultProvinces,'provinceTable',0);?>','provinceChart')+
+            getRow('<?php generateTable($resultProvinces,'provinceTable',0,$labs,$daterange); ?>','provinceChart')+
         <?php
           }if(!empty($resultDistricts)){  ?>
             '<h4><?php echo $this->translate('TAT by District'); ?></h4>'+
-            getRow('<?php generateTable($resultDistricts,'districtTable',1);?>','districtChart')+
+            getRow('<?php generateTable($resultDistricts,'districtTable',1,$labs,$daterange);?>','districtChart')+
         <?php
           }if(!empty($resultClinics)){   ?>
             '<h4><?php echo $this->translate('TAT by Clinic'); ?></h4>'+
-            getRow('<?php generateTable($resultClinics,'clinicTable',2);?>','clinicChart')+
+            getRow('<?php generateTable($resultClinics,'clinicTable',2,$labs,$daterange);?>','clinicChart')+
         <?php
           }
         ?>
@@ -34,7 +34,7 @@
 
       $('.clickable').click(function(){
         if($(this).attr('data-category') != 2){
-          window.location.href='/times/dashboard?facility='+$(this).attr('id')+'&category='+$(this).attr('data-category')+'&place='+$(this).attr('data-place');
+          window.location.href='/times/dashboard?district='+$(this).attr('id')+'&lab=<?php echo $labs; ?>&range=<?php echo $daterange; ?>&category='+$(this).attr('data-category')+'&place='+$(this).attr('data-place');
         }
       });
     });
@@ -89,7 +89,7 @@
                       enabled: true,
                       color: (Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'white'
                   },
-                  cursor: 'pointer',
+                  cursor: (category == 'PROVINCES' || category == 'DISTRICTS')?'pointer':'default',
                   point: {
                       events: {
                         <?php
@@ -97,10 +97,10 @@
                         ?>
                           click: function () {
                               if(category == 'PROVINCES'){
-                                window.location.href='/times/dashboard?facility='+this.id+'&category=0&place='+this.category;
+                                window.location.href='/times/dashboard?province='+this.id+'&lab=<?php echo $labs; ?>&range=<?php echo $daterange; ?>&category=0&place='+this.category;
                               }
                               else if(category == 'DISTRICTS'){
-                                window.location.href='/times/dashboard?facility='+this.id+'&category=1&place='+this.category;
+                                window.location.href='/times/dashboard?district='+this.id+'&lab=<?php echo $labs; ?>&range=<?php echo $daterange; ?>&category=1&place='+this.category;
                               }
                             }
                         <?php
@@ -208,13 +208,14 @@
     ] ";
   }
 
-  function generateTable($result,$idTable,$facilityCategory){
+  function generateTable($result,$idTable,$facilityCategory,$labs,$daterange){
     $cont = 0;
     $tableHeader = '';
     $tableBody = '';
     $tableFooter = '';
     $category = '';
     $categoryNext = 0;
+    $clickable = ($idTable == "clinicTable")?'':'clickable';
     $tableHeader = '<table class="header">'
                       .'<thead>'
                         .'<th>Places</th>'
@@ -226,7 +227,7 @@
                       .'</thead>'
                     .'</table>';
     foreach ($result as $key) {
-      $tableBody .= '<tr class="clickable" id="'.$key['facility_id'].'" data-category="'.$facilityCategory.'"  data-place="'.$key['facility'].'">'
+      $tableBody .= '<tr class="'.$clickable.'" id="'.$key['facility_id'].'" data-labs="'.$labs.'" data-date-range="'.$daterange.'" data-category="'.$facilityCategory.'"  data-place="'.$key['facility'].'">'
                       .'<td id="td-'.$cont.'-0">'.$key['facility'].'</td>'
                       .'<td id="td-'.$cont.'-1">'.$key['collect_receive'].'</td>'
                       .'<td id="td-'.$cont.'-2">'.$key['receive_register'].'</td>'
