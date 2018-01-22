@@ -213,7 +213,7 @@ $languagecontainer->locale = $this->GetLocaleData('locale',$config['language']);
                         
                         <?php
                         if($logincontainer->role == 1){ ?>
-                            <li class="nav-item <?php echo ($activeTab == 'config' || $activeTab == 'users' || $activeTab == 'facility') ? " active open " : ""; ?>">
+                            <li class="nav-item <?php echo ($activeTab == 'config' || $activeTab == 'users' || $activeTab == 'facility' || $activeTab == 'import') ? " active open " : ""; ?>">
                                 <a href="javascript:;" class="nav-link nav-toggle">
                                     <i class="icon-equalizer"></i>
                                     <span class="title"><?php echo $this->translate('Admin'); ?></span>
@@ -233,6 +233,11 @@ $languagecontainer->locale = $this->GetLocaleData('locale',$config['language']);
                                     <li class="nav-item end <?php echo ($activeTab == 'facility') ? " active open" : ""; ?>">
                                         <a href="<?php echo $this->url('facility', array('action' => 'index')) ?>" class="nav-link ">
                                           <i class="fa fa-angle-right"></i>   <span class="title"><?php echo $this->translate('Facilities'); ?></span>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item end <?php echo ($activeTab == 'import') ? " active open" : ""; ?>">
+                                        <a href="<?php echo $this->url('import', array('action' => 'index')) ?>" class="nav-link ">
+                                          <i class="fa fa-angle-right"></i>   <span class="title"><?php echo $this->translate('Import'); ?></span>
                                         </a>
                                     </li>
                                 </ul>

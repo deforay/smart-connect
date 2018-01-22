@@ -5,23 +5,18 @@ namespace Application\Controller;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 
-class VlRequestController extends AbstractActionController
+class ImportController extends AbstractActionController
 {
-
     public function indexAction()
     {
-        
-        //$this->layout()->setVariable('activeTab', 'vl-request');
-    }
-    public function importFileAction(){
-        $this->layout()->setVariable('activeTab', 'vl-request');
-        $this->layout()->setVariable('activeMenu', 'vl-request');
+        $this->layout()->setVariable('activeTab', 'import');
+        $this->layout()->setVariable('activeMenu', 'import');
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();            
             $sampleService = $this->getServiceLocator()->get('SampleService');
             $sampleService->uploadSampleResultFile($params);
-            return $this->redirect()->toRoute("vl-request");
+            return $this->redirect()->toRoute("import");
         }else{
             $sourceService = $this->getServiceLocator()->get('SourceService');
             $sourceResult=$sourceService->getAllActiveSource();
