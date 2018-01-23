@@ -122,12 +122,12 @@ return array(
                     ),
                 ),
             ),
-            'vl-request' => array(
+            'import' => array(
                 'type'    => 'segment',
                 'options' => array(
-                    'route'    => '/vl-request[/][:action][/:id]',
+                    'route'    => '/import[/][:action][/:id]',
                     'defaults' => array(
-                        'controller' => 'Application\Controller\VlRequest',
+                        'controller' => 'Application\Controller\Import',
                         'action' => 'index',
                     ),
                 ),
@@ -212,7 +212,7 @@ return array(
             'Application\Controller\Laboratory' => 'Application\Controller\LaboratoryController',
             'Application\Controller\Clinic' => 'Application\Controller\ClinicController',
             'Application\Controller\Hubs' => 'Application\Controller\HubsController',
-            'Application\Controller\VlRequest' => 'Application\Controller\VlRequestController',
+            'Application\Controller\Import' => 'Application\Controller\ImportController',
             'Application\Controller\Source' => 'Application\Controller\SourceController',
             'Application\Controller\Common' => 'Application\Controller\CommonController',
             'Application\Controller\Config' => 'Application\Controller\ConfigController',

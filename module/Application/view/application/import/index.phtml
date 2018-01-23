@@ -10,10 +10,6 @@
                                 <i class="fa fa-circle"></i>
                             </li>
                             <li>
-                                <a href="/vl-request/index">vl-request</a>
-                                <i class="fa fa-circle"></i>
-                            </li>
-                            <li>
                                 import-file
                             </li>
                         </ul>
@@ -32,11 +28,11 @@
 
 
                                 <div class="portlet-body form">
-                                    <form class="form-horizontal" method="post" role="form" enctype="multipart/form-data" action="<?php echo $this->url('vl-request', array('action' => 'import-file')); ?>" autocomplete="off" onsubmit="validateNow();return false;">
+                                    <form class="form-horizontal" method="post" role="form" id="importFile" enctype="multipart/form-data" action="<?php echo $this->url('import', array('action' => 'index')); ?>" autocomplete="off" onsubmit="validateNow();return false;">
                                         <div class="form-group">
                                             <label class="col-md-3 control-label">Source Name <span class="font-red-mint">*</span></label>
                                             <div class="col-md-6">
-                                                <select class="form-control" name="sourceName" id="sourceName">
+                                                <select class="form-control isRequired" name="sourceName" id="sourceName" title="Please choose source">
                                                     <option value="">--Select--</option>
                                                     <?php
                                                     foreach($sourceResult as $source){
@@ -52,14 +48,15 @@
                                             <div class="form-group">
                                                 <label class="col-md-3 control-label">Attach File <span class="font-red-mint">*</span></label>
                                                 <div class="col-md-6">
-                                                <input type="file" name="importFile" id="importFile" title="Please choose file" class="isRequired"/>
+                                                <input type="file" name="importFile" id="importFile" title="Please choose file" class="isRequired" onchange="fileValidation(this)"/>
+                                                (Upload xls, xlsx, csv format)
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="form-actions">
                                             <div class="row">
                                                 <div class="col-md-offset-3 col-md-9">
-                                                    <button type="submit" class="btn green">Submit</button>
+                                                    <a class="btn green" href="javascript:void(0);" onclick="validateNow();return false;">Submit</a>
                                                     <!--<button type="button" class="btn default" onclick="document.location.href='/vl-request/index'">Cancel</button>-->
                                                 </div>
                                             </div>
@@ -68,11 +65,28 @@
                                 </div>
 
 
-                                    
                                 </div>
                             </div>
                             <!-- END EXAMPLE TABLE PORTLET-->
                         </div>
                     </div>
-                    
+                    <script>
+function fileValidation(obj){
+                    var fileExtension = ['xls', 'xlsx', 'csv'];
+                            if ($.inArray($(obj).val().split('.').pop().toLowerCase(), fileExtension) == -1)
+                        {
+                            alert("Only '.xls','.xlsx', '.csv' formats are allowed.");
+                            $(obj).val("");
+                        }
+}
+
+                        function validateNow(){
+                        flag = deforayValidator.init({
+                            formId: 'importFile'
+                        });
+                        if(flag){
+                        document.getElementById('importFile').submit();
+                        }
+                    }
+                    </script>
                     
