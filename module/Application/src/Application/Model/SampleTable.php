@@ -5810,6 +5810,7 @@ class SampleTable extends AbstractTableGateway {
             }
             $clinicQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
                                ->columns(array())
+                               ->join(array('tr'=>'r_vl_test_reasons'),'tr.test_reason_id=vl.reason_for_vl_testing', array())
                                ->join(array('f'=>'facility_details'),'f.facility_id=vl.facility_id',array('facility_id','facility_name'))
                                ->where('vl.facility_id !=0')
                                ->group('vl.facility_id');
@@ -5828,6 +5829,7 @@ class SampleTable extends AbstractTableGateway {
                 foreach($clinicResult as $clinic){
                     $rQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
                                                 ->columns(array("total" => new Expression('COUNT(*)')))
+                                                ->join(array('tr'=>'r_vl_test_reasons'),'tr.test_reason_id=vl.reason_for_vl_testing', array())
                                                 ->join(array('f'=>'facility_details'),'f.facility_id=vl.facility_id',array())
                                                 ->where(array('vl.facility_id'=>$clinic['facility_id']))
                                                 ->where(array("DATE(vl.sample_collection_date) >='$startDate'", "DATE(vl.sample_collection_date) <='$endDate'"));

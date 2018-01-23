@@ -62,6 +62,7 @@
                         ?>
                         {
                             name:'<?php echo ucwords(($reason['test_reason_code']));?>',
+                            <?php if($resultTotal['total'] == 0){ ?> visible:false,<?php } ?>
                             y:<?php echo $resultTotal['total'];?>,
                             number:<?php echo $resultTotal['total'];?>,
                             myData:'<?php echo ucwords(($reason['test_reason_name']));?>'
