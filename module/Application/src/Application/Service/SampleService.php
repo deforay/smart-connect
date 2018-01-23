@@ -1167,6 +1167,21 @@ class SampleService {
         return $sampleDb->removeDuplicateSampleRows($params);
     }
     
+    public function getVLTestReasonBasedOnAgeGroup($params){
+        $sampleDb = $this->sm->get('SampleTable');
+        return $sampleDb->getVLTestReasonBasedOnAgeGroup($params);
+    }
+    
+    public function getVLTestReasonBasedOnGender($params){
+        $sampleDb = $this->sm->get('SampleTable');
+        return $sampleDb->getVLTestReasonBasedOnGender($params);
+    }
+    
+    public function getVLTestReasonBasedOnClinics($params){
+        $sampleDb = $this->sm->get('SampleTable');
+        return $sampleDb->getVLTestReasonBasedOnClinics($params);
+    }
+    
     ////////////////////////////////////////
     /////////*** Turnaround Time ***///////
     ///////////////////////////////////////

@@ -32,9 +32,10 @@
         },
         plotOptions: {
             pie: {
+                allowPointSelect: true,
+                cursor: 'pointer',
                 dataLabels: {
                     distance:-30,
-                    
                     style: {
                         color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'white'
                     }
@@ -44,6 +45,14 @@
         },
         series: [{
             name: '<?php echo $this->translate('Samples'); ?>',
+            point: {
+              events: {
+                  click: function(e) {
+                     doSamplesTestReasonRedirect(this.name);
+                     e.preventDefault();
+                  }
+              }
+            },
             colorByPoint: true,
             data: [<?php
             if(isset($result) && count($result)>0){

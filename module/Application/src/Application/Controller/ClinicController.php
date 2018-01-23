@@ -9,8 +9,8 @@ use Zend\Json\Json;
 class ClinicController extends AbstractActionController{
 
     public function indexAction(){
-        $this->layout()->setVariable('activeTab', 'clinics-dashboard');          
-        return $this->_redirect()->toUrl('/clinics/dashboard'); 
+        $this->layout()->setVariable('activeTab', 'clinics-dashboard');
+        return $this->_redirect()->toUrl('/clinics/dashboard');
     }
 
     public function dashboardAction(){
@@ -127,6 +127,70 @@ class ClinicController extends AbstractActionController{
         return new ViewModel(array(
                 'result' => $sampleResult
             ));
+    }
+    
+    public function samplesTestReasonAction(){
+        $this->layout()->setVariable('activeTab', 'clinics-dashboard');
+        $params = array();
+        $params['clinic'] = $this->params()->fromQuery('clinic');
+        $params['testReasonCode'] = $this->params()->fromQuery('r');
+        $params['dateRange'] = $this->params()->fromQuery('dRange');
+        $params['testResult'] = $this->params()->fromQuery('rlt');
+        $params['sampleType'] = base64_decode($this->params()->fromQuery('sTyp'));
+        $params['adherence'] = $this->params()->fromQuery('adhr');
+        $params['age'] = $this->params()->fromQuery('age');
+        $params['gender'] = $this->params()->fromQuery('gd');
+        $params['isPatientPregnant'] = $this->params()->fromQuery('p');
+        $params['isPatientBreastfeeding'] = $this->params()->fromQuery('bf');
+        $sampleService = $this->getServiceLocator()->get('SampleService');
+        $clinics = $sampleService->getAllClinicName();
+        $testReasons = $sampleService->getAllTestReasonName();
+        $sampleType = $sampleService->getSampleType();
+        return new ViewModel(array(
+                'clinics' => $clinics,
+                'testReasons' => $testReasons,
+                'sampleType'=>$sampleType,
+                'params'=>$params
+            ));
+    }
+    
+    public function getSamplesTestReasonBasedOnAgeGroupAction(){
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $sampleService = $this->getServiceLocator()->get('SampleService');
+            $result = $sampleService->getVLTestReasonBasedOnAgeGroup($params);
+            $viewModel = new ViewModel();
+            $viewModel->setVariables(array('result'=>$result))
+                        ->setTerminal(true);
+            return $viewModel;
+        }
+    }
+    
+    public function getSamplesTestReasonBasedOnGenderAction(){
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $sampleService = $this->getServiceLocator()->get('SampleService');
+            $result = $sampleService->getVLTestReasonBasedOnGender($params);
+            $viewModel = new ViewModel();
+            $viewModel->setVariables(array('result'=>$result))
+                        ->setTerminal(true);
+            return $viewModel;
+        }
+    }
+    
+    public function getSamplesTestReasonBasedOnClinicsAction(){
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $sampleService = $this->getServiceLocator()->get('SampleService');
+            $result = $sampleService->getVLTestReasonBasedOnClinics($params);
+            $viewModel = new ViewModel();
+            $viewModel->setVariables(array('result'=>$result))
+                        ->setTerminal(true);
+            return $viewModel;
+        }
     }
     
 }

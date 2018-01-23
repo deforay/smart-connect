@@ -1,0 +1,342 @@
+<?php
+use Zend\Session\Container;
+$languagecontainer = new Container('language');
+$sType = '';
+foreach($sampleType as $samples){
+    $selected = (isset($params['sampleType']) && $params['sampleType'] == $samples['sample_id'])?'selected="selected"':'';
+    $sType.='<option value="'.base64_encode($samples['sample_id']).'" '.$selected.'>'.ucwords($samples['sample_name']).'</option>';
+}
+$startDate = '';
+$endDate = '';
+if(isset($params['dateRange']) && trim($params['dateRange'])!= ''){
+   $splitSearchRange = explode("to",$params['dateRange']);
+   $startDate = $splitSearchRange[0];
+   $endDate = $splitSearchRange[1];
+}
+//set selected clinics
+$selectedClinics = array();
+if(isset($params['clinic']) && trim($params['clinic'])!= ''){
+    $selectedClinics = explode(",",$params['clinic']);
+}
+//set selected age group
+$selectedAgeGroup = array();
+if(isset($params['age']) && trim($params['age'])!= ''){
+    $selectedAgeGroup = explode(",",$params['age']);
+}
+?>
+    <!-- BEGIN PAGE BAR -->
+    <div class="page-bar">
+        <h1 class="page-title"><?php echo $this->translate('VL Orderded'); ?></h1>
+    </div>
+    <!-- END PAGE BAR -->
+    <!-- BEGIN PAGE TITLE-->
+    <!-- END PAGE TITLE-->
+    <!-- END PAGE HEADER-->
+    <br>
+    <br>
+    <form id="pageFilter" action="#" method="">
+        <div class="row" style="padding-top:10px;padding-bottom:20px;">
+            <div class="col-md-12">
+                <div class="col-lg-6">
+                    <select class="form-control" id="clinicId" name="clinicId[]" multiple title="<?php echo $this->translate('Please select one or more clinics. Leave blank for All'); ?>">
+                        <?php
+                        foreach($clinics as $clinic){
+                            ?>
+                            <option value="<?php echo $clinic['facility_id']; ?>" <?php echo(in_array($clinic['facility_id'],$selectedClinics))?'selected="selected"':''; ?>><?php echo $clinic['facility_code']." - ".$clinic['facility_name'];?></option>
+                            <?php
+                        }
+                        ?>
+                    </select>
+                </div>
+                <div class="col-lg-6">
+                    <div id="dashboard-range" class="btn btn-sm form-control"
+                        data-container="body"
+                        data-placement="bottom"
+                        data-original-title="Change dashboard date range">
+                        <?php echo $this->translate('Date Range'); ?>&nbsp;&nbsp;&nbsp;&nbsp;<i class="icon-calendar"></i>&nbsp;
+                        <span class="thin uppercase hidden-xs"></span>&nbsp;
+                        <i class="fa fa-angle-down"></i>
+                        <input type="hidden" name="sampleCollectionDate" id="sampleCollectionDate"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group col-lg-4">
+                    <label class="control-label"><?php echo $this->translate('Test Reason'); ?>&nbsp;</label>
+                    <select class="form-control" name="testReason[]" id="testReason" multiple title="<?php echo $this->translate('Please choose test reason'); ?>">
+                      <?php
+                      foreach($testReasons as $test){
+                          ?>
+                          <option value="<?php echo $test['test_reason_id']; ?>" <?php echo (isset($params['testReasonCode']) && trim($params['testReasonCode']) == $test['test_reason_code'])?'selected="selected"':''; ?>><?php echo $test['test_reason_name'];?></option>
+                          <?php
+                      }
+                      ?>
+                    </select>
+                </div>
+                <div class="form-group col-lg-4">
+                  <label class="control-label"><?php echo $this->translate('Sample Type'); ?></label>
+                  <select class="form-control" name="sampleTypeId" id="sampleTypeId" title="<?php echo $this->translate('Please choose sample type'); ?>">
+                    <option value=""><?php echo $this->translate('All'); ?></option>
+                    <?php echo $sType;?>
+                  </select>
+                </div>
+                <div class="form-group col-lg-4">
+                    <label class="control-label"><?php echo $this->translate('ARV Adherence'); ?></label>
+                    <select class="form-control" name="adherence" id="adherence">
+                      <option value=''>--<?php echo $this->translate('Select'); ?>--</option>
+                      <option value="good" <?php echo (isset($params['adherence']) && $params['adherence'] == 'good')?'selected="selected"':''; ?>><?php echo $this->translate('Good'); ?> >= 95%</option>
+                      <option value="fair" <?php echo (isset($params['adherence']) && $params['adherence'] == 'fair')?'selected="selected"':''; ?>><?php echo $this->translate('Fair'); ?> 85-94%</option>
+                      <option value="poor" <?php echo (isset($params['adherence']) && $params['adherence'] == 'poor')?'selected="selected"':''; ?>><?php echo $this->translate('Poor'); ?> < 85%</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group col-lg-4">
+                    <label class="control-label"><?php echo $this->translate('Test Result'); ?>&nbsp;</label>
+                    <select class="form-control" name="testResult" id="testResult" title="<?php echo $this->translate('Please choose result'); ?>">
+                      <option value=""><?php echo $this->translate('All'); ?></option>
+                      <option value=">=1000" <?php echo (isset($params['testResult']) && $params['testResult'] == '>=1000')?'selected="selected"':''; ?>><?php echo $this->translate('>= 1000 cp/ml'); ?></option>
+                      <option value="<1000" <?php echo (isset($params['testResult']) && $params['testResult'] == '<1000')?'selected="selected"':''; ?>><?php echo $this->translate('< 1000 cp/ml'); ?></option>
+                    </select>
+                </div>
+                <div class="form-group col-lg-4">
+                    <label class="control-label"><?php echo $this->translate('Age Group'); ?>&nbsp;</label>
+                    <select class="form-control" name="age[]" id="age" multiple title="<?php echo $this->translate('Please choose age group'); ?>">
+                      <option value="<2" <?php echo(in_array('<2',$selectedAgeGroup))?'selected="selected"':''; ?>> < 2</option>
+                      <option value="2to5" <?php echo(in_array('2to5',$selectedAgeGroup))?'selected="selected"':''; ?>> 2 - 5</option>
+                      <option value="6to14" <?php echo(in_array('6to14',$selectedAgeGroup))?'selected="selected"':''; ?>> 6 - 14</option>
+                      <option value="15to49" <?php echo(in_array('15to49',$selectedAgeGroup))?'selected="selected"':''; ?>> 15 - 49</option>
+                      <option value=">=50" <?php echo(in_array('>=50',$selectedAgeGroup))?'selected="selected"':''; ?>> >= 50</option>
+                      <option value="unknown" <?php echo(in_array('unknown',$selectedAgeGroup))?'selected="selected"':''; ?>> <?php echo $this->translate('Unknown'); ?></option>
+                    </select>
+                </div>
+                <div class="form-group col-lg-4">
+                    <label class="control-label"><?php echo $this->translate('Gender'); ?></label>
+                  <select class="form-control" name="gender" id="gender">
+                    <option value=''>--<?php echo $this->translate('Select'); ?>--</option>
+                    <option value="M" <?php echo(isset($params['gender']) && $params['gender'] == 'M')?'selected="selected"':''; ?>><?php echo $this->translate('Male'); ?></option>
+                    <option value="F" <?php echo(isset($params['gender']) && $params['gender'] == 'F')?'selected="selected"':''; ?>><?php echo $this->translate('Female'); ?></option>
+                    <option value="not_specified" <?php echo(isset($params['gender']) && $params['gender'] == 'not_specified')?'selected="selected"':''; ?>><?php echo $this->translate('Other'); ?></option>
+                  </select>
+                </div>
+            </div>
+        </div>
+        <div class="row femaleSection" style="display:<?php echo($params['gender'] == 'F')?'':'none;'; ?>;">
+            <div class="col-md-12">
+                <div class="form-group col-lg-4">
+                    <label class="control-label"><?php echo $this->translate('Is Patient Pregnant'); ?></label>
+                    <select class="form-control" name="isPregnant" id="isPregnant">
+                      <option value=""><?php echo $this->translate('All'); ?></option>
+                      <option value="yes" <?php echo(isset($params['isPatientPregnant']) && $params['isPatientPregnant'] == 'yes')?'selected="selected"':''; ?>><?php echo $this->translate('Yes'); ?></option>
+                      <option value="no" <?php echo(isset($params['isPatientPregnant']) && $params['isPatientPregnant'] == 'no')?'selected="selected"':''; ?>><?php echo $this->translate('No'); ?></option>
+                      <option value="unreported" <?php echo(isset($params['isPatientPregnant']) && $params['isPatientPregnant'] == 'unreported')?'selected="selected"':''; ?>><?php echo $this->translate('Unreported'); ?></option>
+                    </select>
+                </div>
+                <div class="form-group col-lg-4">
+                    <label class="control-label"><?php echo $this->translate('Is Patient Breastfeeding'); ?></label>
+                    <select class="form-control" name="isBreastfeeding" id="isBreastfeeding">
+                      <option value=""><?php echo $this->translate('All'); ?></option>
+                      <option value="yes" <?php echo(isset($params['isPatientBreastfeeding']) && $params['isPatientBreastfeeding'] == 'yes')?'selected="selected"':''; ?>><?php echo $this->translate('Yes'); ?></option>
+                      <option value="no" <?php echo(isset($params['isPatientBreastfeeding']) && $params['isPatientBreastfeeding'] == 'no')?'selected="selected"':''; ?>><?php echo $this->translate('No'); ?></option>
+                      <option value="unreported" <?php echo(isset($params['isPatientBreastfeeding']) && $params['isPatientBreastfeeding'] == 'unreported')?'selected="selected"':''; ?>><?php echo $this->translate('Unreported'); ?></option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group col-lg-12" style="text-align:center;margin-top:10px;">
+                    <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="searchClinicData();"><?php echo $this->translate('Search'); ?></a>&nbsp;&nbsp;
+                    <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="resetEverything();"><?php echo $this->translate('Reset'); ?></a>
+                </div>
+            </div>
+        </div>
+    </form>
+    <hr style="background: #000 !important;border-color:#ccc;">
+    <div class="row">
+        <div class="col-md-6 col-sm-6">
+            <div class="portlet box blue">
+                <div class="portlet-title">
+                    <div class="caption">
+                        <span class="caption-subject"><?php echo $this->translate('VL Orderded based on Age Group'); ?></span>
+                    </div>
+                </div>
+                <div class="portlet-body">
+                    <div id="vlOrderedAgeGroupContainer" style="min-width: 310px; height: 520px; margin: 0 auto"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-sm-6">
+            <div class="portlet box blue">
+                <div class="portlet-title">
+                    <div class="caption">
+                        <span class="caption-subject"><?php echo $this->translate('VL Orderded based on Gender'); ?></span>
+                    </div>
+                </div>
+                <div class="portlet-body">
+                    <div id="vlOrderedGenderContainer" style="min-width: 310px; height: 520px; margin: 0 auto"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12 col-sm-12">
+            <div class="portlet box blue">
+                <div class="portlet-title">
+                    <div class="caption">
+                        <span class="caption-subject"><?php echo $this->translate('VL Orderded based on Clinics'); ?></span>
+                    </div>
+                </div>
+                <div class="portlet-body">
+                    <div id="vlOrderedClinicContainer" style="width:100%; height: 520px; margin: 0 auto"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+<script>
+    var oTable = null;
+    $(function() {
+        $('#testReason').select2({
+            placeholder: "<?php echo $this->translate('All Reason'); ?>",
+            allowClear: true
+        });
+        $('#clinicId').select2({
+            placeholder: "<?php echo $this->translate('All Clinics'); ?>",
+            allowClear: true
+        });
+        $('#age').select2({
+            placeholder: "<?php echo $this->translate('All'); ?>",
+            allowClear: true
+        });
+        
+        <?php if(trim($startDate)!= ''){ ?>
+          var start = moment('<?php echo $startDate; ?>', "YYYY-MM-DD");
+          var end = moment('<?php echo $endDate; ?>', "YYYY-MM-DD");
+        <?php } else { ?>
+          var start = moment().subtract(12, 'months');
+          var end = moment();
+        <?php } ?>
+        
+        function cb(start, end) {
+            $('#dashboard-range span').html(start.format('MMM D, YYYY') + ' to ' + end.format('MMM D, YYYY'));
+            $('#sampleCollectionDate').val(start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
+        }
+        
+        $('#dashboard-range').daterangepicker({
+            format: 'DD-MMM-YYYY',
+            separator: ' to ',
+            startDate: start,
+            endDate: end,
+            maxDate:moment(),
+            ranges: {
+               'Today': [moment(), moment()],
+               'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+               'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+               'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+               'This Month': [moment().startOf('month'), moment().endOf('month')],
+               'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+            },
+            opens: "left"
+        }, cb);
+        cb(start, end);
+        $('#dashboard-range').show();
+        getAllFunction();
+    });
+    
+    function getAllFunction(){
+        $.blockUI.defaults.css.border = '1px solid grey';
+        $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
+        getTestReasonBasedonAgeGroup();
+        getTestReasonBasedonGender();
+        getTestReasonBasedonClinics();
+        if( !$('#sampleCollectionDate').val() ) {
+            $('#sampleCollectionDate').val(moment().subtract('days', 29).format('YYYY-MM-DD') + ' to ' + moment().format('YYYY-MM-DD'));
+        }
+    }
+    
+    $('#gender').on('change',function() {
+        if(this.value == 'F'){
+            $('.femaleSection').show();
+        }else{
+           $('.femaleSection').hide();
+           $("#isPregnant").val('');
+           $("#isBreastfeeding").val('');
+        }
+    });
+    
+    function searchClinicData(){
+        $.blockUI.defaults.css.border = '1px solid grey';
+        $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
+        getAllFunction();
+    }
+
+    function resetEverything(){
+        $('#pageFilter')[0].reset();
+        $('#dashboard-range span').html(moment().subtract(12, 'months').format('MMM D, YYYY') + ' to ' + moment().format('MMM D, YYYY'));
+        $('#sampleCollectionDate').val(moment().subtract(12, 'months').format('YYYY-MM-DD') + ' to ' + moment().format('YYYY-MM-DD'));
+        $('#clinicId').val('').change();
+        $('#testReason').val('').change();
+        $('#age').val('').change();
+        if($('#gender').val() == 'F'){
+          $('.femaleSection').show();  
+        }else{
+          $('.femaleSection').hide();  
+        }
+        searchClinicData();
+    }
+    
+    function getTestReasonBasedonAgeGroup(){
+        var clinic = ($("#clinicId").val() == null)?[]:$("#clinicId").val();
+        var dateRange = $("#sampleCollectionDate").val();
+        var testReason = ($("#testReason").val() == null)?[]:$("#testReason").val();
+        var sampleTypeId = $("#sampleTypeId").val();
+        var adherence = $("#adherence").val();
+        var testResult = $("#testResult").val();
+        var age = ($("#age").val() == null)?[]:$("#age").val();
+        var gender = $("#gender").val();
+        var isPregnant = $("#isPregnant").val();
+        var isBreastfeeding = $("#isBreastfeeding").val();
+        $.post("<?php echo $this->url('clinics', array('action' => 'get-samples-test-reason-based-on-age-group')); ?>",{clinic:clinic,sampleCollectionDate:dateRange,testReason:testReason,sampleTypeId:sampleTypeId,adherence:adherence,testResult:testResult,age:age,gender:gender,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding},
+        function(data) {
+           $("#vlOrderedAgeGroupContainer").html(data);
+        });
+    }
+    
+    function getTestReasonBasedonGender(){
+        var clinic = ($("#clinicId").val() == null)?[]:$("#clinicId").val();
+        var dateRange = $("#sampleCollectionDate").val();
+        var testReason = ($("#testReason").val() == null)?[]:$("#testReason").val();
+        var sampleTypeId = $("#sampleTypeId").val();
+        var adherence = $("#adherence").val();
+        var testResult = $("#testResult").val();
+        var age = ($("#age").val() == null)?[]:$("#age").val();
+        var gender = $("#gender").val();
+        var isPregnant = $("#isPregnant").val();
+        var isBreastfeeding = $("#isBreastfeeding").val();
+        $.post("<?php echo $this->url('clinics', array('action' => 'get-samples-test-reason-based-on-gender')); ?>",{clinic:clinic,sampleCollectionDate:dateRange,testReason:testReason,sampleTypeId:sampleTypeId,adherence:adherence,testResult:testResult,age:age,gender:gender,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding},
+        function(data) {
+           $("#vlOrderedGenderContainer").html(data);
+        });
+    }
+    
+    function getTestReasonBasedonClinics(){
+        var clinic = ($("#clinicId").val() == null)?[]:$("#clinicId").val();
+        var dateRange = $("#sampleCollectionDate").val();
+        var testReason = ($("#testReason").val() == null)?[]:$("#testReason").val();
+        var sampleTypeId = $("#sampleTypeId").val();
+        var adherence = $("#adherence").val();
+        var testResult = $("#testResult").val();
+        var age = ($("#age").val() == null)?[]:$("#age").val();
+        var gender = $("#gender").val();
+        var isPregnant = $("#isPregnant").val();
+        var isBreastfeeding = $("#isBreastfeeding").val();
+        $.post("<?php echo $this->url('clinics', array('action' => 'get-samples-test-reason-based-on-clinics')); ?>",{clinic:clinic,sampleCollectionDate:dateRange,testReason:testReason,sampleTypeId:sampleTypeId,adherence:adherence,testResult:testResult,age:age,gender:gender,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding},
+        function(data) {
+           $("#vlOrderedClinicContainer").html(data);
+        });
+    }
+</script>        

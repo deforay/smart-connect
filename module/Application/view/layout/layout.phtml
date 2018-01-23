@@ -184,16 +184,6 @@ $languagecontainer->locale = $this->GetLocaleData('locale',$config['language']);
                                  </a>
                             </li>
                         <?php } ?>
-                        <?php
-                        if($logincontainer->role == 1 || $logincontainer->role == 3){ ?>
-                            <li class="nav-item <?php echo ($activeTab == 'times-dashboard' ? " active open " : ""); ?>">
-                                 <a href="/times/dashboard" class="nav-link nav-toggle">
-                                     <i class="icon-home"></i>
-                                     <span class="title"><?php echo $this->translate('Painel do TRL'); ?></span>
-                                     <span class="selected"></span>
-                                 </a>
-                            </li>
-                        <?php } ?>
                         <?php if($logincontainer->role == 1){ ?>
                             <li class="nav-item <?php echo ($activeTab == 'duplicate-data') ? " active open " : ""; ?>">
                                 <a href="javascript:;" class="nav-link nav-toggle">

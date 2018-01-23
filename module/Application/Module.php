@@ -197,37 +197,37 @@ class Module{
                     $table = new UsersTable($dbAdapter,$sm);
                     return $table;
                 },
-				'OrganizationsTable' => function($sm) {
+		    'OrganizationsTable' => function($sm) {
                     $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
                     $table = new OrganizationsTable($dbAdapter);
                     return $table;
                 },
-				'OrganizationTypesTable' => function($sm) {
+		    'OrganizationTypesTable' => function($sm) {
                     $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
                     $table = new OrganizationTypesTable($dbAdapter);
                     return $table;
                 },
-				'CountriesTable' => function($sm) {
+		    'CountriesTable' => function($sm) {
                     $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
                     $table = new CountriesTable($dbAdapter);
                     return $table;
                 },
-				'RolesTable' => function($sm) {
+		    'RolesTable' => function($sm) {
                     $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
                     $table = new RolesTable($dbAdapter);
                     return $table;
                 },
-				'UserOrganizationsMapTable' => function($sm) {
+		    'UserOrganizationsMapTable' => function($sm) {
                     $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
                     $table = new UserOrganizationsMapTable($dbAdapter);
                     return $table;
                 },
-				'SourceTable' => function($sm) {
+		    'SourceTable' => function($sm) {
                     $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
                     $table = new SourceTable($dbAdapter);
                     return $table;
                 },
-				'SampleTable' => function($sm) {
+		    'SampleTable' => function($sm) {
                     $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
                     $tableObj = new SampleTable($dbAdapter,$sm);
 					$table = PatternFactory::factory('object', [
@@ -236,7 +236,7 @@ class Module{
 					]);   					
                     return $table;
                 },
-				'FacilityTable' => function($sm) {
+		    'FacilityTable' => function($sm) {
                     $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
                     $tableObj = new FacilityTable($dbAdapter,$sm);
 					$table = PatternFactory::factory('object', [
@@ -245,7 +245,7 @@ class Module{
 					]);   					
                     return $table;
                 },
-				'FacilityTypeTable' => function($sm) {
+		    'FacilityTypeTable' => function($sm) {
                     $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
                     $table = new FacilitytypeTable($dbAdapter);
                     return $table;
@@ -255,12 +255,12 @@ class Module{
                     $table = new TestReasonTable($dbAdapter);
                     return $table;
                 },
-				'SampleStatusTable' => function($sm) {
+		    'SampleStatusTable' => function($sm) {
                     $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
                     $table = new SampleStatusTable($dbAdapter);
                     return $table;
                 },
-				'SampleTypeTable' => function($sm) {
+		    'SampleTypeTable' => function($sm) {
                     $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
                     $table = new SampleTypeTable($dbAdapter);
                     return $table;
@@ -308,13 +308,13 @@ class Module{
                 'SampleService' => function($sm) {
                     return new SampleService($sm);
                 },
-				'SummaryService' => function($sm) {
+		'SummaryService' => function($sm) {
                     return new SummaryService($sm);
                 },
-				'ConfigService' => function($sm) {
+		'ConfigService' => function($sm) {
                     return new ConfigService($sm);
                 },
-				'FacilityService' => function($sm) {
+		'FacilityService' => function($sm) {
                     return new FacilityService($sm);
                 },
 		'translator' => 'Zend\Mvc\Service\TranslatorServiceFactory',

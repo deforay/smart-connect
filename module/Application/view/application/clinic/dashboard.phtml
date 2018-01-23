@@ -46,7 +46,14 @@ foreach($sampleType as $samples){
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="form-group col-lg-4">
-                                    <label class="control-label"><?php echo $this->translate('Test Result'); ?>&nbsp;</label>
+                                    <label class="control-label"><?php echo $this->translate('Sample Type'); ?></label>
+                                  <select class="form-control" name="sampleTypeId" id="sampleTypeId" title="<?php echo $this->translate('Please choose sample type'); ?>">
+                                    <option value=""><?php echo $this->translate('All'); ?></option>
+                                    <?php echo $sType;?>
+                                  </select>
+                                </div>
+                                <div class="form-group col-lg-4">
+                                  <label class="control-label"><?php echo $this->translate('Test Result'); ?>&nbsp;</label>
                                   <select class="form-control" name="testResult" id="testResult" title="<?php echo $this->translate('Please choose result'); ?>">
                                     <option value=""><?php echo $this->translate('All'); ?></option>
                                     <option value=">=1000"><?php echo $this->translate('>= 1000 cp/ml'); ?></option>
@@ -54,12 +61,18 @@ foreach($sampleType as $samples){
                                   </select>
                                 </div>
                                 <div class="form-group col-lg-4">
-                                    <label class="control-label"><?php echo $this->translate('Sample Type'); ?></label>
-                                  <select class="form-control" name="sampleTypeId" id="sampleTypeId" title="<?php echo $this->translate('Please choose sample type'); ?>">
-                                    <option value=""><?php echo $this->translate('All'); ?></option>
-                                    <?php echo $sType;?>
-                                  </select>
+                                    <label class="control-label"><?php echo $this->translate('ARV Adherence'); ?></label>
+                                    <select class="form-control" name="adherence" id="adherence">
+                                      <option value=''>--<?php echo $this->translate('Select'); ?>--</option>
+                                      <option value="good"><?php echo $this->translate('Good'); ?> >= 95%</option>
+                                      <option value="fair"><?php echo $this->translate('Fair'); ?> 85-94%</option>
+                                      <option value="poor"><?php echo $this->translate('Poor'); ?> < 85%</option>
+                                    </select>
                                 </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
                                 <div class="form-group col-lg-4">
                                     <label class="control-label"><?php echo $this->translate('Age Group'); ?>&nbsp;</label>
                                     <select class="form-control" name="age[]" id="age" multiple title="<?php echo $this->translate('Please choose age group'); ?>">
@@ -69,19 +82,6 @@ foreach($sampleType as $samples){
                                       <option value="15to49"> 15 - 49</option>
                                       <option value=">=50"> >= 50</option>
                                       <option value="unknown"> <?php echo $this->translate('Unknown'); ?></option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="form-group col-lg-4">
-                                    <label class="control-label"><?php echo $this->translate('ARV Adherence'); ?></label>
-                                    <select class="form-control" name="adherence" id="adherence">
-                                      <option value=''>--<?php echo $this->translate('Select'); ?>--</option>
-                                      <option value="good"><?php echo $this->translate('Good'); ?> >= 95%</option>
-                                      <option value="fair"><?php echo $this->translate('Fair'); ?> 85-94%</option>
-                                      <option value="poor"><?php echo $this->translate('Poor'); ?> < 85%</option>
                                     </select>
                                 </div>
                                 <div class="form-group col-lg-4">
@@ -255,14 +255,6 @@ foreach($sampleType as $samples){
 <script>
     var oTable = null;
     $(function() {
-        var start = moment().subtract(12, 'months');
-        var end = moment();
-        
-        function cb(start, end) {
-            $('#dashboard-range span').html(start.format('MMM D, YYYY') + ' to ' + end.format('MMM D, YYYY'));
-            $('#sampleCollectionDate').val(start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
-        }
-
         $('#clinicId').select2({
             placeholder: "<?php echo $this->translate('All Clinics'); ?>",
             allowClear: true
@@ -271,6 +263,14 @@ foreach($sampleType as $samples){
             placeholder: "<?php echo $this->translate('All'); ?>",
             allowClear: true
         });
+        
+        var start = moment().subtract(12, 'months');
+        var end = moment();
+        
+        function cb(start, end) {
+            $('#dashboard-range span').html(start.format('MMM D, YYYY') + ' to ' + end.format('MMM D, YYYY'));
+            $('#sampleCollectionDate').val(start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
+        }
         
         $('#dashboard-range').daterangepicker({
             format: 'DD-MMM-YYYY',
@@ -309,15 +309,15 @@ foreach($sampleType as $samples){
     }
     
     function getOverAllViralLoadStatus(){
-        clinicId = $("#clinicId").val();
-        dateRange = $("#sampleCollectionDate").val();
-        testResult = $("#testResult").val();
-        sampleTypeId = $("#sampleTypeId").val();
-        age = $("#age").val();
-        adherence = $("#adherence").val();
-        gender = $("#gender").val();
-        isPregnant = $("#isPregnant").val();
-        isBreastfeeding = $("#isBreastfeeding").val();
+        var clinicId = $("#clinicId").val();
+        var dateRange = $("#sampleCollectionDate").val();
+        var testResult = $("#testResult").val();
+        var sampleTypeId = $("#sampleTypeId").val();
+        var age = $("#age").val();
+        var adherence = $("#adherence").val();
+        var gender = $("#gender").val();
+        var isPregnant = $("#isPregnant").val();
+        var isBreastfeeding = $("#isBreastfeeding").val();
         $.post("<?php echo $this->url('clinics', array('action' => 'get-overall-viral-load-status')); ?>",{clinicId:clinicId,sampleCollectionDate:dateRange,testResult:testResult,sampleTypeId:sampleTypeId,age:age,adherence:adherence,gender:gender,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding},
         function(data) {
             $("#overall-vl-status").html(data);
@@ -325,15 +325,15 @@ foreach($sampleType as $samples){
     }
     
     function getOverAllViralLoadbasedonGender(){
-        clinicId = $("#clinicId").val();
-        dateRange = $("#sampleCollectionDate").val();
-        testResult = $("#testResult").val();
-        sampleTypeId = $("#sampleTypeId").val();
-        age = $("#age").val();
-        adherence = $("#adherence").val();
-        gender = $("#gender").val();
-        isPregnant = $("#isPregnant").val();
-        isBreastfeeding = $("#isBreastfeeding").val();
+        var clinicId = $("#clinicId").val();
+        var dateRange = $("#sampleCollectionDate").val();
+        var testResult = $("#testResult").val();
+        var sampleTypeId = $("#sampleTypeId").val();
+        var age = $("#age").val();
+        var adherence = $("#adherence").val();
+        var gender = $("#gender").val();
+        var isPregnant = $("#isPregnant").val();
+        var isBreastfeeding = $("#isBreastfeeding").val();
         $.post("<?php echo $this->url('clinics', array('action' => 'get-viral-load-status-based-on-age')); ?>",{clinicId:clinicId,sampleCollectionDate:dateRange,testResult:testResult,sampleTypeId:sampleTypeId,age:age,adherence:adherence,gender:gender,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding},
         function(data) {
             $("#overall-vl-status-based-gender").html(data);
@@ -341,16 +341,16 @@ foreach($sampleType as $samples){
     }
     
     function getAllTestReason(){
-        clinicId = $("#clinicId").val();
-        dateRange = $("#sampleCollectionDate").val();
-        testResult = $("#testResult").val();
-        sampleTypeId = $("#sampleTypeId").val();
-        age = $("#age").val();
-        adherence = $("#adherence").val();
-        gender = $("#gender").val();
-        isPregnant = $("#isPregnant").val();
-        isBreastfeeding = $("#isBreastfeeding").val();
-        testReason = $("#testReason").val();
+        var clinicId = $("#clinicId").val();
+        var dateRange = $("#sampleCollectionDate").val();
+        var testResult = $("#testResult").val();
+        var sampleTypeId = $("#sampleTypeId").val();
+        var age = $("#age").val();
+        var adherence = $("#adherence").val();
+        var gender = $("#gender").val();
+        var isPregnant = $("#isPregnant").val();
+        var isBreastfeeding = $("#isBreastfeeding").val();
+        var testReason = $("#testReason").val();
         $.post("<?php echo $this->url('clinics', array('action' => 'get-sample-test-reason')); ?>",{clinicId:clinicId,sampleCollectionDate:dateRange,testResult:testResult,sampleTypeId:sampleTypeId,age:age,adherence:adherence,gender:gender,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding,testReason:testReason},
         function(data) {
            $("#samplesTestedReason").html(data);
@@ -483,7 +483,7 @@ foreach($sampleType as $samples){
         $.post("<?php echo $this->url('clinics', array('action' => 'generate-result-pdf')); ?>", {id : id},
         function(data){
             if(data == "" || data == null || data == undefined){
-                alert('<?php echo $this->translate('Unable to generate pdf'); ?>');
+                alert('<?php echo $this->translate('Unable to generate pdf') ?>');
             }else{
                 window.open('../temporary/'+data,'_blank');
             }
@@ -496,10 +496,23 @@ foreach($sampleType as $samples){
        $.post("<?php echo $this->url('clinics', array('action' => 'export-result-excel')); ?>", {result : $("#result").val()},
         function(data){
             if(data == "" || data == null || data == undefined){
-                alert('<?php echo $this->translate('Unable to export excel'); ?>');
+                alert('<?php echo $this->translate('Unable to export excel') ?>');
             }else{
                 window.open('../temporary/'+data,'_blank');
             }
         }); 
+    }
+    
+    function doSamplesTestReasonRedirect(reason){
+        var clinic = ($("#clinicId").val() == null)?'':$("#clinicId").val().join(',');
+        var dateRange = $("#sampleCollectionDate").val();
+        var testResult = $("#testResult").val();
+        var sampleTypeId = $("#sampleTypeId").val();
+        var adherence = $("#adherence").val();
+        var age = ($("#age").val() == null)?'':$("#age").val().join(',');
+        var gender = $("#gender").val();
+        var isPregnant = $("#isPregnant").val();
+        var isBreastfeeding = $("#isBreastfeeding").val();
+        window.open('/clinics/samples-test-reason?clinic='+clinic+'&dRange='+dateRange+'&r='+reason+'&rlt='+testResult+'&sTyp='+sampleTypeId+'&adhr='+adherence+'&age='+age+'&gd='+gender+'&p='+isPregnant+'&bf='+isBreastfeeding, '_blank');
     }
 </script>        
