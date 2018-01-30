@@ -4743,7 +4743,7 @@ class SampleTable extends AbstractTableGateway {
             $row[]=$validTested;            
             $row[]=$aRow['total_suppressed_samples'];            
             $row[]=$validTested-$aRow['total_suppressed_samples'];            
-            $row[]=(isset($aRow['total_suppressed_samples']) && $aRow['total_suppressed_samples'] > 0)?round((($aRow['total_suppressed_samples']/$validTested)*100),2).'%':'';
+            $row[]=(isset($aRow['total_suppressed_samples']) && $aRow['total_suppressed_samples'] > 0 && $validTested > 0)?round((($aRow['total_suppressed_samples']/$validTested)*100),2).'%':'';
             
             $output['aaData'][] = $row;
         }
@@ -4945,7 +4945,7 @@ class SampleTable extends AbstractTableGateway {
             $sampleResult = $common->cacheQuery($queryStr,$dbAdapter);
             $validTested = $sampleResult[0]["total_samples_tested"] - $sampleResult[0]["total_samples_rejected"];
             $result['valid_results'][$j] = $validTested;
-            $result['samples_rate'][$j] = (isset($sampleResult[0]["total_suppressed_samples"]) && $sampleResult[0]["total_suppressed_samples"] > 0)?round((($sampleResult[0]["total_suppressed_samples"]/$validTested)*100),2):0;
+            $result['samples_rate'][$j] = (isset($sampleResult[0]["total_suppressed_samples"]) && $sampleResult[0]["total_suppressed_samples"] > 0 && $validTested > 0)?round((($sampleResult[0]["total_suppressed_samples"]/$validTested)*100),2):0;
             $result['date'][$j] = $monthYearFormat;
            $start = strtotime("+1 month", $start);
            $j++;
@@ -5584,7 +5584,7 @@ class SampleTable extends AbstractTableGateway {
             $summaryResult['sample']['samples-received']['month'][$j] = (isset($samplesReceivedSummaryResult[0]["total_samples_received"]))?$samplesReceivedSummaryResult[0]["total_samples_received"]:0;
             $summaryResult['sample']['samples-tested']['month'][$j] = (isset($samplesReceivedSummaryResult[0]["total_samples_tested"]))?$samplesReceivedSummaryResult[0]["total_samples_tested"]:0;
             $summaryResult['sample']['valid-tested']['month'][$j] = $validTested;
-            $summaryResult['sample']['suppression-rate']['month'][$j] = (isset($samplesReceivedSummaryResult[0]["total_suppressed_samples"]) && $samplesReceivedSummaryResult[0]["total_suppressed_samples"] >0)?round((($samplesReceivedSummaryResult[0]["total_suppressed_samples"]/$validTested)*100),2).' %':'';
+            $summaryResult['sample']['suppression-rate']['month'][$j] = (isset($samplesReceivedSummaryResult[0]["total_suppressed_samples"]) && $samplesReceivedSummaryResult[0]["total_suppressed_samples"] >0 && $validTested > 0)?round((($samplesReceivedSummaryResult[0]["total_suppressed_samples"]/$validTested)*100),2).' %':'';
             $summaryResult['sample']['rejection-rate']['month'][$j] = (isset($samplesReceivedSummaryResult[0]["rejected_samples_percentage"]) && $samplesReceivedSummaryResult[0]["rejected_samples_percentage"] >0)?$samplesReceivedSummaryResult[0]["rejected_samples_percentage"].' %':'';
             $summaryResult['month'][$j] = $monthYearFormat;
           $start = strtotime("+1 month", $start);

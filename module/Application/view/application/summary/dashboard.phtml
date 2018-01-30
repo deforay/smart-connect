@@ -25,8 +25,8 @@ if(isset($summaryTabInfo[0]["suppressed_samples"]) && $summaryTabInfo[0]["suppre
  $suppressedSampleTotal = $summaryTabInfo[0]["suppressed_samples"];
 }
 $validTested = $totalSampleTested - $rejectedSamples;
-$suppressedSamplepercentage = round((($suppressedSampleTotal/$validTested)*100),2);
-if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["1st_line_of_current_regimen_samples"] >0){
+$suppressedSamplepercentage = ($totalSampleTested > 0 && $validTested > 0)?round((($suppressedSampleTotal/$validTested)*100),2):0;
+if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["1st_line_of_current_regimen_samples"] >0 && $summaryTabInfo[0]["all_current_regimen_samples"] > 0){
  $firstLineCurrentRegimenPercentage = round((($summaryTabInfo[0]["1st_line_of_current_regimen_samples"]/$summaryTabInfo[0]["all_current_regimen_samples"])*100),2);
 }
 ?>
