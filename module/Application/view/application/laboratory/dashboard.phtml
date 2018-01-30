@@ -489,8 +489,8 @@ foreach($sampleType as $samples){
     
     function getTestedSampleResult(){
         var facilityId = $("#labName").val();
-        var fromDate=$('#mrp-lowerDate').val();
-        var toDate=$('#mrp-upperDate').val();
+        var fromDate = $('#mrp-lowerDate').val();
+        var toDate = $('#mrp-upperDate').val();
         var sampleType = $("#sampleType").val();
         $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-test-result')); ?>",{fromDate:fromDate,toDate:toDate,sampleType:sampleType,facilityId:facilityId},
         function(data) {
@@ -500,8 +500,8 @@ foreach($sampleType as $samples){
     
     function getTestedSampleResultBasedLab(){
         var facilityId = $("#labName").val();
-        var fromDate=$('#mrp-lowerDate').val();
-        var toDate=$('#mrp-upperDate').val();
+        var fromDate = $('#mrp-lowerDate').val();
+        var toDate = $('#mrp-upperDate').val();
         var sampleType = $("#sampleTypeVolume").val();
         $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-test-result-volume')); ?>",{fromDate:fromDate,toDate:toDate,sampleType:sampleType,facilityId:facilityId},
         function(data) {
@@ -511,8 +511,8 @@ foreach($sampleType as $samples){
     
     function getTestedSampleResultBasedGender(){
         var facilityId = $("#labName").val();
-        var fromDate=$('#mrp-lowerDate').val();
-        var toDate=$('#mrp-upperDate').val();
+        var fromDate = $('#mrp-lowerDate').val();
+        var toDate = $('#mrp-upperDate').val();
         $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-test-result-gender')); ?>",{fromDate:fromDate,toDate:toDate,facilityId:facilityId},
         function(data) {
             $("#samplesTestedResultGender").html(data);

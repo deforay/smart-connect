@@ -9,7 +9,17 @@ $endMonth = date('m');
 $startDate = date('Y-m', strtotime('+1 month', strtotime('-1 year')));
 $endDate=date('Y-m');
 
+$suppressedSampleTotal = 0;
+$totalSampleTested = 0;
+$suppressedSamplepercentage = 0;
 $firstLineCurrentRegimenPercentage = 0;
+if(isset($summaryTabInfo[0]["suppressed_samples"]) && $summaryTabInfo[0]["suppressed_samples"] >0){
+ $suppressedSampleTotal = $summaryTabInfo[0]["suppressed_samples"];
+}
+if(isset($summaryTabInfo[0]["total_samples_tested"]) && $summaryTabInfo[0]["total_samples_tested"] >0){
+ $totalSampleTested = $summaryTabInfo[0]["total_samples_tested"];
+}
+$suppressedSamplepercentage = round((($suppressedSampleTotal/$totalSampleTested)*100),2);
 if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["1st_line_of_current_regimen_samples"] >0){
  $firstLineCurrentRegimenPercentage = round((($summaryTabInfo[0]["1st_line_of_current_regimen_samples"]/$summaryTabInfo[0]["all_current_regimen_samples"])*100),2);
 }
@@ -233,7 +243,7 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
         </li>
         <li role="presentation">
             <a href="#suppressionRateTab" aria-controls="suppressionRateTab" role="tab" data-toggle="tab">
-                <h3 class="tabPercentageVal"><?php echo number_format($summaryTabInfo[0]["suppressed_samples_percentage"], 2);?>%</h3>            
+                <h3 class="tabPercentageVal"><?php echo $suppressedSamplepercentage ;?>%</h3>           
                 <?php echo $this->translate('Suppression Rate'); ?>
             </a>
         </li>

@@ -1182,6 +1182,10 @@ class SampleService {
         return $sampleDb->getVLTestReasonBasedOnClinics($params);
     }
     
+    public function getSample($id){
+        $sampleDb = $this->sm->get('SampleTable');
+        return $sampleDb->getSample($id);
+    }
     ////////////////////////////////////////
     /////////*** Turnaround Time ***///////
     ///////////////////////////////////////
