@@ -14,6 +14,7 @@ $rejectedSamples = 0;
 $validTested = 0;
 $suppressedSampleTotal = 0;
 $suppressedSamplepercentage = 0;
+$rejectionPercentage = 0;
 $firstLineCurrentRegimenPercentage = 0;
 if(isset($summaryTabInfo[0]["total_samples_tested"]) && $summaryTabInfo[0]["total_samples_tested"] >0){
  $totalSampleTested = $summaryTabInfo[0]["total_samples_tested"];
@@ -26,6 +27,7 @@ if(isset($summaryTabInfo[0]["suppressed_samples"]) && $summaryTabInfo[0]["suppre
 }
 $validTested = $totalSampleTested - $rejectedSamples;
 $suppressedSamplepercentage = ($totalSampleTested > 0 && $validTested > 0)?round((($suppressedSampleTotal/$validTested)*100),2):0;
+$rejectionPercentage = ($rejectedSamples > 0 && $totalSampleTested > 0)?round((($rejectedSamples/$totalSampleTested)*100),2):0;
 if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["1st_line_of_current_regimen_samples"] >0 && $summaryTabInfo[0]["all_current_regimen_samples"] > 0){
  $firstLineCurrentRegimenPercentage = round((($summaryTabInfo[0]["1st_line_of_current_regimen_samples"]/$summaryTabInfo[0]["all_current_regimen_samples"])*100),2);
 }
@@ -255,7 +257,7 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
         </li>
         <li role="presentation">
             <a href="#samplesRejectedTab" aria-controls="messages" role="tab" data-toggle="tab">
-                <h3 class="tabPercentageVal"><?php echo number_format($summaryTabInfo[0]["rejected_samples_percentage"], 2);?>%</h3>
+                <h3 class="tabPercentageVal"><?php echo $rejectionPercentage; ?>%</h3>
                 Rejection Rate
             </a>
         </li>
