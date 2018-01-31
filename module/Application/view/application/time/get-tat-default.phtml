@@ -4,15 +4,21 @@
   $tableBody = '';
   $tableFooter = '';
   $categoryNext = 0;
- ?>
+  $places = $this->translate('Places');
+  $collectReceive = $this->translate('Collect-Receive');
+  $receiveRegister = $this->translate('Receive-Register');
+  $registerAnalysis = $this->translate('Register-Analysis');
+  $analysisAuthorise = $this->translate('Analysis-Authorise');
+  $total = $this->translate('Total');
+?>
 <script>
     $(function(){
       $('#page-data-viewer').html(
         '<div class="">'+
-            getRow('<?php generateTable($results,'provinceTable',0,$labs,$daterange); ?>','provinceChart','<?php echo $this->translate('Tempo de resposta por provincia'); ?>','<?php echo $this->translate('Provinces Chart'); ?>')
+            getRow('<?php generateTable($results,'provinceTable',0,$labs,$daterange,$places,$collectReceive,$receiveRegister,$registerAnalysis,$analysisAuthorise,$total); ?>','provinceChart','<?php echo $this->translate('TAT by Province'); ?>','<?php echo $this->translate('Provinces Chart'); ?>')
         +'</div>'
       );
-      generateChart('provinceTable','provinceChart','Provinces Chart',<?php getSeries($results)?>,'PROVINCES');
+      generateChart('provinceTable','provinceChart','Provinces Chart',<?php getSeries($results,$collectReceive,$receiveRegister,$registerAnalysis,$analysisAuthorise)?>,'PROVINCES');
       $('.clickable').click(function(){
         if($(this).attr('data-category') != 2){
           window.location.href='/times/dashboard?province='+$(this).attr('id')+'&lab='+$(this).attr('data-labs')+'&range='+$(this).attr('data-date-range')+'&category='+$(this).attr('data-category')+'&place='+$(this).attr('data-place');
@@ -45,7 +51,7 @@
           yAxis: {
               min: 0,
               title: {
-                  text: ''
+                  text: '<?php echo $this->translate('TAT in days'); ?>'
               },
               stackLabels: {
                   enabled: true,
@@ -68,7 +74,7 @@
           },
           tooltip: {
               headerFormat: '<b>{point.x}</b><br/>',
-              pointFormat: '{series.name}: {point.y}<br/>Total: {point.stackTotal}'
+              pointFormat: '{series.name}: {point.y}<br/><?php echo $this->translate('Total'); ?>: {point.stackTotal}'
           },
           plotOptions: {
               column: {
@@ -101,10 +107,10 @@
 </script>
 
 <?php
-  function getSeries($results){
+  function getSeries($results,$collectReceive,$receiveRegister,$registerAnalysis,$analysisAuthorise){
     echo "[
       {
-          name: 'Collect-Receive',
+          name: '$collectReceive',
           data:[";
     foreach ($results as $key) {
         echo"          {
@@ -126,7 +132,7 @@
              ]
       },
       {
-          name: 'Receive-Register',
+          name: '$receiveRegister',
           data:[";
                 foreach ($results as $key) {
                 echo "  {
@@ -147,7 +153,7 @@
              ]
       },
       {
-          name: 'Register-Analysis',
+          name: '$registerAnalysis',
           data:[";
                 foreach ($results as $key) {
                   echo "{
@@ -168,7 +174,7 @@
              ]
       },
       {
-          name: 'Analysis-Authorise',
+          name: '$analysisAuthorise',
           data:[";
                 foreach ($results as $key) {
                 echo "  {
@@ -192,7 +198,7 @@
     ] ";
   }
 
-  function generateTable($result,$idTable,$facilityCategory,$labs,$daterange){
+  function generateTable($result,$idTable,$facilityCategory,$labs,$daterange,$places,$collectReceive,$receiveRegister,$registerAnalysis,$analysisAuthorise,$total){
     $cont = 0;
     $tableHeader = '';
     $tableBody = '';
@@ -201,17 +207,17 @@
     $categoryNext = 0;
     $tableHeader = '<table class="header">'
                       .'<thead>'
-                          .'<th>Places</th>'
-                          .'<th>Collect-Receive</th>'
-                          .'<th>Receive-Register</th>'
-                          .'<th>Register-Analysis</th>'
-                          .'<th>Analysis-Authorise</th>'
-                          .'<th>Total</th>'
+                          .'<th>'.$places.'</th>'
+                          .'<th>'.$collectReceive.'</th>'
+                          .'<th>'.$receiveRegister.'</th>'
+                          .'<th>'.$receiveRegister.'</th>'
+                          .'<th>'.$analysisAuthorise.'</th>'
+                          .'<th>'.$total.'</th>'
                       .'</thead>'
                     .'</table>';
     foreach ($result as $key) {
       $tableBody .= '<tr class="clickable" id="'.$key['facility_id'].'" data-labs="'.$labs.'" data-date-range="'.$daterange.'" data-category="'.$facilityCategory.'" data-place="'.$key['facility'].'">'
-                      .'<td id="td-'.$cont.'-0">'.$key['facility'].'</td>'
+                      .'<td id="td-'.$cont.'-0">'.ucwords($key['facility']).'</td>'
                       .'<td id="td-'.$cont.'-1">'.$key['collect_receive'].'</td>'
                       .'<td id="td-'.$cont.'-2">'.$key['receive_register'].'</td>'
                       .'<td id="td-'.$cont.'-3">'.$key['register_analysis'].'</td>'

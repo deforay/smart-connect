@@ -4,13 +4,18 @@
   $tableBody = '';
   $tableFooter = '';
   $categoryNext = 0;
-
+  $places = $this->translate('Places');
+  $collectReceive = $this->translate('Collect-Receive');
+  $receiveRegister = $this->translate('Receive-Register');
+  $registerAnalysis = $this->translate('Register-Analysis');
+  $analysisAuthorise = $this->translate('Analysis-Authorise');
+  $total = $this->translate('Total');
  ?>
 <script type="text/javascript">
     $(function(){
       $('#page-data-viewer').html(
         '<dic class="">'+
-            getRow('<?php generateTable($results,'provinceTable',$category+1,$labs,$daterange,$category) ?>','provinceChart','<?php echo $this->translate('TAT: '.$place); ?>','<?php echo $this->translate('TAT Chart'); ?>')
+            getRow('<?php generateTable($results,'provinceTable',$category+1,$labs,$daterange,$category,$places,$collectReceive,$receiveRegister,$registerAnalysis,$analysisAuthorise,$total) ?>','provinceChart','<?php echo $this->translate('TAT: '.$place); ?>','<?php echo $this->translate('TAT Chart'); ?>')
         +'</div>'
       );
 
@@ -68,7 +73,7 @@
           },
           tooltip: {
               headerFormat: '<b>{point.x}</b><br/>',
-              pointFormat: '{series.name}: {point.y}<br/>Total: {point.stackTotal}'
+              pointFormat: '{series.name}: {point.y}<br/><?php echo $this->translate('Total'); ?>: {point.stackTotal}'
           },
           plotOptions: {
               column: {
@@ -93,7 +98,7 @@
           },
           series:[
             {
-                name: 'Collect-Receive',
+                name: '<?php echo $this->translate('Collect-Receive'); ?>',
                 data:[<?php
                       foreach ($results as $key) { ?>
                         {
@@ -115,7 +120,7 @@
                      ?> ]
             },
             {
-                name: 'Receive-Register',
+                name: '<?php echo $this->translate('Receive-Register'); ?>',
                 data:[<?php
                       foreach ($results as $key) { ?>
                         {
@@ -136,7 +141,7 @@
                   ]
             },
             {
-                name: 'Register-Analysis',
+                name: '<?php echo $this->translate('Register-Analysis'); ?>',
                 data:[<?php
                       foreach ($results as $key) { ?>
                         {
@@ -157,7 +162,7 @@
                      ?> ]
             },
             {
-                name: 'Analysis-Authorise',
+                name: '<?php echo $this->translate('Analysis-Authorise'); ?>',
                 data:[<?php
                       foreach ($results as $key) { ?>
                         {
@@ -189,7 +194,7 @@
 </script>
 
 <?php
-function generateTable($result,$idTable,$facilityCategory,$labs,$daterange,$categoryVal){
+function generateTable($result,$idTable,$facilityCategory,$labs,$daterange,$categoryVal,$places,$collectReceive,$receiveRegister,$registerAnalysis,$analysisAuthorise,$total){
   $cont = 0;
   $tableHeader = '';
   $tableBody = '';
@@ -199,12 +204,12 @@ function generateTable($result,$idTable,$facilityCategory,$labs,$daterange,$cate
   $clickable = ($categoryVal == 1)?'':'clickable';
   $tableHeader = '<table class="header">'
                     .'<thead>'
-                        .'<th>Places</th>'
-                        .'<th>Collect-Receive</th>'
-                        .'<th>Receive-Register</th>'
-                        .'<th>Register-Analysis</th>'
-                        .'<th>Analysis-Authorise</th>'
-                        .'<th>Total</th>'
+                        .'<th>'.$places.'</th>'
+                        .'<th>'.$collectReceive.'</th>'
+                        .'<th>'.$receiveRegister.'</th>'
+                        .'<th>'.$receiveRegister.'</th>'
+                        .'<th>'.$analysisAuthorise.'</th>'
+                        .'<th>'.$total.'</th>'
                     .'</thead>'
                   .'</table>';
 
@@ -230,6 +235,5 @@ function generateTable($result,$idTable,$facilityCategory,$labs,$daterange,$cate
               .'</table>'
           .'</div>'
        .'</div>';
-
 }
 ?>
