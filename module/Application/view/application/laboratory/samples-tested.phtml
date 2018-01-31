@@ -774,11 +774,11 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
         $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
         $.post("<?php echo $this->url('laboratory', array('action' => 'export-sample-result-excel')); ?>", {fromDate:$('#mrp-lowerDate').val(),toDate:$('#mrp-upperDate').val()},
          function(data){
-             if(data == "" || data == null || data == undefined){
-                 alert('<?php echo $this->translate('Unable to export excel'); ?>');
-             }else{
-                 window.open('../temporary/'+data,'_blank');
-             }
+            if(data == "" || data == null || data == undefined){
+                alert('<?php echo $this->translate('Unable to export excel'); ?>');
+            }else{
+                window.open('../temporary/'+data,'_blank');
+            }
          }); 
     }
 </script>

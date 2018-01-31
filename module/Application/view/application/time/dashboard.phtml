@@ -412,7 +412,7 @@ if(isset($labFilter) && trim($labFilter)!= ''){
                 navigator.msSaveBlob(blob, 'Test file.xls');
             }
         } else {
-            var fullDate = new Date()
+            var fullDate = new Date();
             var twoDigitMonth = ((fullDate.getMonth().length+1) === 1)? (fullDate.getMonth()+1) : '0' + (fullDate.getMonth()+1);
             var currentDate = fullDate.getDate() + "_" + twoDigitMonth + "_" + fullDate.getFullYear();
             var seconds = fullDate.getSeconds();
@@ -495,7 +495,7 @@ if(isset($labFilter) && trim($labFilter)!= ''){
                        +'<div class="action" style="padding: 11px 0 9px">'
                         +'<a id="'+idTbl+'-a-btl-display-table" href="javascript:fnExcelReport(\'.'+idTbl+'\',\'#'+idTbl+'\',\'#'+idTbl+'-a-btl-display-table\'); " style="color:#fff;float:right;">'
                               +'<span id="btl-display" style="cursor:pointer">'
-                                +'<i class="fa fa-download" aria-hidden="true"></i>&nbsp;<?php echo $this->translate('Download table'); ?>'
+                                +'<i class="fa fa-download" aria-hidden="true"></i>&nbsp;<?php echo $this->translate('Download Table'); ?>'
                               +'</span>'
                             +'</a>'
                        +'</div>'
