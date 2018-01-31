@@ -11,10 +11,7 @@ $endDate=date('Y-m');
 
 $totalSampleTested = 0;
 $rejectedSamples = 0;
-$validTested = 0;
 $suppressedSampleTotal = 0;
-$suppressedSamplepercentage = 0;
-$rejectionPercentage = 0;
 $firstLineCurrentRegimenPercentage = 0;
 if(isset($summaryTabInfo[0]["total_samples_tested"]) && $summaryTabInfo[0]["total_samples_tested"] >0){
  $totalSampleTested = $summaryTabInfo[0]["total_samples_tested"];
@@ -25,9 +22,8 @@ if(isset($summaryTabInfo[0]["rejected_samples"]) && $summaryTabInfo[0]["rejected
 if(isset($summaryTabInfo[0]["suppressed_samples"]) && $summaryTabInfo[0]["suppressed_samples"] >0){
  $suppressedSampleTotal = $summaryTabInfo[0]["suppressed_samples"];
 }
-$validTested = $totalSampleTested - $rejectedSamples;
-$suppressedSamplepercentage = ($totalSampleTested > 0 && $validTested > 0)?round((($suppressedSampleTotal/$validTested)*100),2):0;
-$rejectionPercentage = ($rejectedSamples > 0 && $totalSampleTested > 0)?round((($rejectedSamples/$totalSampleTested)*100),2):0;
+$suppressedSamplepercentage = ($suppressedSampleTotal > 0 && $totalSampleTested > 0)?round((($suppressedSampleTotal/$totalSampleTested)*100),2):0;
+$rejectionPercentage = ($summaryTabInfo[0]["total_samples_received"] > 0 && $rejectedSamples > 0)?round((($rejectedSamples/$summaryTabInfo[0]["total_samples_received"])*100),2):0;
 if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["1st_line_of_current_regimen_samples"] >0 && $summaryTabInfo[0]["all_current_regimen_samples"] > 0){
  $firstLineCurrentRegimenPercentage = round((($summaryTabInfo[0]["1st_line_of_current_regimen_samples"]/$summaryTabInfo[0]["all_current_regimen_samples"])*100),2);
 }
