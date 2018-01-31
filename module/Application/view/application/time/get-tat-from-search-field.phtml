@@ -8,23 +8,20 @@
 <script type="text/javascript">
     $(function(){
       $('#page-data-viewer').html(
-        '<div class="container">'+
+        '<div class="">'+
         <?php
           if(!empty($resultProvinces)){  ?>
-            '<h4><?php echo $this->translate('TAT by Province'); ?></h4>'+
-            getRow('<?php generateTable($resultProvinces,'provinceTable',0,$labs,$daterange); ?>','provinceChart')+
+            getRow('<?php generateTable($resultProvinces,'provinceTable',0,$labs,$daterange); ?>','provinceChart','<?php echo $this->translate('TAT by Province'); ?>','<?php echo $this->translate('Provinces Chart'); ?>')+
         <?php
           }if(!empty($resultDistricts)){  ?>
-            '<h4><?php echo $this->translate('TAT by District'); ?></h4>'+
-            getRow('<?php generateTable($resultDistricts,'districtTable',1,$labs,$daterange);?>','districtChart')+
+            getRow('<?php generateTable($resultDistricts,'districtTable',1,$labs,$daterange);?>','districtChart','<?php echo $this->translate('TAT by District'); ?>','<?php echo $this->translate('Districts Chart'); ?>')+
         <?php
           }if(!empty($resultClinics)){   ?>
-            '<h4><?php echo $this->translate('TAT by Clinic'); ?></h4>'+
-            getRow('<?php generateTable($resultClinics,'clinicTable',2,$labs,$daterange);?>','clinicChart')+
+            getRow('<?php generateTable($resultClinics,'clinicTable',2,$labs,$daterange);?>','clinicChart','<?php echo $this->translate('TAT by Clinic'); ?>','<?php echo $this->translate('Clinics Chart'); ?>')+
         <?php
           }
         ?>
-        +'</div>'
+        '</div>'
       );
       generateChart('provinceTable','provinceChart','Provinces Chart',<?php getSeries($resultProvinces)?>,'PROVINCES');
       generateChart('districtTable','districtChart','Districts chart',<?php getSeries($resultDistricts)?>,'DISTRICTS');
@@ -45,7 +42,15 @@
               type: 'column'
           },
           title: {
-              text: chartTitle
+              text: ''
+          },
+          exporting:{
+            chartOptions:{
+                subtitle: {
+                    text:chartTitle,
+                }
+            },
+            width: 2000
           },
           credits: {
               enabled: false

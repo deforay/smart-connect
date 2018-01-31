@@ -54,7 +54,7 @@ if(isset($labFilter) && trim($labFilter)!= ''){
       display: none
     }
     .time-box{
-      background-color: #FFF
+      /*background-color: #FFF;*/
     }
 
     .scrolltable {
@@ -143,88 +143,86 @@ if(isset($labFilter) && trim($labFilter)!= ''){
       background-color:#F5F5F5;
     }
 </style>
-                    <!-- BEGIN PAGE BAR -->
-                    <div class="page-bar">
-                      <h1 class="page-title"><?php echo $this->translate('TAT Dashboard'); ?></h1>
-                    </div>
-                    <!-- END PAGE BAR -->
-                    <br/>
-                    <br/>
+<!-- BEGIN PAGE BAR -->
+<div class="page-bar">
+  <h1 class="page-title"><?php echo $this->translate('TAT Dashboard'); ?></h1>
+</div>
+<!-- END PAGE BAR -->
+<br/>
+<br/>
 
-                    <form id="pageFilter" action="#" method="">
-                        <div class="row">
-                            <div class="col-md-12" style="padding-left:30px;">
-                              <div class="col-md-12">
-                                  <div class="form-group col-lg-4">
-                                      <label class="control-label"><?php echo $this->translate('Provinces'); ?>&nbsp;</label>
-                                      <select name="provinces[]" id="provinces" class="form-control" multiple title="<?php echo $this->translate('Please choose provinces'); ?>" onchange="getLocationInfo('provinces');">
-                                          <?php
-                                          if(isset($provinces) && count($provinces) > 0){
-                                              foreach($provinces as $province){
-                                          ?>
-                                              <option value="<?php echo $province['location_id']; ?>" <?php echo(in_array($province['location_id'],$selectedProvinces))?'selected="selected"':''; ?>><?php echo ucwords($province['location_name']); ?></option>
-                                          <?php } } ?>
-                                      </select>
-                                  </div>
-                                  <div class="form-group col-lg-4">
-                                      <label class="control-label"><?php echo $this->translate('Districts'); ?>&nbsp;</label>
-                                      <select name="districts[]" id="districts" class="form-control" multiple title="<?php echo $this->translate('Please choose districts'); ?>" onchange="getLocationInfo('districts');">
-                                          <?php
-                                          if(isset($districts) && count($districts) > 0){
-                                              foreach($districts as $district){
-                                          ?>
-                                              <option value="<?php echo $district['location_id']; ?>" <?php echo(in_array($district['location_id'],$selectedDistricts))?'selected="selected"':''; ?>><?php echo ucwords($district['location_name']); ?></option>
-                                          <?php } } ?>
-                                      </select>
-                                  </div>
-                                  <div class="form-group col-lg-4">
-                                    <label class="control-label"><?php echo $this->translate('Date Range'); ?>&nbsp;</label>
-                                    <div id="dashboard-range" class="btn btn-sm form-control"
-                                        data-container="body" data-placement="bottom" data-original-title="Change dashboard date range">
-                                        <?php echo $this->translate('Date Range'); ?>&nbsp;&nbsp;&nbsp;&nbsp;<i class="icon-calendar"></i>&nbsp;
-                                        <span class="thin uppercase hidden-xs"></span>&nbsp;
-                                        <i class="fa fa-angle-down"></i>
-                                        <input type="hidden" name="sampleCollectionDate" id="sampleCollectionDate"/>
-                                    </div>
-                                  </div>
-                              </div>
-                              <div class="col-md-12">
-                                  <div class="form-group col-lg-4">
-                                    <label class="control-label"><?php echo $this->translate('Clinics'); ?>&nbsp;</label>
-                                    <select class="form-control" id="clinics" name="clinics[]" multiple title="<?php echo $this->translate('Please choose clinics'); ?>">
-                                      <?php
-                                      if(isset($clinics) && count($clinics) > 0){
-                                        foreach($clinics as $clinic){
-                                          ?>
-                                          <option value="<?php echo $clinic['facility_id']; ?>"><?php echo ucwords($clinic['facility_name']); ?></option>
-                                          <?php
-                                        }
-                                      } ?>
-                                    </select>
-                                  </div>
-                                  <div class="form-group col-lg-4">
-                                      <label class="control-label"><?php echo $this->translate('Labs'); ?>&nbsp;</label>
-                                      <select name="labs[]" id="labs" class="form-control" multiple title="<?php echo $this->translate('Please choose labs'); ?>">
-                                          <?php
-                                          if(isset($labs) && count($labs) > 0){
-                                              foreach($labs as $lab){
-                                          ?>
-                                              <option value="<?php echo $lab['facility_id']; ?>" <?php echo(in_array($lab['facility_id'],$selectedLabs))?'selected="selected"':''; ?>><?php echo ucwords($lab['facility_name']); ?></option>
-                                          <?php } } ?>
-                                      </select>
-                                  </div>
-                              </div>
-                              <div class="col-md-12">
-                                  <div class="form-group col-lg-12" style="text-align:center;margin-top:10px;">
-                                      <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="searchTATData();"><?php echo $this->translate('Search'); ?></a>&nbsp;&nbsp;
-                                      <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="resetEverything();"><?php echo $this->translate('Reset'); ?></a>
-                                  </div>
-                              </div>
-                            </div>
-                        </div>
-                        <hr style="background: #000 !important;border-color:#ccc;">
-                    </form>
-                    <div id="page-data-viewer"></div>
+<form id="pageFilter" action="#" method="">
+    <div class="row">
+          <div class="col-md-12">
+              <div class="form-group col-lg-4">
+                  <label class="control-label"><?php echo $this->translate('Provinces'); ?>&nbsp;</label>
+                  <select name="provinces[]" id="provinces" class="form-control" multiple title="<?php echo $this->translate('Please choose provinces'); ?>" onchange="getLocationInfo('provinces');">
+                      <?php
+                      if(isset($provinces) && count($provinces) > 0){
+                          foreach($provinces as $province){
+                      ?>
+                          <option value="<?php echo $province['location_id']; ?>" <?php echo(in_array($province['location_id'],$selectedProvinces))?'selected="selected"':''; ?>><?php echo ucwords($province['location_name']); ?></option>
+                      <?php } } ?>
+                  </select>
+              </div>
+              <div class="form-group col-lg-4">
+                  <label class="control-label"><?php echo $this->translate('Districts'); ?>&nbsp;</label>
+                  <select name="districts[]" id="districts" class="form-control" multiple title="<?php echo $this->translate('Please choose districts'); ?>" onchange="getLocationInfo('districts');">
+                      <?php
+                      if(isset($districts) && count($districts) > 0){
+                          foreach($districts as $district){
+                      ?>
+                          <option value="<?php echo $district['location_id']; ?>" <?php echo(in_array($district['location_id'],$selectedDistricts))?'selected="selected"':''; ?>><?php echo ucwords($district['location_name']); ?></option>
+                      <?php } } ?>
+                  </select>
+              </div>
+              <div class="form-group col-lg-4">
+                <label class="control-label"><?php echo $this->translate('Date Range'); ?>&nbsp;</label>
+                <div id="dashboard-range" class="btn btn-sm form-control"
+                    data-container="body" data-placement="bottom" data-original-title="Change dashboard date range">
+                    <?php echo $this->translate('Date Range'); ?>&nbsp;&nbsp;&nbsp;&nbsp;<i class="icon-calendar"></i>&nbsp;
+                    <span class="thin uppercase hidden-xs"></span>&nbsp;
+                    <i class="fa fa-angle-down"></i>
+                    <input type="hidden" name="sampleCollectionDate" id="sampleCollectionDate"/>
+                </div>
+              </div>
+          </div>
+          <div class="col-md-12">
+              <div class="form-group col-lg-4">
+                <label class="control-label"><?php echo $this->translate('Clinics'); ?>&nbsp;</label>
+                <select class="form-control" id="clinics" name="clinics[]" multiple title="<?php echo $this->translate('Please choose clinics'); ?>">
+                  <?php
+                  if(isset($clinics) && count($clinics) > 0){
+                    foreach($clinics as $clinic){
+                      ?>
+                      <option value="<?php echo $clinic['facility_id']; ?>"><?php echo ucwords($clinic['facility_name']); ?></option>
+                      <?php
+                    }
+                  } ?>
+                </select>
+              </div>
+              <div class="form-group col-lg-4">
+                  <label class="control-label"><?php echo $this->translate('Labs'); ?>&nbsp;</label>
+                  <select name="labs[]" id="labs" class="form-control" multiple title="<?php echo $this->translate('Please choose labs'); ?>">
+                      <?php
+                      if(isset($labs) && count($labs) > 0){
+                          foreach($labs as $lab){
+                      ?>
+                          <option value="<?php echo $lab['facility_id']; ?>" <?php echo(in_array($lab['facility_id'],$selectedLabs))?'selected="selected"':''; ?>><?php echo ucwords($lab['facility_name']); ?></option>
+                      <?php } } ?>
+                  </select>
+              </div>
+          </div>
+          <div class="col-md-12">
+              <div class="form-group col-lg-12" style="text-align:center;margin-top:10px;">
+                  <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="searchTATData();"><?php echo $this->translate('Search'); ?></a>&nbsp;&nbsp;
+                  <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="resetEverything();"><?php echo $this->translate('Reset'); ?></a>
+              </div>
+          </div>
+    </div>
+</form>
+<hr style="background: #000 !important;border-color:#ccc;">
+<div id="page-data-viewer"></div>
 <script src="<?php echo $this->basePath('assets/js/month-year-rang-picker.js'); ?>" type="text/javascript"></script>
 <script type="text/javascript">
     $(function() {
@@ -488,26 +486,28 @@ if(isset($labFilter) && trim($labFilter)!= ''){
         }
     }
 
-    function getRow(table,idChart){
-      return '<div class="row time-box" id="row-'+idChart+'" style="height:400px;border: 1px solid rgba(0,0,0,.125);">'
-                +'<div class="col-md-6 col-sm-12 table-container" style="height:100%; margin:0px; padding-top:15px; overflow-y: auto">'
-                    +'<div class="scrolltable">'
-                        +table
+    function getRow(table,idChart,tblTitle,chartTtitle){
+      return '<div class="row time-box" id="row-'+idChart+'">'
+                +'<div class="col-md-6 col-sm-12"><div class="portlet box"><div class="portlet-body"><div class="portlet box blue">'
+                    +'<div class="portlet-title"><div class="caption"><span class="caption-subject">'+tblTitle+'</span></div></div>'
+                    +'<div class="portlet-body"><div class="scrolltable">'+table+'</div></div>'
+                    +'</div></div></div></div>'
+                +'<div class="col-md-6 col-sm-12"><div class="portlet box"><div class="portlet-body"><div class="portlet box blue">'
+                    +'<div class="portlet-title">'
+                    +'<div class="caption"><span class="caption-subject">'+chartTtitle+'</span></div>'
+                        +'<a id="a-btl-display-table" href="javascript:toogleTable(\'row-'+idChart+'\'); ">'
+                          +'<span id="btl-display" style="position: absolute; top:20; left 10; z-index:999; cursor:pointer">'
+                            +'<i class="fa fa-bar-chart" aria-hidden="true"></i>'
+                          +'</span>'
+                        +'</a>'
+                        +'<a id="a-btl-display-table" style="display:none" href="javascript:fnExcelReport(\'#timeTable\',\'#a-btl-display-table\'); ">'
+                          +'<span id="btl-display" style="position: absolute; top:20; left 20; z-index:999; cursor:pointer">'
+                            +'<i class="fa fa-download"></i><?php echo $this->translate('Download table'); ?>'
+                          +'</span>'
+                        +'</a>'
                     +'</div>'
-                +'</div>'
-                +'<div class="col-md-6 col-sm-12 chart-container" style="position:relative; padding: 0; ">'
-                    +'<a id="a-btl-display-table" href="javascript:toogleTable(\'row-'+idChart+'\'); ">'
-                      +'<span id="btl-display" style="position: absolute; top:20; left 10; z-index:999; cursor:pointer">'
-                        +'<i class="fa fa-bar-chart" aria-hidden="true"></i>'
-                      +'</span>'
-                    +'</a>'
-                    +'<a id="a-btl-display-table" style="display:none" href="javascript:fnExcelReport(\'#timeTable\',\'#a-btl-display-table\'); ">'
-                      +'<span id="btl-display" style="position: absolute; top:20; left 20; z-index:999; cursor:pointer">'
-                        +'<i class="fa fa-download"></i><?php echo $this->translate('Download table'); ?>'
-                      +'</span>'
-                    +'</a>'
-                    +'<div id="'+idChart+'" style="width:100%; min-width:100%;max-width:100%; height: 400px; padding:0 !important; margin: 0"></div>'
-                +'</div>'
+                    +'<div class="portlet-body"><div id="'+idChart+'" style="width:100%; min-width:100%;max-width:100%; height: 400px; padding:0 !important; margin: 0"></div></div>'
+                    +'</div></div></div></div>'
             +'</div><br>';
     }
 </script>

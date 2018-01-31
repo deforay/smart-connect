@@ -8,9 +8,8 @@
 <script>
     $(function(){
       $('#page-data-viewer').html(
-        '<div class="container">'+
-            '<h4><?php echo $this->translate("Tempo de resposta por provincia"); ?></h4>'+
-            getRow('<?php generateTable($results,'provinceTable',0,$labs,$daterange); ?>','provinceChart')+
+        '<div class="">'+
+            getRow('<?php generateTable($results,'provinceTable',0,$labs,$daterange); ?>','provinceChart','<?php echo $this->translate('Tempo de resposta por provincia'); ?>','<?php echo $this->translate('Provinces Chart'); ?>')
         +'</div>'
       );
       generateChart('provinceTable','provinceChart','Provinces Chart',<?php getSeries($results)?>,'PROVINCES');
@@ -27,7 +26,15 @@
               type: 'column'
           },
           title: {
-              text: chartTitle
+              text: ''
+          },
+          exporting:{
+            chartOptions:{
+                subtitle: {
+                    text:chartTitle,
+                }
+            },
+            width: 2000
           },
           credits: {
               enabled: false
@@ -38,7 +45,7 @@
           yAxis: {
               min: 0,
               title: {
-                  text: '<?php echo $this->translate('TAT in days'); ?>'
+                  text: ''
               },
               stackLabels: {
                   enabled: true,

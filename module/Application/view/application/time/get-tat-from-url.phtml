@@ -9,10 +9,9 @@
 <script type="text/javascript">
     $(function(){
       $('#page-data-viewer').html(
-        '<dic class="container">'+
-            '<h4><?php echo $this->translate('TAT: '.$place); ?></h4>'+
-            getRow('<?php generateTable($results,'provinceTable',$category+1,$labs,$daterange,$category) ?>','provinceChart')+
-        '</div>'
+        '<dic class="">'+
+            getRow('<?php generateTable($results,'provinceTable',$category+1,$labs,$daterange,$category) ?>','provinceChart','<?php echo $this->translate('TAT: '.$place); ?>','<?php echo $this->translate('TAT Chart'); ?>')
+        +'</div>'
       );
 
       $('.clickable').click(function(){
@@ -27,7 +26,15 @@
               type: 'column'
           },
           title: {
-              text: '<?php echo $this->translate('TAT Chart'); ?>'
+              text: ''
+          },
+          exporting:{
+            chartOptions:{
+                subtitle: {
+                    text:'<?php echo $this->translate('TAT Chart'); ?>',
+                }
+            },
+            width: 2000
           },
           credits: {
               enabled: false
