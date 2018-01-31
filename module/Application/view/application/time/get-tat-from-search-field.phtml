@@ -17,13 +17,13 @@
         '<div class="">'+
         <?php
           if(!empty($resultProvinces)){  ?>
-            getRow('<?php generateTable($resultProvinces,'provinceTable',0,$labs,$daterange,$places,$collectReceive,$receiveRegister,$registerAnalysis,$analysisAuthorise,$total); ?>','provinceChart','<?php echo $this->translate('TAT by Province'); ?>','<?php echo $this->translate('Provinces Chart'); ?>')+
+            getRow('<?php generateTable($resultProvinces,'provinceTable',0,$labs,$daterange,$places,$collectReceive,$receiveRegister,$registerAnalysis,$analysisAuthorise,$total); ?>','provinceTable','provinceChart','<?php echo $this->translate('TAT by Province'); ?>','<?php echo $this->translate('Provinces Chart'); ?>')+
         <?php
           }if(!empty($resultDistricts)){  ?>
-            getRow('<?php generateTable($resultDistricts,'districtTable',1,$labs,$daterange,$places,$collectReceive,$receiveRegister,$registerAnalysis,$analysisAuthorise,$total); ?>','districtChart','<?php echo $this->translate('TAT by District'); ?>','<?php echo $this->translate('Districts Chart'); ?>')+
+            getRow('<?php generateTable($resultDistricts,'districtTable',1,$labs,$daterange,$places,$collectReceive,$receiveRegister,$registerAnalysis,$analysisAuthorise,$total); ?>','districtTable','districtChart','<?php echo $this->translate('TAT by District'); ?>','<?php echo $this->translate('Districts Chart'); ?>')+
         <?php
           }if(!empty($resultClinics)){   ?>
-            getRow('<?php generateTable($resultClinics,'clinicTable',2,$labs,$daterange,$places,$collectReceive,$receiveRegister,$registerAnalysis,$analysisAuthorise,$total); ?>','clinicChart','<?php echo $this->translate('TAT by Clinic'); ?>','<?php echo $this->translate('Clinics Chart'); ?>')+
+            getRow('<?php generateTable($resultClinics,'clinicTable',2,$labs,$daterange,$places,$collectReceive,$receiveRegister,$registerAnalysis,$analysisAuthorise,$total); ?>','clinicTable','clinicChart','<?php echo $this->translate('TAT by Clinic'); ?>','<?php echo $this->translate('Clinics Chart'); ?>')+
         <?php
           }
         ?>
@@ -78,10 +78,10 @@
               }
           },
           legend: {
-              align: 'right',
-              x: -30,
+              align: 'center',
+              x: 0,
               verticalAlign: 'top',
-              y: 25,
+              y: 0,
               floating: true,
               backgroundColor: (Highcharts.theme && Highcharts.theme.background2) || 'white',
               borderColor: '#CCC',
@@ -227,7 +227,7 @@
     $category = '';
     $categoryNext = 0;
     $clickable = ($idTable == "clinicTable")?'':'clickable';
-    $tableHeader = '<table class="header">'
+    $tableHeader = '<table class="'.$idTable.' header">'
                       .'<thead>'
                         .'<th>'.$places.'</th>'
                         .'<th>'.$collectReceive.'</th>'
@@ -251,7 +251,7 @@
     }
     echo '<div class="scrolltable">'
             .$tableHeader
-            .'<div class="body scrollbar" id="style-3">'
+            .'<div class="body scrollbar style-3">'
                 .'<table id="'.$idTable.'">'
                   .'<tbody>'
                     .$tableBody

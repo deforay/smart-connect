@@ -15,7 +15,7 @@
     $(function(){
       $('#page-data-viewer').html(
         '<div class="">'+
-            getRow('<?php generateTable($results,'provinceTable',0,$labs,$daterange,$places,$collectReceive,$receiveRegister,$registerAnalysis,$analysisAuthorise,$total); ?>','provinceChart','<?php echo $this->translate('TAT by Province'); ?>','<?php echo $this->translate('Provinces Chart'); ?>')
+            getRow('<?php generateTable($results,'provinceTable',0,$labs,$daterange,$places,$collectReceive,$receiveRegister,$registerAnalysis,$analysisAuthorise,$total); ?>','provinceTable','provinceChart','<?php echo $this->translate('TAT by Province'); ?>','<?php echo $this->translate('Provinces Chart'); ?>')
         +'</div>'
       );
       generateChart('provinceTable','provinceChart','Provinces Chart',<?php getSeries($results,$collectReceive,$receiveRegister,$registerAnalysis,$analysisAuthorise)?>,'PROVINCES');
@@ -62,10 +62,10 @@
               }
           },
           legend: {
-              align: 'right',
-              x: -30,
+              align: 'center',
+              x: 0,
               verticalAlign: 'top',
-              y: 25,
+              y: 0,
               floating: true,
               backgroundColor: (Highcharts.theme && Highcharts.theme.background2) || 'white',
               borderColor: '#CCC',
@@ -205,7 +205,7 @@
     $tableFooter = '';
     $category = '';
     $categoryNext = 0;
-    $tableHeader = '<table class="header">'
+    $tableHeader = '<table class="'.$idTable.' header">'
                       .'<thead>'
                           .'<th>'.$places.'</th>'
                           .'<th>'.$collectReceive.'</th>'
@@ -229,7 +229,7 @@
     }
     echo '<div class="scrolltable">'
             .$tableHeader
-            .'<div class="body scrollbar" id="style-3">'
+            .'<div class="body scrollbar style-3">'
                 .'<table id="'.$idTable.'">'
                   .'<tbody>'
                     .$tableBody

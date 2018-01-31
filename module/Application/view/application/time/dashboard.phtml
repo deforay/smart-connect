@@ -40,11 +40,11 @@ if(isset($labFilter) && trim($labFilter)!= ''){
       width: 100% !important
     }
     .table-container{
-      margin: 0 !important;
+      /*margin: 0 !important;
       padding: 0 !important;
       background-color: #cccccc;
       height: 100%;
-      overflow-y: hidden !important;
+      overflow-y: hidden !important;*/
     }
     .time-table{
       margin: 0 !important;
@@ -123,17 +123,17 @@ if(isset($labFilter) && trim($labFilter)!= ''){
         overflow-y: scroll;
     }
 
-    #style-3::-webkit-scrollbar-track{
+    .style-3::-webkit-scrollbar-track{
         -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
         background-color: #F5F5F5;
     }
 
-    #style-3::-webkit-scrollbar{
+    .style-3::-webkit-scrollbar{
         width: 6px;
         background-color: #F5F5F5;
     }
 
-    #style-3::-webkit-scrollbar-thumb{
+    .style-3::-webkit-scrollbar-thumb{
         background-color: #000000;
     }
     .clickable{
@@ -385,7 +385,7 @@ if(isset($labFilter) && trim($labFilter)!= ''){
       return facilities;
     }
 
-    function fnExcelReport(idTable,idButton) {
+    function fnExcelReport(clsTable,idTable,idButton) {
         var tab_text = '<html xmlns:x="urn:schemas-microsoft-com:office:excel">';
         tab_text = tab_text + '<head><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet>';
 
@@ -395,6 +395,7 @@ if(isset($labFilter) && trim($labFilter)!= ''){
         tab_text = tab_text + '</x:ExcelWorksheets></x:ExcelWorkbook></xml> <meta charset="utf-8"></head><body>';
 
         tab_text = tab_text + "<table border='1px'>";
+        tab_text = tab_text + $(clsTable).html();
         tab_text = tab_text + $(idTable).html();
         tab_text = tab_text + '</table></body></html>';
 
@@ -475,36 +476,42 @@ if(isset($labFilter) && trim($labFilter)!= ''){
                     $container = $(this); // context container
                     $container.find('div[id$="Chart"]').each(function () { // for only chart
                         $chart = $(this).highcharts(); // cast from JQuery to highcharts obj
-                        $chart.setSize($container.width(), $chart.chartHeight, doAnimation = true); // adjust chart size with animation transition
+                        $chart.setSize($container.width() - 80, $chart.chartHeight, doAnimation = true); // adjust chart size with animation transition
                     });
                 });
             } else {
-                chart.setSize($('.chart-container:visible').width(), chart.chartHeight, doAnimation = true); // if chart is set, adjust
+                chart.setSize($('.chart-container:visible').width() - 80, chart.chartHeight, doAnimation = true); // if chart is set, adjust
             }
         } catch (err) {
             // do nothing
         }
     }
 
-    function getRow(table,idChart,tblTitle,chartTtitle){
+    function getRow(table,idTbl,idChart,tblTitle,chartTtitle){
       return '<div class="row time-box" id="row-'+idChart+'">'
-                +'<div class="col-md-6 col-sm-12"><div class="portlet box"><div class="portlet-body"><div class="portlet box blue">'
-                    +'<div class="portlet-title"><div class="caption"><span class="caption-subject">'+tblTitle+'</span></div></div>'
+                +'<div class="col-md-6 col-sm-12 table-container"><div class="portlet box"><div class="portlet-body"><div class="portlet box blue">'
+                    +'<div class="portlet-title">'
+                       +'<div class="caption"><span class="caption-subject">'+tblTitle+'</span></div>'
+                       +'<div class="action" style="padding: 11px 0 9px">'
+                        +'<a id="'+idTbl+'-a-btl-display-table" href="javascript:fnExcelReport(\'.'+idTbl+'\',\'#'+idTbl+'\',\'#'+idTbl+'-a-btl-display-table\'); " style="color:#fff;float:right;">'
+                              +'<span id="btl-display" style="cursor:pointer">'
+                                +'<i class="fa fa-download" aria-hidden="true"></i>&nbsp;<?php echo $this->translate('Download table'); ?>'
+                              +'</span>'
+                            +'</a>'
+                       +'</div>'
+                    +'</div>'
                     +'<div class="portlet-body"><div class="scrolltable">'+table+'</div></div>'
                     +'</div></div></div></div>'
-                +'<div class="col-md-6 col-sm-12"><div class="portlet box"><div class="portlet-body"><div class="portlet box blue">'
+                +'<div class="col-md-6 col-sm-12 chart-container"><div class="portlet box"><div class="portlet-body"><div class="portlet box blue">'
                     +'<div class="portlet-title">'
                     +'<div class="caption"><span class="caption-subject">'+chartTtitle+'</span></div>'
-                        +'<a id="a-btl-display-table" href="javascript:toogleTable(\'row-'+idChart+'\'); ">'
-                          +'<span id="btl-display" style="position: absolute; top:20; left 10; z-index:999; cursor:pointer">'
-                            +'<i class="fa fa-bar-chart" aria-hidden="true"></i>'
-                          +'</span>'
-                        +'</a>'
-                        +'<a id="a-btl-display-table" style="display:none" href="javascript:fnExcelReport(\'#timeTable\',\'#a-btl-display-table\'); ">'
-                          +'<span id="btl-display" style="position: absolute; top:20; left 20; z-index:999; cursor:pointer">'
-                            +'<i class="fa fa-download"></i><?php echo $this->translate('Download table'); ?>'
-                          +'</span>'
-                        +'</a>'
+                        +'<div class="action" style="padding: 11px 0 9px">'
+                            +'<a id="a-btl-display-table" href="javascript:toogleTable(\'row-'+idChart+'\'); " style="color:#fff;float:right;">'
+                              +'<span style="cursor:pointer">'
+                                +'<i class="fa fa-expand" aria-hidden="true"></i>'
+                              +'</span>'
+                            +'</a>'
+                       +'</div>'
                     +'</div>'
                     +'<div class="portlet-body"><div id="'+idChart+'" style="width:100%; min-width:100%;max-width:100%; height: 400px; padding:0 !important; margin: 0"></div></div>'
                     +'</div></div></div></div>'

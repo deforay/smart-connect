@@ -15,7 +15,7 @@
     $(function(){
       $('#page-data-viewer').html(
         '<dic class="">'+
-            getRow('<?php generateTable($results,'provinceTable',$category+1,$labs,$daterange,$category,$places,$collectReceive,$receiveRegister,$registerAnalysis,$analysisAuthorise,$total) ?>','provinceChart','<?php echo $this->translate('TAT: '.$place); ?>','<?php echo $this->translate('TAT Chart'); ?>')
+            getRow('<?php generateTable($results,'downloadTable',$category+1,$labs,$daterange,$category,$places,$collectReceive,$receiveRegister,$registerAnalysis,$analysisAuthorise,$total) ?>','downloadTable','provinceChart','<?php echo $this->translate('TAT: '.$place); ?>','<?php echo $this->translate('TAT Chart'); ?>')
         +'</div>'
       );
 
@@ -45,7 +45,7 @@
               enabled: false
           },
           xAxis: {
-              categories: getTATChartData("provinceTable")
+              categories: getTATChartData("downloadTable")
           },
           yAxis: {
               min: 0,
@@ -61,10 +61,10 @@
               }
           },
           legend: {
-              align: 'right',
-              x: -30,
+              align: 'center',
+              x: 0,
               verticalAlign: 'top',
-              y: 25,
+              y: 0,
               floating: true,
               backgroundColor: (Highcharts.theme && Highcharts.theme.background2) || 'white',
               borderColor: '#CCC',
@@ -202,7 +202,7 @@ function generateTable($result,$idTable,$facilityCategory,$labs,$daterange,$cate
 //  $category = '';
   $categoryNext = 0;
   $clickable = ($categoryVal == 1)?'':'clickable';
-  $tableHeader = '<table class="header">'
+  $tableHeader = '<table class="'.$idTable.' header">'
                     .'<thead>'
                         .'<th>'.$places.'</th>'
                         .'<th>'.$collectReceive.'</th>'
@@ -227,7 +227,7 @@ function generateTable($result,$idTable,$facilityCategory,$labs,$daterange,$cate
   }
   echo '<div class="scrolltable">'
           .$tableHeader
-          .'<div class="body scrollbar" id="style-3">'
+          .'<div class="body scrollbar style-3">'
               .'<table id="'.$idTable.'">'
                 .'<tbody>'
                   .$tableBody
