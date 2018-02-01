@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: ZendSkeletonApplication\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-01-31 17:17+0530\n"
-"PO-Revision-Date: 2018-01-31 17:18+0530\n"
+"PO-Revision-Date: 2018-02-01 14:41+0530\n"
 "Last-Translator: Diogo Melo <dmelo87@gmail.com>\n"
 "Language-Team: ZF Contibutors <zf-devteam@zend.com>\n"
 "Language: pt\n"
@@ -25,11 +25,11 @@ msgstr "Editar"
 
 #: ../src/Application/Model/SampleTable.php:1660
 msgid "View"
-msgstr ""
+msgstr "View"
 
 #: ../src/Application/Model/SampleTable.php:1661
 msgid "PDF"
-msgstr ""
+msgstr "PDF"
 
 #: ../src/Application/Service/SampleService.php:594
 #: ../src/Application/Service/SampleService.php:1095
@@ -66,12 +66,8 @@ msgstr "Motivo da rejeição"
 msgid "Date Tested"
 msgstr "Data de Teste"
 
-#: ../src/Application/Service/SampleService.php:600
-#: ../src/Application/Service/SampleService.php:603
-#, fuzzy
-#| msgid "Viral Load (cp/ml)"
 msgid "Viral Load(cp/ml)"
-msgstr "Carga Viral (cp/ml)"
+msgstr "Carga Viral(cp/ml)"
 
 #: ../src/Application/Service/SampleService.php:724
 #: ../src/Application/Service/SampleService.php:1099
@@ -81,17 +77,11 @@ msgstr "Carga Viral (cp/ml)"
 msgid "Lab"
 msgstr "Laboratório"
 
-#: ../src/Application/Service/SampleService.php:725
-#: ../src/Application/Service/SampleService.php:844
-#: ../src/Application/Service/SampleService.php:958
-#: ../view/application/laboratory/sample-volume.phtml:276
-#: ../view/application/laboratory/samples-tested-lab.phtml:274
-#: ../view/application/laboratory/samples-tested-turn-around-time.phtml:214
-#: ../view/application/laboratory/samples-tested.phtml:296
-#, fuzzy
-#| msgid "Sample(s) Selected"
+msgid "Sample(s) Selected"
+msgstr "Amostra (s) selecionada"
+
 msgid "Samples Collected"
-msgstr "Amostra (s) selecionada (s)"
+msgstr "Samples Collected"
 
 #: ../src/Application/Service/SampleService.php:726
 #: ../src/Application/Service/SampleService.php:845
@@ -115,43 +105,14 @@ msgstr "Amostra (s) selecionada (s)"
 msgid "Samples Tested"
 msgstr "Amostras testadas"
 
-#: ../src/Application/Service/SampleService.php:727
-#: ../src/Application/Service/SampleService.php:846
-#: ../src/Application/Service/SampleService.php:960
-#: ../view/application/laboratory/sample-volume.phtml:278
-#: ../view/application/laboratory/samples-tested-lab.phtml:276
-#: ../view/application/laboratory/samples-tested-turn-around-time.phtml:216
-#: ../view/application/laboratory/samples-tested.phtml:298
-#: ../view/application/summary/dashboard.phtml:313
-#: ../view/application/summary/dashboard.phtml:336
-#, fuzzy
-#| msgid "Samples Tested"
 msgid "Samples Pending"
-msgstr "Amostras testadas"
+msgstr "Samples Pending"
 
-#: ../src/Application/Service/SampleService.php:728
-#: ../src/Application/Service/SampleService.php:847
-#: ../src/Application/Service/SampleService.php:961
-#: ../view/application/laboratory/sample-volume.phtml:279
-#: ../view/application/laboratory/samples-tested-lab.phtml:277
-#: ../view/application/laboratory/samples-tested-turn-around-time.phtml:217
-#: ../view/application/laboratory/samples-tested.phtml:299
-#, fuzzy
-#| msgid "Samples Tested"
 msgid "Samples Suppressed"
-msgstr "Amostras testadas"
+msgstr "Samples Suppressed"
 
-#: ../src/Application/Service/SampleService.php:729
-#: ../src/Application/Service/SampleService.php:848
-#: ../src/Application/Service/SampleService.php:962
-#: ../view/application/laboratory/sample-volume.phtml:280
-#: ../view/application/laboratory/samples-tested-lab.phtml:278
-#: ../view/application/laboratory/samples-tested-turn-around-time.phtml:218
-#: ../view/application/laboratory/samples-tested.phtml:300
-#, fuzzy
-#| msgid "Samples Not Tested"
 msgid "Samples Not Suppressed"
-msgstr "Amostras não testadas"
+msgstr "Samples Not Suppressed"
 
 #: ../src/Application/Service/SampleService.php:730
 #: ../src/Application/Service/SampleService.php:849
@@ -231,9 +192,6 @@ msgstr "Data de Colheita"
 msgid "Facility"
 msgstr "Local"
 
-#: ../src/Application/Service/SampleService.php:1100
-#, fuzzy
-#| msgid "Sample Recieved at Lab"
 msgid "Sample Received at Lab"
 msgstr "Amostras recebidas por Laboratorio"
 
@@ -245,9 +203,7 @@ msgstr "Painel das Unidades Sanitárias"
 #: ../view/application/clinic/dashboard.phtml:23
 #: ../view/application/clinic/samples-test-reason.phtml:41
 msgid "Please select one or more clinics. Leave blank for All"
-msgstr ""
-"Por favor selecione uma ou mais Unidades Sanitárias. Deixe em branco para "
-"todas"
+msgstr "Por favor selecione uma ou mais Unidades Sanitárias. Deixe em branco para todas"
 
 #: ../view/application/clinic/dashboard.phtml:38
 #: ../view/application/clinic/samples-test-reason.phtml:56
@@ -595,14 +551,9 @@ msgstr "Status total de Carga Viral"
 msgid "Overall Viral Load Status based on Gender"
 msgstr "Status geral da carga viral com base no género"
 
-#: ../view/application/clinic/dashboard.phtml:163
-#: ../view/application/clinic/get-sample-test-reason.phtml:17
-msgid "VL Ordered"
-msgstr "Carga Viral Solicitada"
-
 #: ../view/application/clinic/dashboard.phtml:168
 msgid "Test Reasons"
-msgstr "Motivos de teste"
+msgstr "Motivos de testes"
 
 #: ../view/application/clinic/dashboard.phtml:187
 #: ../view/application/clinic/get-sample-test-result.phtml:18
@@ -705,11 +656,8 @@ msgstr "Código do local"
 msgid "HIV Viral Load"
 msgstr "Carga Viral de HIV"
 
-#: ../view/application/clinic/generate-result-pdf.phtml:208
-#, fuzzy
-#| msgid "Additional information"
 msgid "Sample Information"
-msgstr "Informação adicional"
+msgstr "Sample Information"
 
 #: ../view/application/clinic/generate-result-pdf.phtml:217
 #: ../view/application/clinic/generate-result-pdf.phtml:220
@@ -796,11 +744,8 @@ msgstr "Fim do relatório"
 msgid "VL Tested"
 msgstr "CV das amostras testadas"
 
-#: ../view/application/clinic/get-overall-viral-load-status.phtml:23
-#, fuzzy
-#| msgid "VL Tested"
 msgid "VL Not Tested"
-msgstr "CV das amostras testadas"
+msgstr "VL Not Tested"
 
 #: ../view/application/clinic/get-overall-viral-load-status.phtml:26
 msgid "Total Samples"
@@ -856,11 +801,8 @@ msgstr "No. de Amostras"
 msgid "Total"
 msgstr "Total"
 
-#: ../view/application/clinic/get-overall-viral-load-status.phtml:57
-#, fuzzy
-#| msgid "Samples"
 msgid "Sample"
-msgstr "Amostras"
+msgstr "Amostra"
 
 #: ../view/application/clinic/get-sample-test-reason.phtml:47
 #: ../view/application/clinic/get-samples-test-reason-based-on-age-group.phtml:42
@@ -885,23 +827,17 @@ msgstr "Amostras"
 
 #: ../view/application/clinic/get-sample-test-result.phtml:73
 msgid " - "
-msgstr ""
+msgstr " - "
 
-#: ../view/application/clinic/get-samples-test-reason-based-on-age-group.phtml:17
-#, fuzzy
-#| msgid "Samples Tested based on Age"
 msgid "VL Ordered based on Age Group"
-msgstr "Amostras testadas por Idade"
+msgstr "VL Ordered based on Age Group"
 
 #: ../view/application/clinic/get-samples-test-reason-based-on-clinics.phtml:16
 msgid "VL Ordered based on Clinics"
-msgstr ""
+msgstr "VL Ordered based on Clinics"
 
-#: ../view/application/clinic/get-samples-test-reason-based-on-gender.phtml:17
-#, fuzzy
-#| msgid "Samples Tested based on Gender"
 msgid "VL Ordered based on Gender"
-msgstr "Amostras testadas por Género"
+msgstr "VL Ordered based on Gender"
 
 #: ../view/application/clinic/get-viral-load-status-based-on-age.phtml:25
 #: ../view/application/laboratory/requisition-forms-incomplete.phtml:119
@@ -914,43 +850,17 @@ msgstr "Amostras testadas por Género"
 msgid "Not Specified"
 msgstr "(Não especificado) (NE)"
 
-#: ../view/application/clinic/samples-test-reason.phtml:29
-#, fuzzy
-#| msgid "VL Ordered"
-msgid "VL Orderded"
+msgid "VL Ordered"
 msgstr "Carga Viral Solicitada"
 
-#: ../view/application/clinic/samples-test-reason.phtml:67
-#, fuzzy
-#| msgid "Test Reasons"
 msgid "Test Reason"
 msgstr "Motivos de teste"
 
-#: ../view/application/clinic/samples-test-reason.phtml:68
-#, fuzzy
-#| msgid "Please choose result"
 msgid "Please choose test reason"
-msgstr "Por favor escolha um resultado"
+msgstr "Please choose test reason"
 
-#: ../view/application/clinic/samples-test-reason.phtml:165
-msgid "VL Orderded based on Age Group"
-msgstr ""
-
-#: ../view/application/clinic/samples-test-reason.phtml:177
-#, fuzzy
-#| msgid "Samples Tested based on Gender"
-msgid "VL Orderded based on Gender"
-msgstr "Amostras testadas por Género"
-
-#: ../view/application/clinic/samples-test-reason.phtml:191
-msgid "VL Orderded based on Clinics"
-msgstr ""
-
-#: ../view/application/clinic/samples-test-reason.phtml:204
-#, fuzzy
-#| msgid "All Labs"
 msgid "All Reason"
-msgstr "Todos Laboratórios"
+msgstr "All Reason"
 
 #: ../view/application/clinic/test-result-view.phtml:78
 msgid "Sample Overview"
@@ -1020,17 +930,11 @@ msgstr "Data do teste da amostra"
 msgid "Specimen Type"
 msgstr "Tipo da amostra"
 
-#: ../view/application/clinic/test-result-view.phtml:179
-#, fuzzy
-#| msgid "Samples Rejected"
 msgid "Sample Rejection"
-msgstr "Amostras rejeitadas"
+msgstr "Sample Rejection"
 
-#: ../view/application/clinic/test-result-view.phtml:184
-#, fuzzy
-#| msgid "Rejection Reason"
 msgid "Rejection Facility"
-msgstr "Motivo da rejeição"
+msgstr "Rejection Facility"
 
 #: ../view/application/clinic/test-result-view.phtml:190
 msgid "Platform"
@@ -1040,11 +944,11 @@ msgstr "Plataforma"
 msgid "VIRAL LOAD RESULT (copies/ml)"
 msgstr "RESLTADO DE CARGA VIRAL (copias/ml)"
 
-#: ../view/application/clinic/test-result-view.phtml:198
-#, fuzzy
-#| msgid "Approved By (copies/ml)"
-msgid "Approved By"
+msgid "Approved By (copies/ml)"
 msgstr "Aprovado por (copias/ml)"
+
+msgid "Approved By"
+msgstr "Aprovado por"
 
 #: ../view/application/clinic/test-result-view.phtml:205
 msgid "Lab Comments"
@@ -1389,9 +1293,7 @@ msgstr "Fechar o filtro de data"
 #: ../view/application/laboratory/dashboard.phtml:216
 #: ../view/application/laboratory/get-facilities-geolocation.phtml:53
 msgid "Please select one or more labs. Leave blank for All"
-msgstr ""
-"Por favor selecione um ou mais laboratórios. Deixe em branco para buscar "
-"Todos"
+msgstr "Por favor selecione um ou mais laboratórios. Deixe em branco para buscar Todos"
 
 #: ../view/application/laboratory/dashboard.phtml:256
 #: ../view/application/laboratory/dashboard.phtml:277
@@ -1428,19 +1330,11 @@ msgstr "Amostras testadas - Mulheres gravidas"
 msgid "Samples Tested - Breastfeeding"
 msgstr "Amostras testadas - Mulheres lactantes"
 
-#: ../view/application/laboratory/dashboard.phtml:381
-#: ../view/application/laboratory/get-requisition-forms.phtml:12
-#: ../view/application/laboratory/requisition-forms-incomplete.phtml:44
-#, fuzzy
-#| msgid "Requisition Forms Completion"
 msgid "Request Form Completeness"
-msgstr "Formulários de requisição preenchidos completamente"
+msgstr "Request Form Completeness"
 
-#: ../view/application/laboratory/dashboard.phtml:385
-#, fuzzy
-#| msgid "Please choose result"
 msgid "Please choose form fields"
-msgstr "Por favor escolha um resultado"
+msgstr "Please choose form fields"
 
 #: ../view/application/laboratory/dashboard.phtml:403
 #: ../view/application/laboratory/get-sample-volume.phtml:15
@@ -1472,11 +1366,8 @@ msgstr "Todos Locais - Geolocalização"
 msgid "Expand Map"
 msgstr "Expandir o mapa"
 
-#: ../view/application/laboratory/dashboard.phtml:482
-#, fuzzy
-#| msgid "Please choose age group"
 msgid "Please choose date range"
-msgstr "Por favor escolha a faixa etária"
+msgstr "Please choose date range"
 
 #: ../view/application/laboratory/dashboard.phtml:626
 #: ../view/application/laboratory/get-facilities-geolocation.phtml:103
@@ -1490,11 +1381,8 @@ msgstr "Por favor escolha a faixa etária"
 msgid "All Labs"
 msgstr "Todos Laboratórios"
 
-#: ../view/application/laboratory/dashboard.phtml:631
-#, fuzzy
-#| msgid "Age Group"
 msgid "All Age Group"
-msgstr "Faixa etária"
+msgstr "All Age Group"
 
 #: ../view/application/laboratory/dashboard.phtml:669
 #: ../view/application/laboratory/dashboard.phtml:1086
@@ -1593,7 +1481,7 @@ msgstr "AMOSTRAS REJEITADAS"
 
 #: ../view/application/laboratory/get-sample-test-result-gender.phtml:76
 msgid "("
-msgstr ""
+msgstr "("
 
 #: ../view/application/laboratory/get-vl-out-comes.phtml:11
 msgid "VL Suppressed/Not Suppressed"
@@ -1720,10 +1608,6 @@ msgstr "Regime Actual"
 msgid "Results Awaited"
 msgstr "Resultados Pendentes"
 
-#: ../view/application/laboratory/sample-result-awaited.phtml:225
-msgid "Sample Recieved at Lab"
-msgstr "Amostras recebidas por Laboratorio"
-
 #: ../view/application/laboratory/sample-volume.phtml:55
 msgid "Sample Test Volume"
 msgstr "Volume de Teste de Amostra"
@@ -1808,11 +1692,6 @@ msgstr "A Força-Tarefa para a Saúde Global"
 msgid "Emory University / PEPFAR"
 msgstr "Emory University / PEPFAR"
 
-#: ../view/application/summary/dashboard.phtml:236
-#: ../view/layout/layout.phtml:149
-msgid "Summary"
-msgstr ""
-
 #: ../view/application/summary/dashboard.phtml:245
 #: ../view/application/summary/dashboard.phtml:280
 #: ../view/application/summary/dashboard.phtml:311
@@ -1824,147 +1703,92 @@ msgstr ""
 msgid "Samples Received"
 msgstr "Amostras Recebidas"
 
-#: ../view/application/summary/dashboard.phtml:251
-#: ../view/application/summary/dashboard.phtml:363
-#: ../view/application/summary/dashboard.phtml:541
-#, fuzzy
-#| msgid "VL Suppression"
-msgid "Suppression Rate"
-msgstr "Supressão de Carga Viral"
-
 #: ../view/application/summary/dashboard.phtml:293
 msgid "Districts/Facility Wise Samples Received Summary"
-msgstr ""
+msgstr "Districts/Facility Wise Samples Received Summary"
 
-#: ../view/application/summary/dashboard.phtml:310
-#: ../view/application/summary/dashboard.phtml:333
-#: ../view/application/summary/dashboard.phtml:394
-#: ../view/application/summary/dashboard.phtml:413
-#: ../view/application/summary/dashboard.phtml:471
-#: ../view/application/summary/dashboard.phtml:489
-#, fuzzy
-#| msgid "Districts"
 msgid "District"
-msgstr "Distritos"
+msgstr "Distrito"
 
 #: ../view/application/summary/dashboard.phtml:316
 #: ../view/application/summary/dashboard.phtml:339
 msgid "Plasma"
-msgstr ""
+msgstr "Plasma"
 
 #: ../view/application/summary/dashboard.phtml:377
 msgid "Facility Wise Suppression Rate Summary"
-msgstr ""
+msgstr "Facility Wise Suppression Rate Summary"
 
-#: ../view/application/summary/dashboard.phtml:395
-#: ../view/application/summary/dashboard.phtml:415
-#: ../view/application/summary/dashboard.phtml:539
-#, fuzzy
-#| msgid "Test Results"
 msgid "Valid Results"
-msgstr "Resultados de Testes"
+msgstr "Valid Results"
 
-#: ../view/application/summary/dashboard.phtml:396
-#: ../view/application/summary/dashboard.phtml:416
-#, fuzzy
-#| msgid "Suppressed"
 msgid "Suppressed Results"
-msgstr "Suprimido"
+msgstr "Suppressed Results"
 
-#: ../view/application/summary/dashboard.phtml:397
-#: ../view/application/summary/dashboard.phtml:417
-#, fuzzy
-#| msgid "Not Suppressed"
 msgid "Non Suppressed Results"
-msgstr "Não suprimido"
+msgstr "Non Suppressed Results"
 
 #: ../view/application/summary/dashboard.phtml:454
 msgid "District Wise Samples Rejected Summary"
-msgstr ""
+msgstr "District Wise Samples Rejected Summary"
 
-#: ../view/application/summary/dashboard.phtml:474
-#: ../view/application/summary/dashboard.phtml:491
-#, fuzzy
-#| msgid "Rejection Reason"
 msgid "Rejection Rate(%)"
-msgstr "Motivo da rejeição"
+msgstr "Rejection Rate(%)"
 
-#: ../view/application/summary/dashboard.phtml:514
-#: ../view/application/summary/get-regimen-group-bar-chart.phtml:25
-#, fuzzy
-#| msgid "Age Group"
 msgid "Regimen Groups"
-msgstr "Faixa etária"
+msgstr "Regimen Groups"
 
 #: ../view/application/summary/dashboard.phtml:529
 msgid "Regimen Groups Summary"
-msgstr ""
+msgstr "Regimen Groups Summary"
 
-#: ../view/application/summary/dashboard.phtml:540
-#, fuzzy
-#| msgid "Not Suppressed"
 msgid "Number Suppressed"
-msgstr "Não suprimido"
+msgstr "Number Suppressed"
 
-#: ../view/application/summary/dashboard.phtml:542
-#, fuzzy
-#| msgid "Number of Samples"
+msgid "Number of Samples"
+msgstr "Number of Samples"
+
 msgid "Percentage of Samples(%)"
-msgstr "Número de amostras"
+msgstr "Percentage of Samples(%)"
 
 #: ../view/application/summary/dashboard.phtml:991
 msgid "SUMMARY OF KEY INDICATORS"
-msgstr ""
+msgstr "SUMMARY OF KEY INDICATORS"
 
 #: ../view/application/summary/dashboard.phtml:999
 msgid "Months"
-msgstr ""
+msgstr "Months"
 
-#: ../view/application/summary/dashboard.phtml:1271
-#, fuzzy
-#| msgid "Samples Received"
 msgid "District Wise Samples Received"
-msgstr "Amostras Recebidas"
+msgstr "District Wise Samples Received"
 
-#: ../view/application/summary/dashboard.phtml:1273
-#, fuzzy
-#| msgid "Samples Received"
 msgid "Facility Wise Samples Received"
-msgstr "Amostras Recebidas"
+msgstr "Facility Wise Samples Received"
 
 #: ../view/application/summary/dashboard.phtml:1275
 msgid "District Wise Suppression Rate"
-msgstr ""
+msgstr "District Wise Suppression Rate"
 
 #: ../view/application/summary/dashboard.phtml:1277
 msgid "Facility Wise Suppression Rate"
-msgstr ""
+msgstr "Facility Wise Suppression Rate"
 
-#: ../view/application/summary/dashboard.phtml:1279
-#, fuzzy
-#| msgid "Samples Rejected"
 msgid "District Wise Samples Rejected"
-msgstr "Amostras rejeitadas"
+msgstr "District Wise Samples Rejected"
 
-#: ../view/application/summary/dashboard.phtml:1281
-#, fuzzy
-#| msgid "Samples Rejected"
 msgid "Facility Wise Samples Rejected"
-msgstr "Amostras rejeitadas"
+msgstr "Facility Wise Samples Rejected"
 
-#: ../view/application/summary/get-suppression-rate-bar-chart.phtml:25
-#, fuzzy
-#| msgid "VL Suppression"
 msgid "Suppression Rate Data"
-msgstr "Supressão de Carga Viral"
+msgstr "Suppression Rate Data"
 
 #: ../view/application/time/dashboard.phtml:148
 msgid "TAT Dashboard"
 msgstr "TAT Dashboard"
 
 #: ../view/application/time/dashboard.phtml:505
-msgid "Download table"
-msgstr ""
+msgid "Download Table"
+msgstr "Download Table"
 
 #: ../view/application/time/get-tat-default.phtml:7
 #: ../view/application/time/get-tat-from-search-field.phtml:7
@@ -2034,7 +1858,7 @@ msgstr "Clinics Chart"
 
 #: ../view/application/time/get-tat-from-url.phtml:18
 msgid "TAT: "
-msgstr ""
+msgstr "TAT:"
 
 #: ../view/application/time/get-tat-from-url.phtml:18
 #: ../view/application/time/get-tat-from-url.phtml:39
@@ -2125,11 +1949,8 @@ msgid "The requested controller was unable to dispatch the request."
 msgstr "O controlador requisitado não foi capaz de despachar a requisição."
 
 #: ../view/error/404.phtml:13
-msgid ""
-"The requested controller could not be mapped to an existing controller class."
-msgstr ""
-"O controlador requisitado não pode ser mapeado a uma classe de controlador "
-"existente."
+msgid "The requested controller could not be mapped to an existing controller class."
+msgstr "O controlador requisitado não pode ser mapeado a uma classe de controlador existente."
 
 #: ../view/error/404.phtml:16
 msgid "The requested controller was not dispatchable."
@@ -2185,7 +2006,7 @@ msgstr "Ocorreu um erro"
 
 #: ../view/layout/layout.phtml:18 ../view/layout/layout.phtml:83
 msgid "Smart Connect"
-msgstr ""
+msgstr "Smart Connect"
 
 #: ../view/layout/layout.phtml:92
 msgid "Development/Test Environment with dummy data"
@@ -2213,266 +2034,8 @@ msgstr "Configuração Geral"
 
 #: ../view/layout/layout.phtml:230
 msgid "Import"
-msgstr ""
+msgstr "Import"
 
 #: ../view/layout/layout.phtml:452
-msgid ""
-"Smart Connect - The Viral Load Dashboard (Testing Environment with dummy "
-"data) | Funded by"
-msgstr ""
-"Smart Connect - Portal de Carga Viral (Ambiente de Teste com dados "
-"fictícios) | Fundado por"
-
-#~ msgid "Above"
-#~ msgstr "Acima"
-
-#~ msgid "Clinic Name"
-#~ msgstr "Nome da Unidade Sanitária"
-
-#~ msgid "Requisition Forms for Testing"
-#~ msgstr "Formulários de requisição para Testes"
-
-#~ msgid "Total No. of Samples Tested"
-#~ msgstr "No. Total de Amostras testadas"
-
-#~ msgid "Rejected"
-#~ msgstr "Rejeitadas"
-
-#~ msgid "Hub"
-#~ msgstr "Unidade Sanitária"
-
-#~ msgid "DEMO"
-#~ msgstr "DEMO"
-
-#~ msgid "Facility details added successfully"
-#~ msgstr "Detalhes da unidade adicionados com sucesso"
-
-#~ msgid "Facility details updated successfully"
-#~ msgstr "Detalhes da unidade actualizados com sucesso"
-
-#~ msgid "Config details updated successfully"
-#~ msgstr "Detalhes da configuração actualizados com sucesso"
-
-#~ msgid "User details added successfully"
-#~ msgstr "Detalhes do utilizador adicionados com sucesso"
-
-#~ msgid "User details updated successfully"
-#~ msgstr "Detalhes do utilizador actualizados com sucesso"
-
-#~ msgid "Clinic"
-#~ msgstr "Unidade Sanitária"
-
-#~ msgid "Gender Missing"
-#~ msgstr "FSR sem o Género preenchido"
-
-#~ msgid "Age Missing"
-#~ msgstr "FSR sem a Idade  preenchida"
-
-#~ msgid "Results Awaited <br>(< 6 months)"
-#~ msgstr "Resultados pendentes <br>(< 6 meses)"
-
-#~ msgid "Results Awaited <br>(> 6 months)"
-#~ msgstr "Resultados pendentes <br>(> 6 meses)"
-
-#~ msgid "VL (>= 1000 cp/ml)"
-#~ msgstr "CV (>= 1000 cp/ml)"
-
-#~ msgid "VL (< 1000 cp/ml)"
-#~ msgstr "CV (< 1000 cp/ml)"
-
-#~ msgid "VL (>= 1000 cp/ml)(M)"
-#~ msgstr "CV (>= 1000 cp/ml)(M)"
-
-#~ msgid "VL (< 1000 cp/ml)(M)"
-#~ msgstr "CV (< 1000 cp/ml)(M)"
-
-#~ msgid "VL (>= 1000 cp/ml)(F)"
-#~ msgstr "CV (>= 1000 cp/ml)(F)"
-
-#~ msgid "VL (< 1000 cp/ml)(F)"
-#~ msgstr "CV (< 1000 cp/ml)(F)"
-
-#~ msgid "VL (>= 1000 cp/ml)(Not Specified)"
-#~ msgstr "CV (>= 1000 cp/ml)(Não especificado)"
-
-#~ msgid "VL (< 1000 cp/ml)(Not Specified)"
-#~ msgstr "CV (< 1000 cp/ml)(Não especificado)"
-
-#~ msgid "LOT1"
-#~ msgstr "LT1"
-
-#~ msgid "LOT2"
-#~ msgstr "LT2"
-
-#~ msgid "LOT3"
-#~ msgstr "LT3"
-
-#~ msgid "NS"
-#~ msgstr "NE"
-
-#~ msgid "Breastfeeding"
-#~ msgstr "Lactante"
-
-#~ msgid "BF"
-#~ msgstr "L"
-
-#~ msgid "Not Breastfeeding"
-#~ msgstr "Não lactante"
-
-#~ msgid "NBF"
-#~ msgstr "NL"
-
-#~ msgid "Breastfeeding Unknown"
-#~ msgstr "Não se sabe se é lactante"
-
-#~ msgid "BFU"
-#~ msgstr "NSL"
-
-#~ msgid "Pregnant"
-#~ msgstr "Grávida"
-
-#~ msgid "P"
-#~ msgstr "G"
-
-#~ msgid "Not Pregnant"
-#~ msgstr "Não está Grávida"
-
-#~ msgid "NP"
-#~ msgstr "NG"
-
-#~ msgid "Pregnant Unknown"
-#~ msgstr "Não se sabe se está Grávida"
-
-#~ msgid "PU"
-#~ msgstr "NSG"
-
-#~ msgid "Patient ART No"
-#~ msgstr "No. ART do Paciente"
-
-#~ msgid "PAN"
-#~ msgstr "NAP"
-
-#~ msgid "CR"
-#~ msgstr "CR"
-
-#~ msgid "Patient Age in Years"
-#~ msgstr "Idade do paciente em anos"
-
-#~ msgid "PAiY"
-#~ msgstr "IPA"
-
-#~ msgid "Patient Gender"
-#~ msgstr "Género do Paciente"
-
-#~ msgid "PG"
-#~ msgstr "GP"
-
-#~ msgid "DBS - VL (>= 1000 cp/ml)"
-#~ msgstr "DBS - CV (>= 1000 cp/ml)"
-
-#~ msgid "Others - VL (>= 1000 cp/ml)"
-#~ msgstr "Outros - CV (>= 1000 cp/ml)"
-
-#~ msgid "DBS - VL (< 1000 cp/ml)"
-#~ msgstr "DBS - CV (< 1000 cp/ml)"
-
-#~ msgid "Others - VL (< 1000 cp/ml)"
-#~ msgstr "Outros - CV (< 1000 cp/ml)"
-
-#~ msgid "Remove Selected Samples"
-#~ msgstr "Remover amostras selecionadas"
-
-#~ msgid "OOPS..Error while removing duplicate samples"
-#~ msgstr "OOPS ... Erro ao remover amostras duplicadas"
-
-#~ msgid "Batch Code"
-#~ msgstr "Código do lote"
-
-#~ msgid "Patient's Name"
-#~ msgstr "Nome do paciente"
-
-#~ msgid "Hubs Dashboard"
-#~ msgstr "Hubs Dashboard"
-
-#~ msgid "Skeleton Application"
-#~ msgstr "Aplicação Skeleton"
-
-#~ msgid "Home"
-#~ msgstr "Início"
-
-#~ msgid "All rights reserved."
-#~ msgstr "Todos os direitos reservados."
-
-#~ msgid "Welcome to %sZend Framework 2%s"
-#~ msgstr "Bem vindo ao %sZend Framework 2%s"
-
-#~ msgid ""
-#~ "Congratulations! You have successfully installed the %sZF2 Skeleton "
-#~ "Application%s. You are currently running Zend Framework version %s. This "
-#~ "skeleton can serve as a simple starting point for you to begin building "
-#~ "your application on ZF2."
-#~ msgstr ""
-#~ "Parabéns! Você instalou a %sAplicação Skeleton ZF2%s com sucesso. Você "
-#~ "está usando a versão %s do Zend Framework. Este esqueleto serve "
-#~ "simplesmente como um ponto de inicio na construção da sua aplicação ZF2."
-
-#~ msgid "Fork Zend Framework 2 on GitHub"
-#~ msgstr "Replique Zend Framework 2 no GitHub"
-
-#~ msgid "Follow Development"
-#~ msgstr "Acompanhe o Desenvolvimento"
-
-#~ msgid ""
-#~ "Zend Framework 2 is under active development. If you are interested in "
-#~ "following the development of ZF2, there is a special ZF2 portal on the "
-#~ "official Zend Framework website which provides links to the ZF2 %swiki%s, "
-#~ "%sdev blog%s, %sissue tracker%s, and much more. This is a great resource "
-#~ "for staying up to date with the latest developments!"
-#~ msgstr ""
-#~ "Zend Framework 2 está sob desenvolvimento ativo. Se vocês está "
-#~ "interessado em acompanhar o desenvolvimento do ZF2, tem um portal ZF2 "
-#~ "especial no site oficial do Zend Framework que possui links para ZF2 "
-#~ "%swiki%s, %sdev blog%s, %sissue tracker%s, dentre outros. Este é um "
-#~ "excelente material para se manter atualizado com os últimos "
-#~ "desenvolvimentos!"
-
-#~ msgid "ZF2 Development Portal"
-#~ msgstr "Portal de Desenvolvimento do ZF2"
-
-#~ msgid "Discover Modules"
-#~ msgstr "Descubra Módulos"
-
-#~ msgid ""
-#~ "The community is working on developing a community site to serve as a "
-#~ "repository and gallery for ZF2 modules. The project is available %son "
-#~ "GitHub%s. The site is currently live and currently contains a list of "
-#~ "some of the modules already available for ZF2."
-#~ msgstr ""
-#~ "A Comunidade está trabalhando em desenvolver um site comunitário para "
-#~ "servir como repositório e galeria de módulos ZF2. O projeto estará "
-#~ "disponível %sem breve no GitHub%s. O site já está online e atualmente "
-#~ "contém uma lista de alguns dos módulos já disponíveis para ZF2."
-
-#~ msgid "Explore ZF2 Modules"
-#~ msgstr "Explore Módulos ZF2"
-
-#~ msgid "Help &amp; Support"
-#~ msgstr "Ajuda &amp; Suporte"
-
-#~ msgid ""
-#~ "If you need any help or support while developing with ZF2, you may reach "
-#~ "us via IRC: %s#zftalk on Freenode%s. We'd love to hear any questions or "
-#~ "feedback you may have regarding the beta releases. Alternatively, you may "
-#~ "subscribe and post questions to the %smailing lists%s."
-#~ msgstr ""
-#~ "Caso você precise de ajuda ou suporte enquanto desenvolve com ZF2, pode "
-#~ "nos encontrar pelo %s#zftalk on Freenode%s. Vamos gostar muito de ouvir "
-#~ "perguntas e opiniões que você possa ter em relação às versões beta. "
-#~ "Também, você pode se registrar e enviar perguntar para a %slista de e-mail"
-#~ "%s."
-
-#~ msgid "Ping us on IRC"
-#~ msgstr "Nos escreva no IRC"
-
-#~ msgid "Exception"
-#~ msgstr "Exceção"
+msgid "Smart Connect - The Viral Load Dashboard (Testing Environment with dummy data) | Funded by"
+msgstr "Smart Connect - Portal de Carga Viral (Ambiente de Teste com dados fictícios) | Fundado por"

@@ -69,7 +69,7 @@
                     foreach($result['sampleName'] as $key=>$condition){                     
                     ?>
                     {
-                    name:'<?php echo $this->translate(strtoupper($key)); ?>',
+                    name:'<?php echo strtoupper($this->translate(ucfirst($key))); ?>',
                     data:[<?php
                         foreach($condition as $count){
                            echo '{y:'.$count.'},';

@@ -49,7 +49,7 @@
                              }
                          },
                          title: {
-                             text: 'Suppression Rate',
+                             text: '<?php echo $this->translate('Suppression Rate'); ?>',
                              style: {
                                  color: Highcharts.getOptions().colors[1]
                              }
@@ -58,7 +58,7 @@
                          allowDecimals: false,
                          min: 0,
                          title: {
-                             text: 'Valid Results',
+                             text: '<?php echo $this->translate('Valid Results'); ?>',
                              style: {
                                  color: Highcharts.getOptions().colors[1]
                              }
@@ -76,7 +76,7 @@
                      },
                      
                      series: [{
-                         name: 'Valid Results (R)',
+                         name: '<?php echo $this->translate('Valid Results'); ?> (R)',
                          type: 'column',
                          yAxis: 1,
                          data: [
@@ -92,7 +92,7 @@
                          }
                  
                      }, {
-                         name: 'Suppression Rate (L)',
+                         name: '<?php echo $this->translate('Suppression Rate'); ?> (L)',
                          type: 'spline',
                          data: [
                          <?php if(isset($result['samples_rate']) && count($result['samples_rate']) >0){

@@ -254,19 +254,19 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
         <li role="presentation">
             <a href="#samplesRejectedTab" aria-controls="messages" role="tab" data-toggle="tab">
                 <h3 class="tabPercentageVal"><?php echo $rejectionPercentage; ?>%</h3>
-                Rejection Rate
+                <?php echo $this->translate('Rejection Rate'); ?>
             </a>
         </li>
         <li role="presentation">
             <a href="#currentRegimenTab" aria-controls="messages" role="tab" data-toggle="tab">
-                <h3 class="tabPercentageVal"><?php echo $firstLineCurrentRegimenPercentage; ?>% <span style="font-size:14px;">on 1st Line</span></h3>
-                Current Regimen
+                <h3 class="tabPercentageVal"><?php echo $firstLineCurrentRegimenPercentage; ?>% <span style="font-size:14px;"><?php echo $this->translate('on 1st Line'); ?></span></h3>
+                <?php echo $this->translate('Current Regimen'); ?>
             </a>
         </li>
         <li role="presentation">
             <a href="#allRegimenTab" aria-controls="messages" role="tab" data-toggle="tab">
-            <h6 style="padding-bottom:2px;padding-top:20px;">Reg. All</h6>
-                All Regimens
+            <h6 style="padding-bottom:2px;padding-top:20px;"><?php echo $this->translate('Reg. All'); ?></h6>
+                <?php echo $this->translate('All Regimens'); ?>
             </a>
         </li>
     </ul>
@@ -297,8 +297,8 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
                             <div class="form-group">                                
                                 <div class="col-md-12 text-center">
                                     <div class="btn-group" data-toggle="btns" style="margin-bottom:10px;">
-                                        <a class="btn btn-default active" href="#districtWiseSamplesReceivedSummary" data-toggle="tab" onclick="toggleSummary('districtWiseSamplesReceivedSummary','facilityWiseSamplesReceivedSummary');" style="font-size:13px;padding:4px 12px;">Districts</a>
-                                        <a class="btn btn-default" href="#facilityWiseSamplesReceivedSummary" data-toggle="tab" onclick="toggleSummary('facilityWiseSamplesReceivedSummary','districtWiseSamplesReceivedSummary');" style="font-size:13px;padding:4px 12px;">Facilities</a>
+                                        <a class="btn btn-default active" href="#districtWiseSamplesReceivedSummary" data-toggle="tab" onclick="toggleSummary('districtWiseSamplesReceivedSummary','facilityWiseSamplesReceivedSummary');" style="font-size:13px;padding:4px 12px;"><?php echo $this->translate('Districts'); ?></a>
+                                        <a class="btn btn-default" href="#facilityWiseSamplesReceivedSummary" data-toggle="tab" onclick="toggleSummary('facilityWiseSamplesReceivedSummary','districtWiseSamplesReceivedSummary');" style="font-size:13px;padding:4px 12px;"><?php echo $this->translate('Facilities'); ?></a>
                                     </div>
                                 </div>
                             </div>
@@ -307,7 +307,7 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
                                     <table class="table table-striped table-bordered table-hover order-column" id="samplesReceivedDistrict">
                                         <thead>
                                             <tr>
-                                                <th> <?php echo $this->translate('District'); ?> </th>
+                                                <th> <?php echo $this->translate('District/County'); ?> </th>
                                                 <th> <?php echo $this->translate('Samples Received'); ?> </th>
                                                 <th> <?php echo $this->translate('Samples Tested'); ?></th>
                                                 <th> <?php echo $this->translate('Samples Pending'); ?></th>
@@ -328,9 +328,8 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
                                     <table class="table table-striped table-bordered table-hover order-column" id="samplesReceivedFacility">
                                         <thead>
                                             <tr>
-                                                
                                                 <th> <?php echo $this->translate('Facility'); ?> </th>
-                                                <th> <?php echo $this->translate('District'); ?> </th>
+                                                <th> <?php echo $this->translate('District/County'); ?> </th>
                                                 <th> <?php echo $this->translate('Samples Received'); ?> </th>
                                                 <th> <?php echo $this->translate('Samples Tested'); ?></th>
                                                 <th> <?php echo $this->translate('Samples Pending'); ?></th>
@@ -381,8 +380,8 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
                             <div class="form-group">                                
                                 <div class="col-md-12 text-center">
                                     <div class="btn-group" data-toggle="btns" style="margin-bottom:10px;">
-                                        <a class="btn btn-default active" href="#districtWiseSuppressionRateSummary" data-toggle="tab" onclick="toggleSummary('districtWiseSuppressionRateSummary','facilityWiseSuppressionRateSummary');" style="font-size:13px;padding:4px 12px;">Districts</a>
-                                        <a class="btn btn-default" href="#facilityWiseSuppressionRateSummary" data-toggle="tab" onclick="toggleSummary('facilityWiseSuppressionRateSummary','districtWiseSuppressionRateSummary');" style="font-size:13px;padding:4px 12px;">Facilities</a>
+                                        <a class="btn btn-default active" href="#districtWiseSuppressionRateSummary" data-toggle="tab" onclick="toggleSummary('districtWiseSuppressionRateSummary','facilityWiseSuppressionRateSummary');" style="font-size:13px;padding:4px 12px;"><?php echo $this->translate('Districts'); ?></a>
+                                        <a class="btn btn-default" href="#facilityWiseSuppressionRateSummary" data-toggle="tab" onclick="toggleSummary('facilityWiseSuppressionRateSummary','districtWiseSuppressionRateSummary');" style="font-size:13px;padding:4px 12px;"><?php echo $this->translate('Facilities'); ?></a>
                                     </div>
                                 </div>
                             </div>
@@ -391,7 +390,7 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
                                     <table class="table table-striped table-bordered table-hover order-column" id="suppressionRateDistrict">
                                         <thead>
                                             <tr>
-                                                <th> <?php echo $this->translate('District'); ?> </th>
+                                                <th> <?php echo $this->translate('District/County'); ?> </th>
                                                 <th> <?php echo $this->translate('Valid Results'); ?> </th>
                                                 <th> <?php echo $this->translate('Suppressed Results'); ?></th>
                                                 <th> <?php echo $this->translate('Non Suppressed Results'); ?></th>
@@ -410,8 +409,7 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
                                         <thead>
                                             <tr>
                                                 <th> <?php echo $this->translate('Facility'); ?> </th>
-                                                <th> <?php echo $this->translate('District'); ?> </th>
-                                                
+                                                <th> <?php echo $this->translate('District/County'); ?> </th>
                                                 <th> <?php echo $this->translate('Valid Results'); ?> </th>
                                                 <th> <?php echo $this->translate('Suppressed Results'); ?></th>
                                                 <th> <?php echo $this->translate('Non Suppressed Results'); ?></th>
@@ -458,8 +456,8 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
                             <div class="form-group">                                
                                 <div class="col-md-12 text-center">
                                     <div class="btn-group" data-toggle="btns" style="margin-bottom:10px;">
-                                        <a class="btn btn-default active" href="#districtWiseSamplesRejectedSummary" data-toggle="tab" onclick="toggleSummary('districtWiseSamplesRejectedSummary','facilityWiseSamplesRejectedSummary');" style="font-size:13px;padding:4px 12px;">Districts</a>
-                                        <a class="btn btn-default" href="#facilityWiseSamplesRejectedSummary" data-toggle="tab" onclick="toggleSummary('facilityWiseSamplesRejectedSummary','districtWiseSamplesRejectedSummary');" style="font-size:13px;padding:4px 12px;">Facilities</a>
+                                        <a class="btn btn-default active" href="#districtWiseSamplesRejectedSummary" data-toggle="tab" onclick="toggleSummary('districtWiseSamplesRejectedSummary','facilityWiseSamplesRejectedSummary');" style="font-size:13px;padding:4px 12px;"><?php echo $this->translate('Districts'); ?></a>
+                                        <a class="btn btn-default" href="#facilityWiseSamplesRejectedSummary" data-toggle="tab" onclick="toggleSummary('facilityWiseSamplesRejectedSummary','districtWiseSamplesRejectedSummary');" style="font-size:13px;padding:4px 12px;"><?php echo $this->translate('Facilities'); ?></a>
                                     </div>
                                 </div>
                             </div>
@@ -468,7 +466,7 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
                                     <table class="table table-striped table-bordered table-hover order-column" id="samplesRejectedDistrict">
                                         <thead>
                                             <tr>
-                                                <th> <?php echo $this->translate('District'); ?> </th>
+                                                <th> <?php echo $this->translate('District/County'); ?> </th>
                                                 <th> <?php echo $this->translate('Samples Received'); ?> </th>
                                                 <th> <?php echo $this->translate('Samples Rejected'); ?></th>
                                                 <th> <?php echo $this->translate('Rejection Rate(%)'); ?> </th>
@@ -486,7 +484,7 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
                                         <thead>
                                             <tr>
                                                 <th> <?php echo $this->translate('Facility'); ?> </th>
-                                                <th> <?php echo $this->translate('District'); ?> </th>
+                                                <th> <?php echo $this->translate('District/County'); ?> </th>
                                                 <th> <?php echo $this->translate('Samples Received'); ?> </th>
                                                 <th> <?php echo $this->translate('Rejection Rate(%)'); ?> </th>
                                             </tr>
@@ -562,19 +560,19 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
                         <table class="table">
                             <thead>
                               <tr>
-                                <td colspan="9" style="font-size:11px;">By Line of Regimen</td>
+                                <td colspan="9" style="font-size:11px;"><?php echo $this->translate('By Line of Regimen'); ?></td>
                               </tr>
                               <tr>
                                 <th></th>
-                                <th colspan="2" style="text-align:center;font-size:11px;">1st Line</th>
-                                <th colspan="2" style="text-align:center;font-size:11px;">2nd Line</th>
-                                <th colspan="2" style="text-align:center;font-size:11px;">Others</th>
-                                <th colspan="2" style="text-align:center;font-size:11px;">Total</th>
+                                <th colspan="2" style="text-align:center;font-size:11px;"><?php echo $this->translate('1st Line'); ?></th>
+                                <th colspan="2" style="text-align:center;font-size:11px;"><?php echo $this->translate('2nd Line'); ?></th>
+                                <th colspan="2" style="text-align:center;font-size:11px;"><?php echo $this->translate('Others'); ?></th>
+                                <th colspan="2" style="text-align:center;font-size:11px;"><?php echo $this->translate('Total'); ?></th>
                               </tr>
                             </thead>
                             <tbody>
                               <tr>
-                                <th style="text-align:center;font-size:11px;">Results</th>
+                                <th style="text-align:center;font-size:11px;"><?php echo $this->translate('Results'); ?></th>
                                 <td style="text-align:center;font-size:11px;">#</td>
                                 <td style="text-align:center;font-size:11px;">%</td>
                                 <td style="text-align:center;font-size:11px;">#</td>
@@ -607,7 +605,7 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
                                 <td style="text-align:center;font-size:11px;"><?php echo (($allLineofTreatmentInfo[0]['1stLineofSuppressed']+$allLineofTreatmentInfo[0]['2ndLineofSuppressed']+$allLineofTreatmentInfo[0]['otherLineofSuppressed']) > 0)?round(((($allLineofTreatmentInfo[0]['1stLineofSuppressed']+$allLineofTreatmentInfo[0]['2ndLineofSuppressed']+$allLineofTreatmentInfo[0]['otherLineofSuppressed'])/($allLineofTreatmentInfo[0]['1stLineofSuppressed']+$allLineofTreatmentInfo[0]['2ndLineofSuppressed']+$allLineofTreatmentInfo[0]['otherLineofSuppressed']+$allLineofTreatmentInfo[0]['1stLineofNotSuppressed']+$allLineofTreatmentInfo[0]['2ndLineofNotSuppressed']+$allLineofTreatmentInfo[0]['otherLineofNotSuppressed']))*100),2):''; ?></td>
                               </tr>
                               <tr>
-                                <th style="text-align:center;font-size:11px;">Total</th>
+                                <th style="text-align:center;font-size:11px;"><?php echo $this->translate('Total'); ?></th>
                                 <td style="text-align:center;font-size:11px;"><?php echo $allLineofTreatmentInfo[0]['1stLineofNotSuppressed']+$allLineofTreatmentInfo[0]['1stLineofSuppressed']; ?></td>
                                 <td style="text-align:center;font-size:11px;"></td>
                                 <td style="text-align:center;font-size:11px;"><?php echo $allLineofTreatmentInfo[0]['2ndLineofNotSuppressed']+$allLineofTreatmentInfo[0]['2ndLineofSuppressed']; ?></td>
@@ -624,10 +622,10 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
                         <table class="table">
                             <thead>
                               <tr>
-                                <td colspan="<?php echo ($adult1stLineofTreatmentTotal > 0)?(2*$adult1stLineofTreatmentTotal)+3:3; ?>" style="font-size:11px;">By first line regimens [Adult & Paeds]</td>
+                                <td colspan="<?php echo ($adult1stLineofTreatmentTotal > 0)?(2*$adult1stLineofTreatmentTotal)+3:3; ?>" style="font-size:11px;"><?php echo $this->translate('By first line regimens [Adult & Paeds]'); ?></td>
                               </tr>
                               <tr>
-                                <th colspan="<?php echo ($adult1stLineofTreatmentTotal > 0)?(2*$adult1stLineofTreatmentTotal)+3:3; ?>" style="text-align:center;font-size:11px;">1st Line (ADULT)</th>
+                                <th colspan="<?php echo ($adult1stLineofTreatmentTotal > 0)?(2*$adult1stLineofTreatmentTotal)+3:3; ?>" style="text-align:center;font-size:11px;"><?php echo $this->translate('1st Line (ADULT)'); ?></th>
                               </tr>
                               <tr>
                                 <th></th>
@@ -637,12 +635,12 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
                                 ?>
                                    <th colspan="2" style="font-size:11px;"><?php echo $adult1stLineofTreatment['current_regimen']; ?></th>
                                 <?php } }?>
-                                <th colspan="2" style="text-align:center;font-size:11px;">Others</th>
+                                <th colspan="2" style="text-align:center;font-size:11px;"><?php echo $this->translate('Others'); ?></th>
                               </tr>
                             </thead>
                             <tbody>
                               <tr>
-                                <th style="text-align:center;font-size:11px;">Results</th>
+                                <th style="text-align:center;font-size:11px;"><?php echo $this->translate('Results'); ?></th>
                                 <?php
                                 if(isset($allCollapsibleLineofTreatmentResult['adult1stLineofTreatmentResult']) && count($allCollapsibleLineofTreatmentResult['adult1stLineofTreatmentResult']) >0){
                                    foreach($allCollapsibleLineofTreatmentResult['adult1stLineofTreatmentResult'] as $adult1stLineofTreatmentLabel){
@@ -688,7 +686,7 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
                                 <td style="text-align:center;font-size:11px;"><?php echo ($totalAdult1stLineofTreatmentOthersSuppressed >0)?round((($totalAdult1stLineofTreatmentOthersSuppressed/($totalAdult1stLineofTreatmentOthersSuppressed+$totalAdult1stLineofTreatmentOthersNotSuppressed))*100),2):''; ?></td>
                               </tr>
                               <tr>
-                                <th style="text-align:center;font-size:11px;">Total</th>
+                                <th style="text-align:center;font-size:11px;"><?php echo $this->translate('Total'); ?></th>
                                 <?php
                                 if(isset($allCollapsibleLineofTreatmentResult['adult1stLineofTreatmentResult']) && count($allCollapsibleLineofTreatmentResult['adult1stLineofTreatmentResult']) >0){
                                   foreach($allCollapsibleLineofTreatmentResult['adult1stLineofTreatmentResult'] as $adult1stLineofTreatmentGrandTotal){
@@ -710,7 +708,7 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
                                 <td colspan="<?php echo ($paeds1stLineofTreatmentTotal > 0)?(2*$paeds1stLineofTreatmentTotal)+3:3; ?>"></td>
                               </tr>
                               <tr>
-                                <th colspan="<?php echo ($paeds1stLineofTreatmentTotal > 0)?(2*$paeds1stLineofTreatmentTotal)+3:3; ?>" style="text-align:center;font-size:11px;">1st Line (PAEDS)</th>
+                                <th colspan="<?php echo ($paeds1stLineofTreatmentTotal > 0)?(2*$paeds1stLineofTreatmentTotal)+3:3; ?>" style="text-align:center;font-size:11px;"><?php echo $this->translate('1st Line (PAEDS)'); ?></th>
                               </tr>
                               <tr>
                                 <th></th>
@@ -720,12 +718,12 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
                                 ?>
                                    <th colspan="2" style="font-size:11px;"><?php echo $paeds1stLineofTreatment['current_regimen']; ?></th>
                                 <?php } } ?>
-                                <th colspan="2" style="text-align:center;font-size:11px;">Others</th>
+                                <th colspan="2" style="text-align:center;font-size:11px;"><?php echo $this->translate('Others'); ?></th>
                               </tr>
                             </thead>
                             <tbody>
                               <tr>
-                                <th style="text-align:center;font-size:11px;">Results</th>
+                                <th style="text-align:center;font-size:11px;"><?php echo $this->translate('Results'); ?></th>
                                 <?php
                                 if(isset($allCollapsibleLineofTreatmentResult['paeds1stLineofTreatmentResult']) && count($allCollapsibleLineofTreatmentResult['paeds1stLineofTreatmentResult']) >0){
                                     foreach($allCollapsibleLineofTreatmentResult['paeds1stLineofTreatmentResult'] as $paeds1stLineofTreatmentLabel){
@@ -771,7 +769,7 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
                                 <td style="text-align:center;font-size:11px;"><?php echo ($totalPaeds1stLineofTreatmentOthersSuppressed >0)?round((($totalPaeds1stLineofTreatmentOthersSuppressed/($totalPaeds1stLineofTreatmentOthersSuppressed+$totalPaeds1stLineofTreatmentOthersNotSuppressed))*100),2):''; ?></td>
                               </tr>
                               <tr>
-                                <th style="text-align:center;font-size:11px;">Total</th>
+                                <th style="text-align:center;font-size:11px;"><?php echo $this->translate('Total'); ?></th>
                                 <?php
                                 if(isset($allCollapsibleLineofTreatmentResult['paeds1stLineofTreatmentResult']) && count($allCollapsibleLineofTreatmentResult['paeds1stLineofTreatmentResult']) >0){
                                    foreach($allCollapsibleLineofTreatmentResult['paeds1stLineofTreatmentResult'] as $paeds1stLineofTreatmentTotal){
@@ -791,10 +789,10 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
                         <table class="table">
                             <thead>
                               <tr>
-                                <td colspan="<?php echo ($adult2ndLineofTreatmentTotal > 0)?(2*$adult2ndLineofTreatmentTotal)+3:3; ?>" style="font-size:11px;">By second line regimens [Adult & Paeds] & Others</td>
+                                <td colspan="<?php echo ($adult2ndLineofTreatmentTotal > 0)?(2*$adult2ndLineofTreatmentTotal)+3:3; ?>" style="font-size:11px;"><?php echo $this->translate('By second line regimens [Adult & Paeds] & Others'); ?></td>
                               </tr>
                               <tr>
-                                <th colspan="<?php echo ($adult2ndLineofTreatmentTotal > 0)?(2*$adult2ndLineofTreatmentTotal)+3:3; ?>" style="text-align:center;font-size:11px;">2nd Line (ADULT)</th>
+                                <th colspan="<?php echo ($adult2ndLineofTreatmentTotal > 0)?(2*$adult2ndLineofTreatmentTotal)+3:3; ?>" style="text-align:center;font-size:11px;"><?php echo $this->translate('2nd Line (ADULT)'); ?></th>
                               </tr>
                               <tr>
                                 <th></th>
@@ -804,12 +802,12 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
                                 ?>
                                    <th colspan="2" style="font-size:11px;"><?php echo $adult2ndLineofTreatment['current_regimen']; ?></th>
                                 <?php } }?>
-                                <th colspan="2" style="text-align:center;font-size:11px;">Others</th>
+                                <th colspan="2" style="text-align:center;font-size:11px;"><?php echo $this->translate('Others'); ?></th>
                               </tr>
                             </thead>
                             <tbody>
                               <tr>
-                                <th style="text-align:center;font-size:11px;">Results</th>
+                                <th style="text-align:center;font-size:11px;"><?php echo $this->translate('Results'); ?></th>
                                 <?php
                                 if(isset($allCollapsibleLineofTreatmentResult['adult2ndLineofTreatmentResult']) && count($allCollapsibleLineofTreatmentResult['adult2ndLineofTreatmentResult']) >0){
                                    foreach($allCollapsibleLineofTreatmentResult['adult2ndLineofTreatmentResult'] as $adult2ndLineofTreatmentLabel){
@@ -855,7 +853,7 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
                                 <td style="text-align:center;font-size:11px;"><?php echo ($totalAdult2ndLineofTreatmentOthersSuppressed >0)?round((($totalAdult2ndLineofTreatmentOthersSuppressed/($totalAdult2ndLineofTreatmentOthersSuppressed+$totalAdult2ndLineofTreatmentOthersNotSuppressed))*100),2):''; ?></td>
                               </tr>
                               <tr>
-                                <th style="text-align:center;font-size:11px;">Total</th>
+                                <th style="text-align:center;font-size:11px;"><?php echo $this->translate('Total'); ?></th>
                                 <?php
                                 if(isset($allCollapsibleLineofTreatmentResult['adult2ndLineofTreatmentResult']) && count($allCollapsibleLineofTreatmentResult['adult2ndLineofTreatmentResult']) >0){
                                   foreach($allCollapsibleLineofTreatmentResult['adult2ndLineofTreatmentResult'] as $adult2ndLineofTreatmentGrandTotal){
@@ -877,8 +875,8 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
                                 <td colspan="<?php echo ($paeds2ndLineofTreatmentTotal > 0)?(2*$paeds2ndLineofTreatmentTotal)+5:3; ?>"></td>
                               </tr>
                               <tr>
-                                <th colspan="<?php echo ($paeds2ndLineofTreatmentTotal > 0)?(2*$paeds2ndLineofTreatmentTotal)+3:3; ?>" style="text-align:center;font-size:11px;">2nd Line (PAEDS)</th>
-                                <th colspan="2" style="text-align:center;font-size:11px;">Others</th>
+                                <th colspan="<?php echo ($paeds2ndLineofTreatmentTotal > 0)?(2*$paeds2ndLineofTreatmentTotal)+3:3; ?>" style="text-align:center;font-size:11px;"><?php echo $this->translate('2nd Line (PAEDS)'); ?></th>
+                                <th colspan="2" style="text-align:center;font-size:11px;"><?php echo $this->translate('Others'); ?></th>
                               </tr>
                               <tr>
                                 <th></th>
@@ -888,13 +886,13 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
                                 ?>
                                    <th colspan="2" style="font-size:11px;"><?php echo $paeds2ndLineofTreatment['current_regimen']; ?></th>
                                 <?php } } ?>
-                                <th colspan="2" style="text-align:center;font-size:11px;">Others</th>
-                                <th colspan="2" style="text-align:center;font-size:11px;">Other</th>
+                                <th colspan="2" style="text-align:center;font-size:11px;"><?php echo $this->translate('Others'); ?></th>
+                                <th colspan="2" style="text-align:center;font-size:11px;"><?php echo $this->translate('Other'); ?></th>
                               </tr>
                             </thead>
                             <tbody>
                               <tr>
-                                <th style="text-align:center;font-size:11px;">Results</th>
+                                <th style="text-align:center;font-size:11px;"><?php echo $this->translate('Results'); ?></th>
                                 <?php
                                 if(isset($allCollapsibleLineofTreatmentResult['paeds2ndLineofTreatmentResult']) && count($allCollapsibleLineofTreatmentResult['paeds2ndLineofTreatmentResult']) >0){
                                     foreach($allCollapsibleLineofTreatmentResult['paeds2ndLineofTreatmentResult'] as $paeds2ndLineofTreatmentLabel){
@@ -956,7 +954,7 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
                                 <td style="text-align:center;font-size:11px;"><?php echo ($totalOtherLineofTreatmentSuppressed >0)?round((($totalOtherLineofTreatmentSuppressed/($totalOtherLineofTreatmentSuppressed+$totalOtherLineofTreatmentNotSuppressed))*100),2):''; ?></td>
                               </tr>
                               <tr>
-                                <th style="text-align:center;font-size:11px;">Total</th>
+                                <th style="text-align:center;font-size:11px;"><?php echo $this->translate('Total'); ?></th>
                                 <?php
                                 if(isset($allCollapsibleLineofTreatmentResult['paeds2ndLineofTreatmentResult']) && count($allCollapsibleLineofTreatmentResult['paeds2ndLineofTreatmentResult']) >0){
                                    foreach($allCollapsibleLineofTreatmentResult['paeds2ndLineofTreatmentResult'] as $paeds2ndLineofTreatmentTotal){
@@ -1005,7 +1003,7 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
                             <tbody>
                                 <?php foreach($keySummaryIndicators['sample'] as $key=>$indicators){ ?>
                                 <tr>
-                                    <td><?php echo $this->translate(strtoupper(str_replace('-',' ',$key)));?></td>
+                                    <td><?php echo strtoupper($this->translate(str_replace('-',' ',$key)));?></td>
                                     <?php foreach($indicators['month'] as $months){ ?>
                                        <td><?php echo $months;?></td>
                                     <?php } ?>
