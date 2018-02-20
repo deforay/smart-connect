@@ -218,7 +218,8 @@ return array(
             'Application\Controller\Config' => 'Application\Controller\ConfigController',
             'Application\Controller\Facility' => 'Application\Controller\FacilityController',
             'Application\Controller\Summary' => 'Application\Controller\SummaryController',
-            'Application\Controller\Time' => 'Application\Controller\TimeController'
+            'Application\Controller\Time' => 'Application\Controller\TimeController',
+            'Application\Controller\Cron' => 'Application\Controller\CronController'
         ),
     ),
     'view_manager' => array(
@@ -241,6 +242,16 @@ return array(
     'console' => array(
         'router' => array(
             'routes' => array(
+                'import-vl' => array(
+                    'type' => 'simple',
+                    'options' => array(
+                        'route' => 'import-vl',
+                        'defaults' => array(
+                            'controller' => 'Application\Controller\Cron',
+                            'action' => 'import-vl',
+                        ),
+                    ),
+                ),
             ),
         ),
     ),

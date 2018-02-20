@@ -65,116 +65,118 @@ class Module{
     public function preSetter(MvcEvent $e) {
         $session = new Container('credo');
 	$tempName=explode('Controller',$e->getRouteMatch()->getParam('controller'));
-	if ($e->getRouteMatch()->getParam('controller') != 'Application\Controller\Login') {
-	    //$session->userId = 'guest';
-	    //$session->accessType = 4;
-            if (!isset($session->userId) || $session->userId == "") {
-                $url = $e->getRouter()->assemble(array(), array('name' => 'login'));
-                $response = $e->getResponse();
-                $response->getHeaders()->addHeaderLine('Location', $url);
-                $response->setStatusCode(302);
-                $response->sendHeaders();
-
-                // To avoid additional processing
-                // we can attach a listener for Event Route with a high priority
-                $stopCallBack = function($event) use ($response) {
-                                    $event->stopPropagation();
-                                    return $response;
-                                };
-                //Attach the "break" as a listener with a high priority
-                $e->getApplication()->getEventManager()->attach(MvcEvent::EVENT_ROUTE, $stopCallBack, -10000);
-                return $response;
-            }else{
-		if((substr($tempName[1], 1) == 'Clinic' || substr($tempName[0], 1) == 'Hubs')  && $session->role == '2'){
-			$response = $e->getResponse();
-			$response->getHeaders()->addHeaderLine('Location', '/labs/dashboard');
-			$response->setStatusCode(302);
-			$response->sendHeaders();
-
-			// To avoid additional processing
-			// we can attach a listener for Event Route with a high priority
-			$stopCallBack = function($event) use ($response) {
-								$event->stopPropagation();
-								return $response;
-							};
-			//Attach the "break" as a listener with a high priority
-			$e->getApplication()->getEventManager()->attach(MvcEvent::EVENT_ROUTE, $stopCallBack, -10000);
-			return $response;
-		}else if((substr($tempName[1], 1) == 'Laboratory' || substr($tempName[1], 1) == 'Hubs')  && $session->role == '3'){
-			$response = $e->getResponse();
-			$response->getHeaders()->addHeaderLine('Location', '/clinics/dashboard');
-			$response->setStatusCode(302);
-			$response->sendHeaders();
-
-			// To avoid additional processing
-			// we can attach a listener for Event Route with a high priority
-			$stopCallBack = function($event) use ($response) {
-								$event->stopPropagation();
-								return $response;
-							};
-			//Attach the "break" as a listener with a high priority
-			$e->getApplication()->getEventManager()->attach(MvcEvent::EVENT_ROUTE, $stopCallBack, -10000);
-			return $response;
-		}else if((substr($tempName[1], 1) == 'Laboratory' || substr($tempName[1], 1) == 'Clinic')  && $session->role == '4'){
-			$response = $e->getResponse();
-			$response->getHeaders()->addHeaderLine('Location', '/hubs/dashboard');
-			$response->setStatusCode(302);
-			$response->sendHeaders();
-
-			// To avoid additional processing
-			// we can attach a listener for Event Route with a high priority
-			$stopCallBack = function($event) use ($response) {
-								$event->stopPropagation();
-								return $response;
-							};
-			//Attach the "break" as a listener with a high priority
-			$e->getApplication()->getEventManager()->attach(MvcEvent::EVENT_ROUTE, $stopCallBack, -10000);
-			return $response;
-		}
-		//clinic/lab dashboard re-direction, in-case of passing invalid url params
-		if($session->role!= 1){
-		    $mappedFacilities = (isset($session->mappedFacilities) && count($session->mappedFacilities) >0)?$session->mappedFacilities:array();
-		    $mappedFacilitiesName = (isset($session->mappedFacilitiesName) && count($session->mappedFacilitiesName) >0)?$session->mappedFacilitiesName:array();
-		    $mappedFacilitiesCode = (isset($session->mappedFacilitiesCode) && count($session->mappedFacilitiesCode) >0)?$session->mappedFacilitiesCode:array();
-		    $lab = array();
-		    if(isset($_GET['lab']) && trim($_GET['lab'])!= ''){
-			$lab = array_values(array_filter(explode(',',$_GET['lab'])));
-		    }
-		    $redirect = false;
-		    if(count($lab) > 0){
-			for($l=0;$l<count($lab);$l++){
-			    if(!in_array($lab[$l],$mappedFacilities) && !in_array($lab[$l],$mappedFacilitiesName) && !in_array($lab[$l],$mappedFacilitiesCode)){
-				$redirect = true;
-				break;
-			    }
+	if(substr($tempName[0], 0, -1) == 'Application'){
+		if ($e->getRouteMatch()->getParam('controller') != 'Application\Controller\Login') {
+			//$session->userId = 'guest';
+			//$session->accessType = 4;
+				if (!isset($session->userId) || $session->userId == "") {
+					$url = $e->getRouter()->assemble(array(), array('name' => 'login'));
+					$response = $e->getResponse();
+					$response->getHeaders()->addHeaderLine('Location', $url);
+					$response->setStatusCode(302);
+					$response->sendHeaders();
+	
+					// To avoid additional processing
+					// we can attach a listener for Event Route with a high priority
+					$stopCallBack = function($event) use ($response) {
+										$event->stopPropagation();
+										return $response;
+									};
+					//Attach the "break" as a listener with a high priority
+					$e->getApplication()->getEventManager()->attach(MvcEvent::EVENT_ROUTE, $stopCallBack, -10000);
+					return $response;
+				}else{
+				if((substr($tempName[1], 1) == 'Clinic' || substr($tempName[0], 1) == 'Hubs')  && $session->role == '2'){
+					$response = $e->getResponse();
+					$response->getHeaders()->addHeaderLine('Location', '/labs/dashboard');
+					$response->setStatusCode(302);
+					$response->sendHeaders();
+		
+					// To avoid additional processing
+					// we can attach a listener for Event Route with a high priority
+					$stopCallBack = function($event) use ($response) {
+										$event->stopPropagation();
+										return $response;
+									};
+					//Attach the "break" as a listener with a high priority
+					$e->getApplication()->getEventManager()->attach(MvcEvent::EVENT_ROUTE, $stopCallBack, -10000);
+					return $response;
+				}else if((substr($tempName[1], 1) == 'Laboratory' || substr($tempName[1], 1) == 'Hubs')  && $session->role == '3'){
+					$response = $e->getResponse();
+					$response->getHeaders()->addHeaderLine('Location', '/clinics/dashboard');
+					$response->setStatusCode(302);
+					$response->sendHeaders();
+		
+					// To avoid additional processing
+					// we can attach a listener for Event Route with a high priority
+					$stopCallBack = function($event) use ($response) {
+										$event->stopPropagation();
+										return $response;
+									};
+					//Attach the "break" as a listener with a high priority
+					$e->getApplication()->getEventManager()->attach(MvcEvent::EVENT_ROUTE, $stopCallBack, -10000);
+					return $response;
+				}else if((substr($tempName[1], 1) == 'Laboratory' || substr($tempName[1], 1) == 'Clinic')  && $session->role == '4'){
+					$response = $e->getResponse();
+					$response->getHeaders()->addHeaderLine('Location', '/hubs/dashboard');
+					$response->setStatusCode(302);
+					$response->sendHeaders();
+		
+					// To avoid additional processing
+					// we can attach a listener for Event Route with a high priority
+					$stopCallBack = function($event) use ($response) {
+										$event->stopPropagation();
+										return $response;
+									};
+					//Attach the "break" as a listener with a high priority
+					$e->getApplication()->getEventManager()->attach(MvcEvent::EVENT_ROUTE, $stopCallBack, -10000);
+					return $response;
+				}
+				//clinic/lab dashboard re-direction, in-case of passing invalid url params
+				if($session->role!= 1){
+					$mappedFacilities = (isset($session->mappedFacilities) && count($session->mappedFacilities) >0)?$session->mappedFacilities:array();
+					$mappedFacilitiesName = (isset($session->mappedFacilitiesName) && count($session->mappedFacilitiesName) >0)?$session->mappedFacilitiesName:array();
+					$mappedFacilitiesCode = (isset($session->mappedFacilitiesCode) && count($session->mappedFacilitiesCode) >0)?$session->mappedFacilitiesCode:array();
+					$lab = array();
+					if(isset($_GET['lab']) && trim($_GET['lab'])!= ''){
+					$lab = array_values(array_filter(explode(',',$_GET['lab'])));
+					}
+					$redirect = false;
+					if(count($lab) > 0){
+					for($l=0;$l<count($lab);$l++){
+						if(!in_array($lab[$l],$mappedFacilities) && !in_array($lab[$l],$mappedFacilitiesName) && !in_array($lab[$l],$mappedFacilitiesCode)){
+						$redirect = true;
+						break;
+						}
+					}
+					}
+					if($redirect == true){
+					//set redirect path
+					$response = $e->getResponse();
+					if($session->role == 2){
+						$response->getHeaders()->addHeaderLine('Location', '/labs/dashboard');
+					}else if($session->role == 3){
+						$response->getHeaders()->addHeaderLine('Location', '/clinics/dashboard');
+					}else if($session->role == 4){
+						$response->getHeaders()->addHeaderLine('Location', '/hubs/dashboard');
+					}
+					$response->setStatusCode(302);
+					$response->sendHeaders();
+			
+					// To avoid additional processing
+					// we can attach a listener for Event Route with a high priority
+					$stopCallBack = function($event) use ($response) {
+										$event->stopPropagation();
+										return $response;
+									};
+					//Attach the "break" as a listener with a high priority
+					$e->getApplication()->getEventManager()->attach(MvcEvent::EVENT_ROUTE, $stopCallBack, -10000);
+					  return $response;
+					}
+				}
+				}
 			}
-		    }
-		    if($redirect == true){
-			//set redirect path
-			$response = $e->getResponse();
-			if($session->role == 2){
-			    $response->getHeaders()->addHeaderLine('Location', '/labs/dashboard');
-			}else if($session->role == 3){
-			    $response->getHeaders()->addHeaderLine('Location', '/clinics/dashboard');
-			}else if($session->role == 4){
-			    $response->getHeaders()->addHeaderLine('Location', '/hubs/dashboard');
-			}
-			$response->setStatusCode(302);
-			$response->sendHeaders();
-    
-			// To avoid additional processing
-			// we can attach a listener for Event Route with a high priority
-			$stopCallBack = function($event) use ($response) {
-								$event->stopPropagation();
-								return $response;
-							};
-			//Attach the "break" as a listener with a high priority
-			$e->getApplication()->getEventManager()->attach(MvcEvent::EVENT_ROUTE, $stopCallBack, -10000);
-		      return $response;
-		    }
 		}
-	    }
-        }
     }
     
     protected function initTranslator(MvcEvent $event){

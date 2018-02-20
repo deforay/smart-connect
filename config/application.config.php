@@ -8,6 +8,7 @@
 return array(
     'modules' => array(
         'Application',
+        'Api',
         'DataManagement'
     ),
     'module_listener_options' => array(
