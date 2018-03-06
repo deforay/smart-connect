@@ -1271,4 +1271,251 @@ class SampleService {
     ////////////////////////////////////////
     ////////*** Turnaround Time ***////////
     ///////////////////////////////////////
+    
+    public function importSampleResultFile(){
+        $pathname = UPLOAD_PATH . DIRECTORY_SEPARATOR . "not-import-vl";
+        $common = new CommonService();
+        $sampleDb = $this->sm->get('SampleTable');
+        $facilityDb = $this->sm->get('FacilityTable');
+        $facilityTypeDb = $this->sm->get('FacilityTypeTable');
+        $testStatusDb = $this->sm->get('SampleStatusTable');
+        $testReasonDb = $this->sm->get('TestReasonTable');
+        $sampleTypeDb = $this->sm->get('SampleTypeTable');
+        $locationDb = $this->sm->get('LocationDetailsTable');
+        $sampleRjtReasonDb = $this->sm->get('SampleRejectionReasonTable');
+        $dbAdapter = $this->sm->get('Zend\Db\Adapter\Adapter');
+        $sql = new Sql($dbAdapter);
+        $files = scandir($pathname, SCANDIR_SORT_DESCENDING);
+        $newest_file = $files[0];
+        
+        if(trim($newest_file)!=""){
+            try {
+                //Hardcoded source details
+                $fileName =$newest_file;
+                if (file_exists($pathname . DIRECTORY_SEPARATOR . $fileName)) {
+                    $objPHPExcel = \PHPExcel_IOFactory::load($pathname . DIRECTORY_SEPARATOR . $fileName);
+                    $sheetData = $objPHPExcel->getActiveSheet()->toArray(null, true, true, true);
+                    $count = count($sheetData);
+                    for ($i = 2; $i <= $count; $i++) {
+                            if(trim($sheetData[$i]['A']) != '' && trim($sheetData[$i]['B']) != '') {
+                                $sampleCode = trim($sheetData[$i]['A']);
+                                $instanceCode = trim($sheetData[$i]['B']);
+                                $data = array('sample_code'=>$sampleCode,
+                                        'vlsm_instance_id'=>trim($sheetData[$i]['B']),
+                                        'source'=>'1',
+                                        'patient_gender'=>(trim($sheetData[$i]['C'])!='' ? trim($sheetData[$i]['C']) :  NULL),
+                                        'patient_age_in_years'=>(trim($sheetData[$i]['D'])!='' ? trim($sheetData[$i]['D']) :  NULL),
+                                        'sample_collection_date'=>(trim($sheetData[$i]['U'])!='' ? trim($sheetData[$i]['U']) :  NULL),
+                                        'sample_registered_at_lab'=>(trim($sheetData[$i]['AS'])!='' ? trim($sheetData[$i]['AS']) :  NULL),
+                                        'line_of_treatment'=>(trim($sheetData[$i]['AT'])!='' ? trim($sheetData[$i]['AT']) :  NULL),
+                                        'is_sample_rejected'=>(trim($sheetData[$i]['AU'])!='' ? trim($sheetData[$i]['AU']) :  NULL),
+                                        'is_patient_pregnant'=>(trim($sheetData[$i]['AX'])!='' ? trim($sheetData[$i]['AX']) :  NULL),
+                                        'is_patient_breastfeeding'=>(trim($sheetData[$i]['AY'])!='' ? trim($sheetData[$i]['AY']) :  NULL),
+                                        'patient_art_no'=>(trim($sheetData[$i]['AZ'])!='' ? trim($sheetData[$i]['AZ']) :  NULL),
+                                        'date_of_initiation_of_current_regimen'=>(trim($sheetData[$i]['BA'])!='' ? trim($sheetData[$i]['BA']) :  NULL),
+                                        'arv_adherance_percentage'=>(trim($sheetData[$i]['BB'])!='' ? trim($sheetData[$i]['BB']) :  NULL),
+                                        'is_adherance_poor'=>(trim($sheetData[$i]['BC'])!='' ? trim($sheetData[$i]['BC']) :  NULL),
+                                        'result_approved_datetime'=>(trim($sheetData[$i]['BD'])!='' ? trim($sheetData[$i]['BD']) :  NULL),
+                                        'sample_tested_datetime'=>(trim($sheetData[$i]['AJ'])!='' ? trim($sheetData[$i]['AJ']) :  NULL),
+                                        'result_value_log'=>(trim($sheetData[$i]['AK'])!='' ? trim($sheetData[$i]['AK']) :  NULL),
+                                        'result_value_absolute'=>(trim($sheetData[$i]['AL'])!='' ? trim($sheetData[$i]['AL']) :  NULL),
+                                        'result_value_text'=>(trim($sheetData[$i]['AM'])!='' ? trim($sheetData[$i]['AM']) :  NULL),
+                                        'result_value_absolute_decimal'=>(trim($sheetData[$i]['AN'])!='' ? trim($sheetData[$i]['AN']) :  NULL),
+                                        'result'=>(trim($sheetData[$i]['AO'])!='' ? trim($sheetData[$i]['AO']) :  NULL),
+                                );
+                                
+                                $facilityData = array('vlsm_instance_id'=>trim($sheetData[$i]['B']),
+                                        'facility_name'=>trim($sheetData[$i]['E']),
+                                        'facility_code'=>trim($sheetData[$i]['F']),
+                                        'facility_mobile_numbers'=>trim($sheetData[$i]['I']),
+                                        'address'=>trim($sheetData[$i]['J']),
+                                        'facility_hub_name'=>trim($sheetData[$i]['K']),
+                                        'contact_person'=>trim($sheetData[$i]['L']),
+                                        'report_email'=>trim($sheetData[$i]['M']),
+                                        'country'=>trim($sheetData[$i]['N']),
+                                        'facility_state'=>trim($sheetData[$i]['G']),
+                                        'facility_district'=>trim($sheetData[$i]['H']),
+                                        'longitude'=>trim($sheetData[$i]['O']),
+                                        'latitude'=>trim($sheetData[$i]['P']),
+                                        'status'=>trim($sheetData[$i]['Q']),
+                                );
+                                if(trim($sheetData[$i]['G'])!=''){
+                                    $sQueryResult = $this->checkFacilityStateDistrictDetails(trim($sheetData[$i]['G']),0);
+                                    if($sQueryResult){
+                                        $facilityData['facility_state'] = $sQueryResult['location_id'];
+                                    }else{
+                                        $locationDb->insert(array('parent_location'=>0,'location_name'=>trim($sheetData[$i]['G'])));
+                                        $facilityData['facility_state'] = $locationDb->lastInsertValue;
+                                    }
+                                }
+                                if(trim($sheetData[$i]['H'])!=''){
+                                    $sQueryResult = $this->checkFacilityStateDistrictDetails(trim($sheetData[$i]['H']),$facilityData['facility_state']);
+                                    if($sQueryResult){
+                                        $facilityData['facility_district'] = $sQueryResult['location_id'];
+                                    }else{
+                                        $locationDb->insert(array('parent_location'=>$facilityData['facility_state'],'location_name'=>trim($sheetData[$i]['H'])));
+                                        $facilityData['facility_district'] = $locationDb->lastInsertValue;
+                                    }
+                                }
+                                //check facility type
+                                if(trim($sheetData[$i]['R'])!=''){
+                                    $facilityTypeDataResult = $this->checkFacilityTypeDetails(trim($sheetData[$i]['R']));
+                                    if($facilityTypeDataResult){
+                                        $facilityData['facility_type'] = $facilityTypeDataResult['facility_type_id'];
+                                    }else{
+                                        $facilityTypeDb->insert(array('facility_type_name'=>trim($sheetData[$i]['R'])));
+                                        $facilityData['facility_type'] = $facilityTypeDb->lastInsertValue;
+                                    }
+                                }
+                                
+                                //check clinic details
+                                if(trim($sheetData[$i]['E'])!=''){
+                                    $facilityDataResult = $this->checkFacilityDetails(trim($sheetData[$i]['E']));
+                                    if($facilityDataResult){
+                                        $facilityDb->update($facilityData,array('facility_id'=>$facilityDataResult['facility_id']));
+                                        $data['facility_id'] = $facilityDataResult['facility_id'];
+                                    }else{
+                                        $facilityDb->insert($facilityData);
+                                        $data['facility_id'] = $facilityDb->lastInsertValue;
+                                    }
+                                }else{
+                                        $data['facility_id'] = NULL;
+                                }
+                                
+                                $labData = array('vlsm_instance_id'=>trim($sheetData[$i]['B']),
+                                        'facility_name'=>trim($sheetData[$i]['V']),
+                                        'facility_code'=>trim($sheetData[$i]['W']),
+                                        'facility_state'=>trim($sheetData[$i]['X']),
+                                        'facility_district'=>trim($sheetData[$i]['Y']),
+                                        'facility_mobile_numbers'=>trim($sheetData[$i]['Z']),
+                                        'address'=>trim($sheetData[$i]['AA']),
+                                        'facility_hub_name'=>trim($sheetData[$i]['AB']),
+                                        'contact_person'=>trim($sheetData[$i]['AC']),
+                                        'report_email'=>trim($sheetData[$i]['AD']),
+                                        'country'=>trim($sheetData[$i]['AE']),
+                                        'longitude'=>trim($sheetData[$i]['AF']),
+                                        'latitude'=>trim($sheetData[$i]['AG']),
+                                        'status'=>trim($sheetData[$i]['AH']),
+                                );
+                                if(trim($sheetData[$i]['X'])!=''){
+                                    $sQueryResult = $this->checkFacilityStateDistrictDetails(trim($sheetData[$i]['X']),0);
+                                    if($sQueryResult){
+                                        $labData['facility_state'] = $sQueryResult['location_id'];
+                                    }else{
+                                        $locationDb->insert(array('parent_location'=>0,'location_name'=>trim($sheetData[$i]['X'])));
+                                        $labData['facility_state'] = $locationDb->lastInsertValue;
+                                    }
+                                }
+                                if(trim($sheetData[$i]['Y'])!=''){
+                                    $sQueryResult = $this->checkFacilityStateDistrictDetails(trim($sheetData[$i]['Y']),$labData['facility_state']);
+                                    if($sQueryResult){
+                                        $labData['facility_district'] = $sQueryResult['location_id'];
+                                    }else{
+                                        $locationDb->insert(array('parent_location'=>$labData['facility_state'],'location_name'=>trim($sheetData[$i]['Y'])));
+                                        $labData['facility_district'] = $locationDb->lastInsertValue;
+                                    }
+                                }
+                                //check lab type
+                                if(trim($sheetData[$i]['AI'])!=''){
+                                    $labTypeDataResult = $this->checkFacilityTypeDetails(trim($sheetData[$i]['AI']));
+                                    if($labTypeDataResult){
+                                        $labData['facility_type'] = $labTypeDataResult['facility_type_id'];
+                                    }else{
+                                        $facilityTypeDb->insert(array('facility_type_name'=>trim($sheetData[$i]['AI'])));
+                                        $labData['facility_type'] = $facilityTypeDb->lastInsertValue;
+                                    }
+                                }
+                                
+                                //check lab details
+                                if(trim($sheetData[$i]['V'])!=''){
+                                    $labDataResult = $this->checkFacilityDetails(trim($sheetData[$i]['V']));
+                                    if($labDataResult){
+                                        $facilityDb->update($labData,array('facility_id'=>$labDataResult['facility_id']));
+                                        $data['lab_id'] = $labDataResult['facility_id'];
+                                    }else{
+                                        $facilityDb->insert($labData);
+                                        $data['lab_id'] = $facilityDb->lastInsertValue;
+                                    }
+                                }else{
+                                    $data['lab_id'] = 0;
+                                }
+                                //check testing reason
+                                if(trim($sheetData[$i]['AP'])!=''){
+                                    $testReasonResult = $this->checkTestingReson(trim($sheetData[$i]['AP']));
+                                    if($testReasonResult){
+                                        $testReasonDb->update(array('test_reason_name'=>trim($sheetData[$i]['AP']),'test_reason_status'=>trim($sheetData[$i]['AQ'])),array('test_reason_id'=>$testReasonResult['test_reason_id']));
+                                        $data['reason_for_vl_testing'] = $testReasonResult['test_reason_id'];
+                                    }else{
+                                        $testReasonDb->insert(array('test_reason_name'=>trim($sheetData[$i]['AP']),'test_reason_status'=>trim($sheetData[$i]['AQ'])));
+                                        $data['reason_for_vl_testing'] = $testReasonDb->lastInsertValue;
+                                    }
+                                }else{
+                                        $data['reason_for_vl_testing'] = 0;
+                                }
+                                //check testing reason
+                                if(trim($sheetData[$i]['AR'])!=''){
+                                    $sampleStatusResult = $this->checkSampleStatus(trim($sheetData[$i]['AR']));
+                                    if($sampleStatusResult){
+                                        $data['result_status'] = $sampleStatusResult['status_id'];
+                                    }else{
+                                        $testStatusDb->insert(array('status_name'=>trim($sheetData[$i]['AR'])));
+                                        $data['result_status'] = $testStatusDb->lastInsertValue;
+                                    }
+                                }else{
+                                    $data['result_status'] = 6;
+                                }
+                                //check sample type
+                                if(trim($sheetData[$i]['S'])!=''){
+                                    $sampleType = $this->checkSampleType(trim($sheetData[$i]['S']));
+                                    if($sampleType){
+                                        $sampleTypeDb->update(array('sample_name'=>trim($sheetData[$i]['S']),'status'=>trim($sheetData[$i]['T'])),array('sample_id'=>$sampleType['sample_id']));
+                                        $data['sample_type'] = $sampleType['sample_id'];
+                                    }else{
+                                        $sampleTypeDb->insert(array('sample_name'=>trim($sheetData[$i]['S']),'status'=>trim($sheetData[$i]['T'])));
+                                        $data['sample_type'] = $sampleTypeDb->lastInsertValue;
+                                    }
+                                }else{
+                                    $data['sample_type'] = NULL;
+                                }
+                                //check sample rejection reason
+                                if(trim($sheetData[$i]['AV'])!=''){
+                                    $sampleRejectionReason = $this->checkSampleRejectionReason(trim($sheetData[$i]['AV']));
+                                    if($sampleRejectionReason){
+                                        $sampleRjtReasonDb->update(array('rejection_reason_name'=>trim($sheetData[$i]['AV']),'rejection_reason_status'=>trim($sheetData[$i]['AW'])),array('rejection_reason_id'=>$sampleRejectionReason['rejection_reason_id']));
+                                        $data['reason_for_sample_rejection'] = $sampleRejectionReason['rejection_reason_id'];
+                                    }else{
+                                        $sampleRjtReasonDb->insert(array('rejection_reason_name'=>trim($sheetData[$i]['AV']),'rejection_reason_status'=>trim($sheetData[$i]['AW'])));
+                                        $data['reason_for_sample_rejection'] = $sampleRjtReasonDb->lastInsertValue;
+                                    }
+                                }else{
+                                    $data['reason_for_sample_rejection'] = NULL;
+                                }
+                                
+                                //check existing sample code
+                                $sampleCode = $this->checkSampleCode($sampleCode,$instanceCode);
+                                if($sampleCode){
+                                    //sample data update
+                                    $sampleDb->update($data,array('vl_sample_id'=>$sampleCode['vl_sample_id']));
+                                }else{
+                                    //sample data insert
+                                    $sampleDb->insert($data);
+                                }
+                            }
+                        }
+                        
+                        $destination=UPLOAD_PATH . DIRECTORY_SEPARATOR . "import-vl";
+                        if (!file_exists($destination) && !is_dir($destination)) {
+                            mkdir(UPLOAD_PATH . DIRECTORY_SEPARATOR . "import-vl");
+                        }
+                        
+                        if (copy($pathname . DIRECTORY_SEPARATOR . $fileName, $destination. DIRECTORY_SEPARATOR.$fileName)) {
+                            unlink($pathname . DIRECTORY_SEPARATOR . $fileName);
+                        }
+                }
+            }catch (Exception $exc) {
+                error_log($exc->getMessage());
+                error_log($exc->getTraceAsString());
+            }
+        }
+    }
 }
