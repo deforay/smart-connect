@@ -36,137 +36,137 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
 }
 ?>
 <link href="<?php echo $this->basePath('assets/global/css/month-year-rang-picker.css'); ?>" rel="stylesheet" type="text/css" />
-           <!-- BEGIN PAGE HEADER-->
-                    <!-- BEGIN THEME PANEL -->
-                    <!-- END THEME PANEL -->
-                    <!-- BEGIN PAGE BAR -->
-                     <div class="page-bar">
-                        <h1 class="page-title"><?php echo $this->translate('Request Form Completeness'); ?>
-                        <ul class="page-breadcrumb pull-right">
-                            <li>
-                                <i class="fa fa-arrow-left"></i>
-                                <a href="/labs/dashboard"><?php echo $this->translate('Back to Labs Dashboard'); ?></a>
-                            </li>
-                        </ul>
-                        </h1>
-                    </div>                    
-                   
-                    <!-- END PAGE BAR -->
-                    <!-- BEGIN PAGE TITLE-->
-                    <h3 class="page-title"></h3>
-                    <!-- END PAGE TITLE-->
-                    <!-- END PAGE HEADER-->
-                    <form id="pageFilter" action="#" method="">
-                        <div class="row">
-                            <div class="col-md-12" style="padding-left:30px;">
-                            <div class="col-md-12">
-                                <div class="form-group col-lg-4">
-                                    <label class="control-label"><?php echo $this->translate('Date Range'); ?>&nbsp;</label>
-                                  <div id="sla-data-range" class="btn btn-sm form-control col-lg-6 mrp-container ">
-                                    
-                                    <span class="mrp-icon"><i class="fa fa-calendar"></i> &nbsp;</span>
-                                    <div class="mrp-monthdisplay ">
-                                      <span class="mrp-lowerMonth"><?php echo $startDisplayDate; ?></span>
-                                      <span class="mrp-to"> to </span>
-                                      <span class="mrp-upperMonth"><?php echo $endDisplayDate; ?></span>
-                                    </div>
-                                  <input type="hidden" value="<?php echo $startDate; ?>" id="mrp-lowerDate" />
-                                  <input type="hidden" value="<?php echo $endDate; ?>" id="mrp-upperDate" />
-                                
-                                </div>
-                                </div>
-                                <div class="form-group col-lg-4">
-                                    <label class="control-label"><?php echo $this->translate('Provinces'); ?>&nbsp;</label>
-                                    <select name="provinces[]" id="provinces" class="form-control" multiple title="<?php echo $this->translate('Please choose provinces'); ?>" onchange="getLocationInfo('provinces');">
-                                        <?php
-                                        if(isset($facilityInfo['provinces']) && count($facilityInfo['provinces']) > 0){
-                                            foreach($facilityInfo['provinces'] as $province){
-                                        ?>
-                                            <option value="<?php echo $province['location_id']; ?>" <?php echo(in_array($province['location_id'],$selectedProvinces))?'selected="selected"':''; ?>><?php echo ucwords($province['location_name']); ?></option>
-                                        <?php } } ?>
-                                    </select>
-                                </div>
-                                <div class="form-group col-lg-4">
-                                    <label class="control-label"><?php echo $this->translate('Districts'); ?>&nbsp;</label>
-                                    <select name="districts[]" id="districts" class="form-control" multiple title="<?php echo $this->translate('Please choose districts'); ?>" onchange="getLocationInfo('districts');">
-                                        <?php
-                                        if(isset($facilityInfo['provinceDistricts']) && count($facilityInfo['provinceDistricts']) > 0){
-                                            foreach($facilityInfo['provinceDistricts'] as $provinceDistrict){
-                                        ?>
-                                            <option value="<?php echo $provinceDistrict['location_id']; ?>" <?php echo(in_array($provinceDistrict['location_id'],$selectedDistricts))?'selected="selected"':''; ?>><?php echo ucwords($provinceDistrict['location_name']); ?></option>
-                                        <?php } } ?>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-12">
-                                <div class="form-group col-lg-4">
-                                    <label class="control-label"><?php echo $this->translate('Labs'); ?>&nbsp;</label>
-                                    <select name="labName[]" id="labName" class="form-control" multiple title="<?php echo $this->translate('Please choose labs'); ?>">
-                                        <?php
-                                        if(isset($facilityInfo['labs']) && count($facilityInfo['labs']) > 0){
-                                            foreach($facilityInfo['labs'] as $labs){
-                                        ?>
-                                            <option value="<?php echo $labs['facility_id']; ?>" <?php echo(in_array($labs['facility_id'],$selectedLabs))?'selected="selected"':''; ?>><?php echo ucwords($labs['facility_name']); ?></option>
-                                        <?php } } ?>
-                                    </select>
-                                </div>
-                                <div class="form-group col-lg-4">
-                                  <label class="control-label"><?php echo $this->translate('Gender'); ?></label>
-                                  <select class="form-control" name="gender" id="gender">
-                                    <option value=""><?php echo $this->translate('All'); ?></option>
-                                    <option value="M"><?php echo $this->translate('Male'); ?></option>
-                                    <option value="F"><?php echo $this->translate('Female'); ?></option>
-                                    <option value="not_specified"><?php echo $this->translate('Not Specified'); ?></option>
-                                  </select>
-                                </div>
-                                <div class="form-group col-lg-4 femaleSection" style="display:none;">
-                                    <label class="control-label"><?php echo $this->translate('Is Patient Pregnant'); ?></label>
-                                    <select class="form-control" name="isPregnant" id="isPregnant">
-                                      <option value=""><?php echo $this->translate('All'); ?></option>  
-                                      <option value="yes"><?php echo $this->translate('Yes'); ?></option>
-                                      <option value="no"><?php echo $this->translate('No'); ?></option>
-                                      <option value="unreported"><?php echo $this->translate('Unreported'); ?></option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-12">
-                                <div class="form-group col-lg-4 femaleSection" style="display:none;">
-                                    <label class="control-label"><?php echo $this->translate('Is Patient Breastfeeding'); ?></label>
-                                    <select class="form-control" name="isBreastfeeding" id="isBreastfeeding">
-                                      <option value=""><?php echo $this->translate('All'); ?></option>  
-                                      <option value="yes"><?php echo $this->translate('Yes'); ?></option>
-                                      <option value="no"><?php echo $this->translate('No'); ?></option>
-                                      <option value="unreported"><?php echo $this->translate('Unreported'); ?></option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-12">
-                                <div class="form-group col-lg-12" style="text-align:center;margin-top:10px;">
-                                    <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="searchIncompleteSampleResult()"><?php echo $this->translate('Search'); ?></a>&nbsp;&nbsp;
-                                    <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="resetEverything();"><?php echo $this->translate('Reset'); ?></a>
-                                </div>
-                            </div>
-                            </div>
-                        </div>
-                    </form>
-                    <hr style="background: #000 !important;border-color:#ccc;">
-                    <div class="row" style="margin-bottom:30px;">
-                        <div class="col-lg-6">
-                            <div id="piecontainer" style="min-width: 310px; height: 400px; max-width: 100%; margin: 0 auto;padding:1.5%;"></div>
-                        </div>
-                        <div class="col-lg-6">
-                            <div id="barcontainer" style="min-width: 310px; height: 400px; max-width: 100%; margin: 0 auto;padding:1.5%;"></div>
-                        </div>
+<!-- BEGIN PAGE HEADER-->
+    <!-- BEGIN THEME PANEL -->
+    <!-- END THEME PANEL -->
+    <!-- BEGIN PAGE BAR -->
+     <div class="page-bar">
+        <h1 class="page-title"><?php echo $this->translate('Request Form Completeness'); ?>
+        <ul class="page-breadcrumb pull-right">
+            <li>
+                <i class="fa fa-arrow-left"></i>
+                <a href="/labs/dashboard"><?php echo $this->translate('Back to Labs Dashboard'); ?></a>
+            </li>
+        </ul>
+        </h1>
+    </div>                    
+   
+    <!-- END PAGE BAR -->
+    <!-- BEGIN PAGE TITLE-->
+    <h3 class="page-title"></h3>
+    <!-- END PAGE TITLE-->
+    <!-- END PAGE HEADER-->
+    <form id="pageFilter" action="#" method="">
+        <div class="row">
+            <div class="col-md-12" style="padding-left:30px;">
+            <div class="col-md-12">
+                <div class="form-group col-lg-4">
+                    <label class="control-label"><?php echo $this->translate('Date Range'); ?>&nbsp;</label>
+                  <div id="sla-data-range" class="btn btn-sm form-control col-lg-6 mrp-container ">
+                    
+                    <span class="mrp-icon"><i class="fa fa-calendar"></i> &nbsp;</span>
+                    <div class="mrp-monthdisplay ">
+                      <span class="mrp-lowerMonth"><?php echo $startDisplayDate; ?></span>
+                      <span class="mrp-to"> to </span>
+                      <span class="mrp-upperMonth"><?php echo $endDisplayDate; ?></span>
                     </div>
+                  <input type="hidden" value="<?php echo $startDate; ?>" id="mrp-lowerDate" />
+                  <input type="hidden" value="<?php echo $endDate; ?>" id="mrp-upperDate" />
+                
+                </div>
+                </div>
+                <div class="form-group col-lg-4">
+                    <label class="control-label"><?php echo $this->translate('Provinces'); ?>&nbsp;</label>
+                    <select name="provinces[]" id="provinces" class="form-control" multiple title="<?php echo $this->translate('Please choose provinces'); ?>" onchange="getLocationInfo('provinces');">
+                        <?php
+                        if(isset($facilityInfo['provinces']) && count($facilityInfo['provinces']) > 0){
+                            foreach($facilityInfo['provinces'] as $province){
+                        ?>
+                            <option value="<?php echo $province['location_id']; ?>" <?php echo(in_array($province['location_id'],$selectedProvinces))?'selected="selected"':''; ?>><?php echo ucwords($province['location_name']); ?></option>
+                        <?php } } ?>
+                    </select>
+                </div>
+                <div class="form-group col-lg-4">
+                    <label class="control-label"><?php echo $this->translate('Districts'); ?>&nbsp;</label>
+                    <select name="districts[]" id="districts" class="form-control" multiple title="<?php echo $this->translate('Please choose districts'); ?>" onchange="getLocationInfo('districts');">
+                        <?php
+                        if(isset($facilityInfo['provinceDistricts']) && count($facilityInfo['provinceDistricts']) > 0){
+                            foreach($facilityInfo['provinceDistricts'] as $provinceDistrict){
+                        ?>
+                            <option value="<?php echo $provinceDistrict['location_id']; ?>" <?php echo(in_array($provinceDistrict['location_id'],$selectedDistricts))?'selected="selected"':''; ?>><?php echo ucwords($provinceDistrict['location_name']); ?></option>
+                        <?php } } ?>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="form-group col-lg-4">
+                    <label class="control-label"><?php echo $this->translate('Labs'); ?>&nbsp;</label>
+                    <select name="labName[]" id="labName" class="form-control" multiple title="<?php echo $this->translate('Please choose labs'); ?>">
+                        <?php
+                        if(isset($facilityInfo['labs']) && count($facilityInfo['labs']) > 0){
+                            foreach($facilityInfo['labs'] as $labs){
+                        ?>
+                            <option value="<?php echo $labs['facility_id']; ?>" <?php echo(in_array($labs['facility_id'],$selectedLabs))?'selected="selected"':''; ?>><?php echo ucwords($labs['facility_name']); ?></option>
+                        <?php } } ?>
+                    </select>
+                </div>
+                <div class="form-group col-lg-4">
+                  <label class="control-label"><?php echo $this->translate('Gender'); ?></label>
+                  <select class="form-control" name="gender" id="gender">
+                    <option value=""><?php echo $this->translate('All'); ?></option>
+                    <option value="M"><?php echo $this->translate('Male'); ?></option>
+                    <option value="F"><?php echo $this->translate('Female'); ?></option>
+                    <option value="not_specified"><?php echo $this->translate('Not Specified'); ?></option>
+                  </select>
+                </div>
+                <div class="form-group col-lg-4 femaleSection" style="display:none;">
+                    <label class="control-label"><?php echo $this->translate('Is Patient Pregnant'); ?></label>
+                    <select class="form-control" name="isPregnant" id="isPregnant">
+                      <option value=""><?php echo $this->translate('All'); ?></option>  
+                      <option value="yes"><?php echo $this->translate('Yes'); ?></option>
+                      <option value="no"><?php echo $this->translate('No'); ?></option>
+                      <option value="unreported"><?php echo $this->translate('Unreported'); ?></option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="form-group col-lg-4 femaleSection" style="display:none;">
+                    <label class="control-label"><?php echo $this->translate('Is Patient Breastfeeding'); ?></label>
+                    <select class="form-control" name="isBreastfeeding" id="isBreastfeeding">
+                      <option value=""><?php echo $this->translate('All'); ?></option>  
+                      <option value="yes"><?php echo $this->translate('Yes'); ?></option>
+                      <option value="no"><?php echo $this->translate('No'); ?></option>
+                      <option value="unreported"><?php echo $this->translate('Unreported'); ?></option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="form-group col-lg-12" style="text-align:center;margin-top:10px;">
+                    <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="searchIncompleteSampleResult()"><?php echo $this->translate('Search'); ?></a>&nbsp;&nbsp;
+                    <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="resetEverything();"><?php echo $this->translate('Reset'); ?></a>
+                </div>
+            </div>
+            </div>
+        </div>
+    </form>
+    <hr style="background: #000 !important;border-color:#ccc;">
+    <div class="row" style="margin-bottom:30px;">
+        <div class="col-lg-6">
+            <div id="piecontainer" style="min-width: 310px; height: 400px; max-width: 100%; margin: 0 auto;padding:1.5%;"></div>
+        </div>
+        <div class="col-lg-6">
+            <div id="barcontainer" style="min-width: 310px; height: 400px; max-width: 100%; margin: 0 auto;padding:1.5%;"></div>
+        </div>
+    </div>
 <script>
     function generatePieContainer(){
         $.blockUI.defaults.css.border = '1px solid grey';
         $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
         var fromDate = $('#mrp-lowerDate').val();
         var toDate = $('#mrp-upperDate').val();
-        var provinces = $("#provinces").val();
-        var districts = $("#districts").val();
-        var lab = $("#labName").val();
+        var provinces = ($("#provinces").val() == null)?'':$("#provinces").val().join(',');
+        var districts = ($("#districts").val() == null)?'':$("#districts").val().join(',');
+        var lab = ($("#labName").val() == null)?'':$("#labName").val().join(',');
         var gender = $("#gender").val();
         var isPregnant = $("#isPregnant").val();
         var isBreastfeeding = $("#isBreastfeeding").val();
@@ -181,9 +181,9 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
         $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
         var fromDate = $('#mrp-lowerDate').val();
         var toDate = $('#mrp-upperDate').val();
-        var provinces = $("#provinces").val();
-        var districts = $("#districts").val();
-        var lab = $("#labName").val();
+        var provinces = ($("#provinces").val() == null)?'':$("#provinces").val().join(',');
+        var districts = ($("#districts").val() == null)?'':$("#districts").val().join(',');
+        var lab = ($("#labName").val() == null)?'':$("#labName").val().join(',');
         var gender = $("#gender").val();
         var isPregnant = $("#isPregnant").val();
         var isBreastfeeding = $("#isBreastfeeding").val();
@@ -498,13 +498,13 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
     });
     
     function getLocationInfo(fromSrc){
-        provinces = ($("#provinces").val() == null || $("#provinces").val() == '')?[]:$("#provinces").val();
-        districts = ($("#districts").val() == null || $("#districts").val() == '')?[]:$("#districts").val();
+        var provinces = ($("#provinces").val() == null || $("#provinces").val() == '')?[]:$("#provinces").val();
+        var districts = ($("#districts").val() == null || $("#districts").val() == '')?[]:$("#districts").val();
         $.post("<?php echo $this->url('laboratory', array('action' => 'get-location-info')); ?>", {provinces:provinces,districts:districts,fromSrc:fromSrc},
         function(data){
             if(fromSrc == 'provinces'){ $('#districts').val('').change(); }
             $('#labName').val('').change();
-            splitLocationInfo = data.split('##');
+            var splitLocationInfo = data.split('##');
             if(fromSrc == 'provinces'){ $('#districts').html(splitLocationInfo[0]); }
             $('#labName').html(splitLocationInfo[1]);
         });

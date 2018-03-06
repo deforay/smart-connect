@@ -2,7 +2,6 @@
 
 namespace Application\Model;
 
-use Zend\Session\Container;
 use Zend\Db\Adapter\Adapter;
 use Zend\Db\Sql\Sql;
 use Zend\Db\Sql\Expression;
@@ -34,6 +33,7 @@ class LocationDetailsTable extends AbstractTableGateway {
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         return $rResult;
     }
+    
     public function fetchDistrictList($locationId){
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);

@@ -5,19 +5,24 @@ $patientMobileNumber = '';
 //set patient details
 if(isset($result[0]['patient_first_name']) && $result[0]['patient_first_name']!= NULL && trim($result[0]['patient_first_name'])!= ''){
     $patientFirstName = ucwords($result[0]['patient_first_name']);
-}if(isset($result[0]['patient_last_name']) && $result[0]['patient_last_name']!= NULL && trim($result[0]['patient_last_name'])!= ''){
+}
+if(isset($result[0]['patient_last_name']) && $result[0]['patient_last_name']!= NULL && trim($result[0]['patient_last_name'])!= ''){
     $patientLastName = ucwords($result[0]['patient_last_name']);
-}if(isset($result[0]['patient_mobile_number']) && $result[0]['patient_mobile_number']!= NULL && trim($result[0]['patient_mobile_number'])!= ''){
+}
+if(isset($result[0]['patient_mobile_number']) && $result[0]['patient_mobile_number']!= NULL && trim($result[0]['patient_mobile_number'])!= ''){
     $patientMobileNumber = $result[0]['patient_mobile_number'];
 }
 //set facility details
 if(!isset($result[0]['facility_name']) || $result[0]['facility_name'] == NULL || trim($result[0]['facility_name']) == ''){
    $result[0]['facility_name'] = '';
-}if(!isset($result[0]['facility_code']) || $result[0]['facility_code'] == NULL || trim($result[0]['facility_code']) == ''){
+}
+if(!isset($result[0]['facility_code']) || $result[0]['facility_code'] == NULL || trim($result[0]['facility_code']) == ''){
    $result[0]['facility_code'] = '';
-}if(!isset($result[0]['provinceName']) || $result[0]['provinceName'] == NULL || trim($result[0]['provinceName']) == ''){
+}
+if(!isset($result[0]['provinceName']) || $result[0]['provinceName'] == NULL || trim($result[0]['provinceName']) == ''){
    $result[0]['provinceName'] = '';
-}if(!isset($result[0]['districtName']) || $result[0]['districtName'] == NULL || trim($result[0]['districtName']) == ''){
+}
+if(!isset($result[0]['districtName']) || $result[0]['districtName'] == NULL || trim($result[0]['districtName']) == ''){
    $result[0]['districtName'] = '';
 }
 //set gender

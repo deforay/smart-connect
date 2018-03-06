@@ -1,6 +1,6 @@
 <?php
-$lt1000 = array('Age < 2'=>'#088738', 'Age 2-5' => '#7fb17f', 'Age 6-14' => '#60D18F', 'Age 15-49' => '#A5F7C6', 'Age > 50' => '#b2d0b2');
-$gt1000 = array('Age < 2'=>'#ff1900', 'Age 2-5' => '#ac2710', 'Age 6-14' => '#f8745d', 'Age 15-49' => '#fa9c8b', 'Age > 50' => '#fcc3b9');
+$lt1000 = array('Age < 2'=>'#088738', 'Age 2-5' => '#7fb17f', 'Age 6-14' => '#60D18F', 'Age 15-49' => '#A5F7C6', 'Age > 50' => '#b2d0b2', 'Age Unknown' => '#b2ffb2');
+$gt1000 = array('Age < 2'=>'#ff1900', 'Age 2-5' => '#ff1900', 'Age 6-14' => '#ff1900', 'Age 15-49' => '#ff1900', 'Age > 50' => '#ff1900', 'Age Unknown' => '#ff1900');
 ?>
 <div id="samplesTestedVsAgeGroup"></div>
 <script>
@@ -61,7 +61,7 @@ $(function () {
             }
         },
         series: [<?php
-        $age = array('Age < 2','Age 2-5','Age 6-14','Age 15-49','Age > 50');
+        $age = array('Age < 2','Age 2-5','Age 6-14','Age 15-49','Age > 50','Age Unknown');
         for($i=0;$i<count($age);$i++){
               if(!isset($result[$age[$i]])) continue;
               foreach($result[$age[$i]] as $key=>$condition){

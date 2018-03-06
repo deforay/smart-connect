@@ -21,11 +21,25 @@ class SummaryController extends AbstractActionController{
         $allLineofTreatmentResult = $summaryService->getAllLineOfTreatmentDetails();
         $allCollapsibleLineofTreatmentResult = $summaryService->getAllCollapsibleLineOfTreatmentDetails();
         return new ViewModel(array(
-                    'summaryTabInfo' => $summaryTabResult,
-                    'keySummaryIndicators' => $keySummaryIndicatorsResult,
-                    'allLineofTreatmentInfo' => $allLineofTreatmentResult,
-                    'allCollapsibleLineofTreatmentResult'=>$allCollapsibleLineofTreatmentResult
+            'summaryTabInfo' => $summaryTabResult,
+            'keySummaryIndicators' => $keySummaryIndicatorsResult,
+            'allLineofTreatmentInfo' => $allLineofTreatmentResult,
+            'allCollapsibleLineofTreatmentResult'=>$allCollapsibleLineofTreatmentResult
         ));
+    }
+    
+    public function getSamplesReceivedBarChartAction() {
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $summaryService = $this->getServiceLocator()->get('SummaryService');
+            $result = $summaryService->getSamplesReceivedBarChartDetails($params);
+            $viewModel = new ViewModel();
+            $viewModel->setVariables(array(
+                                    'result' => $result
+                                    ))->setTerminal(true);
+            return $viewModel;
+        }
     }
     
     public function samplesReceivedDistrictAction() {
@@ -48,12 +62,12 @@ class SummaryController extends AbstractActionController{
         }
     }
     
-    public function getSamplesReceivedBarChartAction() {
+    public function getSuppressionRateBarChartAction() {
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
             $summaryService = $this->getServiceLocator()->get('SummaryService');
-            $result = $summaryService->getSamplesReceivedBarChartDetails($params);
+            $result = $summaryService->getSuppressionRateBarChartDetails($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array(
                                     'result' => $result
@@ -81,13 +95,13 @@ class SummaryController extends AbstractActionController{
             return $this->getResponse()->setContent(Json::encode($result));
         }
     }
-    
-    public function getSuppressionRateBarChartAction() {
+
+    public function getSamplesRejectedBarChartAction() {
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
             $summaryService = $this->getServiceLocator()->get('SummaryService');
-            $result = $summaryService->getSuppressionRateBarChartDetails($params);
+            $result = $summaryService->getSamplesRejectedBarChartDetails($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array(
                                     'result' => $result
@@ -95,7 +109,7 @@ class SummaryController extends AbstractActionController{
             return $viewModel;
         }
     }
-
+    
     public function samplesRejectedDistrictAction() {
         $request = $this->getRequest();
         if ($request->isPost()) {
@@ -116,12 +130,12 @@ class SummaryController extends AbstractActionController{
         }
     }
     
-    public function getSamplesRejectedBarChartAction() {
+    public function getRegimenGroupBarChartAction() {
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
             $summaryService = $this->getServiceLocator()->get('SummaryService');
-            $result = $summaryService->getSamplesRejectedBarChartDetails($params);
+            $result = $summaryService->getRegimenGroupBarChartDetails($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array(
                                     'result' => $result
@@ -137,20 +151,6 @@ class SummaryController extends AbstractActionController{
             $summaryService = $this->getServiceLocator()->get('SummaryService');
             $result = $summaryService->getRegimenGroupSamplesDetails($parameters);
             return $this->getResponse()->setContent(Json::encode($result));
-        }
-    }
-    
-    public function getRegimenGroupBarChartAction() {
-        $request = $this->getRequest();
-        if ($request->isPost()) {
-            $params = $request->getPost();
-            $summaryService = $this->getServiceLocator()->get('SummaryService');
-            $result = $summaryService->getRegimenGroupBarChartDetails($params);
-            $viewModel = new ViewModel();
-            $viewModel->setVariables(array(
-                                    'result' => $result
-                                    ))->setTerminal(true);
-            return $viewModel;
         }
     }
 }

@@ -352,9 +352,20 @@ class SampleService {
         return $sampleDb->fetchSampleTestedResultDetails($params);
     }
     
+    //get sample tested result details
+    public function getSampleTestedResultBasedVolumeDetails($params){
+        $sampleDb = $this->sm->get('SampleTable');
+        return $sampleDb->fetchSampleTestedResultBasedVolumeDetails($params);
+    }
+    
     public function getSampleTestedResultGenderDetails($params){
         $sampleDb = $this->sm->get('SampleTable');
         return $sampleDb->fetchSampleTestedResultGenderDetails($params);
+    }
+    
+    public function getLabTurnAroundTime($params){
+        $sampleDb = $this->sm->get('SampleTable');
+        return $sampleDb->fetchLabTurnAroundTime($params);
     }
     
     public function getSampleTestedResultAgeGroupDetails($params){
@@ -362,10 +373,14 @@ class SampleService {
         return $sampleDb->fetchSampleTestedResultAgeGroupDetails($params);
     }
     
-    //get sample tested result details
-    public function getSampleTestedResultBasedVolumeDetails($params){
+    public function getSampleTestedResultPregnantPatientDetails($params){
         $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->fetchSampleTestedResultBasedVolumeDetails($params);
+        return $sampleDb->fetchSampleTestedResultPregnantPatientDetails($params);
+    }
+    
+    public function getSampleTestedResultBreastfeedingPatientDetails($params){
+        $sampleDb = $this->sm->get('SampleTable');
+        return $sampleDb->fetchSampleTestedResultBreastfeedingPatientDetails($params);
     }
     
     //get Requisition Forms tested
@@ -373,7 +388,7 @@ class SampleService {
         $sampleDb = $this->sm->get('SampleTable');
         return $sampleDb->getRequisitionFormsTested($params);
     }
-    //get Requisition Forms tested
+   
     public function getSampleVolume($params){
         $sampleDb = $this->sm->get('SampleTable');
         return $sampleDb->getSampleVolume($params);
@@ -389,19 +404,14 @@ class SampleService {
         return $sampleDb->getLineOfTreatment($params);
     }
     
-    public function getVlOutComes($params){
-        $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->getVlOutComes($params);
-    }
-    
-    public function getLabTurnAroundTime($params){
-        $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->fetchLabTurnAroundTime($params);
-    }
-    
     public function getFacilites($params){
         $sampleDb = $this->sm->get('SampleTable');
         return $sampleDb->fetchFacilites($params);
+    }
+    
+    public function getVlOutComes($params){
+        $sampleDb = $this->sm->get('SampleTable');
+        return $sampleDb->getVlOutComes($params);
     }
     //lab details end
     
@@ -1018,6 +1028,11 @@ class SampleService {
         return $sampleDb->fetchProvinceBarSampleResultAwaitedDetails($params);
     }
     
+    public function getFacilityBarSampleResultAwaitedDetails($params){
+        $sampleDb = $this->sm->get('SampleTable');
+        return $sampleDb->fetchFacilityBarSampleResultAwaitedDetails($params);
+    }
+    
     public function getDistrictBarSampleResultAwaitedDetails($params){
         $sampleDb = $this->sm->get('SampleTable');
         return $sampleDb->fetchDistrictBarSampleResultAwaitedDetails($params);
@@ -1026,11 +1041,6 @@ class SampleService {
     public function getClinicBarSampleResultAwaitedDetails($params){
         $sampleDb = $this->sm->get('SampleTable');
         return $sampleDb->fetchClinicBarSampleResultAwaitedDetails($params);
-    }
-    
-    public function getFacilityBarSampleResultAwaitedDetails($params){
-        $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->fetchFacilityBarSampleResultAwaitedDetails($params);
     }
     
     public function getFilterSampleResultAwaitedDetails($parameters){
@@ -1145,16 +1155,6 @@ class SampleService {
         }else{
             return "";
         }
-    }
-    
-    public function getSampleTestedResultPregnantPatientDetails($params){
-        $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->fetchSampleTestedResultPregnantPatientDetails($params);
-    }
-    
-    public function getSampleTestedResultBreastfeedingPatientDetails($params){
-        $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->fetchSampleTestedResultBreastfeedingPatientDetails($params);
     }
     
     public function getAllSamples($parameters){

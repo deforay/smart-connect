@@ -74,7 +74,21 @@
                      tooltip: {
                          shared: true
                      },
-                     
+                     plotOptions: {
+                            column: {
+                                stacking: 'normal',
+                                pointPadding: 0.2,
+                                borderWidth: 0,
+                                cursor: 'default',
+                                point: {
+                                    events: {
+                                        click: function (e) {
+                                            
+                                        }
+                                    }
+                                }
+                            }
+                     },
                      series: [{
                          name: '<?php echo $this->translate('Valid Results'); ?> (R)',
                          type: 'column',

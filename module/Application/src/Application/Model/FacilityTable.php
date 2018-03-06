@@ -450,7 +450,7 @@ class FacilityTable extends AbstractTableGateway {
                              ->where(array('parent_location'=>0))
                              ->order('location_name asc');
         if($logincontainer->role != 1){
-            $provinceQuery = $provinceQuery->where('l_d.location_id IN ("' . implode('", "', array_values(array_filter($logincontainer->provinces))) . '")');
+            $provinceQuery = $provinceQuery->where('l_d.location_id IN ("' . implode('", "', $logincontainer->provinces) . '")');
         }
         $provinceQueryStr = $sql->getSqlStringForSqlObject($provinceQuery);
         $facilityInfo['provinces'] = $dbAdapter->query($provinceQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -477,10 +477,10 @@ class FacilityTable extends AbstractTableGateway {
                                      ->where('parent_location != 0')
                                      ->order('location_name asc');
         if(isset($labProvinces) && count($labProvinces) >0){
-            $provinceDistrictQuery = $provinceDistrictQuery->where('l_d.parent_location IN ("' . implode('", "', array_values(array_filter($labProvinces))) . '")');
+            $provinceDistrictQuery = $provinceDistrictQuery->where('l_d.parent_location IN ("' . implode('", "', $labProvinces) . '")');
         }else{
             if($logincontainer->role != 1){
-                $provinceDistrictQuery = $provinceDistrictQuery->where('l_d.location_id IN ("' . implode('", "', array_values(array_filter($logincontainer->districts))) . '")');
+                $provinceDistrictQuery = $provinceDistrictQuery->where('l_d.location_id IN ("' . implode('", "', $logincontainer->districts) . '")');
             }
         }
         $provinceDistrictQueryStr = $sql->getSqlStringForSqlObject($provinceDistrictQuery);
@@ -504,12 +504,12 @@ class FacilityTable extends AbstractTableGateway {
                         ->columns(array('facility_id','facility_name','facility_code'))
                         ->where(array('f.facility_type'=>2))
                         ->order('facility_name asc');
-        if(isset($labDistricts) && count(array_values(array_filter($labDistricts))) >0){
-           $labQuery = $labQuery->where('f.facility_district IN ("' . implode('", "', array_values(array_filter($labDistricts))) . '")');
+        if(isset($labDistricts) && count($labDistricts) >0){
+           $labQuery = $labQuery->where('f.facility_district IN ("' . implode('", "', $labDistricts) . '")');
         }else{
             if($logincontainer->role != 1){
                 $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:array(0);
-                $labQuery = $labQuery->where('f.facility_id IN ("' . implode('", "', array_values(array_filter($mappedFacilities))) . '")');
+                $labQuery = $labQuery->where('f.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
             }
         }
         $labQueryStr = $sql->getSqlStringForSqlObject($labQuery);
@@ -519,12 +519,12 @@ class FacilityTable extends AbstractTableGateway {
                            ->columns(array('facility_id','facility_name'))
                            ->where('f.facility_type IN ("1","4")')
                            ->order('facility_name asc');
-        if(isset($labDistricts) && count(array_values(array_filter($labDistricts))) >0){
-           $clinicQuery = $clinicQuery->where('f.facility_district IN ("' . implode('", "', array_values(array_filter($labDistricts))) . '")');
+        if(isset($labDistricts) && count($labDistricts) >0){
+           $clinicQuery = $clinicQuery->where('f.facility_district IN ("' . implode('", "', $labDistricts) . '")');
         }else{
             if($logincontainer->role != 1){
                 $mappedDistricts = (isset($logincontainer->districts) && count($logincontainer->districts) >0)?$logincontainer->districts:array(0);
-                $clinicQuery = $clinicQuery->where('f.facility_district IN ("' . implode('", "', array_values(array_filter($mappedDistricts))) . '")');
+                $clinicQuery = $clinicQuery->where('f.facility_district IN ("' . implode('", "', $mappedDistricts) . '")');
             }
         }
         $clinicQueryStr = $sql->getSqlStringForSqlObject($clinicQuery);

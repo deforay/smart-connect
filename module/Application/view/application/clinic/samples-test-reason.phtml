@@ -290,51 +290,51 @@ if(isset($params['age']) && trim($params['age'])!= ''){
     }
     
     function getTestReasonBasedonAgeGroup(){
-        var clinic = ($("#clinicId").val() == null)?[]:$("#clinicId").val();
+        var clinicId = ($("#clinicId").val() == null)?'':$("#clinicId").val().join(',');
         var dateRange = $("#sampleCollectionDate").val();
-        var testReason = ($("#testReason").val() == null)?[]:$("#testReason").val();
+        var testReason = ($("#testReason").val() == null)?'':$("#testReason").val().join(',');
         var sampleTypeId = $("#sampleTypeId").val();
         var adherence = $("#adherence").val();
         var testResult = $("#testResult").val();
-        var age = ($("#age").val() == null)?[]:$("#age").val();
+        var age = ($("#age").val() == null)?'':$("#age").val().join(',');
         var gender = $("#gender").val();
         var isPregnant = $("#isPregnant").val();
         var isBreastfeeding = $("#isBreastfeeding").val();
-        $.post("<?php echo $this->url('clinics', array('action' => 'get-samples-test-reason-based-on-age-group')); ?>",{clinic:clinic,sampleCollectionDate:dateRange,testReason:testReason,sampleTypeId:sampleTypeId,adherence:adherence,testResult:testResult,age:age,gender:gender,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding},
+        $.post("<?php echo $this->url('clinics', array('action' => 'get-samples-test-reason-based-on-age-group')); ?>",{clinicId:clinicId,sampleCollectionDate:dateRange,testReason:testReason,sampleTypeId:sampleTypeId,adherence:adherence,testResult:testResult,age:age,gender:gender,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding},
         function(data) {
            $("#vlOrderedAgeGroupContainer").html(data);
         });
     }
     
     function getTestReasonBasedonGender(){
-        var clinic = ($("#clinicId").val() == null)?[]:$("#clinicId").val();
+        var clinicId = ($("#clinicId").val() == null)?'':$("#clinicId").val().join(',');
         var dateRange = $("#sampleCollectionDate").val();
-        var testReason = ($("#testReason").val() == null)?[]:$("#testReason").val();
+        var testReason = ($("#testReason").val() == null)?'':$("#testReason").val().join(',');
         var sampleTypeId = $("#sampleTypeId").val();
         var adherence = $("#adherence").val();
         var testResult = $("#testResult").val();
-        var age = ($("#age").val() == null)?[]:$("#age").val();
+        var age = ($("#age").val() == null)?'':$("#age").val().join(',');
         var gender = $("#gender").val();
         var isPregnant = $("#isPregnant").val();
         var isBreastfeeding = $("#isBreastfeeding").val();
-        $.post("<?php echo $this->url('clinics', array('action' => 'get-samples-test-reason-based-on-gender')); ?>",{clinic:clinic,sampleCollectionDate:dateRange,testReason:testReason,sampleTypeId:sampleTypeId,adherence:adherence,testResult:testResult,age:age,gender:gender,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding},
+        $.post("<?php echo $this->url('clinics', array('action' => 'get-samples-test-reason-based-on-gender')); ?>",{clinicId:clinicId,sampleCollectionDate:dateRange,testReason:testReason,sampleTypeId:sampleTypeId,adherence:adherence,testResult:testResult,age:age,gender:gender,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding},
         function(data) {
            $("#vlOrderedGenderContainer").html(data);
         });
     }
     
     function getTestReasonBasedonClinics(){
-        var clinic = ($("#clinicId").val() == null)?[]:$("#clinicId").val();
+        var clinicId = ($("#clinicId").val() == null)?'':$("#clinicId").val().join(',');
         var dateRange = $("#sampleCollectionDate").val();
-        var testReason = ($("#testReason").val() == null)?[]:$("#testReason").val();
+        var testReason = ($("#testReason").val() == null)?'':$("#testReason").val().join(',');
         var sampleTypeId = $("#sampleTypeId").val();
         var adherence = $("#adherence").val();
         var testResult = $("#testResult").val();
-        var age = ($("#age").val() == null)?[]:$("#age").val();
+        var age = ($("#age").val() == null)?'':$("#age").val().join(',');
         var gender = $("#gender").val();
         var isPregnant = $("#isPregnant").val();
         var isBreastfeeding = $("#isBreastfeeding").val();
-        $.post("<?php echo $this->url('clinics', array('action' => 'get-samples-test-reason-based-on-clinics')); ?>",{clinic:clinic,sampleCollectionDate:dateRange,testReason:testReason,sampleTypeId:sampleTypeId,adherence:adherence,testResult:testResult,age:age,gender:gender,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding},
+        $.post("<?php echo $this->url('clinics', array('action' => 'get-samples-test-reason-based-on-clinics')); ?>",{clinicId:clinicId,sampleCollectionDate:dateRange,testReason:testReason,sampleTypeId:sampleTypeId,adherence:adherence,testResult:testResult,age:age,gender:gender,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding},
         function(data) {
            $("#vlOrderedClinicContainer").html(data);
         });

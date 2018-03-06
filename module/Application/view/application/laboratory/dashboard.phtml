@@ -10,8 +10,6 @@ $startDate = date('Y-m', strtotime('+1 month', strtotime('-1 year')));
 $endDate=date('Y-m');
 ?>
 <style>
-
-
 .bluebox, .dashboard-stat2{
     border:1px solid #3598DC;
 }
@@ -168,330 +166,324 @@ foreach($sampleType as $samples){
     $sType.='<option value="'.base64_encode($samples['sample_id']).'">'.ucwords($samples['sample_name']).'</option>';
 }
 ?>
-                    <!-- BEGIN PAGE BAR -->
-                    <!-- BEGIN PAGE BAR -->
-                    <div class="page-bar">
-                       <h1 class="page-title"><?php echo $this->translate('Labs Dashboard'); ?></h1>
-                    </div>
+    <!-- BEGIN PAGE BAR -->
+    <!-- BEGIN PAGE BAR -->
+    <div class="page-bar">
+       <h1 class="page-title"><?php echo $this->translate('Labs Dashboard'); ?></h1>
+    </div>
 
-                    <!-- END PAGE BAR -->
-                    <!-- BEGIN PAGE TITLE-->
+    <!-- END PAGE BAR -->
+    <!-- BEGIN PAGE TITLE-->
+    
+    <br>
+    <br>
+    
+    <!-- END PAGE TITLE-->
+    <!-- END PAGE HEADER-->
+   
+    <div class="row" style="margin-bottom:20px;">
+        <div class="col-md-12 col-sm-12" style="text-align:center;">
+            <a id="showDateRange" href="javascript:void(0);" style="color:#0d68e0;box-shadow: 1px 2px 12px rgb(173, 200, 222);border-radius: 12px;padding: 2px 10px 2px 10px;margin-left:26%;"><i class="fa fa-chevron-down" aria-hidden="true"></i> <?php echo $this->translate('Show Date Filter'); ?></a>
+            <a id="closeDateRange" href="javascript:void(0);" style="color:#0d68e0;display:none;box-shadow: 1px 2px 12px rgb(173, 200, 222);border-radius: 12px;padding: 2px 10px 2px 10px;margin-left:26%;"><i class="fa fa-chevron-up" aria-hidden="true"></i> <?php echo $this->translate('Close Date Filter'); ?></a>
+        </div>
+    </div>
+    <form id="dateFilter" action="#" method="">
+        <div class="daterange-container row" style="margin-bottom:20px;display:none;">
+            <div class="col-md-12 col-sm-12" style="text-align:right;">
+                <div id="daterange-container" class="btn btn-sm form-control"
+                    data-container="body"
+                    data-placement="bottom"
+                    data-original-title="Change date range" style="text-align:center;width:50%;">
+                    <i class="icon-calendar"></i>&nbsp;
+                    <span class="thin uppercase hidden-xs"></span>&nbsp;
+                    <i class="fa fa-angle-down"></i>
+                    <input type="hidden" name="daterange" id="daterange"/>
+                </div>&nbsp;&nbsp;
+                <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="getSampleResult('daterange');"><?php echo $this->translate('Search'); ?></a>&nbsp;&nbsp;
+                <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="resetDateFilter();" style="margin-right:5.8%;"><?php echo $this->translate('Reset'); ?></a>
+            </div>
+        </div>
+    </form>
+    <div class="row">
+        <div id="sampleResultDetails"></div>
+    </div>
+    <hr style="background: #000 !important;border-color:#ccc;">
+    <form id="pageFilter" action="#" method="">
+        <div class="row" style="padding-top:10px;padding-bottom:20px;">
+            <div class="col-lg-6">
+                <select name="labName[]" id="labName" class="form-control" multiple title="<?php echo $this->translate('Please select one or more labs. Leave blank for All'); ?>">
+                    <?php
+                    foreach($labName as $lab){
+                        ?>
+                        <option data-name="<?php echo $lab['facility_name']; ?>" value="<?php echo $lab['facility_id']; ?>"><?php echo $lab['facility_code']." - ".$lab['facility_name'];?></option>
+                        <?php
+                    }
+                    ?>
                     
-                    <br>
-                    <br>
-                    
-                    <!-- END PAGE TITLE-->
-                    <!-- END PAGE HEADER-->
-                   
-                    <div class="row" style="margin-bottom:20px;">
-                        <div class="col-md-12 col-sm-12" style="text-align:center;">
-                            <a id="showDateRange" href="javascript:void(0);" style="color:#0d68e0;box-shadow: 1px 2px 12px rgb(173, 200, 222);border-radius: 12px;padding: 2px 10px 2px 10px;margin-left:26%;"><i class="fa fa-chevron-down" aria-hidden="true"></i> <?php echo $this->translate('Show Date Filter'); ?></a>
-                            <a id="closeDateRange" href="javascript:void(0);" style="color:#0d68e0;display:none;box-shadow: 1px 2px 12px rgb(173, 200, 222);border-radius: 12px;padding: 2px 10px 2px 10px;margin-left:26%;"><i class="fa fa-chevron-up" aria-hidden="true"></i> <?php echo $this->translate('Close Date Filter'); ?></a>
+                </select>
+            </div>
+            <div class="col-lg-3">
+                <div id="sla-date-range" class="mrp-container form-control">
+                    <span class="mrp-icon"><i class="fa fa-calendar"></i> &nbsp;</span>
+                    <div class="mrp-monthdisplay ">
+                      <span class="mrp-lowerMonth"><?php echo date('M', strtotime('+1 month', strtotime('-1 year')));; ?> <?php echo $startYear; ?></span>
+                      <span class="mrp-to"> to </span>
+                      <span class="mrp-upperMonth"><?php echo date('M'); ?> <?php echo date('Y'); ?></span>
+                    </div>
+                  <input type="hidden" value="<?php echo $startDate; ?>" id="mrp-lowerDate" onchange=""/>
+                  <input type="hidden" value="<?php echo $endDate; ?>" id="mrp-upperDate" />
+                </div>
+            </div>                        
+            <div class="col-lg-3">
+                <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="getEverything();"><?php echo $this->translate('Search'); ?></a>&nbsp;&nbsp;
+                <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="resetEverything();"><?php echo $this->translate('Reset'); ?></a>
+            </div>
+        </div>
+    </form>
+    
+    <div class="row">
+        <div class="col-md-6 col-sm-6">
+            <div class="portlet box blue">
+                <div class="portlet-title">
+                    <div class="caption">
+                        <span class="caption-subject"><?php echo $this->translate('Samples Tested'); ?></span>
+                    </div>
+                    <div class="actions">
+                        <div class="btn-group">
+                            <select id="sampleType" class="btn white btn-outline btn-circle btn-sm dropdown-toggle" onchange="getTestedSampleResult()">
+                                <option value=""><?php echo $this->translate('All Sample Types'); ?></option>
+                                <?php echo $sType;?>
+                            </select>
                         </div>
                     </div>
-                    <form id="dateFilter" action="#" method="">
-                        <div class="daterange-container row" style="margin-bottom:20px;display:none;">
-                            <div class="col-md-12 col-sm-12" style="text-align:right;">
-                                <div id="daterange-container" class="btn btn-sm form-control"
-                                    data-container="body"
-                                    data-placement="bottom"
-                                    data-original-title="Change date range" style="text-align:center;width:50%;">
-                                    <i class="icon-calendar"></i>&nbsp;
-                                    <span class="thin uppercase hidden-xs"></span>&nbsp;
-                                    <i class="fa fa-angle-down"></i>
-                                    <input type="hidden" name="daterange" id="daterange"/>
-                                </div>&nbsp;&nbsp;
-                                <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="getSampleResult('daterange');"><?php echo $this->translate('Search'); ?></a>&nbsp;&nbsp;
-                                <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="resetDateFilter();" style="margin-right:5.8%;"><?php echo $this->translate('Reset'); ?></a>
-                            </div>
-                        </div>
-                    </form>
-                    <div class="row">
-                        <div id="sampleResultDetails"></div>
+                </div>
+                <div class="portlet-body" style="cursor:pointer;">
+                    <div id="samplesTestedResult"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 col-sm-6">
+            <div class="portlet box blue">
+                <div class="portlet-title">
+                    <div class="caption">
+                        <span class="caption-subject"><?php echo $this->translate('Samples Tested per Lab'); ?></span>
                     </div>
-                    <hr style="background: #000 !important;border-color:#ccc;">
-                    <form id="pageFilter" action="#" method="">
-                        <div class="row" style="padding-top:10px;padding-bottom:20px;">
-                            <div class="col-lg-6">
-                                <select name="labName[]" id="labName" class="form-control" multiple title="<?php echo $this->translate('Please select one or more labs. Leave blank for All'); ?>">
-                                    <?php
-                                    foreach($labName as $lab){
-                                        ?>
-                                        <option data-name="<?php echo $lab['facility_name']; ?>" value="<?php echo $lab['facility_id']; ?>"><?php echo $lab['facility_code']." - ".$lab['facility_name'];?></option>
-                                        <?php
-                                    }
-                                    ?>
-                                    
-                                </select>
-                            </div>
-                            <div class="col-lg-3">
-                                <div id="sla-date-range" class="mrp-container form-control">
-                                    <span class="mrp-icon"><i class="fa fa-calendar"></i> &nbsp;</span>
-                                    <div class="mrp-monthdisplay ">
-                                      <span class="mrp-lowerMonth"><?php echo date('M', strtotime('+1 month', strtotime('-1 year')));; ?> <?php echo $startYear; ?></span>
-                                      <span class="mrp-to"> to </span>
-                                      <span class="mrp-upperMonth"><?php echo date('M'); ?> <?php echo date('Y'); ?></span>
-                                    </div>
-                                  <input type="hidden" value="<?php echo $startDate; ?>" id="mrp-lowerDate" onchange=""/>
-                                  <input type="hidden" value="<?php echo $endDate; ?>" id="mrp-upperDate" />
-                                </div>
-                            </div>                        
-                            <div class="col-lg-3">
-                                <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="getEverything();"><?php echo $this->translate('Search'); ?></a>&nbsp;&nbsp;
-                                <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="resetEverything();"><?php echo $this->translate('Reset'); ?></a>
-                            </div>
+                    <div class="actions">
+                        <div class="btn-group">
+                            <select id="sampleTypeVolume" class="btn white btn-outline btn-circle btn-sm dropdown-toggle" onchange="getTestedSampleResultBasedLab();">
+                                <option value=""><?php echo $this->translate('All Sample Types'); ?></option>
+                                <?php echo $sType;?>
+                            </select>
                         </div>
-                    </form>
-                    
-                    <div class="row">
-                        <div class="col-md-6 col-sm-6">
-                            <div class="portlet box blue">
-                                <div class="portlet-title">
-                                    <div class="caption">
-                                        <span class="caption-subject"><?php echo $this->translate('Samples Tested'); ?></span>
-                                    </div>
-                                    <div class="actions">
-                                        <div class="btn-group">
-                                            <select id="sampleType" class="btn white btn-outline btn-circle btn-sm dropdown-toggle" onchange="getTestedSampleResult()">
-                                                <option value=""><?php echo $this->translate('All Sample Types'); ?></option>
-                                                <?php echo $sType;?>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="portlet-body" style="cursor:pointer;">
-                                    <div id="samplesTestedResult"></div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="col-md-6 col-sm-6">
-                            <div class="portlet box blue">
-                                <div class="portlet-title">
-                                    <div class="caption">
-                                        <span class="caption-subject"><?php echo $this->translate('Samples Tested per Lab'); ?></span>
-                                    </div>
-                                    <div class="actions">
-                                        <div class="btn-group">
-                                            <select id="sampleTypeVolume" class="btn white btn-outline btn-circle btn-sm dropdown-toggle" onchange="getTestedSampleResultBasedLab();">
-                                                <option value=""><?php echo $this->translate('All Sample Types'); ?></option>
-                                                <?php echo $sType;?>
-                                            </select>
-                                        </div>
-                                    </div>                                    
-                                </div>
-                                <div class="portlet-body" style="cursor:pointer;">
-                                    <div id="samplesTestedLabResult"></div>
-                                </div>
-                            </div>
-                        </div>                        
+                    </div>                                    
+                </div>
+                <div class="portlet-body" style="cursor:pointer;">
+                    <div id="samplesTestedLabResult"></div>
+                </div>
+            </div>
+        </div>                        
+    </div>
+    <div class="row">
+        <div class="col-md-6 col-sm-6">
+            <div class="portlet box blue">
+                <div class="portlet-title">
+                    <div class="caption">
+                        <span class="caption-subject"><?php echo $this->translate('Samples Tested based on Gender'); ?> </span>
                     </div>
-                    <div class="row">
-                        <div class="col-md-6 col-sm-6">
-                            <div class="portlet box blue">
-                                <div class="portlet-title">
-                                    <div class="caption">
-                                        <span class="caption-subject"><?php echo $this->translate('Samples Tested based on Gender'); ?> </span>
-                                    </div>
-                                    <div class="actions">
-                                        <div class="btn-group">
-                                            <!--<select id="sampleTypeGender" class="btn white btn-outline btn-circle btn-sm dropdown-toggle" onchange="getTestedSampleResultBasedGender()">-->
-                                            <!--    <option value="">< ?php echo $this->translate('All Sample Types'); ?></option>-->
-                                            <!--    < ?php echo $sType;?>-->
-                                            <!--</select>-->
-                                        </div>
-                                    </div>  
-                                </div>
-                                <div class="portlet-body">
-                                    <div id="samplesTestedResultGender" style="height:450px;"></div>
-                                </div>
-                            </div>
+                    <div class="actions">
+                        <div class="btn-group">
+                            <!--<select id="sampleTypeGender" class="btn white btn-outline btn-circle btn-sm dropdown-toggle" onchange="getTestedSampleResultBasedGender()">-->
+                            <!--    <option value="">< ?php echo $this->translate('All Sample Types'); ?></option>-->
+                            <!--    < ?php echo $sType;?>-->
+                            <!--</select>-->
                         </div>
-                        
-                        <div class="col-md-6 col-sm-6">
-                            <div class="portlet box blue">
-                                <div class="portlet-title">
-                                    <div class="caption">
-                                        <span class="caption-subject"><?php echo $this->translate('Laboratory Turnaround Time'); ?></span>
-                                    </div>
-                                </div>
-                                <div class="portlet-body">
-                                    <div id="labAverageTat" style="height:450px;"></div>
-                                </div>
-                            </div>
+                    </div>  
+                </div>
+                <div class="portlet-body">
+                    <div id="samplesTestedResultGender" style="height:450px;"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 col-sm-6">
+            <div class="portlet box blue">
+                <div class="portlet-title">
+                    <div class="caption">
+                        <span class="caption-subject"><?php echo $this->translate('Laboratory Turnaround Time'); ?></span>
+                    </div>
+                </div>
+                <div class="portlet-body">
+                    <div id="labAverageTat" style="height:450px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12 col-sm-12">
+            <div class="portlet box blue">
+                <div class="portlet-title">
+                    <div class="caption">
+                        <span class="caption-subject"><?php echo $this->translate('Samples Tested based on Age'); ?></span>
+                    </div>
+                    <div class="actions" style="width:20%;">
+                        <div class="btn-group" style="width:100%;">
+                            <select id="age" name="age[]" class="form-control" multiple title="<?php echo $this->translate('Please choose age group'); ?>" onchange="getTestedSampleResultBasedAgeGroup();">
+                                <option value="<2"> < 2</option>
+                                <option value="2to5"> 2 - 5</option>
+                                <option value="6to14"> 6 - 14</option>
+                                <option value="15to49"> 15 - 49</option>
+                                <option value=">=50"> >= 50</option>
+                                <option value="unknown"> <?php echo $this->translate('Unknown'); ?></option>
+                            </select>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-md-12 col-sm-12">
-                            <div class="portlet box blue">
-                                <div class="portlet-title">
-                                    <div class="caption">
-                                        <span class="caption-subject"><?php echo $this->translate('Samples Tested based on Age'); ?></span>
-                                    </div>
-                                    <div class="actions" style="width:20%;">
-                                        <div class="btn-group" style="width:100%;">
-                                            <select id="age" name="age[]" class="form-control" multiple title="<?php echo $this->translate('Please choose age group'); ?>" onchange="getTestedSampleResultBasedAgeGroup();">
-                                                <option value="<2"> < 2</option>
-                                                <option value="2to5"> 2 - 5</option>
-                                                <option value="6to14"> 6 - 14</option>
-                                                <option value="15to49"> 15 - 49</option>
-                                                <option value=">=50"> >= 50</option>
-                                                <option value="unknown"> <?php echo $this->translate('Unknown'); ?></option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="portlet-body">
-                                    <div id="samplesTestedResultAgeGroup"></div>
-                                </div>
-                            </div>
-                        </div>            
+                </div>
+                <div class="portlet-body">
+                    <div id="samplesTestedResultAgeGroup"></div>
+                </div>
+            </div>
+        </div>            
+    </div>
+    <div class="row">
+        <div class="col-md-6 col-sm-6">
+            <div class="portlet box blue">
+                <div class="portlet-title">
+                    <div class="caption">
+                        <span class="caption-subject"><?php echo $this->translate('Samples Tested - Pregnant'); ?></span>
                     </div>
-                    <div class="row">
-                        <div class="col-md-6 col-sm-6">
-                            <div class="portlet box blue">
-                                <div class="portlet-title">
-                                    <div class="caption">
-                                        <span class="caption-subject"><?php echo $this->translate('Samples Tested - Pregnant'); ?></span>
-                                    </div>
-                                </div>
-                                <div class="portlet-body">
-                                    <div id="samplesTestedResultPregnantPatient"></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6 col-sm-6">
-                            <div class="portlet box blue">
-                                <div class="portlet-title">
-                                    <div class="caption">
-                                        <span class="caption-subject"><?php echo $this->translate('Samples Tested - Breastfeeding'); ?></span>
-                                    </div>
-                                </div>
-                                <div class="portlet-body">
-                                    <div id="samplesTestedResultBreastfeedingPatient"></div>
-                                </div>
-                            </div>
+                </div>
+                <div class="portlet-body">
+                    <div id="samplesTestedResultPregnantPatient"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-sm-6">
+            <div class="portlet box blue">
+                <div class="portlet-title">
+                    <div class="caption">
+                        <span class="caption-subject"><?php echo $this->translate('Samples Tested - Breastfeeding'); ?></span>
+                    </div>
+                </div>
+                <div class="portlet-body">
+                    <div id="samplesTestedResultBreastfeedingPatient"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6 col-sm-6">
+            <div class="portlet box blue">
+                <div class="portlet-title">
+                    <div class="caption">
+                        <span class="caption-subject"><?php echo $this->translate('Request Form Completeness'); ?></span>
+                    </div>
+                    <div class="actions" style="width:50%;">
+                        <div class="btn-group" style="width:100%;">
+                            <select id="formFields" name="formFields[]" class="form-control" multiple title="<?php echo $this->translate('Please choose form fields'); ?>" onchange="getRequisitionFormsTested();">
+                                <option value="patient_art_no">Patient ART Number</option>
+                                <option value="patient_age_in_years"> Patient Age</option>
+                                <option value="patient_gender"> Patient Gender</option>
+                                <option value="current_regimen"> Current Regimen</option>
+                            </select>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-md-6 col-sm-6">
-                            <div class="portlet box blue">
-                                <div class="portlet-title">
-                                    <div class="caption">
-                                        <span class="caption-subject"><?php echo $this->translate('Request Form Completeness'); ?></span>
-                                    </div>
-                                    <div class="actions" style="width:50%;">
-                                        <div class="btn-group" style="width:100%;">
-                                            <select id="formFields" name="formFields[]" class="form-control" multiple title="<?php echo $this->translate('Please choose form fields'); ?>" onchange="getRequisitionFormsTested();">
-                                                <option value="patient_art_no">Patient ART Number</option>
-                                                <option value="patient_age_in_years"> Patient Age</option>
-                                                <option value="patient_gender"> Patient Gender</option>
-                                                <option value="current_regimen"> Current Regimen</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="portlet-body" id="requisitionForms">
-                                    <div id="labDashReqFormBar" style="height:450px;"></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6 col-sm-6">
-                            <div class="portlet box blue">
-                                <div class="portlet-title">
-                                    <div class="caption">
-                                        <span class="caption-subject"><?php echo $this->translate('Sample Volume'); ?></span>
-                                    </div>
-                                   <div class="actions">
-                                        <div class="btn-group">
-                                            <select id="sampleStatus" class="btn white btn-outline btn-circle btn-sm dropdown-toggle" onchange="getSampleVolume('change');">
-                                                <option value=""><?php echo $this->translate('All Samples'); ?></option>
-                                                <option value="sample_tested"><?php echo $this->translate('Samples Tested'); ?></option>
-                                                <option value="samples_not_tested"><?php echo $this->translate('Samples Not Tested'); ?></option>
-                                                <option value="sample_rejected"><?php echo $this->translate('Samples Rejected'); ?></option>
-                                            </select>
-                                        </div>
-                                    </div>                                 
-                                </div>
-                                <div class="portlet-body" id="pieChartLabResult">
-                                    <div id="labDashSampleVolumePie" style="height:450px;"></div>
-                                </div>
-                            </div>                            
-                        </div>
-
+                </div>
+                <div class="portlet-body" id="requisitionForms">
+                    <div id="labDashReqFormBar" style="height:450px;"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-sm-6">
+            <div class="portlet box blue">
+                <div class="portlet-title">
+                    <div class="caption">
+                        <span class="caption-subject"><?php echo $this->translate('Sample Volume'); ?></span>
                     </div>
-                    <div class="row">
-                        <div class="col-md-6 col-sm-6">
-                            <div class="portlet box blue">
-                                <div class="portlet-title">
-                                    <div class="caption">
-                                        <span class="caption-subject"><?php echo $this->translate('Female Patients'); ?></span>
-                                    </div>
-                                </div>
-                                <div class="portlet-body" id="femalePatientPieChart">
-                                    <div id="labDashFemalePie" style="height:450px;"></div>
-                                </div>
-                            </div>                            
+                   <div class="actions">
+                        <div class="btn-group">
+                            <select id="sampleStatus" class="btn white btn-outline btn-circle btn-sm dropdown-toggle" onchange="getSampleVolume('change');">
+                                <option value=""><?php echo $this->translate('All Samples'); ?></option>
+                                <option value="sample_tested"><?php echo $this->translate('Samples Tested'); ?></option>
+                                <option value="samples_not_tested"><?php echo $this->translate('Samples Not Tested'); ?></option>
+                                <option value="sample_rejected"><?php echo $this->translate('Samples Rejected'); ?></option>
+                            </select>
                         </div>
-                        <div class="col-md-6 col-sm-6">
-                            <div class="portlet box blue">
-                                <div class="portlet-title">
-                                    <div class="caption">
-                                        <span class="caption-subject"><?php echo $this->translate('Line Of Treatment'); ?></span>
-                                    </div>
-                                </div>
-                                <div class="portlet-body" id="lineOfTreatmentPieChart">
-                                    <div id="labDashLineOfTreatmentPie" style="height:450px;"></div>
-                                </div>
-                            </div>                            
+                    </div>                                 
+                </div>
+                <div class="portlet-body" id="pieChartLabResult">
+                    <div id="labDashSampleVolumePie" style="height:450px;"></div>
+                </div>
+            </div>                            
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6 col-sm-6">
+            <div class="portlet box blue">
+                <div class="portlet-title">
+                    <div class="caption">
+                        <span class="caption-subject"><?php echo $this->translate('Female Patients'); ?></span>
+                    </div>
+                </div>
+                <div class="portlet-body" id="femalePatientPieChart">
+                    <div id="labDashFemalePie" style="height:450px;"></div>
+                </div>
+            </div>                            
+        </div>
+        <div class="col-md-6 col-sm-6">
+            <div class="portlet box blue">
+                <div class="portlet-title">
+                    <div class="caption">
+                        <span class="caption-subject"><?php echo $this->translate('Line Of Treatment'); ?></span>
+                    </div>
+                </div>
+                <div class="portlet-body" id="lineOfTreatmentPieChart">
+                    <div id="labDashLineOfTreatmentPie" style="height:450px;"></div>
+                </div>
+            </div>                            
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12 col-sm-12">
+            <div class="portlet box blue">
+                <div class="portlet-title">
+                    <div class="caption">
+                        <span class="caption-subject"><?php echo $this->translate('All Facilities - Geolocation'); ?></span>
+                    </div>
+                    <div class="actions">
+                        <div class="btn-group">
+                            <button class="btn btn-danger" onclick="expandMap();"><span><i class="fa fa-angle-double-right" aria-hidden="true"></i> <?php echo $this->translate('Expand Map'); ?></span></button>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-md-12 col-sm-12">
-                            <div class="portlet box blue">
-                                <div class="portlet-title">
-                                    <div class="caption">
-                                        <span class="caption-subject"><?php echo $this->translate('All Facilities - Geolocation'); ?></span>
-                                    </div>
-                                    <div class="actions">
-                                        <div class="btn-group">
-                                            <button class="btn btn-danger" onclick="expandMap();"><span><i class="fa fa-angle-double-right" aria-hidden="true"></i> <?php echo $this->translate('Expand Map'); ?></span></button>
-                                        </div>
-                                    </div>
-                                </div>                                
-                                <div class="portlet-body">
-                                    <div id="controls-polyline"></div>
-                                    <div id="gmap-polyline-data"></div>
-                                </div>
-                            </div>
-                        </div>                        
-                    </div>
-                    
+                </div>                                
+                <div class="portlet-body">
+                    <div id="controls-polyline"></div>
+                    <div id="gmap-polyline-data"></div>
+                </div>
+            </div>
+        </div>                        
+    </div>
     <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAFpbfAKFJZ8Ps7yAGIDZtD4EeBlsb_ANA"></script>
     <script src="<?php echo $this->basePath('assets/pages/scripts/dashboard.js'); ?>" type="text/javascript"></script>
     <script>
     //var gfxPath = 'https://raw.githubusercontent.com/highslide-software/pattern-fill/master/graphics/';
     var startDate;
     var endDate;
-   
     function getSampleResult(frmSource){
-        var facilityId = $("#labName").val();
-        var fromDate=$('#mrp-lowerDate').val();
-        var toDate=$('#mrp-upperDate').val();
-        var daterange=$('#daterange').val();
+        var daterange= $('#daterange').val();
         if(frmSource == 'daterange' && $.trim(daterange) == ''){ alert('<?php echo $this->translate('Please choose date range'); ?>'); return false; }
         if(frmSource !='load'){$.blockUI.defaults.css.border = '1px solid grey'; $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);}
-        $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-result')); ?>",{daterange:daterange,fromDate:fromDate,toDate:toDate,facilityId:facilityId},
+        $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-result')); ?>",{daterange:daterange},
         function(data) {
             $("#sampleResultDetails").html(data);
         });
     }
     
     function getTestedSampleResult(){
-        var facilityId = $("#labName").val();
         var fromDate = $('#mrp-lowerDate').val();
         var toDate = $('#mrp-upperDate').val();
-        var sampleType = $("#sampleType").val();
+        var sampleType = ($("#sampleType").val() == null)?'':$("#sampleType").val();
+        var facilityId = ($("#labName").val() == null)?'':$("#labName").val().join(',');
         $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-test-result')); ?>",{fromDate:fromDate,toDate:toDate,sampleType:sampleType,facilityId:facilityId},
         function(data) {
             $("#samplesTestedResult").html(data);
@@ -499,10 +491,10 @@ foreach($sampleType as $samples){
     }
     
     function getTestedSampleResultBasedLab(){
-        var facilityId = $("#labName").val();
         var fromDate = $('#mrp-lowerDate').val();
         var toDate = $('#mrp-upperDate').val();
-        var sampleType = $("#sampleTypeVolume").val();
+        var sampleType = ($("#sampleType").val() == null)?'':$("#sampleType").val();
+        var facilityId = ($("#labName").val() == null)?'':$("#labName").val().join(',');
         $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-test-result-volume')); ?>",{fromDate:fromDate,toDate:toDate,sampleType:sampleType,facilityId:facilityId},
         function(data) {
             $("#samplesTestedLabResult").html(data);
@@ -510,20 +502,30 @@ foreach($sampleType as $samples){
     }
     
     function getTestedSampleResultBasedGender(){
-        var facilityId = $("#labName").val();
         var fromDate = $('#mrp-lowerDate').val();
         var toDate = $('#mrp-upperDate').val();
+        var facilityId = ($("#labName").val() == null)?'':$("#labName").val().join(',');
         $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-test-result-gender')); ?>",{fromDate:fromDate,toDate:toDate,facilityId:facilityId},
         function(data) {
             $("#samplesTestedResultGender").html(data);
         });
     }
     
+    function getAverageLabTAT(){
+        var fromDate = $('#mrp-lowerDate').val();
+        var toDate = $('#mrp-upperDate').val();
+        var facilityId = ($("#labName").val() == null)?'':$("#labName").val().join(',');
+        $.post("<?php echo $this->url('laboratory', array('action' => 'get-lab-turn-around-time')); ?>",{fromDate:fromDate,toDate:toDate,facilityId:facilityId},
+        function(data) {
+            $("#labAverageTat").html(data);
+        });
+    }
+    
     function getTestedSampleResultBasedAgeGroup(){
-        var facilityId = $("#labName").val();
-        var fromDate=$('#mrp-lowerDate').val();
-        var toDate=$('#mrp-upperDate').val();
-        var age = ($('#age').val() == null)?[]:$('#age').val();
+        var fromDate = $('#mrp-lowerDate').val();
+        var toDate = $('#mrp-upperDate').val();
+        var facilityId = ($("#labName").val() == null)?'':$("#labName").val().join(',');
+        var age = ($('#age').val() == null)?'':$('#age').val().join(',');
         $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-test-result-age-group')); ?>",{fromDate:fromDate,toDate:toDate,facilityId:facilityId,age:age},
         function(data) {
             $("#samplesTestedResultAgeGroup").html(data);
@@ -531,9 +533,9 @@ foreach($sampleType as $samples){
     }
     
     function getTestedSampleResultBasedonPregnantPatient(){
-        var facilityId = $("#labName").val();
-        var fromDate=$('#mrp-lowerDate').val();
-        var toDate=$('#mrp-upperDate').val();
+        var fromDate = $('#mrp-lowerDate').val();
+        var toDate = $('#mrp-upperDate').val();
+        var facilityId = ($("#labName").val() == null)?'':$("#labName").val().join(',');
         $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-test-result-pregnant')); ?>",{fromDate:fromDate,toDate:toDate,facilityId:facilityId},
         function(data) {
             $("#samplesTestedResultPregnantPatient").html(data);
@@ -541,30 +543,20 @@ foreach($sampleType as $samples){
     }
     
     function getTestedSampleResultBasedonBreastfeedingPatient(){
-        var facilityId = $("#labName").val();
-        var fromDate=$('#mrp-lowerDate').val();
-        var toDate=$('#mrp-upperDate').val();
+        var fromDate = $('#mrp-lowerDate').val();
+        var toDate = $('#mrp-upperDate').val();
+        var facilityId = ($("#labName").val() == null)?'':$("#labName").val().join(',');
         $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-test-result-breastfeeding')); ?>",{fromDate:fromDate,toDate:toDate,facilityId:facilityId},
         function(data) {
             $("#samplesTestedResultBreastfeedingPatient").html(data);
         });
     }
     
-    function getAverageLabTAT(){
-        var facilityId = $("#labName").val();
-        var fromDate=$('#mrp-lowerDate').val();
-        var toDate=$('#mrp-upperDate').val();
-        $.post("<?php echo $this->url('laboratory', array('action' => 'get-lab-turn-around-time')); ?>",{fromDate:fromDate,toDate:toDate,facilityId:facilityId},
-        function(data) {
-            $("#labAverageTat").html(data);
-        });
-    }
-    
     function getRequisitionFormsTested(){
-        var facilityId = $("#labName").val();
         var fromDate = $('#mrp-lowerDate').val();
         var toDate = $('#mrp-upperDate').val();
-        var formFields = ($('#formFields').val() == null)?['patient_art_no','patient_age_in_years','patient_gender','current_regimen']:$('#formFields').val();
+        var facilityId = ($("#labName").val() == null)?'':$("#labName").val().join(',');
+        var formFields = ($('#formFields').val() == null)?"patient_art_no,patient_age_in_years,patient_gender,current_regimen":$('#formFields').val().join(',');
         $.post("<?php echo $this->url('laboratory', array('action' => 'get-requisition-forms')); ?>",{fromDate:fromDate,toDate:toDate,facilityId:facilityId,formFields:formFields},
         function(data) {
             $("#labDashReqFormBar").html(data);
@@ -573,10 +565,10 @@ foreach($sampleType as $samples){
     
     function getSampleVolume(formSrc){
         if(formSrc == 'change'){$.blockUI.defaults.css.border = '1px solid grey';$(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);}
-        var facilityId = $("#labName").val();
-        var fromDate=$('#mrp-lowerDate').val();
-        var toDate=$('#mrp-upperDate').val();
-        var sampleStatus = $("#sampleStatus").val();
+        var fromDate = $('#mrp-lowerDate').val();
+        var toDate = $('#mrp-upperDate').val();
+        var facilityId = ($("#labName").val() == null)?'':$("#labName").val().join(',');
+        var sampleStatus = ($("#sampleStatus").val() == null)?'':$("#sampleStatus").val();
         $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-volume')); ?>",{fromDate:fromDate,toDate:toDate,facilityId:facilityId,sampleStatus:sampleStatus},
         function(data) {
            $("#labDashSampleVolumePie").html(data);
@@ -584,9 +576,9 @@ foreach($sampleType as $samples){
     }
     
     function femalePatient(){
-        var facilityId = $("#labName").val();
-        var fromDate=$('#mrp-lowerDate').val();
-        var toDate=$('#mrp-upperDate').val();
+        var fromDate = $('#mrp-lowerDate').val();
+        var toDate = $('#mrp-upperDate').val();
+        var facilityId = ($("#labName").val() == null)?'':$("#labName").val().join(',');
         $.post("<?php echo $this->url('laboratory', array('action' => 'get-female-patient-result')); ?>",{fromDate:fromDate,toDate:toDate,facilityId:facilityId},
         function(data) {
             $("#labDashFemalePie").html(data);
@@ -594,9 +586,9 @@ foreach($sampleType as $samples){
     }
     
     function lineOfTreatment(){
-        var facilityId = $("#labName").val();
-        var fromDate=$('#mrp-lowerDate').val();
-        var toDate=$('#mrp-upperDate').val();
+        var fromDate = $('#mrp-lowerDate').val();
+        var toDate = $('#mrp-upperDate').val();
+        var facilityId = ($("#labName").val() == null)?'':$("#labName").val().join(',');
         $.post("<?php echo $this->url('laboratory', array('action' => 'get-line-of-treatment')); ?>",{fromDate:fromDate,toDate:toDate,facilityId:facilityId},
         function(data) {
             $("#labDashLineOfTreatmentPie").html(data);
@@ -604,9 +596,9 @@ foreach($sampleType as $samples){
     }
     
     function getLabFacilities(){
-        var facilityId = $("#labName").val();
-        var fromDate=$('#mrp-lowerDate').val();
-        var toDate=$('#mrp-upperDate').val();
+        var fromDate = $('#mrp-lowerDate').val();
+        var toDate = $('#mrp-upperDate').val();
+        var facilityId = ($("#labName").val() == null)?'':$("#labName").val().join(',');
         $.post("<?php echo $this->url('laboratory', array('action' => 'get-lab-facilities')); ?>",{fromDate:fromDate,toDate:toDate,facilityId:facilityId,height:'600px;'},
         function(data) {
             $("#gmap-polyline-data").html(data);
@@ -614,14 +606,6 @@ foreach($sampleType as $samples){
     }
         
     $(function() {
-        var start = moment().subtract(12, 'months');
-        var end = moment();
-        
-        function cb(start, end) {
-            $('#daterange-container span').html(start.format('MMM D, YYYY') + ' to ' + end.format('MMM D, YYYY'));
-            $('#daterange').val(start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
-        }
-    
         $('#labName').select2({
             placeholder: "<?php echo $this->translate('All Labs'); ?>",
             allowClear: true
@@ -649,6 +633,12 @@ foreach($sampleType as $samples){
             uldiv.html("<li>"+count+" items selected</li>");
         });
         
+        var start = moment().subtract(12, 'months');
+        var end = moment();
+        function cb(start, end) {
+            $('#daterange-container span').html(start.format('MMM D, YYYY') + ' to ' + end.format('MMM D, YYYY'));
+            $('#daterange').val(start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
+        }
         $('#daterange-container').daterangepicker({
             format: 'DD-MMM-YYYY',
             separator: ' to ',
@@ -996,16 +986,14 @@ foreach($sampleType as $samples){
         $('#mrp-lowerDate').val(startyear+'-'+startmonth);
         $('#mrp-upperDate').val(endyear+'-'+endmonth);
        
-        
-            if(startyear == parseInt($('.mpr-calendar:first h5 span').html()))
-                    //$('.mpr-calendar:first .mpr-selected:first').css("background","#40667A");
-            
-             $('.mpr-month').css("color","black");
+        if(startyear == parseInt($('.mpr-calendar:first h5 span').html()))
+        //$('.mpr-calendar:first .mpr-selected:first').css("background","#40667A");
+        $('.mpr-month').css("color","black");
         if(endyear == parseInt($('.mpr-calendar:last h5 span').html()))
-          //$('.mpr-calendar:last .mpr-selected:last').css("background","#40667A");
-          $('.mpr-month').css("color","black");
-          $('.mpr-calendar:first .mpr-selected:first').css({"background-color": "#40667A","color":"#fff"});
-          $('.mpr-calendar:last .mpr-selected:last').css({"background-color": "#40667A","color":"#fff"});
+        //$('.mpr-calendar:last .mpr-selected:last').css("background","#40667A");
+        $('.mpr-month').css("color","black");
+        $('.mpr-calendar:first .mpr-selected:first').css({"background-color": "#40667A","color":"#fff"});
+        $('.mpr-calendar:last .mpr-selected:last').css({"background-color": "#40667A","color":"#fff"});
     }
     
     function safeRound(val){
@@ -1013,8 +1001,7 @@ foreach($sampleType as $samples){
     }
     
     function doSampleResultAwaitedRedirect(frmSource){
-       var selectedLabs = ($("#labName").val() == null)?'':$("#labName").val();
-       window.open("/labs/sample-result-awaited?src="+frmSource+"&lab="+selectedLabs);
+       window.open("/labs/sample-result-awaited?src="+frmSource);
     }
     
     function doSampleTestedRedirect(month){

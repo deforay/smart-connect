@@ -6,252 +6,252 @@ foreach($sampleType as $samples){
     $sType.='<option value="'.base64_encode($samples['sample_id']).'">'.ucwords($samples['sample_name']).'</option>';
 }
 ?>
-                    <!-- BEGIN PAGE BAR -->
-                    <div class="page-bar">
-                        <h1 class="page-title"><?php echo $this->translate('Clinics Dashboard'); ?></h1>
+<!-- BEGIN PAGE BAR -->
+<div class="page-bar">
+    <h1 class="page-title"><?php echo $this->translate('Clinics Dashboard'); ?></h1>
+</div>
+<!-- END PAGE BAR -->
+<!-- BEGIN PAGE TITLE-->
+<!-- END PAGE TITLE-->
+<!-- END PAGE HEADER-->
+<br>
+<br>
+<form id="pageFilter" action="#" method="">
+    <div class="row" style="padding-top:10px;padding-bottom:20px;">
+        <div class="col-md-12">
+            <div class="col-lg-6">
+                <select class="form-control" id="clinicId" name="clinicId[]" multiple title="<?php echo $this->translate('Please select one or more clinics. Leave blank for All'); ?>">
+                    <?php
+                    foreach($clinicName as $clinic){
+                        ?>
+                        <option value="<?php echo $clinic['facility_id']; ?>"><?php echo $clinic['facility_code']." - ".$clinic['facility_name'];?></option>
+                        <?php
+                    }
+                    ?>
+                </select>
+            </div>
+            <div class="col-lg-6">
+                <div id="dashboard-range" class="btn btn-sm form-control"
+                    data-container="body"
+                    data-placement="bottom"
+                    data-original-title="Change dashboard date range">
+                    <?php echo $this->translate('Date Range'); ?>&nbsp;&nbsp;&nbsp;&nbsp;<i class="icon-calendar"></i>&nbsp;
+                    <span class="thin uppercase hidden-xs"></span>&nbsp;
+                    <i class="fa fa-angle-down"></i>
+                    <input type="hidden" name="sampleCollectionDate" id="sampleCollectionDate"/>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group col-lg-4">
+                <label class="control-label"><?php echo $this->translate('Sample Type'); ?></label>
+              <select class="form-control" name="sampleTypeId" id="sampleTypeId" title="<?php echo $this->translate('Please choose sample type'); ?>">
+                <option value=""><?php echo $this->translate('All'); ?></option>
+                <?php echo $sType;?>
+              </select>
+            </div>
+            <div class="form-group col-lg-4">
+              <label class="control-label"><?php echo $this->translate('Test Result'); ?>&nbsp;</label>
+              <select class="form-control" name="testResult" id="testResult" title="<?php echo $this->translate('Please choose result'); ?>">
+                <option value=""><?php echo $this->translate('All'); ?></option>
+                <option value=">=1000"><?php echo $this->translate('>= 1000 cp/ml'); ?></option>
+                <option value="<1000"><?php echo $this->translate('< 1000 cp/ml'); ?></option>
+              </select>
+            </div>
+            <div class="form-group col-lg-4">
+                <label class="control-label"><?php echo $this->translate('ARV Adherence'); ?></label>
+                <select class="form-control" name="adherence" id="adherence">
+                  <option value=''>--<?php echo $this->translate('Select'); ?>--</option>
+                  <option value="good"><?php echo $this->translate('Good'); ?> >= 95%</option>
+                  <option value="fair"><?php echo $this->translate('Fair'); ?> 85-94%</option>
+                  <option value="poor"><?php echo $this->translate('Poor'); ?> < 85%</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group col-lg-4">
+                <label class="control-label"><?php echo $this->translate('Age Group'); ?>&nbsp;</label>
+                <select class="form-control" name="age[]" id="age" multiple title="<?php echo $this->translate('Please choose age group'); ?>">
+                  <option value="<2"> < 2</option>
+                  <option value="2to5"> 2 - 5</option>
+                  <option value="6to14"> 6 - 14</option>
+                  <option value="15to49"> 15 - 49</option>
+                  <option value=">=50"> >= 50</option>
+                  <option value="unknown"> <?php echo $this->translate('Unknown'); ?></option>
+                </select>
+            </div>
+            <div class="form-group col-lg-4">
+                <label class="control-label"><?php echo $this->translate('Gender'); ?></label>
+              <select class="form-control" name="gender" id="gender">
+                <option value=''>--<?php echo $this->translate('Select'); ?>--</option>
+                <option value="M"><?php echo $this->translate('Male'); ?></option>
+                <option value="F"><?php echo $this->translate('Female'); ?></option>
+                <option value="not_specified"><?php echo $this->translate('Other'); ?></option>
+              </select>
+            </div>
+            <div class="form-group col-lg-4 femaleSection" style="display:none;">
+                <label class="control-label"><?php echo $this->translate('Is Patient Pregnant'); ?></label>
+                <select class="form-control" name="isPregnant" id="isPregnant">
+                  <option value=""><?php echo $this->translate('All'); ?></option>  
+                  <option value="yes"><?php echo $this->translate('Yes'); ?></option>
+                  <option value="no"><?php echo $this->translate('No'); ?></option>
+                  <option value="unreported"><?php echo $this->translate('Unreported'); ?></option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group col-lg-4 femaleSection" style="display:none;">
+                <label class="control-label"><?php echo $this->translate('Is Patient Breastfeeding'); ?></label>
+                <select class="form-control" name="isBreastfeeding" id="isBreastfeeding">
+                  <option value=""><?php echo $this->translate('All'); ?></option>  
+                  <option value="yes"><?php echo $this->translate('Yes'); ?></option>
+                  <option value="no"><?php echo $this->translate('No'); ?></option>
+                  <option value="unreported"><?php echo $this->translate('Unreported'); ?></option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group col-lg-12" style="text-align:center;margin-top:10px;">
+                <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="searchClinicData();"><?php echo $this->translate('Search'); ?></a>&nbsp;&nbsp;
+                <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="resetEverything();"><?php echo $this->translate('Reset'); ?></a>
+            </div>
+        </div>
+    </div>
+</form>
+<hr style="background: #000 !important;border-color:#ccc;">
+<div class="row">
+    <div class="col-md-6 col-sm-6">
+        <div class="portlet box blue">
+            <div class="portlet-title">
+                <div class="caption">
+                    <span class="caption-subject"><?php echo $this->translate('Overall Viral Load Status'); ?></span>
+                </div>
+            </div>
+            <div class="portlet-body">
+                <div id="overall-vl-status" style="min-width: 310px; height: 520px; margin: 0 auto"></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-sm-6">
+        <div class="portlet box blue">
+            <div class="portlet-title">
+                <div class="caption">
+                    <span class="caption-subject"><?php echo $this->translate('Overall Viral Load Status based on Gender'); ?></span>
+                </div>
+            </div>
+            <div class="portlet-body">
+                <div id="overall-vl-status-based-gender" style="min-width: 310px; height: 520px; margin: 0 auto"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<br><br>
+<div class="row">
+    <div class="col-md-6 col-sm-6">
+        <div class="portlet box blue">
+            <div class="portlet-title">
+                <div class="caption">
+                    <span class="caption-subject"><?php echo $this->translate('VL Ordered'); ?></span>
+                </div>
+                <div class="actions">
+                    <div class="btn-group">
+                        <select id="testReason" class="btn white btn-outline btn-circle btn-sm dropdown-toggle" onchange="getAllTestReason();">
+                            <option value=""><?php echo $this->translate('Test Reasons'); ?></option>
+                            <?php
+                            foreach($testReason as $test){
+                                ?>
+                                <option value="<?php echo base64_encode($test['test_reason_id']);?>"><?php echo $test['test_reason_name'];?></option>
+                                <?php
+                            }
+                            ?>
+                        </select>
                     </div>
-                    <!-- END PAGE BAR -->
-                    <!-- BEGIN PAGE TITLE-->
-                    <!-- END PAGE TITLE-->
-                    <!-- END PAGE HEADER-->
-                    <br>
-                    <br>
-                    <form id="pageFilter" action="#" method="">
-                        <div class="row" style="padding-top:10px;padding-bottom:20px;">
-                            <div class="col-md-12">
-                                <div class="col-lg-6">
-                                    <select class="form-control" id="clinicId" name="clinicId[]" multiple title="<?php echo $this->translate('Please select one or more clinics. Leave blank for All'); ?>">
-                                        <?php
-                                        foreach($clinicName as $clinic){
-                                            ?>
-                                            <option value="<?php echo $clinic['facility_id']; ?>"><?php echo $clinic['facility_code']." - ".$clinic['facility_name'];?></option>
-                                            <?php
-                                        }
-                                        ?>
+                </div>                                   
+            </div>
+            <div class="portlet-body" id="samplesTestedReason"></div>
+        </div>
+    </div>
+    <div class="col-md-6 col-sm-6">
+        <div class="portlet box blue">
+            <div class="portlet-title">
+                <div class="caption">
+                    <span class="caption-subject"><?php echo $this->translate('VL Suppression'); ?></span>
+                </div>
+                <div class="actions">
+                    <div class="btn-group">
+                        <select id="sampleType" class="btn white btn-outline btn-circle btn-sm dropdown-toggle" onchange="getTestedSampleResult('change');">
+                            <option value=""><?php echo $this->translate('All Samples'); ?></option>
+                            <option value="dbs"><?php echo $this->translate('DBS'); ?></option>
+                            <option value="others"><?php echo $this->translate('Others'); ?></option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="portlet-body">
+                <div id="samplesTestedResult" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12 col-sm-12">
+        <div class="portlet box">
+            <div class="portlet-body">
+                    <div class="portlet box blue">
+                        <div class="portlet-title">
+                            <div class="caption">
+                                <i class="fa fa-cogs"></i><?php echo $this->translate('Test Results'); ?>
+                            </div>
+                            <div class="actions" style="width:<?php echo (isset($languagecontainer->locale) &&  $languagecontainer->locale== 'pt_BR')?'36%':'30%'; ?>;">
+                                <div class="btn-group" style="width:60%;float:left;">
+                                    <select id="sampleStatus" class="btn white btn-outline btn-circle btn-sm dropdown-toggle" onchange="fnShowHide();">
+                                        <option value=""><?php echo $this->translate('All Samples'); ?></option>
+                                        <option value="result" selected="selected"><?php echo $this->translate('Samples with Test Results'); ?></option>
+                                        <option value="noresult"><?php echo $this->translate('Samples Awaiting Results'); ?></option>
+                                        <option value="rejected"><?php echo $this->translate('Rejected Samples'); ?></option>
                                     </select>
                                 </div>
-                                <div class="col-lg-6">
-                                    <div id="dashboard-range" class="btn btn-sm form-control"
-                                        data-container="body"
-                                        data-placement="bottom"
-                                        data-original-title="Change dashboard date range">
-                                        <?php echo $this->translate('Date Range'); ?>&nbsp;&nbsp;&nbsp;&nbsp;<i class="icon-calendar"></i>&nbsp;
-                                        <span class="thin uppercase hidden-xs"></span>&nbsp;
-                                        <i class="fa fa-angle-down"></i>
-                                        <input type="hidden" name="sampleCollectionDate" id="sampleCollectionDate"/>
-                                    </div>
+                                <div class="tools" style="width:40%;float:right;text-align:right;">
+                                    <button class="btn btn-default" onclick="exportTestResult();"><span><i class="fa fa-file-excel-o" aria-hidden="true"></i> <?php echo $this->translate('Excel'); ?></span></button>
                                 </div>
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="form-group col-lg-4">
-                                    <label class="control-label"><?php echo $this->translate('Sample Type'); ?></label>
-                                  <select class="form-control" name="sampleTypeId" id="sampleTypeId" title="<?php echo $this->translate('Please choose sample type'); ?>">
-                                    <option value=""><?php echo $this->translate('All'); ?></option>
-                                    <?php echo $sType;?>
-                                  </select>
-                                </div>
-                                <div class="form-group col-lg-4">
-                                  <label class="control-label"><?php echo $this->translate('Test Result'); ?>&nbsp;</label>
-                                  <select class="form-control" name="testResult" id="testResult" title="<?php echo $this->translate('Please choose result'); ?>">
-                                    <option value=""><?php echo $this->translate('All'); ?></option>
-                                    <option value=">=1000"><?php echo $this->translate('>= 1000 cp/ml'); ?></option>
-                                    <option value="<1000"><?php echo $this->translate('< 1000 cp/ml'); ?></option>
-                                  </select>
-                                </div>
-                                <div class="form-group col-lg-4">
-                                    <label class="control-label"><?php echo $this->translate('ARV Adherence'); ?></label>
-                                    <select class="form-control" name="adherence" id="adherence">
-                                      <option value=''>--<?php echo $this->translate('Select'); ?>--</option>
-                                      <option value="good"><?php echo $this->translate('Good'); ?> >= 95%</option>
-                                      <option value="fair"><?php echo $this->translate('Fair'); ?> 85-94%</option>
-                                      <option value="poor"><?php echo $this->translate('Poor'); ?> < 85%</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="form-group col-lg-4">
-                                    <label class="control-label"><?php echo $this->translate('Age Group'); ?>&nbsp;</label>
-                                    <select class="form-control" name="age[]" id="age" multiple title="<?php echo $this->translate('Please choose age group'); ?>">
-                                      <option value="<2"> < 2</option>
-                                      <option value="2to5"> 2 - 5</option>
-                                      <option value="6to14"> 6 - 14</option>
-                                      <option value="15to49"> 15 - 49</option>
-                                      <option value=">=50"> >= 50</option>
-                                      <option value="unknown"> <?php echo $this->translate('Unknown'); ?></option>
-                                    </select>
-                                </div>
-                                <div class="form-group col-lg-4">
-                                    <label class="control-label"><?php echo $this->translate('Gender'); ?></label>
-                                  <select class="form-control" name="gender" id="gender">
-                                    <option value=''>--<?php echo $this->translate('Select'); ?>--</option>
-                                    <option value="M"><?php echo $this->translate('Male'); ?></option>
-                                    <option value="F"><?php echo $this->translate('Female'); ?></option>
-                                    <option value="not_specified"><?php echo $this->translate('Other'); ?></option>
-                                  </select>
-                                </div>
-                                <div class="form-group col-lg-4 femaleSection" style="display:none;">
-                                    <label class="control-label"><?php echo $this->translate('Is Patient Pregnant'); ?></label>
-                                    <select class="form-control" name="isPregnant" id="isPregnant">
-                                      <option value=""><?php echo $this->translate('All'); ?></option>  
-                                      <option value="yes"><?php echo $this->translate('Yes'); ?></option>
-                                      <option value="no"><?php echo $this->translate('No'); ?></option>
-                                      <option value="unreported"><?php echo $this->translate('Unreported'); ?></option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="form-group col-lg-4 femaleSection" style="display:none;">
-                                    <label class="control-label"><?php echo $this->translate('Is Patient Breastfeeding'); ?></label>
-                                    <select class="form-control" name="isBreastfeeding" id="isBreastfeeding">
-                                      <option value=""><?php echo $this->translate('All'); ?></option>  
-                                      <option value="yes"><?php echo $this->translate('Yes'); ?></option>
-                                      <option value="no"><?php echo $this->translate('No'); ?></option>
-                                      <option value="unreported"><?php echo $this->translate('Unreported'); ?></option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="form-group col-lg-12" style="text-align:center;margin-top:10px;">
-                                    <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="searchClinicData();"><?php echo $this->translate('Search'); ?></a>&nbsp;&nbsp;
-                                    <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="resetEverything();"><?php echo $this->translate('Reset'); ?></a>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                    <hr style="background: #000 !important;border-color:#ccc;">
-                    <div class="row">
-                        <div class="col-md-6 col-sm-6">
-                            <div class="portlet box blue">
-                                <div class="portlet-title">
-                                    <div class="caption">
-                                        <span class="caption-subject"><?php echo $this->translate('Overall Viral Load Status'); ?></span>
-                                    </div>
-                                </div>
-                                <div class="portlet-body">
-                                    <div id="overall-vl-status" style="min-width: 310px; height: 520px; margin: 0 auto"></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6 col-sm-6">
-                            <div class="portlet box blue">
-                                <div class="portlet-title">
-                                    <div class="caption">
-                                        <span class="caption-subject"><?php echo $this->translate('Overall Viral Load Status based on Gender'); ?></span>
-                                    </div>
-                                </div>
-                                <div class="portlet-body">
-                                    <div id="overall-vl-status-based-gender" style="min-width: 310px; height: 520px; margin: 0 auto"></div>
-                                </div>
+                        <div class="portlet-body">
+                            <div class="table-toolbar">
+                                <table class="table table-striped table-bordered table-hover order-column" id="testResults">
+                                    <thead>
+                                        <tr>
+                                            <th> <?php echo $this->translate('Sample ID'); ?> </th>
+                                            <th> <?php echo $this->translate('Facility Name'); ?> </th>
+                                            <th> <?php echo $this->translate('Date Collected'); ?></th>
+                                            <th> <?php echo $this->translate('Rejection Reason'); ?></th>
+                                            <th> <?php echo $this->translate('Date Tested'); ?></th>
+                                            <th> <?php echo $this->translate('Viral Load(cp/ml)'); ?> </th>                                                              
+                                            <th> <?php echo $this->translate('Action'); ?> </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td colspan="7" class="dataTables_empty">Loading data from server</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>
-                    
-                    <br><br>
-                    <div class="row">
-                        <div class="col-md-6 col-sm-6">
-                            <div class="portlet box blue">
-                                <div class="portlet-title">
-                                    <div class="caption">
-                                        <span class="caption-subject"><?php echo $this->translate('VL Ordered'); ?></span>
-                                    </div>
-                                    <div class="actions">
-                                        <div class="btn-group">
-                                            <select id="testReason" class="btn white btn-outline btn-circle btn-sm dropdown-toggle" onchange="getAllTestReason();">
-                                                <option value=""><?php echo $this->translate('Test Reasons'); ?></option>
-                                                <?php
-                                                foreach($testReason as $test){
-                                                    ?>
-                                                    <option value="<?php echo base64_encode($test['test_reason_id']);?>"><?php echo $test['test_reason_name'];?></option>
-                                                    <?php
-                                                }
-                                                ?>
-                                            </select>
-                                        </div>
-                                    </div>                                   
-                                </div>
-                                <div class="portlet-body" id="samplesTestedReason"></div>
-                            </div>
-                        </div>
-                        <div class="col-md-6 col-sm-6">
-                            <div class="portlet box blue">
-                                <div class="portlet-title">
-                                    <div class="caption">
-                                        <span class="caption-subject"><?php echo $this->translate('VL Suppression'); ?></span>
-                                    </div>
-                                    <div class="actions">
-                                        <div class="btn-group">
-                                            <select id="sampleType" class="btn white btn-outline btn-circle btn-sm dropdown-toggle" onchange="getTestedSampleResult('change');">
-                                                <option value=""><?php echo $this->translate('All Samples'); ?></option>
-                                                <option value="dbs"><?php echo $this->translate('DBS'); ?></option>
-                                                <option value="others"><?php echo $this->translate('Others'); ?></option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="portlet-body">
-                                    <div id="samplesTestedResult" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12 col-sm-12">
-                            <div class="portlet box">
-                                <div class="portlet-body">
-                                        <div class="portlet box blue">
-                                            <div class="portlet-title">
-                                                <div class="caption">
-                                                    <i class="fa fa-cogs"></i><?php echo $this->translate('Test Results'); ?>
-                                                </div>
-                                                <div class="actions" style="width:<?php echo (isset($languagecontainer->locale) &&  $languagecontainer->locale== 'pt_BR')?'36%':'30%'; ?>;">
-                                                    <div class="btn-group" style="width:60%;float:left;">
-                                                        <select id="result" class="btn white btn-outline btn-circle btn-sm dropdown-toggle" onchange="fnShowHide();">
-                                                            <option value=""><?php echo $this->translate('All Samples'); ?></option>
-                                                            <option value="result" selected="selected"><?php echo $this->translate('Samples with Test Results'); ?></option>
-                                                            <option value="noresult"><?php echo $this->translate('Samples Awaiting Results'); ?></option>
-                                                            <option value="rejected"><?php echo $this->translate('Rejected Samples'); ?></option>
-                                                        </select>
-                                                    </div>
-                                                    <div class="tools" style="width:40%;float:right;text-align:right;">
-                                                        <button class="btn btn-default" onclick="exportTestResult();"><span><i class="fa fa-file-excel-o" aria-hidden="true"></i> <?php echo $this->translate('Excel'); ?></span></button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="portlet-body">
-                                                <div class="table-toolbar">
-                                                    <table class="table table-striped table-bordered table-hover order-column" id="testResults">
-                                                        <thead>
-                                                            <tr>
-                                                                <th> <?php echo $this->translate('Sample ID'); ?> </th>
-                                                                <th> <?php echo $this->translate('Facility Name'); ?> </th>
-                                                                <th> <?php echo $this->translate('Date Collected'); ?></th>
-                                                                <th> <?php echo $this->translate('Rejection Reason'); ?></th>
-                                                                <th> <?php echo $this->translate('Date Tested'); ?></th>
-                                                                <th> <?php echo $this->translate('Viral Load(cp/ml)'); ?> </th>                                                              
-                                                                <th> <?php echo $this->translate('Action'); ?> </th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            <tr>
-                                                                <td colspan="7" class="dataTables_empty">Loading data from server</td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                        </div>
-                                </div>
-                            </div>
-                        </div>                        
-                    </div>
+            </div>
+        </div>
+    </div>                        
+</div>
 <script>
     var oTable = null;
     $(function() {
@@ -309,11 +309,11 @@ foreach($sampleType as $samples){
     }
     
     function getOverAllViralLoadStatus(){
-        var clinicId = $("#clinicId").val();
+        var clinicId = ($("#clinicId").val() == null)?'':$("#clinicId").val().join(',');
         var dateRange = $("#sampleCollectionDate").val();
         var testResult = $("#testResult").val();
         var sampleTypeId = $("#sampleTypeId").val();
-        var age = $("#age").val();
+        var age = ($("#age").val() == null)?'':$("#age").val().join(',');
         var adherence = $("#adherence").val();
         var gender = $("#gender").val();
         var isPregnant = $("#isPregnant").val();
@@ -325,11 +325,11 @@ foreach($sampleType as $samples){
     }
     
     function getOverAllViralLoadbasedonGender(){
-        var clinicId = $("#clinicId").val();
+        var clinicId = ($("#clinicId").val() == null)?'':$("#clinicId").val().join(',');
         var dateRange = $("#sampleCollectionDate").val();
         var testResult = $("#testResult").val();
         var sampleTypeId = $("#sampleTypeId").val();
-        var age = $("#age").val();
+        var age = ($("#age").val() == null)?'':$("#age").val().join(',');
         var adherence = $("#adherence").val();
         var gender = $("#gender").val();
         var isPregnant = $("#isPregnant").val();
@@ -341,11 +341,11 @@ foreach($sampleType as $samples){
     }
     
     function getAllTestReason(){
-        var clinicId = $("#clinicId").val();
+        var clinicId = ($("#clinicId").val() == null)?'':$("#clinicId").val().join(',');
         var dateRange = $("#sampleCollectionDate").val();
         var testResult = $("#testResult").val();
         var sampleTypeId = $("#sampleTypeId").val();
-        var age = $("#age").val();
+        var age = ($("#age").val() == null)?'':$("#age").val().join(',');
         var adherence = $("#adherence").val();
         var gender = $("#gender").val();
         var isPregnant = $("#isPregnant").val();
@@ -358,11 +358,11 @@ foreach($sampleType as $samples){
     }
     
     function getTestedSampleResult(frmSrc){
-        var clinicId = $("#clinicId").val();
+        var clinicId = ($("#clinicId").val() == null)?'':$("#clinicId").val().join(',');
         var dateRange = $("#sampleCollectionDate").val();
         var testResult = $("#testResult").val();
         var sampleTypeId = $("#sampleTypeId").val();
-        var age = $("#age").val();
+        var age = ($("#age").val() == null)?'':$("#age").val().join(',');
         var adherence = $("#adherence").val();
         var gender = $("#gender").val();
         var isPregnant = $("#isPregnant").val();
@@ -403,7 +403,7 @@ foreach($sampleType as $samples){
                 aoData.push({ "name":"gender","value": $("#gender").val()});
                 aoData.push({"name": "isPregnant", "value": $("#isPregnant").val()});
                 aoData.push({"name": "isBreastfeeding", "value": $("#isBreastfeeding").val()});
-                aoData.push({ "name":"result","value": $("#result").val()});
+                aoData.push({ "name":"sampleStatus","value": $("#sampleStatus").val()});
                 $.ajax({
                     "dataType": 'json',
                     "type": "POST",
@@ -457,19 +457,19 @@ foreach($sampleType as $samples){
     }
     
     function fnShowHide(){
-        if($('#result').val() == ''){
+        if($('#sampleStatus').val() == ''){
             oTable.column(3).visible(true);
             oTable.column(4).visible(true);
             oTable.column(5).visible(true);
-        }else if($('#result').val() == 'result'){
+        }else if($('#sampleStatus').val() == 'result'){
             oTable.column(3).visible(false);
             oTable.column(4).visible(true);
             oTable.column(5).visible(true);
-        }else if($('#result').val() == 'noresult'){
+        }else if($('#sampleStatus').val() == 'noresult'){
             oTable.column(3).visible(false);
             oTable.column(4).visible(false);
             oTable.column(5).visible(false);
-        }else if($('#result').val() == 'rejected'){
+        }else if($('#sampleStatus').val() == 'rejected'){
            oTable.column(4).visible(false);
            oTable.column(5).visible(false);
            oTable.column(3).visible(true);
@@ -493,7 +493,7 @@ foreach($sampleType as $samples){
     function exportTestResult(){
        $.blockUI.defaults.css.border = '1px solid grey';
        $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI); 
-       $.post("<?php echo $this->url('clinics', array('action' => 'export-result-excel')); ?>", {result : $("#result").val()},
+       $.post("<?php echo $this->url('clinics', array('action' => 'export-result-excel')); ?>", {result : $("#sampleStatus").val()},
         function(data){
             if(data == "" || data == null || data == undefined){
                 alert('<?php echo $this->translate('Unable to export excel') ?>');

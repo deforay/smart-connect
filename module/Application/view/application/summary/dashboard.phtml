@@ -1281,6 +1281,12 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
        
     }
     
+    $('[data-toggle="btns"] .btn').on('click', function(){
+        var $this = $(this);
+        $this.parent().find('.active').removeClass('active');
+        $this.addClass('active');
+    });
+    
     function getSamplesReceivedBarChartInfo(){
         $.post("<?php echo $this->url('summary', array('action' => 'get-samples-received-bar-chart')); ?>",{},
         function(data) {
@@ -1308,10 +1314,4 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
             $("#regimenGroupBarChartContainer").html(data);
         });
     }
-    
-    $('[data-toggle="btns"] .btn').on('click', function(){
-        var $this = $(this);
-        $this.parent().find('.active').removeClass('active');
-        $this.addClass('active');
-    });
 </script>

@@ -22,7 +22,7 @@ class ClinicController extends AbstractActionController{
         return new ViewModel(array(
                 'sampleType' => $sampleType,
                 'clinicName' => $clinicName,
-                'testReason' => $testReasonName,
+                'testReason' => $testReasonName
             ));
     }
     
