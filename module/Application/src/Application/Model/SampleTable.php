@@ -4160,19 +4160,19 @@ class SampleTable extends AbstractTableGateway {
         $sql = new Sql($dbAdapter);
         $common = new CommonService($this->sm);
         $queryStr = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
-                            ->columns(array(
-                            "total_samples_received" => new Expression("COUNT(*)"),
-                            "total_samples_tested" => new Expression("(SUM(CASE WHEN (((vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL') AND (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) OR (vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0)) THEN 1 ELSE 0 END))"),
-                            "suppressed_samples" => new Expression("SUM(CASE WHEN ((vl.result < 1000 or vl.result = 'Target Not Detected' or vl.result = 'TND' or vl.result = 'tnd' or vl.result= 'Below Detection Level' or vl.result='BDL' or vl.result='bdl' or vl.result= 'Low Detection Level' or vl.result='LDL' or vl.result='ldl') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample') THEN 1 ELSE 0 END)"),
-                            //"suppressed_samples_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (vl.result < 1000 or vl.result='Target Not Detected') THEN 1 ELSE 0 END)/COUNT(*))*100),2)"),
-                            //"not_suppressed_samples" => new Expression("SUM(CASE WHEN (vl.result >= 1000) THEN 1 ELSE 0 END)"),
-                            //"not_suppressed_samples_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (vl.result >= 1000) THEN 1 ELSE 0 END)/COUNT(*))*100),2)"),
-                            "rejected_samples" => new Expression("SUM(CASE WHEN (vl.reason_for_sample_rejection !='' AND vl.reason_for_sample_rejection !='0' AND vl.reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END)"),
-                            //"rejected_samples_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (vl.reason_for_sample_rejection !='' AND vl.reason_for_sample_rejection !='0' AND vl.reason_for_sample_rejection IS NOT NULL AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END)/COUNT(*))*100),2)"),
-                            "all_current_regimen_samples" => new Expression("SUM(CASE WHEN (vl.line_of_treatment IS NOT NULL AND vl.line_of_treatment!= '' AND vl.line_of_treatment != 0) THEN 1 ELSE 0 END)"),
-                            "1st_line_of_current_regimen_samples" => new Expression("SUM(CASE WHEN (vl.line_of_treatment = 1) THEN 1 ELSE 0 END)"),
-                            ))
-                            ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date != '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')");
+                        ->columns(array(
+                        "total_samples_received" => new Expression("COUNT(*)"),
+                        "total_samples_tested" => new Expression("(SUM(CASE WHEN (((vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL') AND (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) OR (vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0)) THEN 1 ELSE 0 END))"),
+                        "suppressed_samples" => new Expression("SUM(CASE WHEN ((vl.result < 1000 or vl.result = 'Target Not Detected' or vl.result = 'TND' or vl.result = 'tnd' or vl.result= 'Below Detection Level' or vl.result='BDL' or vl.result='bdl' or vl.result= 'Low Detection Level' or vl.result='LDL' or vl.result='ldl') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample') THEN 1 ELSE 0 END)"),
+                        //"suppressed_samples_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (vl.result < 1000 or vl.result='Target Not Detected') THEN 1 ELSE 0 END)/COUNT(*))*100),2)"),
+                        //"not_suppressed_samples" => new Expression("SUM(CASE WHEN (vl.result >= 1000) THEN 1 ELSE 0 END)"),
+                        //"not_suppressed_samples_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (vl.result >= 1000) THEN 1 ELSE 0 END)/COUNT(*))*100),2)"),
+                        "rejected_samples" => new Expression("SUM(CASE WHEN (vl.reason_for_sample_rejection !='' AND vl.reason_for_sample_rejection !='0' AND vl.reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END)"),
+                        //"rejected_samples_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (vl.reason_for_sample_rejection !='' AND vl.reason_for_sample_rejection !='0' AND vl.reason_for_sample_rejection IS NOT NULL AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END)/COUNT(*))*100),2)"),
+                        "all_current_regimen_samples" => new Expression("SUM(CASE WHEN (vl.line_of_treatment IS NOT NULL AND vl.line_of_treatment!= '' AND vl.line_of_treatment != 0) THEN 1 ELSE 0 END)"),
+                        "1st_line_of_current_regimen_samples" => new Expression("SUM(CASE WHEN (vl.line_of_treatment = 1) THEN 1 ELSE 0 END)"),
+                        ))
+                        ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date != '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')");
         $queryStr = $sql->getSqlStringForSqlObject($queryStr);
       return $common->cacheQuery($queryStr,$dbAdapter);
     }
@@ -4480,8 +4480,8 @@ class SampleTable extends AbstractTableGateway {
                                                 'sampleCollectionDate'=>new Expression('DATE(sample_collection_date)'),
                                                 'result',
                                                 "total_samples_received" => new Expression("(COUNT(*))"),
-                                                "total_samples_tested" => new Expression("(SUM(CASE WHEN (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END))"),
-                                                "total_samples_pending" => new Expression("(SUM(CASE WHEN (sample_tested_datetime is null OR sample_tested_datetime = '' OR DATE(sample_tested_datetime) ='1970-01-01' OR DATE(sample_tested_datetime) ='0000-00-00' OR DATE(sample_tested_datetime) ='0') THEN 1 ELSE 0 END))"),
+                                                "total_samples_tested" => new Expression("(SUM(CASE WHEN (((vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL') AND (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) OR (vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0)) THEN 1 ELSE 0 END))"),
+                                                "total_samples_pending" => new Expression("(SUM(CASE WHEN ((vl.result IS NULL OR vl.result = '' OR vl.result = 'NULL' OR sample_tested_datetime is null OR sample_tested_datetime = '' OR DATE(sample_tested_datetime) ='1970-01-01' OR DATE(sample_tested_datetime) ='0000-00-00') AND (vl.reason_for_sample_rejection IS NULL OR vl.reason_for_sample_rejection = '' OR vl.reason_for_sample_rejection = 0)) THEN 1 ELSE 0 END))"),
                                                 "total_samples_rejected" => new Expression("(SUM(CASE WHEN (reason_for_sample_rejection !='' AND reason_for_sample_rejection !='0' AND reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END))"),
                                                 "total_dbs_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (sample_type = 2) THEN 1 ELSE 0 END)/COUNT(*))*100),2)"),
                                                 "total_plasma_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (sample_type = 11) THEN 1 ELSE 0 END)/COUNT(*))*100),2)"),
@@ -4526,8 +4526,8 @@ class SampleTable extends AbstractTableGateway {
                                                 'sampleCollectionDate'=>new Expression('DATE(sample_collection_date)'),
                                                 'result',
                                                 "total_samples_received" => new Expression("(COUNT(*))"),
-                                                "total_samples_tested" => new Expression("(SUM(CASE WHEN (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END))"),
-                                                "total_samples_pending" => new Expression("(SUM(CASE WHEN (sample_tested_datetime is null OR sample_tested_datetime = '' OR DATE(sample_tested_datetime) ='1970-01-01' OR DATE(sample_tested_datetime) ='0000-00-00' OR DATE(sample_tested_datetime) ='0') THEN 1 ELSE 0 END))"),
+                                                "total_samples_tested" => new Expression("(SUM(CASE WHEN (((vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL') AND (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) OR (vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0)) THEN 1 ELSE 0 END))"),
+                                                "total_samples_pending" => new Expression("(SUM(CASE WHEN ((vl.result IS NULL OR vl.result = '' OR vl.result = 'NULL' OR sample_tested_datetime is null OR sample_tested_datetime = '' OR DATE(sample_tested_datetime) ='1970-01-01' OR DATE(sample_tested_datetime) ='0000-00-00') AND (vl.reason_for_sample_rejection IS NULL OR vl.reason_for_sample_rejection = '' OR vl.reason_for_sample_rejection = 0)) THEN 1 ELSE 0 END))"),
                                                 "total_samples_rejected" => new Expression("(SUM(CASE WHEN (reason_for_sample_rejection !='' AND reason_for_sample_rejection !='0' AND reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END))"),
                                                 "total_dbs_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (sample_type = 2) THEN 1 ELSE 0 END)/COUNT(*))*100),2)"),
                                                 "total_plasma_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (sample_type = 11) THEN 1 ELSE 0 END)/COUNT(*))*100),2)"),
@@ -4580,7 +4580,7 @@ class SampleTable extends AbstractTableGateway {
             $sQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
                                     ->columns(
                                               array(
-                                                    "total_samples_tested" => new Expression("(SUM(CASE WHEN (((vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL') AND (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) OR (vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0)) THEN 1 ELSE 0 END))"),
+                                                    "total_samples_valid" => new Expression("(SUM(CASE WHEN ((vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample') AND (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) THEN 1 ELSE 0 END))"),
                                                     //"total_samples_rejected" => new Expression("SUM(CASE WHEN (vl.reason_for_sample_rejection !='' AND vl.reason_for_sample_rejection !='0' AND vl.reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END)"),
                                                     "total_suppressed_samples" => new Expression("SUM(CASE WHEN ((vl.result < 1000 or vl.result = 'Target Not Detected' or vl.result = 'TND' or vl.result = 'tnd' or vl.result= 'Below Detection Level' or vl.result='BDL' or vl.result='bdl' or vl.result= 'Low Detection Level' or vl.result='LDL' or vl.result='ldl') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END)"),
                                                     //"total_suppressed_samples_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (vl.result < 1000 or vl.result='Target Not Detected') THEN 1 ELSE 0 END)/COUNT(*))*100),2)")
@@ -4591,8 +4591,8 @@ class SampleTable extends AbstractTableGateway {
             //echo $queryStr;die;
             //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             $sampleResult = $common->cacheQuery($queryStr,$dbAdapter);
-            $result['valid_results'][$j] = (isset($sampleResult[0]["total_samples_tested"]))?$sampleResult[0]["total_samples_tested"]:0;
-            $result['samples_rate'][$j] = ($sampleResult[0]["total_suppressed_samples"] > 0 && $sampleResult[0]["total_samples_tested"] > 0)?round((($sampleResult[0]["total_suppressed_samples"]/$sampleResult[0]["total_samples_tested"])*100),2):0;
+            $result['valid_results'][$j] = (isset($sampleResult[0]["total_samples_valid"]))?$sampleResult[0]["total_samples_valid"]:0;
+            $result['suppression_rate'][$j] = ($sampleResult[0]["total_suppressed_samples"] > 0 && $sampleResult[0]["total_samples_valid"] > 0)?round((($sampleResult[0]["total_suppressed_samples"]/$sampleResult[0]["total_samples_valid"])*100),2):0;
             $result['date'][$j] = $monthYearFormat;
            $start = strtotime("+1 month", $start);
            $j++;
@@ -4691,7 +4691,7 @@ class SampleTable extends AbstractTableGateway {
                                                 'sampleCollectionDate'=>new Expression('DATE(sample_collection_date)'),
                                                 'result',
                                                 "total_samples_received" => new Expression("(COUNT(*))"),
-                                                "total_samples_tested" => new Expression("(SUM(CASE WHEN (((vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') OR (vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0))) THEN 1 ELSE 0 END))"),
+                                                "total_samples_valid" => new Expression("(SUM(CASE WHEN ((vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample') AND (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) THEN 1 ELSE 0 END))"),
                                                 "total_samples_rejected" => new Expression("(SUM(CASE WHEN (reason_for_sample_rejection !='' AND reason_for_sample_rejection !='0' AND reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END))"),
                                                 "total_suppressed_samples" => new Expression("(SUM(CASE WHEN ((vl.result < 1000 or vl.result = 'Target Not Detected' or vl.result = 'TND' or vl.result = 'tnd' or vl.result= 'Below Detection Level' or vl.result='BDL' or vl.result='bdl' or vl.result= 'Low Detection Level' or vl.result='LDL' or vl.result='ldl') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END))"),
                                                 "total_not_suppressed_samples" => new Expression("(SUM(CASE WHEN (vl.result IS NOT NULL AND vl.result!= '' AND vl.result >= 1000 AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END))"),
@@ -4736,7 +4736,7 @@ class SampleTable extends AbstractTableGateway {
                                                 'sampleCollectionDate'=>new Expression('DATE(sample_collection_date)'),
                                                 'result',
                                                 "total_samples_received" => new Expression("(COUNT(*))"),
-                                                "total_samples_tested" => new Expression("(SUM(CASE WHEN (((vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') OR (vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0))) THEN 1 ELSE 0 END))"),
+                                                "total_samples_valid" => new Expression("(SUM(CASE WHEN ((vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample') AND (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) THEN 1 ELSE 0 END))"),
                                                 "total_samples_rejected" => new Expression("(SUM(CASE WHEN (reason_for_sample_rejection !='' AND reason_for_sample_rejection !='0' AND reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END))"),
                                                 "total_suppressed_samples" => new Expression("(SUM(CASE WHEN ((vl.result < 1000 or vl.result = 'Target Not Detected' or vl.result = 'TND' or vl.result = 'tnd' or vl.result= 'Below Detection Level' or vl.result='BDL' or vl.result='bdl' or vl.result= 'Low Detection Level' or vl.result='LDL' or vl.result='ldl') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END))"),
                                                 "total_not_suppressed_samples" => new Expression("(SUM(CASE WHEN (vl.result IS NOT NULL AND vl.result!= '' AND vl.result >= 1000 AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END))"),
@@ -4760,7 +4760,7 @@ class SampleTable extends AbstractTableGateway {
         foreach ($rResult as $aRow) {
             $row = array();
             $row[] = ucwords($aRow['district']);      
-            $row[] = $aRow['total_samples_tested'];           
+            $row[] = $aRow['total_samples_valid'];           
             $row[] = $aRow['total_suppressed_samples'];            
             $row[] = $aRow['total_not_suppressed_samples'];            
             $row[] = ($aRow['total_samples_rejected'] > 0 && $aRow['total_samples_received'] > 0)?round((($aRow['total_samples_rejected']/$aRow['total_samples_received'])*100),2).'%':'';
@@ -4861,7 +4861,7 @@ class SampleTable extends AbstractTableGateway {
                                                 'sampleCollectionDate'=>new Expression('DATE(sample_collection_date)'),
                                                 'result',
                                                 "total_samples_received" => new Expression("(COUNT(*))"),
-                                                "total_samples_tested" => new Expression("(SUM(CASE WHEN (((vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') OR (vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0))) THEN 1 ELSE 0 END))"),
+                                                "total_samples_valid" => new Expression("(SUM(CASE WHEN ((vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample') AND (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) THEN 1 ELSE 0 END))"),
                                                 "total_samples_rejected" => new Expression("(SUM(CASE WHEN (reason_for_sample_rejection !='' AND reason_for_sample_rejection !='0' AND reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END))"),
                                                 "total_suppressed_samples" => new Expression("(SUM(CASE WHEN ((vl.result < 1000 or vl.result = 'Target Not Detected' or vl.result = 'TND' or vl.result = 'tnd' or vl.result= 'Below Detection Level' or vl.result='BDL' or vl.result='bdl' or vl.result= 'Low Detection Level' or vl.result='LDL' or vl.result='ldl') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END))"),
                                                 "total_not_suppressed_samples" => new Expression("(SUM(CASE WHEN (vl.result IS NOT NULL AND vl.result!= '' AND vl.result >= 1000 AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END))"),
@@ -4906,7 +4906,7 @@ class SampleTable extends AbstractTableGateway {
                                                 'sampleCollectionDate'=>new Expression('DATE(sample_collection_date)'),
                                                 'result',
                                                 "total_samples_received" => new Expression("(COUNT(*))"),
-                                                "total_samples_tested" => new Expression("(SUM(CASE WHEN (((vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') OR (vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0))) THEN 1 ELSE 0 END))"),
+                                                "total_samples_valid" => new Expression("(SUM(CASE WHEN ((vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample') AND (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) THEN 1 ELSE 0 END))"),
                                                 "total_samples_rejected" => new Expression("(SUM(CASE WHEN (reason_for_sample_rejection !='' AND reason_for_sample_rejection !='0' AND reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END))"),
                                                 "total_suppressed_samples" => new Expression("(SUM(CASE WHEN ((vl.result < 1000 or vl.result = 'Target Not Detected' or vl.result = 'TND' or vl.result = 'tnd' or vl.result= 'Below Detection Level' or vl.result='BDL' or vl.result='bdl' or vl.result= 'Low Detection Level' or vl.result='LDL' or vl.result='ldl') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END))"),
                                                 "total_not_suppressed_samples" => new Expression("(SUM(CASE WHEN (vl.result IS NOT NULL AND vl.result!= '' AND vl.result >= 1000 AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END))"),
@@ -4931,7 +4931,7 @@ class SampleTable extends AbstractTableGateway {
             $row = array();
             $row[] = "<span style='white-space:nowrap !important;' >".ucwords($aRow['facility_name'])."</span>";
             $row[] = ucwords($aRow['district']);     
-            $row[] = $aRow['total_samples_tested'];        
+            $row[] = $aRow['total_samples_valid'];        
             $row[] = $aRow['total_suppressed_samples'];            
             $row[] = $aRow['total_not_suppressed_samples'];
             $row[] = ($aRow['total_samples_rejected'] > 0 && $aRow['total_samples_received'] > 0)?round((($aRow['total_samples_rejected']/$aRow['total_samples_received'])*100),2).'%':'';
@@ -4941,6 +4941,53 @@ class SampleTable extends AbstractTableGateway {
        return $output;
     }
 
+    public function fetchSamplesRejectedBarChartDetails($params){
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $mostRejectionReasons = array();
+        $mostRejectionQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
+                                  ->columns(array('rejections' => new Expression('COUNT(*)')))                    
+                                  ->join(array('r_r_r'=>'r_sample_rejection_reasons'),'r_r_r.rejection_reason_id=vl.reason_for_sample_rejection',array('rejection_reason_id'))
+                                  ->group('vl.reason_for_sample_rejection')
+                                  ->order('rejections DESC')
+                                  ->limit(4);
+        $mostRejectionQueryStr = $sql->getSqlStringForSqlObject($mostRejectionQuery);
+        $mostRejectionResult = $dbAdapter->query($mostRejectionQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+        if(isset($mostRejectionResult) && count($mostRejectionResult) >0){
+            foreach($mostRejectionResult as $rejectionReason){
+                $mostRejectionReasons[] = $rejectionReason['rejection_reason_id'];
+            }
+          $mostRejectionReasons[] = 0;
+        }
+        $result=array();
+        $common = new CommonService($this->sm);
+        $start = strtotime(date("Y", strtotime("-1 year")).'-'.date('m', strtotime('+1 month', strtotime('-1 year'))));
+        $end = strtotime(date('Y').'-'.date('m'));
+        $j = 0;
+        while($start <= $end){
+            $month = date('m', $start);$year = date('Y', $start);$monthYearFormat = date("M-Y", $start);
+            for($m=0;$m<count($mostRejectionReasons);$m++){
+                $rejectionQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
+                                      ->columns(array('rejections' => new Expression('COUNT(*)')))                    
+                                      ->join(array('r_r_r'=>'r_sample_rejection_reasons'),'r_r_r.rejection_reason_id=vl.reason_for_sample_rejection',array('rejection_reason_name'))
+                                      ->where("Month(sample_collection_date)='".$month."' AND Year(sample_collection_date)='".$year."'");
+                if($mostRejectionReasons[$m] == 0){
+                    $rejectionQuery = $rejectionQuery->where('vl.reason_for_sample_rejection is not null and vl.reason_for_sample_rejection!= "" and vl.reason_for_sample_rejection NOT IN("' . implode('", "', $mostRejectionReasons) . '")');
+                }else{
+                   $rejectionQuery = $rejectionQuery->where('vl.reason_for_sample_rejection = "'.$mostRejectionReasons[$m].'"'); 
+                }
+                $rejectionQueryStr = $sql->getSqlStringForSqlObject($rejectionQuery);
+                $rejectionResult = $common->cacheQuery($rejectionQueryStr ,$dbAdapter);
+                $rejectionReasonName = ($mostRejectionReasons[$m] == 0)?'Others':ucwords($rejectionResult[0]['rejection_reason_name']);
+                $result['rejection'][$rejectionReasonName][$j] = (isset($rejectionResult[0]['rejections']))?$rejectionResult[0]['rejections']:0;
+                $result['date'][$j] = $monthYearFormat;
+            }
+          $start = strtotime("+1 month", $start);
+          $j++;
+        }
+       return $result;
+    }
+    
     public function fetchAllSamplesRejectedByDistrict($parameters){
         /* Array of database columns which should be read and sent back to DataTables. Use a space where
          * you want to insert a non-database field (for example a counter or static image)
@@ -5247,51 +5294,35 @@ class SampleTable extends AbstractTableGateway {
        return $output;
     }
     
-    public function fetchSamplesRejectedBarChartDetails($params){
+    public function fetchRegimenGroupBarChartDetails($params){
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $mostRejectionReasons = array();
-        $mostRejectionQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
-                                  ->columns(array('rejections' => new Expression('COUNT(*)')))                    
-                                  ->join(array('r_r_r'=>'r_sample_rejection_reasons'),'r_r_r.rejection_reason_id=vl.reason_for_sample_rejection',array('rejection_reason_id'))
-                                  ->group('vl.reason_for_sample_rejection')
-                                  ->order('rejections DESC')
-                                  ->limit(4);
-        $mostRejectionQueryStr = $sql->getSqlStringForSqlObject($mostRejectionQuery);
-        $mostRejectionResult = $dbAdapter->query($mostRejectionQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-        if(isset($mostRejectionResult) && count($mostRejectionResult) >0){
-            foreach($mostRejectionResult as $rejectionReason){
-                $mostRejectionReasons[] = $rejectionReason['rejection_reason_id'];
-            }
-          $mostRejectionReasons[] = 0;
-        }
-        $result=array();
         $common = new CommonService($this->sm);
-        $start = strtotime(date("Y", strtotime("-1 year")).'-'.date('m', strtotime('+1 month', strtotime('-1 year'))));
-        $end = strtotime(date('Y').'-'.date('m'));
-        $j = 0;
-        while($start <= $end){
-            $month = date('m', $start);$year = date('Y', $start);$monthYearFormat = date("M-Y", $start);
-            for($m=0;$m<count($mostRejectionReasons);$m++){
-                $rejectionQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
-                                      ->columns(array('rejections' => new Expression('COUNT(*)')))                    
-                                      ->join(array('r_r_r'=>'r_sample_rejection_reasons'),'r_r_r.rejection_reason_id=vl.reason_for_sample_rejection',array('rejection_reason_name'))
-                                      ->where("Month(sample_collection_date)='".$month."' AND Year(sample_collection_date)='".$year."'");
-                if($mostRejectionReasons[$m] == 0){
-                    $rejectionQuery = $rejectionQuery->where('vl.reason_for_sample_rejection is not null and vl.reason_for_sample_rejection!= "" and vl.reason_for_sample_rejection NOT IN("' . implode('", "', $mostRejectionReasons) . '")');
-                }else{
-                   $rejectionQuery = $rejectionQuery->where('vl.reason_for_sample_rejection = "'.$mostRejectionReasons[$m].'"'); 
-                }
-                $rejectionQueryStr = $sql->getSqlStringForSqlObject($rejectionQuery);
-                $rejectionResult = $common->cacheQuery($rejectionQueryStr ,$dbAdapter);
-                $rejectionReasonName = ($mostRejectionReasons[$m] == 0)?'Others':ucwords($rejectionResult[0]['rejection_reason_name']);
-                $result['rejection'][$rejectionReasonName][$j] = (isset($rejectionResult[0]['rejections']))?$rejectionResult[0]['rejections']:0;
-                $result['date'][$j] = $monthYearFormat;
+        $sQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
+                                ->columns(
+                                          array(
+                                                "current_regimen",
+                                                "total_samples_valid" => new Expression("(SUM(CASE WHEN ((vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample') AND (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) THEN 1 ELSE 0 END))"),
+                                                "total_samples_rejected" => new Expression("(SUM(CASE WHEN (reason_for_sample_rejection !='' AND reason_for_sample_rejection !='0' AND reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END))"),
+                                                "total_suppressed_samples" => new Expression("(SUM(CASE WHEN ((vl.result < 1000 or vl.result = 'Target Not Detected' or vl.result = 'TND' or vl.result = 'tnd' or vl.result= 'Below Detection Level' or vl.result='BDL' or vl.result='bdl' or vl.result= 'Low Detection Level' or vl.result='LDL' or vl.result='ldl') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END))"),
+                                                //"total_suppressed_samples_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN ((vl.result < 1000 or vl.result='Target Not Detected') AND vl.result IS NOT NULL AND vl.result!= '') THEN 1 ELSE 0 END)/COUNT(*))*100),2)")
+                                                )
+                                          )
+                                ->where(array('vl.line_of_treatment'=>1))
+                                ->group('vl.current_regimen');
+            $queryStr = $sql->getSqlStringForSqlObject($sQuery);
+            //echo $queryStr;die;
+            //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+            $sampleResult = $common->cacheQuery($queryStr,$dbAdapter);
+            $j=0;
+            $result=array();
+            foreach($sampleResult as $sRow){
+                $result['valid_results'][$j] = $aRow['total_samples_valid'];
+                $result['suppression_rate'][$j] = ($aRow['total_suppressed_samples'] > 0 && $aRow['total_samples_valid'] > 0)?round((($aRow['total_suppressed_samples']/$aRow['total_samples_valid'])*100),2):0;
+                $result['current_regimen'][$j] = $sRow["current_regimen"];
+                $j++;
             }
-          $start = strtotime("+1 month", $start);
-          $j++;
-        }
-       return $result;
+        return $result;  
     }
     
     public function fetchRegimenGroupSamplesDetails($parameters){
@@ -5383,6 +5414,7 @@ class SampleTable extends AbstractTableGateway {
                                                 "total_samples" => new Expression('COUNT(*)'),
                                                 "total_samples_received" => new Expression("(SUM(CASE WHEN (vl.sample_collection_date is not null AND vl.sample_collection_date != '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00') THEN 1 ELSE 0 END))"),
                                                 "total_samples_tested" => new Expression("(SUM(CASE WHEN (((vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') OR (vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0))) THEN 1 ELSE 0 END))"),
+                                                "total_samples_valid" => new Expression("(SUM(CASE WHEN ((vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample') AND (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) THEN 1 ELSE 0 END))"),
                                                 "total_samples_rejected" => new Expression("(SUM(CASE WHEN (reason_for_sample_rejection !='' AND reason_for_sample_rejection !='0' AND reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END))"),
                                                 "total_suppressed_samples" => new Expression("(SUM(CASE WHEN ((vl.result < 1000 or vl.result = 'Target Not Detected' or vl.result = 'TND' or vl.result = 'tnd' or vl.result= 'Below Detection Level' or vl.result='BDL' or vl.result='bdl' or vl.result= 'Low Detection Level' or vl.result='LDL' or vl.result='ldl') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END))"),
                                                 'current_regimen'
@@ -5423,6 +5455,7 @@ class SampleTable extends AbstractTableGateway {
                                                 "total_samples" => new Expression('COUNT(*)'),
                                                 "total_samples_received" => new Expression("(SUM(CASE WHEN (vl.sample_collection_date is not null AND vl.sample_collection_date != '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00') THEN 1 ELSE 0 END))"),
                                                 "total_samples_tested" => new Expression("(SUM(CASE WHEN (((vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') OR (vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0))) THEN 1 ELSE 0 END))"),
+                                                "total_samples_valid" => new Expression("(SUM(CASE WHEN ((vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample') AND (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) THEN 1 ELSE 0 END))"),
                                                 "total_samples_rejected" => new Expression("(SUM(CASE WHEN (reason_for_sample_rejection !='' AND reason_for_sample_rejection !='0' AND reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END))"),
                                                 "total_suppressed_samples" => new Expression("(SUM(CASE WHEN ((vl.result < 1000 or vl.result = 'Target Not Detected' or vl.result = 'TND' or vl.result = 'tnd' or vl.result= 'Below Detection Level' or vl.result='BDL' or vl.result='bdl' or vl.result= 'Low Detection Level' or vl.result='LDL' or vl.result='ldl') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END))"),
                                                 'current_regimen'
@@ -5447,44 +5480,13 @@ class SampleTable extends AbstractTableGateway {
             $row[] = $aRow['current_regimen'];
             $row[] = $aRow['total_samples_received'];
             $row[] = $aRow['total_samples_tested'];
-            $row[] = $aRow['total_samples_tested'];
+            $row[] = $aRow['total_samples_valid'];
             $row[] = $aRow['total_suppressed_samples'];           
-            $row[] = ($aRow['total_suppressed_samples'] > 0 && $aRow['total_samples_tested'] > 0)?round((($aRow['total_suppressed_samples']/$aRow['total_samples_tested'])*100),2).'%':'';
+            $row[] = ($aRow['total_suppressed_samples'] > 0 && $aRow['total_samples_valid'] > 0)?round((($aRow['total_suppressed_samples']/$aRow['total_samples_valid'])*100),2).'%':'';
             $row[] = ($parameters['t_received'] > 0 && $aRow['total_samples_received'] >0)?round((($aRow['total_samples_received']/$parameters['t_received'])*100),2).'%':'';
             $output['aaData'][] = $row;
         }
        return $output;
-    }
-    
-    public function fetchRegimenGroupBarChartDetails($params){
-        $dbAdapter = $this->adapter;
-        $sql = new Sql($dbAdapter);
-        $common = new CommonService($this->sm);
-        $sQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
-                                ->columns(
-                                          array(
-                                                "current_regimen",
-                                                "total_samples_tested" => new Expression("(SUM(CASE WHEN (((vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') OR (vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0))) THEN 1 ELSE 0 END))"),
-                                                "total_samples_rejected" => new Expression("(SUM(CASE WHEN (reason_for_sample_rejection !='' AND reason_for_sample_rejection !='0' AND reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END))"),
-                                                "total_suppressed_samples" => new Expression("(SUM(CASE WHEN ((vl.result < 1000 or vl.result = 'Target Not Detected' or vl.result = 'TND' or vl.result = 'tnd' or vl.result= 'Below Detection Level' or vl.result='BDL' or vl.result='bdl' or vl.result= 'Low Detection Level' or vl.result='LDL' or vl.result='ldl') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END))"),
-                                                //"total_suppressed_samples_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN ((vl.result < 1000 or vl.result='Target Not Detected') AND vl.result IS NOT NULL AND vl.result!= '') THEN 1 ELSE 0 END)/COUNT(*))*100),2)")
-                                                )
-                                          )
-                                ->where(array('vl.line_of_treatment'=>1))
-                                ->group('vl.current_regimen');
-            $queryStr = $sql->getSqlStringForSqlObject($sQuery);
-            //echo $queryStr;die;
-            //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-            $sampleResult = $common->cacheQuery($queryStr,$dbAdapter);
-            $j=0;
-            $result=array();
-            foreach($sampleResult as $sRow){
-                $result['valid_results'][$j] = $aRow['total_samples_tested'];
-                $result['samples_rate'][$j] = ($aRow['total_suppressed_samples'] > 0 && $aRow['total_samples_tested'] > 0)?round((($aRow['total_suppressed_samples']/$aRow['total_samples_tested'])*100),2):0;
-                $result['current_regimen'][$j] = $sRow["current_regimen"];
-                $j++;
-            }
-        return $result;  
     }
     
     public function fetchAllLineOfTreatmentDetails(){
@@ -5498,8 +5500,8 @@ class SampleTable extends AbstractTableGateway {
                                                 "1stLineofNotSuppressed" => new Expression("(SUM(CASE WHEN (vl.result IS NOT NULL AND vl.result!= '' AND vl.result >= 1000 AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00' AND vl.line_of_treatment = 1) THEN 1 ELSE 0 END))"),
                                                 "2ndLineofSuppressed" => new Expression("(SUM(CASE WHEN ((vl.result < 1000 or vl.result = 'Target Not Detected' or vl.result = 'TND' or vl.result = 'tnd' or vl.result= 'Below Detection Level' or vl.result='BDL' or vl.result='bdl' or vl.result= 'Low Detection Level' or vl.result='LDL' or vl.result='ldl') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00' AND vl.line_of_treatment = 2) THEN 1 ELSE 0 END))"),
                                                 "2ndLineofNotSuppressed" => new Expression("(SUM(CASE WHEN (vl.result IS NOT NULL AND vl.result!= '' AND vl.result >= 1000 AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00' AND vl.line_of_treatment = 2) THEN 1 ELSE 0 END))"),
-                                                "otherLineofSuppressed" => new Expression("(SUM(CASE WHEN ((vl.result < 1000 or vl.result = 'Target Not Detected' or vl.result = 'TND' or vl.result = 'tnd' or vl.result= 'Below Detection Level' or vl.result='BDL' or vl.result='bdl' or vl.result= 'Low Detection Level' or vl.result='LDL' or vl.result='ldl') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00' AND vl.line_of_treatment!= 1 AND vl.line_of_treatment!= 2) THEN 1 ELSE 0 END))"),
-                                                "otherLineofNotSuppressed" => new Expression("(SUM(CASE WHEN (vl.result IS NOT NULL AND vl.result!= '' AND vl.result >= 1000 AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00' AND vl.line_of_treatment!= 1 AND vl.line_of_treatment!= 2) THEN 1 ELSE 0 END))")
+                                                "otherLineofSuppressed" => new Expression("(SUM(CASE WHEN ((vl.result < 1000 or vl.result = 'Target Not Detected' or vl.result = 'TND' or vl.result = 'tnd' or vl.result= 'Below Detection Level' or vl.result='BDL' or vl.result='bdl' or vl.result= 'Low Detection Level' or vl.result='LDL' or vl.result='ldl') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00' AND (vl.line_of_treatment!= 1 AND vl.line_of_treatment!= 2)) THEN 1 ELSE 0 END))"),
+                                                "otherLineofNotSuppressed" => new Expression("(SUM(CASE WHEN (vl.result IS NOT NULL AND vl.result!= '' AND vl.result >= 1000 AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00' AND (vl.line_of_treatment!= 1 AND vl.line_of_treatment!= 2)) THEN 1 ELSE 0 END))")
                                                 )
                                           );
         $queryStr = $sql->getSqlStringForSqlObject($sQuery);
@@ -5516,24 +5518,24 @@ class SampleTable extends AbstractTableGateway {
                                 ->columns(
                                           array(
                                                 "current_regimen",
-                                                "validResults"=>new Expression("(SUM(CASE WHEN (((vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') OR (vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0))) THEN 1 ELSE 0 END))"),
+                                                "validResults"=>new Expression("(SUM(CASE WHEN ((vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample') AND (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) THEN 1 ELSE 0 END))"),
                                                 "totalSuppressed" => new Expression("(SUM(CASE WHEN ((vl.result < 1000 or vl.result = 'Target Not Detected' or vl.result = 'TND' or vl.result = 'tnd' or vl.result= 'Below Detection Level' or vl.result='BDL' or vl.result='bdl' or vl.result= 'Low Detection Level' or vl.result='LDL' or vl.result='ldl') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END))"),
                                                 "totalNotSuppressed" => new Expression("(SUM(CASE WHEN (vl.result IS NOT NULL AND vl.result!= '' AND vl.result >= 1000 AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END))")
                                                 )
                                           );
         $queryStr = $sql->getSqlStringForSqlObject($sQuery);
         //lineofTreatmentResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-        $adult1stLineofTreatmentResult = $common->cacheQuery($queryStr." Where line_of_treatment = 1 AND patient_age_in_years IS NOT NULL AND patient_age_in_years!= '' AND patient_age_in_years >= 18 group by current_regimen order by validResults desc limit 9",$dbAdapter);
-        $adult1stLineofTreatmentOthersResult = $common->cacheQuery($queryStr." Where line_of_treatment = 1 AND patient_age_in_years IS NOT NULL AND patient_age_in_years!= '' AND patient_age_in_years >= 18 group by current_regimen order by validResults desc limit 10,18446744073709551615",$dbAdapter);
+        $adult1stLineofTreatmentResult = $common->cacheQuery($queryStr." Where line_of_treatment = 1 AND (patient_age_in_years IS NOT NULL AND patient_age_in_years!= '' AND patient_age_in_years >= 18) group by current_regimen order by validResults desc limit 9",$dbAdapter);
+        $adult1stLineofTreatmentOthersResult = $common->cacheQuery($queryStr." Where line_of_treatment = 1 AND (patient_age_in_years IS NOT NULL AND patient_age_in_years!= '' AND patient_age_in_years >= 18) group by current_regimen order by validResults desc limit 10,18446744073709551615",$dbAdapter);
         
-        $paeds1stLineofTreatmentResult = $common->cacheQuery($queryStr." Where line_of_treatment = 1 AND patient_age_in_years IS NOT NULL AND patient_age_in_years!= '' AND patient_age_in_years < 18 group by current_regimen order by validResults desc limit 9",$dbAdapter);
-        $paeds1stLineofTreatmentOthersResult = $common->cacheQuery($queryStr." Where line_of_treatment = 1 AND patient_age_in_years IS NOT NULL AND patient_age_in_years!= '' AND patient_age_in_years < 18 group by current_regimen order by validResults desc limit 10,18446744073709551615",$dbAdapter);
+        $paeds1stLineofTreatmentResult = $common->cacheQuery($queryStr." Where line_of_treatment = 1 AND (patient_age_in_years IS NOT NULL AND patient_age_in_years!= '' AND patient_age_in_years < 18) group by current_regimen order by validResults desc limit 9",$dbAdapter);
+        $paeds1stLineofTreatmentOthersResult = $common->cacheQuery($queryStr." Where line_of_treatment = 1 AND (patient_age_in_years IS NOT NULL AND patient_age_in_years!= '' AND patient_age_in_years < 18) group by current_regimen order by validResults desc limit 10,18446744073709551615",$dbAdapter);
         
-        $adult2ndLineofTreatmentResult = $common->cacheQuery($queryStr." Where line_of_treatment = 2 AND patient_age_in_years IS NOT NULL AND patient_age_in_years!= '' AND patient_age_in_years >= 18 group by current_regimen order by validResults desc limit 9",$dbAdapter);
+        $adult2ndLineofTreatmentResult = $common->cacheQuery($queryStr." Where line_of_treatment = 2 AND (patient_age_in_years IS NOT NULL AND patient_age_in_years!= '' AND patient_age_in_years >= 18) group by current_regimen order by validResults desc limit 9",$dbAdapter);
         $adult2ndLineofTreatmentOthersResult = $common->cacheQuery($queryStr." Where line_of_treatment = 2 AND patient_age_in_years IS NOT NULL AND patient_age_in_years!= '' AND patient_age_in_years >= 18 group by current_regimen order by validResults desc limit 10,18446744073709551615",$dbAdapter);
         
-        $paeds2ndLineofTreatmentResult = $common->cacheQuery($queryStr." Where line_of_treatment = 2 AND patient_age_in_years IS NOT NULL AND patient_age_in_years!= '' AND patient_age_in_years < 18 group by current_regimen order by validResults desc limit 8",$dbAdapter);
-        $paeds2ndLineofTreatmentOthersResult = $common->cacheQuery($queryStr." Where line_of_treatment = 2 AND patient_age_in_years IS NOT NULL AND patient_age_in_years!= '' AND patient_age_in_years < 18 group by current_regimen order by validResults desc limit 9,18446744073709551615",$dbAdapter);
+        $paeds2ndLineofTreatmentResult = $common->cacheQuery($queryStr." Where line_of_treatment = 2 AND (patient_age_in_years IS NOT NULL AND patient_age_in_years!= '' AND patient_age_in_years < 18) group by current_regimen order by validResults desc limit 8",$dbAdapter);
+        $paeds2ndLineofTreatmentOthersResult = $common->cacheQuery($queryStr." Where line_of_treatment = 2 AND (patient_age_in_years IS NOT NULL AND patient_age_in_years!= '' AND patient_age_in_years < 18) group by current_regimen order by validResults desc limit 9,18446744073709551615",$dbAdapter);
         
         $otherLineofTreatmentResult = $common->cacheQuery($queryStr." Where line_of_treatment is not null AND line_of_treatment!= '' AND line_of_treatment!= 1 AND line_of_treatment!= 2 group by current_regimen",$dbAdapter);
        return array('adult1stLineofTreatmentResult'=>$adult1stLineofTreatmentResult,'adult1stLineofTreatmentOthersResult'=>$adult1stLineofTreatmentOthersResult,'paeds1stLineofTreatmentResult'=>$paeds1stLineofTreatmentResult,'paeds1stLineofTreatmentOthersResult'=>$paeds1stLineofTreatmentOthersResult,'adult2ndLineofTreatmentResult'=>$adult2ndLineofTreatmentResult,'adult2ndLineofTreatmentOthersResult'=>$adult2ndLineofTreatmentOthersResult,'paeds2ndLineofTreatmentResult'=>$paeds2ndLineofTreatmentResult,'paeds2ndLineofTreatmentOthersResult'=>$paeds2ndLineofTreatmentOthersResult,'otherLineofTreatmentResult'=>$otherLineofTreatmentResult);
@@ -5554,6 +5556,7 @@ class SampleTable extends AbstractTableGateway {
                                                           array(
                                                                 "total_samples_received" => new Expression("(COUNT(*))"),
                                                                 "total_samples_tested" => new Expression("(SUM(CASE WHEN (((vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL') AND (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) OR (vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0)) THEN 1 ELSE 0 END))"),
+                                                                "total_samples_valid" => new Expression("(SUM(CASE WHEN ((vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample') AND (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) THEN 1 ELSE 0 END))"),
                                                                 "total_samples_pending" => new Expression("(SUM(CASE WHEN ((vl.result IS NULL OR vl.result = '' OR vl.result = 'NULL' OR sample_tested_datetime is null OR sample_tested_datetime = '' OR DATE(sample_tested_datetime) ='1970-01-01' OR DATE(sample_tested_datetime) ='0000-00-00') AND (vl.reason_for_sample_rejection IS NULL OR vl.reason_for_sample_rejection = '' OR vl.reason_for_sample_rejection = 0)) THEN 1 ELSE 0 END))"),
                                                                 "total_suppressed_samples" => new Expression("SUM(CASE WHEN ((vl.result < 1000 or vl.result = 'Target Not Detected' or vl.result = 'TND' or vl.result = 'tnd' or vl.result= 'Below Detection Level' or vl.result='BDL' or vl.result='bdl' or vl.result= 'Low Detection Level' or vl.result='LDL' or vl.result='ldl') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END)"),
                                                                 "total_samples_rejected" => new Expression("SUM(CASE WHEN (vl.reason_for_sample_rejection !='' AND vl.reason_for_sample_rejection !='0' AND vl.reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END)"),
@@ -5566,8 +5569,8 @@ class SampleTable extends AbstractTableGateway {
             $samplesReceivedSummaryResult = $common->cacheQuery($samplesReceivedSummaryCacheQuery,$dbAdapter);
             $summaryResult['sample']['Samples Received']['month'][$j] = (isset($samplesReceivedSummaryResult[0]["total_samples_received"]))?$samplesReceivedSummaryResult[0]["total_samples_received"]:0;
             $summaryResult['sample']['Samples Tested']['month'][$j] = (isset($samplesReceivedSummaryResult[0]["total_samples_tested"]))?$samplesReceivedSummaryResult[0]["total_samples_tested"]:0;
-            $summaryResult['sample']['Valid Tested']['month'][$j] = (isset($samplesReceivedSummaryResult[0]["total_samples_tested"]))?$samplesReceivedSummaryResult[0]["total_samples_tested"]:0;;
-            $summaryResult['sample']['Suppression Rate']['month'][$j] = (isset($samplesReceivedSummaryResult[0]["total_suppressed_samples"]) && $samplesReceivedSummaryResult[0]["total_suppressed_samples"] >0 && $samplesReceivedSummaryResult[0]["total_samples_tested"] > 0)?round((($samplesReceivedSummaryResult[0]["total_suppressed_samples"]/$samplesReceivedSummaryResult[0]["total_samples_tested"])*100),2).' %':'';
+            $summaryResult['sample']['Valid Tested']['month'][$j] = (isset($samplesReceivedSummaryResult[0]["total_samples_valid"]))?$samplesReceivedSummaryResult[0]["total_samples_valid"]:0;;
+            $summaryResult['sample']['Suppression Rate']['month'][$j] = (isset($samplesReceivedSummaryResult[0]["total_suppressed_samples"]) && $samplesReceivedSummaryResult[0]["total_suppressed_samples"] >0 && $samplesReceivedSummaryResult[0]["total_samples_valid"] > 0)?round((($samplesReceivedSummaryResult[0]["total_suppressed_samples"]/$samplesReceivedSummaryResult[0]["total_samples_valid"])*100),2).' %':'';
             $summaryResult['sample']['Rejection Rate']['month'][$j] = (isset($samplesReceivedSummaryResult[0]["total_samples_rejected"]) && $samplesReceivedSummaryResult[0]["total_samples_rejected"] >0 && $samplesReceivedSummaryResult[0]["total_samples_received"] > 0)?round((($samplesReceivedSummaryResult[0]["total_samples_rejected"]/$samplesReceivedSummaryResult[0]["total_samples_received"])*100),2).' %':'';
             $summaryResult['month'][$j] = $monthYearFormat;
           $start = strtotime("+1 month", $start);

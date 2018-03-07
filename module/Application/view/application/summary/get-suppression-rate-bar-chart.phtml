@@ -109,9 +109,9 @@
                          name: '<?php echo $this->translate('Suppression Rate'); ?> (L)',
                          type: 'spline',
                          data: [
-                         <?php if(isset($result['samples_rate']) && count($result['samples_rate']) >0){
-                               foreach($result['samples_rate'] as $samplesRate){                     
-                                 echo $samplesRate.',';
+                         <?php if(isset($result['suppression_rate']) && count($result['suppression_rate']) >0){
+                               foreach($result['suppression_rate'] as $suppressionRate){                     
+                                 echo $suppressionRate.',';
                                }
                                ?>
                         <?php  } ?>
