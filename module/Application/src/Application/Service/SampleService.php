@@ -421,9 +421,9 @@ class SampleService {
         return $sampleDb->fetchOverallViralLoadStatus($params);
     }
     
-    public function getViralLoadStatusBasedOnAge($params){
+    public function getViralLoadStatusBasedOnGender($params){
         $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->fetchViralLoadStatusBasedOnAge($params);
+        return $sampleDb->fetchViralLoadStatusBasedOnGender($params);
     }
     
     public function fetchSampleTestedReason($params){

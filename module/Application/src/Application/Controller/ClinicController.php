@@ -39,12 +39,12 @@ class ClinicController extends AbstractActionController{
         }
     }
     
-    public function getViralLoadStatusBasedOnAgeAction() {
+    public function getViralLoadStatusBasedOnGenderAction() {
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
             $sampleService = $this->getServiceLocator()->get('SampleService');
-            $chartResult = $sampleService->getViralLoadStatusBasedOnAge($params);
+            $chartResult = $sampleService->getViralLoadStatusBasedOnGender($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('result'=>$chartResult))
                         ->setTerminal(true);

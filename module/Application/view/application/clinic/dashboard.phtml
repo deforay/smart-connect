@@ -334,7 +334,7 @@ foreach($sampleType as $samples){
         var gender = $("#gender").val();
         var isPregnant = $("#isPregnant").val();
         var isBreastfeeding = $("#isBreastfeeding").val();
-        $.post("<?php echo $this->url('clinics', array('action' => 'get-viral-load-status-based-on-age')); ?>",{clinicId:clinicId,sampleCollectionDate:dateRange,testResult:testResult,sampleTypeId:sampleTypeId,age:age,adherence:adherence,gender:gender,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding},
+        $.post("<?php echo $this->url('clinics', array('action' => 'get-viral-load-status-based-on-gender')); ?>",{clinicId:clinicId,sampleCollectionDate:dateRange,testResult:testResult,sampleTypeId:sampleTypeId,age:age,adherence:adherence,gender:gender,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding},
         function(data) {
             $("#overall-vl-status-based-gender").html(data);
         });
