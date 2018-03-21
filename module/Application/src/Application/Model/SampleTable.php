@@ -81,7 +81,7 @@ class SampleTable extends AbstractTableGateway {
                                                                                                                                 END)")
                                           )
                                         );
-        //$query = $query->where("(vl.sample_collection_date is not null AND vl.sample_collection_date != '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')");
+        $query = $query->where("(vl.sample_collection_date is not null AND vl.sample_collection_date != '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')");
         if($logincontainer->role!= 1){
             $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:array(0);
             $query = $query->where('vl.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
