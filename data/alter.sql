@@ -369,3 +369,7 @@ ALTER TABLE `dash_vl_request_form` ADD `sample_registered_at_lab` DATETIME NULL 
 
 
 
+-- Amit Apr 26 2017
+
+ALTER TABLE `dash_vl_request_form` ADD `vl_result_category` VARCHAR(255) NULL AFTER `sample_to_transport`;
+

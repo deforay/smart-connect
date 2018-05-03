@@ -5,8 +5,8 @@ use Zend\View\Model\JsonModel;
 
 class ImportViralLoadController extends AbstractRestfulController
 {
-    public function create(){
-		$response="";
+    public function create($params){
+		$response=array();
 		if(isset($_FILES['vlFile']['name']) && trim($_FILES['vlFile']['name'])!=""){
 			$pathname = UPLOAD_PATH . DIRECTORY_SEPARATOR . "not-import-vl";
 			if (!file_exists($pathname) && !is_dir($pathname)) {
