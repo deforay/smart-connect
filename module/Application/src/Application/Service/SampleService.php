@@ -699,6 +699,24 @@ class SampleService {
                     $i = 1;
                     foreach ($sResult as $aRow) {
                         $row = array();
+                        if(isset($aRow['sampleCollectionDate']) && $aRow['sampleCollectionDate']!= NULL && trim($aRow['sampleCollectionDate'])!="" && $aRow['sampleCollectionDate']!= '0000-00-00'){
+                            $sampleCollectionDate = $common->humanDateFormat($aRow['sampleCollectionDate']);
+                        }
+                        if(isset($aRow['treatmentInitiateDate']) && $aRow['treatmentInitiateDate']!= NULL && trim($aRow['treatmentInitiateDate'])!="" && $aRow['treatmentInitiateDate']!= '0000-00-00'){
+                            $treatmentInitiateDate = $common->humanDateFormat($aRow['treatmentInitiateDate']);
+                        }
+                        if(isset($aRow['patientDOB']) && $aRow['patientDOB']!= NULL && trim($aRow['patientDOB'])!="" && $aRow['patientDOB']!= '0000-00-00'){
+                            $patientDOB = $common->humanDateFormat($aRow['patientDOB']);
+                        }
+                        if(isset($aRow['treatmentInitiateCurrentRegimen']) && $aRow['treatmentInitiateCurrentRegimen']!= NULL && trim($aRow['treatmentInitiateCurrentRegimen'])!="" && $aRow['treatmentInitiateCurrentRegimen']!= '0000-00-00'){
+                            $patientDOB = $common->humanDateFormat($aRow['patitreatmentInitiateCurrentRegimenentDOB']);
+                        }
+                        if(isset($aRow['requestDate']) && $aRow['requestDate']!= NULL && trim($aRow['requestDate'])!="" && $aRow['requestDate']!= '0000-00-00'){
+                            $requestDate = $common->humanDateFormat($aRow['requestDate']);
+                        }
+                        if(isset($aRow['receivedAtLab']) && $aRow['receivedAtLab']!= NULL && trim($aRow['receivedAtLab'])!="" && $aRow['receivedAtLab']!= '0000-00-00'){
+                            $requestDate = $common->humanDateFormat($aRow['receivedAtLab']);
+                        }
                         $row[] = $i;
                         $row[] = $aRow['sample_code'];
                         $row[] = ucwords($aRow['facility_name']);
@@ -707,19 +725,19 @@ class SampleService {
                         $row[] = $aRow['facilityState'];
                         $row[] = $aRow['patient_art_no'];
                         $row[] = ucwords($aRow['first_name']." ".$aRow['middle_name']." ".$aRow['last_name']);
-                        $row[] = $aRow['patientDOB'];
+                        $row[] = $patientDOB;
                         $row[] = $aRow['patient_age_in_years'];
                         $row[] = $aRow['patient_gender'];
-                        $row[] = $aRow['sampleCollectionDate'];
+                        $row[] = $sampleCollectionDate;
                         $row[] = $aRow['sample_name'];
-                        $row[] = $aRow['treatmentInitiateDate'];
+                        $row[] = $treatmentInitiateDate;
                         $row[] = $aRow['current_regimen'];
-                        $row[] = $aRow['treatmentInitiateCurrentRegimen'];
+                        $row[] = $treatmentInitiateCurrentRegimen;
                         $row[] = $aRow['is_patient_pregnant'];
                         $row[] = $aRow['is_patient_breastfeeding'];
                         $row[] = $aRow['arv_adherance_percentage'];
                         $row[] = $aRow['request_clinician_name'];
-                        $row[] = $aRow['requestDate'];
+                        $row[] = $requestDate;
                         $row[] = $aRow['receivedAtLab'];
                         $row[] = $aRow['result'];
                         $row[] = $aRow['result_value_log'];
@@ -742,7 +760,7 @@ class SampleService {
                     );
                     $borderStyle = array(
                         'alignment' => array(
-                            'horizontal' => \PHPExcel_Style_Alignment::HORIZONTAL_LEFT,
+                            'horizontal' => \PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
                         ),
                         'borders' => array(
                             'outline' => array(
