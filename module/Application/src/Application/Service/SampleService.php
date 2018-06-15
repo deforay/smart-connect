@@ -5,6 +5,7 @@ namespace Application\Service;
 use Zend\Session\Container;
 use Zend\Db\Adapter\Adapter;
 use Zend\Db\Sql\Sql;
+use Zend\Db\Sql\Select;
 use Zend\Db\TableGateway\AbstractTableGateway;
 use Zend\Db\Sql\Expression;
 use Application\Service\CommonService;
@@ -677,6 +678,169 @@ class SampleService {
         }
     }
     
+    public function generateHighVlSampleResultExcel($params){
+        $queryContainer = new Container('query');
+        $translator = $this->sm->get('translator');
+        $common = new CommonService();
+            if(isset($queryContainer->resultQuery)){
+             try{
+                $dbAdapter = $this->sm->get('Zend\Db\Adapter\Adapter');
+                $sql = new Sql($dbAdapter);
+                $hQueryStr = $sql->getSqlStringForSqlObject($queryContainer->highVlSampleQuery);
+                //error_log($hQueryStr);die;
+                $sResult = $dbAdapter->query($hQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+                if(isset($sResult) && count($sResult)>0){
+                    $excel = new PHPExcel();
+                    $cacheMethod = \PHPExcel_CachedObjectStorageFactory::cache_to_phpTemp;
+                    $cacheSettings = array('memoryCacheSize' => '80MB');
+                    \PHPExcel_Settings::setCacheStorageMethod($cacheMethod, $cacheSettings);
+                    $sheet = $excel->getActiveSheet();
+                    $output = array();
+                    $i = 1;
+                    foreach ($sResult as $aRow) {
+                        $row = array();
+                        $row[] = $i;
+                        $row[] = $aRow['sample_code'];
+                        $row[] = ucwords($aRow['facility_name']);
+                        $row[] = $aRow['facility_code'];
+                        $row[] = $aRow['facilityDistrict'];
+                        $row[] = $aRow['facilityState'];
+                        $row[] = $aRow['patient_art_no'];
+                        $row[] = ucwords($aRow['first_name']." ".$aRow['middle_name']." ".$aRow['last_name']);
+                        $row[] = $aRow['patientDOB'];
+                        $row[] = $aRow['patient_age_in_years'];
+                        $row[] = $aRow['patient_gender'];
+                        $row[] = $aRow['sampleCollectionDate'];
+                        $row[] = $aRow['sample_name'];
+                        $row[] = $aRow['treatmentInitiateDate'];
+                        $row[] = $aRow['current_regimen'];
+                        $row[] = $aRow['treatmentInitiateCurrentRegimen'];
+                        $row[] = $aRow['is_patient_pregnant'];
+                        $row[] = $aRow['is_patient_breastfeeding'];
+                        $row[] = $aRow['arv_adherance_percentage'];
+                        $row[] = $aRow['request_clinician_name'];
+                        $row[] = $aRow['requestDate'];
+                        $row[] = $aRow['receivedAtLab'];
+                        $row[] = $aRow['result'];
+                        $row[] = $aRow['result_value_log'];
+                        $row[] = $aRow['rejection_reason_name'];
+                        $output[] = $row;
+                    }
+                    $styleArray = array(
+                        'font' => array(
+                            'bold' => true,
+                        ),
+                        'alignment' => array(
+                            'horizontal' => \PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
+                            'vertical' => \PHPExcel_Style_Alignment::VERTICAL_CENTER,
+                        ),
+                        'borders' => array(
+                            'outline' => array(
+                                'style' => \PHPExcel_Style_Border::BORDER_THIN,
+                            ),
+                        )
+                    );
+                    $borderStyle = array(
+                        'alignment' => array(
+                            'horizontal' => \PHPExcel_Style_Alignment::HORIZONTAL_LEFT,
+                        ),
+                        'borders' => array(
+                            'outline' => array(
+                                'style' => \PHPExcel_Style_Border::BORDER_THIN,
+                            ),
+                        )
+                    );
+                    
+                    $sheet->setCellValue('A1', html_entity_decode($translator->translate('No.'), ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
+                    $sheet->setCellValue('B1', html_entity_decode($translator->translate('Sample Code'), ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
+                    $sheet->setCellValue('C1', html_entity_decode($translator->translate('Health Facility Name'), ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
+                    $sheet->setCellValue('D1', html_entity_decode($translator->translate('Health Facility Code'), ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
+                    $sheet->setCellValue('E1', html_entity_decode($translator->translate('District/County'), ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
+                    $sheet->setCellValue('F1', html_entity_decode($translator->translate('Province/State'), ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
+                    $sheet->setCellValue('G1', html_entity_decode($translator->translate('Unique ART No.'), ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
+                    $sheet->setCellValue('H1', html_entity_decode($translator->translate('Patient Name'), ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
+                    $sheet->setCellValue('I1', html_entity_decode($translator->translate('Date of Birth'), ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
+                    $sheet->setCellValue('J1', html_entity_decode($translator->translate('Age'), ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
+                    $sheet->setCellValue('K1', html_entity_decode($translator->translate('Gender'), ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
+                    $sheet->setCellValue('L1', html_entity_decode($translator->translate('Date of Sample Collection'), ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
+                    $sheet->setCellValue('M1', html_entity_decode($translator->translate('Sample Type'), ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
+                    $sheet->setCellValue('N1', html_entity_decode($translator->translate('Date of Treatment Initiation'), ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
+                    $sheet->setCellValue('O1', html_entity_decode($translator->translate('Current Regimen'), ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
+                    $sheet->setCellValue('P1', html_entity_decode($translator->translate('Date of Initiation of Current Regimen'), ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
+                    $sheet->setCellValue('Q1', html_entity_decode($translator->translate('Is Patient Pregnant'), ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
+                    $sheet->setCellValue('R1', html_entity_decode($translator->translate('Is Patient Breastfeeding'), ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
+                    $sheet->setCellValue('S1', html_entity_decode($translator->translate('ARV Adherence'), ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
+                    $sheet->setCellValue('T1', html_entity_decode($translator->translate('Requesting Clinican'), ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
+                    $sheet->setCellValue('U1', html_entity_decode($translator->translate('Request Date'), ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
+                    $sheet->setCellValue('V1', html_entity_decode($translator->translate('Date Sample Received at Lab'), ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
+                    $sheet->setCellValue('W1', html_entity_decode($translator->translate('VL Result (cp/ml)'), ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
+                    $sheet->setCellValue('X1', html_entity_decode($translator->translate('Vl Result (log)'), ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
+                    $sheet->setCellValue('Y1', html_entity_decode($translator->translate('Rejection Reason (if Rejected)'), ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
+                   
+                    $sheet->getStyle('A1')->applyFromArray($styleArray);
+                    $sheet->getStyle('B1')->applyFromArray($styleArray);
+                    $sheet->getStyle('C1')->applyFromArray($styleArray);
+                    $sheet->getStyle('D1')->applyFromArray($styleArray);
+                    $sheet->getStyle('E1')->applyFromArray($styleArray);
+                    $sheet->getStyle('F1')->applyFromArray($styleArray);
+                    $sheet->getStyle('G1')->applyFromArray($styleArray);
+                    $sheet->getStyle('H1')->applyFromArray($styleArray);
+                    $sheet->getStyle('I1')->applyFromArray($styleArray);
+                    $sheet->getStyle('J1')->applyFromArray($styleArray);
+                    $sheet->getStyle('K1')->applyFromArray($styleArray);
+                    $sheet->getStyle('L1')->applyFromArray($styleArray);
+                    $sheet->getStyle('M1')->applyFromArray($styleArray);
+                    $sheet->getStyle('N1')->applyFromArray($styleArray);
+                    $sheet->getStyle('O1')->applyFromArray($styleArray);
+                    $sheet->getStyle('P1')->applyFromArray($styleArray);
+                    $sheet->getStyle('Q1')->applyFromArray($styleArray);
+                    $sheet->getStyle('R1')->applyFromArray($styleArray);
+                    $sheet->getStyle('S1')->applyFromArray($styleArray);
+                    $sheet->getStyle('T1')->applyFromArray($styleArray);
+                    $sheet->getStyle('U1')->applyFromArray($styleArray);
+                    $sheet->getStyle('V1')->applyFromArray($styleArray);
+                    $sheet->getStyle('W1')->applyFromArray($styleArray);
+                    $sheet->getStyle('X1')->applyFromArray($styleArray);
+                    $sheet->getStyle('Y1')->applyFromArray($styleArray);
+                    
+                    $currentRow = 2;
+                    foreach ($output as $rowData) {
+                        $colNo = 0;
+                        foreach ($rowData as $field => $value) {
+                            if (!isset($value)) {
+                                $value = "";
+                            }
+                            if (is_numeric($value)) {
+                                $sheet->getCellByColumnAndRow($colNo, $currentRow)->setValueExplicit(html_entity_decode($value, ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_NUMERIC);
+                            }else{
+                                $sheet->getCellByColumnAndRow($colNo, $currentRow)->setValueExplicit(html_entity_decode($value, ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
+                            }
+                            $cellName = $sheet->getCellByColumnAndRow($colNo, $currentRow)->getColumn();
+                            $sheet->getStyle($cellName . $currentRow)->applyFromArray($borderStyle);
+                            $sheet->getDefaultRowDimension()->setRowHeight(20);
+                            $sheet->getColumnDimensionByColumn($colNo)->setWidth(20);
+                            $sheet->getStyleByColumnAndRow($colNo, $currentRow)->getAlignment()->setWrapText(true);
+                            $colNo++;
+                        }
+                      $currentRow++;
+                    }
+                    $writer = \PHPExcel_IOFactory::createWriter($excel, 'Excel5');
+                    $filename = 'HIGH-VL-SAMPLE-RESULT-REPORT--' . date('d-M-Y-H-i-s') . '.xls';
+                    $writer->save(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . $filename);
+                    return $filename;
+                }else{
+                    return "";
+                }
+             }catch (Exception $exc) {
+                error_log("HIGH-VL-SAMPLE-RESULT-REPORT--" . $exc->getMessage());
+                error_log($exc->getTraceAsString());
+                return "";
+             }  
+            }else{
+                return "";
+            }
+    }
+
     public function generateSampleResultExcel($params){
         $queryContainer = new Container('query');
         $translator = $this->sm->get('translator');

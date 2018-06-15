@@ -1631,8 +1631,8 @@ class SampleTable extends AbstractTableGateway {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
-                                ->columns(array('vl_sample_id','sample_code','sampleCollectionDate'=>new Expression('DATE(sample_collection_date)'),'sample_type','sampleTestingDate'=>new Expression('DATE(sample_testing_date)'),'result_value_log','result_value_absolute','result_value_text','result'))
-				->join(array('f'=>'facility_details'),'f.facility_id=vl.facility_id',array('facility_name'))
+                                ->columns(array('vl_sample_id','sample_code','sampleCollectionDate'=>new Expression('DATE(sample_collection_date)'),'sample_type','sampleTestingDate'=>new Expression('DATE(sample_testing_date)'),'result_value_log','result_value_absolute','result_value_text','result','patient_art_no','patientDOB'=>new Expression('DATE(patient_dob)'),'patient_age_in_years','patient_gender','treatmentInitiateDate'=>new Expression('DATE(treatment_initiated_date)'),'current_regimen','treatmentInitiateCurrentRegimen'=>new Expression('DATE(date_of_initiation_of_current_regimen)'),'is_patient_pregnant','is_patient_breastfeeding','arv_adherance_percentage','request_clinician_name','requestDate'=>new Expression('DATE(request_created_datetime)'),'receivedAtLab'=>new Expression('DATE(sample_received_at_vl_lab_datetime)')))
+				->join(array('f'=>'facility_details'),'f.facility_id=vl.facility_id',array('facility_name','facility_code','facility_district','facility_state'))
 				->join(array('r_r_r'=>'r_sample_rejection_reasons'),'r_r_r.rejection_reason_id=vl.reason_for_sample_rejection',array('rejection_reason_name'),'left');
 				//->where(array('f.facility_type'=>'1'));
         if(isset($parameters['sampleCollectionDate']) && trim($parameters['sampleCollectionDate'])!= ''){
@@ -1714,6 +1714,16 @@ class SampleTable extends AbstractTableGateway {
 
         if (isset($sOrder) && $sOrder != "") {
             $sQuery->order($sOrder);
+        }
+        if(isset($parameters['sampleStatus']) && $parameters['sampleStatus'] == 'result'){
+            $hQuery = '';
+            $hQuery = clone $sQuery;
+                $hQuery->join(array('pat'=>'patients'),'pat.patient_art_no=vl.patient_art_no',array('first_name','middle_name','last_name'))
+                    ->join(array('st'=>'r_sample_type'),'st.sample_id=vl.sample_type',array('sample_name'),'left')
+                    ->join(array('lds'=>'location_details'),'lds.location_id=f.facility_state',array('facilityState'=>'location_name'),'left')
+                    ->join(array('ldd'=>'location_details'),'ldd.location_id=f.facility_district',array('facilityDistrict'=>'location_name'),'left')
+                    ->where('DashVL_AnalysisResult="Not Suppressed"');
+            $queryContainer->highVlSampleQuery = $hQuery;
         }
         $queryContainer->resultQuery = $sQuery;
         if (isset($sLimit) && isset($sOffset)) {

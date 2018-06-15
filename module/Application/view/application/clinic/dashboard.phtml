@@ -211,8 +211,8 @@ foreach($sampleType as $samples){
                             <div class="caption">
                                 <i class="fa fa-cogs"></i><?php echo $this->translate('Test Results'); ?>
                             </div>
-                            <div class="actions" style="width:<?php echo (isset($languagecontainer->locale) &&  $languagecontainer->locale== 'pt_BR')?'36%':'30%'; ?>;">
-                                <div class="btn-group" style="width:60%;float:left;">
+                            <div class="actions" style="width:<?php echo (isset($languagecontainer->locale) &&  $languagecontainer->locale== 'pt_BR')?'36%':'44%'; ?>;">
+                                <div class="btn-group" style="width:40%;float:left;">
                                     <select id="sampleStatus" class="btn white btn-outline btn-circle btn-sm dropdown-toggle" onchange="fnShowHide();">
                                         <option value=""><?php echo $this->translate('All Samples'); ?></option>
                                         <option value="result" selected="selected"><?php echo $this->translate('Samples with Test Results'); ?></option>
@@ -220,8 +220,11 @@ foreach($sampleType as $samples){
                                         <option value="rejected"><?php echo $this->translate('Rejected Samples'); ?></option>
                                     </select>
                                 </div>
-                                <div class="tools" style="width:40%;float:right;text-align:right;">
-                                    <button class="btn btn-default" onclick="exportTestResult();"><span><i class="fa fa-file-excel-o" aria-hidden="true"></i> <?php echo $this->translate('Excel'); ?></span></button>
+                                <div class="tools" id="exportHighVlSample" style="float:right;text-align:right;">
+                                    <button class="btn btn-default" onclick="exportTestResult('high');"><span><i class="fa fa-file-excel-o" aria-hidden="true"></i> <?php echo $this->translate('Export High VL Samples'); ?></span></button>
+                                </div>&nbsp;&nbsp;
+                                <div class="tools" style="float:right;text-align:right;margin-right:5px;">
+                                    <button class="btn btn-default" onclick="exportTestResult('');"><span><i class="fa fa-file-excel-o" aria-hidden="true"></i> <?php echo $this->translate('Excel'); ?></span></button>
                                 </div>
                             </div>
                         </div>
@@ -461,18 +464,22 @@ foreach($sampleType as $samples){
             oTable.column(3).visible(true);
             oTable.column(4).visible(true);
             oTable.column(5).visible(true);
+            $("#exportHighVlSample").css("visibility","hidden");
         }else if($('#sampleStatus').val() == 'result'){
             oTable.column(3).visible(false);
             oTable.column(4).visible(true);
             oTable.column(5).visible(true);
+            $("#exportHighVlSample").css("visibility","visible");
         }else if($('#sampleStatus').val() == 'noresult'){
             oTable.column(3).visible(false);
             oTable.column(4).visible(false);
             oTable.column(5).visible(false);
+            $("#exportHighVlSample").css("visibility","hidden");
         }else if($('#sampleStatus').val() == 'rejected'){
            oTable.column(4).visible(false);
            oTable.column(5).visible(false);
            oTable.column(3).visible(true);
+           $("#exportHighVlSample").css("visibility","hidden");
         }
         searchTestResultData();
     }
@@ -490,10 +497,10 @@ foreach($sampleType as $samples){
         });
     }
     
-    function exportTestResult(){
+    function exportTestResult(cFrom){
        $.blockUI.defaults.css.border = '1px solid grey';
        $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI); 
-       $.post("<?php echo $this->url('clinics', array('action' => 'export-result-excel')); ?>", {result : $("#sampleStatus").val()},
+       $.post("<?php echo $this->url('clinics', array('action' => 'export-result-excel')); ?>", {result : $("#sampleStatus").val(),cFrom:cFrom},
         function(data){
             if(data == "" || data == null || data == undefined){
                 alert('<?php echo $this->translate('Unable to export excel') ?>');
