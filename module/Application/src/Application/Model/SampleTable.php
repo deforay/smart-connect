@@ -1718,7 +1718,7 @@ class SampleTable extends AbstractTableGateway {
         if(isset($parameters['sampleStatus']) && $parameters['sampleStatus'] == 'result'){
             $hQuery = '';
             $hQuery = clone $sQuery;
-                $hQuery->join(array('pat'=>'patients'),'pat.patient_art_no=vl.patient_art_no',array('first_name','middle_name','last_name'))
+                $hQuery->join(array('pat'=>'patients'),'pat.patient_art_no=vl.patient_art_no',array('first_name','middle_name','last_name'),'left')
                     ->join(array('st'=>'r_sample_type'),'st.sample_id=vl.sample_type',array('sample_name'),'left')
                     ->join(array('lds'=>'location_details'),'lds.location_id=f.facility_state',array('facilityState'=>'location_name'),'left')
                     ->join(array('ldd'=>'location_details'),'ldd.location_id=f.facility_district',array('facilityDistrict'=>'location_name'),'left')

@@ -743,6 +743,7 @@ class SampleService {
                         $row[] = $aRow['result_value_log'];
                         $row[] = $aRow['rejection_reason_name'];
                         $output[] = $row;
+$i++;
                     }
                     $styleArray = array(
                         'font' => array(
