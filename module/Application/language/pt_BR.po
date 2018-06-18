@@ -1,45 +1,45 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: ZendSkeletonApplication\n"
+"Project-Id-Version: VL Dashboard\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-03-06 17:47+0530\n"
-"PO-Revision-Date: 2018-03-06 17:48+0530\n"
-"Last-Translator: Diogo Melo <dmelo87@gmail.com>\n"
-"Language-Team: ZF Contibutors <zf-devteam@zend.com>\n"
+"POT-Creation-Date: 2018-06-15 01:13+0530\n"
+"PO-Revision-Date: 2018-06-15 01:16+0530\n"
+"Last-Translator: Amit Dugar <amit@deforay.com>\n"
+"Language-Team: Amit <amit@deforay.com>\n"
 "Language: pt\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-KeywordsList: translate\n"
 "X-Poedit-Basepath: .\n"
-"X-Generator: Poedit 2.0.3\n"
+"X-Generator: Poedit 2.0.8\n"
 "X-Poedit-SearchPath-0: ..\n"
 
 #: ../src/Application/Model/FacilityTable.php:215
-#: ../src/Application/Model/SampleTable.php:3968
+#: ../src/Application/Model/SampleTable.php:3958
 #: ../src/Application/Model/UsersTable.php:318
 #: ../view/application/facility/edit.phtml:17
 #: ../view/application/users/edit.phtml:24
 msgid "Edit"
 msgstr "Editar"
 
-#: ../src/Application/Model/SampleTable.php:1757
+#: ../src/Application/Model/SampleTable.php:1762
 msgid "View"
 msgstr "View"
 
-#: ../src/Application/Model/SampleTable.php:1758
+#: ../src/Application/Model/SampleTable.php:1763
 msgid "PDF"
 msgstr "PDF"
 
-#: ../src/Application/Service/SampleService.php:604
-#: ../src/Application/Service/SampleService.php:1105
+#: ../src/Application/Service/SampleService.php:616
+#: ../src/Application/Service/SampleService.php:1117
 #: ../view/application/clinic/dashboard.phtml:233
-#: ../view/application/clinic/generate-result-pdf.phtml:211
+#: ../view/application/clinic/generate-result-pdf.phtml:220
 #: ../view/application/laboratory/sample-result-awaited.phtml:220
 msgid "Sample ID"
 msgstr "Identificador da Amostra"
 
-#: ../src/Application/Service/SampleService.php:605
+#: ../src/Application/Service/SampleService.php:617
 #: ../view/application/clinic/dashboard.phtml:234
 #: ../view/application/facility/add.phtml:38
 #: ../view/application/facility/add.phtml:40
@@ -49,40 +49,40 @@ msgstr "Identificador da Amostra"
 msgid "Facility Name"
 msgstr "Nome do local"
 
-#: ../src/Application/Service/SampleService.php:606
+#: ../src/Application/Service/SampleService.php:618
 #: ../view/application/clinic/dashboard.phtml:235
 msgid "Date Collected"
 msgstr "Data da Colheita"
 
-#: ../src/Application/Service/SampleService.php:608
-#: ../src/Application/Service/SampleService.php:615
+#: ../src/Application/Service/SampleService.php:620
+#: ../src/Application/Service/SampleService.php:627
 #: ../view/application/clinic/dashboard.phtml:236
 msgid "Rejection Reason"
 msgstr "Motivo da rejeição"
 
-#: ../src/Application/Service/SampleService.php:609
-#: ../src/Application/Service/SampleService.php:612
+#: ../src/Application/Service/SampleService.php:621
+#: ../src/Application/Service/SampleService.php:624
 #: ../view/application/clinic/dashboard.phtml:237
 msgid "Date Tested"
 msgstr "Data de Teste"
 
-#: ../src/Application/Service/SampleService.php:610
-#: ../src/Application/Service/SampleService.php:613
+#: ../src/Application/Service/SampleService.php:622
+#: ../src/Application/Service/SampleService.php:625
 #: ../view/application/clinic/dashboard.phtml:238
 msgid "Viral Load(cp/ml)"
 msgstr "Carga Viral(cp/ml)"
 
-#: ../src/Application/Service/SampleService.php:734
-#: ../src/Application/Service/SampleService.php:1109
+#: ../src/Application/Service/SampleService.php:746
+#: ../src/Application/Service/SampleService.php:1121
 #: ../view/application/laboratory/sample-result-awaited.phtml:224
 #: ../view/application/laboratory/sample-volume.phtml:269
 #: ../view/application/laboratory/samples-tested.phtml:286
 msgid "Lab"
 msgstr "Laboratório"
 
-#: ../src/Application/Service/SampleService.php:735
-#: ../src/Application/Service/SampleService.php:854
-#: ../src/Application/Service/SampleService.php:968
+#: ../src/Application/Service/SampleService.php:747
+#: ../src/Application/Service/SampleService.php:866
+#: ../src/Application/Service/SampleService.php:980
 #: ../view/application/laboratory/sample-volume.phtml:270
 #: ../view/application/laboratory/samples-tested-lab.phtml:274
 #: ../view/application/laboratory/samples-tested-turn-around-time.phtml:214
@@ -90,9 +90,9 @@ msgstr "Laboratório"
 msgid "Samples Collected"
 msgstr "Amostras Colhidas"
 
-#: ../src/Application/Service/SampleService.php:736
-#: ../src/Application/Service/SampleService.php:855
-#: ../src/Application/Service/SampleService.php:969
+#: ../src/Application/Service/SampleService.php:748
+#: ../src/Application/Service/SampleService.php:867
+#: ../src/Application/Service/SampleService.php:981
 #: ../view/application/laboratory/dashboard.phtml:249
 #: ../view/application/laboratory/dashboard.phtml:407
 #: ../view/application/laboratory/get-sample-test-result.phtml:14
@@ -111,9 +111,9 @@ msgstr "Amostras Colhidas"
 msgid "Samples Tested"
 msgstr "Amostras testadas"
 
-#: ../src/Application/Service/SampleService.php:737
-#: ../src/Application/Service/SampleService.php:856
-#: ../src/Application/Service/SampleService.php:970
+#: ../src/Application/Service/SampleService.php:749
+#: ../src/Application/Service/SampleService.php:868
+#: ../src/Application/Service/SampleService.php:982
 #: ../view/application/laboratory/sample-volume.phtml:272
 #: ../view/application/laboratory/samples-tested-lab.phtml:276
 #: ../view/application/laboratory/samples-tested-turn-around-time.phtml:216
@@ -123,9 +123,9 @@ msgstr "Amostras testadas"
 msgid "Samples Pending"
 msgstr "Amostras Pendentes"
 
-#: ../src/Application/Service/SampleService.php:738
-#: ../src/Application/Service/SampleService.php:857
-#: ../src/Application/Service/SampleService.php:971
+#: ../src/Application/Service/SampleService.php:750
+#: ../src/Application/Service/SampleService.php:869
+#: ../src/Application/Service/SampleService.php:983
 #: ../view/application/laboratory/sample-volume.phtml:273
 #: ../view/application/laboratory/samples-tested-lab.phtml:277
 #: ../view/application/laboratory/samples-tested-turn-around-time.phtml:217
@@ -133,9 +133,9 @@ msgstr "Amostras Pendentes"
 msgid "Samples Suppressed"
 msgstr "CV < 1000"
 
-#: ../src/Application/Service/SampleService.php:739
-#: ../src/Application/Service/SampleService.php:858
-#: ../src/Application/Service/SampleService.php:972
+#: ../src/Application/Service/SampleService.php:751
+#: ../src/Application/Service/SampleService.php:870
+#: ../src/Application/Service/SampleService.php:984
 #: ../view/application/laboratory/sample-volume.phtml:274
 #: ../view/application/laboratory/samples-tested-lab.phtml:278
 #: ../view/application/laboratory/samples-tested-turn-around-time.phtml:218
@@ -143,9 +143,9 @@ msgstr "CV < 1000"
 msgid "Samples Not Suppressed"
 msgstr "CV >= 1000"
 
-#: ../src/Application/Service/SampleService.php:740
-#: ../src/Application/Service/SampleService.php:859
-#: ../src/Application/Service/SampleService.php:973
+#: ../src/Application/Service/SampleService.php:752
+#: ../src/Application/Service/SampleService.php:871
+#: ../src/Application/Service/SampleService.php:985
 #: ../view/application/laboratory/dashboard.phtml:409
 #: ../view/application/laboratory/sample-volume.phtml:199
 #: ../view/application/laboratory/sample-volume.phtml:275
@@ -162,15 +162,15 @@ msgstr "CV >= 1000"
 msgid "Samples Rejected"
 msgstr "Amostras rejeitadas"
 
-#: ../src/Application/Service/SampleService.php:853
+#: ../src/Application/Service/SampleService.php:865
 #: ../view/application/laboratory/samples-tested-lab.phtml:273
 msgid "Date"
 msgstr "Data"
 
-#: ../src/Application/Service/SampleService.php:860
-#: ../src/Application/Service/SampleService.php:1108
+#: ../src/Application/Service/SampleService.php:872
+#: ../src/Application/Service/SampleService.php:1120
 #: ../view/application/clinic/dashboard.phtml:49
-#: ../view/application/clinic/generate-result-pdf.phtml:199
+#: ../view/application/clinic/generate-result-pdf.phtml:230
 #: ../view/application/clinic/samples-test-reason.phtml:79
 #: ../view/application/laboratory/sample-result-awaited.phtml:131
 #: ../view/application/laboratory/sample-result-awaited.phtml:223
@@ -182,7 +182,7 @@ msgstr "Data"
 msgid "Sample Type"
 msgstr "Tipo de amostras"
 
-#: ../src/Application/Service/SampleService.php:861
+#: ../src/Application/Service/SampleService.php:873
 #: ../view/application/laboratory/sample-result-awaited.phtml:94
 #: ../view/application/laboratory/sample-volume.phtml:133
 #: ../view/application/laboratory/samples-tested-lab.phtml:138
@@ -193,24 +193,23 @@ msgstr "Tipo de amostras"
 msgid "Clinics"
 msgstr "Unidades Sanitárias"
 
-#: ../src/Application/Service/SampleService.php:967
+#: ../src/Application/Service/SampleService.php:979
 #: ../view/application/laboratory/samples-tested-turn-around-time.phtml:213
 msgid "Month and Year"
 msgstr "Mês e Ano"
 
-#: ../src/Application/Service/SampleService.php:974
+#: ../src/Application/Service/SampleService.php:986
 #: ../view/application/laboratory/get-lab-turn-around-time.phtml:61
 #: ../view/application/laboratory/samples-tested-turn-around-time.phtml:220
 msgid "Average TAT in Days"
 msgstr "Média dos TRL em dias"
 
-#: ../src/Application/Service/SampleService.php:1106
-#: ../view/application/clinic/generate-result-pdf.phtml:193
+#: ../src/Application/Service/SampleService.php:1118
 #: ../view/application/laboratory/sample-result-awaited.phtml:221
 msgid "Collection Date"
 msgstr "Data de Colheita"
 
-#: ../src/Application/Service/SampleService.php:1107
+#: ../src/Application/Service/SampleService.php:1119
 #: ../view/application/laboratory/sample-result-awaited.phtml:222
 #: ../view/application/summary/dashboard.phtml:331
 #: ../view/application/summary/dashboard.phtml:411
@@ -220,13 +219,13 @@ msgstr "Data de Colheita"
 msgid "Facility"
 msgstr "Local"
 
-#: ../src/Application/Service/SampleService.php:1110
+#: ../src/Application/Service/SampleService.php:1122
 #: ../view/application/laboratory/sample-result-awaited.phtml:225
 msgid "Sample Received at Lab"
 msgstr "Amostras recebidas por Laboratorio"
 
 #: ../view/application/clinic/dashboard.phtml:11
-#: ../view/layout/layout.phtml:182
+#: ../view/layout/layout.phtml:187
 msgid "Clinics Dashboard"
 msgstr "Painel das Unidades Sanitárias"
 
@@ -428,7 +427,7 @@ msgid "Gender"
 msgstr "Género"
 
 #: ../view/application/clinic/dashboard.phtml:91
-#: ../view/application/clinic/get-viral-load-status-based-on-age.phtml:25
+#: ../view/application/clinic/get-viral-load-status-based-on-gender.phtml:25
 #: ../view/application/clinic/samples-test-reason.phtml:121
 #: ../view/application/laboratory/requisition-forms-incomplete.phtml:117
 #: ../view/application/laboratory/sample-result-awaited.phtml:147
@@ -440,7 +439,7 @@ msgid "Male"
 msgstr "Masculino"
 
 #: ../view/application/clinic/dashboard.phtml:92
-#: ../view/application/clinic/get-viral-load-status-based-on-age.phtml:25
+#: ../view/application/clinic/get-viral-load-status-based-on-gender.phtml:25
 #: ../view/application/clinic/samples-test-reason.phtml:122
 #: ../view/application/laboratory/requisition-forms-incomplete.phtml:118
 #: ../view/application/laboratory/sample-result-awaited.phtml:148
@@ -580,7 +579,7 @@ msgid "Overall Viral Load Status"
 msgstr "Status total de Carga Viral"
 
 #: ../view/application/clinic/dashboard.phtml:147
-#: ../view/application/clinic/get-viral-load-status-based-on-age.phtml:17
+#: ../view/application/clinic/get-viral-load-status-based-on-gender.phtml:17
 msgid "Overall Viral Load Status based on Gender"
 msgstr "Status geral da carga viral com base no género"
 
@@ -679,103 +678,55 @@ msgstr "Unable to generate pdf"
 msgid "Unable to export excel"
 msgstr "Unable to export excel"
 
-#: ../view/application/clinic/generate-result-pdf.phtml:187
-msgid "Laboratory Result (Provisional)"
-msgstr "Resultado do Laboratório (Provisional)"
+#: ../view/application/clinic/generate-result-pdf.phtml:209
+msgid "Laboratory Result"
+msgstr "Resultado do Laboratório"
 
-#: ../view/application/clinic/generate-result-pdf.phtml:196
-#: ../view/application/facility/add.phtml:46
-#: ../view/application/facility/add.phtml:48
-#: ../view/application/facility/edit.phtml:46
-#: ../view/application/facility/edit.phtml:48
-#: ../view/application/facility/index.phtml:45
-msgid "Facility Code"
-msgstr "Código do local"
+#: ../view/application/clinic/generate-result-pdf.phtml:215
+msgid "Collected"
+msgstr "Colheita"
 
-#: ../view/application/clinic/generate-result-pdf.phtml:202
+#: ../view/application/clinic/generate-result-pdf.phtml:228
+msgid "Referred by"
+msgstr "Referido por"
+
+#: ../view/application/clinic/generate-result-pdf.phtml:235
+msgid "Issued"
+msgstr "Entrega"
+
+#: ../view/application/clinic/generate-result-pdf.phtml:241
 msgid "HIV Viral Load"
 msgstr "Carga Viral de HIV"
 
-#: ../view/application/clinic/generate-result-pdf.phtml:208
-msgid "Sample Information"
-msgstr "Informações sobre amostra"
+#: ../view/application/clinic/generate-result-pdf.phtml:245
+msgid "Date of ART Regimen"
+msgstr "Data de inicio do TARV"
 
-#: ../view/application/clinic/generate-result-pdf.phtml:217
-#: ../view/application/clinic/generate-result-pdf.phtml:220
+#: ../view/application/clinic/generate-result-pdf.phtml:248
 msgid "Reason for Application"
 msgstr "Razão para a aplicação"
 
-#: ../view/application/clinic/generate-result-pdf.phtml:220
-#: ../view/application/clinic/generate-result-pdf.phtml:259
-msgid "Routine"
-msgstr "Rotina"
+#: ../view/application/clinic/generate-result-pdf.phtml:251
+#, fuzzy
+#| msgid "All Regimens"
+msgid "ART Regimen"
+msgstr "Regimes"
 
-#: ../view/application/clinic/generate-result-pdf.phtml:226
-msgid "Current ART Regimen"
-msgstr "Regime Actual de ART"
-
-#: ../view/application/clinic/generate-result-pdf.phtml:229
-msgid "First Line Treatment"
-msgstr "Tratamento de Primeira linha"
-
-#: ../view/application/clinic/generate-result-pdf.phtml:232
-#: ../view/application/summary/dashboard.phtml:534
-msgid "Regimen"
-msgstr "Regime"
-
-#: ../view/application/clinic/generate-result-pdf.phtml:238
-msgid "First Viral Load"
-msgstr "Primeira Carga Viral"
-
-#: ../view/application/clinic/generate-result-pdf.phtml:241
-#: ../view/application/clinic/test-result-view.phtml:218
-msgid "Date of Last Viral Load Test"
-msgstr "Data do último teste de Carga Viral"
-
-#: ../view/application/clinic/generate-result-pdf.phtml:247
-msgid "TO BE COMPLETED BY THE LABORATORY"
-msgstr "A ser completado pelo Laboratório"
-
-#: ../view/application/clinic/generate-result-pdf.phtml:250
-msgid "Place of Collection"
-msgstr "Local da colheita"
-
-#: ../view/application/clinic/generate-result-pdf.phtml:253
-msgid "Date of Collection"
-msgstr "Data da colheita"
-
-#: ../view/application/clinic/generate-result-pdf.phtml:256
-msgid "Time"
-msgstr "Tempo"
-
-#: ../view/application/clinic/generate-result-pdf.phtml:259
-msgid "Type of Collection"
-msgstr "Tipo da colheita"
-
-#: ../view/application/clinic/generate-result-pdf.phtml:262
-msgid "Name of Technician"
-msgstr "Nome do técnico"
-
-#: ../view/application/clinic/generate-result-pdf.phtml:265
-#: ../view/application/clinic/test-result-view.phtml:216
-msgid "Previous Result"
-msgstr "Resultado anterior"
-
-#: ../view/application/clinic/generate-result-pdf.phtml:271
-msgid "HIV Viral Load (* provisional *)"
-msgstr "Carga Viral de HIV (* Provisional *)"
-
-#: ../view/application/clinic/generate-result-pdf.phtml:274
+#: ../view/application/clinic/generate-result-pdf.phtml:263
 msgid "Viral Load (CAP/CTM)"
 msgstr "Carga Viral (CAP/CTM)"
 
-#: ../view/application/clinic/generate-result-pdf.phtml:274
+#: ../view/application/clinic/generate-result-pdf.phtml:263
 msgid "copies/ml"
 msgstr "cópias/ml"
 
-#: ../view/application/clinic/generate-result-pdf.phtml:277
+#: ../view/application/clinic/generate-result-pdf.phtml:266
 msgid "Log Value"
 msgstr "Valor Log"
+
+#: ../view/application/clinic/generate-result-pdf.phtml:275
+msgid "Authorized By"
+msgstr "Autorizado por"
 
 #: ../view/application/clinic/generate-result-pdf.phtml:280
 msgid "End of report"
@@ -796,7 +747,7 @@ msgstr "Total de amostras"
 #: ../view/application/clinic/get-overall-viral-load-status.phtml:34
 #: ../view/application/clinic/get-sample-test-result.phtml:38
 #: ../view/application/clinic/get-samples-test-reason-based-on-clinics.phtml:36
-#: ../view/application/clinic/get-viral-load-status-based-on-age.phtml:31
+#: ../view/application/clinic/get-viral-load-status-based-on-gender.phtml:31
 #: ../view/application/laboratory/get-bar-sample-details.phtml:29
 #: ../view/application/laboratory/get-bar-sample-tat.phtml:26
 #: ../view/application/laboratory/get-clinic-bar-sample-result-awaited-details.phtml:33
@@ -820,7 +771,7 @@ msgstr "No. de Amostras"
 
 #: ../view/application/clinic/get-overall-viral-load-status.phtml:42
 #: ../view/application/clinic/get-sample-test-result.phtml:45
-#: ../view/application/clinic/get-viral-load-status-based-on-age.phtml:36
+#: ../view/application/clinic/get-viral-load-status-based-on-gender.phtml:36
 #: ../view/application/laboratory/get-bar-sample-details.phtml:37
 #: ../view/application/laboratory/get-bar-sample-tat.phtml:34
 #: ../view/application/laboratory/get-incomplete-bar-sample-details.phtml:34
@@ -866,9 +817,9 @@ msgstr "Amostra"
 #: ../view/application/laboratory/get-pie-sample-tat.phtml:35
 #: ../view/application/laboratory/get-province-bar-sample-result-awaited-details.phtml:67
 #: ../view/application/laboratory/get-sample-details.phtml:37
-#: ../view/application/laboratory/get-sample-result.phtml:186
-#: ../view/application/laboratory/get-sample-result.phtml:246
-#: ../view/application/laboratory/get-sample-result.phtml:305
+#: ../view/application/laboratory/get-sample-result.phtml:184
+#: ../view/application/laboratory/get-sample-result.phtml:244
+#: ../view/application/laboratory/get-sample-result.phtml:303
 #: ../view/application/laboratory/get-sample-volume.phtml:44
 #: ../view/application/laboratory/get-vl-out-comes.phtml:43
 msgid "Samples"
@@ -893,7 +844,7 @@ msgstr "Desegragação das amostras solicitadas por Unidade Sanitária"
 msgid "VL Ordered based on Gender"
 msgstr "Desegragação das amostras solicitadas por Gênero"
 
-#: ../view/application/clinic/get-viral-load-status-based-on-age.phtml:25
+#: ../view/application/clinic/get-viral-load-status-based-on-gender.phtml:25
 #: ../view/application/laboratory/requisition-forms-incomplete.phtml:119
 #: ../view/application/laboratory/sample-result-awaited.phtml:149
 #: ../view/application/laboratory/sample-volume.phtml:208
@@ -1013,6 +964,14 @@ msgstr "Aprovado por"
 #: ../view/application/clinic/test-result-view.phtml:210
 msgid "Lab Comments"
 msgstr "Comentários do laboratório"
+
+#: ../view/application/clinic/test-result-view.phtml:216
+msgid "Previous Result"
+msgstr "Resultado anterior"
+
+#: ../view/application/clinic/test-result-view.phtml:218
+msgid "Date of Last Viral Load Test"
+msgstr "Data do último teste de Carga Viral"
 
 #: ../view/application/clinic/test-result-view.phtml:222
 msgid "Result of previous viral load(copies/ml)"
@@ -1143,7 +1102,7 @@ msgstr "Valor"
 #: ../view/application/summary/dashboard.phtml:301
 #: ../view/application/summary/dashboard.phtml:384
 #: ../view/application/summary/dashboard.phtml:460
-#: ../view/layout/layout.phtml:225
+#: ../view/layout/layout.phtml:230
 msgid "Facilities"
 msgstr "Unidades"
 
@@ -1165,6 +1124,14 @@ msgstr "Por favor selecione o nome do local"
 #: ../view/application/facility/edit.phtml:40
 msgid "The facility name that you entered already exists.Enter another name"
 msgstr "O nome da unidade inserido, já existe. Insira outro nome"
+
+#: ../view/application/facility/add.phtml:46
+#: ../view/application/facility/add.phtml:48
+#: ../view/application/facility/edit.phtml:46
+#: ../view/application/facility/edit.phtml:48
+#: ../view/application/facility/index.phtml:45
+msgid "Facility Code"
+msgstr "Código do local"
 
 #: ../view/application/facility/add.phtml:48
 #: ../view/application/facility/edit.phtml:48
@@ -1342,7 +1309,7 @@ msgstr "Novo utilizador"
 
 #: ../view/application/laboratory/dashboard.phtml:172
 #: ../view/application/laboratory/get-facilities-geolocation.phtml:37
-#: ../view/layout/layout.phtml:160
+#: ../view/layout/layout.phtml:165
 msgid "Labs Dashboard"
 msgstr "Painel dos Laboratórios"
 
@@ -1529,24 +1496,24 @@ msgstr "Incompleto"
 msgid "Quick Stats"
 msgstr "Sumário Rápido"
 
-#: ../view/application/laboratory/get-sample-result.phtml:72
-#: ../view/application/laboratory/get-sample-result.phtml:147
+#: ../view/application/laboratory/get-sample-result.phtml:70
+#: ../view/application/laboratory/get-sample-result.phtml:145
 msgid "SAMPLES COLLECTED"
 msgstr "AMOSTRAS COLHIDAS"
 
-#: ../view/application/laboratory/get-sample-result.phtml:77
-#: ../view/application/laboratory/get-sample-result.phtml:100
-#: ../view/application/laboratory/get-sample-result.phtml:122
+#: ../view/application/laboratory/get-sample-result.phtml:75
+#: ../view/application/laboratory/get-sample-result.phtml:98
+#: ../view/application/laboratory/get-sample-result.phtml:120
 msgid "Last 28 days"
 msgstr "NOS ÚLTIMOS 28 DIAS"
 
-#: ../view/application/laboratory/get-sample-result.phtml:95
-#: ../view/application/laboratory/get-sample-result.phtml:208
+#: ../view/application/laboratory/get-sample-result.phtml:93
+#: ../view/application/laboratory/get-sample-result.phtml:206
 msgid "SAMPLES TESTED"
 msgstr "AMOSTRAS TESTADAS"
 
-#: ../view/application/laboratory/get-sample-result.phtml:117
-#: ../view/application/laboratory/get-sample-result.phtml:268
+#: ../view/application/laboratory/get-sample-result.phtml:115
+#: ../view/application/laboratory/get-sample-result.phtml:266
 msgid "SAMPLES REJECTED"
 msgstr "AMOSTRAS REJEITADAS"
 
@@ -1720,7 +1687,7 @@ msgid "Line Of Treatment 3"
 msgstr "3a Linha de Tratamento (LT 3)"
 
 #: ../view/application/login/index.phtml:16
-#: ../view/application/login/index.phtml:60 ../view/layout/layout.phtml:18
+#: ../view/application/login/index.phtml:60 ../view/layout/layout.phtml:23
 msgid "Dashboard for Enhancement of VL Treatment Cascade"
 msgstr "Portal para o aprimoramento do Tratamento Cascata de Carga Viral"
 
@@ -1758,16 +1725,16 @@ msgstr "Aceder"
 msgid "Funded by"
 msgstr "Fundada por"
 
-#: ../view/application/login/index.phtml:97 ../view/layout/layout.phtml:453
+#: ../view/application/login/index.phtml:97 ../view/layout/layout.phtml:458
 msgid "The Task Force for Global Health"
 msgstr "A Força-Tarefa para a Saúde Global"
 
-#: ../view/application/login/index.phtml:98 ../view/layout/layout.phtml:454
+#: ../view/application/login/index.phtml:98 ../view/layout/layout.phtml:459
 msgid "Emory University / PEPFAR"
 msgstr "Emory University / PEPFAR"
 
 #: ../view/application/summary/dashboard.phtml:236
-#: ../view/layout/layout.phtml:149
+#: ../view/layout/layout.phtml:154
 msgid "Summary"
 msgstr "Resumo"
 
@@ -1785,8 +1752,8 @@ msgstr "Amostras Recebidas"
 #: ../view/application/summary/dashboard.phtml:251
 #: ../view/application/summary/dashboard.phtml:362
 #: ../view/application/summary/dashboard.phtml:539
-#: ../view/application/summary/get-regimen-group-bar-chart.phtml:55
-#: ../view/application/summary/get-regimen-group-bar-chart.phtml:98
+#: ../view/application/summary/get-regimen-group-bar-chart.phtml:56
+#: ../view/application/summary/get-regimen-group-bar-chart.phtml:99
 #: ../view/application/summary/get-suppression-rate-bar-chart.phtml:52
 #: ../view/application/summary/get-suppression-rate-bar-chart.phtml:109
 msgid "Suppression Rate"
@@ -1798,7 +1765,7 @@ msgstr "Taxa de Rejeição"
 
 #: ../view/application/summary/dashboard.phtml:262
 msgid "on 1st Line"
-msgstr "Na Primeira linha"
+msgstr "na Primeira linha"
 
 #: ../view/application/summary/dashboard.phtml:268
 msgid "Reg. All"
@@ -1824,8 +1791,8 @@ msgstr "Taxas de supressão por Unidade Sanitária"
 #: ../view/application/summary/dashboard.phtml:394
 #: ../view/application/summary/dashboard.phtml:413
 #: ../view/application/summary/dashboard.phtml:537
-#: ../view/application/summary/get-regimen-group-bar-chart.phtml:64
-#: ../view/application/summary/get-regimen-group-bar-chart.phtml:82
+#: ../view/application/summary/get-regimen-group-bar-chart.phtml:65
+#: ../view/application/summary/get-regimen-group-bar-chart.phtml:83
 #: ../view/application/summary/get-suppression-rate-bar-chart.phtml:61
 #: ../view/application/summary/get-suppression-rate-bar-chart.phtml:93
 msgid "Valid Results"
@@ -1858,6 +1825,10 @@ msgstr "Grupos de regime"
 #: ../view/application/summary/dashboard.phtml:527
 msgid "Regimen Groups Summary"
 msgstr "Resumo de grupos de regimes"
+
+#: ../view/application/summary/dashboard.phtml:534
+msgid "Regimen"
+msgstr "Regime"
 
 #: ../view/application/summary/dashboard.phtml:538
 msgid "Number Suppressed"
@@ -2023,7 +1994,7 @@ msgstr "Gráfico do TRL por US"
 
 #: ../view/application/time/get-tat-from-url.phtml:18
 msgid "TAT: "
-msgstr "Tempo de resposta Laboratorial:"
+msgstr "Tempo de resposta Laboratorial: "
 
 #: ../view/application/time/get-tat-from-url.phtml:18
 #: ../view/application/time/get-tat-from-url.phtml:39
@@ -2032,7 +2003,7 @@ msgstr "Gráfico do TRL"
 
 #: ../view/application/users/add.phtml:12
 #: ../view/application/users/edit.phtml:20
-#: ../view/application/users/index.phtml:13 ../view/layout/layout.phtml:220
+#: ../view/application/users/index.phtml:13 ../view/layout/layout.phtml:225
 msgid "Users"
 msgstr "Utilizadores"
 
@@ -2172,45 +2143,78 @@ msgstr "Nenhuma exceção disponível"
 msgid "An error occurred"
 msgstr "Ocorreu um erro"
 
-#: ../view/layout/layout.phtml:18 ../view/layout/layout.phtml:83
+#: ../view/layout/layout.phtml:23 ../view/layout/layout.phtml:88
 msgid "Smart Connect"
 msgstr "Smart Connect"
 
-#: ../view/layout/layout.phtml:92
+#: ../view/layout/layout.phtml:97
 msgid "Development/Test Environment with dummy data"
 msgstr "Dados do ambiente de testes"
 
-#: ../view/layout/layout.phtml:105
+#: ../view/layout/layout.phtml:110
 msgid "Log Out"
 msgstr "Sair"
 
-#: ../view/layout/layout.phtml:191
+#: ../view/layout/layout.phtml:196
 msgid "Data Management"
 msgstr "Gestão de Dados"
 
-#: ../view/layout/layout.phtml:197
+#: ../view/layout/layout.phtml:202
 msgid "Duplicate Data"
 msgstr "Dados duplicados"
 
-#: ../view/layout/layout.phtml:209
+#: ../view/layout/layout.phtml:214
 msgid "Admin"
 msgstr "Admin"
 
-#: ../view/layout/layout.phtml:215
+#: ../view/layout/layout.phtml:220
 msgid "Global Config"
 msgstr "Configuração Geral"
 
-#: ../view/layout/layout.phtml:230
+#: ../view/layout/layout.phtml:235
 msgid "Import"
 msgstr "Importar"
 
-#: ../view/layout/layout.phtml:452
+#: ../view/layout/layout.phtml:457
 msgid ""
 "Smart Connect - The Viral Load Dashboard (Testing Environment with dummy "
 "data) | Funded by"
 msgstr ""
 "Smart Connect - Portal de Carga Viral (Ambiente de Teste com dados "
 "fictícios) | Fundado por"
+
+#~ msgid "Sample Information"
+#~ msgstr "Informações sobre amostra"
+
+#~ msgid "Routine"
+#~ msgstr "Rotina"
+
+#~ msgid "First Line Treatment"
+#~ msgstr "Tratamento de Primeira linha"
+
+#~ msgid "First Viral Load"
+#~ msgstr "Primeira Carga Viral"
+
+#~ msgid "TO BE COMPLETED BY THE LABORATORY"
+#~ msgstr "A ser completado pelo Laboratório"
+
+#~ msgid "Place of Collection"
+#~ msgstr "Local da colheita"
+
+#~ msgid "Date of Collection"
+#~ msgstr "Data da colheita"
+
+#~ msgid "Time"
+#~ msgstr "Tempo"
+
+#~ msgid "Type of Collection"
+#~ msgstr "Tipo da colheita"
+
+#~ msgid "Name of Technician"
+#~ msgstr "Nome do técnico"
+
+#~ msgid "HIV Viral Load (* provisional *)"
+#~ msgstr "Carga Viral de HIV (* Provisional *)"
 
 #~ msgid "Sample(s) Selected"
 #~ msgstr "Amostra (s) selecionada"

@@ -346,15 +346,14 @@ class FacilityTable extends AbstractTableGateway {
         }
     }
 
-    public function fetchAllLabName(){
-        $logincontainer = new Container('credo');
+    public function fetchAllLabName($mappedFacilities){
+
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $fQuery = $sql->select()->from(array('f'=>'facility_details'))
                       ->join(array('ft'=>'facility_type'),'ft.facility_type_id=f.facility_type')
                       ->where('ft.facility_type_name="Viral Load Lab"');
-        if($logincontainer->role!= 1){
-            $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:array();
+        if($mappedFacilities != null){
             $fQuery = $fQuery->where('f.facility_id IN ("' . implode('", "', array_values(array_filter($mappedFacilities))) . '")');
         }
         $fQueryStr = $sql->getSqlStringForSqlObject($fQuery);
@@ -362,15 +361,14 @@ class FacilityTable extends AbstractTableGateway {
         return $facilityResult;
     }
     
-    public function fetchAllClinicName(){
-        $logincontainer = new Container('credo');
+    public function fetchAllClinicName($mappedFacilities){
+
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $fQuery = $sql->select()->from(array('f'=>'facility_details'))
                         ->join(array('ft'=>'facility_type'),'ft.facility_type_id=f.facility_type')
                         ->where('ft.facility_type_name="clinic"');
-        if($logincontainer->role!= 1){
-            $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:array();
+        if($mappedFacilities != null){
             $fQuery = $fQuery->where('f.facility_id IN ("' . implode('", "', array_values(array_filter($mappedFacilities))) . '")');
         }
         $fQueryStr = $sql->getSqlStringForSqlObject($fQuery);

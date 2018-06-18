@@ -445,13 +445,25 @@ class SampleService {
     }
     //get all Lab Name
     public function getAllLabName(){
+        $logincontainer = new Container('credo');
+        $mappedFacilities = null;
+        if($logincontainer->role!= 1){
+            $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:null;
+        }        
         $facilityDb = $this->sm->get('FacilityTable');
-        return $facilityDb->fetchAllLabName();
+        return $facilityDb->fetchAllLabName($mappedFacilities);
     }
     //get all Lab Name
     public function getAllClinicName(){
+
+        $logincontainer = new Container('credo');
+        $mappedFacilities = null;
+        if($logincontainer->role!= 1){
+            $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:null;
+        }
+
         $facilityDb = $this->sm->get('FacilityTable');
-        return $facilityDb->fetchAllClinicName();
+        return $facilityDb->fetchAllClinicName($mappedFacilities);
     }
     
     public function getAllTestResults($parameters){

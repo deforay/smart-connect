@@ -267,7 +267,7 @@ foreach($sampleType as $samples){
             allowClear: true
         });
         
-        var start = moment().subtract(12, 'months');
+        var start = moment().subtract(3, 'months');
         var end = moment();
         
         function cb(start, end) {
@@ -301,7 +301,7 @@ foreach($sampleType as $samples){
         $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
         
         if( !$('#sampleCollectionDate').val() ) {
-            $('#sampleCollectionDate').val(moment().subtract('days', 29).format('YYYY-MM-DD') + ' to ' + moment().format('YYYY-MM-DD'));
+            $('#sampleCollectionDate').val(moment().subtract('months', 1).format('YYYY-MM-DD') + ' to ' + moment().format('YYYY-MM-DD'));
         }
         getOverAllViralLoadStatus();
         getOverAllViralLoadbasedonGender();
@@ -440,8 +440,8 @@ foreach($sampleType as $samples){
 
     function resetEverything(){
         $('#pageFilter')[0].reset();
-        $('#dashboard-range span').html(moment().subtract(12, 'months').format('MMM D, YYYY') + ' to ' + moment().format('MMM D, YYYY'));
-        $('#sampleCollectionDate').val(moment().subtract(12, 'months').format('YYYY-MM-DD') + ' to ' + moment().format('YYYY-MM-DD'));
+        $('#dashboard-range span').html(moment().subtract(3, 'months').format('MMM D, YYYY') + ' to ' + moment().format('MMM D, YYYY'));
+        $('#sampleCollectionDate').val(moment().subtract(3, 'months').format('YYYY-MM-DD') + ' to ' + moment().format('YYYY-MM-DD'));
         $('#labName').val('').change();
         $('#age').val('').change();
         if($('#gender').val() == 'F'){

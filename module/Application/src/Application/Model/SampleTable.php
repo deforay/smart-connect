@@ -25,6 +25,8 @@ class SampleTable extends AbstractTableGateway {
 
     protected $table = 'dash_vl_request_form';
     public $sm = null;
+    protected $dbsId = 8;
+    protected $plasmaId = 19;
 
     public function __construct(Adapter $adapter, $sm=null) {
         $this->adapter = $adapter;
@@ -60,23 +62,23 @@ class SampleTable extends AbstractTableGateway {
                                           array(
                                           "Total Samples" => new Expression('COUNT(*)'),
                                           "Samples Tested" => new Expression("SUM(CASE 
-                                                                                WHEN (((vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL') OR (vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0))) THEN 1
+                                                                                WHEN (((vl.DashVL_AnalysisResult is NOT NULL AND vl.DashVL_AnalysisResult !='') OR (vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0))) THEN 1
                                                                                 ELSE 0
                                                                                 END)"),
                                           "Gender Missing" => new Expression("SUM(CASE 
-                                                                                    WHEN ((patient_gender IS NULL OR patient_gender ='' OR patient_gender ='unreported')) THEN 1
+                                                                                    WHEN ((patient_gender IS NULL OR patient_gender ='' OR patient_gender ='unreported' OR patient_gender ='Unreported')) THEN 1
                                                                                     ELSE 0
                                                                                     END)"),
                                           "Age Missing" => new Expression("SUM(CASE 
-                                                                                WHEN ((patient_age_in_years IS NULL OR patient_age_in_years ='')) THEN 1
+                                                                                WHEN ((patient_age_in_years IS NULL OR patient_age_in_years ='' OR patient_age_in_years ='Unreported'  OR patient_age_in_years ='unreported')) THEN 1
                                                                                 ELSE 0
                                                                                 END)"),
                                           "Results Awaited <br>(< $samplesWaitingFromLastXMonths months)" => new Expression("SUM(CASE
-                                                                                                                                WHEN ((result is NULL OR result ='') AND (sample_collection_date < DATE_SUB(NOW(), INTERVAL $samplesWaitingFromLastXMonths MONTH)) AND (reason_for_sample_rejection is NULL or reason_for_sample_rejection ='' or reason_for_sample_rejection = 0)) THEN 1
+                                                                                                                                WHEN ((vl.DashVL_AnalysisResult is NULL OR vl.DashVL_AnalysisResult ='') AND (sample_collection_date < DATE_SUB(NOW(), INTERVAL $samplesWaitingFromLastXMonths MONTH)) AND (reason_for_sample_rejection is NULL or reason_for_sample_rejection ='' or reason_for_sample_rejection = 0)) THEN 1
                                                                                                                                 ELSE 0
                                                                                                                                 END)"),
                                           "Results Awaited <br>(> $samplesWaitingFromLastXMonths months)" => new Expression("SUM(CASE
-                                                                                                                                WHEN ((result is NULL OR result ='') AND (sample_collection_date > DATE_SUB(NOW(), INTERVAL $samplesWaitingFromLastXMonths MONTH)) AND (reason_for_sample_rejection is NULL or reason_for_sample_rejection ='' or reason_for_sample_rejection = 0)) THEN 1
+                                                                                                                                WHEN ((vl.DashVL_AnalysisResult is NULL OR vl.DashVL_AnalysisResult ='') AND (sample_collection_date > DATE_SUB(NOW(), INTERVAL $samplesWaitingFromLastXMonths MONTH)) AND (reason_for_sample_rejection is NULL or reason_for_sample_rejection ='' or reason_for_sample_rejection = 0)) THEN 1
                                                                                                                                 ELSE 0
                                                                                                                                 END)")
                                           )
@@ -151,7 +153,7 @@ class SampleTable extends AbstractTableGateway {
         //tested data
         $testedQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
                                      ->columns(array('total' => new Expression('COUNT(*)'), 'testedDate' => new Expression('DATE(sample_tested_datetime)')))
-                                     ->where("((vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') OR (vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0))")
+                                     ->where("((vl.DashVL_AnalysisResult IS NOT NULL AND vl.DashVL_AnalysisResult != '' AND vl.DashVL_AnalysisResult != 'NULL') OR (vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0))")
                                      ->where("sample_collection_date is not null AND sample_collection_date != '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00'")
                                      ->group(array("testedDate"));
         if($logincontainer->role!= 1){
@@ -233,9 +235,10 @@ class SampleTable extends AbstractTableGateway {
                                                 ->columns(array(
                                                     "total" => new Expression('COUNT(*)'),
                                                     "monthDate" => new Expression("DATE_FORMAT(DATE(sample_collection_date), '%b-%Y')"),
-                                                    "GreaterThan1000" => new Expression("SUM(CASE WHEN (vl.result IS NOT NULL AND vl.result!= '' AND vl.result >= 1000 AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END)"),
-                                                    "LesserThan1000" => new Expression("SUM(CASE WHEN ((vl.result < 1000 or vl.result = 'Target Not Detected' or vl.result = 'Target not Detected' or vl.result = 'TND' or vl.result = 'tnd' or vl.result= 'Below Detection Level' or vl.result='BDL' or vl.result='bdl' or vl.result= 'Low Detection Level' or vl.result like 'LDL' or vl.result like 'ldl' or vl.result like 'NON DETECTE' or vl.result like '%baixo%' or vl.result like 'Negative' or vl.result like 'NEGAT' or vl.result like 'Indeterminado' or vl.result like 'NON DETECTEE' or vl.result like '<40' or vl.result like '< 40' or vl.result like '<20' or vl.result like'< 20') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END)"),
+                                                    "GreaterThan1000" => new Expression("SUM(CASE WHEN ((vl.DashVL_AnalysisResult like 'not%' OR vl.DashVL_AnalysisResult like 'Not%' or vl.DashVL_Abs >= 1000)) THEN 1 ELSE 0 END)"),
+                                                    "LesserThan1000" => new Expression("SUM(CASE WHEN ((vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' or vl.DashVL_Abs < 1000)) THEN 1 ELSE 0 END)"),
                                                     //"TND" => new Expression("SUM(CASE WHEN (vl.result='Target Not Detected' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END)"),
+                                                    //new Expression("SUM(CASE WHEN ((vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' or vl.DashVL_Abs < 1000)) THEN 1 ELSE 0 END)")
                                              )
                                             );
             if(isset($params['facilityId']) && trim($params['facilityId'])!= ''){
@@ -317,14 +320,14 @@ class SampleTable extends AbstractTableGateway {
                                            ->where('vl.sample_type IN ("' . implode('", "', $sampleId) . '")')
                                            ->where(array('vl.lab_id'=>$facility['facility_id']));
                     $queryStr = $sql->getSqlStringForSqlObject($query);
-        
-                    $greaterResult = $dbAdapter->query($queryStr." AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result >= 1000 AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00'", $dbAdapter::QUERY_MODE_EXECUTE)->current();
+                    
+                    $greaterResult = $dbAdapter->query($queryStr . " AND (vl.DashVL_AnalysisResult like 'not%' OR vl.DashVL_AnalysisResult like 'Not%' or vl.DashVL_Abs >= 1000)", $dbAdapter::QUERY_MODE_EXECUTE)->current();
                     $result['sampleName']['VL (>= 1000 cp/ml)'][$j] = $greaterTotal+$greaterResult['total'];
                     
                     //$notTargetResult = $dbAdapter->query($lQueryStr." AND 'vl.result' ='Target Not Detected'", $dbAdapter::QUERY_MODE_EXECUTE)->current();
                     //$result['sampleName']['VL Not Detected'][$j] = $notTargetTotal+$notTargetResult['total'];
                     
-                    $lessResult = $dbAdapter->query($queryStr." AND (vl.result < 1000 or vl.result = 'Target Not Detected' or vl.result = 'TND' or vl.result = 'tnd' or vl.result= 'Below Detection Level' or vl.result='BDL' or vl.result='bdl' or vl.result= 'Low Detection Level' or vl.result='LDL' or vl.result='ldl' or vl.result like '%baixo%' or vl.result like 'Negative' or vl.result like 'NEGAT' or vl.result like 'Indeterminado' or vl.result like 'Target not Detected') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00'", $dbAdapter::QUERY_MODE_EXECUTE)->current();
+                    $lessResult = $dbAdapter->query($queryStr." AND (vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' or vl.DashVL_Abs < 1000)", $dbAdapter::QUERY_MODE_EXECUTE)->current();
                     $result['sampleName']['VL (< 1000 cp/ml)'][$j] = $lessTotal+$lessResult['total'];
                     $result['lab'][$j] = ucwords($facility['facility_name']);
                     $j++;
@@ -353,16 +356,16 @@ class SampleTable extends AbstractTableGateway {
                                                     "total" => new Expression('COUNT(*)'),
                                                     "monthDate" => new Expression("DATE_FORMAT(DATE(sample_collection_date), '%b-%Y')"),
                                                     
-                                                    "MGreaterThan1000" => new Expression("SUM(CASE WHEN (vl.patient_gender is not null and vl.patient_gender != '' and vl.patient_gender !='unreported' and vl.patient_gender in('m','Male','M','MALE') and (vl.result IS NOT NULL AND vl.result!= '' AND vl.result >= 1000 AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) THEN 1 ELSE 0 END)"),
-                                                    "MLesserThan1000" => new Expression("SUM(CASE WHEN (vl.patient_gender is not null and vl.patient_gender != '' and vl.patient_gender !='unreported' and vl.patient_gender in('m','Male','M','MALE') and ((vl.result < 1000 or vl.result = 'Target Not Detected' or vl.result = 'TND' or vl.result = 'tnd' or vl.result= 'Below Detection Level' or vl.result='BDL' or vl.result='bdl' or vl.result= 'Low Detection Level' or vl.result='LDL' or vl.result='ldl' or vl.result like '%baixo%' or vl.result like 'Negative' or vl.result like 'NEGAT' or vl.result like 'Indeterminado' or vl.result like 'Target not Detected') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) THEN 1 ELSE 0 END)"),
+                                                    "MGreaterThan1000" => new Expression("SUM(CASE WHEN (vl.patient_gender is not null and vl.patient_gender != '' and vl.patient_gender !='unreported' and vl.patient_gender in('m','Male','M','MALE') and (vl.DashVL_AnalysisResult like 'not suppressed%' OR vl.DashVL_AnalysisResult like 'Not Suppressed%' or vl.DashVL_Abs >= 1000)) THEN 1 ELSE 0 END)"),
+                                                    "MLesserThan1000" => new Expression("SUM(CASE WHEN (vl.patient_gender is not null and vl.patient_gender != '' and vl.patient_gender !='unreported' and vl.patient_gender in('m','Male','M','MALE') and (vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' or vl.DashVL_Abs < 1000)) THEN 1 ELSE 0 END)"),
                                                     //"MTND" => new Expression("SUM(CASE WHEN (vl.result='Target Not Detected' and vl.patient_gender in('m','Male','M','MALE')) THEN 1 ELSE 0 END)"),
                                              
-                                                    "FGreaterThan1000" => new Expression("SUM(CASE WHEN (vl.patient_gender is not null and vl.patient_gender != '' and vl.patient_gender !='unreported' and vl.patient_gender in('f','Female','F','FEMALE') and (vl.result IS NOT NULL AND vl.result!= '' AND vl.result >= 1000 AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) THEN 1 ELSE 0 END)"),
-                                                    "FLesserThan1000" => new Expression("SUM(CASE WHEN (vl.patient_gender is not null and vl.patient_gender != '' and vl.patient_gender !='unreported' and vl.patient_gender in('f','Female','F','FEMALE') and ((vl.result < 1000 or vl.result = 'Target Not Detected' or vl.result = 'TND' or vl.result = 'tnd' or vl.result= 'Below Detection Level' or vl.result='BDL' or vl.result='bdl' or vl.result= 'Low Detection Level' or vl.result='LDL' or vl.result='ldl' or vl.result like '%baixo%' or vl.result like 'Negative' or vl.result like 'NEGAT' or vl.result like 'Indeterminado' or vl.result like 'Target not Detected') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) THEN 1 ELSE 0 END)"),
+                                                    "FGreaterThan1000" => new Expression("SUM(CASE WHEN (vl.patient_gender is not null and vl.patient_gender != '' and vl.patient_gender !='unreported' and vl.patient_gender in('f','Female','F','FEMALE') and (vl.DashVL_AnalysisResult like 'not suppressed%' OR vl.DashVL_AnalysisResult like 'Not Suppressed%' or vl.DashVL_Abs >= 1000)) THEN 1 ELSE 0 END)"),
+                                                    "FLesserThan1000" => new Expression("SUM(CASE WHEN (vl.patient_gender is not null and vl.patient_gender != '' and vl.patient_gender !='unreported' and vl.patient_gender in('f','Female','F','FEMALE') and (vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' or vl.DashVL_Abs < 1000)) THEN 1 ELSE 0 END)"),
                                                     //"FTND" => new Expression("SUM(CASE WHEN vl.result='Target Not Detected' and vl.patient_gender in('f','Female','F','FEMALE') THEN 1 ELSE 0 END)"),
 
-                                                    "OGreaterThan1000" => new Expression("SUM(CASE WHEN ((vl.patient_gender IS NULL or vl.patient_gender = '' or vl.patient_gender = 'Not Recorded' or vl.patient_gender = 'not recorded') and vl.result IS NOT NULL AND vl.result!= '' AND vl.result >= 1000 AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END)"),
-                                                    "OLesserThan1000" => new Expression("SUM(CASE WHEN ((vl.patient_gender IS NULL or vl.patient_gender ='NULL' or vl.patient_gender = '' or vl.patient_gender = 'Not Recorded' or vl.patient_gender = 'not recorded') and (vl.result < 1000 or vl.result = 'Target Not Detected' or vl.result = 'TND' or vl.result = 'tnd' or vl.result= 'Below Detection Level' or vl.result='BDL' or vl.result='bdl' or vl.result= 'Low Detection Level' or vl.result='LDL' or vl.result='ldl') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END)"),
+                                                    "OGreaterThan1000" => new Expression("SUM(CASE WHEN ((vl.patient_gender IS NULL or vl.patient_gender = '' or vl.patient_gender = 'Not Recorded' or vl.patient_gender = 'not recorded') and (vl.DashVL_AnalysisResult like 'not suppressed%' OR vl.DashVL_AnalysisResult like 'Not Suppressed%' or vl.DashVL_Abs >= 1000)) THEN 1 ELSE 0 END)"),
+                                                    "OLesserThan1000" => new Expression("SUM(CASE WHEN ((vl.patient_gender IS NULL or vl.patient_gender ='NULL' or vl.patient_gender = '' or vl.patient_gender = 'Not Recorded' or vl.patient_gender = 'not recorded' or vl.patient_gender = 'Unreported' or vl.patient_gender = 'unreported') and (vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' or vl.DashVL_Abs < 1000)) THEN 1 ELSE 0 END)"),
                                                     //"OTND" => new Expression("SUM(CASE WHEN (vl.result='Target Not Detected' and vl.patient_gender NOT in('m','Male','M','MALE','f','Female','F','FEMALE')) THEN 1 ELSE 0 END)")
                                               )
                                             );
@@ -431,7 +434,7 @@ class SampleTable extends AbstractTableGateway {
                                         "year" => new Expression("YEAR(sample_collection_date)"),
                                         "monthDate" => new Expression("DATE_FORMAT(DATE(sample_collection_date), '%b-%Y')"),
                                         "total_samples_collected" => new Expression('COUNT(*)'),
-                                        "total_samples_pending" => new Expression("(SUM(CASE WHEN ((vl.result IS NULL OR vl.result = '' OR vl.result = 'NULL' OR sample_tested_datetime is null OR sample_tested_datetime = '' OR DATE(sample_tested_datetime) ='1970-01-01' OR DATE(sample_tested_datetime) ='0000-00-00') AND (vl.reason_for_sample_rejection IS NULL OR vl.reason_for_sample_rejection = '' OR vl.reason_for_sample_rejection = 0)) THEN 1 ELSE 0 END))")
+                                        "total_samples_pending" => new Expression("(SUM(CASE WHEN ((vl.DashVL_AnalysisResult IS NULL OR vl.DashVL_AnalysisResult = '' OR vl.DashVL_AnalysisResult = 'NULL') AND (vl.reason_for_sample_rejection IS NULL OR vl.reason_for_sample_rejection = '' OR vl.reason_for_sample_rejection = 0)) THEN 1 ELSE 0 END))")
                                       )
                                     );
             $query = $query->where("
@@ -505,23 +508,23 @@ class SampleTable extends AbstractTableGateway {
                                     ->columns(array(
                                                     "monthDate" => new Expression("DATE_FORMAT(DATE(sample_collection_date), '%b-%Y')"),
                                                     
-                                                    "AgeLt2VLGt1000" => new Expression("SUM(CASE WHEN ((vl.patient_age_in_years > 0 AND vl.patient_age_in_years < 2) AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result >= 1000 AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END)"),
-                                                    "AgeLt2VLLt1000" => new Expression("SUM(CASE WHEN ((vl.patient_age_in_years > 0 AND vl.patient_age_in_years < 2) AND (vl.result < 1000 or vl.result = 'Target Not Detected' or vl.result = 'TND' or vl.result = 'tnd' or vl.result= 'Below Detection Level' or vl.result='BDL' or vl.result='bdl' or vl.result= 'Low Detection Level' or vl.result='LDL' or vl.result='ldl') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END)"),
+                                                    "AgeLt2VLGt1000" => new Expression("SUM(CASE WHEN ((vl.patient_age_in_years > 0 AND vl.patient_age_in_years < 2) and (vl.DashVL_AnalysisResult like 'not suppressed%' OR vl.DashVL_AnalysisResult like 'Not Suppressed%' or vl.DashVL_Abs >= 1000)) THEN 1 ELSE 0 END)"),
+                                                    "AgeLt2VLLt1000" => new Expression("SUM(CASE WHEN ((vl.patient_age_in_years > 0 AND vl.patient_age_in_years < 2) and (vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' or vl.DashVL_Abs < 1000)) THEN 1 ELSE 0 END)"),
                                              
-                                                    "AgeGte2Lte5VLGt1000" => new Expression("SUM(CASE WHEN ((patient_age_in_years >= 2 and patient_age_in_years <= 5) AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result >= 1000 AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END)"),
-                                                    "AgeGte2Lte5VLLt1000" => new Expression("SUM(CASE WHEN ((patient_age_in_years >= 2 and patient_age_in_years <= 5) AND (vl.result < 1000 or vl.result = 'Target Not Detected' or vl.result = 'TND' or vl.result = 'tnd' or vl.result= 'Below Detection Level' or vl.result='BDL' or vl.result='bdl' or vl.result= 'Low Detection Level' or vl.result='LDL' or vl.result='ldl') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END)"),
+                                                    "AgeGte2Lte5VLGt1000" => new Expression("SUM(CASE WHEN ((patient_age_in_years >= 2 and patient_age_in_years <= 5) and (vl.DashVL_AnalysisResult like 'not suppressed%' OR vl.DashVL_AnalysisResult like 'Not Suppressed%' or vl.DashVL_Abs >= 1000)) THEN 1 ELSE 0 END)"),
+                                                    "AgeGte2Lte5VLLt1000" => new Expression("SUM(CASE WHEN ((patient_age_in_years >= 2 and patient_age_in_years <= 5) and (vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' or vl.DashVL_Abs < 1000)) THEN 1 ELSE 0 END)"),
                                                     
-                                                    "AgeGte6Lte14VLGt1000" => new Expression("SUM(CASE WHEN ((patient_age_in_years >= 6 and patient_age_in_years <= 14) AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result >= 1000 AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END)"),
-                                                    "AgeGte6Lte14VLLt1000" => new Expression("SUM(CASE WHEN ((patient_age_in_years >= 6 and patient_age_in_years <= 14) AND (vl.result < 1000 or vl.result = 'Target Not Detected' or vl.result = 'TND' or vl.result = 'tnd' or vl.result= 'Below Detection Level' or vl.result='BDL' or vl.result='bdl' or vl.result= 'Low Detection Level' or vl.result='LDL' or vl.result='ldl') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END)"),
+                                                    "AgeGte6Lte14VLGt1000" => new Expression("SUM(CASE WHEN ((patient_age_in_years >= 6 and patient_age_in_years <= 14) and (vl.DashVL_AnalysisResult like 'not suppressed%' OR vl.DashVL_AnalysisResult like 'Not Suppressed%' or vl.DashVL_Abs >= 1000)) THEN 1 ELSE 0 END)"),
+                                                    "AgeGte6Lte14VLLt1000" => new Expression("SUM(CASE WHEN ((patient_age_in_years >= 6 and patient_age_in_years <= 14) and (vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' or vl.DashVL_Abs < 1000)) THEN 1 ELSE 0 END)"),
                                                     
-                                                    "AgeGte15Lte49VLGt1000" => new Expression("SUM(CASE WHEN ((patient_age_in_years >= 15 and patient_age_in_years <= 49) AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result >= 1000 AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END)"),
-                                                    "AgeGte15Lte49VLLt1000" => new Expression("SUM(CASE WHEN ((patient_age_in_years >= 15 and patient_age_in_years <= 49) AND (vl.result < 1000 or vl.result = 'Target Not Detected' or vl.result = 'TND' or vl.result = 'tnd' or vl.result= 'Below Detection Level' or vl.result='BDL' or vl.result='bdl' or vl.result= 'Low Detection Level' or vl.result='LDL' or vl.result='ldl') AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END)"),
+                                                    "AgeGte15Lte49VLGt1000" => new Expression("SUM(CASE WHEN ((patient_age_in_years >= 15 and patient_age_in_years <= 49) and (vl.DashVL_AnalysisResult like 'not suppressed%' OR vl.DashVL_AnalysisResult like 'Not Suppressed%' or vl.DashVL_Abs >= 1000)) THEN 1 ELSE 0 END)"),
+                                                    "AgeGte15Lte49VLLt1000" => new Expression("SUM(CASE WHEN ((patient_age_in_years >= 15 and patient_age_in_years <= 49) and (vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' or vl.DashVL_Abs < 1000)) THEN 1 ELSE 0 END)"),
                                                     
-                                                    "AgeGt50VLGt1000" => new Expression("SUM(CASE WHEN ((patient_age_in_years > 50) AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result >= 1000 AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END)"),
-                                                    "AgeGt50VLLt1000" => new Expression("SUM(CASE WHEN ((patient_age_in_years > 50) AND (vl.result < 1000 or vl.result = 'Target Not Detected' or vl.result = 'TND' or vl.result = 'tnd' or vl.result= 'Below Detection Level' or vl.result='BDL' or vl.result='bdl' or vl.result= 'Low Detection Level' or vl.result='LDL' or vl.result='ldl') AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END)"),
+                                                    "AgeGt50VLGt1000" => new Expression("SUM(CASE WHEN ((patient_age_in_years > 50) and (vl.DashVL_AnalysisResult like 'not suppressed%' OR vl.DashVL_AnalysisResult like 'Not Suppressed%' or vl.DashVL_Abs >= 1000)) THEN 1 ELSE 0 END)"),
+                                                    "AgeGt50VLLt1000" => new Expression("SUM(CASE WHEN ((patient_age_in_years > 50) and (vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' or vl.DashVL_Abs < 1000)) THEN 1 ELSE 0 END)"),
                                                     
-                                                    "AgeUnknownVLGt1000" => new Expression("SUM(CASE WHEN ((vl.patient_age_in_years IS NULL OR vl.patient_age_in_years = '' OR vl.patient_age_in_years = 'Unknown' OR vl.patient_age_in_years = 'unknown') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result >= 1000 AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END)"),
-                                                    "AgeUnknownVLLt1000" => new Expression("SUM(CASE WHEN ((vl.patient_age_in_years IS NULL OR vl.patient_age_in_years = '' OR vl.patient_age_in_years = 'Unknown' OR vl.patient_age_in_years = 'unknown') AND (vl.result < 1000 or vl.result = 'Target Not Detected' or vl.result = 'TND' or vl.result = 'tnd' or vl.result= 'Below Detection Level' or vl.result='BDL' or vl.result='bdl' or vl.result= 'Low Detection Level' or vl.result='LDL' or vl.result='ldl') AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END)")
+                                                    "AgeUnknownVLGt1000" => new Expression("SUM(CASE WHEN ((vl.patient_age_in_years IS NULL OR vl.patient_age_in_years = '' OR vl.patient_age_in_years = 'Unknown' OR vl.patient_age_in_years = 'unknown' OR vl.patient_age_in_years = 'Unreported' OR vl.patient_age_in_years = 'unreported') and (vl.DashVL_AnalysisResult like 'not suppressed%' OR vl.DashVL_AnalysisResult like 'Not Suppressed%' or vl.DashVL_Abs >= 1000)) THEN 1 ELSE 0 END)"),
+                                                    "AgeUnknownVLLt1000" => new Expression("SUM(CASE WHEN ((vl.patient_age_in_years IS NULL OR vl.patient_age_in_years = '' OR vl.patient_age_in_years = 'Unknown' OR vl.patient_age_in_years = 'unknown' OR vl.patient_age_in_years = 'Unreported' OR vl.patient_age_in_years = 'unreported') and (vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' or vl.DashVL_Abs < 1000)) THEN 1 ELSE 0 END)"),
                                               )
                                             );
             if(isset($params['facilityId']) && trim($params['facilityId'])!= ''){
@@ -605,8 +608,8 @@ class SampleTable extends AbstractTableGateway {
             $query = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
                                    ->columns(array(
                                                     "monthDate" => new Expression("DATE_FORMAT(DATE(sample_collection_date), '%b-%Y')"),
-                                                    "greaterThan1000" => new Expression("SUM(CASE WHEN (vl.is_patient_pregnant in('yes','Yes','YES') and (vl.result IS NOT NULL AND vl.result!= '' AND vl.result >= 1000 AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) THEN 1 ELSE 0 END)"),
-                                                    "lesserThan1000" => new Expression("SUM(CASE WHEN (vl.is_patient_pregnant in('yes','Yes','YES') and (vl.result < 1000 or vl.result = 'Target Not Detected' or vl.result = 'TND' or vl.result = 'tnd' or vl.result= 'Below Detection Level' or vl.result='BDL' or vl.result='bdl' or vl.result= 'Low Detection Level' or vl.result='LDL' or vl.result='ldl') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END)")
+                                                    "greaterThan1000" => new Expression("SUM(CASE WHEN (vl.is_patient_pregnant in('yes','Yes','YES') and (vl.DashVL_AnalysisResult like 'not suppressed%' OR vl.DashVL_AnalysisResult like 'Not Suppressed%' or vl.DashVL_Abs >= 1000)) THEN 1 ELSE 0 END)"),
+                                                    "lesserThan1000" => new Expression("SUM(CASE WHEN (vl.is_patient_pregnant in('yes','Yes','YES') and (vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' or vl.DashVL_Abs < 1000)) THEN 1 ELSE 0 END)"),
                                               )
                                             );
             if(isset($params['facilityId']) && trim($params['facilityId'])!= ''){
@@ -657,8 +660,8 @@ class SampleTable extends AbstractTableGateway {
             $query = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
                                    ->columns(array(
                                                     "monthDate" => new Expression("DATE_FORMAT(DATE(sample_collection_date), '%b-%Y')"),
-                                                    "greaterThan1000" => new Expression("SUM(CASE WHEN (vl.is_patient_breastfeeding in('yes','Yes','YES') and (vl.result IS NOT NULL AND vl.result!= '' AND vl.result >= 1000 AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) THEN 1 ELSE 0 END)"),
-                                                    "lesserThan1000" => new Expression("SUM(CASE WHEN (vl.is_patient_breastfeeding in('yes','Yes','YES') and (vl.result < 1000 or vl.result = 'Target Not Detected' or vl.result = 'TND' or vl.result = 'tnd' or vl.result= 'Below Detection Level' or vl.result='BDL' or vl.result='bdl' or vl.result= 'Low Detection Level' or vl.result='LDL' or vl.result='ldl') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END)")
+                                                    "greaterThan1000" => new Expression("SUM(CASE WHEN (vl.is_patient_breastfeeding in('yes','Yes','YES') and (vl.DashVL_AnalysisResult like 'not suppressed%' OR vl.DashVL_AnalysisResult like 'Not Suppressed%' or vl.DashVL_Abs >= 1000)) THEN 1 ELSE 0 END)"),
+                                                    "lesserThan1000" => new Expression("SUM(CASE WHEN (vl.is_patient_breastfeeding in('yes','Yes','YES') and (vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' or vl.DashVL_Abs < 1000)) THEN 1 ELSE 0 END)"),
                                               )
                                             );
             if(isset($params['facilityId']) && trim($params['facilityId'])!= ''){
@@ -790,9 +793,9 @@ class SampleTable extends AbstractTableGateway {
                                       ->where(array("vl.sample_collection_date >='" . $startMonth ." 00:00:00". "'", "vl.sample_collection_date <='" .$endMonth." 23:59:59". "'"))
                                       ->where('vl.lab_id="'.$facility['facility_id'].'"');
                     if(isset($params['sampleStatus']) && $params['sampleStatus'] == 'sample_tested'){
-                        $countQuery = $countQuery->where("((vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') OR (vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0))");
+                        $countQuery = $countQuery->where("((vl.DashVL_AnalysisResult IS NOT NULL AND vl.DashVL_AnalysisResult != '' AND vl.DashVL_AnalysisResult != 'NULL') OR (vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0))");
                     }else if(isset($params['sampleStatus']) && $params['sampleStatus'] == 'samples_not_tested') {
-                        $countQuery = $countQuery->where("(vl.result IS NULL OR vl.result = '' OR vl.result = 'NULL' OR sample_tested_datetime is null OR sample_tested_datetime = '' OR DATE(sample_tested_datetime) ='1970-01-01' OR DATE(sample_tested_datetime) ='0000-00-00') AND (vl.reason_for_sample_rejection IS NULL OR vl.reason_for_sample_rejection = '' OR vl.reason_for_sample_rejection = 0)");
+                        $countQuery = $countQuery->where("(vl.DashVL_AnalysisResult IS NULL OR vl.DashVL_AnalysisResult = '' OR vl.DashVL_AnalysisResult = 'NULL') AND (vl.reason_for_sample_rejection IS NULL OR vl.reason_for_sample_rejection = '' OR vl.reason_for_sample_rejection = 0)");
                     }else if(isset($params['sampleStatus']) && $params['sampleStatus'] == 'sample_rejected') {
                         $countQuery = $countQuery->where("vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0");
                     }
@@ -1082,8 +1085,8 @@ class SampleTable extends AbstractTableGateway {
             $endMonth = str_replace(' ','-',$params['toDate'])."-31";
             $sQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
                                     ->columns(array(
-                                                    "Suppressed" => new Expression("SUM(CASE WHEN ((vl.result < 1000 or vl.result = 'Target Not Detected' or vl.result = 'TND' or vl.result = 'tnd' or vl.result= 'Below Detection Level' or vl.result='BDL' or vl.result='bdl' or vl.result= 'Low Detection Level' or vl.result='LDL' or vl.result='ldl' or vl.result like '%baixo%' or vl.result like 'Negative' or vl.result like 'NEGAT' or vl.result like 'Indeterminado' or vl.result like 'NON DETECTEE' or vl.result like '<40' or vl.result like '< 40' or vl.result like '<20' or vl.result like'< 20') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END)"),
-                                                    "Not_Suppressed" => new Expression("SUM(CASE WHEN (vl.result IS NOT NULL AND vl.result!= '' AND vl.result >= 1000 AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END)"),
+                                                    "Suppressed" => new Expression("SUM(CASE WHEN ((vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' or vl.DashVL_Abs < 1000)) THEN 1 ELSE 0 END)"),
+                                                    "Not_Suppressed" => new Expression("SUM(CASE WHEN ((vl.DashVL_AnalysisResult like 'not suppressed%' OR vl.DashVL_AnalysisResult like 'Not Suppressed%' or vl.DashVL_Abs >= 1000)) THEN 1 ELSE 0 END)"),
                                               )
                                             )
                                     ->join(array('f'=>'facility_details'),'f.facility_id=vl.lab_id',array());
@@ -1139,9 +1142,9 @@ class SampleTable extends AbstractTableGateway {
               $sQuery = $sQuery->where($where);
             }
             if(isset($params['testResult']) && $params['testResult'] == '<1000'){
-                $sQuery = $sQuery->where("(vl.result < 1000 or vl.result = 'Target Not Detected' or vl.result = 'TND' or vl.result = 'tnd' or vl.result= 'Below Detection Level' or vl.result='BDL' or vl.result='bdl' or vl.result= 'Low Detection Level' or vl.result='LDL' or vl.result='ldl') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00'");
+                $sQuery = $sQuery->where("vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' or vl.DashVL_Abs < 1000");
             }else if(isset($params['testResult']) && $params['testResult'] == '>=1000') {
-                $sQuery = $sQuery->where("vl.result IS NOT NULL AND vl.result!= '' AND vl.result >= 1000 AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00'");
+                $sQuery = $sQuery->where("vl.DashVL_AnalysisResult like 'not suppressed%' OR vl.DashVL_AnalysisResult like 'Not Suppressed%' or vl.DashVL_Abs >= 1000");
             }
             if(isset($params['sampleType']) && trim($params['sampleType'])!=''){
                 $sQuery = $sQuery->where('vl.sample_type="'.base64_decode(trim($params['sampleType'])).'"');
@@ -1194,16 +1197,16 @@ class SampleTable extends AbstractTableGateway {
         $where = "";
         $overAllTotal = $this->fetchOverallViralLoadResult($params,$where);
         //total tested samples
-        $where = "((vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') OR (vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0))";
+        $where = "(vl.DashVL_AnalysisResult is NOT NULL OR vl.DashVL_AnalysisResult != '')";
         $testedTotal = $this->fetchOverallViralLoadResult($params,$where);
         //total not tested samples
-        $where = "((vl.result IS NULL OR vl.result = '' OR vl.result = 'NULL' OR sample_tested_datetime is null OR sample_tested_datetime = '' OR DATE(sample_tested_datetime) ='1970-01-01' OR DATE(sample_tested_datetime) ='0000-00-00') AND (vl.reason_for_sample_rejection IS NULL OR vl.reason_for_sample_rejection = '' OR vl.reason_for_sample_rejection = 0))";
+        $where = "(vl.DashVL_AnalysisResult is NULL OR vl.DashVL_AnalysisResult = '')";
         $notTestedTotal = $this->fetchOverallViralLoadResult($params,$where);
         //total VL <1000
-        $where = "((vl.result < 1000 or vl.result = 'Target Not Detected' or vl.result = 'TND' or vl.result = 'tnd' or vl.result= 'Below Detection Level' or vl.result='BDL' or vl.result='bdl' or vl.result= 'Low Detection Level' or vl.result='LDL' or vl.result='ldl') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')";
+        $where = "(vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' or vl.DashVL_Abs < 1000)";
         $lessTotal = $this->fetchOverallViralLoadResult($params,$where);
         //total VL >=1000
-        $where = "vl.result IS NOT NULL AND vl.result!= '' AND vl.result >= 1000 AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00'";
+        $where = "(vl.DashVL_AnalysisResult like 'not suppressed%' OR vl.DashVL_AnalysisResult like 'Not Suppressed%' or vl.DashVL_Abs >= 1000)";
         $gTotal = $this->fetchOverallViralLoadResult($params,$where);
       return array($testedTotal,$notTestedTotal,$lessTotal,$gTotal,$overAllTotal);
     }
@@ -1236,9 +1239,9 @@ class SampleTable extends AbstractTableGateway {
                 }
             }
             if(isset($params['testResult']) && $params['testResult'] == '<1000'){
-                $squery = $squery->where("(vl.result < 1000 or vl.result = 'Target Not Detected' or vl.result = 'TND' or vl.result = 'tnd' or vl.result= 'Below Detection Level' or vl.result='BDL' or vl.result='bdl' or vl.result= 'Low Detection Level' or vl.result='LDL' or vl.result='ldl') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00'");
+                $squery = $squery->where("(vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' or vl.DashVL_Abs < 1000)");
             }else if(isset($params['testResult']) && $params['testResult'] == '>=1000') {
-                $squery = $squery->where("vl.result IS NOT NULL AND vl.result!= '' AND vl.result >= 1000 AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00'");
+                $squery = $squery->where("(vl.DashVL_AnalysisResult like 'not suppressed%' OR vl.DashVL_AnalysisResult like 'Not Suppressed%' or vl.DashVL_Abs >= 1000))");
             }
             if(isset($params['sampleTypeId']) && $params['sampleTypeId']!=''){
                 $squery = $squery->where('vl.sample_type="'.base64_decode(trim($params['sampleTypeId'])).'"');
@@ -1318,14 +1321,16 @@ class SampleTable extends AbstractTableGateway {
             $query = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
                                    ->columns(array(
                                                 "mTotal" => new Expression("SUM(CASE WHEN (vl.patient_gender in('m','Male','M','MALE')) THEN 1 ELSE 0 END)"),
-                                                "mGreaterThanEqual1000" => new Expression("SUM(CASE WHEN (vl.patient_gender in('m','Male','M','MALE') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result >= 1000 AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END)"),
-                                                "mLesserThan1000" => new Expression("SUM(CASE WHEN (vl.patient_gender in('m','Male','M','MALE') AND (vl.result < 1000 or vl.result = 'Target Not Detected' or vl.result = 'TND' or vl.result = 'tnd' or vl.result= 'Below Detection Level' or vl.result='BDL' or vl.result='bdl' or vl.result= 'Low Detection Level' or vl.result='LDL' or vl.result='ldl') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END)"),
+                                                "mGreaterThanEqual1000" => new Expression("SUM(CASE WHEN (vl.patient_gender in('m','Male','M','MALE') and (vl.DashVL_AnalysisResult like 'not suppressed%' OR vl.DashVL_AnalysisResult like 'Not Suppressed%' or vl.DashVL_Abs >= 1000)) THEN 1 ELSE 0 END)"),
+                                                "mLesserThan1000" => new Expression("SUM(CASE WHEN (vl.patient_gender in('m','Male','M','MALE') and (vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' or vl.DashVL_Abs < 1000)) THEN 1 ELSE 0 END)"),
+                                                
                                                 "fTotal" => new Expression("SUM(CASE WHEN (vl.patient_gender in('f','Female','F','FEMALE')) THEN 1 ELSE 0 END)"),
-                                                "fGreaterThanEqual1000" => new Expression("SUM(CASE WHEN (vl.patient_gender in('f','Female','F','FEMALE') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result >= 1000 AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END)"),
-                                                "fLesserThan1000" => new Expression("SUM(CASE WHEN (vl.patient_gender in('f','Female','F','FEMALE') AND (vl.result < 1000 or vl.result = 'Target Not Detected' or vl.result = 'TND' or vl.result = 'tnd' or vl.result= 'Below Detection Level' or vl.result='BDL' or vl.result='bdl' or vl.result= 'Low Detection Level' or vl.result='LDL' or vl.result='ldl') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END)"),
+                                                "fGreaterThanEqual1000" => new Expression("SUM(CASE WHEN (vl.patient_gender in('f','Female','F','FEMALE') and (vl.DashVL_AnalysisResult like 'not suppressed%' OR vl.DashVL_AnalysisResult like 'Not Suppressed%' or vl.DashVL_Abs >= 1000)) THEN 1 ELSE 0 END)"),
+                                                "fLesserThan1000" => new Expression("SUM(CASE WHEN (vl.patient_gender in('f','Female','F','FEMALE') and (vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' or vl.DashVL_Abs < 1000)) THEN 1 ELSE 0 END)"),
+                                                
                                                 "nsTotal" => new Expression("SUM(CASE WHEN ((vl.patient_gender IS NULL OR vl.patient_gender = '' OR vl.patient_gender ='Not Recorded' OR vl.patient_gender = 'not recorded')) THEN 1 ELSE 0 END)"),
-                                                "nsGreaterThanEqual1000" => new Expression("SUM(CASE WHEN ((vl.patient_gender IS NULL OR vl.patient_gender = '' OR vl.patient_gender ='Not Recorded' OR vl.patient_gender = 'not recorded') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result >= 1000 AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END)"),
-                                                "nsLesserThan1000" => new Expression("SUM(CASE WHEN ((vl.patient_gender IS NULL OR vl.patient_gender = '' OR vl.patient_gender ='Not Recorded' OR vl.patient_gender = 'not recorded') AND (vl.result < 1000 or vl.result = 'Target Not Detected' or vl.result = 'TND' or vl.result = 'tnd' or vl.result= 'Below Detection Level' or vl.result='BDL' or vl.result='bdl' or vl.result= 'Low Detection Level' or vl.result='LDL' or vl.result='ldl') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END)")
+                                                "nsGreaterThanEqual1000" => new Expression("SUM(CASE WHEN ((vl.patient_gender IS NULL OR vl.patient_gender = '' OR vl.patient_gender ='Not Recorded' OR vl.patient_gender = 'not recorded' OR vl.patient_gender = 'Unreported' OR vl.patient_gender = 'unreported') and (vl.DashVL_AnalysisResult like 'not suppressed%' OR vl.DashVL_AnalysisResult like 'Not Suppressed%' or vl.DashVL_Abs >= 1000)) THEN 1 ELSE 0 END)"),
+                                                "nsLesserThan1000" => new Expression("SUM(CASE WHEN ((vl.patient_gender IS NULL OR vl.patient_gender = '' OR vl.patient_gender ='Not Recorded' OR vl.patient_gender = 'not recorded' OR vl.patient_gender = 'Unreported' OR vl.patient_gender = 'unreported') and (vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' or vl.DashVL_Abs < 1000)) THEN 1 ELSE 0 END)"),
                                               )
                                             )
                                    ->where(array("DATE(vl.sample_collection_date) <='$endDate'","DATE(vl.sample_collection_date) >='$startDate'"));
@@ -1338,9 +1343,9 @@ class SampleTable extends AbstractTableGateway {
                 }
             }
             if(isset($params['testResult']) && $params['testResult'] == '<1000'){
-                $query = $query->where("(vl.result < 1000 or vl.result = 'Target Not Detected' or vl.result = 'TND' or vl.result = 'tnd' or vl.result= 'Below Detection Level' or vl.result='BDL' or vl.result='bdl' or vl.result= 'Low Detection Level' or vl.result='LDL' or vl.result='ldl') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00'");
+                $query = $query->where("(vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' or vl.DashVL_Abs < 1000)");
             }else if(isset($params['testResult']) && $params['testResult'] == '>=1000') {
-                $query = $query->where("vl.result IS NOT NULL AND vl.result!= '' AND vl.result >= 1000 AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00'");
+                $query = $query->where("(vl.DashVL_AnalysisResult like 'not suppressed%' OR vl.DashVL_AnalysisResult like 'Not Suppressed%' or vl.DashVL_Abs >= 1000)");
             }
             if(isset($params['sampleTypeId']) && $params['sampleTypeId']!=''){
                 $query = $query->where('vl.sample_type="'.base64_decode(trim($params['sampleTypeId'])).'"');
@@ -1362,7 +1367,7 @@ class SampleTable extends AbstractTableGateway {
                     }else if($age[$a] == '>=50'){
                       $where.= "(vl.patient_age_in_years >= 50)";
                     }else if($age[$a] == 'unknown'){
-                      $where.= "(vl.patient_age_in_years IS NULL OR vl.patient_age_in_years = '' OR vl.patient_age_in_years = 'Unknown' OR vl.patient_age_in_years = 'unknown')";
+                      $where.= "(vl.patient_age_in_years IS NULL OR vl.patient_age_in_years = '' OR vl.patient_age_in_years = 'Unknown' OR vl.patient_age_in_years = 'unknown' OR vl.patient_age_in_years = 'Unreported' OR vl.patient_age_in_years = 'unreported')";
                     }
                 }
               $where = '('.$where.')';
@@ -1376,21 +1381,21 @@ class SampleTable extends AbstractTableGateway {
             }else if(isset($params['gender']) && $params['gender']=='M'){
                 $query = $query->where("vl.patient_gender IN ('m','male','M','MALE')");
             }else if(isset($params['gender']) && $params['gender']=='not_specified'){
-                $query = $query->where("(vl.patient_gender IS NULL OR vl.patient_gender = '' OR vl.patient_gender ='Not Recorded' OR vl.patient_gender = 'not recorded')");
+                $query = $query->where("(vl.patient_gender IS NULL OR vl.patient_gender = '' OR vl.patient_gender ='Not Recorded' OR vl.patient_gender = 'not recorded OR vl.patient_age_in_years = 'Unreported' OR vl.patient_age_in_years = 'unreported')");
             }
             if(isset($params['isPregnant']) && $params['isPregnant']=='yes'){
                 $query = $query->where("vl.is_patient_pregnant = 'yes'");
             }else if(isset($params['isPregnant']) && $params['isPregnant']=='no'){
                 $query = $query->where("vl.is_patient_pregnant = 'no'"); 
             }else if(isset($params['isPregnant']) && $params['isPregnant']=='unreported'){
-                $query = $query->where("(vl.is_patient_pregnant IS NULL OR vl.is_patient_pregnant = '' OR vl.is_patient_pregnant = 'Unreported')"); 
+                $query = $query->where("(vl.is_patient_pregnant IS NULL OR vl.is_patient_pregnant = '' OR vl.is_patient_pregnant = 'Unreported' OR vl.is_patient_pregnant = 'unreported')"); 
             }
             if(isset($params['isBreastfeeding']) && $params['isBreastfeeding']=='yes'){
                 $query = $query->where("vl.is_patient_breastfeeding = 'yes'");
             }else if(isset($params['isBreastfeeding']) && $params['isBreastfeeding']=='no'){
                 $query = $query->where("vl.is_patient_breastfeeding = 'no'"); 
             }else if(isset($params['isBreastfeeding']) && $params['isBreastfeeding']=='unreported'){
-                $query = $query->where("(vl.is_patient_breastfeeding IS NULL OR vl.is_patient_breastfeeding = '' OR vl.is_patient_breastfeeding = 'Unreported')"); 
+                $query = $query->where("(vl.is_patient_breastfeeding IS NULL OR vl.is_patient_breastfeeding = '' OR vl.is_patient_breastfeeding = 'Unreported' OR vl.is_patient_breastfeeding = 'unreported')"); 
             }
             $queryStr = $sql->getSqlStringForSqlObject($query);
             //echo $queryStr;die;
@@ -1443,9 +1448,9 @@ class SampleTable extends AbstractTableGateway {
                 }
             }
             if(isset($params['testResult']) && $params['testResult'] == '<1000'){
-                $rQuery = $rQuery->where("(vl.result < 1000 or vl.result = 'Target Not Detected' or vl.result = 'TND' or vl.result = 'tnd' or vl.result= 'Below Detection Level' or vl.result='BDL' or vl.result='bdl' or vl.result= 'Low Detection Level' or vl.result='LDL' or vl.result='ldl') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00'");
+                $rQuery = $rQuery->where("(vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' or vl.DashVL_Abs < 1000)");
             }else if(isset($params['testResult']) && $params['testResult'] == '>=1000') {
-                $rQuery = $rQuery->where("vl.result IS NOT NULL AND vl.result!= '' AND vl.result >= 1000 AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00'");
+                $rQuery = $rQuery->where("(vl.DashVL_AnalysisResult like 'not suppressed%' OR vl.DashVL_AnalysisResult like 'Not Suppressed%' or vl.DashVL_Abs >= 1000)");
             }
             if(isset($params['sampleTypeId']) && $params['sampleTypeId']!=''){
                 $rQuery = $rQuery->where('vl.sample_type="'.base64_decode(trim($params['sampleTypeId'])).'"');
@@ -1467,7 +1472,7 @@ class SampleTable extends AbstractTableGateway {
                     }else if($age[$a] == '>=50'){
                       $where.= "(vl.patient_age_in_years >= 50)";
                     }else if($age[$a] == 'unknown'){
-                      $where.= "(vl.patient_age_in_years IS NULL OR vl.patient_age_in_years = '' OR vl.patient_age_in_years = 'Unknown' OR vl.patient_age_in_years = 'unknown')";
+                      $where.= "(vl.patient_age_in_years IS NULL OR vl.patient_age_in_years = '' OR vl.patient_age_in_years = 'Unknown' OR vl.patient_age_in_years = 'unknown' OR vl.patient_age_in_years = 'Unreported' OR vl.patient_age_in_years = 'unreported')";
                     }
                 }
               $where = '('.$where.')';
@@ -1481,21 +1486,21 @@ class SampleTable extends AbstractTableGateway {
             }else if(isset($params['gender']) && $params['gender']=='M'){
                 $rQuery = $rQuery->where("vl.patient_gender IN ('m','male','M','MALE')");
             }else if(isset($params['gender']) && $params['gender']=='not_specified'){
-                $rQuery = $rQuery->where("(vl.patient_gender IS NULL OR vl.patient_gender = '' OR vl.patient_gender ='Not Recorded' OR vl.patient_gender = 'not recorded')");
+                $rQuery = $rQuery->where("(vl.patient_gender IS NULL OR vl.patient_gender = '' OR vl.patient_gender ='Not Recorded' OR vl.patient_gender = 'not recorded' OR vl.patient_gender = 'Unreported' OR vl.patient_gender = 'unreported')");
             }
             if(isset($params['isPregnant']) && $params['isPregnant']=='yes'){
                 $rQuery = $rQuery->where("vl.is_patient_pregnant = 'yes'");
             }else if(isset($params['isPregnant']) && $params['isPregnant']=='no'){
                 $rQuery = $rQuery->where("vl.is_patient_pregnant = 'no'"); 
             }else if(isset($params['isPregnant']) && $params['isPregnant']=='unreported'){
-                $rQuery = $rQuery->where("(vl.is_patient_pregnant IS NULL OR vl.is_patient_pregnant = '' OR vl.is_patient_pregnant = 'Unreported')"); 
+                $rQuery = $rQuery->where("(vl.is_patient_pregnant IS NULL OR vl.is_patient_pregnant = '' OR vl.is_patient_pregnant = 'Unreported' OR vl.is_patient_pregnant = 'unreported')"); 
             }
             if(isset($params['isBreastfeeding']) && $params['isBreastfeeding']=='yes'){
                 $rQuery = $rQuery->where("vl.is_patient_breastfeeding = 'yes'");
             }else if(isset($params['isBreastfeeding']) && $params['isBreastfeeding']=='no'){
                 $rQuery = $rQuery->where("vl.is_patient_breastfeeding = 'no'"); 
             }else if(isset($params['isBreastfeeding']) && $params['isBreastfeeding']=='unreported'){
-                $rQuery = $rQuery->where("(vl.is_patient_breastfeeding IS NULL OR vl.is_patient_breastfeeding = '' OR vl.is_patient_breastfeeding = 'Unreported')"); 
+                $rQuery = $rQuery->where("(vl.is_patient_breastfeeding IS NULL OR vl.is_patient_breastfeeding = '' OR vl.is_patient_breastfeeding = 'Unreported' OR vl.is_patient_breastfeeding = 'unreported')"); 
             }
             if(isset($params['testReason'] ) && trim($params['testReason'])!=''){
                 $rQuery = $rQuery->where(array("vl.reason_for_vl_testing ='".base64_decode($params['testReason'])."'")); 
@@ -1545,8 +1550,8 @@ class SampleTable extends AbstractTableGateway {
         /* Array of database columns which should be read and sent back to DataTables. Use a space where
          * you want to insert a non-database field (for example a counter or static image)
         */
-        $aColumns = array('sample_code','facility_name','DATE_FORMAT(sample_collection_date,"%d-%b-%Y")','rejection_reason_name','DATE_FORMAT(sample_testing_date,"%d-%b-%Y")','result');
-        $orderColumns = array('sample_code','facility_name','sample_collection_date','rejection_reason_name','sample_testing_date','result');
+        $aColumns = array('sample_code','facility_name','DATE_FORMAT(sample_collection_date,"%d-%b-%Y")','rejection_reason_name','DATE_FORMAT(sample_tested_datetime,"%d-%b-%Y")','result');
+        $orderColumns = array('sample_code','facility_name','sample_collection_date','rejection_reason_name','sample_tested_datetime','result');
 
         /*
          * Paging
@@ -1631,8 +1636,8 @@ class SampleTable extends AbstractTableGateway {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
-                                ->columns(array('vl_sample_id','sample_code','sampleCollectionDate'=>new Expression('DATE(sample_collection_date)'),'sample_type','sampleTestingDate'=>new Expression('DATE(sample_testing_date)'),'result_value_log','result_value_absolute','result_value_text','result','patient_art_no','patientDOB'=>new Expression('DATE(patient_dob)'),'patient_age_in_years','patient_gender','treatmentInitiateDate'=>new Expression('DATE(treatment_initiated_date)'),'current_regimen','treatmentInitiateCurrentRegimen'=>new Expression('DATE(date_of_initiation_of_current_regimen)'),'is_patient_pregnant','is_patient_breastfeeding','arv_adherance_percentage','request_clinician_name','requestDate'=>new Expression('DATE(request_created_datetime)'),'receivedAtLab'=>new Expression('DATE(sample_received_at_vl_lab_datetime)')))
-				->join(array('f'=>'facility_details'),'f.facility_id=vl.facility_id',array('facility_name','facility_code','facility_district','facility_state'))
+                                ->columns(array('vl_sample_id','sample_code','DashVL_AnalysisResult','DashVL_Abs','sampleCollectionDate'=>new Expression('DATE(sample_collection_date)'),'sample_type','sampleTestingDate'=>new Expression('DATE(sample_tested_datetime)'),'result_value_log','result_value_absolute','result_value_text','result'))
+				->join(array('f'=>'facility_details'),'f.facility_id=vl.facility_id',array('facility_name'))
 				->join(array('r_r_r'=>'r_sample_rejection_reasons'),'r_r_r.rejection_reason_id=vl.reason_for_sample_rejection',array('rejection_reason_name'),'left');
 				//->where(array('f.facility_type'=>'1'));
         if(isset($parameters['sampleCollectionDate']) && trim($parameters['sampleCollectionDate'])!= ''){
@@ -1647,9 +1652,9 @@ class SampleTable extends AbstractTableGateway {
             }
         }
         if(isset($parameters['testResult']) && $parameters['testResult'] == '<1000'){
-            $sQuery = $sQuery->where("(vl.result < 1000 or vl.result = 'Target Not Detected' or vl.result = 'TND' or vl.result = 'tnd' or vl.result= 'Below Detection Level' or vl.result='BDL' or vl.result='bdl' or vl.result= 'Low Detection Level' or vl.result='LDL' or vl.result='ldl') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00'");
+            $sQuery = $sQuery->where("(vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' or vl.DashVL_Abs < 1000)");
         }else if(isset($parameters['testResult']) && $parameters['testResult'] == '>=1000') {
-            $sQuery = $sQuery->where("vl.result IS NOT NULL AND vl.result!= '' AND vl.result >= 1000 AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00'");
+            $sQuery = $sQuery->where("vl.DashVL_AnalysisResult like 'not suppressed%' OR vl.DashVL_AnalysisResult like 'Not Suppressed%' or vl.DashVL_Abs >= 1000");
         }
         if(isset($parameters['sampleTypeId'] ) && trim($parameters['sampleTypeId'])!=''){
             $sQuery = $sQuery->where('vl.sample_type="'.base64_decode(trim($parameters['sampleTypeId'])).'"');
@@ -1671,7 +1676,7 @@ class SampleTable extends AbstractTableGateway {
                 }else if($age[$a] == '>=50'){
                   $where.= "(vl.patient_age_in_years >= 50)";
                 }else if($age[$a] == 'unknown'){
-                  $where.= "(vl.patient_age_in_years IS NULL OR vl.patient_age_in_years = '' OR vl.patient_age_in_years = 'Unknown' OR vl.patient_age_in_years = 'unknown')";
+                  $where.= "(vl.patient_age_in_years IS NULL OR vl.patient_age_in_years = '' OR vl.patient_age_in_years = 'Unknown' OR vl.patient_age_in_years = 'unknown' OR vl.patient_age_in_years = 'Unreported' OR vl.patient_age_in_years = 'unreported')";
                 }
             }
           $where = '('.$where.')';
@@ -1685,28 +1690,28 @@ class SampleTable extends AbstractTableGateway {
         }else if(isset($parameters['gender']) && $parameters['gender']=='M'){
             $sQuery = $sQuery->where("vl.patient_gender IN ('m','male','M','MALE')");
         }else if(isset($parameters['gender']) && $parameters['gender']=='not_specified'){
-            $sQuery = $sQuery->where("(vl.patient_gender IS NULL OR vl.patient_gender = '' OR vl.patient_gender ='Not Recorded' OR vl.patient_gender = 'not recorded')");
+            $sQuery = $sQuery->where("(vl.patient_gender IS NULL OR vl.patient_gender = '' OR vl.patient_gender ='Not Recorded' OR vl.patient_gender = 'not recorded' OR vl.patient_gender = 'unreported' OR vl.patient_gender = 'Unreported')");
         }
         if(isset($parameters['isPregnant']) && $parameters['isPregnant']=='yes'){
             $sQuery = $sQuery->where("vl.is_patient_pregnant = 'yes'");
         }else if(isset($parameters['isPregnant']) && $parameters['isPregnant']=='no'){
             $sQuery = $sQuery->where("vl.is_patient_pregnant = 'no'"); 
         }else if(isset($parameters['isPregnant']) && $parameters['isPregnant']=='unreported'){
-            $sQuery = $sQuery->where("(vl.is_patient_pregnant IS NULL OR vl.is_patient_pregnant = '' OR vl.is_patient_pregnant = 'Unreported')"); 
+            $sQuery = $sQuery->where("(vl.is_patient_pregnant IS NULL OR vl.is_patient_pregnant = '' OR vl.is_patient_pregnant = 'Unreported' OR vl.is_patient_pregnant = 'unreported')"); 
         }
         if(isset($parameters['isBreastfeeding']) && $parameters['isBreastfeeding']=='yes'){
             $sQuery = $sQuery->where("vl.is_patient_breastfeeding = 'yes'");
         }else if(isset($parameters['isBreastfeeding']) && $parameters['isBreastfeeding']=='no'){
             $sQuery = $sQuery->where("vl.is_patient_breastfeeding = 'no'"); 
         }else if(isset($parameters['isBreastfeeding']) && $parameters['isBreastfeeding']=='unreported'){
-            $sQuery = $sQuery->where("(vl.is_patient_breastfeeding IS NULL OR vl.is_patient_breastfeeding = '' OR vl.is_patient_breastfeeding = 'Unreported')"); 
+            $sQuery = $sQuery->where("(vl.is_patient_breastfeeding IS NULL OR vl.is_patient_breastfeeding = '' OR vl.is_patient_breastfeeding = 'Unreported' OR vl.is_patient_breastfeeding = 'unreported')"); 
         }
         if(isset($parameters['sampleStatus']) && $parameters['sampleStatus'] == 'result'){
-            $sQuery = $sQuery->where("((vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') OR (vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0))");
+            $sQuery = $sQuery->where("(vl.DashVL_AnalysisResult is NOT NULL AND vl.DashVL_AnalysisResult !='' AND vl.DashVL_AnalysisResult !='Rejected')");
         }else if(isset($parameters['sampleStatus']) && $parameters['sampleStatus'] == 'noresult') {
-            $sQuery = $sQuery->where("(vl.result IS NULL OR vl.result = '' OR vl.result = 'NULL' OR sample_tested_datetime is null OR sample_tested_datetime = '' OR DATE(sample_tested_datetime) ='1970-01-01' OR DATE(sample_tested_datetime) ='0000-00-00') AND (vl.reason_for_sample_rejection IS NULL OR vl.reason_for_sample_rejection = '' OR vl.reason_for_sample_rejection = 0)");
+            $sQuery = $sQuery->where("(vl.DashVL_AnalysisResult is NULL OR vl.DashVL_AnalysisResult ='')");
         }else if(isset($parameters['sampleStatus']) && $parameters['sampleStatus'] == 'rejected') {
-            $sQuery = $sQuery->where("vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0");
+            $sQuery = $sQuery->where("vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0 OR vl.DashVL_AnalysisResult = 'Rejected'");
         }
         if (isset($sWhere) && $sWhere != "") {
             $sQuery->where($sWhere);
@@ -1744,7 +1749,7 @@ class SampleTable extends AbstractTableGateway {
 
         /* Total data set length */
         $iQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
-                                ->columns(array('vl_sample_id','sample_code','sampleCollectionDate'=>new Expression('DATE(sample_collection_date)'),'sample_type','sampleTestingDate'=>new Expression('DATE(sample_testing_date)'),'result_value_log','result_value_absolute','result_value_text','result'))
+                                ->columns(array('vl_sample_id'))
 				->join(array('f'=>'facility_details'),'f.facility_id=vl.facility_id',array('facility_name'))
                                 ->join(array('r_r_r'=>'r_sample_rejection_reasons'),'r_r_r.rejection_reason_id=vl.reason_for_sample_rejection',array('rejection_reason_name'),'left');
 				//->where(array('f.facility_type'=>'1'));
@@ -1782,10 +1787,11 @@ class SampleTable extends AbstractTableGateway {
             $row[] = $sampleCollectionDate;
             $row[] = (isset($aRow['rejection_reason_name']))?ucwords($aRow['rejection_reason_name']):'';
             $row[] = $sampleTestedDate;
-	    $row[] = $aRow['result'];
-	    $row[]='<a href="/clinics/test-result-view/'.base64_encode($aRow['vl_sample_id']).'" class="btn btn-primary btn-xs" target="_blank">'.$viewText.'</a>&nbsp;&nbsp;<a href="javascript:void(0);" class="btn btn-danger btn-xs" style="'.$pdfButtCss.'" onclick="generateResultPDF('.$aRow['vl_sample_id'].');">'.$pdfText.'</a>';
+            $row[] = $aRow['result'];
+            $row[]='<a href="/clinics/test-result-view/'.base64_encode($aRow['vl_sample_id']).'" class="btn btn-primary btn-xs" target="_blank">'.$viewText.'</a>&nbsp;&nbsp;<a href="javascript:void(0);" class="btn btn-danger btn-xs" style="'.$pdfButtCss.'" onclick="generateResultPDF('.$aRow['vl_sample_id'].');">'.$pdfText.'</a>';
             $output['aaData'][] = $row;
         }
+
        return $output;
     }
     
@@ -1796,6 +1802,8 @@ class SampleTable extends AbstractTableGateway {
         $sql = new Sql($dbAdapter);
         $result = array();
         $common = new CommonService($this->sm);
+        $this->dbsId = 8;
+        $this->plasmaId = 19;        
         if(isset($params['sampleCollectionDate']) && trim($params['sampleCollectionDate'])!= ''){
             $s_c_date = explode("to", $params['sampleCollectionDate']);
             if (isset($s_c_date[0]) && trim($s_c_date[0]) != "") {
@@ -1809,11 +1817,11 @@ class SampleTable extends AbstractTableGateway {
                                                     //"total" => new Expression('COUNT(*)'),
                                                     "day" => new Expression("DATE_FORMAT(DATE(sample_collection_date), '%d-%b-%Y')"),
                                                     
-                                                    "DBSGreaterThan1000" => new Expression("SUM(CASE WHEN (vl.sample_type=2 AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result >= 1000 AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END)"),
-                                                    "DBSLesserThan1000" => new Expression("SUM(CASE WHEN (vl.sample_type=2 AND (vl.result < 1000 or vl.result = 'Target Not Detected' or vl.result = 'TND' or vl.result = 'tnd' or vl.result= 'Below Detection Level' or vl.result='BDL' or vl.result='bdl' or vl.result= 'Low Detection Level' or vl.result='LDL' or vl.result='ldl') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END)"),
+                                                    "DBSGreaterThan1000" => new Expression("SUM(CASE WHEN (vl.sample_type=$this->dbsId AND (vl.DashVL_AnalysisResult like 'not%' OR vl.DashVL_AnalysisResult like 'Not%' or vl.DashVL_Abs >= 1000)) THEN 1 ELSE 0 END)"),
+                                                    "DBSLesserThan1000" => new Expression("SUM(CASE WHEN (vl.sample_type=$this->dbsId AND (vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' or vl.DashVL_Abs < 1000)) THEN 1 ELSE 0 END)"),
                                                    
-                                                    "OGreaterThan1000" => new Expression("SUM(CASE WHEN (vl.sample_type!=2 AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result >= 1000 AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END)"),
-                                                    "OLesserThan1000" => new Expression("SUM(CASE WHEN (vl.sample_type!=2 AND (vl.result < 1000 or vl.result = 'Target Not Detected' or vl.result = 'TND' or vl.result = 'tnd' or vl.result= 'Below Detection Level' or vl.result='BDL' or vl.result='bdl' or vl.result= 'Low Detection Level' or vl.result='LDL' or vl.result='ldl') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END)")
+                                                    "OGreaterThan1000" => new Expression("SUM(CASE WHEN (vl.sample_type!=$this->dbsId AND (vl.DashVL_AnalysisResult like 'not%' OR vl.DashVL_AnalysisResult like 'Not%' or vl.DashVL_Abs >= 1000)) THEN 1 ELSE 0 END)"),
+                                                    "OLesserThan1000" => new Expression("SUM(CASE WHEN (vl.sample_type!=$this->dbsId AND (vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' or vl.DashVL_Abs < 1000)) THEN 1 ELSE 0 END)"),
                                               )
                                             )
                                       ->where(array("DATE(vl.sample_collection_date) <='$endDate'", "DATE(vl.sample_collection_date) >='$startDate'"));
@@ -1826,15 +1834,15 @@ class SampleTable extends AbstractTableGateway {
                 }
             }
             if(isset($params['testResult']) && $params['testResult'] == '<1000'){
-                $queryStr = $queryStr->where("(vl.result < 1000 or vl.result = 'Target Not Detected' or vl.result = 'TND' or vl.result = 'tnd' or vl.result= 'Below Detection Level' or vl.result='BDL' or vl.result='bdl' or vl.result= 'Low Detection Level' or vl.result='LDL' or vl.result='ldl') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00'");
+                $queryStr = $queryStr->where("(vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' or vl.DashVL_Abs < 1000)");
             }else if(isset($params['testResult']) && $params['testResult'] == '>=1000') {
-                $queryStr = $queryStr->where("vl.result IS NOT NULL AND vl.result!= '' AND vl.result >= 1000 AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00'");
+                $queryStr = $queryStr->where("(vl.DashVL_AnalysisResult like 'not%' OR vl.DashVL_AnalysisResult like 'Not%' or vl.DashVL_Abs >= 1000)");
             }
             if(isset($params['frmSrc']) && $params['frmSrc'] =='change'){
                 if(isset($params['sampleType']) && $params['sampleType'] == 'dbs'){
-                    $queryStr = $queryStr->where('vl.sample_type IN(2)');
+                    $queryStr = $queryStr->where("vl.sample_type = $this->dbsId");
                 }else if(isset($params['sampleType']) && $params['sampleType'] == 'others'){
-                    $queryStr = $queryStr->where('vl.sample_type NOT IN(2)');
+                    $queryStr = $queryStr->where("vl.sample_type != $this->dbsId");
                 }
             }else if(isset($params['sampleTypeId']) && $params['sampleTypeId']!=''){
                 $queryStr = $queryStr->where('vl.sample_type="'.base64_decode(trim($params['sampleTypeId'])).'"');
@@ -1935,7 +1943,7 @@ class SampleTable extends AbstractTableGateway {
                                                 ->join(array('f'=>'facility_details'),'f.facility_id=vl.lab_id',array())
                                                 ->where('vl.lab_id="'.$facility['facility_id'].'"');
                     if(!isset($params['fromSrc'])){
-                        $countQuery = $countQuery->where('vl.result IS NOT NULL AND vl.result!= "" AND sample_tested_datetime is not null AND sample_tested_datetime != "" AND DATE(sample_tested_datetime) !="1970-01-01" AND DATE(sample_tested_datetime) !="0000-00-00"');
+                        $countQuery = $countQuery->where('(vl.DashVL_AnalysisResult IS NOT NULL AND vl.DashVL_AnalysisResult!= "")');
                     }
                     if(trim($params['fromDate'])!= '' && trim($params['toDate'])!= ''){
                         $countQuery = $countQuery->where(array("vl.sample_collection_date >='" . $startMonth ." 00:00:00". "'", "vl.sample_collection_date <='" .$endMonth." 23:59:59". "'"));
@@ -1979,17 +1987,17 @@ class SampleTable extends AbstractTableGateway {
                       $countQuery = $countQuery->where($where);
                     }
                     if(isset($params['testResult']) && $params['testResult'] == '<1000'){
-                      $countQuery = $countQuery->where("(vl.result < 1000 or vl.result = 'Target Not Detected' or vl.result = 'TND' or vl.result = 'tnd' or vl.result= 'Below Detection Level' or vl.result='BDL' or vl.result='bdl' or vl.result= 'Low Detection Level' or vl.result='LDL' or vl.result='ldl') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00'");
+                      $countQuery = $countQuery->where("(vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' or vl.DashVL_Abs < 1000)");
                     }else if(isset($params['testResult']) && $params['testResult'] == '>=1000') {
-                      $countQuery = $countQuery->where("vl.result IS NOT NULL AND vl.result!= '' AND vl.result >= 1000 AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00'");
+                      $countQuery = $countQuery->where("(vl.DashVL_AnalysisResult like 'not%' OR vl.DashVL_AnalysisResult like 'Not%' or vl.DashVL_Abs >= 1000)");
                     }
                     if(isset($params['sampleType']) && trim($params['sampleType'])!=''){
                         $countQuery = $countQuery->where('vl.sample_type="'.base64_decode(trim($params['sampleType'])).'"');
                     }
                     if(isset($params['sampleStatus']) && $params['sampleStatus'] == 'sample_tested'){
-                        $countQuery = $countQuery->where("((vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') OR (vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0))");
+                        $countQuery = $countQuery->where("((vl.DashVL_AnalysisResult IS NOT NULL AND vl.DashVL_AnalysisResult != '' AND vl.DashVL_AnalysisResult != 'NULL') OR (vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0))");
                     }else if(isset($params['sampleStatus']) && $params['sampleStatus'] == 'samples_not_tested') {
-                        $countQuery = $countQuery->where("(vl.result IS NULL OR vl.result = '' OR vl.result = 'NULL' OR sample_tested_datetime is null OR sample_tested_datetime = '' OR DATE(sample_tested_datetime) ='1970-01-01' OR DATE(sample_tested_datetime) ='0000-00-00') AND (vl.reason_for_sample_rejection IS NULL OR vl.reason_for_sample_rejection = '' OR vl.reason_for_sample_rejection = 0)");
+                        $countQuery = $countQuery->where("(vl.DashVL_AnalysisResult IS NULL OR vl.DashVL_AnalysisResult = '' OR vl.DashVL_AnalysisResult = 'NULL') AND (vl.reason_for_sample_rejection IS NULL OR vl.reason_for_sample_rejection = '' OR vl.reason_for_sample_rejection = 0)");
                     }else if(isset($params['sampleStatus']) && $params['sampleStatus'] == 'sample_rejected') {
                         $countQuery = $countQuery->where("vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0");
                     }
@@ -2106,17 +2114,17 @@ class SampleTable extends AbstractTableGateway {
                       $countQuery = $countQuery->where($where);
                     }
                     if(isset($params['testResult']) && $params['testResult'] == '<1000'){
-                      $countQuery = $countQuery->where("(vl.result < 1000 or vl.result = 'Target Not Detected' or vl.result = 'TND' or vl.result = 'tnd' or vl.result= 'Below Detection Level' or vl.result='BDL' or vl.result='bdl' or vl.result= 'Low Detection Level' or vl.result='LDL' or vl.result='ldl') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00'");
+                      $countQuery = $countQuery->where("(vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' or vl.DashVL_Abs < 1000)");
                     }else if(isset($params['testResult']) && $params['testResult'] == '>=1000') {
-                      $countQuery = $countQuery->where("vl.result IS NOT NULL AND vl.result!= '' AND vl.result >= 1000 AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00'");
+                      $countQuery = $countQuery->where("(vl.DashVL_AnalysisResult like 'not%' OR vl.DashVL_AnalysisResult like 'Not%' or vl.DashVL_Abs >= 1000)");
                     }
                     if(isset($params['sampleType']) && trim($params['sampleType'])!=''){
                         $countQuery = $countQuery->where('vl.sample_type="'.base64_decode(trim($params['sampleType'])).'"');
                     }
                     if(isset($params['sampleStatus']) && $params['sampleStatus'] == 'sample_tested'){
-                        $countQuery = $countQuery->where("((vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') OR (vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0))");
+                        $countQuery = $countQuery->where("((vl.DashVL_AnalysisResult IS NOT NULL AND vl.DashVL_AnalysisResult != '' AND vl.DashVL_AnalysisResult != 'NULL') OR (vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0))");
                     }else if(isset($params['sampleStatus']) && $params['sampleStatus'] == 'samples_not_tested') {
-                        $countQuery = $countQuery->where("(vl.result IS NULL OR vl.result = '' OR vl.result = 'NULL' OR sample_tested_datetime is null OR sample_tested_datetime = '' OR DATE(sample_tested_datetime) ='1970-01-01' OR DATE(sample_tested_datetime) ='0000-00-00') AND (vl.reason_for_sample_rejection IS NULL OR vl.reason_for_sample_rejection = '' OR vl.reason_for_sample_rejection = 0)");
+                        $countQuery = $countQuery->where("(vl.DashVL_AnalysisResult IS NULL OR vl.DashVL_AnalysisResult = '' OR vl.DashVL_AnalysisResult = 'NULL') AND (vl.reason_for_sample_rejection IS NULL OR vl.reason_for_sample_rejection = '' OR vl.reason_for_sample_rejection = 0)");
                     }else if(isset($params['sampleStatus']) && $params['sampleStatus'] == 'sample_rejected') {
                         $countQuery = $countQuery->where("vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0");
                     }
@@ -2152,9 +2160,9 @@ class SampleTable extends AbstractTableGateway {
                     }
                     $cQueryStr = $sql->getSqlStringForSqlObject($countQuery);
                     //echo $cQueryStr;die;
-                    $lessResult = $dbAdapter->query($cQueryStr." AND ((vl.result < 1000 or vl.result = 'Target Not Detected' or vl.result = 'TND' or vl.result = 'tnd' or vl.result= 'Below Detection Level' or vl.result='BDL' or vl.result='bdl' or vl.result= 'Low Detection Level' or vl.result='LDL' or vl.result='ldl') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')", $dbAdapter::QUERY_MODE_EXECUTE)->current();
+                    $lessResult = $dbAdapter->query($cQueryStr." AND (vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' or vl.DashVL_Abs < 1000)", $dbAdapter::QUERY_MODE_EXECUTE)->current();
                     $result['sample']['Suppressed'][$j] = $lessResult->total;
-                    $greaterResult = $dbAdapter->query($cQueryStr." AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result >= 1000 AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00'", $dbAdapter::QUERY_MODE_EXECUTE)->current();
+                    $greaterResult = $dbAdapter->query($cQueryStr." AND (vl.DashVL_AnalysisResult like 'not%' OR vl.DashVL_AnalysisResult like 'Not%' or vl.DashVL_Abs >= 1000)", $dbAdapter::QUERY_MODE_EXECUTE)->current();
                     $result['sample']['Not Suppressed'][$j] = $greaterResult->total;
                     $rejectionResult = $dbAdapter->query($cQueryStr." AND vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0", $dbAdapter::QUERY_MODE_EXECUTE)->current();
                     $result['sample']['Rejected'][$j] = $rejectionResult->total;
@@ -2171,14 +2179,16 @@ class SampleTable extends AbstractTableGateway {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = array();
+        $this->dbsId = 8;
+        $this->plasmaId = 19;           
         $common = new CommonService($this->sm);
         if(trim($params['fromDate'])!= '' && trim($params['toDate'])!= ''){
             $startMonth = date("Y-m", strtotime(trim($params['fromDate'])))."-01";
             $endMonth = date("Y-m", strtotime(trim($params['toDate'])))."-31";
             $sQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
                                     ->columns(array(
-                                                    "DBS" => new Expression("SUM(CASE WHEN (vl.sample_type=2 AND (((vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL') AND (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) OR (vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0))) THEN 1 ELSE 0 END)"),
-                                                    "Others" => new Expression("SUM(CASE WHEN (vl.sample_type!=2 AND (((vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL') AND (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) OR (vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0))) THEN 1 ELSE 0 END)"),
+                                                    "DBS" => new Expression("SUM(CASE WHEN ((vl.sample_type=$this->dbsId AND (vl.DashVL_AnalysisResult IS NOT NULL AND vl.DashVL_AnalysisResult != '' AND vl.DashVL_AnalysisResult != 'NULL') OR (vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0))) THEN 1 ELSE 0 END)"),
+                                                    "Others" => new Expression("SUM(CASE WHEN ((vl.sample_type!=$this->dbsId AND (vl.DashVL_AnalysisResult IS NOT NULL AND vl.DashVL_AnalysisResult != '' AND vl.DashVL_AnalysisResult != 'NULL') OR (vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0))) THEN 1 ELSE 0 END)"),
                                               )
                                             )
                                     ->join(array('f'=>'facility_details'),'f.facility_id=vl.lab_id',array(),'left')
@@ -2591,13 +2601,8 @@ class SampleTable extends AbstractTableGateway {
         /* Total data set length */
         $iQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
                                 ->columns(array(
-                                                'sampleCollectionDate'=>new Expression('DATE(sample_collection_date)'),
-                                                "total_samples_received" => new Expression("(COUNT(*))"),
-                                                "total_samples_tested" => new Expression("(SUM(CASE WHEN (((vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL') AND (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) OR (vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0)) THEN 1 ELSE 0 END))"),
-                                                "total_samples_pending" => new Expression("(SUM(CASE WHEN ((vl.result IS NULL OR vl.result = '' OR vl.result = 'NULL' OR sample_tested_datetime is null OR sample_tested_datetime = '' OR DATE(sample_tested_datetime) ='1970-01-01' OR DATE(sample_tested_datetime) ='0000-00-00') AND (vl.reason_for_sample_rejection IS NULL OR vl.reason_for_sample_rejection = '' OR vl.reason_for_sample_rejection = 0)) THEN 1 ELSE 0 END))"),
-                                                "suppressed_samples" => new Expression("SUM(CASE WHEN ((vl.result < 1000 or vl.result = 'Target Not Detected' or vl.result = 'TND' or vl.result = 'tnd' or vl.result= 'Below Detection Level' or vl.result='BDL' or vl.result='bdl' or vl.result= 'Low Detection Level' or vl.result='LDL' or vl.result='ldl' or vl.result like '%baixo%' or vl.result like 'Negative' or vl.result like 'NEGAT' or vl.result like 'Indeterminado' or vl.result like 'NON DETECTEE' or vl.result like '<40' or vl.result like '< 40' or vl.result like '<20' or vl.result like'< 20') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END)"),
-                                                "not_suppressed_samples" => new Expression("SUM(CASE WHEN (vl.result IS NOT NULL AND vl.result!= '' AND vl.result >= 1000 AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END)"),
-                                                "rejected_samples" => new Expression("SUM(CASE WHEN (vl.reason_for_sample_rejection !='' AND vl.reason_for_sample_rejection !='0' AND vl.reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END)")
+                                                
+                                                "total_samples_received" => new Expression("(COUNT(*))")
                                 ))
 				->join(array('f'=>'facility_details'),'f.facility_id=vl.facility_id',array('facility_name'))
 				->join(array('rs'=>'r_sample_type'),'rs.sample_id=vl.sample_type',array('sample_name'))
@@ -2855,12 +2860,7 @@ class SampleTable extends AbstractTableGateway {
         /* Total data set length */
         $iQuery = $sql->select()->from(array('f'=>'facility_details'))
                                 ->join(array('vl'=>'dash_vl_request_form'),'vl.lab_id=f.facility_id',array(
-                                                                                                            "total_samples_received" => new Expression("(COUNT(*))"),
-                                                                                                            "total_samples_tested" => new Expression("(SUM(CASE WHEN (((vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL') AND (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) OR (vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0)) THEN 1 ELSE 0 END))"),
-                                                                                                            "total_samples_pending" => new Expression("(SUM(CASE WHEN ((vl.result IS NULL OR vl.result = '' OR vl.result = 'NULL' OR sample_tested_datetime is null OR sample_tested_datetime = '' OR DATE(sample_tested_datetime) ='1970-01-01' OR DATE(sample_tested_datetime) ='0000-00-00') AND (vl.reason_for_sample_rejection IS NULL OR vl.reason_for_sample_rejection = '' OR vl.reason_for_sample_rejection = 0)) THEN 1 ELSE 0 END))"),
-                                                                                                            "suppressed_samples" => new Expression("SUM(CASE WHEN ((vl.result < 1000 or vl.result = 'Target Not Detected' or vl.result = 'TND' or vl.result = 'tnd' or vl.result= 'Below Detection Level' or vl.result='BDL' or vl.result='bdl' or vl.result= 'Low Detection Level' or vl.result='LDL' or vl.result='ldl' or vl.result like '%baixo%' or vl.result like 'Negative' or vl.result like 'NEGAT' or vl.result like 'Indeterminado' or vl.result like 'NON DETECTEE' or vl.result like '<40' or vl.result like '< 40' or vl.result like '<20' or vl.result like'< 20') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END)"),
-                                                                                                            "not_suppressed_samples" => new Expression("SUM(CASE WHEN (vl.result IS NOT NULL AND vl.result!= '' AND vl.result >= 1000 AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END)"),
-                                                                                                            "rejected_samples" => new Expression("SUM(CASE WHEN (vl.reason_for_sample_rejection !='' AND vl.reason_for_sample_rejection !='0' AND vl.reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END)")
+                                                                                                            "total_samples_received" => new Expression("(COUNT(*))")
                                                                                                             ))
                                 ->where("sample_collection_date is not null AND sample_collection_date != '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00' AND vl.lab_id !=0")
                                 ->group('vl.lab_id');
@@ -3061,14 +3061,8 @@ class SampleTable extends AbstractTableGateway {
         /* Total data set length */
         $iQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
                                 ->columns(array(
-                                                "monthDate" => new Expression("DATE_FORMAT(DATE(sample_collection_date), '%b-%Y')"),
-                                                "total_samples_received" => new Expression("(COUNT(*))"),
-                                                "total_samples_tested" => new Expression("(SUM(CASE WHEN (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END))"),
-                                                "total_samples_pending" => new Expression("(SUM(CASE WHEN (sample_tested_datetime is null OR sample_tested_datetime = '' OR DATE(sample_tested_datetime) ='1970-01-01' OR DATE(sample_tested_datetime) ='0000-00-00' OR DATE(sample_tested_datetime) ='0') THEN 1 ELSE 0 END))"),
-                                                "suppressed_samples" => new Expression("SUM(CASE WHEN (vl.result < 1000 or vl.result='Target Not Detected') THEN 1 ELSE 0 END)"),
-                                                "not_suppressed_samples" => new Expression("SUM(CASE WHEN (vl.result >= 1000) THEN 1 ELSE 0 END)"),
-                                                "rejected_samples" => new Expression("SUM(CASE WHEN (vl.reason_for_sample_rejection !='' AND vl.reason_for_sample_rejection !='0' AND vl.reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END)"),
-                                                "AvgDiff" => new Expression("CAST(ABS(AVG(TIMESTAMPDIFF(DAY,sample_tested_datetime,sample_collection_date))) AS DECIMAL (10,2))")
+                                                
+                                                "total_samples_received" => new Expression("(COUNT(*))")
                                               )
                                             )
                                 ->join(array('f'=>'facility_details'),'f.facility_id=vl.lab_id',array(),'left');
@@ -3126,7 +3120,7 @@ class SampleTable extends AbstractTableGateway {
             foreach($pResult as $province){
                 $countQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
                                   ->columns(
-                                            array("total" => new Expression("SUM(CASE WHEN (((result is NULL OR result ='' OR sample_tested_datetime is null OR sample_tested_datetime = '' OR DATE(sample_tested_datetime) ='1970-01-01' OR DATE(sample_tested_datetime) ='0000-00-00') AND (reason_for_sample_rejection is NULL or reason_for_sample_rejection ='' or vl.reason_for_sample_rejection = 0))) THEN 1
+                                            array("total" => new Expression("SUM(CASE WHEN (((vl.DashVL_AnalysisResult is NULL OR vl.DashVL_AnalysisResult = '') AND (reason_for_sample_rejection is NULL or reason_for_sample_rejection ='' or vl.reason_for_sample_rejection = 0))) THEN 1
                                                                                      ELSE 0
                                                                                      END)")))
                                   ->join(array('f'=>'facility_details'),'f.facility_id=vl.lab_id',array())
@@ -3174,7 +3168,7 @@ class SampleTable extends AbstractTableGateway {
                         }else if($age[$a] == '>=50'){
                           $where.= "(vl.patient_age_in_years >= 50)";
                         }else if($age[$a] == 'unknown'){
-                          $where.= "(vl.patient_age_in_years IS NULL OR vl.patient_age_in_years = '' OR vl.patient_age_in_years = 'Unknown' OR vl.patient_age_in_years = 'unknown')";
+                          $where.= "(vl.patient_age_in_years IS NULL OR vl.patient_age_in_years = '' OR vl.patient_age_in_years = 'Unknown' OR vl.patient_age_in_years = 'unknown' OR vl.patient_age_in_years = 'unreported' OR vl.patient_age_in_years = 'Unreported')";
                         }
                     }
                   $where = '('.$where.')';
@@ -3189,21 +3183,21 @@ class SampleTable extends AbstractTableGateway {
                 }else if(isset($params['gender']) && $params['gender']=='M'){
                     $countQuery = $countQuery->where("vl.patient_gender IN ('m','male','M','MALE')");
                 }else if(isset($params['gender']) && $params['gender']=='not_specified'){
-                    $countQuery = $countQuery->where("(vl.patient_gender IS NULL OR vl.patient_gender = '' OR vl.patient_gender ='Not Recorded' OR vl.patient_gender = 'not recorded')");
+                    $countQuery = $countQuery->where("(vl.patient_gender IS NULL OR vl.patient_gender = '' OR vl.patient_gender ='Not Recorded' OR vl.patient_gender = 'not recorded' OR vl.patient_gender = 'Unreported' OR vl.patient_gender = 'unreported')");
                 }
                 if(isset($params['isPregnant']) && $params['isPregnant']=='yes'){
                     $countQuery = $countQuery->where("vl.is_patient_pregnant = 'yes'");
                 }else if(isset($params['isPregnant']) && $params['isPregnant']=='no'){
                     $countQuery = $countQuery->where("vl.is_patient_pregnant = 'no'");
                 }else if(isset($params['isPregnant']) && $params['isPregnant']=='unreported'){
-                    $countQuery = $countQuery->where("(vl.is_patient_pregnant IS NULL OR vl.is_patient_pregnant = '' OR vl.is_patient_pregnant = 'Unreported')"); 
+                    $countQuery = $countQuery->where("(vl.is_patient_pregnant IS NULL OR vl.is_patient_pregnant = '' OR vl.is_patient_pregnant = 'Unreported' OR vl.is_patient_pregnant = 'unreported')"); 
                 }
                 if(isset($params['isBreastfeeding']) && $params['isBreastfeeding']=='yes'){
                     $countQuery = $countQuery->where("vl.is_patient_breastfeeding = 'yes'");
                 }else if(isset($params['isBreastfeeding']) && $params['isBreastfeeding']=='no'){
                     $countQuery = $countQuery->where("vl.is_patient_breastfeeding = 'no'"); 
                 }else if(isset($params['isBreastfeeding']) && $params['isBreastfeeding']=='unreported'){
-                    $countQuery = $countQuery->where("(vl.is_patient_breastfeeding IS NULL OR vl.is_patient_breastfeeding = '' OR vl.is_patient_breastfeeding = 'Unreported')"); 
+                    $countQuery = $countQuery->where("(vl.is_patient_breastfeeding IS NULL OR vl.is_patient_breastfeeding = '' OR vl.is_patient_breastfeeding = 'Unreported' OR vl.is_patient_breastfeeding = 'unreported')"); 
                 }
                 $countQueryStr = $sql->getSqlStringForSqlObject($countQuery);
                 //echo $countQueryStr;die;
@@ -3244,7 +3238,7 @@ class SampleTable extends AbstractTableGateway {
             foreach($labResult as $lab){
                 $countQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
                                   ->columns(
-                                             array("total" => new Expression("SUM(CASE WHEN (((result is NULL OR result ='' OR sample_tested_datetime is null OR sample_tested_datetime = '' OR DATE(sample_tested_datetime) ='1970-01-01' OR DATE(sample_tested_datetime) ='0000-00-00') AND (reason_for_sample_rejection is NULL or reason_for_sample_rejection ='' or vl.reason_for_sample_rejection = 0))) THEN 1
+                                             array("total" => new Expression("SUM(CASE WHEN (((vl.DashVL_AnalysisResult is NULL OR vl.DashVL_AnalysisResult ='') AND (reason_for_sample_rejection is NULL or reason_for_sample_rejection ='' or vl.reason_for_sample_rejection = 0))) THEN 1
                                                                                  ELSE 0
                                                                                  END)")))
                                   ->join(array('f'=>'facility_details'),'f.facility_id=vl.lab_id',array())
@@ -3287,7 +3281,7 @@ class SampleTable extends AbstractTableGateway {
                         }else if($age[$a] == '>=50'){
                           $where.= "(vl.patient_age_in_years >= 50)";
                         }else if($age[$a] == 'unknown'){
-                          $where.= "(vl.patient_age_in_years IS NULL OR vl.patient_age_in_years = '' OR vl.patient_age_in_years = 'Unknown' OR vl.patient_age_in_years = 'unknown')";
+                          $where.= "(vl.patient_age_in_years IS NULL OR vl.patient_age_in_years = '' OR vl.patient_age_in_years = 'Unknown' OR vl.patient_age_in_years = 'unknown' OR vl.patient_age_in_years = 'Unreported' OR vl.patient_age_in_years = 'unreported')";
                         }
                     }
                   $where = '('.$where.')';
@@ -3302,21 +3296,21 @@ class SampleTable extends AbstractTableGateway {
                 }else if(isset($params['gender']) && $params['gender']=='M'){
                     $countQuery = $countQuery->where("vl.patient_gender IN ('m','male','M','MALE')");
                 }else if(isset($params['gender']) && $params['gender']=='not_specified'){
-                    $countQuery = $countQuery->where("(vl.patient_gender IS NULL OR vl.patient_gender = '' OR vl.patient_gender ='Not Recorded' OR vl.patient_gender = 'not recorded')");
+                    $countQuery = $countQuery->where("(vl.patient_gender IS NULL OR vl.patient_gender = '' OR vl.patient_gender ='Not Recorded' OR vl.patient_gender = 'not recorded' OR vl.patient_gender = 'unreported' OR vl.patient_gender = 'Unreported')");
                 }
                 if(isset($params['isPregnant']) && $params['isPregnant']=='yes'){
                     $countQuery = $countQuery->where("vl.is_patient_pregnant = 'yes'");
                 }else if(isset($params['isPregnant']) && $params['isPregnant']=='no'){
                     $countQuery = $countQuery->where("vl.is_patient_pregnant = 'no'");
                 }else if(isset($params['isPregnant']) && $params['isPregnant']=='unreported'){
-                    $countQuery = $countQuery->where("(vl.is_patient_pregnant IS NULL OR vl.is_patient_pregnant = '' OR vl.is_patient_pregnant = 'Unreported')"); 
+                    $countQuery = $countQuery->where("(vl.is_patient_pregnant IS NULL OR vl.is_patient_pregnant = '' OR vl.is_patient_pregnant = 'Unreported' OR vl.is_patient_pregnant = 'unreported')"); 
                 }
                 if(isset($params['isBreastfeeding']) && $params['isBreastfeeding']=='yes'){
                     $countQuery = $countQuery->where("vl.is_patient_breastfeeding = 'yes'");
                 }else if(isset($params['isBreastfeeding']) && $params['isBreastfeeding']=='no'){
                     $countQuery = $countQuery->where("vl.is_patient_breastfeeding = 'no'"); 
                 }else if(isset($params['isBreastfeeding']) && $params['isBreastfeeding']=='unreported'){
-                    $countQuery = $countQuery->where("(vl.is_patient_breastfeeding IS NULL OR vl.is_patient_breastfeeding = '' OR vl.is_patient_breastfeeding = 'Unreported')"); 
+                    $countQuery = $countQuery->where("(vl.is_patient_breastfeeding IS NULL OR vl.is_patient_breastfeeding = '' OR vl.is_patient_breastfeeding = 'Unreported' OR vl.is_patient_breastfeeding = 'unreported')"); 
                 }
                 $countQueryStr = $sql->getSqlStringForSqlObject($countQuery);
                 //echo $countQueryStr;die;
@@ -3354,7 +3348,7 @@ class SampleTable extends AbstractTableGateway {
             foreach($dResult as $district){
                 $countQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
                                   ->columns(
-                                                 array("total" => new Expression("SUM(CASE WHEN (((result is NULL OR result ='' OR sample_tested_datetime is null OR sample_tested_datetime = '' OR DATE(sample_tested_datetime) ='1970-01-01' OR DATE(sample_tested_datetime) ='0000-00-00') AND (reason_for_sample_rejection is NULL or reason_for_sample_rejection ='' or vl.reason_for_sample_rejection = 0))) THEN 1
+                                                 array("total" => new Expression("SUM(CASE WHEN (((vl.DashVL_AnalysisResult is NULL OR vl.DashVL_AnalysisResult ='') AND (reason_for_sample_rejection is NULL or reason_for_sample_rejection ='' or vl.reason_for_sample_rejection = 0))) THEN 1
                                                                                      ELSE 0
                                                                                      END)")))
                                   ->join(array('f'=>'facility_details'),'f.facility_id=vl.lab_id',array())
@@ -3414,7 +3408,7 @@ class SampleTable extends AbstractTableGateway {
                         }else if($age[$a] == '>=50'){
                           $where.= "(vl.patient_age_in_years >= 50)";
                         }else if($age[$a] == 'unknown'){
-                          $where.= "(vl.patient_age_in_years IS NULL OR vl.patient_age_in_years = '' OR vl.patient_age_in_years = 'Unknown' OR vl.patient_age_in_years = 'unknown')";
+                          $where.= "(vl.patient_age_in_years IS NULL OR vl.patient_age_in_years = '' OR vl.patient_age_in_years = 'Unknown' OR vl.patient_age_in_years = 'unknown' OR vl.patient_age_in_years = 'unreported' OR vl.patient_age_in_years = 'Unreported')";
                         }
                     }
                   $where = '('.$where.')';
@@ -3429,21 +3423,21 @@ class SampleTable extends AbstractTableGateway {
                 }else if(isset($params['gender']) && $params['gender']=='M'){
                     $countQuery = $countQuery->where("vl.patient_gender IN ('m','male','M','MALE')");
                 }else if(isset($params['gender']) && $params['gender']=='not_specified'){
-                    $countQuery = $countQuery->where("(vl.patient_gender IS NULL OR vl.patient_gender = '' OR vl.patient_gender ='Not Recorded' OR vl.patient_gender = 'not recorded')");
+                    $countQuery = $countQuery->where("(vl.patient_gender IS NULL OR vl.patient_gender = '' OR vl.patient_gender ='Not Recorded' OR vl.patient_gender = 'not recorded' OR vl.patient_gender = 'unreported' OR vl.patient_gender = 'Unreported')");
                 }
                 if(isset($params['isPregnant']) && $params['isPregnant']=='yes'){
                     $countQuery = $countQuery->where("vl.is_patient_pregnant = 'yes'");
                 }else if(isset($params['isPregnant']) && $params['isPregnant']=='no'){
                     $countQuery = $countQuery->where("vl.is_patient_pregnant = 'no'");
                 }else if(isset($params['isPregnant']) && $params['isPregnant']=='unreported'){
-                    $countQuery = $countQuery->where("(vl.is_patient_pregnant IS NULL OR vl.is_patient_pregnant = '' OR vl.is_patient_pregnant = 'Unreported')"); 
+                    $countQuery = $countQuery->where("(vl.is_patient_pregnant IS NULL OR vl.is_patient_pregnant = '' OR vl.is_patient_pregnant = 'Unreported' OR vl.is_patient_pregnant = 'unreported')"); 
                 }
                 if(isset($params['isBreastfeeding']) && $params['isBreastfeeding']=='yes'){
                     $countQuery = $countQuery->where("vl.is_patient_breastfeeding = 'yes'");
                 }else if(isset($params['isBreastfeeding']) && $params['isBreastfeeding']=='no'){
                     $countQuery = $countQuery->where("vl.is_patient_breastfeeding = 'no'"); 
                 }else if(isset($params['isBreastfeeding']) && $params['isBreastfeeding']=='unreported'){
-                    $countQuery = $countQuery->where("(vl.is_patient_breastfeeding IS NULL OR vl.is_patient_breastfeeding = '' OR vl.is_patient_breastfeeding = 'Unreported')"); 
+                    $countQuery = $countQuery->where("(vl.is_patient_breastfeeding IS NULL OR vl.is_patient_breastfeeding = '' OR vl.is_patient_breastfeeding = 'Unreported' OR vl.is_patient_breastfeeding = 'unreported')"); 
                 }
                 $countQueryStr = $sql->getSqlStringForSqlObject($countQuery);
                 $countResult  = $dbAdapter->query($countQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
@@ -3478,12 +3472,15 @@ class SampleTable extends AbstractTableGateway {
             $c = 0;
             foreach($clinicResult as $clinic){
                 $countQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
-                                  ->columns(
-                                             array("total" => new Expression("SUM(CASE WHEN (((result is NULL OR result ='' OR sample_tested_datetime is null OR sample_tested_datetime = '' OR DATE(sample_tested_datetime) ='1970-01-01' OR DATE(sample_tested_datetime) ='0000-00-00') AND (reason_for_sample_rejection is NULL or reason_for_sample_rejection ='' or vl.reason_for_sample_rejection = 0))) THEN 1
+                                  ->columns(array("total" => new Expression("SUM(CASE WHEN (((vl.DashVL_AnalysisResult is NULL OR vl.DashVL_AnalysisResult ='') AND (reason_for_sample_rejection is NULL or reason_for_sample_rejection ='' or vl.reason_for_sample_rejection = 0))) THEN 1
                                                                                  ELSE 0
                                                                                  END)")))
-                                  ->join(array('f'=>'facility_details'),'f.facility_id=vl.facility_id',array())
-                                  ->where(array('vl.facility_id'=>$clinic['facility_id']));
+                                  ->join(array('f'=>'facility_details'),'f.facility_id=vl.facility_id',array('facility_id','facility_name'))
+                                  ->where(array('vl.facility_id'=>$clinic['facility_id']))
+                                  //->where('f.facility_type = 1')
+                                  //->group('facility_name')
+                                  //->order('facility_name')
+                                  ;
                 if(isset($params['srcVal']) && trim($params['srcVal'])!= '' && $params['src'] == 'province'){
                     if($params['srcVal'] == 'Not Specified'){
                         $countQuery = $countQuery->where('f.facility_state IS NULL OR f.facility_state = ""');
@@ -3546,7 +3543,7 @@ class SampleTable extends AbstractTableGateway {
                         }else if($age[$a] == '>=50'){
                           $where.= "(vl.patient_age_in_years >= 50)";
                         }else if($age[$a] == 'unknown'){
-                          $where.= "(vl.patient_age_in_years IS NULL OR vl.patient_age_in_years = '' OR vl.patient_age_in_years = 'Unknown' OR vl.patient_age_in_years = 'unknown')";
+                          $where.= "(vl.patient_age_in_years IS NULL OR vl.patient_age_in_years = '' OR vl.patient_age_in_years = 'Unknown' OR vl.patient_age_in_years = 'unknown' OR vl.patient_age_in_years = 'Unreported'  OR vl.patient_age_in_years = 'unreported')";
                         }
                     }
                   $where = '('.$where.')';
@@ -3561,25 +3558,25 @@ class SampleTable extends AbstractTableGateway {
                 }else if(isset($params['gender']) && $params['gender']=='M'){
                     $countQuery = $countQuery->where("vl.patient_gender IN ('m','male','M','MALE')");
                 }else if(isset($params['gender']) && $params['gender']=='not_specified'){
-                    $countQuery = $countQuery->where("(vl.patient_gender IS NULL OR vl.patient_gender = '' OR vl.patient_gender ='Not Recorded' OR vl.patient_gender = 'not recorded')");
+                    $countQuery = $countQuery->where("(vl.patient_gender IS NULL OR vl.patient_gender = '' OR vl.patient_gender ='Not Recorded' OR vl.patient_gender = 'not recorded' OR vl.patient_gender = 'Unreported' OR vl.patient_gender = 'unreported')");
                 }
                 if(isset($params['isPregnant']) && $params['isPregnant']=='yes'){
                     $countQuery = $countQuery->where("vl.is_patient_pregnant = 'yes'");
                 }else if(isset($params['isPregnant']) && $params['isPregnant']=='no'){
                     $countQuery = $countQuery->where("vl.is_patient_pregnant = 'no'");
                 }else if(isset($params['isPregnant']) && $params['isPregnant']=='unreported'){
-                    $countQuery = $countQuery->where("(vl.is_patient_pregnant IS NULL OR vl.is_patient_pregnant = '' OR vl.is_patient_pregnant = 'Unreported')"); 
+                    $countQuery = $countQuery->where("(vl.is_patient_pregnant IS NULL OR vl.is_patient_pregnant = '' OR vl.is_patient_pregnant = 'Unreported' OR vl.is_patient_pregnant = 'unreported')"); 
                 }
                 if(isset($params['isBreastfeeding']) && $params['isBreastfeeding']=='yes'){
                     $countQuery = $countQuery->where("vl.is_patient_breastfeeding = 'yes'");
                 }else if(isset($params['isBreastfeeding']) && $params['isBreastfeeding']=='no'){
                     $countQuery = $countQuery->where("vl.is_patient_breastfeeding = 'no'"); 
                 }else if(isset($params['isBreastfeeding']) && $params['isBreastfeeding']=='unreported'){
-                    $countQuery = $countQuery->where("(vl.is_patient_breastfeeding IS NULL OR vl.is_patient_breastfeeding = '' OR vl.is_patient_breastfeeding = 'Unreported')"); 
+                    $countQuery = $countQuery->where("(vl.is_patient_breastfeeding IS NULL OR vl.is_patient_breastfeeding = '' OR vl.is_patient_breastfeeding = 'Unreported' OR vl.is_patient_breastfeeding = 'unreported')"); 
                 }
                 $countQueryStr = $sql->getSqlStringForSqlObject($countQuery);
                 $countResult  = $dbAdapter->query($countQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-                $result['clinic'][$c] = ucwords($clinic['facility_name']);
+                $result['clinic'][$c] = addslashes($clinic['facility_name']);
                 $result['sample']['Results Awaited'][$c] = (isset($countResult->total))?$countResult->total:0;
               $c++;
             }
@@ -3677,7 +3674,7 @@ class SampleTable extends AbstractTableGateway {
                                 ->join(array('f'=>'facility_details'),'f.facility_id=vl.facility_id',array('facilityName'=>'facility_name','facilityCode'=>'facility_code'))
                                 ->join(array('l'=>'facility_details'),'l.facility_id=vl.lab_id',array('labName'=>'facility_name'),'left')
                                 ->join(array('rs'=>'r_sample_type'),'rs.sample_id=vl.sample_type',array('sample_name'),'left')
-                                ->where("(result is NULL OR result ='' OR sample_tested_datetime is null OR sample_tested_datetime = '' OR DATE(sample_tested_datetime) ='1970-01-01' OR DATE(sample_tested_datetime) ='0000-00-00') AND (reason_for_sample_rejection is NULL or reason_for_sample_rejection ='' or vl.reason_for_sample_rejection = 0)");
+                                ->where("(vl.DashVL_AnalysisResult is NULL OR vl.DashVL_AnalysisResult ='') AND (reason_for_sample_rejection is NULL or reason_for_sample_rejection ='' or vl.reason_for_sample_rejection = 0)");
         if(isset($parameters['daterange']) && trim($parameters['daterange'])!= '' && trim($splitDate[0])!= '' && trim($splitDate[1])!= ''){
             $sQuery = $sQuery->where(array("vl.sample_collection_date >='" . $splitDate[0] ." 00:00:00". "'", "vl.sample_collection_date <='" .$splitDate[1]." 23:59:59". "'"));
         }else{
@@ -3724,7 +3721,7 @@ class SampleTable extends AbstractTableGateway {
                 }else if($parameters['age'][$a] == '>=50'){
                   $where.= "(vl.patient_age_in_years >= 50)";
                 }else if($parameters['age'][$a] == 'unknown'){
-                  $where.= "(vl.patient_age_in_years IS NULL OR vl.patient_age_in_years = '' OR vl.patient_age_in_years = 'Unknown' OR vl.patient_age_in_years = 'unknown')";
+                  $where.= "(vl.patient_age_in_years IS NULL OR vl.patient_age_in_years = '' OR vl.patient_age_in_years = 'Unknown' OR vl.patient_age_in_years = 'unknown' OR vl.patient_age_in_years = 'Unreported' OR vl.patient_age_in_years = 'unreported')";
                 }
             }
           $where = '('.$where.')';
@@ -3739,21 +3736,21 @@ class SampleTable extends AbstractTableGateway {
         }else if(isset($parameters['gender']) && $parameters['gender']=='M'){
             $sQuery = $sQuery->where("vl.patient_gender IN ('m','male','M','MALE')");
         }else if(isset($parameters['gender']) && $parameters['gender']=='not_specified'){
-            $sQuery = $sQuery->where("(vl.patient_gender IS NULL OR vl.patient_gender = '' OR vl.patient_gender ='Not Recorded' OR vl.patient_gender = 'not recorded')");
+            $sQuery = $sQuery->where("(vl.patient_gender IS NULL OR vl.patient_gender = '' OR vl.patient_gender ='Not Recorded' OR vl.patient_gender = 'not recorded' OR vl.patient_gender = 'unreported' OR vl.patient_gender = 'Unreported')");
         }
         if(isset($parameters['isPregnant']) && $parameters['isPregnant']=='yes'){
             $sQuery = $sQuery->where("vl.is_patient_pregnant = 'yes'");
         }else if(isset($parameters['isPregnant']) && $parameters['isPregnant']=='no'){
             $sQuery = $sQuery->where("vl.is_patient_pregnant = 'no'"); 
         }else if(isset($parameters['isPregnant']) && $parameters['isPregnant']=='unreported'){
-            $sQuery = $sQuery->where("(vl.is_patient_pregnant IS NULL OR vl.is_patient_pregnant = '' OR vl.is_patient_pregnant = 'Unreported')"); 
+            $sQuery = $sQuery->where("(vl.is_patient_pregnant IS NULL OR vl.is_patient_pregnant = '' OR vl.is_patient_pregnant = 'Unreported' OR vl.is_patient_pregnant = 'unreported')"); 
         }
         if(isset($parameters['isBreastfeeding']) && $parameters['isBreastfeeding']=='yes'){
             $sQuery = $sQuery->where("vl.is_patient_breastfeeding = 'yes'");
         }else if(isset($parameters['isBreastfeeding']) && $parameters['isBreastfeeding']=='no'){
             $sQuery = $sQuery->where("vl.is_patient_breastfeeding = 'no'"); 
         }else if(isset($parameters['isBreastfeeding']) && $parameters['isBreastfeeding']=='unreported'){
-            $sQuery = $sQuery->where("(vl.is_patient_breastfeeding IS NULL OR vl.is_patient_breastfeeding = '' OR vl.is_patient_breastfeeding = 'Unreported')"); 
+            $sQuery = $sQuery->where("(vl.is_patient_breastfeeding IS NULL OR vl.is_patient_breastfeeding = '' OR vl.is_patient_breastfeeding = 'Unreported' OR vl.is_patient_breastfeeding = 'unreported')"); 
         }
         
         if (isset($sWhere) && $sWhere != "") {
@@ -3786,7 +3783,7 @@ class SampleTable extends AbstractTableGateway {
                                 ->join(array('f'=>'facility_details'),'f.facility_id=vl.facility_id',array('facilityName'=>'facility_name','facilityCode'=>'facility_code'))
                                 ->join(array('l'=>'facility_details'),'l.facility_id=vl.lab_id',array('labName'=>'facility_name'),'left')
                                 ->join(array('rs'=>'r_sample_type'),'rs.sample_id=vl.sample_type',array('sample_name'),'left')
-                                ->where("(result is NULL OR result ='' OR sample_tested_datetime is null OR sample_tested_datetime = '' OR DATE(sample_tested_datetime) ='1970-01-01' OR DATE(sample_tested_datetime) ='0000-00-00') AND (reason_for_sample_rejection is NULL or reason_for_sample_rejection ='' or vl.reason_for_sample_rejection = 0)");
+                                ->where("(vl.DashVL_AnalysisResult is NULL OR vl.DashVL_AnalysisResult ='') AND (reason_for_sample_rejection is NULL or reason_for_sample_rejection ='' or vl.reason_for_sample_rejection = 0)");
         if($logincontainer->role!= 1){
             $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:array(0);
             $iQuery = $iQuery->where('vl.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
@@ -3945,7 +3942,7 @@ class SampleTable extends AbstractTableGateway {
 
         /* Total data set length */
         $iQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
-                                ->columns(array('vl_sample_id','sample_code','facility_id','patient_first_name','patient_last_name','patient_art_no','sampleCollectionDate'=>new Expression('DATE(sample_collection_date)'),'result'))
+                                ->columns(array('vl_sample_id'))
                                 ->join(array('rss'=>'r_sample_status'),'rss.status_id=vl.result_status',array('status_name'))
                                 ->join(array('b'=>'batch_details'),'b.batch_id=vl.sample_batch_id',array('batch_code'),'left')
                                 ->join(array('f'=>'facility_details'),'f.facility_id=vl.facility_id',array('facility_name'),'left')
@@ -4054,7 +4051,7 @@ class SampleTable extends AbstractTableGateway {
                                 'last_vl_sample_type_failure'=>$rResult->last_vl_sample_type_failure,
                                 'request_clinician_name'=>$rResult->request_clinician_name,
                                 'request_clinician_phone_number'=>$rResult->request_clinician_phone_number,
-                                'sample_testing_date'=>$rResult->sample_testing_date,
+                                'sample_tested_datetime'=>$rResult->sample_tested_datetime,
                                 'vl_focal_person'=>$rResult->vl_focal_person,
                                 'vl_focal_person_phone_number'=>$rResult->vl_focal_person_phone_number,
                                 'sample_received_at_vl_lab_datetime'=>$rResult->sample_received_at_vl_lab_datetime,
@@ -4181,8 +4178,8 @@ class SampleTable extends AbstractTableGateway {
         $queryStr = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
         ->columns(array(
         "total_samples_received" => new Expression("COUNT(*)"),
-        "total_samples_tested" => new Expression("(SUM(CASE WHEN (((vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL')) OR (vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0)) THEN 1 ELSE 0 END))"),
-        "suppressed_samples" => new Expression("SUM(CASE WHEN ((vl.vl_result_category like 'suppressed%' OR vl.vl_result_category like 'Suppressed%' OR vl.result < 1000 or vl.result = 'Target Not Detected' or vl.result = 'TND' or vl.result = 'tnd' or vl.result= 'Below Detection Level' or vl.result='BDL' or vl.result='bdl' or vl.result= 'Low Detection Level' or vl.result='LDL' or vl.result='ldl') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample') THEN 1 ELSE 0 END)"),
+        "total_samples_tested" => new Expression("(SUM(CASE WHEN (((vl.DashVL_AnalysisResult IS NOT NULL AND vl.DashVL_AnalysisResult != '' AND vl.DashVL_AnalysisResult != 'NULL'))) THEN 1 ELSE 0 END))"),
+        "suppressed_samples" => new Expression("SUM(CASE WHEN ((vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' or vl.DashVL_Abs < 1000)) THEN 1 ELSE 0 END)"),
         //"suppressed_samples_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (vl.result < 1000 or vl.result='Target Not Detected') THEN 1 ELSE 0 END)/COUNT(*))*100),2)"),
         //"not_suppressed_samples" => new Expression("SUM(CASE WHEN (vl.result >= 1000) THEN 1 ELSE 0 END)"),
         //"not_suppressed_samples_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (vl.result >= 1000) THEN 1 ELSE 0 END)/COUNT(*))*100),2)"),
@@ -4193,10 +4190,17 @@ class SampleTable extends AbstractTableGateway {
         ));
         //->where("(vl.sample_collection_date is not null AND vl.sample_collection_date != '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')");        
         $queryStr = $sql->getSqlStringForSqlObject($queryStr);
+
+        //echo $queryStr;die;
+
       return $common->cacheQuery($queryStr,$dbAdapter);
     }
     
     public function fetchSamplesReceivedBarChartDetails($params){
+
+        $this->dbsId = 8;
+        $this->plasmaId = 19;
+
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result=array();
@@ -4210,9 +4214,9 @@ class SampleTable extends AbstractTableGateway {
                                     ->columns(
                                           array(
                                                 "monthDate" => new Expression("DATE_FORMAT(DATE(sample_collection_date), '%b-%Y')"),
-                                                "total_dbs" => new Expression("SUM(CASE WHEN (sample_type=2) THEN 1 ELSE 0 END)"),
-                                                "total_plasma" => new Expression("SUM(CASE WHEN (sample_type=11) THEN 1 ELSE 0 END)"),
-                                                "total_others" => new Expression("SUM(CASE WHEN ((sample_type!= 2 AND sample_type!= 11) AND sample_type IS NOT NULL AND sample_type!= '') THEN 1 ELSE 0 END)")
+                                                "total_dbs" => new Expression("SUM(CASE WHEN (sample_type=$this->dbsId) THEN 1 ELSE 0 END)"),
+                                                "total_plasma" => new Expression("SUM(CASE WHEN (sample_type=$this->plasmaId) THEN 1 ELSE 0 END)"),
+                                                "total_others" => new Expression("SUM(CASE WHEN ((sample_type!= $this->dbsId AND sample_type!= $this->plasmaId) AND sample_type IS NOT NULL AND sample_type!= '') THEN 1 ELSE 0 END)")
                                                 )
                                           )                                
                                     ->join(array('rs'=>'r_sample_type'),'rs.sample_id=vl.sample_type',array('sample_name'))
@@ -4233,11 +4237,13 @@ class SampleTable extends AbstractTableGateway {
     
     /* Samples Received District*/
     public function fetchAllSamplesReceivedByDistrict($parameters){
+        $this->dbsId = 8;
+        $this->plasmaId = 19;                
         /* Array of database columns which should be read and sent back to DataTables. Use a space where
          * you want to insert a non-database field (for example a counter or static image)
         */
         $aColumns = array('f_d_l_d.location_name');
-        $orderColumns = array('f_d_l_d.location_name','f_d_l_d.location_id','f_d_l_d.location_id','f_d_l_d.location_id','f_d_l_d.location_id','f_d_l_d.location_id','f_d_l_d.location_id','f_d_l_d.location_id');
+        $orderColumns = array('f_d_l_d.location_name','total_samples_received','total_samples_tested','total_samples_pending','total_samples_rejected','total_dbs_percentage','total_plasma_percentage','total_others_percentage');
 
         /*
          * Paging
@@ -4323,12 +4329,12 @@ class SampleTable extends AbstractTableGateway {
                                                 'sampleCollectionDate'=>new Expression('DATE(sample_collection_date)'),
                                                 'result',
                                                 "total_samples_received" => new Expression("(COUNT(*))"),
-                                                "total_samples_tested" => new Expression("(SUM(CASE WHEN (((vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL') AND (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) OR (vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0)) THEN 1 ELSE 0 END))"),
-                                                "total_samples_pending" => new Expression("(SUM(CASE WHEN ((vl.result IS NULL OR vl.result = '' OR vl.result = 'NULL' OR sample_tested_datetime is null OR sample_tested_datetime = '' OR DATE(sample_tested_datetime) ='1970-01-01' OR DATE(sample_tested_datetime) ='0000-00-00') AND (vl.reason_for_sample_rejection IS NULL OR vl.reason_for_sample_rejection = '' OR vl.reason_for_sample_rejection = 0)) THEN 1 ELSE 0 END))"),
+                                                "total_samples_tested" => new Expression("(SUM(CASE WHEN ((vl.DashVL_AnalysisResult IS NOT NULL AND vl.DashVL_AnalysisResult != '' AND vl.DashVL_AnalysisResult != 'NULL') OR (vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0)) THEN 1 ELSE 0 END))"),
+                                                "total_samples_pending" => new Expression("(SUM(CASE WHEN ((vl.DashVL_AnalysisResult IS NULL OR vl.DashVL_AnalysisResult = '' OR vl.DashVL_AnalysisResult = 'NULL') AND (vl.reason_for_sample_rejection IS NULL OR vl.reason_for_sample_rejection = '' OR vl.reason_for_sample_rejection = 0)) THEN 1 ELSE 0 END))"),
                                                 "total_samples_rejected" => new Expression("SUM(CASE WHEN (vl.reason_for_sample_rejection !='' AND vl.reason_for_sample_rejection !='0' AND vl.reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END)"),
-                                                "total_dbs_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (sample_type = 2) THEN 1 ELSE 0 END)/COUNT(*))*100),2)"),
-                                                "total_plasma_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (sample_type = 11) THEN 1 ELSE 0 END)/COUNT(*))*100),2)"),
-                                                "total_others_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (sample_type IS NOT NULL AND sample_type!= '' AND (sample_type!= 2 AND sample_type!= 11)) THEN 1 ELSE 0 END)/COUNT(*))*100),2)")
+                                                "total_dbs_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (sample_type = $this->dbsId) THEN 1 ELSE 0 END)/COUNT(*))*100),2)"),
+                                                "total_plasma_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (sample_type = $this->plasmaId) THEN 1 ELSE 0 END)/COUNT(*))*100),2)"),
+                                                "total_others_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (sample_type!= $this->dbsId AND sample_type!= $this->plasmaId) THEN 1 ELSE 0 END)/COUNT(*))*100),2)")
                                             )
                                           )
                                 ->join(array('f'=>'facility_details'),'f.facility_id=vl.facility_id',array('facility_name'))
@@ -4364,17 +4370,7 @@ class SampleTable extends AbstractTableGateway {
         $iQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
                                 ->columns(
                                           array(
-                                                'vl_sample_id',
-                                                'facility_id',
-                                                'sampleCollectionDate'=>new Expression('DATE(sample_collection_date)'),
-                                                'result',
-                                                "total_samples_received" => new Expression("(COUNT(*))"),
-                                                "total_samples_tested" => new Expression("(SUM(CASE WHEN (((vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL') AND (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) OR (vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0)) THEN 1 ELSE 0 END))"),
-                                                "total_samples_pending" => new Expression("(SUM(CASE WHEN ((vl.result IS NULL OR vl.result = '' OR vl.result = 'NULL' OR sample_tested_datetime is null OR sample_tested_datetime = '' OR DATE(sample_tested_datetime) ='1970-01-01' OR DATE(sample_tested_datetime) ='0000-00-00') AND (vl.reason_for_sample_rejection IS NULL OR vl.reason_for_sample_rejection = '' OR vl.reason_for_sample_rejection = 0)) THEN 1 ELSE 0 END))"),
-                                                "total_samples_rejected" => new Expression("SUM(CASE WHEN (vl.reason_for_sample_rejection !='' AND vl.reason_for_sample_rejection !='0' AND vl.reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END)"),
-                                                "total_dbs_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (sample_type = 2) THEN 1 ELSE 0 END)/COUNT(*))*100),2)"),
-                                                "total_plasma_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (sample_type = 11) THEN 1 ELSE 0 END)/COUNT(*))*100),2)"),
-                                                "total_others_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (sample_type IS NOT NULL AND sample_type!= '' AND (sample_type!= 2 AND sample_type!= 11)) THEN 1 ELSE 0 END)/COUNT(*))*100),2)")
+                                                'vl_sample_id'
                                             )
                                           )
                                 ->join(array('f'=>'facility_details'),'f.facility_id=vl.facility_id',array('facility_name'))
@@ -4409,11 +4405,14 @@ class SampleTable extends AbstractTableGateway {
     }
     
     public function fetchAllSamplesReceivedByFacility($parameters){
+
+        $this->dbsId = 8;
+        $this->plasmaId = 19;
         /* Array of database columns which should be read and sent back to DataTables. Use a space where
          * you want to insert a non-database field (for example a counter or static image)
         */
         $aColumns = array('facility_name','f_d_l_d.location_name');
-        $orderColumns = array('facility_name','f_d_l_d.location_name','f_d_l_d.location_id','f_d_l_d.location_id','f_d_l_d.location_id','f_d_l_d.location_id','f_d_l_d.location_id','f_d_l_d.location_id','f_d_l_d.location_id');
+        $orderColumns = array('facility_name','total_samples_received','total_samples_tested','total_samples_pending','total_samples_rejected','total_dbs_percentage','total_plasma_percentage','total_others_percentage');
 
         /*
          * Paging
@@ -4499,12 +4498,12 @@ class SampleTable extends AbstractTableGateway {
                                                 'sampleCollectionDate'=>new Expression('DATE(sample_collection_date)'),
                                                 'result',
                                                 "total_samples_received" => new Expression("(COUNT(*))"),
-                                                "total_samples_tested" => new Expression("(SUM(CASE WHEN (((vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL') AND (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) OR (vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0)) THEN 1 ELSE 0 END))"),
-                                                "total_samples_pending" => new Expression("(SUM(CASE WHEN ((vl.result IS NULL OR vl.result = '' OR vl.result = 'NULL' OR sample_tested_datetime is null OR sample_tested_datetime = '' OR DATE(sample_tested_datetime) ='1970-01-01' OR DATE(sample_tested_datetime) ='0000-00-00') AND (vl.reason_for_sample_rejection IS NULL OR vl.reason_for_sample_rejection = '' OR vl.reason_for_sample_rejection = 0)) THEN 1 ELSE 0 END))"),
+                                                "total_samples_tested" => new Expression("(SUM(CASE WHEN ((vl.DashVL_AnalysisResult IS NOT NULL AND vl.DashVL_AnalysisResult != '' AND vl.DashVL_AnalysisResult != 'NULL') OR (vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0)) THEN 1 ELSE 0 END))"),
+                                                "total_samples_pending" => new Expression("(SUM(CASE WHEN ((vl.DashVL_AnalysisResult IS NULL OR vl.DashVL_AnalysisResult = '' OR vl.DashVL_AnalysisResult = 'NULL') AND (vl.reason_for_sample_rejection IS NULL OR vl.reason_for_sample_rejection = '' OR vl.reason_for_sample_rejection = 0)) THEN 1 ELSE 0 END))"),
                                                 "total_samples_rejected" => new Expression("(SUM(CASE WHEN (reason_for_sample_rejection !='' AND reason_for_sample_rejection !='0' AND reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END))"),
-                                                "total_dbs_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (sample_type = 2) THEN 1 ELSE 0 END)/COUNT(*))*100),2)"),
-                                                "total_plasma_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (sample_type = 11) THEN 1 ELSE 0 END)/COUNT(*))*100),2)"),
-                                                "total_others_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (sample_type IS NOT NULL AND sample_type!= '' AND (sample_type!= 2 AND sample_type!= 11)) THEN 1 ELSE 0 END)/COUNT(*))*100),2)")
+                                                "total_dbs_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (sample_type = $this->dbsId) THEN 1 ELSE 0 END)/COUNT(*))*100),2)"),
+                                                "total_plasma_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (sample_type = $this->plasmaId) THEN 1 ELSE 0 END)/COUNT(*))*100),2)"),
+                                                "total_others_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (sample_type!= $this->dbsId AND sample_type!= $this->plasmaId) THEN 1 ELSE 0 END)/COUNT(*))*100),2)")
                                                 )
                                           )
                                 ->join(array('f'=>'facility_details'),'f.facility_id=vl.facility_id',array('facility_name'))
@@ -4540,17 +4539,7 @@ class SampleTable extends AbstractTableGateway {
         $iQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
                                 ->columns(
                                           array(
-                                                'vl_sample_id',
-                                                'facility_id',
-                                                'sampleCollectionDate'=>new Expression('DATE(sample_collection_date)'),
-                                                'result',
-                                                "total_samples_received" => new Expression("(COUNT(*))"),
-                                                "total_samples_tested" => new Expression("(SUM(CASE WHEN (((vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL') AND (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) OR (vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0)) THEN 1 ELSE 0 END))"),
-                                                "total_samples_pending" => new Expression("(SUM(CASE WHEN ((vl.result IS NULL OR vl.result = '' OR vl.result = 'NULL' OR sample_tested_datetime is null OR sample_tested_datetime = '' OR DATE(sample_tested_datetime) ='1970-01-01' OR DATE(sample_tested_datetime) ='0000-00-00') AND (vl.reason_for_sample_rejection IS NULL OR vl.reason_for_sample_rejection = '' OR vl.reason_for_sample_rejection = 0)) THEN 1 ELSE 0 END))"),
-                                                "total_samples_rejected" => new Expression("(SUM(CASE WHEN (reason_for_sample_rejection !='' AND reason_for_sample_rejection !='0' AND reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END))"),
-                                                "total_dbs_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (sample_type = 2) THEN 1 ELSE 0 END)/COUNT(*))*100),2)"),
-                                                "total_plasma_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (sample_type = 11) THEN 1 ELSE 0 END)/COUNT(*))*100),2)"),
-                                                "total_others_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (sample_type IS NOT NULL AND sample_type!= '' AND (sample_type!= 2 AND sample_type!= 11)) THEN 1 ELSE 0 END)/COUNT(*))*100),2)")
+                                                'vl_sample_id'
                                                 )
                                           )
                                 ->join(array('f'=>'facility_details'),'f.facility_id=vl.facility_id',array('facility_name'))
@@ -4599,13 +4588,16 @@ class SampleTable extends AbstractTableGateway {
             $sQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
                                     ->columns(
                                               array(
-                                                    "total_samples_valid" => new Expression("(SUM(CASE WHEN ((vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample') AND (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) THEN 1 ELSE 0 END))"),
+                                                    
                                                     //"total_samples_rejected" => new Expression("SUM(CASE WHEN (vl.reason_for_sample_rejection !='' AND vl.reason_for_sample_rejection !='0' AND vl.reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END)"),
-                                                    "total_suppressed_samples" => new Expression("SUM(CASE WHEN ((vl.result < 1000 or vl.result = 'Target Not Detected' or vl.result = 'TND' or vl.result = 'tnd' or vl.result= 'Below Detection Level' or vl.result='BDL' or vl.result='bdl' or vl.result= 'Low Detection Level' or vl.result='LDL' or vl.result='ldl' or vl.result like '%baixo%' or vl.result like 'Negative' or vl.result like 'NEGAT' or vl.result like 'Indeterminado' or vl.result like 'Target not Detected') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END)"),
+                                                    
+
+                                                    "total_samples_valid" => new Expression("(SUM(CASE WHEN (((vl.DashVL_AnalysisResult IS NOT NULL AND vl.DashVL_AnalysisResult != '' AND vl.DashVL_AnalysisResult != 'NULL'))) THEN 1 ELSE 0 END))"),
+                                                    "total_suppressed_samples" => new Expression("SUM(CASE WHEN ((vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' or vl.DashVL_Abs < 1000)) THEN 1 ELSE 0 END)"),                                                    
                                                     //"total_suppressed_samples_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (vl.result < 1000 or vl.result='Target Not Detected') THEN 1 ELSE 0 END)/COUNT(*))*100),2)")
                                                     )
                                               )
-                                    ->where("Month(sample_collection_date)='".$month."' AND Year(sample_collection_date)='".$year."'");
+                                    ->where("MONTH(sample_collection_date)='".$month."' AND YEAR(sample_collection_date)='".$year."'");
             $queryStr = $sql->getSqlStringForSqlObject($sQuery);
             //echo $queryStr;die;
             //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -4624,7 +4616,7 @@ class SampleTable extends AbstractTableGateway {
          * you want to insert a non-database field (for example a counter or static image)
         */
         $aColumns = array('f_d_l_d.location_name');
-        $orderColumns = array('f_d_l_d.location_name','f_d_l_d.location_id','f_d_l_d.location_id','f_d_l_d.location_id','f_d_l_d.location_id');
+        $orderColumns = array('f_d_l_d.location_name','total_samples_valid','total_suppressed_samples','total_not_suppressed_samples','total_samples_rejected');
 
         /*
          * Paging
@@ -4710,10 +4702,10 @@ class SampleTable extends AbstractTableGateway {
                                                 'sampleCollectionDate'=>new Expression('DATE(sample_collection_date)'),
                                                 'result',
                                                 "total_samples_received" => new Expression("(COUNT(*))"),
-                                                "total_samples_valid" => new Expression("(SUM(CASE WHEN ((vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample') AND (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) THEN 1 ELSE 0 END))"),
+                                                "total_samples_valid" => new Expression("(SUM(CASE WHEN (((vl.DashVL_AnalysisResult IS NOT NULL AND vl.DashVL_AnalysisResult != '' AND vl.DashVL_AnalysisResult != 'NULL'))) THEN 1 ELSE 0 END))"),
                                                 "total_samples_rejected" => new Expression("(SUM(CASE WHEN (reason_for_sample_rejection !='' AND reason_for_sample_rejection !='0' AND reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END))"),
-                                                "total_suppressed_samples" => new Expression("(SUM(CASE WHEN ((vl.result < 1000 or vl.result = 'Target Not Detected' or vl.result = 'TND' or vl.result = 'tnd' or vl.result= 'Below Detection Level' or vl.result='BDL' or vl.result='bdl' or vl.result= 'Low Detection Level' or vl.result='LDL' or vl.result='ldl') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END))"),
-                                                "total_not_suppressed_samples" => new Expression("(SUM(CASE WHEN (vl.result IS NOT NULL AND vl.result!= '' AND vl.result >= 1000 AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END))"),
+                                                "total_suppressed_samples" => new Expression("SUM(CASE WHEN ((vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' or vl.DashVL_Abs < 1000)) THEN 1 ELSE 0 END)"),
+                                                "total_not_suppressed_samples" => new Expression("SUM(CASE WHEN ((vl.DashVL_AnalysisResult like 'not%' OR vl.DashVL_AnalysisResult like 'Not%' or vl.DashVL_Abs >= 1000)) THEN 1 ELSE 0 END)"),
                                                 //"total_suppressed_samples_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (vl.result < 1000 or vl.result='Target Not Detected') THEN 1 ELSE 0 END)/COUNT(*))*100),2)")
                                                 )
                                           )
@@ -4750,16 +4742,7 @@ class SampleTable extends AbstractTableGateway {
         $iQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
                                 ->columns(
                                           array(
-                                                'vl_sample_id',
-                                                'facility_id',
-                                                'sampleCollectionDate'=>new Expression('DATE(sample_collection_date)'),
-                                                'result',
-                                                "total_samples_received" => new Expression("(COUNT(*))"),
-                                                "total_samples_valid" => new Expression("(SUM(CASE WHEN ((vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample') AND (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) THEN 1 ELSE 0 END))"),
-                                                "total_samples_rejected" => new Expression("(SUM(CASE WHEN (reason_for_sample_rejection !='' AND reason_for_sample_rejection !='0' AND reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END))"),
-                                                "total_suppressed_samples" => new Expression("(SUM(CASE WHEN ((vl.result < 1000 or vl.result = 'Target Not Detected' or vl.result = 'TND' or vl.result = 'tnd' or vl.result= 'Below Detection Level' or vl.result='BDL' or vl.result='bdl' or vl.result= 'Low Detection Level' or vl.result='LDL' or vl.result='ldl') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END))"),
-                                                "total_not_suppressed_samples" => new Expression("(SUM(CASE WHEN (vl.result IS NOT NULL AND vl.result!= '' AND vl.result >= 1000 AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END))"),
-                                                //"total_suppressed_samples_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (vl.result < 1000 or vl.result='Target Not Detected') THEN 1 ELSE 0 END)/COUNT(*))*100),2)")
+                                                'vl_sample_id'
                                                 )
                                           )
                                 ->join(array('f'=>'facility_details'),'f.facility_id=vl.facility_id',array('facility_name'))
@@ -4794,7 +4777,7 @@ class SampleTable extends AbstractTableGateway {
          * you want to insert a non-database field (for example a counter or static image)
         */
         $aColumns = array('facility_name','f_d_l_d.location_name');
-        $orderColumns = array('facility_name','f_d_l_d.location_name','f_d_l_d.location_id','f_d_l_d.location_id','f_d_l_d.location_id','f_d_l_d.location_id');
+        $orderColumns = array('f_d_l_d.location_name','total_samples_valid','total_suppressed_samples','total_not_suppressed_samples','total_samples_rejected');
 
         /*
          * Paging
@@ -4880,10 +4863,10 @@ class SampleTable extends AbstractTableGateway {
                                                 'sampleCollectionDate'=>new Expression('DATE(sample_collection_date)'),
                                                 'result',
                                                 "total_samples_received" => new Expression("(COUNT(*))"),
-                                                "total_samples_valid" => new Expression("(SUM(CASE WHEN ((vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample') AND (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) THEN 1 ELSE 0 END))"),
+                                                "total_samples_valid" => new Expression("(SUM(CASE WHEN (((vl.DashVL_AnalysisResult IS NOT NULL AND vl.DashVL_AnalysisResult != '' AND vl.DashVL_AnalysisResult != 'NULL'))) THEN 1 ELSE 0 END))"),
                                                 "total_samples_rejected" => new Expression("(SUM(CASE WHEN (reason_for_sample_rejection !='' AND reason_for_sample_rejection !='0' AND reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END))"),
-                                                "total_suppressed_samples" => new Expression("(SUM(CASE WHEN ((vl.result < 1000 or vl.result = 'Target Not Detected' or vl.result = 'TND' or vl.result = 'tnd' or vl.result= 'Below Detection Level' or vl.result='BDL' or vl.result='bdl' or vl.result= 'Low Detection Level' or vl.result='LDL' or vl.result='ldl') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END))"),
-                                                "total_not_suppressed_samples" => new Expression("(SUM(CASE WHEN (vl.result IS NOT NULL AND vl.result!= '' AND vl.result >= 1000 AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END))"),
+                                                "total_suppressed_samples" => new Expression("SUM(CASE WHEN ((vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' or vl.DashVL_Abs < 1000)) THEN 1 ELSE 0 END)"),
+                                                "total_not_suppressed_samples" => new Expression("SUM(CASE WHEN ((vl.DashVL_AnalysisResult like 'not%' OR vl.DashVL_AnalysisResult like 'Not%' or vl.DashVL_Abs >= 1000)) THEN 1 ELSE 0 END)"),
                                                 //"total_suppressed_samples_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (vl.result < 1000 or vl.result='Target Not Detected') THEN 1 ELSE 0 END)/COUNT(*))*100),2)")
                                                 )
                                           )
@@ -4920,16 +4903,7 @@ class SampleTable extends AbstractTableGateway {
         $iQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
                                 ->columns(
                                           array(
-                                                'vl_sample_id',
-                                                'facility_id',
-                                                'sampleCollectionDate'=>new Expression('DATE(sample_collection_date)'),
-                                                'result',
-                                                "total_samples_received" => new Expression("(COUNT(*))"),
-                                                "total_samples_valid" => new Expression("(SUM(CASE WHEN ((vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample') AND (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) THEN 1 ELSE 0 END))"),
-                                                "total_samples_rejected" => new Expression("(SUM(CASE WHEN (reason_for_sample_rejection !='' AND reason_for_sample_rejection !='0' AND reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END))"),
-                                                "total_suppressed_samples" => new Expression("(SUM(CASE WHEN ((vl.result < 1000 or vl.result = 'Target Not Detected' or vl.result = 'TND' or vl.result = 'tnd' or vl.result= 'Below Detection Level' or vl.result='BDL' or vl.result='bdl' or vl.result= 'Low Detection Level' or vl.result='LDL' or vl.result='ldl') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END))"),
-                                                "total_not_suppressed_samples" => new Expression("(SUM(CASE WHEN (vl.result IS NOT NULL AND vl.result!= '' AND vl.result >= 1000 AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END))"),
-                                                //"total_suppressed_samples_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (vl.result < 1000 or vl.result='Target Not Detected') THEN 1 ELSE 0 END)/COUNT(*))*100),2)")
+                                                'vl_sample_id'
                                                 )
                                           )
                                 ->join(array('f'=>'facility_details'),'f.facility_id=vl.facility_id',array('facility_name'))
@@ -5012,7 +4986,7 @@ class SampleTable extends AbstractTableGateway {
          * you want to insert a non-database field (for example a counter or static image)
         */
         $aColumns = array('f_d_l_d.location_name');
-        $orderColumns = array('f_d_l_d.location_name','f_d_l_d.location_id','f_d_l_d.location_id','f_d_l_d.location_id');
+        $orderColumns = array('f_d_l_d.location_name','total_samples_received','total_samples_rejected','rejection_rate');
 
         /*
          * Paging
@@ -5095,6 +5069,7 @@ class SampleTable extends AbstractTableGateway {
                                           array(
                                                 "total_samples_received" => new Expression('COUNT(*)'),
                                                 "total_samples_rejected" => new Expression("(SUM(CASE WHEN (reason_for_sample_rejection !='' AND reason_for_sample_rejection !='0' AND reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END))"),
+                                                "rejection_rate" => new Expression("ROUND(((SUM(CASE WHEN (reason_for_sample_rejection !='' AND reason_for_sample_rejection !='0' AND reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END))/(COUNT(*)))*100,2)"),
                                                 )
                                           )
                                 ->join(array('f'=>'facility_details'),'f.facility_id=vl.facility_id',array('facility_name'))
@@ -5130,8 +5105,7 @@ class SampleTable extends AbstractTableGateway {
         $iQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
                                 ->columns(
                                           array(
-                                                "total_samples_received" => new Expression('COUNT(*)'),
-                                                "total_samples_rejected" => new Expression("(SUM(CASE WHEN (reason_for_sample_rejection !='' AND reason_for_sample_rejection !='0' AND reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END))"),
+                                                "total_samples_received" => new Expression('COUNT(*)')
                                                 )
                                           )
                                 ->join(array('f'=>'facility_details'),'f.facility_id=vl.facility_id',array('facility_name'))
@@ -5154,7 +5128,7 @@ class SampleTable extends AbstractTableGateway {
             $row[] = ucwords($aRow['district']);          
             $row[] = $aRow['total_samples_received'];            
             $row[] = $aRow['total_samples_rejected'];
-            $row[] = ($aRow['total_samples_received'] > 0 && $aRow['total_samples_rejected'] > 0)?round(($aRow['total_samples_rejected']/$aRow['total_samples_received'])*100,2):0;
+            $row[] = ($aRow['rejection_rate']);
             $output['aaData'][] = $row;
         }
        return $output;
@@ -5165,7 +5139,7 @@ class SampleTable extends AbstractTableGateway {
          * you want to insert a non-database field (for example a counter or static image)
         */
         $aColumns = array('f.facility_name','f_d_l_d.location_name');
-        $orderColumns = array('f.facility_name','f_d_l_d.location_name','f_d_l_d.location_id','f_d_l_d.location_id');
+        $orderColumns = array('f_d_l_d.location_name','total_samples_received','total_samples_rejected','rejection_rate');
 
         /*
          * Paging
@@ -5248,6 +5222,7 @@ class SampleTable extends AbstractTableGateway {
                                           array(
                                                 "total_samples_received" => new Expression('COUNT(*)'),
                                                 "total_samples_rejected" => new Expression("(SUM(CASE WHEN (reason_for_sample_rejection !='' AND reason_for_sample_rejection !='0' AND reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END))"),
+                                                "rejection_rate" => new Expression("ROUND(((SUM(CASE WHEN (reason_for_sample_rejection !='' AND reason_for_sample_rejection !='0' AND reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END))/(COUNT(*)))*100,2)")
                                                 )
                                           )
                                 ->join(array('f'=>'facility_details'),'f.facility_id=vl.facility_id',array('facility_name'))
@@ -5283,8 +5258,7 @@ class SampleTable extends AbstractTableGateway {
         $iQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
                                 ->columns(
                                           array(
-                                                "total_samples_received" => new Expression('COUNT(*)'),
-                                                "total_samples_rejected" => new Expression("(SUM(CASE WHEN (reason_for_sample_rejection !='' AND reason_for_sample_rejection !='0' AND reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END))"),
+                                                "total_samples_received" => new Expression('COUNT(*)')
                                                 )
                                           )
                                 ->join(array('f'=>'facility_details'),'f.facility_id=vl.facility_id',array('facility_name'))
@@ -5307,7 +5281,7 @@ class SampleTable extends AbstractTableGateway {
             $row[]= "<span style='white-space:nowrap !important;' >".ucwords($aRow['facility_name'])."</span>";      
             $row[] = ucwords($aRow['district']); 
             $row[] = $aRow['total_samples_received'];    
-            $row[] = ($aRow['total_samples_received'] > 0 && $aRow['total_samples_rejected'] > 0)?round(($aRow['total_samples_rejected']/$aRow['total_samples_received'])*100,2):0;
+            $row[] = ($aRow['rejection_rate']);
             $output['aaData'][] = $row;
         }
        return $output;
@@ -5317,28 +5291,56 @@ class SampleTable extends AbstractTableGateway {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $common = new CommonService($this->sm);
+
+
+        $validQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
+                    ->columns(
+            array(
+                  "current_regimen",
+                  "total_samples_valid" => new Expression("(SUM(CASE WHEN (vl.DashVL_AnalysisResult IS NOT NULL AND vl.DashVL_AnalysisResult != '' AND vl.DashVL_AnalysisResult != 'NULL') THEN 1 ELSE 0 END))")
+                  )
+            ) 
+            //->where('vl.line_of_treatment >= 1')
+            ->group('vl.current_regimen');
+
+
+        $suppressedQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
+                    ->columns(array(
+                            "current_regimen",
+                            "total_suppressed_samples" => new Expression("SUM(CASE WHEN ((vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' or vl.DashVL_Abs < 1000)) THEN 1 ELSE 0 END)"),
+                            )) 
+                    //->where('vl.line_of_treatment >= 1')
+                    ->group('vl.current_regimen');            
+        
+
         $sQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
                                 ->columns(
                                           array(
                                                 "current_regimen",
-                                                "total_samples_valid" => new Expression("(SUM(CASE WHEN ((vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample') AND (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) THEN 1 ELSE 0 END))"),
                                                 "total_samples_rejected" => new Expression("(SUM(CASE WHEN (reason_for_sample_rejection !='' AND reason_for_sample_rejection !='0' AND reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END))"),
-                                                "total_suppressed_samples" => new Expression("(SUM(CASE WHEN ((vl.result < 1000 or vl.result = 'Target Not Detected' or vl.result = 'TND' or vl.result = 'tnd' or vl.result= 'Below Detection Level' or vl.result='BDL' or vl.result='bdl' or vl.result= 'Low Detection Level' or vl.result='LDL' or vl.result='ldl') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END))"),
-                                                //"total_suppressed_samples_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN ((vl.result < 1000 or vl.result='Target Not Detected') AND vl.result IS NOT NULL AND vl.result!= '') THEN 1 ELSE 0 END)/COUNT(*))*100),2)")
+                                                "suppression_rate" => new Expression("ROUND(((total_suppressed_samples)/(total_samples_valid))*100,2)"),
                                                 )
                                           )
-                                ->where(array('vl.line_of_treatment'=>1))
-                                ->group('vl.current_regimen');
+                                          ->join(array('valid'=>$validQuery),'valid.current_regimen=vl.current_regimen',array('total_samples_valid'))
+                                          ->join(array('suppressed'=>$suppressedQuery),'suppressed.current_regimen=vl.current_regimen',array('total_suppressed_samples'))
+                                //->where('vl.line_of_treatment >= 1')
+                                ->group('vl.current_regimen')
+                                ->order('total_samples_valid DESC')
+                                ->limit(20)
+                                ;
             $queryStr = $sql->getSqlStringForSqlObject($sQuery);
             //echo $queryStr;die;
             //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             $sampleResult = $common->cacheQuery($queryStr,$dbAdapter);
+            //\Zend\Debug\Debug::dump($sampleResult);
+            //\Zend\Debug\Debug::dump("==========");
+            //die;
             $j=0;
             $result=array();
-            foreach($sampleResult as $sRow){
+            foreach($sampleResult as $aRow){
                 $result['valid_results'][$j] = $aRow['total_samples_valid'];
-                $result['suppression_rate'][$j] = ($aRow['total_suppressed_samples'] > 0 && $aRow['total_samples_valid'] > 0)?round((($aRow['total_suppressed_samples']/$aRow['total_samples_valid'])*100),2):0;
-                $result['current_regimen'][$j] = $sRow["current_regimen"];
+                $result['suppression_rate'][$j] = ($aRow['total_samples_valid'] > 0) ? $aRow['suppression_rate'] : 0;
+                $result['current_regimen'][$j] = $aRow["current_regimen"];
                 $j++;
             }
         return $result;  
@@ -5349,7 +5351,7 @@ class SampleTable extends AbstractTableGateway {
          * you want to insert a non-database field (for example a counter or static image)
         */
         $aColumns = array('current_regimen');
-        $orderColumns = array('current_regimen','vl_sample_id','vl_sample_id','vl_sample_id','vl_sample_id','vl_sample_id','vl_sample_id');
+        $orderColumns = array('current_regimen','total_samples_received','total_samples_tested','total_samples_valid','total_suppressed_samples','suppression_rate','percentage_of_samples');
 
         /*
          * Paging
@@ -5427,20 +5429,47 @@ class SampleTable extends AbstractTableGateway {
         
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
+        $totalSamples = $parameters['t_received'];
+
+        $validQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
+                    ->columns(
+            array(
+                  "current_regimen",
+                  "total_samples_valid" => new Expression("(SUM(CASE WHEN (vl.DashVL_AnalysisResult IS NOT NULL AND vl.DashVL_AnalysisResult != '' AND vl.DashVL_AnalysisResult != 'NULL') THEN 1 ELSE 0 END))")
+                  )
+            ) 
+            //->where('vl.line_of_treatment >= 1')
+            ->group('vl.current_regimen');
+
+
+        $suppressedQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
+                    ->columns(
+            array(
+                  "current_regimen",
+                  "total_suppressed_samples" => new Expression("SUM(CASE WHEN ((vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' or vl.DashVL_Abs < 1000)) THEN 1 ELSE 0 END)"),
+                  )
+            ) 
+            //->where('vl.line_of_treatment >= 1')
+            ->group('vl.current_regimen'); 
+
         $sQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
                                 ->columns(
                                           array(
-                                                "total_samples" => new Expression('COUNT(*)'),
+                                                "total_samples" => new Expression('COUNT(vl.current_regimen)'),
                                                 "total_samples_received" => new Expression("(SUM(CASE WHEN (vl.sample_collection_date is not null AND vl.sample_collection_date != '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00') THEN 1 ELSE 0 END))"),
-                                                "total_samples_tested" => new Expression("(SUM(CASE WHEN (((vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') OR (vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0))) THEN 1 ELSE 0 END))"),
-                                                "total_samples_valid" => new Expression("(SUM(CASE WHEN ((vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample') AND (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) THEN 1 ELSE 0 END))"),
+                                                "total_samples_tested" => new Expression("(SUM(CASE WHEN (((vl.DashVL_AnalysisResult IS NOT NULL AND vl.DashVL_AnalysisResult != '' AND vl.DashVL_AnalysisResult != 'NULL') OR (vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0))) THEN 1 ELSE 0 END))"),
+                                                //"total_samples_valid" => new Expression("(SUM(CASE WHEN ((vl.DashVL_AnalysisResult IS NOT NULL AND vl.DashVL_AnalysisResult != '' AND vl.DashVL_AnalysisResult != 'NULL') AND (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) THEN 1 ELSE 0 END))"),
                                                 "total_samples_rejected" => new Expression("(SUM(CASE WHEN (reason_for_sample_rejection !='' AND reason_for_sample_rejection !='0' AND reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END))"),
-                                                "total_suppressed_samples" => new Expression("(SUM(CASE WHEN ((vl.result < 1000 or vl.result = 'Target Not Detected' or vl.result = 'TND' or vl.result = 'tnd' or vl.result= 'Below Detection Level' or vl.result='BDL' or vl.result='bdl' or vl.result= 'Low Detection Level' or vl.result='LDL' or vl.result='ldl') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END))"),
+                                                //"total_suppressed_samples" => new Expression("(SUM(CASE WHEN (vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' or vl.DashVL_Abs < 1000) THEN 1 ELSE 0 END))"),
+                                                "suppression_rate" => new Expression("ROUND(((total_suppressed_samples)/(total_samples_valid))*100,2)"),
+                                                "percentage_of_samples" => new Expression("ROUND((COUNT(*)/$totalSamples)*100,2)"),
                                                 'current_regimen'
                                                 )
                                           )
                                 ->join(array('f'=>'facility_details'),'f.facility_id=vl.facility_id',array('facility_name'))
-                                ->where(array('vl.line_of_treatment'=>1))
+                                ->join(array('valid'=>$validQuery),'valid.current_regimen=vl.current_regimen',array('total_samples_valid'))
+                                ->join(array('suppressed'=>$suppressedQuery),'suppressed.current_regimen=vl.current_regimen',array('total_suppressed_samples'))                                
+                                //->where(array('vl.line_of_treatment  >= 1'))
                                 ->group('vl.current_regimen');
                                 
         if (isset($sWhere) && $sWhere != "") {
@@ -5471,17 +5500,13 @@ class SampleTable extends AbstractTableGateway {
         $iQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
                                 ->columns(
                                           array(
-                                                "total_samples" => new Expression('COUNT(*)'),
-                                                "total_samples_received" => new Expression("(SUM(CASE WHEN (vl.sample_collection_date is not null AND vl.sample_collection_date != '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00') THEN 1 ELSE 0 END))"),
-                                                "total_samples_tested" => new Expression("(SUM(CASE WHEN (((vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') OR (vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0))) THEN 1 ELSE 0 END))"),
-                                                "total_samples_valid" => new Expression("(SUM(CASE WHEN ((vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample') AND (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) THEN 1 ELSE 0 END))"),
-                                                "total_samples_rejected" => new Expression("(SUM(CASE WHEN (reason_for_sample_rejection !='' AND reason_for_sample_rejection !='0' AND reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END))"),
-                                                "total_suppressed_samples" => new Expression("(SUM(CASE WHEN ((vl.result < 1000 or vl.result = 'Target Not Detected' or vl.result = 'TND' or vl.result = 'tnd' or vl.result= 'Below Detection Level' or vl.result='BDL' or vl.result='bdl' or vl.result= 'Low Detection Level' or vl.result='LDL' or vl.result='ldl') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END))"),
-                                                'current_regimen'
+                                                "total_samples" => new Expression('COUNT(*)')
                                                 )
                                           )
                                 ->join(array('f'=>'facility_details'),'f.facility_id=vl.facility_id',array('facility_name'))
-                                ->where(array('vl.line_of_treatment'=>1))
+                                ->join(array('valid'=>$validQuery),'valid.current_regimen=vl.current_regimen',array('total_samples_valid'))
+                                ->join(array('suppressed'=>$suppressedQuery),'suppressed.current_regimen=vl.current_regimen',array('total_suppressed_samples'))                                
+                                //->where(array('vl.line_of_treatment'=>1))
                                 ->group('vl.current_regimen');
         $iQueryStr = $sql->getSqlStringForSqlObject($iQuery);
         $iResult = $dbAdapter->query($iQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -5501,8 +5526,8 @@ class SampleTable extends AbstractTableGateway {
             $row[] = $aRow['total_samples_tested'];
             $row[] = $aRow['total_samples_valid'];
             $row[] = $aRow['total_suppressed_samples'];           
-            $row[] = ($aRow['total_suppressed_samples'] > 0 && $aRow['total_samples_valid'] > 0)?round((($aRow['total_suppressed_samples']/$aRow['total_samples_valid'])*100),2).'%':'';
-            $row[] = ($parameters['t_received'] > 0 && $aRow['total_samples_received'] >0)?round((($aRow['total_samples_received']/$parameters['t_received'])*100),2).'%':'';
+            $row[] = ($aRow['suppression_rate']);
+            $row[] = ($aRow['percentage_of_samples']);
             $output['aaData'][] = $row;
         }
        return $output;
@@ -5574,11 +5599,16 @@ class SampleTable extends AbstractTableGateway {
                                                ->columns(
                                                           array(
                                                                 "total_samples_received" => new Expression("(COUNT(*))"),
-                                                                "total_samples_tested" => new Expression("(SUM(CASE WHEN (((vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL') AND (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) OR (vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0)) THEN 1 ELSE 0 END))"),
-                                                                "total_samples_valid" => new Expression("(SUM(CASE WHEN ((vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample') AND (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) THEN 1 ELSE 0 END))"),
-                                                                "total_samples_pending" => new Expression("(SUM(CASE WHEN ((vl.result IS NULL OR vl.result = '' OR vl.result = 'NULL' OR sample_tested_datetime is null OR sample_tested_datetime = '' OR DATE(sample_tested_datetime) ='1970-01-01' OR DATE(sample_tested_datetime) ='0000-00-00') AND (vl.reason_for_sample_rejection IS NULL OR vl.reason_for_sample_rejection = '' OR vl.reason_for_sample_rejection = 0)) THEN 1 ELSE 0 END))"),
-                                                                "total_suppressed_samples" => new Expression("SUM(CASE WHEN ((vl.result < 1000 or vl.result = 'Target Not Detected' or vl.result = 'TND' or vl.result = 'tnd' or vl.result= 'Below Detection Level' or vl.result='BDL' or vl.result='bdl' or vl.result= 'Low Detection Level' or vl.result='LDL' or vl.result='ldl') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END)"),
-                                                                "total_samples_rejected" => new Expression("SUM(CASE WHEN (vl.reason_for_sample_rejection !='' AND vl.reason_for_sample_rejection !='0' AND vl.reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END)"),
+                                                                //"total_samples_tested" => new Expression("(SUM(CASE WHEN (((vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL') AND (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) OR (vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0)) THEN 1 ELSE 0 END))"),
+                                                                
+                                                                "total_samples_pending" => new Expression("(SUM(CASE WHEN ((vl.DashVL_AnalysisResult IS NULL OR vl.DashVL_AnalysisResult = '' OR vl.DashVL_AnalysisResult = 'NULL') AND (vl.reason_for_sample_rejection IS NULL OR vl.reason_for_sample_rejection = '' OR vl.reason_for_sample_rejection = 0)) THEN 1 ELSE 0 END))"),
+                                                                "total_samples_tested" => new Expression("(SUM(CASE WHEN (((vl.DashVL_AnalysisResult IS NOT NULL AND vl.DashVL_AnalysisResult != '' AND vl.DashVL_AnalysisResult != 'NULL'))) THEN 1 ELSE 0 END))"),
+                                                                
+                                                                "total_samples_valid" => new Expression("(SUM(CASE WHEN (((vl.DashVL_AnalysisResult IS NOT NULL AND vl.DashVL_AnalysisResult != '' AND vl.DashVL_AnalysisResult != 'NULL'))) THEN 1 ELSE 0 END))"),
+                                                                "total_samples_rejected" => new Expression("(SUM(CASE WHEN (reason_for_sample_rejection !='' AND reason_for_sample_rejection !='0' AND reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END))"),
+                                                                "total_suppressed_samples" => new Expression("SUM(CASE WHEN ((vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' or vl.DashVL_Abs < 1000)) THEN 1 ELSE 0 END)"),                                                                
+                                                                //"total_suppressed_samples" => new Expression("SUM(CASE WHEN ((vl.result < 1000 or vl.result = 'Target Not Detected' or vl.result = 'TND' or vl.result = 'tnd' or vl.result= 'Below Detection Level' or vl.result='BDL' or vl.result='bdl' or vl.result= 'Low Detection Level' or vl.result='LDL' or vl.result='ldl') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END)"),
+                                                                
                                                                 //"suppressed_samples_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (vl.result < 1000 or vl.result='Target Not Detected') THEN 1 ELSE 0 END)/COUNT(*))*100),2)"),
                                                                 //"rejected_samples_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (vl.reason_for_sample_rejection !='' AND vl.reason_for_sample_rejection !='0' AND vl.reason_for_sample_rejection IS NOT NULL AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END)/COUNT(*))*100),2)"),
                                                                 )
@@ -5588,9 +5618,9 @@ class SampleTable extends AbstractTableGateway {
             $samplesReceivedSummaryResult = $common->cacheQuery($samplesReceivedSummaryCacheQuery,$dbAdapter);
             $summaryResult['sample']['Samples Received']['month'][$j] = (isset($samplesReceivedSummaryResult[0]["total_samples_received"]))?$samplesReceivedSummaryResult[0]["total_samples_received"]:0;
             $summaryResult['sample']['Samples Tested']['month'][$j] = (isset($samplesReceivedSummaryResult[0]["total_samples_tested"]))?$samplesReceivedSummaryResult[0]["total_samples_tested"]:0;
-            $summaryResult['sample']['Valid Tested']['month'][$j] = (isset($samplesReceivedSummaryResult[0]["total_samples_valid"]))?$samplesReceivedSummaryResult[0]["total_samples_valid"]:0;;
-            $summaryResult['sample']['Suppression Rate']['month'][$j] = (isset($samplesReceivedSummaryResult[0]["total_suppressed_samples"]) && $samplesReceivedSummaryResult[0]["total_suppressed_samples"] >0 && $samplesReceivedSummaryResult[0]["total_samples_valid"] > 0)?round((($samplesReceivedSummaryResult[0]["total_suppressed_samples"]/$samplesReceivedSummaryResult[0]["total_samples_valid"])*100),2).' %':'';
-            $summaryResult['sample']['Rejection Rate']['month'][$j] = (isset($samplesReceivedSummaryResult[0]["total_samples_rejected"]) && $samplesReceivedSummaryResult[0]["total_samples_rejected"] >0 && $samplesReceivedSummaryResult[0]["total_samples_received"] > 0)?round((($samplesReceivedSummaryResult[0]["total_samples_rejected"]/$samplesReceivedSummaryResult[0]["total_samples_received"])*100),2).' %':'';
+            $summaryResult['sample']['Valid Tested']['month'][$j] = (isset($samplesReceivedSummaryResult[0]["total_samples_valid"]))? $samplesReceivedSummaryResult[0]["total_samples_valid"] - $samplesReceivedSummaryResult[0]["total_samples_rejected"] :0;;
+            $summaryResult['sample']['Suppression Rate']['month'][$j] = (isset($samplesReceivedSummaryResult[0]["total_suppressed_samples"]) && $samplesReceivedSummaryResult[0]["total_suppressed_samples"] >0 && $samplesReceivedSummaryResult[0]["total_samples_valid"] > 0)?round((($samplesReceivedSummaryResult[0]["total_suppressed_samples"]/$samplesReceivedSummaryResult[0]["total_samples_valid"])*100),2).' %':'0';
+            $summaryResult['sample']['Rejection Rate']['month'][$j] = (isset($samplesReceivedSummaryResult[0]["total_samples_rejected"]) && $samplesReceivedSummaryResult[0]["total_samples_rejected"] >0 && $samplesReceivedSummaryResult[0]["total_samples_received"] > 0)?round((($samplesReceivedSummaryResult[0]["total_samples_rejected"]/$samplesReceivedSummaryResult[0]["total_samples_received"])*100),2).' %':'0';
             $summaryResult['month'][$j] = $monthYearFormat;
           $start = strtotime("+1 month", $start);
           $j++;
@@ -5903,7 +5933,7 @@ class SampleTable extends AbstractTableGateway {
                     }
                     $rQueryStr = $sql->getSqlStringForSqlObject($rQuery);
                     $rResult  = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-                    $result['clinic'][$c] = ucwords($clinic['facility_name']);
+                    $result['clinic'][$c] = addslashes($clinic['facility_name']);
                     $result['sample']['total'][$c] = (isset($rResult->total))?$rResult->total:0;
                   $c++;
                 }

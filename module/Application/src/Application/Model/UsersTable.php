@@ -92,8 +92,8 @@ class UsersTable extends AbstractTableGateway {
                //return '/labs/dashboard';
                return '/summary/dashboard';
             }else if($logincontainer->role == 3){
-                //return '/clinics/dashboard';
-                return '/summary/dashboard';
+                return '/clinics/dashboard';
+                //return '/summary/dashboard';
             }else if($logincontainer->role == 4){
                 //return '/hubs/dashboard';
                 return '/summary/dashboard';

@@ -1057,16 +1057,16 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
             // "sScrollX": true,
             "aoColumns": [
                 {"sClass":"center"},
-                {"sClass":"center","bSortable":false},
-                {"sClass":"center","bSortable":false},
-                {"sClass":"center","bSortable":false},
-                {"sClass":"center","bSortable":false},
-                {"sClass":"center","bSortable":false},
-                {"sClass":"center","bSortable":false},
-                {"sClass":"center","bSortable":false}
+                {"sClass":"center","bSortable":true},
+                {"sClass":"center","bSortable":true},
+                {"sClass":"center","bSortable":true},
+                {"sClass":"center","bSortable":true},
+                {"sClass":"center","bSortable":true},
+                {"sClass":"center","bSortable":true},
+                {"sClass":"center","bSortable":true}
                 ],
             "iDisplayLength": 10,
-            "aaSorting": [[ 0, "asc" ]],
+            "aaSorting": [[ 1, "desc" ]],
             "pagingType": "simple",
             "sAjaxSource": "<?php echo $this->url('summary',array('action' => 'samples-received-district')); ?>",
             "fnServerData": function ( sSource, aoData, fnCallback ) {                
@@ -1090,16 +1090,16 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
             "aoColumns": [
                 {"sClass":"center"},
                 {"sClass":"center"},
-                {"sClass":"center","bSortable":false},
-                {"sClass":"center","bSortable":false},
-                {"sClass":"center","bSortable":false},
-                {"sClass":"center","bSortable":false},
-                {"sClass":"center","bSortable":false},
-                {"sClass":"center","bSortable":false},
-                {"sClass":"center","bSortable":false}
+                {"sClass":"center","bSortable":true},
+                {"sClass":"center","bSortable":true},
+                {"sClass":"center","bSortable":true},
+                {"sClass":"center","bSortable":true},
+                {"sClass":"center","bSortable":true},
+                {"sClass":"center","bSortable":true},
+                {"sClass":"center","bSortable":true}
                 ],
             "iDisplayLength": 10,
-            "aaSorting": [[ 0, "asc" ]],
+            "aaSorting": [[ 2, "desc" ]],
             "pagingType": "simple",
             "sAjaxSource": "<?php echo $this->url('summary',array('action' => 'samples-received-facility')); ?>",
             "fnServerData": function ( sSource, aoData, fnCallback ) {                
@@ -1122,13 +1122,13 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
             //"sScrollX": true,
             "aoColumns": [
                 {"sClass":"center"},
-                {"sClass":"center","bSortable":false},
-                {"sClass":"center","bSortable":false},
-                {"sClass":"center","bSortable":false},
-                {"sClass":"center","bSortable":false}
+                {"sClass":"center","bSortable":true},
+                {"sClass":"center","bSortable":true},
+                {"sClass":"center","bSortable":true},
+                {"sClass":"center","bSortable":true}
                 ],
             "iDisplayLength": 10,
-            "aaSorting": [[ 0, "asc" ]],
+            "aaSorting": [[ 1, "desc" ]],
             "pagingType": "simple",
             "sAjaxSource": "<?php echo $this->url('summary',array('action' => 'suppression-rate-district')); ?>",
             "fnServerData": function ( sSource, aoData, fnCallback ) {                
@@ -1153,13 +1153,13 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
             "aoColumns": [
                 {"sClass":"center"},
                 {"sClass":"center"},
-                {"sClass":"center","bSortable":false},
-                {"sClass":"center","bSortable":false},
-                {"sClass":"center","bSortable":false},
-                {"sClass":"center","bSortable":false}
+                {"sClass":"center","bSortable":true},
+                {"sClass":"center","bSortable":true},
+                {"sClass":"center","bSortable":true},
+                {"sClass":"center","bSortable":true}
                 ],
             "iDisplayLength": 10,
-            "aaSorting": [[ 0, "asc" ]],
+            "aaSorting": [[ 2, "desc" ]],
             "pagingType": "simple",
             "sAjaxSource": "<?php echo $this->url('summary',array('action' => 'suppression-rate-facility')); ?>",
             "fnServerData": function ( sSource, aoData, fnCallback ) {                
@@ -1182,12 +1182,12 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
             //"scrollX":true,
             "aoColumns": [
                 {"sClass":"center"},
-                {"sClass":"center","bSortable":false},
-                {"sClass":"center","bSortable":false},
-                {"sClass":"center","bSortable":false}
+                {"sClass":"center","bSortable":true},
+                {"sClass":"center","bSortable":true},
+                {"sClass":"center","bSortable":true}
                 ],
             "iDisplayLength": 10,
-            "aaSorting": [[ 0, "asc" ]],
+            "aaSorting": [[ 1, "desc" ]],
             "pagingType": "simple",
             "sAjaxSource": "<?php echo $this->url('summary',array('action' => 'samples-rejected-district')); ?>",
             "fnServerData": function ( sSource, aoData, fnCallback ) {                
@@ -1211,11 +1211,11 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
             "aoColumns": [
                 {"sClass":"center"},
                 {"sClass":"center"},
-                {"sClass":"center","bSortable":false},
-                {"sClass":"center","bSortable":false}
+                {"sClass":"center","bSortable":true},
+                {"sClass":"center","bSortable":true}
                 ],
             "iDisplayLength": 10,
-            "aaSorting": [[ 0, "asc" ]],
+            "aaSorting": [[ 2, "desc" ]],
             "pagingType": "simple",
             "sAjaxSource": "<?php echo $this->url('summary',array('action' => 'samples-rejected-facility')); ?>",
             "fnServerData": function ( sSource, aoData, fnCallback ) {                
@@ -1238,15 +1238,15 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
             //"scrollX":true,
             "aoColumns": [
                 {"sClass":"center"},
-                {"sClass":"center","bSortable":false},
-                {"sClass":"center","bSortable":false},
-                {"sClass":"center","bSortable":false},
-                {"sClass":"center","bSortable":false},
-                {"sClass":"center","bSortable":false},
-                {"sClass":"center","bSortable":false}
+                {"sClass":"center","bSortable":true},
+                {"sClass":"center","bSortable":true},
+                {"sClass":"center","bSortable":true},
+                {"sClass":"center","bSortable":true},
+                {"sClass":"center","bSortable":true},
+                {"sClass":"center","bSortable":true}
                 ],
             "iDisplayLength": 10,
-            "aaSorting": [[ 0, "asc" ]],
+            "aaSorting": [[ 1, "desc" ]],
             "pagingType": "simple",
             "sAjaxSource": "<?php echo $this->url('summary',array('action' => 'get-regimen-group-details')); ?>",
             "fnServerData": function ( sSource, aoData, fnCallback ) {

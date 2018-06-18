@@ -37,14 +37,15 @@
                       }
                     }
                     ?>],
-                tickInterval: 20,
+                tickInterval: 1,
                 //minorTicks: true,
-                tickPosition: 'inside',
+                //tickPosition: 'inside',
                 crosshair: true
             }],
             yAxis: [{ // Primary yAxis
                 allowDecimals: false,
                 min: 0,
+                max: 100,
                 labels: {
                     format: '{value}%',
                     style: {
@@ -97,10 +98,11 @@
             }, {
                 name: '<?php echo $this->translate('Suppression Rate'); ?>(L)',
                 type: 'spline',
+                
                 data: [
                 <?php if(isset($result['suppression_rate']) && count($result['suppression_rate']) >0){
                       foreach($result['suppression_rate'] as $suppressionRate){                     
-                        echo $suppressionRate.',';
+                        echo ($suppressionRate>0) ? $suppressionRate.',' : null;
                       }
                       ?>
                <?php  } ?>

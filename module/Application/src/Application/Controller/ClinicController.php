@@ -111,9 +111,9 @@ class ClinicController extends AbstractActionController{
             $params = $request->getPost();
             $sampleService = $this->getServiceLocator()->get('SampleService');
             if($params['cFrom']=='high'){
-            $file=$sampleService->generateHighVlSampleResultExcel($params);
+                $file=$sampleService->generateHighVlSampleResultExcel($params);
             }else{
-            $file=$sampleService->generateResultExcel($params);
+                $file=$sampleService->generateResultExcel($params);
             }
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('file' =>$file))
