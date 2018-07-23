@@ -51,6 +51,15 @@ class SummaryController extends AbstractActionController{
             return $this->getResponse()->setContent(Json::encode($result));
         }
     }
+    public function samplesReceivedProvinceAction() {
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $parameters = $request->getPost();
+            $summaryService = $this->getServiceLocator()->get('SummaryService');
+            $result = $summaryService->getAllSamplesReceivedByProvince($parameters);
+            return $this->getResponse()->setContent(Json::encode($result));
+        }
+    }
     
     public function samplesReceivedFacilityAction() {
         $request = $this->getRequest();
@@ -82,6 +91,15 @@ class SummaryController extends AbstractActionController{
             $parameters = $request->getPost();
             $summaryService = $this->getServiceLocator()->get('SummaryService');
             $result = $summaryService->getAllSuppressionRateByDistrict($parameters);
+            return $this->getResponse()->setContent(Json::encode($result));
+        }
+    }
+    public function suppressionRateProvinceAction() {
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $parameters = $request->getPost();
+            $summaryService = $this->getServiceLocator()->get('SummaryService');
+            $result = $summaryService->getAllSuppressionRateByProvince($parameters);
             return $this->getResponse()->setContent(Json::encode($result));
         }
     }
@@ -126,6 +144,15 @@ class SummaryController extends AbstractActionController{
             $parameters = $request->getPost();
             $summaryService = $this->getServiceLocator()->get('SummaryService');
             $result = $summaryService->getAllSamplesRejectedByFacility($parameters);
+            return $this->getResponse()->setContent(Json::encode($result));
+        }
+    }
+    public function samplesRejectedProvinceAction() {
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $parameters = $request->getPost();
+            $summaryService = $this->getServiceLocator()->get('SummaryService');
+            $result = $summaryService->getAllSamplesRejectedByProvince($parameters);
             return $this->getResponse()->setContent(Json::encode($result));
         }
     }

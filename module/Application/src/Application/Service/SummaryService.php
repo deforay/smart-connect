@@ -41,6 +41,10 @@ class SummaryService {
         $sampleDb = $this->sm->get('SampleTable');
         return $sampleDb->fetchAllSamplesReceivedByDistrict($parameters);
     }
+    public function getAllSamplesReceivedByProvince($parameters){
+        $sampleDb = $this->sm->get('SampleTable');
+        return $sampleDb->fetchAllSamplesReceivedByProvince($parameters);
+    }
     
     public function getAllSamplesReceivedByFacility($parameters){
         $sampleDb = $this->sm->get('SampleTable');
@@ -55,6 +59,11 @@ class SummaryService {
     public function getAllSuppressionRateByDistrict($parameters){
         $sampleDb = $this->sm->get('SampleTable');
         return $sampleDb->fetchAllSuppressionRateByDistrict($parameters);
+    }
+
+    public function getAllSuppressionRateByProvince($parameters){
+        $sampleDb = $this->sm->get('SampleTable');
+        return $sampleDb->fetchAllSuppressionRateByProvince($parameters);
     }
     
     public function getAllSuppressionRateByFacility($parameters){
@@ -76,6 +85,10 @@ class SummaryService {
        $sampleDb = $this->sm->get('SampleTable');
       return $sampleDb->fecthAllSamplesRejectedByFacility($parameters); 
     }
+    public function getAllSamplesRejectedByProvince($parameters){
+        $sampleDb = $this->sm->get('SampleTable');
+       return $sampleDb->fecthAllSamplesRejectedByProvince($parameters); 
+     }
     
     public function getRegimenGroupBarChartDetails($params){
         $sampleDb = $this->sm->get('SampleTable');
