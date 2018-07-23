@@ -17,10 +17,14 @@ class LaboratoryController extends AbstractActionController{
         $this->layout()->setVariable('activeTab', 'labs-dashboard');
         $sampleService = $this->getServiceLocator()->get('SampleService');
         $sampleType = $sampleService->getSampleType();
-        $labName = $sampleService->getAllLabName();        
+        $labName = $sampleService->getAllLabName();
+        $provinceName = $sampleService->getAllProvinceList();
+        $districtName = $sampleService->getAllDistrictList();
         return new ViewModel(array(
                     'sampleType' => $sampleType,
-                    'labName' => $labName
+                    'labName' => $labName,
+                    'provinceName'=>$provinceName,
+                    'districtName'=>$districtName
                 ));
     }
     

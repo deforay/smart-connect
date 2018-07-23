@@ -209,13 +209,38 @@ foreach($sampleType as $samples){
     </div>
     <hr style="background: #000 !important;border-color:#ccc;">
     <form id="pageFilter" action="#" method="">
-        <div class="row" style="padding-top:10px;padding-bottom:20px;">
+        <div class="row" style="padding-top:10px;padding-bottom:10px;">
+            <div class="col-lg-6">
+                <select name="provinceName[]" id="provinceName" class="form-control" multiple title="<?php echo $this->translate('Please select one or more province. Leave blank for All'); ?>" onchange="selectDistrictName();">
+                    <?php
+                    foreach($provinceName as $province){
+                        ?>
+                        <option value="<?php echo $province['location_id']; ?>"><?php echo $province['location_name'];?></option>
+                        <?php
+                    }
+                    ?>
+                </select>
+            </div>
+            <div class="col-lg-6">
+                <select name="districtName[]" id="districtName" class="form-control" multiple title="<?php echo $this->translate('Please select one or more district. Leave blank for All'); ?>" onchange="selectLabName();">
+                    <?php
+                    foreach($districtName as $district){
+                        ?>
+                        <option data-parent-location="<?php echo $district['parent_location']; ?>" value="<?php echo $district['parent_location']; ?>"><?php echo $district['location_name'];?></option>
+                        <?php
+                    }
+                    ?>
+                    <option value="0" >Empty</option>
+                </select>
+            </div>
+            </div>
+            <div class="row" style="padding-top:5px;padding-bottom:20px;">
             <div class="col-lg-6">
                 <select name="labName[]" id="labName" class="form-control" multiple title="<?php echo $this->translate('Please select one or more labs. Leave blank for All'); ?>">
                     <?php
                     foreach($labName as $lab){
                         ?>
-                        <option data-name="<?php echo $lab['facility_name']; ?>" value="<?php echo $lab['facility_id']; ?>"><?php echo $lab['facility_code']." - ".$lab['facility_name'];?></option>
+                        <option data-name="<?php echo $lab['facility_name']; ?>" data-district="<?php echo $lab['facility_district'];?>" data-province="<?php echo $lab['facility_state'];?>" value="<?php echo $lab['facility_id']; ?>"><?php echo $lab['facility_code']." - ".$lab['facility_name'];?></option>
                         <?php
                     }
                     ?>
@@ -606,6 +631,15 @@ foreach($sampleType as $samples){
     }
         
     $(function() {
+        $('#provinceName').select2({
+            placeholder: "<?php echo $this->translate('All Province'); ?>",
+            allowClear: true
+        });
+        $('#districtName').select2({
+            placeholder: "<?php echo $this->translate('All Districts'); ?>",
+            allowClear: true,
+            //maxPlaceholderOpts : 10
+        });
         $('#labName').select2({
             placeholder: "<?php echo $this->translate('All Labs'); ?>",
             allowClear: true
@@ -1073,5 +1107,27 @@ foreach($sampleType as $samples){
        $('#daterange-container span').html('<?php echo $this->translate('Choose Date Range'); ?>');
        $('input[name="daterange"]').val('');
        getSampleResult('reset');
+    }
+    function selectDistrictName()
+    {
+        var pName = $("#provinceName").val();
+        if(pName==null){
+            $('#districtName').select2('val', []);
+        }else{
+         $('#districtName').select2('val', pName);
+        }
+        selectLabName();
+    }
+    function selectLabName()
+    {
+        var dName = $("#districtName").val();
+        if(dName==null){
+            $('#labName').select2('val', []);
+        }else{
+            for(i=0;i<dName.length;i++)   {
+                $("#labName option[data-province='" + dName[i] +"']").attr("selected","selected");
+            }
+        }
+        $('#labName').select2('val', $("#labName").val());
     }
 </script>

@@ -465,6 +465,17 @@ class SampleService {
         $facilityDb = $this->sm->get('FacilityTable');
         return $facilityDb->fetchAllClinicName($mappedFacilities);
     }
+    //get all province name
+    public function getAllProvinceList()
+    {
+        $locationDb = $this->sm->get('LocationDetailsTable');
+        return $locationDb->fetchLocationDetails();
+    }
+    public function getAllDistrictList()
+    {
+        $locationDb = $this->sm->get('LocationDetailsTable');
+        return $locationDb->fetchAllDistrictsList();
+    }
     
     public function getAllTestResults($parameters){
         $sampleDb = $this->sm->get('SampleTable');
