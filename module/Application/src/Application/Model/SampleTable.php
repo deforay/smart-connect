@@ -1802,8 +1802,8 @@ class SampleTable extends AbstractTableGateway {
         $sql = new Sql($dbAdapter);
         $result = array();
         $common = new CommonService($this->sm);
-        $this->dbsId = 8;
-        $this->plasmaId = 19;        
+        
+              
         if(isset($params['sampleCollectionDate']) && trim($params['sampleCollectionDate'])!= ''){
             $s_c_date = explode("to", $params['sampleCollectionDate']);
             if (isset($s_c_date[0]) && trim($s_c_date[0]) != "") {
@@ -2179,8 +2179,8 @@ class SampleTable extends AbstractTableGateway {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = array();
-        $this->dbsId = 8;
-        $this->plasmaId = 19;           
+        
+                 
         $common = new CommonService($this->sm);
         if(trim($params['fromDate'])!= '' && trim($params['toDate'])!= ''){
             $startMonth = date("Y-m", strtotime(trim($params['fromDate'])))."-01";
@@ -4198,8 +4198,8 @@ class SampleTable extends AbstractTableGateway {
     
     public function fetchSamplesReceivedBarChartDetails($params){
 
-        $this->dbsId = 8;
-        $this->plasmaId = 19;
+        
+        
 
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
@@ -4237,8 +4237,8 @@ class SampleTable extends AbstractTableGateway {
     
     /* Samples Received Province*/
     public function fetchAllSamplesReceivedByProvince($parameters){
-        $this->dbsId = 8;
-        $this->plasmaId = 19;                
+        
+                        
         /* Array of database columns which should be read and sent back to DataTables. Use a space where
          * you want to insert a non-database field (for example a counter or static image)
         */
@@ -4406,8 +4406,8 @@ class SampleTable extends AbstractTableGateway {
 
     /* Samples Received District*/
     public function fetchAllSamplesReceivedByDistrict($parameters){
-        $this->dbsId = 8;
-        $this->plasmaId = 19;                
+        
+                      
         /* Array of database columns which should be read and sent back to DataTables. Use a space where
          * you want to insert a non-database field (for example a counter or static image)
         */
@@ -4575,8 +4575,8 @@ class SampleTable extends AbstractTableGateway {
     
     public function fetchAllSamplesReceivedByFacility($parameters){
 
-        $this->dbsId = 8;
-        $this->plasmaId = 19;
+        
+        
         /* Array of database columns which should be read and sent back to DataTables. Use a space where
          * you want to insert a non-database field (for example a counter or static image)
         */
@@ -4775,7 +4775,7 @@ class SampleTable extends AbstractTableGateway {
             //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             $sampleResult = $common->cacheQuery($queryStr,$dbAdapter);
             $result['valid_results'][$j] = (isset($sampleResult[0]["total_samples_valid"]))?$sampleResult[0]["total_samples_valid"]:0;
-            $result['suppression_rate'][$j] = ($sampleResult[0]["total_suppressed_samples"] > 0 && $sampleResult[0]["total_samples_valid"] > 0)?round((($sampleResult[0]["total_suppressed_samples"]/$sampleResult[0]["total_samples_valid"])*100),2):0;
+            $result['suppression_rate'][$j] = ($sampleResult[0]["total_suppressed_samples"] > 0 && $sampleResult[0]["total_samples_valid"] > 0)?round((($sampleResult[0]["total_suppressed_samples"]/$sampleResult[0]["total_samples_valid"])*100),2):null;
             $result['date'][$j] = $monthYearFormat;
            $start = strtotime("+1 month", $start);
            $j++;
@@ -5829,7 +5829,7 @@ class SampleTable extends AbstractTableGateway {
             $result=array();
             foreach($sampleResult as $aRow){
                 $result['valid_results'][$j] = $aRow['total_samples_valid'];
-                $result['suppression_rate'][$j] = ($aRow['total_samples_valid'] > 0) ? $aRow['suppression_rate'] : 0;
+                $result['suppression_rate'][$j] = ($aRow['total_samples_valid'] > 0) ? $aRow['suppression_rate'] : null;
                 $result['current_regimen'][$j] = $aRow["current_regimen"];
                 $j++;
             }
@@ -6092,9 +6092,9 @@ class SampleTable extends AbstractTableGateway {
                                                                 //"total_samples_tested" => new Expression("(SUM(CASE WHEN (((vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL') AND (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) OR (vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0)) THEN 1 ELSE 0 END))"),
                                                                 
                                                                 "total_samples_pending" => new Expression("(SUM(CASE WHEN ((vl.DashVL_AnalysisResult IS NULL OR vl.DashVL_AnalysisResult = '' OR vl.DashVL_AnalysisResult = 'NULL') AND (vl.reason_for_sample_rejection IS NULL OR vl.reason_for_sample_rejection = '' OR vl.reason_for_sample_rejection = 0)) THEN 1 ELSE 0 END))"),
-                                                                "total_samples_tested" => new Expression("(SUM(CASE WHEN (((vl.DashVL_AnalysisResult IS NOT NULL AND vl.DashVL_AnalysisResult != '' AND vl.DashVL_AnalysisResult != 'NULL'))) THEN 1 ELSE 0 END))"),
+                                                                "total_samples_tested" => new Expression("(SUM(CASE WHEN (vl.DashVL_AnalysisResult IS NOT NULL AND vl.DashVL_AnalysisResult != '' AND vl.DashVL_AnalysisResult != 'NULL') THEN 1 ELSE 0 END))"),
                                                                 
-                                                                "total_samples_valid" => new Expression("(SUM(CASE WHEN (((vl.DashVL_AnalysisResult IS NOT NULL AND vl.DashVL_AnalysisResult != '' AND vl.DashVL_AnalysisResult != 'NULL'))) THEN 1 ELSE 0 END))"),
+                                                                //"total_samples_valid" => new Expression("(SUM(CASE WHEN ((vl.DashVL_AnalysisResult IS NOT NULL AND vl.DashVL_AnalysisResult != '' AND vl.DashVL_AnalysisResult not like 'NULL')) THEN 1 ELSE 0 END))"),
                                                                 "total_samples_rejected" => new Expression("(SUM(CASE WHEN (reason_for_sample_rejection !='' AND reason_for_sample_rejection !='0' AND reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END))"),
                                                                 "total_suppressed_samples" => new Expression("SUM(CASE WHEN ((vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' or vl.DashVL_Abs < 1000)) THEN 1 ELSE 0 END)"),                                                                
                                                                 //"total_suppressed_samples" => new Expression("SUM(CASE WHEN ((vl.result < 1000 or vl.result = 'Target Not Detected' or vl.result = 'TND' or vl.result = 'tnd' or vl.result= 'Below Detection Level' or vl.result='BDL' or vl.result='bdl' or vl.result= 'Low Detection Level' or vl.result='LDL' or vl.result='ldl') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END)"),
@@ -6106,11 +6106,17 @@ class SampleTable extends AbstractTableGateway {
                                                ->where("Month(sample_collection_date)='".$month."' AND Year(sample_collection_date)='".$year."'");
             $samplesReceivedSummaryCacheQuery = $sql->getSqlStringForSqlObject($samplesReceivedSummaryQuery);
             $samplesReceivedSummaryResult = $common->cacheQuery($samplesReceivedSummaryCacheQuery,$dbAdapter);
+            
             $summaryResult['sample']['Samples Received']['month'][$j] = (isset($samplesReceivedSummaryResult[0]["total_samples_received"]))?$samplesReceivedSummaryResult[0]["total_samples_received"]:0;
             $summaryResult['sample']['Samples Tested']['month'][$j] = (isset($samplesReceivedSummaryResult[0]["total_samples_tested"]))?$samplesReceivedSummaryResult[0]["total_samples_tested"]:0;
-            $summaryResult['sample']['Valid Tested']['month'][$j] = (isset($samplesReceivedSummaryResult[0]["total_samples_valid"]))? $samplesReceivedSummaryResult[0]["total_samples_valid"] - $samplesReceivedSummaryResult[0]["total_samples_rejected"] :0;;
-            $summaryResult['sample']['Suppression Rate']['month'][$j] = (isset($samplesReceivedSummaryResult[0]["total_suppressed_samples"]) && $samplesReceivedSummaryResult[0]["total_suppressed_samples"] >0 && $samplesReceivedSummaryResult[0]["total_samples_valid"] > 0)?round((($samplesReceivedSummaryResult[0]["total_suppressed_samples"]/$samplesReceivedSummaryResult[0]["total_samples_valid"])*100),2).' %':'0';
-            $summaryResult['sample']['Rejection Rate']['month'][$j] = (isset($samplesReceivedSummaryResult[0]["total_samples_rejected"]) && $samplesReceivedSummaryResult[0]["total_samples_rejected"] >0 && $samplesReceivedSummaryResult[0]["total_samples_received"] > 0)?round((($samplesReceivedSummaryResult[0]["total_samples_rejected"]/$samplesReceivedSummaryResult[0]["total_samples_received"])*100),2).' %':'0';
+            $summaryResult['sample']['Samples Rejected']['month'][$j] = (isset($samplesReceivedSummaryResult[0]["total_samples_rejected"]))?$samplesReceivedSummaryResult[0]["total_samples_rejected"]:0;
+            $summaryResult['sample']['Valid Tested']['month'][$j]  = $valid = (isset($samplesReceivedSummaryResult[0]["total_samples_tested"]))? $samplesReceivedSummaryResult[0]["total_samples_tested"] - $samplesReceivedSummaryResult[0]["total_samples_rejected"] :0;;
+            $summaryResult['sample']['Samples Suppressed']['month'][$j] = (isset($samplesReceivedSummaryResult[0]["total_suppressed_samples"]))?$samplesReceivedSummaryResult[0]["total_suppressed_samples"]:0;
+            
+            
+            $summaryResult['sample']['Suppression Rate']['month'][$j] = ($valid > 0) ?round((($samplesReceivedSummaryResult[0]["total_suppressed_samples"]/$valid)*100),2).' %':'0';
+            
+            $summaryResult['sample']['Rejection Rate']['month'][$j] = (isset($samplesReceivedSummaryResult[0]["total_samples_rejected"]) && $samplesReceivedSummaryResult[0]["total_samples_rejected"] >0 && $samplesReceivedSummaryResult[0]["total_samples_received"] > 0)?round((($samplesReceivedSummaryResult[0]["total_samples_rejected"]/($samplesReceivedSummaryResult[0]["total_samples_tested"] + $samplesReceivedSummaryResult[0]["total_samples_rejected"]))*100),2).' %':'0';
             $summaryResult['month'][$j] = $monthYearFormat;
           $start = strtotime("+1 month", $start);
           $j++;
