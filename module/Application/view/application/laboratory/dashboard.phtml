@@ -640,9 +640,31 @@ foreach($sampleType as $samples){
             allowClear: true,
             //maxPlaceholderOpts : 10
         });
+        $('#provinceName').on('select2:close', function (evt) {
+            var uldiv = $('#districtName').siblings('span.select2').find('ul');
+            var count = uldiv.find('li').length - 1;
+            uldiv.html("<li>"+count+" items selected</li>");
+            var uldiv = $('#labName').siblings('span.select2').find('ul');
+            var count = uldiv.find('li').length - 1;
+            uldiv.html("<li>"+count+" items selected</li>");
+        });
+        $('#districtName').on('select2:close', function (evt) {
+            var uldiv = $(this).siblings('span.select2').find('ul');
+            var count = uldiv.find('li').length - 1;
+            uldiv.html("<li>"+count+" items selected</li>");
+            var uldiv = $('#labName').siblings('span.select2').find('ul');
+            var count = uldiv.find('li').length - 1;
+            uldiv.html("<li>"+count+" items selected</li>");
+        });
+        
         $('#labName').select2({
             placeholder: "<?php echo $this->translate('All Labs'); ?>",
             allowClear: true
+        });
+        $('#labName').on('select2:close', function (evt) {
+            var uldiv = $('#labName').siblings('span.select2').find('ul');
+            var count = uldiv.find('li').length - 1;
+            uldiv.html("<li>"+count+" items selected</li>");
         });
         
         $('#age').select2({
@@ -1112,16 +1134,10 @@ foreach($sampleType as $samples){
     {
         var pName = $("#provinceName").val();
         if(pName==null){
-            $("#districtHeight .select2-selection__rendered").css({"height":"30px"});
             $('#districtName').select2('val', []);
         }else{
             for(i=0;i<pName.length;i++)   {
                 $("#districtName option[data-parent-location='" + pName[i] +"']").attr("selected","selected");
-            }
-            if($("#districtName").val()!=''){
-                $("#districtHeight .select2-selection__rendered").css({"height":"75px","overflow-y": "scroll"});
-            }else{
-                $("#districtHeight .select2-selection__rendered").css({"height":"30px"});
             }
             $('#districtName').select2('val', $("#districtName").val());
             selectLabName();
@@ -1132,17 +1148,10 @@ foreach($sampleType as $samples){
         var dName = $("#districtName").val();
         var pName = $("#provinceName").val();
         if(dName==null || pName==null){
-            $("#labHeight .select2-selection__rendered").css({"height":"30px"});
-            $("#districtHeight .select2-selection__rendered").css({"height":"30px"});
             $('#labName').select2('val', []);
         }else{
             for(i=0;i<dName.length;i++)   {
                 $("#labName option[data-district='" + dName[i] +"']").attr("selected","selected");
-            }
-            if($("#labName").val()!=null){
-                $("#labHeight .select2-selection__rendered").css({"height":"75px","overflow-y": "scroll"});
-            }else{
-                $("#labHeight .select2-selection__rendered").css({"height":"30px"});
             }
             $('#labName').select2('val', $("#labName").val());
         }
