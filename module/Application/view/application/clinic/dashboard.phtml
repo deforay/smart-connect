@@ -6,6 +6,9 @@ foreach($sampleType as $samples){
     $sType.='<option value="'.base64_encode($samples['sample_id']).'">'.ucwords($samples['sample_name']).'</option>';
 }
 ?>
+<style>
+
+</style>
 <!-- BEGIN PAGE BAR -->
 <div class="page-bar">
     <h1 class="page-title"><?php echo $this->translate('Clinics Dashboard'); ?></h1>
@@ -17,14 +20,42 @@ foreach($sampleType as $samples){
 <br>
 <br>
 <form id="pageFilter" action="#" method="">
-    <div class="row" style="padding-top:10px;padding-bottom:20px;">
+
+    <div class="row" style="padding-top:5px;padding-bottom:10px;">
         <div class="col-md-12">
             <div class="col-lg-6">
-                <select class="form-control" id="clinicId" name="clinicId[]" multiple title="<?php echo $this->translate('Please select one or more clinics. Leave blank for All'); ?>">
+                <select name="provinceName[]" id="provinceName" class="form-control" multiple title="<?php echo $this->translate('Please select one or more province. Leave blank for All'); ?>" onchange="selectDistrictName();">
+                    <?php
+                    foreach($provinceName as $province){
+                        ?>
+                        <option value="<?php echo $province['location_id']; ?>"><?php echo $province['location_name'];?></option>
+                        <?php
+                    }
+                    ?>
+                </select>
+            </div>
+            <div class="col-lg-6" id="districtHeight">
+                <select name="districtName[]" id="districtName" class="form-control" multiple title="<?php echo $this->translate('Please select one or more district. Leave blank for All'); ?>" onchange="selectClinicName();">
+                    <?php
+                    foreach($districtName as $district){
+                        ?>
+                        <option data-parent-location="<?php echo $district['parent_location']; ?>" value="<?php echo $district['location_id']; ?>"><?php echo $district['location_name'];?></option>
+                        <?php
+                    }
+                    ?>
+                    <option value="0" >Empty</option>
+                </select>
+            </div>
+            </div>
+            </div>
+            <div class="row" style="padding-top:10px;padding-bottom:10px;">
+        <div class="col-md-12">
+            <div class="col-lg-6" id="clinicHeight">
+                <select class="form-control" id="clinicId" name="clinicId[]" multiple title="<?php echo $this->translate('Please select one or more clinics. Leave blank for All'); ?>" >
                     <?php
                     foreach($clinicName as $clinic){
                         ?>
-                        <option value="<?php echo $clinic['facility_id']; ?>"><?php echo $clinic['facility_code']." - ".$clinic['facility_name'];?></option>
+                        <option value="<?php echo $clinic['facility_id']; ?>" data-district="<?php echo $clinic['facility_district'];?>" ><?php echo $clinic['facility_code']." - ".$clinic['facility_name'];?></option>
                         <?php
                     }
                     ?>
@@ -43,6 +74,7 @@ foreach($sampleType as $samples){
             </div>
         </div>
     </div>
+
     <div class="row">
         <div class="col-md-12">
             <div class="form-group col-lg-4">
@@ -258,6 +290,15 @@ foreach($sampleType as $samples){
 <script>
     var oTable = null;
     $(function() {
+        $('#provinceName').select2({
+            placeholder: "<?php echo $this->translate('All Province'); ?>",
+            allowClear: true
+        });
+        $('#districtName').select2({
+            placeholder: "<?php echo $this->translate('All Districts'); ?>",
+            allowClear: true,
+            //maxPlaceholderOpts : 10
+        });
         $('#clinicId').select2({
             placeholder: "<?php echo $this->translate('All Clinics'); ?>",
             allowClear: true
@@ -521,5 +562,44 @@ foreach($sampleType as $samples){
         var isPregnant = $("#isPregnant").val();
         var isBreastfeeding = $("#isBreastfeeding").val();
         window.open('/clinics/samples-test-reason?clinic='+clinic+'&dRange='+dateRange+'&r='+reason+'&rlt='+testResult+'&sTyp='+sampleTypeId+'&adhr='+adherence+'&age='+age+'&gd='+gender+'&p='+isPregnant+'&bf='+isBreastfeeding, '_blank');
+    }
+    function selectDistrictName()
+    {
+        var pName = $("#provinceName").val();
+        if(pName==null){
+            $("#districtHeight .select2-selection__rendered").css({"height":"30px"});
+            $('#districtName').select2('val', []);
+        }else{
+            for(i=0;i<pName.length;i++)   {
+                $("#districtName option[data-parent-location='" + pName[i] +"']").attr("selected","selected");
+            }
+            if($("#districtName").val()!=''){
+                $("#districtHeight .select2-selection__rendered").css({"height":"75px","overflow-y": "scroll"});
+            }else{
+                $("#districtHeight .select2-selection__rendered").css({"height":"30px"});
+            }
+            $('#districtName').select2('val', $("#districtName").val());
+            selectClinicName();
+        }
+    }
+    function selectClinicName()
+    {
+        var dName = $("#districtName").val();
+        var pName = $("#provinceName").val();
+        if(dName==null || pName==null){
+            $("#clinicHeight .select2-selection__rendered").css({"height":"30px"});
+            $("#districtHeight .select2-selection__rendered").css({"height":"30px"});
+            $('#clinicId').select2('val', []);
+        }else{
+            for(i=0;i<dName.length;i++)   {
+                $("#clinicId option[data-district='" + dName[i] +"']").attr("selected","selected");
+            }
+        }
+        if($("#clinicId").val()!=null){
+            $("#clinicHeight .select2-selection__rendered").css({"height":"75px","overflow-y": "scroll"});
+        }else{
+            $("#clinicHeight .select2-selection__rendered").css({"height":"30px"});
+        }
+        $('#clinicId').select2('val', $("#clinicId").val());
     }
 </script>        

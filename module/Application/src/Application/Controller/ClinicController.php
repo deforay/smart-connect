@@ -18,11 +18,15 @@ class ClinicController extends AbstractActionController{
         $sampleService = $this->getServiceLocator()->get('SampleService');
         $sampleType = $sampleService->getSampleType();
         $clinicName = $sampleService->getAllClinicName();
-        $testReasonName = $sampleService->getAllTestReasonName();          
+        $testReasonName = $sampleService->getAllTestReasonName();    
+        $provinceName = $sampleService->getAllProvinceList();
+        $districtName = $sampleService->getAllDistrictList();      
         return new ViewModel(array(
                 'sampleType' => $sampleType,
                 'clinicName' => $clinicName,
-                'testReason' => $testReasonName
+                'testReason' => $testReasonName,
+                'provinceName'=>$provinceName,
+                'districtName'=>$districtName
             ));
     }
     

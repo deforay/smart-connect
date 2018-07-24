@@ -141,7 +141,7 @@ $endDate=date('Y-m');
     width:100% !important;
 }
 .select2-selection--multiple{
-    border-radius:50px !important;
+    border-radius:10px !important;
 }
 @media screen and (min-width:320px) and (max-width: 760px){
     #daterange-container{
@@ -221,12 +221,12 @@ foreach($sampleType as $samples){
                     ?>
                 </select>
             </div>
-            <div class="col-lg-6">
+            <div class="col-lg-6" id="districtHeight">
                 <select name="districtName[]" id="districtName" class="form-control" multiple title="<?php echo $this->translate('Please select one or more district. Leave blank for All'); ?>" onchange="selectLabName();">
                     <?php
                     foreach($districtName as $district){
                         ?>
-                        <option data-parent-location="<?php echo $district['parent_location']; ?>" value="<?php echo $district['parent_location']; ?>"><?php echo $district['location_name'];?></option>
+                        <option data-parent-location="<?php echo $district['parent_location']; ?>" value="<?php echo $district['location_id']; ?>"><?php echo $district['location_name'];?></option>
                         <?php
                     }
                     ?>
@@ -235,12 +235,12 @@ foreach($sampleType as $samples){
             </div>
             </div>
             <div class="row" style="padding-top:5px;padding-bottom:20px;">
-            <div class="col-lg-6">
+            <div class="col-lg-6" id="labHeight">
                 <select name="labName[]" id="labName" class="form-control" multiple title="<?php echo $this->translate('Please select one or more labs. Leave blank for All'); ?>">
                     <?php
                     foreach($labName as $lab){
                         ?>
-                        <option data-name="<?php echo $lab['facility_name']; ?>" data-district="<?php echo $lab['facility_district'];?>" data-province="<?php echo $lab['facility_state'];?>" value="<?php echo $lab['facility_id']; ?>"><?php echo $lab['facility_code']." - ".$lab['facility_name'];?></option>
+                        <option data-name="<?php echo $lab['facility_name']; ?>" data-district="<?php echo $lab['facility_district'];?>" value="<?php echo $lab['facility_id']; ?>"><?php echo $lab['facility_code']." - ".$lab['facility_name'];?></option>
                         <?php
                     }
                     ?>
@@ -1112,22 +1112,39 @@ foreach($sampleType as $samples){
     {
         var pName = $("#provinceName").val();
         if(pName==null){
+            $("#districtHeight .select2-selection__rendered").css({"height":"30px"});
             $('#districtName').select2('val', []);
         }else{
-         $('#districtName').select2('val', pName);
+            for(i=0;i<pName.length;i++)   {
+                $("#districtName option[data-parent-location='" + pName[i] +"']").attr("selected","selected");
+            }
+            if($("#districtName").val()!=''){
+                $("#districtHeight .select2-selection__rendered").css({"height":"75px","overflow-y": "scroll"});
+            }else{
+                $("#districtHeight .select2-selection__rendered").css({"height":"30px"});
+            }
+            $('#districtName').select2('val', $("#districtName").val());
+            selectLabName();
         }
-        selectLabName();
     }
     function selectLabName()
     {
         var dName = $("#districtName").val();
-        if(dName==null){
+        var pName = $("#provinceName").val();
+        if(dName==null || pName==null){
+            $("#labHeight .select2-selection__rendered").css({"height":"30px"});
+            $("#districtHeight .select2-selection__rendered").css({"height":"30px"});
             $('#labName').select2('val', []);
         }else{
             for(i=0;i<dName.length;i++)   {
-                $("#labName option[data-province='" + dName[i] +"']").attr("selected","selected");
+                $("#labName option[data-district='" + dName[i] +"']").attr("selected","selected");
             }
+            if($("#labName").val()!=null){
+                $("#labHeight .select2-selection__rendered").css({"height":"75px","overflow-y": "scroll"});
+            }else{
+                $("#labHeight .select2-selection__rendered").css({"height":"30px"});
+            }
+            $('#labName').select2('val', $("#labName").val());
         }
-        $('#labName').select2('val', $("#labName").val());
     }
 </script>

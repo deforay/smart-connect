@@ -370,6 +370,8 @@ class FacilityTable extends AbstractTableGateway {
         $sql = new Sql($dbAdapter);
         $fQuery = $sql->select()->from(array('f'=>'facility_details'))
                         ->join(array('ft'=>'facility_type'),'ft.facility_type_id=f.facility_type')
+                        ->join(array('lp'=>'location_details'),'lp.location_id=f.facility_state',array())
+                        ->join(array('ld'=>'location_details'),'ld.location_id=f.facility_district',array())
                         ->where('ft.facility_type_name="clinic"');
         if($mappedFacilities != null){
             $fQuery = $fQuery->where('f.facility_id IN ("' . implode('", "', array_values(array_filter($mappedFacilities))) . '")');
