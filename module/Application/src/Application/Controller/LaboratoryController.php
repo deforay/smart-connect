@@ -782,4 +782,13 @@ class LaboratoryController extends AbstractActionController{
             return $viewModel;
         }
     }
+    public function expandBarChartAction(){
+        echo "came";die;
+        $this->layout('layout/modal.phtml');
+        $request = $this->getRequest();
+        $params = $request->getQuery();
+        return new ViewModel(array(
+            'params'=>$params
+        ));
+    }
 }

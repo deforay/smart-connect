@@ -462,7 +462,7 @@ class SampleTable extends AbstractTableGateway {
                 $monthDateArray[] = $sRow["monthDate"];
                 $subQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
                                 ->columns(array(
-                                                "AvgDiff" => new Expression("CAST(ABS(AVG(TIMESTAMPDIFF(DAY,result_approved_datetime,sample_collection_date))) AS DECIMAL (10,2))")
+                                                "AvgDiff" => new Expression("CAST(ABS(AVG(TIMESTAMPDIFF(DAY,result_approved_datetime,sample_collection_date))) AS DECIMAL (10,2))"),
                                               )
                                             );
                 $subQuery = $subQuery->where("
@@ -481,7 +481,9 @@ class SampleTable extends AbstractTableGateway {
                 $subQueryStr = $sql->getSqlStringForSqlObject($subQuery);
                 //echo $subQueryStr;die;
                 $subQueryResult = $common->cacheQuery($subQueryStr,$dbAdapter);
+
                 $result['all'][$j] = (isset($subQueryResult[0]["AvgDiff"]) && $subQueryResult[0]["AvgDiff"] != NULL && $subQueryResult[0]["AvgDiff"] > 0) ? round($subQueryResult[0]["AvgDiff"],2) : 0;
+                //$result['lab'][$j] = (isset($labsubQueryResult[0]["labCount"]) && $labsubQueryResult[0]["labCount"] != NULL && $labsubQueryResult[0]["labCount"] > 0) ? round($labsubQueryResult[0]["labCount"],2) : 0;
                 $result['sample']['Samples Collected'][$j] = (isset($sRow['total_samples_collected']) && $sRow['total_samples_collected'] != NULL) ? $sRow['total_samples_collected'] : 0;
                 $result['sample']['Samples Pending'][$j] = (isset($sRow['total_samples_pending']) && $sRow['total_samples_pending'] != NULL) ? $sRow['total_samples_pending'] : 0;
                 $result['date'][$j] = $sRow["monthDate"];
@@ -777,11 +779,11 @@ class SampleTable extends AbstractTableGateway {
             $fQuery = $sql->select()->from(array('f'=>'facility_details'))
                           ->where('f.facility_type = 2');
             if(isset($params['facilityId']) && trim($params['facilityId'])!= ''){
-                $fQuery = $fQuery->where('vl.lab_id IN ('.$params['facilityId'].')');
+                $fQuery = $fQuery->where('f.facility_id IN ('.$params['facilityId'].')');
             }else{
                 if($logincontainer->role!= 1){
                     $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:array(0);
-                    $fQuery = $fQuery->where('vl.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
+                    $fQuery = $fQuery->where('f.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
                 }
             }
             $fQueryStr = $sql->getSqlStringForSqlObject($fQuery);

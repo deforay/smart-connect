@@ -258,7 +258,7 @@ foreach($sampleType as $samples){
                   <input type="hidden" value="<?php echo $startDate; ?>" id="mrp-lowerDate" onchange=""/>
                   <input type="hidden" value="<?php echo $endDate; ?>" id="mrp-upperDate" />
                 </div>
-            </div>                        
+            </div>
             <div class="col-lg-3">
                 <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="getEverything();"><?php echo $this->translate('Search'); ?></a>&nbsp;&nbsp;
                 <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="resetEverything();"><?php echo $this->translate('Reset'); ?></a>
@@ -274,11 +274,13 @@ foreach($sampleType as $samples){
                         <span class="caption-subject"><?php echo $this->translate('Samples Tested'); ?></span>
                     </div>
                     <div class="actions">
+                    <!-- <a class="btn btn-danger" onclick="expandChart('stb');"><span><i class="fa fa-angle-double-right" aria-hidden="true"></i> <?php echo $this->translate('Expand'); ?></span></a> -->
                         <div class="btn-group">
                             <select id="sampleType" class="btn white btn-outline btn-circle btn-sm dropdown-toggle" onchange="getTestedSampleResult()">
                                 <option value=""><?php echo $this->translate('All Sample Types'); ?></option>
                                 <?php echo $sType;?>
                             </select>
+                            
                         </div>
                     </div>
                 </div>
@@ -1155,5 +1157,12 @@ foreach($sampleType as $samples){
             }
             $('#labName').select2('val', $("#labName").val());
         }
+    }
+    function expandChart(from)
+    {
+        var fromDate = $('#mrp-lowerDate').val();
+        var toDate = $('#mrp-upperDate').val();
+        var facilityId = ($("#labName").val() == null)?'':$("#labName").val().join(',');
+        showModal('labs/expand-bar-chart/?fromDate='+fromDate+'&toDate='+toDate+'&facilityId='+facilityId+'&from='+from,'800','450');
     }
 </script>
