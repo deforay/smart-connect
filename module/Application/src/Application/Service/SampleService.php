@@ -1504,8 +1504,63 @@ $i++;
                     $count = count($sheetData);
                     for ($i = 2; $i <= $count; $i++) {
                             if(trim($sheetData[$i]['A']) != '' && trim($sheetData[$i]['B']) != '') {
+
+                                
                                 $sampleCode = trim($sheetData[$i]['A']);
                                 $instanceCode = trim($sheetData[$i]['B']);
+
+
+                                $VLAnalysisResult = (float)$sheetData[$i]['AN'];
+                                $DashVL_Abs = NULL; 
+                                $DashVL_AnalysisResult = NULL;                                
+
+                                if ($sheetData[$i]['AM'] == 'Target not Detected' || $sheetData[$i]['AM'] == 'Target Not Detected' || strtolower($sheetData[$i]['AM']) == 'target not detected' || strtolower($sheetData[$i]['AM']) == 'tnd'
+                                    || $sheetData[$i]['AO'] == 'Target not Detected' || $sheetData[$i]['AO'] == 'Target Not Detected' || strtolower($sheetData[$i]['AO']) == 'target not detected' || strtolower($sheetData[$i]['AO']) == 'tnd'
+                                    ) {
+                                    $VLAnalysisResult = 20;
+                                }
+                                else if ($sheetData[$i]['AM'] == '< 20' || $sheetData[$i]['AM'] == '<20' || $sheetData[$i]['AO'] == '< 20' || $sheetData[$i]['AO'] == '<20') {
+                                    $VLAnalysisResult = 20;
+                                }
+                                else if ($sheetData[$i]['AM'] == '< 40' || $sheetData[$i]['AM'] == '<40' || $sheetData[$i]['AO'] == '< 40' || $sheetData[$i]['AO'] == '<40') {
+                                    $VLAnalysisResult = 40;
+                                }
+                                else if ($sheetData[$i]['AM'] == 'Nivel de detecÁao baixo' || $sheetData[$i]['AM'] == 'NÌvel de detecÁ„o baixo' || $sheetData[$i]['AO'] == 'Nivel de detecÁao baixo' || $sheetData[$i]['AO'] == 'NÌvel de detecÁ„o baixo') {
+                                    $VLAnalysisResult = 20;
+                                }
+                                else if ($sheetData[$i]['AM'] == 'Suppressed' || $sheetData[$i]['AO'] == 'Suppressed') {
+                                    $VLAnalysisResult = 500;
+                                }
+                                else if ($sheetData[$i]['AM'] == 'Not Suppressed' || $sheetData[$i]['AO'] == 'Not Suppressed') {
+                                    $VLAnalysisResult = 1500;
+                                }
+                                else if ($sheetData[$i]['AM'] == 'Negative' || $sheetData[$i]['AM'] == 'NEGAT' || $sheetData[$i]['AO'] == 'Negative' || $sheetData[$i]['AO'] == 'NEGAT' ) {
+                                    $VLAnalysisResult = 20;
+                                }	
+                                else if ($sheetData[$i]['AM'] == 'Positive' || $sheetData[$i]['AO'] == 'Positive') {
+                                    $VLAnalysisResult = 1500;
+                                }	
+                                else if ($sheetData[$i]['AM'] == 'Indeterminado' || $sheetData[$i]['AO'] == 'Indeterminado') {
+                                    $VLAnalysisResult = "";
+                                }	
+
+                            
+                                if ($VLAnalysisResult == 'NULL' || $VLAnalysisResult == '' || $VLAnalysisResult == NULL){
+                                    $DashVL_Abs = NULL; 
+                                    $DashVL_AnalysisResult = NULL;                                
+                                }else if ($VLAnalysisResult < 1000){
+                                    $DashVL_AnalysisResult ='Suppressed';
+                                    $DashVL_Abs = $VLAnalysisResult;
+                                }else if ($VLAnalysisResult >= 1000){
+                                    $DashVL_AnalysisResult ='Not Suppressed';
+                                    $DashVL_Abs = $VLAnalysisResult;
+                                }
+                                
+
+
+                                
+
+
                                 $data = array('sample_code'=>$sampleCode,
                                         'vlsm_instance_id'=>trim($sheetData[$i]['B']),
                                         'source'=>'1',
@@ -1528,8 +1583,11 @@ $i++;
                                         'result_value_text'=>(trim($sheetData[$i]['AM'])!='' ? trim($sheetData[$i]['AM']) :  NULL),
                                         'result_value_absolute_decimal'=>(trim($sheetData[$i]['AN'])!='' ? trim($sheetData[$i]['AN']) :  NULL),
                                         'result'=>(trim($sheetData[$i]['AO'])!='' ? trim($sheetData[$i]['AO']) :  NULL),
+                                        'DashVL_Abs' =>   $DashVL_Abs,
+                                        'DashVL_AnalysisResult' =>   $DashVL_AnalysisResult                                        
                                 );
                                 
+
                                 $facilityData = array('vlsm_instance_id'=>trim($sheetData[$i]['B']),
                                         'facility_name'=>trim($sheetData[$i]['E']),
                                         'facility_code'=>trim($sheetData[$i]['F']),
