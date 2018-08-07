@@ -4940,6 +4940,7 @@ class SampleTable extends AbstractTableGateway {
             $row[] = $aRow['total_suppressed_samples'];            
             $row[] = $aRow['total_not_suppressed_samples'];            
             $row[] = ($aRow['total_samples_rejected'] > 0 && $aRow['total_samples_received'] > 0)?round((($aRow['total_samples_rejected']/$aRow['total_samples_received'])*100),2).'%':'';
+            $row[] = ($aRow['total_samples_valid'] > 0 && $aRow['total_suppressed_samples'] > 0)?round((($aRow['total_suppressed_samples']/$aRow['total_samples_valid'])*100),2).'%':'';
             
             $output['aaData'][] = $row;
         }
@@ -5100,6 +5101,7 @@ class SampleTable extends AbstractTableGateway {
             $row[] = $aRow['total_suppressed_samples'];            
             $row[] = $aRow['total_not_suppressed_samples'];            
             $row[] = ($aRow['total_samples_rejected'] > 0 && $aRow['total_samples_received'] > 0)?round((($aRow['total_samples_rejected']/$aRow['total_samples_received'])*100),2).'%':'';
+            $row[] = ($aRow['total_samples_valid'] > 0 && $aRow['total_suppressed_samples'] > 0)?round((($aRow['total_suppressed_samples']/$aRow['total_samples_valid'])*100),2).'%':'';
             
             $output['aaData'][] = $row;
         }
@@ -5265,6 +5267,7 @@ class SampleTable extends AbstractTableGateway {
             $row[] = $aRow['total_suppressed_samples'];            
             $row[] = $aRow['total_not_suppressed_samples'];
             $row[] = ($aRow['total_samples_rejected'] > 0 && $aRow['total_samples_received'] > 0)?round((($aRow['total_samples_rejected']/$aRow['total_samples_received'])*100),2).'%':'';
+            $row[] = ($aRow['total_samples_valid'] > 0 && $aRow['total_suppressed_samples'] > 0)?round((($aRow['total_suppressed_samples']/$aRow['total_samples_valid'])*100),2).'%':'';
            
             $output['aaData'][] = $row;
         }

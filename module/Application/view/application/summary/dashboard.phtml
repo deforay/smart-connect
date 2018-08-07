@@ -427,6 +427,7 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
                                                 <th> <?php echo $this->translate('Suppressed Results'); ?></th>
                                                 <th> <?php echo $this->translate('Non Suppressed Results'); ?></th>
                                                 <th> <?php echo $this->translate('Samples Rejected'); ?></th>
+                                                <th> <?php echo $this->translate('Suppression Rate'); ?></th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -445,6 +446,7 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
                                                 <th> <?php echo $this->translate('Suppressed Results'); ?></th>
                                                 <th> <?php echo $this->translate('Non Suppressed Results'); ?></th>
                                                 <th> <?php echo $this->translate('Samples Rejected'); ?></th>
+                                                <th> <?php echo $this->translate('Suppression Rate'); ?></th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -462,7 +464,8 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
                                                 <th> <?php echo $this->translate('Valid Results'); ?> </th>
                                                 <th> <?php echo $this->translate('Suppressed Results'); ?></th>
                                                 <th> <?php echo $this->translate('Non Suppressed Results'); ?></th>
-                                                <th> <?php echo $this->translate('Samples Rejected'); ?></th>                                                                
+                                                <th> <?php echo $this->translate('Samples Rejected'); ?></th>  
+                                                <th> <?php echo $this->translate('Suppression Rate'); ?></th>                                                              
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -1177,7 +1180,7 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
                 {"sClass":"center","bSortable":true},
                 {"sClass":"center","bSortable":true},
                 {"sClass":"center","bSortable":true},
-                {"sClass":"center","bSortable":true},
+                {"sClass":"center","bSortable":true},  
                 ],
             "iDisplayLength": 10,
             "aaSorting": [[ 3, "desc" ]],
@@ -1238,6 +1241,7 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
                 {"sClass":"center","bSortable":true},
                 {"sClass":"center","bSortable":true},
                 {"sClass":"center","bSortable":true},
+                {"sClass":"center","bSortable":true},
                 {"sClass":"center","bSortable":true}
                 ],
             "iDisplayLength": 10,
@@ -1270,6 +1274,7 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
                 {"sClass":"center","bSortable":true},
                 {"sClass":"center","bSortable":true},
                 {"sClass":"center","bSortable":true},
+                {"sClass":"center","bSortable":true},
                 {"sClass":"center","bSortable":true}
                 ],
             "iDisplayLength": 10,
@@ -1295,6 +1300,7 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
             // "scrollX":false,
             "aoColumns": [
                 {"sClass":"center"},
+                {"sClass":"center","bSortable":true},
                 {"sClass":"center","bSortable":true},
                 {"sClass":"center","bSortable":true},
                 {"sClass":"center","bSortable":true},

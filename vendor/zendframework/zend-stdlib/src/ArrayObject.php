@@ -287,7 +287,7 @@ class ArrayObject implements IteratorAggregate, ArrayAccess, Serializable, Count
      * @param  mixed $key
      * @return mixed
      */
-    public function &offsetGet($key)
+    public function offsetGet($key)
     {
         $ret = null;
         if (!$this->offsetExists($key)) {
