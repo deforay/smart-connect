@@ -4790,7 +4790,7 @@ class SampleTable extends AbstractTableGateway {
          * you want to insert a non-database field (for example a counter or static image)
         */
         $aColumns = array('f_d_l_d.location_name');
-        $orderColumns = array('f_d_l_d.location_name','total_samples_valid','total_suppressed_samples','total_not_suppressed_samples','total_samples_rejected');
+        $orderColumns = array('f_d_l_d.location_name','total_samples_valid','total_suppressed_samples','total_not_suppressed_samples','total_samples_rejected','suppression_rate');
 
         /*
          * Paging
@@ -4881,6 +4881,7 @@ class SampleTable extends AbstractTableGateway {
                                                 "total_suppressed_samples" => new Expression("SUM(CASE WHEN ((vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' or vl.DashVL_Abs < 1000)) THEN 1 ELSE 0 END)"),
                                                 "total_not_suppressed_samples" => new Expression("SUM(CASE WHEN ((vl.DashVL_AnalysisResult like 'not%' OR vl.DashVL_AnalysisResult like 'Not%' or vl.DashVL_Abs >= 1000)) THEN 1 ELSE 0 END)"),
                                                 //"total_suppressed_samples_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (vl.result < 1000 or vl.result='Target Not Detected') THEN 1 ELSE 0 END)/COUNT(*))*100),2)")
+                                                "suppression_rate" => new Expression("ROUND(((SUM(CASE WHEN ((vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' or vl.DashVL_Abs < 1000)) THEN 1 ELSE 0 END))/(SUM(CASE WHEN (((vl.DashVL_AnalysisResult IS NOT NULL AND vl.DashVL_AnalysisResult != '' AND vl.DashVL_AnalysisResult != 'NULL'))) THEN 1 ELSE 0 END)))*100,2)")
                                                 )
                                           )
                                 ->join(array('f'=>'facility_details'),'f.facility_id=vl.facility_id',array('facility_name'))
@@ -4951,7 +4952,7 @@ class SampleTable extends AbstractTableGateway {
          * you want to insert a non-database field (for example a counter or static image)
         */
         $aColumns = array('f_d_l_d.location_name');
-        $orderColumns = array('f_d_l_d.location_name','total_samples_valid','total_suppressed_samples','total_not_suppressed_samples','total_samples_rejected');
+        $orderColumns = array('f_d_l_d.location_name','total_samples_valid','total_suppressed_samples','total_not_suppressed_samples','total_samples_rejected','suppression_rate');
 
         /*
          * Paging
@@ -5042,6 +5043,7 @@ class SampleTable extends AbstractTableGateway {
                                                 "total_suppressed_samples" => new Expression("SUM(CASE WHEN ((vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' or vl.DashVL_Abs < 1000)) THEN 1 ELSE 0 END)"),
                                                 "total_not_suppressed_samples" => new Expression("SUM(CASE WHEN ((vl.DashVL_AnalysisResult like 'not%' OR vl.DashVL_AnalysisResult like 'Not%' or vl.DashVL_Abs >= 1000)) THEN 1 ELSE 0 END)"),
                                                 //"total_suppressed_samples_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (vl.result < 1000 or vl.result='Target Not Detected') THEN 1 ELSE 0 END)/COUNT(*))*100),2)")
+                                                "suppression_rate" => new Expression("ROUND(((SUM(CASE WHEN ((vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' or vl.DashVL_Abs < 1000)) THEN 1 ELSE 0 END))/(SUM(CASE WHEN (((vl.DashVL_AnalysisResult IS NOT NULL AND vl.DashVL_AnalysisResult != '' AND vl.DashVL_AnalysisResult != 'NULL'))) THEN 1 ELSE 0 END)))*100,2)")
                                                 )
                                           )
                                 ->join(array('f'=>'facility_details'),'f.facility_id=vl.facility_id',array('facility_name'))
@@ -5113,7 +5115,7 @@ class SampleTable extends AbstractTableGateway {
          * you want to insert a non-database field (for example a counter or static image)
         */
         $aColumns = array('facility_name','f_d_l_dp.location_name','f_d_l_d.location_name');
-        $orderColumns = array('f_d_l_d.location_name','f_d_l_dp.location_name','f_d_l_d.location_name','total_samples_valid','total_suppressed_samples','total_not_suppressed_samples','total_samples_rejected');
+        $orderColumns = array('f_d_l_d.location_name','f_d_l_dp.location_name','f_d_l_d.location_name','total_samples_valid','total_suppressed_samples','total_not_suppressed_samples','total_samples_rejected','suppression_rate');
 
         /*
          * Paging
@@ -5204,6 +5206,7 @@ class SampleTable extends AbstractTableGateway {
                                                 "total_suppressed_samples" => new Expression("SUM(CASE WHEN ((vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' or vl.DashVL_Abs < 1000)) THEN 1 ELSE 0 END)"),
                                                 "total_not_suppressed_samples" => new Expression("SUM(CASE WHEN ((vl.DashVL_AnalysisResult like 'not%' OR vl.DashVL_AnalysisResult like 'Not%' or vl.DashVL_Abs >= 1000)) THEN 1 ELSE 0 END)"),
                                                 //"total_suppressed_samples_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (vl.result < 1000 or vl.result='Target Not Detected') THEN 1 ELSE 0 END)/COUNT(*))*100),2)")
+                                                "suppression_rate" => new Expression("ROUND(((SUM(CASE WHEN ((vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' or vl.DashVL_Abs < 1000)) THEN 1 ELSE 0 END))/(SUM(CASE WHEN (((vl.DashVL_AnalysisResult IS NOT NULL AND vl.DashVL_AnalysisResult != '' AND vl.DashVL_AnalysisResult != 'NULL'))) THEN 1 ELSE 0 END)))*100,2)")
                                                 )
                                           )
                                 ->join(array('f'=>'facility_details'),'f.facility_id=vl.facility_id',array('facility_name'))
