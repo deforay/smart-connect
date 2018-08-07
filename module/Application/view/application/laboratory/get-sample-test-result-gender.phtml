@@ -86,7 +86,7 @@ foreach($gender as $gen){
                     }
                 }
             },
-            scatter: {
+            /*scatter: {
                       stacking: 'normal',
                       pointPadding: 0.2,
                       borderWidth: 0,
@@ -104,7 +104,7 @@ foreach($gender as $gen){
                               }
                           }
                       }
-                  }
+            }*/
         },
         series: [<?php
         
@@ -143,17 +143,18 @@ foreach($gender as $gen){
               },
               <?php
               }
-              if(count($supAvg[$gender[$i]])>0){
+              //if(count($supAvg[$gender[$i]])>0){
                 ?>
-                {
-                name: '<?php echo $this->translate("Suppression %(".$gender[$i].")"); ?>',
+                /*{
+                name: '< ?php echo $this->translate("Suppression %(".$gender[$i].")"); ?>',
                 type: 'scatter',
                 //data: [[69.5,1],[57.66,1],[62.46,1]],
-                data: [<?php echo implode(",",$supAvg[$gender[$i]]);?>],
-                color:'<?php echo $supColor[$gender[$i]];?>',
-                stack:'<?php echo $gender[$i];?>',
-                },
-            <?php } 
+                data: [< ?php echo implode(",",$supAvg[$gender[$i]]);?>],
+                color:'< ?php echo $supColor[$gender[$i]];?>',
+                stack:'< ?php echo $gender[$i];?>',
+                },*/
+            <?php 
+            //} 
         }
             ?>
         ],
