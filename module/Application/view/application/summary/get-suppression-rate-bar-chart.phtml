@@ -1,4 +1,5 @@
 <div id="suppressionRateBarChartData" style="min-height:600px;"></div>
+
 <script>
        $(function () {
              $('#suppressionRateBarChartData').highcharts({
@@ -94,12 +95,12 @@
                          type: 'column',
                          yAxis: 1,
                          data: [
-                         <?php if(isset($result['valid_results']) && count($result['valid_results']) >0){
+                            <?php if(isset($result['valid_results']) && count($result['valid_results']) >0){
                                foreach($result['valid_results'] as $validResult){                     
-                                 echo $validResult.',';
+                                 echo ((isset($validResult) && trim($validResult)!='')?$validResult:'null').',';
                                }
-                               ?>
-                        <?php  } ?>
+                               
+                          } ?>
                          ],
                          tooltip: {
                              valueSuffix: ' '
@@ -109,12 +110,11 @@
                          name: '<?php echo $this->translate('Suppression Rate'); ?> (L)',
                          type: 'spline',
                          data: [
-                         <?php if(isset($result['suppression_rate']) && count($result['suppression_rate']) >0){
+                            <?php if(isset($result['suppression_rate']) && count($result['suppression_rate']) >0){
                                foreach($result['suppression_rate'] as $suppressionRate){                     
-                                 echo $suppressionRate.',';
-                               }
-                               ?>
-                        <?php  } ?>
+                                 echo ((isset($suppressionRate) && trim($suppressionRate)!='')?$suppressionRate:'null').',';
+                               }                               
+                           } ?>
                          ],
                          tooltip: {
                              valueSuffix: '%'
