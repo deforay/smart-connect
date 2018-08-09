@@ -581,6 +581,54 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
         </div>
     </div>
     <div role="tabpanel" class="tab-pane fade" id="currentRegimenTab">
+    <div class="row" style="padding-top:5px;padding-bottom:10px;">
+        <div class="col-md-12">
+            <div class="col-md-6">
+                <select style="width:100%" name="provinceName[]" id="provinceName" class="form-control" multiple title="<?php echo $this->translate('Please select one or more province. Leave blank for All'); ?>" onchange="selectDistrictName();">
+                    <?php
+                    foreach($provinceName as $province){
+                        ?>
+                        <option value="<?php echo $province['location_id']; ?>"><?php echo $province['location_name'];?></option>
+                        <?php
+                    }
+                    ?>
+                </select>
+            </div>
+            <div class="col-md-6" id="districtHeight">
+                <select style="width:100%" name="districtName[]" id="districtName" class="form-control" multiple title="<?php echo $this->translate('Please select one or more district. Leave blank for All'); ?>" onchange="selectClinicName();">
+                    <?php
+                    foreach($districtName as $district){
+                        ?>
+                        <option data-parent-location="<?php echo $district['parent_location']; ?>" value="<?php echo $district['location_id']; ?>"><?php echo $district['location_name'];?></option>
+                        <?php
+                    }
+                    ?>
+                    <option value="0" >Empty</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="row" style="padding-top:10px;padding-bottom:10px;">
+        <div class="col-md-12">
+            <div class="col-lg-6" id="clinicHeight">
+                <select style="width:100%" class="form-control" id="clinicId" name="clinicId[]" multiple title="<?php echo $this->translate('Please select one or more clinics. Leave blank for All'); ?>" >
+                    <?php
+                    foreach($clinicName as $clinic){
+                        ?>
+                        <option value="<?php echo $clinic['facility_id']; ?>" data-district="<?php echo $clinic['facility_district'];?>" ><?php echo $clinic['facility_code']." - ".$clinic['facility_name'];?></option>
+                        <?php
+                    }
+                    ?>
+                </select>
+            </div>
+            <div class="col-lg-6">
+            <div class="form-group col-md-4" style="text-align:center;margin-top:10px;">
+                <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="getRegimenGroupBarChartInfo();"><?php echo $this->translate('Search'); ?></a>&nbsp;&nbsp;
+                <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="resetEverything();"><?php echo $this->translate('Reset'); ?></a>
+            </div>
+        </div>
+        </div>
+    </div>
         <div class="row">                   
             <div class="col-md-12 col-sm-12">
                 <div class="portlet box blue">
@@ -1130,6 +1178,41 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
       facilityWiseSamplesRejectedSummaryFn();
       provinceWiseSamplesRejectedSummaryFn();
       regimenGroupsSummaryFn();
+
+      /* District ,Province and Facilities */     
+    $('#provinceName').select2({
+        placeholder: "<?php echo $this->translate('All Province'); ?>",
+        allowClear: true
+    });
+    $('#districtName').select2({
+        placeholder: "<?php echo $this->translate('All Districts'); ?>",
+        allowClear: true,
+    });
+    $('#provinceName').on('select2:close', function (evt) {
+        var uldiv = $('#districtName').siblings('span.select2').find('ul');
+        var count = uldiv.find('li').length - 1;
+        uldiv.html("<li>"+count+" items selected</li>");
+        var uldiv = $('#clinicId').siblings('span.select2').find('ul');
+        var count = uldiv.find('li').length - 1;
+        uldiv.html("<li>"+count+" items selected</li>");
+    });
+    $('#districtName').on('select2:close', function (evt) {
+        var uldiv = $(this).siblings('span.select2').find('ul');
+        var count = uldiv.find('li').length - 1;
+        uldiv.html("<li>"+count+" items selected</li>");
+        var uldiv = $('#clinicId').siblings('span.select2').find('ul');
+        var count = uldiv.find('li').length - 1;
+        uldiv.html("<li>"+count+" items selected</li>");
+    });
+    $('#clinicId').select2({
+        placeholder: "<?php echo $this->translate('All Facilities'); ?>",
+        allowClear: true
+    });
+    $('#clinicId').on('select2:close', function (evt) {
+        var uldiv = $(this).siblings('span.select2').find('ul');
+        var count = uldiv.find('li').length - 1;
+        uldiv.html("<li>"+count+" items selected</li>");
+    });
     });
     
     function districtWiseSamplesReceivedSummaryFn(){
@@ -1492,9 +1575,48 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
     }
     
     function getRegimenGroupBarChartInfo(){
-        $.post("<?php echo $this->url('summary', array('action' => 'get-regimen-group-bar-chart')); ?>",{},
+        var districtIdList = ($("#districtName").val() == null)?'':$("#districtName").val().join(',');
+        var provinceIdList = ($("#provinceName").val() == null)?'':$("#provinceName").val().join(',');
+        var clinicIdList = ($("#clinicId").val() == null)?'':$('#clinicId').val().join(',');
+        $.post("<?php echo $this->url('summary',array('action' => 'get-regimen-group-bar-chart')); ?>",{ districts : districtIdList, provinces : provinceIdList , clinics : clinicIdList },
         function(data) {
             $("#regimenGroupBarChartContainer").html(data);
         });
+    }
+
+    /* Reset Everything Fn */
+    function resetEverything(){
+        $("#districtName").select2('val', '');
+        $("#provinceName").select2('val', '');
+        $('#clinicId').select2('val', '');
+    }
+
+    function selectDistrictName()
+    {
+        var pName = $("#provinceName").val();
+        if(pName==null){
+            $('#districtName').select2('val', []);
+        }else{
+            for(i=0;i<pName.length;i++)   {
+                $("#districtName option[data-parent-location='" + pName[i] +"']").attr("selected","selected");
+                
+            }
+            $('#districtName').select2('val', $("#districtName").val());
+            
+            selectClinicName();
+        }
+    }
+    function selectClinicName()
+    {
+        var dName = $("#districtName").val();
+        var pName = $("#provinceName").val();
+        if(dName==null || pName==null){
+            $('#clinicId').select2('val', []);
+        }else{
+            for(i=0;i<dName.length;i++)   {
+                $("#clinicId option[data-district='" + dName[i] +"']").attr("selected","selected");
+            }
+        }
+        $('#clinicId').select2('val', $("#clinicId").val());
     }
 </script>

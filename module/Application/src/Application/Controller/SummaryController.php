@@ -20,11 +20,23 @@ class SummaryController extends AbstractActionController{
         $keySummaryIndicatorsResult = $summaryService->getKeySummaryIndicatorsDetails();
         $allLineofTreatmentResult = $summaryService->getAllLineOfTreatmentDetails();
         $allCollapsibleLineofTreatmentResult = $summaryService->getAllCollapsibleLineOfTreatmentDetails();
+        
+        /* District, Province and Facility */
+        $sampleService = $this->getServiceLocator()->get('SampleService');        
+        $clinicName = $sampleService->getAllClinicName();        
+        $provinceName = $sampleService->getAllProvinceList();
+        $districtName = $sampleService->getAllDistrictList();
+        /* Ends Here*/   
+
         return new ViewModel(array(
             'summaryTabInfo' => $summaryTabResult,
             'keySummaryIndicators' => $keySummaryIndicatorsResult,
             'allLineofTreatmentInfo' => $allLineofTreatmentResult,
-            'allCollapsibleLineofTreatmentResult'=>$allCollapsibleLineofTreatmentResult
+            'allCollapsibleLineofTreatmentResult'=>$allCollapsibleLineofTreatmentResult,
+
+            'clinicName' => $clinicName,
+            'provinceName'=>$provinceName,
+            'districtName'=>$districtName
         ));
     }
     

@@ -5807,7 +5807,7 @@ class SampleTable extends AbstractTableGateway {
                             "current_regimen",
                             "total_suppressed_samples" => new Expression("SUM(CASE WHEN ((vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' or vl.DashVL_Abs < 1000)) THEN 1 ELSE 0 END)"),
                             )) 
-                    //->where('vl.line_of_treatment >= 1')
+                            //->where('vl.line_of_treatment >= 1')
                     ->group('vl.current_regimen');            
         
 
@@ -5819,13 +5819,26 @@ class SampleTable extends AbstractTableGateway {
                                                 "suppression_rate" => new Expression("ROUND(((total_suppressed_samples)/(total_samples_valid))*100,2)"),
                                                 )
                                           )
+                                          
                                           ->join(array('valid'=>$validQuery),'valid.current_regimen=vl.current_regimen',array('total_samples_valid'))
                                           ->join(array('suppressed'=>$suppressedQuery),'suppressed.current_regimen=vl.current_regimen',array('total_suppressed_samples'))
-                                //->where('vl.line_of_treatment >= 1')
+                                          ->join(array('f'=>'facility_details'),'f.facility_id=vl.facility_id',array('facility_name','facility_state','facility_district'),'left')
+                                
+                                //->where('vl.line_of_treatment >= 1')                                
                                 ->group('vl.current_regimen')
                                 ->order('total_samples_valid DESC')
                                 ->limit(20)
                                 ;
+            if(isset($params['provinces']) && trim($params['provinces'])!= ''){
+                $sQuery = $sQuery->where('f.facility_state IN (' .$params['provinces']. ')');
+            }
+            if(isset($params['districts']) && trim($params['districts'])!= ''){
+                $sQuery = $sQuery->where('f.facility_district IN (' .$params['districts']. ')');
+            }
+            
+            if(isset($params['clinics']) && trim($params['clinics'])!= ''){
+                $sQuery = $sQuery->where('vl.facility_id IN (' . $params['clinics'] . ')');
+            }
             $queryStr = $sql->getSqlStringForSqlObject($sQuery);
             //echo $queryStr;die;
             //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
