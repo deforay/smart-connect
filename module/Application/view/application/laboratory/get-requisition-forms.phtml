@@ -1,8 +1,6 @@
 <script>
 $('#labDashReqFormBar').highcharts({
-        chart: {
-            type: 'column'
-        },
+
         title: {
             text: ''
         },
@@ -25,7 +23,7 @@ $('#labDashReqFormBar').highcharts({
                 }
             ?>]
         },
-        yAxis: {
+        yAxis: [{
             min: 0,
             title: {
                 text: '<?php echo $this->translate('Forms'); ?>'
@@ -38,21 +36,36 @@ $('#labDashReqFormBar').highcharts({
                     color: (Highcharts.theme && Highcharts.theme.textColor) || 'gray'
                 }
             }
-        },
+        },{ // Secondary yAxis
+                         allowDecimals: true,
+                         min: 0,
+                         max: 100,
+                         title: {
+                             text: '<?php echo $this->translate('Completion Rate'); ?>',
+                             style: {
+                                 color: Highcharts.getOptions().colors[1]
+                             }
+                         },
+                         labels: {
+                             format: '{value}%',
+                             style: {
+                                 color: Highcharts.getOptions().colors[1]
+                             }
+                         },
+                         opposite: true
+                     }
+        ],
         legend: {
-            align: 'right',
-            x: -30,
-            verticalAlign: 'top',
-            y: 25,
-            floating: true,
+            align: 'center',
+            verticalAlign: 'bottom',
+            floating: false,
             backgroundColor: (Highcharts.theme && Highcharts.theme.background2) || 'white',
             borderColor: '#CCC',
             borderWidth: 1,
             shadow: false
         },
         tooltip: {
-            headerFormat: '<b>{point.x}</b><br/>',
-            pointFormat: '{series.name}: {point.y}<br/><?php echo $this->translate('Total'); ?>: {point.stackTotal}'
+            shared: true
         },
         plotOptions: {
             column: {
@@ -66,10 +79,10 @@ $('#labDashReqFormBar').highcharts({
                     }
                 },
                 dataLabels: {
-                    enabled: false,
+                    enabled: true,
                     color: (Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'white',
                     style: {
-                        textShadow: '0 0 3px black'
+                        textShadow: 'none'
                     }
                 }
             }
@@ -78,20 +91,50 @@ $('#labDashReqFormBar').highcharts({
               <?php if(isset($result['Complete'])){ ?>
                 {
                     name: '<?php echo $this->translate('Complete'); ?>',
+                    type: 'column',
+                    yAxis: 0,
                     <?php if(array_sum($result['Complete']) == 0) { ?> visible: false,<?php } ?>
-                    data: [<?php echo implode(",",$result['Complete']);?>]
+                    data: [<?php echo implode(",",$result['Complete']);?>],
+                    tooltip: {
+                        valueSuffix: ' '
+                    }
                 },
                 <?php } if(isset($result['Incomplete'])){ ?>
                 {
                     name: '<?php echo $this->translate('Incomplete'); ?>',
+                    type: 'column',
+                    yAxis: 0,
                     <?php if(array_sum($result['Incomplete']) == 0) { ?> visible: false,<?php } ?>
-                    data: [<?php echo implode(",",$result['Incomplete']);?>]
+                    data: [<?php echo implode(",",$result['Incomplete']);?>],
+                    tooltip: {
+                        valueSuffix: ' '
+                    }
                 },
-                <?php } ?>
+                <?php } if(isset($result['CompletionRate'])){ ?>
+                {
+                    name: '<?php echo $this->translate('Completion Percentage'); ?>',
+                    yAxis: 1,                    
+                    type: 'spline',
+                    lineWidth : 0,
+                    states: {
+                        hover: {
+                            lineWidthPlus: 0
+                        }
+                    },    
+                    marker: {
+                        symbol: 'diamond'
+                    },                    
+                    data: [<?php echo implode(",",$result['CompletionRate']);?>],
+                    tooltip: {
+                        valueSuffix: '%'
+                    }
+                },
+                <?php } ?>                
                 ],
     colors: [
         '#64ade5',
-        '#8877a9'
+        '#8877a9',
+        '#000000',
     ]
     });
     

@@ -759,6 +759,8 @@ class SampleTable extends AbstractTableGateway {
                     if($sRow["monthDate"] == null) continue;
                     $result['Complete'][$j] = (isset($sRow["CompletedForms"]))?(int)$sRow["CompletedForms"]:null;
                     $result['Incomplete'][$j] = (isset($sRow["IncompleteForms"]))?(int)$sRow["IncompleteForms"]:null;
+                    $completionRate = 100* ($result['Complete'][$j]/($result['Complete'][$j] + $result['Incomplete'][$j]));
+                    $result['CompletionRate'][$j] = ($completionRate > 0) ? round($completionRate,2) : 0;
                     $result['date'][$j] = $sRow["monthDate"];
                     $j++;                
                 }
