@@ -18,11 +18,11 @@ $('#labDashReqFormBar').highcharts({
        },
         xAxis: {
             categories: [<?php
-       if(isset($result['date']) && count($result['date'])>0){
-            foreach($result['date'] as $date){
-                echo "'".$date."',";
-            }
-       }
+                if(isset($result['date']) && count($result['date'])>0){
+                        foreach($result['date'] as $date){
+                            echo "'".$date."',";
+                        }
+                }
             ?>]
         },
         yAxis: {
@@ -66,7 +66,7 @@ $('#labDashReqFormBar').highcharts({
                     }
                 },
                 dataLabels: {
-                    enabled: true,
+                    enabled: false,
                     color: (Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'white',
                     style: {
                         textShadow: '0 0 3px black'

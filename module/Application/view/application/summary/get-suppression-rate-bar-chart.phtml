@@ -41,8 +41,9 @@
                          crosshair: true
                      }],
                      yAxis: [{ // Primary yAxis
-                         allowDecimals: false,
+                         allowDecimals: true,
                          min: 0,
+                         max: 100,
                          labels: {
                              format: '{value}%',
                              style: {
@@ -109,6 +110,15 @@
                      }, {
                          name: '<?php echo $this->translate('Suppression Rate'); ?> (L)',
                          type: 'spline',
+                         lineWidth : 0,
+                         states: {
+                            hover: {
+                                lineWidthPlus: 0
+                            }
+                        },    
+                        marker: {
+                            symbol: 'diamond'
+                        },                                             
                          data: [
                             <?php if(isset($result['suppression_rate']) && count($result['suppression_rate']) >0){
                                foreach($result['suppression_rate'] as $suppressionRate){                     

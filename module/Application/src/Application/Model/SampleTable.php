@@ -25,8 +25,8 @@ class SampleTable extends AbstractTableGateway {
 
     protected $table = 'dash_vl_request_form';
     public $sm = null;
-    protected $dbsId = 8;
-    protected $plasmaId = 19;
+    protected $dbsId = 1;
+    protected $plasmaId = 2;
 
     public function __construct(Adapter $adapter, $sm=null) {
         $this->adapter = $adapter;
@@ -482,10 +482,10 @@ class SampleTable extends AbstractTableGateway {
                 //echo $subQueryStr;die;
                 $subQueryResult = $common->cacheQuery($subQueryStr,$dbAdapter);
 
-                $result['all'][$j] = (isset($subQueryResult[0]["AvgDiff"]) && $subQueryResult[0]["AvgDiff"] != NULL && $subQueryResult[0]["AvgDiff"] > 0) ? round($subQueryResult[0]["AvgDiff"],2) : 0;
+                $result['all'][$j] = (isset($subQueryResult[0]["AvgDiff"]) && $subQueryResult[0]["AvgDiff"] != NULL && $subQueryResult[0]["AvgDiff"] > 0) ? round($subQueryResult[0]["AvgDiff"],2) : null;
                 //$result['lab'][$j] = (isset($labsubQueryResult[0]["labCount"]) && $labsubQueryResult[0]["labCount"] != NULL && $labsubQueryResult[0]["labCount"] > 0) ? round($labsubQueryResult[0]["labCount"],2) : 0;
-                $result['sample']['Samples Collected'][$j] = (isset($sRow['total_samples_collected']) && $sRow['total_samples_collected'] != NULL) ? $sRow['total_samples_collected'] : 0;
-                $result['sample']['Samples Pending'][$j] = (isset($sRow['total_samples_pending']) && $sRow['total_samples_pending'] != NULL) ? $sRow['total_samples_pending'] : 0;
+                $result['sample']['Samples Collected'][$j] = (isset($sRow['total_samples_collected']) && $sRow['total_samples_collected'] != NULL) ? $sRow['total_samples_collected'] : null;
+                $result['sample']['Samples Pending'][$j] = (isset($sRow['total_samples_pending']) && $sRow['total_samples_pending'] != NULL) ? $sRow['total_samples_pending'] : null;
                 $result['date'][$j] = $sRow["monthDate"];
                 $j++;
             }
@@ -635,8 +635,8 @@ class SampleTable extends AbstractTableGateway {
             $j=0;
             foreach($sampleResult as $sRow){
                 if($sRow["monthDate"] == null) continue;
-                $result['sampleName']['VL (>= 1000 cp/ml)'][$j] = (isset($sRow["greaterThan1000"]))?$sRow["greaterThan1000"]:0;
-                $result['sampleName']['VL (< 1000 cp/ml)'][$j] = (isset($sRow["lesserThan1000"]))?$sRow["lesserThan1000"]:0;
+                $result['sampleName']['VL (>= 1000 cp/ml)'][$j] = (isset($sRow["greaterThan1000"]))?$sRow["greaterThan1000"]:null;
+                $result['sampleName']['VL (< 1000 cp/ml)'][$j] = (isset($sRow["lesserThan1000"]))?$sRow["lesserThan1000"]:null;
                 
                 $result['date'][$j] = $sRow["monthDate"];
                 $j++;
@@ -687,8 +687,8 @@ class SampleTable extends AbstractTableGateway {
             $j=0;
             foreach($sampleResult as $sRow){
                 if($sRow["monthDate"] == null) continue;
-                $result['sampleName']['VL (>= 1000 cp/ml)'][$j] = (isset($sRow["greaterThan1000"]))?$sRow["greaterThan1000"]:0;
-                $result['sampleName']['VL (< 1000 cp/ml)'][$j] = (isset($sRow["lesserThan1000"]))?$sRow["lesserThan1000"]:0;
+                $result['sampleName']['VL (>= 1000 cp/ml)'][$j] = (isset($sRow["greaterThan1000"]))?$sRow["greaterThan1000"]:null;
+                $result['sampleName']['VL (< 1000 cp/ml)'][$j] = (isset($sRow["lesserThan1000"]))?$sRow["lesserThan1000"]:null;
                 
                 $result['date'][$j] = $sRow["monthDate"];
                 $j++;
@@ -757,8 +757,8 @@ class SampleTable extends AbstractTableGateway {
             if(isset($sampleResult) && count($sampleResult) > 0){
                 foreach($sampleResult as $sRow){
                     if($sRow["monthDate"] == null) continue;
-                    $result['Complete'][$j] = (isset($sRow["CompletedForms"]))?(int)$sRow["CompletedForms"]:0;
-                    $result['Incomplete'][$j] = (isset($sRow["IncompleteForms"]))?(int)$sRow["IncompleteForms"]:0;
+                    $result['Complete'][$j] = (isset($sRow["CompletedForms"]))?(int)$sRow["CompletedForms"]:null;
+                    $result['Incomplete'][$j] = (isset($sRow["IncompleteForms"]))?(int)$sRow["IncompleteForms"]:null;
                     $result['date'][$j] = $sRow["monthDate"];
                     $j++;                
                 }

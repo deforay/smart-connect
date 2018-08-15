@@ -43,7 +43,7 @@
                 crosshair: true
             }],
             yAxis: [{ // Primary yAxis
-                allowDecimals: false,
+                allowDecimals: true,
                 min: 0,
                 max: 100,
                 labels: {
@@ -57,7 +57,8 @@
                     style: {
                         color: Highcharts.getOptions().colors[1]
                     }
-                }
+                },
+                opposite: true
             }, { // Secondary yAxis
                 allowDecimals: false,
                 min: 0,
@@ -72,8 +73,7 @@
                     style: {
                         color: Highcharts.getOptions().colors[1]
                     }
-                },
-                opposite: true
+                }
             }],
             tooltip: {
                 shared: true
@@ -98,7 +98,7 @@
             }, {
                 name: '<?php echo $this->translate('Suppression Rate'); ?>(L)',
                 type: 'spline',
-                
+                lineWidth : 0,
                 data: [
                 <?php if(isset($result['suppression_rate']) && count($result['suppression_rate']) >0){
                       foreach($result['suppression_rate'] as $suppressionRate){                     
@@ -107,9 +107,17 @@
                       ?>
                <?php  } ?>
                 ],
+                marker: {
+                    symbol: 'diamond'
+                },                
                 tooltip: {
                     valueSuffix: '%'
-                }
+                },
+                states: {
+                    hover: {
+                        lineWidthPlus: 0
+                    }
+                },
             }]
         });
     });

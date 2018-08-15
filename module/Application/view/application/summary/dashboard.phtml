@@ -583,7 +583,7 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
     <div role="tabpanel" class="tab-pane fade" id="currentRegimenTab">
     <div class="row" style="padding-top:5px;padding-bottom:10px;">
         <div class="col-md-12">
-            <div class="col-md-6">
+            <div class="col-md-3">
                 <select style="width:100%" name="provinceName[]" id="provinceName" class="form-control" multiple title="<?php echo $this->translate('Please select one or more province. Leave blank for All'); ?>" onchange="selectDistrictName();">
                     <?php
                     foreach($provinceName as $province){
@@ -594,7 +594,7 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
                     ?>
                 </select>
             </div>
-            <div class="col-md-6" id="districtHeight">
+            <div class="col-md-3" id="districtHeight">
                 <select style="width:100%" name="districtName[]" id="districtName" class="form-control" multiple title="<?php echo $this->translate('Please select one or more district. Leave blank for All'); ?>" onchange="selectClinicName();">
                     <?php
                     foreach($districtName as $district){
@@ -606,11 +606,8 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
                     <option value="0" >Empty</option>
                 </select>
             </div>
-        </div>
-    </div>
-    <div class="row" style="padding-top:10px;padding-bottom:10px;">
-        <div class="col-md-12">
-            <div class="col-lg-6" id="clinicHeight">
+        
+            <div class="col-lg-4" id="clinicHeight">
                 <select style="width:100%" class="form-control" id="clinicId" name="clinicId[]" multiple title="<?php echo $this->translate('Please select one or more clinics. Leave blank for All'); ?>" >
                     <?php
                     foreach($clinicName as $clinic){
@@ -621,9 +618,9 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
                     ?>
                 </select>
             </div>
-            <div class="col-lg-6">
-            <div class="form-group col-md-4" style="text-align:center;margin-top:10px;">
-                <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="getRegimenGroupBarChartInfo();"><?php echo $this->translate('Search'); ?></a>&nbsp;&nbsp;
+            <div class="col-lg-2">
+            <div class="form-group" style="">
+                <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="getRegimenGroupBarChartInfo();"><?php echo $this->translate('Search'); ?></a> 
                 <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="resetEverything();"><?php echo $this->translate('Reset'); ?></a>
             </div>
         </div>
