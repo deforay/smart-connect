@@ -273,6 +273,68 @@ class SampleTable extends AbstractTableGateway {
         }
       return $result;
     }
+    public function fetchSampleTestReasonBarChartDetails($params){
+        $logincontainer = new Container('credo');
+        $result = array();
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $common = new CommonService($this->sm);
+        if(trim($params['fromDate'])!= '' && trim($params['toDate'])!= ''){
+            $startMonth = str_replace(' ','-',$params['fromDate'])."-01";
+            $endMonth = str_replace(' ','-',$params['toDate'])."-31";
+            $rsQuery = $sql->select()->from(array('tr'=>'r_vl_test_reasons'));
+            if(isset($params['testedReason']) && trim($params['testedReason'])!=''){
+                $rsQuery = $rsQuery->where('tr.test_reason_id="'.base64_decode(trim($params['testedReason'])).'"');
+            }
+            $rsQueryStr = $sql->getSqlStringForSqlObject($rsQuery);
+            $sampleTypeResult = $dbAdapter->query($rsQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+            //$sampleTypeResult = $common->cacheQuery($rsQueryStr,$dbAdapter);
+            $sampleTestReasonId = array();
+            foreach($sampleTypeResult as $samples){
+                $sampleTestReasonId[] = "'".$samples['test_reason_id']."'";
+            }
+            $sampleTestedReason = implode(',', $sampleTestReasonId);
+            
+            $queryStr = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
+                                                ->columns(array(
+                                                    "total" => new Expression('COUNT(*)'),
+                                                    "monthDate" => new Expression("DATE_FORMAT(DATE(sample_collection_date), '%b-%Y')"),
+                                                    "GreaterThan1000" => new Expression("SUM(CASE WHEN ((vl.DashVL_AnalysisResult like 'not%' OR vl.DashVL_AnalysisResult like 'Not%' or vl.DashVL_Abs >= 1000)) THEN 1 ELSE 0 END)"),
+                                                    "LesserThan1000" => new Expression("SUM(CASE WHEN ((vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' or vl.DashVL_Abs < 1000)) THEN 1 ELSE 0 END)"),
+                                                    //"TND" => new Expression("SUM(CASE WHEN (vl.result='Target Not Detected' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END)"),
+                                                    //new Expression("SUM(CASE WHEN ((vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' or vl.DashVL_Abs < 1000)) THEN 1 ELSE 0 END)")
+                                             )
+                                            );
+            if(isset($params['facilityId']) && trim($params['facilityId'])!= ''){
+                $queryStr = $queryStr->where('vl.lab_id IN ('.$params['facilityId'].')');
+            }else{
+                if($logincontainer->role!= 1){
+                    $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:array(0);
+                    $queryStr = $queryStr->where('vl.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
+                }
+            }
+            $queryStr = $queryStr->where("
+                        (sample_collection_date is not null AND sample_collection_date != '')
+                        AND DATE(sample_collection_date) >= '".$startMonth."' 
+                        AND DATE(sample_collection_date) <= '".$endMonth."'
+                        AND vl.reason_for_vl_testing IN ($sampleTestedReason)");
+                
+            $queryStr = $queryStr->group(array(new Expression('MONTH(sample_collection_date)')));   
+            $queryStr = $queryStr->order(array(new Expression('DATE(sample_collection_date)')));
+            $queryStr = $sql->getSqlStringForSqlObject($queryStr);
+            //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+            $sampleResult = $common->cacheQuery($queryStr,$dbAdapter);
+            $j=0;
+            foreach($sampleResult as $sRow){
+                if($sRow["monthDate"] == null) continue;
+                $result['sampleTestedReason']['VL (>= 1000 cp/ml)'][$j] = (isset($sRow["GreaterThan1000"]))?$sRow["GreaterThan1000"]:0;
+                $result['sampleTestedReason']['VL (< 1000 cp/ml)'][$j] = (isset($sRow["LesserThan1000"]))?$sRow["LesserThan1000"]:0;
+                $result['date'][$j] = $sRow["monthDate"];
+                $j++;
+            } 
+        }
+      return $result;
+    }
     
     public function fetchSampleTestedResultBasedVolumeDetails($params){
         $logincontainer = new Container('credo');
@@ -462,14 +524,16 @@ class SampleTable extends AbstractTableGateway {
                 $monthDateArray[] = $sRow["monthDate"];
                 $subQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
                                 ->columns(array(
-                                                "AvgDiff" => new Expression("CAST(ABS(AVG(TIMESTAMPDIFF(DAY,result_approved_datetime,sample_collection_date))) AS DECIMAL (10,2))"),
+                                                //"AvgDiff" => new Expression("CAST(ABS(AVG(TIMESTAMPDIFF(DAY,result_approved_datetime,sample_collection_date))) AS DECIMAL (10,2))"),
+                                                "AvgDiff" => new Expression("CAST(ABS((TIMESTAMPDIFF(DAY,result_approved_datetime,sample_collection_date))) AS DECIMAL (10,2))"),'lab_id',
                                               )
                                             );
                 $subQuery = $subQuery->where("
                         (vl.sample_collection_date is not null AND vl.sample_collection_date != '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')
                         AND (vl.result_approved_datetime is not null AND vl.result_approved_datetime != '' AND DATE(vl.result_approved_datetime) !='1970-01-01' AND DATE(vl.result_approved_datetime) !='0000-00-00')
                         AND MONTH(vl.result_approved_datetime) >= '".$sRow['month']."'
-                        AND YEAR(vl.result_approved_datetime) <= '".$sRow['year']."' ");
+                        AND YEAR(vl.result_approved_datetime) <= '".$sRow['year']."' ")
+                        ;
                 if(isset($params['facilityId']) && trim($params['facilityId'])!= ''){
                     $subQuery = $subQuery->where('vl.lab_id IN ('.$params['facilityId'].')');
                 }else{

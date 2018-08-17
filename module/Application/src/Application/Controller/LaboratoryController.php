@@ -20,11 +20,13 @@ class LaboratoryController extends AbstractActionController{
         $labName = $sampleService->getAllLabName();
         $provinceName = $sampleService->getAllProvinceList();
         $districtName = $sampleService->getAllDistrictList();
+        $testReasonName = $sampleService->getAllTestReasonName();
         return new ViewModel(array(
                     'sampleType' => $sampleType,
                     'labName' => $labName,
                     'provinceName'=>$provinceName,
-                    'districtName'=>$districtName
+                    'districtName'=>$districtName,
+                    'testReason' => $testReasonName
                 ));
     }
     
@@ -790,5 +792,18 @@ class LaboratoryController extends AbstractActionController{
         return new ViewModel(array(
             'params'=>$params
         ));
+    }
+    public function getSampleTestReasonBarChartAction() {
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $sampleService = $this->getServiceLocator()->get('SampleService');
+            $result = $sampleService->getSampleTestReasonBarChartDetails($params);
+            $viewModel = new ViewModel();
+            $viewModel->setVariables(array(
+                                    'result' => $result
+                                    ))->setTerminal(true);
+            return $viewModel;
+        }
     }
 }

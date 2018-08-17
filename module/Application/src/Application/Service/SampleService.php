@@ -1782,4 +1782,9 @@ $i++;
             }
         }
     }
+    public function getSampleTestReasonBarChartDetails($params)
+    {
+        $sampleDb = $this->sm->get('SampleTable');
+        return $sampleDb->fetchSampleTestReasonBarChartDetails($params);
+    }
 }

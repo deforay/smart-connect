@@ -373,6 +373,34 @@ foreach($sampleType as $samples){
         </div>            
     </div>
     <div class="row">
+        <div class="col-md-12 col-sm-12">
+            <div class="portlet box blue">
+                <div class="portlet-title">
+                    <div class="caption">
+                        <span class="caption-subject"><?php echo $this->translate('Samples Tested Reason'); ?></span>
+                    </div>
+                    <div class="actions" style="width:20%;">
+                        <div class="btn-group" style="width:100%;">
+                            <select id="testedReason" name="testedReason" class="form-control" title="<?php echo $this->translate('Please choose test reason'); ?>" onchange="getTestedSampleReason();">
+                            <option value=""><?php echo $this->translate('Test Reasons'); ?></option>
+                            <?php
+                            foreach($testReason as $test){
+                                ?>
+                                <option value="<?php echo base64_encode($test['test_reason_id']);?>"><?php echo $test['test_reason_name'];?></option>
+                                <?php
+                            }
+                            ?>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="portlet-body">
+                    <div id="samplesTestedReason"></div>
+                </div>
+            </div>
+        </div>            
+    </div>
+    <div class="row">
         <div class="col-md-6 col-sm-6">
             <div class="portlet box blue">
                 <div class="portlet-title">
@@ -558,6 +586,17 @@ foreach($sampleType as $samples){
             $("#samplesTestedResultAgeGroup").html(data);
         });
     }
+
+    function getTestedSampleReason(){
+        var fromDate = $('#mrp-lowerDate').val();
+        var toDate = $('#mrp-upperDate').val();
+        var facilityId = ($("#labName").val() == null)?'':$("#labName").val().join(',');
+        var testedReason = ($('#testedReason').val() == null)?'':$('#testedReason').val();
+        $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-test-reason-bar-chart')); ?>",{fromDate:fromDate,toDate:toDate,facilityId:facilityId,testedReason:testedReason},
+        function(data) {
+            $("#samplesTestedReason").html(data);
+        });
+    }
     
     function getTestedSampleResultBasedonPregnantPatient(){
         var fromDate = $('#mrp-lowerDate').val();
@@ -734,6 +773,7 @@ foreach($sampleType as $samples){
         getTestedSampleResultBasedLab();
         getTestedSampleResultBasedGender();
         getTestedSampleResultBasedAgeGroup();
+        getTestedSampleReason();
         getTestedSampleResultBasedonPregnantPatient();
         getTestedSampleResultBasedonBreastfeedingPatient();
         femalePatient();

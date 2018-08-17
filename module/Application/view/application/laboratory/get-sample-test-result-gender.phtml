@@ -4,6 +4,7 @@ $supAvg = array();
 $less1000 = array('M'=>'#088738', 'F' => '#60d18f', 'Not Specified' => '#A5F7C6');
 $more1000 = array('M'=>'#ff1900', 'F' => '#F2786D', 'Not Specified' => '#8C1308');
 $supColor = array('M'=>'#252424', 'F' => '#826c6c', 'Not Specified' => '#cd6969');
+if(count($result)>0){
 foreach($gender as $gen){
     $arrayKey = array_keys($result[$gen]);
     $sumArray = array_map(function () {
@@ -12,6 +13,7 @@ foreach($gender as $gen){
     foreach($result[$gen][$arrayKey[1]] as $key=>$suppression){
         $supAvg[$gen][] = (($suppression==0) ? (int)0 : round(100 * ($suppression / $sumArray[$key]),2));
     }
+}
 }
 ?>
 <div id="samplesTestedVsGender" style="height:450px;"></div>
@@ -86,29 +88,34 @@ foreach($gender as $gen){
                     }
                 }
             },
-            /*scatter: {
-                      stacking: 'normal',
+            spline: {
                       pointPadding: 0.2,
                       borderWidth: 0,
+                      lineWidth : 0,
                       cursor: 'pointer',
                       yAxis: 1,
                       //color : '#1B325F',
                       marker: {
                         symbol: 'diamond'
                       },
+                      states: {
+                        hover: {
+                            lineWidthPlus: 0
+                        }
+                        },  
                       point: {
                           events: {
                               click: function (e) {
-                                  console.log(e.point);
                                 doSampleTestedBasedonGenderRedirect(e.point.category,e.point.color);
                               }
                           }
                       }
-            }*/
+            }
         },
         series: [<?php
         
         for($i=0;$i<3;$i++){
+            if(isset($result[$gender[$i]]) && count($result[$gender[$i]])>0){
               foreach($result[$gender[$i]] as $key=>$condition){
                      if($key!='VL Not Detected'){
                             $range = substr($key,4,6);
@@ -143,19 +150,20 @@ foreach($gender as $gen){
               },
               <?php
               }
-              //if(count($supAvg[$gender[$i]])>0){
+              if(count($supAvg[$gender[$i]])>0){
                 ?>
-                /*{
-                name: '< ?php echo $this->translate("Suppression %(".$gender[$i].")"); ?>',
-                type: 'scatter',
+                {
+                name: '<?php echo $this->translate("Suppression %(".$gender[$i].")"); ?>',
+                type: 'spline',
                 //data: [[69.5,1],[57.66,1],[62.46,1]],
-                data: [< ?php echo implode(",",$supAvg[$gender[$i]]);?>],
-                color:'< ?php echo $supColor[$gender[$i]];?>',
-                stack:'< ?php echo $gender[$i];?>',
-                },*/
+                data: [<?php echo implode(",",$supAvg[$gender[$i]]);?>],
+                color:'<?php echo $supColor[$gender[$i]];?>',
+                stack:'<?php echo $gender[$i];?>',
+                },
             <?php 
-            //} 
+            } 
         }
+    }
             ?>
         ],
         //colors: ['#ff1900','#60d18f'],
