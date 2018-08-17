@@ -78,13 +78,15 @@ foreach($result['sampleTestedReason'][$arrayKey[1]] as $key=>$suppression){
                 point: {
                     events: {
                         click: function (e) {
-                           // doSampleTestedRedirect(e.point.category);
+                            doSampleTestedRedirect(e.point.category);
                         }
                     }
                 }
             },
             spline: {
                 stacking: 'normal',
+                pointPadding: 0.2,
+                borderWidth: 0,
                 lineWidth : 0,
                 cursor: 'pointer',
                 marker: {
