@@ -240,7 +240,7 @@ class Module{
                 },
 		    'SampleTableWithoutCache' => function($sm) {
                     $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
-                    return SampleTable($dbAdapter,$sm);
+                    return new SampleTable($dbAdapter,$sm);
             },
 		    'FacilityTable' => function($sm) {
                     $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
