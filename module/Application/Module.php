@@ -238,6 +238,10 @@ class Module{
 					]);   					
                     return $table;
                 },
+		    'SampleTableWithoutCache' => function($sm) {
+                    $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+                    return SampleTable($dbAdapter,$sm);
+            },
 		    'FacilityTable' => function($sm) {
                     $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
                     $tableObj = new FacilityTable($dbAdapter,$sm);
@@ -246,17 +250,21 @@ class Module{
 						'object' => $tableObj
 					]);   					
                     return $table;
-                },
+            },
+		    'FacilityTableWithoutCache' => function($sm) {
+                    $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+                    return new FacilityTable($dbAdapter,$sm);
+            },
 		    'FacilityTypeTable' => function($sm) {
                     $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
                     $table = new FacilitytypeTable($dbAdapter);
                     return $table;
-                },
-				'TestReasonTable' => function($sm) {
-                    $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
-                    $table = new TestReasonTable($dbAdapter);
-                    return $table;
-                },
+			},
+			'TestReasonTable' => function($sm) {
+				$dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+				$table = new TestReasonTable($dbAdapter);
+				return $table;
+			},
 		    'SampleStatusTable' => function($sm) {
                     $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
                     $table = new SampleStatusTable($dbAdapter);
@@ -266,19 +274,19 @@ class Module{
                     $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
                     $table = new SampleTypeTable($dbAdapter);
                     return $table;
-                },'GlobalTable' => function($sm) {
-                    $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
-                    $table = new GlobalTable($dbAdapter,$sm);
-                    return $table;
-                },'ArtCodeTable' => function($sm) {
-                    $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
-                    $table = new ArtCodeTable($dbAdapter);
-                    return $table;
-                },'UserFacilityMapTable' => function($sm) {
-                    $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
-                    $table = new UserFacilityMapTable($dbAdapter);
-                    return $table;
-                },
+			},'GlobalTable' => function($sm) {
+				$dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+				$table = new GlobalTable($dbAdapter,$sm);
+				return $table;
+			},'ArtCodeTable' => function($sm) {
+				$dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+				$table = new ArtCodeTable($dbAdapter);
+				return $table;
+			},'UserFacilityMapTable' => function($sm) {
+				$dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+				$table = new UserFacilityMapTable($dbAdapter);
+				return $table;
+			},
 		'LocationDetailsTable' => function($sm) {
                     $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
                     $table = new LocationDetailsTable($dbAdapter);

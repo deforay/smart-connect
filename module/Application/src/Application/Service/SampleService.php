@@ -1481,8 +1481,8 @@ $i++;
     public function importSampleResultFile(){
         $pathname = UPLOAD_PATH . DIRECTORY_SEPARATOR . "not-import-vl";
         $common = new CommonService();
-        $sampleDb = $this->sm->get('SampleTable');
-        $facilityDb = $this->sm->get('FacilityTable');
+        $sampleDb = $this->sm->get('SampleTableWithoutCache');
+        $facilityDb = $this->sm->get('FacilityTableWithoutCache');
         $facilityTypeDb = $this->sm->get('FacilityTypeTable');
         $testStatusDb = $this->sm->get('SampleStatusTable');
         $testReasonDb = $this->sm->get('TestReasonTable');
