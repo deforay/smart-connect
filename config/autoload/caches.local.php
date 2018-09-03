@@ -19,7 +19,7 @@ return array(
                 'cache_dir' => realpath(__DIR__ . '/../../data/cache/'),
                 'dirPermission' => 0755,
                 'filePermission' => 0666,
-                'dirLevel' => 2,
+                'dirLevel' => 1,
             ),
             'plugins' => array('serializer'),
             
