@@ -347,27 +347,81 @@ foreach($sampleType as $samples){
         </div>
     </div>
     <div class="row">
-        <div class="col-md-12 col-sm-12">
+        <div class="col-md-6 col-sm-6">
             <div class="portlet box blue">
                 <div class="portlet-title">
                     <div class="caption">
-                        <span class="caption-subject"><?php echo $this->translate('Samples Tested based on Age'); ?></span>
-                    </div>
-                    <div class="actions" style="width:20%;">
-                        <div class="btn-group" style="width:100%;">
-                            <select id="age" name="age[]" class="form-control" multiple title="<?php echo $this->translate('Please choose age group'); ?>" onchange="getTestedSampleResultBasedAgeGroup();">
-                                <option value="<2"> < 2</option>
-                                <option value="2to5"> 2 - 5</option>
-                                <option value="6to14"> 6 - 14</option>
-                                <option value="15to49"> 15 - 49</option>
-                                <option value=">=50"> >= 50</option>
-                                <option value="unknown"> <?php echo $this->translate('Unknown'); ?></option>
-                            </select>
-                        </div>
+                        <span class="caption-subject"><?php echo $this->translate('Samples Tested based on Age < 2'); ?></span>
                     </div>
                 </div>
                 <div class="portlet-body">
-                    <div id="samplesTestedResultAgeGroup"></div>
+                    <div id="samplesTestedResultAgeGroupLessThanTwo"></div>
+                </div>
+            </div>
+        </div>    
+        <div class="col-md-6 col-sm-6">
+            <div class="portlet box blue">
+                <div class="portlet-title">
+                    <div class="caption">
+                        <span class="caption-subject"><?php echo $this->translate('Samples Tested based on Age 2-5'); ?></span>
+                    </div>
+                </div>
+                <div class="portlet-body">
+                    <div id="samplesTestedResultAgeGroupTwoToFive"></div>
+                </div>
+            </div>
+        </div>            
+    </div>
+    <div class="row">
+        <div class="col-md-6 col-sm-6">
+            <div class="portlet box blue">
+                <div class="portlet-title">
+                    <div class="caption">
+                        <span class="caption-subject"><?php echo $this->translate('Samples Tested based on Age 6-14'); ?></span>
+                    </div>
+                    
+                </div>
+                <div class="portlet-body">
+                    <div id="samplesTestedResultAgeGroupSixToFourteen"></div>
+                </div>
+            </div>
+        </div>    
+        <div class="col-md-6 col-sm-6">
+            <div class="portlet box blue">
+                <div class="portlet-title">
+                    <div class="caption">
+                        <span class="caption-subject"><?php echo $this->translate('Samples Tested based on Age 15-49'); ?></span>
+                    </div>
+                </div>
+                <div class="portlet-body">
+                    <div id="samplesTestedResultAgeGroupFifteenToFourtyNine"></div>
+                </div>
+            </div>
+        </div>            
+    </div>
+    <div class="row">
+        <div class="col-md-6 col-sm-6">
+            <div class="portlet box blue">
+                <div class="portlet-title">
+                    <div class="caption">
+                        <span class="caption-subject"><?php echo $this->translate('Samples Tested based on Age >=50'); ?></span>
+                    </div>
+                    
+                </div>
+                <div class="portlet-body">
+                    <div id="samplesTestedResultAgeGroupGreaterThanFifty"></div>
+                </div>
+            </div>
+        </div>    
+        <div class="col-md-6 col-sm-6">
+            <div class="portlet box blue">
+                <div class="portlet-title">
+                    <div class="caption">
+                        <span class="caption-subject"><?php echo $this->translate('Samples Tested based on Age unknown'); ?></span>
+                    </div>
+                </div>
+                <div class="portlet-body">
+                    <div id="samplesTestedResultAgeGroupUnknown"></div>
                 </div>
             </div>
         </div>            
@@ -576,14 +630,64 @@ foreach($sampleType as $samples){
         });
     }
     
-    function getTestedSampleResultBasedAgeGroup(){
+    function getTestedSampleResultBasedAgeGroupLessThanTwo(){
         var fromDate = $('#mrp-lowerDate').val();
         var toDate = $('#mrp-upperDate').val();
         var facilityId = ($("#labName").val() == null)?'':$("#labName").val().join(',');
-        var age = ($('#age').val() == null)?'':$('#age').val().join(',');
+        var age = '<2';
         $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-test-result-age-group')); ?>",{fromDate:fromDate,toDate:toDate,facilityId:facilityId,age:age},
         function(data) {
-            $("#samplesTestedResultAgeGroup").html(data);
+            $("#samplesTestedResultAgeGroupLessThanTwo").html(data);
+        });
+    }
+    function getTestedSampleResultBasedAgeGroupTwoToFive(){
+        var fromDate = $('#mrp-lowerDate').val();
+        var toDate = $('#mrp-upperDate').val();
+        var facilityId = ($("#labName").val() == null)?'':$("#labName").val().join(',');
+        var age = '2to5';
+        $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-test-result-age-group-two-to-five')); ?>",{fromDate:fromDate,toDate:toDate,facilityId:facilityId,age:age},
+        function(data) {
+            $("#samplesTestedResultAgeGroupTwoToFive").html(data);
+        });
+    }
+    function getTestedSampleResultBasedAgeGroupSixToFourteen(){
+        var fromDate = $('#mrp-lowerDate').val();
+        var toDate = $('#mrp-upperDate').val();
+        var facilityId = ($("#labName").val() == null)?'':$("#labName").val().join(',');
+        var age = '6to14';
+        $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-test-result-age-group-six-to-fourteen')); ?>",{fromDate:fromDate,toDate:toDate,facilityId:facilityId,age:age},
+        function(data) {
+            $("#samplesTestedResultAgeGroupSixToFourteen").html(data);
+        });
+    }
+    function getTestedSampleResultBasedAgeGroupFifteenToFourtyNine(){
+        var fromDate = $('#mrp-lowerDate').val();
+        var toDate = $('#mrp-upperDate').val();
+        var facilityId = ($("#labName").val() == null)?'':$("#labName").val().join(',');
+        var age = '15to49';
+        $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-test-result-age-group-fifteen-to-fourtynine')); ?>",{fromDate:fromDate,toDate:toDate,facilityId:facilityId,age:age},
+        function(data) {
+            $("#samplesTestedResultAgeGroupFifteenToFourtyNine").html(data);
+        });
+    }
+    function getTestedSampleResultBasedAgeGroupGreaterThanFifty(){
+        var fromDate = $('#mrp-lowerDate').val();
+        var toDate = $('#mrp-upperDate').val();
+        var facilityId = ($("#labName").val() == null)?'':$("#labName").val().join(',');
+        var age = '>=50';
+        $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-test-result-age-group-greater-fifty')); ?>",{fromDate:fromDate,toDate:toDate,facilityId:facilityId,age:age},
+        function(data) {
+            $("#samplesTestedResultAgeGroupGreaterThanFifty").html(data);
+        });
+    }
+    function getTestedSampleResultBasedAgeGroupUnknown(){
+        var fromDate = $('#mrp-lowerDate').val();
+        var toDate = $('#mrp-upperDate').val();
+        var facilityId = ($("#labName").val() == null)?'':$("#labName").val().join(',');
+        var age = 'unknown';
+        $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-test-result-age-group-unknown')); ?>",{fromDate:fromDate,toDate:toDate,facilityId:facilityId,age:age},
+        function(data) {
+            $("#samplesTestedResultAgeGroupUnknown").html(data);
         });
     }
 
@@ -772,7 +876,12 @@ foreach($sampleType as $samples){
         getTestedSampleResult();
         getTestedSampleResultBasedLab();
         getTestedSampleResultBasedGender();
-        getTestedSampleResultBasedAgeGroup();
+        getTestedSampleResultBasedAgeGroupLessThanTwo();
+        getTestedSampleResultBasedAgeGroupTwoToFive();
+        getTestedSampleResultBasedAgeGroupSixToFourteen();
+        getTestedSampleResultBasedAgeGroupFifteenToFourtyNine();
+        getTestedSampleResultBasedAgeGroupGreaterThanFifty();
+        getTestedSampleResultBasedAgeGroupUnknown();
         getTestedSampleReason();
         getTestedSampleResultBasedonPregnantPatient();
         getTestedSampleResultBasedonBreastfeedingPatient();
