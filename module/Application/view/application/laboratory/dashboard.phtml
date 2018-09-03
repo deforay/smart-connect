@@ -431,7 +431,7 @@ foreach($sampleType as $samples){
             <div class="portlet box blue">
                 <div class="portlet-title">
                     <div class="caption">
-                        <span class="caption-subject"><?php echo $this->translate('Samples Tested Reason'); ?></span>
+                        <span class="caption-subject"><?php echo $this->translate('Reason for VL Testing'); ?></span>
                     </div>
                     <div class="actions" style="width:20%;">
                         <div class="btn-group" style="width:100%;">
@@ -581,7 +581,7 @@ foreach($sampleType as $samples){
     function getSampleResult(frmSource){
         var daterange= $('#daterange').val();
         if(frmSource == 'daterange' && $.trim(daterange) == ''){ alert('<?php echo $this->translate('Please choose date range'); ?>'); return false; }
-        if(frmSource !='load'){$.blockUI.defaults.css.border = '1px solid grey'; $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);}
+        //if(frmSource !='load'){$.blockUI.defaults.css.border = '1px solid grey'; $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);}
         $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-result')); ?>",{daterange:daterange},
         function(data) {
             $("#sampleResultDetails").html(data);
@@ -734,7 +734,7 @@ foreach($sampleType as $samples){
     }
     
     function getSampleVolume(formSrc){
-        if(formSrc == 'change'){$.blockUI.defaults.css.border = '1px solid grey';$(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);}
+        //if(formSrc == 'change'){$.blockUI.defaults.css.border = '1px solid grey';$(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);}
         var fromDate = $('#mrp-lowerDate').val();
         var toDate = $('#mrp-upperDate').val();
         var facilityId = ($("#labName").val() == null)?'':$("#labName").val().join(',');
@@ -864,7 +864,7 @@ foreach($sampleType as $samples){
     
     function getEverything(){
         $.blockUI.defaults.css.border = '1px solid grey'; 
-        $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
+        //$(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
         if(!$('#sampleCollectionDate').val() ) {
           $('#sampleCollectionDate').val(moment().subtract('days', 179).format('YYYY-MM-DD') + ' to ' + moment().format('YYYY-MM-DD'));
         }

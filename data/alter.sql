@@ -373,3 +373,7 @@ ALTER TABLE `dash_vl_request_form` ADD `sample_registered_at_lab` DATETIME NULL 
 
 ALTER TABLE `dash_vl_request_form` ADD `vl_result_category` VARCHAR(255) NULL AFTER `sample_to_transport`;
 
+-- Amit 21 August 2018
+
+INSERT INTO `locale_details` (`locale_id`, `locale`, `display_name`, `locale_status`) VALUES
+(3, 'en_CD', 'DRC - English', 'active');

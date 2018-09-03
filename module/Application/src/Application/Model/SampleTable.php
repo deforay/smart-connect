@@ -549,7 +549,7 @@ class SampleTable extends AbstractTableGateway {
                 $result['all'][$j] = (isset($subQueryResult[0]["AvgDiff"]) && $subQueryResult[0]["AvgDiff"] != NULL && $subQueryResult[0]["AvgDiff"] > 0) ? round($subQueryResult[0]["AvgDiff"],2) : null;
                 //$result['lab'][$j] = (isset($labsubQueryResult[0]["labCount"]) && $labsubQueryResult[0]["labCount"] != NULL && $labsubQueryResult[0]["labCount"] > 0) ? round($labsubQueryResult[0]["labCount"],2) : 0;
                 $result['sample']['Samples Collected'][$j] = (isset($sRow['total_samples_collected']) && $sRow['total_samples_collected'] != NULL) ? $sRow['total_samples_collected'] : null;
-                $result['sample']['Samples Pending'][$j] = (isset($sRow['total_samples_pending']) && $sRow['total_samples_pending'] != NULL) ? $sRow['total_samples_pending'] : null;
+                $result['sample']['Results Awaited'][$j] = (isset($sRow['total_samples_pending']) && $sRow['total_samples_pending'] != NULL) ? $sRow['total_samples_pending'] : null;
                 $result['date'][$j] = $sRow["monthDate"];
                 $j++;
             }
