@@ -4,14 +4,26 @@ $supAvg = array();
 $less1000 = array('M'=>'#088738', 'F' => '#60d18f', 'Not Specified' => '#A5F7C6');
 $more1000 = array('M'=>'#ff1900', 'F' => '#F2786D', 'Not Specified' => '#8C1308');
 $supColor = array('M'=>'#252424', 'F' => '#826c6c', 'Not Specified' => '#cd6969');
+//\Zend\Debug\Debug::dump($result);die;
 if(count($result)>0){
 foreach($gender as $gen){
     $arrayKey = array_keys($result[$gen]);
     $sumArray = array_map(function () {
         return array_sum(func_get_args());
     }, $result[$gen][$arrayKey[0]], $result[$gen][$arrayKey[1]]);
+    
     foreach($result[$gen][$arrayKey[1]] as $key=>$suppression){
-        $supAvg[$gen][] = (($suppression==0) ? (int)0 : round(100 * ($suppression / $sumArray[$key]),2));
+        $supAvg[$gen][] = (($suppression==0) ? null : round(100 * ($suppression / $sumArray[$key]),2));
+    }
+}
+$genderResult = array();
+$genderSupName = array();
+for($i=0;$i<=count($supAvg['M']);$i++){
+    foreach($gender as $gen){
+        if($supAvg[$gen][$i]!=NULL){
+            $genderResult[] = $supAvg[$gen][$i];
+            $genderSupName[] = "'".$gen."'";
+        }
     }
 }
 }
@@ -20,7 +32,7 @@ foreach($gender as $gen){
 <script>
        $(function () {
         $('#samplesTestedVsGender').highcharts({
-       chart: {
+            chart: {
             type: 'column'
         },
         title: {
@@ -36,18 +48,26 @@ foreach($gender as $gen){
        credits: {
               enabled: false
        },
-        xAxis: {
+        xAxis: [{
             categories: [<?php
             if(isset($result['date']) && count($result['date'])>0){
               foreach($result['date'] as $date){
                   echo "'".$date."',";
               }
             }
-            ?>]
-        },
+            ?>],
+            gridLineWidth: 0
+        },{
+            categories:[<?php echo implode(",",$genderSupName);?>],
+            opposite:true,
+            labels: {
+                enabled:false
+            }
+        }],
+
         yAxis: [{
+            gridLineWidth: 0,
             allowDecimals: false,
-            min: 0,
             title: {
                 text: '<?php echo $this->translate('No. of Samples'); ?>'
             }
@@ -64,14 +84,16 @@ foreach($gender as $gen){
                 }
                 },
                 opposite: true,
-                min: 0
             }
         ],
+       
+
+
         tooltip: {
             formatter: function () {
                 return '<b>' + this.x + '</b><br/>' +
-                    this.series.name + ': ' + this.y + '<br/>' +
-                    '<?php echo $this->translate('Total'); ?>: ' + this.point.stackTotal;
+                    this.series.name + ': ' + this.y + '<br/>'
+                    //'< ?php echo $this->translate('Total'); ?>: ' + this.point.stackTotal;
             }
         },
         plotOptions: {
@@ -89,12 +111,8 @@ foreach($gender as $gen){
                 }
             },
             spline: {
-                      pointPadding: 0.2,
-                      borderWidth: 0,
                       lineWidth : 0,
-                      cursor: 'pointer',
-                      yAxis: 1,
-                      //color : '#1B325F',
+                      color : '#1B325F',
                       marker: {
                         symbol: 'diamond'
                       },
@@ -102,7 +120,7 @@ foreach($gender as $gen){
                         hover: {
                             lineWidthPlus: 0
                         }
-                        },  
+                        },
                       point: {
                           events: {
                               click: function (e) {
@@ -111,6 +129,7 @@ foreach($gender as $gen){
                           }
                       }
             }
+           
         },
         series: [<?php
         
@@ -128,45 +147,36 @@ foreach($gender as $gen){
               name:'<?php echo $this->translate($key."(".$gender[$i].")"); ?>',
               data:[<?php
                   foreach($condition as $count){
-                      echo '{y:'.$count.',gender:"'.$gender[$i].'"},';
+                    echo $count.",";
                   }
               ?>],
               stack:'<?php echo $gender[$i];?>',
-              <?php
-              if($key == "VL (< 1000 cp/ml)"){
-              
-                     if(isset($less1000[$gender[$i]])) { ?>
-                     
+                <?php if($key == "VL (< 1000 cp/ml)"){
+                        if(isset($less1000[$gender[$i]])) { ?>
                             color: '<?php echo $less1000[$gender[$i]]; ?>'
-                     
-                     <?php } else{ ?>
+                <?php   } else{ ?>
                             color: '<?php echo $more1000[$gender[$i]]; ?>'
-              <?php }
-              } else { ?>
+              <?php         }
+                    } else { ?>
                  color: '#ff1900'     
-              <?php
-              }
-              ?>
+              <?php } ?>
               },
               <?php
               }
-              //if(count($supAvg[$gender[$i]])>0){
-                ?>
-                // {
-                // name: '< ?php echo $this->translate("Suppression %(".$gender[$i].")"); ?>',
-                // type: 'spline',
-                // //data: [[69.5,1],[57.66,1],[62.46,1]],
-                // data: [< ?php echo implode(",",$supAvg[$gender[$i]]);?>],
-                // color:'< ?php echo $supColor[$gender[$i]];?>',
-                // stack:'< ?php echo $gender[$i];?>',
-                // },
-            <?php 
-            //} 
         }
     }
-            ?>
-        ],
-        //colors: ['#ff1900','#60d18f'],
+   
+    ?>
+          
+          
+        {
+            type: 'spline',
+            name: 'Suppression %',
+            yAxis: 1,
+            xAxis:1,
+            data: [<?php echo implode(",",$genderResult);?>],
+        }
+
+        ]
     });
-    });
-</script>
+});
