@@ -188,6 +188,22 @@ foreach($sampleType as $samples){
 
 <br><br>
 <div class="row">
+    <div class="col-md-12 col-sm-12">
+        <div class="portlet box blue">
+            <div class="portlet-title">
+                <div class="caption">
+                    <span class="caption-subject"><?php echo $this->translate('Samples Tested based on Gender'); ?></span>
+                </div>
+            </div>
+            <div class="portlet-body">
+                <div id="overall-sample-test-based-gender" style="min-width: 310px; height: 520px; margin: 0 auto"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<br><br>
+<div class="row">
     <div class="col-md-6 col-sm-6">
         <div class="portlet box blue">
             <div class="portlet-title">
@@ -366,10 +382,12 @@ foreach($sampleType as $samples){
         }
         getOverAllViralLoadStatus();
         getOverAllViralLoadbasedonGender();
+        getTestedSampleResultBasedGender();
         getAllTestReason();
         getTestedSampleResult('load');
         loadTestResult();
         fnShowHide();
+        
     }
     
     function getOverAllViralLoadStatus(){
@@ -495,6 +513,7 @@ foreach($sampleType as $samples){
         oTable.draw();
         getOverAllViralLoadStatus();
         getOverAllViralLoadbasedonGender();
+        getTestedSampleResultBasedGender();
         getAllTestReason();
         getTestedSampleResult('search');
     }
@@ -610,5 +629,21 @@ foreach($sampleType as $samples){
             }
         }
         $('#clinicId').select2('val', $("#clinicId").val());
+    }
+    function getTestedSampleResultBasedGender(){
+        var clinicId = ($("#clinicId").val() == null)?'':$("#clinicId").val().join(',');
+        var dateRange = $("#sampleCollectionDate").val();
+        var testResult = $("#testResult").val();
+        var sampleTypeId = $("#sampleTypeId").val();
+        var age = ($("#age").val() == null)?'':$("#age").val().join(',');
+        var adherence = $("#adherence").val();
+        var gender = $("#gender").val();
+        var isPregnant = $("#isPregnant").val();
+        var isBreastfeeding = $("#isBreastfeeding").val();
+
+        $.post("<?php echo $this->url('clinics', array('action' => 'get-sample-test-result-gender')); ?>",{clinicId:clinicId,sampleCollectionDate:dateRange,testResult:testResult,sampleTypeId:sampleTypeId,age:age,adherence:adherence,gender:gender,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding},
+        function(data) {
+            $("#overall-sample-test-based-gender").html(data);
+        });
     }
 </script>        

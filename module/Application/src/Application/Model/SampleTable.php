@@ -1371,7 +1371,7 @@ class SampleTable extends AbstractTableGateway {
         }
        return $sResult;
     }
-    
+
     public function fetchViralLoadStatusBasedOnGender($params){
         $logincontainer = new Container('credo');
         $dbAdapter = $this->adapter;
@@ -1388,17 +1388,17 @@ class SampleTable extends AbstractTableGateway {
             }
             $query = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
                                    ->columns(array(
-                                                "mTotal" => new Expression("SUM(CASE WHEN (vl.patient_gender in('m','Male','M','MALE')) THEN 1 ELSE 0 END)"),
-                                                "mGreaterThanEqual1000" => new Expression("SUM(CASE WHEN (vl.patient_gender in('m','Male','M','MALE') and (vl.DashVL_AnalysisResult like 'not suppressed%' OR vl.DashVL_AnalysisResult like 'Not Suppressed%' or vl.DashVL_Abs >= 1000)) THEN 1 ELSE 0 END)"),
-                                                "mLesserThan1000" => new Expression("SUM(CASE WHEN (vl.patient_gender in('m','Male','M','MALE') and (vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' or vl.DashVL_Abs < 1000)) THEN 1 ELSE 0 END)"),
-                                                
-                                                "fTotal" => new Expression("SUM(CASE WHEN (vl.patient_gender in('f','Female','F','FEMALE')) THEN 1 ELSE 0 END)"),
-                                                "fGreaterThanEqual1000" => new Expression("SUM(CASE WHEN (vl.patient_gender in('f','Female','F','FEMALE') and (vl.DashVL_AnalysisResult like 'not suppressed%' OR vl.DashVL_AnalysisResult like 'Not Suppressed%' or vl.DashVL_Abs >= 1000)) THEN 1 ELSE 0 END)"),
-                                                "fLesserThan1000" => new Expression("SUM(CASE WHEN (vl.patient_gender in('f','Female','F','FEMALE') and (vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' or vl.DashVL_Abs < 1000)) THEN 1 ELSE 0 END)"),
-                                                
-                                                "nsTotal" => new Expression("SUM(CASE WHEN ((vl.patient_gender IS NULL OR vl.patient_gender = '' OR vl.patient_gender ='Not Recorded' OR vl.patient_gender = 'not recorded')) THEN 1 ELSE 0 END)"),
-                                                "nsGreaterThanEqual1000" => new Expression("SUM(CASE WHEN ((vl.patient_gender IS NULL OR vl.patient_gender = '' OR vl.patient_gender ='Not Recorded' OR vl.patient_gender = 'not recorded' OR vl.patient_gender = 'Unreported' OR vl.patient_gender = 'unreported') and (vl.DashVL_AnalysisResult like 'not suppressed%' OR vl.DashVL_AnalysisResult like 'Not Suppressed%' or vl.DashVL_Abs >= 1000)) THEN 1 ELSE 0 END)"),
-                                                "nsLesserThan1000" => new Expression("SUM(CASE WHEN ((vl.patient_gender IS NULL OR vl.patient_gender = '' OR vl.patient_gender ='Not Recorded' OR vl.patient_gender = 'not recorded' OR vl.patient_gender = 'Unreported' OR vl.patient_gender = 'unreported') and (vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' or vl.DashVL_Abs < 1000)) THEN 1 ELSE 0 END)"),
+                                    "mTotal" => new Expression("SUM(CASE WHEN (vl.patient_gender in('m','Male','M','MALE')) THEN 1 ELSE 0 END)"),
+                                    "mGreaterThanEqual1000" => new Expression("SUM(CASE WHEN (vl.patient_gender in('m','Male','M','MALE') and (vl.DashVL_AnalysisResult like 'not suppressed%' OR vl.DashVL_AnalysisResult like 'Not Suppressed%' or vl.DashVL_Abs >= 1000)) THEN 1 ELSE 0 END)"),
+                                    "mLesserThan1000" => new Expression("SUM(CASE WHEN (vl.patient_gender in('m','Male','M','MALE') and (vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' or vl.DashVL_Abs < 1000)) THEN 1 ELSE 0 END)"),
+                                    
+                                    "fTotal" => new Expression("SUM(CASE WHEN (vl.patient_gender in('f','Female','F','FEMALE')) THEN 1 ELSE 0 END)"),
+                                    "fGreaterThanEqual1000" => new Expression("SUM(CASE WHEN (vl.patient_gender in('f','Female','F','FEMALE') and (vl.DashVL_AnalysisResult like 'not suppressed%' OR vl.DashVL_AnalysisResult like 'Not Suppressed%' or vl.DashVL_Abs >= 1000)) THEN 1 ELSE 0 END)"),
+                                    "fLesserThan1000" => new Expression("SUM(CASE WHEN (vl.patient_gender in('f','Female','F','FEMALE') and (vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' or vl.DashVL_Abs < 1000)) THEN 1 ELSE 0 END)"),
+                                    
+                                    "nsTotal" => new Expression("SUM(CASE WHEN ((vl.patient_gender IS NULL OR vl.patient_gender = '' OR vl.patient_gender ='Not Recorded' OR vl.patient_gender = 'not recorded')) THEN 1 ELSE 0 END)"),
+                                    "nsGreaterThanEqual1000" => new Expression("SUM(CASE WHEN ((vl.patient_gender IS NULL OR vl.patient_gender = '' OR vl.patient_gender ='Not Recorded' OR vl.patient_gender = 'not recorded' OR vl.patient_gender = 'Unreported' OR vl.patient_gender = 'unreported') and (vl.DashVL_AnalysisResult like 'not suppressed%' OR vl.DashVL_AnalysisResult like 'Not Suppressed%' or vl.DashVL_Abs >= 1000)) THEN 1 ELSE 0 END)"),
+                                    "nsLesserThan1000" => new Expression("SUM(CASE WHEN ((vl.patient_gender IS NULL OR vl.patient_gender = '' OR vl.patient_gender ='Not Recorded' OR vl.patient_gender = 'not recorded' OR vl.patient_gender = 'Unreported' OR vl.patient_gender = 'unreported') and (vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' or vl.DashVL_Abs < 1000)) THEN 1 ELSE 0 END)"),
                                               )
                                             )
                                    ->where(array("DATE(vl.sample_collection_date) <='$endDate'","DATE(vl.sample_collection_date) >='$startDate'"));
@@ -1465,9 +1465,9 @@ class SampleTable extends AbstractTableGateway {
             }else if(isset($params['isBreastfeeding']) && $params['isBreastfeeding']=='unreported'){
                 $query = $query->where("(vl.is_patient_breastfeeding IS NULL OR vl.is_patient_breastfeeding = '' OR vl.is_patient_breastfeeding = 'Unreported' OR vl.is_patient_breastfeeding = 'unreported')"); 
             }
+
             $queryStr = $sql->getSqlStringForSqlObject($query);
-            //echo $queryStr;die;
-            //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+
             $sampleResult = $common->cacheQuery($queryStr,$dbAdapter);
             $j = 0;
             foreach($sampleResult as $sample){
@@ -1483,6 +1483,133 @@ class SampleTable extends AbstractTableGateway {
               $j++;
             }
         }
+
+            
+      return $result;
+    }
+    
+    public function fetchSampleTestedResultBasedGenderDetails($params){
+        $logincontainer = new Container('credo');
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $result = array();
+        $common = new CommonService($this->sm);
+        if(isset($params['sampleCollectionDate']) && trim($params['sampleCollectionDate'])!= ''){
+            $s_c_date = explode("to", $params['sampleCollectionDate']);
+            if (isset($s_c_date[0]) && trim($s_c_date[0]) != "") {
+              $startDate = trim($s_c_date[0]);
+            }
+            if (isset($s_c_date[1]) && trim($s_c_date[1]) != "") {
+              $endDate = trim($s_c_date[1]);
+            }
+            $query = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
+                                   ->columns(array(
+
+                                    "total" => new Expression('COUNT(*)'),
+                                                "sampleCollectionDate" => new Expression("DATE_FORMAT(DATE(sample_collection_date), '%d-%b-%Y')"),
+                                                
+                                                "MGreaterThan1000" => new Expression("SUM(CASE WHEN (vl.patient_gender is not null and vl.patient_gender != '' and vl.patient_gender !='unreported' and vl.patient_gender in('m','Male','M','MALE') and (vl.DashVL_AnalysisResult like 'not suppressed%' OR vl.DashVL_AnalysisResult like 'Not Suppressed%' or vl.DashVL_Abs >= 1000)) THEN 1 ELSE 0 END)"),
+                                                "MLesserThan1000" => new Expression("SUM(CASE WHEN (vl.patient_gender is not null and vl.patient_gender != '' and vl.patient_gender !='unreported' and vl.patient_gender in('m','Male','M','MALE') and (vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' or vl.DashVL_Abs < 1000)) THEN 1 ELSE 0 END)"),
+                                        
+                                                "FGreaterThan1000" => new Expression("SUM(CASE WHEN (vl.patient_gender is not null and vl.patient_gender != '' and vl.patient_gender !='unreported' and vl.patient_gender in('f','Female','F','FEMALE') and (vl.DashVL_AnalysisResult like 'not suppressed%' OR vl.DashVL_AnalysisResult like 'Not Suppressed%' or vl.DashVL_Abs >= 1000)) THEN 1 ELSE 0 END)"),
+                                                "FLesserThan1000" => new Expression("SUM(CASE WHEN (vl.patient_gender is not null and vl.patient_gender != '' and vl.patient_gender !='unreported' and vl.patient_gender in('f','Female','F','FEMALE') and (vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' or vl.DashVL_Abs < 1000)) THEN 1 ELSE 0 END)"),
+
+                                                "OGreaterThan1000" => new Expression("SUM(CASE WHEN ((vl.patient_gender IS NULL or vl.patient_gender = '' or vl.patient_gender = 'Not Recorded' or vl.patient_gender = 'not recorded') and (vl.DashVL_AnalysisResult like 'not suppressed%' OR vl.DashVL_AnalysisResult like 'Not Suppressed%' or vl.DashVL_Abs >= 1000)) THEN 1 ELSE 0 END)"),
+                                                "OLesserThan1000" => new Expression("SUM(CASE WHEN ((vl.patient_gender IS NULL or vl.patient_gender ='NULL' or vl.patient_gender = '' or vl.patient_gender = 'Not Recorded' or vl.patient_gender = 'not recorded' or vl.patient_gender = 'Unreported' or vl.patient_gender = 'unreported') and (vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' or vl.DashVL_Abs < 1000)) THEN 1 ELSE 0 END)"),
+
+
+                                                
+                                              )
+                                            )
+                                   ->where(array("DATE(vl.sample_collection_date) <='$endDate'","DATE(vl.sample_collection_date) >='$startDate'"));
+            if(isset($params['clinicId']) && trim($params['clinicId'])!= ''){
+                $query = $query->where('vl.facility_id IN ('.$params['clinicId'].')');
+            }else{
+                if($logincontainer->role!= 1){
+                    $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:array(0);
+                    $query = $query->where('vl.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
+                }
+            }
+            if(isset($params['testResult']) && $params['testResult'] == '<1000'){
+                $query = $query->where("(vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' or vl.DashVL_Abs < 1000)");
+            }else if(isset($params['testResult']) && $params['testResult'] == '>=1000') {
+                $query = $query->where("(vl.DashVL_AnalysisResult like 'not suppressed%' OR vl.DashVL_AnalysisResult like 'Not Suppressed%' or vl.DashVL_Abs >= 1000)");
+            }
+            if(isset($params['sampleTypeId']) && $params['sampleTypeId']!=''){
+                $query = $query->where('vl.sample_type="'.base64_decode(trim($params['sampleTypeId'])).'"');
+            }
+            //print_r($params['age']);die;
+            if(isset($params['age']) && trim($params['age'])!= ''){
+                $age = explode(',',$params['age']);
+                $where = '';
+                for($a=0;$a<count($age);$a++){
+                    if(trim($where)!= ''){ $where.= ' OR '; }
+                    if($age[$a] == '<2'){
+                      $where.= "(vl.patient_age_in_years > 0 AND vl.patient_age_in_years < 2)";
+                    }else if($age[$a] == '2to5') {
+                      $where.= "(vl.patient_age_in_years >= 2 AND vl.patient_age_in_years <= 5)";
+                    }else if($age[$a] == '6to14') {
+                      $where.= "(vl.patient_age_in_years >= 6 AND vl.patient_age_in_years <= 14)";
+                    }else if($age[$a] == '15to49') {
+                      $where.= "(vl.patient_age_in_years >= 15 AND vl.patient_age_in_years <= 49)";
+                    }else if($age[$a] == '>=50'){
+                      $where.= "(vl.patient_age_in_years >= 50)";
+                    }else if($age[$a] == 'unknown'){
+                      $where.= "(vl.patient_age_in_years IS NULL OR vl.patient_age_in_years = '' OR vl.patient_age_in_years = 'Unknown' OR vl.patient_age_in_years = 'unknown' OR vl.patient_age_in_years = 'Unreported' OR vl.patient_age_in_years = 'unreported')";
+                    }
+                }
+              $where = '('.$where.')';
+              $query = $query->where($where);
+            }
+            if(isset($params['adherence']) && trim($params['adherence'])!=''){
+                $query = $query->where(array("vl.arv_adherance_percentage = '".$params['adherence']."'")); 
+            }
+            if(isset($params['gender']) && $params['gender']=='F'){
+                $query = $query->where("vl.patient_gender IN ('f','female','F','FEMALE')");
+            }else if(isset($params['gender']) && $params['gender']=='M'){
+                $query = $query->where("vl.patient_gender IN ('m','male','M','MALE')");
+            }else if(isset($params['gender']) && $params['gender']=='not_specified'){
+                $query = $query->where("(vl.patient_gender IS NULL OR vl.patient_gender = '' OR vl.patient_gender ='Not Recorded' OR vl.patient_gender = 'not recorded OR vl.patient_age_in_years = 'Unreported' OR vl.patient_age_in_years = 'unreported')");
+            }
+            if(isset($params['isPregnant']) && $params['isPregnant']=='yes'){
+                $query = $query->where("vl.is_patient_pregnant = 'yes'");
+            }else if(isset($params['isPregnant']) && $params['isPregnant']=='no'){
+                $query = $query->where("vl.is_patient_pregnant = 'no'"); 
+            }else if(isset($params['isPregnant']) && $params['isPregnant']=='unreported'){
+                $query = $query->where("(vl.is_patient_pregnant IS NULL OR vl.is_patient_pregnant = '' OR vl.is_patient_pregnant = 'Unreported' OR vl.is_patient_pregnant = 'unreported')"); 
+            }
+            if(isset($params['isBreastfeeding']) && $params['isBreastfeeding']=='yes'){
+                $query = $query->where("vl.is_patient_breastfeeding = 'yes'");
+            }else if(isset($params['isBreastfeeding']) && $params['isBreastfeeding']=='no'){
+                $query = $query->where("vl.is_patient_breastfeeding = 'no'"); 
+            }else if(isset($params['isBreastfeeding']) && $params['isBreastfeeding']=='unreported'){
+                $query = $query->where("(vl.is_patient_breastfeeding IS NULL OR vl.is_patient_breastfeeding = '' OR vl.is_patient_breastfeeding = 'Unreported' OR vl.is_patient_breastfeeding = 'unreported')"); 
+            }
+            $query = $query->group(array(new Expression('DATE(sample_collection_date)')));   
+            $query = $query->order(array(new Expression('DATE(sample_collection_date)')));    
+            $queryStr = $sql->getSqlStringForSqlObject($query);
+            //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+            $sampleResult = $common->cacheQuery($queryStr,$dbAdapter);
+            $j = 0;
+            foreach($sampleResult as $sRow){
+                if($sRow["sampleCollectionDate"] == null) continue;
+                $result['M']['VL (>= 1000 cp/ml)'][$j] = (isset($sRow["MGreaterThan1000"]))?$sRow["MGreaterThan1000"]:0;
+                //$result['M']['VL Not Detected'][$j] = $sRow["MTND"];
+                $result['M']['VL (< 1000 cp/ml)'][$j] = (isset($sRow["MLesserThan1000"]))?$sRow["MLesserThan1000"]:0;
+ 
+                $result['F']['VL (>= 1000 cp/ml)'][$j] = (isset($sRow["FGreaterThan1000"]))?$sRow["FGreaterThan1000"]:0;
+                //$result['F']['VL Not Detected'][$j] = $sRow["FTND"];
+                $result['F']['VL (< 1000 cp/ml)'][$j] = (isset($sRow["FLesserThan1000"]))?$sRow["FLesserThan1000"]:0;
+
+                $result['Not Specified']['VL (>= 1000 cp/ml)'][$j] = (isset($sRow["OGreaterThan1000"]))?$sRow["OGreaterThan1000"]:0;
+                //$result['Not Specified']['VL Not Detected'][$j] = $sRow["OTND"];
+                $result['Not Specified']['VL (< 1000 cp/ml)'][$j] = (isset($sRow["OLesserThan1000"]))?$sRow["OLesserThan1000"]:0;
+                
+                $result['date'][$j] = $sRow["sampleCollectionDate"];
+                $j++;
+            }
+        }
+        
       return $result;
     }
     

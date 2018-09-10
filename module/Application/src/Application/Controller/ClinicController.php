@@ -200,5 +200,17 @@ class ClinicController extends AbstractActionController{
             return $viewModel;
         }
     }
+    public function getSampleTestResultGenderAction(){
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $sampleService = $this->getServiceLocator()->get('SampleService');
+            $result = $sampleService->getSampleTestedResultBasedGenderDetails($params);
+            $viewModel = new ViewModel();
+            $viewModel->setVariables(array('result' => $result))
+                        ->setTerminal(true);
+            return $viewModel;
+        }
+    }
     
 }

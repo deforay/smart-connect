@@ -426,6 +426,11 @@ class SampleService {
         $sampleDb = $this->sm->get('SampleTable');
         return $sampleDb->fetchViralLoadStatusBasedOnGender($params);
     }
+
+    public function getSampleTestedResultBasedGenderDetails($params){
+        $sampleDb = $this->sm->get('SampleTable');
+        return $sampleDb->fetchSampleTestedResultBasedGenderDetails($params);
+    }
     
     public function fetchSampleTestedReason($params){
         $sampleDb = $this->sm->get('SampleTable');
