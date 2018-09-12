@@ -441,6 +441,15 @@ class SampleService {
         $reasonDb = $this->sm->get('TestReasonTable');
         return $reasonDb->fetchAllTestReasonName();
     }
+    public function getClinicSampleTestedResultAgeGroupDetails($params){
+        $sampleDb = $this->sm->get('SampleTable');
+        return $sampleDb->fetchClinicSampleTestedResultAgeGroupDetails($params);
+    }
+    public function getClinicRequisitionFormsTested($params)
+    {
+        $sampleDb = $this->sm->get('SampleTable');
+        return $sampleDb->fetchClinicRequisitionFormsTested($params);
+    }
     //clinic details end
     
     //get all smaple type

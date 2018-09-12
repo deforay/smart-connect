@@ -20,7 +20,7 @@ $genderResult = array();
 $genderSupName = array();
 for($i=0;$i<=count($supAvg['M']);$i++){
     foreach($gender as $gen){
-        if($supAvg[$gen][$i]!=NULL){
+        if(isset($supAvg[$gen][$i]) && $supAvg[$gen][$i]!=NULL){
             $genderResult[] = $supAvg[$gen][$i];
             $genderSupName[] = "'".$gen."'";
         }
@@ -105,7 +105,7 @@ for($i=0;$i<=count($supAvg['M']);$i++){
                 point: {
                     events: {
                         click: function (e) {
-                            doSampleTestedBasedonGenderRedirect(e.point.category,e.point.gender);
+                            //doSampleTestedBasedonGenderRedirect(e.point.category,e.point.gender);
                         }
                     }
                 }
@@ -124,7 +124,7 @@ for($i=0;$i<=count($supAvg['M']);$i++){
                       point: {
                           events: {
                               click: function (e) {
-                                doSampleTestedBasedonGenderRedirect(e.point.category,e.point.color);
+                               // doSampleTestedBasedonGenderRedirect(e.point.category,e.point.color);
                               }
                           }
                       }

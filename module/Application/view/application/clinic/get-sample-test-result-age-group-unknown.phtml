@@ -1,21 +1,21 @@
 <?php
-$lt1000 = array('Age 6-14' => '#60D18F');
-$gt1000 = array('Age 6-14' => '#ff1900');
+$lt1000 = array($params['age']['ageName'] => '#b2ffb2');
+$gt1000 = array($params['age']['ageName'] => '#ff1900');
 $supAvg = array();
-if(isset($result['Age 6-14']) && count($result['Age 6-14']) >0){
-$arrayKey = array_keys($result['Age 6-14']);
+if(isset($result[$params['age']['ageName']]) && count($result[$params['age']['ageName']]) >0){
+$arrayKey = array_keys($result[$params['age']['ageName']]);
 $sumArray = array_map(function () {
     return array_sum(func_get_args());
-}, $result['Age 6-14'][$arrayKey[0]], $result['Age 6-14'][$arrayKey[1]]);
-foreach($result['Age 6-14'][$arrayKey[1]] as $key=>$suppression){
+}, $result[$params['age']['ageName']][$arrayKey[0]], $result[$params['age']['ageName']][$arrayKey[1]]);
+foreach($result[$params['age']['ageName']][$arrayKey[1]] as $key=>$suppression){
     $supAvg[] = (($suppression==0) ? 0 : round(100 * ($suppression / $sumArray[$key]),2));
 }
 }
 ?>
-<div id="samplesTestedVsAgeGroupSixToFourteen"></div>
+<div id="samplesTestedVsAgeGroupunknown"></div>
 <script>
 $(function () {
-       $('#samplesTestedVsAgeGroupSixToFourteen').highcharts({
+       $('#samplesTestedVsAgeGroupunknown').highcharts({
         chart: {
             type: 'column'
         },
@@ -25,7 +25,7 @@ $(function () {
         exporting:{
             chartOptions:{
                 subtitle: {
-                    text:'<?php echo $this->translate('Samples Tested based on Age 6-14'); ?>',
+                    text:'<?php echo $this->translate('Samples Tested based on '.$params['age']['ageName']); ?>',
                 }
             }
         },
@@ -120,7 +120,7 @@ $(function () {
             }
         },
         series: [<?php
-        $age = array('Age 6-14');
+        $age = array($params['age']['ageName']);
         for($i=0;$i<count($age);$i++){
               if(!isset($result[$age[$i]])) continue;
               foreach($result[$age[$i]] as $key=>$condition){

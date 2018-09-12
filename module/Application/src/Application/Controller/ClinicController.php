@@ -212,5 +212,89 @@ class ClinicController extends AbstractActionController{
             return $viewModel;
         }
     }
-    
+
+    public function getSampleTestResultAgeGroupAction(){
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $sampleService = $this->getServiceLocator()->get('SampleService');
+            $result = $sampleService->getClinicSampleTestedResultAgeGroupDetails($params);
+            $viewModel = new ViewModel();
+            $viewModel->setVariables(array('result' => $result,'params'=>$params))
+                        ->setTerminal(true);
+            return $viewModel;
+        }
+    }
+    public function getSampleTestResultAgeGroupTwoToFiveAction(){
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $sampleService = $this->getServiceLocator()->get('SampleService');
+            $result = $sampleService->getClinicSampleTestedResultAgeGroupDetails($params);
+            $viewModel = new ViewModel();
+            $viewModel->setVariables(array('result' => $result,'params'=>$params))
+                        ->setTerminal(true);
+            return $viewModel;
+        }
+    }
+    public function getSampleTestResultAgeGroupSixToFourteenAction(){
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $sampleService = $this->getServiceLocator()->get('SampleService');
+            $result = $sampleService->getClinicSampleTestedResultAgeGroupDetails($params);
+            $viewModel = new ViewModel();
+            $viewModel->setVariables(array('result' => $result,'params'=>$params))
+                        ->setTerminal(true);
+            return $viewModel;
+        }
+    }
+    public function getSampleTestResultAgeGroupFifteenToFourtynineAction(){
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $sampleService = $this->getServiceLocator()->get('SampleService');
+            $result = $sampleService->getClinicSampleTestedResultAgeGroupDetails($params);
+            $viewModel = new ViewModel();
+            $viewModel->setVariables(array('result' => $result,'params'=>$params))
+                        ->setTerminal(true);
+            return $viewModel;
+        }
+    }
+    public function getSampleTestResultAgeGroupGreaterFiftyAction(){
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $sampleService = $this->getServiceLocator()->get('SampleService');
+            $result = $sampleService->getClinicSampleTestedResultAgeGroupDetails($params);
+            $viewModel = new ViewModel();
+            $viewModel->setVariables(array('result' => $result,'params'=>$params))
+                        ->setTerminal(true);
+            return $viewModel;
+        }
+    }
+    public function getSampleTestResultAgeGroupUnknownAction(){
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $sampleService = $this->getServiceLocator()->get('SampleService');
+            $result = $sampleService->getClinicSampleTestedResultAgeGroupDetails($params);
+            $viewModel = new ViewModel();
+            $viewModel->setVariables(array('result' => $result,'params'=>$params))
+                        ->setTerminal(true);
+            return $viewModel;
+        }
+    }
+    public function getRequisitionFormsAction(){
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $sampleService = $this->getServiceLocator()->get('SampleService');
+            $result = $sampleService->getClinicRequisitionFormsTested($params);
+            $viewModel = new ViewModel();
+            $viewModel->setVariables(array('result' => $result))
+                        ->setTerminal(true);
+            return $viewModel;
+        }
+    }
 }
