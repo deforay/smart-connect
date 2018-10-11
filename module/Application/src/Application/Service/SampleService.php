@@ -1598,7 +1598,8 @@ $i++;
                                         'result_value_absolute_decimal'=>(trim($sheetData[$i]['AN'])!='' ? trim($sheetData[$i]['AN']) :  NULL),
                                         'result'=>(trim($sheetData[$i]['AO'])!='' ? trim($sheetData[$i]['AO']) :  NULL),
                                         'DashVL_Abs' =>   $DashVL_Abs,
-                                        'DashVL_AnalysisResult' =>   $DashVL_AnalysisResult                                        
+                                        'DashVL_AnalysisResult' =>   $DashVL_AnalysisResult,
+                                        'current_regimen'=>(trim($sheetData[$i]['BG'])!='' ? trim($sheetData[$i]['BG']) :  NULL),                                   
                                 );
                                 
 
