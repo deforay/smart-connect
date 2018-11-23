@@ -377,3 +377,16 @@ ALTER TABLE `dash_vl_request_form` ADD `vl_result_category` VARCHAR(255) NULL AF
 
 INSERT INTO `locale_details` (`locale_id`, `locale`, `display_name`, `locale_status`) VALUES
 (3, 'en_CD', 'DRC - English', 'active');
+
+
+-- Amit 13 Sep 2018
+CREATE TABLE IF NOT EXISTS `patients` (
+  `patient_art_no` varchar(1000) NOT NULL,
+  `first_name` varchar(1000) DEFAULT NULL,
+  `middle_name` varchar(1000) DEFAULT NULL,
+  `last_name` varchar(1000) DEFAULT NULL,
+  `skey` text,
+  PRIMARY KEY (`patient_art_no`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+

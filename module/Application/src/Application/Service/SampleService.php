@@ -59,23 +59,31 @@ class SampleService {
                         if(trim($sheetData[$i]['A']) != '' && trim($sheetData[$i]['B']) != '') {
                             $sampleCode = trim($sheetData[$i]['A']);
                             $instanceCode = trim($sheetData[$i]['B']);
+
+                            $sampleCollectionDate = (trim($sheetData[$i]['U'])!='' ? trim(date('Y-m-d H:i', strtotime($sheetData[$i]['U']))) :  null);
+                            $sampleReceivedAtLab = (trim($sheetData[$i]['AS'])!='' ? trim(date('Y-m-d H:i', strtotime($sheetData[$i]['AS']))) :  null);
+                            $dateOfInitiationOfRegimen = (trim($sheetData[$i]['BA'])!='' ? trim(date('Y-m-d H:i', strtotime($sheetData[$i]['BA']))) :  null);
+                            $resultApprovedDateTime = (trim($sheetData[$i]['BD'])!='' ? trim(date('Y-m-d H:i', strtotime($sheetData[$i]['BD']))) :  null);
+                            $sampleTestedDateTime = (trim($sheetData[$i]['AJ'])!='' ? trim(date('Y-m-d H:i', strtotime($sheetData[$i]['AJ']))) :  null);
+                            
+
                             $data = array('sample_code'=>$sampleCode,
                                           'vlsm_instance_id'=>trim($sheetData[$i]['B']),
                                           'source'=>$params['sourceName'],
                                           'patient_gender'=>(trim($sheetData[$i]['C'])!='' ? trim($sheetData[$i]['C']) :  NULL),
                                           'patient_age_in_years'=>(trim($sheetData[$i]['D'])!='' ? trim($sheetData[$i]['D']) :  NULL),
-                                          'sample_collection_date'=>(trim($sheetData[$i]['U'])!='' ? trim($sheetData[$i]['U']) :  NULL),
-                                          'sample_registered_at_lab'=>(trim($sheetData[$i]['AS'])!='' ? trim($sheetData[$i]['AS']) :  NULL),
+                                          'sample_collection_date'=>$sampleCollectionDate,
+                                          'sample_received_at_vl_lab'=>$sampleReceivedAtLab,
                                           'line_of_treatment'=>(trim($sheetData[$i]['AT'])!='' ? trim($sheetData[$i]['AT']) :  NULL),
                                           'is_sample_rejected'=>(trim($sheetData[$i]['AU'])!='' ? trim($sheetData[$i]['AU']) :  NULL),
                                           'is_patient_pregnant'=>(trim($sheetData[$i]['AX'])!='' ? trim($sheetData[$i]['AX']) :  NULL),
                                           'is_patient_breastfeeding'=>(trim($sheetData[$i]['AY'])!='' ? trim($sheetData[$i]['AY']) :  NULL),
                                           'patient_art_no'=>(trim($sheetData[$i]['AZ'])!='' ? trim($sheetData[$i]['AZ']) :  NULL),
-                                          'date_of_initiation_of_current_regimen'=>(trim($sheetData[$i]['BA'])!='' ? trim($sheetData[$i]['BA']) :  NULL),
+                                          'date_of_initiation_of_current_regimen'=>$dateOfInitiationOfRegimen,
                                           'arv_adherance_percentage'=>(trim($sheetData[$i]['BB'])!='' ? trim($sheetData[$i]['BB']) :  NULL),
                                           'is_adherance_poor'=>(trim($sheetData[$i]['BC'])!='' ? trim($sheetData[$i]['BC']) :  NULL),
-                                          'result_approved_datetime'=>(trim($sheetData[$i]['BD'])!='' ? trim($sheetData[$i]['BD']) :  NULL),
-                                          'sample_tested_datetime'=>(trim($sheetData[$i]['AJ'])!='' ? trim($sheetData[$i]['AJ']) :  NULL),
+                                          'result_approved_datetime'=>$resultApprovedDateTime,
+                                          'sample_tested_datetime'=>$sampleTestedDateTime,
                                           'result_value_log'=>(trim($sheetData[$i]['AK'])!='' ? trim($sheetData[$i]['AK']) :  NULL),
                                           'result_value_absolute'=>(trim($sheetData[$i]['AL'])!='' ? trim($sheetData[$i]['AL']) :  NULL),
                                           'result_value_text'=>(trim($sheetData[$i]['AM'])!='' ? trim($sheetData[$i]['AM']) :  NULL),
@@ -1572,7 +1580,14 @@ $i++;
                                 
 
 
+
+                                $sampleCollectionDate = (trim($sheetData[$i]['U'])!='' ? trim(date('Y-m-d H:i', strtotime($sheetData[$i]['U']))) :  null);
+                                $sampleReceivedAtLab = (trim($sheetData[$i]['AS'])!='' ? trim(date('Y-m-d H:i', strtotime($sheetData[$i]['AS']))) :  null);
+                                $dateOfInitiationOfRegimen = (trim($sheetData[$i]['BA'])!='' ? trim(date('Y-m-d H:i', strtotime($sheetData[$i]['BA']))) :  null);
+                                $resultApprovedDateTime = (trim($sheetData[$i]['BD'])!='' ? trim(date('Y-m-d H:i', strtotime($sheetData[$i]['BD']))) :  null);
+                                $sampleTestedDateTime = (trim($sheetData[$i]['AJ'])!='' ? trim(date('Y-m-d H:i', strtotime($sheetData[$i]['AJ']))) :  null);
                                 
+                                    
 
 
                                 $data = array('sample_code'=>$sampleCode,
@@ -1580,18 +1595,18 @@ $i++;
                                         'source'=>'1',
                                         'patient_gender'=>(trim($sheetData[$i]['C'])!='' ? trim($sheetData[$i]['C']) :  NULL),
                                         'patient_age_in_years'=>(trim($sheetData[$i]['D'])!='' ? trim($sheetData[$i]['D']) :  NULL),
-                                        'sample_collection_date'=>(trim($sheetData[$i]['U'])!='' ? trim($sheetData[$i]['U']) :  NULL),
-                                        'sample_registered_at_lab'=>(trim($sheetData[$i]['AS'])!='' ? trim($sheetData[$i]['AS']) :  NULL),
+                                        'sample_collection_date'=>$sampleCollectionDate,
+                                        'sample_registered_at_lab'=>$sampleReceivedAtLab,
                                         'line_of_treatment'=>(trim($sheetData[$i]['AT'])!='' ? trim($sheetData[$i]['AT']) :  NULL),
                                         'is_sample_rejected'=>(trim($sheetData[$i]['AU'])!='' ? trim($sheetData[$i]['AU']) :  NULL),
                                         'is_patient_pregnant'=>(trim($sheetData[$i]['AX'])!='' ? trim($sheetData[$i]['AX']) :  NULL),
                                         'is_patient_breastfeeding'=>(trim($sheetData[$i]['AY'])!='' ? trim($sheetData[$i]['AY']) :  NULL),
-                                        'patient_art_no'=>(trim($sheetData[$i]['AZ'])!='' ? trim($sheetData[$i]['AZ']) :  NULL),
-                                        'date_of_initiation_of_current_regimen'=>(trim($sheetData[$i]['BA'])!='' ? trim($sheetData[$i]['BA']) :  NULL),
+                                        'current_regimen'=>(trim($sheetData[$i]['AZ'])!='' ? trim($sheetData[$i]['AZ']) :  NULL),
+                                        'date_of_initiation_of_current_regimen'=>$dateOfInitiationOfRegimen,
                                         'arv_adherance_percentage'=>(trim($sheetData[$i]['BB'])!='' ? trim($sheetData[$i]['BB']) :  NULL),
                                         'is_adherance_poor'=>(trim($sheetData[$i]['BC'])!='' ? trim($sheetData[$i]['BC']) :  NULL),
-                                        'result_approved_datetime'=>(trim($sheetData[$i]['BD'])!='' ? trim($sheetData[$i]['BD']) :  NULL),
-                                        'sample_tested_datetime'=>(trim($sheetData[$i]['AJ'])!='' ? trim($sheetData[$i]['AJ']) :  NULL),
+                                        'result_approved_datetime'=>$resultApprovedDateTime,
+                                        'sample_tested_datetime'=>$sampleTestedDateTime,
                                         'result_value_log'=>(trim($sheetData[$i]['AK'])!='' ? trim($sheetData[$i]['AK']) :  NULL),
                                         'result_value_absolute'=>(trim($sheetData[$i]['AL'])!='' ? trim($sheetData[$i]['AL']) :  NULL),
                                         'result_value_text'=>(trim($sheetData[$i]['AM'])!='' ? trim($sheetData[$i]['AM']) :  NULL),
