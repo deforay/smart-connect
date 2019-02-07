@@ -533,7 +533,9 @@ class SampleTable extends AbstractTableGateway {
                         AND (vl.result_approved_datetime is not null AND vl.result_approved_datetime != '' AND DATE(vl.result_approved_datetime) !='1970-01-01' AND DATE(vl.result_approved_datetime) !='0000-00-00')
                         AND MONTH(vl.result_approved_datetime) >= '".$sRow['month']."'
                         AND YEAR(vl.result_approved_datetime) <= '".$sRow['year']."' ")
-                        ;
+                        ->where('
+                    DATEDIFF(result_approved_datetime,sample_collection_date)<120 AND 
+                    DATEDIFF(result_approved_datetime,sample_collection_date)>=0');
                 if(isset($params['facilityId']) && trim($params['facilityId'])!= ''){
                     $subQuery = $subQuery->where('vl.lab_id IN ('.$params['facilityId'].')');
                 }else{
