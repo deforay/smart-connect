@@ -6856,7 +6856,20 @@ class SampleTable extends AbstractTableGateway {
                           "sample_tested_datetime >= '$startDate' AND sample_tested_datetime <= '$endDate'",
                           "facility_details.facility_state = '$provinceID'"
                         )
-                    );
+                    )
+                    
+                    ->where('
+                    DATEDIFF(sample_received_at_vl_lab_datetime,sample_collection_date)<120 AND 
+                    DATEDIFF(sample_received_at_vl_lab_datetime,sample_collection_date)>=0 AND 
+
+                    DATEDIFF(sample_registered_at_lab,sample_received_at_vl_lab_datetime)<120 AND 
+                    DATEDIFF(sample_registered_at_lab,sample_received_at_vl_lab_datetime)>=0 AND 
+
+                    DATEDIFF(sample_tested_datetime,sample_received_at_vl_lab_datetime)<120 AND 
+                    DATEDIFF(sample_tested_datetime,sample_registered_at_lab)>=0 AND 
+
+                    DATEDIFF(result_approved_datetime,sample_tested_datetime)<120 AND 
+                    DATEDIFF(result_approved_datetime,sample_tested_datetime)>=0');
         if(isset($labs) && !empty($labs)){
             $squery = $squery->where('vl.lab_id IN (' . implode(',',$labs) . ')');
         }else{
@@ -6889,7 +6902,19 @@ class SampleTable extends AbstractTableGateway {
                           "sample_tested_datetime >= '$startDate' AND sample_tested_datetime <= '$endDate'",
                           "facility_details.facility_district = '$districtID'"
                         )
-                    );
+                    )
+                    ->where('
+                    DATEDIFF(sample_received_at_vl_lab_datetime,sample_collection_date)<120 AND 
+                    DATEDIFF(sample_received_at_vl_lab_datetime,sample_collection_date)>=0 AND 
+
+                    DATEDIFF(sample_registered_at_lab,sample_received_at_vl_lab_datetime)<120 AND 
+                    DATEDIFF(sample_registered_at_lab,sample_received_at_vl_lab_datetime)>=0 AND 
+
+                    DATEDIFF(sample_tested_datetime,sample_received_at_vl_lab_datetime)<120 AND 
+                    DATEDIFF(sample_tested_datetime,sample_registered_at_lab)>=0 AND 
+
+                    DATEDIFF(result_approved_datetime,sample_tested_datetime)<120 AND 
+                    DATEDIFF(result_approved_datetime,sample_tested_datetime)>=0');
         if(isset($labs) && !empty($labs)){
             $squery = $squery->where('vl.lab_id IN (' . implode(',',$labs) . ')');
         }else{
@@ -6922,7 +6947,19 @@ class SampleTable extends AbstractTableGateway {
                               "sample_tested_datetime >= '$startDate' AND sample_tested_datetime <= '$endDate'",
                               "vl.facility_id = '$clinicID'"
                             )
-                        );
+                        )
+                        ->where('
+                    DATEDIFF(sample_received_at_vl_lab_datetime,sample_collection_date)<120 AND 
+                    DATEDIFF(sample_received_at_vl_lab_datetime,sample_collection_date)>=0 AND 
+
+                    DATEDIFF(sample_registered_at_lab,sample_received_at_vl_lab_datetime)<120 AND 
+                    DATEDIFF(sample_registered_at_lab,sample_received_at_vl_lab_datetime)>=0 AND 
+
+                    DATEDIFF(sample_tested_datetime,sample_received_at_vl_lab_datetime)<120 AND 
+                    DATEDIFF(sample_tested_datetime,sample_registered_at_lab)>=0 AND 
+
+                    DATEDIFF(result_approved_datetime,sample_tested_datetime)<120 AND 
+                    DATEDIFF(result_approved_datetime,sample_tested_datetime)>=0');
         if(isset($labs) && !empty($labs)){
             $squery = $squery->where('vl.lab_id IN (' . implode(',',$labs) . ')');
         }else{
