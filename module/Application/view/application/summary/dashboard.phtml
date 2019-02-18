@@ -26,6 +26,7 @@ $suppressedSamplepercentage = ($suppressedSampleTotal > 0 && $totalSampleTested 
 $rejectionPercentage = ($summaryTabInfo[0]["total_samples_received"] > 0 && $rejectedSamples > 0)?round((($rejectedSamples/$summaryTabInfo[0]["total_samples_received"])*100),2):0;
 if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["1st_line_of_current_regimen_samples"] >0 && $summaryTabInfo[0]["all_current_regimen_samples"] > 0){
  $firstLineCurrentRegimenPercentage = round((($summaryTabInfo[0]["1st_line_of_current_regimen_samples"]/$summaryTabInfo[0]["all_current_regimen_samples"])*100),2);
+ 
 }
 ?>
 <style>
@@ -583,6 +584,12 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
     <div role="tabpanel" class="tab-pane fade" id="currentRegimenTab">
     <div class="row" style="padding-top:5px;padding-bottom:10px;">
         <div class="col-md-12">
+        <div>
+        <?php
+        echo "&nbsp;&nbsp;&nbsp;<b>Number of samples on 1st line Current Regimen = ".$summaryTabInfo[0]["1st_line_of_current_regimen_samples"]."</b>";
+        echo "&nbsp;&nbsp;&nbsp;<b>Total number of samples having valid Current Regimen = ".$summaryTabInfo[0]["all_current_regimen_samples"]."</b>";
+        ?>
+        <div><br/>
             <div class="col-md-3">
                 <select style="width:100%" name="provinceName[]" id="provinceName" class="form-control" multiple title="<?php echo $this->translate('Please select one or more province. Leave blank for All'); ?>" onchange="selectDistrictName();">
                     <?php
