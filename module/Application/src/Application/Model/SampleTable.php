@@ -25,8 +25,8 @@ class SampleTable extends AbstractTableGateway {
 
     protected $table = 'dash_vl_request_form';
     public $sm = null;
-    protected $dbsId = 1;
-    protected $plasmaId = 2;
+    protected $dbsId = 10;
+    protected $plasmaId = 19;
 
     public function __construct(Adapter $adapter, $sm=null) {
         $this->adapter = $adapter;
@@ -73,11 +73,11 @@ class SampleTable extends AbstractTableGateway {
                                                                                 WHEN ((patient_age_in_years IS NULL OR patient_age_in_years ='' OR patient_age_in_years ='Unreported'  OR patient_age_in_years ='unreported')) THEN 1
                                                                                 ELSE 0
                                                                                 END)"),
-                                          "Results Awaited <br>(< $samplesWaitingFromLastXMonths months)" => new Expression("SUM(CASE
+                                          "Results Not Available <br>(< $samplesWaitingFromLastXMonths months)" => new Expression("SUM(CASE
                                                                                                                                 WHEN ((vl.DashVL_AnalysisResult is NULL OR vl.DashVL_AnalysisResult ='') AND (sample_collection_date < DATE_SUB(NOW(), INTERVAL $samplesWaitingFromLastXMonths MONTH)) AND (reason_for_sample_rejection is NULL or reason_for_sample_rejection ='' or reason_for_sample_rejection = 0)) THEN 1
                                                                                                                                 ELSE 0
                                                                                                                                 END)"),
-                                          "Results Awaited <br>(> $samplesWaitingFromLastXMonths months)" => new Expression("SUM(CASE
+                                          "Results Not Available <br>(> $samplesWaitingFromLastXMonths months)" => new Expression("SUM(CASE
                                                                                                                                 WHEN ((vl.DashVL_AnalysisResult is NULL OR vl.DashVL_AnalysisResult ='') AND (sample_collection_date > DATE_SUB(NOW(), INTERVAL $samplesWaitingFromLastXMonths MONTH)) AND (reason_for_sample_rejection is NULL or reason_for_sample_rejection ='' or reason_for_sample_rejection = 0)) THEN 1
                                                                                                                                 ELSE 0
                                                                                                                                 END)")
@@ -346,7 +346,7 @@ class SampleTable extends AbstractTableGateway {
             $startMonth = str_replace(' ','-',$params['fromDate'])."-01";
             $endMonth = str_replace(' ','-',$params['toDate'])."-31";
             $fQuery = $sql->select()->from(array('f'=>'facility_details'))
-                          ->where('f.facility_type = 2');
+                          ->where('f.facility_type = 2 AND f.status="active"');
             if(isset($params['facilityId']) && trim($params['facilityId'])!= ''){
                 $fQuery = $fQuery->where('f.facility_id IN ('.$params['facilityId'].')');
             }else{
@@ -551,7 +551,7 @@ class SampleTable extends AbstractTableGateway {
                 $result['all'][$j] = (isset($subQueryResult[0]["AvgDiff"]) && $subQueryResult[0]["AvgDiff"] != NULL && $subQueryResult[0]["AvgDiff"] > 0) ? round($subQueryResult[0]["AvgDiff"],2) : null;
                 //$result['lab'][$j] = (isset($labsubQueryResult[0]["labCount"]) && $labsubQueryResult[0]["labCount"] != NULL && $labsubQueryResult[0]["labCount"] > 0) ? round($labsubQueryResult[0]["labCount"],2) : 0;
                 $result['sample']['Samples Collected'][$j] = (isset($sRow['total_samples_collected']) && $sRow['total_samples_collected'] != NULL) ? $sRow['total_samples_collected'] : null;
-                $result['sample']['Results Awaited'][$j] = (isset($sRow['total_samples_pending']) && $sRow['total_samples_pending'] != NULL) ? $sRow['total_samples_pending'] : null;
+                $result['sample']['Results Not Available'][$j] = (isset($sRow['total_samples_pending']) && $sRow['total_samples_pending'] != NULL) ? $sRow['total_samples_pending'] : null;
                 $result['date'][$j] = $sRow["monthDate"];
                 $j++;
             }
@@ -845,7 +845,7 @@ class SampleTable extends AbstractTableGateway {
             $startMonth = str_replace(' ','-',$params['fromDate'])."-01";
             $endMonth = str_replace(' ','-',$params['toDate'])."-31";
             $fQuery = $sql->select()->from(array('f'=>'facility_details'))
-                          ->where('f.facility_type = 2');
+                          ->where('f.facility_type = 2 AND f.status="active"');
             if(isset($params['facilityId']) && trim($params['facilityId'])!= ''){
                 $fQuery = $fQuery->where('f.facility_id IN ('.$params['facilityId'].')');
             }else{
@@ -3599,7 +3599,7 @@ class SampleTable extends AbstractTableGateway {
                 //echo $countQueryStr;die;
                 $countResult  = $dbAdapter->query($countQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
                 $result['province'][$p] = ($province['location_name']!= null && trim($province['location_name'])!= '')?ucwords($province['location_name']):'Not Specified';
-                $result['sample']['Results Awaited'][$p] = (isset($countResult->total))?$countResult->total:0;
+                $result['sample']['Results Not Available'][$p] = (isset($countResult->total))?$countResult->total:0;
               $p++;
             }
         }
@@ -3712,7 +3712,7 @@ class SampleTable extends AbstractTableGateway {
                 //echo $countQueryStr;die;
                 $countResult  = $dbAdapter->query($countQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
                 $result['lab'][$l] = ucwords($lab['facility_name']);
-                $result['sample']['Results Awaited'][$l] = (isset($countResult->total))?$countResult->total:0;
+                $result['sample']['Results Not Available'][$l] = (isset($countResult->total))?$countResult->total:0;
               $l++;
             }
         }
@@ -3838,7 +3838,7 @@ class SampleTable extends AbstractTableGateway {
                 $countQueryStr = $sql->getSqlStringForSqlObject($countQuery);
                 $countResult  = $dbAdapter->query($countQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
                 $result['district'][$d] = ($district['location_name']!= null && trim($district['location_name'])!= '')?ucwords($district['location_name']):'Not Specified';
-                $result['sample']['Results Awaited'][$d] = (isset($countResult->total))?$countResult->total:0;
+                $result['sample']['Results Not Available'][$d] = (isset($countResult->total))?$countResult->total:0;
               $d++;
             }
         }
@@ -3973,7 +3973,7 @@ class SampleTable extends AbstractTableGateway {
                 $countQueryStr = $sql->getSqlStringForSqlObject($countQuery);
                 $countResult  = $dbAdapter->query($countQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
                 $result['clinic'][$c] = addslashes($clinic['facility_name']);
-                $result['sample']['Results Awaited'][$c] = (isset($countResult->total))?$countResult->total:0;
+                $result['sample']['Results Not Available'][$c] = (isset($countResult->total))?$countResult->total:0;
               $c++;
             }
         }

@@ -1615,11 +1615,11 @@ msgid "VL Samples Tested"
 msgstr ""
 
 #: ../view/application/laboratory/get-clinic-bar-sample-result-awaited-details.phtml:8
-msgid "Results Awaited (Health Center-wise)"
+msgid "Results Not Available (Health Center-wise)"
 msgstr ""
 
 #: ../view/application/laboratory/get-district-bar-sample-result-awaited-details.phtml:8
-msgid "Results Awaited (District-wise)"
+msgid "Results Not Available (District-wise)"
 msgstr ""
 
 #: ../view/application/laboratory/get-facilities-geolocation.phtml:41
@@ -1627,7 +1627,7 @@ msgid "Facilities Geolocation"
 msgstr ""
 
 #: ../view/application/laboratory/get-facility-bar-sample-result-awaited-details.phtml:8
-msgid "Results Awaited (VL Laboratory-wise)"
+msgid "Results Not Available (VL Laboratory-wise)"
 msgstr ""
 
 #: ../view/application/laboratory/get-incomplete-bar-sample-details.phtml:8
@@ -1660,7 +1660,7 @@ msgid "TAT"
 msgstr ""
 
 #: ../view/application/laboratory/get-province-bar-sample-result-awaited-details.phtml:8
-msgid "Results Awaited (Province-wise)"
+msgid "Results Not Available (Province-wise)"
 msgstr ""
 
 #: ../view/application/laboratory/get-requisition-forms.phtml:44
@@ -1820,7 +1820,7 @@ msgid "All Provinces"
 msgstr ""
 
 #: ../view/application/laboratory/sample-result-awaited.phtml:13
-msgid "Results Awaited Overview"
+msgid "Results Not Available Overview"
 msgstr ""
 
 #: ../view/application/laboratory/sample-result-awaited.phtml:95
@@ -1833,7 +1833,7 @@ msgid "Please choose clinics"
 msgstr "Please choose Health Center"
 
 #: ../view/application/laboratory/sample-result-awaited.phtml:209
-msgid "Results Awaited"
+msgid "Results Not Available"
 msgstr ""
 
 #: ../view/application/laboratory/sample-volume.phtml:49
