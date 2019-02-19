@@ -32,7 +32,7 @@ if(isset($result['scResult']) && count($result['scResult'])>0){
                 <i class="icon-pie-chart"></i>
             </div>
         </div>
-        <div id="quickStats" width="210" height="130" style="max-height:210px !important;">
+        <div id="quickStats" width="210" height="130" style="max-height:240px !important;">
             <table class="table table-striped table-hover table-compressed">
                 <?php
                 $totalSample = 0;
@@ -79,7 +79,7 @@ if(isset($result['scResult']) && count($result['scResult'])>0){
                 <i class="icon-pie-chart"></i>
             </div>
         </div>
-        <div id="samplesReceivedChart" width="210" height="150" style="min-height:180px;"></div>
+        <div id="samplesReceivedChart" width="210" height="150" style="min-height:220px;"></div>
     </div>
 </div>
 
@@ -102,7 +102,7 @@ if(isset($result['scResult']) && count($result['scResult'])>0){
                 <i class="icon-pie-chart"></i>
             </div>
         </div>
-        <div id="samplesTestedChart" width="210" height="150" style="min-height:180px;"></div>
+        <div id="samplesTestedChart" width="210" height="150" style="min-height:220px;"></div>
     </div>
 </div>
 <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
@@ -124,7 +124,7 @@ if(isset($result['scResult']) && count($result['scResult'])>0){
                 <i class="icon-pie-chart"></i>
             </div>
         </div>
-        <div id="samplesRejectedChart" width="210" height="150" style="min-height:180px;"></div>
+        <div id="samplesRejectedChart" width="210" height="150" style="min-height:220px;"></div>
     </div>
 </div>
 <script>
@@ -134,7 +134,7 @@ if(isset($result['scResult']) && count($result['scResult'])>0){
           $('#samplesReceivedChart').highcharts({
             chart: {
                 type: 'column',
-                height: 180
+                height: 220
             },
             title: {
                 text: ''
@@ -195,7 +195,7 @@ if(isset($result['scResult']) && count($result['scResult'])>0){
       $('#samplesTestedChart').highcharts({
         chart: {
             type: 'column',
-            height: 180
+            height: 220
         },
         title: {
             text: ''
@@ -255,7 +255,7 @@ if(isset($result['scResult']) && count($result['scResult'])>0){
         $('#samplesRejectedChart').highcharts({
             chart: {
                 type: 'column',
-                height: 180
+                height: 220
             },
             title: {
                 text: ''
