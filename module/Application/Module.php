@@ -150,6 +150,10 @@ class Module{
 						}
 					}
 					}
+					
+					if(substr($tempName[1], 1)=='Users' || substr($tempName[1], 1)=='Config' || substr($tempName[1], 1)=='Facility' || substr($tempName[1], 1)=='Import'){
+						$redirect = true;
+					}
 					if($redirect == true){
 					//set redirect path
 					$response = $e->getResponse();
@@ -159,6 +163,8 @@ class Module{
 						$response->getHeaders()->addHeaderLine('Location', '/clinics/dashboard');
 					}else if($session->role == 4){
 						$response->getHeaders()->addHeaderLine('Location', '/hubs/dashboard');
+					}else if($session->role == 5){
+						$response->getHeaders()->addHeaderLine('Location', '/labs/dashboard');
 					}
 					$response->setStatusCode(302);
 					$response->sendHeaders();

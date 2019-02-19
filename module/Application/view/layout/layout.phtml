@@ -148,7 +148,7 @@ if(!isset($activeTab)) {
                         </li>
                         <!-- DOC: To remove the search box from the sidebar you just need to completely remove the below "sidebar-search-wrapper" LI element -->
                         <?php
-                        if($logincontainer->role == 1){ ?>
+                        if($logincontainer->role == 1 || $logincontainer->role == 5){ ?>
                             <li class="nav-item start <?php echo ($activeTab == 'summary-dashboard' ? " active open " : ""); ?>">
                                  <a href="/summary/" class="nav-link nav-toggle">
                                      <i class="icon-layers"></i>
@@ -159,7 +159,7 @@ if(!isset($activeTab)) {
                             </li>
                         <?php } ?>
                         <?php
-                        if($logincontainer->role == 1 || $logincontainer->role == 2){ ?>
+                        if($logincontainer->role == 1 || $logincontainer->role == 2 || $logincontainer->role == 5){ ?>
                             <li class="nav-item <?php echo ($activeTab == 'labs-dashboard' ? " active open" : ""); ?>">
                                  <a href="/labs/dashboard" class="nav-link nav-toggle">
                                      <i class="icon-chemistry"></i>
@@ -181,7 +181,7 @@ if(!isset($activeTab)) {
                             </li>-->
                         <?php } ?>
                         <?php
-                        if($logincontainer->role == 1 || $logincontainer->role == 3){ ?>
+                        if($logincontainer->role == 1 || $logincontainer->role == 3 || $logincontainer->role == 5){ ?>
                             <li class="nav-item <?php echo ($activeTab == 'clinics-dashboard' ? " active open " : ""); ?>">
                                  <a href="/clinics/dashboard" class="nav-link nav-toggle">
                                      <i class="icon-plus"></i>
@@ -190,7 +190,7 @@ if(!isset($activeTab)) {
                                  </a>
                             </li>
                         <?php } ?>
-                        <?php if($logincontainer->role == 1){ ?>
+                        <?php if($logincontainer->role == 1 || $logincontainer->role == 5){ ?>
                             <li class="nav-item <?php echo ($activeTab == 'duplicate-data') ? " active open " : ""; ?>">
                                 <a href="javascript:;" class="nav-link nav-toggle">
                                     <i class="icon-briefcase"></i>

@@ -390,3 +390,5 @@ CREATE TABLE IF NOT EXISTS `patients` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
+-- saravanan 18-feb-2019
+INSERT INTO `dash_user_roles` (`role_id`, `role_name`, `role_code`, `status`) VALUES (NULL, 'management', 'mgmt', 'active');
