@@ -1,9 +1,9 @@
 <?php
 $gender = array('M','F','Not Specified');
 $supAvg = array();
-$less1000 = array('M'=>'#088738', 'F' => '#60d18f', 'Not Specified' => '#A5F7C6');
-$more1000 = array('M'=>'#ff1900', 'F' => '#F2786D', 'Not Specified' => '#8C1308');
-$supColor = array('M'=>'#252424', 'F' => '#826c6c', 'Not Specified' => '#cd6969');
+$less1000 = array('M'=>'#65c6c4', 'F' => '#ffcece', 'Not Specified' => '#60d18f');
+$more1000 = array('M'=>'#039BE6', 'F' => '#f185b3', 'Not Specified' => '#ff1900');
+//$supColor = array('M'=>'#252424', 'F' => '#826c6c', 'Not Specified' => '#cd6969');
 //\Zend\Debug\Debug::dump($result);die;
 if(count($result)>0){
 foreach($gender as $gen){
@@ -13,28 +13,49 @@ foreach($gender as $gen){
     }, $result[$gen][$arrayKey[0]], $result[$gen][$arrayKey[1]]);
     
     foreach($result[$gen][$arrayKey[1]] as $key=>$suppression){
-        $supAvg[$gen][] = (($suppression==0) ? null : round(100 * ($suppression / $sumArray[$key]),2));
+        $supAvg[$gen][] = (($suppression==0) ? 'null' : round(100 * ($suppression / $sumArray[$key]),2));
     }
 }
+
+
+
 $genderResult = array();
 $genderSupName = array();
-for($i=0;$i<=count($supAvg['M']);$i++){
-    foreach($gender as $gen){
-        if(isset($supAvg[$gen][$i]) && $supAvg[$gen][$i]!=NULL){
-            $genderResult[] = $supAvg[$gen][$i];
-            $genderSupName[] = "'".$gen."'";
-        }
+// for($i=0;$i<=count($supAvg['M']);$i++){
+//     foreach($gender as $gen){
+//         if($supAvg[$gen][$i]!=NULL){
+//             $genderResult[] = $supAvg[$gen][$i];
+//             $genderSupName[] = "'".$gen."'";
+//         }
+//     }
+// }
+
+
+$maleSuppressionSpline = $femaleSuppressionSpline = $unspecifedSuppressionSpline = array();
+foreach($supAvg as $gen => $subRow){
+    if($gen == 'M'){
+        $maleSuppressionSpline = $subRow;
+    } else if($gen == 'F'){
+        $femaleSuppressionSpline = $subRow;
+    } else{
+        $unspecifedSuppressionSpline = $subRow;
     }
+    
 }
+
+
+
+
 }
 ?>
-<div id="samplesTestedVsGender" style="height:450px;"></div>
+<div id="samplesTestedVsGender" style="height:520px;"></div>
 <script>
        $(function () {
         $('#samplesTestedVsGender').highcharts({
             chart: {
-            type: 'column'
-        },
+            type: 'column',
+            styledMode : true
+            },
         title: {
             text: ''
         },
@@ -48,6 +69,9 @@ for($i=0;$i<=count($supAvg['M']);$i++){
        credits: {
               enabled: false
        },
+       legend : {
+        itemMarginTop  : 8
+       },
         xAxis: [{
             categories: [<?php
             if(isset($result['date']) && count($result['date'])>0){
@@ -57,34 +81,30 @@ for($i=0;$i<=count($supAvg['M']);$i++){
             }
             ?>],
             gridLineWidth: 0
-        },{
-            categories:[<?php echo implode(",",$genderSupName);?>],
-            opposite:true,
-            labels: {
-                enabled:false
-            }
         }],
 
         yAxis: [{
-            gridLineWidth: 0,
-            allowDecimals: false,
-            title: {
-                text: '<?php echo $this->translate('No. of Samples'); ?>'
-            }
-            },
-            {
-                labels: {
-                format: '{value}',
-                style: {
-                }
-                },
+                gridLineWidth: 0,
+                allowDecimals: false,
                 title: {
-                text: '<?php echo $this->translate('Suppression %'); ?>',
-                style: {
+                    text: '<?php echo $this->translate('No. of Samples'); ?>'
                 }
-                },
-                opposite: true,
-            }
+            },{ // Secondary yAxis
+                         allowDecimals: true,
+                         min: 0,
+                         max: 100,
+                         title: {
+                            text: '<?php echo $this->translate('Suppression %'); ?>',
+                             style: {
+                             }
+                         },
+                         labels: {
+                             format: '{value}%',
+                             style: {
+                             }
+                         },
+                         opposite: true
+                     }
         ],
        
 
@@ -105,29 +125,10 @@ for($i=0;$i<=count($supAvg['M']);$i++){
                 point: {
                     events: {
                         click: function (e) {
-                            //doSampleTestedBasedonGenderRedirect(e.point.category,e.point.gender);
+                            doSampleTestedBasedonGenderRedirect(e.point.category,e.point.gender);
                         }
                     }
                 }
-            },
-            spline: {
-                      lineWidth : 0,
-                      color : '#1B325F',
-                      marker: {
-                        symbol: 'diamond'
-                      },
-                      states: {
-                        hover: {
-                            lineWidthPlus: 0
-                        }
-                        },
-                      point: {
-                          events: {
-                              click: function (e) {
-                               // doSampleTestedBasedonGenderRedirect(e.point.category,e.point.color);
-                              }
-                          }
-                      }
             }
            
         },
@@ -151,17 +152,17 @@ for($i=0;$i<=count($supAvg['M']);$i++){
                   }
               ?>],
               stack:'<?php echo $gender[$i];?>',
-                <?php if($key == "VL (< 1000 cp/ml)"){
-                        if(isset($less1000[$gender[$i]])) { ?>
-                            color: '<?php echo $less1000[$gender[$i]]; ?>'
-                <?php   } else{ ?>
-                            color: '<?php echo $more1000[$gender[$i]]; ?>'
-              <?php         }
-                    } else { ?>
-                 color: '#ff1900'     
-              <?php } ?>
+        <?php if(strpos($key, '< 1000') !== false){ ?>
+              color: '<?php echo $less1000[$gender[$i]]; ?>'
+        <?php    
+              } else if(strpos($key, '>= 1000') !== false) { 
+        ?>
+              color: '<?php echo $more1000[$gender[$i]]; ?>' 
+        <?php } else { ?>
+              color: 'red'     
+        <?php } ?>
               },
-              <?php
+        <?php
               }
         }
     }
@@ -171,11 +172,37 @@ for($i=0;$i<=count($supAvg['M']);$i++){
           
         {
             type: 'spline',
-            name: 'Suppression %',
+            lineWidth : 0,
+            color : '#0080ff',
+            marker: {
+                symbol: 'diamond'
+            },
+            states: {
+                hover: {
+                    lineWidthPlus: 0
+                }
+            },
+            name: 'Suppression % (Male)',
             yAxis: 1,
-            xAxis:1,
-            data: [<?php echo implode(",",$genderResult);?>],
+            data: [<?php echo implode(",",$maleSuppressionSpline);?>],
+        },
+        {
+            type: 'spline',
+            lineWidth : 0,
+            color : '#ff00a9',
+            name: 'Suppression % (Female)',
+            marker: {
+                symbol: 'diamond'
+            },  
+            states: {
+                hover: {
+                    lineWidthPlus: 0
+                }
+            },                                
+            yAxis: 1,
+            data: [<?php echo implode(",",$femaleSuppressionSpline);?>],
         }
+
 
         ]
     });

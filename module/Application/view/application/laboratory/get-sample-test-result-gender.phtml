@@ -1,7 +1,7 @@
 <?php
 $gender = array('M','F','Not Specified');
 $supAvg = array();
-$less1000 = array('M'=>'#65c6c4', 'F' => '#ffcece', 'Not Specified' => '#088738');
+$less1000 = array('M'=>'#65c6c4', 'F' => '#ffcece', 'Not Specified' => '#60d18f');
 $more1000 = array('M'=>'#039BE6', 'F' => '#f185b3', 'Not Specified' => '#ff1900');
 //$supColor = array('M'=>'#252424', 'F' => '#826c6c', 'Not Specified' => '#cd6969');
 //\Zend\Debug\Debug::dump($result);die;
@@ -13,22 +13,22 @@ foreach($gender as $gen){
     }, $result[$gen][$arrayKey[0]], $result[$gen][$arrayKey[1]]);
     
     foreach($result[$gen][$arrayKey[1]] as $key=>$suppression){
-        $supAvg[$gen][] = (($suppression==0) ? null : round(100 * ($suppression / $sumArray[$key]),2));
+        $supAvg[$gen][] = (($suppression==0) ? 'null' : round(100 * ($suppression / $sumArray[$key]),2));
     }
 }
 
 
 
-$genderResult = array();
-$genderSupName = array();
-for($i=0;$i<=count($supAvg['M']);$i++){
-    foreach($gender as $gen){
-        if($supAvg[$gen][$i]!=NULL){
-            $genderResult[] = $supAvg[$gen][$i];
-            $genderSupName[] = "'".$gen."'";
-        }
-    }
-}
+// $genderResult = array();
+// $genderSupName = array();
+// for($i=0;$i<=count($supAvg['M']);$i++){
+//     foreach($gender as $gen){
+//         if($supAvg[$gen][$i]!=NULL){
+//             $genderResult[] = $supAvg[$gen][$i];
+//             $genderSupName[] = "'".$gen."'";
+//         }
+//     }
+// }
 
 
 $maleSuppressionSpline = $femaleSuppressionSpline = $unspecifedSuppressionSpline = array();
@@ -48,7 +48,7 @@ foreach($supAvg as $gen => $subRow){
 
 }
 ?>
-<div id="samplesTestedVsGender" style="height:550px;"></div>
+<div id="samplesTestedVsGender" style="height:450px;"></div>
 <script>
        $(function () {
         $('#samplesTestedVsGender').highcharts({
@@ -70,7 +70,7 @@ foreach($supAvg as $gen => $subRow){
               enabled: false
        },
        legend : {
-        itemMarginTop  : 4
+        itemMarginTop  : 8
        },
         xAxis: [{
             categories: [<?php
@@ -89,20 +89,22 @@ foreach($supAvg as $gen => $subRow){
                 title: {
                     text: '<?php echo $this->translate('No. of Samples'); ?>'
                 }
-            },
-            {
-                labels: {
-                    format: '{value}',
-                    style: {
-                    }
-                },
-                title: {
-                    text: '<?php echo $this->translate('Suppression %'); ?>',
-                    style: {
-                    }
-                },
-                opposite: true,
-            }
+            },{ // Secondary yAxis
+                         allowDecimals: true,
+                         min: 0,
+                         max: 100,
+                         title: {
+                            text: '<?php echo $this->translate('Suppression %'); ?>',
+                             style: {
+                             }
+                         },
+                         labels: {
+                             format: '{value}%',
+                             style: {
+                             }
+                         },
+                         opposite: true
+                     }
         ],
        
 
