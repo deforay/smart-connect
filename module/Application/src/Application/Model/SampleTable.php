@@ -25,8 +25,8 @@ class SampleTable extends AbstractTableGateway {
 
     protected $table = 'dash_vl_request_form';
     public $sm = null;
-    protected $dbsId = 10;
-    protected $plasmaId = 19;
+    protected $dbsId = 1;
+    protected $plasmaId = 2;
 
     public function __construct(Adapter $adapter, $sm=null) {
         $this->adapter = $adapter;

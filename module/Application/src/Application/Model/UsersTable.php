@@ -88,16 +88,23 @@ class UsersTable extends AbstractTableGateway {
             $logincontainer->districts = $districts;
             $container->alertMsg = '';
             //die('home');
-            if($logincontainer->role == 1 || $logincontainer->role == 2){
-               //return '/labs/dashboard';
-               return '/summary/dashboard';
-            }else if($logincontainer->role == 3){
-                return '/clinics/dashboard';
-                //return '/summary/dashboard';
-            }else if($logincontainer->role == 4){
-                //return '/hubs/dashboard';
-                return '/summary/dashboard';
-            }
+            // if($logincontainer->role == 1 || $logincontainer->role == 2 || $logincontainer->role == 5){
+            //    //return '/labs/dashboard';
+            //    return '/summary/dashboard';
+            // }else if($logincontainer->role == 3){
+            //     return '/clinics/dashboard';
+            //     //return '/summary/dashboard';
+            // }else {
+            //     //return '/hubs/dashboard';
+            //     return '/summary/dashboard';
+            // }
+
+            if($logincontainer->role == 3){
+                 return '/clinics/dashboard';
+             }else {
+                 return '/summary/dashboard';
+             }
+             
         } else {
             $container->alertMsg = 'Please check your login credentials';
             //die('login');

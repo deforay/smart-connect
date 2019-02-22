@@ -391,4 +391,4 @@ CREATE TABLE IF NOT EXISTS `patients` (
 
 
 -- saravanan 18-feb-2019
-INSERT INTO `dash_user_roles` (`role_id`, `role_name`, `role_code`, `status`) VALUES (NULL, 'management', 'mgmt', 'active');
+INSERT INTO `dash_user_roles` (`role_id`, `role_name`, `role_code`, `status`) VALUES (5, 'management', 'mgmt', 'active');
