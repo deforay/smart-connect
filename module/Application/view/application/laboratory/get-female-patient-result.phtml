@@ -24,7 +24,7 @@ $('#labDashFemalePie').highcharts({
             pointFormat: '{series.name}: <b>{point.percentage:.1f}% ({point.number})</b>'
         },
         legend: {
-            layout: 'vertical',
+            //layout: 'vertical',
             align: 'center',
             //backgroundColor: '#f3f3f3',
             useHTML: true,
@@ -38,6 +38,7 @@ $('#labDashFemalePie').highcharts({
                 allowPointSelect: true,
                 cursor: 'pointer',
                 dataLabels: {
+                    //enabled : false,
                 distance: -30
               },
                 showInLegend: true

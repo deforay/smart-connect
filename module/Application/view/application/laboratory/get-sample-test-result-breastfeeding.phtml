@@ -46,20 +46,22 @@ foreach($result['sampleName'][$arrayKey[1]] as $key=>$suppression){
                   title: {
                       text: '<?php echo $this->translate('No. of Samples'); ?>'
                   }
-              },{
-                labels: {
-                format: '{value}',
-                style: {
-                }
-                },
-                title: {
-                text: '<?php echo $this->translate('Suppression %'); ?>',
-                style: {
-                }
-                },
-                opposite: true,
-                min: 0
-                }],
+              },{ // Secondary yAxis
+                         allowDecimals: true,
+                         min: 0,
+                         max: 100,
+                         title: {
+                            text: '<?php echo $this->translate('Suppression %'); ?>',
+                             style: {
+                             }
+                         },
+                         labels: {
+                             format: '{value}%',
+                             style: {
+                             }
+                         },
+                         opposite: true
+                     }],
               tooltip: {
                   formatter: function () {
                       return '<b>' + this.x + '</b><br/>' +

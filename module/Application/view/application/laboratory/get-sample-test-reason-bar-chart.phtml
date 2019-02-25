@@ -47,20 +47,22 @@ foreach($result['sampleTestedReason'][$arrayKey[1]] as $key=>$suppression){
             },
             
         },
-        {
-        labels: {
-            format: '{value}',
-            style: {
-            }
-        },
-        title: {
-            text: '<?php echo $this->translate('Suppression %'); ?>',
-            style: {
-            }
-        },
-        opposite: true,
-        min: 0
-    }
+        { // Secondary yAxis
+                         allowDecimals: true,
+                         min: 0,
+                         max: 100,
+                         title: {
+                            text: '<?php echo $this->translate('Suppression %'); ?>',
+                             style: {
+                             }
+                         },
+                         labels: {
+                             format: '{value}%',
+                             style: {
+                             }
+                         },
+                         opposite: true
+                     }
         ],
         tooltip: {
             formatter: function () {
