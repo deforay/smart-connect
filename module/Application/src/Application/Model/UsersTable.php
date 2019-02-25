@@ -88,7 +88,7 @@ class UsersTable extends AbstractTableGateway {
             $logincontainer->districts = $districts;
             $container->alertMsg = '';
             //die('home');
-            if($logincontainer->role == 1 || $logincontainer->role == 2){
+            if($logincontainer->role == 1 || $logincontainer->role == 2 || $logincontainer->role == 5){
                //return '/labs/dashboard';
                return '/summary/dashboard';
             }else if($logincontainer->role == 3){

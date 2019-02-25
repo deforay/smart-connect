@@ -602,7 +602,7 @@ foreach($sampleType as $samples){
     function getTestedSampleResultBasedLab(){
         var fromDate = $('#mrp-lowerDate').val();
         var toDate = $('#mrp-upperDate').val();
-        var sampleType = ($("#sampleType").val() == null)?'':$("#sampleType").val();
+        var sampleType = ($("#sampleTypeVolume").val() == null)?'':$("#sampleTypeVolume").val();
         var facilityId = ($("#labName").val() == null)?'':$("#labName").val().join(',');
         $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-test-result-volume')); ?>",{fromDate:fromDate,toDate:toDate,sampleType:sampleType,facilityId:facilityId},
         function(data) {

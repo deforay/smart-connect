@@ -345,7 +345,7 @@ class SampleTable extends AbstractTableGateway {
         if(trim($params['fromDate'])!= '' && trim($params['toDate'])!= ''){
             $startMonth = str_replace(' ','-',$params['fromDate'])."-01";
             $endMonth = str_replace(' ','-',$params['toDate'])."-31";
-            $fQuery = $sql->select()->from(array('f'=>'facility_details'))
+            $fQuery = $sql->select()->from(array('f'=>'facility_details'))->columns(array('facility_id'))
                           ->where('f.facility_type = 2 AND f.status="active"');
             if(isset($params['facilityId']) && trim($params['facilityId'])!= ''){
                 $fQuery = $fQuery->where('f.facility_id IN ('.$params['facilityId'].')');
@@ -369,31 +369,64 @@ class SampleTable extends AbstractTableGateway {
             foreach($sampleTypeResult as $samples){
                $sampleId[] = $samples['sample_id'];
             }
-            
+
             if(count($facilityResult) >0 && count($sampleTypeResult) >0){
+
+                $facilityIdList = array_column($facilityResult, 'facility_id');
+
+                $query = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
+                
+                                        ->columns(
+                                                array(
+                                                    "total" => new Expression("SUM(CASE WHEN (
+                                                        (vl.DashVL_AnalysisResult like 'not%' OR vl.DashVL_AnalysisResult like 'Not%' or vl.DashVL_Abs >= 1000)
+                                                        OR
+                                                        (vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%')
+                                                        ) THEN 1 ELSE 0 END)"),
+                                                    "GreaterThan1000" => new Expression("SUM(CASE WHEN ((vl.DashVL_AnalysisResult like 'not%' OR vl.DashVL_AnalysisResult like 'Not%' or vl.DashVL_Abs >= 1000)) THEN 1 ELSE 0 END)"),
+                                                    "LesserThan1000" => new Expression("SUM(CASE WHEN ((vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' )) THEN 1 ELSE 0 END)"),
+                                                )
+                                            )
+                                        ->join(array('f'=>'facility_details'),'f.facility_id=vl.lab_id',array('facility_name'))
+                                        ->where(array("vl.sample_collection_date <='" . $endMonth ." 23:59:59". "'", "vl.sample_collection_date >='" . $startMonth." 00:00:00". "'"))
+                                        ->where('vl.sample_type IN ("' . implode('", "', $sampleId) . '")')
+                                        ->where('vl.lab_id IN ("' . implode('", "', $facilityIdList) . '")')
+                                        ->group('vl.lab_id');
+                $queryStr = $sql->getSqlStringForSqlObject($query);
+                $testResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+
                 $j = 0;
-                $lessTotal = 0;
-                $greaterTotal = 0;
-                $notTargetTotal = 0;
-                foreach($facilityResult as $facility){
-                    $query = $sql->select()->from(array('vl'=>'dash_vl_request_form'))->columns(array('total' => new Expression('COUNT(*)')))
-                                           ->where(array("vl.sample_collection_date <='" . $endMonth ." 23:59:59". "'", "vl.sample_collection_date >='" . $startMonth." 00:00:00". "'"))
-                                           //->where('vl.sample_type="'.$sample['sample_id'].'"')
-                                           ->where('vl.sample_type IN ("' . implode('", "', $sampleId) . '")')
-                                           ->where(array('vl.lab_id'=>$facility['facility_id']));
-                    $queryStr = $sql->getSqlStringForSqlObject($query);
-                    
-                    $greaterResult = $dbAdapter->query($queryStr . " AND (vl.DashVL_AnalysisResult like 'not%' OR vl.DashVL_AnalysisResult like 'Not%' or vl.DashVL_Abs >= 1000)", $dbAdapter::QUERY_MODE_EXECUTE)->current();
-                    $result['sampleName']['VL (>= 1000 cp/ml)'][$j] = $greaterTotal+$greaterResult['total'];
-                    
-                    //$notTargetResult = $dbAdapter->query($lQueryStr." AND 'vl.result' ='Target Not Detected'", $dbAdapter::QUERY_MODE_EXECUTE)->current();
-                    //$result['sampleName']['VL Not Detected'][$j] = $notTargetTotal+$notTargetResult['total'];
-                    
-                    $lessResult = $dbAdapter->query($queryStr." AND (vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' )", $dbAdapter::QUERY_MODE_EXECUTE)->current();
-                    $result['sampleName']['VL (< 1000 cp/ml)'][$j] = $lessTotal+$lessResult['total'];
-                    $result['lab'][$j] = ucwords($facility['facility_name']);
+                foreach($testResult as $data)
+                {
+                    $result['sampleName']['VL (>= 1000 cp/ml)'][$j] = $data['GreaterThan1000'];
+                    $result['sampleName']['VL (< 1000 cp/ml)'][$j] = $data['LesserThan1000'];
+                    $result['lab'][$j] = $data['facility_name'];
                     $j++;
                 }
+
+                // $j = 0;
+                // $lessTotal = 0;
+                // $greaterTotal = 0;
+                // $notTargetTotal = 0;
+                // foreach($facilityResult as $facility){
+                //     $query = $sql->select()->from(array('vl'=>'dash_vl_request_form'))->columns(array('total' => new Expression('COUNT(*)')))
+                //                            ->where(array("vl.sample_collection_date <='" . $endMonth ." 23:59:59". "'", "vl.sample_collection_date >='" . $startMonth." 00:00:00". "'"))
+                //                            //->where('vl.sample_type="'.$sample['sample_id'].'"')
+                //                            ->where('vl.sample_type IN ("' . implode('", "', $sampleId) . '")')
+                //                            ->where(array('vl.lab_id'=>$facility['facility_id']));
+                //     $queryStr = $sql->getSqlStringForSqlObject($query);
+                    
+                //     $greaterResult = $dbAdapter->query($queryStr . " AND (vl.DashVL_AnalysisResult like 'not%' OR vl.DashVL_AnalysisResult like 'Not%' or vl.DashVL_Abs >= 1000)", $dbAdapter::QUERY_MODE_EXECUTE)->current();
+                //     $result['sampleName']['VL (>= 1000 cp/ml)'][$j] = $greaterTotal+$greaterResult['total'];
+                    
+                //     //$notTargetResult = $dbAdapter->query($lQueryStr." AND 'vl.result' ='Target Not Detected'", $dbAdapter::QUERY_MODE_EXECUTE)->current();
+                //     //$result['sampleName']['VL Not Detected'][$j] = $notTargetTotal+$notTargetResult['total'];
+                    
+                //     $lessResult = $dbAdapter->query($queryStr." AND (vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' )", $dbAdapter::QUERY_MODE_EXECUTE)->current();
+                //     $result['sampleName']['VL (< 1000 cp/ml)'][$j] = $lessTotal+$lessResult['total'];
+                //     $result['lab'][$j] = ucwords($facility['facility_name']);
+                //     $j++;
+                // }
             }
         }
         return $result;
