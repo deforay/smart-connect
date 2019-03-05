@@ -7220,8 +7220,8 @@ print_r($sResult);die;
                 $result['status'] = '200';
                 $result['result'] = $rResult;
             }else{
-                $result['status'] = '500';
-                $result['result'] = "Something's wrong or Temporary issue";
+                $result['status'] = '200';
+                $result['result'] = [];
             }
         }else{
             $result['status'] = '403';
