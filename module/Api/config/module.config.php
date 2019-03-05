@@ -15,11 +15,24 @@ return array(
                     ),
                 ),
             ),
+            'api-source-data' => array(
+                'type'    => 'segment',
+                'options' => array(
+                    'route'    => '/api/source-data[/:id]',
+                    'constraints' => array(
+                        'id'     => '[0-9]+',
+                    ),
+                    'defaults' => array(
+                        'controller' => 'Api\Controller\SourceData',
+                    ),
+                ),
+            ),
         ),
     ),
     'controllers' => array(
         'invokables' => array(
-            'Api\Controller\ImportViralLoad' => 'Api\Controller\ImportViralLoadController'
+            'Api\Controller\ImportViralLoad' => 'Api\Controller\ImportViralLoadController',
+            'Api\Controller\SourceData' => 'Api\Controller\SourceDataController',
         ),
     ),
     'view_manager' => array(

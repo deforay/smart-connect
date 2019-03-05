@@ -1326,7 +1326,7 @@ class SampleTable extends AbstractTableGateway {
       return array($testedTotal,$notTestedTotal,$lessTotal,$gTotal,$overAllTotal);
     }
     
-    public function fetchOverallViralLoadResult($params,$where){
+    public function fetchOverallViralLoadResult($params){
         $logincontainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
@@ -1340,11 +1340,38 @@ class SampleTable extends AbstractTableGateway {
             if (isset($s_c_date[1]) && trim($s_c_date[1]) != "") {
               $endDate = trim($s_c_date[1]);
             }
+
             $squery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
-                                    ->columns(array('total' => new Expression('COUNT(*)')))
-                                    //->join(array('rs'=>'r_sample_type'),'rs.sample_id=vl.sample_type')
-                                    ->where(array("DATE(vl.sample_collection_date) <='$endDate'",
-                                                  "DATE(vl.sample_collection_date) >='$startDate'"));
+                                    ->columns(array(
+                                                    "testedTotal" => new Expression("SUM(CASE WHEN ((vl.DashVL_AnalysisResult is NOT NULL OR vl.DashVL_AnalysisResult != '')) THEN 1 ELSE 0 END)"),
+                                                    "notTestedTotal" => new Expression("SUM(CASE WHEN ((vl.DashVL_AnalysisResult is NULL OR vl.DashVL_AnalysisResult = '')) THEN 1 ELSE 0 END)"),
+                                                    "lessThan1000" => new Expression("SUM(CASE WHEN ((vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' )) THEN 1 ELSE 0 END)"),
+                                                    "greaterThan1000" => new Expression("SUM(CASE WHEN ((vl.DashVL_AnalysisResult like 'not suppressed%' OR vl.DashVL_AnalysisResult like 'Not Suppressed%' or vl.DashVL_Abs >= 1000)) THEN 1 ELSE 0 END)"),
+                                              )
+                                    );
+            if(isset($params['testResult']) && $params['testResult'] == '<1000'){
+                $squery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
+                                    ->columns(array(
+                                                    "testedTotal" => new Expression("SUM(CASE WHEN ((vl.DashVL_AnalysisResult is NOT NULL OR vl.DashVL_AnalysisResult != '')) THEN 1 ELSE 0 END)"),
+                                                    "lessThan1000" => new Expression("SUM(CASE WHEN ((vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' )) THEN 1 ELSE 0 END)"),
+                                              )
+                                    );
+            }else if(isset($params['testResult']) && $params['testResult'] == '>=1000') {
+                $squery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
+                                    ->columns(array(
+                                                    "testedTotal" => new Expression("SUM(CASE WHEN ((vl.DashVL_AnalysisResult is NOT NULL OR vl.DashVL_AnalysisResult != '')) THEN 1 ELSE 0 END)"),
+                                                    "greaterThan1000" => new Expression("SUM(CASE WHEN ((vl.DashVL_AnalysisResult like 'not suppressed%' OR vl.DashVL_AnalysisResult like 'Not Suppressed%' or vl.DashVL_Abs >= 1000)) THEN 1 ELSE 0 END)"),
+                                              )
+                                    );
+            }
+            $squery = $squery->where(array("DATE(vl.sample_collection_date) <='$endDate'","DATE(vl.sample_collection_date) >='$startDate'"));
+
+            // $squery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
+            //                         ->columns(array('total' => new Expression('COUNT(*)')))
+            //                         //->join(array('rs'=>'r_sample_type'),'rs.sample_id=vl.sample_type')
+            //                         ->where(array("DATE(vl.sample_collection_date) <='$endDate'",
+            //                                       "DATE(vl.sample_collection_date) >='$startDate'"));
+            
             if(isset($params['clinicId']) && trim($params['clinicId'])!= ''){
                 $squery = $squery->where('vl.facility_id IN ('.$params['clinicId'].')');
             }else{
@@ -1353,11 +1380,11 @@ class SampleTable extends AbstractTableGateway {
                     $squery = $squery->where('vl.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
                 }
             }
-            if(isset($params['testResult']) && $params['testResult'] == '<1000'){
-                $squery = $squery->where("(vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' )");
-            }else if(isset($params['testResult']) && $params['testResult'] == '>=1000') {
-                $squery = $squery->where("(vl.DashVL_AnalysisResult like 'not suppressed%' OR vl.DashVL_AnalysisResult like 'Not Suppressed%' or vl.DashVL_Abs >= 1000))");
-            }
+            // if(isset($params['testResult']) && $params['testResult'] == '<1000'){
+            //     $squery = $squery->where("(vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' )");
+            // }else if(isset($params['testResult']) && $params['testResult'] == '>=1000') {
+            //     $squery = $squery->where("(vl.DashVL_AnalysisResult like 'not suppressed%' OR vl.DashVL_AnalysisResult like 'Not Suppressed%' or vl.DashVL_Abs >= 1000)");
+            // }
             if(isset($params['sampleTypeId']) && $params['sampleTypeId']!=''){
                 $squery = $squery->where('vl.sample_type="'.base64_decode(trim($params['sampleTypeId'])).'"');
             }
@@ -1414,7 +1441,8 @@ class SampleTable extends AbstractTableGateway {
             }
             $sQueryStr = $sql->getSqlStringForSqlObject($squery);
             //echo $sQueryStr;die;
-            $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
+            $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+print_r($sResult);die;
         }
        return $sResult;
     }
@@ -7151,4 +7179,55 @@ class SampleTable extends AbstractTableGateway {
     /////////////////////////////////////////////
     /////////*** Turnaround Time Page ***////////
     ////////////////////////////////////////////
+
+
+
+    //api for fetch samples refer SourceData Controller
+    public function fetchSourceData($params)
+    {
+        $result = array();
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        //check if the token is valid or not
+
+        $uQuery = $sql->select()->from(array('vl' => 'dash_users'))
+                        ->where(array('api_token'=>$params['token'],'role'=>6));
+
+        $uQueryStr = $sql->getSqlStringForSqlObject($uQuery);
+        $uResult = $dbAdapter->query($uQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
+        if(isset($uResult['user_id']))
+        {
+            $sQuery = $sql->select()->from(array('vl' => 'dash_vl_request_form'))->columns(array('sample_code','sample_collection_date','sample_tested_datetime','result'))
+                            ->join(array('r_r_r'=>'r_sample_rejection_reasons'),'r_r_r.rejection_reason_id=vl.reason_for_sample_rejection',array('rejection_reason_name'),'left')
+                            ->join(array('rss'=>'r_sample_status'),'rss.status_id=vl.result_status',array('status_name'),'left');
+
+                            if(isset($params['patient_id']) && $params['patient_id']!='')
+                            {
+                                $sQuery = $sQuery->where(array('patient_art_no'=>$params['patient_id']));
+                            }
+                            if(isset($params['facility_id']) && $params['facility_id']!='')
+                            {
+                                $sQuery = $sQuery->where(array('facility_id'=>$params['facility_id']));
+                            }
+                            if(isset($params['return_results']) && $params['return_results']==1)
+                            {
+                                $sQuery = $sQuery->order('vl_sample_id DESC')
+                                                ->limit(1);
+                            }
+            $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
+            $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+            if(count($rResult)>0){
+                $result['status'] = '200';
+                $result['result'] = $rResult;
+            }else{
+                $result['status'] = '500';
+                $result['result'] = "Something's wrong or Temporary issue";
+            }
+        }else{
+            $result['status'] = '403';
+            $result['result'] = 'API KEY INVALID';
+        }
+        return $result;
+    }
+
 }

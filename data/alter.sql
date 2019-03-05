@@ -392,3 +392,7 @@ CREATE TABLE IF NOT EXISTS `patients` (
 
 -- saravanan 18-feb-2019
 INSERT INTO `dash_user_roles` (`role_id`, `role_name`, `role_code`, `status`) VALUES (5, 'management', 'mgmt', 'active');
+
+-- saravanan 05-mar-2019
+INSERT INTO `dash_user_roles` (`role_id`, `role_name`, `role_code`, `status`) VALUES (6, 'API', 'api', 'active');
+ALTER TABLE `dash_users` ADD `api_token` VARCHAR(255) NULL DEFAULT NULL AFTER `role`;
