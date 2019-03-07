@@ -435,7 +435,8 @@ class SampleService {
     //clinic details start
     public function getOverallViralLoadStatus($params){
         $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->fetchOverallViralLoadStatus($params);
+        //return $sampleDb->fetchOverallViralLoadStatus($params);
+        return $sampleDb->fetchOverallViralLoadResult($params);
     }
     
     public function getViralLoadStatusBasedOnGender($params){
@@ -1825,5 +1826,11 @@ $i++;
     {
         $sampleDb = $this->sm->get('SampleTable');
         return $sampleDb->fetchSampleTestReasonBarChartDetails($params);
+    }
+    //api for fecth samples
+    public function getSourceData($params)
+    {
+        $sampleDb = $this->sm->get('SampleTable');
+        return $sampleDb->fetchSourceData($params);
     }
 }

@@ -85,4 +85,9 @@ class FacilityService {
         $db = $this->sm->get('FacilityTable');
         return $db->fetchFacilityByDistrict($districtId);
     }
+    
+    public function getAllFacilitiesInApi(){
+        $db = $this->sm->get('FacilityTable');
+        return $db->fetchAllFacilitiesInApi();
+    }
 }

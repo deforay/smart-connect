@@ -336,4 +336,62 @@ class UsersTable extends AbstractTableGateway {
         return $output;
     }
     
+    public function userLoginDetailsApi($params) {
+        if(trim($params['userName'])!="" && trim($params['password'])!=""){
+            $username = $params['userName'];
+            $password = $params['password'];
+            $dbAdapter = $this->adapter;
+            $sql = new Sql($dbAdapter);
+
+            $sQuery = $sql->select()->from(array('u' => 'dash_users'))
+                      ->join(array('r' => 'dash_user_roles'), 'u.role=r.role_id',array('role_code'))
+                      ->where(array('email' => $username, 'password' => $password,'u.status'=>'active','role'=>'6'));
+            $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
+            $rResult=$dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
+            if($rResult!=""){
+                if(trim($rResult['api_token'])=='') {
+                    $token = $this->generateApiToken();
+                    $data = array('api_token' => $token);
+                    $this->update($data, array('user_id' => $rResult['user_id']));
+                }
+                $query = $sql->select()->from(array('u' => 'dash_users'))
+                            ->columns(array('api_token'))
+                            ->where(array('user_id' => $rResult['user_id']));
+                $queryStr = $sql->getSqlStringForSqlObject($query);
+                $dResult=$dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
+                if($dResult!=""){
+                    $response['status']='200';
+                    $response['token']=$dResult['api_token'];
+                }
+            }
+            else {
+                $response['status'] = '403';
+                $response['message']='Invalid or Missing Query Params';
+            }
+        }else{
+            $response['status'] = '403';
+            $response['message']='Invalid or Missing Query Params';
+        }
+        return $response;
+    }
+
+    public function generateApiToken(){
+        //$token = bin2hex(random_bytes(32));
+        $token = bin2hex(openssl_random_pseudo_bytes(32));
+        return $this->checkUserApiToken($token);
+    }
+
+    public function checkUserApiToken($token){
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $sQuery = $sql->select()->from(array('u' => 'dash_users'))
+                    ->where(array('api_token' => $token));
+        $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
+        $result=$dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
+        if($result!=""){
+            $this->generateApiToken();
+        }else{
+            return $token;
+        }
+    }
 }
