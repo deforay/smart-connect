@@ -27,12 +27,25 @@ return array(
                     ),
                 ),
             ),
+            'api-user' => array(
+                'type'    => 'segment',
+                'options' => array(
+                    'route'    => '/api/user[/:id]',
+                    'constraints' => array(
+                        'id'     => '[0-9]+',
+                    ),
+                    'defaults' => array(
+                        'controller' => 'Api\Controller\User',
+                    ),
+                ),
+            ),
         ),
     ),
     'controllers' => array(
         'invokables' => array(
             'Api\Controller\ImportViralLoad' => 'Api\Controller\ImportViralLoadController',
             'Api\Controller\SourceData' => 'Api\Controller\SourceDataController',
+            'Api\Controller\User' => 'Api\Controller\UserController',
         ),
     ),
     'view_manager' => array(

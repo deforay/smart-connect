@@ -87,4 +87,9 @@ class UserService {
         $db = $this->sm->get('UsersTable');
         return $db->fetchAllUsers($parameters);
     }
+
+    public function userLoginApi($params) {
+        $db = $this->sm->get('UsersTable');
+        return $db->userLoginDetailsApi($params);
+    }
 }
