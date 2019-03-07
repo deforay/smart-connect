@@ -350,28 +350,28 @@ class UsersTable extends AbstractTableGateway {
             $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
             $rResult=$dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
             if($rResult!=""){
-                
                 if(trim($rResult['api_token'])=='') {
                     $token = $this->generateApiToken();
                     $data = array('api_token' => $token);
                     $this->update($data, array('user_id' => $rResult['user_id']));
                 }
                 $query = $sql->select()->from(array('u' => 'dash_users'))
-                            ->columns(array('user_id','email','mobile','api_token','role'))
-                            ->join(array('r' => 'dash_user_roles'), 'u.role=r.role_id',array('role_code'))
+                            ->columns(array('api_token'))
                             ->where(array('user_id' => $rResult['user_id']));
                 $queryStr = $sql->getSqlStringForSqlObject($query);
                 $dResult=$dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-                $response['status']='200';
-                $response['result']=$dResult;
+                if($dResult!=""){
+                    $response['status']='200';
+                    $response['token']=$dResult['api_token'];
+                }
             }
             else {
                 $response['status'] = '403';
-                $response['result']='Invalid or Missing Query Params';
+                $response['message']='Invalid or Missing Query Params';
             }
         }else{
             $response['status'] = '403';
-            $response['result']='Invalid or Missing Query Params';
+            $response['message']='Invalid or Missing Query Params';
         }
         return $response;
     }

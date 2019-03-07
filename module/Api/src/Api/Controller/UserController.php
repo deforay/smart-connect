@@ -15,7 +15,7 @@ class UserController extends AbstractRestfulController
             return new JsonModel($response);
         }else{
             $response['status'] = '403';
-            $response['result'] = 'Invalid or Missing Query Params';
+            $response['message'] = 'Invalid or Missing Query Params';
           return new JsonModel($response);
         }
     }
