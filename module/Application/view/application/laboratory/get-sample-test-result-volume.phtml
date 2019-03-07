@@ -128,6 +128,11 @@ foreach($result['sampleName'][$arrayKey[1]] as $key=>$suppression){
                       echo '{y:'.$count.',url:"/labs/samples-tested-lab?"},';
                   }
               ?>],
+              <?php if(strpos($key, '>') !== false){ ?>
+              color : '#ff1900',
+              <?php } else if(strpos($key, '<') !== false){ ?>
+              color : '#60d18f',
+              <?php } ?>              
               },
               <?php
               } 

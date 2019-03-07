@@ -349,6 +349,14 @@ class SampleService {
         $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
         return $sResult;
     }
+
+    //lab details start
+    //get sample status for lab dash
+    public function getSampleStatusDataTable($params){
+        $sampleDb = $this->sm->get('SampleTableWithoutCache');
+        return $sampleDb->getSampleStatusDataTable($params);
+    }
+
     //lab details start
     //get sample result details
     public function getSampleResultDetails($params){
@@ -722,6 +730,7 @@ class SampleService {
             return "";
         }
     }
+
     
     public function generateHighVlSampleResultExcel($params){
         $queryContainer = new Container('query');

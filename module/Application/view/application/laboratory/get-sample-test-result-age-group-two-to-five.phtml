@@ -141,21 +141,13 @@ $(function () {
                   }
               ?>],
               stack:'<?php echo $age[$i];?>',
-              <?php
-              if($key == "VL (< 1000 cp/ml)"){
-              
-                     if(isset($lt1000[$age[$i]])) { ?>
-                     
-                            color: '<?php echo $lt1000[$age[$i]]; ?>'
-                     
-                     <?php } else{ ?>
-                            color: '<?php echo $gt1000[$age[$i]]; ?>'
-              <?php }
-              } else { ?>
-                 color: '#ff1900'
-              <?php
-              }
-              ?>
+
+              <?php if(strpos($key, '<') !== false){ ?>
+                color: '<?php echo $lt1000[$age[$i]]; ?>',
+              <?php } else if(strpos($key, '>') !== false){ ?>
+                color: '<?php echo $gt1000[$age[$i]]; ?>',
+              <?php }  ?>
+                
               },
               <?php
               }

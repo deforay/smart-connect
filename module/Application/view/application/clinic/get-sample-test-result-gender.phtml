@@ -54,7 +54,6 @@ foreach($supAvg as $gen => $subRow){
         $('#samplesTestedVsGender').highcharts({
             chart: {
             type: 'column',
-            styledMode : true
             },
         title: {
             text: ''
@@ -64,7 +63,8 @@ foreach($supAvg as $gen => $subRow){
                 subtitle: {
                     text:'<?php echo $this->translate('Samples Tested based on Gender'); ?>',
                 }
-            }
+            },
+            filename : '<?php echo $this->translate('Samples Tested based on Gender'); ?>',
         },
        credits: {
               enabled: false

@@ -122,6 +122,11 @@ foreach($result['sampleTestedReason'][$arrayKey[1]] as $key=>$suppression){
               ?>
               {
               name:'<?php echo $this->translate($key); ?>',
+              <?php if(strpos($key, '>') !== false){ ?>
+              color : '#ff1900',
+              <?php } else if(strpos($key, '<') !== false){ ?>
+              color : '#60d18f',
+              <?php } ?>              
               data:[<?php
                   foreach($condition as $count){
                      echo '{y:'.$count.'},';

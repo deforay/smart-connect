@@ -101,10 +101,10 @@ class UsersTable extends AbstractTableGateway {
 
             if($logincontainer->role == 3){
                  return '/clinics/dashboard';
-             }else {
+            } else {
                  return '/summary/dashboard';
-             }
-             
+            }
+
         } else {
             $container->alertMsg = 'Please check your login credentials';
             //die('login');

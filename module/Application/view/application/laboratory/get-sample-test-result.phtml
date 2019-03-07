@@ -116,6 +116,11 @@ foreach($result['sampleName'][$arrayKey[1]] as $key=>$suppression){
               ?>
               {
               name:'<?php echo $this->translate($key); ?>',
+              <?php if(strpos($key, '>') !== false){ ?>
+              color : '#ff1900',
+              <?php } else if(strpos($key, '<') !== false){ ?>
+              color : '#60d18f',
+              <?php } ?>
               data:[<?php
                   foreach($condition as $count){
                      echo '{y:'.$count.'},';
@@ -133,8 +138,7 @@ foreach($result['sampleName'][$arrayKey[1]] as $key=>$suppression){
             data: [<?php echo implode(",",$supAvg);?>],
         }
         <?php } ?>
-        ],
-        colors: ['#ff1900','#60d18f',],
+        ]
     });
     });
 </script>

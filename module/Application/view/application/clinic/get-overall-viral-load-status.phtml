@@ -57,7 +57,10 @@
             name: '<?php echo $this->translate('Sample'); ?>',
             showInLegend: false, 
             data: [
-                    { y : <?php echo (isset($chartResult[0]['total']))?$chartResult[0]['total']:0; ?> , color : '#ECD078' },{ y : <?php echo (isset($chartResult[1]['total']))?$chartResult[1]['total']:0; ?> , color : '#DDDF00' },{ y : <?php echo (isset($chartResult[2]['total']))?$chartResult[2]['total']:0; ?> , color : '#b9ecbe' },{ y : <?php echo (isset($chartResult[3]['total']))?$chartResult[3]['total']:0; ?> , color : '#D95B43' }
+                    { y : <?php echo (isset($chartResult[0]['total']))?$chartResult[0]['total']:0; ?> , color : '#ECD078' },
+                    { y : <?php echo (isset($chartResult[1]['total']))?$chartResult[1]['total']:0; ?> , color : '#DDDF00' },
+                    { y : <?php echo (isset($chartResult[2]['total']))?$chartResult[2]['total']:0; ?> , color : '#b9ecbe' },
+                    { y : <?php echo (isset($chartResult[3]['total']))?$chartResult[3]['total']:0; ?> , color : '#D95B43' }
                 ],
             stack: 'total'
         }]

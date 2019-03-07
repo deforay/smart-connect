@@ -95,6 +95,7 @@ $('#labDashReqFormBar').highcharts({
                     yAxis: 0,
                     <?php if(array_sum($result['Complete']) == 0) { ?> visible: false,<?php } ?>
                     data: [<?php echo implode(",",$result['Complete']);?>],
+                    color : '#8877a9',
                     tooltip: {
                         valueSuffix: ' '
                     }
@@ -106,6 +107,7 @@ $('#labDashReqFormBar').highcharts({
                     yAxis: 0,
                     <?php if(array_sum($result['Incomplete']) == 0) { ?> visible: false,<?php } ?>
                     data: [<?php echo implode(",",$result['Incomplete']);?>],
+                    color : '#64ade5',
                     tooltip: {
                         valueSuffix: ' '
                     }
@@ -120,7 +122,8 @@ $('#labDashReqFormBar').highcharts({
                         hover: {
                             lineWidthPlus: 0
                         }
-                    },    
+                    },   
+                    color : '#000000', 
                     marker: {
                         symbol: 'diamond'
                     },   
@@ -131,11 +134,6 @@ $('#labDashReqFormBar').highcharts({
                 },
                 <?php } ?>                
                 ],
-    colors: [
-        '#64ade5',
-        '#8877a9',
-        '#000000',
-    ]
     });
     
 </script>

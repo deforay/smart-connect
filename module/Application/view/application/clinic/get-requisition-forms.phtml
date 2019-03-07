@@ -92,6 +92,7 @@ $('#clinicDashReqFormBar').highcharts({
                 {
                     name: '<?php echo $this->translate('Complete'); ?>',
                     type: 'column',
+                    color : '#8877a9',
                     yAxis: 0,
                     <?php if(array_sum($result['Complete']) == 0) { ?> visible: false,<?php } ?>
                     data: [<?php echo implode(",",$result['Complete']);?>],
@@ -103,6 +104,7 @@ $('#clinicDashReqFormBar').highcharts({
                 {
                     name: '<?php echo $this->translate('Incomplete'); ?>',
                     type: 'column',
+                    color : '#64ade5',
                     yAxis: 0,
                     <?php if(array_sum($result['Incomplete']) == 0) { ?> visible: false,<?php } ?>
                     data: [<?php echo implode(",",$result['Incomplete']);?>],
@@ -121,6 +123,7 @@ $('#clinicDashReqFormBar').highcharts({
                             lineWidthPlus: 0
                         }
                     },    
+                    color : '#000000', 
                     marker: {
                         symbol: 'diamond'
                     },   
@@ -130,12 +133,7 @@ $('#clinicDashReqFormBar').highcharts({
                     }
                 },
                 <?php } ?>                
-                ],
-    colors: [
-        '#64ade5',
-        '#8877a9',
-        '#000000',
-    ]
+                ]
     });
     
 </script>

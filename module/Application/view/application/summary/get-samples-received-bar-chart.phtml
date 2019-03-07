@@ -1,3 +1,8 @@
+<?php
+
+$colors = array('DBS' => '#FFD55A','PLASMA' => '#869EA7', 'OTHERS' =>'black' );
+
+?>
 <div id="samplesReceivedBarChartData" style="min-height:600px;"></div>
 <script>
        $(function () {
@@ -69,7 +74,9 @@
                     foreach($result['sampleName'] as $key=>$condition){                     
                     ?>
                     {
-                    name:'<?php echo strtoupper($this->translate(ucfirst($key))); ?>',
+                    
+                    name:'<?php echo strtoupper($this->translate(($key))); ?>',
+                    color : '<?php echo $colors[strtoupper($key)] ?>' ,
                     data:[<?php
                         foreach($condition as $count){
                            echo '{y:'.$count.'},';

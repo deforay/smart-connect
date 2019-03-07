@@ -866,4 +866,14 @@ class LaboratoryController extends AbstractActionController{
             return $viewModel;
         }
     }
+    public function getSampleStatusDataTableAction(){
+
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $parameters = $request->getPost();
+            $sampleService = $this->getServiceLocator()->get('SampleService');
+            $result = $sampleService->getSampleStatusDataTable($parameters);
+            return $this->getResponse()->setContent(Json::encode($result));
+        }
+    }
 }

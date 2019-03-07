@@ -1,13 +1,13 @@
 <?php
 use Zend\Session\Container;
 $languagecontainer = new Container('language');
-$startYear=date("Y", strtotime("-1 year"));
+$startYear = date("Y", strtotime("-1 year"));
 $startMonth = date('m', strtotime('+1 month', strtotime('-1 year')));
 $endYear = date('Y');
 $endMonth = date('m');
 
 $startDate = date('Y-m', strtotime('+1 month', strtotime('-1 year')));
-$endDate=date('Y-m');
+$endDate = date('Y-m');
 ?>
 <style>
 .bluebox, .dashboard-stat2{
@@ -43,7 +43,7 @@ $endDate=date('Y-m');
 }
 
 .mpr-calendar::last-child{
-  border-right: none;  
+  border-right: none;
 }
 
 .mpr-month{
@@ -60,7 +60,7 @@ $endDate=date('Y-m');
 }
 
 .mpr-selected{
-  
+
 }
 
 .mpr-month:hover{
@@ -130,8 +130,8 @@ $endDate=date('Y-m');
   max-width: 1920px!important;
 }
 .table > tbody > tr > td, .table > tbody > tr > th, .table > tfoot > tr > td, .table > tfoot > tr > th, .table > thead > tr > td, .table > thead > tr > th{
-  padding:<?php echo(isset($languagecontainer->locale) && $languagecontainer->locale == 'en_US')?'8':'3'; ?>px;
-  font-size:<?php echo(isset($languagecontainer->locale) && $languagecontainer->locale == 'en_US')?'14':'13'; ?>px;
+  padding:<?php echo (isset($languagecontainer->locale) && $languagecontainer->locale == 'en_US') ? '8' : '3'; ?>px;
+  font-size:<?php echo (isset($languagecontainer->locale) && $languagecontainer->locale == 'en_US') ? '14' : '13'; ?>px;
 }
 .select2-search__field,.select2-selection__rendered{
     color:#333;
@@ -162,8 +162,8 @@ $endDate=date('Y-m');
 </style>
 <?php
 $sType = '';
-foreach($sampleType as $samples){
-    $sType.='<option value="'.base64_encode($samples['sample_id']).'">'.ucwords($samples['sample_name']).'</option>';
+foreach ($sampleType as $samples) {
+    $sType .= '<option value="' . base64_encode($samples['sample_id']) . '">' . ucwords($samples['sample_name']) . '</option>';
 }
 ?>
     <!-- BEGIN PAGE BAR -->
@@ -174,13 +174,13 @@ foreach($sampleType as $samples){
 
     <!-- END PAGE BAR -->
     <!-- BEGIN PAGE TITLE-->
-    
+
     <br>
     <br>
-    
+
     <!-- END PAGE TITLE-->
     <!-- END PAGE HEADER-->
-   
+
     <div class="row" style="margin-bottom:20px;">
         <div class="col-md-12 col-sm-12" style="text-align:center;">
             <a id="showDateRange" href="javascript:void(0);" style="color:#0d68e0;box-shadow: 1px 2px 12px rgb(173, 200, 222);border-radius: 12px;padding: 2px 10px 2px 10px;margin-left:26%;"><i class="fa fa-chevron-down" aria-hidden="true"></i> <?php echo $this->translate('Show Date Filter'); ?></a>
@@ -213,23 +213,23 @@ foreach($sampleType as $samples){
             <div class="col-lg-6">
                 <select name="provinceName[]" id="provinceName" class="form-control" multiple title="<?php echo $this->translate('Please select one or more province. Leave blank for All'); ?>" onchange="selectDistrictName();">
                     <?php
-                    foreach($provinceName as $province){
-                        ?>
-                        <option value="<?php echo $province['location_id']; ?>"><?php echo $province['location_name'];?></option>
+foreach ($provinceName as $province) {
+    ?>
+                        <option value="<?php echo $province['location_id']; ?>"><?php echo $province['location_name']; ?></option>
                         <?php
-                    }
-                    ?>
+}
+?>
                 </select>
             </div>
             <div class="col-lg-6" id="districtHeight">
                 <select name="districtName[]" id="districtName" class="form-control" multiple title="<?php echo $this->translate('Please select one or more district. Leave blank for All'); ?>" onchange="selectLabName();">
                     <?php
-                    foreach($districtName as $district){
-                        ?>
-                        <option data-parent-location="<?php echo $district['parent_location']; ?>" value="<?php echo $district['location_id']; ?>"><?php echo $district['location_name'];?></option>
+foreach ($districtName as $district) {
+    ?>
+                        <option data-parent-location="<?php echo $district['parent_location']; ?>" value="<?php echo $district['location_id']; ?>"><?php echo $district['location_name']; ?></option>
                         <?php
-                    }
-                    ?>
+}
+?>
                     <option value="0" >Empty</option>
                 </select>
             </div>
@@ -238,20 +238,20 @@ foreach($sampleType as $samples){
             <div class="col-lg-6" id="labHeight">
                 <select name="labName[]" id="labName" class="form-control" multiple title="<?php echo $this->translate('Please select one or more labs. Leave blank for All'); ?>">
                     <?php
-                    foreach($labName as $lab){
-                        ?>
-                        <option data-name="<?php echo $lab['facility_name']; ?>" data-district="<?php echo $lab['facility_district'];?>" value="<?php echo $lab['facility_id']; ?>"><?php echo $lab['facility_code']." - ".$lab['facility_name'];?></option>
+foreach ($labName as $lab) {
+    ?>
+                        <option data-name="<?php echo $lab['facility_name']; ?>" data-district="<?php echo $lab['facility_district']; ?>" value="<?php echo $lab['facility_id']; ?>"><?php echo $lab['facility_code'] . " - " . $lab['facility_name']; ?></option>
                         <?php
-                    }
-                    ?>
-                    
+}
+?>
+
                 </select>
             </div>
             <div class="col-lg-3">
                 <div id="sla-date-range" class="mrp-container form-control">
                     <span class="mrp-icon"><i class="fa fa-calendar"></i> &nbsp;</span>
                     <div class="mrp-monthdisplay ">
-                      <span class="mrp-lowerMonth"><?php echo date('M', strtotime('+1 month', strtotime('-1 year')));; ?> <?php echo $startYear; ?></span>
+                      <span class="mrp-lowerMonth"><?php echo date('M', strtotime('+1 month', strtotime('-1 year'))); ?> <?php echo $startYear; ?></span>
                       <span class="mrp-to"> to </span>
                       <span class="mrp-upperMonth"><?php echo date('M'); ?> <?php echo date('Y'); ?></span>
                     </div>
@@ -265,7 +265,7 @@ foreach($sampleType as $samples){
             </div>
         </div>
     </form>
-    
+
     <div class="row">
         <div class="col-md-6 col-sm-6">
             <div class="portlet box blue">
@@ -278,9 +278,9 @@ foreach($sampleType as $samples){
                         <div class="btn-group">
                             <select id="sampleType" class="btn white btn-outline btn-circle btn-sm dropdown-toggle" onchange="getTestedSampleResult()">
                                 <option value=""><?php echo $this->translate('All Sample Types'); ?></option>
-                                <?php echo $sType;?>
+                                <?php echo $sType; ?>
                             </select>
-                            
+
                         </div>
                     </div>
                 </div>
@@ -289,7 +289,7 @@ foreach($sampleType as $samples){
                 </div>
             </div>
         </div>
-        
+
         <div class="col-md-6 col-sm-6">
             <div class="portlet box blue">
                 <div class="portlet-title">
@@ -300,16 +300,16 @@ foreach($sampleType as $samples){
                         <div class="btn-group">
                             <select id="sampleTypeVolume" class="btn white btn-outline btn-circle btn-sm dropdown-toggle" onchange="getTestedSampleResultBasedLab();">
                                 <option value=""><?php echo $this->translate('All Sample Types'); ?></option>
-                                <?php echo $sType;?>
+                                <?php echo $sType; ?>
                             </select>
                         </div>
-                    </div>                                    
+                    </div>
                 </div>
                 <div class="portlet-body" style="cursor:pointer;">
                     <div id="samplesTestedLabResult"></div>
                 </div>
             </div>
-        </div>                        
+        </div>
     </div>
     <div class="row">
         <div class="col-md-12 col-sm-12 col-lg-12">
@@ -325,14 +325,14 @@ foreach($sampleType as $samples){
                             <!--    < ?php echo $sType;?>-->
                             <!--</select>-->
                         </div>
-                    </div>  
+                    </div>
                 </div>
                 <div class="portlet-body">
                     <div id="samplesTestedResultGender" style="height:450px;"></div>
                 </div>
             </div>
         </div>
-        
+
         <div class="col-md-12 col-sm-12 col-lg-12">
             <div class="portlet box blue">
                 <div class="portlet-title">
@@ -358,7 +358,7 @@ foreach($sampleType as $samples){
                     <div id="samplesTestedResultAgeGroupLessThanTwo"></div>
                 </div>
             </div>
-        </div>    
+        </div>
         <div class="col-md-6 col-sm-6">
             <div class="portlet box blue">
                 <div class="portlet-title">
@@ -370,7 +370,7 @@ foreach($sampleType as $samples){
                     <div id="samplesTestedResultAgeGroupTwoToFive"></div>
                 </div>
             </div>
-        </div>            
+        </div>
     </div>
     <div class="row">
         <div class="col-md-6 col-sm-6">
@@ -379,13 +379,13 @@ foreach($sampleType as $samples){
                     <div class="caption">
                         <span class="caption-subject"><?php echo $this->translate('Samples Tested based on Age 6-14'); ?></span>
                     </div>
-                    
+
                 </div>
                 <div class="portlet-body">
                     <div id="samplesTestedResultAgeGroupSixToFourteen"></div>
                 </div>
             </div>
-        </div>    
+        </div>
         <div class="col-md-6 col-sm-6">
             <div class="portlet box blue">
                 <div class="portlet-title">
@@ -397,7 +397,7 @@ foreach($sampleType as $samples){
                     <div id="samplesTestedResultAgeGroupFifteenToFourtyNine"></div>
                 </div>
             </div>
-        </div>            
+        </div>
     </div>
     <div class="row">
         <div class="col-md-6 col-sm-6">
@@ -406,13 +406,13 @@ foreach($sampleType as $samples){
                     <div class="caption">
                         <span class="caption-subject"><?php echo $this->translate('Samples Tested based on Age >=50'); ?></span>
                     </div>
-                    
+
                 </div>
                 <div class="portlet-body">
                     <div id="samplesTestedResultAgeGroupGreaterThanFifty"></div>
                 </div>
             </div>
-        </div>    
+        </div>
         <div class="col-md-6 col-sm-6">
             <div class="portlet box blue">
                 <div class="portlet-title">
@@ -424,7 +424,7 @@ foreach($sampleType as $samples){
                     <div id="samplesTestedResultAgeGroupUnknown"></div>
                 </div>
             </div>
-        </div>            
+        </div>
     </div>
     <div class="row">
         <div class="col-md-12 col-sm-12">
@@ -438,12 +438,12 @@ foreach($sampleType as $samples){
                             <select id="testedReason" name="testedReason" class="form-control" title="<?php echo $this->translate('Please choose test reason'); ?>" onchange="getTestedSampleReason();">
                             <option value=""><?php echo $this->translate('Test Reasons'); ?></option>
                             <?php
-                            foreach($testReason as $test){
-                                ?>
-                                <option value="<?php echo base64_encode($test['test_reason_id']);?>"><?php echo $test['test_reason_name'];?></option>
+foreach ($testReason as $test) {
+    ?>
+                                <option value="<?php echo base64_encode($test['test_reason_id']); ?>"><?php echo $test['test_reason_name']; ?></option>
                                 <?php
-                            }
-                            ?>
+}
+?>
                             </select>
                         </div>
                     </div>
@@ -452,7 +452,7 @@ foreach($sampleType as $samples){
                     <div id="samplesTestedReason"></div>
                 </div>
             </div>
-        </div>            
+        </div>
     </div>
     <div class="row">
         <div class="col-md-6 col-sm-6">
@@ -518,12 +518,12 @@ foreach($sampleType as $samples){
                                 <option value="sample_rejected"><?php echo $this->translate('Samples Rejected'); ?></option>
                             </select>
                         </div>
-                    </div>                                 
+                    </div>
                 </div>
                 <div class="portlet-body" id="pieChartLabResult">
                     <div id="labDashSampleVolumePie" style="height:500px;"></div>
                 </div>
-            </div>                            
+            </div>
         </div>
     </div>
     <div class="row">
@@ -537,7 +537,7 @@ foreach($sampleType as $samples){
                 <div class="portlet-body" id="femalePatientPieChart">
                     <div id="labDashFemalePie" style="height:500px;"></div>
                 </div>
-            </div>                            
+            </div>
         </div>
         <div class="col-md-6 col-sm-6">
             <div class="portlet box blue">
@@ -549,9 +549,51 @@ foreach($sampleType as $samples){
                 <div class="portlet-body" id="lineOfTreatmentPieChart">
                     <div id="labDashLineOfTreatmentPie" style="height:500px;"></div>
                 </div>
-            </div>                            
+            </div>
         </div>
     </div>
+
+
+
+<div class="row">
+    <div class="col-md-12 col-sm-12">
+        <div class="portlet box">
+            <div class="portlet-body">
+                    <div class="portlet box blue">
+                        <div class="portlet-title">
+                            <div class="caption">
+                                <i class="fa fa-cogs"></i><?php echo $this->translate('Sample Overview'); ?>
+                            </div>
+                        </div>
+                        <div class="portlet-body">
+                            <div class="table-toolbar">
+                                <table class="table table-striped table-bordered table-hover order-column" id="sampleStatusTable">
+                                    <thead>
+                                        <tr>
+                                            <th> <?php echo $this->translate('Month and Year'); ?> </th>
+                                            <th> <?php echo $this->translate('Facility Name'); ?> </th>
+                                            <th> <?php echo $this->translate('District'); ?></th>
+                                            <th> <?php echo $this->translate('Lab Name'); ?> </th>                                            
+                                            <th> <?php echo $this->translate('Samples Registered'); ?></th>
+                                            <th> <?php echo $this->translate('Samples Tested'); ?></th>
+                                            <th> <?php echo $this->translate('Samples Rejected'); ?></th>
+                                            <th> <?php echo $this->translate('No. of High VL'); ?> </th>
+                                            <th> <?php echo $this->translate('No. of Low VL'); ?> </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td colspan="7" class="dataTables_empty">Loading data from server</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+            </div>
+        </div>
+    </div>
+</div>
     <div class="row" style="display:none;">
         <div class="col-md-12 col-sm-12">
             <div class="portlet box blue">
@@ -564,13 +606,13 @@ foreach($sampleType as $samples){
                             <button class="btn btn-danger" onclick="expandMap();"><span><i class="fa fa-angle-double-right" aria-hidden="true"></i> <?php echo $this->translate('Expand Map'); ?></span></button>
                         </div>
                     </div>
-                </div>                                
+                </div>
                 <div class="portlet-body">
                     <div id="controls-polyline"></div>
                     <div id="gmap-polyline-data"></div>
                 </div>
             </div>
-        </div>                        
+        </div>
     </div>
     <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAFpbfAKFJZ8Ps7yAGIDZtD4EeBlsb_ANA"></script>
     <script src="<?php echo $this->basePath('assets/pages/scripts/dashboard.js'); ?>" type="text/javascript"></script>
@@ -578,6 +620,7 @@ foreach($sampleType as $samples){
     //var gfxPath = 'https://raw.githubusercontent.com/highslide-software/pattern-fill/master/graphics/';
     var startDate;
     var endDate;
+    var oTable;
     function getSampleResult(frmSource){
         var daterange= $('#daterange').val();
         if(frmSource == 'daterange' && $.trim(daterange) == ''){ alert('<?php echo $this->translate('Please choose date range'); ?>'); return false; }
@@ -587,7 +630,49 @@ foreach($sampleType as $samples){
             $("#sampleResultDetails").html(data);
         });
     }
-    
+
+
+function sampleStatusDataTable(){
+        var fromDate = $('#mrp-lowerDate').val();
+        var toDate = $('#mrp-upperDate').val();
+        var sampleType = ($("#sampleType").val() == null)?'':$("#sampleType").val();
+        var facilityId = ($("#labName").val() == null)?'':$("#labName").val().join(',');
+        oTable = $('#sampleStatusTable').DataTable( {
+            "bProcessing": true,
+            "bDestroy": true,
+            "bRetrieve": false,
+            "bServerSide": true,
+            "aoColumns": [
+                {"sClass":"center"},
+                {"sClass":"center"},
+                {"sClass":"center"},
+                {"sClass":"center"},
+                {"sClass":"center"},
+                {"sClass":"center"},
+                {"sClass":"center"},
+                {"sClass":"center"},
+                {"sClass":"center"},
+                ],
+            "iDisplayLength": 10,
+            "aaSorting": [[ 0, "desc" ]],
+
+            "sAjaxSource": "<?php echo $this->url('laboratory', array('action' => 'get-sample-status-data-table')); ?>",
+            "fnServerData": function ( sSource, aoData, fnCallback ) {
+                aoData.push({ "name":"fromDate","value": fromDate});
+                aoData.push({ "name":"toDate","value": toDate});
+                //aoData.push({ "name":"sampleType","value": sampleType});
+                aoData.push({ "name":"facilityId","value": facilityId});
+                $.ajax({
+                    "dataType": 'json',
+                    "type": "POST",
+                    "url": sSource,
+                    "data": aoData,
+                    "success": fnCallback
+                });
+            }
+        } );
+    }
+
     function getTestedSampleResult(){
         var fromDate = $('#mrp-lowerDate').val();
         var toDate = $('#mrp-upperDate').val();
@@ -598,7 +683,7 @@ foreach($sampleType as $samples){
             $("#samplesTestedResult").html(data);
         });
     }
-    
+
     function getTestedSampleResultBasedLab(){
         var fromDate = $('#mrp-lowerDate').val();
         var toDate = $('#mrp-upperDate').val();
@@ -609,7 +694,7 @@ foreach($sampleType as $samples){
             $("#samplesTestedLabResult").html(data);
         });
     }
-    
+
     function getTestedSampleResultBasedGender(){
         var fromDate = $('#mrp-lowerDate').val();
         var toDate = $('#mrp-upperDate').val();
@@ -619,7 +704,7 @@ foreach($sampleType as $samples){
             $("#samplesTestedResultGender").html(data);
         });
     }
-    
+
     function getAverageLabTAT(){
         var fromDate = $('#mrp-lowerDate').val();
         var toDate = $('#mrp-upperDate').val();
@@ -629,7 +714,7 @@ foreach($sampleType as $samples){
             $("#labAverageTat").html(data);
         });
     }
-    
+
     function getTestedSampleResultBasedAgeGroupLessThanTwo(){
         var fromDate = $('#mrp-lowerDate').val();
         var toDate = $('#mrp-upperDate').val();
@@ -701,7 +786,7 @@ foreach($sampleType as $samples){
             $("#samplesTestedReason").html(data);
         });
     }
-    
+
     function getTestedSampleResultBasedonPregnantPatient(){
         var fromDate = $('#mrp-lowerDate').val();
         var toDate = $('#mrp-upperDate').val();
@@ -711,7 +796,7 @@ foreach($sampleType as $samples){
             $("#samplesTestedResultPregnantPatient").html(data);
         });
     }
-    
+
     function getTestedSampleResultBasedonBreastfeedingPatient(){
         var fromDate = $('#mrp-lowerDate').val();
         var toDate = $('#mrp-upperDate').val();
@@ -721,7 +806,7 @@ foreach($sampleType as $samples){
             $("#samplesTestedResultBreastfeedingPatient").html(data);
         });
     }
-    
+
     function getRequisitionFormsTested(){
         var fromDate = $('#mrp-lowerDate').val();
         var toDate = $('#mrp-upperDate').val();
@@ -732,7 +817,7 @@ foreach($sampleType as $samples){
             $("#labDashReqFormBar").html(data);
         });
     }
-    
+
     function getSampleVolume(formSrc){
         //if(formSrc == 'change'){$.blockUI.defaults.css.border = '1px solid grey';$(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);}
         var fromDate = $('#mrp-lowerDate').val();
@@ -744,7 +829,7 @@ foreach($sampleType as $samples){
            $("#labDashSampleVolumePie").html(data);
         });
     }
-    
+
     function femalePatient(){
         var fromDate = $('#mrp-lowerDate').val();
         var toDate = $('#mrp-upperDate').val();
@@ -754,7 +839,7 @@ foreach($sampleType as $samples){
             $("#labDashFemalePie").html(data);
         });
     }
-    
+
     function lineOfTreatment(){
         var fromDate = $('#mrp-lowerDate').val();
         var toDate = $('#mrp-upperDate').val();
@@ -764,7 +849,7 @@ foreach($sampleType as $samples){
             $("#labDashLineOfTreatmentPie").html(data);
         });
     }
-    
+
     function getLabFacilities(){
         var fromDate = $('#mrp-lowerDate').val();
         var toDate = $('#mrp-upperDate').val();
@@ -774,7 +859,7 @@ foreach($sampleType as $samples){
             $("#gmap-polyline-data").html(data);
         });
     }
-        
+
     $(function() {
         $('#provinceName').select2({
             placeholder: "<?php echo $this->translate('All Province'); ?>",
@@ -801,7 +886,7 @@ foreach($sampleType as $samples){
             var count = uldiv.find('li').length - 1;
             uldiv.html("<li>"+count+" items selected</li>");
         });
-        
+
         $('#labName').select2({
             placeholder: "<?php echo $this->translate('All Labs'); ?>",
             allowClear: true
@@ -811,29 +896,29 @@ foreach($sampleType as $samples){
             var count = uldiv.find('li').length - 1;
             uldiv.html("<li>"+count+" items selected</li>");
         });
-        
+
         $('#age').select2({
             placeholder: "<?php echo $this->translate('All Age Group'); ?>",
             allowClear: true
         });
-        
+
         $('#age').on('select2:close', function (evt) {
             var uldiv = $(this).siblings('span.select2').find('ul');
             var count = uldiv.find('li').length - 1;
             uldiv.html("<li>"+count+" items selected</li>");
         });
-        
+
         $('#formFields').select2({
             placeholder: "<?php echo $this->translate('All'); ?>",
             allowClear: true
         });
-        
+
         $('#formFields').on('select2:close', function (evt) {
             var uldiv = $(this).siblings('span.select2').find('ul');
             var count = uldiv.find('li').length - 1;
             uldiv.html("<li>"+count+" items selected</li>");
         });
-        
+
         var start = moment().subtract(12, 'months');
         var end = moment();
         function cb(start, end) {
@@ -861,9 +946,9 @@ foreach($sampleType as $samples){
         $('input[name="daterange"]').val('');
         getEverything();
     });
-    
+
     function getEverything(){
-        $.blockUI.defaults.css.border = '1px solid grey'; 
+        $.blockUI.defaults.css.border = '1px solid grey';
         //$(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
         if(!$('#sampleCollectionDate').val() ) {
           $('#sampleCollectionDate').val(moment().subtract('days', 179).format('YYYY-MM-DD') + ' to ' + moment().format('YYYY-MM-DD'));
@@ -887,16 +972,17 @@ foreach($sampleType as $samples){
         getTestedSampleResultBasedonBreastfeedingPatient();
         femalePatient();
         lineOfTreatment();
+        sampleStatusDataTable();
     }
-       
+
     function resetEverything(){
        $('#pageFilter')[0].reset();
        $('#labName').val('').change();
        getEverything();
     }
-        
+
     var MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-    
+
     $(function () {
       startMonth = <?php echo $startMonth; ?>;
       startYear = <?php echo $startYear; ?>;
@@ -911,7 +997,7 @@ foreach($sampleType as $samples){
             endDate = parseInt("" + endYear + '0' + endMonth + "");
       else
         endDate = parseInt("" + endYear + endMonth + "");
-      
+
       content = '<div class="row mpr-calendarholder">';
       calendarCount = endYear - startYear;
       if(calendarCount == 0)
@@ -938,7 +1024,7 @@ foreach($sampleType as $samples){
       content += '<button class="btn btn-info mpr-close">Apply</button>';
       content += '</div>';
       content += '</div>';
-      
+
       $(document).on('click','.mpr-month',function(e){
         e.stopPropagation();
                     $month = $(this);
@@ -948,7 +1034,7 @@ foreach($sampleType as $samples){
               //Start Date
               startDate = parseInt("" + year + monthnum);
               if(startDate > endDate){
-                
+
                 if(year != parseInt(endDate/100))
                   $('.mpr-calendar:last h5 span').html(year);
                    endDate = startDate;
@@ -962,11 +1048,11 @@ foreach($sampleType as $samples){
                 startDate = endDate;
               }
             }
-        
+
             paintMonths();
       });
-      
-      
+
+
       $(document).on('click','.mpr-yearup',function(e){
             $('.mpr-month').css("color","black");
             e.stopPropagation();
@@ -978,7 +1064,7 @@ foreach($sampleType as $samples){
             $(this).parents('.mpr-calendar').find('.mpr-MonthsWrapper').fadeIn(175);
           });
       });
-      
+
       $(document).on('click','.mpr-yeardown',function(e){
             $('.mpr-month').css("color","black");
             e.stopPropagation();
@@ -991,7 +1077,7 @@ foreach($sampleType as $samples){
             $(this).parents('.mpr-calendar').find('.mpr-MonthsWrapper').fadeIn(175);
           });
       });
-      
+
       $(document).on('click','.mpr-ytd', function(e){
         e.stopPropagation();
         var d = new Date();
@@ -1009,7 +1095,7 @@ foreach($sampleType as $samples){
             $('.mpr-calendar').find('.mpr-MonthsWrapper').fadeIn(175);
         });
       });
-      
+
       $(document).on('click','.mpr-prev-year', function(e){
         e.stopPropagation();
         var d = new Date();
@@ -1025,7 +1111,7 @@ foreach($sampleType as $samples){
             $('.mpr-calendar').find('.mpr-MonthsWrapper').fadeIn(175);
         });
       });
-      
+
       $(document).on('click','.mpr-fiscal-ytd', function(e){
         e.stopPropagation();
         var d = new Date();
@@ -1056,7 +1142,7 @@ foreach($sampleType as $samples){
             $('.mpr-calendar').find('.mpr-MonthsWrapper').fadeIn(175);
         });
       });
-      
+
       $(document).on('click','.mpr-prev-fiscal', function(){
         var d = new Date();
         var year;
@@ -1086,7 +1172,7 @@ foreach($sampleType as $samples){
             $('.mpr-calendar').find('.mpr-MonthsWrapper').fadeIn(175);
         });
       });
-      
+
       var mprVisible = false;
       var mprpopover = $('.mrp-container').popover({
         container: "body",
@@ -1106,8 +1192,8 @@ foreach($sampleType as $samples){
         mprVisible = true;
       }).on('hidden.bs.popover', function(){
         mprVisible = false;
-      }); 
-      
+      });
+
       $(document).on('click','.mpr-calendarholder',function(e){
         e.preventDefault();
         e.stopPropagation();
@@ -1119,9 +1205,9 @@ foreach($sampleType as $samples){
           mprVisible = false;
         }
       });
-      
+
       $(document).on("click",function(e){
-       
+
         if(mprVisible){
             $('.mpr-calendarholder').parents('.popover').fadeOut(200,function(){
             $('.mpr-calendarholder').parents('.popover').remove();
@@ -1130,7 +1216,7 @@ foreach($sampleType as $samples){
           mprVisible = false;
         }
       });
-      
+
       $(document).on('click','.mpr-close', function(e){
         //console.log(e);
         if(mprVisible){
@@ -1141,16 +1227,16 @@ foreach($sampleType as $samples){
           mprVisible = false;
         }
       });
-      
+
     });
-    
+
     function setViewToCurrentYears(){
             var startyear = parseInt(startDate / 100);
         var endyear = parseInt(endDate / 100);
             $('.mpr-calendar h5 span').eq(0).html(startyear);
             $('.mpr-calendar h5 span').eq(1).html(endyear);
     }
-    
+
     function paintMonths(){
         $('.mpr-calendar').each(function(){
           var $cal = $(this);
@@ -1167,7 +1253,7 @@ foreach($sampleType as $samples){
             }
           });
         });
-        
+
       $('.mpr-calendar .mpr-month').css("background","");
         //Write Text
         var startyear = parseInt(startDate / 100);
@@ -1178,21 +1264,21 @@ foreach($sampleType as $samples){
         $('.mrp-monthdisplay .mrp-upperMonth').html(MONTHS[endmonth - 1] + " " + endyear);
         //$('#mrp-lowerDate').val(startDate);
         //$('#mrp-upperDate').val(endDate);
-        
+
         if(startmonth < 10)
             startmonth = '0' +startmonth;
         else
         startmonth = startmonth;
-        
+
         if(endmonth < 10){
-        endmonth = '0' +endmonth;    
+        endmonth = '0' +endmonth;
         }
         else{
-        endmonth = endmonth;    
+        endmonth = endmonth;
         }
         $('#mrp-lowerDate').val(startyear+'-'+startmonth);
         $('#mrp-upperDate').val(endyear+'-'+endmonth);
-       
+
         if(startyear == parseInt($('.mpr-calendar:first h5 span').html()))
         //$('.mpr-calendar:first .mpr-selected:first').css("background","#40667A");
         $('.mpr-month').css("color","black");
@@ -1202,79 +1288,79 @@ foreach($sampleType as $samples){
         $('.mpr-calendar:first .mpr-selected:first').css({"background-color": "#40667A","color":"#fff"});
         $('.mpr-calendar:last .mpr-selected:last').css({"background-color": "#40667A","color":"#fff"});
     }
-    
+
     function safeRound(val){
       return Math.round(((val)+ 0.00001) * 100) / 100;
     }
-    
+
     function doSampleResultAwaitedRedirect(frmSource){
        window.open("/labs/sample-result-awaited?src="+frmSource);
     }
-    
+
     function doSampleTestedRedirect(month){
       var selectedLabs = ($("#labName").val() == null)?'':$("#labName").val();
       window.open('/labs/samples-tested?month='+month+'&lab='+selectedLabs, '_blank');
     }
-    
+
     function doSampleTestedBasedonGenderRedirect(month,gender){
       var selectedLabs = ($("#labName").val() == null)?'':$("#labName").val();
       window.open('/labs/samples-tested?month='+month+'&gender='+gender+'&lab='+selectedLabs, '_blank');
     }
-    
+
     function doSampleTestedBasedonAgeRedirect(month,age){
       var selectedLabs = ($("#labName").val() == null)?'':$("#labName").val();
       window.open('/labs/samples-tested?month='+month+'&age='+age+'&lab='+selectedLabs, '_blank');
     }
-    
+
     function doSampleTestedBasedonPregnantPatientRedirect(month){
       var selectedLabs = ($("#labName").val() == null)?'':$("#labName").val();
       window.open('/labs/samples-tested?month='+month+'&gender=F&femaleFilter=P&lab='+selectedLabs, '_blank');
     }
-    
+
     function doSampleTestedBasedonBreastfeedingPatientRedirect(month){
       var selectedLabs = ($("#labName").val() == null)?'':$("#labName").val();
-      window.open('/labs/samples-tested?month='+month+'&gender=F&femaleFilter=BF&lab='+selectedLabs, '_blank');  
+      window.open('/labs/samples-tested?month='+month+'&gender=F&femaleFilter=BF&lab='+selectedLabs, '_blank');
     }
-    
+
     function doLabTATRedirect(month){
       var selectedLabs = ($("#labName").val() == null)?'':$("#labName").val();
       window.open('/times/dashboard?month='+month+'&lab='+selectedLabs, '_blank');
     }
-    
+
     function doRequisitionFormRedirect(month){
       var selectedLabs = ($("#labName").val() == null)?'':$("#labName").val();
       window.open('/labs/requisition-forms-incomplete?month='+month+'&lab='+selectedLabs, '_blank');
     }
-    
+
     function doSampleVolumeRedirect(labCode){
       window.open('/labs/sample-volume?fromMonth='+$('#mrp-lowerDate').val()+'&toMonth='+$('#mrp-upperDate').val()+'&lab='+labCode+'&result='+$("#sampleStatus").val(), '_blank');
     }
-    
+
     function doFemalePatientRedirect(field){
       var selectedLabs = ($("#labName").val() == null)?'':$("#labName").val();
       window.open('/labs/samples-tested?fromMonth='+$('#mrp-lowerDate').val()+'&toMonth='+$('#mrp-upperDate').val()+'&gender=F&femaleFilter='+field+'&lab='+selectedLabs, '_blank');
     }
-    
+
     function doLineofTreatmentRedirect(field){
       var selectedLabs = ($("#labName").val() == null)?'':$("#labName").val();
       window.open('/labs/samples-tested?fromMonth='+$('#mrp-lowerDate').val()+'&toMonth='+$('#mrp-upperDate').val()+'&lt='+field+'&lab='+selectedLabs, '_blank');
     }
-    
+
     function expandMap(){
        var selectedLabs = ($("#labName").val() == null)?'':$("#labName").val();
        window.open("/labs/get-facilities-geolocation?fromDate="+$('#mrp-lowerDate').val()+"&toDate="+$('#mrp-upperDate').val()+"&lab="+selectedLabs);
     }
-    
+
     $("#showDateRange").click(function(){
         $("#showDateRange").hide();
         $("#closeDateRange,.daterange-container").show();
     });
-    
+
     $("#closeDateRange").click(function(){
         $("#closeDateRange,.daterange-container").hide();
         $("#showDateRange").show();
     });
-    
+
     function resetDateFilter(){
        $('#dateFilter')[0].reset();
        $('#daterange-container span').html('<?php echo $this->translate('Choose Date Range'); ?>');
