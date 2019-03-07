@@ -4517,8 +4517,8 @@ print_r($sResult);die;
                                                         "DATE(vl.sample_collection_date) >='$startDate'"))
                                 ->group(array(new Expression("DATE_FORMAT(sample_collection_date, '%b %y')"),'f.facility_id'));
 
-        if(isset($parameters['facilityId']) && trim($parameters['facilityId'])!= ''){
-            $sQuery = $sQuery->where('vl.lab_id IN ('.$parameters['facilityId'].')');
+        if(isset($parameters['labID']) && trim($parameters['labID'])!= ''){
+            $sQuery = $sQuery->where('vl.lab_id IN ('.$parameters['labID'].')');
         }
         if (isset($sWhere) && $sWhere != "") {
             $sQuery->where($sWhere);

@@ -636,7 +636,7 @@ function sampleStatusDataTable(){
         var fromDate = $('#mrp-lowerDate').val();
         var toDate = $('#mrp-upperDate').val();
         var sampleType = ($("#sampleType").val() == null)?'':$("#sampleType").val();
-        var facilityId = ($("#labName").val() == null)?'':$("#labName").val().join(',');
+        var labID = ($("#labName").val() == null)?'':$("#labName").val().join(',');
         oTable = $('#sampleStatusTable').DataTable( {
             "bProcessing": true,
             "bDestroy": true,
@@ -661,7 +661,7 @@ function sampleStatusDataTable(){
                 aoData.push({ "name":"fromDate","value": fromDate});
                 aoData.push({ "name":"toDate","value": toDate});
                 //aoData.push({ "name":"sampleType","value": sampleType});
-                aoData.push({ "name":"facilityId","value": facilityId});
+                aoData.push({ "name":"labID","value": labID});
                 $.ajax({
                     "dataType": 'json',
                     "type": "POST",
