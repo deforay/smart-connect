@@ -4,6 +4,7 @@ namespace Api\Controller;
 
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\View\Model\JsonModel;
+use Zend\Json\Json;
 
 class UserController extends AbstractRestfulController
 {
@@ -12,12 +13,12 @@ class UserController extends AbstractRestfulController
         if($plugin->checkParams($params,array('userName','password'))){
             $userService = $this->getServiceLocator()->get('UserService');
             $response =$userService->userLoginApi($params);
-            return new JsonModel($response);
         }else{
             $response['status'] = '403';
             $response['message'] = 'Invalid or Missing Query Params';
-          return new JsonModel($response);
         }
+
+        return new JsonModel($response);
     }
 }   
 

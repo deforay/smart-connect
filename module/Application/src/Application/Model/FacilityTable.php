@@ -628,4 +628,24 @@ class FacilityTable extends AbstractTableGateway {
         $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
         return $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
     }
+
+    public function fetchAllFacilitiesInApi(){
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $sQuery = $sql->select()->from(array('f' => 'facility_details'))
+                    ->columns(array('facility_id','facility_name','facility_code'))
+                    ->join(array('lp'=>'location_details'),'lp.location_id=f.facility_state',array('state_name'=>'location_name'))
+                    ->join(array('ld'=>'location_details'),'ld.location_id=f.facility_district',array('district_name'=>'location_name'))
+                    ->order('facility_name asc');
+        $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
+        $rResult=$dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+        if(count($rResult)>0){
+            $result['status'] = '200';
+            $result['result'] = $rResult;
+        }else{
+            $result['status'] = '200';
+            $result['result'] = [];
+        }
+        return $result;
+    }
 }

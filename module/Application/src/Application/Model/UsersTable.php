@@ -340,13 +340,12 @@ class UsersTable extends AbstractTableGateway {
         if(trim($params['userName'])!="" && trim($params['password'])!=""){
             $username = $params['userName'];
             $password = $params['password'];
-            //\Zend\Debug\Debug::dump($params);die;
             $dbAdapter = $this->adapter;
             $sql = new Sql($dbAdapter);
 
             $sQuery = $sql->select()->from(array('u' => 'dash_users'))
                       ->join(array('r' => 'dash_user_roles'), 'u.role=r.role_id',array('role_code'))
-                      ->where(array('email' => $username, 'password' => $password,'u.status'=>'active'));
+                      ->where(array('email' => $username, 'password' => $password,'u.status'=>'active','role'=>'6'));
             $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
             $rResult=$dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
             if($rResult!=""){
@@ -377,7 +376,8 @@ class UsersTable extends AbstractTableGateway {
     }
 
     public function generateApiToken(){
-        $token = bin2hex(random_bytes(32));
+        //$token = bin2hex(random_bytes(32));
+        $token = bin2hex(openssl_random_pseudo_bytes(32));
         return $this->checkUserApiToken($token);
     }
 
