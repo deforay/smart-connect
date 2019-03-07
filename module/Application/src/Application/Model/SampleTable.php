@@ -4250,8 +4250,8 @@ class SampleTable extends AbstractTableGateway {
         /* Array of database columns which should be read and sent back to DataTables. Use a space where
          * you want to insert a non-database field (for example a counter or static image)
         */
-        $aColumns = array('sample_collection_date','facility_name','district','lab_name','total_samples_received','total_samples_tested','total_samples_rejected','total_hvl_samples','total_lvl_samples');
-        $orderColumns = array('sample_collection_date','facility_name','district','lab_name','total_samples_received','total_samples_tested','total_samples_rejected','total_hvl_samples','total_lvl_samples');
+        $aColumns = array('sample_collection_date','f.facility_name','f_d_l_d.location_name','l.facility_name');
+        $orderColumns = array('sample_collection_date','f.facility_name','f_d_l_d.location_name','l.facility_name','total_samples_received','total_samples_tested','total_samples_rejected','total_hvl_samples','total_lvl_samples');
 
         /*
          * Paging
@@ -4380,6 +4380,7 @@ class SampleTable extends AbstractTableGateway {
         $iQuery = $sql->select()->from(array('vl'=>'dash_vl_request_form'))
                         ->columns(array('vl_sample_id'))
                         ->join(array('f'=>'facility_details'),'f.facility_id=vl.facility_id',array('facility_name'),'left')
+                        ->join(array('l'=>'facility_details'),'l.facility_id=vl.lab_id',array('lab_name'=>'facility_name'),'left')
                         ->join(array('f_p_l_d'=>'location_details'),'f_p_l_d.location_id=f.facility_state',array('province'=>'location_name'),'left')
                         ->join(array('f_d_l_d'=>'location_details'),'f_d_l_d.location_id=f.facility_district',array('district'=>'location_name'),'left')
                         ->where(array("DATE(vl.sample_collection_date) <='$endDate'",
