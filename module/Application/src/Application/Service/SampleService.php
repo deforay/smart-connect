@@ -1833,4 +1833,125 @@ $i++;
         $sampleDb = $this->sm->get('SampleTable');
         return $sampleDb->fetchSourceData($params);
     }
+
+    public function generateSampleStatusResultExcel($params){
+        $queryContainer = new Container('query');
+        $translator = $this->sm->get('translator');
+        $common = new CommonService();
+        if(isset($queryContainer->sampleStatusResultQuery)){
+            try{
+                $dbAdapter = $this->sm->get('Zend\Db\Adapter\Adapter');
+                $sql = new Sql($dbAdapter);
+                $sQueryStr = $sql->getSqlStringForSqlObject($queryContainer->sampleStatusResultQuery);
+                
+                $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+                if(isset($sResult) && count($sResult)>0){
+                    $excel = new PHPExcel();
+                    $cacheMethod = \PHPExcel_CachedObjectStorageFactory::cache_to_phpTemp;
+                    $cacheSettings = array('memoryCacheSize' => '80MB');
+                    \PHPExcel_Settings::setCacheStorageMethod($cacheMethod, $cacheSettings);
+                    $sheet = $excel->getActiveSheet();
+                    $output = array();
+                    foreach ($sResult as $aRow) {
+                        $row = array();
+
+                        $row[]=$aRow['monthyear'];
+                        $row[] = ucwords($aRow['facility_name']);
+                        $row[]=$aRow['district'];
+                        $row[]=$aRow['lab_name'];
+	                    $row[]=$aRow['total_samples_received'];
+	                    $row[]=$aRow['total_samples_tested'];
+	                    $row[]=$aRow['total_samples_rejected'];
+	                    $row[]=$aRow['total_hvl_samples'];
+                        $row[]=$aRow['total_lvl_samples'];
+
+                        $output[] = $row;
+                    }
+                    $styleArray = array(
+                        'font' => array(
+                            'bold' => true,
+                        ),
+                        'alignment' => array(
+                            'horizontal' => \PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
+                            'vertical' => \PHPExcel_Style_Alignment::VERTICAL_CENTER,
+                        ),
+                        'borders' => array(
+                            'outline' => array(
+                                'style' => \PHPExcel_Style_Border::BORDER_THIN,
+                            ),
+                        )
+                    );
+                    $borderStyle = array(
+                        'alignment' => array(
+                            'horizontal' => \PHPExcel_Style_Alignment::HORIZONTAL_LEFT,
+                        ),
+                        'borders' => array(
+                            'outline' => array(
+                                'style' => \PHPExcel_Style_Border::BORDER_THIN,
+                            ),
+                        )
+                    );
+                    
+                    $sheet->setCellValue('A1', html_entity_decode($translator->translate('Month and Year'), ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
+                    $sheet->setCellValue('B1', html_entity_decode($translator->translate('Facility Name'), ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
+                    $sheet->setCellValue('C1', html_entity_decode($translator->translate('District'), ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
+                    $sheet->setCellValue('D1', html_entity_decode($translator->translate('Lab Name'), ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
+                    $sheet->setCellValue('E1', html_entity_decode($translator->translate('Samples Registered'), ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
+                    $sheet->setCellValue('F1', html_entity_decode($translator->translate('Samples Tested'), ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
+                    $sheet->setCellValue('G1', html_entity_decode($translator->translate('Samples Rejected'), ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
+                    $sheet->setCellValue('H1', html_entity_decode($translator->translate('No.Of High VL'), ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
+                    $sheet->setCellValue('I1', html_entity_decode($translator->translate('No.Of Low VL'), ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
+                    
+                   
+                    $sheet->getStyle('A1')->applyFromArray($styleArray);
+                    $sheet->getStyle('B1')->applyFromArray($styleArray);
+                    $sheet->getStyle('C1')->applyFromArray($styleArray);
+                    $sheet->getStyle('D1')->applyFromArray($styleArray);
+                    $sheet->getStyle('E1')->applyFromArray($styleArray);
+                    $sheet->getStyle('F1')->applyFromArray($styleArray);
+                    $sheet->getStyle('G1')->applyFromArray($styleArray);
+                    $sheet->getStyle('H1')->applyFromArray($styleArray);
+                    $sheet->getStyle('I1')->applyFromArray($styleArray);
+                    
+                    $currentRow = 2;
+                    foreach ($output as $rowData) {
+                        $colNo = 0;
+                        foreach ($rowData as $field => $value) {
+                            if (!isset($value)) {
+                                $value = "";
+                            }
+                            if($colNo > 8){
+                                break;
+                            }
+                            if (is_numeric($value)) {
+                                $sheet->getCellByColumnAndRow($colNo, $currentRow)->setValueExplicit(html_entity_decode($value, ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_NUMERIC);
+                            }else{
+                                $sheet->getCellByColumnAndRow($colNo, $currentRow)->setValueExplicit(html_entity_decode($value, ENT_QUOTES, 'UTF-8'), \PHPExcel_Cell_DataType::TYPE_STRING);
+                            }
+                            $cellName = $sheet->getCellByColumnAndRow($colNo, $currentRow)->getColumn();
+                            $sheet->getStyle($cellName . $currentRow)->applyFromArray($borderStyle);
+                            $sheet->getDefaultRowDimension()->setRowHeight(20);
+                            $sheet->getColumnDimensionByColumn($colNo)->setWidth(20);
+                            $sheet->getStyleByColumnAndRow($colNo, $currentRow)->getAlignment()->setWrapText(true);
+                            $colNo++;
+                        }
+                      $currentRow++;
+                    }
+                    $writer = \PHPExcel_IOFactory::createWriter($excel, 'Excel5');
+                    $filename = 'SAMPLE-STATUS-RESULT-REPORT--' . date('d-M-Y-H-i-s') . '.xls';
+                    $writer->save(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . $filename);
+                    return $filename;
+                }else{
+                    return "";
+                }
+             }catch (Exception $exc) {
+                error_log("SAMPLE-STATUS-RESULT-REPORT--" . $exc->getMessage());
+                error_log($exc->getTraceAsString());
+                return "";
+             }  
+        }else{
+            return "";
+        }
+        
+    }
 }

@@ -4527,7 +4527,7 @@ print_r($sResult);die;
         if (isset($sOrder) && $sOrder != "") {
             $sQuery->order($sOrder);
         }
-        $queryContainer->resultQuery = $sQuery;
+        $queryContainer->sampleStatusResultQuery = $sQuery;
         if (isset($sLimit) && isset($sOffset)) {
             $sQuery->limit($sLimit);
             $sQuery->offset($sOffset);
