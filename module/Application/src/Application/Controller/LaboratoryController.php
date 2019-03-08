@@ -21,12 +21,14 @@ class LaboratoryController extends AbstractActionController{
         $provinceName = $sampleService->getAllProvinceList();
         $districtName = $sampleService->getAllDistrictList();
         $testReasonName = $sampleService->getAllTestReasonName();
+        $clinicName = $sampleService->getAllClinicName();
         return new ViewModel(array(
                     'sampleType' => $sampleType,
                     'labName' => $labName,
                     'provinceName'=>$provinceName,
                     'districtName'=>$districtName,
-                    'testReason' => $testReasonName
+                    'testReason' => $testReasonName,
+                    'clinicName' => $clinicName,
                 ));
     }
     

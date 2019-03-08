@@ -4520,6 +4520,9 @@ print_r($sResult);die;
         if(isset($parameters['labID']) && trim($parameters['labID'])!= ''){
             $sQuery = $sQuery->where('vl.lab_id IN ('.$parameters['labID'].')');
         }
+        if(isset($parameters['clinicId']) && trim($parameters['clinicId'])!= ''){
+            $sQuery = $sQuery->where('vl.lab_id IN ('.$parameters['clinicId'].')');
+        }
         if (isset($sWhere) && $sWhere != "") {
             $sQuery->where($sWhere);
         }
@@ -4554,9 +4557,13 @@ print_r($sResult);die;
                         ->where(array("DATE(vl.sample_collection_date) <='$endDate'",
                         "DATE(vl.sample_collection_date) >='$startDate'"))                        
                         ->group(array(new Expression("DATE_FORMAT(sample_collection_date, '%b %y')"),'f.facility_id'));                                
+        
         if(isset($parameters['facilityId']) && trim($parameters['facilityId'])!= ''){
             $iQuery = $iQuery->where('vl.lab_id IN ('.$parameters['facilityId'].')');
-        }                        
+        } 
+        if(isset($parameters['clinicId']) && trim($parameters['clinicId'])!= ''){
+            $iQuery = $iQuery->where('vl.lab_id IN ('.$parameters['clinicId'].')');
+        }                       
         $iQueryStr = $sql->getSqlStringForSqlObject($iQuery);
         $iResult = $dbAdapter->query($iQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $iTotal = count($iResult);

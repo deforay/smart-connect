@@ -492,7 +492,7 @@ class SampleService {
         if($logincontainer->role!= 1){
             $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) >0)?$logincontainer->mappedFacilities:null;
         }
-
+        
         $facilityDb = $this->sm->get('FacilityTable');
         return $facilityDb->fetchAllClinicName($mappedFacilities);
     }
