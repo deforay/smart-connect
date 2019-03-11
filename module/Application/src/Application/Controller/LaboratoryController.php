@@ -875,20 +875,23 @@ class LaboratoryController extends AbstractActionController{
             $parameters = $request->getPost();
             $sampleService = $this->getServiceLocator()->get('SampleService');
             $result = $sampleService->getSampleStatusDataTable($parameters);
-            return $this->getResponse()->setContent(Json::encode($result));
-        }
-    }
-
-    public function exportSampleStatusResultExcelAction() {
-        $request = $this->getRequest();
-        if ($request->isPost()) {
-            $params = $request->getPost();
-            $sampleService = $this->getServiceLocator()->get('SampleService');
-            $file=$sampleService->generateSampleStatusResultExcel($params);
             $viewModel = new ViewModel();
-            $viewModel->setVariables(array('file' =>$file))
-                      ->setTerminal(true);
+            $viewModel->setVariables(array('result' => $result))
+                        ->setTerminal(true);
             return $viewModel;
         }
     }
+
+    // public function exportSampleStatusResultExcelAction() {
+    //     $request = $this->getRequest();
+    //     if ($request->isPost()) {
+    //         $params = $request->getPost();
+    //         $sampleService = $this->getServiceLocator()->get('SampleService');
+    //         $file=$sampleService->generateSampleStatusResultExcel($params);
+    //         $viewModel = new ViewModel();
+    //         $viewModel->setVariables(array('file' =>$file))
+    //                   ->setTerminal(true);
+    //         return $viewModel;
+    //     }
+    // }
 }

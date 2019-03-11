@@ -345,7 +345,7 @@ class UsersTable extends AbstractTableGateway {
 
             $sQuery = $sql->select()->from(array('u' => 'dash_users'))
                       ->join(array('r' => 'dash_user_roles'), 'u.role=r.role_id',array('role_code'))
-                      ->where(array('email' => $username, 'password' => $password,'u.status'=>'active','role'=>'6'));
+                      ->where(array('login_id' => $username, 'password' => $password,'u.status'=>'active','role'=>'6'));
             $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
             $rResult=$dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
             if($rResult!=""){
