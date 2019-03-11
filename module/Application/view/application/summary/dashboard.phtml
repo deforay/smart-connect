@@ -1118,6 +1118,11 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
                     <div class="caption" id="blockTitle">
                         <i class="fa fa-cogs"></i><?php echo $this->translate('SUMMARY OF KEY INDICATORS'); ?>
                     </div>
+                    <div class="actions" style="width:<?php echo (isset($languagecontainer->locale) &&  $languagecontainer->locale== 'pt_BR')?'36%':'44%'; ?>;">
+                        <div class="tools" id="exportHighVlSample" style="float:right;text-align:right;">
+                            <button class="btn btn-default" onclick="exportSummaryIndicatorResult();"><span><i class="fa fa-file-excel-o" aria-hidden="true"></i> <?php echo $this->translate('Export Excel'); ?></span></button>
+                        </div>&nbsp;&nbsp;
+                    </div>
                 </div>
                 <div class="portlet-body">
                 <div class="row">
@@ -1144,7 +1149,7 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
                             <option value="0" >Empty</option>
                         </select>
                     </div>
-                    <div class="col-lg-4" id="clinicHeight">
+                    <div class="col-lg-4">
                         <select style="width:100%" class="form-control" id="indClinicId" name="indClinicId[]" multiple title="<?php echo $this->translate('Please select one or more clinics. Leave blank for All'); ?>" >
                             <?php
                             foreach($clinicName as $clinic){
@@ -1679,5 +1684,19 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
         $("#indDistrictName").select2('val', '');
         $("#indProvinceName").select2('val', '');
         $('#indClinicId').select2('val', '');
+        getSummaryIndicators();
+    }
+
+    function exportSummaryIndicatorResult(){
+       $.blockUI.defaults.css.border = '1px solid grey';
+       $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI); 
+       $.post("<?php echo $this->url('summary', array('action' => 'export-indicator-result-excel')); ?>", {result : $("#sampleStatus").val()},
+        function(data){
+            if(data == "" || data == null || data == undefined){
+                alert('<?php echo $this->translate('Unable to export excel') ?>');
+            }else{
+                window.open('../temporary/'+data,'_blank');
+            }
+        }); 
     }
 </script>

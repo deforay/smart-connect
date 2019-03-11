@@ -6863,7 +6863,7 @@ print_r($sResult);die;
     }
     
     public function fetchKeySummaryIndicatorsDetails($params){
-        //\Zend\Debug\Debug::dump($params);die;
+        $queryContainer = new Container('query');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $summaryResult = array();
@@ -6894,9 +6894,10 @@ print_r($sResult);die;
         if(isset($params['clinics']) && trim($params['clinics'])!= ''){
             $samplesReceivedSummaryQuery = $samplesReceivedSummaryQuery->where('vl.facility_id IN (' . $params['clinics'] . ')');
         }
+
+        $queryContainer->indicatorSummaryQuery = $samplesReceivedSummaryQuery;
         $samplesReceivedSummaryCacheQuery = $sql->getSqlStringForSqlObject($samplesReceivedSummaryQuery);
         $samplesReceivedSummaryResult = $common->cacheQuery($samplesReceivedSummaryCacheQuery,$dbAdapter);
-        //echo $samplesReceivedSummaryCacheQuery;
         //\Zend\Debug\Debug::dump($samplesReceivedSummaryResult);die;
         $j = 0;
         foreach($samplesReceivedSummaryResult as $row){

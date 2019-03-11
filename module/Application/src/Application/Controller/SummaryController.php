@@ -204,4 +204,17 @@ class SummaryController extends AbstractActionController{
             return $viewModel;
         }
     }
+
+    public function exportIndicatorResultExcelAction() {
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $summaryService = $this->getServiceLocator()->get('SummaryService');
+            $file=$summaryService->exportIndicatorResultExcel($params);
+            $viewModel = new ViewModel();
+            $viewModel->setVariables(array('file' =>$file))
+                      ->setTerminal(true);
+            return $viewModel;
+        }
+    }
 }
