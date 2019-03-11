@@ -6862,7 +6862,8 @@ print_r($sResult);die;
        return array('adult1stLineofTreatmentResult'=>$adult1stLineofTreatmentResult,'adult1stLineofTreatmentOthersResult'=>$adult1stLineofTreatmentOthersResult,'paeds1stLineofTreatmentResult'=>$paeds1stLineofTreatmentResult,'paeds1stLineofTreatmentOthersResult'=>$paeds1stLineofTreatmentOthersResult,'adult2ndLineofTreatmentResult'=>$adult2ndLineofTreatmentResult,'adult2ndLineofTreatmentOthersResult'=>$adult2ndLineofTreatmentOthersResult,'paeds2ndLineofTreatmentResult'=>$paeds2ndLineofTreatmentResult,'paeds2ndLineofTreatmentOthersResult'=>$paeds2ndLineofTreatmentOthersResult,'otherLineofTreatmentResult'=>$otherLineofTreatmentResult);
     }
     
-    public function fetchKeySummaryIndicatorsDetails(){
+    public function fetchKeySummaryIndicatorsDetails($params){
+        //\Zend\Debug\Debug::dump($params);die;
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $summaryResult = array();
@@ -6879,9 +6880,20 @@ print_r($sResult);die;
                                                     "total_suppressed_samples" => new Expression("SUM(CASE WHEN ((vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' )) THEN 1 ELSE 0 END)"),
                                                 )
                                             )
+                                            ->join(array('f'=>'facility_details'), 'f.facility_id = vl.facility_id')
                                             ->where("sample_collection_date <= NOW()")
                                             ->where("sample_collection_date >= DATE_ADD(Now(),interval - 12 month)")
                                             ->group(array(new Expression('YEAR(sample_collection_date)'),new Expression('MONTH(sample_collection_date)')));
+        
+        if(isset($params['provinces']) && trim($params['provinces'])!= ''){
+            $samplesReceivedSummaryQuery = $samplesReceivedSummaryQuery->where('f.facility_state IN (' .$params['provinces']. ')');
+        }
+        if(isset($params['districts']) && trim($params['districts'])!= ''){
+            $samplesReceivedSummaryQuery = $samplesReceivedSummaryQuery->where('f.facility_district IN (' .$params['districts']. ')');
+        }
+        if(isset($params['clinics']) && trim($params['clinics'])!= ''){
+            $samplesReceivedSummaryQuery = $samplesReceivedSummaryQuery->where('vl.facility_id IN (' . $params['clinics'] . ')');
+        }
         $samplesReceivedSummaryCacheQuery = $sql->getSqlStringForSqlObject($samplesReceivedSummaryQuery);
         $samplesReceivedSummaryResult = $common->cacheQuery($samplesReceivedSummaryCacheQuery,$dbAdapter);
         //echo $samplesReceivedSummaryCacheQuery;

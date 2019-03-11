@@ -1109,6 +1109,7 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
   </div>
 </div>
 <br>
+
 <div class="row">
     <div class="col-md-12 col-sm-12">
         <div class="portlet box">
@@ -1119,27 +1120,51 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
                     </div>
                 </div>
                 <div class="portlet-body">
-                    <div class="table-toolbar" id="keyIndicatorsSummary" style="overflow-x:scroll;">
-                        <table class="table table-striped table-bordered table-hover" id="keyIndicatorsSummary">
-                            <thead>
-                                <tr>
-                                    <th> <?php echo $this->translate('Months'); ?> </th>
-                                    <?php foreach($keySummaryIndicators['month'] as $key=>$month){ ?>
-                                        <th> <?php echo $month ;?> </th>
-                                    <?php } ?>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach($keySummaryIndicators['sample'] as $key=>$indicators){ ?>
-                                <tr>
-                                    <td><?php echo strtoupper($this->translate(str_replace('-',' ',$key)));?></td>
-                                    <?php foreach($indicators['month'] as $months){ ?>
-                                       <td><?php echo $months;?></td>
-                                    <?php } ?>
-                                </tr>
-                                <?php } ?>
-                            </tbody>
-                        </table>
+                <div class="row">
+                    <div class="col-md-3">
+                        <select style="width:100%" name="indProvinceName[]" id="indProvinceName" multiple class="form-control" title="<?php echo $this->translate('Please select one or more province. Leave blank for All'); ?>" onchange="selectDistrictName();">
+                            <?php
+                            foreach($provinceName as $province){
+                                ?>
+                                <option value="<?php echo $province['location_id']; ?>"><?php echo $province['location_name'];?></option>
+                                <?php
+                            }
+                            ?>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select style="width:100%" name="indDistrictName[]" id="indDistrictName" multiple class="form-control" title="<?php echo $this->translate('Please select one or more district. Leave blank for All'); ?>" onchange="selectClinicName();">
+                            <?php
+                            foreach($districtName as $district){
+                                ?>
+                                <option data-parent-location="<?php echo $district['parent_location']; ?>" value="<?php echo $district['location_id']; ?>"><?php echo $district['location_name'];?></option>
+                                <?php
+                            }
+                            ?>
+                            <option value="0" >Empty</option>
+                        </select>
+                    </div>
+                    <div class="col-lg-4" id="clinicHeight">
+                        <select style="width:100%" class="form-control" id="indClinicId" name="indClinicId[]" multiple title="<?php echo $this->translate('Please select one or more clinics. Leave blank for All'); ?>" >
+                            <?php
+                            foreach($clinicName as $clinic){
+                                ?>
+                                <option value="<?php echo $clinic['facility_id']; ?>" data-district="<?php echo $clinic['facility_district'];?>" ><?php echo $clinic['facility_code']." - ".$clinic['facility_name'];?></option>
+                                <?php
+                            }
+                            ?>
+                        </select>
+                    </div>
+                    <div class="col-lg-2">
+                        <div class="form-group" style="">
+                            <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="getSummaryIndicators();"><?php echo $this->translate('Search'); ?></a> 
+                            <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="resetIndicators();"><?php echo $this->translate('Reset'); ?></a>
+                        </div>
+                    </div>
+                </div>
+
+                    <div class="table-toolbar" id="keyIndicatorsSummary" style="overflow-x:scroll;" >
+                            
                     </div>
                 </div>
             </div>
@@ -1182,7 +1207,7 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
       facilityWiseSamplesRejectedSummaryFn();
       provinceWiseSamplesRejectedSummaryFn();
       regimenGroupsSummaryFn();
-
+      getSummaryIndicators();
       /* District ,Province and Facilities */     
     $('#provinceName').select2({
         placeholder: "<?php echo $this->translate('All Province'); ?>",
@@ -1216,6 +1241,19 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
         var uldiv = $(this).siblings('span.select2').find('ul');
         var count = uldiv.find('li').length - 1;
         uldiv.html("<li>"+count+" items selected</li>");
+    });
+
+    $('#indProvinceName').select2({
+        placeholder: "<?php echo $this->translate('All Province'); ?>",
+        allowClear: true
+    });
+    $('#indDistrictName').select2({
+        placeholder: "<?php echo $this->translate('All Districts'); ?>",
+        allowClear: true,
+    });
+    $('#indClinicId').select2({
+        placeholder: "<?php echo $this->translate('All Facilities'); ?>",
+        allowClear: true
     });
     });
     
@@ -1622,5 +1660,24 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
             }
         }
         $('#clinicId').select2('val', $("#clinicId").val());
+    }
+
+    function getSummaryIndicators(){
+        $.blockUI();
+        var indDistrictIdList = ($("#indDistrictName").val() == null)?'':$("#indDistrictName").val().join(',');
+        var indProvinceIdList = ($("#indProvinceName").val() == null)?'':$("#indProvinceName").val().join(',');
+        var indClinicIdList = ($("#indClinicId").val() == null)?'':$('#indClinicId').val().join(',');
+
+        $.post("<?php echo $this->url('summary', array('action' => 'get-indicators')); ?>",{ districts : indDistrictIdList, provinces : indProvinceIdList , clinics : indClinicIdList },
+        function(data) {
+            $("#keyIndicatorsSummary").html(data);
+            $.unblockUI();
+        });
+    }
+
+    function resetIndicators(){
+        $("#indDistrictName").select2('val', '');
+        $("#indProvinceName").select2('val', '');
+        $('#indClinicId').select2('val', '');
     }
 </script>

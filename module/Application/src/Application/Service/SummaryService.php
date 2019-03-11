@@ -27,9 +27,9 @@ class SummaryService {
         return $sampleDb->getSummaryTabDetails();
     }
     
-    public function getKeySummaryIndicatorsDetails(){
+    public function getKeySummaryIndicatorsDetails($params){
         $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->fetchKeySummaryIndicatorsDetails();
+        return $sampleDb->fetchKeySummaryIndicatorsDetails($params);
     }
     
     public function getSamplesReceivedBarChartDetails($params){

@@ -12,12 +12,11 @@ class SummaryController extends AbstractActionController{
         $this->layout()->setVariable('activeTab', 'summary-dashboard');
         return $this->_redirect()->toUrl('/summary/dashboard'); 
     }
-
+    
     public function dashboardAction(){
         $this->layout()->setVariable('activeTab', 'summary-dashboard');
         $summaryService = $this->getServiceLocator()->get('SummaryService');
         $summaryTabResult = $summaryService->fetchSummaryTabDetails(); 
-        $keySummaryIndicatorsResult = $summaryService->getKeySummaryIndicatorsDetails();
         $allLineofTreatmentResult = $summaryService->getAllLineOfTreatmentDetails();
         $allCollapsibleLineofTreatmentResult = $summaryService->getAllCollapsibleLineOfTreatmentDetails();
         
@@ -30,7 +29,6 @@ class SummaryController extends AbstractActionController{
 
         return new ViewModel(array(
             'summaryTabInfo' => $summaryTabResult,
-            'keySummaryIndicators' => $keySummaryIndicatorsResult,
             'allLineofTreatmentInfo' => $allLineofTreatmentResult,
             'allCollapsibleLineofTreatmentResult'=>$allCollapsibleLineofTreatmentResult,
 
@@ -190,6 +188,20 @@ class SummaryController extends AbstractActionController{
             $summaryService = $this->getServiceLocator()->get('SummaryService');
             $result = $summaryService->getRegimenGroupSamplesDetails($parameters);
             return $this->getResponse()->setContent(Json::encode($result));
+        }
+    }
+
+    public function getIndicatorsAction() {
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $summaryService = $this->getServiceLocator()->get('SummaryService');
+            $keySummaryIndicatorsResult = $summaryService->getKeySummaryIndicatorsDetails($params);
+            $viewModel = new ViewModel();
+            $viewModel->setVariables(array(
+                            'keySummaryIndicators' => $keySummaryIndicatorsResult,
+                        ))->setTerminal(true);
+            return $viewModel;
         }
     }
 }
