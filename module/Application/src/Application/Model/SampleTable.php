@@ -4426,9 +4426,9 @@ class SampleTable extends AbstractTableGateway {
         $queryContainer = new Container('query');
        
 
-        $parameters['quarter'] = 4;
-        $parameters['year'] = 2018;
-        if(isset($parameters['quarter'])){
+        //$parameters['quarter'] = 4;
+        //$parameters['year'] = 2018;
+        if(isset($parameters['quarter']) && $parameters['quarter'] != ""){
             $quarterArray = $this->getMonthsByQuarter($parameters['quarter']);
             $quarters = implode(",",$quarterArray);
         }else{
@@ -4437,7 +4437,7 @@ class SampleTable extends AbstractTableGateway {
             $quarters = implode(",",$quarterArray);
         }
 
-        if(isset($parameters['year'])){
+        if(isset($parameters['year']) && $parameters['year'] !=""){
             $year = $parameters['year'];
         }else{
             $year = date('Y');
