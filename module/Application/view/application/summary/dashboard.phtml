@@ -589,7 +589,7 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
         echo "&nbsp;&nbsp;&nbsp;<b>". $this->translate('Number of samples on 1st line Current Regimen') ." = ".$summaryTabInfo[0]["1st_line_of_current_regimen_samples"]."</b>";
         echo "&nbsp;&nbsp;&nbsp;<b>". $this->translate('Total number of samples having valid Current Regimen') ." = ".$summaryTabInfo[0]["all_current_regimen_samples"]."</b>";
         ?>
-        <div><br/>
+        </div><br/>
             <div class="col-md-3">
                 <select style="width:100%" name="provinceName[]" id="provinceName" class="form-control" multiple title="<?php echo $this->translate('Please select one or more province. Leave blank for All'); ?>" onchange="selectDistrictName();">
                     <?php
