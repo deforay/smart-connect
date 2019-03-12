@@ -10,6 +10,7 @@ $startDate = date('Y-m', strtotime('+1 month', strtotime('-1 year')));
 $endDate = date('Y-m');
 ?>
 <style>
+
 .bluebox, .dashboard-stat2{
     border:1px solid #3598DC;
 }
@@ -159,7 +160,16 @@ $endDate = date('Y-m');
         margin-left:52% !important;
     }
 }
+
+.select2-container--default .select2-selection--single{
+    height:34px !important;
+}
 </style>
+
+<link
+	href="https://cdn.datatables.net/buttons/1.1.0/css/buttons.dataTables.min.css"
+	rel="stylesheet">
+
 <?php
 $sType = '';
 foreach ($sampleType as $samples) {
@@ -564,48 +574,50 @@ foreach ($testReason as $test) {
                             <div class="caption">
                                 <i class="fa fa-cogs"></i><?php echo $this->translate('Sample Overview'); ?>
                             </div>
-                            <div class="actions" style="width:<?php echo (isset($languagecontainer->locale) &&  $languagecontainer->locale== 'pt_BR')?'36%':'44%'; ?>;">
-                                <div class="btn-group" style="width:70%;float:left;">
-                                    <select id="clinicId" class="form-control">
-                                        <option value="">--All Facilities--</option>
-                                        <?php
-                                        foreach ($clinicName as $clinic) {
-                                        ?>
-                                        <option value="<?php echo $clinic['facility_id']; ?>" data-district="<?php echo $clinic['facility_district'];?>"><?php echo $clinic['facility_code']." - ".$clinic['facility_name'];?></option>
-                                        <?php
-                                        }
-                                        ?>
-                                    </select>
-                                </div>
-
-                                <div class="tools" id="exportHighVlSample" style="float:right;text-align:right;">
-                                    <button class="btn btn-default" onclick="exportSampleResult();"><span><i class="fa fa-file-excel-o" aria-hidden="true"></i> <?php echo $this->translate('Export Excel'); ?></span></button>
-                                </div>&nbsp;&nbsp;
-                                
-                            </div>
+                            
+                            
                         </div>
                         <div class="portlet-body">
-                            <div class="table-toolbar">
-                                <table class="table table-striped table-bordered table-hover order-column" id="sampleStatusTable">
-                                    <thead>
-                                        <tr>
-                                            <th> <?php echo $this->translate('Month and Year'); ?> </th>
-                                            <th> <?php echo $this->translate('Facility Name'); ?> </th>
-                                            <th> <?php echo $this->translate('District'); ?></th>
-                                            <th> <?php echo $this->translate('Lab Name'); ?> </th>                                            
-                                            <th> <?php echo $this->translate('Samples Registered'); ?></th>
-                                            <th> <?php echo $this->translate('Samples Tested'); ?></th>
-                                            <th> <?php echo $this->translate('Samples Rejected'); ?></th>
-                                            <th> <?php echo $this->translate('No. of High VL'); ?> </th>
-                                            <th> <?php echo $this->translate('No. of Low VL'); ?> </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td colspan="7" class="dataTables_empty">Loading data from server</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+
+                            <div class="form-inline" style="clear:both !important;width:100% !important;">
+                                
+                                <select id="quarter" class="form-control" style="width:100px;">
+                                        <option value="">Quarter</option>
+                                        <option value="1">Q1</option>
+                                        <option value="2">Q2</option>
+                                        <option value="3">Q3</option>
+                                        <option value="4">Q4</option>
+                                </select>
+                                <select id="year" class="form-control" style="width:100px;">
+                                        <option value="">Year</option>
+                                        <?php 
+                                        $year = date('Y');
+                                        for($i=$year; $i>=($year-5); $i--){
+                                            ?>
+                                            <option value="<?php echo $i; ?>"><?php echo $i; ?></option>
+                                            <?php
+                                        }
+
+
+                                        ?>
+                                    </select>      
+                                    <div class="btn-group" style="width:300px;">                          
+                                        <select id="clinicId" class="form-control">
+                                            <option value="">--All Facilities--</option>
+                                            <?php
+                                            foreach ($clinicName as $clinic) {
+                                            ?>
+                                            <option value="<?php echo $clinic['facility_id']; ?>" data-district="<?php echo $clinic['facility_district'];?>"><?php echo $clinic['facility_code']." - ".$clinic['facility_name'];?></option>
+                                            <?php
+                                            }
+                                            ?>
+                                        </select>
+                                    </div>  
+                                    <button class="btn btn-primary" onclick="sampleStatusDataTable();return false;"><span>Filter</span></button>                      
+                                </div>       
+                                <br>                 
+                            <div class="table-toolbar" id="sampleStatusDataTableDiv">
+                                
                             </div>
                         </div>
                     </div>
@@ -635,6 +647,23 @@ foreach ($testReason as $test) {
     </div>
     <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAFpbfAKFJZ8Ps7yAGIDZtD4EeBlsb_ANA"></script>
     <script src="<?php echo $this->basePath('assets/pages/scripts/dashboard.js'); ?>" type="text/javascript"></script>
+    <script src="https://cdn.datatables.net/1.10.10/js/jquery.dataTables.min.js"></script>
+
+<script
+	src="https://cdn.datatables.net/buttons/1.1.0/js/dataTables.buttons.min.js"></script>
+<script
+	src="https://cdn.datatables.net/buttons/1.1.0/js/buttons.flash.min.js"></script>
+<script
+	src="https://cdnjs.cloudflare.com/ajax/libs/jszip/2.5.0/jszip.min.js"></script>
+<script
+	src="https://cdn.rawgit.com/bpampuch/pdfmake/0.1.18/build/pdfmake.min.js"></script>
+<script
+	src="https://cdn.rawgit.com/bpampuch/pdfmake/0.1.18/build/vfs_fonts.js"></script>
+
+<script
+	src="https://cdn.datatables.net/buttons/1.1.0/js/buttons.print.min.js"></script>
+
+
     <script>
     //var gfxPath = 'https://raw.githubusercontent.com/highslide-software/pattern-fill/master/graphics/';
     var startDate;
@@ -656,42 +685,25 @@ function sampleStatusDataTable(){
         var toDate = $('#mrp-upperDate').val();
         var sampleType = ($("#sampleType").val() == null)?'':$("#sampleType").val();
         var labID = ($("#labName").val() == null)?'':$("#labName").val().join(',');
+        var clinicId = $("#clinicId").val();
+        var year = $("#year").val();
+        var quarter = $("#quarter").val();
         
-        oTable = $('#sampleStatusTable').DataTable( {
-            "bProcessing": true,
-            "bDestroy": true,
-            "bRetrieve": false,
-            "bServerSide": true,
-            "aoColumns": [
-                {"sClass":"center"},
-                {"sClass":"center"},
-                {"sClass":"center"},
-                {"sClass":"center"},
-                {"sClass":"center"},
-                {"sClass":"center"},
-                {"sClass":"center"},
-                {"sClass":"center"},
-                {"sClass":"center"},
-                ],
-            "iDisplayLength": 10,
-            "aaSorting": [[ 0, "desc" ]],
+        $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-status-data-table')); ?>",{fromDate:fromDate,toDate:toDate,sampleType:sampleType,labID:labID,clinicId:clinicId,quarter:quarter,year:year},
+        function(data) {
+            $("#sampleStatusDataTableDiv").html(data);
+            $("#sampleStatusTable").DataTable({
+			dom : 'Bfrtip',
+			buttons : [{
+	            extend: 'excelHtml5',
+	            text: 'Export To Excel',
+	            title:'SampleStatus-VLDashboard',
+	            extension:'.xlsx'
+	        }]
+		    });
+        });
 
-            "sAjaxSource": "<?php echo $this->url('laboratory', array('action' => 'get-sample-status-data-table')); ?>",
-            "fnServerData": function ( sSource, aoData, fnCallback ) {
-                aoData.push({ "name":"fromDate","value": fromDate});
-                aoData.push({ "name":"toDate","value": toDate});
-                //aoData.push({ "name":"sampleType","value": sampleType});
-                aoData.push({ "name":"labID","value": labID});
-                aoData.push({ "name":"clinicId","value": $("#clinicId").val()});
-                $.ajax({
-                    "dataType": 'json',
-                    "type": "POST",
-                    "url": sSource,
-                    "data": aoData,
-                    "success": fnCallback
-                });
-            }
-        } );
+        
     }
 
     function getTestedSampleResult(){
@@ -941,10 +953,10 @@ function sampleStatusDataTable(){
         });
 
         $('#clinicId').select2({
-            placeholder: "All Facilities",
+            placeholder: "<?php echo $this->translate('All Facilities'); ?>",
             allowClear: true
         }).on("change", function(e) {
-            oTable.draw();
+            
         });
 
         var start = moment().subtract(12, 'months');
@@ -1429,16 +1441,16 @@ function sampleStatusDataTable(){
         showModal('labs/expand-bar-chart/?fromDate='+fromDate+'&toDate='+toDate+'&facilityId='+facilityId+'&from='+from,'800','450');
     }
 
-    function exportSampleResult(){
-       $.blockUI.defaults.css.border = '1px solid grey';
-       $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI); 
-       $.post("<?php echo $this->url('laboratory', array('action' => 'export-sample-status-result-excel')); ?>", {result : $("#sampleStatus").val()},
-        function(data){
-            if(data == "" || data == null || data == undefined){
-                alert('<?php echo $this->translate('Unable to export excel') ?>');
-            }else{
-                window.open('../temporary/'+data,'_blank');
-            }
-        }); 
-    }
+    // function exportSampleResult(){
+    //    $.blockUI.defaults.css.border = '1px solid grey';
+    //    $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI); 
+    //    $.post("<?php echo $this->url('laboratory', array('action' => 'export-sample-status-result-excel')); ?>", {result : $("#sampleStatus").val()},
+    //     function(data){
+    //         if(data == "" || data == null || data == undefined){
+    //             alert('<?php echo $this->translate('Unable to export excel') ?>');
+    //         }else{
+    //             window.open('../temporary/'+data,'_blank');
+    //         }
+    //     }); 
+    // }
 </script>

@@ -36,6 +36,7 @@ class ClinicController extends AbstractActionController{
             $params = $request->getPost();
             $sampleService = $this->getServiceLocator()->get('SampleService');
             $chartResult = $sampleService->getOverallViralLoadStatus($params);
+            //var_dump($chartResult);die;
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('chartResult'=>$chartResult))
                         ->setTerminal(true);
