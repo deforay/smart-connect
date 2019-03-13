@@ -1,7 +1,6 @@
 <?php
-
+if(count($result)>0){
 $colors = array('DBS' => '#FFD55A','PLASMA' => '#869EA7', 'OTHERS' =>'black' );
-
 ?>
 <div id="samplesReceivedBarChartData" style="min-height:600px;"></div>
 <script>
@@ -92,3 +91,9 @@ $colors = array('DBS' => '#FFD55A','PLASMA' => '#869EA7', 'OTHERS' =>'black' );
           });
       });
 </script>
+
+<?php }else{
+?>
+<h3 style="text-align:center;">No data available</h3>
+<?php
+} ?>

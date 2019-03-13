@@ -4888,7 +4888,6 @@ class SampleTable extends AbstractTableGateway {
     }
     
     public function fetchSamplesReceivedBarChartDetails($params){
-
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result=array();
@@ -4907,6 +4906,19 @@ class SampleTable extends AbstractTableGateway {
                                 ->where("sample_collection_date <= NOW()")
                                 ->where("sample_collection_date >= DATE_ADD(Now(),interval - 12 month)")
                                 ->group(array(new Expression('YEAR(vl.sample_collection_date)'),new Expression('MONTH(vl.sample_collection_date)')));
+        
+        if(trim($params['provinces'])!= '' || trim($params['districts'])!= '' || trim($params['clinics'])!= ''){
+            $sQuery=$sQuery->join(array('f'=>'facility_details'),'f.facility_id=vl.facility_id',array('facility_name'));
+        }
+        if(isset($params['provinces']) && trim($params['provinces'])!= ''){
+            $sQuery = $sQuery->where('f.facility_state IN (' .$params['provinces']. ')');
+        }
+        if(isset($params['districts']) && trim($params['districts'])!= ''){
+            $sQuery = $sQuery->where('f.facility_district IN (' .$params['districts']. ')');
+        }
+        if(isset($params['clinics']) && trim($params['clinics'])!= ''){
+            $sQuery = $sQuery->where('vl.facility_id IN (' . $params['clinics'] . ')');
+        }
         $queryStr = $sql->getSqlStringForSqlObject($sQuery);
         //echo $queryStr;die;
         //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -5449,6 +5461,21 @@ class SampleTable extends AbstractTableGateway {
                         ->where("sample_collection_date <= NOW()")
                         ->where("sample_collection_date >= DATE_ADD(Now(),interval - 12 month)")
                         ->group(array(new Expression('YEAR(sample_collection_date)'),new Expression('MONTH(sample_collection_date)')));
+        
+        if(trim($params['provinces'])!= '' || trim($params['districts'])!= '' || trim($params['clinics'])!= ''){
+            $sQuery=$sQuery->join(array('f'=>'facility_details'),'f.facility_id=vl.facility_id',array('facility_name'));
+        }
+
+        if(isset($params['provinces']) && trim($params['provinces'])!= ''){
+            $sQuery = $sQuery->where('f.facility_state IN (' .$params['provinces']. ')');
+        }
+        if(isset($params['districts']) && trim($params['districts'])!= ''){
+            $sQuery = $sQuery->where('f.facility_district IN (' .$params['districts']. ')');
+        }
+        
+        if(isset($params['clinics']) && trim($params['clinics'])!= ''){
+            $sQuery = $sQuery->where('vl.facility_id IN (' . $params['clinics'] . ')');
+        }
         $queryStr = $sql->getSqlStringForSqlObject($sQuery);
         //echo $queryStr;die;
         //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -5965,6 +5992,19 @@ class SampleTable extends AbstractTableGateway {
                                   ->group('vl.reason_for_sample_rejection')
                                   ->order('rejections DESC')
                                   ->limit(4);
+        
+        if(trim($params['provinces'])!= '' || trim($params['districts'])!= '' || trim($params['clinics'])!= ''){
+            $mostRejectionQuery=$mostRejectionQuery->join(array('f'=>'facility_details'),'f.facility_id=vl.facility_id',array('facility_name'));
+        }
+        if(isset($params['provinces']) && trim($params['provinces'])!= ''){
+            $mostRejectionQuery = $mostRejectionQuery->where('f.facility_state IN (' .$params['provinces']. ')');
+        }
+        if(isset($params['districts']) && trim($params['districts'])!= ''){
+            $mostRejectionQuery = $mostRejectionQuery->where('f.facility_district IN (' .$params['districts']. ')');
+        }
+        if(isset($params['clinics']) && trim($params['clinics'])!= ''){
+            $mostRejectionQuery = $mostRejectionQuery->where('vl.facility_id IN (' . $params['clinics'] . ')');
+        }
         $mostRejectionQueryStr = $sql->getSqlStringForSqlObject($mostRejectionQuery);
         $mostRejectionResult = $dbAdapter->query($mostRejectionQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         if(isset($mostRejectionResult) && count($mostRejectionResult) >0){
@@ -5985,6 +6025,20 @@ class SampleTable extends AbstractTableGateway {
                                       ->columns(array('rejections' => new Expression('COUNT(*)')))                    
                                       ->join(array('r_r_r'=>'r_sample_rejection_reasons'),'r_r_r.rejection_reason_id=vl.reason_for_sample_rejection',array('rejection_reason_name'))
                                       ->where("Month(sample_collection_date)='".$month."' AND Year(sample_collection_date)='".$year."'");
+                
+                
+                if(trim($params['provinces'])!= '' || trim($params['districts'])!= '' || trim($params['clinics'])!= ''){
+                    $rejectionQuery=$rejectionQuery->join(array('f'=>'facility_details'),'f.facility_id=vl.facility_id',array('facility_name'));
+                }
+                if(isset($params['provinces']) && trim($params['provinces'])!= ''){
+                    $rejectionQuery = $rejectionQuery->where('f.facility_state IN (' .$params['provinces']. ')');
+                }
+                if(isset($params['districts']) && trim($params['districts'])!= ''){
+                    $rejectionQuery = $rejectionQuery->where('f.facility_district IN (' .$params['districts']. ')');
+                }
+                if(isset($params['clinics']) && trim($params['clinics'])!= ''){
+                    $rejectionQuery = $rejectionQuery->where('vl.facility_id IN (' . $params['clinics'] . ')');
+                }
                 if($mostRejectionReasons[$m] == 0){
                     $rejectionQuery = $rejectionQuery->where('vl.reason_for_sample_rejection is not null and vl.reason_for_sample_rejection!= "" and vl.reason_for_sample_rejection NOT IN("' . implode('", "', $mostRejectionReasons) . '")');
                 }else{
