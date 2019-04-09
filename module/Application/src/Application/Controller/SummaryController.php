@@ -26,7 +26,7 @@ class SummaryController extends AbstractActionController{
         $provinceName = $sampleService->getAllProvinceList();
         $districtName = $sampleService->getAllDistrictList();
         /* Ends Here*/   
-
+        
         return new ViewModel(array(
             'summaryTabInfo' => $summaryTabResult,
             'allLineofTreatmentInfo' => $allLineofTreatmentResult,
