@@ -63,9 +63,9 @@
             name: '<?php echo $this->translate('Sample'); ?>',
             showInLegend: false, 
             data: [
-                    { y : <?php echo (isset($chartResult[0]['totalCollected']))?$chartResult[0]['totalCollected']:0; ?> , color : '#EEEEFF' },
+                    { y : <?php echo (isset($chartResult[0]['totalCollected']))?$chartResult[0]['totalCollected']:0; ?> , color : '#6e6e9e' },
                     { y : <?php echo (isset($chartResult[0]['testedTotal']))?$chartResult[0]['testedTotal']:0; ?> , color : '#039BE6' },
-                    { y : <?php echo (isset($chartResult[0]['notTestedTotal']))?$chartResult[0]['notTestedTotal']:0; ?> , color : '#AAAAAA' },
+                    { y : <?php echo (isset($chartResult[0]['notTestedTotal']))?$chartResult[0]['notTestedTotal']:0; ?> , color : '#492828' },
                     { y : <?php echo (isset($chartResult[0]['lessThan1000']))?$chartResult[0]['lessThan1000']:0; ?> , color : '#60d18f' },
                     { y : <?php echo (isset($chartResult[0]['greaterThan1000']))?$chartResult[0]['greaterThan1000']:0; ?> , color : '#ff1900' }
                 ],

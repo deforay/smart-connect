@@ -73,7 +73,7 @@ class SampleService {
                                           'patient_gender'=>(trim($sheetData[$i]['C'])!='' ? trim($sheetData[$i]['C']) :  NULL),
                                           'patient_age_in_years'=>(trim($sheetData[$i]['D'])!='' ? trim($sheetData[$i]['D']) :  NULL),
                                           'sample_collection_date'=>$sampleCollectionDate,
-                                          'sample_received_at_vl_lab'=>$sampleReceivedAtLab,
+                                          'sample_received_at_vl_lab_datetime'=>$sampleReceivedAtLab,
                                           'line_of_treatment'=>(trim($sheetData[$i]['AT'])!='' ? trim($sheetData[$i]['AT']) :  NULL),
                                           'is_sample_rejected'=>(trim($sheetData[$i]['AU'])!='' ? trim($sheetData[$i]['AU']) :  NULL),
                                           'is_patient_pregnant'=>(trim($sheetData[$i]['AX'])!='' ? trim($sheetData[$i]['AX']) :  NULL),
@@ -1596,6 +1596,7 @@ $i++;
                                 $dateOfInitiationOfRegimen = (trim($sheetData[$i]['BA'])!='' ? trim(date('Y-m-d H:i', strtotime($sheetData[$i]['BA']))) :  null);
                                 $resultApprovedDateTime = (trim($sheetData[$i]['BD'])!='' ? trim(date('Y-m-d H:i', strtotime($sheetData[$i]['BD']))) :  null);
                                 $sampleTestedDateTime = (trim($sheetData[$i]['AJ'])!='' ? trim(date('Y-m-d H:i', strtotime($sheetData[$i]['AJ']))) :  null);
+                                $sampleRegisteredAtLabDateTime = (trim($sheetData[$i]['BH'])!='' ? trim(date('Y-m-d H:i', strtotime($sheetData[$i]['BH']))) :  null);
                                 
                                     
 
@@ -1625,6 +1626,7 @@ $i++;
                                         'DashVL_Abs' =>   $DashVL_Abs,
                                         'DashVL_AnalysisResult' =>   $DashVL_AnalysisResult,
                                         'current_regimen'=>(trim($sheetData[$i]['BG'])!='' ? trim($sheetData[$i]['BG']) :  NULL),                                   
+                                        'sample_registered_at_lab'=>$sampleRegisteredAtLabDateTime
                                 );
                                 
 
@@ -1954,4 +1956,15 @@ $i++;
     //     }
         
     // }
+
+
+        public function generateBackup(){
+            $sampleDb = $this->sm->get('SampleTableWithoutCache');
+            $response = $sampleDb->generateBackup();            
+            if(isset($response['fileName']) && file_exists($response['fileName'])){
+                $generateBackupDb = $this->sm->get('GenerateBackupTable');
+                $generateBackupDb->completeBackup($response['backupId']);
+            }
+        }
+
 }

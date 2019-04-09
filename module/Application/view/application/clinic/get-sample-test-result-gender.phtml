@@ -5,6 +5,9 @@ $less1000 = array('M'=>'#65c6c4', 'F' => '#ffcece', 'Not Specified' => '#60d18f'
 $more1000 = array('M'=>'#039BE6', 'F' => '#f185b3', 'Not Specified' => '#ff1900');
 //$supColor = array('M'=>'#252424', 'F' => '#826c6c', 'Not Specified' => '#cd6969');
 //\Zend\Debug\Debug::dump($result);die;
+
+$maleSuppressionSpline = $femaleSuppressionSpline = $unspecifedSuppressionSpline = array();
+
 if(count($result)>0){
 foreach($gender as $gen){
     $arrayKey = array_keys($result[$gen]);
@@ -31,7 +34,7 @@ $genderSupName = array();
 // }
 
 
-$maleSuppressionSpline = $femaleSuppressionSpline = $unspecifedSuppressionSpline = array();
+
 foreach($supAvg as $gen => $subRow){
     if($gen == 'M'){
         $maleSuppressionSpline = $subRow;

@@ -14,6 +14,11 @@ class CronController extends AbstractActionController{
         $sampleService = $this->getServiceLocator()->get('SampleService');
         $sampleService->importSampleResultFile();
     }
+
+    public function generateBackupAction(){
+        $sampleService = $this->getServiceLocator()->get('SampleService');
+        $sampleService->generateBackup();
+    }    
     
     
 }

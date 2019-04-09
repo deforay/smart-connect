@@ -30,6 +30,7 @@ use Application\Model\UserFacilityMapTable;
 use Application\Model\LocationDetailsTable;
 use Application\Model\RemovedSamplesTable;
 use Application\Model\SampleRejectionReasonTable;
+use Application\Model\GenerateBackupTable;
 
 use Application\Service\CommonService;
 use Application\Service\UserService;
@@ -301,6 +302,11 @@ class Module{
 		'RemovedSamplesTable' => function($sm) {
                     $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
                     $table = new RemovedSamplesTable($dbAdapter);
+                    return $table;
+                },
+		'GenerateBackupTable' => function($sm) {
+                    $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+                    $table = new GenerateBackupTable($dbAdapter);
                     return $table;
                 },
 		'SampleRejectionReasonTable' => function($sm) {

@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ZendSkeletonApplication\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-08-21 17:40+0530\n"
-"PO-Revision-Date: 2018-08-21 17:56+0530\n"
+"POT-Creation-Date: 2019-03-12 20:24+0530\n"
+"PO-Revision-Date: 2019-03-12 20:28+0530\n"
 "Last-Translator: Amit Dugar <amit@deforay.com>\n"
 "Language-Team: ZF Contibutors <zf-devteam@zend.com>\n"
 "Language: en_US\n"
@@ -12,129 +12,124 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-KeywordsList: translate\n"
 "X-Poedit-Basepath: .\n"
-"X-Generator: Poedit 2.1.1\n"
+"X-Generator: Poedit 2.2.1\n"
 "X-Poedit-SearchPath-0: ..\n"
 
 #: ../src/Application/Model/FacilityTable.php:215
-#: ../src/Application/Model/SampleTable.php:4036
-#: ../src/Application/Model/UsersTable.php:318
+#: ../src/Application/Model/SampleTable.php:4659
+#: ../src/Application/Model/UsersTable.php:325
 #: ../view/application/facility/edit.phtml:17
 #: ../view/application/users/edit.phtml:24
 msgid "Edit"
 msgstr ""
 
-#: ../src/Application/Model/SampleTable.php:1840
+#: ../src/Application/Model/SampleTable.php:2242
 msgid "View"
 msgstr ""
 
-#: ../src/Application/Model/SampleTable.php:1841
+#: ../src/Application/Model/SampleTable.php:2243
 msgid "PDF"
 msgstr ""
 
-#: ../src/Application/Service/SampleService.php:628
-#: ../src/Application/Service/SampleService.php:1311
-#: ../view/application/clinic/dashboard.phtml:268
-#: ../view/application/clinic/generate-result-pdf.phtml:220
+#: ../src/Application/Service/SampleService.php:659
+#: ../src/Application/Service/SampleService.php:1343
+#: ../view/application/clinic/dashboard.phtml:395
+#: ../view/application/clinic/generate-result-pdf.phtml:229
 #: ../view/application/laboratory/sample-result-awaited.phtml:220
 msgid "Sample ID"
 msgstr ""
 
-#: ../src/Application/Service/SampleService.php:629
-#: ../view/application/clinic/dashboard.phtml:269
+#: ../src/Application/Service/SampleService.php:660
+#: ../view/application/clinic/dashboard.phtml:396
 #: ../view/application/facility/add.phtml:38
 #: ../view/application/facility/add.phtml:40
 #: ../view/application/facility/edit.phtml:38
 #: ../view/application/facility/edit.phtml:40
 #: ../view/application/facility/index.phtml:46
+#: ../view/application/laboratory/get-sample-status-data-table.phtml:9
 msgid "Facility Name"
 msgstr "Health Center"
 
-#: ../src/Application/Service/SampleService.php:630
-#: ../view/application/clinic/dashboard.phtml:270
+#: ../src/Application/Service/SampleService.php:661
+#: ../view/application/clinic/dashboard.phtml:397
 msgid "Date Collected"
 msgstr ""
 
-#: ../src/Application/Service/SampleService.php:632
-#: ../src/Application/Service/SampleService.php:639
-#: ../view/application/clinic/dashboard.phtml:271
+#: ../src/Application/Service/SampleService.php:663
+#: ../src/Application/Service/SampleService.php:670
+#: ../view/application/clinic/dashboard.phtml:398
 msgid "Rejection Reason"
 msgstr ""
 
-#: ../src/Application/Service/SampleService.php:633
-#: ../src/Application/Service/SampleService.php:636
-#: ../view/application/clinic/dashboard.phtml:272
+#: ../src/Application/Service/SampleService.php:664
+#: ../src/Application/Service/SampleService.php:667
+#: ../view/application/clinic/dashboard.phtml:399
 msgid "Date Tested"
 msgstr ""
 
-#: ../src/Application/Service/SampleService.php:634
-#: ../src/Application/Service/SampleService.php:637
-#: ../view/application/clinic/dashboard.phtml:273
+#: ../src/Application/Service/SampleService.php:665
+#: ../src/Application/Service/SampleService.php:668
+#: ../view/application/clinic/dashboard.phtml:400
 msgid "Viral Load(cp/ml)"
 msgstr ""
 
-#: ../src/Application/Service/SampleService.php:796
+#: ../src/Application/Service/SampleService.php:828
 msgid "No."
 msgstr ""
 
-#: ../src/Application/Service/SampleService.php:797
+#: ../src/Application/Service/SampleService.php:829
 msgid "Sample Code"
 msgstr ""
 
-#: ../src/Application/Service/SampleService.php:798
+#: ../src/Application/Service/SampleService.php:830
 msgid "Health Facility Name"
 msgstr "Health Center Name"
 
-#: ../src/Application/Service/SampleService.php:799
+#: ../src/Application/Service/SampleService.php:831
 msgid "Health Facility Code"
 msgstr "Health Center Code"
 
-#: ../src/Application/Service/SampleService.php:800
-#: ../view/application/clinic/test-result-view.phtml:152
+#: ../src/Application/Service/SampleService.php:832
+#: ../view/application/clinic/test-result-view.phtml:167
 #: ../view/application/facility/add.phtml:140
 #: ../view/application/facility/edit.phtml:140
-#: ../view/application/summary/-dashboard.phtml:315
-#: ../view/application/summary/-dashboard.phtml:357
-#: ../view/application/summary/-dashboard.phtml:425
-#: ../view/application/summary/-dashboard.phtml:463
-#: ../view/application/summary/-dashboard.phtml:529
-#: ../view/application/summary/-dashboard.phtml:562
-#: ../view/application/summary/dashboard.phtml:315
-#: ../view/application/summary/dashboard.phtml:357
-#: ../view/application/summary/dashboard.phtml:425
-#: ../view/application/summary/dashboard.phtml:463
-#: ../view/application/summary/dashboard.phtml:529
-#: ../view/application/summary/dashboard.phtml:562
+#: ../view/application/summary/dashboard.phtml:316
+#: ../view/application/summary/dashboard.phtml:358
+#: ../view/application/summary/dashboard.phtml:426
+#: ../view/application/summary/dashboard.phtml:464
+#: ../view/application/summary/dashboard.phtml:530
+#: ../view/application/summary/dashboard.phtml:563
 msgid "District/County"
 msgstr ""
 
-#: ../src/Application/Service/SampleService.php:801
-#: ../view/application/clinic/test-result-view.phtml:148
+#: ../src/Application/Service/SampleService.php:833
+#: ../view/application/clinic/test-result-view.phtml:163
 #: ../view/application/facility/add.phtml:121
 #: ../view/application/facility/edit.phtml:121
 msgid "Province/State"
 msgstr ""
 
-#: ../src/Application/Service/SampleService.php:802
+#: ../src/Application/Service/SampleService.php:834
 msgid "Unique ART No."
 msgstr ""
 
-#: ../src/Application/Service/SampleService.php:803
+#: ../src/Application/Service/SampleService.php:835
 msgid "Patient Name"
 msgstr ""
 
-#: ../src/Application/Service/SampleService.php:804
+#: ../src/Application/Service/SampleService.php:836
 msgid "Date of Birth"
 msgstr ""
 
-#: ../src/Application/Service/SampleService.php:805
-#: ../view/application/clinic/test-result-view.phtml:128
+#: ../src/Application/Service/SampleService.php:837
+#: ../view/application/clinic/test-result-view.phtml:143
 msgid "Age"
 msgstr ""
 
-#: ../src/Application/Service/SampleService.php:806
-#: ../view/application/clinic/dashboard.phtml:120
+#: ../src/Application/Service/SampleService.php:838
+#: ../view/application/clinic/dashboard.phtml:127
 #: ../view/application/clinic/samples-test-reason.phtml:118
-#: ../view/application/clinic/test-result-view.phtml:135
+#: ../view/application/clinic/test-result-view.phtml:150
 #: ../view/application/laboratory/requisition-forms-incomplete.phtml:114
 #: ../view/application/laboratory/sample-result-awaited.phtml:144
 #: ../view/application/laboratory/sample-volume.phtml:203
@@ -144,14 +139,14 @@ msgstr ""
 msgid "Gender"
 msgstr ""
 
-#: ../src/Application/Service/SampleService.php:807
+#: ../src/Application/Service/SampleService.php:839
 msgid "Date of Sample Collection"
 msgstr ""
 
-#: ../src/Application/Service/SampleService.php:808
-#: ../src/Application/Service/SampleService.php:1066
-#: ../src/Application/Service/SampleService.php:1314
-#: ../view/application/clinic/dashboard.phtml:81
+#: ../src/Application/Service/SampleService.php:840
+#: ../src/Application/Service/SampleService.php:1098
+#: ../src/Application/Service/SampleService.php:1346
+#: ../view/application/clinic/dashboard.phtml:88
 #: ../view/application/clinic/samples-test-reason.phtml:79
 #: ../view/application/laboratory/sample-result-awaited.phtml:131
 #: ../view/application/laboratory/sample-result-awaited.phtml:223
@@ -163,26 +158,25 @@ msgstr ""
 msgid "Sample Type"
 msgstr ""
 
-#: ../src/Application/Service/SampleService.php:809
+#: ../src/Application/Service/SampleService.php:841
 msgid "Date of Treatment Initiation"
 msgstr ""
 
-#: ../src/Application/Service/SampleService.php:810
+#: ../src/Application/Service/SampleService.php:842
 #: ../view/application/laboratory/sample-result-awaited.phtml:105
 #: ../view/application/laboratory/sample-volume.phtml:144
 #: ../view/application/laboratory/samples-tested-lab.phtml:149
 #: ../view/application/laboratory/samples-tested.phtml:147
-#: ../view/application/summary/-dashboard.phtml:263
-#: ../view/application/summary/dashboard.phtml:263
+#: ../view/application/summary/dashboard.phtml:264
 msgid "Current Regimen"
 msgstr ""
 
-#: ../src/Application/Service/SampleService.php:811
+#: ../src/Application/Service/SampleService.php:843
 msgid "Date of Initiation of Current Regimen"
 msgstr ""
 
-#: ../src/Application/Service/SampleService.php:812
-#: ../view/application/clinic/dashboard.phtml:129
+#: ../src/Application/Service/SampleService.php:844
+#: ../view/application/clinic/dashboard.phtml:136
 #: ../view/application/clinic/samples-test-reason.phtml:131
 #: ../view/application/laboratory/requisition-forms-incomplete.phtml:123
 #: ../view/application/laboratory/sample-result-awaited.phtml:155
@@ -193,8 +187,8 @@ msgstr ""
 msgid "Is Patient Pregnant"
 msgstr ""
 
-#: ../src/Application/Service/SampleService.php:813
-#: ../view/application/clinic/dashboard.phtml:142
+#: ../src/Application/Service/SampleService.php:845
+#: ../view/application/clinic/dashboard.phtml:149
 #: ../view/application/clinic/samples-test-reason.phtml:140
 #: ../view/application/laboratory/requisition-forms-incomplete.phtml:134
 #: ../view/application/laboratory/sample-result-awaited.phtml:164
@@ -205,8 +199,8 @@ msgstr ""
 msgid "Is Patient Breastfeeding"
 msgstr ""
 
-#: ../src/Application/Service/SampleService.php:814
-#: ../view/application/clinic/dashboard.phtml:96
+#: ../src/Application/Service/SampleService.php:846
+#: ../view/application/clinic/dashboard.phtml:103
 #: ../view/application/clinic/samples-test-reason.phtml:86
 #: ../view/application/laboratory/sample-volume.phtml:159
 #: ../view/application/laboratory/samples-tested-lab.phtml:164
@@ -214,41 +208,41 @@ msgstr ""
 msgid "ARV Adherence"
 msgstr ""
 
-#: ../src/Application/Service/SampleService.php:815
+#: ../src/Application/Service/SampleService.php:847
 msgid "Requesting Clinican"
 msgstr ""
 
-#: ../src/Application/Service/SampleService.php:816
+#: ../src/Application/Service/SampleService.php:848
 msgid "Request Date"
 msgstr ""
 
-#: ../src/Application/Service/SampleService.php:817
+#: ../src/Application/Service/SampleService.php:849
 msgid "Date Sample Received at Lab"
 msgstr ""
 
-#: ../src/Application/Service/SampleService.php:818
+#: ../src/Application/Service/SampleService.php:850
 msgid "VL Result (cp/ml)"
 msgstr ""
 
-#: ../src/Application/Service/SampleService.php:819
+#: ../src/Application/Service/SampleService.php:851
 msgid "Vl Result (log)"
 msgstr ""
 
-#: ../src/Application/Service/SampleService.php:820
+#: ../src/Application/Service/SampleService.php:852
 msgid "Rejection Reason (if Rejected)"
 msgstr ""
 
-#: ../src/Application/Service/SampleService.php:940
-#: ../src/Application/Service/SampleService.php:1315
+#: ../src/Application/Service/SampleService.php:972
+#: ../src/Application/Service/SampleService.php:1347
 #: ../view/application/laboratory/sample-result-awaited.phtml:224
 #: ../view/application/laboratory/sample-volume.phtml:269
 #: ../view/application/laboratory/samples-tested.phtml:286
 msgid "Lab"
 msgstr ""
 
-#: ../src/Application/Service/SampleService.php:941
-#: ../src/Application/Service/SampleService.php:1060
-#: ../src/Application/Service/SampleService.php:1174
+#: ../src/Application/Service/SampleService.php:973
+#: ../src/Application/Service/SampleService.php:1092
+#: ../src/Application/Service/SampleService.php:1206
 #: ../view/application/laboratory/sample-volume.phtml:270
 #: ../view/application/laboratory/samples-tested-lab.phtml:274
 #: ../view/application/laboratory/samples-tested-turn-around-time.phtml:214
@@ -256,11 +250,12 @@ msgstr ""
 msgid "Samples Collected"
 msgstr ""
 
-#: ../src/Application/Service/SampleService.php:942
-#: ../src/Application/Service/SampleService.php:1061
-#: ../src/Application/Service/SampleService.php:1175
-#: ../view/application/laboratory/dashboard.phtml:274
-#: ../view/application/laboratory/dashboard.phtml:462
+#: ../src/Application/Service/SampleService.php:974
+#: ../src/Application/Service/SampleService.php:1093
+#: ../src/Application/Service/SampleService.php:1207
+#: ../view/application/laboratory/dashboard.phtml:284
+#: ../view/application/laboratory/dashboard.phtml:526
+#: ../view/application/laboratory/get-sample-status-data-table.phtml:16
 #: ../view/application/laboratory/get-sample-test-result.phtml:26
 #: ../view/application/laboratory/sample-volume.phtml:197
 #: ../view/application/laboratory/sample-volume.phtml:257
@@ -271,36 +266,22 @@ msgstr ""
 #: ../view/application/laboratory/samples-tested-turn-around-time.phtml:215
 #: ../view/application/laboratory/samples-tested.phtml:274
 #: ../view/application/laboratory/samples-tested.phtml:288
-#: ../view/application/summary/-dashboard.phtml:317
-#: ../view/application/summary/-dashboard.phtml:338
-#: ../view/application/summary/-dashboard.phtml:359
-#: ../view/application/summary/-dashboard.phtml:613
-#: ../view/application/summary/dashboard.phtml:317
-#: ../view/application/summary/dashboard.phtml:338
-#: ../view/application/summary/dashboard.phtml:359
-#: ../view/application/summary/dashboard.phtml:658
-msgid "Samples Tested"
-msgstr ""
-
-#: ../src/Application/Service/SampleService.php:943
-#: ../src/Application/Service/SampleService.php:1062
-#: ../src/Application/Service/SampleService.php:1176
-#: ../view/application/laboratory/sample-volume.phtml:272
-#: ../view/application/laboratory/samples-tested-lab.phtml:276
-#: ../view/application/laboratory/samples-tested-turn-around-time.phtml:216
-#: ../view/application/laboratory/samples-tested.phtml:289
-#: ../view/application/summary/-dashboard.phtml:318
-#: ../view/application/summary/-dashboard.phtml:339
-#: ../view/application/summary/-dashboard.phtml:360
 #: ../view/application/summary/dashboard.phtml:318
 #: ../view/application/summary/dashboard.phtml:339
 #: ../view/application/summary/dashboard.phtml:360
+#: ../view/application/summary/dashboard.phtml:665
+msgid "Samples Tested"
+msgstr ""
+
+#: ../src/Application/Service/SampleService.php:975
+#: ../src/Application/Service/SampleService.php:1094
+#: ../src/Application/Service/SampleService.php:1208
 msgid "Samples Pending"
 msgstr ""
 
-#: ../src/Application/Service/SampleService.php:944
-#: ../src/Application/Service/SampleService.php:1063
-#: ../src/Application/Service/SampleService.php:1177
+#: ../src/Application/Service/SampleService.php:976
+#: ../src/Application/Service/SampleService.php:1095
+#: ../src/Application/Service/SampleService.php:1209
 #: ../view/application/laboratory/sample-volume.phtml:273
 #: ../view/application/laboratory/samples-tested-lab.phtml:277
 #: ../view/application/laboratory/samples-tested-turn-around-time.phtml:217
@@ -308,9 +289,9 @@ msgstr ""
 msgid "Samples Suppressed"
 msgstr ""
 
-#: ../src/Application/Service/SampleService.php:945
-#: ../src/Application/Service/SampleService.php:1064
-#: ../src/Application/Service/SampleService.php:1178
+#: ../src/Application/Service/SampleService.php:977
+#: ../src/Application/Service/SampleService.php:1096
+#: ../src/Application/Service/SampleService.php:1210
 #: ../view/application/laboratory/sample-volume.phtml:274
 #: ../view/application/laboratory/samples-tested-lab.phtml:278
 #: ../view/application/laboratory/samples-tested-turn-around-time.phtml:218
@@ -318,43 +299,34 @@ msgstr ""
 msgid "Samples Not Suppressed"
 msgstr ""
 
-#: ../src/Application/Service/SampleService.php:946
-#: ../src/Application/Service/SampleService.php:1065
-#: ../src/Application/Service/SampleService.php:1179
-#: ../view/application/laboratory/dashboard.phtml:464
+#: ../src/Application/Service/SampleService.php:978
+#: ../src/Application/Service/SampleService.php:1097
+#: ../src/Application/Service/SampleService.php:1211
+#: ../view/application/laboratory/dashboard.phtml:528
 #: ../view/application/laboratory/sample-volume.phtml:199
 #: ../view/application/laboratory/sample-volume.phtml:275
 #: ../view/application/laboratory/samples-tested-lab.phtml:279
 #: ../view/application/laboratory/samples-tested-turn-around-time.phtml:219
 #: ../view/application/laboratory/samples-tested.phtml:292
-#: ../view/application/summary/-dashboard.phtml:319
-#: ../view/application/summary/-dashboard.phtml:340
-#: ../view/application/summary/-dashboard.phtml:361
-#: ../view/application/summary/-dashboard.phtml:429
-#: ../view/application/summary/-dashboard.phtml:448
-#: ../view/application/summary/-dashboard.phtml:467
-#: ../view/application/summary/-dashboard.phtml:493
-#: ../view/application/summary/-dashboard.phtml:547
-#: ../view/application/summary/-dashboard.phtml:564
-#: ../view/application/summary/dashboard.phtml:319
-#: ../view/application/summary/dashboard.phtml:340
-#: ../view/application/summary/dashboard.phtml:361
-#: ../view/application/summary/dashboard.phtml:429
-#: ../view/application/summary/dashboard.phtml:448
-#: ../view/application/summary/dashboard.phtml:467
-#: ../view/application/summary/dashboard.phtml:493
-#: ../view/application/summary/dashboard.phtml:547
-#: ../view/application/summary/dashboard.phtml:564
+#: ../view/application/summary/dashboard.phtml:320
+#: ../view/application/summary/dashboard.phtml:341
+#: ../view/application/summary/dashboard.phtml:362
+#: ../view/application/summary/dashboard.phtml:430
+#: ../view/application/summary/dashboard.phtml:449
+#: ../view/application/summary/dashboard.phtml:468
+#: ../view/application/summary/dashboard.phtml:494
+#: ../view/application/summary/dashboard.phtml:548
+#: ../view/application/summary/dashboard.phtml:565
 #: ../view/application/summary/get-samples-rejected-bar-chart.phtml:22
 msgid "Samples Rejected"
 msgstr ""
 
-#: ../src/Application/Service/SampleService.php:1059
+#: ../src/Application/Service/SampleService.php:1091
 #: ../view/application/laboratory/samples-tested-lab.phtml:273
 msgid "Date"
 msgstr ""
 
-#: ../src/Application/Service/SampleService.php:1067
+#: ../src/Application/Service/SampleService.php:1099
 #: ../view/application/laboratory/sample-result-awaited.phtml:94
 #: ../view/application/laboratory/sample-volume.phtml:133
 #: ../view/application/laboratory/samples-tested-lab.phtml:138
@@ -365,64 +337,69 @@ msgstr ""
 msgid "Clinics"
 msgstr "Health Centers"
 
-#: ../src/Application/Service/SampleService.php:1173
+#: ../src/Application/Service/SampleService.php:1205
 #: ../view/application/laboratory/samples-tested-turn-around-time.phtml:213
 msgid "Month and Year"
 msgstr ""
 
-#: ../src/Application/Service/SampleService.php:1180
+#: ../src/Application/Service/SampleService.php:1212
 #: ../view/application/laboratory/get-lab-turn-around-time.phtml:61
 #: ../view/application/laboratory/samples-tested-turn-around-time.phtml:220
 msgid "Average TAT in Days"
 msgstr ""
 
-#: ../src/Application/Service/SampleService.php:1312
+#: ../src/Application/Service/SampleService.php:1344
 #: ../view/application/laboratory/sample-result-awaited.phtml:221
 msgid "Collection Date"
 msgstr ""
 
-#: ../src/Application/Service/SampleService.php:1313
+#: ../src/Application/Service/SampleService.php:1345
 #: ../view/application/laboratory/sample-result-awaited.phtml:222
-#: ../view/application/summary/-dashboard.phtml:313
-#: ../view/application/summary/-dashboard.phtml:423
-#: ../view/application/summary/-dashboard.phtml:527
-#: ../view/application/summary/dashboard.phtml:313
-#: ../view/application/summary/dashboard.phtml:423
-#: ../view/application/summary/dashboard.phtml:527
+#: ../view/application/summary/dashboard.phtml:314
+#: ../view/application/summary/dashboard.phtml:424
+#: ../view/application/summary/dashboard.phtml:528
 #: ../view/application/users/add.phtml:58
 #: ../view/application/users/edit.phtml:68
 msgid "Facility"
 msgstr "Health Center"
 
-#: ../src/Application/Service/SampleService.php:1316
+#: ../src/Application/Service/SampleService.php:1348
 #: ../view/application/laboratory/sample-result-awaited.phtml:225
 msgid "Sample Received at Lab"
 msgstr ""
 
-#: ../view/application/clinic/dashboard.phtml:14
-#: ../view/layout/layout.phtml:188
+#: ../src/Application/Service/SummaryService.php:169
+#: ../view/application/summary/get-indicators.phtml:7
+msgid "Months"
+msgstr ""
+
+#: ../view/application/clinic/dashboard.phtml:21
+#: ../view/layout/layout.phtml:190
 msgid "Clinics Dashboard"
 msgstr "Health Center Dashboard"
 
-#: ../view/application/clinic/dashboard.phtml:27
-#: ../view/application/laboratory/dashboard.phtml:214
-#: ../view/application/summary/dashboard.phtml:587
+#: ../view/application/clinic/dashboard.phtml:34
+#: ../view/application/laboratory/dashboard.phtml:224
+#: ../view/application/summary/dashboard.phtml:594
+#: ../view/application/summary/dashboard.phtml:1130
 msgid "Please select one or more province. Leave blank for All"
 msgstr ""
 
-#: ../view/application/clinic/dashboard.phtml:38
-#: ../view/application/laboratory/dashboard.phtml:225
-#: ../view/application/summary/dashboard.phtml:598
+#: ../view/application/clinic/dashboard.phtml:45
+#: ../view/application/laboratory/dashboard.phtml:235
+#: ../view/application/summary/dashboard.phtml:605
+#: ../view/application/summary/dashboard.phtml:1141
 msgid "Please select one or more district. Leave blank for All"
 msgstr ""
 
-#: ../view/application/clinic/dashboard.phtml:54
+#: ../view/application/clinic/dashboard.phtml:61
 #: ../view/application/clinic/samples-test-reason.phtml:41
-#: ../view/application/summary/dashboard.phtml:611
+#: ../view/application/summary/dashboard.phtml:618
+#: ../view/application/summary/dashboard.phtml:1153
 msgid "Please select one or more clinics. Leave blank for All"
 msgstr "Please select one or more health centers. Leave blank for All"
 
-#: ../view/application/clinic/dashboard.phtml:69
+#: ../view/application/clinic/dashboard.phtml:76
 #: ../view/application/clinic/samples-test-reason.phtml:56
 #: ../view/application/laboratory/requisition-forms-incomplete.phtml:64
 #: ../view/application/laboratory/sample-result-awaited.phtml:33
@@ -435,22 +412,23 @@ msgstr "Please select one or more health centers. Leave blank for All"
 msgid "Date Range"
 msgstr ""
 
-#: ../view/application/clinic/dashboard.phtml:82
+#: ../view/application/clinic/dashboard.phtml:89
 #: ../view/application/clinic/samples-test-reason.phtml:80
 msgid "Please choose sample type"
 msgstr ""
 
-#: ../view/application/clinic/dashboard.phtml:83
 #: ../view/application/clinic/dashboard.phtml:90
-#: ../view/application/clinic/dashboard.phtml:131
-#: ../view/application/clinic/dashboard.phtml:144
-#: ../view/application/clinic/dashboard.phtml:327
+#: ../view/application/clinic/dashboard.phtml:97
+#: ../view/application/clinic/dashboard.phtml:138
+#: ../view/application/clinic/dashboard.phtml:151
+#: ../view/application/clinic/dashboard.phtml:454
+#: ../view/application/clinic/dashboard.phtml:458
 #: ../view/application/clinic/samples-test-reason.phtml:81
 #: ../view/application/clinic/samples-test-reason.phtml:101
 #: ../view/application/clinic/samples-test-reason.phtml:133
 #: ../view/application/clinic/samples-test-reason.phtml:142
 #: ../view/application/clinic/samples-test-reason.phtml:212
-#: ../view/application/laboratory/dashboard.phtml:723
+#: ../view/application/laboratory/dashboard.phtml:945
 #: ../view/application/laboratory/requisition-forms-incomplete.phtml:116
 #: ../view/application/laboratory/requisition-forms-incomplete.phtml:125
 #: ../view/application/laboratory/requisition-forms-incomplete.phtml:136
@@ -488,38 +466,38 @@ msgstr ""
 msgid "All"
 msgstr ""
 
-#: ../view/application/clinic/dashboard.phtml:88
+#: ../view/application/clinic/dashboard.phtml:95
 #: ../view/application/clinic/samples-test-reason.phtml:99
 #: ../view/application/laboratory/samples-tested-lab.phtml:184
 #: ../view/application/laboratory/samples-tested.phtml:182
 msgid "Test Result"
 msgstr ""
 
-#: ../view/application/clinic/dashboard.phtml:89
+#: ../view/application/clinic/dashboard.phtml:96
 #: ../view/application/clinic/samples-test-reason.phtml:100
 #: ../view/application/laboratory/samples-tested-lab.phtml:185
 #: ../view/application/laboratory/samples-tested.phtml:183
 msgid "Please choose result"
 msgstr ""
 
-#: ../view/application/clinic/dashboard.phtml:91
-#: ../view/application/clinic/get-overall-viral-load-status.phtml:25
+#: ../view/application/clinic/dashboard.phtml:98
+#: ../view/application/clinic/get-overall-viral-load-status.phtml:31
 #: ../view/application/clinic/samples-test-reason.phtml:102
 #: ../view/application/laboratory/samples-tested-lab.phtml:187
 #: ../view/application/laboratory/samples-tested.phtml:185
 msgid ">= 1000 cp/ml"
 msgstr ""
 
-#: ../view/application/clinic/dashboard.phtml:92
-#: ../view/application/clinic/get-overall-viral-load-status.phtml:24
+#: ../view/application/clinic/dashboard.phtml:99
+#: ../view/application/clinic/get-overall-viral-load-status.phtml:30
 #: ../view/application/clinic/samples-test-reason.phtml:103
 #: ../view/application/laboratory/samples-tested-lab.phtml:188
 #: ../view/application/laboratory/samples-tested.phtml:186
 msgid "< 1000 cp/ml"
 msgstr ""
 
-#: ../view/application/clinic/dashboard.phtml:98
-#: ../view/application/clinic/dashboard.phtml:122
+#: ../view/application/clinic/dashboard.phtml:105
+#: ../view/application/clinic/dashboard.phtml:129
 #: ../view/application/clinic/samples-test-reason.phtml:88
 #: ../view/application/clinic/samples-test-reason.phtml:120
 #: ../view/application/facility/add.phtml:68
@@ -539,7 +517,7 @@ msgstr ""
 msgid "Select"
 msgstr ""
 
-#: ../view/application/clinic/dashboard.phtml:99
+#: ../view/application/clinic/dashboard.phtml:106
 #: ../view/application/clinic/samples-test-reason.phtml:89
 #: ../view/application/laboratory/sample-volume.phtml:162
 #: ../view/application/laboratory/samples-tested-lab.phtml:167
@@ -547,7 +525,7 @@ msgstr ""
 msgid "Good"
 msgstr ""
 
-#: ../view/application/clinic/dashboard.phtml:100
+#: ../view/application/clinic/dashboard.phtml:107
 #: ../view/application/clinic/samples-test-reason.phtml:90
 #: ../view/application/laboratory/sample-volume.phtml:163
 #: ../view/application/laboratory/samples-tested-lab.phtml:168
@@ -555,7 +533,7 @@ msgstr ""
 msgid "Fair"
 msgstr ""
 
-#: ../view/application/clinic/dashboard.phtml:101
+#: ../view/application/clinic/dashboard.phtml:108
 #: ../view/application/clinic/samples-test-reason.phtml:91
 #: ../view/application/laboratory/sample-volume.phtml:164
 #: ../view/application/laboratory/samples-tested-lab.phtml:169
@@ -563,7 +541,7 @@ msgstr ""
 msgid "Poor"
 msgstr ""
 
-#: ../view/application/clinic/dashboard.phtml:109
+#: ../view/application/clinic/dashboard.phtml:116
 #: ../view/application/clinic/samples-test-reason.phtml:107
 #: ../view/application/laboratory/sample-result-awaited.phtml:120
 #: ../view/application/laboratory/sample-volume.phtml:168
@@ -572,9 +550,8 @@ msgstr ""
 msgid "Age Group"
 msgstr ""
 
-#: ../view/application/clinic/dashboard.phtml:110
+#: ../view/application/clinic/dashboard.phtml:117
 #: ../view/application/clinic/samples-test-reason.phtml:108
-#: ../view/application/laboratory/dashboard.phtml:358
 #: ../view/application/laboratory/sample-result-awaited.phtml:121
 #: ../view/application/laboratory/sample-volume.phtml:169
 #: ../view/application/laboratory/samples-tested-lab.phtml:174
@@ -582,9 +559,8 @@ msgstr ""
 msgid "Please choose age group"
 msgstr ""
 
-#: ../view/application/clinic/dashboard.phtml:116
+#: ../view/application/clinic/dashboard.phtml:123
 #: ../view/application/clinic/samples-test-reason.phtml:114
-#: ../view/application/laboratory/dashboard.phtml:364
 #: ../view/application/laboratory/sample-result-awaited.phtml:127
 #: ../view/application/laboratory/sample-volume.phtml:175
 #: ../view/application/laboratory/samples-tested-lab.phtml:180
@@ -592,7 +568,7 @@ msgstr ""
 msgid "Unknown"
 msgstr ""
 
-#: ../view/application/clinic/dashboard.phtml:123
+#: ../view/application/clinic/dashboard.phtml:130
 #: ../view/application/clinic/get-viral-load-status-based-on-gender.phtml:25
 #: ../view/application/clinic/samples-test-reason.phtml:121
 #: ../view/application/laboratory/requisition-forms-incomplete.phtml:117
@@ -604,7 +580,7 @@ msgstr ""
 msgid "Male"
 msgstr ""
 
-#: ../view/application/clinic/dashboard.phtml:124
+#: ../view/application/clinic/dashboard.phtml:131
 #: ../view/application/clinic/get-viral-load-status-based-on-gender.phtml:25
 #: ../view/application/clinic/samples-test-reason.phtml:122
 #: ../view/application/laboratory/requisition-forms-incomplete.phtml:118
@@ -616,7 +592,7 @@ msgstr ""
 msgid "Female"
 msgstr ""
 
-#: ../view/application/clinic/dashboard.phtml:125
+#: ../view/application/clinic/dashboard.phtml:132
 #: ../view/application/clinic/samples-test-reason.phtml:123
 #: ../view/application/facility/add.phtml:132
 #: ../view/application/facility/add.phtml:144
@@ -624,13 +600,12 @@ msgstr ""
 #: ../view/application/facility/edit.phtml:144
 #: ../view/application/facility/get-district-list.phtml:8
 #: ../view/application/facility/get-district-list.phtml:10
-#: ../view/application/summary/-dashboard.phtml:967
-#: ../view/application/summary/dashboard.phtml:1012
+#: ../view/application/summary/dashboard.phtml:1019
 msgid "Other"
 msgstr ""
 
-#: ../view/application/clinic/dashboard.phtml:132
-#: ../view/application/clinic/dashboard.phtml:145
+#: ../view/application/clinic/dashboard.phtml:139
+#: ../view/application/clinic/dashboard.phtml:152
 #: ../view/application/clinic/samples-test-reason.phtml:134
 #: ../view/application/clinic/samples-test-reason.phtml:143
 #: ../view/application/config/edit.phtml:78
@@ -649,8 +624,8 @@ msgstr ""
 msgid "Yes"
 msgstr ""
 
-#: ../view/application/clinic/dashboard.phtml:133
-#: ../view/application/clinic/dashboard.phtml:146
+#: ../view/application/clinic/dashboard.phtml:140
+#: ../view/application/clinic/dashboard.phtml:153
 #: ../view/application/clinic/samples-test-reason.phtml:135
 #: ../view/application/clinic/samples-test-reason.phtml:144
 #: ../view/application/config/edit.phtml:79
@@ -669,8 +644,8 @@ msgstr ""
 msgid "No"
 msgstr ""
 
-#: ../view/application/clinic/dashboard.phtml:134
-#: ../view/application/clinic/dashboard.phtml:147
+#: ../view/application/clinic/dashboard.phtml:141
+#: ../view/application/clinic/dashboard.phtml:154
 #: ../view/application/clinic/samples-test-reason.phtml:136
 #: ../view/application/clinic/samples-test-reason.phtml:145
 #: ../view/application/laboratory/requisition-forms-incomplete.phtml:128
@@ -688,10 +663,10 @@ msgstr ""
 msgid "Unreported"
 msgstr ""
 
-#: ../view/application/clinic/dashboard.phtml:155
+#: ../view/application/clinic/dashboard.phtml:162
 #: ../view/application/clinic/samples-test-reason.phtml:153
-#: ../view/application/laboratory/dashboard.phtml:202
-#: ../view/application/laboratory/dashboard.phtml:263
+#: ../view/application/laboratory/dashboard.phtml:212
+#: ../view/application/laboratory/dashboard.phtml:273
 #: ../view/application/laboratory/get-facilities-geolocation.phtml:76
 #: ../view/application/laboratory/requisition-forms-incomplete.phtml:145
 #: ../view/application/laboratory/sample-result-awaited.phtml:175
@@ -699,15 +674,16 @@ msgstr ""
 #: ../view/application/laboratory/samples-tested-lab.phtml:238
 #: ../view/application/laboratory/samples-tested-turn-around-time.phtml:179
 #: ../view/application/laboratory/samples-tested.phtml:246
-#: ../view/application/summary/dashboard.phtml:623
+#: ../view/application/summary/dashboard.phtml:630
+#: ../view/application/summary/dashboard.phtml:1165
 #: ../view/application/time/dashboard.phtml:218
 msgid "Search"
 msgstr ""
 
-#: ../view/application/clinic/dashboard.phtml:156
+#: ../view/application/clinic/dashboard.phtml:163
 #: ../view/application/clinic/samples-test-reason.phtml:154
-#: ../view/application/laboratory/dashboard.phtml:203
-#: ../view/application/laboratory/dashboard.phtml:264
+#: ../view/application/laboratory/dashboard.phtml:213
+#: ../view/application/laboratory/dashboard.phtml:274
 #: ../view/application/laboratory/get-facilities-geolocation.phtml:77
 #: ../view/application/laboratory/requisition-forms-incomplete.phtml:146
 #: ../view/application/laboratory/sample-result-awaited.phtml:176
@@ -715,97 +691,142 @@ msgstr ""
 #: ../view/application/laboratory/samples-tested-lab.phtml:239
 #: ../view/application/laboratory/samples-tested-turn-around-time.phtml:180
 #: ../view/application/laboratory/samples-tested.phtml:247
-#: ../view/application/summary/dashboard.phtml:624
+#: ../view/application/summary/dashboard.phtml:631
+#: ../view/application/summary/dashboard.phtml:1166
 #: ../view/application/time/dashboard.phtml:219
 msgid "Reset"
 msgstr ""
 
-#: ../view/application/clinic/dashboard.phtml:167
-#: ../view/application/clinic/get-overall-viral-load-status.phtml:14
+#: ../view/application/clinic/dashboard.phtml:174
+#: ../view/application/clinic/get-overall-viral-load-status.phtml:19
 msgid "Overall Viral Load Status"
 msgstr ""
 
-#: ../view/application/clinic/dashboard.phtml:179
+#: ../view/application/clinic/dashboard.phtml:186
 #: ../view/application/clinic/get-viral-load-status-based-on-gender.phtml:17
 msgid "Overall Viral Load Status based on Gender"
 msgstr ""
 
-#: ../view/application/clinic/dashboard.phtml:195
+#: ../view/application/clinic/dashboard.phtml:201
+#: ../view/application/clinic/get-sample-test-result-gender.phtml:64
+#: ../view/application/clinic/get-sample-test-result-gender.phtml:67
+#: ../view/application/laboratory/dashboard.phtml:329
+#: ../view/application/laboratory/get-sample-test-result-gender.phtml:64
+#: ../view/application/laboratory/get-sample-test-result-gender.phtml:67
+msgid "Samples Tested based on Gender"
+msgstr ""
+
+#: ../view/application/clinic/dashboard.phtml:216
+#: ../view/application/laboratory/dashboard.phtml:364
+#: ../view/application/laboratory/get-sample-test-result-age-group.phtml:28
+msgid "Samples Tested based on Age < 2"
+msgstr ""
+
+#: ../view/application/clinic/dashboard.phtml:228
+#: ../view/application/laboratory/dashboard.phtml:376
+#: ../view/application/laboratory/get-sample-test-result-age-group-two-to-five.phtml:28
+msgid "Samples Tested based on Age 2-5"
+msgstr ""
+
+#: ../view/application/clinic/dashboard.phtml:243
+#: ../view/application/laboratory/dashboard.phtml:390
+#: ../view/application/laboratory/get-sample-test-result-age-group-six-to-fourteen.phtml:28
+msgid "Samples Tested based on Age 6-14"
+msgstr ""
+
+#: ../view/application/clinic/dashboard.phtml:255
+#: ../view/application/laboratory/dashboard.phtml:403
+#: ../view/application/laboratory/get-sample-test-result-age-group-fifteen-to-fourtynine.phtml:28
+msgid "Samples Tested based on Age 15-49"
+msgstr ""
+
+#: ../view/application/clinic/dashboard.phtml:270
+#: ../view/application/laboratory/dashboard.phtml:417
+msgid "Samples Tested based on Age >=50"
+msgstr ""
+
+#: ../view/application/clinic/dashboard.phtml:282
+#: ../view/application/laboratory/dashboard.phtml:430
+msgid "Samples Tested based on Age unknown"
+msgstr ""
+
+#: ../view/application/clinic/dashboard.phtml:297
 #: ../view/application/clinic/get-sample-test-reason.phtml:17
 #: ../view/application/clinic/samples-test-reason.phtml:29
 msgid "VL Ordered"
 msgstr ""
 
-#: ../view/application/clinic/dashboard.phtml:200
-#: ../view/application/laboratory/dashboard.phtml:385
+#: ../view/application/clinic/dashboard.phtml:302
+#: ../view/application/laboratory/dashboard.phtml:449
 msgid "Test Reasons"
 msgstr ""
 
-#: ../view/application/clinic/dashboard.phtml:219
+#: ../view/application/clinic/dashboard.phtml:321
 #: ../view/application/clinic/get-sample-test-result.phtml:18
 msgid "VL Suppression"
 msgstr ""
 
-#: ../view/application/clinic/dashboard.phtml:224
-#: ../view/application/clinic/dashboard.phtml:249
-#: ../view/application/laboratory/dashboard.phtml:461
+#: ../view/application/clinic/dashboard.phtml:326
+#: ../view/application/clinic/dashboard.phtml:376
+#: ../view/application/laboratory/dashboard.phtml:525
 #: ../view/application/laboratory/sample-volume.phtml:196
 msgid "All Samples"
 msgstr ""
 
-#: ../view/application/clinic/dashboard.phtml:225
-#: ../view/application/summary/-dashboard.phtml:320
-#: ../view/application/summary/-dashboard.phtml:341
-#: ../view/application/summary/-dashboard.phtml:362
-#: ../view/application/summary/dashboard.phtml:320
-#: ../view/application/summary/dashboard.phtml:341
-#: ../view/application/summary/dashboard.phtml:362
+#: ../view/application/clinic/dashboard.phtml:327
+#: ../view/application/summary/dashboard.phtml:321
+#: ../view/application/summary/dashboard.phtml:342
+#: ../view/application/summary/dashboard.phtml:363
 msgid "DBS"
 msgstr ""
 
-#: ../view/application/clinic/dashboard.phtml:226
-#: ../view/application/summary/-dashboard.phtml:322
-#: ../view/application/summary/-dashboard.phtml:343
-#: ../view/application/summary/-dashboard.phtml:364
-#: ../view/application/summary/-dashboard.phtml:646
-#: ../view/application/summary/-dashboard.phtml:715
-#: ../view/application/summary/-dashboard.phtml:798
-#: ../view/application/summary/-dashboard.phtml:882
-#: ../view/application/summary/-dashboard.phtml:956
-#: ../view/application/summary/-dashboard.phtml:966
-#: ../view/application/summary/dashboard.phtml:322
-#: ../view/application/summary/dashboard.phtml:343
-#: ../view/application/summary/dashboard.phtml:364
-#: ../view/application/summary/dashboard.phtml:691
-#: ../view/application/summary/dashboard.phtml:760
-#: ../view/application/summary/dashboard.phtml:843
-#: ../view/application/summary/dashboard.phtml:927
-#: ../view/application/summary/dashboard.phtml:1001
-#: ../view/application/summary/dashboard.phtml:1011
+#: ../view/application/clinic/dashboard.phtml:328
+#: ../view/application/summary/dashboard.phtml:323
+#: ../view/application/summary/dashboard.phtml:344
+#: ../view/application/summary/dashboard.phtml:365
+#: ../view/application/summary/dashboard.phtml:698
+#: ../view/application/summary/dashboard.phtml:767
+#: ../view/application/summary/dashboard.phtml:850
+#: ../view/application/summary/dashboard.phtml:934
+#: ../view/application/summary/dashboard.phtml:1008
+#: ../view/application/summary/dashboard.phtml:1018
 msgid "Others"
 msgstr ""
 
-#: ../view/application/clinic/dashboard.phtml:244
+#: ../view/application/clinic/dashboard.phtml:345
+#: ../view/application/clinic/get-requisition-forms.phtml:10
+#: ../view/application/laboratory/dashboard.phtml:498
+#: ../view/application/laboratory/get-requisition-forms.phtml:10
+#: ../view/application/laboratory/requisition-forms-incomplete.phtml:44
+msgid "Request Form Completeness"
+msgstr ""
+
+#: ../view/application/clinic/dashboard.phtml:349
+#: ../view/application/laboratory/dashboard.phtml:502
+msgid "Please choose form fields"
+msgstr ""
+
+#: ../view/application/clinic/dashboard.phtml:371
 msgid "Test Results"
 msgstr ""
 
-#: ../view/application/clinic/dashboard.phtml:250
+#: ../view/application/clinic/dashboard.phtml:377
 msgid "Samples with Test Results"
 msgstr ""
 
-#: ../view/application/clinic/dashboard.phtml:251
+#: ../view/application/clinic/dashboard.phtml:378
 msgid "Samples Awaiting Results"
 msgstr ""
 
-#: ../view/application/clinic/dashboard.phtml:252
+#: ../view/application/clinic/dashboard.phtml:379
 msgid "Rejected Samples"
 msgstr ""
 
-#: ../view/application/clinic/dashboard.phtml:256
+#: ../view/application/clinic/dashboard.phtml:383
 msgid "Export High VL Samples"
 msgstr ""
 
-#: ../view/application/clinic/dashboard.phtml:259
+#: ../view/application/clinic/dashboard.phtml:386
 #: ../view/application/laboratory/sample-result-awaited.phtml:212
 #: ../view/application/laboratory/sample-volume.phtml:260
 #: ../view/application/laboratory/samples-tested-lab.phtml:265
@@ -814,32 +835,34 @@ msgstr ""
 msgid "Excel"
 msgstr ""
 
-#: ../view/application/clinic/dashboard.phtml:274
+#: ../view/application/clinic/dashboard.phtml:401
 #: ../view/application/facility/index.phtml:49
 #: ../view/application/users/index.phtml:48
 msgid "Action"
 msgstr ""
 
-#: ../view/application/clinic/dashboard.phtml:294
-#: ../view/application/laboratory/dashboard.phtml:676
-#: ../view/application/summary/dashboard.phtml:1181
+#: ../view/application/clinic/dashboard.phtml:421
+#: ../view/application/laboratory/dashboard.phtml:898
+#: ../view/application/summary/dashboard.phtml:1218
+#: ../view/application/summary/dashboard.phtml:1252
 msgid "All Province"
 msgstr ""
 
-#: ../view/application/clinic/dashboard.phtml:298
-#: ../view/application/laboratory/dashboard.phtml:680
+#: ../view/application/clinic/dashboard.phtml:425
+#: ../view/application/laboratory/dashboard.phtml:902
 #: ../view/application/laboratory/requisition-forms-incomplete.phtml:202
 #: ../view/application/laboratory/sample-result-awaited.phtml:372
 #: ../view/application/laboratory/sample-volume.phtml:345
 #: ../view/application/laboratory/samples-tested-lab.phtml:351
 #: ../view/application/laboratory/samples-tested-turn-around-time.phtml:282
 #: ../view/application/laboratory/samples-tested.phtml:386
-#: ../view/application/summary/dashboard.phtml:1185
+#: ../view/application/summary/dashboard.phtml:1222
+#: ../view/application/summary/dashboard.phtml:1256
 #: ../view/application/time/dashboard.phtml:234
 msgid "All Districts"
 msgstr ""
 
-#: ../view/application/clinic/dashboard.phtml:318
+#: ../view/application/clinic/dashboard.phtml:445
 #: ../view/application/clinic/samples-test-reason.phtml:208
 #: ../view/application/laboratory/sample-result-awaited.phtml:380
 #: ../view/application/laboratory/sample-volume.phtml:353
@@ -850,84 +873,106 @@ msgstr ""
 msgid "All Clinics"
 msgstr "All Health Centers"
 
-#: ../view/application/clinic/dashboard.phtml:554
+#: ../view/application/clinic/dashboard.phtml:712
 msgid "Unable to generate pdf"
 msgstr ""
 
-#: ../view/application/clinic/dashboard.phtml:567
+#: ../view/application/clinic/dashboard.phtml:725
+#: ../view/application/laboratory/dashboard.phtml:1450
 #: ../view/application/laboratory/sample-result-awaited.phtml:477
 #: ../view/application/laboratory/sample-volume.phtml:721
 #: ../view/application/laboratory/samples-tested-lab.phtml:728
 #: ../view/application/laboratory/samples-tested-turn-around-time.phtml:651
 #: ../view/application/laboratory/samples-tested.phtml:765
+#: ../view/application/summary/dashboard.phtml:1696
 msgid "Unable to export excel"
 msgstr ""
 
-#: ../view/application/clinic/generate-result-pdf.phtml:209
+#: ../view/application/clinic/generate-result-pdf.phtml:215
 msgid "Laboratory Result"
 msgstr ""
 
-#: ../view/application/clinic/generate-result-pdf.phtml:215
+#: ../view/application/clinic/generate-result-pdf.phtml:224
 msgid "Collected"
 msgstr ""
 
-#: ../view/application/clinic/generate-result-pdf.phtml:228
+#: ../view/application/clinic/generate-result-pdf.phtml:237
 msgid "Referred by"
 msgstr ""
 
-#: ../view/application/clinic/generate-result-pdf.phtml:230
+#: ../view/application/clinic/generate-result-pdf.phtml:239
 msgid "Specimen"
 msgstr ""
 
-#: ../view/application/clinic/generate-result-pdf.phtml:235
+#: ../view/application/clinic/generate-result-pdf.phtml:244
 msgid "Issued"
 msgstr ""
 
-#: ../view/application/clinic/generate-result-pdf.phtml:241
+#: ../view/application/clinic/generate-result-pdf.phtml:250
 msgid "HIV Viral Load"
 msgstr ""
 
-#: ../view/application/clinic/generate-result-pdf.phtml:245
+#: ../view/application/clinic/generate-result-pdf.phtml:254
 msgid "Date of ART Regimen"
 msgstr ""
 
-#: ../view/application/clinic/generate-result-pdf.phtml:248
+#: ../view/application/clinic/generate-result-pdf.phtml:257
 msgid "Reason for Application"
 msgstr ""
 
-#: ../view/application/clinic/generate-result-pdf.phtml:251
+#: ../view/application/clinic/generate-result-pdf.phtml:260
 msgid "ART Regimen"
 msgstr ""
 
-#: ../view/application/clinic/generate-result-pdf.phtml:263
+#: ../view/application/clinic/generate-result-pdf.phtml:272
 msgid "Viral Load (CAP/CTM)"
 msgstr ""
 
-#: ../view/application/clinic/generate-result-pdf.phtml:263
+#: ../view/application/clinic/generate-result-pdf.phtml:272
 msgid "copies/ml"
 msgstr ""
 
-#: ../view/application/clinic/generate-result-pdf.phtml:266
+#: ../view/application/clinic/generate-result-pdf.phtml:275
 msgid "Log Value"
 msgstr ""
 
-#: ../view/application/clinic/generate-result-pdf.phtml:275
+#: ../view/application/clinic/generate-result-pdf.phtml:284
 msgid "Authorized By"
 msgstr ""
 
-#: ../view/application/clinic/generate-result-pdf.phtml:281
+#: ../view/application/clinic/generate-result-pdf.phtml:290
 msgid "End of report"
 msgstr ""
 
-#: ../view/application/clinic/get-overall-viral-load-status.phtml:22
+#: ../view/application/clinic/get-overall-viral-load-status.phtml:27
+#: ../view/application/summary/dashboard.phtml:246
+#: ../view/application/summary/dashboard.phtml:281
+#: ../view/application/summary/dashboard.phtml:317
+#: ../view/application/summary/dashboard.phtml:338
+#: ../view/application/summary/dashboard.phtml:359
+#: ../view/application/summary/dashboard.phtml:531
+#: ../view/application/summary/dashboard.phtml:547
+#: ../view/application/summary/dashboard.phtml:564
+#: ../view/application/summary/dashboard.phtml:664
+msgid "Samples Registered"
+msgstr ""
+
+#: ../view/application/clinic/get-overall-viral-load-status.phtml:28
 msgid "VL Tested"
 msgstr ""
 
-#: ../view/application/clinic/get-overall-viral-load-status.phtml:23
+#: ../view/application/clinic/get-overall-viral-load-status.phtml:29
 msgid "VL Not Tested"
 msgstr ""
 
-#: ../view/application/clinic/get-overall-viral-load-status.phtml:34
+#: ../view/application/clinic/get-overall-viral-load-status.phtml:40
+#: ../view/application/clinic/get-sample-test-result-age-group-fifteen-to-fourtynine.phtml:47
+#: ../view/application/clinic/get-sample-test-result-age-group-greater-fifty.phtml:47
+#: ../view/application/clinic/get-sample-test-result-age-group-six-to-fourteen.phtml:47
+#: ../view/application/clinic/get-sample-test-result-age-group-two-to-five.phtml:47
+#: ../view/application/clinic/get-sample-test-result-age-group-unknown.phtml:47
+#: ../view/application/clinic/get-sample-test-result-age-group.phtml:47
+#: ../view/application/clinic/get-sample-test-result-gender.phtml:90
 #: ../view/application/clinic/get-sample-test-result.phtml:38
 #: ../view/application/clinic/get-samples-test-reason-based-on-clinics.phtml:36
 #: ../view/application/clinic/get-viral-load-status-based-on-gender.phtml:31
@@ -942,44 +987,41 @@ msgstr ""
 #: ../view/application/laboratory/get-lab-turn-around-time.phtml:43
 #: ../view/application/laboratory/get-province-bar-sample-result-awaited-details.phtml:26
 #: ../view/application/laboratory/get-sample-test-reason-bar-chart.phtml:46
-#: ../view/application/laboratory/get-sample-test-result-age-group.phtml:38
+#: ../view/application/laboratory/get-sample-test-result-age-group-fifteen-to-fourtynine.phtml:47
+#: ../view/application/laboratory/get-sample-test-result-age-group-greater-fifty.phtml:47
+#: ../view/application/laboratory/get-sample-test-result-age-group-six-to-fourteen.phtml:47
+#: ../view/application/laboratory/get-sample-test-result-age-group-two-to-five.phtml:47
+#: ../view/application/laboratory/get-sample-test-result-age-group-unknown.phtml:47
+#: ../view/application/laboratory/get-sample-test-result-age-group.phtml:47
 #: ../view/application/laboratory/get-sample-test-result-breastfeeding.phtml:47
-#: ../view/application/laboratory/get-sample-test-result-gender.phtml:52
+#: ../view/application/laboratory/get-sample-test-result-gender.phtml:90
 #: ../view/application/laboratory/get-sample-test-result-pregnant.phtml:46
 #: ../view/application/laboratory/get-sample-test-result-volume.phtml:46
 #: ../view/application/laboratory/get-sample-test-result.phtml:46
-#: ../view/application/summary/get-samples-received-bar-chart.phtml:42
+#: ../view/application/summary/get-samples-received-bar-chart.phtml:47
 #: ../view/application/summary/get-samples-rejected-bar-chart.phtml:42
 msgid "No. of Samples"
 msgstr ""
 
-#: ../view/application/clinic/get-overall-viral-load-status.phtml:42
+#: ../view/application/clinic/get-overall-viral-load-status.phtml:48
 #: ../view/application/clinic/get-sample-test-result.phtml:45
 #: ../view/application/clinic/get-viral-load-status-based-on-gender.phtml:36
 #: ../view/application/laboratory/get-bar-sample-details.phtml:37
 #: ../view/application/laboratory/get-bar-sample-tat.phtml:34
 #: ../view/application/laboratory/get-incomplete-bar-sample-details.phtml:34
 #: ../view/application/laboratory/get-lab-bar-sample-details.phtml:35
-#: ../view/application/laboratory/get-sample-test-reason-bar-chart.phtml:69
-#: ../view/application/laboratory/get-sample-test-result-age-group.phtml:45
-#: ../view/application/laboratory/get-sample-test-result-breastfeeding.phtml:67
-#: ../view/application/laboratory/get-sample-test-result-gender.phtml:74
-#: ../view/application/laboratory/get-sample-test-result-pregnant.phtml:66
-#: ../view/application/laboratory/get-sample-test-result-volume.phtml:66
-#: ../view/application/laboratory/get-sample-test-result.phtml:69
-#: ../view/application/summary/-dashboard.phtml:647
-#: ../view/application/summary/-dashboard.phtml:685
-#: ../view/application/summary/-dashboard.phtml:766
-#: ../view/application/summary/-dashboard.phtml:849
-#: ../view/application/summary/-dashboard.phtml:933
-#: ../view/application/summary/-dashboard.phtml:1034
-#: ../view/application/summary/dashboard.phtml:692
-#: ../view/application/summary/dashboard.phtml:730
-#: ../view/application/summary/dashboard.phtml:811
-#: ../view/application/summary/dashboard.phtml:894
-#: ../view/application/summary/dashboard.phtml:978
-#: ../view/application/summary/dashboard.phtml:1079
-#: ../view/application/summary/get-samples-received-bar-chart.phtml:49
+#: ../view/application/laboratory/get-sample-test-reason-bar-chart.phtml:71
+#: ../view/application/laboratory/get-sample-test-result-breastfeeding.phtml:69
+#: ../view/application/laboratory/get-sample-test-result-pregnant.phtml:68
+#: ../view/application/laboratory/get-sample-test-result-volume.phtml:68
+#: ../view/application/laboratory/get-sample-test-result.phtml:71
+#: ../view/application/summary/dashboard.phtml:699
+#: ../view/application/summary/dashboard.phtml:737
+#: ../view/application/summary/dashboard.phtml:818
+#: ../view/application/summary/dashboard.phtml:901
+#: ../view/application/summary/dashboard.phtml:985
+#: ../view/application/summary/dashboard.phtml:1086
+#: ../view/application/summary/get-samples-received-bar-chart.phtml:54
 #: ../view/application/summary/get-samples-rejected-bar-chart.phtml:49
 #: ../view/application/time/get-tat-default.phtml:12
 #: ../view/application/time/get-tat-default.phtml:77
@@ -990,8 +1032,34 @@ msgstr ""
 msgid "Total"
 msgstr ""
 
-#: ../view/application/clinic/get-overall-viral-load-status.phtml:57
+#: ../view/application/clinic/get-overall-viral-load-status.phtml:63
 msgid "Sample"
+msgstr ""
+
+#: ../view/application/clinic/get-requisition-forms.phtml:29
+#: ../view/application/laboratory/get-incomplete-bar-sample-details.phtml:26
+#: ../view/application/laboratory/get-requisition-forms.phtml:29
+msgid "Forms"
+msgstr ""
+
+#: ../view/application/clinic/get-requisition-forms.phtml:44
+#: ../view/application/laboratory/get-requisition-forms.phtml:44
+msgid "Completion Rate"
+msgstr ""
+
+#: ../view/application/clinic/get-requisition-forms.phtml:93
+#: ../view/application/laboratory/get-requisition-forms.phtml:93
+msgid "Complete"
+msgstr ""
+
+#: ../view/application/clinic/get-requisition-forms.phtml:105
+#: ../view/application/laboratory/get-requisition-forms.phtml:105
+msgid "Incomplete"
+msgstr ""
+
+#: ../view/application/clinic/get-requisition-forms.phtml:117
+#: ../view/application/laboratory/get-requisition-forms.phtml:117
+msgid "Completion Percentage"
 msgstr ""
 
 #: ../view/application/clinic/get-sample-test-reason.phtml:47
@@ -1001,7 +1069,7 @@ msgstr ""
 #: ../view/application/laboratory/get-clinic-bar-sample-result-awaited-details.phtml:59
 #: ../view/application/laboratory/get-district-bar-sample-result-awaited-details.phtml:73
 #: ../view/application/laboratory/get-facility-bar-sample-result-awaited-details.phtml:67
-#: ../view/application/laboratory/get-female-patient-result.phtml:47
+#: ../view/application/laboratory/get-female-patient-result.phtml:48
 #: ../view/application/laboratory/get-lab-sample-details.phtml:34
 #: ../view/application/laboratory/get-line-of-treatment.phtml:47
 #: ../view/application/laboratory/get-pie-sample-tat.phtml:35
@@ -1010,9 +1078,62 @@ msgstr ""
 #: ../view/application/laboratory/get-sample-result.phtml:184
 #: ../view/application/laboratory/get-sample-result.phtml:244
 #: ../view/application/laboratory/get-sample-result.phtml:303
-#: ../view/application/laboratory/get-sample-volume.phtml:44
+#: ../view/application/laboratory/get-sample-volume.phtml:46
 #: ../view/application/laboratory/get-vl-out-comes.phtml:43
 msgid "Samples"
+msgstr ""
+
+#: ../view/application/clinic/get-sample-test-result-age-group-fifteen-to-fourtynine.phtml:28
+#: ../view/application/clinic/get-sample-test-result-age-group-greater-fifty.phtml:28
+#: ../view/application/clinic/get-sample-test-result-age-group-six-to-fourteen.phtml:28
+#: ../view/application/clinic/get-sample-test-result-age-group-two-to-five.phtml:28
+#: ../view/application/clinic/get-sample-test-result-age-group-unknown.phtml:28
+#: ../view/application/clinic/get-sample-test-result-age-group.phtml:28
+msgid "Samples Tested based on "
+msgstr ""
+
+#: ../view/application/clinic/get-sample-test-result-age-group-fifteen-to-fourtynine.phtml:59
+#: ../view/application/clinic/get-sample-test-result-age-group-fifteen-to-fourtynine.phtml:166
+#: ../view/application/clinic/get-sample-test-result-age-group-greater-fifty.phtml:59
+#: ../view/application/clinic/get-sample-test-result-age-group-greater-fifty.phtml:166
+#: ../view/application/clinic/get-sample-test-result-age-group-six-to-fourteen.phtml:59
+#: ../view/application/clinic/get-sample-test-result-age-group-six-to-fourteen.phtml:166
+#: ../view/application/clinic/get-sample-test-result-age-group-two-to-five.phtml:59
+#: ../view/application/clinic/get-sample-test-result-age-group-two-to-five.phtml:166
+#: ../view/application/clinic/get-sample-test-result-age-group-unknown.phtml:59
+#: ../view/application/clinic/get-sample-test-result-age-group-unknown.phtml:166
+#: ../view/application/clinic/get-sample-test-result-age-group.phtml:59
+#: ../view/application/clinic/get-sample-test-result-age-group.phtml:166
+#: ../view/application/clinic/get-sample-test-result-gender.phtml:97
+#: ../view/application/laboratory/get-sample-test-reason-bar-chart.phtml:55
+#: ../view/application/laboratory/get-sample-test-reason-bar-chart.phtml:142
+#: ../view/application/laboratory/get-sample-test-result-age-group-fifteen-to-fourtynine.phtml:59
+#: ../view/application/laboratory/get-sample-test-result-age-group-fifteen-to-fourtynine.phtml:166
+#: ../view/application/laboratory/get-sample-test-result-age-group-greater-fifty.phtml:59
+#: ../view/application/laboratory/get-sample-test-result-age-group-greater-fifty.phtml:166
+#: ../view/application/laboratory/get-sample-test-result-age-group-six-to-fourteen.phtml:59
+#: ../view/application/laboratory/get-sample-test-result-age-group-six-to-fourteen.phtml:166
+#: ../view/application/laboratory/get-sample-test-result-age-group-two-to-five.phtml:59
+#: ../view/application/laboratory/get-sample-test-result-age-group-two-to-five.phtml:158
+#: ../view/application/laboratory/get-sample-test-result-age-group-unknown.phtml:59
+#: ../view/application/laboratory/get-sample-test-result-age-group-unknown.phtml:166
+#: ../view/application/laboratory/get-sample-test-result-age-group.phtml:59
+#: ../view/application/laboratory/get-sample-test-result-age-group.phtml:166
+#: ../view/application/laboratory/get-sample-test-result-breastfeeding.phtml:54
+#: ../view/application/laboratory/get-sample-test-result-breastfeeding.phtml:128
+#: ../view/application/laboratory/get-sample-test-result-gender.phtml:97
+#: ../view/application/laboratory/get-sample-test-result-pregnant.phtml:53
+#: ../view/application/laboratory/get-sample-test-result-pregnant.phtml:128
+#: ../view/application/laboratory/get-sample-test-result-volume.phtml:53
+#: ../view/application/laboratory/get-sample-test-result-volume.phtml:143
+#: ../view/application/laboratory/get-sample-test-result.phtml:55
+#: ../view/application/laboratory/get-sample-test-result.phtml:136
+msgid "Suppression %"
+msgstr ""
+
+#: ../view/application/clinic/get-sample-test-result-gender.phtml:148
+#: ../view/application/laboratory/get-sample-test-result-gender.phtml:148
+msgid "("
 msgstr ""
 
 #: ../view/application/clinic/get-sample-test-result.phtml:73
@@ -1050,7 +1171,7 @@ msgid "Test Reason"
 msgstr ""
 
 #: ../view/application/clinic/samples-test-reason.phtml:68
-#: ../view/application/laboratory/dashboard.phtml:384
+#: ../view/application/laboratory/dashboard.phtml:448
 msgid "Please choose test reason"
 msgstr ""
 
@@ -1058,91 +1179,92 @@ msgstr ""
 msgid "All Reason"
 msgstr ""
 
-#: ../view/application/clinic/test-result-view.phtml:83
+#: ../view/application/clinic/test-result-view.phtml:96
+#: ../view/application/laboratory/dashboard.phtml:575
 msgid "Sample Overview"
 msgstr ""
 
-#: ../view/application/clinic/test-result-view.phtml:86
+#: ../view/application/clinic/test-result-view.phtml:99
 msgid "CLOSE"
 msgstr ""
 
-#: ../view/application/clinic/test-result-view.phtml:105
+#: ../view/application/clinic/test-result-view.phtml:118
 msgid "Sample No"
 msgstr ""
 
-#: ../view/application/clinic/test-result-view.phtml:109
+#: ../view/application/clinic/test-result-view.phtml:122
 msgid "Sample Collection Date"
 msgstr ""
 
-#: ../view/application/clinic/test-result-view.phtml:113
+#: ../view/application/clinic/test-result-view.phtml:126
 msgid "ART (TRACNET) No"
 msgstr ""
 
-#: ../view/application/clinic/test-result-view.phtml:120
+#: ../view/application/clinic/test-result-view.phtml:134
 msgid "Patient First Name & Last Name"
 msgstr ""
 
-#: ../view/application/clinic/test-result-view.phtml:124
+#: ../view/application/clinic/test-result-view.phtml:139
 msgid "Mobile No"
 msgstr ""
 
-#: ../view/application/clinic/test-result-view.phtml:144
+#: ../view/application/clinic/test-result-view.phtml:159
 msgid "Clinic/Health Center Code"
 msgstr ""
 
-#: ../view/application/clinic/test-result-view.phtml:159
+#: ../view/application/clinic/test-result-view.phtml:174
 msgid "Clinic/Health Center Name"
 msgstr ""
 
-#: ../view/application/clinic/test-result-view.phtml:163
+#: ../view/application/clinic/test-result-view.phtml:178
 msgid "Clinician Name"
 msgstr ""
 
-#: ../view/application/clinic/test-result-view.phtml:169
+#: ../view/application/clinic/test-result-view.phtml:184
 msgid "Sample Receipt Date"
 msgstr ""
 
-#: ../view/application/clinic/test-result-view.phtml:173
+#: ../view/application/clinic/test-result-view.phtml:188
 msgid "Sample Test Date"
 msgstr ""
 
-#: ../view/application/clinic/test-result-view.phtml:177
+#: ../view/application/clinic/test-result-view.phtml:192
 msgid "Specimen Type"
 msgstr ""
 
-#: ../view/application/clinic/test-result-view.phtml:184
+#: ../view/application/clinic/test-result-view.phtml:199
 msgid "Sample Rejection"
 msgstr ""
 
-#: ../view/application/clinic/test-result-view.phtml:189
+#: ../view/application/clinic/test-result-view.phtml:204
 msgid "Rejection Facility"
 msgstr ""
 
-#: ../view/application/clinic/test-result-view.phtml:195
+#: ../view/application/clinic/test-result-view.phtml:210
 msgid "Platform"
 msgstr ""
 
-#: ../view/application/clinic/test-result-view.phtml:199
+#: ../view/application/clinic/test-result-view.phtml:214
 msgid "VIRAL LOAD RESULT (copies/ml)"
 msgstr ""
 
-#: ../view/application/clinic/test-result-view.phtml:203
+#: ../view/application/clinic/test-result-view.phtml:218
 msgid "Approved By"
 msgstr ""
 
-#: ../view/application/clinic/test-result-view.phtml:210
+#: ../view/application/clinic/test-result-view.phtml:225
 msgid "Lab Comments"
 msgstr ""
 
-#: ../view/application/clinic/test-result-view.phtml:216
+#: ../view/application/clinic/test-result-view.phtml:231
 msgid "Previous Result"
 msgstr ""
 
-#: ../view/application/clinic/test-result-view.phtml:218
+#: ../view/application/clinic/test-result-view.phtml:233
 msgid "Date of Last Viral Load Test"
 msgstr ""
 
-#: ../view/application/clinic/test-result-view.phtml:222
+#: ../view/application/clinic/test-result-view.phtml:237
 msgid "Result of previous viral load(copies/ml)"
 msgstr ""
 
@@ -1268,13 +1390,10 @@ msgstr ""
 #: ../view/application/facility/add.phtml:13
 #: ../view/application/facility/edit.phtml:13
 #: ../view/application/facility/index.phtml:12
-#: ../view/application/summary/-dashboard.phtml:302
-#: ../view/application/summary/-dashboard.phtml:411
-#: ../view/application/summary/-dashboard.phtml:515
-#: ../view/application/summary/dashboard.phtml:302
-#: ../view/application/summary/dashboard.phtml:411
-#: ../view/application/summary/dashboard.phtml:515
-#: ../view/layout/layout.phtml:231
+#: ../view/application/summary/dashboard.phtml:303
+#: ../view/application/summary/dashboard.phtml:412
+#: ../view/application/summary/dashboard.phtml:516
+#: ../view/layout/layout.phtml:233
 msgid "Facilities"
 msgstr "Health Centers"
 
@@ -1479,113 +1598,93 @@ msgstr ""
 msgid "Add New"
 msgstr ""
 
-#: ../view/application/laboratory/dashboard.phtml:172
+#: ../view/application/laboratory/dashboard.phtml:182
 #: ../view/application/laboratory/get-facilities-geolocation.phtml:37
-#: ../view/layout/layout.phtml:166
+#: ../view/layout/layout.phtml:168
 msgid "Labs Dashboard"
 msgstr ""
 
-#: ../view/application/laboratory/dashboard.phtml:186
+#: ../view/application/laboratory/dashboard.phtml:196
 msgid "Show Date Filter"
 msgstr ""
 
-#: ../view/application/laboratory/dashboard.phtml:187
+#: ../view/application/laboratory/dashboard.phtml:197
 msgid "Close Date Filter"
 msgstr ""
 
-#: ../view/application/laboratory/dashboard.phtml:239
+#: ../view/application/laboratory/dashboard.phtml:249
 #: ../view/application/laboratory/get-facilities-geolocation.phtml:53
 msgid "Please select one or more labs. Leave blank for All"
 msgstr ""
 
-#: ../view/application/laboratory/dashboard.phtml:277
+#: ../view/application/laboratory/dashboard.phtml:287
 msgid "Expand"
 msgstr ""
 
-#: ../view/application/laboratory/dashboard.phtml:280
-#: ../view/application/laboratory/dashboard.phtml:302
+#: ../view/application/laboratory/dashboard.phtml:290
+#: ../view/application/laboratory/dashboard.phtml:312
 msgid "All Sample Types"
 msgstr ""
 
-#: ../view/application/laboratory/dashboard.phtml:297
+#: ../view/application/laboratory/dashboard.phtml:307
 #: ../view/application/laboratory/get-sample-test-result-volume.phtml:26
 msgid "Samples Tested per Lab"
 msgstr ""
 
-#: ../view/application/laboratory/dashboard.phtml:319
-#: ../view/application/laboratory/get-sample-test-result-gender.phtml:32
-msgid "Samples Tested based on Gender"
-msgstr ""
-
-#: ../view/application/laboratory/dashboard.phtml:340
+#: ../view/application/laboratory/dashboard.phtml:350
 #: ../view/application/laboratory/get-lab-turn-around-time.phtml:22
 msgid "Laboratory Turnaround Time"
 msgstr ""
 
-#: ../view/application/laboratory/dashboard.phtml:354
-#: ../view/application/laboratory/get-sample-test-result-age-group.phtml:18
-msgid "Samples Tested based on Age"
-msgstr ""
-
-#: ../view/application/laboratory/dashboard.phtml:380
+#: ../view/application/laboratory/dashboard.phtml:444
 #: ../view/application/laboratory/get-sample-test-reason-bar-chart.phtml:26
-msgid "Samples Tested Reason"
+msgid "Reason for VL Testing"
 msgstr ""
 
-#: ../view/application/laboratory/dashboard.phtml:408
+#: ../view/application/laboratory/dashboard.phtml:472
 #: ../view/application/laboratory/get-sample-test-result-pregnant.phtml:26
 msgid "Samples Tested - Pregnant"
 msgstr ""
 
-#: ../view/application/laboratory/dashboard.phtml:420
+#: ../view/application/laboratory/dashboard.phtml:484
 #: ../view/application/laboratory/get-sample-test-result-breastfeeding.phtml:27
 msgid "Samples Tested - Breastfeeding"
 msgstr ""
 
-#: ../view/application/laboratory/dashboard.phtml:434
-#: ../view/application/laboratory/get-requisition-forms.phtml:10
-#: ../view/application/laboratory/requisition-forms-incomplete.phtml:44
-msgid "Request Form Completeness"
-msgstr ""
-
-#: ../view/application/laboratory/dashboard.phtml:438
-msgid "Please choose form fields"
-msgstr ""
-
-#: ../view/application/laboratory/dashboard.phtml:456
+#: ../view/application/laboratory/dashboard.phtml:520
 #: ../view/application/laboratory/get-sample-volume.phtml:15
 msgid "Sample Volume"
 msgstr ""
 
-#: ../view/application/laboratory/dashboard.phtml:463
+#: ../view/application/laboratory/dashboard.phtml:527
 #: ../view/application/laboratory/sample-volume.phtml:198
 msgid "Samples Not Tested"
 msgstr ""
 
-#: ../view/application/laboratory/dashboard.phtml:480
+#: ../view/application/laboratory/dashboard.phtml:544
 #: ../view/application/laboratory/get-female-patient-result.phtml:16
 msgid "Female Patients"
 msgstr ""
 
-#: ../view/application/laboratory/dashboard.phtml:492
+#: ../view/application/laboratory/dashboard.phtml:556
 #: ../view/application/laboratory/get-line-of-treatment.phtml:16
 msgid "Line Of Treatment"
 msgstr ""
 
-#: ../view/application/laboratory/dashboard.phtml:506
+#: ../view/application/laboratory/dashboard.phtml:633
 #: ../view/application/laboratory/get-facilities-geolocation.phtml:86
 msgid "All Facilities - Geolocation"
 msgstr ""
 
-#: ../view/application/laboratory/dashboard.phtml:510
+#: ../view/application/laboratory/dashboard.phtml:637
 msgid "Expand Map"
 msgstr ""
 
-#: ../view/application/laboratory/dashboard.phtml:529
+#: ../view/application/laboratory/dashboard.phtml:674
 msgid "Please choose date range"
 msgstr ""
 
-#: ../view/application/laboratory/dashboard.phtml:702
+#: ../view/application/laboratory/dashboard.phtml:924
 #: ../view/application/laboratory/get-facilities-geolocation.phtml:103
 #: ../view/application/laboratory/requisition-forms-incomplete.phtml:206
 #: ../view/application/laboratory/sample-result-awaited.phtml:376
@@ -1597,12 +1696,20 @@ msgstr ""
 msgid "All Labs"
 msgstr ""
 
-#: ../view/application/laboratory/dashboard.phtml:712
+#: ../view/application/laboratory/dashboard.phtml:934
 msgid "All Age Group"
 msgstr ""
 
-#: ../view/application/laboratory/dashboard.phtml:756
-#: ../view/application/laboratory/dashboard.phtml:1171
+#: ../view/application/laboratory/dashboard.phtml:956
+#: ../view/application/summary/dashboard.phtml:1242
+#: ../view/application/summary/dashboard.phtml:1260
+#: ../view/application/users/add.phtml:103
+#: ../view/application/users/edit.phtml:127
+msgid "All Facilities"
+msgstr ""
+
+#: ../view/application/laboratory/dashboard.phtml:985
+#: ../view/application/laboratory/dashboard.phtml:1406
 #: ../view/application/laboratory/sample-result-awaited.phtml:412
 #: ../view/application/laboratory/sample-result-awaited.phtml:431
 msgid "Choose Date Range"
@@ -1634,11 +1741,6 @@ msgstr ""
 msgid "Completed VS Incomplete Forms"
 msgstr ""
 
-#: ../view/application/laboratory/get-incomplete-bar-sample-details.phtml:26
-#: ../view/application/laboratory/get-requisition-forms.phtml:29
-msgid "Forms"
-msgstr ""
-
 #: ../view/application/laboratory/get-incomplete-sample-details.phtml:11
 msgid "Incomplete Fields"
 msgstr ""
@@ -1663,29 +1765,12 @@ msgstr ""
 msgid "Results Not Available (Province-wise)"
 msgstr ""
 
-#: ../view/application/laboratory/get-requisition-forms.phtml:44
-msgid "Completion Rate"
-msgstr ""
-
-#: ../view/application/laboratory/get-requisition-forms.phtml:93
-msgid "Complete"
-msgstr ""
-
-#: ../view/application/laboratory/get-requisition-forms.phtml:104
-msgid "Incomplete"
-msgstr ""
-
-#: ../view/application/laboratory/get-requisition-forms.phtml:115
-msgid "Completion Percentage"
-msgstr ""
-
 #: ../view/application/laboratory/get-sample-result.phtml:28
 msgid "Quick Stats"
 msgstr ""
 
 #: ../view/application/laboratory/get-sample-result.phtml:70
-#: ../view/application/laboratory/get-sample-result.phtml:145
-msgid "SAMPLES COLLECTED"
+msgid "SAMPLES REGISTERED"
 msgstr ""
 
 #: ../view/application/laboratory/get-sample-result.phtml:75
@@ -1704,22 +1789,37 @@ msgstr ""
 msgid "SAMPLES REJECTED"
 msgstr ""
 
-#: ../view/application/laboratory/get-sample-test-reason-bar-chart.phtml:57
-#: ../view/application/laboratory/get-sample-test-reason-bar-chart.phtml:135
-#: ../view/application/laboratory/get-sample-test-result-breastfeeding.phtml:56
-#: ../view/application/laboratory/get-sample-test-result-breastfeeding.phtml:121
-#: ../view/application/laboratory/get-sample-test-result-gender.phtml:62
-#: ../view/application/laboratory/get-sample-test-result-pregnant.phtml:55
-#: ../view/application/laboratory/get-sample-test-result-pregnant.phtml:121
-#: ../view/application/laboratory/get-sample-test-result-volume.phtml:55
-#: ../view/application/laboratory/get-sample-test-result-volume.phtml:136
-#: ../view/application/laboratory/get-sample-test-result.phtml:57
-#: ../view/application/laboratory/get-sample-test-result.phtml:129
-msgid "Suppression %"
+#: ../view/application/laboratory/get-sample-result.phtml:145
+msgid "SAMPLES COLLECTED"
 msgstr ""
 
-#: ../view/application/laboratory/get-sample-test-result-gender.phtml:128
-msgid "("
+#: ../view/application/laboratory/get-sample-status-data-table.phtml:10
+#: ../view/application/summary/dashboard.phtml:304
+#: ../view/application/summary/dashboard.phtml:315
+#: ../view/application/summary/dashboard.phtml:337
+#: ../view/application/summary/dashboard.phtml:413
+#: ../view/application/summary/dashboard.phtml:425
+#: ../view/application/summary/dashboard.phtml:445
+#: ../view/application/summary/dashboard.phtml:517
+#: ../view/application/summary/dashboard.phtml:529
+#: ../view/application/summary/dashboard.phtml:546
+msgid "Province"
+msgstr ""
+
+#: ../view/application/laboratory/get-sample-status-data-table.phtml:11
+msgid "District"
+msgstr ""
+
+#: ../view/application/laboratory/get-sample-status-data-table.phtml:17
+msgid "High Viral Load"
+msgstr ""
+
+#: ../view/application/laboratory/get-sample-test-result-age-group-greater-fifty.phtml:28
+msgid "Samples Tested based on Age > 50"
+msgstr ""
+
+#: ../view/application/laboratory/get-sample-test-result-age-group-unknown.phtml:28
+msgid "Samples Tested based on Age Unknown"
 msgstr ""
 
 #: ../view/application/laboratory/get-vl-out-comes.phtml:11
@@ -1769,12 +1869,9 @@ msgstr ""
 #: ../view/application/laboratory/samples-tested-lab.phtml:100
 #: ../view/application/laboratory/samples-tested-turn-around-time.phtml:100
 #: ../view/application/laboratory/samples-tested.phtml:99
-#: ../view/application/summary/-dashboard.phtml:304
-#: ../view/application/summary/-dashboard.phtml:413
-#: ../view/application/summary/-dashboard.phtml:517
-#: ../view/application/summary/dashboard.phtml:304
-#: ../view/application/summary/dashboard.phtml:413
-#: ../view/application/summary/dashboard.phtml:517
+#: ../view/application/summary/dashboard.phtml:305
+#: ../view/application/summary/dashboard.phtml:414
+#: ../view/application/summary/dashboard.phtml:518
 #: ../view/application/time/dashboard.phtml:169
 msgid "Districts"
 msgstr ""
@@ -1833,6 +1930,13 @@ msgid "Please choose clinics"
 msgstr "Please choose Health Center"
 
 #: ../view/application/laboratory/sample-result-awaited.phtml:209
+#: ../view/application/laboratory/sample-volume.phtml:272
+#: ../view/application/laboratory/samples-tested-lab.phtml:276
+#: ../view/application/laboratory/samples-tested-turn-around-time.phtml:216
+#: ../view/application/laboratory/samples-tested.phtml:289
+#: ../view/application/summary/dashboard.phtml:319
+#: ../view/application/summary/dashboard.phtml:340
+#: ../view/application/summary/dashboard.phtml:361
 msgid "Results Not Available"
 msgstr ""
 
@@ -1912,54 +2016,25 @@ msgstr ""
 msgid "Funded by"
 msgstr ""
 
-#: ../view/application/login/index.phtml:97 ../view/layout/layout.phtml:460
+#: ../view/application/login/index.phtml:97 ../view/layout/layout.phtml:462
 msgid "The Task Force for Global Health"
 msgstr ""
 
-#: ../view/application/login/index.phtml:98 ../view/layout/layout.phtml:461
+#: ../view/application/login/index.phtml:98 ../view/layout/layout.phtml:463
 msgid "Emory University / PEPFAR"
 msgstr ""
 
-#: ../view/application/summary/-dashboard.phtml:236
-#: ../view/application/summary/dashboard.phtml:236
-#: ../view/layout/layout.phtml:155
+#: ../view/application/summary/dashboard.phtml:237
+#: ../view/layout/layout.phtml:157
 msgid "Summary"
 msgstr ""
 
-#: ../view/application/summary/-dashboard.phtml:245
-#: ../view/application/summary/-dashboard.phtml:280
-#: ../view/application/summary/-dashboard.phtml:316
-#: ../view/application/summary/-dashboard.phtml:337
-#: ../view/application/summary/-dashboard.phtml:358
-#: ../view/application/summary/-dashboard.phtml:530
-#: ../view/application/summary/-dashboard.phtml:546
-#: ../view/application/summary/-dashboard.phtml:563
-#: ../view/application/summary/-dashboard.phtml:612
-#: ../view/application/summary/dashboard.phtml:245
-#: ../view/application/summary/dashboard.phtml:280
-#: ../view/application/summary/dashboard.phtml:316
-#: ../view/application/summary/dashboard.phtml:337
-#: ../view/application/summary/dashboard.phtml:358
-#: ../view/application/summary/dashboard.phtml:530
-#: ../view/application/summary/dashboard.phtml:546
-#: ../view/application/summary/dashboard.phtml:563
-#: ../view/application/summary/dashboard.phtml:657
-#: ../view/application/summary/get-samples-received-bar-chart.phtml:22
-msgid "Samples Received"
-msgstr ""
-
-#: ../view/application/summary/-dashboard.phtml:251
-#: ../view/application/summary/-dashboard.phtml:389
-#: ../view/application/summary/-dashboard.phtml:430
-#: ../view/application/summary/-dashboard.phtml:449
-#: ../view/application/summary/-dashboard.phtml:468
-#: ../view/application/summary/-dashboard.phtml:616
-#: ../view/application/summary/dashboard.phtml:251
-#: ../view/application/summary/dashboard.phtml:389
-#: ../view/application/summary/dashboard.phtml:430
-#: ../view/application/summary/dashboard.phtml:449
-#: ../view/application/summary/dashboard.phtml:468
-#: ../view/application/summary/dashboard.phtml:661
+#: ../view/application/summary/dashboard.phtml:252
+#: ../view/application/summary/dashboard.phtml:390
+#: ../view/application/summary/dashboard.phtml:431
+#: ../view/application/summary/dashboard.phtml:450
+#: ../view/application/summary/dashboard.phtml:469
+#: ../view/application/summary/dashboard.phtml:668
 #: ../view/application/summary/get-regimen-group-bar-chart.phtml:56
 #: ../view/application/summary/get-regimen-group-bar-chart.phtml:99
 #: ../view/application/summary/get-suppression-rate-bar-chart.phtml:54
@@ -1967,74 +2042,40 @@ msgstr ""
 msgid "Suppression Rate"
 msgstr ""
 
-#: ../view/application/summary/-dashboard.phtml:257
-#: ../view/application/summary/dashboard.phtml:257
+#: ../view/application/summary/dashboard.phtml:258
 msgid "Rejection Rate"
 msgstr ""
 
-#: ../view/application/summary/-dashboard.phtml:262
-#: ../view/application/summary/dashboard.phtml:262
+#: ../view/application/summary/dashboard.phtml:263
 msgid "on 1st Line"
 msgstr ""
 
-#: ../view/application/summary/-dashboard.phtml:268
-#: ../view/application/summary/dashboard.phtml:268
+#: ../view/application/summary/dashboard.phtml:269
 msgid "Reg. All"
 msgstr ""
 
-#: ../view/application/summary/-dashboard.phtml:269
-#: ../view/application/summary/dashboard.phtml:269
+#: ../view/application/summary/dashboard.phtml:270
 msgid "All Regimens"
 msgstr ""
 
-#: ../view/application/summary/-dashboard.phtml:295
-#: ../view/application/summary/dashboard.phtml:295
-msgid "Districts/Facility Wise Samples Received Summary"
+#: ../view/application/summary/dashboard.phtml:296
+msgid "Districts/Facility Wise Samples Registered Summary"
 msgstr "Districts/Health Centers Wise Samples Received Summary"
 
-#: ../view/application/summary/-dashboard.phtml:303
-#: ../view/application/summary/-dashboard.phtml:314
-#: ../view/application/summary/-dashboard.phtml:336
-#: ../view/application/summary/-dashboard.phtml:412
-#: ../view/application/summary/-dashboard.phtml:424
-#: ../view/application/summary/-dashboard.phtml:444
-#: ../view/application/summary/-dashboard.phtml:516
-#: ../view/application/summary/-dashboard.phtml:528
-#: ../view/application/summary/-dashboard.phtml:545
-#: ../view/application/summary/dashboard.phtml:303
-#: ../view/application/summary/dashboard.phtml:314
-#: ../view/application/summary/dashboard.phtml:336
-#: ../view/application/summary/dashboard.phtml:412
-#: ../view/application/summary/dashboard.phtml:424
-#: ../view/application/summary/dashboard.phtml:444
-#: ../view/application/summary/dashboard.phtml:516
-#: ../view/application/summary/dashboard.phtml:528
-#: ../view/application/summary/dashboard.phtml:545
-msgid "Province"
-msgstr ""
-
-#: ../view/application/summary/-dashboard.phtml:321
-#: ../view/application/summary/-dashboard.phtml:342
-#: ../view/application/summary/-dashboard.phtml:363
-#: ../view/application/summary/dashboard.phtml:321
-#: ../view/application/summary/dashboard.phtml:342
-#: ../view/application/summary/dashboard.phtml:363
+#: ../view/application/summary/dashboard.phtml:322
+#: ../view/application/summary/dashboard.phtml:343
+#: ../view/application/summary/dashboard.phtml:364
 msgid "Plasma"
 msgstr ""
 
-#: ../view/application/summary/-dashboard.phtml:404
-#: ../view/application/summary/dashboard.phtml:404
+#: ../view/application/summary/dashboard.phtml:405
 msgid "Facility Wise Suppression Rate Summary"
 msgstr "Health Center Wise Suppression Rate Summary"
 
-#: ../view/application/summary/-dashboard.phtml:426
-#: ../view/application/summary/-dashboard.phtml:445
-#: ../view/application/summary/-dashboard.phtml:464
-#: ../view/application/summary/-dashboard.phtml:614
-#: ../view/application/summary/dashboard.phtml:426
-#: ../view/application/summary/dashboard.phtml:445
-#: ../view/application/summary/dashboard.phtml:464
-#: ../view/application/summary/dashboard.phtml:659
+#: ../view/application/summary/dashboard.phtml:427
+#: ../view/application/summary/dashboard.phtml:446
+#: ../view/application/summary/dashboard.phtml:465
+#: ../view/application/summary/dashboard.phtml:666
 #: ../view/application/summary/get-regimen-group-bar-chart.phtml:66
 #: ../view/application/summary/get-regimen-group-bar-chart.phtml:83
 #: ../view/application/summary/get-suppression-rate-bar-chart.phtml:63
@@ -2042,181 +2083,147 @@ msgstr "Health Center Wise Suppression Rate Summary"
 msgid "Valid Results"
 msgstr ""
 
-#: ../view/application/summary/-dashboard.phtml:427
-#: ../view/application/summary/-dashboard.phtml:446
-#: ../view/application/summary/-dashboard.phtml:465
-#: ../view/application/summary/dashboard.phtml:427
-#: ../view/application/summary/dashboard.phtml:446
-#: ../view/application/summary/dashboard.phtml:465
-msgid "Suppressed Results"
-msgstr ""
-
-#: ../view/application/summary/-dashboard.phtml:428
-#: ../view/application/summary/-dashboard.phtml:447
-#: ../view/application/summary/-dashboard.phtml:466
 #: ../view/application/summary/dashboard.phtml:428
 #: ../view/application/summary/dashboard.phtml:447
 #: ../view/application/summary/dashboard.phtml:466
+msgid "Suppressed Results"
+msgstr ""
+
+#: ../view/application/summary/dashboard.phtml:429
+#: ../view/application/summary/dashboard.phtml:448
+#: ../view/application/summary/dashboard.phtml:467
 msgid "Non Suppressed Results"
 msgstr ""
 
-#: ../view/application/summary/-dashboard.phtml:508
-#: ../view/application/summary/dashboard.phtml:508
+#: ../view/application/summary/dashboard.phtml:509
 msgid "District Wise Samples Rejected Summary"
 msgstr ""
 
-#: ../view/application/summary/-dashboard.phtml:531
-#: ../view/application/summary/-dashboard.phtml:548
-#: ../view/application/summary/-dashboard.phtml:565
-#: ../view/application/summary/dashboard.phtml:531
-#: ../view/application/summary/dashboard.phtml:548
-#: ../view/application/summary/dashboard.phtml:565
+#: ../view/application/summary/dashboard.phtml:532
+#: ../view/application/summary/dashboard.phtml:549
+#: ../view/application/summary/dashboard.phtml:566
 msgid "Rejection Rate(%)"
 msgstr ""
 
-#: ../view/application/summary/-dashboard.phtml:589
-#: ../view/application/summary/dashboard.phtml:634
+#: ../view/application/summary/dashboard.phtml:589
+msgid "Number of samples on 1st line Current Regimen"
+msgstr ""
+
+#: ../view/application/summary/dashboard.phtml:590
+msgid "Total number of samples having valid Current Regimen"
+msgstr ""
+
+#: ../view/application/summary/dashboard.phtml:641
 #: ../view/application/summary/get-regimen-group-bar-chart.phtml:25
 msgid "Regimen Groups"
 msgstr ""
 
-#: ../view/application/summary/-dashboard.phtml:604
-#: ../view/application/summary/dashboard.phtml:649
+#: ../view/application/summary/dashboard.phtml:656
 msgid "Regimen Groups Summary"
 msgstr ""
 
-#: ../view/application/summary/-dashboard.phtml:611
-#: ../view/application/summary/dashboard.phtml:656
+#: ../view/application/summary/dashboard.phtml:663
 msgid "Regimen"
 msgstr ""
 
-#: ../view/application/summary/-dashboard.phtml:615
-#: ../view/application/summary/dashboard.phtml:660
+#: ../view/application/summary/dashboard.phtml:667
 msgid "Number Suppressed"
 msgstr ""
 
-#: ../view/application/summary/-dashboard.phtml:617
-#: ../view/application/summary/dashboard.phtml:662
+#: ../view/application/summary/dashboard.phtml:669
 msgid "Percentage of Samples(%)"
 msgstr ""
 
-#: ../view/application/summary/-dashboard.phtml:640
-#: ../view/application/summary/dashboard.phtml:685
+#: ../view/application/summary/dashboard.phtml:692
 msgid "By Line of Regimen"
 msgstr ""
 
-#: ../view/application/summary/-dashboard.phtml:644
-#: ../view/application/summary/dashboard.phtml:689
+#: ../view/application/summary/dashboard.phtml:696
 msgid "1st Line"
 msgstr ""
 
-#: ../view/application/summary/-dashboard.phtml:645
-#: ../view/application/summary/dashboard.phtml:690
+#: ../view/application/summary/dashboard.phtml:697
 msgid "2nd Line"
 msgstr ""
 
-#: ../view/application/summary/-dashboard.phtml:652
-#: ../view/application/summary/-dashboard.phtml:720
-#: ../view/application/summary/-dashboard.phtml:803
-#: ../view/application/summary/-dashboard.phtml:887
-#: ../view/application/summary/-dashboard.phtml:972
-#: ../view/application/summary/dashboard.phtml:697
-#: ../view/application/summary/dashboard.phtml:765
-#: ../view/application/summary/dashboard.phtml:848
-#: ../view/application/summary/dashboard.phtml:932
-#: ../view/application/summary/dashboard.phtml:1017
+#: ../view/application/summary/dashboard.phtml:704
+#: ../view/application/summary/dashboard.phtml:772
+#: ../view/application/summary/dashboard.phtml:855
+#: ../view/application/summary/dashboard.phtml:939
+#: ../view/application/summary/dashboard.phtml:1024
 msgid "Results"
 msgstr ""
 
-#: ../view/application/summary/-dashboard.phtml:702
-#: ../view/application/summary/dashboard.phtml:747
+#: ../view/application/summary/dashboard.phtml:754
 msgid "By first line regimens [Adult & Paeds]"
 msgstr ""
 
-#: ../view/application/summary/-dashboard.phtml:705
-#: ../view/application/summary/dashboard.phtml:750
+#: ../view/application/summary/dashboard.phtml:757
 msgid "1st Line (ADULT)"
 msgstr ""
 
-#: ../view/application/summary/-dashboard.phtml:788
-#: ../view/application/summary/dashboard.phtml:833
+#: ../view/application/summary/dashboard.phtml:840
 msgid "1st Line (PAEDS)"
 msgstr ""
 
-#: ../view/application/summary/-dashboard.phtml:869
-#: ../view/application/summary/dashboard.phtml:914
+#: ../view/application/summary/dashboard.phtml:921
 msgid "By second line regimens [Adult & Paeds] & Others"
 msgstr ""
 
-#: ../view/application/summary/-dashboard.phtml:872
-#: ../view/application/summary/dashboard.phtml:917
+#: ../view/application/summary/dashboard.phtml:924
 msgid "2nd Line (ADULT)"
 msgstr ""
 
-#: ../view/application/summary/-dashboard.phtml:955
-#: ../view/application/summary/dashboard.phtml:1000
+#: ../view/application/summary/dashboard.phtml:1007
 msgid "2nd Line (PAEDS)"
 msgstr ""
 
-#: ../view/application/summary/-dashboard.phtml:1066
-#: ../view/application/summary/dashboard.phtml:1111
+#: ../view/application/summary/dashboard.phtml:1119
 msgid "SUMMARY OF KEY INDICATORS"
 msgstr ""
 
-#: ../view/application/summary/-dashboard.phtml:1074
-#: ../view/application/summary/dashboard.phtml:1119
-msgid "Months"
+#: ../view/application/summary/dashboard.phtml:1123
+msgid "Export Excel"
 msgstr ""
 
-#: ../view/application/summary/-dashboard.phtml:1446
-#: ../view/application/summary/dashboard.phtml:1526
-msgid "District Wise Samples Received"
-msgstr ""
-
-#: ../view/application/summary/-dashboard.phtml:1448
-#: ../view/application/summary/dashboard.phtml:1528
-msgid "Facility Wise Samples Received"
+#: ../view/application/summary/dashboard.phtml:1576
+msgid "District Wise Samples Registered"
 msgstr "Health Center Wise Samples Received"
 
-#: ../view/application/summary/-dashboard.phtml:1450
-#: ../view/application/summary/dashboard.phtml:1530
-msgid "Province Wise Samples Received"
-msgstr ""
+#: ../view/application/summary/dashboard.phtml:1578
+msgid "Facility Wise Samples Registered"
+msgstr "Health Center Wise Samples Received"
 
-#: ../view/application/summary/-dashboard.phtml:1452
-#: ../view/application/summary/dashboard.phtml:1532
+#: ../view/application/summary/dashboard.phtml:1580
+msgid "Province Wise Samples Registered"
+msgstr "Health Center Wise Samples Received"
+
+#: ../view/application/summary/dashboard.phtml:1582
 msgid "District Wise Suppression Rate"
 msgstr ""
 
-#: ../view/application/summary/-dashboard.phtml:1454
-#: ../view/application/summary/dashboard.phtml:1534
+#: ../view/application/summary/dashboard.phtml:1584
 msgid "Facility Wise Suppression Rate"
 msgstr "Health Center-Wise Suppression Rate"
 
-#: ../view/application/summary/-dashboard.phtml:1456
-#: ../view/application/summary/dashboard.phtml:1536
+#: ../view/application/summary/dashboard.phtml:1586
 msgid "Province Wise Suppression Rate"
 msgstr ""
 
-#: ../view/application/summary/-dashboard.phtml:1458
-#: ../view/application/summary/dashboard.phtml:1538
+#: ../view/application/summary/dashboard.phtml:1588
 msgid "District Wise Samples Rejected"
 msgstr ""
 
-#: ../view/application/summary/-dashboard.phtml:1460
-#: ../view/application/summary/dashboard.phtml:1540
+#: ../view/application/summary/dashboard.phtml:1590
 msgid "Facility Wise Samples Rejected"
 msgstr "Health Center-Wise Samples Rejected"
 
-#: ../view/application/summary/-dashboard.phtml:1462
-#: ../view/application/summary/dashboard.phtml:1542
+#: ../view/application/summary/dashboard.phtml:1592
 msgid "Province Wise Samples Rejected"
 msgstr ""
 
-#: ../view/application/summary/dashboard.phtml:1205
-#: ../view/application/users/add.phtml:103
-#: ../view/application/users/edit.phtml:127
-msgid "All Facilities"
+#: ../view/application/summary/get-samples-received-bar-chart.phtml:27
+msgid "Samples Received"
 msgstr ""
 
 #: ../view/application/summary/get-suppression-rate-bar-chart.phtml:26
@@ -2308,7 +2315,7 @@ msgstr ""
 
 #: ../view/application/users/add.phtml:12
 #: ../view/application/users/edit.phtml:20
-#: ../view/application/users/index.phtml:13 ../view/layout/layout.phtml:226
+#: ../view/application/users/index.phtml:13 ../view/layout/layout.phtml:228
 msgid "Users"
 msgstr ""
 
@@ -2441,40 +2448,40 @@ msgstr ""
 msgid "An error occurred"
 msgstr ""
 
-#: ../view/layout/layout.phtml:23 ../view/layout/layout.phtml:89
+#: ../view/layout/layout.phtml:23 ../view/layout/layout.phtml:91
 #: ../view/layout/modal.phtml:10
 msgid "Smart Connect"
 msgstr ""
 
-#: ../view/layout/layout.phtml:98
+#: ../view/layout/layout.phtml:100
 msgid "Development/Test Environment with dummy data"
 msgstr ""
 
-#: ../view/layout/layout.phtml:111
+#: ../view/layout/layout.phtml:113
 msgid "Log Out"
 msgstr ""
 
-#: ../view/layout/layout.phtml:197
+#: ../view/layout/layout.phtml:199
 msgid "Data Management"
 msgstr ""
 
-#: ../view/layout/layout.phtml:203
+#: ../view/layout/layout.phtml:205
 msgid "Duplicate Data"
 msgstr ""
 
-#: ../view/layout/layout.phtml:215
+#: ../view/layout/layout.phtml:217
 msgid "Admin"
 msgstr ""
 
-#: ../view/layout/layout.phtml:221
+#: ../view/layout/layout.phtml:223
 msgid "Global Config"
 msgstr ""
 
-#: ../view/layout/layout.phtml:236
+#: ../view/layout/layout.phtml:238
 msgid "Import"
 msgstr ""
 
-#: ../view/layout/layout.phtml:459
+#: ../view/layout/layout.phtml:461
 msgid ""
 "Smart Connect - The Viral Load Dashboard (Testing Environment with dummy "
 "data) | Funded by"

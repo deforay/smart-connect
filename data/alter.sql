@@ -396,3 +396,25 @@ INSERT INTO `dash_user_roles` (`role_id`, `role_name`, `role_code`, `status`) VA
 -- saravanan 05-mar-2019
 INSERT INTO `dash_user_roles` (`role_id`, `role_name`, `role_code`, `status`) VALUES (6, 'API', 'api', 'active');
 ALTER TABLE `dash_users` ADD `api_token` VARCHAR(255) NULL DEFAULT NULL AFTER `role`;
+
+INSERT INTO `dash_user_roles` (`role_id`, `role_name`, `role_code`, `status`) VALUES (7, 'Data Integration', 'DATAINTEGRATION', 'active');
+ALTER TABLE `dash_users` ADD `otp` VARCHAR(255) NULL DEFAULT NULL AFTER `role`;
+
+-- Amit 04-Apr-2019
+ALTER TABLE `dash_users` DROP `login_id`;
+
+
+-- Amit 09 April 2019
+
+CREATE TABLE `generate_backups` (
+ `id` int(11) NOT NULL AUTO_INCREMENT,
+ `start_date` date NOT NULL,
+ `end_date` date NOT NULL,
+ `requested_by` int(11) NOT NULL,
+ `requested_on` datetime NOT NULL,
+ `status` varchar(255) NOT NULL,
+ `completed_on` datetime NOT NULL,
+ PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- 

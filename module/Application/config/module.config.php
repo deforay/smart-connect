@@ -257,6 +257,16 @@ return array(
                         ),
                     ),
                 ),
+                'generate-backup' => array(
+                    'type' => 'simple',
+                    'options' => array(
+                        'route' => 'generate-backup',
+                        'defaults' => array(
+                            'controller' => 'Application\Controller\Cron',
+                            'action' => 'generate-backup',
+                        ),
+                    ),
+                ),
             ),
         ),
     ),

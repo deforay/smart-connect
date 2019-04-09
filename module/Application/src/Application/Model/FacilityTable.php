@@ -37,7 +37,7 @@ class FacilityTable extends AbstractTableGateway {
         if(trim($params['facilityName']!='')){
             $facilityData=array('facility_name'=>$params['facilityName'],
                         'facility_code'=>$params['facilityCode'],
-                        'vlsm_instance_id'=>'mozambiquedisaopenldr',
+                        'vlsm_instance_id'=>'vldashboard',
                         'other_id'=>$params['otherId'],
                         'facility_emails'=>$params['email'],
                         'report_email'=>$params['reportEmail'],
@@ -241,7 +241,6 @@ class FacilityTable extends AbstractTableGateway {
         if(trim($params['facilityName']!='')){
             $facilityData=array('facility_name'=>$params['facilityName'],
 		'facility_code'=>$params['facilityCode'],
-		'vlsm_instance_id'=>'mozambiquedisaopenldr',
 		'other_id'=>$params['otherId'],
 		'facility_emails'=>$params['email'],
 		'report_email'=>$params['reportEmail'],

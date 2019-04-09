@@ -20,6 +20,12 @@ class UserService {
         $db = $this->sm->get('UsersTable');
         return $db->login($params);
     }
+    public function otp($params) {
+        $dataInterfaceLogin = new Container('dataInterfaceLogin');
+        $loginParams = array('email' => $dataInterfaceLogin->email,'password' => $dataInterfaceLogin->password);
+        $db = $this->sm->get('UsersTable');
+        return $db->login($loginParams,$params['otp']);
+    }
     public function fetchUsers() {
         $db = $this->sm->get('UsersTable');
         return $db->fetchUsers();

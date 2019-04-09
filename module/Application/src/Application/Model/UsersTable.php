@@ -30,14 +30,21 @@ class UsersTable extends AbstractTableGateway {
         $this->sm = $sm;
     }
     
-    public function login($params) {
+    public function login($params, $otp = null) {
         $username = $params['email'];
         $password = $params['password'];
+
+        //echo $username; echo $password; echo $otp; die;
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->from(array('u' => 'dash_users'))
                       ->join(array('r' => 'dash_user_roles'), 'u.role=r.role_id')
                       ->where(array('email' => $username, 'password' => $password));
+        
+        if(isset($otp) && $otp != null && $otp!= ''){
+            $sQuery = $sQuery->where(array('otp' => $otp));
+        }
+
         $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $container = new Container('alert');
@@ -87,6 +94,30 @@ class UsersTable extends AbstractTableGateway {
             $logincontainer->provinces = $provinces;
             $logincontainer->districts = $districts;
             $container->alertMsg = '';
+
+
+            if($otp == null && $logincontainer->role == 7){
+                
+                // Let us ensure this person cannot login till they enter OTP.
+                // so we will clear the login session                
+                $logincontainer->getManager()->getStorage()->clear('credo');   
+
+                $dataInterfaceLogin = new Container('dataInterfaceLogin');
+                $dataInterfaceLogin->email = $rResult[0]["email"];
+                $dataInterfaceLogin->password = $rResult[0]["password"];
+
+                return '/login/otp';
+
+
+            }else if($otp != null && $logincontainer->role == 7){
+                return '/data-management/export/';
+            }
+            
+            else if($logincontainer->role == 3){
+                return '/clinics/dashboard';
+            } else {
+                return '/summary/dashboard';
+            }
             //die('home');
             // if($logincontainer->role == 1 || $logincontainer->role == 2 || $logincontainer->role == 5){
             //    //return '/labs/dashboard';
@@ -99,13 +130,10 @@ class UsersTable extends AbstractTableGateway {
             //     return '/summary/dashboard';
             // }
 
-            if($logincontainer->role == 3){
-                 return '/clinics/dashboard';
-            } else {
-                 return '/summary/dashboard';
-            }
+            
 
         } else {
+            $container = new Container('alert');
             $container->alertMsg = 'Please check your login credentials';
             //die('login');
             return '/login';
@@ -345,7 +373,7 @@ class UsersTable extends AbstractTableGateway {
 
             $sQuery = $sql->select()->from(array('u' => 'dash_users'))
                       ->join(array('r' => 'dash_user_roles'), 'u.role=r.role_id',array('role_code'))
-                      ->where(array('login_id' => $username, 'password' => $password,'u.status'=>'active','role'=>'6'));
+                      ->where(array('email' => $username, 'password' => $password,'u.status'=>'active','role'=>'6'));
             $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
             $rResult=$dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
             if($rResult!=""){
