@@ -217,4 +217,17 @@ class SummaryController extends AbstractActionController{
             return $viewModel;
         }
     }
+
+    public function exportSuppressionRateByFacilityAction() {
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $summaryService = $this->getServiceLocator()->get('SummaryService');
+            $file=$summaryService->exportSuppressionRateByFacility($params);
+            $viewModel = new ViewModel();
+            $viewModel->setVariables(array('file' =>$file))
+                      ->setTerminal(true);
+            return $viewModel;
+        }
+    }
 }

@@ -16,7 +16,6 @@ if (php_sapi_name() === 'cli-server') {
 defined('APPLICATION_PATH')
     || define('APPLICATION_PATH', realpath(dirname(__FILE__)));
 
-
 defined('UPLOAD_PATH')
     || define('UPLOAD_PATH', realpath(dirname(__FILE__) . '/uploads'));
     

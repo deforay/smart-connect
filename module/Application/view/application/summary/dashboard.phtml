@@ -508,6 +508,8 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
                             </div>
                             <div class="tab-content" style="border:none;height:560px;max-height:600px;overflow:scroll;">
                             <div class="tab-pane active" id="facilityWiseSuppressionRateSummary">
+
+                            <button class="btn btn-primary pull-right" onclick="exportSuppressionRateByFacility();"><span><i class="fa fa-file-excel-o" aria-hidden="true"></i> <?php echo $this->translate('Export Excel'); ?></span></button> <br><br>
                                     <table class="table table-striped table-bordered table-hover order-column" id="suppressionRateFacility" style="width:100%;" >
                                         <thead>
                                             <tr>
@@ -1832,7 +1834,20 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
             if(data == "" || data == null || data == undefined){
                 alert('<?php echo $this->translate('Unable to export excel') ?>');
             }else{
-                window.open('../temporary/'+data,'_blank');
+                window.open('/temporary/'+data,'_blank');
+            }
+        }); 
+    }
+
+    function exportSuppressionRateByFacility(){
+       $.blockUI.defaults.css.border = '1px solid grey';
+       $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI); 
+       $.post("<?php echo $this->url('summary', array('action' => 'export-suppression-rate-by-facility')); ?>", {result : $("#sampleStatus").val()},
+        function(data){
+            if(data == "" || data == null || data == undefined){
+                alert('<?php echo $this->translate('Unable to export excel') ?>');
+            }else{
+                window.open('/temporary/'+data,'_blank');
             }
         }); 
     }

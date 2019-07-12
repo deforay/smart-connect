@@ -25,13 +25,15 @@ class SampleTable extends AbstractTableGateway {
 
     protected $table = 'dash_vl_request_form';
     public $sm = null;
-    protected $dbsId = 1;
-    protected $plasmaId = 2;
+    protected $dbsId = null;
+    protected $plasmaId = null;
 
     public function __construct(Adapter $adapter, $sm=null) {
         $this->adapter = $adapter;
         $this->sm = $sm;
-        
+        $config = $this->sm->get('Config');
+        $this->dbsId = $config['defaults']['dbsId'];
+        $this->plasmaId = $config['defaults']['plasmaId'];
     }
     
     public function fetchQuickStats($params){
@@ -5819,6 +5821,9 @@ class SampleTable extends AbstractTableGateway {
         /* Array of database columns which should be read and sent back to DataTables. Use a space where
          * you want to insert a non-database field (for example a counter or static image)
         */
+
+        $queryContainer = new Container('query');
+
         $aColumns = array('facility_name','f_d_l_dp.location_name','f_d_l_d.location_name');
         $orderColumns = array('f_d_l_d.location_name','f_d_l_dp.location_name','f_d_l_d.location_name','total_samples_valid','total_suppressed_samples','total_not_suppressed_samples','total_samples_rejected','suppression_rate');
 
@@ -5927,6 +5932,8 @@ class SampleTable extends AbstractTableGateway {
         if (isset($sOrder) && $sOrder != "") {
             $sQuery->order($sOrder);
         }
+
+        $queryContainer->fetchAllSuppressionRateByFacility = $sQuery;
         
         if (isset($sLimit) && isset($sOffset)) {
             $sQuery->limit($sLimit);
