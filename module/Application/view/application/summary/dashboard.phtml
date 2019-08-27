@@ -1,13 +1,19 @@
 <?php
 use Zend\Session\Container;
 $languagecontainer = new Container('language');
-$startYear=date("Y", strtotime("-1 year"));
-$startMonth = date('m', strtotime('+1 month', strtotime('-1 year')));
-$endYear = date('Y');
-$endMonth = date('m');
 
-$startDate = date('Y-m', strtotime('+1 month', strtotime('-1 year')));
-$endDate=date('Y-m');
+$startArray = explode("-",$startDate);
+$endArray = explode("-",$endDate);
+
+$startYear= (int)$startArray[0];
+$startMonth = (int)$startArray[1] - 1;
+$endYear = (int)$endArray[0];
+$endMonth = (int)$endArray[1] - 1;
+
+
+$MONTHS = array("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec");
+
+
 
 $totalSampleTested = 0;
 $rejectedSamples = 0;
@@ -234,7 +240,28 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
 </style>
 
 <div class="page-bar">
-    <h1 class="page-title"><?php echo $this->translate('Summary'); ?></h1>
+    <h1 class="page-title">
+        <div class="col-lg-1">
+            <?php echo $this->translate('Summary'); ?>
+        </div>
+
+
+        <div class="col-lg-2" style="margin-top:-5px;padding-bottom:10px;margin-left:20px;">
+                <div id="sla-date-range" class="mrp-container form-control">
+                    <span class="mrp-icon"><i class="fa fa-calendar"></i> &nbsp;</span>
+                    <div class="mrp-monthdisplay ">
+                      <span class="mrp-lowerMonth"><?php echo $MONTHS[$startMonth]; ?> <?php echo $startYear; ?></span>
+                      <span class="mrp-to"> to </span>
+                      <span class="mrp-upperMonth"><?php echo $MONTHS[$endMonth]; ?> <?php echo $endYear; ?></span>
+                    </div>
+                  <input type="hidden" value="<?php echo $startDate; ?>" id="mrp-lowerDate" onchange=""/>
+                  <input type="hidden" value="<?php echo $endDate; ?>" id="mrp-upperDate" />
+                </div>
+        </div>        
+        <div class="col-lg-1" style="margin-top:-5px;padding-bottom:10px;margin-left:-20px;">
+        <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="summarize();"><?php echo $this->translate('Search'); ?></a>
+        </div>
+    </h1>
 </div>
 <br>
 
@@ -1326,14 +1353,10 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
     var oTableSamplesRejectedFacility = null;
     var oTableSamplesRejectedProvince = null;
     var otableRegimenGroups = null;
-    $(function() {
-      toggleSummary('facilityWiseSamplesReceivedSummary','provinceWiseSamplesReceivedSummary','districtWiseSamplesReceivedSummary');
-      toggleSummary('facilityWiseSuppressionRateSummary','provinceWiseSuppressionRateSummary','districtWiseSuppressionRateSummary');
-      toggleSummary('facilityWiseSamplesRejectedSummary','provinceWiseSamplesRejectedSummary','districtWiseSamplesRejectedSummary');
-      
-      $.blockUI.defaults.css.border = '1px solid grey';
-      //$(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
 
+
+
+    function getAllDataNow(){
       getSamplesReceivedBarChartInfo();
       getSuppressionRateBarChartInfo();
       getSamplesRejectedBarChartInfo();
@@ -1349,7 +1372,19 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
       facilityWiseSamplesRejectedSummaryFn();
       provinceWiseSamplesRejectedSummaryFn();
       regimenGroupsSummaryFn();
-      getSummaryIndicators();
+      getSummaryIndicators();                                
+    }
+
+    $(function() {
+      toggleSummary('facilityWiseSamplesReceivedSummary','provinceWiseSamplesReceivedSummary','districtWiseSamplesReceivedSummary');
+      toggleSummary('facilityWiseSuppressionRateSummary','provinceWiseSuppressionRateSummary','districtWiseSuppressionRateSummary');
+      toggleSummary('facilityWiseSamplesRejectedSummary','provinceWiseSamplesRejectedSummary','districtWiseSamplesRejectedSummary');
+      
+      $.blockUI.defaults.css.border = '1px solid grey';
+      //$(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
+
+      getAllDataNow();
+      
       /* District ,Province and Facilities */     
     $('#provinceName').select2({
         placeholder: "<?php echo $this->translate('All Province'); ?>",
@@ -1437,7 +1472,9 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
             "aaSorting": [[ 1, "desc" ]],
             "pagingType": "simple",
             "sAjaxSource": "<?php echo $this->url('summary',array('action' => 'samples-received-district')); ?>",
-            "fnServerData": function ( sSource, aoData, fnCallback ) {                
+            "fnServerData": function ( sSource, aoData, fnCallback ) {
+                aoData.push({ "name":"fromDate","value": $('#mrp-lowerDate').val()});
+                aoData.push({ "name":"toDate","value": $('#mrp-upperDate').val()});                
                 $.ajax({
                     "dataType": 'json',
                     "type": "POST",
@@ -1472,6 +1509,8 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
             "pagingType": "simple",
             "sAjaxSource": "<?php echo $this->url('summary',array('action' => 'samples-received-facility')); ?>",
             "fnServerData": function ( sSource, aoData, fnCallback ) {                
+                aoData.push({ "name":"fromDate","value": $('#mrp-lowerDate').val()});
+                aoData.push({ "name":"toDate","value": $('#mrp-upperDate').val()});
                 $.ajax({
                     "dataType": 'json',
                     "type": "POST",
@@ -1504,6 +1543,8 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
             "pagingType": "simple",
             "sAjaxSource": "<?php echo $this->url('summary',array('action' => 'samples-received-province')); ?>",
             "fnServerData": function ( sSource, aoData, fnCallback ) {                
+                aoData.push({ "name":"fromDate","value": $('#mrp-lowerDate').val()});
+                aoData.push({ "name":"toDate","value": $('#mrp-upperDate').val()});                
                 $.ajax({
                     "dataType": 'json',
                     "type": "POST",
@@ -1533,7 +1574,9 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
             "aaSorting": [[ 1, "desc" ]],
             "pagingType": "simple",
             "sAjaxSource": "<?php echo $this->url('summary',array('action' => 'suppression-rate-district')); ?>",
-            "fnServerData": function ( sSource, aoData, fnCallback ) {                
+            "fnServerData": function ( sSource, aoData, fnCallback ) {
+                aoData.push({ "name":"fromDate","value": $('#mrp-lowerDate').val()});
+                aoData.push({ "name":"toDate","value": $('#mrp-upperDate').val()});                                
                 $.ajax({
                     "dataType": 'json',
                     "type": "POST",
@@ -1566,7 +1609,9 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
             "aaSorting": [[ 3, "desc" ]],
             "pagingType": "simple",
             "sAjaxSource": "<?php echo $this->url('summary',array('action' => 'suppression-rate-facility')); ?>",
-            "fnServerData": function ( sSource, aoData, fnCallback ) {                
+            "fnServerData": function ( sSource, aoData, fnCallback ) {
+                aoData.push({ "name":"fromDate","value": $('#mrp-lowerDate').val()});
+                aoData.push({ "name":"toDate","value": $('#mrp-upperDate').val()});                                
                 $.ajax({
                     "dataType": 'json',
                     "type": "POST",
@@ -1595,7 +1640,9 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
             "aaSorting": [[ 1, "desc" ]],
             "pagingType": "simple",
             "sAjaxSource": "<?php echo $this->url('summary',array('action' => 'suppression-rate-province')); ?>",
-            "fnServerData": function ( sSource, aoData, fnCallback ) {                
+            "fnServerData": function ( sSource, aoData, fnCallback ) {
+                aoData.push({ "name":"fromDate","value": $('#mrp-lowerDate').val()});
+                aoData.push({ "name":"toDate","value": $('#mrp-upperDate').val()});                                
                 $.ajax({
                     "dataType": 'json',
                     "type": "POST",
@@ -1623,7 +1670,9 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
             "aaSorting": [[ 1, "desc" ]],
             "pagingType": "simple",
             "sAjaxSource": "<?php echo $this->url('summary',array('action' => 'samples-rejected-district')); ?>",
-            "fnServerData": function ( sSource, aoData, fnCallback ) {                
+            "fnServerData": function ( sSource, aoData, fnCallback ) {  
+                aoData.push({ "name":"fromDate","value": $('#mrp-lowerDate').val()});
+                aoData.push({ "name":"toDate","value": $('#mrp-upperDate').val()});                              
                 $.ajax({
                     "dataType": 'json',
                     "type": "POST",
@@ -1652,7 +1701,9 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
             "aaSorting": [[ 3, "desc" ]],
             "pagingType": "simple",
             "sAjaxSource": "<?php echo $this->url('summary',array('action' => 'samples-rejected-facility')); ?>",
-            "fnServerData": function ( sSource, aoData, fnCallback ) {                
+            "fnServerData": function ( sSource, aoData, fnCallback ) {
+                aoData.push({ "name":"fromDate","value": $('#mrp-lowerDate').val()});
+                aoData.push({ "name":"toDate","value": $('#mrp-upperDate').val()});                                
                 $.ajax({
                     "dataType": 'json',
                     "type": "POST",
@@ -1679,7 +1730,9 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
             "aaSorting": [[ 3, "desc" ]],
             "pagingType": "simple",
             "sAjaxSource": "<?php echo $this->url('summary',array('action' => 'samples-rejected-province')); ?>",
-            "fnServerData": function ( sSource, aoData, fnCallback ) {                
+            "fnServerData": function ( sSource, aoData, fnCallback ) { 
+                aoData.push({ "name":"fromDate","value": $('#mrp-lowerDate').val()});
+                aoData.push({ "name":"toDate","value": $('#mrp-upperDate').val()});                               
                 $.ajax({
                     "dataType": 'json',
                     "type": "POST",
@@ -1712,6 +1765,8 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
             "sAjaxSource": "<?php echo $this->url('summary',array('action' => 'get-regimen-group-details')); ?>",
             "fnServerData": function ( sSource, aoData, fnCallback ) {
                 aoData.push({"name": "t_received", "value": '<?php echo $summaryTabInfo[0]["total_samples_received"]; ?>'});
+                aoData.push({ "name":"fromDate","value": $('#mrp-lowerDate').val()});
+                aoData.push({ "name":"toDate","value": $('#mrp-upperDate').val()});                
                 $.ajax({
                     "dataType": 'json',
                     "type": "POST",
@@ -1759,7 +1814,9 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
         sampDistrictIdList = ($("#sampleDistrictName").val() == null)?'':$("#sampleDistrictName").val().join(',');
         sampProvinceIdList = ($("#sampleProvinceName").val() == null)?'':$("#sampleProvinceName").val().join(',');
         sampClinicIdList = ($("#sampleClinicId").val() == null)?'':$('#sampleClinicId').val().join(',');
-        $.post("<?php echo $this->url('summary', array('action' => 'get-samples-received-bar-chart')); ?>",{districts : sampDistrictIdList, provinces : sampProvinceIdList , clinics : sampClinicIdList},
+        var fromDate = $('#mrp-lowerDate').val();
+        var toDate = $('#mrp-upperDate').val();
+        $.post("<?php echo $this->url('summary', array('action' => 'get-samples-received-bar-chart')); ?>",{districts : sampDistrictIdList, provinces : sampProvinceIdList , clinics : sampClinicIdList, fromDate:fromDate,toDate:toDate},
         function(data) {
             $("#samplesReceivedBarChartContainer").html(data);
         });
@@ -1769,8 +1826,9 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
         supDistrictIdList = ($("#suppressionDistrictName").val() == null)?'':$("#suppressionDistrictName").val().join(',');
         supProvinceIdList = ($("#suppressionProvinceName").val() == null)?'':$("#suppressionProvinceName").val().join(',');
         supClinicIdList = ($("#suppressionClinicId").val() == null)?'':$('#suppressionClinicId').val().join(',');
-        
-        $.post("<?php echo $this->url('summary', array('action' => 'get-suppression-rate-bar-chart')); ?>",{districts : supDistrictIdList, provinces : supProvinceIdList , clinics : supClinicIdList},
+        var fromDate = $('#mrp-lowerDate').val();
+        var toDate = $('#mrp-upperDate').val();        
+        $.post("<?php echo $this->url('summary', array('action' => 'get-suppression-rate-bar-chart')); ?>",{districts : supDistrictIdList, provinces : supProvinceIdList , clinics : supClinicIdList, fromDate:fromDate, toDate:toDate},
         function(data) {
             $("#suppressionRateBarChartContainer").html(data);
         });
@@ -1780,8 +1838,9 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
         rejDistrictIdList = ($("#rejectionDistrictName").val() == null)?'':$("#rejectionDistrictName").val().join(',');
         rejProvinceIdList = ($("#rejectionProvinceName").val() == null)?'':$("#rejectionProvinceName").val().join(',');
         rejClinicIdList = ($("#rejectionClinicId").val() == null)?'':$('#rejectionClinicId').val().join(',');
-        
-        $.post("<?php echo $this->url('summary', array('action' => 'get-samples-rejected-bar-chart')); ?>",{districts : rejDistrictIdList, provinces : rejProvinceIdList , clinics : rejClinicIdList},
+        var fromDate = $('#mrp-lowerDate').val();
+        var toDate = $('#mrp-upperDate').val();        
+        $.post("<?php echo $this->url('summary', array('action' => 'get-samples-rejected-bar-chart')); ?>",{districts : rejDistrictIdList, provinces : rejProvinceIdList , clinics : rejClinicIdList, fromDate:fromDate, toDate:toDate},
         function(data) {
             $("#samplesRejectedBarChartContainer").html(data);
         });
@@ -1791,7 +1850,9 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
         var districtIdList = ($("#districtName").val() == null)?'':$("#districtName").val().join(',');
         var provinceIdList = ($("#provinceName").val() == null)?'':$("#provinceName").val().join(',');
         var clinicIdList = ($("#clinicId").val() == null)?'':$('#clinicId').val().join(',');
-        $.post("<?php echo $this->url('summary',array('action' => 'get-regimen-group-bar-chart')); ?>",{ districts : districtIdList, provinces : provinceIdList , clinics : clinicIdList },
+        var fromDate = $('#mrp-lowerDate').val();
+        var toDate = $('#mrp-upperDate').val();         
+        $.post("<?php echo $this->url('summary',array('action' => 'get-regimen-group-bar-chart')); ?>",{ districts : districtIdList, provinces : provinceIdList , clinics : clinicIdList, fromDate:fromDate, toDate:toDate },
         function(data) {
             $("#regimenGroupBarChartContainer").html(data);
         });
@@ -1811,8 +1872,9 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
         var indDistrictIdList = ($("#indDistrictName").val() == null)?'':$("#indDistrictName").val().join(',');
         var indProvinceIdList = ($("#indProvinceName").val() == null)?'':$("#indProvinceName").val().join(',');
         var indClinicIdList = ($("#indClinicId").val() == null)?'':$('#indClinicId').val().join(',');
-
-        $.post("<?php echo $this->url('summary', array('action' => 'get-indicators')); ?>",{ districts : indDistrictIdList, provinces : indProvinceIdList , clinics : indClinicIdList },
+        var fromDate = $('#mrp-lowerDate').val();
+        var toDate = $('#mrp-upperDate').val();
+        $.post("<?php echo $this->url('summary', array('action' => 'get-indicators')); ?>",{ districts : indDistrictIdList, provinces : indProvinceIdList , clinics : indClinicIdList, fromDate : fromDate, toDate : toDate },
         function(data) {
             $("#keyIndicatorsSummary").html(data);
             $.unblockUI();
@@ -1875,5 +1937,11 @@ if($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["
         $('#rejectionClinicId').select2('val', '');
         getSamplesRejectedBarChartInfo();
         $.unblockUI();
+    }
+
+    function summarize(){
+        var f = $('#mrp-lowerDate').val();
+        var t = $('#mrp-upperDate').val();
+        document.location.href="/summary/dashboard?f="+f+"&t="+t
     }
 </script>

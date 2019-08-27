@@ -14,11 +14,19 @@ class SummaryController extends AbstractActionController{
     }
     
     public function dashboardAction(){
+        
+        if($this->params()->fromQuery('f') && $this->params()->fromQuery('t')){
+            $params['fromDate']=$this->params()->fromQuery('f');
+            $params['toDate']=$this->params()->fromQuery('t');
+        }else{
+            $params['fromDate']  = date('Y-m', strtotime('+1 month', strtotime('-18 month')));
+            $params['toDate']  =date('Y-m');
+        }      
         $this->layout()->setVariable('activeTab', 'summary-dashboard');
         $summaryService = $this->getServiceLocator()->get('SummaryService');
-        $summaryTabResult = $summaryService->fetchSummaryTabDetails(); 
-        $allLineofTreatmentResult = $summaryService->getAllLineOfTreatmentDetails();
-        $allCollapsibleLineofTreatmentResult = $summaryService->getAllCollapsibleLineOfTreatmentDetails();
+        $summaryTabResult = $summaryService->fetchSummaryTabDetails($params); 
+        $allLineofTreatmentResult = $summaryService->getAllLineOfTreatmentDetails($params);
+        $allCollapsibleLineofTreatmentResult = $summaryService->getAllCollapsibleLineOfTreatmentDetails($params);
         
         /* District, Province and Facility */
         $sampleService = $this->getServiceLocator()->get('SampleService');        
@@ -31,7 +39,8 @@ class SummaryController extends AbstractActionController{
             'summaryTabInfo' => $summaryTabResult,
             'allLineofTreatmentInfo' => $allLineofTreatmentResult,
             'allCollapsibleLineofTreatmentResult'=>$allCollapsibleLineofTreatmentResult,
-
+            'startDate' => $params['fromDate'],
+            'endDate' => $params['toDate'],
             'clinicName' => $clinicName,
             'provinceName'=>$provinceName,
             'districtName'=>$districtName

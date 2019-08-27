@@ -25,13 +25,25 @@ class LocationDetailsTable extends AbstractTableGateway {
     public function __construct(Adapter $adapter) {
         $this->adapter = $adapter;
     }
-    public function fetchLocationDetails(){
+    public function fetchLocationDetails($mappedFacilities = null){
+
+
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $sQuery = $sql->select()->from(array('l' => 'location_details'))->where(array('parent_location'=>0));
+        $sQuery = $sql->select()->quantifier(\Zend\Db\Sql\Select::QUANTIFIER_DISTINCT)
+                                ->from(array('l' => 'location_details'))
+                                ->join(array('f'=>'facility_details'),'f.facility_state=l.location_id',array())
+                                ->join(array('ft'=>'facility_type'),'ft.facility_type_id=f.facility_type')
+                                ->where('ft.facility_type_name="clinic"')
+                                ->where(array('parent_location'=>0));
+        if($mappedFacilities != null){
+            $sQuery = $sQuery->where('f.facility_id IN ("' . implode('", "', array_values(array_filter($mappedFacilities))) . '")');
+        }                                
         $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         return $rResult;
+
+
     }
     
     public function fetchDistrictList($locationId){
@@ -43,10 +55,19 @@ class LocationDetailsTable extends AbstractTableGateway {
         return $rResult;
     }
     
-    public function fetchAllDistrictsList(){
+    public function fetchAllDistrictsList($mappedFacilities = null){
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $sQuery = $sql->select()->from(array('l' => 'location_details'))->where(array("parent_location <> 0"));
+        $sQuery = $sql->select()
+                                ->quantifier(\Zend\Db\Sql\Select::QUANTIFIER_DISTINCT)
+                                ->from(array('l' => 'location_details'))
+                                ->join(array('f'=>'facility_details'),'f.facility_district=l.location_id',array())
+                                ->join(array('ft'=>'facility_type'),'ft.facility_type_id=f.facility_type')
+                                ->where('ft.facility_type_name="clinic"')
+                                ->where(array("parent_location <> 0"));
+        if($mappedFacilities != null){
+            $sQuery = $sQuery->where('f.facility_id IN ("' . implode('", "', array_values(array_filter($mappedFacilities))) . '")');
+        }                                
         $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         return $rResult;

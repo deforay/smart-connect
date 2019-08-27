@@ -298,7 +298,7 @@ foreach($sampleType as $samples){
                 </div>
                 <div class="actions">
                     <div class="btn-group">
-                        <select id="testReason" class="btn white btn-outline btn-circle btn-sm dropdown-toggle" onchange="getAllTestReason();">
+                        <select id="testReason" class="btn white btn-outline btn-circle btn-sm dropdown-toggle" onchange="getAllTestReason();" style="width:250px;max-width:250px;">
                             <option value=""><?php echo $this->translate('Test Reasons'); ?></option>
                             <?php
                             foreach($testReason as $test){
@@ -322,7 +322,7 @@ foreach($sampleType as $samples){
                 </div>
                 <div class="actions">
                     <div class="btn-group">
-                        <select id="sampleType" class="btn white btn-outline btn-circle btn-sm dropdown-toggle" onchange="getTestedSampleResult('change');">
+                        <select id="sampleType" class="btn white btn-outline btn-circle btn-sm dropdown-toggle" onchange="getTestedSampleResult('change');" style="width:250px;max-width:250px;">
                             <option value=""><?php echo $this->translate('All Samples'); ?></option>
                             <option value="dbs"><?php echo $this->translate('DBS'); ?></option>
                             <option value="others"><?php echo $this->translate('Others'); ?></option>

@@ -532,11 +532,24 @@ class SampleService
     //get all province name
     public function getAllProvinceList()
     {
+
+        $logincontainer = new Container('credo');
+        $mappedFacilities = null;
+        if ($logincontainer->role != 1) {
+            $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : null;
+        }
+
         $locationDb = $this->sm->get('LocationDetailsTable');
-        return $locationDb->fetchLocationDetails();
+        return $locationDb->fetchLocationDetails($mappedFacilities);
     }
     public function getAllDistrictList()
     {
+
+        $logincontainer = new Container('credo');
+        $mappedFacilities = null;
+        if ($logincontainer->role != 1) {
+            $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : null;
+        }        
         $locationDb = $this->sm->get('LocationDetailsTable');
         return $locationDb->fetchAllDistrictsList();
     }
