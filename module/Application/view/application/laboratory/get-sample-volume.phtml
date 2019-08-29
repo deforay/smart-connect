@@ -58,7 +58,7 @@ $('#labDashSampleVolumePie').highcharts({
               foreach($result as $lab){
                 ?>{
                   myData:<?php echo "'".$lab[1]."'";?>,
-                  name:<?php echo "'".$lab[2]."'";?>,
+                  name:<?php echo "'".$lab[1]."'";?>,
                   y:<?php echo $lab[0];?>,
                   number:<?php echo $lab[0];?>
                 },

@@ -29,7 +29,7 @@ class SampleTypeTable extends AbstractTableGateway {
     
     public function fetchAllSampleType()
     {
-        $query = $this->select();
+        $query = $this->select(array('status' => 'active'));
         return $query;
     }
 }
