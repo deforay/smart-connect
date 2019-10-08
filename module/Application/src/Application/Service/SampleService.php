@@ -363,7 +363,7 @@ class SampleService
     //get sample status for lab dash
     public function getSampleStatusDataTable($params)
     {
-        $sampleDb = $this->sm->get('SampleTableWithoutCache');
+        $sampleDb = $this->sm->get('SampleTable');
         return $sampleDb->getSampleStatusDataTable($params);
     }
 

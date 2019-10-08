@@ -58,7 +58,8 @@ if(count($result)>0){
                              style: {
                                  color: Highcharts.getOptions().colors[1]
                              }
-                         }
+                         },
+                         opposite: true
                      }, { // Secondary yAxis
                          allowDecimals: false,
                          min: 0,
@@ -73,8 +74,7 @@ if(count($result)>0){
                              style: {
                                  color: Highcharts.getOptions().colors[1]
                              }
-                         },
-                         opposite: true
+                         }
                      }],
                      tooltip: {
                          shared: true
