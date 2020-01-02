@@ -63,8 +63,13 @@ if (!isset($activeTab)) {
         table.dataTable th.sorting_3 {
             background: #fbfcfd !important
         }
-
-        <?php } ?>.resize-page-logo {
+        <?php } ?>
+        <?php if(isset($logincontainer->sampleTable) && $logincontainer->sampleTable != "dash_vl_request_form_current"){ ?>
+        body, .nav-item, .page-header.navbar,.portlet.blue, .portlet.box.blue>.portlet-title, .portlet>.portlet-body.blue, .btn-primary, .page-sidebar.navbar-collapse.collapse, .page-sidebar-menu.page-header-fixed.page-sidebar-menu-light.page-sidebar-menu-closed{
+            background-image: url('/assets/img/patterns/blue-pattern.png');
+        }
+        <?php }?>
+        .resize-page-logo {
             width: auto !important;
         }
 
@@ -646,10 +651,12 @@ if (!isset($activeTab)) {
         }
 
         function toggleSwitch(obj) {
-            if(obj.value == 'current'){
-                $(obj).val('archive');
-            }else{
-                $(obj).val('current');
+            if(confirm("Are you sure want to switch the "+obj.value)){
+                if(obj.value == 'current'){
+                    $(obj).val('archive');
+                }else{
+                    $(obj).val('current');
+                }
             }
             $.post("<?php echo $this->url('common', array('action' => 'set-session')); ?>", {sessionType : obj.value},
             function(data) {
