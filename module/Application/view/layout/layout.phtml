@@ -65,7 +65,7 @@ if (!isset($activeTab)) {
         }
         <?php } ?>
         <?php if(isset($logincontainer->sampleTable) && $logincontainer->sampleTable != "dash_vl_request_form_current"){ ?>
-        body, .nav-item, .page-header.navbar,.portlet.blue, .portlet.box.blue>.portlet-title, .portlet>.portlet-body.blue, .btn-primary, .page-sidebar.navbar-collapse.collapse, .page-sidebar-menu.page-header-fixed.page-sidebar-menu-light.page-sidebar-menu-closed{
+        body, .nav-item, .page-header.navbar,.portlet.blue, .page-sidebar.navbar-collapse.collapse, .page-sidebar-menu.page-header-fixed.page-sidebar-menu-light.page-sidebar-menu-closed{
             background-image: url('/assets/img/patterns/blue-pattern.png');
         }
         <?php }?>
@@ -85,7 +85,9 @@ if (!isset($activeTab)) {
             color: #ff7a7a !important;
         }
         .toggle.btn.btn-primary, .toggle.btn.btn-default.off {
-            margin-top: 5px;
+            margin: auto;
+            width: 50%;
+            display: block;
         }
     </style>
     <!-- END THEME LAYOUT STYLES -->
@@ -130,14 +132,14 @@ if (!isset($activeTab)) {
                             <i class="fa fa-angle-down"></i>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-default">
+                            <?php if($logincontainer->toggleStatus){ ?>
+                            <li><input type="checkbox" id="toggle-trigger" onchange="toggleSwitch(this);" data-toggle="toggle" data-on="CURRENT" data-off="ARCHIVE" <?php echo (isset($logincontainer->sampleTable) && $logincontainer->sampleTable == "dash_vl_request_form_current")?"checked value='current'":"value='archive'";?>></li>
+                            <?php }?>
                             <li>
                                 <a href="/login/logout"><i class="icon-key"></i> <?php echo $this->translate('Log Out'); ?> </a>
                             </li>
                         </ul>
                     </li>
-                    <?php if($logincontainer->toggleStatus){ ?>
-                    <li><input type="checkbox" id="toggle-trigger" onchange="toggleSwitch(this);" data-toggle="toggle" data-on="CURRENT" data-off="ARCHIVE" <?php echo (isset($logincontainer->sampleTable) && $logincontainer->sampleTable == "dash_vl_request_form_current")?"checked value='current'":"value='archive'";?>></li>
-                    <?php }?>
                     <!-- END USER LOGIN DROPDOWN -->
 
                 </ul>
