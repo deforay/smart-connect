@@ -2,6 +2,7 @@
 
 namespace Application\Controller;
 
+use Zend\Session\Container;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 
@@ -45,6 +46,24 @@ class CommonController extends AbstractActionController{
         $viewModel = new ViewModel();
         $viewModel->setVariables(array('result' => $result))
                 ->setTerminal(true);
+        return $viewModel;
+    }
+    
+    public function setSessionAction(){
+        $logincontainer = new Container('credo');
+        $logincontainer->sampleTable="";
+        unset($logincontainer->sampleTable);
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            if($params['sessionType'] == "current"){
+                $logincontainer->sampleTable = 'dash_vl_request_form_current';
+            }else{
+                $logincontainer->sampleTable = 'dash_vl_request_form';
+            }
+        }
+        $viewModel = new ViewModel();
+        $viewModel->setVariables(array('result' => $logincontainer->sampleTable))->setTerminal(true);
         return $viewModel;
     }
 

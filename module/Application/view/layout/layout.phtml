@@ -52,6 +52,8 @@ if (!isset($activeTab)) {
     <link href="<?php echo $this->basePath('assets/global/plugins/datatables/plugins/bootstrap/datatables.bootstrap.css'); ?>" rel="stylesheet" type="text/css" />
     <link href="<?php echo $this->basePath('assets/global/plugins/select2/css/select2.min.css'); ?>" rel="stylesheet" type="text/css" />
     <link href="<?php echo $this->basePath('assets/global/css/highcharts.css'); ?>" rel="stylesheet" type="text/css" />
+
+    <link href="<?php echo $this->basePath('assets/bootstrap-toggle/bootstrap-toggle.min.css'); ?>" rel="stylesheet">
     <style>
         <?php if ($activeTab != 'duplicate-data') { ?>table.dataTable td.sorting_1,
         table.dataTable td.sorting_2,
@@ -76,6 +78,9 @@ if (!isset($activeTab)) {
 
         .scroll-to-top>i {
             color: #ff7a7a !important;
+        }
+        .toggle.btn.btn-primary, .toggle.btn.btn-default.off {
+            margin-top: 5px;
         }
     </style>
     <!-- END THEME LAYOUT STYLES -->
@@ -125,6 +130,9 @@ if (!isset($activeTab)) {
                             </li>
                         </ul>
                     </li>
+                    <?php if($logincontainer->toggleStatus){ ?>
+                    <li><input type="checkbox" id="toggle-trigger" onchange="toggleSwitch(this);" data-toggle="toggle" data-on="CURRENT" data-off="ARCHIVE" <?php echo (isset($logincontainer->sampleTable) && $logincontainer->sampleTable == "dash_vl_request_form_current")?"checked value='current'":"value='archive'";?>></li>
+                    <?php }?>
                     <!-- END USER LOGIN DROPDOWN -->
 
                 </ul>
@@ -522,6 +530,8 @@ if (!isset($activeTab)) {
     <script src="<?php echo $this->basePath('assets/js/cookie.js'); ?>" type="text/javascript"></script>
     <script src="<?php echo $this->basePath('assets/js/month-year-range-picker.php'); ?>" type="text/javascript"></script>
     <!-- END THEME LAYOUT SCRIPTS -->
+
+    <script src="<?php echo $this->basePath('assets/bootstrap-toggle/bootstrap-toggle.min.js'); ?>"></script>
     <!-- page script -->
     <div id="dDiv" class="dialog ">
         <div style="text-align:center"><span onclick="closeModal();" style="float:right;clear:both;" class="closeModal"></span></div>
@@ -633,6 +643,18 @@ if (!isset($activeTab)) {
         function closeModal() {
             document.getElementById('dFrame').src = '';
             hidedefModal('dDiv');
+        }
+
+        function toggleSwitch(obj) {
+            if(obj.value == 'current'){
+                $(obj).val('archive');
+            }else{
+                $(obj).val('current');
+            }
+            $.post("<?php echo $this->url('common', array('action' => 'set-session')); ?>", {sessionType : obj.value},
+            function(data) {
+                window.location.reload(true);
+            });
         }
     </script>
 </body>

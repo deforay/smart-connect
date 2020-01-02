@@ -251,7 +251,11 @@ class SummaryService
     {
         $queryContainer = new Container('query');
         $translator = $this->sm->get('translator');
-        
+        // To set te session table
+        $logincontainer = new Container('credo');
+        if(isset($logincontainer->sampleTable) && $logincontainer->sampleTable != ""){
+            $dashTable = $logincontainer->sampleTable;
+        }
         $common = new CommonService();
 
         if (!isset($queryContainer->fetchAllSuppressionRateByFacility)) {
