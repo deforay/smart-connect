@@ -14,7 +14,7 @@ return array(
         //),
         'Cache\Persistent' => array(
             'adapter' => 'filesystem',
-            'ttl'     => 86400,
+            'ttl' => 1440,  // 1440 minutes = 1 day
             'options' => array(
                 'cache_dir' => realpath(__DIR__ . '/../../data/cache/'),
                 'dirPermission' => 0755,
@@ -28,7 +28,7 @@ return array(
             'adapter' => array(
                 'name'     =>'memcached',
                 'options'  => array(
-                    'ttl' => 86400, 
+                    'ttl' => 1440,  // 1440 minutes = 1 day
                     'servers'   => array(
                         array(
                             '127.0.0.1',11211

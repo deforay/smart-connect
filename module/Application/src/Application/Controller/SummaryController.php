@@ -19,7 +19,7 @@ class SummaryController extends AbstractActionController{
             $params['fromDate']=$this->params()->fromQuery('f');
             $params['toDate']=$this->params()->fromQuery('t');
         }else{
-            $params['fromDate']  = date('Y-m', strtotime('+1 month', strtotime('-18 month')));
+            $params['fromDate']  = date('Y-m', strtotime('+1 month', strtotime('-12 month')));
             $params['toDate']  =date('Y-m');
         }      
         $this->layout()->setVariable('activeTab', 'summary-dashboard');

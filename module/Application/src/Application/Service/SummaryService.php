@@ -247,17 +247,18 @@ class SummaryService
         }
     }
 
-    public function exportSuppressionRateByFacility($params)
+    public function exportSuppressionRateByFacility($params, $dashTable = 'dash_vl_request_form')
     {
         $queryContainer = new Container('query');
         $translator = $this->sm->get('translator');
+        
         $common = new CommonService();
 
         if (!isset($queryContainer->fetchAllSuppressionRateByFacility)) {
 
             $dbAdapter = $this->sm->get('Zend\Db\Adapter\Adapter');
             $sql = new Sql($dbAdapter);
-            $queryContainer->fetchAllSuppressionRateByFacility = $sql->select()->from(array('vl' => 'dash_vl_request_form'))
+            $queryContainer->fetchAllSuppressionRateByFacility = $sql->select()->from(array('vl' => $dashTable))
                 ->columns(
                     array(
                         'vl_sample_id',

@@ -8,6 +8,7 @@ use Zend\Json\Json;
 
 class ClinicController extends AbstractActionController{
 
+
     public function indexAction(){
         $this->layout()->setVariable('activeTab', 'clinics-dashboard');
         return $this->_redirect()->toUrl('/clinics/dashboard');
@@ -33,7 +34,9 @@ class ClinicController extends AbstractActionController{
     public function getOverallViralLoadStatusAction(){
         $request = $this->getRequest();
         if ($request->isPost()) {
+            
             $params = $request->getPost();
+
             $sampleService = $this->getServiceLocator()->get('SampleService');
             $chartResult = $sampleService->getOverallViralLoadStatus($params);
             //var_dump($chartResult);die;

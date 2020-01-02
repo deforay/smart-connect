@@ -87,7 +87,7 @@ if (!isset($activeTab)) {
 
 <body class="page-header-fixed page-container-bg-solid page-content-white page-sidebar-closed">
     <!-- BEGIN HEADER -->
-    <div class="page-header navbar navbar-fixed-top">
+    <div class="page-header navbar navbar-fixed-top" ondblclick="clearCache();">
         <!-- BEGIN HEADER INNER -->
         <div class="page-header-inner ">
             <!-- BEGIN LOGO -->
@@ -101,7 +101,7 @@ if (!isset($activeTab)) {
                     <?php } ?>
                     <span class="default-logo-text hide-default-text" style="color:#fff;line-height:50px;"><?php echo $this->translate('Smart Connect'); ?></span>
                 </a>
-                <div class="menu-toggler sidebar-toggler"> </div>
+                <div class="menu-toggler sidebar-toggler" > </div>
             </div>
             <!-- END LOGO -->
             <!-- BEGIN RESPONSIVE MENU TOGGLER -->

@@ -36,7 +36,7 @@ $(function () {
             categories: [<?php
             if(isset($result['date']) && count($result['date'])>0){
               foreach($result['date'] as $date){
-                  echo "'".$date."',";
+                  echo "'".$this->translate('Week of') . ' ' .$date."',";
               }
             }
             ?>]
@@ -142,7 +142,7 @@ $(function () {
               ?>],
               stack:'<?php echo $age[$i];?>',
               <?php
-              if($key == "<"){
+              if($key == "VL (< 1000 cp/ml)"){
               
                      if(isset($lt1000[$age[$i]])) { ?>
                      

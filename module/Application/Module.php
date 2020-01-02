@@ -245,8 +245,10 @@ class Module
 					return $table;
 				},
 				'SampleTable' => function ($sm) {
+					$session = new Container('credo');
+					$mappedFacilities = (isset($session->mappedFacilities) && count($session->mappedFacilities) > 0) ? $session->mappedFacilities : array();
 					$dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
-					$tableObj = new SampleTable($dbAdapter, $sm);
+					$tableObj = new SampleTable($dbAdapter, $sm, $mappedFacilities);
 					$table = PatternFactory::factory('object', [
 						'storage' => $sm->get('Cache\Persistent'),
 						'object' => $tableObj
@@ -291,8 +293,13 @@ class Module
 					return $table;
 				}, 'GlobalTable' => function ($sm) {
 					$dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
-					$table = new GlobalTable($dbAdapter, $sm);
-					return $table;
+					return new GlobalTable($dbAdapter, $sm);
+					// $tableObj = new GlobalTable($dbAdapter, $sm);
+					// $table = PatternFactory::factory('object', [
+					// 	'storage' => $sm->get('Cache\Persistent'),
+					// 	'object' => $tableObj
+					// ]);
+					// return $table;					
 				}, 'ArtCodeTable' => function ($sm) {
 					$dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
 					$table = new ArtCodeTable($dbAdapter);

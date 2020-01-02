@@ -283,11 +283,11 @@ class SampleService
         }
     }
 
-    public function checkSampleCode($sampleCode, $instanceCode)
+    public function checkSampleCode($sampleCode, $instanceCode, $dashTable = 'dash_vl_request_form')
     {
         $dbAdapter = $this->sm->get('Zend\Db\Adapter\Adapter');
         $sql = new Sql($dbAdapter);
-        $sQuery = $sql->select()->from('dash_vl_request_form')->where(array('sample_code' => $sampleCode, 'vlsm_instance_id' => $instanceCode));
+        $sQuery = $sql->select()->from($dashTable)->where(array('sample_code' => $sampleCode, 'vlsm_instance_id' => $instanceCode));
         $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
         $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
         return $sResult;
@@ -460,7 +460,6 @@ class SampleService
     public function getOverallViralLoadStatus($params)
     {
         $sampleDb = $this->sm->get('SampleTable');
-        //return $sampleDb->fetchOverallViralLoadStatus($params);
         return $sampleDb->fetchOverallViralLoadResult($params);
     }
 
@@ -634,11 +633,11 @@ class SampleService
         return $sampleDb->fetchIncompleteBarSampleDetails($params);
     }
 
-    public function getSampleInfo($params)
+    public function getSampleInfo($params, $dashTable = 'dash_vl_request_form')
     {
         $dbAdapter = $this->sm->get('Zend\Db\Adapter\Adapter');
         $sql = new Sql($dbAdapter);
-        $sQuery = $sql->select()->from(array('vl' => 'dash_vl_request_form'))
+        $sQuery = $sql->select()->from(array('vl' => $dashTable))
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name', 'facility_code', 'facility_logo'), 'left')
             ->join(array('l_s' => 'location_details'), 'l_s.location_id=f.facility_state', array('provinceName' => 'location_name'), 'left')
             ->join(array('l_d' => 'location_details'), 'l_d.location_id=f.facility_district', array('districtName' => 'location_name'), 'left')
