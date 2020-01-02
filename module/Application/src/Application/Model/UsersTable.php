@@ -25,11 +25,13 @@ class UsersTable extends AbstractTableGateway
 
     protected $table = 'dash_users';
     public $sm = null;
+    public $useDashCurrentTable = null;
 
     public function __construct(Adapter $adapter, $sm = null)
     {
         $this->adapter = $adapter;
         $this->sm = $sm;
+        $this->useCurrentSampleTable = $this->config['defaults']['use-dash-current-table'];
     }
 
     public function login($params, $otp = null)
@@ -97,6 +99,12 @@ class UsersTable extends AbstractTableGateway
             $logincontainer->provinces = $provinces;
             $logincontainer->districts = $districts;
             $container->alertMsg = '';
+
+            if ($this->useCurrentSampleTable == true) {
+                $logincontainer->sampleTable = 'dash_vl_request_form_current';
+            } else {
+                $logincontainer->sampleTable = 'dash_vl_request_form';
+            }
 
 
             if ($otp == null && $logincontainer->role == 7) {

@@ -248,7 +248,8 @@ class Module
 					$session = new Container('credo');
 					$mappedFacilities = (isset($session->mappedFacilities) && count($session->mappedFacilities) > 0) ? $session->mappedFacilities : array();
 					$dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
-					$tableObj = new SampleTable($dbAdapter, $sm, $mappedFacilities);
+					$sampleTable = isset($session->sampleTable) ? $session->sampleTable :  null;
+					$tableObj = new SampleTable($dbAdapter, $sm, $mappedFacilities, $sampleTable);
 					$table = PatternFactory::factory('object', [
 						'storage' => $sm->get('Cache\Persistent'),
 						'object' => $tableObj
