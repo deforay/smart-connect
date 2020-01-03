@@ -1,7 +1,7 @@
 <?php
 
 use Zend\Session\Container;
-
+$logincontainer = new Container('credo');
 $languagecontainer = new Container('language');
 $sType = '';
 foreach ($sampleType as $samples) {
@@ -474,6 +474,9 @@ foreach ($sampleType as $samples) {
             separator: ' to ',
             startDate: start,
             endDate: end,
+            <?php if(isset($logincontainer->sampleTable) && $logincontainer->sampleTable == "dash_vl_request_form_current"){?>
+            minDate:moment().subtract(12, 'months'),
+            <?php }?>
             maxDate: moment(),
             ranges: {
                 'Today': [moment(), moment()],

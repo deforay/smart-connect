@@ -3,14 +3,22 @@
 use Zend\Session\Container;
 
 $languagecontainer = new Container('language');
+$logincontainer = new Container('credo');
 
 $startArray = explode("-", $startDate);
 $endArray = explode("-", $endDate);
-
-$startYear = (int) $startArray[0];
-$startMonth = (int) $startArray[1] - 1;
-$endYear = (int) $endArray[0];
-$endMonth = (int) $endArray[1] - 1;
+// \Zend\Debug\Debug::dump($logincontainer->sampleTable);die;
+if(isset($logincontainer->sampleTable) && $logincontainer->sampleTable == "dash_vl_request_form_current"){
+    $startYear = (int) date('Y',strtotime('-12 MONTH '.date('Y-m-d')));
+    $startMonth = (int) date('M',strtotime('-12 MONTH '.date('Y-m-d')));
+    $endYear = (int) date('y');
+    $endMonth = (int) date('M');
+}else{
+    $startYear = (int) $startArray[0];
+    $startMonth = (int) $startArray[1] - 1;
+    $endYear = (int) $endArray[0];
+    $endMonth = (int) $endArray[1] - 1;
+}
 
 
 $MONTHS = array("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
@@ -1459,6 +1467,13 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
     }
     var scrollCounter = 0;
     $(function() {
+        <?php if(isset($logincontainer->sampleTable) && $logincontainer->sampleTable == "dash_vl_request_form_current"){?>
+        $('#sla-date-range').daterangepicker({
+            minDate:moment().subtract(12, 'months'),
+            maxDate: moment(),
+            ranges : false
+        });
+        <?php }?>
 
         window.addEventListener('scroll', function(e) {
             // we dont want to call it each time there is a scroll event
