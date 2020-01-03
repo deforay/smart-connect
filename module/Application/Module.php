@@ -252,7 +252,8 @@ class Module
 					$tableObj = new SampleTable($dbAdapter, $sm, $mappedFacilities, $sampleTable);
 					$table = PatternFactory::factory('object', [
 						'storage' => $sm->get('Cache\Persistent'),
-						'object' => $tableObj
+						'object' => $tableObj,
+						'object_key' => $sampleTable // this makes sure we have different caches for both current and archive
 					]);
 					return $table;
 				},

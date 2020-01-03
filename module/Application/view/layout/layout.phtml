@@ -63,13 +63,17 @@ if (!isset($activeTab)) {
         table.dataTable th.sorting_3 {
             background: #fbfcfd !important
         }
-        <?php } ?>
-        <?php if(isset($logincontainer->sampleTable) && $logincontainer->sampleTable != "dash_vl_request_form_current"){ ?>
-        body, .nav-item, .page-header.navbar,.portlet.blue, .page-sidebar.navbar-collapse.collapse, .page-sidebar-menu.page-header-fixed.page-sidebar-menu-light.page-sidebar-menu-closed{
+
+        <?php } ?><?php if (isset($logincontainer->sampleTable) && $logincontainer->sampleTable != "dash_vl_request_form_current") { ?>body,
+        .nav-item,
+        .page-header.navbar,
+        .portlet.blue,
+        .page-sidebar.navbar-collapse.collapse,
+        .page-sidebar-menu.page-header-fixed.page-sidebar-menu-light.page-sidebar-menu-closed {
             background-image: url('/assets/img/patterns/blue-pattern.png');
         }
-        <?php }?>
-        .resize-page-logo {
+
+        <?php } ?>.resize-page-logo {
             width: auto !important;
         }
 
@@ -84,7 +88,9 @@ if (!isset($activeTab)) {
         .scroll-to-top>i {
             color: #ff7a7a !important;
         }
-        .toggle.btn.btn-primary, .toggle.btn.btn-default.off {
+
+        .toggle.btn.btn-primary,
+        .toggle.btn.btn-default.off {
             margin: auto;
             width: 50%;
             display: block;
@@ -113,7 +119,7 @@ if (!isset($activeTab)) {
                     <?php } ?>
                     <span class="default-logo-text hide-default-text" style="color:#fff;line-height:50px;"><?php echo $this->translate('Smart Connect'); ?></span>
                 </a>
-                <div class="menu-toggler sidebar-toggler" > </div>
+                <div class="menu-toggler sidebar-toggler"> </div>
             </div>
             <!-- END LOGO -->
             <!-- BEGIN RESPONSIVE MENU TOGGLER -->
@@ -122,9 +128,19 @@ if (!isset($activeTab)) {
             <!-- BEGIN TOP NAVIGATION MENU -->
             <!-- <span style="color:#ccc;padding:10px;line-height:50px;font-weight:lighter"><?php echo $this->translate('Development/Test Environment with dummy data'); ?></span> -->
             <div class="top-menu">
+                
                 <ul class="nav navbar-nav pull-right">
+
                     <!-- BEGIN USER LOGIN DROPDOWN -->
                     <!-- DOC: Apply "dropdown-dark" class after below "dropdown-extended" to change the dropdown styte -->
+                    <?php if ($logincontainer->toggleStatus) { ?>
+                    <li style="width:200px;margin-top:6px;">
+                        <select class="form-control" onchange="changeTable(this);">
+                            <option value='current' <?php echo (isset($logincontainer->sampleTable) && $logincontainer->sampleTable == "dash_vl_request_form_current") ? "selected" : ""; ?>>LAST ONE YEAR</option>
+                            <option value='archive' <?php echo (isset($logincontainer->sampleTable) && $logincontainer->sampleTable == "dash_vl_request_form") ? "selected" : ""; ?>>FUll DATA</option>
+                        </select>
+                    </li>
+                <?php } ?>                    
                     <li class="dropdown dropdown-user">
                         <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-close-others="true">
                             <img alt="" class="img-circle" src="<?php echo $this->basePath('assets/img/default-avatar.png'); ?>" />
@@ -132,14 +148,14 @@ if (!isset($activeTab)) {
                             <i class="fa fa-angle-down"></i>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-default">
-                            <?php if($logincontainer->toggleStatus){ ?>
-                            <li><input type="checkbox" id="toggle-trigger" onchange="toggleSwitch(this);" data-toggle="toggle" data-on="CURRENT" data-off="ARCHIVE" <?php echo (isset($logincontainer->sampleTable) && $logincontainer->sampleTable == "dash_vl_request_form_current")?"checked value='current'":"value='archive'";?>></li>
-                            <?php }?>
+
                             <li>
                                 <a href="/login/logout"><i class="icon-key"></i> <?php echo $this->translate('Log Out'); ?> </a>
                             </li>
                         </ul>
+
                     </li>
+
                     <!-- END USER LOGIN DROPDOWN -->
 
                 </ul>
@@ -484,9 +500,12 @@ if (!isset($activeTab)) {
     <!-- BEGIN FOOTER -->
     <div class="page-footer">
         <div class="page-footer-inner" style="width:100%;font-size:1em;">
+
+
+
             <a href="javascript:void(0);" onclick="clearCache();" style="font-size:8px;cursor:pointer;color:#fff;">Clear Cache</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<?php echo $this->translate('Funded by'); ?>
             <a href="https://www.taskforce.org/" style="color:#ccc;text-decoration:underline;"><?php echo $this->translate('The Task Force for Global Health'); ?></a> &
-            <a href="https://www.emory.edu/home/index.html" style="color:#ccc;text-decoration:underline;"><?php echo $this->translate('Emory University / PEPFAR'); ?></a>  | ver. <?php echo APP_VERSION; ?>
+            <a href="https://www.emory.edu/home/index.html" style="color:#ccc;text-decoration:underline;"><?php echo $this->translate('Emory University / PEPFAR'); ?></a> | ver. <?php echo APP_VERSION; ?>
         </div>
         <div class="scroll-to-top">
             <i class="icon-arrow-up"></i>
@@ -548,7 +567,7 @@ if (!isset($activeTab)) {
         $(function() {
             <?php
             if (isset($container->alertMsg) && $container->alertMsg != "") {
-                ?>
+            ?>
                 alert("<?php echo $this->translate($container->alertMsg); ?>");
             <?php
                 $container->alertMsg = "";
@@ -652,18 +671,14 @@ if (!isset($activeTab)) {
             hidedefModal('dDiv');
         }
 
-        function toggleSwitch(obj) {
-            if(confirm("Are you sure want to switch the "+obj.value)){
-                if(obj.value == 'current'){
-                    $(obj).val('archive');
-                }else{
-                    $(obj).val('current');
-                }
-            }
-            $.post("<?php echo $this->url('common', array('action' => 'set-session')); ?>", {sessionType : obj.value},
-            function(data) {
-                window.location.reload(true);
-            });
+        function changeTable(obj) {
+            
+            $.post("<?php echo $this->url('common', array('action' => 'set-session')); ?>", {
+                    sessionType: obj.value
+                },
+                function(data) {
+                    window.location.reload(true);
+                });
         }
     </script>
 </body>
