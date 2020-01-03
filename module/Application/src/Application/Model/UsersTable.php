@@ -100,11 +100,11 @@ class UsersTable extends AbstractTableGateway
             $logincontainer->provinces = $provinces;
             $logincontainer->districts = $districts;
             $container->alertMsg = '';
-            $logincontainer->toggleStatus = $this->useCurrentSampleTable;
             if ($this->useCurrentSampleTable == true) {
+                $logincontainer->toggleStatus = $this->useCurrentSampleTable;
                 $logincontainer->sampleTable = 'dash_vl_request_form_current';
             } else {
-                $logincontainer->sampleTable = 'dash_vl_request_form';
+                //$logincontainer->sampleTable = 'dash_vl_request_form';
             }
 
 

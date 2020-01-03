@@ -52,10 +52,11 @@ if (!isset($activeTab)) {
     <link href="<?php echo $this->basePath('assets/global/plugins/datatables/plugins/bootstrap/datatables.bootstrap.css'); ?>" rel="stylesheet" type="text/css" />
     <link href="<?php echo $this->basePath('assets/global/plugins/select2/css/select2.min.css'); ?>" rel="stylesheet" type="text/css" />
     <link href="<?php echo $this->basePath('assets/global/css/highcharts.css'); ?>" rel="stylesheet" type="text/css" />
-
     <link href="<?php echo $this->basePath('assets/bootstrap-toggle/bootstrap-toggle.min.css'); ?>" rel="stylesheet">
+
     <style>
-        <?php if ($activeTab != 'duplicate-data') { ?>table.dataTable td.sorting_1,
+        <?php if ($activeTab != 'duplicate-data') { ?>
+        table.dataTable td.sorting_1,
         table.dataTable td.sorting_2,
         table.dataTable td.sorting_3,
         table.dataTable th.sorting_1,
@@ -64,7 +65,10 @@ if (!isset($activeTab)) {
             background: #fbfcfd !important
         }
 
-        <?php } ?><?php if (isset($logincontainer->sampleTable) && $logincontainer->sampleTable != "dash_vl_request_form_current") { ?>body,
+        <?php } ?>
+        <?php if (isset($logincontainer->sampleTable) && $logincontainer->sampleTable != "dash_vl_request_form_current") { ?>
+            
+        body,
         .nav-item,
         .page-header.navbar,
         .portlet.blue,
@@ -73,7 +77,10 @@ if (!isset($activeTab)) {
             background-image: url('/assets/img/patterns/blue-pattern.png');
         }
 
-        <?php } ?>.resize-page-logo {
+        <?php } ?>
+        
+        
+        .resize-page-logo {
             width: auto !important;
         }
 
