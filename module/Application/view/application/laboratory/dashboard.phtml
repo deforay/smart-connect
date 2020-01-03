@@ -11,6 +11,7 @@ $endMonth = date('m');
 $startDate = date('Y-m', strtotime('+1 month', strtotime('-1 year')));
 $endDate = date('Y-m');
 ?>
+<link rel="stylesheet" href="<?php echo $this->basePath('assets/plugins/datepicker/datepicker3.css') ?>">
 <style>
     .bluebox,
     .dashboard-stat2 {
@@ -272,8 +273,8 @@ foreach ($sampleType as $samples) {
 
             </select>
         </div>
-        <div class="col-lg-3">
-            <div id="sla-date-range" class="mrp-container form-control">
+        <div class="col-lg-3" style="display: flex;">
+            <!-- <div id="sla-date-range" class="mrp-container form-control">
                 <span class="mrp-icon"><i class="fa fa-calendar"></i> &nbsp;</span>
                 <div class="mrp-monthdisplay ">
                     <span class="mrp-lowerMonth"><?php echo date("M Y", strtotime('+1 month', strtotime('-1 year'))); ?></span>
@@ -282,6 +283,19 @@ foreach ($sampleType as $samples) {
                 </div>
                 <input type="hidden" value="<?php echo $startDate; ?>" id="mrp-lowerDate" onchange="" />
                 <input type="hidden" value="<?php echo $endDate; ?>" id="mrp-upperDate" />
+            </div> -->
+            <div class="input-append date" id="dpMonthsStart" data-date-format="M/yyyy" data-date-viewmode="years" data-date-minviewmode="months">
+                <input type="text" class="form-control isRequired readonly" id="mrp-lowerDate" name="mrp-lowerDate" placeholder="Select month & year" title="Please select month and year" readonly="readonly" value="<?php echo date('M-Y',strtotime($startDate)); ?>" />
+                <span class="add-on" style="display:none;"><i class="icon-calendar"></i></span>
+            </div>
+            <div class="input-group-prepend input-group-append" style=" padding-top: 5px; ">
+                <span class="input-group-text font-w600" style="padding: 0.100rem .35rem;">
+                    <i class="fa fa-fw fa-arrow-right"></i>
+                </span>
+            </div>
+            <div class="input-append date" id="dpMonthsEnd" data-date-format="M/yyyy" data-date-viewmode="years" data-date-minviewmode="months">
+                <input type="text" class="form-control isRequired readonly" id="mrp-upperDate" name="mrp-upperDate" placeholder="Select month & year" title="Please select month and year" readonly="readonly" value="<?php echo date('M-Y',strtotime($endDate)); ?>" />
+                <span class="add-on" style="display:none;"><i class="icon-calendar"></i></span>
             </div>
         </div>
         <div class="col-lg-3">
@@ -660,6 +674,7 @@ foreach ($sampleType as $samples) {
         </div>
     </div>
 </div>
+<script src="<?php echo $this->basePath('assets/plugins/datepicker/bootstrap-datepicker.js') ?>"></script>
 <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAFpbfAKFJZ8Ps7yAGIDZtD4EeBlsb_ANA"></script>
 <script src="<?php echo $this->basePath('assets/pages/scripts/dashboard.js'); ?>" type="text/javascript"></script>
 <script src="https://cdn.datatables.net/1.10.10/js/jquery.dataTables.min.js"></script>
@@ -670,8 +685,6 @@ foreach ($sampleType as $samples) {
 <script src="https://cdn.rawgit.com/bpampuch/pdfmake/0.1.18/build/pdfmake.min.js"></script>
 <script src="https://cdn.rawgit.com/bpampuch/pdfmake/0.1.18/build/vfs_fonts.js"></script>
 <script src="https://cdn.datatables.net/buttons/1.1.0/js/buttons.print.min.js"></script>
-
-
 <script>
     //var gfxPath = 'https://raw.githubusercontent.com/highslide-software/pattern-fill/master/graphics/';
     var startDate;
@@ -1102,13 +1115,6 @@ foreach ($sampleType as $samples) {
 
         getSampleResult('load');
         getEverything();
-        <?php if(isset($logincontainer->sampleTable) && $logincontainer->sampleTable == "dash_vl_request_form_current"){?>
-        $('#sla-date-range').daterangepicker({
-            minDate:moment().subtract(12, 'months'),
-            maxDate: moment(),
-            ranges : false
-        });
-        <?php }?>
 
     });
 
@@ -1291,4 +1297,40 @@ foreach ($sampleType as $samples) {
     //         }
     //     }); 
     // }
+
+    jQuery(function() {
+        // set default dates
+        var start = new Date();
+        // set end date to max one year period:
+        var end = new Date(new Date().setYear(start.getFullYear()-1));
+
+        $('#dpMonthsStart').datepicker({
+            clearBtn: true,
+            autoclose: true,
+            todayHighlight: true,
+            format: 'M-yyyy',
+            viewMode: "months",
+            minViewMode: "months",
+            <?php if(isset($logincontainer->sampleTable) && $logincontainer->sampleTable == "dash_vl_request_form_current"){?>
+            startDate : end,
+            <?php }?>
+            endDate: "0m"
+        }).on('changeDate', function(e) {
+            $('#dpMonthsEnd').val('');
+			var _satrt = new Date(e.date.valueOf());
+			$('#dpMonthsEnd').datepicker('setStartDate', _satrt);
+        });
+        $('#dpMonthsEnd').datepicker({
+            clearBtn: true,
+            autoclose: true,
+            todayHighlight: true,
+            format: 'M-yyyy',
+            viewMode: "months",
+            minViewMode: "months",
+            <?php if(isset($logincontainer->sampleTable) && $logincontainer->sampleTable == "dash_vl_request_form_current"){?>
+            startDate : end,
+            <?php }?>
+            endDate: "0m"
+        })
+    });
 </script>

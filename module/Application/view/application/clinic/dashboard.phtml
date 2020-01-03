@@ -468,7 +468,6 @@ foreach ($sampleType as $samples) {
             $('#dashboard-range span').html(start.format('MMM D, YYYY') + ' to ' + end.format('MMM D, YYYY'));
             $('#sampleCollectionDate').val(start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
         }
-
         $('#dashboard-range').daterangepicker({
             format: 'DD-MMM-YYYY',
             separator: ' to ',
@@ -476,8 +475,8 @@ foreach ($sampleType as $samples) {
             endDate: end,
             <?php if(isset($logincontainer->sampleTable) && $logincontainer->sampleTable == "dash_vl_request_form_current"){?>
             minDate:moment().subtract(12, 'months'),
-            <?php }?>
             maxDate: moment(),
+            <?php }?>
             ranges: {
                 'Today': [moment(), moment()],
                 'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
