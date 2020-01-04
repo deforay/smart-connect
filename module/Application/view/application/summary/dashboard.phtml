@@ -297,7 +297,7 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
             </div>
             <div class="input-group-prepend input-group-append">
                 <span class="input-group-text font-w600" style="padding: 0.100rem .35rem;">
-                    <i class="fa fa-fw fa-arrow-right"></i>
+                    <!-- <i class="fa fa-fw fa-arrow-right"></i> -->to
                 </span>
             </div>
             <div class="input-append date" id="dpMonthsEnd" data-date-format="M/yyyy" data-date-viewmode="years" data-date-minviewmode="months">
@@ -1619,11 +1619,11 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
             "fnServerData": function(sSource, aoData, fnCallback) {
                 aoData.push({
                     "name": "fromDate",
-                    "value": $('#mrp-lowerDate').val()
+                    "value": formatDate($('#mrp-lowerDate').val())
                 });
                 aoData.push({
                     "name": "toDate",
-                    "value": $('#mrp-upperDate').val()
+                    "value": formatDate($('#mrp-upperDate').val())
                 });
                 $.ajax({
                     "dataType": 'json',
@@ -1690,11 +1690,11 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
             "fnServerData": function(sSource, aoData, fnCallback) {
                 aoData.push({
                     "name": "fromDate",
-                    "value": $('#mrp-lowerDate').val()
+                    "value": formatDate($('#mrp-lowerDate').val())
                 });
                 aoData.push({
                     "name": "toDate",
-                    "value": $('#mrp-upperDate').val()
+                    "value": formatDate($('#mrp-upperDate').val())
                 });
                 $.ajax({
                     "dataType": 'json',
@@ -1756,11 +1756,11 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
             "fnServerData": function(sSource, aoData, fnCallback) {
                 aoData.push({
                     "name": "fromDate",
-                    "value": $('#mrp-lowerDate').val()
+                    "value": formatDate($('#mrp-lowerDate').val())
                 });
                 aoData.push({
                     "name": "toDate",
-                    "value": $('#mrp-upperDate').val()
+                    "value": formatDate($('#mrp-upperDate').val())
                 });
                 $.ajax({
                     "dataType": 'json',
@@ -1813,11 +1813,11 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
             "fnServerData": function(sSource, aoData, fnCallback) {
                 aoData.push({
                     "name": "fromDate",
-                    "value": $('#mrp-lowerDate').val()
+                    "value": formatDate($('#mrp-lowerDate').val())
                 });
                 aoData.push({
                     "name": "toDate",
-                    "value": $('#mrp-upperDate').val()
+                    "value": formatDate($('#mrp-upperDate').val())
                 });
                 $.ajax({
                     "dataType": 'json',
@@ -1877,11 +1877,11 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
             "fnServerData": function(sSource, aoData, fnCallback) {
                 aoData.push({
                     "name": "fromDate",
-                    "value": $('#mrp-lowerDate').val()
+                    "value": formatDate($('#mrp-lowerDate').val())
                 });
                 aoData.push({
                     "name": "toDate",
-                    "value": $('#mrp-upperDate').val()
+                    "value": formatDate($('#mrp-upperDate').val())
                 });
                 $.ajax({
                     "dataType": 'json',
@@ -1934,11 +1934,11 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
             "fnServerData": function(sSource, aoData, fnCallback) {
                 aoData.push({
                     "name": "fromDate",
-                    "value": $('#mrp-lowerDate').val()
+                    "value": formatDate($('#mrp-lowerDate').val())
                 });
                 aoData.push({
                     "name": "toDate",
-                    "value": $('#mrp-upperDate').val()
+                    "value": formatDate($('#mrp-upperDate').val())
                 });
                 $.ajax({
                     "dataType": 'json',
@@ -1983,11 +1983,11 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
             "fnServerData": function(sSource, aoData, fnCallback) {
                 aoData.push({
                     "name": "fromDate",
-                    "value": $('#mrp-lowerDate').val()
+                    "value": formatDate($('#mrp-lowerDate').val())
                 });
                 aoData.push({
                     "name": "toDate",
-                    "value": $('#mrp-upperDate').val()
+                    "value": formatDate($('#mrp-upperDate').val())
                 });
                 $.ajax({
                     "dataType": 'json',
@@ -2035,11 +2035,11 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
             "fnServerData": function(sSource, aoData, fnCallback) {
                 aoData.push({
                     "name": "fromDate",
-                    "value": $('#mrp-lowerDate').val()
+                    "value": formatDate($('#mrp-lowerDate').val())
                 });
                 aoData.push({
                     "name": "toDate",
-                    "value": $('#mrp-upperDate').val()
+                    "value": formatDate($('#mrp-upperDate').val())
                 });
                 $.ajax({
                     "dataType": 'json',
@@ -2084,11 +2084,11 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
             "fnServerData": function(sSource, aoData, fnCallback) {
                 aoData.push({
                     "name": "fromDate",
-                    "value": $('#mrp-lowerDate').val()
+                    "value": formatDate($('#mrp-lowerDate').val())
                 });
                 aoData.push({
                     "name": "toDate",
-                    "value": $('#mrp-upperDate').val()
+                    "value": formatDate($('#mrp-upperDate').val())
                 });
                 $.ajax({
                     "dataType": 'json',
@@ -2149,11 +2149,11 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
                 });
                 aoData.push({
                     "name": "fromDate",
-                    "value": $('#mrp-lowerDate').val()
+                    "value": formatDate($('#mrp-lowerDate').val())
                 });
                 aoData.push({
                     "name": "toDate",
-                    "value": $('#mrp-upperDate').val()
+                    "value": formatDate($('#mrp-upperDate').val())
                 });
                 $.ajax({
                     "dataType": 'json',
@@ -2202,8 +2202,8 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
         sampDistrictIdList = ($("#sampleDistrictName").val() == null) ? '' : $("#sampleDistrictName").val().join(',');
         sampProvinceIdList = ($("#sampleProvinceName").val() == null) ? '' : $("#sampleProvinceName").val().join(',');
         sampClinicIdList = ($("#sampleClinicId").val() == null) ? '' : $('#sampleClinicId').val().join(',');
-        var fromDate = $('#mrp-lowerDate').val();
-        var toDate = $('#mrp-upperDate').val();
+        var fromDate = formatDate($('#mrp-lowerDate').val());
+        var toDate = formatDate($('#mrp-upperDate').val());
         $.post("<?php echo $this->url('summary', array('action' => 'get-samples-received-bar-chart')); ?>", {
                 districts: sampDistrictIdList,
                 provinces: sampProvinceIdList,
@@ -2220,8 +2220,8 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
         supDistrictIdList = ($("#suppressionDistrictName").val() == null) ? '' : $("#suppressionDistrictName").val().join(',');
         supProvinceIdList = ($("#suppressionProvinceName").val() == null) ? '' : $("#suppressionProvinceName").val().join(',');
         supClinicIdList = ($("#suppressionClinicId").val() == null) ? '' : $('#suppressionClinicId').val().join(',');
-        var fromDate = $('#mrp-lowerDate').val();
-        var toDate = $('#mrp-upperDate').val();
+        var fromDate = formatDate($('#mrp-lowerDate').val());
+        var toDate = formatDate($('#mrp-upperDate').val());
         $.post("<?php echo $this->url('summary', array('action' => 'get-suppression-rate-bar-chart')); ?>", {
                 districts: supDistrictIdList,
                 provinces: supProvinceIdList,
@@ -2238,8 +2238,8 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
         rejDistrictIdList = ($("#rejectionDistrictName").val() == null) ? '' : $("#rejectionDistrictName").val().join(',');
         rejProvinceIdList = ($("#rejectionProvinceName").val() == null) ? '' : $("#rejectionProvinceName").val().join(',');
         rejClinicIdList = ($("#rejectionClinicId").val() == null) ? '' : $('#rejectionClinicId').val().join(',');
-        var fromDate = $('#mrp-lowerDate').val();
-        var toDate = $('#mrp-upperDate').val();
+        var fromDate = formatDate($('#mrp-lowerDate').val());
+        var toDate = formatDate($('#mrp-upperDate').val());
         $.post("<?php echo $this->url('summary', array('action' => 'get-samples-rejected-bar-chart')); ?>", {
                 districts: rejDistrictIdList,
                 provinces: rejProvinceIdList,
@@ -2256,8 +2256,8 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
         var districtIdList = ($("#districtName").val() == null) ? '' : $("#districtName").val().join(',');
         var provinceIdList = ($("#provinceName").val() == null) ? '' : $("#provinceName").val().join(',');
         var clinicIdList = ($("#clinicId").val() == null) ? '' : $('#clinicId').val().join(',');
-        var fromDate = $('#mrp-lowerDate').val();
-        var toDate = $('#mrp-upperDate').val();
+        var fromDate = formatDate($('#mrp-lowerDate').val());
+        var toDate = formatDate($('#mrp-upperDate').val());
         $.post("<?php echo $this->url('summary', array('action' => 'get-regimen-group-bar-chart')); ?>", {
                 districts: districtIdList,
                 provinces: provinceIdList,
@@ -2286,8 +2286,8 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
         var indDistrictIdList = ($("#indDistrictName").val() == null) ? '' : $("#indDistrictName").val().join(',');
         var indProvinceIdList = ($("#indProvinceName").val() == null) ? '' : $("#indProvinceName").val().join(',');
         var indClinicIdList = ($("#indClinicId").val() == null) ? '' : $('#indClinicId').val().join(',');
-        var fromDate = $('#mrp-lowerDate').val();
-        var toDate = $('#mrp-upperDate').val();
+        var fromDate = formatDate($('#mrp-lowerDate').val());
+        var toDate = formatDate($('#mrp-upperDate').val());
         $.post("<?php echo $this->url('summary', array('action' => 'get-indicators')); ?>", {
                 districts: indDistrictIdList,
                 provinces: indProvinceIdList,
@@ -2370,8 +2370,8 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
     }
 
     function summarize() {
-        var f = $('#mrp-lowerDate').val();
-        var t = $('#mrp-upperDate').val();
+        var f = formatDate($('#mrp-lowerDate').val());
+        var t = formatDate($('#mrp-upperDate').val());
         document.location.href = "/summary/dashboard?f=" + f + "&t=" + t
     }
 
@@ -2383,7 +2383,7 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
             clearBtn: true,
             autoclose: true,
             todayHighlight: true,
-            format: 'M-yyyy',
+            format: 'yyyy-m',
             viewMode: "months",
             minViewMode: "months",
             <?php if(isset($logincontainer->sampleTable) && $logincontainer->sampleTable == "dash_vl_request_form_current"){?>
@@ -2399,7 +2399,7 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
             clearBtn: true,
             autoclose: true,
             todayHighlight: true,
-            format: 'M-yyyy',
+            format: 'yyyy-m',
             viewMode: "months",
             minViewMode: "months",
             <?php if(isset($logincontainer->sampleTable) && $logincontainer->sampleTable == "dash_vl_request_form_current"){?>
@@ -2408,4 +2408,13 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
             endDate: "0m"
         })
     });
+
+    function formatDate(date) {
+        var d = new Date(date),
+            month = '' + (d.getMonth() + 1),
+            year = d.getFullYear();
+        if (month.length < 2) month = '0' + month;
+
+        return [year, month].join('-');
+    }
 </script>

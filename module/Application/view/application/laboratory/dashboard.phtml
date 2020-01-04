@@ -290,7 +290,7 @@ foreach ($sampleType as $samples) {
             </div>
             <div class="input-group-prepend input-group-append" style=" padding-top: 5px; ">
                 <span class="input-group-text font-w600" style="padding: 0.100rem .35rem;">
-                    <i class="fa fa-fw fa-arrow-right"></i>
+                    <!-- <i class="fa fa-fw fa-arrow-right"></i> --> to
                 </span>
             </div>
             <div class="input-append date" id="dpMonthsEnd" data-date-format="M/yyyy" data-date-viewmode="years" data-date-minviewmode="months">
@@ -708,8 +708,8 @@ foreach ($sampleType as $samples) {
 
 
     function sampleStatusDataTable() {
-        var fromDate = $('#mrp-lowerDate').val();
-        var toDate = $('#mrp-upperDate').val();
+        var fromDate = formatDate($('#mrp-lowerDate').val());
+        var toDate = formatDate($('#mrp-upperDate').val());
         var sampleType = ($("#sampleType").val() == null) ? '' : $("#sampleType").val();
         var labID = ($("#labName").val() == null) ? '' : $("#labName").val().join(',');
         var clinicId = $("#clinicId").val();
@@ -742,8 +742,8 @@ foreach ($sampleType as $samples) {
     }
 
     function getTestedSampleResult() {
-        var fromDate = $('#mrp-lowerDate').val();
-        var toDate = $('#mrp-upperDate').val();
+        var fromDate = formatDate($('#mrp-lowerDate').val());
+        var toDate = formatDate($('#mrp-upperDate').val());
         var sampleType = ($("#sampleType").val() == null) ? '' : $("#sampleType").val();
         var facilityId = ($("#labName").val() == null) ? '' : $("#labName").val().join(',');
         return $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-test-result')); ?>", {
@@ -758,8 +758,8 @@ foreach ($sampleType as $samples) {
     }
 
     function getTestedSampleResultBasedLab() {
-        var fromDate = $('#mrp-lowerDate').val();
-        var toDate = $('#mrp-upperDate').val();
+        var fromDate = formatDate($('#mrp-lowerDate').val());
+        var toDate = formatDate($('#mrp-upperDate').val());
         var sampleType = ($("#sampleTypeVolume").val() == null) ? '' : $("#sampleTypeVolume").val();
         var facilityId = ($("#labName").val() == null) ? '' : $("#labName").val().join(',');
         return $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-test-result-volume')); ?>", {
@@ -774,8 +774,8 @@ foreach ($sampleType as $samples) {
     }
 
     function getTestedSampleResultBasedGender() {
-        var fromDate = $('#mrp-lowerDate').val();
-        var toDate = $('#mrp-upperDate').val();
+        var fromDate = formatDate($('#mrp-lowerDate').val());
+        var toDate = formatDate($('#mrp-upperDate').val());
         var facilityId = ($("#labName").val() == null) ? '' : $("#labName").val().join(',');
         $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-test-result-gender')); ?>", {
                 fromDate: fromDate,
@@ -788,8 +788,8 @@ foreach ($sampleType as $samples) {
     }
 
     function getAverageLabTAT() {
-        var fromDate = $('#mrp-lowerDate').val();
-        var toDate = $('#mrp-upperDate').val();
+        var fromDate = formatDate($('#mrp-lowerDate').val());
+        var toDate = formatDate($('#mrp-upperDate').val());
         var facilityId = ($("#labName").val() == null) ? '' : $("#labName").val().join(',');
         $.post("<?php echo $this->url('laboratory', array('action' => 'get-lab-turn-around-time')); ?>", {
                 fromDate: fromDate,
@@ -802,8 +802,8 @@ foreach ($sampleType as $samples) {
     }
 
     function getTestedSampleResultBasedAgeGroupLessThanTwo() {
-        var fromDate = $('#mrp-lowerDate').val();
-        var toDate = $('#mrp-upperDate').val();
+        var fromDate = formatDate($('#mrp-lowerDate').val());
+        var toDate = formatDate($('#mrp-upperDate').val());
         var facilityId = ($("#labName").val() == null) ? '' : $("#labName").val().join(',');
         var age = '<2';
         return $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-test-result-age-group')); ?>", {
@@ -818,8 +818,8 @@ foreach ($sampleType as $samples) {
     }
 
     function getTestedSampleResultBasedAgeGroupTwoToFive() {
-        var fromDate = $('#mrp-lowerDate').val();
-        var toDate = $('#mrp-upperDate').val();
+        var fromDate = formatDate($('#mrp-lowerDate').val());
+        var toDate = formatDate($('#mrp-upperDate').val());
         var facilityId = ($("#labName").val() == null) ? '' : $("#labName").val().join(',');
         var age = '2to5';
         return $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-test-result-age-group-two-to-five')); ?>", {
@@ -834,8 +834,8 @@ foreach ($sampleType as $samples) {
     }
 
     function getTestedSampleResultBasedAgeGroupSixToFourteen() {
-        var fromDate = $('#mrp-lowerDate').val();
-        var toDate = $('#mrp-upperDate').val();
+        var fromDate = formatDate($('#mrp-lowerDate').val());
+        var toDate = formatDate($('#mrp-upperDate').val());
         var facilityId = ($("#labName").val() == null) ? '' : $("#labName").val().join(',');
         var age = '6to14';
         return $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-test-result-age-group-six-to-fourteen')); ?>", {
@@ -850,8 +850,8 @@ foreach ($sampleType as $samples) {
     }
 
     function getTestedSampleResultBasedAgeGroupFifteenToFourtyNine() {
-        var fromDate = $('#mrp-lowerDate').val();
-        var toDate = $('#mrp-upperDate').val();
+        var fromDate = formatDate($('#mrp-lowerDate').val());
+        var toDate = formatDate($('#mrp-upperDate').val());
         var facilityId = ($("#labName").val() == null) ? '' : $("#labName").val().join(',');
         var age = '15to49';
         return $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-test-result-age-group-fifteen-to-fourtynine')); ?>", {
@@ -866,8 +866,8 @@ foreach ($sampleType as $samples) {
     }
 
     function getTestedSampleResultBasedAgeGroupGreaterThanFifty() {
-        var fromDate = $('#mrp-lowerDate').val();
-        var toDate = $('#mrp-upperDate').val();
+        var fromDate = formatDate($('#mrp-lowerDate').val());
+        var toDate = formatDate($('#mrp-upperDate').val());
         var facilityId = ($("#labName").val() == null) ? '' : $("#labName").val().join(',');
         var age = '>=50';
         return $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-test-result-age-group-greater-fifty')); ?>", {
@@ -882,8 +882,8 @@ foreach ($sampleType as $samples) {
     }
 
     function getTestedSampleResultBasedAgeGroupUnknown() {
-        var fromDate = $('#mrp-lowerDate').val();
-        var toDate = $('#mrp-upperDate').val();
+        var fromDate = formatDate($('#mrp-lowerDate').val());
+        var toDate = formatDate($('#mrp-upperDate').val());
         var facilityId = ($("#labName").val() == null) ? '' : $("#labName").val().join(',');
         var age = 'unknown';
         return $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-test-result-age-group-unknown')); ?>", {
@@ -898,8 +898,8 @@ foreach ($sampleType as $samples) {
     }
 
     function getTestedSampleReason() {
-        var fromDate = $('#mrp-lowerDate').val();
-        var toDate = $('#mrp-upperDate').val();
+        var fromDate = formatDate($('#mrp-lowerDate').val());
+        var toDate = formatDate($('#mrp-upperDate').val());
         var facilityId = ($("#labName").val() == null) ? '' : $("#labName").val().join(',');
         var testedReason = ($('#testedReason').val() == null) ? '' : $('#testedReason').val();
         return $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-test-reason-bar-chart')); ?>", {
@@ -914,8 +914,8 @@ foreach ($sampleType as $samples) {
     }
 
     function getTestedSampleResultBasedonPregnantPatient() {
-        var fromDate = $('#mrp-lowerDate').val();
-        var toDate = $('#mrp-upperDate').val();
+        var fromDate = formatDate($('#mrp-lowerDate').val());
+        var toDate = formatDate($('#mrp-upperDate').val());
         var facilityId = ($("#labName").val() == null) ? '' : $("#labName").val().join(',');
         return $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-test-result-pregnant')); ?>", {
                 fromDate: fromDate,
@@ -928,8 +928,8 @@ foreach ($sampleType as $samples) {
     }
 
     function getTestedSampleResultBasedonBreastfeedingPatient() {
-        var fromDate = $('#mrp-lowerDate').val();
-        var toDate = $('#mrp-upperDate').val();
+        var fromDate = formatDate($('#mrp-lowerDate').val());
+        var toDate = formatDate($('#mrp-upperDate').val());
         var facilityId = ($("#labName").val() == null) ? '' : $("#labName").val().join(',');
         return $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-test-result-breastfeeding')); ?>", {
                 fromDate: fromDate,
@@ -942,8 +942,8 @@ foreach ($sampleType as $samples) {
     }
 
     function getRequisitionFormsTested() {
-        var fromDate = $('#mrp-lowerDate').val();
-        var toDate = $('#mrp-upperDate').val();
+        var fromDate = formatDate($('#mrp-lowerDate').val());
+        var toDate = formatDate($('#mrp-upperDate').val());
         var facilityId = ($("#labName").val() == null) ? '' : $("#labName").val().join(',');
         var formFields = ($('#formFields').val() == null) ? "patient_art_no,patient_age_in_years,patient_gender,current_regimen" : $('#formFields').val().join(',');
         return $.post("<?php echo $this->url('laboratory', array('action' => 'get-requisition-forms')); ?>", {
@@ -959,8 +959,8 @@ foreach ($sampleType as $samples) {
 
     function getSampleVolume(formSrc) {
         //if(formSrc == 'change'){$.blockUI.defaults.css.border = '1px solid grey';$(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);}
-        var fromDate = $('#mrp-lowerDate').val();
-        var toDate = $('#mrp-upperDate').val();
+        var fromDate = formatDate($('#mrp-lowerDate').val());
+        var toDate = formatDate($('#mrp-upperDate').val());
         var facilityId = ($("#labName").val() == null) ? '' : $("#labName").val().join(',');
         var sampleStatus = ($("#sampleStatus").val() == null) ? '' : $("#sampleStatus").val();
         return $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-volume')); ?>", {
@@ -975,8 +975,8 @@ foreach ($sampleType as $samples) {
     }
 
     function femalePatient() {
-        var fromDate = $('#mrp-lowerDate').val();
-        var toDate = $('#mrp-upperDate').val();
+        var fromDate = formatDate($('#mrp-lowerDate').val());
+        var toDate = formatDate($('#mrp-upperDate').val());
         var facilityId = ($("#labName").val() == null) ? '' : $("#labName").val().join(',');
         return $.post("<?php echo $this->url('laboratory', array('action' => 'get-female-patient-result')); ?>", {
                 fromDate: fromDate,
@@ -989,8 +989,8 @@ foreach ($sampleType as $samples) {
     }
 
     function lineOfTreatment() {
-        var fromDate = $('#mrp-lowerDate').val();
-        var toDate = $('#mrp-upperDate').val();
+        var fromDate = formatDate($('#mrp-lowerDate').val());
+        var toDate = formatDate($('#mrp-upperDate').val());
         var facilityId = ($("#labName").val() == null) ? '' : $("#labName").val().join(',');
         return $.post("<?php echo $this->url('laboratory', array('action' => 'get-line-of-treatment')); ?>", {
                 fromDate: fromDate,
@@ -1003,8 +1003,8 @@ foreach ($sampleType as $samples) {
     }
 
     function getLabFacilities() {
-        var fromDate = $('#mrp-lowerDate').val();
-        var toDate = $('#mrp-upperDate').val();
+        var fromDate = formatDate($('#mrp-lowerDate').val());
+        var toDate = formatDate($('#mrp-upperDate').val());
         var facilityId = ($("#labName").val() == null) ? '' : $("#labName").val().join(',');
         return $.post("<?php echo $this->url('laboratory', array('action' => 'get-lab-facilities')); ?>", {
                 fromDate: fromDate,
@@ -1217,22 +1217,22 @@ foreach ($sampleType as $samples) {
     }
 
     function doSampleVolumeRedirect(labCode) {
-        window.open('/labs/sample-volume?fromMonth=' + $('#mrp-lowerDate').val() + '&toMonth=' + $('#mrp-upperDate').val() + '&lab=' + labCode + '&result=' + $("#sampleStatus").val(), '_blank');
+        window.open('/labs/sample-volume?fromMonth=' + formatDate($('#mrp-lowerDate').val()) + '&toMonth=' + formatDate($('#mrp-upperDate').val()) + '&lab=' + labCode + '&result=' + $("#sampleStatus").val(), '_blank');
     }
 
     function doFemalePatientRedirect(field) {
         var selectedLabs = ($("#labName").val() == null) ? '' : $("#labName").val();
-        window.open('/labs/samples-tested?fromMonth=' + $('#mrp-lowerDate').val() + '&toMonth=' + $('#mrp-upperDate').val() + '&gender=F&femaleFilter=' + field + '&lab=' + selectedLabs, '_blank');
+        window.open('/labs/samples-tested?fromMonth=' + formatDate($('#mrp-lowerDate').val()) + '&toMonth=' + formatDate($('#mrp-upperDate').val()) + '&gender=F&femaleFilter=' + field + '&lab=' + selectedLabs, '_blank');
     }
 
     function doLineofTreatmentRedirect(field) {
         var selectedLabs = ($("#labName").val() == null) ? '' : $("#labName").val();
-        window.open('/labs/samples-tested?fromMonth=' + $('#mrp-lowerDate').val() + '&toMonth=' + $('#mrp-upperDate').val() + '&lt=' + field + '&lab=' + selectedLabs, '_blank');
+        window.open('/labs/samples-tested?fromMonth=' + formatDate($('#mrp-lowerDate').val()) + '&toMonth=' + formatDate($('#mrp-upperDate').val()) + '&lt=' + field + '&lab=' + selectedLabs, '_blank');
     }
 
     function expandMap() {
         var selectedLabs = ($("#labName").val() == null) ? '' : $("#labName").val();
-        window.open("/labs/get-facilities-geolocation?fromDate=" + $('#mrp-lowerDate').val() + "&toDate=" + $('#mrp-upperDate').val() + "&lab=" + selectedLabs);
+        window.open("/labs/get-facilities-geolocation?fromDate=" + formatDate($('#mrp-lowerDate').val()) + "&toDate=" + formatDate($('#mrp-upperDate').val()) + "&lab=" + selectedLabs);
     }
 
     $("#showDateRange").click(function() {
@@ -1279,8 +1279,8 @@ foreach ($sampleType as $samples) {
     }
 
     function expandChart(from) {
-        var fromDate = $('#mrp-lowerDate').val();
-        var toDate = $('#mrp-upperDate').val();
+        var fromDate = formatDate($('#mrp-lowerDate').val());
+        var toDate = formatDate($('#mrp-upperDate').val());
         var facilityId = ($("#labName").val() == null) ? '' : $("#labName").val().join(',');
         showModal('labs/expand-bar-chart/?fromDate=' + fromDate + '&toDate=' + toDate + '&facilityId=' + facilityId + '&from=' + from, '800', '450');
     }
@@ -1333,4 +1333,13 @@ foreach ($sampleType as $samples) {
             endDate: "0m"
         })
     });
+
+    function formatDate(date) {
+        var d = new Date(date),
+            month = '' + (d.getMonth() + 1),
+            year = d.getFullYear();
+        if (month.length < 2) month = '0' + month;
+
+        return [year, month].join('-');
+    }
 </script>
