@@ -280,7 +280,7 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
         </div>
 
 
-        <div class="col-lg-4" style="margin-top:-5px;padding-bottom:10px;margin-left:20px;display: flex;">
+        <div class="col-lg-3" style="margin-top:-5px;padding-bottom:10px;margin-left:20px;display: flex;">
             <!-- <div id="sla-date-range" class="mrp-container form-control">
                 <span class="mrp-icon"><i class="fa fa-calendar"></i> &nbsp;</span>
                 <div class="mrp-monthdisplay ">
@@ -296,7 +296,7 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
                 <span class="add-on" style="display:none;"><i class="icon-calendar"></i></span>
             </div>
             <div class="input-group-prepend input-group-append">
-                <span class="input-group-text font-w600" style="padding: 0.100rem .35rem;">
+                <span class="input-group-text font-w600" style="padding: 0.100rem .35rem;font-size:0.7em;">
                     <!-- <i class="fa fa-fw fa-arrow-right"></i> -->to
                 </span>
             </div>
@@ -2383,7 +2383,7 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
             clearBtn: true,
             autoclose: true,
             todayHighlight: true,
-            format: 'yyyy-m',
+            format: 'M-yyyy',
             viewMode: "months",
             minViewMode: "months",
             <?php if(isset($logincontainer->sampleTable) && $logincontainer->sampleTable == "dash_vl_request_form_current"){?>
@@ -2399,7 +2399,7 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
             clearBtn: true,
             autoclose: true,
             todayHighlight: true,
-            format: 'yyyy-m',
+            format: 'M-yyyy',
             viewMode: "months",
             minViewMode: "months",
             <?php if(isset($logincontainer->sampleTable) && $logincontainer->sampleTable == "dash_vl_request_form_current"){?>

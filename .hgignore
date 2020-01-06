@@ -3,6 +3,8 @@ syntax: regexp
 ^backup/(?!index.php)
 ^public/uploads/(?!index.php)
 ^public/temporary/(?!index.php)
+
+syntax: glob
 error_log
 Thumbs.db
 Thumbs.db.orig
