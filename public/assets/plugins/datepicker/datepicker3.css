@@ -578,12 +578,12 @@ fieldset[disabled] .datepicker table tr td.active.disabled:hover.active {
 .datepicker table tr td span {
   display: block;
   width: 23%;
-  height: 54px;
-  line-height: 54px;
+  height: 44px;
+  line-height: 44px;
   float: left;
   margin: 1%;
   cursor: pointer;
-  border-radius: 4px;
+  border-radius: 3px;
 }
 .datepicker table tr td span:hover {
   background: rgba(0,0,0,0.2);
@@ -591,7 +591,7 @@ fieldset[disabled] .datepicker table tr td.active.disabled:hover.active {
 .datepicker table tr td span.disabled,
 .datepicker table tr td span.disabled:hover {
   background: none;
-  color: #444;
+  color: #999;
   cursor: default;
 }
 .datepicker table tr td span.active,
