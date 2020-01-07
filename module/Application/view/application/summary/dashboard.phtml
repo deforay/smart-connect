@@ -1317,7 +1317,7 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
     function getSamplesRegisteredTab() {
 
         $(document).ajaxStart($.blockUI({
-            message: '<h2>Processing...</h2>'
+            message: '<h2><?php echo $this->translate('Processing...'); ?></h2>'
         })).ajaxStop($.unblockUI);
         getSamplesReceivedBarChartInfo();
         facilityWiseSamplesReceivedSummaryFn();
@@ -1327,7 +1327,7 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
 
     function getSuppressionRateTab() {
         $(document).ajaxStart($.blockUI({
-            message: '<h2>Processing...</h2>'
+            message: '<h2><?php echo $this->translate('Processing...'); ?></h2>'
         })).ajaxStop($.unblockUI);
         getSuppressionRateBarChartInfo();
         facilityWiseSuppressionRateSummaryFn();
@@ -1335,7 +1335,7 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
 
     function getRejectionRateTab() {
         $(document).ajaxStart($.blockUI({
-            message: '<h2>Processing...</h2>'
+            message: '<h2><?php echo $this->translate('Processing...'); ?></h2>'
         })).ajaxStop($.unblockUI);
         getSamplesRejectedBarChartInfo();
         facilityWiseSamplesRejectedSummaryFn();
@@ -1344,7 +1344,7 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
 
     function getCurrentRegimenTab() {
         $(document).ajaxStart($.blockUI({
-            message: '<h2>Processing...</h2>'
+            message: '<h2><?php echo $this->translate('Processing...'); ?></h2>'
         })).ajaxStop($.unblockUI);
         getRegimenGroupBarChartInfo();
         regimenGroupsSummaryFn();
@@ -1389,7 +1389,7 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
 
         $.blockUI.defaults.css.border = '1px solid grey';
         $(document).ajaxStart($.blockUI({
-            message: '<h2>Processing...</h2>'
+            message: '<h2><?php echo $this->translate('Processing...'); ?></h2>'
         })).ajaxStop($.unblockUI);
 
         getSamplesRegisteredTab();
@@ -2172,7 +2172,7 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
 
     function getSummaryIndicators() {
         $(document).ajaxStart($.blockUI({
-            message: '<h4>Processing <?php echo ($this->translate('Summary of Key Indicators')); ?> ... </h4>'
+            message: '<h4> <?php echo ($this->translate('Processing Summary of Key Indicators')); ?> ... </h4>'
         })).ajaxStop($.unblockUI);
         var indDistrictIdList = ($("#indDistrictName").val() == null) ? '' : $("#indDistrictName").val().join(',');
         var indProvinceIdList = ($("#indProvinceName").val() == null) ? '' : $("#indProvinceName").val().join(',');
@@ -2202,7 +2202,7 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
     function exportSummaryIndicatorResult() {
         $.blockUI.defaults.css.border = '1px solid grey';
         $(document).ajaxStart($.blockUI({
-            message: '<h2>Processing...</h2>'
+            message: '<h2><?php echo $this->translate('Processing...'); ?></h2>'
         })).ajaxStop($.unblockUI);
         $.post("<?php echo $this->url('summary', array('action' => 'export-indicator-result-excel')); ?>", {
                 result: $("#sampleStatus").val()
@@ -2219,7 +2219,7 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
     function exportSuppressionRateByFacility() {
         $.blockUI.defaults.css.border = '1px solid grey';
         $(document).ajaxStart($.blockUI({
-            message: '<h2>Processing...</h2>'
+            message: '<h2><?php echo $this->translate('Processing...'); ?></h2>'
         })).ajaxStop($.unblockUI);
         $.post("<?php echo $this->url('summary', array('action' => 'export-suppression-rate-by-facility')); ?>", {
                 result: $("#sampleStatus").val()

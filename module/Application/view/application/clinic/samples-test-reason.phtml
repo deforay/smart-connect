@@ -249,7 +249,7 @@ if(isset($params['age']) && trim($params['age'])!= ''){
     
     function getAllFunction(){
         $.blockUI.defaults.css.border = '1px solid grey';
-        $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
+        $(document).ajaxStart($.blockUI({ message: '<h2><?php echo $this->translate('Processing...'); ?></h2>' })).ajaxStop($.unblockUI);
         getTestReasonBasedonAgeGroup();
         getTestReasonBasedonGender();
         getTestReasonBasedonClinics();
@@ -270,7 +270,7 @@ if(isset($params['age']) && trim($params['age'])!= ''){
     
     function searchClinicData(){
         $.blockUI.defaults.css.border = '1px solid grey';
-        $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
+        $(document).ajaxStart($.blockUI({ message: '<h2><?php echo $this->translate('Processing...'); ?></h2>' })).ajaxStop($.unblockUI);
         getAllFunction();
     }
 

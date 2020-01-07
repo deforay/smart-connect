@@ -297,7 +297,7 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
 <script>
     function generatePieContainer(){
         $.blockUI.defaults.css.border = '1px solid grey';
-        $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
+        $(document).ajaxStart($.blockUI({ message: '<h2><?php echo $this->translate('Processing...'); ?></h2>' })).ajaxStop($.unblockUI);
         var fromDate = $('#mrp-lowerDate').val();
         var toDate = $('#mrp-upperDate').val();
         var provinces = ($("#provinces").val() == null)?'':$("#provinces").val().join(',');
@@ -320,7 +320,7 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
     
     function generateBarContainer(){
         $.blockUI.defaults.css.border = '1px solid grey';
-        $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
+        $(document).ajaxStart($.blockUI({ message: '<h2><?php echo $this->translate('Processing...'); ?></h2>' })).ajaxStop($.unblockUI);
         var fromDate = $('#mrp-lowerDate').val();
         var toDate = $('#mrp-upperDate').val();
         var provinces = ($("#provinces").val() == null)?'':$("#provinces").val().join(',');
@@ -401,7 +401,7 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
     
     function loadSampleDataTable(){
         $.blockUI.defaults.css.border = '1px solid grey';
-        $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
+        $(document).ajaxStart($.blockUI({ message: '<h2><?php echo $this->translate('Processing...'); ?></h2>' })).ajaxStop($.unblockUI);
         oTable = $('#sampleDataTable').dataTable({
                 "bAutoWidth": false,
                 "bProcessing": true,
@@ -473,7 +473,7 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
     
     function exportLabTestedSampleResult(){
         $.blockUI.defaults.css.border = '1px solid grey';
-        $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI); 
+        $(document).ajaxStart($.blockUI({ message: '<h2><?php echo $this->translate('Processing...'); ?></h2>' })).ajaxStop($.unblockUI); 
         $.post("<?php echo $this->url('laboratory', array('action' => 'export-lab-tested-sample-excel')); ?>", { },
          function(data){
              if(data == "" || data == null || data == undefined){

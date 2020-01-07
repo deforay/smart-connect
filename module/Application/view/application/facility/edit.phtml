@@ -304,7 +304,7 @@
         }else{
             $('#provinceNew').hide().removeClass('isRequired').val('');
             $.blockUI.defaults.css.border = '1px solid grey'; 
-            $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
+            $(document).ajaxStart($.blockUI({ message: '<h2><?php echo $this->translate('Processing...'); ?></h2>' })).ajaxStop($.unblockUI);
             $.post("<?php echo $this->url('facility', array('action' => 'get-district-list')); ?>", {state : $('#state').val()},
             function(data){
                 $('#districtName').html(data);

@@ -697,7 +697,7 @@ foreach ($sampleType as $samples) {
             alert('<?php echo $this->translate('Please choose date range'); ?>');
             return false;
         }
-        //if(frmSource !='load'){$.blockUI.defaults.css.border = '1px solid grey'; $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);}
+        //if(frmSource !='load'){$.blockUI.defaults.css.border = '1px solid grey'; $(document).ajaxStart($.blockUI({ message: '<h2><?php echo $this->translate('Processing...'); ?></h2>' })).ajaxStop($.unblockUI);}
         return $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-result')); ?>", {
                 daterange: daterange
             },
@@ -958,7 +958,7 @@ foreach ($sampleType as $samples) {
     }
 
     function getSampleVolume(formSrc) {
-        //if(formSrc == 'change'){$.blockUI.defaults.css.border = '1px solid grey';$(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);}
+        //if(formSrc == 'change'){$.blockUI.defaults.css.border = '1px solid grey';$(document).ajaxStart($.blockUI({ message: '<h2><?php echo $this->translate('Processing...'); ?></h2>' })).ajaxStop($.unblockUI);}
         var fromDate = formatDate($('#mrp-lowerDate').val());
         var toDate = formatDate($('#mrp-upperDate').val());
         var facilityId = ($("#labName").val() == null) ? '' : $("#labName").val().join(',');
@@ -1120,7 +1120,7 @@ foreach ($sampleType as $samples) {
 
     function getEverything() {
         $.blockUI.defaults.css.border = '1px solid grey';
-        //$(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
+        //$(document).ajaxStart($.blockUI({ message: '<h2><?php echo $this->translate('Processing...'); ?></h2>' })).ajaxStop($.unblockUI);
         if (!$('#sampleCollectionDate').val()) {
             $('#sampleCollectionDate').val(moment().subtract('days', 179).format('YYYY-MM-DD') + ' to ' + moment().format('YYYY-MM-DD'));
         }
@@ -1287,7 +1287,7 @@ foreach ($sampleType as $samples) {
 
     // function exportSampleResult(){
     //    $.blockUI.defaults.css.border = '1px solid grey';
-    //    $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI); 
+    //    $(document).ajaxStart($.blockUI({ message: '<h2><?php echo $this->translate('Processing...'); ?></h2>' })).ajaxStop($.unblockUI); 
     //    $.post("<?php echo $this->url('laboratory', array('action' => 'export-sample-status-result-excel')); ?>", {result : $("#sampleStatus").val()},
     //     function(data){
     //         if(data == "" || data == null || data == undefined){

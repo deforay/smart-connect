@@ -109,7 +109,7 @@
     $('#role').on('change',function(){
         if(this.value!= '' && this.value!= 1){
             $.blockUI.defaults.css.border = '1px solid grey'; 
-            $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
+            $(document).ajaxStart($.blockUI({ message: '<h2><?php echo $this->translate('Processing...'); ?></h2>' })).ajaxStop($.unblockUI);
             $('#facility').val('').change();
             $.post("<?php echo $this->url('users', array('action' => 'get-role-facilities')); ?>", {role : this.value},
             function(data){

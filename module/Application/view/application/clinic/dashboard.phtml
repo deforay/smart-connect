@@ -736,7 +736,7 @@ foreach ($sampleType as $samples) {
     function searchClinicData() {
         $.blockUI.defaults.css.border = '1px solid grey';
         $(document).ajaxStart($.blockUI({
-            message: '<h2>Processing...</h2>'
+            message: '<h2><?php echo $this->translate('Processing...'); ?></h2>'
         })).ajaxStop($.unblockUI);
         
 
@@ -794,7 +794,7 @@ foreach ($sampleType as $samples) {
     function generateResultPDF(id) {
         $.blockUI.defaults.css.border = '1px solid grey';
         $(document).ajaxStart($.blockUI({
-            message: '<h2>Processing...</h2>'
+            message: '<h2><?php echo $this->translate('Processing...'); ?></h2>'
         })).ajaxStop($.unblockUI);
         $.post("<?php echo $this->url('clinics', array('action' => 'generate-result-pdf')); ?>", {
                 id: id
@@ -811,7 +811,7 @@ foreach ($sampleType as $samples) {
     function exportTestResult(cFrom) {
         $.blockUI.defaults.css.border = '1px solid grey';
         $(document).ajaxStart($.blockUI({
-            message: '<h2>Processing...</h2>'
+            message: '<h2><?php echo $this->translate('Processing...'); ?></h2>'
         })).ajaxStop($.unblockUI);
         $.post("<?php echo $this->url('clinics', array('action' => 'export-result-excel')); ?>", {
                 result: $("#sampleStatus").val(),

@@ -293,7 +293,7 @@ if(isset($labFilter) && trim($labFilter)!= ''){
 
     function setProgress(){
         $.blockUI.defaults.css.border = '1px solid grey';
-        $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
+        $(document).ajaxStart($.blockUI({ message: '<h2><?php echo $this->translate('Processing...'); ?></h2>' })).ajaxStop($.unblockUI);
         if( !$('#sampleCollectionDate').val() ) {
           $('#sampleCollectionDate').val(moment().subtract('days', 29).format('YYYY-MM-DD') + ' to ' + moment().format('YYYY-MM-DD'));
         }

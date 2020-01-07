@@ -242,7 +242,7 @@ if(isset($labFilter) && trim($labFilter)!= ''){
     var oTable = null;
     function generateProvinceBarContainer(){
         $.blockUI.defaults.css.border = '1px solid grey';
-        $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
+        $(document).ajaxStart($.blockUI({ message: '<h2><?php echo $this->translate('Processing...'); ?></h2>' })).ajaxStop($.unblockUI);
         var daterange = $('#daterange').val();
         var provinces = ($("#provinces").val() == null)?'':$("#provinces").val().join(',');
         var districts = ($("#districts").val() == null)?'':$("#districts").val().join(',');
@@ -262,7 +262,7 @@ if(isset($labFilter) && trim($labFilter)!= ''){
     
     function generateFacilityBarContainer(){
         $.blockUI.defaults.css.border = '1px solid grey';
-        $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
+        $(document).ajaxStart($.blockUI({ message: '<h2><?php echo $this->translate('Processing...'); ?></h2>' })).ajaxStop($.unblockUI);
         var daterange = $('#daterange').val();
         var provinces = ($("#provinces").val() == null)?'':$("#provinces").val().join(',');
         var districts = ($("#districts").val() == null)?'':$("#districts").val().join(',');
@@ -283,7 +283,7 @@ if(isset($labFilter) && trim($labFilter)!= ''){
     function generateDistrictBarContainer(srcVal,src){
         if(src == 'province'){ window.scrollTo(0,document.documentElement.offsetHeight-(window.innerHeight+1200)); }
         $.blockUI.defaults.css.border = '1px solid grey';
-        $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
+        $(document).ajaxStart($.blockUI({ message: '<h2><?php echo $this->translate('Processing...'); ?></h2>' })).ajaxStop($.unblockUI);
         var daterange = $('#daterange').val();
         var provinces = ($("#provinces").val() == null)?'':$("#provinces").val().join(',');
         var districts = ($("#districts").val() == null)?'':$("#districts").val().join(',');
@@ -304,7 +304,7 @@ if(isset($labFilter) && trim($labFilter)!= ''){
     function generateClinicBarContainer(srcVal,src){
         if(src == 'district'){ window.scrollTo(0,document.documentElement.offsetHeight-(window.innerHeight+800)); }
         $.blockUI.defaults.css.border = '1px solid grey';
-        $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
+        $(document).ajaxStart($.blockUI({ message: '<h2><?php echo $this->translate('Processing...'); ?></h2>' })).ajaxStop($.unblockUI);
         var daterange = $('#daterange').val();
         var provinces = ($("#provinces").val() == null)?'':$("#provinces").val().join(',');
         var districts = ($("#districts").val() == null)?'':$("#districts").val().join(',');
@@ -324,7 +324,7 @@ if(isset($labFilter) && trim($labFilter)!= ''){
     
     function loadResultsAwaitedDataTable(){
         $.blockUI.defaults.css.border = '1px solid grey';
-        $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
+        $(document).ajaxStart($.blockUI({ message: '<h2><?php echo $this->translate('Processing...'); ?></h2>' })).ajaxStop($.unblockUI);
         oTable = $('#resultsAwaitedDataTable').dataTable({
             "bAutoWidth": false,
             "bProcessing": true,
@@ -470,7 +470,7 @@ if(isset($labFilter) && trim($labFilter)!= ''){
     
     function exportResultsAwaited(){
         $.blockUI.defaults.css.border = '1px solid grey';
-        $(document).ajaxStart($.blockUI({ message: '<h2>Processing...</h2>' })).ajaxStop($.unblockUI);
+        $(document).ajaxStart($.blockUI({ message: '<h2><?php echo $this->translate('Processing...'); ?></h2>' })).ajaxStop($.unblockUI);
         $.post("<?php echo $this->url('laboratory', array('action' => 'export-results-awaited-sample')); ?>", { },
         function(data){
            if(data == "" || data == null || data == undefined){
