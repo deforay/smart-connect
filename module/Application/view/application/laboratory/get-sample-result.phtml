@@ -5,16 +5,18 @@ $rejectedDate = '';
 $receivedTotal = 0;
 $testedTotal = 0;
 $rejectedTotal = 0;
-$quickStats = (isset($result['quickStats'])& count($result['quickStats']) >0)?$result['quickStats']:array();
-if(isset($result['scResult']) && count($result['scResult'])>0){
+$quickStats = (isset($result['quickStats']) & count($result['quickStats']) > 0) ? $result['quickStats'] : array();
+if (isset($result['scResult']) && count($result['scResult']) > 0) {
     $received = end($result['scResult']);
     $receivedTotal = $received['receivedTotal'];
     $receivedDate = $received['receivedDate'];
-}if(isset($result['stResult']) && count($result['stResult'])>0){
+}
+if (isset($result['stResult']) && count($result['stResult']) > 0) {
     $tested = end($result['stResult']);
     $testedTotal = $tested['testedTotal'];
     $testedDate = $tested['testedDate'];
-}if(isset($result['srResult']) && count($result['srResult'])>0){
+}
+if (isset($result['srResult']) && count($result['srResult']) > 0) {
     $reject = end($result['srResult']);
     $rejectedTotal = $reject['rejectTotal'];
     $rejectedDate = $reject['rejectDate'];
@@ -37,42 +39,46 @@ if(isset($result['scResult']) && count($result['scResult'])>0){
                 <?php
                 $totalSample = 0;
                 $samplePercentage = '';
-                foreach($quickStats as $statName => $statValue) {
-                    if($statName == 'Total Samples'){ $totalSample = $statValue; }
-                    if($statName!= 'Total Samples'){ $samplePercentage = ' ('.round(($statValue/$totalSample)*100,2).'%)'; }
-                    if(strpos($statName,'(<')!= false){
-                        $statName = '<a href="javascript:void(0);" onclick="doSampleResultAwaitedRedirect(\'<\');">'.$this->translate($statName).'</a>';
-                        $statValue = '<a href="javascript:void(0);" onclick="doSampleResultAwaitedRedirect(\'<\');">'.number_format($statValue).'</a>';
-                    }else if(strpos($statName,'(>')!= false){
-                        $statName = '<a href="javascript:void(0);" onclick="doSampleResultAwaitedRedirect(\'>\');">'.$this->translate($statName).'</a>';
-                        $statValue = '<a href="javascript:void(0);" onclick="doSampleResultAwaitedRedirect(\'>\');">'.number_format($statValue).'</a>';
-                    }else{
+                foreach ($quickStats as $statName => $statValue) {
+                    if ($statName == 'Total Samples') {
+                        $totalSample = $statValue;
+                    }
+                    if ($statName != 'Total Samples') {
+                        $samplePercentage = ' (' . round(($statValue / $totalSample) * 100, 2) . '%)';
+                    }
+                    if (strpos($statName, '(<') != false) {
+                        $statName = '<a href="javascript:void(0);" onclick="doSampleResultAwaitedRedirect(\'<\');">' . $this->translate($statName) . '</a>';
+                        $statValue = '<a href="javascript:void(0);" onclick="doSampleResultAwaitedRedirect(\'<\');">' . number_format($statValue) . '</a>';
+                    } else if (strpos($statName, '(>') != false) {
+                        $statName = '<a href="javascript:void(0);" onclick="doSampleResultAwaitedRedirect(\'>\');">' . $this->translate($statName) . '</a>';
+                        $statValue = '<a href="javascript:void(0);" onclick="doSampleResultAwaitedRedirect(\'>\');">' . number_format($statValue) . '</a>';
+                    } else {
                         $statName = $this->translate($statName);
                         $statValue = number_format($statValue);
                     }
                 ?>
-                <tr>
-                    <th style="font-size:14px !important;padding:4px;"><?php echo $statName; ?></th>
-                    <td style="font-size:14px !important;padding:4px;"><?php echo $statValue.$samplePercentage; ?></td>
-                </tr>
+                    <tr>
+                        <th style="font-size:14px !important;padding:4px;"><?php echo $statName; ?></th>
+                        <td style="font-size:14px !important;padding:4px;"><?php echo $statValue . $samplePercentage; ?></td>
+                    </tr>
                 <?php } ?>
             </table>
         </div>
     </div>
 </div>
 <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 ">
-    <div class="dashboard-stat2 bluebox" style="cursor:pointer;" >
+    <div class="dashboard-stat2 bluebox" style="cursor:pointer;">
         <div class="display">
             <div class="number">
                 <h3 class="font-green-sharp">
                     <span data-counter="counterup" data-value="<?php echo $receivedTotal; ?>"><?php echo $receivedTotal; ?></span>
                 </h3>
                 <small class="font-green-sharp"><?php echo $this->translate('SAMPLES REGISTERED'); ?></small><br>
-                <!--<small class="font-blue-sharp"><?php echo $receivedDate;?></small>-->
+                <!--<small class="font-blue-sharp"><?php echo $receivedDate; ?></small>-->
                 <?php
-                if(trim($params['daterange'])== ''){
+                if (trim($params['daterange']) == '') {
                 ?>
-                   <small class="font-green-sharp"><?php echo $this->translate('Last 28 days'); ?></small>
+                    <small class="font-green-sharp"><?php echo $this->translate('Last 28 days'); ?></small>
                 <?php } ?>
             </div>
             <div class="icon">
@@ -84,18 +90,18 @@ if(isset($result['scResult']) && count($result['scResult'])>0){
 </div>
 
 <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
-    <div class="dashboard-stat2" style="cursor:pointer;" >
+    <div class="dashboard-stat2" style="cursor:pointer;">
         <div class="display">
             <div class="number">
                 <h3 class="font-blue-sharp">
                     <span data-counter="counterup" data-value="<?php echo $testedTotal; ?>"><?php echo $testedTotal; ?></span>
                 </h3>
                 <small class="font-blue-sharp"><?php echo $this->translate('SAMPLES TESTED'); ?></small><br>
-                <!--<small class="font-blue-sharp"><?php echo $testedDate;?></small>-->
+                <!--<small class="font-blue-sharp"><?php echo $testedDate; ?></small>-->
                 <?php
-                if(trim($params['daterange'])== ''){
+                if (trim($params['daterange']) == '') {
                 ?>
-                  <small class="font-blue-sharp"><?php echo $this->translate('Last 28 days'); ?></small>
+                    <small class="font-blue-sharp"><?php echo $this->translate('Last 28 days'); ?></small>
                 <?php } ?>
             </div>
             <div class="icon">
@@ -113,11 +119,11 @@ if(isset($result['scResult']) && count($result['scResult'])>0){
                     <span data-counter="counterup" data-value="<?php echo $rejectedTotal; ?>"><?php echo $rejectedTotal; ?></span>
                 </h3>
                 <small class="font-red-haze"><?php echo $this->translate('SAMPLES REJECTED'); ?></small><br>
-                <!--<small class="font-red-haze"><?php echo $rejectedDate;?></small>-->
+                <!--<small class="font-red-haze"><?php echo $rejectedDate; ?></small>-->
                 <?php
-                if(trim($params['daterange'])== ''){
+                if (trim($params['daterange']) == '') {
                 ?>
-                   <small class="font-red-haze"><?php echo $this->translate('Last 28 days'); ?></small>
+                    <small class="font-red-haze"><?php echo $this->translate('Last 28 days'); ?></small>
                 <?php } ?>
             </div>
             <div class="icon">
@@ -129,186 +135,198 @@ if(isset($result['scResult']) && count($result['scResult'])>0){
 </div>
 <script>
     <?php
-    if(isset($result['scResult']) && count($result['scResult'])>0){
-        if($receivedTotal>0){ ?>
-          $('#samplesReceivedChart').highcharts({
-            chart: {
-                type: 'column',
-                height: 220
-            },
-            title: {
-                text: ''
-            },
-            exporting:{
-                chartOptions:{
-                    subtitle: {
-                        text:'<?php echo $this->translate('SAMPLES COLLECTED'); ?>',
-                    }
-                }
-            },
-            credits: {
-                enabled: false
-            },
-            xAxis: {
-                categories: [
-                <?php
-                foreach($result['scResult'] as $total){
-                    echo "'".ucwords($total['date'])."',";
-                }
-                ?>],
-                crosshair: true
-            },
-            yAxis: {
-                min: 0,
+    if (isset($result['scResult']) && count($result['scResult']) > 0) {
+        if ($receivedTotal > 0) { ?>
+            $('#samplesReceivedChart').highcharts({
+                chart: {
+                    type: 'column',
+                    height: 220
+                },
                 title: {
                     text: ''
                 },
-                labels: { formatter: function() { return this.value; } },
-            },
-            tooltip: {
-                headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
-                pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
-                    '<td style="padding:0"><b>{point.y}</b></td></tr>',
-                footerFormat: '</table>',
-                shared: true,
-                useHTML: true
-            },
-            plotOptions: {
-                column: {
-                    pointPadding: 0.2,
-                    borderWidth: 0
+                exporting: {
+                    chartOptions: {
+                        subtitle: {
+                            text: '<?php echo $this->translate('SAMPLES COLLECTED'); ?>',
+                        }
+                    }
                 },
-            },
-            series: [{
-                showInLegend: false,  
-                name: '<?php echo $this->translate('Samples'); ?>',
-                data: [<?php
-                foreach($result['scResult'] as $total){
-                    echo ucwords($total[0]['total']).",";
-                }
-                ?>]
-    
-            }],
-            colors : ['#2ab4c0']
-        });
-    <?php } if($testedTotal>0){ ?>
-      $('#samplesTestedChart').highcharts({
-        chart: {
-            type: 'column',
-            height: 220
-        },
-        title: {
-            text: ''
-        },
-        exporting:{
-            chartOptions:{
-                subtitle: {
-                    text:'<?php echo $this->translate('SAMPLES TESTED'); ?>',
-                }
-            }
-        },
-        credits: {
-            enabled: false
-        },
-        xAxis: {
-            categories: [<?php
-            foreach($result['stResult'] as $total){
-                echo "'".ucwords($total['date'])."',";
-            }
-            ?>],
-            crosshair: true
-        },
-        yAxis: {
-            min: 0,
-            title: {
-                text: ''
-            },
-            labels: { formatter: function() { return this.value; } },
-        },
-        tooltip: {
-            headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
-            pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
-                '<td style="padding:0"><b>{point.y}</b></td></tr>',
-            footerFormat: '</table>',
-            shared: true,
-            useHTML: true
-        },
-        plotOptions: {
-            column: {
-                pointPadding: 0.2,
-                borderWidth: 0
-            }
-        },
-        series: [{
-            showInLegend: false,  
-            name: '<?php echo $this->translate('Samples'); ?>',
-            data: [<?php
-            foreach($result['stResult'] as $total){
-                echo ucwords($total[0]['total']).",";
-            }
-            ?>]
+                credits: {
+                    enabled: false
+                },
+                xAxis: {
+                    categories: [
+                        <?php
+                        foreach ($result['scResult'] as $total) {
+                            echo "'" . ucwords($total['date']) . "',";
+                        }
+                        ?>
+                    ],
+                    crosshair: true
+                },
+                yAxis: {
+                    min: 0,
+                    title: {
+                        text: ''
+                    },
+                    labels: {
+                        formatter: function() {
+                            return this.value;
+                        }
+                    },
+                },
+                tooltip: {
+                    headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+                    pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                        '<td style="padding:0"><b>{point.y}</b></td></tr>',
+                    footerFormat: '</table>',
+                    shared: true,
+                    useHTML: true
+                },
+                plotOptions: {
+                    column: {
+                        pointPadding: 0.2,
+                        borderWidth: 0
+                    },
+                },
+                series: [{
+                    showInLegend: false,
+                    name: '<?php echo $this->translate('Samples'); ?>',
+                    data: [<?php
+                            foreach ($result['scResult'] as $total) {
+                                echo ucwords($total[0]['total']) . ",";
+                            }
+                            ?>]
 
-        }],
-        colors : ['#f36a5a']
-    });        
-    <?php } if($rejectedTotal>0){ ?>
-        $('#samplesRejectedChart').highcharts({
-            chart: {
-                type: 'column',
-                height: 220
-            },
-            title: {
-                text: ''
-            },
-            exporting:{
-                chartOptions:{
-                    subtitle: {
-                        text:'<?php echo $this->translate('SAMPLES REJECTED'); ?>',
-                    }
-                }
-            },
-            credits: {
-                enabled: false
-            },
-            xAxis: {
-                categories: [<?php
-                foreach($result['srResult'] as $total){
-                    echo "'".ucwords($total['date'])."',";
-                }
-                ?>],
-                crosshair: true
-            },
-            yAxis: {
-                min: 0,
+                }],
+                colors: ['#2ab4c0']
+            });
+        <?php }
+        if ($testedTotal > 0) { ?>
+            $('#samplesTestedChart').highcharts({
+                chart: {
+                    type: 'column',
+                    height: 220
+                },
                 title: {
                     text: ''
-                }
-            },
-            tooltip: {
-                headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
-                pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
-                    '<td style="padding:0"><b>{point.y}</b></td></tr>',
-                footerFormat: '</table>',
-                shared: true,
-                useHTML: true
-            },
-            plotOptions: {
-                column: {
-                    pointPadding: 0.2,
-                    borderWidth: 0
-                }
-            },
-            series: [{
-                showInLegend: false,
-                name: '<?php echo $this->translate('Samples'); ?>',
-                data: [<?php
-                foreach($result['srResult'] as $total){
-                    echo ucwords($total[0]['total']).",";
-                }
-                ?>]
-    
-            }],
-            colors : ['#5C9BD1']
-        });
-    <?php } }?>
+                },
+                exporting: {
+                    chartOptions: {
+                        subtitle: {
+                            text: '<?php echo $this->translate('SAMPLES TESTED'); ?>',
+                        }
+                    }
+                },
+                credits: {
+                    enabled: false
+                },
+                xAxis: {
+                    categories: [<?php
+                                    foreach ($result['stResult'] as $total) {
+                                        echo "'" . ucwords($total['date']) . "',";
+                                    }
+                                    ?>],
+                    crosshair: true
+                },
+                yAxis: {
+                    min: 0,
+                    title: {
+                        text: ''
+                    },
+                    labels: {
+                        formatter: function() {
+                            return this.value;
+                        }
+                    },
+                },
+                tooltip: {
+                    headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+                    pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                        '<td style="padding:0"><b>{point.y}</b></td></tr>',
+                    footerFormat: '</table>',
+                    shared: true,
+                    useHTML: true
+                },
+                plotOptions: {
+                    column: {
+                        pointPadding: 0.2,
+                        borderWidth: 0
+                    }
+                },
+                series: [{
+                    showInLegend: false,
+                    name: '<?php echo $this->translate('Samples'); ?>',
+                    data: [<?php
+                            foreach ($result['stResult'] as $total) {
+                                echo ucwords($total[0]['total']) . ",";
+                            }
+                            ?>]
+
+                }],
+                colors: ['#f36a5a']
+            });
+        <?php }
+        if ($rejectedTotal > 0) { ?>
+            $('#samplesRejectedChart').highcharts({
+                chart: {
+                    type: 'column',
+                    height: 220
+                },
+                title: {
+                    text: ''
+                },
+                exporting: {
+                    chartOptions: {
+                        subtitle: {
+                            text: '<?php echo $this->translate('SAMPLES REJECTED'); ?>',
+                        }
+                    }
+                },
+                credits: {
+                    enabled: false
+                },
+                xAxis: {
+                    categories: [<?php
+                                    foreach ($result['srResult'] as $total) {
+                                        echo "'" . ucwords($total['date']) . "',";
+                                    }
+                                    ?>],
+                    crosshair: true
+                },
+                yAxis: {
+                    min: 0,
+                    title: {
+                        text: ''
+                    }
+                },
+                tooltip: {
+                    headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+                    pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                        '<td style="padding:0"><b>{point.y}</b></td></tr>',
+                    footerFormat: '</table>',
+                    shared: true,
+                    useHTML: true
+                },
+                plotOptions: {
+                    column: {
+                        pointPadding: 0.2,
+                        borderWidth: 0
+                    }
+                },
+                series: [{
+                    showInLegend: false,
+                    name: '<?php echo $this->translate('Samples'); ?>',
+                    data: [<?php
+                            foreach ($result['srResult'] as $total) {
+                                echo ucwords($total[0]['total']) . ",";
+                            }
+                            ?>]
+
+                }],
+                colors: ['#5C9BD1']
+            });
+    <?php }
+    } ?>
 </script>

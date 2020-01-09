@@ -143,8 +143,8 @@ if (!isset($activeTab)) {
                     <?php if ($logincontainer->toggleStatus) { ?>
                     <li style="width:200px;margin-top:6px;">
                         <select class="form-control" onchange="changeTable(this);" id="change-table">
-                            <option value='current' <?php echo (isset($logincontainer->sampleTable) && $logincontainer->sampleTable == "dash_vl_request_form_current") ? "selected" : ""; ?>>LAST ONE YEAR</option>
-                            <option value='archive' <?php echo (isset($logincontainer->sampleTable) && $logincontainer->sampleTable == "dash_vl_request_form") ? "selected" : ""; ?>>FUll DATA</option>
+                            <option value='current' <?php echo (isset($logincontainer->sampleTable) && $logincontainer->sampleTable == "dash_vl_request_form_current") ? "selected" : ""; ?>><?php echo $this->translate("LAST ONE YEAR"); ?></option>
+                            <option value='archive' <?php echo (isset($logincontainer->sampleTable) && $logincontainer->sampleTable == "dash_vl_request_form") ? "selected" : ""; ?>><?php echo $this->translate("FULL DATA"); ?></option>
                         </select>
                     </li>
                     <?php } ?>

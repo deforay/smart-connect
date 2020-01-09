@@ -30,6 +30,7 @@ class SampleTable extends AbstractTableGateway
     protected $dbsId = null;
     protected $plasmaId = null;
     protected $mappedFacilities = null;
+    protected $translate = null;
 
     public function __construct(Adapter $adapter, $sm = null, $mappedFacilities = null, $table = null )
     {
@@ -39,6 +40,7 @@ class SampleTable extends AbstractTableGateway
             $this->table = $table;
         }
         $this->config = $this->sm->get('Config');
+        $this->translate = $this->sm->get('translator');
         $this->dbsId = $this->config['defaults']['dbsId'];
         $this->plasmaId = $this->config['defaults']['plasmaId'];
         $this->mappedFacilities = $mappedFacilities;
@@ -72,24 +74,24 @@ class SampleTable extends AbstractTableGateway
         $query = $sql->select()->from(array('vl' => $this->table))
             ->columns(
                 array(
-                    "Total Samples" => new Expression('COUNT(*)'),
-                    "Samples Tested" => new Expression("SUM(CASE 
+                    $this->translate("Total Samples") => new Expression('COUNT(*)'),
+                    $this->translate("Samples Tested") => new Expression("SUM(CASE 
                                                                                 WHEN (((vl.DashVL_AnalysisResult is NOT NULL AND vl.DashVL_AnalysisResult !='') OR (vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0))) THEN 1
                                                                                 ELSE 0
                                                                                 END)"),
-                    "Gender Missing" => new Expression("SUM(CASE 
+                    $this->translate("Gender Missing") => new Expression("SUM(CASE 
                                                                                     WHEN ((patient_gender IS NULL OR patient_gender ='' OR patient_gender ='unreported' OR patient_gender ='Unreported')) THEN 1
                                                                                     ELSE 0
                                                                                     END)"),
-                    "Age Missing" => new Expression("SUM(CASE 
+                    $this->translate("Age Missing") => new Expression("SUM(CASE 
                                                                                 WHEN ((patient_age_in_years IS NULL OR patient_age_in_years ='' OR patient_age_in_years ='Unreported'  OR patient_age_in_years ='unreported')) THEN 1
                                                                                 ELSE 0
                                                                                 END)"),
-                    "Results Not Available <br>(< $samplesWaitingFromLastXMonths months)" => new Expression("SUM(CASE
+                    $this->translate("Results Not Available (< 6 months)") => new Expression("SUM(CASE
                                                                                                                                 WHEN ((vl.DashVL_AnalysisResult is NULL OR vl.DashVL_AnalysisResult ='') AND (sample_collection_date < DATE_SUB(NOW(), INTERVAL $samplesWaitingFromLastXMonths MONTH)) AND (reason_for_sample_rejection is NULL or reason_for_sample_rejection ='' or reason_for_sample_rejection = 0)) THEN 1
                                                                                                                                 ELSE 0
                                                                                                                                 END)"),
-                    "Results Not Available <br>(> $samplesWaitingFromLastXMonths months)" => new Expression("SUM(CASE
+                    $this->translate("Results Not Available (> 6 months)") => new Expression("SUM(CASE
                                                                                                                                 WHEN ((vl.DashVL_AnalysisResult is NULL OR vl.DashVL_AnalysisResult ='') AND (sample_collection_date > DATE_SUB(NOW(), INTERVAL $samplesWaitingFromLastXMonths MONTH)) AND (reason_for_sample_rejection is NULL or reason_for_sample_rejection ='' or reason_for_sample_rejection = 0)) THEN 1
                                                                                                                                 ELSE 0
                                                                                                                                 END)")
@@ -7243,13 +7245,13 @@ class SampleTable extends AbstractTableGateway
         //\Zend\Debug\Debug::dump($samplesReceivedSummaryResult);die;
         $j = 0;
         foreach ($samplesReceivedSummaryResult as $row) {
-            $summaryResult['sample']['Samples Received']['month'][$j] = (isset($row["total_samples_received"])) ? $row["total_samples_received"] : 0;
-            $summaryResult['sample']['Samples Tested']['month'][$j] = (isset($row["total_samples_tested"])) ? $row["total_samples_tested"] : 0;
-            $summaryResult['sample']['Samples Rejected']['month'][$j] = (isset($row["total_samples_rejected"])) ? $row["total_samples_rejected"] : 0;
-            $summaryResult['sample']['Valid Tested']['month'][$j]  = $valid = (isset($row["total_samples_tested"])) ? $row["total_samples_tested"] - $row["total_samples_rejected"] : 0;;
-            $summaryResult['sample']['Samples Suppressed']['month'][$j] = (isset($row["total_suppressed_samples"])) ? $row["total_suppressed_samples"] : 0;
-            $summaryResult['sample']['Suppression Rate']['month'][$j] = ($valid > 0) ? round((($row["total_suppressed_samples"] / $valid) * 100), 2) . ' %' : '0';
-            $summaryResult['sample']['Rejection Rate']['month'][$j] = (isset($row["total_samples_rejected"]) && $row["total_samples_rejected"] > 0 && $row["total_samples_received"] > 0) ? round((($row["total_samples_rejected"] / ($row["total_samples_tested"] + $row["total_samples_rejected"])) * 100), 2) . ' %' : '0';
+            $summaryResult['sample'][$this->translate('Samples Received')]['month'][$j] = (isset($row["total_samples_received"])) ? $row["total_samples_received"] : 0;
+            $summaryResult['sample'][$this->translate('Samples Tested')]['month'][$j] = (isset($row["total_samples_tested"])) ? $row["total_samples_tested"] : 0;
+            $summaryResult['sample'][$this->translate('Samples Rejected')]['month'][$j] = (isset($row["total_samples_rejected"])) ? $row["total_samples_rejected"] : 0;
+            $summaryResult['sample'][$this->translate('Valid Tested')]['month'][$j]  = $valid = (isset($row["total_samples_tested"])) ? $row["total_samples_tested"] - $row["total_samples_rejected"] : 0;;
+            $summaryResult['sample'][$this->translate('Samples Suppressed')]['month'][$j] = (isset($row["total_suppressed_samples"])) ? $row["total_suppressed_samples"] : 0;
+            $summaryResult['sample'][$this->translate('Suppression Rate')]['month'][$j] = ($valid > 0) ? round((($row["total_suppressed_samples"] / $valid) * 100), 2) . ' %' : '0';
+            $summaryResult['sample'][$this->translate('Rejection Rate')]['month'][$j] = (isset($row["total_samples_rejected"]) && $row["total_samples_rejected"] > 0 && $row["total_samples_received"] > 0) ? round((($row["total_samples_rejected"] / ($row["total_samples_tested"] + $row["total_samples_rejected"])) * 100), 2) . ' %' : '0';
             $summaryResult['month'][$j] = $row['monthyear'];
             $j++;
         }

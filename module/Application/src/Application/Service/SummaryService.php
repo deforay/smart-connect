@@ -14,10 +14,12 @@ class SummaryService
 {
 
     public $sm = null;
+    protected $translate = null;
 
     public function __construct($sm)
     {
         $this->sm = $sm;
+        $this->translate = $this->sm->get('translator');
     }
 
     public function getServiceManager()
@@ -152,13 +154,13 @@ class SummaryService
                     $keySummaryIndicators = array();
                     $j = 0;
                     foreach ($sResult as $row) {
-                        $keySummaryIndicators['sample']['Samples Received']['month'][$j] = (isset($row["total_samples_received"])) ? $row["total_samples_received"] : 0;
-                        $keySummaryIndicators['sample']['Samples Tested']['month'][$j] = (isset($row["total_samples_tested"])) ? $row["total_samples_tested"] : 0;
-                        $keySummaryIndicators['sample']['Samples Rejected']['month'][$j] = (isset($row["total_samples_rejected"])) ? $row["total_samples_rejected"] : 0;
-                        $keySummaryIndicators['sample']['Valid Tested']['month'][$j]  = $valid = (isset($row["total_samples_tested"])) ? $row["total_samples_tested"] - $row["total_samples_rejected"] : 0;;
-                        $keySummaryIndicators['sample']['Samples Suppressed']['month'][$j] = (isset($row["total_suppressed_samples"])) ? $row["total_suppressed_samples"] : 0;
-                        $keySummaryIndicators['sample']['Suppression Rate']['month'][$j] = ($valid > 0) ? round((($row["total_suppressed_samples"] / $valid) * 100), 2) . ' %' : '0';
-                        $keySummaryIndicators['sample']['Rejection Rate']['month'][$j] = (isset($row["total_samples_rejected"]) && $row["total_samples_rejected"] > 0 && $row["total_samples_received"] > 0) ? round((($row["total_samples_rejected"] / ($row["total_samples_tested"] + $row["total_samples_rejected"])) * 100), 2) . ' %' : '0';
+                        $keySummaryIndicators['sample'][$this->translate('Samples Received')]['month'][$j] = (isset($row["total_samples_received"])) ? $row["total_samples_received"] : 0;
+                        $keySummaryIndicators['sample'][$this->translate('Samples Tested')]['month'][$j] = (isset($row["total_samples_tested"])) ? $row["total_samples_tested"] : 0;
+                        $keySummaryIndicators['sample'][$this->translate('Samples Rejected')]['month'][$j] = (isset($row["total_samples_rejected"])) ? $row["total_samples_rejected"] : 0;
+                        $keySummaryIndicators['sample'][$this->translate('Valid Tested')]['month'][$j]  = $valid = (isset($row["total_samples_tested"])) ? $row["total_samples_tested"] - $row["total_samples_rejected"] : 0;;
+                        $keySummaryIndicators['sample'][$this->translate('Samples Suppressed')]['month'][$j] = (isset($row["total_suppressed_samples"])) ? $row["total_suppressed_samples"] : 0;
+                        $keySummaryIndicators['sample'][$this->translate('Suppression Rate')]['month'][$j] = ($valid > 0) ? round((($row["total_suppressed_samples"] / $valid) * 100), 2) . ' %' : '0';
+                        $keySummaryIndicators['sample'][$this->translate('Rejection Rate')]['month'][$j] = (isset($row["total_samples_rejected"]) && $row["total_samples_rejected"] > 0 && $row["total_samples_received"] > 0) ? round((($row["total_samples_rejected"] / ($row["total_samples_tested"] + $row["total_samples_rejected"])) * 100), 2) . ' %' : '0';
                         $keySummaryIndicators['month'][$j] = $row['monthyear'];
                         $j++;
                     }

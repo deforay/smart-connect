@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VL Dashboard\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-06 19:56+0530\n"
-"PO-Revision-Date: 2020-01-10 03:45+0530\n"
+"POT-Creation-Date: 2020-01-10 05:03+0530\n"
+"PO-Revision-Date: 2020-01-10 05:04+0530\n"
 "Last-Translator: Amit Dugar <amit@deforay.com>\n"
 "Language-Team: Amit <amit@deforay.com>\n"
 "Language: pt\n"
@@ -16,20 +16,134 @@ msgstr ""
 "X-Poedit-SearchPath-0: ..\n"
 
 #: ../src/Application/Model/FacilityTable.php:215
-#: ../src/Application/Model/SampleTable.php:4780
+#: ../src/Application/Model/SampleTable.php:4782
 #: ../src/Application/Model/UsersTable.php:370
 #: ../view/application/facility/edit.phtml:17
 #: ../view/application/users/edit.phtml:24
 msgid "Edit"
 msgstr "Editar"
 
-#: ../src/Application/Model/SampleTable.php:2297
+#: ../src/Application/Model/SampleTable.php:77
+msgid "Total Samples"
+msgstr "Total de amostras"
+
+#: ../src/Application/Model/SampleTable.php:78
+#: ../src/Application/Model/SampleTable.php:7249
+#: ../src/Application/Service/SampleService.php:1036
+#: ../src/Application/Service/SampleService.php:1156
+#: ../src/Application/Service/SampleService.php:1271
+#: ../src/Application/Service/SummaryService.php:158
+#: ../view/application/laboratory/dashboard.phtml:313
+#: ../view/application/laboratory/dashboard.phtml:555
+#: ../view/application/laboratory/get-sample-status-data-table.phtml:16
+#: ../view/application/laboratory/get-sample-test-result.phtml:26
+#: ../view/application/laboratory/sample-volume.phtml:197
+#: ../view/application/laboratory/sample-volume.phtml:257
+#: ../view/application/laboratory/sample-volume.phtml:271
+#: ../view/application/laboratory/samples-tested-lab.phtml:262
+#: ../view/application/laboratory/samples-tested-lab.phtml:275
+#: ../view/application/laboratory/samples-tested-turn-around-time.phtml:202
+#: ../view/application/laboratory/samples-tested-turn-around-time.phtml:215
+#: ../view/application/laboratory/samples-tested.phtml:274
+#: ../view/application/laboratory/samples-tested.phtml:288
+#: ../view/application/summary/dashboard.phtml:328
+#: ../view/application/summary/dashboard.phtml:349
+#: ../view/application/summary/dashboard.phtml:370
+#: ../view/application/summary/dashboard.phtml:769
+msgid "Samples Tested"
+msgstr "Amostras testadas"
+
+#: ../src/Application/Model/SampleTable.php:82
+msgid "Gender Missing"
+msgstr "Falta de gênero"
+
+#: ../src/Application/Model/SampleTable.php:86
+msgid "Age Missing"
+msgstr "Idade ausente"
+
+#: ../src/Application/Model/SampleTable.php:90
+msgid "Results Not Available (< 6 months)"
+msgstr "Resultados não disponíveis (< 6 meses)"
+
+#: ../src/Application/Model/SampleTable.php:94
+msgid "Results Not Available (> 6 months)"
+msgstr "Resultados não disponíveis (> 6 meses)"
+
+#: ../src/Application/Model/SampleTable.php:2299
 msgid "View"
 msgstr "View"
 
-#: ../src/Application/Model/SampleTable.php:2298
+#: ../src/Application/Model/SampleTable.php:2300
 msgid "PDF"
 msgstr "PDF"
+
+#: ../src/Application/Model/SampleTable.php:7248
+#: ../src/Application/Service/SummaryService.php:157
+#: ../view/application/summary/get-samples-received-bar-chart.phtml:26
+msgid "Samples Received"
+msgstr "Amostras Recebidas"
+
+#: ../src/Application/Model/SampleTable.php:7250
+#: ../src/Application/Service/SampleService.php:1040
+#: ../src/Application/Service/SampleService.php:1160
+#: ../src/Application/Service/SampleService.php:1275
+#: ../src/Application/Service/SummaryService.php:159
+#: ../view/application/laboratory/dashboard.phtml:557
+#: ../view/application/laboratory/sample-volume.phtml:199
+#: ../view/application/laboratory/sample-volume.phtml:275
+#: ../view/application/laboratory/samples-tested-lab.phtml:279
+#: ../view/application/laboratory/samples-tested-turn-around-time.phtml:219
+#: ../view/application/laboratory/samples-tested.phtml:292
+#: ../view/application/summary/dashboard.phtml:330
+#: ../view/application/summary/dashboard.phtml:351
+#: ../view/application/summary/dashboard.phtml:372
+#: ../view/application/summary/dashboard.phtml:487
+#: ../view/application/summary/dashboard.phtml:506
+#: ../view/application/summary/dashboard.phtml:525
+#: ../view/application/summary/dashboard.phtml:596
+#: ../view/application/summary/dashboard.phtml:650
+#: ../view/application/summary/dashboard.phtml:667
+#: ../view/application/summary/get-samples-rejected-bar-chart.phtml:25
+msgid "Samples Rejected"
+msgstr "Amostras rejeitadas"
+
+#: ../src/Application/Model/SampleTable.php:7251
+#: ../src/Application/Service/SummaryService.php:160
+msgid "Valid Tested"
+msgstr "Testado válido"
+
+#: ../src/Application/Model/SampleTable.php:7252
+#: ../src/Application/Service/SampleService.php:1038
+#: ../src/Application/Service/SampleService.php:1158
+#: ../src/Application/Service/SampleService.php:1273
+#: ../src/Application/Service/SummaryService.php:161
+#: ../view/application/laboratory/sample-volume.phtml:273
+#: ../view/application/laboratory/samples-tested-lab.phtml:277
+#: ../view/application/laboratory/samples-tested-turn-around-time.phtml:217
+#: ../view/application/laboratory/samples-tested.phtml:290
+msgid "Samples Suppressed"
+msgstr "Amostras suprimidas"
+
+#: ../src/Application/Model/SampleTable.php:7253
+#: ../src/Application/Service/SummaryService.php:162
+#: ../view/application/summary/dashboard.phtml:217
+#: ../view/application/summary/dashboard.phtml:445
+#: ../view/application/summary/dashboard.phtml:488
+#: ../view/application/summary/dashboard.phtml:507
+#: ../view/application/summary/dashboard.phtml:526
+#: ../view/application/summary/dashboard.phtml:772
+#: ../view/application/summary/get-regimen-group-bar-chart.phtml:56
+#: ../view/application/summary/get-regimen-group-bar-chart.phtml:99
+#: ../view/application/summary/get-suppression-rate-bar-chart.phtml:57
+#: ../view/application/summary/get-suppression-rate-bar-chart.phtml:114
+msgid "Suppression Rate"
+msgstr "Taxa de Supressão"
+
+#: ../src/Application/Model/SampleTable.php:7254
+#: ../src/Application/Service/SummaryService.php:163
+#: ../view/application/summary/dashboard.phtml:223
+msgid "Rejection Rate"
+msgstr "Taxa de Rejeição"
 
 #: ../src/Application/Service/SampleService.php:719
 #: ../src/Application/Service/SampleService.php:1413
@@ -90,7 +204,7 @@ msgid "Health Facility Code"
 msgstr "Código do local"
 
 #: ../src/Application/Service/SampleService.php:893
-#: ../src/Application/Service/SummaryService.php:340
+#: ../src/Application/Service/SummaryService.php:342
 #: ../view/application/clinic/test-result-view.phtml:167
 #: ../view/application/facility/add.phtml:140
 #: ../view/application/facility/edit.phtml:140
@@ -251,44 +365,11 @@ msgstr "Laboratório"
 msgid "Samples Collected"
 msgstr "Amostras Colhidas"
 
-#: ../src/Application/Service/SampleService.php:1036
-#: ../src/Application/Service/SampleService.php:1156
-#: ../src/Application/Service/SampleService.php:1271
-#: ../view/application/laboratory/dashboard.phtml:313
-#: ../view/application/laboratory/dashboard.phtml:555
-#: ../view/application/laboratory/get-sample-status-data-table.phtml:16
-#: ../view/application/laboratory/get-sample-test-result.phtml:26
-#: ../view/application/laboratory/sample-volume.phtml:197
-#: ../view/application/laboratory/sample-volume.phtml:257
-#: ../view/application/laboratory/sample-volume.phtml:271
-#: ../view/application/laboratory/samples-tested-lab.phtml:262
-#: ../view/application/laboratory/samples-tested-lab.phtml:275
-#: ../view/application/laboratory/samples-tested-turn-around-time.phtml:202
-#: ../view/application/laboratory/samples-tested-turn-around-time.phtml:215
-#: ../view/application/laboratory/samples-tested.phtml:274
-#: ../view/application/laboratory/samples-tested.phtml:288
-#: ../view/application/summary/dashboard.phtml:328
-#: ../view/application/summary/dashboard.phtml:349
-#: ../view/application/summary/dashboard.phtml:370
-#: ../view/application/summary/dashboard.phtml:769
-msgid "Samples Tested"
-msgstr "Amostras testadas"
-
 #: ../src/Application/Service/SampleService.php:1037
 #: ../src/Application/Service/SampleService.php:1157
 #: ../src/Application/Service/SampleService.php:1272
 msgid "Samples Pending"
 msgstr "Amostras Pendentes"
-
-#: ../src/Application/Service/SampleService.php:1038
-#: ../src/Application/Service/SampleService.php:1158
-#: ../src/Application/Service/SampleService.php:1273
-#: ../view/application/laboratory/sample-volume.phtml:273
-#: ../view/application/laboratory/samples-tested-lab.phtml:277
-#: ../view/application/laboratory/samples-tested-turn-around-time.phtml:217
-#: ../view/application/laboratory/samples-tested.phtml:290
-msgid "Samples Suppressed"
-msgstr "Amostras suprimidas"
 
 #: ../src/Application/Service/SampleService.php:1039
 #: ../src/Application/Service/SampleService.php:1159
@@ -299,28 +380,6 @@ msgstr "Amostras suprimidas"
 #: ../view/application/laboratory/samples-tested.phtml:291
 msgid "Samples Not Suppressed"
 msgstr "Amostras não suprimidas"
-
-#: ../src/Application/Service/SampleService.php:1040
-#: ../src/Application/Service/SampleService.php:1160
-#: ../src/Application/Service/SampleService.php:1275
-#: ../view/application/laboratory/dashboard.phtml:557
-#: ../view/application/laboratory/sample-volume.phtml:199
-#: ../view/application/laboratory/sample-volume.phtml:275
-#: ../view/application/laboratory/samples-tested-lab.phtml:279
-#: ../view/application/laboratory/samples-tested-turn-around-time.phtml:219
-#: ../view/application/laboratory/samples-tested.phtml:292
-#: ../view/application/summary/dashboard.phtml:330
-#: ../view/application/summary/dashboard.phtml:351
-#: ../view/application/summary/dashboard.phtml:372
-#: ../view/application/summary/dashboard.phtml:487
-#: ../view/application/summary/dashboard.phtml:506
-#: ../view/application/summary/dashboard.phtml:525
-#: ../view/application/summary/dashboard.phtml:596
-#: ../view/application/summary/dashboard.phtml:650
-#: ../view/application/summary/dashboard.phtml:667
-#: ../view/application/summary/get-samples-rejected-bar-chart.phtml:25
-msgid "Samples Rejected"
-msgstr "Amostras rejeitadas"
 
 #: ../src/Application/Service/SampleService.php:1154
 #: ../view/application/laboratory/samples-tested-lab.phtml:273
@@ -355,7 +414,7 @@ msgid "Collection Date"
 msgstr "Data de Colheita"
 
 #: ../src/Application/Service/SampleService.php:1415
-#: ../src/Application/Service/SummaryService.php:338
+#: ../src/Application/Service/SummaryService.php:340
 #: ../view/application/laboratory/sample-result-awaited.phtml:222
 #: ../view/application/summary/dashboard.phtml:324
 #: ../view/application/summary/dashboard.phtml:481
@@ -370,12 +429,12 @@ msgstr "Local"
 msgid "Sample Received at Lab"
 msgstr "Amostras recebidas por Laboratorio"
 
-#: ../src/Application/Service/SummaryService.php:191
+#: ../src/Application/Service/SummaryService.php:193
 #: ../view/application/summary/get-indicators.phtml:7
 msgid "Months"
 msgstr "Meses"
 
-#: ../src/Application/Service/SummaryService.php:339
+#: ../src/Application/Service/SummaryService.php:341
 #: ../view/application/laboratory/get-sample-status-data-table.phtml:10
 #: ../view/application/summary/dashboard.phtml:314
 #: ../view/application/summary/dashboard.phtml:325
@@ -389,7 +448,7 @@ msgstr "Meses"
 msgid "Province"
 msgstr "Província"
 
-#: ../src/Application/Service/SummaryService.php:341
+#: ../src/Application/Service/SummaryService.php:343
 #: ../view/application/summary/dashboard.phtml:484
 #: ../view/application/summary/dashboard.phtml:503
 #: ../view/application/summary/dashboard.phtml:522
@@ -401,25 +460,25 @@ msgstr "Província"
 msgid "Valid Results"
 msgstr "Resultados válidos"
 
-#: ../src/Application/Service/SummaryService.php:342
+#: ../src/Application/Service/SummaryService.php:344
 #: ../view/application/summary/dashboard.phtml:485
 #: ../view/application/summary/dashboard.phtml:504
 #: ../view/application/summary/dashboard.phtml:523
 msgid "Suppressed Results"
 msgstr "Resultados suprimidos"
 
-#: ../src/Application/Service/SummaryService.php:343
+#: ../src/Application/Service/SummaryService.php:345
 #: ../view/application/summary/dashboard.phtml:486
 #: ../view/application/summary/dashboard.phtml:505
 #: ../view/application/summary/dashboard.phtml:524
 msgid "Non Suppressed Results"
 msgstr "Resultados não suprimidos"
 
-#: ../src/Application/Service/SummaryService.php:344
+#: ../src/Application/Service/SummaryService.php:346
 msgid "Samples Rejected in %"
 msgstr "Amostras rejeitadas em %"
 
-#: ../src/Application/Service/SummaryService.php:345
+#: ../src/Application/Service/SummaryService.php:347
 msgid "Suppression Rate in %"
 msgstr "Taxa de supressão em %"
 
@@ -1212,9 +1271,9 @@ msgstr "Percentagem de conclusão"
 #: ../view/application/laboratory/get-pie-sample-tat.phtml:35
 #: ../view/application/laboratory/get-province-bar-sample-result-awaited-details.phtml:67
 #: ../view/application/laboratory/get-sample-details.phtml:37
-#: ../view/application/laboratory/get-sample-result.phtml:184
-#: ../view/application/laboratory/get-sample-result.phtml:244
-#: ../view/application/laboratory/get-sample-result.phtml:303
+#: ../view/application/laboratory/get-sample-result.phtml:195
+#: ../view/application/laboratory/get-sample-result.phtml:260
+#: ../view/application/laboratory/get-sample-result.phtml:320
 #: ../view/application/laboratory/get-sample-volume.phtml:46
 #: ../view/application/laboratory/get-vl-out-comes.phtml:43
 msgid "Samples"
@@ -1267,15 +1326,6 @@ msgstr "Amostras testadas por Idade "
 #: ../view/application/laboratory/get-sample-test-result.phtml:136
 msgid "Suppression %"
 msgstr "Supressão %"
-
-#: ../view/application/clinic/get-sample-test-result-gender.phtml:151
-#: ../view/application/laboratory/get-sample-test-result-gender.phtml:149
-msgid "("
-msgstr "("
-
-#: ../view/application/clinic/get-sample-test-result.phtml:73
-msgid " - "
-msgstr " - "
 
 #: ../view/application/clinic/get-samples-test-reason-based-on-age-group.phtml:17
 #: ../view/application/clinic/samples-test-reason.phtml:165
@@ -1907,31 +1957,31 @@ msgstr "TAT"
 msgid "Results Not Available (Province-wise)"
 msgstr "Resultados pendentes (Por Provincia)"
 
-#: ../view/application/laboratory/get-sample-result.phtml:28
+#: ../view/application/laboratory/get-sample-result.phtml:30
 msgid "Quick Stats"
 msgstr "Estatísticas rápidas"
 
-#: ../view/application/laboratory/get-sample-result.phtml:70
+#: ../view/application/laboratory/get-sample-result.phtml:76
 msgid "SAMPLES REGISTERED"
 msgstr "AMOSTRAS REGISTRADAS"
 
-#: ../view/application/laboratory/get-sample-result.phtml:75
-#: ../view/application/laboratory/get-sample-result.phtml:98
-#: ../view/application/laboratory/get-sample-result.phtml:120
+#: ../view/application/laboratory/get-sample-result.phtml:81
+#: ../view/application/laboratory/get-sample-result.phtml:104
+#: ../view/application/laboratory/get-sample-result.phtml:126
 msgid "Last 28 days"
 msgstr "NOS ÚLTIMOS 28 DIAS"
 
-#: ../view/application/laboratory/get-sample-result.phtml:93
-#: ../view/application/laboratory/get-sample-result.phtml:206
+#: ../view/application/laboratory/get-sample-result.phtml:99
+#: ../view/application/laboratory/get-sample-result.phtml:218
 msgid "SAMPLES TESTED"
 msgstr "AMOSTRAS TESTADAS"
 
-#: ../view/application/laboratory/get-sample-result.phtml:115
-#: ../view/application/laboratory/get-sample-result.phtml:266
+#: ../view/application/laboratory/get-sample-result.phtml:121
+#: ../view/application/laboratory/get-sample-result.phtml:283
 msgid "SAMPLES REJECTED"
 msgstr "AMOSTRAS REJEITADAS"
 
-#: ../view/application/laboratory/get-sample-result.phtml:145
+#: ../view/application/laboratory/get-sample-result.phtml:151
 msgid "SAMPLES COLLECTED"
 msgstr "AMOSTRAS COLHIDAS"
 
@@ -1950,6 +2000,10 @@ msgstr "Amostras testadas com base na idade > 50"
 #: ../view/application/laboratory/get-sample-test-result-age-group-unknown.phtml:28
 msgid "Samples Tested based on Age Unknown"
 msgstr "Amostras testadas com base na idade desconhecida"
+
+#: ../view/application/laboratory/get-sample-test-result-gender.phtml:149
+msgid "("
+msgstr "("
 
 #: ../view/application/laboratory/get-vl-out-comes.phtml:11
 msgid "VL Suppressed/Not Suppressed"
@@ -2173,23 +2227,6 @@ msgstr "Senha Temporária"
 msgid "Summary"
 msgstr "Sumário"
 
-#: ../view/application/summary/dashboard.phtml:217
-#: ../view/application/summary/dashboard.phtml:445
-#: ../view/application/summary/dashboard.phtml:488
-#: ../view/application/summary/dashboard.phtml:507
-#: ../view/application/summary/dashboard.phtml:526
-#: ../view/application/summary/dashboard.phtml:772
-#: ../view/application/summary/get-regimen-group-bar-chart.phtml:56
-#: ../view/application/summary/get-regimen-group-bar-chart.phtml:99
-#: ../view/application/summary/get-suppression-rate-bar-chart.phtml:57
-#: ../view/application/summary/get-suppression-rate-bar-chart.phtml:114
-msgid "Suppression Rate"
-msgstr "Taxa de Supressão"
-
-#: ../view/application/summary/dashboard.phtml:223
-msgid "Rejection Rate"
-msgstr "Taxa de Rejeição"
-
 #: ../view/application/summary/dashboard.phtml:228
 msgid "on 1st Line"
 msgstr "na 1ª Linha"
@@ -2347,10 +2384,6 @@ msgstr "Amostras Rejeitadas por Distrito"
 #: ../view/application/summary/dashboard.phtml:2175
 msgid "Processing Summary of Key Indicators"
 msgstr "Resumo de processamento dos principais indicadores"
-
-#: ../view/application/summary/get-samples-received-bar-chart.phtml:26
-msgid "Samples Received"
-msgstr "Amostras Recebidas"
 
 #: ../view/application/summary/get-suppression-rate-bar-chart.phtml:29
 msgid "Suppression Rate Data"
@@ -2585,6 +2618,14 @@ msgstr "Smart Connect"
 msgid "Development/Test Environment with dummy data"
 msgstr "Dados do ambiente de testes"
 
+#: ../view/layout/layout.phtml:146
+msgid "LAST ONE YEAR"
+msgstr "ÚLTIMO ANO"
+
+#: ../view/layout/layout.phtml:147
+msgid "FULL DATA"
+msgstr "DADOS COMPLETOS"
+
 #: ../view/layout/layout.phtml:160
 msgid "Log Out"
 msgstr "Sair"
@@ -2609,6 +2650,9 @@ msgstr "Configuração Geral"
 msgid "Import"
 msgstr "Importar"
 
+#~ msgid " - "
+#~ msgstr " - "
+
 #~ msgid "Districts/Facility Wise Samples Received Summary"
 #~ msgstr "Amostras Recebidas por Distrito/US"
 
@@ -2627,9 +2671,6 @@ msgstr "Importar"
 #~ msgstr ""
 #~ "Smart Connect - Portal de Carga Viral (Ambiente de Teste com dados "
 #~ "fictícios) | Fundado por"
-
-#~ msgid "Total Samples"
-#~ msgstr "Total de amostras"
 
 #, fuzzy
 #~| msgid "Provinces"
