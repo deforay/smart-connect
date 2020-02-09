@@ -40,20 +40,20 @@ if (isset($result['srResult']) && count($result['srResult']) > 0) {
                 $totalSample = 0;
                 $samplePercentage = '';
                 foreach ($quickStats as $statName => $statValue) {
-                    if ($statName == 'Total Samples') {
+                    if ($statName ==  $this->translate('Total Samples')) {
                         $totalSample = $statValue;
                     }
-                    if ($statName != 'Total Samples') {
+                    if ($statName !=  $this->translate('Total Samples')) {
                         $samplePercentage = ' (' . round(($statValue / $totalSample) * 100, 2) . '%)';
                     }
                     if (strpos($statName, '(<') != false) {
-                        $statName = '<a href="javascript:void(0);" onclick="doSampleResultAwaitedRedirect(\'<\');">' . $this->translate($statName) . '</a>';
+                        $statName = '<a href="javascript:void(0);" onclick="doSampleResultAwaitedRedirect(\'<\');">' . ($statName) . '</a>';
                         $statValue = '<a href="javascript:void(0);" onclick="doSampleResultAwaitedRedirect(\'<\');">' . number_format($statValue) . '</a>';
                     } else if (strpos($statName, '(>') != false) {
-                        $statName = '<a href="javascript:void(0);" onclick="doSampleResultAwaitedRedirect(\'>\');">' . $this->translate($statName) . '</a>';
+                        $statName = '<a href="javascript:void(0);" onclick="doSampleResultAwaitedRedirect(\'>\');">' . ($statName) . '</a>';
                         $statValue = '<a href="javascript:void(0);" onclick="doSampleResultAwaitedRedirect(\'>\');">' . number_format($statValue) . '</a>';
                     } else {
-                        $statName = $this->translate($statName);
+                        $statName = ($statName);
                         $statValue = number_format($statValue);
                     }
                 ?>
