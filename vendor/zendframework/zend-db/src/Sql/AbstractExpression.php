@@ -3,7 +3,7 @@
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2016 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -14,12 +14,12 @@ abstract class AbstractExpression implements ExpressionInterface
     /**
      * @var string[]
      */
-    protected $allowedTypes = array(
+    protected $allowedTypes = [
         self::TYPE_IDENTIFIER,
         self::TYPE_LITERAL,
         self::TYPE_SELECT,
         self::TYPE_VALUE,
-    );
+    ];
 
     /**
      * Normalize Argument
@@ -85,9 +85,9 @@ abstract class AbstractExpression implements ExpressionInterface
             ));
         }
 
-        return array(
+        return [
             $argument,
             $argumentType,
-        );
+        ];
     }
 }

@@ -10,7 +10,7 @@
 /**
  * NL-Revision: 09.Sept.2012
  */
-return array(
+return [
     // Zend\I18n\Validator\Alnum
     "Invalid type given. String, integer or float expected" => "Ongeldig type opgegeven, waarde moet een float, string of integer zijn",
     "The input contains characters which are non alphabetic and no digits" => "De input bevat tekens welke alfabetisch, noch numeriek zijn",
@@ -202,7 +202,7 @@ return array(
 
     // Zend\Validator\GreaterThan
     "The input is not greater than '%min%'" => "De input is niet groter dan '%min%'",
-    "The input is not greater or equal than '%min%'" => "De input is niet groter dan of gelijk aan '%min%'",
+    "The input is not greater than or equal to '%min%'" => "De input is niet groter dan of gelijk aan '%min%'",
 
     // Zend\Validator\Hex
     "Invalid type given. String expected" => "Ongeldig type gegeven, waarde moet een string zijn",
@@ -286,4 +286,4 @@ return array(
     // Zend\Validator\Uri
     "Invalid type given. String expected" => "Ongeldig type opgegeven, waarde dient een string te zijn",
     "The input does not appear to be a valid Uri" => "De input blijkt geen geldige Uri te zijn",
-);
+];

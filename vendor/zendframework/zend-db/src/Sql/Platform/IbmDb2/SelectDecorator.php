@@ -3,7 +3,7 @@
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2016 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -20,14 +20,20 @@ class SelectDecorator extends Select implements PlatformDecoratorInterface
     /**
      * @var bool
      */
-    protected $isSelectContainDistinct= false;
+    protected $isSelectContainDistinct = false;
 
     /**
      * @var Select
      */
     protected $subject = null;
 
-    /**
+     /**
+     * @var bool
+     */
+    protected $supportsLimitOffset = false;
+
+
+   /**
      * @return bool
      */
     public function getIsSelectContainDistinct()
@@ -49,6 +55,22 @@ class SelectDecorator extends Select implements PlatformDecoratorInterface
     public function setSubject($select)
     {
         $this->subject = $select;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getSupportsLimitOffset()
+    {
+        return $this->supportsLimitOffset;
+    }
+
+    /**
+     * @param bool $supportsLimitOffset
+     */
+    public function setSupportsLimitOffset($supportsLimitOffset)
+    {
+        $this->supportsLimitOffset = $supportsLimitOffset;
     }
 
     /**
@@ -76,9 +98,31 @@ class SelectDecorator extends Select implements PlatformDecoratorInterface
      * @param  array              $sqls
      * @param  array              $parameters
      */
-    protected function processLimitOffset(PlatformInterface $platform, DriverInterface $driver = null, ParameterContainer $parameterContainer = null, &$sqls, &$parameters)
-    {
+    protected function processLimitOffset(
+        PlatformInterface $platform,
+        DriverInterface $driver = null,
+        ParameterContainer $parameterContainer = null,
+        &$sqls,
+        &$parameters
+    ) {
         if ($this->limit === null && $this->offset === null) {
+            return;
+        }
+
+        if ($this->supportsLimitOffset) {
+            // Note: db2_prepare/db2_execute fails with positional parameters, for LIMIT & OFFSET
+            $limit = (int) $this->limit;
+            if (! $limit) {
+                return;
+            }
+
+            $offset = (int) $this->offset;
+            if ($offset) {
+                array_push($sqls, sprintf("LIMIT %s OFFSET %s", $limit, $offset));
+                return;
+            }
+
+            array_push($sqls, sprintf("LIMIT %s", $limit));
             return;
         }
 
@@ -90,7 +134,7 @@ class SelectDecorator extends Select implements PlatformDecoratorInterface
                 || (isset($columnParameters[1]) && $columnParameters[1] == self::SQL_STAR)
                 || strpos($columnParameters[0], $starSuffix)
             ) {
-                $selectParameters[0] = array(array(self::SQL_STAR));
+                $selectParameters[0] = [[self::SQL_STAR]];
                 break;
             }
 
@@ -102,7 +146,7 @@ class SelectDecorator extends Select implements PlatformDecoratorInterface
 
         // first, produce column list without compound names (using the AS portion only)
         array_unshift($sqls, $this->createSqlFromSpecificationAndParameters(
-            array('SELECT %1$s FROM (' => current($this->specifications[self::SELECT])),
+            ['SELECT %1$s FROM (' => current($this->specifications[self::SELECT])],
             $selectParameters
         ));
 
@@ -116,7 +160,9 @@ class SelectDecorator extends Select implements PlatformDecoratorInterface
             $offsetParamName       = $driver->formatParameterName('offset');
 
             array_push($sqls, sprintf(
+                // @codingStandardsIgnoreStart
                 ") AS ZEND_IBMDB2_SERVER_LIMIT_OFFSET_EMULATION WHERE ZEND_IBMDB2_SERVER_LIMIT_OFFSET_EMULATION.ZEND_DB_ROWNUM BETWEEN %s AND %s",
+                // @codingStandardsIgnoreEnd
                 $offsetParamName,
                 $limitParamName
             ));
@@ -136,7 +182,9 @@ class SelectDecorator extends Select implements PlatformDecoratorInterface
             }
 
             array_push($sqls, sprintf(
+                // @codingStandardsIgnoreStart
                 ") AS ZEND_IBMDB2_SERVER_LIMIT_OFFSET_EMULATION WHERE ZEND_IBMDB2_SERVER_LIMIT_OFFSET_EMULATION.ZEND_DB_ROWNUM BETWEEN %d AND %d",
+                // @codingStandardsIgnoreEnd
                 $offset,
                 (int) $this->limit + (int) $this->offset
             ));
@@ -151,9 +199,9 @@ class SelectDecorator extends Select implements PlatformDecoratorInterface
 
         // add a column for row_number() using the order specification //dense_rank()
         if ($this->getIsSelectContainDistinct()) {
-            $parameters[self::SELECT][0][] = array('DENSE_RANK() OVER (' . $orderBy . ')', 'ZEND_DB_ROWNUM');
+            $parameters[self::SELECT][0][] = ['DENSE_RANK() OVER (' . $orderBy . ')', 'ZEND_DB_ROWNUM'];
         } else {
-            $parameters[self::SELECT][0][] = array('ROW_NUMBER() OVER (' . $orderBy . ')', 'ZEND_DB_ROWNUM');
+            $parameters[self::SELECT][0][] = ['ROW_NUMBER() OVER (' . $orderBy . ')', 'ZEND_DB_ROWNUM'];
         }
 
         $sqls[self::SELECT] = $this->createSqlFromSpecificationAndParameters(

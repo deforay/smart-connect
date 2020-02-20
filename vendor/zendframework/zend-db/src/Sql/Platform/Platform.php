@@ -3,7 +3,7 @@
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2016 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -36,11 +36,13 @@ class Platform extends AbstractPlatform
         $sqlServerPlatform = new SqlServer\SqlServer();
         $oraclePlatform    = new Oracle\Oracle();
         $ibmDb2Platform    = new IbmDb2\IbmDb2();
+        $sqlitePlatform    = new Sqlite\Sqlite();
 
         $this->decorators['mysql']     = $mySqlPlatform->getDecorators();
         $this->decorators['sqlserver'] = $sqlServerPlatform->getDecorators();
         $this->decorators['oracle']    = $oraclePlatform->getDecorators();
         $this->decorators['ibmdb2']    = $ibmDb2Platform->getDecorators();
+        $this->decorators['sqlite']    = $sqlitePlatform->getDecorators();
     }
 
     /**
@@ -92,7 +94,10 @@ class Platform extends AbstractPlatform
     public function prepareStatement(AdapterInterface $adapter, StatementContainerInterface $statementContainer)
     {
         if (! $this->subject instanceof PreparableSqlInterface) {
-            throw new Exception\RuntimeException('The subject does not appear to implement Zend\Db\Sql\PreparableSqlInterface, thus calling prepareStatement() has no effect');
+            throw new Exception\RuntimeException(
+                'The subject does not appear to implement Zend\Db\Sql\PreparableSqlInterface, thus calling '
+                . 'prepareStatement() has no effect'
+            );
         }
 
         $this->getTypeDecorator($this->subject, $adapter)->prepareStatement($adapter, $statementContainer);
@@ -108,7 +113,10 @@ class Platform extends AbstractPlatform
     public function getSqlString(PlatformInterface $adapterPlatform = null)
     {
         if (! $this->subject instanceof SqlInterface) {
-            throw new Exception\RuntimeException('The subject does not appear to implement Zend\Db\Sql\SqlInterface, thus calling prepareStatement() has no effect');
+            throw new Exception\RuntimeException(
+                'The subject does not appear to implement Zend\Db\Sql\SqlInterface, thus calling '
+                . 'prepareStatement() has no effect'
+            );
         }
 
         $adapterPlatform = $this->resolvePlatform($adapterPlatform);
@@ -119,7 +127,7 @@ class Platform extends AbstractPlatform
     protected function resolvePlatformName($adapterOrPlatform)
     {
         $platformName = $this->resolvePlatform($adapterOrPlatform)->getName();
-        return str_replace(array(' ', '_'), '', strtolower($platformName));
+        return str_replace([' ', '_'], '', strtolower($platformName));
     }
     /**
      * @param null|PlatformInterface|AdapterInterface $adapterOrPlatform

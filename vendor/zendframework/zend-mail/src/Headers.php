@@ -1,10 +1,8 @@
 <?php
 /**
- * Zend Framework (http://framework.zend.com/)
- *
- * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
- * @license   http://framework.zend.com/license/new-bsd New BSD License
+ * @see       https://github.com/zendframework/zend-mail for the canonical source repository
+ * @copyright Copyright (c) 2005-2018 Zend Technologies USA Inc. (https://www.zend.com)
+ * @license   https://github.com/zendframework/zend-mail/blob/master/LICENSE.md New BSD License
  */
 
 namespace Zend\Mail;
@@ -14,6 +12,8 @@ use Countable;
 use Iterator;
 use Traversable;
 use Zend\Loader\PluginClassLocator;
+use Zend\Mail\Header\GenericHeader;
+use Zend\Mail\Header\HeaderInterface;
 
 /**
  * Basic mail headers collection functionality
@@ -36,12 +36,12 @@ class Headers implements Countable, Iterator
     /**
      * @var array key names for $headers array
      */
-    protected $headersKeys = array();
+    protected $headersKeys = [];
 
     /**
      * @var  Header\HeaderInterface[] instances
      */
-    protected $headers = array();
+    protected $headers = [];
 
     /**
      * Header encoding; defaults to ASCII
@@ -84,7 +84,7 @@ class Headers implements Countable, Iterator
                 continue;
             }
 
-            if ($emptyLine > 0) {
+            if ($emptyLine > 1) {
                 throw new Exception\RuntimeException('Malformed header detected');
             }
 
@@ -107,7 +107,7 @@ class Headers implements Countable, Iterator
 
             // Line does not match header format!
             throw new Exception\RuntimeException(sprintf(
-                'Line "%s"does not match header format!',
+                'Line "%s" does not match header format!',
                 $line
             ));
         }
@@ -178,7 +178,7 @@ class Headers implements Countable, Iterator
      */
     public function addHeaders($headers)
     {
-        if (!is_array($headers) && !$headers instanceof Traversable) {
+        if (! is_array($headers) && ! $headers instanceof Traversable) {
             throw new Exception\InvalidArgumentException(sprintf(
                 'Expected array or Traversable; received "%s"',
                 (is_object($headers) ? get_class($headers) : gettype($headers))
@@ -217,7 +217,7 @@ class Headers implements Countable, Iterator
      */
     public function addHeaderLine($headerFieldNameOrLine, $fieldValue = null)
     {
-        if (!is_string($headerFieldNameOrLine)) {
+        if (! is_string($headerFieldNameOrLine)) {
             throw new Exception\InvalidArgumentException(sprintf(
                 '%s expects its first argument to be a string; received "%s"',
                 __METHOD__,
@@ -228,7 +228,11 @@ class Headers implements Countable, Iterator
         }
 
         if ($fieldValue === null) {
-            $this->addHeader(Header\GenericHeader::fromString($headerFieldNameOrLine));
+            $headers = $this->loadHeader($headerFieldNameOrLine);
+            $headers = is_array($headers) ? $headers : [$headers];
+            foreach ($headers as $header) {
+                $this->addHeader($header);
+            }
         } elseif (is_array($fieldValue)) {
             foreach ($fieldValue as $i) {
                 $this->addHeader(Header\GenericMultiHeader::fromString($headerFieldNameOrLine . ':' . $i));
@@ -272,7 +276,7 @@ class Headers implements Countable, Iterator
             $indexes = array_keys($this->headersKeys, $key, true);
         }
 
-        if (!empty($indexes)) {
+        if (! empty($indexes)) {
             foreach ($indexes as $index) {
                 unset($this->headersKeys[$index]);
                 unset($this->headers[$index]);
@@ -292,7 +296,7 @@ class Headers implements Countable, Iterator
      */
     public function clearHeaders()
     {
-        $this->headers = $this->headersKeys = array();
+        $this->headers = $this->headersKeys = [];
         return $this;
     }
 
@@ -307,7 +311,7 @@ class Headers implements Countable, Iterator
     public function get($name)
     {
         $key = $this->normalizeFieldName($name);
-        $results = array();
+        $results = [];
 
         foreach (array_keys($this->headersKeys, $key) as $index) {
             if ($this->headers[$index] instanceof Header\GenericHeader) {
@@ -430,22 +434,23 @@ class Headers implements Countable, Iterator
     /**
      * Return the headers container as an array
      *
-     * @todo determine how to produce single line headers, if they are supported
+     * @param  bool $format Return the values in Mime::Encoded or in Raw format
      * @return array
+     * @todo determine how to produce single line headers, if they are supported
      */
-    public function toArray()
+    public function toArray($format = Header\HeaderInterface::FORMAT_RAW)
     {
-        $headers = array();
+        $headers = [];
         /* @var $header Header\HeaderInterface */
         foreach ($this->headers as $header) {
             if ($header instanceof Header\MultipleHeadersInterface) {
                 $name = $header->getFieldName();
-                if (!isset($headers[$name])) {
-                    $headers[$name] = array();
+                if (! isset($headers[$name])) {
+                    $headers[$name] = [];
                 }
-                $headers[$name][] = $header->getFieldValue();
+                $headers[$name][] = $header->getFieldValue($format);
             } else {
-                $headers[$header->getFieldName()] = $header->getFieldValue();
+                $headers[$header->getFieldName()] = $header->getFieldValue($format);
             }
         }
         return $headers;
@@ -465,6 +470,21 @@ class Headers implements Countable, Iterator
     }
 
     /**
+     * Create Header object from header line
+     *
+     * @param string $headerLine
+     * @return Header\HeaderInterface|Header\HeaderInterface[]
+     */
+    public function loadHeader($headerLine)
+    {
+        list($name, ) = Header\GenericHeader::splitHeaderLine($headerLine);
+
+        /** @var HeaderInterface $class */
+        $class = $this->getPluginClassLoader()->load($name) ?: Header\GenericHeader::class;
+        return $class::fromString($headerLine);
+    }
+
+    /**
      * @param $index
      * @return mixed
      */
@@ -473,6 +493,8 @@ class Headers implements Countable, Iterator
         $current = $this->headers[$index];
 
         $key   = $this->headersKeys[$index];
+
+        /** @var GenericHeader $class */
         $class = ($this->getPluginClassLoader()->load($key)) ?: 'Zend\Mail\Header\GenericHeader';
 
         $encoding = $current->getEncoding();
@@ -503,6 +525,6 @@ class Headers implements Countable, Iterator
      */
     protected function normalizeFieldName($fieldName)
     {
-        return str_replace(array('-', '_', ' ', '.'), '', strtolower($fieldName));
+        return str_replace(['-', '_', ' ', '.'], '', strtolower($fieldName));
     }
 }

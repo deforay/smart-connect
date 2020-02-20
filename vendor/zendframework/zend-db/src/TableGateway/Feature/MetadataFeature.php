@@ -3,16 +3,17 @@
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2016 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
 namespace Zend\Db\TableGateway\Feature;
 
-use Zend\Db\Metadata\Metadata;
 use Zend\Db\Metadata\MetadataInterface;
 use Zend\Db\TableGateway\Exception;
 use Zend\Db\Metadata\Object\TableObject;
+use Zend\Db\Metadata\Source\Factory as SourceFactory;
+use Zend\Db\Sql\TableIdentifier;
 
 class MetadataFeature extends AbstractFeature
 {
@@ -31,37 +32,47 @@ class MetadataFeature extends AbstractFeature
         if ($metadata) {
             $this->metadata = $metadata;
         }
-        $this->sharedData['metadata'] = array(
+        $this->sharedData['metadata'] = [
             'primaryKey' => null,
-            'columns' => array()
-        );
+            'columns' => []
+        ];
     }
 
     public function postInitialize()
     {
         if ($this->metadata === null) {
-            $this->metadata = new Metadata($this->tableGateway->adapter);
+            $this->metadata = SourceFactory::createSourceFromAdapter($this->tableGateway->adapter);
         }
 
         // localize variable for brevity
         $t = $this->tableGateway;
         $m = $this->metadata;
 
+        $tableGatewayTable = is_array($t->table) ? current($t->table) : $t->table;
+
+        if ($tableGatewayTable instanceof TableIdentifier) {
+            $table = $tableGatewayTable->getTable();
+            $schema = $tableGatewayTable->getSchema();
+        } else {
+            $table = $tableGatewayTable;
+            $schema = null;
+        }
+
         // get column named
-        $columns = $m->getColumnNames($t->table);
+        $columns = $m->getColumnNames($table, $schema);
         $t->columns = $columns;
 
         // set locally
         $this->sharedData['metadata']['columns'] = $columns;
 
         // process primary key only if table is a table; there are no PK constraints on views
-        if (!($m->getTable($t->table) instanceof TableObject)) {
+        if (! ($m->getTable($table, $schema) instanceof TableObject)) {
             return;
         }
 
         $pkc = null;
 
-        foreach ($m->getConstraints($t->table) as $constraint) {
+        foreach ($m->getConstraints($table, $schema) as $constraint) {
             /** @var $constraint \Zend\Db\Metadata\Object\ConstraintObject */
             if ($constraint->getType() == 'PRIMARY KEY') {
                 $pkc = $constraint;
@@ -73,11 +84,11 @@ class MetadataFeature extends AbstractFeature
             throw new Exception\RuntimeException('A primary key for this column could not be found in the metadata.');
         }
 
-        if (count($pkc->getColumns()) == 1) {
-            $pkck = $pkc->getColumns();
-            $primaryKey = $pkck[0];
+        $pkcColumns = $pkc->getColumns();
+        if (count($pkcColumns) === 1) {
+            $primaryKey = $pkcColumns[0];
         } else {
-            $primaryKey = $pkc->getColumns();
+            $primaryKey = $pkcColumns;
         }
 
         $this->sharedData['metadata']['primaryKey'] = $primaryKey;

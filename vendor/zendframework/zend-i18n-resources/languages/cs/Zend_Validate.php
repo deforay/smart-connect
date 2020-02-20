@@ -10,7 +10,7 @@
 /**
  * CS-Revision: 4.Nov.2013
  */
-return array(
+return [
     // Zend\I18n\Validator\Alnum
     "Invalid type given. String, integer or float expected" => "Chybný typ. Byl očekáván řetězec, celé nebo desetinné číslo",
     "The input contains characters which are non alphabetic and no digits" => "Hodnota obsahuje i jiné znaky než písmena a číslice",
@@ -202,7 +202,7 @@ return array(
 
     // Zend\Validator\GreaterThan
     "The input is not greater than '%min%'" => "Hodnota není větší než '%min%'",
-    "The input is not greater or equal than '%min%'" => "Hodnota není větší nebo rovna '%min%'",
+    "The input is not greater than or equal to '%min%'" => "Hodnota není větší nebo rovna '%min%'",
 
     // Zend\Validator\Hex
     "Invalid type given. String expected" => "Chybný typ. Byl očekáván řetězec",
@@ -286,4 +286,4 @@ return array(
     // Zend\Validator\Uri
     "Invalid type given. String expected" => "Chybný typ. Byl očekáván řetězec",
     "The input does not appear to be a valid Uri" => "Hodnota nevypadá jako platná URI",
-);
+];

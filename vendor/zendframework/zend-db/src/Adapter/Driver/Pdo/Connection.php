@@ -3,7 +3,7 @@
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2016 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -51,8 +51,8 @@ class Connection extends AbstractConnection
     /**
      * Set driver
      *
-     * @param  Pdo  $driver
-     * @return self
+     * @param Pdo $driver
+     * @return self Provides a fluent interface
      */
     public function setDriver(Pdo $driver)
     {
@@ -77,7 +77,7 @@ class Connection extends AbstractConnection
             $this->driverName = strtolower($connectionParameters['pdodriver']);
         } elseif (isset($connectionParameters['driver'])) {
             $this->driverName = strtolower(substr(
-                str_replace(array('-', '_', ' '), '', $connectionParameters['driver']),
+                str_replace(['-', '_', ' '], '', $connectionParameters['driver']),
                 3
             ));
         }
@@ -90,8 +90,8 @@ class Connection extends AbstractConnection
      */
     public function getDsn()
     {
-        if (!$this->dsn) {
-            throw new Exception\RunTimeException(
+        if (! $this->dsn) {
+            throw new Exception\RuntimeException(
                 'The DSN has not been set or constructed from parameters in connect() for this Connection'
             );
         }
@@ -104,7 +104,7 @@ class Connection extends AbstractConnection
      */
     public function getCurrentSchema()
     {
-        if (!$this->isConnected()) {
+        if (! $this->isConnected()) {
             $this->connect();
         }
 
@@ -137,7 +137,7 @@ class Connection extends AbstractConnection
      * Set resource
      *
      * @param  \PDO $resource
-     * @return self
+     * @return self Provides a fluent interface
      */
     public function setResource(\PDO $resource)
     {
@@ -160,7 +160,7 @@ class Connection extends AbstractConnection
         }
 
         $dsn = $username = $password = $hostname = $database = null;
-        $options = array();
+        $options = [];
         foreach ($this->connectionParameters as $key => $value) {
             switch (strtolower($key)) {
                 case 'dsn':
@@ -169,9 +169,8 @@ class Connection extends AbstractConnection
                 case 'driver':
                     $value = strtolower((string) $value);
                     if (strpos($value, 'pdo') === 0) {
-                        $pdoDriver = str_replace(array('-', '_', ' '), '', $value);
+                        $pdoDriver = str_replace(['-', '_', ' '], '', $value);
                         $pdoDriver = substr($pdoDriver, 3) ?: '';
-                        $pdoDriver = strtolower($pdoDriver);
                     }
                     break;
                 case 'pdodriver':
@@ -199,6 +198,12 @@ class Connection extends AbstractConnection
                 case 'charset':
                     $charset    = (string) $value;
                     break;
+                case 'unix_socket':
+                    $unix_socket = (string) $value;
+                    break;
+                case 'version':
+                    $version = (string) $value;
+                    break;
                 case 'driver_options':
                 case 'options':
                     $value = (array) $value;
@@ -210,8 +215,15 @@ class Connection extends AbstractConnection
             }
         }
 
-        if (!isset($dsn) && isset($pdoDriver)) {
-            $dsn = array();
+        if (isset($hostname) && isset($unix_socket)) {
+            throw new Exception\InvalidConnectionParametersException(
+                'Ambiguous connection parameters, both hostname and unix_socket parameters were set',
+                $this->connectionParameters
+            );
+        }
+
+        if (! isset($dsn) && isset($pdoDriver)) {
+            $dsn = [];
             switch ($pdoDriver) {
                 case 'sqlite':
                     $dsn[] = $database;
@@ -237,10 +249,16 @@ class Connection extends AbstractConnection
                     if (isset($charset) && $pdoDriver != 'pgsql') {
                         $dsn[] = "charset={$charset}";
                     }
+                    if (isset($unix_socket)) {
+                        $dsn[] = "unix_socket={$unix_socket}";
+                    }
+                    if (isset($version)) {
+                        $dsn[] = "version={$version}";
+                    }
                     break;
             }
             $dsn = $pdoDriver . ':' . implode(';', $dsn);
-        } elseif (!isset($dsn)) {
+        } elseif (! isset($dsn)) {
             throw new Exception\InvalidConnectionParametersException(
                 'A dsn was not provided or could not be constructed from your parameters',
                 $this->connectionParameters
@@ -258,7 +276,7 @@ class Connection extends AbstractConnection
             $this->driverName = strtolower($this->resource->getAttribute(\PDO::ATTR_DRIVER_NAME));
         } catch (\PDOException $e) {
             $code = $e->getCode();
-            if (!is_long($code)) {
+            if (! is_long($code)) {
                 $code = null;
             }
             throw new Exception\RuntimeException('Connect Error: ' . $e->getMessage(), $code, $e);
@@ -280,7 +298,7 @@ class Connection extends AbstractConnection
      */
     public function beginTransaction()
     {
-        if (!$this->isConnected()) {
+        if (! $this->isConnected()) {
             $this->connect();
         }
 
@@ -299,7 +317,7 @@ class Connection extends AbstractConnection
      */
     public function commit()
     {
-        if (!$this->isConnected()) {
+        if (! $this->isConnected()) {
             $this->connect();
         }
 
@@ -326,11 +344,11 @@ class Connection extends AbstractConnection
      */
     public function rollback()
     {
-        if (!$this->isConnected()) {
+        if (! $this->isConnected()) {
             throw new Exception\RuntimeException('Must be connected before you can rollback');
         }
 
-        if (!$this->inTransaction()) {
+        if (! $this->inTransaction()) {
             throw new Exception\RuntimeException('Must call beginTransaction() before you can rollback');
         }
 
@@ -349,7 +367,7 @@ class Connection extends AbstractConnection
      */
     public function execute($sql)
     {
-        if (!$this->isConnected()) {
+        if (! $this->isConnected()) {
             $this->connect();
         }
 
@@ -381,7 +399,7 @@ class Connection extends AbstractConnection
      */
     public function prepare($sql)
     {
-        if (!$this->isConnected()) {
+        if (! $this->isConnected()) {
             $this->connect();
         }
 
@@ -398,7 +416,8 @@ class Connection extends AbstractConnection
      */
     public function getLastGeneratedValue($name = null)
     {
-        if ($name === null && $this->driverName == 'pgsql') {
+        if ($name === null
+            && ($this->driverName == 'pgsql' || $this->driverName == 'firebird')) {
             return;
         }
 

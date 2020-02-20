@@ -3,7 +3,7 @@
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2016 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -22,17 +22,17 @@ abstract class AbstractSql implements SqlInterface
      *
      * @var string[]|array[]
      */
-    protected $specifications = array();
+    protected $specifications = [];
 
     /**
      * @var string
      */
-    protected $processInfo = array('paramPrefix' => '', 'subselectCount' => 0);
+    protected $processInfo = ['paramPrefix' => '', 'subselectCount' => 0];
 
     /**
      * @var array
      */
-    protected $instanceParameterIndex = array();
+    protected $instanceParameterIndex = [];
 
     /**
      * {@inheritDoc}
@@ -56,8 +56,8 @@ abstract class AbstractSql implements SqlInterface
     ) {
         $this->localizeVariables();
 
-        $sqls       = array();
-        $parameters = array();
+        $sqls       = [];
+        $parameters = [];
 
         foreach ($this->specifications as $name => $specification) {
             $parameters[$name] = $this->{'process' . $name}(
@@ -78,7 +78,21 @@ abstract class AbstractSql implements SqlInterface
                 $sqls[$name] = $parameters[$name];
             }
         }
+
         return rtrim(implode(' ', $sqls), "\n ,");
+    }
+
+    /**
+     * Render table with alias in from/join parts
+     *
+     * @todo move TableIdentifier concatenation here
+     * @param string $table
+     * @param string $alias
+     * @return string
+     */
+    protected function renderTable($table, $alias = null)
+    {
+        return $table . ($alias ? ' AS ' . $alias : '');
     }
 
     /**
@@ -104,7 +118,7 @@ abstract class AbstractSql implements SqlInterface
         // static counter for the number of times this method was invoked across the PHP runtime
         static $runtimeExpressionPrefix = 0;
 
-        if ($parameterContainer && ((!is_string($namedParameterPrefix) || $namedParameterPrefix == ''))) {
+        if ($parameterContainer && ((! is_string($namedParameterPrefix) || $namedParameterPrefix == ''))) {
             $namedParameterPrefix = sprintf('expr%04dParam', ++$runtimeExpressionPrefix);
         } else {
             $namedParameterPrefix = preg_replace('/\s/', '__', $namedParameterPrefix);
@@ -145,9 +159,9 @@ abstract class AbstractSql implements SqlInterface
             // Process values and types (the middle and last position of the
             // expression data)
             $values = $part[1];
-            $types = isset($part[2]) ? $part[2] : array();
+            $types = isset($part[2]) ? $part[2] : [];
             foreach ($values as $vIndex => $value) {
-                if (!isset($types[$vIndex])) {
+                if (! isset($types[$vIndex])) {
                     continue;
                 }
                 $type = $types[$vIndex];
@@ -194,7 +208,7 @@ abstract class AbstractSql implements SqlInterface
 
     /**
      * @param string|array $specifications
-     * @param string|array $parameters
+     * @param array $parameters
      *
      * @return string
      *
@@ -216,19 +230,24 @@ abstract class AbstractSql implements SqlInterface
             unset($specificationString, $paramSpecs);
         }
 
-        if (!isset($specificationString)) {
+        if (! isset($specificationString)) {
             throw new Exception\RuntimeException(
                 'A number of parameters was found that is not supported by this specification'
             );
         }
 
-        $topParameters = array();
+        $topParameters = [];
         foreach ($parameters as $position => $paramsForPosition) {
             if (isset($paramSpecs[$position]['combinedby'])) {
-                $multiParamValues = array();
+                $multiParamValues = [];
                 foreach ($paramsForPosition as $multiParamsForPosition) {
-                    $ppCount = count($multiParamsForPosition);
-                    if (!isset($paramSpecs[$position][$ppCount])) {
+                    if (is_array($multiParamsForPosition)) {
+                        $ppCount = count($multiParamsForPosition);
+                    } else {
+                        $ppCount = 1;
+                    }
+
+                    if (! isset($paramSpecs[$position][$ppCount])) {
                         throw new Exception\RuntimeException(sprintf(
                             'A number of parameters (%d) was found that is not supported by this specification',
                             $ppCount
@@ -239,7 +258,7 @@ abstract class AbstractSql implements SqlInterface
                 $topParameters[] = implode($paramSpecs[$position]['combinedby'], $multiParamValues);
             } elseif ($paramSpecs[$position] !== null) {
                 $ppCount = count($paramsForPosition);
-                if (!isset($paramSpecs[$position][$ppCount])) {
+                if (! isset($paramSpecs[$position][$ppCount])) {
                     throw new Exception\RuntimeException(sprintf(
                         'A number of parameters (%d) was found that is not supported by this specification',
                         $ppCount
@@ -289,6 +308,85 @@ abstract class AbstractSql implements SqlInterface
         }
 
         return $decorator->buildSqlString($platform, $driver, $parameterContainer);
+    }
+
+    /**
+     * @param Join[] $joins
+     * @param PlatformInterface $platform
+     * @param null|DriverInterface $driver
+     * @param null|ParameterContainer $parameterContainer
+     * @return null|string[] Null if no joins present, array of JOIN statements
+     *     otherwise
+     * @throws Exception\InvalidArgumentException for invalid JOIN table names.
+     */
+    protected function processJoin(
+        Join $joins,
+        PlatformInterface $platform,
+        DriverInterface $driver = null,
+        ParameterContainer $parameterContainer = null
+    ) {
+        if (! $joins->count()) {
+            return;
+        }
+
+        // process joins
+        $joinSpecArgArray = [];
+        foreach ($joins->getJoins() as $j => $join) {
+            $joinName = null;
+            $joinAs = null;
+
+            // table name
+            if (is_array($join['name'])) {
+                $joinName = current($join['name']);
+                $joinAs = $platform->quoteIdentifier(key($join['name']));
+            } else {
+                $joinName = $join['name'];
+            }
+
+            if ($joinName instanceof Expression) {
+                $joinName = $joinName->getExpression();
+            } elseif ($joinName instanceof TableIdentifier) {
+                $joinName = $joinName->getTableAndSchema();
+                $joinName = ($joinName[1]
+                        ? $platform->quoteIdentifier($joinName[1]) . $platform->getIdentifierSeparator()
+                        : '') . $platform->quoteIdentifier($joinName[0]);
+            } elseif ($joinName instanceof Select) {
+                $joinName = '(' . $this->processSubSelect($joinName, $platform, $driver, $parameterContainer) . ')';
+            } elseif (is_string($joinName) || (is_object($joinName) && is_callable([$joinName, '__toString']))) {
+                $joinName = $platform->quoteIdentifier($joinName);
+            } else {
+                throw new Exception\InvalidArgumentException(sprintf(
+                    'Join name expected to be Expression|TableIdentifier|Select|string, "%s" given',
+                    gettype($joinName)
+                ));
+            }
+
+            $joinSpecArgArray[$j] = [
+                strtoupper($join['type']),
+                $this->renderTable($joinName, $joinAs),
+            ];
+
+            // on expression
+            // note: for Expression objects, pass them to processExpression with a prefix specific to each join
+            // (used for named parameters)
+            if (($join['on'] instanceof ExpressionInterface)) {
+                $joinSpecArgArray[$j][] = $this->processExpression(
+                    $join['on'],
+                    $platform,
+                    $driver,
+                    $parameterContainer,
+                    'join' . ($j + 1) . 'part'
+                );
+            } else {
+                // on
+                $joinSpecArgArray[$j][] = $platform->quoteIdentifierInFragment(
+                    $join['on'],
+                    ['=', 'AND', 'OR', '(', ')', 'BETWEEN', '<', '>']
+                );
+            }
+        }
+
+        return [$joinSpecArgArray];
     }
 
     /**

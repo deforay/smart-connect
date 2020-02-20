@@ -10,12 +10,14 @@
 namespace Zend\File\Transfer\Adapter;
 
 use ErrorException;
+use ReflectionClass;
 use Zend\File\Transfer;
 use Zend\File\Transfer\Exception;
 use Zend\Filter;
 use Zend\Filter\Exception as FilterException;
 use Zend\I18n\Translator\TranslatorInterface as Translator;
 use Zend\I18n\Translator\TranslatorAwareInterface;
+use Zend\ServiceManager\ServiceManager;
 use Zend\Stdlib\ErrorHandler;
 use Zend\Validator;
 
@@ -28,7 +30,7 @@ use Zend\Validator;
  * modifying that should be done in tandem with a rewrite to utilize validator
  * and filter chains instead.
  *
- * @todo      Rewrite
+ * @deprecated since 2.7.0, and scheduled for removal with 3.0.0
  */
 abstract class AbstractAdapter implements TranslatorAwareInterface
 {
@@ -44,7 +46,7 @@ abstract class AbstractAdapter implements TranslatorAwareInterface
      *
      * @var array
      */
-    protected $break = array();
+    protected $break = [];
 
     /**
      * @var FilterPluginManager
@@ -56,21 +58,21 @@ abstract class AbstractAdapter implements TranslatorAwareInterface
      *
      * @var array
      */
-    protected $filters = array();
+    protected $filters = [];
 
     /**
      * Plugin loaders for filter and validation chains
      *
      * @var array
      */
-    protected $loaders = array();
+    protected $loaders = [];
 
     /**
      * Internal list of messages
      *
      * @var array
      */
-    protected $messages = array();
+    protected $messages = [];
 
     /**
      * @var Translator
@@ -100,7 +102,7 @@ abstract class AbstractAdapter implements TranslatorAwareInterface
      * Internal list of validators
      * @var array
      */
-    protected $validators = array();
+    protected $validators = [];
 
     /**
      * Internal list of files
@@ -118,7 +120,7 @@ abstract class AbstractAdapter implements TranslatorAwareInterface
      *
      * @var array
      */
-    protected $files = array();
+    protected $files = [];
 
     /**
      * TMP directory
@@ -129,12 +131,12 @@ abstract class AbstractAdapter implements TranslatorAwareInterface
     /**
      * Available options for file transfers
      */
-    protected $options = array(
+    protected $options = [
         'ignoreNoFile'  => false,
         'useByteString' => true,
         'magicFile'     => null,
         'detectInfos'   => true,
-    );
+    ];
 
     /**
      * Send file
@@ -240,8 +242,8 @@ abstract class AbstractAdapter implements TranslatorAwareInterface
      */
     public function getFilterManager()
     {
-        if (!$this->filterManager instanceof FilterPluginManager) {
-            $this->setFilterManager(new FilterPluginManager());
+        if (! $this->filterManager instanceof FilterPluginManager) {
+            $this->setFilterManager(new FilterPluginManager(new ServiceManager()));
         }
         return $this->filterManager;
     }
@@ -265,8 +267,12 @@ abstract class AbstractAdapter implements TranslatorAwareInterface
      */
     public function getValidatorManager()
     {
-        if (!$this->validatorManager instanceof ValidatorPluginManager) {
-            $this->setValidatorManager(new ValidatorPluginManager());
+        if (! $this->validatorManager instanceof ValidatorPluginManager) {
+            if ($this->isServiceManagerV3()) {
+                $this->setValidatorManager(new ValidatorPluginManager(new ServiceManager()));
+            } else {
+                $this->setValidatorManager(new ValidatorPluginManager());
+            }
         }
         return $this->validatorManager;
     }
@@ -284,6 +290,7 @@ abstract class AbstractAdapter implements TranslatorAwareInterface
     public function addValidator($validator, $breakChainOnFailure = false, $options = null, $files = null)
     {
         if (is_string($validator)) {
+            $options = (null !== $options && is_scalar($options)) ? [$options] : $options;
             $validator = $this->getValidatorManager()->get($validator, $options);
             if (is_array($options) && isset($options['messages'])) {
                 if (is_array($options['messages'])) {
@@ -296,7 +303,7 @@ abstract class AbstractAdapter implements TranslatorAwareInterface
             }
         }
 
-        if (!$validator instanceof Validator\ValidatorInterface) {
+        if (! $validator instanceof Validator\ValidatorInterface) {
             throw new Exception\InvalidArgumentException(
                 'Invalid validator provided to addValidator; ' .
                 'must be string or Zend\Validator\ValidatorInterface'
@@ -311,7 +318,7 @@ abstract class AbstractAdapter implements TranslatorAwareInterface
         foreach ($files as $file) {
             if ($name == 'NotEmpty') {
                 $temp = $this->files[$file]['validators'];
-                $this->files[$file]['validators']  = array($name);
+                $this->files[$file]['validators']  = [$name];
                 $this->files[$file]['validators'] += $temp;
             } else {
                 $this->files[$file]['validators'][] = $name;
@@ -337,7 +344,7 @@ abstract class AbstractAdapter implements TranslatorAwareInterface
             if ($validatorInfo instanceof Validator\ValidatorInterface) {
                 $this->addValidator($validatorInfo, null, null, $files);
             } elseif (is_string($validatorInfo)) {
-                if (!is_int($name)) {
+                if (! is_int($name)) {
                     $this->addValidator($name, null, $validatorInfo, $files);
                 } else {
                     $this->addValidator($validatorInfo, null, null, $files);
@@ -345,7 +352,7 @@ abstract class AbstractAdapter implements TranslatorAwareInterface
             } elseif (is_array($validatorInfo)) {
                 $argc                = count($validatorInfo);
                 $breakChainOnFailure = false;
-                $options             = array();
+                $options             = [];
                 if (isset($validatorInfo['validator'])) {
                     $validator = $validatorInfo['validator'];
                     if (isset($validatorInfo['breakChainOnFailure'])) {
@@ -377,7 +384,7 @@ abstract class AbstractAdapter implements TranslatorAwareInterface
                                 $options = array_shift($validatorInfo);
                                 // fall-through
                             case (4 <= $argc):
-                                if (!empty($validatorInfo)) {
+                                if (! empty($validatorInfo)) {
                                     $file = array_shift($validatorInfo);
                                 }
                                 // fall-through
@@ -446,15 +453,15 @@ abstract class AbstractAdapter implements TranslatorAwareInterface
         }
 
         $files      = $this->getFiles($files, true, true);
-        $validators = array();
+        $validators = [];
         foreach ($files as $file) {
-            if (!empty($this->files[$file]['validators'])) {
+            if (! empty($this->files[$file]['validators'])) {
                 $validators += $this->files[$file]['validators'];
             }
         }
 
         $validators = array_unique($validators);
-        $result     = array();
+        $result     = [];
         foreach ($validators as $validator) {
             $result[$validator] = $this->validators[$validator];
         }
@@ -499,9 +506,9 @@ abstract class AbstractAdapter implements TranslatorAwareInterface
      */
     public function clearValidators()
     {
-        $this->validators = array();
+        $this->validators = [];
         foreach (array_keys($this->files) as $file) {
-            $this->files[$file]['validators'] = array();
+            $this->files[$file]['validators'] = [];
             $this->files[$file]['validated']  = false;
         }
 
@@ -515,7 +522,7 @@ abstract class AbstractAdapter implements TranslatorAwareInterface
      * @param array $files   (Optional) Files to set the options for
      * @return AbstractAdapter
      */
-    public function setOptions($options = array(), $files = null)
+    public function setOptions($options = [], $files = null)
     {
         $file = $this->getFiles($files, false, true);
 
@@ -538,7 +545,7 @@ abstract class AbstractAdapter implements TranslatorAwareInterface
                             break;
 
                         default:
-                            continue;
+                            break;
                     }
                 }
             }
@@ -561,7 +568,7 @@ abstract class AbstractAdapter implements TranslatorAwareInterface
             if (isset($this->files[$key]['options'])) {
                 $options[$key] = $this->files[$key]['options'];
             } else {
-                $options[$key] = array();
+                $options[$key] = [];
             }
         }
 
@@ -582,12 +589,12 @@ abstract class AbstractAdapter implements TranslatorAwareInterface
         }
 
         $translator      = $this->getTranslator();
-        $this->messages = array();
+        $this->messages = [];
         $break           = false;
         foreach ($check as $content) {
             if (array_key_exists('validators', $content) &&
-                in_array('Zend\Validator\File\Count', $content['validators'])) {
-                $validator = $this->validators['Zend\Validator\File\Count'];
+                in_array(Validator\File\Count::class, $content['validators'])) {
+                $validator = $this->validators[Validator\File\Count::class];
                 $count     = $content;
                 if (empty($content['tmp_name'])) {
                     continue;
@@ -605,13 +612,13 @@ abstract class AbstractAdapter implements TranslatorAwareInterface
         }
 
         if (isset($count)) {
-            if (!$validator->isValid($count['tmp_name'], $count)) {
+            if (! $validator->isValid($count['tmp_name'], $count)) {
                 $this->messages += $validator->getMessages();
             }
         }
 
         foreach ($check as $key => $content) {
-            $fileerrors  = array();
+            $fileerrors  = [];
             if (array_key_exists('validators', $content) && $content['validated']) {
                 continue;
             }
@@ -629,11 +636,11 @@ abstract class AbstractAdapter implements TranslatorAwareInterface
                         $tocheck = $content['tmp_name'];
                     }
 
-                    if (!$validator->isValid($tocheck, $content)) {
+                    if (! $validator->isValid($tocheck, $content)) {
                         $fileerrors += $validator->getMessages();
                     }
 
-                    if (!empty($content['options']['ignoreNoFile']) && (isset($fileerrors['fileUploadErrorNoFile']))) {
+                    if (! empty($content['options']['ignoreNoFile']) && (isset($fileerrors['fileUploadErrorNoFile']))) {
                         unset($fileerrors['fileUploadErrorNoFile']);
                         break;
                     }
@@ -695,7 +702,7 @@ abstract class AbstractAdapter implements TranslatorAwareInterface
      */
     public function hasErrors()
     {
-        return (!empty($this->messages));
+        return (! empty($this->messages));
     }
 
     /**
@@ -710,10 +717,11 @@ abstract class AbstractAdapter implements TranslatorAwareInterface
     public function addFilter($filter, $options = null, $files = null)
     {
         if (is_string($filter)) {
+            $options = (null !== $options && is_scalar($options)) ? [$options] : $options;
             $filter = $this->getFilterManager()->get($filter, $options);
         }
 
-        if (!$filter instanceof Filter\FilterInterface) {
+        if (! $filter instanceof Filter\FilterInterface) {
             throw new Exception\InvalidArgumentException('Invalid filter specified');
         }
 
@@ -754,7 +762,7 @@ abstract class AbstractAdapter implements TranslatorAwareInterface
                 }
 
                 if (is_array($spec)) {
-                    if (!array_key_exists('filter', $spec)) {
+                    if (! array_key_exists('filter', $spec)) {
                         continue;
                     }
 
@@ -824,15 +832,15 @@ abstract class AbstractAdapter implements TranslatorAwareInterface
         }
 
         $files   = $this->getFiles($files, true, true);
-        $filters = array();
+        $filters = [];
         foreach ($files as $file) {
-            if (!empty($this->files[$file]['filters'])) {
+            if (! empty($this->files[$file]['filters'])) {
                 $filters += $this->files[$file]['filters'];
             }
         }
 
         $filters = array_unique($filters);
-        $result  = array();
+        $result  = [];
         foreach ($filters as $filter) {
             $result[] = $this->filters[$filter];
         }
@@ -875,9 +883,9 @@ abstract class AbstractAdapter implements TranslatorAwareInterface
      */
     public function clearFilters()
     {
-        $this->filters = array();
+        $this->filters = [];
         foreach (array_keys($this->files) as $file) {
-            $this->files[$file]['filters'] = array();
+            $this->files[$file]['filters'] = [];
         }
 
         return $this;
@@ -893,7 +901,7 @@ abstract class AbstractAdapter implements TranslatorAwareInterface
     public function getFileName($file = null, $path = true)
     {
         $files     = $this->getFiles($file, true, true);
-        $result    = array();
+        $result    = [];
         $directory = "";
         foreach ($files as $file) {
             if (empty($this->files[$file]['name'])) {
@@ -915,9 +923,9 @@ abstract class AbstractAdapter implements TranslatorAwareInterface
     }
 
     /**
-     * Retrieve additional internal file informations for files
+     * Retrieve additional internal file information for files
      *
-     * @param  string $file (Optional) File to get informations for
+     * @param  string $file (Optional) File to get information for
      * @return array
      */
     public function getFileInfo($file = null)
@@ -938,11 +946,11 @@ abstract class AbstractAdapter implements TranslatorAwareInterface
     {
         $orig = $files;
         $destination = rtrim($destination, "/\\");
-        if (!is_dir($destination)) {
+        if (! is_dir($destination)) {
             throw new Exception\InvalidArgumentException('The given destination is not a directory or does not exist');
         }
 
-        if (!is_writable($destination)) {
+        if (! is_writable($destination)) {
             throw new Exception\InvalidArgumentException('The given destination is not writeable');
         }
 
@@ -975,7 +983,7 @@ abstract class AbstractAdapter implements TranslatorAwareInterface
     {
         $orig  = $files;
         $files = $this->getFiles($files, false, true);
-        $destinations = array();
+        $destinations = [];
         if (empty($files) and is_string($orig)) {
             if (isset($this->files[$orig]['destination'])) {
                 $destinations[$orig] = $this->files[$orig]['destination'];
@@ -1101,12 +1109,12 @@ abstract class AbstractAdapter implements TranslatorAwareInterface
      */
     public function getHash($hash = 'crc32', $files = null)
     {
-        if (!in_array($hash, hash_algos())) {
+        if (! in_array($hash, hash_algos())) {
             throw new Exception\InvalidArgumentException('Unknown hash algorithm');
         }
 
         $files  = $this->getFiles($files);
-        $result = array();
+        $result = [];
         foreach ($files as $key => $value) {
             if (file_exists($value['name'])) {
                 $result[$key] = hash_file($hash, $value['name']);
@@ -1134,7 +1142,7 @@ abstract class AbstractAdapter implements TranslatorAwareInterface
     public function getFileSize($files = null)
     {
         $files  = $this->getFiles($files);
-        $result = array();
+        $result = [];
         foreach ($files as $key => $value) {
             if (file_exists($value['name']) || file_exists($value['tmp_name'])) {
                 if ($value['options']['useByteString']) {
@@ -1193,7 +1201,7 @@ abstract class AbstractAdapter implements TranslatorAwareInterface
     public function getMimeType($files = null)
     {
         $files  = $this->getFiles($files);
-        $result = array();
+        $result = [];
         foreach ($files as $key => $value) {
             if (file_exists($value['name']) || file_exists($value['tmp_name'])) {
                 $result[$key] = $value['type'];
@@ -1228,7 +1236,7 @@ abstract class AbstractAdapter implements TranslatorAwareInterface
         }
 
         if (class_exists('finfo', false)) {
-            if (!empty($value['options']['magicFile'])) {
+            if (! empty($value['options']['magicFile'])) {
                 ErrorHandler::start();
                 $mime = finfo_open(FILEINFO_MIME_TYPE, $value['options']['magicFile']);
                 ErrorHandler::stop();
@@ -1240,7 +1248,7 @@ abstract class AbstractAdapter implements TranslatorAwareInterface
                 ErrorHandler::stop();
             }
 
-            if (!empty($mime)) {
+            if (! empty($mime)) {
                 $result = finfo_file($mime, $file);
             }
 
@@ -1267,8 +1275,8 @@ abstract class AbstractAdapter implements TranslatorAwareInterface
      */
     protected static function toByteString($size)
     {
-        $sizes = array('B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB');
-        for ($i=0; $size >= 1024 && $i < 9; $i++) {
+        $sizes = ['B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+        for ($i = 0; $size >= 1024 && $i < 9; $i++) {
             $size /= 1024;
         }
 
@@ -1294,7 +1302,7 @@ abstract class AbstractAdapter implements TranslatorAwareInterface
                         $this->files[$name]['destination'] = dirname($result);
                         $this->files[$name]['name']        = basename($result);
                     } catch (FilterException\ExceptionInterface $e) {
-                        $this->messages += array($e->getMessage());
+                        $this->messages += [$e->getMessage()];
                     }
                 }
             }
@@ -1316,20 +1324,20 @@ abstract class AbstractAdapter implements TranslatorAwareInterface
     protected function getTmpDir()
     {
         if (null === $this->tmpDir) {
-            $tmpdir = array();
+            $tmpdir = [];
             if (function_exists('sys_get_temp_dir')) {
                 $tmpdir[] = sys_get_temp_dir();
             }
 
-            if (!empty($_ENV['TMP'])) {
+            if (! empty($_ENV['TMP'])) {
                 $tmpdir[] = realpath($_ENV['TMP']);
             }
 
-            if (!empty($_ENV['TMPDIR'])) {
+            if (! empty($_ENV['TMPDIR'])) {
                 $tmpdir[] = realpath($_ENV['TMPDIR']);
             }
 
-            if (!empty($_ENV['TEMP'])) {
+            if (! empty($_ENV['TEMP'])) {
                 $tmpdir[] = realpath($_ENV['TEMP']);
             }
 
@@ -1401,17 +1409,17 @@ abstract class AbstractAdapter implements TranslatorAwareInterface
      */
     protected function getFiles($files, $names = false, $noexception = false)
     {
-        $check = array();
+        $check = [];
 
         if (is_string($files)) {
-            $files = array($files);
+            $files = [$files];
         }
 
         if (is_array($files)) {
             foreach ($files as $find) {
-                $found = array();
+                $found = [];
                 foreach ($this->files as $file => $content) {
-                    if (!isset($content['name'])) {
+                    if (! isset($content['name'])) {
                         continue;
                     }
 
@@ -1435,7 +1443,7 @@ abstract class AbstractAdapter implements TranslatorAwareInterface
 
                 if (empty($found)) {
                     if ($noexception !== false) {
-                        return array();
+                        return [];
                     }
 
                     throw new Exception\RuntimeException(sprintf('The file transfer adapter can not find "%s"', $find));
@@ -1504,5 +1512,19 @@ abstract class AbstractAdapter implements TranslatorAwareInterface
         }
 
         return false;
+    }
+
+    /**
+     * Is the service manager component v3?
+     *
+     * This is needed until zend-validator is updated, to ensure we instantiate
+     * the validator plugin manager properly.
+     *
+     * @return bool
+     */
+    private function isServiceManagerV3()
+    {
+        $r = new ReflectionClass(ServiceManager::class);
+        return ! $r->hasProperty('invokableClasses');
     }
 }

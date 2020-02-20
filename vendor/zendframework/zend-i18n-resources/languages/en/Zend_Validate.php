@@ -8,9 +8,15 @@
  */
 
 /**
- * EN-Revision: 08.Apr.2015
+ * EN-Revision: 16.Jun.2015
  */
-return array(
+return [
+    // Zend\Authentication\Validator\Authentication
+    "Invalid identity" => "Invalid identity",
+    "Identity is ambiguous" => "Identity is ambiguous",
+    "Invalid password" => "Invalid password",
+    "Authentication failed" => "Authentication failed",
+
     // Zend\I18n\Validator\Alnum
     "Invalid type given. String, integer or float expected" => "Invalid type given. String, integer or float expected",
     "The input contains characters which are non alphabetic and no digits" => "The input contains characters which are non alphabetic and no digits",
@@ -210,7 +216,7 @@ return array(
 
     // Zend\Validator\GreaterThan
     "The input is not greater than '%min%'" => "The input is not greater than '%min%'",
-    "The input is not greater or equal than '%min%'" => "The input is not greater or equal than '%min%'",
+    "The input is not greater than or equal to '%min%'" => "The input is not greater than or equal to '%min%'",
 
     // Zend\Validator\Hex
     "Invalid type given. String expected" => "Invalid type given. String expected",
@@ -299,4 +305,4 @@ return array(
     // Zend\Validator\Uri
     "Invalid type given. String expected" => "Invalid type given. String expected",
     "The input does not appear to be a valid Uri" => "The input does not appear to be a valid Uri",
-);
+];

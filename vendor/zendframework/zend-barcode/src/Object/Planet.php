@@ -1,10 +1,8 @@
 <?php
 /**
- * Zend Framework (http://framework.zend.com/)
- *
- * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
- * @license   http://framework.zend.com/license/new-bsd New BSD License
+ * @see       https://github.com/zendframework/zend-barcode for the canonical source repository
+ * @copyright Copyright (c) 2005-2019 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   https://github.com/zendframework/zend-barcode/blob/master/LICENSE.md New BSD License
  */
 
 namespace Zend\Barcode\Object;
@@ -20,7 +18,7 @@ class Planet extends Postnet
      * - 1 = complete bar
      * @var array
      */
-    protected $codingMap = array(
+    protected $codingMap = [
         0 => "00111",
         1 => "11100",
         2 => "11010",
@@ -31,5 +29,5 @@ class Planet extends Postnet
         7 => "01110",
         8 => "01101",
         9 => "01011"
-    );
+    ];
 }

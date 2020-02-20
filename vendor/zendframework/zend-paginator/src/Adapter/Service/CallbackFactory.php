@@ -9,36 +9,65 @@
 
 namespace Zend\Paginator\Adapter\Service;
 
+use Interop\Container\ContainerInterface;
 use Zend\Paginator\Adapter\Callback;
-use Zend\ServiceManager\MutableCreationOptionsInterface;
+use Zend\ServiceManager\Exception\ServiceNotCreatedException;
 use Zend\ServiceManager\FactoryInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
 
-class CallbackFactory implements
-    FactoryInterface,
-    MutableCreationOptionsInterface
+/**
+ * Create and return an instance of the Callback adapter.
+ */
+class CallbackFactory implements FactoryInterface
 {
     /**
-     * Adapter options
-     * @var array
+     * Options to use when creating adapter (v2)
+     *
+     * @var null|array
      */
     protected $creationOptions;
-
-    /**
-     * {@inheritDoc}
-     */
-    public function setCreationOptions(array $creationOptions)
-    {
-        $this->creationOptions = $creationOptions;
-    }
 
     /**
      * {@inheritDoc}
      *
      * @return Callback
      */
-    public function createService(ServiceLocatorInterface $serviceLocator)
+    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        return new Callback($this->creationOptions[0], $this->creationOptions[1]);
+        $options = is_array($options) ? $options : [];
+        if (count($options) < 2) {
+            throw new ServiceNotCreatedException(sprintf(
+                '%s requires that at least two options, an Items and Count callback, be provided; received %d options',
+                __CLASS__,
+                count($options)
+            ));
+        }
+        $itemsCallback = array_shift($options);
+        $countCallback = array_shift($options);
+        return new Callback($itemsCallback, $countCallback);
+    }
+
+    /**
+     * Create and return a Callback instance (v2)
+     *
+     * @param ServiceLocatorInterface $container
+     * @param null|string $name
+     * @param string $requestedName
+     * @return Callback
+     */
+    public function createService(ServiceLocatorInterface $container, $name = null, $requestedName = Callback::class)
+    {
+        return $this($container, $requestedName, $this->creationOptions);
+    }
+
+    /**
+     * Options to use with factory (v2)
+     *
+     * @param array $creationOptions
+     * @return void
+     */
+    public function setCreationOptions(array $creationOptions)
+    {
+        $this->creationOptions = $creationOptions;
     }
 }

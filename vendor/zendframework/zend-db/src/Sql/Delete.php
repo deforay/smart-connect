@@ -3,7 +3,7 @@
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2016 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -29,10 +29,10 @@ class Delete extends AbstractPreparableSql
     /**
      * {@inheritDoc}
      */
-    protected $specifications = array(
+    protected $specifications = [
         self::SPECIFICATION_DELETE => 'DELETE FROM %1$s',
         self::SPECIFICATION_WHERE => 'WHERE %1$s'
-    );
+    ];
 
     /**
      * @var string|TableIdentifier
@@ -47,7 +47,7 @@ class Delete extends AbstractPreparableSql
     /**
      * @var array
      */
-    protected $set = array();
+    protected $set = [];
 
     /**
      * @var null|string|Where
@@ -71,7 +71,7 @@ class Delete extends AbstractPreparableSql
      * Create from statement
      *
      * @param  string|TableIdentifier $table
-     * @return Delete
+     * @return self Provides a fluent interface
      */
     public function from($table)
     {
@@ -86,12 +86,12 @@ class Delete extends AbstractPreparableSql
      */
     public function getRawState($key = null)
     {
-        $rawState = array(
+        $rawState = [
             'emptyWhereProtection' => $this->emptyWhereProtection,
             'table' => $this->table,
             'set' => $this->set,
             'where' => $this->where
-        );
+        ];
         return (isset($key) && array_key_exists($key, $rawState)) ? $rawState[$key] : $rawState;
     }
 
@@ -101,7 +101,7 @@ class Delete extends AbstractPreparableSql
      * @param  Where|\Closure|string|array $predicate
      * @param  string $combination One of the OP_* constants from Predicate\PredicateSet
      *
-     * @return Delete
+     * @return self Provides a fluent interface
      */
     public function where($predicate, $combination = Predicate\PredicateSet::OP_AND)
     {
@@ -120,8 +120,11 @@ class Delete extends AbstractPreparableSql
      *
      * @return string
      */
-    protected function processDelete(PlatformInterface $platform, DriverInterface $driver = null, ParameterContainer $parameterContainer = null)
-    {
+    protected function processDelete(
+        PlatformInterface $platform,
+        DriverInterface $driver = null,
+        ParameterContainer $parameterContainer = null
+    ) {
         return sprintf(
             $this->specifications[static::SPECIFICATION_DELETE],
             $this->resolveTable($this->table, $platform, $driver, $parameterContainer)
@@ -135,8 +138,11 @@ class Delete extends AbstractPreparableSql
      *
      * @return null|string
      */
-    protected function processWhere(PlatformInterface $platform, DriverInterface $driver = null, ParameterContainer $parameterContainer = null)
-    {
+    protected function processWhere(
+        PlatformInterface $platform,
+        DriverInterface $driver = null,
+        ParameterContainer $parameterContainer = null
+    ) {
         if ($this->where->count() == 0) {
             return;
         }

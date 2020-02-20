@@ -3,7 +3,7 @@
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2016 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -74,7 +74,7 @@ class Result implements Iterator, ResultInterface
      * @param  PDOStatement $resource
      * @param               $generatedValue
      * @param  int          $rowCount
-     * @return Result
+     * @return self Provides a fluent interface
      */
     public function initialize(PDOStatement $resource, $generatedValue, $rowCount = null)
     {
@@ -136,7 +136,7 @@ class Result implements Iterator, ResultInterface
 
     /**
      * Get the data
-     * @return array
+     * @return mixed
      */
     public function current()
     {

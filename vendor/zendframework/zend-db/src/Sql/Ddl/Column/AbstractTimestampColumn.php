@@ -3,7 +3,7 @@
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2016 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -23,13 +23,13 @@ abstract class AbstractTimestampColumn extends Column
     {
         $spec = $this->specification;
 
-        $params   = array();
+        $params   = [];
         $params[] = $this->name;
         $params[] = $this->type;
 
-        $types = array(self::TYPE_IDENTIFIER, self::TYPE_LITERAL);
+        $types = [self::TYPE_IDENTIFIER, self::TYPE_LITERAL];
 
-        if (!$this->isNullable) {
+        if (! $this->isNullable) {
             $spec .= ' NOT NULL';
         }
 
@@ -47,11 +47,11 @@ abstract class AbstractTimestampColumn extends Column
             $types[]  = self::TYPE_LITERAL;
         }
 
-        $data = array(array(
+        $data = [[
             $spec,
             $params,
             $types,
-        ));
+        ]];
 
         foreach ($this->constraints as $constraint) {
             $data[] = ' ';

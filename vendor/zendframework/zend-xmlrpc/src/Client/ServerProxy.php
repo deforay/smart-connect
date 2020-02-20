@@ -31,7 +31,7 @@ class ServerProxy
     /**
      * @var array of \Zend\XmlRpc\Client\ServerProxy
      */
-    private $cache = array();
+    private $cache = [];
 
     /**
      * Class constructor
@@ -54,7 +54,7 @@ class ServerProxy
     public function __get($namespace)
     {
         $namespace = ltrim("$this->namespace.$namespace", '.');
-        if (!isset($this->cache[$namespace])) {
+        if (! isset($this->cache[$namespace])) {
             $this->cache[$namespace] = new $this($this->client, $namespace);
         }
         return $this->cache[$namespace];

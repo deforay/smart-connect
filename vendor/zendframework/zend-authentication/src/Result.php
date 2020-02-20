@@ -14,7 +14,7 @@ class Result
     /**
      * General Failure
      */
-    const FAILURE                        =  0;
+    const FAILURE                        = 0;
 
     /**
      * Failure due to identity not being found.
@@ -39,7 +39,7 @@ class Result
     /**
      * Authentication success.
      */
-    const SUCCESS                        =  1;
+    const SUCCESS                        = 1;
 
     /**
      * Authentication result code
@@ -71,7 +71,7 @@ class Result
      * @param  mixed   $identity
      * @param  array   $messages
      */
-    public function __construct($code, $identity, array $messages = array())
+    public function __construct($code, $identity, array $messages = [])
     {
         $this->code     = (int) $code;
         $this->identity = $identity;

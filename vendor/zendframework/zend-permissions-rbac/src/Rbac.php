@@ -53,18 +53,18 @@ class Rbac extends AbstractIterator
         if (is_string($child)) {
             $child = new Role($child);
         }
-        if (!$child instanceof RoleInterface) {
+        if (! $child instanceof RoleInterface) {
             throw new Exception\InvalidArgumentException(
                 'Child must be a string or implement Zend\Permissions\Rbac\RoleInterface'
             );
         }
 
         if ($parents) {
-            if (!is_array($parents)) {
-                $parents = array($parents);
+            if (! is_array($parents)) {
+                $parents = [$parents];
             }
             foreach ($parents as $parent) {
-                if ($this->createMissingRoles && !$this->hasRole($parent)) {
+                if ($this->createMissingRoles && ! $this->hasRole($parent)) {
                     $this->addRole($parent);
                 }
                 $this->getRole($parent)->addChild($child);
@@ -102,7 +102,7 @@ class Rbac extends AbstractIterator
      */
     public function getRole($objectOrName)
     {
-        if (!is_string($objectOrName) && !$objectOrName instanceof RoleInterface) {
+        if (! is_string($objectOrName) && ! $objectOrName instanceof RoleInterface) {
             throw new Exception\InvalidArgumentException(
                 'Expected string or implement \Zend\Permissions\Rbac\RoleInterface'
             );
@@ -139,13 +139,15 @@ class Rbac extends AbstractIterator
      */
     public function isGranted($role, $permission, $assert = null)
     {
+        $result = $this->getRole($role)->hasPermission($permission);
+
         if ($assert) {
             if ($assert instanceof AssertionInterface) {
-                return (bool) $assert->assert($this);
+                return $result && $assert->assert($this);
             }
 
             if (is_callable($assert)) {
-                return (bool) $assert($this);
+                return $result && $assert($this);
             }
 
             throw new Exception\InvalidArgumentException(
@@ -153,6 +155,6 @@ class Rbac extends AbstractIterator
             );
         }
 
-        return $this->getRole($role)->hasPermission($permission);
+        return $result;
     }
 }

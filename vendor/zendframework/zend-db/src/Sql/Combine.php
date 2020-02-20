@@ -3,7 +3,7 @@
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2016 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -27,14 +27,14 @@ class Combine extends AbstractPreparableSql
     /**
      * @var string[]
      */
-    protected $specifications = array(
+    protected $specifications = [
         self::COMBINE => '%1$s (%2$s) ',
-    );
+    ];
 
     /**
      * @var Select[][]
      */
-    private $combine = array();
+    private $combine = [];
 
     /**
      * @param Select|array|null $select
@@ -55,14 +55,16 @@ class Combine extends AbstractPreparableSql
      * @param string $type
      * @param string $modifier
      *
-     * @return self
+     * @return self Provides a fluent interface
+     *
+     * @throws Exception\InvalidArgumentException
      */
     public function combine($select, $type = self::COMBINE_UNION, $modifier = '')
     {
         if (is_array($select)) {
             foreach ($select as $combine) {
                 if ($combine instanceof Select) {
-                    $combine = array($combine);
+                    $combine = [$combine];
                 }
 
                 $this->combine(
@@ -81,11 +83,11 @@ class Combine extends AbstractPreparableSql
             ));
         }
 
-        $this->combine[] = array(
+        $this->combine[] = [
             'select' => $select,
             'type' => $type,
             'modifier' => $modifier
-        );
+        ];
         return $this;
     }
 
@@ -136,9 +138,12 @@ class Combine extends AbstractPreparableSql
      *
      * @return string
      */
-    protected function buildSqlString(PlatformInterface $platform, DriverInterface $driver = null, ParameterContainer $parameterContainer = null)
-    {
-        if (!$this->combine) {
+    protected function buildSqlString(
+        PlatformInterface $platform,
+        DriverInterface $driver = null,
+        ParameterContainer $parameterContainer = null
+    ) {
+        if (! $this->combine) {
             return;
         }
 
@@ -158,15 +163,15 @@ class Combine extends AbstractPreparableSql
     }
 
     /**
-     * @return $this
+     * @return self Provides a fluent interface
      */
     public function alignColumns()
     {
-        if (!$this->combine) {
+        if (! $this->combine) {
             return $this;
         }
 
-        $allColumns = array();
+        $allColumns = [];
         foreach ($this->combine as $combine) {
             $allColumns = array_merge(
                 $allColumns,
@@ -176,7 +181,7 @@ class Combine extends AbstractPreparableSql
 
         foreach ($this->combine as $combine) {
             $combineColumns = $combine['select']->getRawState(self::COLUMNS);
-            $aligned = array();
+            $aligned = [];
             foreach ($allColumns as $alias => $column) {
                 $aligned[$alias] = isset($combineColumns[$alias])
                     ? $combineColumns[$alias]
@@ -196,12 +201,12 @@ class Combine extends AbstractPreparableSql
      */
     public function getRawState($key = null)
     {
-        $rawState = array(
+        $rawState = [
             self::COMBINE => $this->combine,
             self::COLUMNS => $this->combine
                                 ? $this->combine[0]['select']->getRawState(self::COLUMNS)
-                                : array(),
-        );
+                                : [],
+        ];
         return (isset($key) && array_key_exists($key, $rawState)) ? $rawState[$key] : $rawState;
     }
 }

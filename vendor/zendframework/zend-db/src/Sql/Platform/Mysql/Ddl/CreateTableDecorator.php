@@ -3,7 +3,7 @@
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2016 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -23,7 +23,7 @@ class CreateTableDecorator extends CreateTable implements PlatformDecoratorInter
     /**
      * @var int[]
      */
-    protected $columnOptionSortOrder = array(
+    protected $columnOptionSortOrder = [
         'unsigned'      => 0,
         'zerofill'      => 1,
         'identity'      => 2,
@@ -33,12 +33,12 @@ class CreateTableDecorator extends CreateTable implements PlatformDecoratorInter
         'columnformat'  => 4,
         'format'        => 4,
         'storage'       => 5,
-    );
+    ];
 
     /**
      * @param CreateTable $subject
      *
-     * @return self
+     * @return self Provides a fluent interface
      */
     public function setSubject($subject)
     {
@@ -54,22 +54,22 @@ class CreateTableDecorator extends CreateTable implements PlatformDecoratorInter
     protected function getSqlInsertOffsets($sql)
     {
         $sqlLength   = strlen($sql);
-        $insertStart = array();
+        $insertStart = [];
 
-        foreach (array('NOT NULL', 'NULL', 'DEFAULT', 'UNIQUE', 'PRIMARY', 'REFERENCES') as $needle) {
+        foreach (['NOT NULL', 'NULL', 'DEFAULT', 'UNIQUE', 'PRIMARY', 'REFERENCES'] as $needle) {
             $insertPos = strpos($sql, ' ' . $needle);
 
             if ($insertPos !== false) {
                 switch ($needle) {
                     case 'REFERENCES':
-                        $insertStart[2] = !isset($insertStart[2]) ? $insertPos : $insertStart[2];
+                        $insertStart[2] = ! isset($insertStart[2]) ? $insertPos : $insertStart[2];
                         // no break
                     case 'PRIMARY':
                     case 'UNIQUE':
-                        $insertStart[1] = !isset($insertStart[1]) ? $insertPos : $insertStart[1];
+                        $insertStart[1] = ! isset($insertStart[1]) ? $insertPos : $insertStart[1];
                         // no break
                     default:
-                        $insertStart[0] = !isset($insertStart[0]) ? $insertPos : $insertStart[0];
+                        $insertStart[0] = ! isset($insertStart[0]) ? $insertPos : $insertStart[0];
                 }
             }
         }
@@ -90,14 +90,14 @@ class CreateTableDecorator extends CreateTable implements PlatformDecoratorInter
             return;
         }
 
-        $sqls = array();
+        $sqls = [];
 
         foreach ($this->columns as $i => $column) {
             $sql           = $this->processExpression($column, $platform);
             $insertStart   = $this->getSqlInsertOffsets($sql);
             $columnOptions = $column->getOptions();
 
-            uksort($columnOptions, array($this, 'compareColumnOptions'));
+            uksort($columnOptions, [$this, 'compareColumnOptions']);
 
             foreach ($columnOptions as $coName => $coValue) {
                 $insert = '';
@@ -149,7 +149,7 @@ class CreateTableDecorator extends CreateTable implements PlatformDecoratorInter
             $sqls[$i] = $sql;
         }
 
-        return array($sqls);
+        return [$sqls];
     }
 
     /**
@@ -159,18 +159,17 @@ class CreateTableDecorator extends CreateTable implements PlatformDecoratorInter
      */
     private function normalizeColumnOption($name)
     {
-        return strtolower(str_replace(array('-', '_', ' '), '', $name));
+        return strtolower(str_replace(['-', '_', ' '], '', $name));
     }
 
     /**
-     * @internal @private this method is only public for PHP 5.3 compatibility purposes.
      *
      * @param string $columnA
      * @param string $columnB
      *
      * @return int
      */
-    public function compareColumnOptions($columnA, $columnB)
+    private function compareColumnOptions($columnA, $columnB)
     {
         $columnA = $this->normalizeColumnOption($columnA);
         $columnA = isset($this->columnOptionSortOrder[$columnA])

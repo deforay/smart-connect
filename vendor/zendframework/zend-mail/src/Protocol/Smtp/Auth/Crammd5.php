@@ -1,10 +1,8 @@
 <?php
 /**
- * Zend Framework (http://framework.zend.com/)
- *
- * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
- * @license   http://framework.zend.com/license/new-bsd New BSD License
+ * @see       https://github.com/zendframework/zend-mail for the canonical source repository
+ * @copyright Copyright (c) 2005-2018 Zend Technologies USA Inc. (https://www.zend.com)
+ * @license   https://github.com/zendframework/zend-mail/blob/master/LICENSE.md New BSD License
  */
 
 namespace Zend\Mail\Protocol\Smtp\Auth;
@@ -74,7 +72,7 @@ class Crammd5 extends Smtp
         $this->_send('AUTH CRAM-MD5');
         $challenge = $this->_expect(334);
         $challenge = base64_decode($challenge);
-        $digest = $this->_hmacMd5($this->getPassword(), $challenge);
+        $digest = $this->hmacMd5($this->getPassword(), $challenge);
         $this->_send(base64_encode($this->getUsername() . ' ' . $digest));
         $this->_expect(235);
         $this->auth = true;
@@ -132,7 +130,7 @@ class Crammd5 extends Smtp
      * @param  int    $block Length of blocks (deprecated; unused)
      * @return string
      */
-    protected function _hmacMd5($key, $data, $block = 64)
+    protected function hmacMd5($key, $data, $block = 64)
     {
         return Hmac::compute($key, 'md5', $data);
     }

@@ -44,7 +44,7 @@ class Ldap extends AbstractAdapter
      * @param  string $identity   The username of the account being authenticated
      * @param  string $credential The password of the account being authenticated
      */
-    public function __construct(array $options = array(), $identity = null, $credential = null)
+    public function __construct(array $options = [], $identity = null, $credential = null)
     {
         $this->setOptions($options);
         if ($identity !== null) {
@@ -70,11 +70,11 @@ class Ldap extends AbstractAdapter
      * this adapter.
      *
      * @param  array $options The array of arrays of Zend\Ldap\Ldap options
-     * @return Ldap Provides a fluent interface
+     * @return self Provides a fluent interface
      */
     public function setOptions($options)
     {
-        $this->options = is_array($options) ? $options : array();
+        $this->options = is_array($options) ? $options : [];
         if (array_key_exists('identity', $this->options)) {
             $this->options['username'] = $this->options['identity'];
         }
@@ -99,7 +99,7 @@ class Ldap extends AbstractAdapter
      * Sets the username for binding
      *
      * @param  string $username The username for binding
-     * @return Ldap Provides a fluent interface
+     * @return self Provides a fluent interface
      */
     public function setUsername($username)
     {
@@ -121,7 +121,7 @@ class Ldap extends AbstractAdapter
      * Sets the password for the account
      *
      * @param  string $password The password of the account being authenticated
-     * @return Ldap Provides a fluent interface
+     * @return self Provides a fluent interface
      */
     public function setPassword($password)
     {
@@ -146,13 +146,13 @@ class Ldap extends AbstractAdapter
      * Set an Ldap connection
      *
      * @param  ZendLdap\Ldap $ldap An existing Ldap object
-     * @return Ldap Provides a fluent interface
+     * @return self Provides a fluent interface
      */
     public function setLdap(ZendLdap\Ldap $ldap)
     {
         $this->ldap = $ldap;
 
-        $this->setOptions(array($ldap->getOptions()));
+        $this->setOptions([$ldap->getOptions()]);
 
         return $this;
     }
@@ -167,7 +167,7 @@ class Ldap extends AbstractAdapter
     {
         $options = $this->getLdap()->getOptions();
         $name = $options['accountDomainName'];
-        if (!$name) {
+        if (! $name) {
             $name = $options['accountDomainNameShort'];
         }
 
@@ -182,19 +182,19 @@ class Ldap extends AbstractAdapter
      */
     public function authenticate()
     {
-        $messages = array();
+        $messages = [];
         $messages[0] = ''; // reserved
         $messages[1] = ''; // reserved
 
         $username = $this->identity;
         $password = $this->credential;
 
-        if (!$username) {
+        if (! $username) {
             $code = AuthenticationResult::FAILURE_IDENTITY_NOT_FOUND;
             $messages[0] = 'A username is required';
             return new AuthenticationResult($code, '', $messages);
         }
-        if (!$password) {
+        if (! $password) {
             /* A password is required because some servers will
              * treat an empty password as an anonymous bind.
              */
@@ -207,13 +207,13 @@ class Ldap extends AbstractAdapter
 
         $code = AuthenticationResult::FAILURE;
         $messages[0] = "Authority not found: $username";
-        $failedAuthorities = array();
+        $failedAuthorities = [];
 
         /* Iterate through each server and try to authenticate the supplied
          * credentials against it.
          */
         foreach ($this->options as $options) {
-            if (!is_array($options)) {
+            if (! is_array($options)) {
                 throw new Exception\InvalidArgumentException('Adapter options array not an array');
             }
             $adapterOptions = $this->prepareOptions($ldap, $options);
@@ -326,7 +326,7 @@ class Ldap extends AbstractAdapter
      */
     protected function prepareOptions(ZendLdap\Ldap $ldap, array $options)
     {
-        $adapterOptions = array(
+        $adapterOptions = [
             'group'       => null,
             'groupDn'     => $ldap->getBaseDn(),
             'groupScope'  => ZendLdap\Ldap::SEARCH_SCOPE_SUB,
@@ -334,7 +334,7 @@ class Ldap extends AbstractAdapter
             'groupFilter' => 'objectClass=groupOfUniqueNames',
             'memberAttr'  => 'uniqueMember',
             'memberIsDn'  => true
-        );
+        ];
         foreach ($adapterOptions as $key => $value) {
             if (array_key_exists($key, $options)) {
                 $value = $options[$key];
@@ -344,11 +344,11 @@ class Ldap extends AbstractAdapter
                         $value = (int) $value;
                         if (in_array(
                             $value,
-                            array(
+                            [
                                 ZendLdap\Ldap::SEARCH_SCOPE_BASE,
                                 ZendLdap\Ldap::SEARCH_SCOPE_ONE,
                                 ZendLdap\Ldap::SEARCH_SCOPE_SUB,
-                            ),
+                            ],
                             true
                         )) {
                             $adapterOptions[$key] = $value;
@@ -393,7 +393,7 @@ class Ldap extends AbstractAdapter
         $membership  = ZendLdap\Filter::equals($adapterOptions['memberAttr'], $user);
         $group       = ZendLdap\Filter::andFilter($groupName, $membership);
         $groupFilter = $adapterOptions['groupFilter'];
-        if (!empty($groupFilter)) {
+        if (! empty($groupFilter)) {
             $group = $group->addAnd($groupFilter);
         }
 
@@ -416,9 +416,9 @@ class Ldap extends AbstractAdapter
      * @param  array $omitAttribs
      * @return stdClass|bool
      */
-    public function getAccountObject(array $returnAttribs = array(), array $omitAttribs = array())
+    public function getAccountObject(array $returnAttribs = [], array $omitAttribs = [])
     {
-        if (!$this->authenticatedDn) {
+        if (! $this->authenticatedDn) {
             return false;
         }
 

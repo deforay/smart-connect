@@ -3,7 +3,7 @@
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2016 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -22,13 +22,13 @@ class Index extends AbstractIndex
     protected $lengths;
 
     /**
-     * @param  string $column
+     * @param  string|array|null $columns
      * @param  null|string $name
      * @param array $lengths
      */
-    public function __construct($column, $name = null, array $lengths = array())
+    public function __construct($columns, $name = null, array $lengths = [])
     {
-        $this->setColumns($column);
+        $this->setColumns($columns);
 
         $this->name    = null === $name ? null : (string) $name;
         $this->lengths = $lengths;
@@ -53,10 +53,10 @@ class Index extends AbstractIndex
     public function getExpressionData()
     {
         $colCount     = count($this->columns);
-        $values       = array();
+        $values       = [];
         $values[]     = $this->name ?: '';
-        $newSpecTypes = array(self::TYPE_IDENTIFIER);
-        $newSpecParts = array();
+        $newSpecTypes = [self::TYPE_IDENTIFIER];
+        $newSpecParts = [];
 
         for ($i = 0; $i < $colCount; $i++) {
             $specPart = '%s';
@@ -71,10 +71,10 @@ class Index extends AbstractIndex
 
         $newSpec = str_replace('...', implode(', ', $newSpecParts), $this->specification);
 
-        return array(array(
+        return [[
             $newSpec,
             array_merge($values, $this->columns),
             $newSpecTypes,
-        ));
+        ]];
     }
 }

@@ -3,7 +3,7 @@
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2016 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -31,12 +31,12 @@ class Column implements ColumnInterface
     /**
      * @var array
      */
-    protected $options = array();
+    protected $options = [];
 
     /**
      * @var ConstraintInterface[]
      */
-    protected $constraints = array();
+    protected $constraints = [];
 
     /**
      * @var string
@@ -54,7 +54,7 @@ class Column implements ColumnInterface
      * @param mixed|null  $default
      * @param mixed[]     $options
      */
-    public function __construct($name = null, $nullable = false, $default = null, array $options = array())
+    public function __construct($name = null, $nullable = false, $default = null, array $options = [])
     {
         $this->setName($name);
         $this->setNullable($nullable);
@@ -64,7 +64,7 @@ class Column implements ColumnInterface
 
     /**
      * @param  string $name
-     * @return self
+     * @return self Provides a fluent interface
      */
     public function setName($name)
     {
@@ -82,7 +82,7 @@ class Column implements ColumnInterface
 
     /**
      * @param  bool $nullable
-     * @return self
+     * @return self Provides a fluent interface
      */
     public function setNullable($nullable)
     {
@@ -100,7 +100,7 @@ class Column implements ColumnInterface
 
     /**
      * @param  null|string|int $default
-     * @return self
+     * @return self Provides a fluent interface
      */
     public function setDefault($default)
     {
@@ -118,7 +118,7 @@ class Column implements ColumnInterface
 
     /**
      * @param  array $options
-     * @return self
+     * @return self Provides a fluent interface
      */
     public function setOptions(array $options)
     {
@@ -129,7 +129,7 @@ class Column implements ColumnInterface
     /**
      * @param  string $name
      * @param  string $value
-     * @return self
+     * @return self Provides a fluent interface
      */
     public function setOption($name, $value)
     {
@@ -148,7 +148,7 @@ class Column implements ColumnInterface
     /**
      * @param ConstraintInterface $constraint
      *
-     * @return self
+     * @return self Provides a fluent interface
      */
     public function addConstraint(ConstraintInterface $constraint)
     {
@@ -164,13 +164,13 @@ class Column implements ColumnInterface
     {
         $spec = $this->specification;
 
-        $params   = array();
+        $params   = [];
         $params[] = $this->name;
         $params[] = $this->type;
 
-        $types = array(self::TYPE_IDENTIFIER, self::TYPE_LITERAL);
+        $types = [self::TYPE_IDENTIFIER, self::TYPE_LITERAL];
 
-        if (!$this->isNullable) {
+        if (! $this->isNullable) {
             $spec .= ' NOT NULL';
         }
 
@@ -180,11 +180,11 @@ class Column implements ColumnInterface
             $types[]  = self::TYPE_VALUE;
         }
 
-        $data = array(array(
+        $data = [[
             $spec,
             $params,
             $types,
-        ));
+        ]];
 
         foreach ($this->constraints as $constraint) {
             $data[] = ' ';

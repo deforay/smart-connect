@@ -3,7 +3,7 @@
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2016 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -14,12 +14,13 @@ use Zend\Db\ResultSet\ResultSet;
 use Zend\Db\ResultSet\ResultSetInterface;
 use Zend\Db\Sql\Delete;
 use Zend\Db\Sql\Insert;
+use Zend\Db\Sql\Join;
 use Zend\Db\Sql\Select;
 use Zend\Db\Sql\Sql;
 use Zend\Db\Sql\TableIdentifier;
 use Zend\Db\Sql\Update;
 use Zend\Db\Sql\Where;
-use Zend\Db\TableGateway\Feature\EventFeature;
+use Zend\Db\TableGateway\Feature\EventFeatureEventsInterface;
 
 /**
  *
@@ -47,7 +48,7 @@ abstract class AbstractTableGateway implements TableGatewayInterface
     /**
      * @var array
      */
-    protected $columns = array();
+    protected $columns = [];
 
     /**
      * @var Feature\FeatureSet
@@ -90,30 +91,30 @@ abstract class AbstractTableGateway implements TableGatewayInterface
             return;
         }
 
-        if (!$this->featureSet instanceof Feature\FeatureSet) {
+        if (! $this->featureSet instanceof Feature\FeatureSet) {
             $this->featureSet = new Feature\FeatureSet;
         }
 
         $this->featureSet->setTableGateway($this);
-        $this->featureSet->apply(EventFeature::EVENT_PRE_INITIALIZE, array());
+        $this->featureSet->apply(EventFeatureEventsInterface::EVENT_PRE_INITIALIZE, []);
 
-        if (!$this->adapter instanceof AdapterInterface) {
+        if (! $this->adapter instanceof AdapterInterface) {
             throw new Exception\RuntimeException('This table does not have an Adapter setup');
         }
 
-        if (!is_string($this->table) && !$this->table instanceof TableIdentifier && !is_array($this->table)) {
+        if (! is_string($this->table) && ! $this->table instanceof TableIdentifier && ! is_array($this->table)) {
             throw new Exception\RuntimeException('This table object does not have a valid table set.');
         }
 
-        if (!$this->resultSetPrototype instanceof ResultSetInterface) {
+        if (! $this->resultSetPrototype instanceof ResultSetInterface) {
             $this->resultSetPrototype = new ResultSet;
         }
 
-        if (!$this->sql instanceof Sql) {
+        if (! $this->sql instanceof Sql) {
             $this->sql = new Sql($this->adapter, $this->table);
         }
 
-        $this->featureSet->apply(EventFeature::EVENT_POST_INITIALIZE, array());
+        $this->featureSet->apply(EventFeatureEventsInterface::EVENT_POST_INITIALIZE, []);
 
         $this->isInitialized = true;
     }
@@ -157,7 +158,7 @@ abstract class AbstractTableGateway implements TableGatewayInterface
     /**
      * Get select result prototype
      *
-     * @return ResultSet
+     * @return ResultSetInterface
      */
     public function getResultSetPrototype()
     {
@@ -176,11 +177,11 @@ abstract class AbstractTableGateway implements TableGatewayInterface
      * Select
      *
      * @param Where|\Closure|string|array $where
-     * @return ResultSet
+     * @return ResultSetInterface
      */
     public function select($where = null)
     {
-        if (!$this->isInitialized) {
+        if (! $this->isInitialized) {
             $this->initialize();
         }
 
@@ -197,12 +198,11 @@ abstract class AbstractTableGateway implements TableGatewayInterface
 
     /**
      * @param Select $select
-     * @return null|ResultSetInterface
-     * @throws \RuntimeException
+     * @return ResultSetInterface
      */
     public function selectWith(Select $select)
     {
-        if (!$this->isInitialized) {
+        if (! $this->isInitialized) {
             $this->initialize();
         }
         return $this->executeSelect($select);
@@ -210,28 +210,30 @@ abstract class AbstractTableGateway implements TableGatewayInterface
 
     /**
      * @param Select $select
-     * @return ResultSet
+     * @return ResultSetInterface
      * @throws Exception\RuntimeException
      */
     protected function executeSelect(Select $select)
     {
         $selectState = $select->getRawState();
-        if ($selectState['table'] != $this->table
+        if (isset($selectState['table'])
+            && $selectState['table'] != $this->table
             && (is_array($selectState['table'])
                 && end($selectState['table']) != $this->table)
         ) {
             throw new Exception\RuntimeException(
-                'The table name of the provided select object must match that of the table'
+                'The table name of the provided Select object must match that of the table'
             );
         }
 
-        if ($selectState['columns'] == array(Select::SQL_STAR)
-            && $this->columns !== array()) {
+        if (isset($selectState['columns'])
+            && $selectState['columns'] == [Select::SQL_STAR]
+            && $this->columns !== []) {
             $select->columns($this->columns);
         }
 
         // apply preSelect features
-        $this->featureSet->apply(EventFeature::EVENT_PRE_SELECT, array($select));
+        $this->featureSet->apply(EventFeatureEventsInterface::EVENT_PRE_SELECT, [$select]);
 
         // prepare and execute
         $statement = $this->sql->prepareStatementForSqlObject($select);
@@ -242,7 +244,7 @@ abstract class AbstractTableGateway implements TableGatewayInterface
         $resultSet->initialize($result);
 
         // apply postSelect features
-        $this->featureSet->apply(EventFeature::EVENT_POST_SELECT, array($statement, $result, $resultSet));
+        $this->featureSet->apply(EventFeatureEventsInterface::EVENT_POST_SELECT, [$statement, $result, $resultSet]);
 
         return $resultSet;
     }
@@ -255,7 +257,7 @@ abstract class AbstractTableGateway implements TableGatewayInterface
      */
     public function insert($set)
     {
-        if (!$this->isInitialized) {
+        if (! $this->isInitialized) {
             $this->initialize();
         }
         $insert = $this->sql->insert();
@@ -265,11 +267,11 @@ abstract class AbstractTableGateway implements TableGatewayInterface
 
     /**
      * @param Insert $insert
-     * @return mixed
+     * @return int
      */
     public function insertWith(Insert $insert)
     {
-        if (!$this->isInitialized) {
+        if (! $this->isInitialized) {
             $this->initialize();
         }
         return $this->executeInsert($insert);
@@ -279,7 +281,7 @@ abstract class AbstractTableGateway implements TableGatewayInterface
      * @todo add $columns support
      *
      * @param Insert $insert
-     * @return mixed
+     * @return int
      * @throws Exception\RuntimeException
      */
     protected function executeInsert(Insert $insert)
@@ -292,7 +294,7 @@ abstract class AbstractTableGateway implements TableGatewayInterface
         }
 
         // apply preInsert features
-        $this->featureSet->apply(EventFeature::EVENT_PRE_INSERT, array($insert));
+        $this->featureSet->apply(EventFeatureEventsInterface::EVENT_PRE_INSERT, [$insert]);
 
         // Most RDBMS solutions do not allow using table aliases in INSERTs
         // See https://github.com/zendframework/zf2/issues/7311
@@ -308,15 +310,14 @@ abstract class AbstractTableGateway implements TableGatewayInterface
         $this->lastInsertValue = $this->adapter->getDriver()->getConnection()->getLastGeneratedValue();
 
         // apply postInsert features
-        $this->featureSet->apply(EventFeature::EVENT_POST_INSERT, array($statement, $result));
+        $this->featureSet->apply(EventFeatureEventsInterface::EVENT_POST_INSERT, [$statement, $result]);
 
         // Reset original table information in Insert instance, if necessary
         if ($unaliasedTable) {
             $insert->into($insertState['table']);
         }
 
-        $return = $result->getAffectedRows();
-        return $return;
+        return $result->getAffectedRows();
     }
 
     /**
@@ -324,11 +325,12 @@ abstract class AbstractTableGateway implements TableGatewayInterface
      *
      * @param  array $set
      * @param  string|array|\Closure $where
+     * @param  null|array $joins
      * @return int
      */
-    public function update($set, $where = null)
+    public function update($set, $where = null, array $joins = null)
     {
-        if (!$this->isInitialized) {
+        if (! $this->isInitialized) {
             $this->initialize();
         }
         $sql = $this->sql;
@@ -337,16 +339,24 @@ abstract class AbstractTableGateway implements TableGatewayInterface
         if ($where !== null) {
             $update->where($where);
         }
+
+        if ($joins) {
+            foreach ($joins as $join) {
+                $type = isset($join['type']) ? $join['type'] : Join::JOIN_INNER;
+                $update->join($join['name'], $join['on'], $type);
+            }
+        }
+
         return $this->executeUpdate($update);
     }
 
     /**
      * @param \Zend\Db\Sql\Update $update
-     * @return mixed
+     * @return int
      */
     public function updateWith(Update $update)
     {
-        if (!$this->isInitialized) {
+        if (! $this->isInitialized) {
             $this->initialize();
         }
         return $this->executeUpdate($update);
@@ -356,7 +366,7 @@ abstract class AbstractTableGateway implements TableGatewayInterface
      * @todo add $columns support
      *
      * @param Update $update
-     * @return mixed
+     * @return int
      * @throws Exception\RuntimeException
      */
     protected function executeUpdate(Update $update)
@@ -369,13 +379,25 @@ abstract class AbstractTableGateway implements TableGatewayInterface
         }
 
         // apply preUpdate features
-        $this->featureSet->apply(EventFeature::EVENT_PRE_UPDATE, array($update));
+        $this->featureSet->apply(EventFeatureEventsInterface::EVENT_PRE_UPDATE, [$update]);
+
+        $unaliasedTable = false;
+        if (is_array($updateState['table'])) {
+            $tableData      = array_values($updateState['table']);
+            $unaliasedTable = array_shift($tableData);
+            $update->table($unaliasedTable);
+        }
 
         $statement = $this->sql->prepareStatementForSqlObject($update);
         $result = $statement->execute();
 
         // apply postUpdate features
-        $this->featureSet->apply(EventFeature::EVENT_POST_UPDATE, array($statement, $result));
+        $this->featureSet->apply(EventFeatureEventsInterface::EVENT_POST_UPDATE, [$statement, $result]);
+
+        // Reset original table information in Update instance, if necessary
+        if ($unaliasedTable) {
+            $update->table($updateState['table']);
+        }
 
         return $result->getAffectedRows();
     }
@@ -388,7 +410,7 @@ abstract class AbstractTableGateway implements TableGatewayInterface
      */
     public function delete($where)
     {
-        if (!$this->isInitialized) {
+        if (! $this->isInitialized) {
             $this->initialize();
         }
         $delete = $this->sql->delete();
@@ -402,7 +424,7 @@ abstract class AbstractTableGateway implements TableGatewayInterface
 
     /**
      * @param Delete $delete
-     * @return mixed
+     * @return int
      */
     public function deleteWith(Delete $delete)
     {
@@ -414,7 +436,7 @@ abstract class AbstractTableGateway implements TableGatewayInterface
      * @todo add $columns support
      *
      * @param Delete $delete
-     * @return mixed
+     * @return int
      * @throws Exception\RuntimeException
      */
     protected function executeDelete(Delete $delete)
@@ -422,18 +444,30 @@ abstract class AbstractTableGateway implements TableGatewayInterface
         $deleteState = $delete->getRawState();
         if ($deleteState['table'] != $this->table) {
             throw new Exception\RuntimeException(
-                'The table name of the provided Update object must match that of the table'
+                'The table name of the provided Delete object must match that of the table'
             );
         }
 
         // pre delete update
-        $this->featureSet->apply(EventFeature::EVENT_PRE_DELETE, array($delete));
+        $this->featureSet->apply(EventFeatureEventsInterface::EVENT_PRE_DELETE, [$delete]);
+
+        $unaliasedTable = false;
+        if (is_array($deleteState['table'])) {
+            $tableData      = array_values($deleteState['table']);
+            $unaliasedTable = array_shift($tableData);
+            $delete->from($unaliasedTable);
+        }
 
         $statement = $this->sql->prepareStatementForSqlObject($delete);
         $result = $statement->execute();
 
         // apply postDelete features
-        $this->featureSet->apply(EventFeature::EVENT_POST_DELETE, array($statement, $result));
+        $this->featureSet->apply(EventFeatureEventsInterface::EVENT_POST_DELETE, [$statement, $result]);
+
+        // Reset original table information in Delete instance, if necessary
+        if ($unaliasedTable) {
+            $delete->from($deleteState['table']);
+        }
 
         return $result->getAffectedRows();
     }
@@ -512,8 +546,7 @@ abstract class AbstractTableGateway implements TableGatewayInterface
         $this->sql = clone $this->sql;
         if (is_object($this->table)) {
             $this->table = clone $this->table;
-        } elseif (
-            is_array($this->table)
+        } elseif (is_array($this->table)
             && count($this->table) == 1
             && is_object(reset($this->table))
         ) {

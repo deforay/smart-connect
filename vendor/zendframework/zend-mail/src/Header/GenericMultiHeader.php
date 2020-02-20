@@ -1,10 +1,8 @@
 <?php
 /**
- * Zend Framework (http://framework.zend.com/)
- *
- * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
- * @license   http://framework.zend.com/license/new-bsd New BSD License
+ * @see       https://github.com/zendframework/zend-mail for the canonical source repository
+ * @copyright Copyright (c) 2005-2018 Zend Technologies USA Inc. (https://www.zend.com)
+ * @license   https://github.com/zendframework/zend-mail/blob/master/LICENSE.md New BSD License
  */
 
 namespace Zend\Mail\Header;
@@ -20,7 +18,7 @@ class GenericMultiHeader extends GenericHeader implements MultipleHeadersInterfa
         $fieldValue = HeaderWrap::mimeDecodeValue($fieldValue);
 
         if (strpos($fieldValue, ',')) {
-            $headers = array();
+            $headers = [];
             foreach (explode(',', $fieldValue) as $multiValue) {
                 $headers[] = new static($fieldName, $multiValue);
             }
@@ -40,7 +38,7 @@ class GenericMultiHeader extends GenericHeader implements MultipleHeadersInterfa
     public function toStringMultipleHeaders(array $headers)
     {
         $name   = $this->getFieldName();
-        $values = array($this->getFieldValue(HeaderInterface::FORMAT_ENCODED));
+        $values = [$this->getFieldValue(HeaderInterface::FORMAT_ENCODED)];
 
         foreach ($headers as $header) {
             if (! $header instanceof static) {

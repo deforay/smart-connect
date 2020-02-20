@@ -3,7 +3,7 @@
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2016 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -17,7 +17,7 @@ abstract class AbstractConnection implements ConnectionInterface, ProfilerAwareI
     /**
      * @var array
      */
-    protected $connectionParameters = array();
+    protected $connectionParameters = [];
 
     /**
      * @var string|null
@@ -93,7 +93,7 @@ abstract class AbstractConnection implements ConnectionInterface, ProfilerAwareI
      */
     public function getResource()
     {
-        if (!$this->isConnected()) {
+        if (! $this->isConnected()) {
             $this->connect();
         }
 
@@ -112,7 +112,7 @@ abstract class AbstractConnection implements ConnectionInterface, ProfilerAwareI
 
     /**
      * @param  array $connectionParameters
-     * @return self
+     * @return self Provides a fluent interface
      */
     public function setConnectionParameters(array $connectionParameters)
     {
@@ -124,7 +124,7 @@ abstract class AbstractConnection implements ConnectionInterface, ProfilerAwareI
     /**
      * {@inheritDoc}
      *
-     * @return self
+     * @return self Provides a fluent interface
      */
     public function setProfiler(ProfilerInterface $profiler)
     {

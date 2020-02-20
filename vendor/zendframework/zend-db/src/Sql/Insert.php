@@ -3,19 +3,20 @@
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2016 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
 namespace Zend\Db\Sql;
 
+use Zend\Db\Adapter\Driver\DriverInterface;
+use Zend\Db\Adapter\Driver\Pdo\Pdo;
 use Zend\Db\Adapter\ParameterContainer;
 use Zend\Db\Adapter\Platform\PlatformInterface;
-use Zend\Db\Adapter\Driver\DriverInterface;
 
 class Insert extends AbstractPreparableSql
 {
-    /**#@+
+    /**
      * Constants
      *
      * @const
@@ -29,16 +30,16 @@ class Insert extends AbstractPreparableSql
     /**
      * @var array Specification array
      */
-    protected $specifications = array(
+    protected $specifications = [
         self::SPECIFICATION_INSERT => 'INSERT INTO %1$s (%2$s) VALUES (%3$s)',
         self::SPECIFICATION_SELECT => 'INSERT INTO %1$s %2$s %3$s',
-    );
+    ];
 
     /**
      * @var string|TableIdentifier
      */
     protected $table            = null;
-    protected $columns          = array();
+    protected $columns          = [];
 
     /**
      * @var array|Select
@@ -61,7 +62,7 @@ class Insert extends AbstractPreparableSql
      * Create INTO clause
      *
      * @param  string|TableIdentifier $table
-     * @return Insert
+     * @return self Provides a fluent interface
      */
     public function into($table)
     {
@@ -73,7 +74,7 @@ class Insert extends AbstractPreparableSql
      * Specify columns
      *
      * @param  array $columns
-     * @return Insert
+     * @return self Provides a fluent interface
      */
     public function columns(array $columns)
     {
@@ -86,8 +87,8 @@ class Insert extends AbstractPreparableSql
      *
      * @param  array|Select $values
      * @param  string $flag one of VALUES_MERGE or VALUES_SET; defaults to VALUES_SET
+     * @return self Provides a fluent interface
      * @throws Exception\InvalidArgumentException
-     * @return Insert
      */
     public function values($values, $flag = self::VALUES_SET)
     {
@@ -101,25 +102,42 @@ class Insert extends AbstractPreparableSql
             return $this;
         }
 
-        if (!is_array($values)) {
+        if (! is_array($values)) {
             throw new Exception\InvalidArgumentException(
                 'values() expects an array of values or Zend\Db\Sql\Select instance'
             );
         }
+
         if ($this->select && $flag == self::VALUES_MERGE) {
             throw new Exception\InvalidArgumentException(
-                'An array of values cannot be provided with the merge flag when a Zend\Db\Sql\Select instance already exists as the value source'
+                'An array of values cannot be provided with the merge flag when a Zend\Db\Sql\Select instance already '
+                . 'exists as the value source'
             );
         }
 
         if ($flag == self::VALUES_SET) {
-            $this->columns = $values;
+            $this->columns = $this->isAssocativeArray($values)
+                ? $values
+                : array_combine(array_keys($this->columns), array_values($values));
         } else {
-            foreach ($values as $column=>$value) {
+            foreach ($values as $column => $value) {
                 $this->columns[$column] = $value;
             }
         }
         return $this;
+    }
+
+
+    /**
+     * Simple test for an associative array
+     *
+     * @link http://stackoverflow.com/questions/173400/how-to-check-if-php-array-is-associative-or-sequential
+     * @param array $array
+     * @return bool
+     */
+    private function isAssocativeArray(array $array)
+    {
+        return array_keys($array) !== range(0, count($array) - 1);
     }
 
     /**
@@ -141,28 +159,38 @@ class Insert extends AbstractPreparableSql
      */
     public function getRawState($key = null)
     {
-        $rawState = array(
+        $rawState = [
             'table' => $this->table,
             'columns' => array_keys($this->columns),
             'values' => array_values($this->columns)
-        );
+        ];
         return (isset($key) && array_key_exists($key, $rawState)) ? $rawState[$key] : $rawState;
     }
 
-    protected function processInsert(PlatformInterface $platform, DriverInterface $driver = null, ParameterContainer $parameterContainer = null)
-    {
+    protected function processInsert(
+        PlatformInterface $platform,
+        DriverInterface $driver = null,
+        ParameterContainer $parameterContainer = null
+    ) {
         if ($this->select) {
             return;
         }
-        if (!$this->columns) {
+        if (! $this->columns) {
             throw new Exception\InvalidArgumentException('values or select should be present');
         }
 
-        $columns = array();
-        $values  = array();
-        foreach ($this->columns as $column=>$value) {
+        $columns = [];
+        $values  = [];
+        $i       = 0;
+
+        foreach ($this->columns as $column => $value) {
             $columns[] = $platform->quoteIdentifier($column);
             if (is_scalar($value) && $parameterContainer) {
+                // use incremental value instead of column name for PDO
+                // @see https://github.com/zendframework/zend-db/issues/35
+                if ($driver instanceof Pdo) {
+                    $column = 'c_' . $i++;
+                }
                 $values[] = $driver->formatParameterName($column);
                 $parameterContainer->offsetSet($column, $value);
             } else {
@@ -182,14 +210,17 @@ class Insert extends AbstractPreparableSql
         );
     }
 
-    protected function processSelect(PlatformInterface $platform, DriverInterface $driver = null, ParameterContainer $parameterContainer = null)
-    {
-        if (!$this->select) {
+    protected function processSelect(
+        PlatformInterface $platform,
+        DriverInterface $driver = null,
+        ParameterContainer $parameterContainer = null
+    ) {
+        if (! $this->select) {
             return;
         }
         $selectSql = $this->processSubSelect($this->select, $platform, $driver, $parameterContainer);
 
-        $columns = array_map(array($platform, 'quoteIdentifier'), array_keys($this->columns));
+        $columns = array_map([$platform, 'quoteIdentifier'], array_keys($this->columns));
         $columns = implode(', ', $columns);
 
         return sprintf(
@@ -207,7 +238,7 @@ class Insert extends AbstractPreparableSql
      *
      * @param  string $name
      * @param  mixed $value
-     * @return Insert
+     * @return self Provides a fluent interface
      */
     public function __set($name, $value)
     {
@@ -226,8 +257,10 @@ class Insert extends AbstractPreparableSql
      */
     public function __unset($name)
     {
-        if (!isset($this->columns[$name])) {
-            throw new Exception\InvalidArgumentException('The key ' . $name . ' was not found in this objects column list');
+        if (! array_key_exists($name, $this->columns)) {
+            throw new Exception\InvalidArgumentException(
+                'The key ' . $name . ' was not found in this objects column list'
+            );
         }
 
         unset($this->columns[$name]);
@@ -243,7 +276,7 @@ class Insert extends AbstractPreparableSql
      */
     public function __isset($name)
     {
-        return isset($this->columns[$name]);
+        return array_key_exists($name, $this->columns);
     }
 
     /**
@@ -257,8 +290,10 @@ class Insert extends AbstractPreparableSql
      */
     public function __get($name)
     {
-        if (!isset($this->columns[$name])) {
-            throw new Exception\InvalidArgumentException('The key ' . $name . ' was not found in this objects column list');
+        if (! array_key_exists($name, $this->columns)) {
+            throw new Exception\InvalidArgumentException(
+                'The key ' . $name . ' was not found in this objects column list'
+            );
         }
         return $this->columns[$name];
     }

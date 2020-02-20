@@ -1,10 +1,8 @@
 <?php
 /**
- * Zend Framework (http://framework.zend.com/)
- *
- * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
- * @license   http://framework.zend.com/license/new-bsd New BSD License
+ * @see       https://github.com/zendframework/zend-barcode for the canonical source repository
+ * @copyright Copyright (c) 2005-2019 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   https://github.com/zendframework/zend-barcode/blob/master/LICENSE.md New BSD License
  */
 
 namespace Zend\Barcode\Object;
@@ -51,9 +49,9 @@ class Error extends AbstractObject
      */
     public function draw()
     {
-        $this->instructions = array();
-        $this->addText('ERROR:', 10, array(5, 18), $this->font, 0, 'left');
-        $this->addText($this->text, 10, array(5, 32), $this->font, 0, 'left');
+        $this->instructions = [];
+        $this->addText('ERROR:', 10, [5, 18], $this->font, 0, 'left');
+        $this->addText($this->text, 10, [5, 32], $this->font, 0, 'left');
         return $this->instructions;
     }
 

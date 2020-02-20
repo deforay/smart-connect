@@ -47,7 +47,7 @@ class Http extends XmlRpcRequest
         ErrorHandler::start();
         $xml = file_get_contents('php://input');
         ErrorHandler::stop();
-        if (!$xml) {
+        if (! $xml) {
             $this->fault = new Fault(630);
             return;
         }
@@ -77,7 +77,7 @@ class Http extends XmlRpcRequest
     public function getHeaders()
     {
         if (null === $this->headers) {
-            $this->headers = array();
+            $this->headers = [];
             foreach ($_SERVER as $key => $value) {
                 if ('HTTP_' == substr($key, 0, 5)) {
                     $header = str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($key, 5)))));

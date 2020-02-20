@@ -3,7 +3,7 @@
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2016 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -22,7 +22,7 @@ class CreateTableDecorator extends CreateTable implements PlatformDecoratorInter
 
     /**
      * @param CreateTable $subject
-     * @return self
+     * @return self Provides a fluent interface
      */
     public function setSubject($subject)
     {
@@ -37,9 +37,9 @@ class CreateTableDecorator extends CreateTable implements PlatformDecoratorInter
     protected function processTable(PlatformInterface $adapterPlatform = null)
     {
         $table = ($this->isTemporary ? '#' : '') . ltrim($this->table, '#');
-        return array(
+        return [
             '',
             $adapterPlatform->quoteIdentifier($table),
-        );
+        ];
     }
 }

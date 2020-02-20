@@ -1,10 +1,8 @@
 <?php
 /**
- * Zend Framework (http://framework.zend.com/)
- *
- * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
- * @license   http://framework.zend.com/license/new-bsd New BSD License
+ * @see       https://github.com/zendframework/zend-mail for the canonical source repository
+ * @copyright Copyright (c) 2005-2018 Zend Technologies USA Inc. (https://www.zend.com)
+ * @license   https://github.com/zendframework/zend-mail/blob/master/LICENSE.md New BSD License
  */
 
 namespace Zend\Mail\Protocol;
@@ -12,7 +10,8 @@ namespace Zend\Mail\Protocol;
 use Zend\Validator;
 
 /**
- * Provides low-level methods for concrete adapters to communicate with a remote mail server and track requests and responses.
+ * Provides low-level methods for concrete adapters to communicate with a
+ * remote mail server and track requests and responses.
  *
  * @todo Implement proxy settings
  */
@@ -74,7 +73,7 @@ abstract class AbstractProtocol
      * Log of mail requests and server responses for a session
      * @var array
      */
-    private $log = array();
+    private $log = [];
 
     /**
      * Constructor.
@@ -88,7 +87,7 @@ abstract class AbstractProtocol
         $this->validHost = new Validator\ValidatorChain();
         $this->validHost->attach(new Validator\Hostname(Validator\Hostname::ALLOW_ALL));
 
-        if (!$this->validHost->isValid($host)) {
+        if (! $this->validHost->isValid($host)) {
             throw new Exception\RuntimeException(implode(', ', $this->validHost->getMessages()));
         }
 
@@ -128,7 +127,8 @@ abstract class AbstractProtocol
     /**
      * Create a connection to the remote host
      *
-     * Concrete adapters for this class will implement their own unique connect scripts, using the _connect() method to create the socket resource.
+     * Concrete adapters for this class will implement their own unique connect
+     * scripts, using the _connect() method to create the socket resource.
      */
     abstract public function connect();
 
@@ -168,9 +168,10 @@ abstract class AbstractProtocol
      */
     public function resetLog()
     {
-        $this->log = array();
+        $this->log = [];
     }
 
+    // @codingStandardsIgnoreStart
     /**
      * Add the transaction log
      *
@@ -178,6 +179,7 @@ abstract class AbstractProtocol
      */
     protected function _addLog($value)
     {
+        // @codingStandardsIgnoreEnd
         if ($this->maximumLog >= 0 && count($this->log) >= $this->maximumLog) {
             array_shift($this->log);
         }
@@ -185,6 +187,7 @@ abstract class AbstractProtocol
         $this->log[] = $value;
     }
 
+    // @codingStandardsIgnoreStart
     /**
      * Connect to the server using the supplied transport and target
      *
@@ -196,11 +199,19 @@ abstract class AbstractProtocol
      */
     protected function _connect($remote)
     {
+        // @codingStandardsIgnoreEnd
         $errorNum = 0;
         $errorStr = '';
 
         // open connection
-        $this->socket = @stream_socket_client($remote, $errorNum, $errorStr, self::TIMEOUT_CONNECTION);
+        set_error_handler(
+            function ($error, $message = '') {
+                throw new Exception\RuntimeException(sprintf('Could not open socket: %s', $message), $error);
+            },
+            E_WARNING
+        );
+        $this->socket = stream_socket_client($remote, $errorNum, $errorStr, self::TIMEOUT_CONNECTION);
+        restore_error_handler();
 
         if ($this->socket === false) {
             if ($errorNum == 0) {
@@ -216,17 +227,20 @@ abstract class AbstractProtocol
         return $result;
     }
 
+    // @codingStandardsIgnoreStart
     /**
      * Disconnect from remote host and free resource
      *
      */
     protected function _disconnect()
     {
+        // @codingStandardsIgnoreEnd
         if (is_resource($this->socket)) {
             fclose($this->socket);
         }
     }
 
+    // @codingStandardsIgnoreStart
     /**
      * Send the given request followed by a LINEEND to the server.
      *
@@ -236,7 +250,8 @@ abstract class AbstractProtocol
      */
     protected function _send($request)
     {
-        if (!is_resource($this->socket)) {
+        // @codingStandardsIgnoreEnd
+        if (! is_resource($this->socket)) {
             throw new Exception\RuntimeException('No connection has been established to ' . $this->host);
         }
 
@@ -254,6 +269,7 @@ abstract class AbstractProtocol
         return $result;
     }
 
+    // @codingStandardsIgnoreStart
     /**
      * Get a line from the stream.
      *
@@ -263,7 +279,8 @@ abstract class AbstractProtocol
      */
     protected function _receive($timeout = null)
     {
-        if (!is_resource($this->socket)) {
+        // @codingStandardsIgnoreEnd
+        if (! is_resource($this->socket)) {
             throw new Exception\RuntimeException('No connection has been established to ' . $this->host);
         }
 
@@ -281,7 +298,7 @@ abstract class AbstractProtocol
         // Check meta data to ensure connection is still valid
         $info = stream_get_meta_data($this->socket);
 
-        if (!empty($info['timed_out'])) {
+        if (! empty($info['timed_out'])) {
             throw new Exception\RuntimeException($this->host . ' has timed out');
         }
 
@@ -292,6 +309,7 @@ abstract class AbstractProtocol
         return $response;
     }
 
+    // @codingStandardsIgnoreStart
     /**
      * Parse server response for successful codes
      *
@@ -305,11 +323,12 @@ abstract class AbstractProtocol
      */
     protected function _expect($code, $timeout = null)
     {
-        $this->response = array();
+        // @codingStandardsIgnoreEnd
+        $this->response = [];
         $errMsg = '';
 
-        if (!is_array($code)) {
-            $code = array($code);
+        if (! is_array($code)) {
+            $code = [$code];
         }
 
         do {
@@ -318,10 +337,12 @@ abstract class AbstractProtocol
 
             if ($errMsg !== '') {
                 $errMsg .= ' ' . $msg;
-            } elseif ($cmd === null || !in_array($cmd, $code)) {
-                $errMsg =  $msg;
+            } elseif ($cmd === null || ! in_array($cmd, $code)) {
+                $errMsg = $msg;
             }
-        } while (strpos($more, '-') === 0); // The '-' message prefix indicates an information string instead of a response string.
+
+        // The '-' message prefix indicates an information string instead of a response string.
+        } while (strpos($more, '-') === 0);
 
         if ($errMsg !== '') {
             throw new Exception\RuntimeException($errMsg);

@@ -1,10 +1,8 @@
 <?php
 /**
- * Zend Framework (http://framework.zend.com/)
- *
- * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
- * @license   http://framework.zend.com/license/new-bsd New BSD License
+ * @see       https://github.com/zendframework/zend-barcode for the canonical source repository
+ * @copyright Copyright (c) 2005-2019 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   https://github.com/zendframework/zend-barcode/blob/master/LICENSE.md New BSD License
  */
 
 namespace Zend\Barcode\Object;
@@ -20,7 +18,7 @@ class Code25 extends AbstractObject
      * - 1 = wide bar
      * @var array
      */
-    protected $codingMap = array(
+    protected $codingMap = [
         '0' => '00110',
         '1' => '10001',
         '2' => '01001',
@@ -31,7 +29,7 @@ class Code25 extends AbstractObject
         '7' => '00011',
         '8' => '10010',
         '9' => '01010',
-    );
+    ];
 
     /**
      * Width of the barcode (in pixels)
@@ -63,15 +61,15 @@ class Code25 extends AbstractObject
      */
     protected function prepareBarcode()
     {
-        $barcodeTable = array();
+        $barcodeTable = [];
 
         // Start character (30301)
-        $barcodeTable[] = array(1, $this->barThickWidth, 0, 1);
-        $barcodeTable[] = array(0, $this->barThinWidth, 0, 1);
-        $barcodeTable[] = array(1, $this->barThickWidth, 0, 1);
-        $barcodeTable[] = array(0, $this->barThinWidth, 0, 1);
-        $barcodeTable[] = array(1, $this->barThinWidth, 0, 1);
-        $barcodeTable[] = array(0, $this->barThinWidth);
+        $barcodeTable[] = [1, $this->barThickWidth, 0, 1];
+        $barcodeTable[] = [0, $this->barThinWidth, 0, 1];
+        $barcodeTable[] = [1, $this->barThickWidth, 0, 1];
+        $barcodeTable[] = [0, $this->barThinWidth, 0, 1];
+        $barcodeTable[] = [1, $this->barThinWidth, 0, 1];
+        $barcodeTable[] = [0, $this->barThinWidth];
 
         $text = str_split($this->getText());
         foreach ($text as $char) {
@@ -79,17 +77,17 @@ class Code25 extends AbstractObject
             foreach ($barcodeChar as $c) {
                 /* visible, width, top, length */
                 $width = $c ? $this->barThickWidth : $this->barThinWidth;
-                $barcodeTable[] = array(1, $width, 0, 1);
-                $barcodeTable[] = array(0, $this->barThinWidth);
+                $barcodeTable[] = [1, $width, 0, 1];
+                $barcodeTable[] = [0, $this->barThinWidth];
             }
         }
 
         // Stop character (30103)
-        $barcodeTable[] = array(1, $this->barThickWidth, 0, 1);
-        $barcodeTable[] = array(0, $this->barThinWidth, 0, 1);
-        $barcodeTable[] = array(1, $this->barThinWidth, 0, 1);
-        $barcodeTable[] = array(0, $this->barThinWidth, 0, 1);
-        $barcodeTable[] = array(1, $this->barThickWidth, 0, 1);
+        $barcodeTable[] = [1, $this->barThickWidth, 0, 1];
+        $barcodeTable[] = [0, $this->barThinWidth, 0, 1];
+        $barcodeTable[] = [1, $this->barThinWidth, 0, 1];
+        $barcodeTable[] = [0, $this->barThinWidth, 0, 1];
+        $barcodeTable[] = [1, $this->barThickWidth, 0, 1];
         return $barcodeTable;
     }
 
@@ -106,7 +104,7 @@ class Code25 extends AbstractObject
         $checksum = 0;
 
         for ($i = strlen($text); $i > 0; $i --) {
-            $checksum += intval($text{$i - 1}) * $factor;
+            $checksum += intval($text[$i - 1]) * $factor;
             $factor    = 4 - $factor;
         }
 

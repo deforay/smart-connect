@@ -1,10 +1,8 @@
 <?php
 /**
- * Zend Framework (http://framework.zend.com/)
- *
- * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
- * @license   http://framework.zend.com/license/new-bsd New BSD License
+ * @see       https://github.com/zendframework/zend-tag for the canonical source repository
+ * @copyright Copyright (c) 2005-2018 Zend Technologies USA Inc. (https://www.zend.com)
+ * @license   https://github.com/zendframework/zend-tag/blob/master/LICENSE.md New BSD License
  */
 
 namespace Zend\Tag;
@@ -22,7 +20,7 @@ class ItemList implements Countable, SeekableIterator, ArrayAccess
      *
      * @var array
      */
-    protected $items = array();
+    protected $items = [];
 
     /**
      * Count all items
@@ -74,7 +72,7 @@ class ItemList implements Countable, SeekableIterator, ArrayAccess
             // Calculate the thresholds
             $steps      = count($values);
             $delta      = ($maxWeight - $minWeight) / ($steps - 1);
-            $thresholds = array();
+            $thresholds = [];
 
             for ($i = 0; $i < $steps; $i++) {
                 $thresholds[$i] = floor(100 * log(($minWeight + $i * $delta) + 2));
@@ -111,7 +109,7 @@ class ItemList implements Countable, SeekableIterator, ArrayAccess
             $position++;
         }
 
-        if (!$this->valid()) {
+        if (! $this->valid()) {
             throw new OutOfBoundsException('Invalid seek position');
         }
     }
@@ -200,7 +198,7 @@ class ItemList implements Countable, SeekableIterator, ArrayAccess
     {
         // We need to make that check here, as the method signature must be
         // compatible with ArrayAccess::offsetSet()
-        if (!($item instanceof TaggableInterface)) {
+        if (! ($item instanceof TaggableInterface)) {
             throw new OutOfBoundsException('Item must implement Zend\Tag\TaggableInterface');
         }
 

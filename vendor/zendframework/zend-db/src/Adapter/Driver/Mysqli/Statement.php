@@ -3,7 +3,7 @@
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2016 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -72,7 +72,7 @@ class Statement implements StatementInterface, Profiler\ProfilerAwareInterface
      * Set driver
      *
      * @param  Mysqli $driver
-     * @return Statement
+     * @return self Provides a fluent interface
      */
     public function setDriver(Mysqli $driver)
     {
@@ -82,7 +82,7 @@ class Statement implements StatementInterface, Profiler\ProfilerAwareInterface
 
     /**
      * @param Profiler\ProfilerInterface $profiler
-     * @return Statement
+     * @return self Provides a fluent interface
      */
     public function setProfiler(Profiler\ProfilerInterface $profiler)
     {
@@ -102,7 +102,7 @@ class Statement implements StatementInterface, Profiler\ProfilerAwareInterface
      * Initialize
      *
      * @param  \mysqli $mysqli
-     * @return Statement
+     * @return self Provides a fluent interface
      */
     public function initialize(\mysqli $mysqli)
     {
@@ -114,7 +114,7 @@ class Statement implements StatementInterface, Profiler\ProfilerAwareInterface
      * Set sql
      *
      * @param  string $sql
-     * @return Statement
+     * @return self Provides a fluent interface
      */
     public function setSql($sql)
     {
@@ -126,7 +126,7 @@ class Statement implements StatementInterface, Profiler\ProfilerAwareInterface
      * Set Parameter container
      *
      * @param ParameterContainer $parameterContainer
-     * @return Statement
+     * @return self Provides a fluent interface
      */
     public function setParameterContainer(ParameterContainer $parameterContainer)
     {
@@ -148,7 +148,7 @@ class Statement implements StatementInterface, Profiler\ProfilerAwareInterface
      * Set resource
      *
      * @param  \mysqli_stmt $mysqliStatement
-     * @return Statement
+     * @return self Provides a fluent interface
      */
     public function setResource(\mysqli_stmt $mysqliStatement)
     {
@@ -191,9 +191,9 @@ class Statement implements StatementInterface, Profiler\ProfilerAwareInterface
      * Prepare
      *
      * @param string $sql
+     * @return self Provides a fluent interface
      * @throws Exception\InvalidQueryException
      * @throws Exception\RuntimeException
-     * @return Statement
      */
     public function prepare($sql = null)
     {
@@ -204,7 +204,7 @@ class Statement implements StatementInterface, Profiler\ProfilerAwareInterface
         $sql = ($sql) ?: $this->sql;
 
         $this->resource = $this->mysqli->prepare($sql);
-        if (!$this->resource instanceof \mysqli_stmt) {
+        if (! $this->resource instanceof \mysqli_stmt) {
             throw new Exception\InvalidQueryException(
                 'Statement couldn\'t be produced with sql: ' . $sql,
                 null,
@@ -225,12 +225,12 @@ class Statement implements StatementInterface, Profiler\ProfilerAwareInterface
      */
     public function execute($parameters = null)
     {
-        if (!$this->isPrepared) {
+        if (! $this->isPrepared) {
             $this->prepare();
         }
 
         /** START Standard ParameterContainer Merging Block */
-        if (!$this->parameterContainer instanceof ParameterContainer) {
+        if (! $this->parameterContainer instanceof ParameterContainer) {
             if ($parameters instanceof ParameterContainer) {
                 $this->parameterContainer = $parameters;
                 $parameters = null;
@@ -283,7 +283,7 @@ class Statement implements StatementInterface, Profiler\ProfilerAwareInterface
     {
         $parameters = $this->parameterContainer->getNamedArray();
         $type = '';
-        $args = array();
+        $args = [];
 
         foreach ($parameters as $name => &$value) {
             if ($this->parameterContainer->offsetHasErrata($name)) {
@@ -309,7 +309,7 @@ class Statement implements StatementInterface, Profiler\ProfilerAwareInterface
 
         if ($args) {
             array_unshift($args, $type);
-            call_user_func_array(array($this->resource, 'bind_param'), $args);
+            call_user_func_array([$this->resource, 'bind_param'], $args);
         }
     }
 }

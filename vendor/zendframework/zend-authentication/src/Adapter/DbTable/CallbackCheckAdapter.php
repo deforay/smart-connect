@@ -56,12 +56,12 @@ class CallbackCheckAdapter extends AbstractAdapter
      * credential.
      *
      * @param callable $validationCallback
-     * @return self
+     * @return self Provides a fluent interface
      * @throws Exception\InvalidArgumentException
      */
     public function setCredentialValidationCallback($validationCallback)
     {
-        if (!is_callable($validationCallback)) {
+        if (! is_callable($validationCallback)) {
             throw new Exception\InvalidArgumentException('Invalid callback provided');
         }
         $this->credentialValidationCallback = $validationCallback;
@@ -79,7 +79,7 @@ class CallbackCheckAdapter extends AbstractAdapter
         // get select
         $dbSelect = clone $this->getDbSelect();
         $dbSelect->from($this->tableName)
-            ->columns(array(Sql\Select::SQL_STAR))
+            ->columns([Sql\Select::SQL_STAR])
             ->where(new SqlOp($this->identityColumn, '=', $this->identity));
 
         return $dbSelect;
@@ -96,7 +96,11 @@ class CallbackCheckAdapter extends AbstractAdapter
     protected function authenticateValidateResult($resultIdentity)
     {
         try {
-            $callbackResult = call_user_func($this->credentialValidationCallback, $resultIdentity[$this->credentialColumn], $this->credential);
+            $callbackResult = call_user_func(
+                $this->credentialValidationCallback,
+                $resultIdentity[$this->credentialColumn],
+                $this->credential
+            );
         } catch (\Exception $e) {
             $this->authenticateResultInfo['code']       = AuthenticationResult::FAILURE_UNCATEGORIZED;
             $this->authenticateResultInfo['messages'][] = $e->getMessage();

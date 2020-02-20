@@ -1,10 +1,8 @@
 <?php
 /**
- * Zend Framework (http://framework.zend.com/)
- *
- * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
- * @license   http://framework.zend.com/license/new-bsd New BSD License
+ * @see       https://github.com/zendframework/zend-barcode for the canonical source repository
+ * @copyright Copyright (c) 2005-2019 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   https://github.com/zendframework/zend-barcode/blob/master/LICENSE.md New BSD License
  */
 
 namespace Zend\Barcode\Object;
@@ -30,6 +28,8 @@ class Identcode extends Code25interleaved
      */
     public function getTextToDisplay()
     {
+        $this->checkText($this->text);
+
         return preg_replace('/([0-9]{2})([0-9]{3})([0-9]{3})([0-9]{3})([0-9])/', '$1.$2 $3.$4 $5', $this->getText());
     }
 
@@ -41,7 +41,7 @@ class Identcode extends Code25interleaved
      */
     public function validateText($value)
     {
-        $this->validateSpecificText($value, array('validator' => $this->getType()));
+        $this->validateSpecificText($value, ['validator' => $this->getType()]);
     }
 
     /**
@@ -53,10 +53,12 @@ class Identcode extends Code25interleaved
     public function getChecksum($text)
     {
         $this->checkText($text);
+        $text = $this->addLeadingZeros($text, true);
+
         $checksum = 0;
 
         for ($i = strlen($text); $i > 0; $i --) {
-            $checksum += intval($text{$i - 1}) * (($i % 2) ? 4 : 9);
+            $checksum += (int) $text[$i - 1] * (($i % 2) ? 4 : 9);
         }
 
         $checksum = (10 - ($checksum % 10)) % 10;

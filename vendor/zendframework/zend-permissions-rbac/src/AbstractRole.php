@@ -14,9 +14,9 @@ use RecursiveIteratorIterator;
 abstract class AbstractRole extends AbstractIterator implements RoleInterface
 {
     /**
-     * @var null|RoleInterface
+     * @var null|array
      */
-    protected $parent;
+    protected $parents;
 
     /**
      * @var string
@@ -26,7 +26,7 @@ abstract class AbstractRole extends AbstractIterator implements RoleInterface
     /**
      * @var array
      */
-    protected $permissions = array();
+    protected $permissions = [];
 
     /**
      * Get the name of the role.
@@ -85,34 +85,61 @@ abstract class AbstractRole extends AbstractIterator implements RoleInterface
         if (is_string($child)) {
             $child = new Role($child);
         }
-        if (!$child instanceof RoleInterface) {
+        if (! $child instanceof RoleInterface) {
             throw new Exception\InvalidArgumentException(
                 'Child must be a string or implement Zend\Permissions\Rbac\RoleInterface'
             );
         }
-
-        $child->setParent($this);
-        $this->children[] = $child;
-
+        if (! in_array($child, $this->children, true)) {
+            $this->children[] = $child;
+            $child->setParent($this);
+        }
         return $this;
+    }
+
+    /**
+     * @deprecated deprecated since version 2.6.0, use addParent() instead
+     *
+     * @param  RoleInterface $parent
+     * @return RoleInterface
+     */
+    public function setParent($parent)
+    {
+        return $this->addParent($parent);
+    }
+
+    /**
+     * @return null|RoleInterface|array
+     */
+    public function getParent()
+    {
+        if (null === $this->parents) {
+            return;
+        }
+        if (1 === count($this->parents)) {
+            return $this->parents[0];
+        }
+        return $this->parents;
     }
 
     /**
      * @param  RoleInterface $parent
      * @return RoleInterface
      */
-    public function setParent($parent)
+    public function addParent($parent)
     {
-        $this->parent = $parent;
-
+        if (! $parent instanceof RoleInterface) {
+            throw new Exception\InvalidArgumentException(
+                'Parent must implement Zend\Permissions\Rbac\RoleInterface'
+            );
+        }
+        if (null === $this->parents) {
+            $this->parents = [];
+        }
+        if (! in_array($parent, $this->parents, true)) {
+            $this->parents[] = $parent;
+            $parent->addChild($this);
+        }
         return $this;
-    }
-
-    /**
-     * @return null|RoleInterface
-     */
-    public function getParent()
-    {
-        return $this->parent;
     }
 }

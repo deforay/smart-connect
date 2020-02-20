@@ -74,7 +74,7 @@ class DbSelect implements AdapterInterface
             $adapterOrSqlObject = new Sql($adapterOrSqlObject);
         }
 
-        if (!$adapterOrSqlObject instanceof Sql) {
+        if (! $adapterOrSqlObject instanceof Sql) {
             throw new Exception\InvalidArgumentException(
                 '$adapterOrSqlObject must be an instance of Zend\Db\Adapter\Adapter or Zend\Db\Sql\Sql'
             );
@@ -146,8 +146,8 @@ class DbSelect implements AdapterInterface
 
         $countSelect = new Select;
 
-        $countSelect->columns(array(self::ROW_COUNT_COLUMN_NAME => new Expression('COUNT(1)')));
-        $countSelect->from(array('original_select' => $select));
+        $countSelect->columns([self::ROW_COUNT_COLUMN_NAME => new Expression('COUNT(1)')]);
+        $countSelect->from(['original_select' => $select]);
 
         return $countSelect;
     }

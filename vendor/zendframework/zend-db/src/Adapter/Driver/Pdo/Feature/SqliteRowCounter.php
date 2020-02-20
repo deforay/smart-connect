@@ -3,7 +3,7 @@
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2016 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -67,12 +67,10 @@ class SqliteRowCounter extends AbstractFeature
      */
     public function getRowCountClosure($context)
     {
-        $sqliteRowCounter = $this;
-        return function () use ($sqliteRowCounter, $context) {
-            /** @var $sqliteRowCounter SqliteRowCounter */
+        return function () use ($context) {
             return ($context instanceof Pdo\Statement)
-                ? $sqliteRowCounter->getCountForStatement($context)
-                : $sqliteRowCounter->getCountForSql($context);
+                ? $this->getCountForStatement($context)
+                : $this->getCountForSql($context);
         };
     }
 }

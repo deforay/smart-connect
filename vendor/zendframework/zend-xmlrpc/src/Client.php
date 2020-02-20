@@ -52,7 +52,7 @@ class Client implements ServerClient
      * Proxy object for more convenient method calls
      * @var array of Zend\XmlRpc\Client\ServerProxy
      */
-    protected $proxyCache = array();
+    protected $proxyCache = [];
 
     /**
      * Flag for skipping system lookup
@@ -181,10 +181,15 @@ class Client implements ServerClient
     /**
      * Perform an XML-RPC request and return a response.
      *
-     * @param \Zend\XmlRpc\Request $request
+     * @param \Zend\XmlRpc\Request       $request
      * @param null|\Zend\XmlRpc\Response $response
-     * @return void
+     *
+     * @throws \Zend\Http\Exception\InvalidArgumentException
+     * @throws \Zend\Http\Client\Exception\RuntimeException
      * @throws \Zend\XmlRpc\Client\Exception\HttpException
+     * @throws \Zend\XmlRpc\Exception\ValueException
+     *
+     * @return void
      */
     public function doRequest($request, $response = null)
     {
@@ -205,12 +210,16 @@ class Client implements ServerClient
         }
 
         $headers = $httpRequest->getHeaders();
-        $headers->addHeaders(array(
-            'Content-Type: text/xml; charset=utf-8',
-            'Accept: text/xml',
-        ));
 
-        if (!$headers->get('user-agent')) {
+        if (! $headers->has('Content-Type')) {
+            $headers->addHeaderLine('Content-Type', 'text/xml; charset=utf-8');
+        }
+
+        if (! $headers->has('Accept')) {
+            $headers->addHeaderLine('Accept', 'text/xml');
+        }
+
+        if (! $headers->has('user-agent')) {
             $headers->addHeaderLine('user-agent', 'Zend_XmlRpc_Client');
         }
 
@@ -218,7 +227,7 @@ class Client implements ServerClient
         $http->setRawBody($xml);
         $httpResponse = $http->setMethod('POST')->send();
 
-        if (!$httpResponse->isSuccess()) {
+        if (! $httpResponse->isSuccess()) {
             /**
              * Exception thrown when an HTTP error occurs
              */
@@ -244,9 +253,9 @@ class Client implements ServerClient
      * @return mixed
      * @throws \Zend\XmlRpc\Client\Exception\FaultException
      */
-    public function call($method, $params = array())
+    public function call($method, $params = [])
     {
-        if (!$this->skipSystemLookup() && ('system.' != substr($method, 0, 7))) {
+        if (! $this->skipSystemLookup() && ('system.' != substr($method, 0, 7))) {
             // Ensure empty array/struct params are cast correctly
             // If system.* methods are not available, bypass. (ZF-2978)
             $success = true;
@@ -256,7 +265,7 @@ class Client implements ServerClient
                 $success = false;
             }
             if ($success) {
-                $validTypes = array(
+                $validTypes = [
                     AbstractValue::XMLRPC_TYPE_ARRAY,
                     AbstractValue::XMLRPC_TYPE_BASE64,
                     AbstractValue::XMLRPC_TYPE_BOOLEAN,
@@ -267,10 +276,10 @@ class Client implements ServerClient
                     AbstractValue::XMLRPC_TYPE_NIL,
                     AbstractValue::XMLRPC_TYPE_STRING,
                     AbstractValue::XMLRPC_TYPE_STRUCT,
-                );
+                ];
 
-                if (!is_array($params)) {
-                    $params = array($params);
+                if (! is_array($params)) {
+                    $params = [$params];
                 }
                 foreach ($params as $key => $param) {
                     if ($param instanceof AbstractValue) {
@@ -280,7 +289,7 @@ class Client implements ServerClient
                     if (count($signatures) > 1) {
                         $type = AbstractValue::getXmlRpcTypeByValue($param);
                         foreach ($signatures as $signature) {
-                            if (!is_array($signature)) {
+                            if (! is_array($signature)) {
                                 continue;
                             }
                             if (isset($signature['parameters'][$key])) {
@@ -295,7 +304,7 @@ class Client implements ServerClient
                         $type = null;
                     }
 
-                    if (empty($type) || !in_array($type, $validTypes)) {
+                    if (empty($type) || ! in_array($type, $validTypes)) {
                         $type = AbstractValue::AUTO_DETECT_TYPE;
                     }
 
@@ -304,7 +313,7 @@ class Client implements ServerClient
             }
         }
 
-        $request = $this->_createRequest($method, $params);
+        $request = $this->createRequest($method, $params);
 
         $this->doRequest($request);
 
@@ -329,7 +338,7 @@ class Client implements ServerClient
      * @param array $params
      * @return \Zend\XmlRpc\Request
      */
-    protected function _createRequest($method, $params)
+    protected function createRequest($method, $params)
     {
         return new Request($method, $params);
     }

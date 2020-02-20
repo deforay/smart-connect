@@ -1,10 +1,8 @@
 <?php
 /**
- * Zend Framework (http://framework.zend.com/)
- *
- * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
- * @license   http://framework.zend.com/license/new-bsd New BSD License
+ * @see       https://github.com/zendframework/zend-mime for the canonical source repository
+ * @copyright Copyright (c) 2005-2019 Zend Technologies USA Inc. (https://www.zend.com)
+ * @license   https://github.com/zendframework/zend-mime/blob/master/LICENSE.md New BSD License
  */
 
 namespace Zend\Mime;
@@ -30,32 +28,32 @@ class Decode
         $body = str_replace("\r", '', $body);
 
         $start = 0;
-        $res = array();
+        $res = [];
         // find every mime part limiter and cut out the
         // string before it.
         // the part before the first boundary string is discarded:
         $p = strpos($body, '--' . $boundary . "\n", $start);
         if ($p === false) {
             // no parts found!
-            return array();
+            return [];
         }
 
         // position after first boundary line
         $start = $p + 3 + strlen($boundary);
 
         while (($p = strpos($body, '--' . $boundary . "\n", $start)) !== false) {
-            $res[] = substr($body, $start, $p-$start);
+            $res[] = substr($body, $start, $p - $start);
             $start = $p + 3 + strlen($boundary);
         }
 
         // no more parts, find end boundary
         $p = strpos($body, '--' . $boundary . '--', $start);
-        if ($p===false) {
+        if ($p === false) {
             throw new Exception\RuntimeException('Not a valid Mime Message: End Missing');
         }
 
         // the remaining part also needs to be parsed:
-        $res[] = substr($body, $start, $p-$start);
+        $res[] = substr($body, $start, $p - $start);
         return $res;
     }
 
@@ -72,16 +70,18 @@ class Decode
     public static function splitMessageStruct($message, $boundary, $EOL = Mime::LINEEND)
     {
         $parts = static::splitMime($message, $boundary);
-        if (count($parts) <= 0) {
+        if (! $parts) {
             return;
         }
-        $result = array();
+        $result = [];
         $headers = null; // "Declare" variable before the first usage "for reading"
         $body    = null; // "Declare" variable before the first usage "for reading"
         foreach ($parts as $part) {
             static::splitMessage($part, $headers, $body, $EOL);
-            $result[] = array('header' => $headers,
-                              'body'   => $body    );
+            $result[] = [
+                'header' => $headers,
+                'body'   => $body,
+            ];
         }
         return $result;
     }
@@ -96,7 +96,7 @@ class Decode
      * @param  Headers         $headers output param, headers container
      * @param  string          $body    output param, content of message
      * @param  string          $EOL EOL string; defaults to {@link Zend\Mime\Mime::LINEEND}
-     * @param  bool         $strict  enable strict mode for parsing message
+     * @param  bool            $strict  enable strict mode for parsing message
      * @return null
      */
     public static function splitMessage($message, &$headers, &$body, $EOL = Mime::LINEEND, $strict = false)
@@ -105,40 +105,48 @@ class Decode
             $message = $message->toString();
         }
         // check for valid header at first line
-        $firstline = strtok($message, "\n");
-        if (!preg_match('%^[^\s]+[^:]*:%', $firstline)) {
-            $headers = array();
+        $firstlinePos = strpos($message, "\n");
+        $firstline = $firstlinePos === false ? $message : substr($message, 0, $firstlinePos);
+        if (! preg_match('%^[^\s]+[^:]*:%', $firstline)) {
+            $headers = new Headers();
             // TODO: we're ignoring \r for now - is this function fast enough and is it safe to assume noone needs \r?
-            $body = str_replace(array("\r", "\n"), array('', $EOL), $message);
+            $body = str_replace(["\r", "\n"], ['', $EOL], $message);
             return;
         }
 
         // see @ZF2-372, pops the first line off a message if it doesn't contain a header
-        if (!$strict) {
+        if (! $strict) {
             $parts = explode(':', $firstline, 2);
             if (count($parts) != 2) {
-                $message = substr($message, strpos($message, $EOL)+1);
+                $message = substr($message, strpos($message, $EOL) + 1);
             }
         }
 
+        // @todo splitMime removes "\r" sequences, which breaks valid mime
+        // messages as returned by many mail servers
+        $headersEOL = $EOL;
+
         // find an empty line between headers and body
         // default is set new line
+        // @todo Maybe this is too much "magic"; we should be more strict here
         if (strpos($message, $EOL . $EOL)) {
             list($headers, $body) = explode($EOL . $EOL, $message, 2);
         // next is the standard new line
         } elseif ($EOL != "\r\n" && strpos($message, "\r\n\r\n")) {
             list($headers, $body) = explode("\r\n\r\n", $message, 2);
+            $headersEOL = "\r\n"; // Headers::fromString will fail with incorrect EOL
         // next is the other "standard" new line
         } elseif ($EOL != "\n" && strpos($message, "\n\n")) {
             list($headers, $body) = explode("\n\n", $message, 2);
+            $headersEOL = "\n";
         // at last resort find anything that looks like a new line
         } else {
-            ErrorHandler::start(E_NOTICE|E_WARNING);
+            ErrorHandler::start(E_NOTICE | E_WARNING);
             list($headers, $body) = preg_split("%([\r\n]+)\\1%U", $message, 2);
             ErrorHandler::stop();
         }
 
-        $headers = Headers::fromString($headers, $EOL);
+        $headers = Headers::fromString($headers, $headersEOL);
     }
 
     /**
@@ -174,7 +182,7 @@ class Decode
         }
 
         $field = $firstName . '=' . $field;
-        if (!preg_match_all('%([^=\s]+)\s*=\s*("[^"]+"|[^;]+)(;\s*|$)%', $field, $matches)) {
+        if (! preg_match_all('%([^=\s]+)\s*=\s*("[^"]+"|[^;]+)(;\s*|$)%', $field, $matches)) {
             throw new Exception\RuntimeException('not a valid header field');
         }
 
@@ -191,7 +199,7 @@ class Decode
             return;
         }
 
-        $split = array();
+        $split = [];
         foreach ($matches[1] as $key => $name) {
             $name = strtolower($name);
             if ($matches[2][$key][0] == '"') {

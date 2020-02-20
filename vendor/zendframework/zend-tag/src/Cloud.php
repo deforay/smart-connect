@@ -1,16 +1,17 @@
 <?php
 /**
- * Zend Framework (http://framework.zend.com/)
- *
- * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
- * @license   http://framework.zend.com/license/new-bsd New BSD License
+ * @see       https://github.com/zendframework/zend-tag for the canonical source repository
+ * @copyright Copyright (c) 2005-2018 Zend Technologies USA Inc. (https://www.zend.com)
+ * @license   https://github.com/zendframework/zend-tag/blob/master/LICENSE.md New BSD License
  */
 
 namespace Zend\Tag;
 
 use Traversable;
+use Zend\ServiceManager\ServiceManager;
 use Zend\Stdlib\ArrayUtils;
+use Zend\Tag\Cloud\Decorator\HtmlCloud;
+use Zend\Tag\Cloud\Decorator\HtmlTag;
 
 class Cloud
 {
@@ -47,10 +48,10 @@ class Cloud
      *
      * @var array
      */
-    protected $skipOptions = array(
+    protected $skipOptions = [
         'options',
         'config',
-    );
+    ];
 
     /**
      * Create a new tag cloud with options
@@ -126,7 +127,7 @@ class Cloud
             return $this;
         }
 
-        if (!is_array($tag)) {
+        if (! is_array($tag)) {
             throw new Exception\InvalidArgumentException(sprintf(
                 'Tag must be an instance of %s\TaggableInterface or an array; received "%s"',
                 __NAMESPACE__,
@@ -191,8 +192,10 @@ class Cloud
             $decorator = $this->getDecoratorPluginManager()->get($decorator, $options);
         }
 
-        if (!($decorator instanceof Cloud\Decorator\AbstractCloud)) {
-            throw new Exception\InvalidArgumentException('DecoratorInterface is no instance of Cloud\Decorator\AbstractCloud');
+        if (! ($decorator instanceof Cloud\Decorator\AbstractCloud)) {
+            throw new Exception\InvalidArgumentException(
+                'DecoratorInterface is no instance of Cloud\Decorator\AbstractCloud'
+            );
         }
 
         $this->cloudDecorator = $decorator;
@@ -208,7 +211,7 @@ class Cloud
     public function getCloudDecorator()
     {
         if (null === $this->cloudDecorator) {
-            $this->setCloudDecorator('htmlCloud');
+            $this->setCloudDecorator(HtmlCloud::class);
         }
         return $this->cloudDecorator;
     }
@@ -238,8 +241,10 @@ class Cloud
             $decorator = $this->getDecoratorPluginManager()->get($decorator, $options);
         }
 
-        if (!($decorator instanceof Cloud\Decorator\AbstractTag)) {
-            throw new Exception\InvalidArgumentException('DecoratorInterface is no instance of Cloud\Decorator\AbstractTag');
+        if (! ($decorator instanceof Cloud\Decorator\AbstractTag)) {
+            throw new Exception\InvalidArgumentException(
+                'DecoratorInterface is no instance of Cloud\Decorator\AbstractTag'
+            );
         }
 
         $this->tagDecorator = $decorator;
@@ -255,7 +260,7 @@ class Cloud
     public function getTagDecorator()
     {
         if (null === $this->tagDecorator) {
-            $this->setTagDecorator('htmlTag');
+            $this->setTagDecorator(HtmlTag::class);
         }
         return $this->tagDecorator;
     }
@@ -280,7 +285,7 @@ class Cloud
     public function getDecoratorPluginManager()
     {
         if ($this->decorators === null) {
-            $this->decorators = new Cloud\DecoratorPluginManager();
+            $this->decorators = new Cloud\DecoratorPluginManager(new ServiceManager());
         }
 
         return $this->decorators;

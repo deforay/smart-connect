@@ -3,7 +3,7 @@
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2016 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -18,7 +18,7 @@ class Sqlite extends AbstractPlatform
     /**
      * {@inheritDoc}
      */
-    protected $quoteIdentifier = array('"','"');
+    protected $quoteIdentifier = ['"','"'];
 
     /**
      * {@inheritDoc}
@@ -42,9 +42,8 @@ class Sqlite extends AbstractPlatform
 
     /**
      * @param \Zend\Db\Adapter\Driver\Pdo\Pdo|\PDO $driver
+     * @return self Provides a fluent interface
      * @throws \Zend\Db\Adapter\Exception\InvalidArgumentException
-     *
-     * @return self
      */
     public function setDriver($driver)
     {
@@ -55,7 +54,9 @@ class Sqlite extends AbstractPlatform
             return $this;
         }
 
-        throw new Exception\InvalidArgumentException('$driver must be a Sqlite PDO Zend\Db\Adapter\Driver, Sqlite PDO instance');
+        throw new Exception\InvalidArgumentException(
+            '$driver must be a Sqlite PDO Zend\Db\Adapter\Driver, Sqlite PDO instance'
+        );
     }
 
     /**

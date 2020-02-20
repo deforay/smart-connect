@@ -3,7 +3,7 @@
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2016 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -44,7 +44,7 @@ class Result implements ResultInterface
      */
     public function initialize($resource, $generatedValue)
     {
-        if (!is_resource($resource) || get_resource_type($resource) != 'pgsql result') {
+        if (! is_resource($resource) || get_resource_type($resource) != 'pgsql result') {
             throw new Exception\InvalidArgumentException('Resource not of the correct type.');
         }
 

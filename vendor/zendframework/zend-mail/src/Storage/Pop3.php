@@ -1,10 +1,8 @@
 <?php
 /**
- * Zend Framework (http://framework.zend.com/)
- *
- * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
- * @license   http://framework.zend.com/license/new-bsd New BSD License
+ * @see       https://github.com/zendframework/zend-mail for the canonical source repository
+ * @copyright Copyright (c) 2005-2018 Zend Technologies USA Inc. (https://www.zend.com)
+ * @license   https://github.com/zendframework/zend-mail/blob/master/LICENSE.md New BSD License
  */
 
 namespace Zend\Mail\Storage;
@@ -61,8 +59,8 @@ class Pop3 extends AbstractStorage
         $bodyLines = 0;
         $message = $this->protocol->top($id, $bodyLines, true);
 
-        return new $this->messageClass(array('handler' => $this, 'id' => $id, 'headers' => $message,
-                                              'noToplines' => $bodyLines < 1));
+        return new $this->messageClass(['handler' => $this, 'id' => $id, 'headers' => $message,
+                                              'noToplines' => $bodyLines < 1]);
     }
 
     /*
@@ -137,14 +135,14 @@ class Pop3 extends AbstractStorage
             return;
         }
 
-        if (!isset($params->user)) {
+        if (! isset($params->user)) {
             throw new Exception\InvalidArgumentException('need at least user in params');
         }
 
-        $host     = isset($params->host)     ? $params->host     : 'localhost';
+        $host     = isset($params->host) ? $params->host : 'localhost';
         $password = isset($params->password) ? $params->password : '';
-        $port     = isset($params->port)     ? $params->port     : null;
-        $ssl      = isset($params->ssl)      ? $params->ssl      : false;
+        $port     = isset($params->port) ? $params->port : null;
+        $ssl      = isset($params->ssl) ? $params->ssl : false;
 
         $this->protocol = new Protocol\Pop3();
         $this->protocol->connect($host, $port, $ssl);
@@ -194,13 +192,13 @@ class Pop3 extends AbstractStorage
      */
     public function getUniqueId($id = null)
     {
-        if (!$this->hasUniqueid) {
+        if (! $this->hasUniqueid) {
             if ($id) {
                 return $id;
             }
             $count = $this->countMessages();
             if ($count < 1) {
-                return array();
+                return [];
             }
             $range = range(1, $count);
             return array_combine($range, $range);
@@ -221,7 +219,7 @@ class Pop3 extends AbstractStorage
      */
     public function getNumberByUniqueId($id)
     {
-        if (!$this->hasUniqueid) {
+        if (! $this->hasUniqueid) {
             return $id;
         }
 

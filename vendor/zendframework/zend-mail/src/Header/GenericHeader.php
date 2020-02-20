@@ -1,10 +1,8 @@
 <?php
 /**
- * Zend Framework (http://framework.zend.com/)
- *
- * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
- * @license   http://framework.zend.com/license/new-bsd New BSD License
+ * @see       https://github.com/zendframework/zend-mail for the canonical source repository
+ * @copyright Copyright (c) 2005-2018 Zend Technologies USA Inc. (https://www.zend.com)
+ * @license   https://github.com/zendframework/zend-mail/blob/master/LICENSE.md New BSD License
  */
 
 namespace Zend\Mail\Header;
@@ -30,6 +28,10 @@ class GenericHeader implements HeaderInterface, UnstructuredInterface
      */
     protected $encoding;
 
+    /**
+     * @param string $headerLine
+     * @return GenericHeader
+     */
     public static function fromString($headerLine)
     {
         list($name, $value) = self::splitHeaderLine($headerLine);
@@ -61,7 +63,6 @@ class GenericHeader implements HeaderInterface, UnstructuredInterface
             throw new Exception\InvalidArgumentException('Invalid header value detected');
         }
 
-        $parts[0] = $parts[0];
         $parts[1] = ltrim($parts[1]);
 
         return $parts;
@@ -79,7 +80,7 @@ class GenericHeader implements HeaderInterface, UnstructuredInterface
             $this->setFieldName($fieldName);
         }
 
-        if ($fieldValue) {
+        if ($fieldValue !== null) {
             $this->setFieldValue($fieldValue);
         }
     }
@@ -93,12 +94,12 @@ class GenericHeader implements HeaderInterface, UnstructuredInterface
      */
     public function setFieldName($fieldName)
     {
-        if (!is_string($fieldName) || empty($fieldName)) {
+        if (! is_string($fieldName) || empty($fieldName)) {
             throw new Exception\InvalidArgumentException('Header name must be a string');
         }
 
         // Pre-filter to normalize valid characters, change underscore to dash
-        $fieldName = str_replace(' ', '-', ucwords(str_replace(array('_', '-'), ' ', $fieldName)));
+        $fieldName = str_replace(' ', '-', ucwords(str_replace(['_', '-'], ' ', $fieldName)));
 
         if (! HeaderName::isValid($fieldName)) {
             throw new Exception\InvalidArgumentException(

@@ -3,7 +3,7 @@
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2016 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -44,7 +44,7 @@ class Like extends AbstractExpression implements PredicateInterface
 
     /**
      * @param  string $identifier
-     * @return self
+     * @return self Provides a fluent interface
      */
     public function setIdentifier($identifier)
     {
@@ -62,7 +62,7 @@ class Like extends AbstractExpression implements PredicateInterface
 
     /**
      * @param  string $like
-     * @return self
+     * @return self Provides a fluent interface
      */
     public function setLike($like)
     {
@@ -80,7 +80,7 @@ class Like extends AbstractExpression implements PredicateInterface
 
     /**
      * @param  string $specification
-     * @return self
+     * @return self Provides a fluent interface
      */
     public function setSpecification($specification)
     {
@@ -103,12 +103,12 @@ class Like extends AbstractExpression implements PredicateInterface
     {
         list($values[], $types[]) = $this->normalizeArgument($this->identifier, self::TYPE_IDENTIFIER);
         list($values[], $types[]) = $this->normalizeArgument($this->like, self::TYPE_VALUE);
-        return array(
-            array(
+        return [
+            [
                 $this->specification,
                 $values,
                 $types,
-            )
-        );
+            ]
+        ];
     }
 }

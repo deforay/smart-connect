@@ -1,10 +1,8 @@
 <?php
 /**
- * Zend Framework (http://framework.zend.com/)
- *
- * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
- * @license   http://framework.zend.com/license/new-bsd New BSD License
+ * @see       https://github.com/zendframework/zend-mail for the canonical source repository
+ * @copyright Copyright (c) 2005-2018 Zend Technologies USA Inc. (https://www.zend.com)
+ * @license   https://github.com/zendframework/zend-mail/blob/master/LICENSE.md New BSD License
  */
 
 namespace Zend\Mail\Transport;
@@ -14,6 +12,7 @@ use Zend\Mail\Headers;
 use Zend\Mail\Message;
 use Zend\Mail\Protocol;
 use Zend\Mail\Protocol\Exception as ProtocolException;
+use Zend\ServiceManager\ServiceManager;
 
 /**
  * SMTP connection object
@@ -48,13 +47,20 @@ class Smtp implements TransportInterface
     protected $plugins;
 
     /**
+     * When did we connect to the server?
+     *
+     * @var int|null
+     */
+    protected $connectedTime;
+
+    /**
      * Constructor.
      *
      * @param  SmtpOptions $options Optional
      */
     public function __construct(SmtpOptions $options = null)
     {
-        if (!$options instanceof SmtpOptions) {
+        if (! $options instanceof SmtpOptions) {
             $options = new SmtpOptions();
         }
         $this->setOptions($options);
@@ -123,7 +129,7 @@ class Smtp implements TransportInterface
     public function getPluginManager()
     {
         if (null === $this->plugins) {
-            $this->setPluginManager(new Protocol\SmtpPluginManager());
+            $this->setPluginManager(new Protocol\SmtpPluginManager(new ServiceManager()));
         }
         return $this->plugins;
     }
@@ -167,15 +173,18 @@ class Smtp implements TransportInterface
      */
     public function __destruct()
     {
-        if ($this->connection instanceof Protocol\Smtp) {
-            try {
-                $this->connection->quit();
-            } catch (ProtocolException\ExceptionInterface $e) {
-                // ignore
-            }
-            if ($this->autoDisconnect) {
-                $this->connection->disconnect();
-            }
+        if (! $this->getConnection() instanceof Protocol\Smtp) {
+            return;
+        }
+
+        try {
+            $this->getConnection()->quit();
+        } catch (ProtocolException\ExceptionInterface $e) {
+            // ignore
+        }
+
+        if ($this->autoDisconnect) {
+            $this->getConnection()->disconnect();
         }
     }
 
@@ -187,6 +196,11 @@ class Smtp implements TransportInterface
     public function setConnection(Protocol\AbstractProtocol $connection)
     {
         $this->connection = $connection;
+        if (($connection instanceof Protocol\Smtp)
+            && ($this->getOptions()->getConnectionTimeLimit() !== null)
+        ) {
+            $connection->setUseCompleteQuit(false);
+        }
     }
 
     /**
@@ -196,6 +210,13 @@ class Smtp implements TransportInterface
      */
     public function getConnection()
     {
+        $timeLimit = $this->getOptions()->getConnectionTimeLimit();
+        if ($timeLimit !== null
+            && $this->connectedTime !== null
+            && ((time() - $this->connectedTime) > $timeLimit)
+        ) {
+            $this->connection = null;
+        }
         return $this->connection;
     }
 
@@ -206,8 +227,9 @@ class Smtp implements TransportInterface
      */
     public function disconnect()
     {
-        if (!empty($this->connection) && ($this->connection instanceof Protocol\Smtp)) {
-            $this->connection->disconnect();
+        if ($this->getConnection() instanceof Protocol\Smtp) {
+            $this->getConnection()->disconnect();
+            $this->connectedTime = null;
         }
     }
 
@@ -225,7 +247,7 @@ class Smtp implements TransportInterface
         // If sending multiple messages per session use existing adapter
         $connection = $this->getConnection();
 
-        if (!($connection instanceof Protocol\Smtp) || !$connection->hasSession()) {
+        if (! ($connection instanceof Protocol\Smtp) || ! $connection->hasSession()) {
             $connection = $this->connect();
         } else {
             // Reset connection to ensure reliable transaction
@@ -238,7 +260,7 @@ class Smtp implements TransportInterface
         $headers    = $this->prepareHeaders($message);
         $body       = $this->prepareBody($message);
 
-        if ((count($recipients) == 0) && (!empty($headers) || !empty($body))) {
+        if ((count($recipients) == 0) && (! empty($headers) || ! empty($body))) {
             // Per RFC 2821 3.3 (page 18)
             throw new Exception\RuntimeException(
                 sprintf(
@@ -279,7 +301,7 @@ class Smtp implements TransportInterface
         }
 
         $from = $message->getFrom();
-        if (!count($from)) {
+        if (! count($from)) {
             // Per RFC 2822 3.6
             throw new Exception\RuntimeException(sprintf(
                 '%s transport expects either a Sender or at least one From address in the Message; none provided',
@@ -304,7 +326,7 @@ class Smtp implements TransportInterface
             return (array) $this->getEnvelope()->getTo();
         }
 
-        $recipients = array();
+        $recipients = [];
         foreach ($message->getTo() as $address) {
             $recipients[] = $address->getEmail();
         }
@@ -355,8 +377,8 @@ class Smtp implements TransportInterface
         $config           = $options->getConnectionConfig();
         $config['host']   = $options->getHost();
         $config['port']   = $options->getPort();
-        $connection       = $this->plugin($options->getConnectionClass(), $config);
-        $this->connection = $connection;
+
+        $this->setConnection($this->plugin($options->getConnectionClass(), $config));
 
         return $this->connect();
     }
@@ -368,11 +390,14 @@ class Smtp implements TransportInterface
      */
     protected function connect()
     {
-        if (!$this->connection instanceof Protocol\Smtp) {
+        if (! $this->connection instanceof Protocol\Smtp) {
             return $this->lazyLoadConnection();
         }
 
         $this->connection->connect();
+
+        $this->connectedTime = time();
+
         $this->connection->helo($this->getOptions()->getName());
 
         return $this->connection;

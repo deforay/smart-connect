@@ -1,10 +1,8 @@
 <?php
 /**
- * Zend Framework (http://framework.zend.com/)
- *
- * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
- * @license   http://framework.zend.com/license/new-bsd New BSD License
+ * @see       https://github.com/zendframework/zend-barcode for the canonical source repository
+ * @copyright Copyright (c) 2005-2019 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   https://github.com/zendframework/zend-barcode/blob/master/LICENSE.md New BSD License
  */
 
 namespace Zend\Barcode\Object;
@@ -18,7 +16,7 @@ class Code39 extends AbstractObject
      * Coding map
      * @var array
      */
-    protected $codingMap = array(
+    protected $codingMap = [
         '0' => '000110100',
         '1' => '100100001',
         '2' => '001100001',
@@ -63,7 +61,7 @@ class Code39 extends AbstractObject
         '+' => '010001010',
         '%' => '000101010',
         '*' => '010010100',
-    );
+    ];
 
     /**
      * Partial check of Code39 barcode
@@ -89,7 +87,7 @@ class Code39 extends AbstractObject
     /**
      * Set text to encode
      * @param string $value
-     * @return Code39
+     * @return self Provides a fluent interface
      */
     public function setText($value)
     {
@@ -127,17 +125,17 @@ class Code39 extends AbstractObject
     protected function prepareBarcode()
     {
         $text         = str_split($this->getText());
-        $barcodeTable = array();
+        $barcodeTable = [];
         foreach ($text as $char) {
             $barcodeChar = str_split($this->codingMap[$char]);
             $visible     = true;
             foreach ($barcodeChar as $c) {
                 /* visible, width, top, length */
                 $width          = $c ? $this->barThickWidth : $this->barThinWidth;
-                $barcodeTable[] = array((int) $visible, $width, 0, 1);
+                $barcodeTable[] = [(int) $visible, $width, 0, 1];
                 $visible = ! $visible;
             }
-            $barcodeTable[] = array(0, $this->barThinWidth);
+            $barcodeTable[] = [0, $this->barThinWidth];
         }
         return $barcodeTable;
     }

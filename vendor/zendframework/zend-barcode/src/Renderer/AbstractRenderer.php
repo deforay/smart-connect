@@ -1,10 +1,8 @@
 <?php
 /**
- * Zend Framework (http://framework.zend.com/)
- *
- * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
- * @license   http://framework.zend.com/license/new-bsd New BSD License
+ * @see       https://github.com/zendframework/zend-barcode for the canonical source repository
+ * @copyright Copyright (c) 2005-2019 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   https://github.com/zendframework/zend-barcode/blob/master/LICENSE.md New BSD License
  */
 
 namespace Zend\Barcode\Renderer;
@@ -12,7 +10,7 @@ namespace Zend\Barcode\Renderer;
 use Traversable;
 use Zend\Barcode\Barcode;
 use Zend\Barcode\Exception as BarcodeException;
-use Zend\Barcode\Object;
+use Zend\Barcode\Object\ObjectInterface;
 use Zend\Stdlib\ArrayUtils;
 
 /**
@@ -70,7 +68,7 @@ abstract class AbstractRenderer implements RendererInterface
 
     /**
      * Barcode object
-     * @var Object\ObjectInterface
+     * @var ObjectInterface
      */
     protected $barcode;
 
@@ -106,7 +104,7 @@ abstract class AbstractRenderer implements RendererInterface
     /**
      * Set renderer state from options array
      * @param  array $options
-     * @return AbstractRenderer
+     * @return self Provides a fluent interface
      */
     public function setOptions($options)
     {
@@ -123,7 +121,7 @@ abstract class AbstractRenderer implements RendererInterface
      * Set renderer namespace for autoloading
      *
      * @param string $namespace
-     * @return AbstractRenderer
+     * @return self Provides a fluent interface
      */
     public function setRendererNamespace($namespace)
     {
@@ -146,7 +144,7 @@ abstract class AbstractRenderer implements RendererInterface
      * Will work for SVG and Image (png and gif only)
      *
      * @param $bool
-     * @return $this
+     * @return self Provides a fluent interface
      */
     public function setTransparentBackground($bool)
     {
@@ -175,12 +173,12 @@ abstract class AbstractRenderer implements RendererInterface
     /**
      * Manually adjust top position
      * @param  int $value
-     * @return AbstractRenderer
+     * @return self Provides a fluent interface
      * @throws Exception\OutOfRangeException
      */
     public function setTopOffset($value)
     {
-        if (!is_numeric($value) || intval($value) < 0) {
+        if (! is_numeric($value) || intval($value) < 0) {
             throw new Exception\OutOfRangeException(
                 'Vertical position must be greater than or equals 0'
             );
@@ -201,12 +199,12 @@ abstract class AbstractRenderer implements RendererInterface
     /**
      * Manually adjust left position
      * @param  int $value
-     * @return AbstractRenderer
+     * @return self Provides a fluent interface
      * @throws Exception\OutOfRangeException
      */
     public function setLeftOffset($value)
     {
-        if (!is_numeric($value) || intval($value) < 0) {
+        if (! is_numeric($value) || intval($value) < 0) {
             throw new Exception\OutOfRangeException(
                 'Horizontal position must be greater than or equals 0'
             );
@@ -227,7 +225,7 @@ abstract class AbstractRenderer implements RendererInterface
     /**
      * Activate/Deactivate the automatic rendering of exception
      * @param  bool $value
-     * @return AbstractRenderer
+     * @return self Provides a fluent interface
      */
     public function setAutomaticRenderError($value)
     {
@@ -238,12 +236,12 @@ abstract class AbstractRenderer implements RendererInterface
     /**
      * Horizontal position of the barcode in the rendering resource
      * @param  string $value
-     * @return AbstractRenderer
+     * @return self Provides a fluent interface
      * @throws Exception\UnexpectedValueException
      */
     public function setHorizontalPosition($value)
     {
-        if (!in_array($value, array('left', 'center', 'right'))) {
+        if (! in_array($value, ['left', 'center', 'right'])) {
             throw new Exception\UnexpectedValueException(
                 "Invalid barcode position provided must be 'left', 'center' or 'right'"
             );
@@ -264,12 +262,12 @@ abstract class AbstractRenderer implements RendererInterface
     /**
      * Vertical position of the barcode in the rendering resource
      * @param  string $value
-     * @return AbstractRenderer
+     * @return self Provides a fluent interface
      * @throws Exception\UnexpectedValueException
      */
     public function setVerticalPosition($value)
     {
-        if (!in_array($value, array('top', 'middle', 'bottom'))) {
+        if (! in_array($value, ['top', 'middle', 'bottom'])) {
             throw new Exception\UnexpectedValueException(
                 "Invalid barcode position provided must be 'top', 'middle' or 'bottom'"
             );
@@ -290,12 +288,12 @@ abstract class AbstractRenderer implements RendererInterface
     /**
      * Set the size of a module
      * @param float $value
-     * @return AbstractRenderer
+     * @return self Provides a fluent interface
      * @throws Exception\OutOfRangeException
      */
     public function setModuleSize($value)
     {
-        if (!is_numeric($value) || floatval($value) <= 0) {
+        if (! is_numeric($value) || floatval($value) <= 0) {
             throw new Exception\OutOfRangeException(
                 'Float size must be greater than 0'
             );
@@ -325,9 +323,9 @@ abstract class AbstractRenderer implements RendererInterface
     /**
      * Set the barcode object
      * @param  Object\ObjectInterface $barcode
-     * @return AbstractRenderer
+     * @return self Provides a fluent interface
      */
-    public function setBarcode(Object\ObjectInterface $barcode)
+    public function setBarcode(ObjectInterface $barcode)
     {
         $this->barcode = $barcode;
         return $this;
@@ -422,10 +420,10 @@ abstract class AbstractRenderer implements RendererInterface
             $this->initRenderer();
             $this->drawInstructionList();
         } catch (BarcodeException\ExceptionInterface $e) {
-            if ($this->automaticRenderError && !($e instanceof BarcodeException\RendererCreationException)) {
+            if ($this->automaticRenderError && ! ($e instanceof BarcodeException\RendererCreationException)) {
                 $barcode = Barcode::makeBarcode(
                     'error',
-                    array('text' => $e->getMessage())
+                    ['text' => $e->getMessage()]
                 );
                 $this->setBarcode($barcode);
                 $this->resource = null;
@@ -467,7 +465,7 @@ abstract class AbstractRenderer implements RendererInterface
                     break;
                 default:
                     throw new Exception\UnexpectedValueException(
-                        'Unkown drawing command'
+                        'Unknown drawing command'
                     );
             }
         }

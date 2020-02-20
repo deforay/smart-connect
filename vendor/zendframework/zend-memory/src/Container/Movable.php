@@ -1,10 +1,8 @@
 <?php
 /**
- * Zend Framework (http://framework.zend.com/)
- *
- * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
- * @license   http://framework.zend.com/license/new-bsd New BSD License
+ * @see       https://github.com/zendframework/zend-memory for the canonical source repository
+ * @copyright Copyright (c) 2005-2018 Zend Technologies USA Inc. (https://www.zend.com)
+ * @license   https://github.com/zendframework/zend-memory/blob/master/LICENSE.md New BSD License
  */
 
 namespace Zend\Memory\Container;
@@ -72,7 +70,7 @@ class Movable extends AbstractContainer
      */
     public function lock()
     {
-        if (!($this->state & self::LOADED)) {
+        if (! ($this->state & self::LOADED)) {
             $this->memManager->load($this, $this->id);
             $this->state |= self::LOADED;
         }
@@ -118,10 +116,14 @@ class Movable extends AbstractContainer
     public function __get($property)
     {
         if ($property != 'value') {
-            throw new Exception\InvalidArgumentException('Unknown property: \Zend\Memory\Container\Movable::$' . $property);
+            throw new Exception\InvalidArgumentException(sprintf(
+                'Unknown property: %s::$%s',
+                __CLASS__,
+                $property
+            ));
         }
 
-        if (!($this->state & self::LOADED)) {
+        if (! ($this->state & self::LOADED)) {
             $this->memManager->load($this, $this->id);
             $this->state |= self::LOADED;
         }
@@ -139,7 +141,11 @@ class Movable extends AbstractContainer
     public function __set($property, $value)
     {
         if ($property != 'value') {
-            throw new Exception\InvalidArgumentException('Unknown property: \Zend\Memory\Container\Movable::$' . $property);
+            throw new Exception\InvalidArgumentException(sprintf(
+                'Unknown property: %s::$%s',
+                __CLASS__,
+                $property
+            ));
         }
 
         $this->state = self::LOADED;
@@ -159,7 +165,7 @@ class Movable extends AbstractContainer
      */
     public function &getRef()
     {
-        if (!($this->state & self::LOADED)) {
+        if (! ($this->state & self::LOADED)) {
             $this->memManager->load($this, $this->id);
             $this->state |= self::LOADED;
         }
@@ -198,7 +204,7 @@ class Movable extends AbstractContainer
      */
     public function startTrace()
     {
-        if (!($this->state & self::LOADED)) {
+        if (! ($this->state & self::LOADED)) {
             $this->memManager->load($this, $this->id);
             $this->state |= self::LOADED;
         }
@@ -236,8 +242,8 @@ class Movable extends AbstractContainer
      */
     public function markAsSwapped()
     {
-        // Clear LOADED state bit
-        $this->state |= self::LOADED;
+        // Set SWAPPED state bit
+        $this->state |= self::SWAPPED;
     }
 
     /**

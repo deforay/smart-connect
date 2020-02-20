@@ -3,7 +3,7 @@
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2016 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -39,7 +39,7 @@ abstract class AbstractRowGateway implements ArrayAccess, Countable, RowGatewayI
     /**
      * @var array
      */
-    protected $data = array();
+    protected $data = [];
 
     /**
      * @var Sql
@@ -60,14 +60,14 @@ abstract class AbstractRowGateway implements ArrayAccess, Countable, RowGatewayI
             return;
         }
 
-        if (!$this->featureSet instanceof Feature\FeatureSet) {
+        if (! $this->featureSet instanceof Feature\FeatureSet) {
             $this->featureSet = new Feature\FeatureSet;
         }
 
         $this->featureSet->setRowGateway($this);
-        $this->featureSet->apply('preInitialize', array());
+        $this->featureSet->apply('preInitialize', []);
 
-        if (!is_string($this->table) && !$this->table instanceof TableIdentifier) {
+        if (! is_string($this->table) && ! $this->table instanceof TableIdentifier) {
             throw new Exception\RuntimeException('This row object does not have a valid table set.');
         }
 
@@ -77,11 +77,11 @@ abstract class AbstractRowGateway implements ArrayAccess, Countable, RowGatewayI
             $this->primaryKeyColumn = (array) $this->primaryKeyColumn;
         }
 
-        if (!$this->sql instanceof Sql) {
+        if (! $this->sql instanceof Sql) {
             throw new Exception\RuntimeException('This row object does not have a Sql object set.');
         }
 
-        $this->featureSet->apply('postInitialize', array());
+        $this->featureSet->apply('postInitialize', []);
 
         $this->isInitialized = true;
     }
@@ -91,7 +91,7 @@ abstract class AbstractRowGateway implements ArrayAccess, Countable, RowGatewayI
      *
      * @param  array $rowData
      * @param  bool  $rowExistsInDatabase
-     * @return AbstractRowGateway
+     * @return self Provides a fluent interface
      */
     public function populate(array $rowData, $rowExistsInDatabase = false)
     {
@@ -109,7 +109,7 @@ abstract class AbstractRowGateway implements ArrayAccess, Countable, RowGatewayI
 
     /**
      * @param mixed $array
-     * @return array|void
+     * @return AbstractRowGateway
      */
     public function exchangeArray($array)
     {
@@ -129,7 +129,7 @@ abstract class AbstractRowGateway implements ArrayAccess, Countable, RowGatewayI
             // UPDATE
 
             $data = $this->data;
-            $where = array();
+            $where = [];
             $isPkModified = false;
 
             // primary key is always an array even if its a single column
@@ -164,7 +164,7 @@ abstract class AbstractRowGateway implements ArrayAccess, Countable, RowGatewayI
 
             $result = $statement->execute();
             if (($primaryKeyValue = $result->getGeneratedValue()) && count($this->primaryKeyColumn) == 1) {
-                $this->primaryKeyData = array($this->primaryKeyColumn[0] => $primaryKeyValue);
+                $this->primaryKeyData = [$this->primaryKeyColumn[0] => $primaryKeyValue];
             } else {
                 // make primary key data available so that $where can be complete
                 $this->processPrimaryKeyData();
@@ -172,7 +172,7 @@ abstract class AbstractRowGateway implements ArrayAccess, Countable, RowGatewayI
             $rowsAffected = $result->getAffectedRows();
             unset($statement, $result); // cleanup
 
-            $where = array();
+            $where = [];
             // primary key is always an array even if its a single column
             foreach ($this->primaryKeyColumn as $pkColumn) {
                 $where[$pkColumn] = $this->primaryKeyData[$pkColumn];
@@ -201,10 +201,12 @@ abstract class AbstractRowGateway implements ArrayAccess, Countable, RowGatewayI
     {
         $this->initialize();
 
-        $where = array();
+        $where = [];
         // primary key is always an array even if its a single column
         foreach ($this->primaryKeyColumn as $pkColumn) {
-            $where[$pkColumn] = $this->primaryKeyData[$pkColumn];
+            $where[$pkColumn] = isset($this->primaryKeyData[$pkColumn])
+                ? $this->primaryKeyData[$pkColumn]
+                : null;
         }
 
         // @todo determine if we need to do a select to ensure 1 row will be affected
@@ -248,7 +250,7 @@ abstract class AbstractRowGateway implements ArrayAccess, Countable, RowGatewayI
      *
      * @param  string $offset
      * @param  mixed $value
-     * @return RowGateway
+     * @return self Provides a fluent interface
      */
     public function offsetSet($offset, $value)
     {
@@ -260,7 +262,7 @@ abstract class AbstractRowGateway implements ArrayAccess, Countable, RowGatewayI
      * Offset unset
      *
      * @param  string $offset
-     * @return AbstractRowGateway
+     * @return self Provides a fluent interface
      */
     public function offsetUnset($offset)
     {
@@ -349,10 +351,12 @@ abstract class AbstractRowGateway implements ArrayAccess, Countable, RowGatewayI
      */
     protected function processPrimaryKeyData()
     {
-        $this->primaryKeyData = array();
+        $this->primaryKeyData = [];
         foreach ($this->primaryKeyColumn as $column) {
-            if (!isset($this->data[$column])) {
-                throw new Exception\RuntimeException('While processing primary key data, a known key ' . $column . ' was not found in the data array');
+            if (! isset($this->data[$column])) {
+                throw new Exception\RuntimeException(
+                    'While processing primary key data, a known key ' . $column . ' was not found in the data array'
+                );
             }
             $this->primaryKeyData[$column] = $this->data[$column];
         }

@@ -19,7 +19,7 @@ class Registry
      *
      * @var array
      */
-    protected $roles = array();
+    protected $roles = [];
 
     /**
      * Adds a Role having an identifier unique to the registry
@@ -51,11 +51,11 @@ class Registry
             ));
         }
 
-        $roleParents = array();
+        $roleParents = [];
 
         if (null !== $parents) {
-            if (!is_array($parents) && !$parents instanceof Traversable) {
-                $parents = array($parents);
+            if (! is_array($parents) && ! $parents instanceof Traversable) {
+                $parents = [$parents];
             }
             foreach ($parents as $parent) {
                 try {
@@ -76,11 +76,11 @@ class Registry
             }
         }
 
-        $this->roles[$roleId] = array(
+        $this->roles[$roleId] = [
             'instance' => $role,
             'parents'  => $roleParents,
-            'children' => array(),
-        );
+            'children' => [],
+        ];
 
         return $this;
     }
@@ -102,7 +102,7 @@ class Registry
             $roleId = (string) $role;
         }
 
-        if (!$this->has($role)) {
+        if (! $this->has($role)) {
             throw new Exception\InvalidArgumentException("Role '$roleId' not found");
         }
 
@@ -223,7 +223,7 @@ class Registry
      */
     public function removeAll()
     {
-        $this->roles = array();
+        $this->roles = [];
 
         return $this;
     }

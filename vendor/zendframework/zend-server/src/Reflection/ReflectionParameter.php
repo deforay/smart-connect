@@ -1,10 +1,8 @@
 <?php
 /**
- * Zend Framework (http://framework.zend.com/)
- *
- * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
- * @license   http://framework.zend.com/license/new-bsd New BSD License
+ * @see       https://github.com/zendframework/zend-server for the canonical source repository
+ * @copyright Copyright (c) 2005-2018 Zend Technologies USA Inc. (https://www.zend.com)
+ * @license   https://github.com/zendframework/zend-server/blob/master/LICENSE.md New BSD License
  */
 
 namespace Zend\Server\Reflection;
@@ -40,6 +38,18 @@ class ReflectionParameter
     protected $description;
 
     /**
+     * Parameter name (needed for serialization)
+     * @var string
+     */
+    protected $name;
+
+    /**
+     * Declaring function name (needed for serialization)
+     * @var string
+     */
+    protected $functionName;
+
+    /**
      * Constructor
      *
      * @param \ReflectionParameter $r
@@ -49,6 +59,13 @@ class ReflectionParameter
     public function __construct(\ReflectionParameter $r, $type = 'mixed', $description = '')
     {
         $this->reflection = $r;
+
+        // Store parameters needed for (un)serialization
+        $this->name = $r->getName();
+        $this->functionName = $r->getDeclaringClass()
+            ? [$r->getDeclaringClass()->getName(), $r->getDeclaringFunction()->getName()]
+            : $r->getDeclaringFunction()->getName();
+
         $this->setType($type);
         $this->setDescription($description);
     }
@@ -64,7 +81,7 @@ class ReflectionParameter
     public function __call($method, $args)
     {
         if (method_exists($this->reflection, $method)) {
-            return call_user_func_array(array($this->reflection, $method), $args);
+            return call_user_func_array([$this->reflection, $method], $args);
         }
 
         throw new Exception\BadMethodCallException('Invalid reflection method');
@@ -89,7 +106,7 @@ class ReflectionParameter
      */
     public function setType($type)
     {
-        if (!is_string($type) && (null !== $type)) {
+        if (! is_string($type) && (null !== $type)) {
             throw new Exception\InvalidArgumentException('Invalid parameter type');
         }
 
@@ -115,7 +132,7 @@ class ReflectionParameter
      */
     public function setDescription($description)
     {
-        if (!is_string($description) && (null !== $description)) {
+        if (! is_string($description) && (null !== $description)) {
             throw new Exception\InvalidArgumentException('Invalid parameter description');
         }
 
@@ -141,5 +158,18 @@ class ReflectionParameter
     public function getPosition()
     {
         return $this->position;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function __sleep()
+    {
+        return ['position', 'type', 'description', 'name', 'functionName'];
+    }
+
+    public function __wakeup()
+    {
+        $this->reflection = new \ReflectionParameter($this->functionName, $this->name);
     }
 }

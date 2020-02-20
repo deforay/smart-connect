@@ -3,7 +3,7 @@
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2016 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -39,7 +39,7 @@ class IsNull extends AbstractExpression implements PredicateInterface
      * Set identifier for comparison
      *
      * @param  string $identifier
-     * @return IsNull
+     * @return self Provides a fluent interface
      */
     public function setIdentifier($identifier)
     {
@@ -61,7 +61,7 @@ class IsNull extends AbstractExpression implements PredicateInterface
      * Set specification string to use in forming SQL predicate
      *
      * @param  string $specification
-     * @return IsNull
+     * @return self Provides a fluent interface
      */
     public function setSpecification($specification)
     {
@@ -87,10 +87,10 @@ class IsNull extends AbstractExpression implements PredicateInterface
     public function getExpressionData()
     {
         $identifier = $this->normalizeArgument($this->identifier, self::TYPE_IDENTIFIER);
-        return array(array(
+        return [[
             $this->getSpecification(),
-            array($identifier[0]),
-            array($identifier[1]),
-        ));
+            [$identifier[0]],
+            [$identifier[1]],
+        ]];
     }
 }

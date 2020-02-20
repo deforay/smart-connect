@@ -12,8 +12,8 @@ namespace Zend\Dom;
 use ArrayAccess;
 use Countable;
 use DOMDocument;
-use DOMNodeList;
 use DOMNode;
+use DOMNodeList;
 use Iterator;
 
 /**
@@ -52,19 +52,31 @@ class NodeList implements Iterator, Countable, ArrayAccess
     protected $xpathQuery;
 
     /**
+     * @var DOMNode|null
+     */
+    protected $contextNode;
+
+    /**
      * Constructor
      *
      * @param string       $cssQuery
      * @param string|array $xpathQuery
      * @param DOMDocument  $document
      * @param DOMNodeList  $nodeList
+     * @param DOMNode|null $contextNode
      */
-    public function __construct($cssQuery, $xpathQuery, DOMDocument $document, DOMNodeList $nodeList)
-    {
-        $this->cssQuery   = $cssQuery;
-        $this->xpathQuery = $xpathQuery;
-        $this->document   = $document;
-        $this->nodeList   = $nodeList;
+    public function __construct(
+        $cssQuery,
+        $xpathQuery,
+        DOMDocument $document,
+        DOMNodeList $nodeList,
+        DOMNode $contextNode = null
+    ) {
+        $this->cssQuery    = $cssQuery;
+        $this->xpathQuery  = $xpathQuery;
+        $this->document    = $document;
+        $this->nodeList    = $nodeList;
+        $this->contextNode = $contextNode;
     }
 
     /**
@@ -95,6 +107,16 @@ class NodeList implements Iterator, Countable, ArrayAccess
     public function getDocument()
     {
         return $this->document;
+    }
+
+    /**
+     * Retrieve context node
+     *
+     * @return DOMNode
+     */
+    public function getContextNode()
+    {
+        return $this->contextNode;
     }
 
     /**

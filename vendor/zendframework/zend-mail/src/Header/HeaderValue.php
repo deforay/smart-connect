@@ -1,10 +1,8 @@
 <?php
 /**
- * Zend Framework (http://framework.zend.com/)
- *
- * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
- * @license   http://framework.zend.com/license/new-bsd New BSD License
+ * @see       https://github.com/zendframework/zend-mail for the canonical source repository
+ * @copyright Copyright (c) 2005-2018 Zend Technologies USA Inc. (https://www.zend.com)
+ * @license   https://github.com/zendframework/zend-mail/blob/master/LICENSE.md New BSD License
  */
 
 namespace Zend\Mail\Header;
@@ -28,20 +26,18 @@ final class HeaderValue
     public static function filter($value)
     {
         $result = '';
-        $tot    = strlen($value);
+        $total  = strlen($value);
 
         // Filter for CR and LF characters, leaving CRLF + WSP sequences for
         // Long Header Fields (section 2.2.3 of RFC 2822)
-        for ($i = 0; $i < $tot; $i += 1) {
+        for ($i = 0; $i < $total; $i += 1) {
             $ord = ord($value[$i]);
-            if (($ord < 32 || $ord > 126)
-                && $ord !== 13
-            ) {
+            if ($ord === 10 || $ord > 127) {
                 continue;
             }
 
             if ($ord === 13) {
-                if ($i + 2 >= $tot) {
+                if ($i + 2 >= $total) {
                     continue;
                 }
 
@@ -72,27 +68,28 @@ final class HeaderValue
      */
     public static function isValid($value)
     {
-        $tot = strlen($value);
-        for ($i = 0; $i < $tot; $i += 1) {
+        $total = strlen($value);
+        for ($i = 0; $i < $total; $i += 1) {
             $ord = ord($value[$i]);
-            if (($ord < 32 || $ord > 126)
-                && $ord !== 13
-            ) {
+
+            // bare LF means we aren't valid
+            if ($ord === 10 || $ord > 127) {
                 return false;
             }
 
             if ($ord === 13) {
-                if ($i + 2 >= $tot) {
+                if ($i + 2 >= $total) {
                     return false;
                 }
 
                 $lf = ord($value[$i + 1]);
                 $sp = ord($value[$i + 2]);
 
-                if ($lf !== 10 || $sp !== 32) {
+                if ($lf !== 10 || ! in_array($sp, [9, 32], true)) {
                     return false;
                 }
 
+                // skip over the LF following this
                 $i += 2;
             }
         }

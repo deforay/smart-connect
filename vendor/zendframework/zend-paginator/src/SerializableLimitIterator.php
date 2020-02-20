@@ -50,12 +50,12 @@ class SerializableLimitIterator extends LimitIterator implements Serializable, A
      */
     public function serialize()
     {
-        return serialize(array(
+        return serialize([
             'it'     => $this->getInnerIterator(),
             'offset' => $this->offset,
             'count'  => $this->count,
             'pos'    => $this->getPosition(),
-        ));
+        ]);
     }
 
     /**
@@ -66,7 +66,7 @@ class SerializableLimitIterator extends LimitIterator implements Serializable, A
     {
         $dataArr = unserialize($data);
         $this->__construct($dataArr['it'], $dataArr['offset'], $dataArr['count']);
-        $this->seek($dataArr['pos']+$dataArr['offset']);
+        $this->seek($dataArr['pos'] + $dataArr['offset']);
     }
 
     /**

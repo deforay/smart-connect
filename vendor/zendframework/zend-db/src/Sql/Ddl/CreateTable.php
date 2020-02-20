@@ -3,7 +3,7 @@
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2016 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -11,6 +11,7 @@ namespace Zend\Db\Sql\Ddl;
 
 use Zend\Db\Adapter\Platform\PlatformInterface;
 use Zend\Db\Sql\AbstractSql;
+use Zend\Db\Sql\TableIdentifier;
 
 class CreateTable extends AbstractSql implements SqlInterface
 {
@@ -21,12 +22,12 @@ class CreateTable extends AbstractSql implements SqlInterface
     /**
      * @var Column\ColumnInterface[]
      */
-    protected $columns = array();
+    protected $columns = [];
 
     /**
      * @var string[]
      */
-    protected $constraints = array();
+    protected $constraints = [];
 
     /**
      * @var bool
@@ -36,21 +37,21 @@ class CreateTable extends AbstractSql implements SqlInterface
     /**
      * {@inheritDoc}
      */
-    protected $specifications = array(
+    protected $specifications = [
         self::TABLE => 'CREATE %1$sTABLE %2$s (',
-        self::COLUMNS  => array(
-            "\n    %1\$s" => array(
-                array(1 => '%1$s', 'combinedby' => ",\n    ")
-            )
-        ),
+        self::COLUMNS  => [
+            "\n    %1\$s" => [
+                [1 => '%1$s', 'combinedby' => ",\n    "]
+            ]
+        ],
         'combinedBy' => ",",
-        self::CONSTRAINTS => array(
-            "\n    %1\$s" => array(
-                array(1 => '%1$s', 'combinedby' => ",\n    ")
-            )
-        ),
+        self::CONSTRAINTS => [
+            "\n    %1\$s" => [
+                [1 => '%1$s', 'combinedby' => ",\n    "]
+            ]
+        ],
         'statementEnd' => '%1$s',
-    );
+    ];
 
     /**
      * @var string
@@ -58,7 +59,7 @@ class CreateTable extends AbstractSql implements SqlInterface
     protected $table = '';
 
     /**
-     * @param string $table
+     * @param string|TableIdentifier $table
      * @param bool   $isTemporary
      */
     public function __construct($table = '', $isTemporary = false)
@@ -69,7 +70,7 @@ class CreateTable extends AbstractSql implements SqlInterface
 
     /**
      * @param  bool $temporary
-     * @return self
+     * @return self Provides a fluent interface
      */
     public function setTemporary($temporary)
     {
@@ -87,7 +88,7 @@ class CreateTable extends AbstractSql implements SqlInterface
 
     /**
      * @param  string $name
-     * @return self
+     * @return self Provides a fluent interface
      */
     public function setTable($name)
     {
@@ -97,7 +98,7 @@ class CreateTable extends AbstractSql implements SqlInterface
 
     /**
      * @param  Column\ColumnInterface $column
-     * @return self
+     * @return self Provides a fluent interface
      */
     public function addColumn(Column\ColumnInterface $column)
     {
@@ -107,7 +108,7 @@ class CreateTable extends AbstractSql implements SqlInterface
 
     /**
      * @param  Constraint\ConstraintInterface $constraint
-     * @return self
+     * @return self Provides a fluent interface
      */
     public function addConstraint(Constraint\ConstraintInterface $constraint)
     {
@@ -121,11 +122,11 @@ class CreateTable extends AbstractSql implements SqlInterface
      */
     public function getRawState($key = null)
     {
-        $rawState = array(
+        $rawState = [
             self::COLUMNS     => $this->columns,
             self::CONSTRAINTS => $this->constraints,
             self::TABLE       => $this->table,
-        );
+        ];
 
         return (isset($key) && array_key_exists($key, $rawState)) ? $rawState[$key] : $rawState;
     }
@@ -137,10 +138,10 @@ class CreateTable extends AbstractSql implements SqlInterface
      */
     protected function processTable(PlatformInterface $adapterPlatform = null)
     {
-        return array(
+        return [
             $this->isTemporary ? 'TEMPORARY ' : '',
-            $adapterPlatform->quoteIdentifier($this->table),
-        );
+            $this->resolveTable($this->table, $adapterPlatform),
+        ];
     }
 
     /**
@@ -154,13 +155,13 @@ class CreateTable extends AbstractSql implements SqlInterface
             return;
         }
 
-        $sqls = array();
+        $sqls = [];
 
         foreach ($this->columns as $column) {
             $sqls[] = $this->processExpression($column, $adapterPlatform);
         }
 
-        return array($sqls);
+        return [$sqls];
     }
 
     /**
@@ -182,17 +183,17 @@ class CreateTable extends AbstractSql implements SqlInterface
      */
     protected function processConstraints(PlatformInterface $adapterPlatform = null)
     {
-        if (!$this->constraints) {
+        if (! $this->constraints) {
             return;
         }
 
-        $sqls = array();
+        $sqls = [];
 
         foreach ($this->constraints as $constraint) {
             $sqls[] = $this->processExpression($constraint, $adapterPlatform);
         }
 
-        return array($sqls);
+        return [$sqls];
     }
 
     /**
@@ -202,6 +203,6 @@ class CreateTable extends AbstractSql implements SqlInterface
      */
     protected function processStatementEnd(PlatformInterface $adapterPlatform = null)
     {
-        return array("\n)");
+        return ["\n)"];
     }
 }

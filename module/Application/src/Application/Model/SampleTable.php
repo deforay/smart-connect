@@ -7610,22 +7610,23 @@ class SampleTable extends AbstractTableGateway
             ->where(
                 array(
                     "sample_tested_datetime >= '$startDate' AND sample_tested_datetime <= '$endDate'",
-                    "facility_details.facility_state = '$provinceID'"
+                    "facility_details.facility_state = '$provinceID'",
+                    "sample_collection_date is not null AND sample_collection_date not like '0000-00-00%' AND sample_collection_date not like ''"
                 )
             );
         if ($skipDays > 0) {
             $squery = $squery->where('
-                DATEDIFF(sample_received_at_vl_lab_datetime,sample_collection_date)<120 AND 
-                DATEDIFF(sample_received_at_vl_lab_datetime,sample_collection_date)>=0 AND 
+                DATEDIFF(sample_received_at_vl_lab_datetime,sample_collection_date) < '.$skipDays.' AND 
+                DATEDIFF(sample_received_at_vl_lab_datetime,sample_collection_date) >= 0 AND 
 
-                DATEDIFF(sample_registered_at_lab,sample_received_at_vl_lab_datetime)<120 AND 
-                DATEDIFF(sample_registered_at_lab,sample_received_at_vl_lab_datetime)>=0 AND 
+                DATEDIFF(sample_registered_at_lab,sample_received_at_vl_lab_datetime) < '.$skipDays.' AND 
+                DATEDIFF(sample_registered_at_lab,sample_received_at_vl_lab_datetime) >= 0 AND 
 
-                DATEDIFF(sample_tested_datetime,sample_received_at_vl_lab_datetime)<120 AND 
+                DATEDIFF(sample_tested_datetime,sample_received_at_vl_lab_datetime) < '.$skipDays.' AND 
                 DATEDIFF(sample_tested_datetime,sample_registered_at_lab)>=0 AND 
 
-                DATEDIFF(result_approved_datetime,sample_tested_datetime)<120 AND 
-                DATEDIFF(result_approved_datetime,sample_tested_datetime)>=0');
+                DATEDIFF(result_approved_datetime,sample_tested_datetime) < '.$skipDays.' AND 
+                DATEDIFF(result_approved_datetime,sample_tested_datetime) >= 0');
         }
 
         if (isset($labs) && !empty($labs)) {

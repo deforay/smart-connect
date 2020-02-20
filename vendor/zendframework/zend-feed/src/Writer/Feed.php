@@ -21,7 +21,7 @@ class Feed extends AbstractFeed implements Iterator, Countable
      *
      * @var array
      */
-    protected $entries = array();
+    protected $entries = [];
 
     /**
      * A pointer for the iterator to keep track of the entries array
@@ -99,7 +99,7 @@ class Feed extends AbstractFeed implements Iterator, Countable
      */
     public function removeEntry($index)
     {
-        if (!isset($this->entries[$index])) {
+        if (! isset($this->entries[$index])) {
             throw new Exception\InvalidArgumentException('Undefined index: ' . $index . '. Entry does not exist.');
         }
         unset($this->entries[$index]);
@@ -137,7 +137,7 @@ class Feed extends AbstractFeed implements Iterator, Countable
          * Could do with some improvement for performance perhaps
          */
         $timestamp = time();
-        $entries = array();
+        $entries = [];
         foreach ($this->entries as $entry) {
             if ($entry->getDateModified()) {
                 $timestamp = (int) $entry->getDateModified()->getTimestamp();

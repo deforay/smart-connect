@@ -1,10 +1,8 @@
 <?php
 /**
- * Zend Framework (http://framework.zend.com/)
- *
- * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
- * @license   http://framework.zend.com/license/new-bsd New BSD License
+ * @see       https://github.com/zendframework/zend-mail for the canonical source repository
+ * @copyright Copyright (c) 2005-2018 Zend Technologies USA Inc. (https://www.zend.com)
+ * @license   https://github.com/zendframework/zend-mail/blob/master/LICENSE.md New BSD License
  */
 
 namespace Zend\Mail\Storage;
@@ -24,7 +22,7 @@ class Maildir extends AbstractStorage
      * data of found message files in maildir dir
      * @var array
      */
-    protected $files = array();
+    protected $files = [];
 
     /**
      * known flag chars in filenames
@@ -33,12 +31,14 @@ class Maildir extends AbstractStorage
      *
      * @var array
      */
-    protected static $knownFlags = array('D' => Mail\Storage::FLAG_DRAFT,
-                                          'F' => Mail\Storage::FLAG_FLAGGED,
-                                          'P' => Mail\Storage::FLAG_PASSED,
-                                          'R' => Mail\Storage::FLAG_ANSWERED,
-                                          'S' => Mail\Storage::FLAG_SEEN,
-                                          'T' => Mail\Storage::FLAG_DELETED);
+    protected static $knownFlags = [
+        'D' => Mail\Storage::FLAG_DRAFT,
+        'F' => Mail\Storage::FLAG_FLAGGED,
+        'P' => Mail\Storage::FLAG_PASSED,
+        'R' => Mail\Storage::FLAG_ANSWERED,
+        'S' => Mail\Storage::FLAG_SEEN,
+        'T' => Mail\Storage::FLAG_DELETED,
+    ];
 
     // TODO: getFlags($id) for fast access if headers are not needed (i.e. just setting flags)?
 
@@ -55,7 +55,7 @@ class Maildir extends AbstractStorage
         }
 
         $count = 0;
-        if (!is_array($flags)) {
+        if (! is_array($flags)) {
             foreach ($this->files as $file) {
                 if (isset($file['flaglookup'][$flags])) {
                     ++$count;
@@ -67,7 +67,7 @@ class Maildir extends AbstractStorage
         $flags = array_flip($flags);
         foreach ($this->files as $file) {
             foreach ($flags as $flag => $v) {
-                if (!isset($file['flaglookup'][$flag])) {
+                if (! isset($file['flaglookup'][$flag])) {
                     continue 2;
                 }
             }
@@ -84,17 +84,17 @@ class Maildir extends AbstractStorage
      * @throws Exception\InvalidArgumentException
      * @return string|array wanted field or all fields as array
      */
-    protected function _getFileData($id, $field = null)
+    protected function getFileData($id, $field = null)
     {
-        if (!isset($this->files[$id - 1])) {
+        if (! isset($this->files[$id - 1])) {
             throw new Exception\InvalidArgumentException('id does not exist');
         }
 
-        if (!$field) {
+        if (! $field) {
             return $this->files[$id - 1];
         }
 
-        if (!isset($this->files[$id - 1][$field])) {
+        if (! isset($this->files[$id - 1][$field])) {
             throw new Exception\InvalidArgumentException('field does not exist');
         }
 
@@ -110,11 +110,11 @@ class Maildir extends AbstractStorage
     public function getSize($id = null)
     {
         if ($id !== null) {
-            $filedata = $this->_getFileData($id);
+            $filedata = $this->getFileData($id);
             return isset($filedata['size']) ? $filedata['size'] : filesize($filedata['filename']);
         }
 
-        $result = array();
+        $result = [];
         foreach ($this->files as $num => $data) {
             $result[$num + 1] = isset($data['size']) ? $data['size'] : filesize($data['filename']);
         }
@@ -132,14 +132,21 @@ class Maildir extends AbstractStorage
     public function getMessage($id)
     {
         // TODO that's ugly, would be better to let the message class decide
-        if (strtolower($this->messageClass) == '\zend\mail\storage\message\file'
-            || is_subclass_of($this->messageClass, '\Zend\Mail\Storage\Message\File')) {
-            return new $this->messageClass(array('file'  => $this->_getFileData($id, 'filename'),
-                                                  'flags' => $this->_getFileData($id, 'flags')));
+        if ($this->messageClass === Message\File::class
+            || is_subclass_of($this->messageClass, Message\File::class)
+        ) {
+            return new $this->messageClass([
+                'file'  => $this->getFileData($id, 'filename'),
+                'flags' => $this->getFileData($id, 'flags'),
+            ]);
         }
 
-        return new $this->messageClass(array('handler' => $this, 'id' => $id, 'headers' => $this->getRawHeader($id),
-                                              'flags'   => $this->_getFileData($id, 'flags')));
+        return new $this->messageClass([
+            'handler' => $this,
+            'id'      => $id,
+            'headers' => $this->getRawHeader($id),
+            'flags'   => $this->getFileData($id, 'flags'),
+        ]);
     }
 
     /*
@@ -158,12 +165,12 @@ class Maildir extends AbstractStorage
             throw new Exception\RuntimeException('not implemented');
         }
 
-        $fh = fopen($this->_getFileData($id, 'filename'), 'r');
+        $fh = fopen($this->getFileData($id, 'filename'), 'r');
 
         $content = '';
-        while (!feof($fh)) {
+        while (! feof($fh)) {
             $line = fgets($fh);
-            if (!trim($line)) {
+            if (! trim($line)) {
                 break;
             }
             $content .= $line;
@@ -188,11 +195,11 @@ class Maildir extends AbstractStorage
             throw new Exception\RuntimeException('not implemented');
         }
 
-        $fh = fopen($this->_getFileData($id, 'filename'), 'r');
+        $fh = fopen($this->getFileData($id, 'filename'), 'r');
 
-        while (!feof($fh)) {
+        while (! feof($fh)) {
             $line = fgets($fh);
-            if (!trim($line)) {
+            if (! trim($line)) {
                 break;
             }
         }
@@ -216,17 +223,17 @@ class Maildir extends AbstractStorage
             $params = (object) $params;
         }
 
-        if (!isset($params->dirname) || !is_dir($params->dirname)) {
+        if (! isset($params->dirname) || ! is_dir($params->dirname)) {
             throw new Exception\InvalidArgumentException('no valid dirname given in params');
         }
 
-        if (!$this->_isMaildir($params->dirname)) {
+        if (! $this->isMaildir($params->dirname)) {
             throw new Exception\InvalidArgumentException('invalid maildir given');
         }
 
         $this->has['top'] = true;
         $this->has['flags'] = true;
-        $this->_openMaildir($params->dirname);
+        $this->openMaildir($params->dirname);
     }
 
     /**
@@ -235,12 +242,12 @@ class Maildir extends AbstractStorage
      * @param string $dirname name of dir
      * @return bool dir is valid maildir
      */
-    protected function _isMaildir($dirname)
+    protected function isMaildir($dirname)
     {
-        if (file_exists($dirname . '/new') && !is_dir($dirname . '/new')) {
+        if (file_exists($dirname . '/new') && ! is_dir($dirname . '/new')) {
             return false;
         }
-        if (file_exists($dirname . '/tmp') && !is_dir($dirname . '/tmp')) {
+        if (file_exists($dirname . '/tmp') && ! is_dir($dirname . '/tmp')) {
             return false;
         }
         return is_dir($dirname . '/cur');
@@ -252,7 +259,7 @@ class Maildir extends AbstractStorage
      * @param string $dirname name of maildir
      * @throws Exception\RuntimeException
      */
-    protected function _openMaildir($dirname)
+    protected function openMaildir($dirname)
     {
         if ($this->files) {
             $this->close();
@@ -261,21 +268,21 @@ class Maildir extends AbstractStorage
         ErrorHandler::start(E_WARNING);
         $dh    = opendir($dirname . '/cur/');
         $error = ErrorHandler::stop();
-        if (!$dh) {
+        if (! $dh) {
             throw new Exception\RuntimeException('cannot open maildir', 0, $error);
         }
-        $this->_getMaildirFiles($dh, $dirname . '/cur/');
+        $this->getMaildirFiles($dh, $dirname . '/cur/');
         closedir($dh);
 
         ErrorHandler::start(E_WARNING);
         $dh    = opendir($dirname . '/new/');
         $error = ErrorHandler::stop();
-        if ($dh) {
-            $this->_getMaildirFiles($dh, $dirname . '/new/', array(Mail\Storage::FLAG_RECENT));
-            closedir($dh);
-        } elseif (file_exists($dirname . '/new/')) {
+        if (! $dh) {
             throw new Exception\RuntimeException('cannot read recent mails in maildir', 0, $error);
         }
+
+        $this->getMaildirFiles($dh, $dirname . '/new/', [Mail\Storage::FLAG_RECENT]);
+        closedir($dh);
     }
 
     /**
@@ -285,10 +292,10 @@ class Maildir extends AbstractStorage
      * @param string   $dirname       dirname of dir in $dh
      * @param array    $defaultFlags default flags for given dir
      */
-    protected function _getMaildirFiles($dh, $dirname, $defaultFlags = array())
+    protected function getMaildirFiles($dh, $dirname, $defaultFlags = [])
     {
         while (($entry = readdir($dh)) !== false) {
-            if ($entry[0] == '.' || !is_file($dirname . $entry)) {
+            if ($entry[0] == '.' || ! is_file($dirname . $entry)) {
                 continue;
             }
 
@@ -299,7 +306,7 @@ class Maildir extends AbstractStorage
             if ($size && $size[0] == 'S' && $size[1] == '=') {
                 $size = substr($size, 2);
             }
-            if (!ctype_digit($size)) {
+            if (! ctype_digit($size)) {
                 $size = null;
             }
 
@@ -317,10 +324,12 @@ class Maildir extends AbstractStorage
                 $namedFlags[$flag] = isset(static::$knownFlags[$flag]) ? static::$knownFlags[$flag] : $flag;
             }
 
-            $data = array('uniq'       => $uniq,
-                          'flags'      => $namedFlags,
-                          'flaglookup' => array_flip($namedFlags),
-                          'filename'   => $dirname . $entry);
+            $data = [
+                'uniq'       => $uniq,
+                'flags'      => $namedFlags,
+                'flaglookup' => array_flip($namedFlags),
+                'filename'   => $dirname . $entry
+            ];
             if ($size !== null) {
                 $data['size'] = (int) $size;
             }
@@ -335,7 +344,7 @@ class Maildir extends AbstractStorage
      */
     public function close()
     {
-        $this->files = array();
+        $this->files = [];
     }
 
     /**
@@ -370,10 +379,10 @@ class Maildir extends AbstractStorage
     public function getUniqueId($id = null)
     {
         if ($id) {
-            return $this->_getFileData($id, 'uniq');
+            return $this->getFileData($id, 'uniq');
         }
 
-        $ids = array();
+        $ids = [];
         foreach ($this->files as $num => $file) {
             $ids[$num + 1] = $file['uniq'];
         }

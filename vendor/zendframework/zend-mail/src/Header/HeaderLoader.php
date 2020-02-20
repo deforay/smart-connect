@@ -1,10 +1,8 @@
 <?php
 /**
- * Zend Framework (http://framework.zend.com/)
- *
- * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
- * @license   http://framework.zend.com/license/new-bsd New BSD License
+ * @see       https://github.com/zendframework/zend-mail for the canonical source repository
+ * @copyright Copyright (c) 2005-2018 Zend Technologies USA Inc. (https://www.zend.com)
+ * @license   https://github.com/zendframework/zend-mail/blob/master/LICENSE.md New BSD License
  */
 
 namespace Zend\Mail\Header;
@@ -19,7 +17,7 @@ class HeaderLoader extends PluginClassLoader
     /**
      * @var array Pre-aliased Header plugins
      */
-    protected $plugins = array(
+    protected $plugins = [
         'bcc'                       => 'Zend\Mail\Header\Bcc',
         'cc'                        => 'Zend\Mail\Header\Cc',
         'contenttype'               => 'Zend\Mail\Header\ContentType',
@@ -30,16 +28,18 @@ class HeaderLoader extends PluginClassLoader
         'content-transfer-encoding' => 'Zend\Mail\Header\ContentTransferEncoding',
         'date'                      => 'Zend\Mail\Header\Date',
         'from'                      => 'Zend\Mail\Header\From',
+        'in-reply-to'               => 'Zend\Mail\Header\InReplyTo',
         'message-id'                => 'Zend\Mail\Header\MessageId',
         'mimeversion'               => 'Zend\Mail\Header\MimeVersion',
         'mime_version'              => 'Zend\Mail\Header\MimeVersion',
         'mime-version'              => 'Zend\Mail\Header\MimeVersion',
         'received'                  => 'Zend\Mail\Header\Received',
+        'references'                => 'Zend\Mail\Header\References',
         'replyto'                   => 'Zend\Mail\Header\ReplyTo',
         'reply_to'                  => 'Zend\Mail\Header\ReplyTo',
         'reply-to'                  => 'Zend\Mail\Header\ReplyTo',
         'sender'                    => 'Zend\Mail\Header\Sender',
         'subject'                   => 'Zend\Mail\Header\Subject',
         'to'                        => 'Zend\Mail\Header\To',
-    );
+    ];
 }

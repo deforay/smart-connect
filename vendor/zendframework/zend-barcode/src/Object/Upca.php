@@ -1,10 +1,8 @@
 <?php
 /**
- * Zend Framework (http://framework.zend.com/)
- *
- * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
- * @license   http://framework.zend.com/license/new-bsd New BSD License
+ * @see       https://github.com/zendframework/zend-barcode for the canonical source repository
+ * @copyright Copyright (c) 2005-2019 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   https://github.com/zendframework/zend-barcode/blob/master/LICENSE.md New BSD License
  */
 
 namespace Zend\Barcode\Object;
@@ -45,55 +43,55 @@ class Upca extends Ean13
      */
     protected function prepareBarcode()
     {
-        $barcodeTable = array();
+        $barcodeTable = [];
         $height = ($this->drawText) ? 1.1 : 1;
 
         // Start character (101)
-        $barcodeTable[] = array(1, $this->barThinWidth, 0, $height);
-        $barcodeTable[] = array(0, $this->barThinWidth, 0, $height);
-        $barcodeTable[] = array(1, $this->barThinWidth, 0, $height);
+        $barcodeTable[] = [1, $this->barThinWidth, 0, $height];
+        $barcodeTable[] = [0, $this->barThinWidth, 0, $height];
+        $barcodeTable[] = [1, $this->barThinWidth, 0, $height];
 
         $textTable = str_split($this->getText());
 
         // First character
         $bars = str_split($this->codingMap['A'][$textTable[0]]);
         foreach ($bars as $b) {
-            $barcodeTable[] = array($b, $this->barThinWidth, 0, $height);
+            $barcodeTable[] = [$b, $this->barThinWidth, 0, $height];
         }
 
         // First part
         for ($i = 1; $i < 6; $i++) {
             $bars = str_split($this->codingMap['A'][$textTable[$i]]);
             foreach ($bars as $b) {
-                $barcodeTable[] = array($b, $this->barThinWidth, 0, 1);
+                $barcodeTable[] = [$b, $this->barThinWidth, 0, 1];
             }
         }
 
         // Middle character (01010)
-        $barcodeTable[] = array(0, $this->barThinWidth, 0, $height);
-        $barcodeTable[] = array(1, $this->barThinWidth, 0, $height);
-        $barcodeTable[] = array(0, $this->barThinWidth, 0, $height);
-        $barcodeTable[] = array(1, $this->barThinWidth, 0, $height);
-        $barcodeTable[] = array(0, $this->barThinWidth, 0, $height);
+        $barcodeTable[] = [0, $this->barThinWidth, 0, $height];
+        $barcodeTable[] = [1, $this->barThinWidth, 0, $height];
+        $barcodeTable[] = [0, $this->barThinWidth, 0, $height];
+        $barcodeTable[] = [1, $this->barThinWidth, 0, $height];
+        $barcodeTable[] = [0, $this->barThinWidth, 0, $height];
 
         // Second part
         for ($i = 6; $i < 11; $i++) {
             $bars = str_split($this->codingMap['C'][$textTable[$i]]);
             foreach ($bars as $b) {
-                $barcodeTable[] = array($b, $this->barThinWidth, 0, 1);
+                $barcodeTable[] = [$b, $this->barThinWidth, 0, 1];
             }
         }
 
         // Last character
         $bars = str_split($this->codingMap['C'][$textTable[11]]);
         foreach ($bars as $b) {
-            $barcodeTable[] = array($b, $this->barThinWidth, 0, $height);
+            $barcodeTable[] = [$b, $this->barThinWidth, 0, $height];
         }
 
         // Stop character (101)
-        $barcodeTable[] = array(1, $this->barThinWidth, 0, $height);
-        $barcodeTable[] = array(0, $this->barThinWidth, 0, $height);
-        $barcodeTable[] = array(1, $this->barThinWidth, 0, $height);
+        $barcodeTable[] = [1, $this->barThinWidth, 0, $height];
+        $barcodeTable[] = [0, $this->barThinWidth, 0, $height];
+        $barcodeTable[] = [1, $this->barThinWidth, 0, $height];
         return $barcodeTable;
     }
 
@@ -113,7 +111,7 @@ class Upca extends Ean13
                     $fontSize *= 0.8;
                 }
                 $this->addText(
-                    $text{$i},
+                    $text[$i],
                     $fontSize * $this->factor,
                     $this->rotate(
                         $leftPosition,

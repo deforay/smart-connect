@@ -65,11 +65,11 @@ class Console extends AbstractAdapter
      *
      * @var array
      */
-    protected $elements = array(
+    protected $elements = [
         self::ELEMENT_PERCENT,
         self::ELEMENT_BAR,
         self::ELEMENT_ETA,
-    );
+    ];
 
     /**
      * Which action to do at finish call
@@ -192,7 +192,7 @@ class Console extends AbstractAdapter
     public function getOutputStream()
     {
         if ($this->outputStream === null) {
-            if (!defined('STDOUT')) {
+            if (! defined('STDOUT')) {
                 $this->outputStream = fopen('php://stdout', 'w');
             } else {
                 return STDOUT;
@@ -210,7 +210,7 @@ class Console extends AbstractAdapter
      */
     public function setWidth($width = null)
     {
-        if ($width === null || !is_int($width)) {
+        if ($width === null || ! is_int($width)) {
             if (substr(PHP_OS, 0, 3) === 'WIN') {
                 // We have to default to 79 on windows, because the windows
                 // terminal always has a fixed width of 80 characters and the
@@ -243,15 +243,16 @@ class Console extends AbstractAdapter
      * Set the elements to display with the progressbar
      *
      * @param  array $elements
-     * @throws \Zend\ProgressBar\Adapter\Exception\InvalidArgumentException When an invalid element is found in the array
+     * @throws \Zend\ProgressBar\Adapter\Exception\InvalidArgumentException When an invalid element is found
+     *                                                                      in the array
      * @return \Zend\ProgressBar\Adapter\Console
      */
     public function setElements(array $elements)
     {
-        $allowedElements = array(self::ELEMENT_PERCENT,
+        $allowedElements = [self::ELEMENT_PERCENT,
                                  self::ELEMENT_BAR,
                                  self::ELEMENT_ETA,
-                                 self::ELEMENT_TEXT);
+                                 self::ELEMENT_TEXT];
 
         if (count(array_diff($elements, $allowedElements)) > 0) {
             throw new Exception\InvalidArgumentException('Invalid element found in $elements array');
@@ -347,11 +348,11 @@ class Console extends AbstractAdapter
      */
     public function setFinishAction($action)
     {
-        $allowedActions = array(self::FINISH_ACTION_CLEAR_LINE,
+        $allowedActions = [self::FINISH_ACTION_CLEAR_LINE,
                                 self::FINISH_ACTION_EOL,
-                                self::FINISH_ACTION_NONE);
+                                self::FINISH_ACTION_NONE];
 
-        if (!in_array($action, $allowedActions)) {
+        if (! in_array($action, $allowedActions)) {
             throw new Exception\InvalidArgumentException('Invalid finish action specified');
         }
 
@@ -382,7 +383,7 @@ class Console extends AbstractAdapter
         }
 
         // Build all elements
-        $renderedElements = array();
+        $renderedElements = [];
 
         foreach ($this->elements as $element) {
             switch ($element) {
@@ -394,14 +395,22 @@ class Console extends AbstractAdapter
 
                     $doneWidth = min($visualWidth - $indicatorWidth, round($visualWidth * $percent));
                     if ($doneWidth > 0) {
-                        $bar .= substr(str_repeat($this->barLeftChar, ceil($doneWidth / strlen($this->barLeftChar))), 0, $doneWidth);
+                        $bar .= substr(
+                            str_repeat($this->barLeftChar, ceil($doneWidth / strlen($this->barLeftChar))),
+                            0,
+                            $doneWidth
+                        );
                     }
 
                     $bar .= $this->barIndicatorChar;
 
                     $leftWidth = $visualWidth - $doneWidth - $indicatorWidth;
                     if ($leftWidth > 0) {
-                        $bar .= substr(str_repeat($this->barRightChar, ceil($leftWidth / strlen($this->barRightChar))), 0, $leftWidth);
+                        $bar .= substr(
+                            str_repeat($this->barRightChar, ceil($leftWidth / strlen($this->barRightChar))),
+                            0,
+                            $leftWidth
+                        );
                     }
 
                     $bar .= ']';
@@ -485,8 +494,10 @@ class Console extends AbstractAdapter
      *
      * @return void
      */
+    // @codingStandardsIgnoreStart
     protected function _calculateBarWidth()
     {
+        // @codingStandardsIgnoreEnd
         if (in_array(self::ELEMENT_BAR, $this->elements)) {
             $barWidth = $this->width;
 
@@ -514,8 +525,10 @@ class Console extends AbstractAdapter
      * @param  string $data
      * @return void
      */
+    // @codingStandardsIgnoreStart
     protected function _outputData($data)
     {
+        // @codingStandardsIgnoreEnd
         fwrite($this->getOutputStream(), $data);
     }
 }

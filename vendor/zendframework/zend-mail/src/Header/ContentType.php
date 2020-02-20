@@ -1,17 +1,16 @@
 <?php
 /**
- * Zend Framework (http://framework.zend.com/)
- *
- * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
- * @license   http://framework.zend.com/license/new-bsd New BSD License
+ * @see       https://github.com/zendframework/zend-mail for the canonical source repository
+ * @copyright Copyright (c) 2005-2018 Zend Technologies USA Inc. (https://www.zend.com)
+ * @license   https://github.com/zendframework/zend-mail/blob/master/LICENSE.md New BSD License
  */
 
 namespace Zend\Mail\Header;
 
 use Zend\Mail\Headers;
+use Zend\Mime\Mime;
 
-class ContentType implements HeaderInterface
+class ContentType implements UnstructuredInterface
 {
     /**
      * @var string
@@ -19,9 +18,16 @@ class ContentType implements HeaderInterface
     protected $type;
 
     /**
+     * Header encoding
+     *
+     * @var string
+     */
+    protected $encoding = 'ASCII';
+
+    /**
      * @var array
      */
-    protected $parameters = array();
+    protected $parameters = [];
 
     public static function fromString($headerLine)
     {
@@ -34,19 +40,20 @@ class ContentType implements HeaderInterface
         }
 
         $value  = str_replace(Headers::FOLDING, ' ', $value);
-        $values = preg_split('#\s*;\s*#', $value);
+        $parts = explode(';', $value, 2);
 
-        $type   = array_shift($values);
         $header = new static();
-        $header->setType($type);
+        $header->setType($parts[0]);
 
-        // Remove empty values
-        $values = array_filter($values);
+        if (isset($parts[1])) {
+            $values = ListParser::parse(trim($parts[1]), [';', '=']);
+            $length = count($values);
 
-        foreach ($values as $keyValuePair) {
-            list($key, $value) = explode('=', $keyValuePair, 2);
-            $value = trim($value, "'\" \t\n\r\0\x0B");
-            $header->addParameter($key, $value);
+            for ($i = 0; $i < $length; $i += 2) {
+                $value = $values[$i + 1];
+                $value = trim($value, "'\" \t\n\r\0\x0B");
+                $header->addParameter($values[$i], $value);
+            }
         }
 
         return $header;
@@ -64,8 +71,14 @@ class ContentType implements HeaderInterface
             return $prepared;
         }
 
-        $values = array($prepared);
+        $values = [$prepared];
         foreach ($this->parameters as $attribute => $value) {
+            if (HeaderInterface::FORMAT_ENCODED === $format && ! Mime::isPrintable($value)) {
+                $this->encoding = 'UTF-8';
+                $value = HeaderWrap::wrap($value, $this);
+                $this->encoding = 'ASCII';
+            }
+
             $values[] = sprintf('%s="%s"', $attribute, $value);
         }
 
@@ -74,18 +87,18 @@ class ContentType implements HeaderInterface
 
     public function setEncoding($encoding)
     {
-        // This header must be always in US-ASCII
+        $this->encoding = $encoding;
         return $this;
     }
 
     public function getEncoding()
     {
-        return 'ASCII';
+        return $this->encoding;
     }
 
     public function toString()
     {
-        return 'Content-Type: ' . $this->getFieldValue();
+        return 'Content-Type: ' . $this->getFieldValue(HeaderInterface::FORMAT_ENCODED);
     }
 
     /**
@@ -97,7 +110,7 @@ class ContentType implements HeaderInterface
      */
     public function setType($type)
     {
-        if (!preg_match('/^[a-z-]+\/[a-z0-9.+-]+$/i', $type)) {
+        if (! preg_match('/^[a-z-]+\/[a-z0-9.+-]+$/i', $type)) {
             throw new Exception\InvalidArgumentException(sprintf(
                 '%s expects a value in the format "type/subtype"; received "%s"',
                 __METHOD__,
@@ -135,8 +148,10 @@ class ContentType implements HeaderInterface
         if (! HeaderValue::isValid($name)) {
             throw new Exception\InvalidArgumentException('Invalid content-type parameter name detected');
         }
-        if (! HeaderValue::isValid($value)) {
-            throw new Exception\InvalidArgumentException('Invalid content-type parameter value detected');
+        if (! HeaderWrap::canBeEncoded($value)) {
+            throw new Exception\InvalidArgumentException(
+                'Parameter value must be composed of printable US-ASCII or UTF-8 characters.'
+            );
         }
 
         $this->parameters[$name] = $value;

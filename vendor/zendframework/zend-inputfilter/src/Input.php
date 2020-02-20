@@ -10,6 +10,7 @@
 namespace Zend\InputFilter;
 
 use Zend\Filter\FilterChain;
+use Zend\ServiceManager\AbstractPluginManager;
 use Zend\Validator\NotEmpty;
 use Zend\Validator\ValidatorChain;
 
@@ -18,11 +19,15 @@ class Input implements
     EmptyContextInterface
 {
     /**
+     * @deprecated 2.4.8 Add Zend\Validator\NotEmpty validator to the ValidatorChain.
+     *
      * @var bool
      */
     protected $allowEmpty = false;
 
     /**
+     * @deprecated 2.4.8 Add Zend\Validator\NotEmpty validator to the ValidatorChain.
+     *
      * @var bool
      */
     protected $continueIfEmpty = false;
@@ -48,6 +53,8 @@ class Input implements
     protected $name;
 
     /**
+     * @deprecated 2.4.8 Add Zend\Validator\NotEmpty validator to the ValidatorChain.
+     *
      * @var bool
      */
     protected $notEmptyValidator = false;
@@ -68,6 +75,13 @@ class Input implements
     protected $value;
 
     /**
+     * Flag for distinguish when $value contains the value previously set or the default one.
+     *
+     * @var bool
+     */
+    protected $hasValue = false;
+
+    /**
      * @var mixed
      */
     protected $fallbackValue;
@@ -83,6 +97,8 @@ class Input implements
     }
 
     /**
+     * @deprecated 2.4.8 Add Zend\Validator\NotEmpty validator to the ValidatorChain and set this to `true`.
+     *
      * @param  bool $allowEmpty
      * @return Input
      */
@@ -103,6 +119,8 @@ class Input implements
     }
 
     /**
+     * @deprecated 2.4.8 Add Zend\Validator\NotEmpty validator to the ValidatorChain and set this to `true`.
+     *
      * @param bool $continueIfEmpty
      * @return Input
      */
@@ -163,12 +181,36 @@ class Input implements
     }
 
     /**
+     * Set the input value.
+     *
+     * If you want to remove/unset the current value use {@link Input::resetValue()}.
+     *
+     * @see Input::getValue() For retrieve the input value.
+     * @see Input::hasValue() For to know if input value was set.
+     * @see Input::resetValue() For reset the input value to the default state.
+     *
      * @param  mixed $value
      * @return Input
      */
     public function setValue($value)
     {
         $this->value = $value;
+        $this->hasValue = true;
+        return $this;
+    }
+
+    /**
+     * Reset input value to the default state.
+     *
+     * @see Input::hasValue() For to know if input value was set.
+     * @see Input::setValue() For set a new value.
+     *
+     * @return Input
+     */
+    public function resetValue()
+    {
+        $this->value = null;
+        $this->hasValue = false;
         return $this;
     }
 
@@ -184,6 +226,8 @@ class Input implements
     }
 
     /**
+     * @deprecated 2.4.8 Add Zend\Validator\NotEmpty validator to the ValidatorChain.
+     *
      * @return bool
      */
     public function allowEmpty()
@@ -200,6 +244,8 @@ class Input implements
     }
 
     /**
+     * @deprecated 2.4.8 Add Zend\Validator\NotEmpty validator to the ValidatorChain. Should always return `true`.
+     *
      * @return bool
      */
     public function continueIfEmpty()
@@ -220,7 +266,7 @@ class Input implements
      */
     public function getFilterChain()
     {
-        if (!$this->filterChain) {
+        if (! $this->filterChain) {
             $this->setFilterChain(new FilterChain());
         }
         return $this->filterChain;
@@ -255,7 +301,7 @@ class Input implements
      */
     public function getValidatorChain()
     {
-        if (!$this->validatorChain) {
+        if (! $this->validatorChain) {
             $this->setValidatorChain(new ValidatorChain());
         }
         return $this->validatorChain;
@@ -268,6 +314,23 @@ class Input implements
     {
         $filter = $this->getFilterChain();
         return $filter->filter($this->value);
+    }
+
+    /**
+     * Flag for inform if input value was set.
+     *
+     * This flag used for distinguish when {@link Input::getValue()}
+     * will return the value previously set or the default.
+     *
+     * @see Input::getValue() For retrieve the input value.
+     * @see Input::setValue() For set a new value.
+     * @see Input::resetValue() For reset the input value to the default state.
+     *
+     * @return bool
+     */
+    public function hasValue()
+    {
+        return $this->hasValue;
     }
 
     /**
@@ -299,12 +362,16 @@ class Input implements
     public function merge(InputInterface $input)
     {
         $this->setBreakOnFailure($input->breakOnFailure());
-        $this->setContinueIfEmpty($input->continueIfEmpty());
+        if ($input instanceof Input) {
+            $this->setContinueIfEmpty($input->continueIfEmpty());
+        }
         $this->setErrorMessage($input->getErrorMessage());
         $this->setName($input->getName());
         $this->setRequired($input->isRequired());
         $this->setAllowEmpty($input->allowEmpty());
-        $this->setValue($input->getRawValue());
+        if (! $input instanceof Input || $input->hasValue()) {
+            $this->setValue($input->getRawValue());
+        }
 
         $filterChain = $input->getFilterChain();
         $this->getFilterChain()->merge($filterChain);
@@ -320,17 +387,38 @@ class Input implements
      */
     public function isValid($context = null)
     {
+        if (is_array($this->errorMessage)) {
+            $this->errorMessage = null;
+        }
+
         $value           = $this->getValue();
-        $empty           = ($value === null || $value === '' || $value === array());
+        $hasValue        = $this->hasValue();
+        $empty           = ($value === null || $value === '' || $value === []);
         $required        = $this->isRequired();
         $allowEmpty      = $this->allowEmpty();
         $continueIfEmpty = $this->continueIfEmpty();
+
+        if (! $hasValue && $this->hasFallback()) {
+            $this->setValue($this->getFallbackValue());
+            return true;
+        }
+
+        if (! $hasValue && ! $required) {
+            return true;
+        }
+
+        if (! $hasValue && $required) {
+            if ($this->errorMessage === null) {
+                $this->errorMessage = $this->prepareRequiredValidationFailureMessage();
+            }
+            return false;
+        }
 
         if ($empty && ! $required && ! $continueIfEmpty) {
             return true;
         }
 
-        if ($empty && $required && $allowEmpty && ! $continueIfEmpty) {
+        if ($empty && $allowEmpty && ! $continueIfEmpty) {
             return true;
         }
 
@@ -353,7 +441,7 @@ class Input implements
     }
 
     /**
-     * @return array
+     * @return string[]
      */
     public function getMessages()
     {
@@ -362,7 +450,7 @@ class Input implements
         }
 
         if ($this->hasFallback()) {
-            return array();
+            return [];
         }
 
         $validator = $this->getValidatorChain();
@@ -370,11 +458,13 @@ class Input implements
     }
 
     /**
+     * @deprecated 2.4.8 Add Zend\Validator\NotEmpty validator to the ValidatorChain.
+     *
      * @return void
      */
     protected function injectNotEmptyValidator()
     {
-        if ((!$this->isRequired() && $this->allowEmpty()) || $this->notEmptyValidator) {
+        if ((! $this->isRequired() && $this->allowEmpty()) || $this->notEmptyValidator) {
             return;
         }
         $chain = $this->getValidatorChain();
@@ -390,12 +480,42 @@ class Input implements
 
         $this->notEmptyValidator = true;
 
-        if (class_exists('Zend\ServiceManager\AbstractPluginManager')) {
-            $chain->prependByName('NotEmpty', array(), true);
+        if (class_exists(AbstractPluginManager::class)) {
+            $chain->prependByName('NotEmpty', [], true);
 
             return;
         }
 
         $chain->prependValidator(new NotEmpty(), true);
+    }
+
+    /**
+     * Create and return the validation failure message for required input.
+     *
+     * @return string[]
+     */
+    protected function prepareRequiredValidationFailureMessage()
+    {
+        $chain      = $this->getValidatorChain();
+        $notEmpty   = $chain->plugin(NotEmpty::class);
+
+        foreach ($chain->getValidators() as $validator) {
+            if ($validator['instance'] instanceof NotEmpty) {
+                $notEmpty = $validator['instance'];
+                break;
+            }
+        }
+
+        $templates  = $notEmpty->getOption('messageTemplates');
+        $message    = $templates[NotEmpty::IS_EMPTY];
+        $translator = $notEmpty->getTranslator();
+
+        if ($translator) {
+            $message = $translator->translate($message, $notEmpty->getTranslatorTextDomain());
+        }
+
+        return [
+            NotEmpty::IS_EMPTY => $message,
+        ];
     }
 }

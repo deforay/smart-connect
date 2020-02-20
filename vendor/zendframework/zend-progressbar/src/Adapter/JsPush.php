@@ -70,14 +70,14 @@ class JsPush extends AbstractAdapter
      */
     public function notify($current, $max, $percent, $timeTaken, $timeRemaining, $text)
     {
-        $arguments = array(
+        $arguments = [
             'current'       => $current,
             'max'           => $max,
             'percent'       => ($percent * 100),
             'timeTaken'     => $timeTaken,
             'timeRemaining' => $timeRemaining,
             'text'          => $text
-        );
+        ];
 
         $data = '<script type="text/javascript">'
               . 'parent.' . $this->updateMethodName . '(' . Json::encode($arguments) . ');'
@@ -113,8 +113,10 @@ class JsPush extends AbstractAdapter
      * @param  string $data
      * @return void
      */
+    // @codingStandardsIgnoreStart
     protected function _outputData($data)
     {
+        // @codingStandardsIgnoreEnd
         // 1024 padding is required for Safari, while 256 padding is required
         // for Internet Explorer. The <br /> is required so Safari actually
         // executes the <script />

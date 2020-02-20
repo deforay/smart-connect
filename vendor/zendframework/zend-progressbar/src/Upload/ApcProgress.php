@@ -23,24 +23,24 @@ class ApcProgress extends AbstractUploadHandler
      */
     protected function getUploadProgress($id)
     {
-        if (!$this->isApcAvailable()) {
+        if (! $this->isApcAvailable()) {
             throw new Exception\PhpEnvironmentException('APC extension is not installed');
         }
 
         $uploadInfo = apc_fetch(ini_get('apc.rfc1867_prefix') . $id);
-        if (!is_array($uploadInfo)) {
+        if (! is_array($uploadInfo)) {
             return false;
         }
 
-        $status  = array(
+        $status  = [
             'total'    => 0,
             'current'  => 0,
             'rate'     => 0,
             'message'  => '',
             'done'     => false
-        );
+        ];
         $status = $uploadInfo + $status;
-        if (!empty($status['cancel_upload'])) {
+        if (! empty($status['cancel_upload'])) {
             $status['done'] = true;
             $status['message'] = 'The upload has been canceled';
         }

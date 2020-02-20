@@ -1,10 +1,8 @@
 <?php
 /**
- * Zend Framework (http://framework.zend.com/)
- *
- * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
- * @license   http://framework.zend.com/license/new-bsd New BSD License
+ * @see       https://github.com/zendframework/zend-tag for the canonical source repository
+ * @copyright Copyright (c) 2005-2018 Zend Technologies USA Inc. (https://www.zend.com)
+ * @license   https://github.com/zendframework/zend-tag/blob/master/LICENSE.md New BSD License
  */
 
 namespace Zend\Tag\Cloud\Decorator;
@@ -37,16 +35,16 @@ class HtmlTag extends AbstractTag
      *
      * @var array
      */
-    protected $allowedFontSizeUnits = array('em', 'ex', 'px', 'in', 'cm', 'mm', 'pt', 'pc', '%');
+    protected $allowedFontSizeUnits = ['em', 'ex', 'px', 'in', 'cm', 'mm', 'pt', 'pc', '%'];
 
     /**
      * List of HTML tags
      *
      * @var array
      */
-    protected $htmlTags = array(
+    protected $htmlTags = [
         'li'
-    );
+    ];
 
     /**
      * Maximum fontsize
@@ -78,7 +76,7 @@ class HtmlTag extends AbstractTag
             }
 
             foreach ($classList as $class) {
-                if (!is_string($class)) {
+                if (! is_string($class)) {
                     throw new InvalidArgumentException('Classlist contains an invalid classname');
                 }
             }
@@ -109,7 +107,7 @@ class HtmlTag extends AbstractTag
      */
     public function setFontSizeUnit($fontSizeUnit)
     {
-        if (!in_array($fontSizeUnit, $this->allowedFontSizeUnits)) {
+        if (! in_array($fontSizeUnit, $this->allowedFontSizeUnits)) {
             throw new InvalidArgumentException('Invalid fontsize unit specified');
         }
 
@@ -158,7 +156,7 @@ class HtmlTag extends AbstractTag
      */
     public function setMaxFontSize($maxFontSize)
     {
-        if (!is_numeric($maxFontSize)) {
+        if (! is_numeric($maxFontSize)) {
             throw new InvalidArgumentException('Fontsize must be numeric');
         }
 
@@ -186,7 +184,7 @@ class HtmlTag extends AbstractTag
      */
     public function setMinFontSize($minFontSize)
     {
-        if (!is_numeric($minFontSize)) {
+        if (! is_numeric($minFontSize)) {
             throw new InvalidArgumentException('Fontsize must be numeric');
         }
 
@@ -214,7 +212,7 @@ class HtmlTag extends AbstractTag
      */
     public function render($tags)
     {
-        if (!$tags instanceof ItemList) {
+        if (! $tags instanceof ItemList) {
             throw new InvalidArgumentException(sprintf(
                 'HtmlTag::render() expects a Zend\Tag\ItemList argument; received "%s"',
                 (is_object($tags) ? get_class($tags) : gettype($tags))
@@ -226,17 +224,26 @@ class HtmlTag extends AbstractTag
 
         $tags->spreadWeightValues($weightValues);
 
-        $result = array();
+        $result = [];
 
         $escaper = $this->getEscaper();
         foreach ($tags as $tag) {
             if (null === ($classList = $this->getClassList())) {
-                $attribute = sprintf('style="font-size: %d%s;"', $tag->getParam('weightValue'), $this->getFontSizeUnit());
+                $attribute = sprintf(
+                    'style="font-size: %d%s;"',
+                    $tag->getParam('weightValue'),
+                    $this->getFontSizeUnit()
+                );
             } else {
                 $attribute = sprintf('class="%s"', $escaper->escapeHtmlAttr($tag->getParam('weightValue')));
             }
 
-            $tagHTML  = sprintf('<a href="%s" %s>%s</a>', $escaper->escapeHtml($tag->getParam('url')), $attribute, $escaper->escapeHtml($tag->getTitle()));
+            $tagHTML  = sprintf(
+                '<a href="%s" %s>%s</a>',
+                $escaper->escapeHtml($tag->getParam('url')),
+                $attribute,
+                $escaper->escapeHtml($tag->getTitle())
+            );
             $tagHTML  = $this->wrapTag($tagHTML);
             $result[] = $tagHTML;
         }

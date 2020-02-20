@@ -3,7 +3,7 @@
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2016 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -19,11 +19,11 @@ class OracleMetadata extends AbstractSource
     /**
      * @var array
      */
-    protected $constraintTypeMap = array(
+    protected $constraintTypeMap = [
         'C' => 'CHECK',
         'P' => 'PRIMARY KEY',
         'R' => 'FOREIGN_KEY'
-    );
+    ];
 
     /**
      * {@inheritdoc}
@@ -35,7 +35,7 @@ class OracleMetadata extends AbstractSource
             return;
         }
 
-        $isColumns = array(
+        $isColumns = [
             'COLUMN_ID',
             'COLUMN_NAME',
             'DATA_DEFAULT',
@@ -44,23 +44,23 @@ class OracleMetadata extends AbstractSource
             'DATA_LENGTH',
             'DATA_PRECISION',
             'DATA_SCALE'
-        );
+        ];
 
         $this->prepareDataHierarchy('columns', $schema, $table);
-        $parameters = array(
+        $parameters = [
             ':ownername' => $schema,
             ':tablename' => $table
-        );
+        ];
 
         $sql = 'SELECT ' . implode(', ', $isColumns)
              . ' FROM all_tab_columns'
              . ' WHERE owner = :ownername AND table_name = :tablename';
 
         $result = $this->adapter->query($sql)->execute($parameters);
-        $columns = array();
+        $columns = [];
 
         foreach ($result as $row) {
-            $columns[$row['COLUMN_NAME']] = array(
+            $columns[$row['COLUMN_NAME']] = [
                 'ordinal_position'          => $row['COLUMN_ID'],
                 'column_default'            => $row['DATA_DEFAULT'],
                 'is_nullable'               => ('Y' == $row['NULLABLE']),
@@ -70,8 +70,8 @@ class OracleMetadata extends AbstractSource
                 'numeric_precision'         => $row['DATA_PRECISION'],
                 'numeric_scale'             => $row['DATA_SCALE'],
                 'numeric_unsigned'          => false,
-                'erratas'                   => array(),
-            );
+                'erratas'                   => [],
+            ];
         }
 
         $this->data['columns'][$schema][$table] = $columns;
@@ -124,42 +124,42 @@ class OracleMetadata extends AbstractSource
                 AND cc2.position = cc1.position
 
             WHERE
-                ac.owner = :schema AND ac.table_name = :table
+                ac.owner = :ownername AND ac.table_name = :tablename
 
-            ORDER BY ac.constraint_name;
+            ORDER BY ac.constraint_name
         ';
 
-        $parameters = array(
-            ':schema' => $schema,
-            ':table' => $table
-        );
+        $parameters = [
+            ':ownername' => $schema,
+            ':tablename' => $table
+        ];
 
         $results = $this->adapter->query($sql)->execute($parameters);
         $isFK = false;
         $name = null;
-        $constraints = array();
+        $constraints = [];
 
         foreach ($results as $row) {
             if ($row['CONSTRAINT_NAME'] !== $name) {
                 $name = $row['CONSTRAINT_NAME'];
-                $constraints[$name] = array(
+                $constraints[$name] = [
                     'constraint_name' => $name,
                     'constraint_type' => $this->getConstraintType($row['CONSTRAINT_TYPE']),
                     'table_name'      => $row['TABLE_NAME'],
-                );
+                ];
 
                 if ('C' == $row['CONSTRAINT_TYPE']) {
                     $constraints[$name]['CHECK_CLAUSE'] = $row['CHECK_CLAUSE'];
                     continue;
                 }
 
-                $constraints[$name]['columns'] = array();
+                $constraints[$name]['columns'] = [];
 
                 $isFK = ('R' == $row['CONSTRAINT_TYPE']);
                 if ($isFK) {
                     $constraints[$name]['referenced_table_schema'] = $row['REF_OWNER'];
                     $constraints[$name]['referenced_table_name']   = $row['REF_TABLE'];
-                    $constraints[$name]['referenced_columns']      = array();
+                    $constraints[$name]['referenced_columns']      = [];
                     $constraints[$name]['match_option']            = 'NONE';
                     $constraints[$name]['update_rule']             = null;
                     $constraints[$name]['delete_rule']             = $row['DELETE_RULE'];
@@ -171,6 +171,8 @@ class OracleMetadata extends AbstractSource
                 $constraints[$name]['referenced_columns'][] = $row['REF_COLUMN'];
             }
         }
+
+        $this->data['constraints'][$schema][$table] = $constraints;
 
         return $this;
     }
@@ -189,7 +191,7 @@ class OracleMetadata extends AbstractSource
         $sql = 'SELECT USERNAME FROM ALL_USERS';
         $results = $this->adapter->query($sql, Adapter::QUERY_MODE_EXECUTE);
 
-        $schemas = array();
+        $schemas = [];
         foreach ($results->toArray() as $row) {
             $schemas[] = $row['USERNAME'];
         }
@@ -208,30 +210,30 @@ class OracleMetadata extends AbstractSource
         }
 
         $this->prepareDataHierarchy('table_names', $schema);
-        $tables = array();
+        $tables = [];
 
         // Tables
-        $bind = array(':OWNER' => strtoupper($schema));
+        $bind = [':OWNER' => strtoupper($schema)];
         $result = $this->adapter->query('SELECT TABLE_NAME FROM ALL_TABLES WHERE OWNER=:OWNER')->execute($bind);
 
         foreach ($result as $row) {
-            $tables[$row['TABLE_NAME']] = array(
+            $tables[$row['TABLE_NAME']] = [
                 'table_type' => 'BASE TABLE',
                 'view_definition' => null,
                 'check_option' => null,
                 'is_updatable' => false,
-            );
+            ];
         }
 
         // Views
         $result = $this->adapter->query('SELECT VIEW_NAME, TEXT FROM ALL_VIEWS WHERE OWNER=:OWNER', $bind);
         foreach ($result as $row) {
-            $tables[$row['VIEW_NAME']] = array(
+            $tables[$row['VIEW_NAME']] = [
                 'table_type' => 'VIEW',
                 'view_definition' => null,
                 'check_option' => 'NONE',
                 'is_updatable' => false,
-            );
+            ];
         }
 
         $this->data['table_names'][$schema] = $tables;

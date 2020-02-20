@@ -44,16 +44,16 @@ class Chain implements StorageInterface
      * storage is not found, then this chain storage itself is empty.
      *
      * In case a non-empty storage is found then this chain storage is also non-empty. Report
-     * that, but also make sure that all storage with higher priorty that are empty
+     * that, but also make sure that all storage with higher priority that are empty
      * are filled.
      *
      * @see StorageInterface::isEmpty()
      */
     public function isEmpty()
     {
-        $storageWithHigherPriority = array();
+        $storageWithHigherPriority = [];
 
-        // Loop invariant: $storageWithHigherPriority contains all storage with higher priorty
+        // Loop invariant: $storageWithHigherPriority contains all storage with higher priority
         // than the current one.
         foreach ($this->storageChain as $storage) {
             if ($storage->isEmpty()) {

@@ -20,22 +20,27 @@ class DOMXPath extends \DOMXPath
      *
      * @var array
      */
-    protected $errors = array(null);
+    protected $errors = [null];
 
     /**
      * Evaluates an XPath expression; throws an ErrorException instead of
      * raising an error
      *
      * @param string $expression The XPath expression to evaluate.
+     * @param \DOMNode $contextNode
      * @return \DOMNodeList
      * @throws ErrorException
      */
-    public function queryWithErrorException($expression)
+    public function queryWithErrorException($expression, \DOMNode $contextNode = null)
     {
-        $this->errors = array(null);
+        $this->errors = [null];
 
-        set_error_handler(array($this, 'addError'), \E_WARNING);
-        $nodeList = $this->query($expression);
+        if ($contextNode === null) {
+            $contextNode = $this->document->documentElement;
+        }
+
+        set_error_handler([$this, 'addError'], \E_WARNING);
+        $nodeList = $this->query($expression, $contextNode);
         restore_error_handler();
 
         $exception = array_pop($this->errors);

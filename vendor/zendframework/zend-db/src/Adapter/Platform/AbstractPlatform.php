@@ -3,7 +3,7 @@
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2016 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -14,7 +14,7 @@ abstract class AbstractPlatform implements PlatformInterface
     /**
      * @var string[]
      */
-    protected $quoteIdentifier = array('"', '"');
+    protected $quoteIdentifier = ['"', '"'];
 
     /**
      * @var string
@@ -27,22 +27,27 @@ abstract class AbstractPlatform implements PlatformInterface
     protected $quoteIdentifiers = true;
 
     /**
+     * @var string
+     */
+    protected $quoteIdentifierFragmentPattern = '/([^0-9,a-z,A-Z$_:])/i';
+
+    /**
      * {@inheritDoc}
      */
-    public function quoteIdentifierInFragment($identifier, array $safeWords = array())
+    public function quoteIdentifierInFragment($identifier, array $safeWords = [])
     {
         if (! $this->quoteIdentifiers) {
             return $identifier;
         }
 
-        $safeWordsInt = array('*' => true, ' ' => true, '.' => true, 'as' => true);
+        $safeWordsInt = ['*' => true, ' ' => true, '.' => true, 'as' => true];
 
         foreach ($safeWords as $sWord) {
             $safeWordsInt[strtolower($sWord)] = true;
         }
 
         $parts = preg_split(
-            '/([^0-9,a-z,A-Z$_:])/i',
+            $this->quoteIdentifierFragmentPattern,
             $identifier,
             -1,
             PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY
@@ -124,7 +129,7 @@ abstract class AbstractPlatform implements PlatformInterface
      */
     public function quoteValueList($valueList)
     {
-        return implode(', ', array_map(array($this, 'quoteValue'), (array) $valueList));
+        return implode(', ', array_map([$this, 'quoteValue'], (array) $valueList));
     }
 
     /**

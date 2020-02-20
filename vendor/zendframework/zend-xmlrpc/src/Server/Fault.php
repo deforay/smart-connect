@@ -34,12 +34,12 @@ class Fault extends \Zend\XmlRpc\Fault
     /**
      * @var array Array of exception classes that may define xmlrpc faults
      */
-    protected static $faultExceptionClasses = array('Zend\\XmlRpc\\Server\\Exception\\ExceptionInterface' => true);
+    protected static $faultExceptionClasses = ['Zend\\XmlRpc\\Server\\Exception\\ExceptionInterface' => true];
 
     /**
      * @var array Array of fault observers
      */
-    protected static $observers = array();
+    protected static $observers = [];
 
     /**
      * Constructor
@@ -64,7 +64,7 @@ class Fault extends \Zend\XmlRpc\Fault
         parent::__construct($code, $message);
 
         // Notify exception observers, if present
-        if (!empty(static::$observers)) {
+        if (! empty(static::$observers)) {
             foreach (array_keys(static::$observers) as $observer) {
                 $observer::observe($this);
             }
@@ -90,7 +90,7 @@ class Fault extends \Zend\XmlRpc\Fault
      */
     public static function attachFaultException($classes)
     {
-        if (!is_array($classes)) {
+        if (! is_array($classes)) {
             $classes = (array) $classes;
         }
 
@@ -109,7 +109,7 @@ class Fault extends \Zend\XmlRpc\Fault
      */
     public static function detachFaultException($classes)
     {
-        if (!is_array($classes)) {
+        if (! is_array($classes)) {
             $classes = (array) $classes;
         }
 
@@ -134,11 +134,11 @@ class Fault extends \Zend\XmlRpc\Fault
      */
     public static function attachObserver($class)
     {
-        if (!is_string($class) || !class_exists($class) || !is_callable(array($class, 'observe'))) {
+        if (! is_string($class) || ! class_exists($class) || ! is_callable([$class, 'observe'])) {
             return false;
         }
 
-        if (!isset(static::$observers[$class])) {
+        if (! isset(static::$observers[$class])) {
             static::$observers[$class] = true;
         }
 
@@ -153,7 +153,7 @@ class Fault extends \Zend\XmlRpc\Fault
      */
     public static function detachObserver($class)
     {
-        if (!isset(static::$observers[$class])) {
+        if (! isset(static::$observers[$class])) {
             return false;
         }
 

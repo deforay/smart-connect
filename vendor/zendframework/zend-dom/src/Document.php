@@ -46,13 +46,13 @@ class Document
      * Error list generated from transformation of document to DOMDocument
      * @var array
      */
-    protected $errors = array();
+    protected $errors = [];
 
     /**
      * XPath namespaces
      * @var array
      */
-    protected $xpathNamespaces = array();
+    protected $xpathNamespaces = [];
 
     /**
      * XPath PHP Functions
@@ -60,11 +60,15 @@ class Document
      */
     protected $xpathPhpFunctions;
 
+    /** @var null|string */
+    protected $encoding;
+
     /**
      * Constructor
      *
      * @param string|null  $document  String containing the document
-     * @param string|null  $type      Force the document to be of a certain type, bypassing setStringDocument's detection
+     * @param string|null  $type      Force the document to be of a certain type,
+     *                                bypassing setStringDocument's detection
      * @param string|null  $encoding  Encoding for the document (used for DOMDocument generation)
      */
     public function __construct($document = null, $type = null, $encoding = null)
@@ -108,11 +112,11 @@ class Document
 
         // Unsetting previously registered DOMDocument
         $this->domDocument     = null;
-        $this->stringDocument  = !empty($document) ? $document : null;
+        $this->stringDocument  = ! empty($document) ? $document : null;
 
-        $this->setType($forcedType ?: (!empty($document) ? $type : null));
+        $this->setType($forcedType ?: (! empty($document) ? $type : null));
         $this->setEncoding($forcedEncoding);
-        $this->setErrors(array());
+        $this->setErrors([]);
 
         return $this;
     }
@@ -164,6 +168,7 @@ class Document
      *
      * @param  DOMDocument $domDocument
      * @return self
+     * @deprecated
      */
     protected function setDomDocument(DOMDocument $domDocument)
     {
@@ -192,7 +197,7 @@ class Document
     {
         $this->encoding = $encoding;
 
-        return $this->encoding;
+        return $this;
     }
 
     /**
@@ -252,7 +257,7 @@ class Document
         }
 
         $errors = libxml_get_errors();
-        if (!empty($errors)) {
+        if (! empty($errors)) {
             $this->setErrors($errors);
             libxml_clear_errors();
         }
@@ -260,7 +265,7 @@ class Document
         libxml_disable_entity_loader(false);
         libxml_use_internal_errors(false);
 
-        if (!$success) {
+        if (! $success) {
             throw new Exception\RuntimeException(sprintf('Error parsing document (type == %s)', $type));
         }
 

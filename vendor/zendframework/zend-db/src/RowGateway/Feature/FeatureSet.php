@@ -3,7 +3,7 @@
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2016 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -23,23 +23,27 @@ class FeatureSet
     /**
      * @var AbstractFeature[]
      */
-    protected $features = array();
+    protected $features = [];
 
     /**
      * @var array
      */
-    protected $magicSpecifications = array();
+    protected $magicSpecifications = [];
 
     /**
      * @param array $features
      */
-    public function __construct(array $features = array())
+    public function __construct(array $features = [])
     {
         if ($features) {
             $this->addFeatures($features);
         }
     }
 
+    /**
+     * @param AbstractRowGateway $rowGateway
+     * @return self Provides a fluent interface
+     */
     public function setRowGateway(AbstractRowGateway $rowGateway)
     {
         $this->rowGateway = $rowGateway;
@@ -61,6 +65,10 @@ class FeatureSet
         return $feature;
     }
 
+    /**
+     * @param array $features
+     * @return self Provides a fluent interface
+     */
     public function addFeatures(array $features)
     {
         foreach ($features as $feature) {
@@ -69,6 +77,10 @@ class FeatureSet
         return $this;
     }
 
+    /**
+     * @param AbstractFeature $feature
+     * @return self Provides a fluent interface
+     */
     public function addFeature(AbstractFeature $feature)
     {
         $this->features[] = $feature;
@@ -80,7 +92,7 @@ class FeatureSet
     {
         foreach ($this->features as $feature) {
             if (method_exists($feature, $method)) {
-                $return = call_user_func_array(array($feature, $method), $args);
+                $return = call_user_func_array([$feature, $method], $args);
                 if ($return === self::APPLY_HALT) {
                     break;
                 }

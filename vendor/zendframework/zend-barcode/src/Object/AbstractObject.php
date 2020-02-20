@@ -1,10 +1,8 @@
 <?php
 /**
- * Zend Framework (http://framework.zend.com/)
- *
- * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
- * @license   http://framework.zend.com/license/new-bsd New BSD License
+ * @see       https://github.com/zendframework/zend-barcode for the canonical source repository
+ * @copyright Copyright (c) 2005-2019 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license   https://github.com/zendframework/zend-barcode/blob/master/LICENSE.md New BSD License
  */
 
 namespace Zend\Barcode\Object;
@@ -31,7 +29,7 @@ abstract class AbstractObject implements ObjectInterface
      *
      * @var array
      */
-    protected $instructions = array();
+    protected $instructions = [];
 
     /**
      * Barcode type
@@ -193,6 +191,13 @@ abstract class AbstractObject implements ObjectInterface
     protected $withChecksumInText = false;
 
     /**
+     * Whether checksum is provided with the input text or not.
+     *
+     * @var bool
+     */
+    protected $providedChecksum = false;
+
+    /**
      * Fix barcode length (numeric or string like 'even')
      *
      * @var int | string
@@ -255,7 +260,7 @@ abstract class AbstractObject implements ObjectInterface
      * Set barcode state from options array
      *
      * @param  array $options
-     * @return \Zend\Barcode\Object\ObjectInterface
+     * @return self Provides a fluent interface
      */
     public function setOptions($options)
     {
@@ -272,7 +277,7 @@ abstract class AbstractObject implements ObjectInterface
      * Set barcode namespace for autoloading
      *
      * @param string $namespace
-     * @return \Zend\Barcode\Object\ObjectInterface
+     * @return self Provides a fluent interface
      */
     public function setBarcodeNamespace($namespace)
     {
@@ -304,7 +309,7 @@ abstract class AbstractObject implements ObjectInterface
      * Set height of the barcode bar
      *
      * @param int $value
-     * @return \Zend\Barcode\Object\ObjectInterface
+     * @return self Provides a fluent interface
      * @throws \Zend\Barcode\Object\Exception\ExceptionInterface
      */
     public function setBarHeight($value)
@@ -332,7 +337,7 @@ abstract class AbstractObject implements ObjectInterface
      * Set thickness of thin bar
      *
      * @param int $value
-     * @return \Zend\Barcode\Object\ObjectInterface
+     * @return self Provides a fluent interface
      * @throws \Zend\Barcode\Object\Exception\ExceptionInterface
      */
     public function setBarThinWidth($value)
@@ -360,7 +365,7 @@ abstract class AbstractObject implements ObjectInterface
      * Set thickness of thick bar
      *
      * @param int $value
-     * @return \Zend\Barcode\Object\ObjectInterface
+     * @return self Provides a fluent interface
      * @throws \Zend\Barcode\Object\Exception\ExceptionInterface
      */
     public function setBarThickWidth($value)
@@ -389,7 +394,7 @@ abstract class AbstractObject implements ObjectInterface
      * thinBarWidth - thickBarWidth - barHeight - fontSize
      *
      * @param int|float|string|bool $value
-     * @return \Zend\Barcode\Object\ObjectInterface
+     * @return self Provides a fluent interface
      * @throws \Zend\Barcode\Object\Exception\ExceptionInterface
      */
     public function setFactor($value)
@@ -418,7 +423,7 @@ abstract class AbstractObject implements ObjectInterface
      * Set color of the barcode and text
      *
      * @param string $value
-     * @return \Zend\Barcode\Object\ObjectInterface
+     * @return self Provides a fluent interface
      * @throws \Zend\Barcode\Object\Exception\ExceptionInterface
      */
     public function setForeColor($value)
@@ -449,7 +454,7 @@ abstract class AbstractObject implements ObjectInterface
      * Set the color of the background
      *
      * @param int $value
-     * @return \Zend\Barcode\Object\ObjectInterface
+     * @return self Provides a fluent interface
      * @throws \Zend\Barcode\Object\Exception\ExceptionInterface
      */
     public function setBackgroundColor($value)
@@ -480,7 +485,7 @@ abstract class AbstractObject implements ObjectInterface
      * Activate/deactivate drawing of the bar
      *
      * @param  bool $value
-     * @return \Zend\Barcode\Object\ObjectInterface
+     * @return self Provides a fluent interface
      */
     public function setWithBorder($value)
     {
@@ -502,7 +507,7 @@ abstract class AbstractObject implements ObjectInterface
      * Activate/deactivate drawing of the quiet zones
      *
      * @param  bool $value
-     * @return AbstractObject
+     * @return self Provides a fluent interface
      */
     public function setWithQuietZones($value)
     {
@@ -523,7 +528,7 @@ abstract class AbstractObject implements ObjectInterface
     /**
      * Allow fast inversion of font/bars color and background color
      *
-     * @return \Zend\Barcode\Object\ObjectInterface
+     * @return self Provides a fluent interface
      */
     public function setReverseColor()
     {
@@ -537,7 +542,7 @@ abstract class AbstractObject implements ObjectInterface
      * Set orientation of barcode and text
      *
      * @param int|float|string|bool $value
-     * @return \Zend\Barcode\Object\ObjectInterface
+     * @return self Provides a fluent interface
      * @throws \Zend\Barcode\Object\Exception\ExceptionInterface
      */
     public function setOrientation($value)
@@ -560,7 +565,7 @@ abstract class AbstractObject implements ObjectInterface
      * Set text to encode
      *
      * @param string $value
-     * @return \Zend\Barcode\Object\ObjectInterface
+     * @return self Provides a fluent interface
      */
     public function setText($value)
     {
@@ -576,7 +581,7 @@ abstract class AbstractObject implements ObjectInterface
     public function getText()
     {
         $text = $this->text;
-        if ($this->withChecksum) {
+        if ($this->withChecksum && ! $this->providedChecksum) {
             $text .= $this->getChecksum($this->text);
         }
         return $this->addLeadingZeros($text);
@@ -624,6 +629,8 @@ abstract class AbstractObject implements ObjectInterface
      */
     public function getTextToDisplay()
     {
+        $this->checkText($this->text);
+
         if ($this->withChecksumInText) {
             return $this->getText();
         }
@@ -635,7 +642,7 @@ abstract class AbstractObject implements ObjectInterface
      * Activate/deactivate drawing of text to encode
      *
      * @param  bool $value
-     * @return \Zend\Barcode\Object\ObjectInterface
+     * @return self Provides a fluent interface
      */
     public function setDrawText($value)
     {
@@ -658,7 +665,7 @@ abstract class AbstractObject implements ObjectInterface
      * of the characters to the position of the bars
      *
      * @param  bool $value
-     * @return \Zend\Barcode\Object\ObjectInterface
+     * @return self Provides a fluent interface
      * @throws \Zend\Barcode\Object\Exception\ExceptionInterface
      */
     public function setStretchText($value)
@@ -684,11 +691,11 @@ abstract class AbstractObject implements ObjectInterface
      * added to the barcode text
      *
      * @param  bool $value
-     * @return \Zend\Barcode\Object\ObjectInterface
+     * @return self Provides a fluent interface
      */
     public function setWithChecksum($value)
     {
-        if (!$this->mandatoryChecksum) {
+        if (! $this->mandatoryChecksum) {
             $this->withChecksum = (bool) $value;
         }
         return $this;
@@ -711,12 +718,12 @@ abstract class AbstractObject implements ObjectInterface
      * added to the barcode text
      *
      * @param  bool $value
-     * @return \Zend\Barcode\Object\ObjectInterface
+     * @return self Provides a fluent interface
      * @throws \Zend\Barcode\Object\Exception\ExceptionInterface
      */
     public function setWithChecksumInText($value)
     {
-        if (!$this->mandatoryChecksum) {
+        if (! $this->mandatoryChecksum) {
             $this->withChecksumInText = (bool) $value;
         }
         return $this;
@@ -734,18 +741,37 @@ abstract class AbstractObject implements ObjectInterface
     }
 
     /**
+     * @param bool $value
+     * @return $this
+     */
+    public function setProvidedChecksum($value)
+    {
+        $this->providedChecksum = (bool) $value;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getProvidedChecksum()
+    {
+        return $this->providedChecksum;
+    }
+
+    /**
      * Set the font:
      *  - if integer between 1 and 5, use gd built-in fonts
      *  - if string, $value is assumed to be the path to a TTF font
      *
      * @param int|string $value
-     * @return \Zend\Barcode\Object\ObjectInterface
+     * @return self Provides a fluent interface
      * @throws \Zend\Barcode\Object\Exception\ExceptionInterface
      */
     public function setFont($value)
     {
         if (is_int($value) && $value >= 1 && $value <= 5) {
-            if (!extension_loaded('gd')) {
+            if (! extension_loaded('gd')) {
                 throw new Exception\ExtensionNotLoadedException(
                     'GD extension is required to use numeric font'
                 );
@@ -781,7 +807,7 @@ abstract class AbstractObject implements ObjectInterface
      * Set the size of the font in case of TTF
      *
      * @param float $value
-     * @return \Zend\Barcode\Object\ObjectInterface
+     * @return self Provides a fluent interface
      * @throws \Zend\Barcode\Object\Exception\ExceptionInterface
      */
     public function setFontSize($value)
@@ -791,7 +817,7 @@ abstract class AbstractObject implements ObjectInterface
             return $this;
         }
 
-        if (!is_numeric($value)) {
+        if (! is_numeric($value)) {
             throw new Exception\InvalidArgumentException(
                 'Font size must be a numeric value'
             );
@@ -857,12 +883,12 @@ abstract class AbstractObject implements ObjectInterface
         if ($color === null) {
             $color = $this->foreColor;
         }
-        $this->addInstruction(array(
+        $this->addInstruction([
             'type'   => 'polygon',
             'points' => $points,
             'color'  => $color,
             'filled' => $filled,
-        ));
+        ]);
     }
 
     /**
@@ -888,7 +914,7 @@ abstract class AbstractObject implements ObjectInterface
         if ($color === null) {
             $color = $this->foreColor;
         }
-        $this->addInstruction(array(
+        $this->addInstruction([
             'type'        => 'text',
             'text'        => $text,
             'size'        => $size,
@@ -897,7 +923,7 @@ abstract class AbstractObject implements ObjectInterface
             'color'       => $color,
             'alignment'   => $alignment,
             'orientation' => $orientation,
-        ));
+        ]);
     }
 
     /**
@@ -924,7 +950,7 @@ abstract class AbstractObject implements ObjectInterface
         if ($value === null) {
             $value = $this->text;
         }
-        if (!strlen($value)) {
+        if (! strlen($value)) {
             throw new Exception\RuntimeException(
                 'A text must be provide to Barcode before drawing'
             );
@@ -942,7 +968,7 @@ abstract class AbstractObject implements ObjectInterface
     protected function checkRatio($min = 2, $max = 3)
     {
         $ratio = $this->barThickWidth / $this->barThinWidth;
-        if (!($ratio >= $min && $ratio <= $max)) {
+        if (! ($ratio >= $min && $ratio <= $max)) {
             throw new Exception\OutOfRangeException(sprintf(
                 'Ratio thick/thin bar must be between %0.1f and %0.1f (actual %0.3f)',
                 $min,
@@ -1057,12 +1083,14 @@ abstract class AbstractObject implements ObjectInterface
     {
         if ($this->offsetLeft === null || $recalculate) {
             $this->offsetLeft = - min(
-                array(
+                [
+                    // @codingStandardsIgnoreStart
                     0 * cos($this->orientation / 180 * pi()) - 0 * sin($this->orientation / 180 * pi()),
                     0 * cos($this->orientation / 180 * pi()) - $this->calculateBarcodeHeight() * sin($this->orientation / 180 * pi()),
                     $this->calculateBarcodeWidth() * cos($this->orientation / 180 * pi()) - $this->calculateBarcodeHeight() * sin($this->orientation / 180 * pi()),
                     $this->calculateBarcodeWidth() * cos($this->orientation / 180 * pi()) - 0 * sin($this->orientation / 180 * pi()),
-                )
+                    // @codingStandardsIgnoreEnd
+                ]
             );
         }
         return $this->offsetLeft;
@@ -1079,12 +1107,14 @@ abstract class AbstractObject implements ObjectInterface
     {
         if ($this->offsetTop === null || $recalculate) {
             $this->offsetTop = - min(
-                array(
+                [
+                    // @codingStandardsIgnoreStart
                     0 * cos($this->orientation / 180 * pi()) + 0 * sin($this->orientation / 180 * pi()),
                     $this->calculateBarcodeHeight() * cos($this->orientation / 180 * pi()) + 0 * sin($this->orientation / 180 * pi()),
                     $this->calculateBarcodeHeight() * cos($this->orientation / 180 * pi()) + $this->calculateBarcodeWidth() * sin($this->orientation / 180 * pi()),
                     0 * cos($this->orientation / 180 * pi()) + $this->calculateBarcodeWidth() * sin($this->orientation / 180 * pi()),
-                )
+                    // @codingStandardsIgnoreEnd
+                ]
             );
         }
         return $this->offsetTop;
@@ -1099,13 +1129,13 @@ abstract class AbstractObject implements ObjectInterface
      */
     protected function rotate($x1, $y1)
     {
-        $x2 = $x1 * cos($this->orientation / 180 * pi())
-            - $y1 * sin($this->orientation / 180 * pi())
+        $x2 = $x1 * round(cos($this->orientation / 180 * pi()), 6)
+            - $y1 * round(sin($this->orientation / 180 * pi()), 6)
             + $this->getOffsetLeft();
-        $y2 = $y1 * cos($this->orientation / 180 * pi())
-            + $x1 * sin($this->orientation / 180 * pi())
+        $y2 = $y1 * round(cos($this->orientation / 180 * pi()), 6)
+            + $x1 * round(sin($this->orientation / 180 * pi()), 6)
             + $this->getOffsetTop();
-        return array(intval($x2), intval($y2));
+        return [intval($x2), intval($y2)];
     }
 
     /**
@@ -1142,12 +1172,12 @@ abstract class AbstractObject implements ObjectInterface
         );
         $point4 = $this->rotate($this->calculateWidth() - 1, 0);
 
-        $this->addPolygon(array(
+        $this->addPolygon([
             $point1,
             $point2,
             $point3,
             $point4
-        ), $this->backgroundColor);
+        ], $this->backgroundColor);
 
         $xpos     += $this->getQuietZone();
         $barLength = $this->barHeight * $this->factor;
@@ -1165,12 +1195,12 @@ abstract class AbstractObject implements ObjectInterface
                     $xpos + $width - 1,
                     $ypos + $bar[2] * $barLength
                 );
-                $this->addPolygon(array(
+                $this->addPolygon([
                     $point1,
                     $point2,
                     $point3,
                     $point4,
-                ));
+                ]);
             }
             $xpos += $width;
         }
@@ -1191,13 +1221,13 @@ abstract class AbstractObject implements ObjectInterface
                 $this->calculateHeight() - 1
             );
             $point4 = $this->rotate(0, $this->calculateHeight() - 1);
-            $this->addPolygon(array(
+            $this->addPolygon([
                 $point1,
                 $point2,
                 $point3,
                 $point4,
                 $point1,
-            ), $this->foreColor, false);
+            ], $this->foreColor, false);
         }
     }
 
@@ -1214,7 +1244,7 @@ abstract class AbstractObject implements ObjectInterface
                 for ($i = 0; $i < $textLength; $i ++) {
                     $leftPosition = $this->getQuietZone() + $space * ($i + 0.5);
                     $this->addText(
-                        $text{$i},
+                        $text[$i],
                         $this->fontSize * $this->factor,
                         $this->rotate(
                             $leftPosition,
@@ -1259,25 +1289,25 @@ abstract class AbstractObject implements ObjectInterface
      * @param string $value
      * @param array  $options
      */
-    protected function validateSpecificText($value, $options = array())
+    protected function validateSpecificText($value, $options = [])
     {
         $validatorName = (isset($options['validator'])) ? $options['validator'] : $this->getType();
 
-        $validator = new BarcodeValidator(array(
+        $validator = new BarcodeValidator([
             'adapter'  => $validatorName,
-            'usechecksum' => false,
-        ));
+            'usechecksum' => $this->providedChecksum,
+        ]);
 
         $checksumCharacter = '';
         $withChecksum = false;
-        if ($this->mandatoryChecksum) {
+        if ($this->mandatoryChecksum && ! $this->providedChecksum) {
             $checksumCharacter = $this->substituteChecksumCharacter;
             $withChecksum = true;
         }
 
         $value = $this->addLeadingZeros($value, $withChecksum) . $checksumCharacter;
 
-        if (!$validator->isValid($value)) {
+        if (! $validator->isValid($value)) {
             $message = implode("\n", $validator->getMessages());
             throw new Exception\BarcodeValidationException($message);
         }

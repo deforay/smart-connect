@@ -3,7 +3,7 @@
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2016 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -12,6 +12,7 @@ namespace Zend\Db\Sql;
 use Zend\Db\Adapter\ParameterContainer;
 use Zend\Db\Adapter\Platform\PlatformInterface;
 use Zend\Db\Adapter\Driver\DriverInterface;
+use Zend\Db\Adapter\Driver\Pdo\Pdo;
 use Zend\Stdlib\PriorityList;
 
 /**
@@ -24,16 +25,24 @@ class Update extends AbstractPreparableSql
      * @const
      */
     const SPECIFICATION_UPDATE = 'update';
+    const SPECIFICATION_SET = 'set';
     const SPECIFICATION_WHERE = 'where';
+    const SPECIFICATION_JOIN = 'joins';
 
     const VALUES_MERGE = 'merge';
     const VALUES_SET   = 'set';
     /**@#-**/
 
-    protected $specifications = array(
-        self::SPECIFICATION_UPDATE => 'UPDATE %1$s SET %2$s',
-        self::SPECIFICATION_WHERE => 'WHERE %1$s'
-    );
+    protected $specifications = [
+        self::SPECIFICATION_UPDATE => 'UPDATE %1$s',
+        self::SPECIFICATION_JOIN => [
+            '%1$s' => [
+                [3 => '%1$s JOIN %2$s ON %3$s', 'combinedby' => ' ']
+            ]
+        ],
+        self::SPECIFICATION_SET => 'SET %1$s',
+        self::SPECIFICATION_WHERE => 'WHERE %1$s',
+    ];
 
     /**
      * @var string|TableIdentifier
@@ -56,6 +65,11 @@ class Update extends AbstractPreparableSql
     protected $where = null;
 
     /**
+     * @var null|Join
+     */
+    protected $joins = null;
+
+    /**
      * Constructor
      *
      * @param  null|string|TableIdentifier $table
@@ -66,6 +80,7 @@ class Update extends AbstractPreparableSql
             $this->table($table);
         }
         $this->where = new Where();
+        $this->joins = new Join();
         $this->set = new PriorityList();
         $this->set->isLIFO(false);
     }
@@ -74,7 +89,7 @@ class Update extends AbstractPreparableSql
      * Specify table for statement
      *
      * @param  string|TableIdentifier $table
-     * @return Update
+     * @return self Provides a fluent interface
      */
     public function table($table)
     {
@@ -87,8 +102,8 @@ class Update extends AbstractPreparableSql
      *
      * @param  array $values Associative array of key values
      * @param  string $flag One of the VALUES_* constants
+     * @return self Provides a fluent interface
      * @throws Exception\InvalidArgumentException
-     * @return Update
      */
     public function set(array $values, $flag = self::VALUES_SET)
     {
@@ -101,7 +116,7 @@ class Update extends AbstractPreparableSql
         }
         $priority = is_numeric($flag) ? $flag : 0;
         foreach ($values as $k => $v) {
-            if (!is_string($k)) {
+            if (! is_string($k)) {
                 throw new Exception\InvalidArgumentException('set() expects a string for the value key');
             }
             $this->set->insert($k, $v, $priority);
@@ -114,8 +129,8 @@ class Update extends AbstractPreparableSql
      *
      * @param  Where|\Closure|string|array $predicate
      * @param  string $combination One of the OP_* constants from Predicate\PredicateSet
+     * @return self Provides a fluent interface
      * @throws Exception\InvalidArgumentException
-     * @return Update
      */
     public function where($predicate, $combination = Predicate\PredicateSet::OP_AND)
     {
@@ -127,23 +142,71 @@ class Update extends AbstractPreparableSql
         return $this;
     }
 
+    /**
+     * Create join clause
+     *
+     * @param  string|array $name
+     * @param  string $on
+     * @param  string $type one of the JOIN_* constants
+     * @return self Provides a fluent interface
+     * @throws Exception\InvalidArgumentException
+     */
+    public function join($name, $on, $type = Join::JOIN_INNER)
+    {
+        $this->joins->join($name, $on, [], $type);
+
+        return $this;
+    }
+
     public function getRawState($key = null)
     {
-        $rawState = array(
+        $rawState = [
             'emptyWhereProtection' => $this->emptyWhereProtection,
             'table' => $this->table,
             'set' => $this->set->toArray(),
-            'where' => $this->where
-        );
+            'where' => $this->where,
+            'joins' => $this->joins
+        ];
         return (isset($key) && array_key_exists($key, $rawState)) ? $rawState[$key] : $rawState;
     }
 
-    protected function processUpdate(PlatformInterface $platform, DriverInterface $driver = null, ParameterContainer $parameterContainer = null)
-    {
-        $setSql = array();
+    protected function processUpdate(
+        PlatformInterface $platform,
+        DriverInterface $driver = null,
+        ParameterContainer $parameterContainer = null
+    ) {
+        return sprintf(
+            $this->specifications[static::SPECIFICATION_UPDATE],
+            $this->resolveTable($this->table, $platform, $driver, $parameterContainer)
+        );
+    }
+
+    protected function processSet(
+        PlatformInterface $platform,
+        DriverInterface $driver = null,
+        ParameterContainer $parameterContainer = null
+    ) {
+        $setSql = [];
+        $i      = 0;
         foreach ($this->set as $column => $value) {
-            $prefix = $platform->quoteIdentifier($column) . ' = ';
+            $prefix = $this->resolveColumnValue(
+                [
+                    'column'       => $column,
+                    'fromTable'    => '',
+                    'isIdentifier' => true,
+                ],
+                $platform,
+                $driver,
+                $parameterContainer,
+                'column'
+            );
+            $prefix .= ' = ';
             if (is_scalar($value) && $parameterContainer) {
+                // use incremental value instead of column name for PDO
+                // @see https://github.com/zendframework/zend-db/issues/35
+                if ($driver instanceof Pdo) {
+                    $column = 'c_' . $i++;
+                }
                 $setSql[] = $prefix . $driver->formatParameterName($column);
                 $parameterContainer->offsetSet($column, $value);
             } else {
@@ -157,14 +220,16 @@ class Update extends AbstractPreparableSql
         }
 
         return sprintf(
-            $this->specifications[static::SPECIFICATION_UPDATE],
-            $this->resolveTable($this->table, $platform, $driver, $parameterContainer),
+            $this->specifications[static::SPECIFICATION_SET],
             implode(', ', $setSql)
         );
     }
 
-    protected function processWhere(PlatformInterface $platform, DriverInterface $driver = null, ParameterContainer $parameterContainer = null)
-    {
+    protected function processWhere(
+        PlatformInterface $platform,
+        DriverInterface $driver = null,
+        ParameterContainer $parameterContainer = null
+    ) {
         if ($this->where->count() == 0) {
             return;
         }
@@ -172,6 +237,14 @@ class Update extends AbstractPreparableSql
             $this->specifications[static::SPECIFICATION_WHERE],
             $this->processExpression($this->where, $platform, $driver, $parameterContainer, 'where')
         );
+    }
+
+    protected function processJoins(
+        PlatformInterface $platform,
+        DriverInterface $driver = null,
+        ParameterContainer $parameterContainer = null
+    ) {
+        return $this->processJoin($this->joins, $platform, $driver, $parameterContainer);
     }
 
     /**

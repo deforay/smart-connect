@@ -67,7 +67,7 @@ class Digest extends AbstractAdapter
      * Sets the filename option value
      *
      * @param  mixed $filename
-     * @return Digest Provides a fluent interface
+     * @return self Provides a fluent interface
      */
     public function setFilename($filename)
     {
@@ -89,7 +89,7 @@ class Digest extends AbstractAdapter
      * Sets the realm option value
      *
      * @param  mixed $realm
-     * @return Digest Provides a fluent interface
+     * @return self Provides a fluent interface
      */
     public function setRealm($realm)
     {
@@ -111,7 +111,7 @@ class Digest extends AbstractAdapter
      * Sets the username option value
      *
      * @param  mixed $username
-     * @return Digest Provides a fluent interface
+     * @return self Provides a fluent interface
      */
     public function setUsername($username)
     {
@@ -132,7 +132,7 @@ class Digest extends AbstractAdapter
      * Sets the password option value
      *
      * @param  mixed $password
-     * @return Digest Provides a fluent interface
+     * @return self Provides a fluent interface
      */
     public function setPassword($password)
     {
@@ -147,7 +147,7 @@ class Digest extends AbstractAdapter
      */
     public function authenticate()
     {
-        $optionsRequired = array('filename', 'realm', 'identity', 'credential');
+        $optionsRequired = ['filename', 'realm', 'identity', 'credential'];
         foreach ($optionsRequired as $optionRequired) {
             if (null === $this->$optionRequired) {
                 throw new Exception\RuntimeException("Option '$optionRequired' must be set before authentication");
@@ -164,14 +164,14 @@ class Digest extends AbstractAdapter
         $id       = "$this->identity:$this->realm";
         $idLength = strlen($id);
 
-        $result = array(
+        $result = [
             'code'  => AuthenticationResult::FAILURE,
-            'identity' => array(
+            'identity' => [
                 'realm'    => $this->realm,
                 'username' => $this->identity,
-            ),
-            'messages' => array()
-        );
+            ],
+            'messages' => []
+        ];
 
         while (($line = fgets($fileHandle)) !== false) {
             $line = trim($line);
@@ -179,15 +179,30 @@ class Digest extends AbstractAdapter
                 break;
             }
             if (substr($line, 0, $idLength) === $id) {
-                if (CryptUtils::compareStrings(substr($line, -32), md5("$this->identity:$this->realm:$this->credential"))) {
-                    return new AuthenticationResult(AuthenticationResult::SUCCESS, $result['identity'], $result['messages']);
+                if (CryptUtils::compareStrings(
+                    substr($line, -32),
+                    md5("$this->identity:$this->realm:$this->credential")
+                )) {
+                    return new AuthenticationResult(
+                        AuthenticationResult::SUCCESS,
+                        $result['identity'],
+                        $result['messages']
+                    );
                 }
                 $result['messages'][] = 'Password incorrect';
-                return new AuthenticationResult(AuthenticationResult::FAILURE_CREDENTIAL_INVALID, $result['identity'], $result['messages']);
+                return new AuthenticationResult(
+                    AuthenticationResult::FAILURE_CREDENTIAL_INVALID,
+                    $result['identity'],
+                    $result['messages']
+                );
             }
         }
 
         $result['messages'][] = "Username '$this->identity' and realm '$this->realm' combination not found";
-        return new AuthenticationResult(AuthenticationResult::FAILURE_IDENTITY_NOT_FOUND, $result['identity'], $result['messages']);
+        return new AuthenticationResult(
+            AuthenticationResult::FAILURE_IDENTITY_NOT_FOUND,
+            $result['identity'],
+            $result['messages']
+        );
     }
 }

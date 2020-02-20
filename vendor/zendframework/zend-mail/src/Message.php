@@ -1,15 +1,15 @@
 <?php
 /**
- * Zend Framework (http://framework.zend.com/)
- *
- * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
- * @license   http://framework.zend.com/license/new-bsd New BSD License
+ * @see       https://github.com/zendframework/zend-mail for the canonical source repository
+ * @copyright Copyright (c) 2005-2018 Zend Technologies USA Inc. (https://www.zend.com)
+ * @license   https://github.com/zendframework/zend-mail/blob/master/LICENSE.md New BSD License
  */
 
 namespace Zend\Mail;
 
 use Traversable;
+use Zend\Mail\Header\ContentType;
+use Zend\Mail\Header\Sender;
 use Zend\Mime;
 
 class Message
@@ -17,7 +17,7 @@ class Message
     /**
      * Content of the message
      *
-     * @var string|object
+     * @var string|object|Mime\Message
      */
     protected $body;
 
@@ -45,7 +45,7 @@ class Message
     public function isValid()
     {
         $from = $this->getFrom();
-        if (!$from instanceof AddressList) {
+        if (! $from instanceof AddressList) {
             return false;
         }
         return (bool) count($from);
@@ -302,6 +302,7 @@ class Message
      */
     public function setSender($emailOrAddress, $name = null)
     {
+        /** @var Sender $header */
         $header = $this->getHeaderByName('sender', __NAMESPACE__ . '\Header\Sender');
         $header->setAddress($emailOrAddress, $name);
         return $this;
@@ -314,6 +315,12 @@ class Message
      */
     public function getSender()
     {
+        $headers = $this->getHeaders();
+        if (! $headers->has('sender')) {
+            return null;
+        }
+
+        /** @var Sender $header */
         $header = $this->getHeaderByName('sender', __NAMESPACE__ . '\Header\Sender');
         return $header->getAddress();
     }
@@ -327,7 +334,7 @@ class Message
     public function setSubject($subject)
     {
         $headers = $this->getHeaders();
-        if (!$headers->has('subject')) {
+        if (! $headers->has('subject')) {
             $header = new Header\Subject();
             $headers->addHeader($header);
         } else {
@@ -345,7 +352,7 @@ class Message
     public function getSubject()
     {
         $headers = $this->getHeaders();
-        if (!$headers->has('subject')) {
+        if (! $headers->has('subject')) {
             return;
         }
         $header = $headers->get('subject');
@@ -361,16 +368,16 @@ class Message
      */
     public function setBody($body)
     {
-        if (!is_string($body) && $body !== null) {
-            if (!is_object($body)) {
+        if (! is_string($body) && $body !== null) {
+            if (! is_object($body)) {
                 throw new Exception\InvalidArgumentException(sprintf(
                     '%s expects a string or object argument; received "%s"',
                     __METHOD__,
                     gettype($body)
                 ));
             }
-            if (!$body instanceof Mime\Message) {
-                if (!method_exists($body, '__toString')) {
+            if (! $body instanceof Mime\Message) {
+                if (! method_exists($body, '__toString')) {
                     throw new Exception\InvalidArgumentException(sprintf(
                         '%s expects object arguments of type Zend\Mime\Message or implementing __toString();'
                         . ' object of type "%s" received',
@@ -382,7 +389,7 @@ class Message
         }
         $this->body = $body;
 
-        if (!$this->body instanceof Mime\Message) {
+        if (! $this->body instanceof Mime\Message) {
             return $this;
         }
 
@@ -393,6 +400,8 @@ class Message
         // Multipart content headers
         if ($this->body->isMultiPart()) {
             $mime   = $this->body->getMime();
+
+            /** @var ContentType $header */
             $header = $this->getHeaderByName('content-type', __NAMESPACE__ . '\Header\ContentType');
             $header->setType('multipart/mixed');
             $header->addParameter('boundary', $mime->boundary());
@@ -401,7 +410,7 @@ class Message
 
         // MIME single part headers
         $parts = $this->body->getParts();
-        if (!empty($parts)) {
+        if (! empty($parts)) {
             $part = array_shift($parts);
             $headers->addHeaders($part->getHeadersArray("\r\n"));
         }
@@ -411,7 +420,7 @@ class Message
     /**
      * Return the currently set message body
      *
-     * @return object
+     * @return object|string|Mime\Message
      */
     public function getBody()
     {
@@ -477,7 +486,7 @@ class Message
     protected function getAddressListFromHeader($headerName, $headerClass)
     {
         $header = $this->getHeaderByName($headerName, $headerClass);
-        if (!$header instanceof Header\AbstractAddressList) {
+        if (! $header instanceof Header\AbstractAddressList) {
             throw new Exception\DomainException(sprintf(
                 'Cannot grab address list from header of type "%s"; not an AbstractAddressList implementation',
                 get_class($header)
@@ -509,7 +518,7 @@ class Message
             $addressList->addMany($emailOrAddressOrList);
             return;
         }
-        if (!is_string($emailOrAddressOrList) && !$emailOrAddressOrList instanceof Address\AddressInterface) {
+        if (! is_string($emailOrAddressOrList) && ! $emailOrAddressOrList instanceof Address\AddressInterface) {
             throw new Exception\InvalidArgumentException(sprintf(
                 '%s expects a string, AddressInterface, array, AddressList, or Traversable as its first argument;'
                 . ' received "%s"',
@@ -517,6 +526,12 @@ class Message
                 (is_object($emailOrAddressOrList) ? get_class($emailOrAddressOrList) : gettype($emailOrAddressOrList))
             ));
         }
+
+        if (is_string($emailOrAddressOrList) && $name === null) {
+            $addressList->addFromString($emailOrAddressOrList);
+            return;
+        }
+
         $addressList->add($emailOrAddressOrList, $name);
     }
 
@@ -543,9 +558,11 @@ class Message
     public static function fromString($rawMessage)
     {
         $message = new static();
+
+        /** @var Headers $headers */
         $headers = null;
         $content = null;
-        Mime\Decode::splitMessage($rawMessage, $headers, $content);
+        Mime\Decode::splitMessage($rawMessage, $headers, $content, Headers::EOL);
         if ($headers->has('mime-version')) {
             // todo - restore body to mime\message
         }

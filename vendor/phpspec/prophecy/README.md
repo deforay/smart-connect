@@ -1,5 +1,6 @@
 # Prophecy
 
+[![Stable release](https://poser.pugx.org/phpspec/prophecy/version.svg)](https://packagist.org/packages/phpspec/prophecy)
 [![Build Status](https://travis-ci.org/phpspec/prophecy.svg?branch=master)](https://travis-ci.org/phpspec/prophecy)
 
 Prophecy is a highly opinionated yet very powerful and flexible PHP object mocking
@@ -11,7 +12,7 @@ enough to be used inside any testing framework out there with minimal effort.
 ```php
 <?php
 
-class UserTest extends PHPUnit_Framework_TestCase
+class UserTest extends PHPUnit\Framework\TestCase
 {
     private $prophet;
 
@@ -27,7 +28,7 @@ class UserTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('hashed_pass', $user->getPassword());
     }
 
-    protected function setup()
+    protected function setUp()
     {
         $this->prophet = new \Prophecy\Prophet;
     }
@@ -158,7 +159,7 @@ promise, there's plenty others you can use:
 
 - `ReturnPromise` or `->willReturn(1)` - returns a value from a method call
 - `ReturnArgumentPromise` or `->willReturnArgument($index)` - returns the nth method argument from call
-- `ThrowPromise` or `->willThrow` - causes the method to throw specific exception
+- `ThrowPromise` or `->willThrow($exception)` - causes the method to throw specific exception
 - `CallbackPromise` or `->will($callback)` - gives you a quick way to define your own custom logic
 
 Keep in mind, that you can always add even more promises by implementing
@@ -205,6 +206,17 @@ $user->setName('everzet')->will(function ($args) use ($user) {
 And now it doesn't matter how many times or in which order your methods are called.
 What matters is their behaviors and how well you faked it.
 
+Note: If the method is called several times, you can use the following syntax to return different
+values for each call:
+
+```php
+$prophecy->read('123')->willReturn(1, 2, 3);
+```
+
+This feature is actually not recommended for most cases. Relying on the order of
+calls for the same arguments tends to make test fragile, as adding one more call
+can break everything.
+
 #### Arguments wildcarding
 
 The previous example is awesome (at least I hope it is for you), but that's not
@@ -244,6 +256,7 @@ That's why Prophecy comes bundled with a bunch of other tokens:
 - `CallbackToken` or `Argument::that(callback)` - checks that the argument matches a custom callback
 - `AnyValueToken` or `Argument::any()` - matches any argument
 - `AnyValuesToken` or `Argument::cetera()` - matches any arguments to the rest of the signature
+- `StringContainsToken` or `Argument::containingString($value)` - checks that the argument contains a specific string value
 
 And you can add even more by implementing `TokenInterface` with your own custom classes.
 

@@ -3,7 +3,7 @@
  * Zend Framework (http://framework.zend.com/)
  *
  * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2016 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
@@ -26,7 +26,7 @@ class AbstractPlatform implements PlatformDecoratorInterface, PreparableSqlInter
     /**
      * @var PlatformDecoratorInterface[]
      */
-    protected $decorators = array();
+    protected $decorators = [];
 
     /**
      * {@inheritDoc}
@@ -82,7 +82,10 @@ class AbstractPlatform implements PlatformDecoratorInterface, PreparableSqlInter
     public function prepareStatement(AdapterInterface $adapter, StatementContainerInterface $statementContainer)
     {
         if (! $this->subject instanceof PreparableSqlInterface) {
-            throw new Exception\RuntimeException('The subject does not appear to implement Zend\Db\Sql\PreparableSqlInterface, thus calling prepareStatement() has no effect');
+            throw new Exception\RuntimeException(
+                'The subject does not appear to implement Zend\Db\Sql\PreparableSqlInterface, thus calling '
+                . 'prepareStatement() has no effect'
+            );
         }
 
         $this->getTypeDecorator($this->subject)->prepareStatement($adapter, $statementContainer);
@@ -98,7 +101,10 @@ class AbstractPlatform implements PlatformDecoratorInterface, PreparableSqlInter
     public function getSqlString(PlatformInterface $adapterPlatform = null)
     {
         if (! $this->subject instanceof SqlInterface) {
-            throw new Exception\RuntimeException('The subject does not appear to implement Zend\Db\Sql\SqlInterface, thus calling prepareStatement() has no effect');
+            throw new Exception\RuntimeException(
+                'The subject does not appear to implement Zend\Db\Sql\SqlInterface, thus calling '
+                . 'prepareStatement() has no effect'
+            );
         }
 
         return $this->getTypeDecorator($this->subject)->getSqlString($adapterPlatform);
