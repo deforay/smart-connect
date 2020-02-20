@@ -9,6 +9,16 @@ use Zend\Json\Json;
 class ClinicController extends AbstractActionController{
 
 
+    private $sampleService = null;
+    private $configService = null;
+
+    public function __construct($sampleService, $configService)
+    {
+        $this->configService = $configService;
+        $this->sampleService = $sampleService;
+    }
+
+
     public function indexAction(){
         $this->layout()->setVariable('activeTab', 'clinics-dashboard');
         return $this->_redirect()->toUrl('/clinics/dashboard');
@@ -16,12 +26,12 @@ class ClinicController extends AbstractActionController{
 
     public function dashboardAction(){
         $this->layout()->setVariable('activeTab', 'clinics-dashboard');
-        $sampleService = $this->getServiceLocator()->get('SampleService');
-        $sampleType = $sampleService->getSampleType();
-        $clinicName = $sampleService->getAllClinicName();
-        $testReasonName = $sampleService->getAllTestReasonName();    
-        $provinceName = $sampleService->getAllProvinceList();
-        $districtName = $sampleService->getAllDistrictList();      
+        // $sampleService = $this->getServiceLocator()->get('SampleService');
+        $sampleType = $this->sampleService->getSampleType();
+        $clinicName = $this->sampleService->getAllClinicName();
+        $testReasonName = $this->sampleService->getAllTestReasonName();    
+        $provinceName = $this->sampleService->getAllProvinceList();
+        $districtName = $this->sampleService->getAllDistrictList();      
         return new ViewModel(array(
                 'sampleType' => $sampleType,
                 'clinicName' => $clinicName,
@@ -37,8 +47,8 @@ class ClinicController extends AbstractActionController{
             
             $params = $request->getPost();
 
-            $sampleService = $this->getServiceLocator()->get('SampleService');
-            $chartResult = $sampleService->getOverallViralLoadStatus($params);
+            // $sampleService = $this->getServiceLocator()->get('SampleService');
+            $chartResult = $this->sampleService->getOverallViralLoadStatus($params);
             //var_dump($chartResult);die;
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('chartResult'=>$chartResult))
@@ -51,8 +61,8 @@ class ClinicController extends AbstractActionController{
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            $sampleService = $this->getServiceLocator()->get('SampleService');
-            $chartResult = $sampleService->getViralLoadStatusBasedOnGender($params);
+            // $sampleService = $this->getServiceLocator()->get('SampleService');
+            $chartResult = $this->sampleService->getViralLoadStatusBasedOnGender($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('result'=>$chartResult))
                         ->setTerminal(true);
@@ -64,9 +74,9 @@ class ClinicController extends AbstractActionController{
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            $sampleService = $this->getServiceLocator()->get('SampleService');
-            $result = $sampleService->fetchSampleTestedReason($params);
-            $testReasonName = $sampleService->getAllTestReasonName();
+            // $sampleService = $this->getServiceLocator()->get('SampleService');
+            $result = $this->sampleService->fetchSampleTestedReason($params);
+            $testReasonName = $this->sampleService->getAllTestReasonName();
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('result' => $result,'testReason' => $testReasonName))
                         ->setTerminal(true);
@@ -78,9 +88,9 @@ class ClinicController extends AbstractActionController{
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            $sampleService = $this->getServiceLocator()->get('SampleService');
-            $result = $sampleService->getClinicSampleTestedResults($params);
-            $sampleType = $sampleService->getSampleType();
+            // $sampleService = $this->getServiceLocator()->get('SampleService');
+            $result = $this->sampleService->getClinicSampleTestedResults($params);
+            $sampleType = $this->sampleService->getSampleType();
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('result' => $result,'sampleType'=>$sampleType))
                         ->setTerminal(true);
@@ -92,8 +102,8 @@ class ClinicController extends AbstractActionController{
         $request = $this->getRequest();
         if ($request->isPost()) {
             $parameters = $request->getPost();
-            $sampleService = $this->getServiceLocator()->get('SampleService');
-            $result = $sampleService->getAllTestResults($parameters);
+            // $sampleService = $this->getServiceLocator()->get('SampleService');
+            $result = $this->sampleService->getAllTestResults($parameters);
             return $this->getResponse()->setContent(Json::encode($result));
         }
     }
@@ -102,10 +112,10 @@ class ClinicController extends AbstractActionController{
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            $sampleService = $this->getServiceLocator()->get('SampleService');
-            $configService = $this->getServiceLocator()->get('ConfigService');
-            $sampleResult=$sampleService->getSampleInfo($params);
-            $config=$configService->getAllGlobalConfig();
+            // $sampleService = $this->getServiceLocator()->get('SampleService');
+            //$configService = $this->getServiceLocator()->get('ConfigService');
+            $sampleResult=$this->sampleService->getSampleInfo($params);
+            $config=$this->configService->getAllGlobalConfig();
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('sampleResult' =>$sampleResult,'config'=>$config))
                       ->setTerminal(true);
@@ -117,11 +127,11 @@ class ClinicController extends AbstractActionController{
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            $sampleService = $this->getServiceLocator()->get('SampleService');
+            // $sampleService = $this->getServiceLocator()->get('SampleService');
             if($params['cFrom']=='high'){
-                $file=$sampleService->generateHighVlSampleResultExcel($params);
+                $file=$this->sampleService->generateHighVlSampleResultExcel($params);
             }else{
-                $file=$sampleService->generateResultExcel($params);
+                $file=$this->sampleService->generateResultExcel($params);
             }
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('file' =>$file))
@@ -134,8 +144,8 @@ class ClinicController extends AbstractActionController{
         $this->layout()->setVariable('activeTab', 'clinics-dashboard');
         $params = array();
         $params['id'] = base64_decode($this->params()->fromRoute('id'));
-        $sampleService = $this->getServiceLocator()->get('SampleService');
-        $sampleResult = $sampleService->getSampleInfo($params);
+        // $sampleService = $this->getServiceLocator()->get('SampleService');
+        $sampleResult = $this->sampleService->getSampleInfo($params);
         return new ViewModel(array(
                 'result' => $sampleResult
             ));
@@ -154,10 +164,10 @@ class ClinicController extends AbstractActionController{
         $params['gender'] = $this->params()->fromQuery('gd');
         $params['isPatientPregnant'] = $this->params()->fromQuery('p');
         $params['isPatientBreastfeeding'] = $this->params()->fromQuery('bf');
-        $sampleService = $this->getServiceLocator()->get('SampleService');
-        $clinics = $sampleService->getAllClinicName();
-        $testReasons = $sampleService->getAllTestReasonName();
-        $sampleType = $sampleService->getSampleType();
+        // $sampleService = $this->getServiceLocator()->get('SampleService');
+        $clinics = $this->sampleService->getAllClinicName();
+        $testReasons = $this->sampleService->getAllTestReasonName();
+        $sampleType = $this->sampleService->getSampleType();
         return new ViewModel(array(
                 'clinics' => $clinics,
                 'testReasons' => $testReasons,
@@ -170,8 +180,8 @@ class ClinicController extends AbstractActionController{
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            $sampleService = $this->getServiceLocator()->get('SampleService');
-            $result = $sampleService->getVLTestReasonBasedOnAgeGroup($params);
+            // $sampleService = $this->getServiceLocator()->get('SampleService');
+            $result = $this->sampleService->getVLTestReasonBasedOnAgeGroup($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('result'=>$result))
                         ->setTerminal(true);
@@ -183,8 +193,8 @@ class ClinicController extends AbstractActionController{
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            $sampleService = $this->getServiceLocator()->get('SampleService');
-            $result = $sampleService->getVLTestReasonBasedOnGender($params);
+            // $sampleService = $this->getServiceLocator()->get('SampleService');
+            $result = $this->sampleService->getVLTestReasonBasedOnGender($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('result'=>$result))
                         ->setTerminal(true);
@@ -196,8 +206,8 @@ class ClinicController extends AbstractActionController{
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            $sampleService = $this->getServiceLocator()->get('SampleService');
-            $result = $sampleService->getVLTestReasonBasedOnClinics($params);
+            // $sampleService = $this->getServiceLocator()->get('SampleService');
+            $result = $this->sampleService->getVLTestReasonBasedOnClinics($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('result'=>$result))
                         ->setTerminal(true);
@@ -208,8 +218,8 @@ class ClinicController extends AbstractActionController{
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            $sampleService = $this->getServiceLocator()->get('SampleService');
-            $result = $sampleService->getSampleTestedResultBasedGenderDetails($params);
+            // $sampleService = $this->getServiceLocator()->get('SampleService');
+            $result = $this->sampleService->getSampleTestedResultBasedGenderDetails($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('result' => $result))
                         ->setTerminal(true);
@@ -221,8 +231,8 @@ class ClinicController extends AbstractActionController{
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            $sampleService = $this->getServiceLocator()->get('SampleService');
-            $result = $sampleService->getClinicSampleTestedResultAgeGroupDetails($params);
+            // $sampleService = $this->getServiceLocator()->get('SampleService');
+            $result = $this->sampleService->getClinicSampleTestedResultAgeGroupDetails($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('result' => $result,'params'=>$params))
                         ->setTerminal(true);
@@ -233,8 +243,8 @@ class ClinicController extends AbstractActionController{
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            $sampleService = $this->getServiceLocator()->get('SampleService');
-            $result = $sampleService->getClinicSampleTestedResultAgeGroupDetails($params);
+            // $sampleService = $this->getServiceLocator()->get('SampleService');
+            $result = $this->sampleService->getClinicSampleTestedResultAgeGroupDetails($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('result' => $result,'params'=>$params))
                         ->setTerminal(true);
@@ -245,8 +255,8 @@ class ClinicController extends AbstractActionController{
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            $sampleService = $this->getServiceLocator()->get('SampleService');
-            $result = $sampleService->getClinicSampleTestedResultAgeGroupDetails($params);
+            // $sampleService = $this->getServiceLocator()->get('SampleService');
+            $result = $this->sampleService->getClinicSampleTestedResultAgeGroupDetails($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('result' => $result,'params'=>$params))
                         ->setTerminal(true);
@@ -257,8 +267,8 @@ class ClinicController extends AbstractActionController{
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            $sampleService = $this->getServiceLocator()->get('SampleService');
-            $result = $sampleService->getClinicSampleTestedResultAgeGroupDetails($params);
+            // $sampleService = $this->getServiceLocator()->get('SampleService');
+            $result = $this->sampleService->getClinicSampleTestedResultAgeGroupDetails($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('result' => $result,'params'=>$params))
                         ->setTerminal(true);
@@ -269,8 +279,8 @@ class ClinicController extends AbstractActionController{
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            $sampleService = $this->getServiceLocator()->get('SampleService');
-            $result = $sampleService->getClinicSampleTestedResultAgeGroupDetails($params);
+            // $sampleService = $this->getServiceLocator()->get('SampleService');
+            $result = $this->sampleService->getClinicSampleTestedResultAgeGroupDetails($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('result' => $result,'params'=>$params))
                         ->setTerminal(true);
@@ -281,8 +291,8 @@ class ClinicController extends AbstractActionController{
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            $sampleService = $this->getServiceLocator()->get('SampleService');
-            $result = $sampleService->getClinicSampleTestedResultAgeGroupDetails($params);
+            // $sampleService = $this->getServiceLocator()->get('SampleService');
+            $result = $this->sampleService->getClinicSampleTestedResultAgeGroupDetails($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('result' => $result,'params'=>$params))
                         ->setTerminal(true);
@@ -293,8 +303,8 @@ class ClinicController extends AbstractActionController{
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            $sampleService = $this->getServiceLocator()->get('SampleService');
-            $result = $sampleService->getClinicRequisitionFormsTested($params);
+            // $sampleService = $this->getServiceLocator()->get('SampleService');
+            $result = $this->sampleService->getClinicRequisitionFormsTested($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('result' => $result))
                         ->setTerminal(true);

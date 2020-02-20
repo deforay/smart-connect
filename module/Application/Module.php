@@ -364,6 +364,33 @@ class Module
 		);
 	}
 
+	public function getControllerConfig()
+	{
+		return array(
+			'factories' => array(
+				'Application\Controller\Cron' => function ($sm) {
+					$sampleService = $sm->getServiceLocator()->get('SampleService');
+					return new \Application\Controller\CronController($sampleService);
+				},
+				'Application\Controller\Summary' => function ($sm) {
+					$sampleService = $sm->getServiceLocator()->get('SampleService');
+					$summaryService = $sm->getServiceLocator()->get('SummaryService');
+					return new \Application\Controller\SummaryController($summaryService,$sampleService);
+				},
+				'Application\Controller\Laboratory' => function ($sm) {
+					$sampleService = $sm->getServiceLocator()->get('SampleService');
+					$commonService = $sm->getServiceLocator()->get('CommonService');
+					return new \Application\Controller\LaboratoryController($sampleService,$commonService);
+				},
+				'Application\Controller\Clinic' => function ($sm) {
+					$sampleService = $sm->getServiceLocator()->get('SampleService');
+					$configService = $sm->getServiceLocator()->get('ConfigService');
+					return new \Application\Controller\ClinicController($sampleService,$commonService);
+				},
+			),
+		);
+	}
+
 	public function getViewHelperConfig()
 	{
 		return array(

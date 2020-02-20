@@ -8,6 +8,16 @@ use Zend\Json\Json;
 
 class SummaryController extends AbstractActionController{
 
+
+    private $sampleService = null;
+    private $summaryService = null;
+
+    public function __construct($summaryService,$sampleService)
+    {
+        $this->summaryService = $summaryService;
+        $this->sampleService = $sampleService;
+    }
+
     public function indexAction(){
         $this->layout()->setVariable('activeTab', 'summary-dashboard');
         return $this->_redirect()->toUrl('/summary/dashboard'); 
@@ -23,16 +33,16 @@ class SummaryController extends AbstractActionController{
             $params['toDate']  =date('Y-m');
         }      
         $this->layout()->setVariable('activeTab', 'summary-dashboard');
-        $summaryService = $this->getServiceLocator()->get('SummaryService');
-        $summaryTabResult = $summaryService->fetchSummaryTabDetails($params); 
-        $allLineofTreatmentResult = $summaryService->getAllLineOfTreatmentDetails($params);
-        $allCollapsibleLineofTreatmentResult = $summaryService->getAllCollapsibleLineOfTreatmentDetails($params);
+        // $summaryService = $this->getServiceLocator()->get('SummaryService');
+        $summaryTabResult = $this->summaryService->fetchSummaryTabDetails($params); 
+        $allLineofTreatmentResult = $this->summaryService->getAllLineOfTreatmentDetails($params);
+        $allCollapsibleLineofTreatmentResult = $this->summaryService->getAllCollapsibleLineOfTreatmentDetails($params);
         
         /* District, Province and Facility */
-        $sampleService = $this->getServiceLocator()->get('SampleService');        
-        $clinicName = $sampleService->getAllClinicName();        
-        $provinceName = $sampleService->getAllProvinceList();
-        $districtName = $sampleService->getAllDistrictList();
+        // $sampleService = $this->getServiceLocator()->get('SampleService');        
+        $clinicName = $this->sampleService->getAllClinicName();        
+        $provinceName = $this->sampleService->getAllProvinceList();
+        $districtName = $this->sampleService->getAllDistrictList();
         /* Ends Here*/   
         
         return new ViewModel(array(
@@ -51,8 +61,8 @@ class SummaryController extends AbstractActionController{
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            $summaryService = $this->getServiceLocator()->get('SummaryService');
-            $result = $summaryService->getSamplesReceivedBarChartDetails($params);
+            // $summaryService = $this->getServiceLocator()->get('SummaryService');
+            $result = $this->summaryService->getSamplesReceivedBarChartDetails($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array(
                                     'result' => $result
@@ -65,8 +75,8 @@ class SummaryController extends AbstractActionController{
         $request = $this->getRequest();
         if ($request->isPost()) {
             $parameters = $request->getPost();
-            $summaryService = $this->getServiceLocator()->get('SummaryService');
-            $result = $summaryService->getAllSamplesReceivedByDistrict($parameters);
+            // $summaryService = $this->getServiceLocator()->get('SummaryService');
+            $result = $this->summaryService->getAllSamplesReceivedByDistrict($parameters);
             return $this->getResponse()->setContent(Json::encode($result));
         }
     }
@@ -74,8 +84,8 @@ class SummaryController extends AbstractActionController{
         $request = $this->getRequest();
         if ($request->isPost()) {
             $parameters = $request->getPost();
-            $summaryService = $this->getServiceLocator()->get('SummaryService');
-            $result = $summaryService->getAllSamplesReceivedByProvince($parameters);
+            // $summaryService = $this->getServiceLocator()->get('SummaryService');
+            $result = $this->summaryService->getAllSamplesReceivedByProvince($parameters);
             return $this->getResponse()->setContent(Json::encode($result));
         }
     }
@@ -84,8 +94,8 @@ class SummaryController extends AbstractActionController{
         $request = $this->getRequest();
         if ($request->isPost()) {
             $parameters = $request->getPost();
-            $summaryService = $this->getServiceLocator()->get('SummaryService');
-            $result = $summaryService->getAllSamplesReceivedByFacility($parameters);
+            // $summaryService = $this->getServiceLocator()->get('SummaryService');
+            $result = $this->summaryService->getAllSamplesReceivedByFacility($parameters);
             return $this->getResponse()->setContent(Json::encode($result));
         }
     }
@@ -94,8 +104,8 @@ class SummaryController extends AbstractActionController{
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            $summaryService = $this->getServiceLocator()->get('SummaryService');
-            $result = $summaryService->getSuppressionRateBarChartDetails($params);
+            // $summaryService = $this->getServiceLocator()->get('SummaryService');
+            $result = $this->summaryService->getSuppressionRateBarChartDetails($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array(
                                     'result' => $result
@@ -108,8 +118,8 @@ class SummaryController extends AbstractActionController{
         $request = $this->getRequest();
         if ($request->isPost()) {
             $parameters = $request->getPost();
-            $summaryService = $this->getServiceLocator()->get('SummaryService');
-            $result = $summaryService->getAllSuppressionRateByDistrict($parameters);
+            // $summaryService = $this->getServiceLocator()->get('SummaryService');
+            $result = $this->summaryService->getAllSuppressionRateByDistrict($parameters);
             return $this->getResponse()->setContent(Json::encode($result));
         }
     }
@@ -117,8 +127,8 @@ class SummaryController extends AbstractActionController{
         $request = $this->getRequest();
         if ($request->isPost()) {
             $parameters = $request->getPost();
-            $summaryService = $this->getServiceLocator()->get('SummaryService');
-            $result = $summaryService->getAllSuppressionRateByProvince($parameters);
+            // $summaryService = $this->getServiceLocator()->get('SummaryService');
+            $result = $this->summaryService->getAllSuppressionRateByProvince($parameters);
             return $this->getResponse()->setContent(Json::encode($result));
         }
     }
@@ -127,8 +137,8 @@ class SummaryController extends AbstractActionController{
         $request = $this->getRequest();
         if ($request->isPost()) {
             $parameters = $request->getPost();
-            $summaryService = $this->getServiceLocator()->get('SummaryService');
-            $result = $summaryService->getAllSuppressionRateByFacility($parameters);
+            // $summaryService = $this->getServiceLocator()->get('SummaryService');
+            $result = $this->summaryService->getAllSuppressionRateByFacility($parameters);
             return $this->getResponse()->setContent(Json::encode($result));
         }
     }
@@ -137,8 +147,8 @@ class SummaryController extends AbstractActionController{
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            $summaryService = $this->getServiceLocator()->get('SummaryService');
-            $result = $summaryService->getSamplesRejectedBarChartDetails($params);
+            // $summaryService = $this->getServiceLocator()->get('SummaryService');
+            $result = $this->summaryService->getSamplesRejectedBarChartDetails($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array(
                                     'result' => $result
@@ -151,8 +161,8 @@ class SummaryController extends AbstractActionController{
         $request = $this->getRequest();
         if ($request->isPost()) {
             $parameters = $request->getPost();
-            $summaryService = $this->getServiceLocator()->get('SummaryService');
-            $result = $summaryService->getAllSamplesRejectedByDistrict($parameters);
+            // $summaryService = $this->getServiceLocator()->get('SummaryService');
+            $result = $this->summaryService->getAllSamplesRejectedByDistrict($parameters);
             return $this->getResponse()->setContent(Json::encode($result));
         }
     }
@@ -161,8 +171,8 @@ class SummaryController extends AbstractActionController{
         $request = $this->getRequest();
         if ($request->isPost()) {
             $parameters = $request->getPost();
-            $summaryService = $this->getServiceLocator()->get('SummaryService');
-            $result = $summaryService->getAllSamplesRejectedByFacility($parameters);
+            // $summaryService = $this->getServiceLocator()->get('SummaryService');
+            $result = $this->summaryService->getAllSamplesRejectedByFacility($parameters);
             return $this->getResponse()->setContent(Json::encode($result));
         }
     }
@@ -170,8 +180,8 @@ class SummaryController extends AbstractActionController{
         $request = $this->getRequest();
         if ($request->isPost()) {
             $parameters = $request->getPost();
-            $summaryService = $this->getServiceLocator()->get('SummaryService');
-            $result = $summaryService->getAllSamplesRejectedByProvince($parameters);
+            // $summaryService = $this->getServiceLocator()->get('SummaryService');
+            $result = $this->summaryService->getAllSamplesRejectedByProvince($parameters);
             return $this->getResponse()->setContent(Json::encode($result));
         }
     }
@@ -180,8 +190,8 @@ class SummaryController extends AbstractActionController{
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            $summaryService = $this->getServiceLocator()->get('SummaryService');
-            $result = $summaryService->getRegimenGroupBarChartDetails($params);
+            // $summaryService = $this->getServiceLocator()->get('SummaryService');
+            $result = $this->summaryService->getRegimenGroupBarChartDetails($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array(
                                     'result' => $result
@@ -194,8 +204,8 @@ class SummaryController extends AbstractActionController{
         $request = $this->getRequest();
         if ($request->isPost()) {
             $parameters = $request->getPost();
-            $summaryService = $this->getServiceLocator()->get('SummaryService');
-            $result = $summaryService->getRegimenGroupSamplesDetails($parameters);
+            // $summaryService = $this->getServiceLocator()->get('SummaryService');
+            $result = $this->summaryService->getRegimenGroupSamplesDetails($parameters);
             return $this->getResponse()->setContent(Json::encode($result));
         }
     }
@@ -204,8 +214,8 @@ class SummaryController extends AbstractActionController{
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            $summaryService = $this->getServiceLocator()->get('SummaryService');
-            $keySummaryIndicatorsResult = $summaryService->getKeySummaryIndicatorsDetails($params);
+            // $summaryService = $this->getServiceLocator()->get('SummaryService');
+            $keySummaryIndicatorsResult = $this->summaryService->getKeySummaryIndicatorsDetails($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array(
                             'keySummaryIndicators' => $keySummaryIndicatorsResult,
@@ -218,8 +228,8 @@ class SummaryController extends AbstractActionController{
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            $summaryService = $this->getServiceLocator()->get('SummaryService');
-            $file=$summaryService->exportIndicatorResultExcel($params);
+            // $summaryService = $this->getServiceLocator()->get('SummaryService');
+            $file=$this->summaryService->exportIndicatorResultExcel($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('file' =>$file))
                       ->setTerminal(true);
@@ -231,8 +241,8 @@ class SummaryController extends AbstractActionController{
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            $summaryService = $this->getServiceLocator()->get('SummaryService');
-            $file=$summaryService->exportSuppressionRateByFacility($params);
+            // $summaryService = $this->getServiceLocator()->get('SummaryService');
+            $file=$this->summaryService->exportSuppressionRateByFacility($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('file' =>$file))
                       ->setTerminal(true);

@@ -209,17 +209,17 @@ return array(
             'Application\Controller\Organizations' => 'Application\Controller\OrganizationsController',
             'Application\Controller\Users' => 'Application\Controller\UsersController',
             'Application\Controller\Login' => 'Application\Controller\LoginController',
-            'Application\Controller\Laboratory' => 'Application\Controller\LaboratoryController',
-            'Application\Controller\Clinic' => 'Application\Controller\ClinicController',
+            //'Application\Controller\Laboratory' => 'Application\Controller\LaboratoryController',
+            //'Application\Controller\Clinic' => 'Application\Controller\ClinicController',
             'Application\Controller\Hubs' => 'Application\Controller\HubsController',
             'Application\Controller\Import' => 'Application\Controller\ImportController',
             'Application\Controller\Source' => 'Application\Controller\SourceController',
             'Application\Controller\Common' => 'Application\Controller\CommonController',
             'Application\Controller\Config' => 'Application\Controller\ConfigController',
             'Application\Controller\Facility' => 'Application\Controller\FacilityController',
-            'Application\Controller\Summary' => 'Application\Controller\SummaryController',
+            //'Application\Controller\Summary' => 'Application\Controller\SummaryController',
             'Application\Controller\Time' => 'Application\Controller\TimeController',
-            'Application\Controller\Cron' => 'Application\Controller\CronController'
+            //'Application\Controller\Cron' => 'Application\Controller\CronController'
         ),
     ),
     'controller_plugins' => array(
