@@ -548,7 +548,7 @@ class SampleService
         $mappedFacilities = null;
         if ($logincontainer->role != 1) {
             $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : null;
-        }        
+        }
         $locationDb = $this->sm->get('LocationDetailsTable');
         return $locationDb->fetchAllDistrictsList();
     }
@@ -1509,7 +1509,7 @@ class SampleService
         set_time_limit(10000);
         $result = array();
         $time = array();
-        $sampleDb = $this->sm->get('SampleTableWithoutCache');
+        $sampleDb = $this->sm->get('SampleTable');
         foreach ($facilities as $facility) {
             $time = $sampleDb->getTATbyProvince($facility['location_id'], $labs, $startDate, $endDate);
             foreach ($time as $key) {
@@ -1603,13 +1603,21 @@ class SampleService
         $sampleRjtReasonDb = $this->sm->get('SampleRejectionReasonTable');
         $dbAdapter = $this->sm->get('Zend\Db\Adapter\Adapter');
         $sql = new Sql($dbAdapter);
-        $files = scandir($pathname, SCANDIR_SORT_DESCENDING);
-        $newest_file = $files[0];
+        //$files = scandir($pathname, SCANDIR_SORT_DESCENDING);
+        
+        $files = glob($pathname . DIRECTORY_SEPARATOR . '*.{xls,xlsx,csv}', GLOB_BRACE);
 
-        if (trim($newest_file) != "") {
+        array_multisort(
+            array_map('filemtime', $files),
+            SORT_NUMERIC,
+            SORT_DESC,
+            $files
+        );
+
+        $fileName = $files[0]; // OLDEST FILE
+
+        if (trim($fileName) != "") {
             try {
-                //Hardcoded source details
-                $fileName = $newest_file;
                 if (file_exists($pathname . DIRECTORY_SEPARATOR . $fileName)) {
                     $objPHPExcel = \PhpOffice\PhpSpreadsheet\IOFactory::load($pathname . DIRECTORY_SEPARATOR . $fileName);
                     $sheetData = $objPHPExcel->getActiveSheet()->toArray(null, true, true, true);

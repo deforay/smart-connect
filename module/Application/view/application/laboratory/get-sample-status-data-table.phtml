@@ -1,41 +1,47 @@
 <style>
-    .center{
-        text-align:center;
+    .center {
+        text-align: center;
     }
 </style>
 <table class="table table-striped table-bordered table-hover order-column" id="sampleStatusTable">
-                                    <thead>
-                                        <tr>
-                                        <th rowspan="1" style="width:15%;"> <?php echo $this->translate('Facility Name'); ?> </th>
-                                            <th rowspan="1"> <?php echo $this->translate('Province'); ?></th>
-                                            <th rowspan="1"> <?php echo $this->translate('District'); ?> </th>
+    <thead>
+        <tr>
+            <th rowspan="1" style="width:15%;"> <?php echo $this->translate('Facility Name'); ?> </th>
+            <th rowspan="1"> <?php echo $this->translate('Province'); ?></th>
+            <th rowspan="1"> <?php echo $this->translate('District'); ?> </th>
 
-                                            <?php foreach($result['months'] as $mYear){ 
-                                                    $dt = DateTime::createFromFormat('!m Y', $mYear);
-                                                ?>
-                                                <th> <?php echo $this->translate('Samples Tested'); ?><br> (<?php echo $dt->format('M Y'); ?>)</th>
-                                                <th> <?php echo $this->translate('High Viral Load'); ?><br> (<?php echo $dt->format('M Y'); ?>)</th>                                                
-                                            <?php } ?>
+            <?php foreach ($result['months'] as $mYear) {
+                $dt = DateTime::createFromFormat('!m Y', $mYear);
+            ?>
+                <th> <?php echo $this->translate('Samples Tested'); ?><br> (<?php echo $dt->format('M Y'); ?>)</th>
+                <th> <?php echo $this->translate('High Viral Load'); ?><br> (<?php echo $dt->format('M Y'); ?>)</th>
+            <?php } ?>
 
-                                        </tr>
-                                       
-                                    </thead>
-                                    <tbody>
-                                    <?php foreach($result['data'] as $facilityName => $fData){ ?>
-                                        <tr>
-                                            <td><?php echo $facilityName; ?></td>
-                                            <td><?php echo $fData['province']; ?></td>
-                                            <td><?php echo $fData['district']; ?></td>
-                                            <?php foreach($result['months'] as $mYear){ ?>
-                                                <?php if(isset($fData['months'][$mYear])){ ?>
-                                                    <td class="center"> <?php echo $fData['months'][$mYear]['samples_tested']; ?></td>
-                                                    <td class="center"> <?php echo $fData['months'][$mYear]['hvl']; ?></td>
-                                                <?php } else { ?>  
-                                                    <td></td>
-                                                    <td></td>
-                                                <?php } ?>                                            
-                                            <?php } ?>                                            
-                                        </tr>
-                                    <?php } ?>
-                                    </tbody>
-                                </table>
+        </tr>
+
+    </thead>
+    <tbody>
+        <?php
+        if (!empty($result['data'])) {
+
+            foreach ($result['data'] as $facilityName => $fData) { ?>
+                <tr>
+                    <td><?php echo $facilityName; ?></td>
+                    <td><?php echo $fData['province']; ?></td>
+                    <td><?php echo $fData['district']; ?></td>
+                    <?php foreach ($result['months'] as $mYear) { ?>
+                        <?php if (isset($fData['months'][$mYear])) { ?>
+                            <td class="center"> <?php echo $fData['months'][$mYear]['samples_tested']; ?></td>
+                            <td class="center"> <?php echo $fData['months'][$mYear]['hvl']; ?></td>
+                        <?php } else { ?>
+                            <td></td>
+                            <td></td>
+                        <?php } ?>
+                    <?php } ?>
+                </tr>
+        <?php }
+        }
+        ?>
+
+    </tbody>
+</table>

@@ -32,7 +32,7 @@ class SampleTable extends AbstractTableGateway
     protected $mappedFacilities = null;
     protected $translator = null;
 
-    public function __construct(Adapter $adapter, $sm = null, $mappedFacilities = null, $table = null )
+    public function __construct(Adapter $adapter, $sm = null, $mappedFacilities = null, $table = null)
     {
         $this->adapter = $adapter;
         $this->sm = $sm;
@@ -282,7 +282,7 @@ class SampleTable extends AbstractTableGateway
             if ($facilityIdList != null) {
                 $queryStr = $queryStr->where('vl.lab_id IN ("' . implode('", "', $facilityIdList) . '")');
             }
-           
+
             $queryStr = $queryStr->where("
                         (sample_collection_date is not null AND sample_collection_date != '')
                         AND DATE(sample_collection_date) >= '" . $startMonth . "' 
@@ -536,6 +536,9 @@ class SampleTable extends AbstractTableGateway
 
         $facilityIdList = null;
 
+        // FILTER :: Checking if the facility filter is set
+        // else if the user is mapped to one or more facilities
+
         if (isset($params['facilityId']) && trim($params['facilityId']) != '') {
             $fQuery = $sql->select()->from(array('f' => 'facility_details'))->columns(array('facility_id'))
                 ->where('f.facility_type = 2 AND f.status="active"');
@@ -551,38 +554,54 @@ class SampleTable extends AbstractTableGateway
             $facilityResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             $facilityIdList = array_column($facilityResult, 'facility_id');
         }
-                
+
+        // FILTER :: Checking if the date range filter is set (which should be always set)
+
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
             $monthyear = date("Y-m");
             $startMonth = $params['fromDate'];
             $endMonth = $params['toDate'];
+
             if (strtotime($startMonth) >= strtotime($monthyear)) {
                 $startMonth = $endMonth = date("Y-m", strtotime("-2 months"));
             } else if (strtotime($endMonth) >= strtotime($monthyear)) {
                 $endMonth = date("Y-m", strtotime("-2 months"));
             }
+
+
             $startMonth = date("Y-m", strtotime(trim($startMonth))) . "-01";
             $endMonth = date("Y-m", strtotime(trim($endMonth))) . "-31";
 
             $query = $sql->select()->from(array('vl' => $this->table))
                 ->columns(
                     array(
-                        "month" => new Expression("MONTH(sample_collection_date)"),
-                        "year" => new Expression("YEAR(sample_collection_date)"),
-                        "monthDate" => new Expression("DATE_FORMAT(DATE(sample_collection_date), '%b-%Y')"),
+                        "month" => new Expression("MONTH(result_approved_datetime)"),
+                        "year" => new Expression("YEAR(result_approved_datetime)"),
+                        "AvgDiff" => new Expression("CAST(ABS((TIMESTAMPDIFF(DAY,result_approved_datetime,sample_collection_date))) AS DECIMAL (10,2))"),
+                        "monthDate" => new Expression("DATE_FORMAT(DATE(result_approved_datetime), '%b-%Y')"),
                         "total_samples_collected" => new Expression('COUNT(*)'),
                         "total_samples_pending" => new Expression("(SUM(CASE WHEN ((vl.DashVL_AnalysisResult IS NULL OR vl.DashVL_AnalysisResult = '' OR vl.DashVL_AnalysisResult = 'NULL') AND (vl.reason_for_sample_rejection IS NULL OR vl.reason_for_sample_rejection = '' OR vl.reason_for_sample_rejection = 0)) THEN 1 ELSE 0 END))")
                     )
                 );
             $query = $query->where("
-                        DATE(vl.sample_collection_date) >= '" . $startMonth . "'
-                        AND DATE(vl.sample_collection_date) <= '" . $endMonth . "' ");
+                    (vl.sample_collection_date is not null AND vl.sample_collection_date not like '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')
+                    AND (vl.result_approved_datetime is not null AND vl.result_approved_datetime not like '' AND DATE(vl.result_approved_datetime) !='1970-01-01' AND DATE(vl.result_approved_datetime) !='0000-00-00')");
+            $query = $query->where("
+                        DATE(vl.result_approved_datetime) >= '" . $startMonth . "'
+                        AND DATE(vl.result_approved_datetime) <= '" . $endMonth . "' ");
+
+            
+            $skipDays = (isset($skipDays) && $skipDays > 0) ? $skipDays : 120;
+            $query = $query->where('
+                (DATEDIFF(result_approved_datetime,sample_collection_date) < '. $skipDays .' AND 
+                DATEDIFF(result_approved_datetime,sample_collection_date) >= 0)');
+            
             if ($facilityIdList != null) {
                 $query = $query->where('vl.lab_id IN ("' . implode('", "', $facilityIdList) . '")');
             }
-            $query = $query->group(array(new Expression('YEAR(vl.sample_collection_date)')));
-            $query = $query->group(array(new Expression('MONTH(vl.sample_collection_date)')));
-            $query = $query->order(array(new Expression('DATE(vl.sample_collection_date) ASC')));
+            $query = $query->group(array(new Expression('YEAR(vl.result_approved_datetime)')));
+            $query = $query->group(array(new Expression('MONTH(vl.result_approved_datetime)')));
+            $query = $query->order(array(new Expression('DATE(vl.result_approved_datetime) ASC')));
             $queryStr = $sql->getSqlStringForSqlObject($query);
             //echo $queryStr;die;
             //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -590,36 +609,7 @@ class SampleTable extends AbstractTableGateway
             $j = 0;
             $monthDateArray = array();
             foreach ($sampleResult as $sRow) {
-                if ($sRow["monthDate"] == null || in_array($sRow["monthDate"], $monthDateArray)) continue;
-                $monthDateArray[] = $sRow["monthDate"];
-                $subQuery = $sql->select()->from(array('vl' => $this->table))
-                    ->columns(
-                        array(
-                            //"AvgDiff" => new Expression("CAST(ABS(AVG(TIMESTAMPDIFF(DAY,result_approved_datetime,sample_collection_date))) AS DECIMAL (10,2))"),
-                            "AvgDiff" => new Expression("CAST(ABS((TIMESTAMPDIFF(DAY,result_approved_datetime,sample_collection_date))) AS DECIMAL (10,2))"), 'lab_id',
-                        )
-                    );
-                $subQuery = $subQuery->where("
-                        (vl.sample_collection_date is not null AND vl.sample_collection_date != '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')
-                        AND (vl.result_approved_datetime is not null AND vl.result_approved_datetime != '' AND DATE(vl.result_approved_datetime) !='1970-01-01' AND DATE(vl.result_approved_datetime) !='0000-00-00')
-                        AND MONTH(vl.result_approved_datetime) >= '" . $sRow['month'] . "'
-                        AND YEAR(vl.result_approved_datetime) <= '" . $sRow['year'] . "' ");
-                if ($skipDays > 0) {
-                    $subQuery = $subQuery->where('
-                    DATEDIFF(result_approved_datetime,sample_collection_date)<120 AND 
-                    DATEDIFF(result_approved_datetime,sample_collection_date)>=0');
-                }
-
-
-                if ($facilityIdList != null) {
-                    $subQuery = $subQuery->where('vl.lab_id IN ("' . implode('", "', $facilityIdList) . '")');
-                }
-                
-                $subQueryStr = $sql->getSqlStringForSqlObject($subQuery);
-                //echo $subQueryStr;die;
-                $subQueryResult = $common->cacheQuery($subQueryStr, $dbAdapter);
-
-                $result['all'][$j] = (isset($subQueryResult[0]["AvgDiff"]) && $subQueryResult[0]["AvgDiff"] != NULL && $subQueryResult[0]["AvgDiff"] > 0) ? round($subQueryResult[0]["AvgDiff"], 2) : null;
+                $result['all'][$j] = (isset($sRow["AvgDiff"]) && $sRow["AvgDiff"] != NULL && $sRow["AvgDiff"] > 0) ? round($sRow["AvgDiff"], 2) : null;
                 //$result['lab'][$j] = (isset($labsubQueryResult[0]["labCount"]) && $labsubQueryResult[0]["labCount"] != NULL && $labsubQueryResult[0]["labCount"] > 0) ? round($labsubQueryResult[0]["labCount"],2) : 0;
                 $result['sample']['Samples Collected'][$j] = (isset($sRow['total_samples_collected']) && $sRow['total_samples_collected'] != NULL) ? $sRow['total_samples_collected'] : null;
                 $result['sample']['Results Not Available'][$j] = (isset($sRow['total_samples_pending']) && $sRow['total_samples_pending'] != NULL) ? $sRow['total_samples_pending'] : null;
@@ -672,7 +662,7 @@ class SampleTable extends AbstractTableGateway
                 $query = $query->where('vl.lab_id IN (' . $params['facilityId'] . ')');
             } else {
                 if ($logincontainer->role != 1) {
-                    
+
                     $query = $query->where('vl.lab_id IN ("' . implode('", "', $this->mappedFacilities) . '")');
                 }
             }
@@ -1415,7 +1405,7 @@ class SampleTable extends AbstractTableGateway
                     $squery = $squery->where('vl.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
                 }
             }
-            
+
             if (isset($params['sampleTypeId']) && $params['sampleTypeId'] != '') {
                 $squery = $squery->where('vl.sample_type="' . base64_decode(trim($params['sampleTypeId'])) . '"');
             }
@@ -1469,7 +1459,7 @@ class SampleTable extends AbstractTableGateway
             } else if (isset($params['isBreastfeeding']) && $params['isBreastfeeding'] == 'unreported') {
                 $squery = $squery->where("(vl.is_patient_breastfeeding IS NULL OR vl.is_patient_breastfeeding = '' OR vl.is_patient_breastfeeding = 'Unreported')");
             }
-            
+
             $sQueryStr = $sql->getSqlStringForSqlObject($squery);
             //echo $sQueryStr;die;
             $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -1510,7 +1500,7 @@ class SampleTable extends AbstractTableGateway
                     )
                 )
                 ->where(array("DATE(vl.sample_collection_date) BETWEEN '$startDate' AND '$endDate'"));
-            
+
             if (isset($params['clinicId']) && trim($params['clinicId']) != '') {
                 $query = $query->where('vl.facility_id IN (' . $params['clinicId'] . ')');
             } else {
@@ -2153,17 +2143,17 @@ class SampleTable extends AbstractTableGateway
                 $endDate = trim($s_c_date[1]);
             }
         }
-        
+
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->from(array('vl' => $this->table))
             ->columns(array('vl_sample_id', 'sample_code', 'DashVL_AnalysisResult', 'DashVL_Abs', 'sampleCollectionDate' => new Expression('DATE(sample_collection_date)'), 'sample_type', 'sampleTestingDate' => new Expression('DATE(sample_tested_datetime)'), 'result_value_log', 'result_value_absolute', 'result_value_text', 'result'))
-            ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'),'left')
+            ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'), 'left')
             ->join(array('r_r_r' => 'r_sample_rejection_reasons'), 'r_r_r.rejection_reason_id=vl.reason_for_sample_rejection', array('rejection_reason_name'), 'left');
         //->where(array('f.facility_type'=>'1'));
         if (isset($parameters['sampleCollectionDate']) && trim($parameters['sampleCollectionDate']) != '') {
             //$sQuery = $sQuery->where(array("vl.sample_collection_date <='" . $endDate . " 23:59:59" . "'", "vl.sample_collection_date >='" . $startDate . " 00:00:00" . "'"));
-            $sQuery = $sQuery->where(array("DATE(vl.sample_collection_date) >='$startDate'","DATE(vl.sample_collection_date) <='$endDate'"));
+            $sQuery = $sQuery->where(array("DATE(vl.sample_collection_date) >='$startDate'", "DATE(vl.sample_collection_date) <='$endDate'"));
         }
         if (isset($parameters['clinicId']) && trim($parameters['clinicId']) != '') {
             $sQuery = $sQuery->where('vl.facility_id IN (' . $parameters['clinicId'] . ')');
@@ -2282,8 +2272,8 @@ class SampleTable extends AbstractTableGateway
             $iQuery = $iQuery->where('vl.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
         }
         if (isset($parameters['sampleCollectionDate']) && trim($parameters['sampleCollectionDate']) != '') {
-            $sQuery = $sQuery->where(array("DATE(vl.sample_collection_date) >='$startDate'","DATE(vl.sample_collection_date) <='$endDate'"));
-        }        
+            $sQuery = $sQuery->where(array("DATE(vl.sample_collection_date) >='$startDate'", "DATE(vl.sample_collection_date) <='$endDate'"));
+        }
         $iQueryStr = $sql->getSqlStringForSqlObject($iQuery);
         $iResult = $dbAdapter->query($iQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $iTotal = count($iResult);
@@ -7616,16 +7606,16 @@ class SampleTable extends AbstractTableGateway
             );
         if ($skipDays > 0) {
             $squery = $squery->where('
-                DATEDIFF(sample_received_at_vl_lab_datetime,sample_collection_date) < '.$skipDays.' AND 
+                DATEDIFF(sample_received_at_vl_lab_datetime,sample_collection_date) < ' . $skipDays . ' AND 
                 DATEDIFF(sample_received_at_vl_lab_datetime,sample_collection_date) >= 0 AND 
 
-                DATEDIFF(sample_registered_at_lab,sample_received_at_vl_lab_datetime) < '.$skipDays.' AND 
+                DATEDIFF(sample_registered_at_lab,sample_received_at_vl_lab_datetime) < ' . $skipDays . ' AND 
                 DATEDIFF(sample_registered_at_lab,sample_received_at_vl_lab_datetime) >= 0 AND 
 
-                DATEDIFF(sample_tested_datetime,sample_received_at_vl_lab_datetime) < '.$skipDays.' AND 
+                DATEDIFF(sample_tested_datetime,sample_received_at_vl_lab_datetime) < ' . $skipDays . ' AND 
                 DATEDIFF(sample_tested_datetime,sample_registered_at_lab)>=0 AND 
 
-                DATEDIFF(result_approved_datetime,sample_tested_datetime) < '.$skipDays.' AND 
+                DATEDIFF(result_approved_datetime,sample_tested_datetime) < ' . $skipDays . ' AND 
                 DATEDIFF(result_approved_datetime,sample_tested_datetime) >= 0');
         }
 

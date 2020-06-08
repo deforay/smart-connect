@@ -299,7 +299,7 @@ foreach ($sampleType as $samples) {
             </div>
         </div>
         <div class="col-lg-3">
-            <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="getEverything();"><?php echo $this->translate('Search'); ?></a>&nbsp;&nbsp;
+            <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="getAverageLabTAT();"><?php echo $this->translate('Search'); ?></a>&nbsp;&nbsp;
             <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="resetEverything();"><?php echo $this->translate('Reset'); ?></a>
         </div>
     </div>
@@ -777,7 +777,7 @@ foreach ($sampleType as $samples) {
         var fromDate = formatDate($('#mrp-lowerDate').val());
         var toDate = formatDate($('#mrp-upperDate').val());
         var facilityId = ($("#labName").val() == null) ? '' : $("#labName").val().join(',');
-        $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-test-result-gender')); ?>", {
+        return $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-test-result-gender')); ?>", {
                 fromDate: fromDate,
                 toDate: toDate,
                 facilityId: facilityId
@@ -791,7 +791,7 @@ foreach ($sampleType as $samples) {
         var fromDate = formatDate($('#mrp-lowerDate').val());
         var toDate = formatDate($('#mrp-upperDate').val());
         var facilityId = ($("#labName").val() == null) ? '' : $("#labName").val().join(',');
-        $.post("<?php echo $this->url('laboratory', array('action' => 'get-lab-turn-around-time')); ?>", {
+        return $.post("<?php echo $this->url('laboratory', array('action' => 'get-lab-turn-around-time')); ?>", {
                 fromDate: fromDate,
                 toDate: toDate,
                 facilityId: facilityId
@@ -1113,6 +1113,8 @@ foreach ($sampleType as $samples) {
         $('#daterange-container span').html('<?php echo $this->translate('Choose Date Range'); ?>');
         $('input[name="daterange"]').val('');
 
+        // The reason why getSampleResult is a separate call is because it does not follow
+        // the Date and Lab filters of the other functions.
         getSampleResult('load');
         getEverything();
 
