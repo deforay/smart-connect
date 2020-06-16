@@ -2,10 +2,10 @@
 
 namespace Application\Model;
 
-use Zend\Db\Adapter\Adapter;
-use Zend\Db\Sql\Sql;
-use Zend\Db\Sql\Expression;
-use Zend\Db\TableGateway\AbstractTableGateway;
+use Laminas\Db\Adapter\Adapter;
+use Laminas\Db\Sql\Sql;
+use Laminas\Db\Sql\Expression;
+use Laminas\Db\TableGateway\AbstractTableGateway;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -30,7 +30,7 @@ class LocationDetailsTable extends AbstractTableGateway {
 
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $sQuery = $sql->select()->quantifier(\Zend\Db\Sql\Select::QUANTIFIER_DISTINCT)
+        $sQuery = $sql->select()->quantifier(\Laminas\Db\Sql\Select::QUANTIFIER_DISTINCT)
                                 ->from(array('l' => 'location_details'))
                                 ->join(array('f'=>'facility_details'),'f.facility_state=l.location_id',array())
                                 ->join(array('ft'=>'facility_type'),'ft.facility_type_id=f.facility_type')
@@ -59,7 +59,7 @@ class LocationDetailsTable extends AbstractTableGateway {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()
-                                ->quantifier(\Zend\Db\Sql\Select::QUANTIFIER_DISTINCT)
+                                ->quantifier(\Laminas\Db\Sql\Select::QUANTIFIER_DISTINCT)
                                 ->from(array('l' => 'location_details'))
                                 ->join(array('f'=>'facility_details'),'f.facility_district=l.location_id',array())
                                 ->join(array('ft'=>'facility_type'),'ft.facility_type_id=f.facility_type')

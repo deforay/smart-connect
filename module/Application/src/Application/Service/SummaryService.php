@@ -2,11 +2,11 @@
 
 namespace Application\Service;
 
-use Zend\Session\Container;
-use Zend\Db\Adapter\Adapter;
-use Zend\Db\Sql\Sql;
-use Zend\Db\TableGateway\AbstractTableGateway;
-use Zend\Db\Sql\Expression;
+use Laminas\Session\Container;
+use Laminas\Db\Adapter\Adapter;
+use Laminas\Db\Sql\Sql;
+use Laminas\Db\TableGateway\AbstractTableGateway;
+use Laminas\Db\Sql\Expression;
 use Application\Service\CommonService;
 use \PhpOffice\PhpSpreadsheet\Spreadsheet;
 
@@ -140,7 +140,7 @@ class SummaryService
         $common = new CommonService();
         if (isset($queryContainer->indicatorSummaryQuery)) {
             try {
-                $dbAdapter = $this->sm->get('Zend\Db\Adapter\Adapter');
+                $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
                 $sql = new Sql($dbAdapter);
                 $sQueryStr = $sql->getSqlStringForSqlObject($queryContainer->indicatorSummaryQuery);
                 $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -266,7 +266,7 @@ class SummaryService
 
         if (!isset($queryContainer->fetchAllSuppressionRateByFacility)) {
 
-            $dbAdapter = $this->sm->get('Zend\Db\Adapter\Adapter');
+            $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
             $sql = new Sql($dbAdapter);
             $queryContainer->fetchAllSuppressionRateByFacility = $sql->select()->from(array('vl' => $dashTable))
                 ->columns(
@@ -294,7 +294,7 @@ class SummaryService
         
 
         try {
-            $dbAdapter = $this->sm->get('Zend\Db\Adapter\Adapter');
+            $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
             $sql = new Sql($dbAdapter);
             $sQueryStr = $sql->getSqlStringForSqlObject($queryContainer->fetchAllSuppressionRateByFacility);
             $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();

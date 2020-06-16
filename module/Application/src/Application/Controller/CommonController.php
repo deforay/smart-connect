@@ -2,9 +2,9 @@
 
 namespace Application\Controller;
 
-use Zend\Session\Container;
-use Zend\Mvc\Controller\AbstractActionController;
-use Zend\View\Model\ViewModel;
+use Laminas\Session\Container;
+use Laminas\Mvc\Controller\AbstractActionController;
+use Laminas\View\Model\ViewModel;
 
 class CommonController extends AbstractActionController{
     public function indexAction(){

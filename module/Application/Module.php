@@ -10,7 +10,7 @@
 
 namespace Application;
 
-use Zend\Session\Container;
+use Laminas\Session\Container;
 
 use Application\Model\UsersTable;
 use Application\Model\OrganizationsTable;
@@ -42,11 +42,11 @@ use Application\Service\ConfigService;
 use Application\Service\FacilityService;
 use Application\Service\SummaryService;
 
-use Zend\Mvc\ModuleRouteListener;
-use Zend\Mvc\MvcEvent;
-use Zend\Cache\PatternFactory;
+use Laminas\Mvc\ModuleRouteListener;
+use Laminas\Mvc\MvcEvent;
+use Laminas\Cache\PatternFactory;
 
-use Zend\View\Model\ViewModel;
+use Laminas\View\Model\ViewModel;
 
 class Module
 {
@@ -210,44 +210,44 @@ class Module
 		return array(
 			'factories' => array(
 				'UsersTable' => function ($sm) {
-					$dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+					$dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');
 					$table = new UsersTable($dbAdapter, $sm);
 					return $table;
 				},
 				'OrganizationsTable' => function ($sm) {
-					$dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+					$dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');
 					$table = new OrganizationsTable($dbAdapter);
 					return $table;
 				},
 				'OrganizationTypesTable' => function ($sm) {
-					$dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+					$dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');
 					$table = new OrganizationTypesTable($dbAdapter);
 					return $table;
 				},
 				'CountriesTable' => function ($sm) {
-					$dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+					$dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');
 					$table = new CountriesTable($dbAdapter);
 					return $table;
 				},
 				'RolesTable' => function ($sm) {
-					$dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+					$dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');
 					$table = new RolesTable($dbAdapter);
 					return $table;
 				},
 				'UserOrganizationsMapTable' => function ($sm) {
-					$dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+					$dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');
 					$table = new UserOrganizationsMapTable($dbAdapter);
 					return $table;
 				},
 				'SourceTable' => function ($sm) {
-					$dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+					$dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');
 					$table = new SourceTable($dbAdapter);
 					return $table;
 				},
 				'SampleTable' => function ($sm) {
 					$session = new Container('credo');
 					$mappedFacilities = (isset($session->mappedFacilities) && count($session->mappedFacilities) > 0) ? $session->mappedFacilities : array();
-					$dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+					$dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');
 					$sampleTable = isset($session->sampleTable) ? $session->sampleTable :  null;
 					$tableObj = new SampleTable($dbAdapter, $sm, $mappedFacilities, $sampleTable);
 					$table = PatternFactory::factory('object', [
@@ -258,11 +258,11 @@ class Module
 					return $table;
 				},
 				'SampleTableWithoutCache' => function ($sm) {
-					$dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+					$dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');
 					return new SampleTable($dbAdapter, $sm);
 				},
 				'FacilityTable' => function ($sm) {
-					$dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+					$dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');
 					$tableObj = new FacilityTable($dbAdapter, $sm);
 					$table = PatternFactory::factory('object', [
 						'storage' => $sm->get('Cache\Persistent'),
@@ -271,30 +271,30 @@ class Module
 					return $table;
 				},
 				'FacilityTableWithoutCache' => function ($sm) {
-					$dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+					$dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');
 					return new FacilityTable($dbAdapter, $sm);
 				},
 				'FacilityTypeTable' => function ($sm) {
-					$dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+					$dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');
 					$table = new FacilitytypeTable($dbAdapter);
 					return $table;
 				},
 				'TestReasonTable' => function ($sm) {
-					$dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+					$dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');
 					$table = new TestReasonTable($dbAdapter);
 					return $table;
 				},
 				'SampleStatusTable' => function ($sm) {
-					$dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+					$dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');
 					$table = new SampleStatusTable($dbAdapter);
 					return $table;
 				},
 				'SampleTypeTable' => function ($sm) {
-					$dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+					$dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');
 					$table = new SampleTypeTable($dbAdapter);
 					return $table;
 				}, 'GlobalTable' => function ($sm) {
-					$dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+					$dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');
 					return new GlobalTable($dbAdapter, $sm);
 					// $tableObj = new GlobalTable($dbAdapter, $sm);
 					// $table = PatternFactory::factory('object', [
@@ -303,31 +303,31 @@ class Module
 					// ]);
 					// return $table;					
 				}, 'ArtCodeTable' => function ($sm) {
-					$dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+					$dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');
 					$table = new ArtCodeTable($dbAdapter);
 					return $table;
 				}, 'UserFacilityMapTable' => function ($sm) {
-					$dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+					$dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');
 					$table = new UserFacilityMapTable($dbAdapter);
 					return $table;
 				},
 				'LocationDetailsTable' => function ($sm) {
-					$dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+					$dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');
 					$table = new LocationDetailsTable($dbAdapter);
 					return $table;
 				},
 				'RemovedSamplesTable' => function ($sm) {
-					$dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+					$dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');
 					$table = new RemovedSamplesTable($dbAdapter);
 					return $table;
 				},
 				'GenerateBackupTable' => function ($sm) {
-					$dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+					$dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');
 					$table = new GenerateBackupTable($dbAdapter);
 					return $table;
 				},
 				'SampleRejectionReasonTable' => function ($sm) {
-					$dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+					$dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');
 					$table = new SampleRejectionReasonTable($dbAdapter);
 					return $table;
 				},
@@ -356,10 +356,10 @@ class Module
 				'FacilityService' => function ($sm) {
 					return new FacilityService($sm);
 				},
-				'translator' => 'Zend\Mvc\Service\TranslatorServiceFactory',
+				'translator' => 'Laminas\Mvc\Service\TranslatorServiceFactory',
 			),
 			'abstract_factories' => array(
-				'Zend\Cache\Service\StorageCacheAbstractServiceFactory',
+				'Laminas\Cache\Service\StorageCacheAbstractServiceFactory',
 			),
 		);
 	}
@@ -385,7 +385,7 @@ class Module
 				'Application\Controller\Clinic' => function ($sm) {
 					$sampleService = $sm->getServiceLocator()->get('SampleService');
 					$configService = $sm->getServiceLocator()->get('ConfigService');
-					return new \Application\Controller\ClinicController($sampleService,$commonService);
+					return new \Application\Controller\ClinicController($sampleService,$configService);
 				},
 			),
 		);
@@ -405,7 +405,7 @@ class Module
 	public function getAutoloaderConfig()
 	{
 		return array(
-			'Zend\Loader\StandardAutoloader' => array(
+			'Laminas\Loader\StandardAutoloader' => array(
 				'namespaces' => array(
 					__NAMESPACE__ => __DIR__ . '/src/' . __NAMESPACE__,
 				),

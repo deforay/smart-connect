@@ -1,7 +1,7 @@
 <?php
 namespace Application\Controller\Plugin;
  
-use Zend\Mvc\Controller\Plugin\AbstractPlugin;
+use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
  
 class HasParams extends AbstractPlugin{
     public function checkParams($allparams,$paramsToCheck){

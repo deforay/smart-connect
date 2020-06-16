@@ -2,7 +2,7 @@
 
 namespace Application\Service;
 
-use Zend\Session\Container;
+use Laminas\Session\Container;
 
 class OrganizationService {
 

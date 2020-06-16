@@ -1,14 +1,14 @@
 <?php
 namespace Application\Service;
 
-use Zend\Session\Container;
+use Laminas\Session\Container;
 use Exception;
-use Zend\Db\Sql\Sql;
-use Zend\Mail\Transport\Smtp as SmtpTransport;
-use Zend\Mail\Transport\SmtpOptions;
-use Zend\Mail;
-use Zend\Mime\Message as MimeMessage;
-use Zend\Mime\Part as MimePart;
+use Laminas\Db\Sql\Sql;
+use Laminas\Mail\Transport\Smtp as SmtpTransport;
+use Laminas\Mail\Transport\SmtpOptions;
+use Laminas\Mail;
+use Laminas\Mime\Message as MimeMessage;
+use Laminas\Mime\Part as MimePart;
 
 
 class CommonService {
@@ -52,7 +52,7 @@ class CommonService {
      }
 
      public function checkMultipleFieldValidations($params) {
-          $adapter = $this->sm->get('Zend\Db\Adapter\Adapter');
+          $adapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
           $jsonData = $params['json_data'];
           $tableName = $jsonData['tableName'];
           $sql = new Sql($adapter);
@@ -76,7 +76,7 @@ class CommonService {
 
 
      public function checkFieldValidations($params) {
-          $adapter = $this->sm->get('Zend\Db\Adapter\Adapter');
+          $adapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
           $tableName = $params['tableName'];
           $fieldName = $params['fieldName'];
           $value = trim($params['value']);
@@ -93,7 +93,7 @@ class CommonService {
                     $table = explode("##", $fnct);
                     if ($fieldName == 'password') {
                          //Password encrypted
-                         $config = new \Zend\Config\Reader\Ini();
+                         $config = new \Laminas\Config\Reader\Ini();
                          $configResult = $config->fromFile(CONFIG_PATH . '/custom.config.ini');
                          $password = sha1($value . $configResult["password"]["salt"]);
                          //$password = $value;
@@ -173,9 +173,9 @@ class CommonService {
      public function sendTempMail() {
           try {
                $tempDb = $this->sm->get('TempMailTable');
-               $config = new \Zend\Config\Reader\Ini();
+               $config = new \Laminas\Config\Reader\Ini();
                $configResult = $config->fromFile(CONFIG_PATH . '/custom.config.ini');
-               $dbAdapter = $this->sm->get('Zend\Db\Adapter\Adapter');
+               $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
                $sql = new Sql($dbAdapter);
 
                // Setup SMTP transport using LOGIN authentication

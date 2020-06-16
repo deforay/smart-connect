@@ -2,9 +2,9 @@
 
 namespace Api\Controller;
 
-use Zend\Mvc\Controller\AbstractRestfulController;
-use Zend\View\Model\JsonModel;
-use Zend\Json\Json;
+use Laminas\Mvc\Controller\AbstractRestfulController;
+use Laminas\View\Model\JsonModel;
+use Laminas\Json\Json;
 
 class FacilityController extends AbstractRestfulController
 {

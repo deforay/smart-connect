@@ -1,0 +1,55 @@
+{
+    "name": "laminas/laminas-code",
+    "description": "provides facilities to generate arbitrary code using an object oriented interface",
+    "license": "BSD-3-Clause",
+    "keywords": [
+        "laminas",
+        "code"
+    ],
+    "homepage": "https://laminas.dev",
+    "support": {
+        "docs": "https://docs.laminas.dev/laminas-code/",
+        "issues": "https://github.com/laminas/laminas-code/issues",
+        "source": "https://github.com/laminas/laminas-code",
+        "rss": "https://github.com/laminas/laminas-code/releases.atom",
+        "chat": "https://laminas.dev/chat",
+        "forum": "https://discourse.laminas.dev"
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.6-dev",
+            "dev-develop": "2.7-dev"
+        }
+    },
+    "require": {
+        "php": "^5.5 || 7.0.0 - 7.0.4 || ^7.0.6",
+        "laminas/laminas-eventmanager": "^2.6 || ^3.0",
+        "laminas/laminas-zendframework-bridge": "^1.0"
+    },
+    "require-dev": {
+        "doctrine/annotations": "~1.0",
+        "fabpot/php-cs-fixer": "1.7.*",
+        "laminas/laminas-stdlib": "^2.7 || ^3.0",
+        "phpunit/phpunit": "^4.8.21"
+    },
+    "suggest": {
+        "doctrine/annotations": "Doctrine\\Common\\Annotations >=1.0 for annotation features",
+        "laminas/laminas-stdlib": "Laminas\\Stdlib component"
+    },
+    "autoload": {
+        "psr-4": {
+            "Laminas\\Code\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "LaminasTest\\Code\\": "test/"
+        }
+    },
+    "replace": {
+        "zendframework/zend-code": "self.version"
+    }
+}

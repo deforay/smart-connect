@@ -2,12 +2,12 @@
 
 namespace Application\Service;
 
-use Zend\Session\Container;
-use Zend\Db\Adapter\Adapter;
-use Zend\Db\Sql\Sql;
-use Zend\Db\Sql\Select;
-use Zend\Db\TableGateway\AbstractTableGateway;
-use Zend\Db\Sql\Expression;
+use Laminas\Session\Container;
+use Laminas\Db\Adapter\Adapter;
+use Laminas\Db\Sql\Sql;
+use Laminas\Db\Sql\Select;
+use Laminas\Db\TableGateway\AbstractTableGateway;
+use Laminas\Db\Sql\Expression;
 use Application\Service\CommonService;
 use \PhpOffice\PhpSpreadsheet\Spreadsheet;
 
@@ -38,7 +38,7 @@ class SampleService
         $sampleTypeDb = $this->sm->get('SampleTypeTable');
         $locationDb = $this->sm->get('LocationDetailsTable');
         $sampleRjtReasonDb = $this->sm->get('SampleRejectionReasonTable');
-        $dbAdapter = $this->sm->get('Zend\Db\Adapter\Adapter');
+        $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
         $sql = new Sql($dbAdapter);
         $allowedExtensions = array('xls', 'xlsx', 'csv');
         $fileName = $_FILES['importFile']['name'];
@@ -285,7 +285,7 @@ class SampleService
 
     public function checkSampleCode($sampleCode, $instanceCode, $dashTable = 'dash_vl_request_form')
     {
-        $dbAdapter = $this->sm->get('Zend\Db\Adapter\Adapter');
+        $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->from($dashTable)->where(array('sample_code' => $sampleCode, 'vlsm_instance_id' => $instanceCode));
         $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
@@ -295,7 +295,7 @@ class SampleService
 
     public function checkFacilityStateDistrictDetails($location, $parent)
     {
-        $dbAdapter = $this->sm->get('Zend\Db\Adapter\Adapter');
+        $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->from(array('l' => 'location_details'))
             ->where(array('l.parent_location' => $parent, 'l.location_name' => trim($location)));
@@ -306,7 +306,7 @@ class SampleService
 
     public function checkFacilityDetails($clinicName)
     {
-        $dbAdapter = $this->sm->get('Zend\Db\Adapter\Adapter');
+        $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
         $sql = new Sql($dbAdapter);
         $fQuery = $sql->select()->from('facility_details')->where(array('facility_name' => $clinicName));
         $fQueryStr = $sql->getSqlStringForSqlObject($fQuery);
@@ -315,7 +315,7 @@ class SampleService
     }
     public function checkFacilityTypeDetails($facilityTypeName)
     {
-        $dbAdapter = $this->sm->get('Zend\Db\Adapter\Adapter');
+        $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
         $sql = new Sql($dbAdapter);
         $fQuery = $sql->select()->from('facility_type')->where(array('facility_type_name' => $facilityTypeName));
         $fQueryStr = $sql->getSqlStringForSqlObject($fQuery);
@@ -324,7 +324,7 @@ class SampleService
     }
     public function checkTestingReson($testingReson)
     {
-        $dbAdapter = $this->sm->get('Zend\Db\Adapter\Adapter');
+        $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
         $sql = new Sql($dbAdapter);
         $tQuery = $sql->select()->from('r_vl_test_reasons')->where(array('test_reason_name' => $testingReson));
         $tQueryStr = $sql->getSqlStringForSqlObject($tQuery);
@@ -333,7 +333,7 @@ class SampleService
     }
     public function checkSampleStatus($testingStatus)
     {
-        $dbAdapter = $this->sm->get('Zend\Db\Adapter\Adapter');
+        $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->from('r_sample_status')->where(array('status_name' => $testingStatus));
         $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
@@ -342,7 +342,7 @@ class SampleService
     }
     public function checkSampleType($sampleType)
     {
-        $dbAdapter = $this->sm->get('Zend\Db\Adapter\Adapter');
+        $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->from('r_sample_type')->where(array('sample_name' => $sampleType));
         $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
@@ -351,7 +351,7 @@ class SampleService
     }
     public function checkSampleRejectionReason($rejectReasonName)
     {
-        $dbAdapter = $this->sm->get('Zend\Db\Adapter\Adapter');
+        $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->from('r_sample_rejection_reasons')->where(array('rejection_reason_name' => $rejectReasonName));
         $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
@@ -635,7 +635,7 @@ class SampleService
 
     public function getSampleInfo($params, $dashTable = 'dash_vl_request_form')
     {
-        $dbAdapter = $this->sm->get('Zend\Db\Adapter\Adapter');
+        $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->from(array('vl' => $dashTable))
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name', 'facility_code', 'facility_logo'), 'left')
@@ -658,7 +658,7 @@ class SampleService
         $common = new CommonService();
         if (isset($queryContainer->resultQuery)) {
             try {
-                $dbAdapter = $this->sm->get('Zend\Db\Adapter\Adapter');
+                $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
                 $sql = new Sql($dbAdapter);
                 $sQueryStr = $sql->getSqlStringForSqlObject($queryContainer->resultQuery);
                 $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -800,7 +800,7 @@ class SampleService
         $common = new CommonService();
         if (isset($queryContainer->resultQuery)) {
             try {
-                $dbAdapter = $this->sm->get('Zend\Db\Adapter\Adapter');
+                $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
                 $sql = new Sql($dbAdapter);
                 $hQueryStr = $sql->getSqlStringForSqlObject($queryContainer->highVlSampleQuery);
                 //error_log($hQueryStr);die;
@@ -984,7 +984,7 @@ class SampleService
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
             if (isset($queryContainer->sampleResultQuery)) {
                 try {
-                    $dbAdapter = $this->sm->get('Zend\Db\Adapter\Adapter');
+                    $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
                     $sql = new Sql($dbAdapter);
                     $sQueryStr = $sql->getSqlStringForSqlObject($queryContainer->sampleResultQuery);
                     $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -1098,7 +1098,7 @@ class SampleService
         $common = new CommonService();
         if (isset($queryContainer->labTestedSampleQuery)) {
             try {
-                $dbAdapter = $this->sm->get('Zend\Db\Adapter\Adapter');
+                $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
                 $sql = new Sql($dbAdapter);
                 $sQueryStr = $sql->getSqlStringForSqlObject($queryContainer->labTestedSampleQuery);
                 $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -1218,7 +1218,7 @@ class SampleService
         $common = new CommonService();
         if (isset($queryContainer->sampleResultTestedTATQuery)) {
             try {
-                $dbAdapter = $this->sm->get('Zend\Db\Adapter\Adapter');
+                $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
                 $sql = new Sql($dbAdapter);
                 $sQueryStr = $sql->getSqlStringForSqlObject($queryContainer->sampleResultTestedTATQuery);
                 $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -1362,7 +1362,7 @@ class SampleService
         $common = new CommonService();
         if (isset($queryContainer->resultsAwaitedQuery)) {
             try {
-                $dbAdapter = $this->sm->get('Zend\Db\Adapter\Adapter');
+                $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
                 $sql = new Sql($dbAdapter);
                 $sQueryStr = $sql->getSqlStringForSqlObject($queryContainer->resultsAwaitedQuery);
                 $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -1601,7 +1601,7 @@ class SampleService
         $sampleTypeDb = $this->sm->get('SampleTypeTable');
         $locationDb = $this->sm->get('LocationDetailsTable');
         $sampleRjtReasonDb = $this->sm->get('SampleRejectionReasonTable');
-        $dbAdapter = $this->sm->get('Zend\Db\Adapter\Adapter');
+        $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
         $sql = new Sql($dbAdapter);
         //$files = scandir($pathname, SCANDIR_SORT_DESCENDING);
         
@@ -1926,7 +1926,7 @@ class SampleService
     //     $common = new CommonService();
     //     if(isset($queryContainer->sampleStatusResultQuery)){
     //         try{
-    //             $dbAdapter = $this->sm->get('Zend\Db\Adapter\Adapter');
+    //             $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
     //             $sql = new Sql($dbAdapter);
     //             $sQueryStr = $sql->getSqlStringForSqlObject($queryContainer->sampleStatusResultQuery);
 

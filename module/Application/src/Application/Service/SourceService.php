@@ -2,11 +2,11 @@
 
 namespace Application\Service;
 
-use Zend\Db\Adapter\Adapter;
-use Zend\Db\Sql\Sql;
-use Zend\Db\TableGateway\AbstractTableGateway;
+use Laminas\Db\Adapter\Adapter;
+use Laminas\Db\Sql\Sql;
+use Laminas\Db\TableGateway\AbstractTableGateway;
 use Zend\Debug\Debug;
-use Zend\Session\Container;
+use Laminas\Session\Container;
 
 
 class SourceService {
@@ -22,7 +22,7 @@ class SourceService {
     }
 
     public function addSource($params) {
-        $adapter = $this->sm->get('Zend\Db\Adapter\Adapter')->getDriver()->getConnection();
+        $adapter = $this->sm->get('Laminas\Db\Adapter\Adapter')->getDriver()->getConnection();
         $adapter->beginTransaction();
         try {
             $sourceDb = $this->sm->get('SourceTable');
@@ -46,7 +46,7 @@ class SourceService {
     }
 
     public function updateSource($params) {
-        $adapter = $this->sm->get('Zend\Db\Adapter\Adapter')->getDriver()->getConnection();
+        $adapter = $this->sm->get('Laminas\Db\Adapter\Adapter')->getDriver()->getConnection();
         $adapter->beginTransaction();
         try {
             $sourceDb = $this->sm->get('SourceTable');

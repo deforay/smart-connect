@@ -2,13 +2,13 @@
 
 namespace Application\Model;
 
-use Zend\Session\Container;
-use Zend\Db\Adapter\Adapter;
-use Zend\Db\Sql\Sql;
-use Zend\Db\TableGateway\AbstractTableGateway;
+use Laminas\Session\Container;
+use Laminas\Db\Adapter\Adapter;
+use Laminas\Db\Sql\Sql;
+use Laminas\Db\TableGateway\AbstractTableGateway;
 use Zend\Debug\Debug;
-use Zend\Db\Sql\Expression;
-//use Zend\Db\Sql\Where;
+use Laminas\Db\Sql\Expression;
+//use Laminas\Db\Sql\Where;
 use \Application\Service\CommonService;
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -1042,7 +1042,7 @@ class SampleTable extends AbstractTableGateway
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
             $endMonth = str_replace(' ', '-', $params['toDate']) . "-31";
-            $lQuery = $sql->select()->from(array('vl' => $this->table))->columns(array('lab_id', 'labCount' => new \Zend\Db\Sql\Expression("COUNT(vl.lab_id)")))
+            $lQuery = $sql->select()->from(array('vl' => $this->table))->columns(array('lab_id', 'labCount' => new \Laminas\Db\Sql\Expression("COUNT(vl.lab_id)")))
                 ->join(array('f' => 'facility_details'), 'f.facility_id=vl.lab_id', array('facility_name', 'latitude', 'longitude'))
                 ->where(array("vl.sample_collection_date >='" . $startMonth . " 00:00:00" . "'", "vl.sample_collection_date <='" . $endMonth . " 23:59:59" . "'"))
                 ->group('vl.lab_id');
@@ -1061,7 +1061,7 @@ class SampleTable extends AbstractTableGateway
                 foreach ($lResult as $lab) {
                     if ($lab['lab_id'] != NULL && trim($lab['lab_id']) != '' && $lab['lab_id'] != 0) {
                         $lcQuery = $sql->select()->from(array('vl' => $this->table))
-                            ->columns(array('facility_id', 'clinicCount' => new \Zend\Db\Sql\Expression("COUNT(vl.facility_id)")))
+                            ->columns(array('facility_id', 'clinicCount' => new \Laminas\Db\Sql\Expression("COUNT(vl.facility_id)")))
                             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name', 'latitude', 'longitude'))
                             ->where(array("vl.sample_collection_date >='" . $startMonth . " 00:00:00" . "'", "vl.sample_collection_date <='" . $endMonth . " 23:59:59" . "'"))
                             ->where(array("vl.lab_id" => $lab['lab_id'], 'f.facility_type' => '1'))
