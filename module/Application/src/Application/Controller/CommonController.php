@@ -7,13 +7,22 @@ use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\ViewModel;
 
 class CommonController extends AbstractActionController{
+
+    private $sampleService = null;
+    private $configService = null;
+
+    public function __construct($commonService, $configService)
+    {
+        $this->configService = $configService;
+        $this->commonService = $commonService;
+    }
+
     public function indexAction(){
         $result = "";
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            $common = $this->getServiceLocator()->get('CommonService');
-            $result = $common->checkFieldValidations($params);
+            $result = $this->commonService->checkFieldValidations($params);
         }
         $viewModel = new ViewModel();
         $viewModel->setVariables(array('result' => $result))
@@ -26,8 +35,7 @@ class CommonController extends AbstractActionController{
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            $common = $this->getServiceLocator()->get('CommonService');
-            $result = $common->checkMultipleFieldValidations($params);
+            $this->commonService->checkMultipleFieldValidations($params);
         }
         $viewModel = new ViewModel();
         $viewModel->setVariables(array('result' => $result))
@@ -40,8 +48,7 @@ class CommonController extends AbstractActionController{
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            $common = $this->getServiceLocator()->get('CommonService');
-            $result = $common->clearAllCache();
+            $this->commonService->clearAllCache();
         }
         $viewModel = new ViewModel();
         $viewModel->setVariables(array('result' => $result))

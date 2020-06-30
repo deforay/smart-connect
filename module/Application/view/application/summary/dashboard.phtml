@@ -7,7 +7,7 @@ $logincontainer = new Container('credo');
 
 $startArray = explode("-", $startDate);
 $endArray = explode("-", $endDate);
-// \Zend\Debug\Debug::dump($logincontainer->sampleTable);die;
+// var_dump($logincontainer->sampleTable);die;
 if(isset($logincontainer->sampleTable) && $logincontainer->sampleTable == "dash_vl_request_form_current"){
     $startYear = (int) date('Y',strtotime('-12 MONTH '.date('Y-m-d')));
     $startMonth = (int) date('M',strtotime('-12 MONTH '.date('Y-m-d')));
@@ -311,8 +311,8 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
                                     <div class="col-md-12 text-center">
                                         <div class="btn-group" data-toggle="btns" style="margin-bottom:10px;">
                                             <a class="btn btn-default active" href="#facilityWiseSamplesReceivedSummary" data-toggle="tab" onclick="toggleSummary('facilityWiseSamplesReceivedSummary','districtWiseSamplesReceivedSummary','provinceWiseSamplesReceivedSummary');" style="font-size:13px;padding:4px 12px;"><?php echo $this->translate('Facilities'); ?></a>
-                                            <a class="btn btn-default" href="#provinceWiseSamplesReceivedSummary" data-toggle="tab" onclick="toggleSummary('provinceWiseSamplesReceivedSummary','districtWiseSamplesReceivedSummary','facilityWiseSamplesReceivedSummary');districtWiseSamplesReceivedSummaryFn();" style="font-size:13px;padding:4px 12px;"><?php echo $this->translate('Province'); ?></a>
-                                            <a class="btn btn-default " href="#districtWiseSamplesReceivedSummary" data-toggle="tab" onclick="toggleSummary('districtWiseSamplesReceivedSummary','facilityWiseSamplesReceivedSummary','provinceWiseSamplesReceivedSummary');provinceWiseSamplesReceivedSummaryFn();" style="font-size:13px;padding:4px 12px;"><?php echo $this->translate('Districts'); ?></a>
+                                            <a class="btn btn-default" href="#provinceWiseSamplesReceivedSummary" data-toggle="tab" onclick="toggleSummary('provinceWiseSamplesReceivedSummary','districtWiseSamplesReceivedSummary','facilityWiseSamplesReceivedSummary');provinceWiseSamplesReceivedSummaryFn();" style="font-size:13px;padding:4px 12px;"><?php echo $this->translate('Province'); ?></a>
+                                            <a class="btn btn-default " href="#districtWiseSamplesReceivedSummary" data-toggle="tab" onclick="toggleSummary('districtWiseSamplesReceivedSummary','facilityWiseSamplesReceivedSummary','provinceWiseSamplesReceivedSummary');districtWiseSamplesReceivedSummaryFn();" style="font-size:13px;padding:4px 12px;"><?php echo $this->translate('Districts'); ?></a>
                                         </div>
                                     </div>
                                 </div>

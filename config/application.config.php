@@ -9,6 +9,7 @@ return array(
     'modules' => array(
         'Application',
         'Api',
+        'Eid',
         'DataManagement'
     ),
     'module_listener_options' => array(

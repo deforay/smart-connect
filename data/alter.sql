@@ -46,6 +46,7 @@ CREATE TABLE `generate_backups` (
 
 
 -- Amit 16 June 2020
+
 CREATE TABLE `dash_eid_form` (
  `eid_id` int(11) NOT NULL AUTO_INCREMENT,
  `vlsm_instance_id` varchar(255) DEFAULT NULL,
@@ -139,3 +140,128 @@ CREATE TABLE `dash_eid_form` (
  `data_sync` int(11) NOT NULL DEFAULT '0',
  PRIMARY KEY (`eid_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+-- Amit 18 June 2020
+
+--
+-- Table structure for table `r_eid_results`
+--
+
+CREATE TABLE `r_eid_results` (
+  `result_id` varchar(255) NOT NULL,
+  `result` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
+  `status` varchar(255) NOT NULL DEFAULT 'active',
+  `data_sync` int(11) NOT NULL DEFAULT '0'
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `r_eid_results`
+--
+
+INSERT INTO `r_eid_results` (`result_id`, `result`, `status`, `data_sync`) VALUES
+('indeterminate', 'Indeterminate', 'active', 0),
+('negative', 'Negative', 'active', 0),
+('positive', 'Positive', 'active', 0);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `r_eid_sample_rejection_reasons`
+--
+
+CREATE TABLE `r_eid_sample_rejection_reasons` (
+  `rejection_reason_id` int(11) NOT NULL,
+  `rejection_reason_name` varchar(255) DEFAULT NULL,
+  `rejection_type` varchar(255) NOT NULL DEFAULT 'general',
+  `rejection_reason_status` varchar(255) DEFAULT NULL,
+  `rejection_reason_code` varchar(255) DEFAULT NULL,
+  `updated_datetime` datetime DEFAULT NULL,
+  `data_sync` int(11) NOT NULL DEFAULT '0'
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `r_eid_sample_type`
+--
+
+CREATE TABLE `r_eid_sample_type` (
+  `sample_id` int(11) NOT NULL,
+  `sample_name` varchar(255) CHARACTER SET latin1 DEFAULT NULL,
+  `status` varchar(45) CHARACTER SET latin1 DEFAULT NULL,
+  `data_sync` int(11) NOT NULL DEFAULT '0'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Dumping data for table `r_eid_sample_type`
+--
+
+INSERT INTO `r_eid_sample_type` (`sample_id`, `sample_name`, `status`, `data_sync`) VALUES
+(1, 'DBS', 'active', 0),
+(2, 'Whole Blood', 'active', 0);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `r_eid_test_reasons`
+--
+
+CREATE TABLE `r_eid_test_reasons` (
+  `test_reason_id` int(11) NOT NULL,
+  `test_reason_name` varchar(255) DEFAULT NULL,
+  `test_reason_status` varchar(45) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Indexes for dumped tables
+--
+
+--
+-- Indexes for table `r_eid_results`
+--
+ALTER TABLE `r_eid_results`
+  ADD PRIMARY KEY (`result_id`);
+
+--
+-- Indexes for table `r_eid_sample_rejection_reasons`
+--
+ALTER TABLE `r_eid_sample_rejection_reasons`
+  ADD PRIMARY KEY (`rejection_reason_id`);
+
+--
+-- Indexes for table `r_eid_sample_type`
+--
+ALTER TABLE `r_eid_sample_type`
+  ADD PRIMARY KEY (`sample_id`);
+
+--
+-- Indexes for table `r_eid_test_reasons`
+--
+ALTER TABLE `r_eid_test_reasons`
+  ADD PRIMARY KEY (`test_reason_id`);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `r_eid_sample_rejection_reasons`
+--
+ALTER TABLE `r_eid_sample_rejection_reasons`
+  MODIFY `rejection_reason_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `r_eid_sample_type`
+--
+ALTER TABLE `r_eid_sample_type`
+  MODIFY `sample_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `r_eid_test_reasons`
+--
+ALTER TABLE `r_eid_test_reasons`
+  MODIFY `test_reason_id` int(11) NOT NULL AUTO_INCREMENT;
+
+-- Amit 22 June 2020
+
+ALTER TABLE `dash_eid_form` ADD `pcr_test_performed_before` VARCHAR(255) NULL DEFAULT NULL AFTER `reason_for_eid_test`;

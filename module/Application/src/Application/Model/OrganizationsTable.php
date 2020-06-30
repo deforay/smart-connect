@@ -60,7 +60,7 @@ class OrganizationsTable extends AbstractTableGateway {
                        'status'=>'active'
                        );
         
-        //\Zend\Debug\Debug::dump($newData);die;
+        //var_dump($newData);die;
         
         $this->insert($newData);
         return $this->lastInsertValue;

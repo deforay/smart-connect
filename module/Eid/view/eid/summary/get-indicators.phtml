@@ -1,0 +1,27 @@
+<table class="table table-striped table-bordered table-hover" >
+<?php
+if(count($keySummaryIndicators)>0){
+?>
+    <thead>
+        <tr>
+            <th> <?php echo $this->translate('Months'); ?> </th>
+            <?php foreach($keySummaryIndicators['month'] as $key=>$month){ ?>
+                <th> <?php echo $month ;?> </th>
+            <?php } ?>
+        </tr>
+    </thead>
+    <tbody>
+        <?php foreach($keySummaryIndicators['sample'] as $key=>$indicators){ ?>
+        <tr>
+            <td><?php echo strtoupper($this->translate(str_replace('-',' ',$key)));?></td>
+            <?php foreach($indicators['month'] as $months){ ?>
+                <td><?php echo $months;?></td>
+            <?php } ?>
+        </tr>
+        <?php } ?>
+    </tbody>
+
+<?php }else{ ?>
+    <tr><td style="text-align:center;">No data available</td></tr>
+<?php } ?>
+</table>

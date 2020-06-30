@@ -1,13 +1,5 @@
 <?php
 
-/**
- * Zend Framework (http://framework.zend.com/)
- *
- * @link      http://github.com/zendframework/ZendSkeletonApplication for the canonical source repository
- * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
- * @license   http://framework.zend.com/license/new-bsd New BSD License
- */
-
 namespace Application;
 
 use Laminas\Session\Container;
@@ -258,8 +250,11 @@ class Module
 					return $table;
 				},
 				'SampleTableWithoutCache' => function ($sm) {
+					$session = new Container('credo');
+					$mappedFacilities = (isset($session->mappedFacilities) && count($session->mappedFacilities) > 0) ? $session->mappedFacilities : array();
+					$sampleTable = isset($session->sampleTable) ? $session->sampleTable :  null;			
 					$dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');
-					return new SampleTable($dbAdapter, $sm);
+					return new SampleTable($dbAdapter, $sm, $mappedFacilities, $sampleTable);
 				},
 				'FacilityTable' => function ($sm) {
 					$dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');
@@ -386,6 +381,11 @@ class Module
 					$sampleService = $sm->getServiceLocator()->get('SampleService');
 					$configService = $sm->getServiceLocator()->get('ConfigService');
 					return new \Application\Controller\ClinicController($sampleService,$configService);
+				},
+				'Application\Controller\Common' => function ($sm) {
+					$commonService = $sm->getServiceLocator()->get('CommonService');
+					$configService = $sm->getServiceLocator()->get('ConfigService');
+					return new \Application\Controller\CommonController($commonService,$configService);
 				},
 			),
 		);

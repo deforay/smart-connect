@@ -1,1 +1,2311 @@
-Action "index", controller "Laboratory", module "Application".
+<?php
+
+use Laminas\Session\Container;
+
+$languagecontainer = new Container('language');
+$logincontainer = new Container('credo');
+
+$startArray = explode("-", $startDate);
+$endArray = explode("-", $endDate);
+// var_dump($logincontainer->sampleTable);die;
+if(isset($logincontainer->sampleTable) && $logincontainer->sampleTable == "dash_vl_request_form_current"){
+    $startYear = (int) date('Y',strtotime('-12 MONTH '.date('Y-m-d')));
+    $startMonth = (int) date('M',strtotime('-12 MONTH '.date('Y-m-d')));
+    $endYear = (int) date('y');
+    $endMonth = (int) date('M');
+}else{
+    $startYear = (int) $startArray[0];
+    $startMonth = (int) $startArray[1] - 1;
+    $endYear = (int) $endArray[0];
+    $endMonth = (int) $endArray[1] - 1;
+}
+
+
+$MONTHS = array("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
+
+
+
+$totalSampleTested = 0;
+$rejectedSamples = 0;
+$suppressedSampleTotal = 0;
+$firstLineCurrentRegimenPercentage = 0;
+if (isset($summaryTabInfo[0]["total_samples_tested"]) && $summaryTabInfo[0]["total_samples_tested"] > 0) {
+    $totalSampleTested = $summaryTabInfo[0]["total_samples_tested"];
+}
+if (isset($summaryTabInfo[0]["rejected_samples"]) && $summaryTabInfo[0]["rejected_samples"] > 0) {
+    $rejectedSamples = $summaryTabInfo[0]["rejected_samples"];
+}
+if (isset($summaryTabInfo[0]["suppressed_samples"]) && $summaryTabInfo[0]["suppressed_samples"] > 0) {
+    $suppressedSampleTotal = $summaryTabInfo[0]["suppressed_samples"];
+}
+$suppressedSamplepercentage = ($suppressedSampleTotal > 0 && $totalSampleTested > 0) ? round((($suppressedSampleTotal / $totalSampleTested) * 100), 2) : 0;
+$rejectionPercentage = ($summaryTabInfo[0]["total_samples_received"] > 0 && $rejectedSamples > 0) ? round((($rejectedSamples / $summaryTabInfo[0]["total_samples_received"]) * 100), 2) : 0;
+if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0]["1st_line_of_current_regimen_samples"] > 0 && $summaryTabInfo[0]["all_current_regimen_samples"] > 0) {
+    $firstLineCurrentRegimenPercentage = round((($summaryTabInfo[0]["1st_line_of_current_regimen_samples"] / $summaryTabInfo[0]["all_current_regimen_samples"]) * 100), 2);
+}
+?>
+<link rel="stylesheet" href="<?php echo $this->basePath('assets/plugins/datepicker/datepicker3.css') ?>">
+<style>
+    /* .portlet-title{
+    background: #fd5454 !important
+    
+}
+
+.portlet.box.blue{
+    border-color: #fd5454 !important
+} */
+    .caption {}
+
+    .tabPercentageVal,
+    .tabbable ul.nav li a {
+        color: #aaa;
+        font-weight: normal !important;
+        text-transform: uppercase;
+    }
+
+    .tabbable ul.nav li.active a,
+    .tabbable ul.nav li.active .tabPercentageVal {
+        color: #fd5454 !important;
+        font-weight: 600 !important;
+
+
+    }
+
+    .tabbable ul.nav li.active a>.tabPercentageVal {}
+
+
+
+    .bluebox,
+    .dashboard-stat2 {
+        border: 1px solid #3598DC;
+    }
+
+
+    .datepicker table tr td span.disabled, .datepicker table tr td span.disabled:hover{
+        color : #ddd;
+    }
+
+    .popover {
+        max-width: 1920px !important;
+    }
+
+    .table>tbody>tr>td,
+    .table>tbody>tr>th,
+    .table>tfoot>tr>td,
+    .table>tfoot>tr>th,
+    .table>thead>tr>td,
+    .table>thead>tr>th {
+        padding: <?php echo (isset($languagecontainer->locale) && $languagecontainer->locale == 'en_US') ? '8' : '3'; ?>px;
+        font-size: <?php echo (isset($languagecontainer->locale) && $languagecontainer->locale == 'en_US') ? '14' : '13'; ?>px;
+    }
+
+    @media screen and (min-width:320px) and (max-width: 760px) {
+        #daterange-container {
+            width: 100% !important;
+        }
+
+        #showDateRange,
+        #closeDateRange {
+            margin-left: 0% !important;
+        }
+    }
+
+    @media screen and (min-width:761px) and (max-width: 970px) {
+        #daterange-container {
+            width: 100% !important;
+        }
+
+        #showDateRange,
+        #closeDateRange {
+            margin-left: 52% !important;
+        }
+    }
+
+    .tabbable {
+        margin: 10px;
+        height: auto;
+        overflow: hidden;
+        border-bottom: 1px solid #869EA7;
+    }
+
+    .nav-tabs-justified>.active>a,
+    .nav-tabs-justified>.active>a:focus,
+    .nav-tabs-justified>.active>a:hover,
+    .nav-tabs.nav-justified>.active>a,
+    .nav-tabs.nav-justified>.active>a:focus,
+    .nav-tabs.nav-justified>.active>a:hover {
+        border: 1px solid #869EA7;
+        border-bottom: none;
+    }
+
+    .nav-tabs-justified>li>a,
+    .nav-tabs.nav-justified>li>a {
+        border-bottom: 1px solid #869EA7;
+        margin-bottom: -1px !important;
+    }
+
+    .nav-tabs {
+        margin: 0;
+    }
+
+    .tab-content {
+        height: 100%;
+
+        border-left: 1px solid #869EA7;
+        border-right: 1px solid #869EA7;
+        padding: 15px;
+    }
+
+    .page-content {
+        background-color: #fff !important;
+    }
+
+    .tabPercentageVal {
+        font-weight: 600;
+    }
+</style>
+<div class="page-bar">
+    <h1 class="page-title">
+        <div class="col-lg-1">
+            <?php echo $this->translate('Summary'); ?>
+        </div>
+
+
+        <div class="col-lg-3" style="margin-top:-5px;padding-bottom:10px;margin-left:20px;display: flex;">
+            <!-- <div id="sla-date-range" class="mrp-container form-control">
+                <span class="mrp-icon"><i class="fa fa-calendar"></i> &nbsp;</span>
+                <div class="mrp-monthdisplay ">
+                    <span class="mrp-lowerMonth"><?php echo $MONTHS[$startMonth]; ?> <?php echo $startYear; ?></span>
+                    <span class="mrp-to"> to </span>
+                    <span class="mrp-upperMonth"><?php echo $MONTHS[$endMonth]; ?> <?php echo $endYear; ?></span>
+                </div>
+                <input type="hidden" value="<?php echo $startDate; ?>" id="mrp-lowerDate" onchange="" />
+                <input type="hidden" value="<?php echo $endDate; ?>" id="mrp-upperDate" />
+            </div> -->
+            <div class="input-append date" id="dpMonthsStart" data-date-format="M/yyyy" data-date-viewmode="years" data-date-minviewmode="months">
+                <input type="text" class="form-control isRequired readonly" id="mrp-lowerDate" name="mrp-lowerDate" placeholder="Select month & year" title="Please select month and year" readonly="readonly" value="<?php echo date('M-Y',strtotime($startDate)); ?>" />
+                <span class="add-on" style="display:none;"><i class="icon-calendar"></i></span>
+            </div>
+            <div class="input-group-prepend input-group-append">
+                <span class="input-group-text font-w600" style="padding: 0.100rem .35rem;font-size:0.7em;">
+                    <!-- <i class="fa fa-fw fa-arrow-right"></i> -->to
+                </span>
+            </div>
+            <div class="input-append date" id="dpMonthsEnd" data-date-format="M/yyyy" data-date-viewmode="years" data-date-minviewmode="months">
+                <input type="text" class="form-control isRequired readonly" id="mrp-upperDate" name="mrp-upperDate" placeholder="Select month & year" title="Please select month and year" readonly="readonly" value="<?php echo date('M-Y',strtotime($endDate)); ?>" />
+                <span class="add-on" style="display:none;"><i class="icon-calendar"></i></span>
+            </div>
+        </div>
+        <div class="col-lg-1" style="margin-top:-5px;padding-bottom:10px;margin-left:-20px;">
+            <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="summarize();"><?php echo $this->translate('Search'); ?></a>
+        </div>
+    </h1>
+</div>
+<br>
+
+<div class="tabbable">
+    <ul class="nav nav-tabs nav-justified" role="tablist">
+        <li role="presentation" class="active">
+            <a href="#samplesReceivedTab" aria-controls="samplesReceivedTab" role="tab" data-toggle="tab">
+                <h3 class="tabPercentageVal"><?php echo number_format($summaryTabInfo[0]["total_samples_received"]); ?></h3>
+                <?php echo $this->translate('Samples Registered'); ?>
+            </a>
+        </li>
+        <li role="presentation">
+            <a href="#suppressionRateTab" aria-controls="suppressionRateTab" onclick="getSuppressionRateTab();" role="tab" data-toggle="tab">
+                <h3 class="tabPercentageVal"><?php echo $suppressedSamplepercentage; ?>%</h3>
+                <?php echo $this->translate('Suppression Rate'); ?>
+            </a>
+        </li>
+        <li role="presentation">
+            <a href="#samplesRejectedTab" aria-controls="messages" onclick="getRejectionRateTab();" role="tab" data-toggle="tab">
+                <h3 class="tabPercentageVal"><?php echo $rejectionPercentage; ?>%</h3>
+                <?php echo $this->translate('Rejection Rate'); ?>
+            </a>
+        </li>
+        <li role="presentation">
+            <a href="#currentRegimenTab" aria-controls="messages" role="tab" onclick="getCurrentRegimenTab();" data-toggle="tab">
+                <h3 class="tabPercentageVal"><?php echo $firstLineCurrentRegimenPercentage; ?>% <span style="font-size:14px;"><?php echo $this->translate('on 1st Line'); ?></span></h3>
+                <?php echo $this->translate('Current Regimen'); ?>
+            </a>
+        </li>
+        <li role="presentation">
+            <a href="#allRegimenTab" aria-controls="messages" role="tab" data-toggle="tab">
+                <h6 style="padding-bottom:2px;padding-top:20px;"><?php echo $this->translate('Reg. All'); ?></h6>
+                <?php echo $this->translate('All Regimens'); ?>
+            </a>
+        </li>
+    </ul>
+    <div class="tab-content">
+        <div role="tabpanel" class="tab-pane fade in active" id="samplesReceivedTab">
+            <div class="row" style="padding-top:5px;padding-bottom:10px;">
+                <div class="col-md-12">
+                    <div class="col-md-3">
+                        <select style="width:100%" name="sampleProvinceName[]" id="sampleProvinceName" class="form-control" multiple title="<?php echo $this->translate('Please select one or more province. Leave blank for All'); ?>">
+                            <?php
+                            foreach ($provinceName as $province) {
+                            ?>
+                                <option value="<?php echo $province['location_id']; ?>"><?php echo $province['location_name']; ?></option>
+                            <?php
+                            }
+                            ?>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select style="width:100%" name="sampleDistrictName[]" id="sampleDistrictName" class="form-control" multiple title="<?php echo $this->translate('Please select one or more district. Leave blank for All'); ?>">
+                            <?php
+                            foreach ($districtName as $district) {
+                            ?>
+                                <option data-parent-location="<?php echo $district['parent_location']; ?>" value="<?php echo $district['location_id']; ?>"><?php echo $district['location_name']; ?></option>
+                            <?php
+                            }
+                            ?>
+                            <option value="0">Empty</option>
+                        </select>
+                    </div>
+
+                    <div class="col-lg-4">
+                        <select style="width:100%" class="form-control" id="sampleClinicId" name="sampleClinicId[]" multiple title="<?php echo $this->translate('Please select one or more clinics. Leave blank for All'); ?>">
+                            <?php
+                            foreach ($clinicName as $clinic) {
+                            ?>
+                                <option value="<?php echo $clinic['facility_id']; ?>" data-district="<?php echo $clinic['facility_district']; ?>"><?php echo $clinic['facility_code'] . " - " . $clinic['facility_name']; ?></option>
+                            <?php
+                            }
+                            ?>
+                        </select>
+                    </div>
+                    <div class="col-lg-2">
+                        <div class="form-group" style="">
+                            <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="getSamplesReceivedBarChartInfo();"><?php echo $this->translate('Search'); ?></a>
+                            <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="resetSampleEverything();"><?php echo $this->translate('Reset'); ?></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12 col-sm-12">
+                    <div class="portlet box blue">
+                        <div class="portlet-title">
+                            <div class="caption">
+                                <span class="caption-subject"><?php echo $this->translate('Samples Registered'); ?></span>
+                            </div>
+                        </div>
+                        <div class="portlet-body" style="cursor:pointer;">
+                            <div id="samplesReceivedBarChartContainer"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12 col-sm-12">
+                    <div class="portlet box">
+                        <div class="portlet box blue">
+                            <div class="portlet-title">
+                                <div class="caption" id="samplesReceivedBlockTitle">
+                                    <i class="fa fa-cogs"></i><?php echo $this->translate('Districts/Facility Wise Samples Registered Summary'); ?>
+                                </div>
+                            </div>
+                            <div class="portlet-body">
+                                <div class="form-group">
+                                    <div class="col-md-12 text-center">
+                                        <div class="btn-group" data-toggle="btns" style="margin-bottom:10px;">
+                                            <a class="btn btn-default active" href="#facilityWiseSamplesReceivedSummary" data-toggle="tab" onclick="toggleSummary('facilityWiseSamplesReceivedSummary','districtWiseSamplesReceivedSummary','provinceWiseSamplesReceivedSummary');" style="font-size:13px;padding:4px 12px;"><?php echo $this->translate('Facilities'); ?></a>
+                                            <a class="btn btn-default" href="#provinceWiseSamplesReceivedSummary" data-toggle="tab" onclick="toggleSummary('provinceWiseSamplesReceivedSummary','districtWiseSamplesReceivedSummary','facilityWiseSamplesReceivedSummary');districtWiseSamplesReceivedSummaryFn();" style="font-size:13px;padding:4px 12px;"><?php echo $this->translate('Province'); ?></a>
+                                            <a class="btn btn-default " href="#districtWiseSamplesReceivedSummary" data-toggle="tab" onclick="toggleSummary('districtWiseSamplesReceivedSummary','facilityWiseSamplesReceivedSummary','provinceWiseSamplesReceivedSummary');provinceWiseSamplesReceivedSummaryFn();" style="font-size:13px;padding:4px 12px;"><?php echo $this->translate('Districts'); ?></a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="tab-content" style="border:none;height:560px;max-height:600px;overflow:scroll;">
+                                    <div class="tab-pane active" id="facilityWiseSamplesReceivedSummary">
+                                        <table class="table table-striped table-bordered table-hover order-column" id="samplesReceivedFacility" style="width:100%;">
+                                            <thead>
+                                                <tr>
+                                                    <th> <?php echo $this->translate('Facility'); ?> </th>
+                                                    <th> <?php echo $this->translate('Province'); ?> </th>
+                                                    <th> <?php echo $this->translate('District/County'); ?> </th>
+                                                    <th> <?php echo $this->translate('Samples Registered'); ?> </th>
+                                                    <th> <?php echo $this->translate('Samples Tested'); ?></th>
+                                                    <th> <?php echo $this->translate('Results Not Available'); ?></th>
+                                                    <th> <?php echo $this->translate('Samples Rejected'); ?></th>
+                                                    <th> <?php echo $this->translate('DBS'); ?>(%) </th>
+                                                    <th> <?php echo $this->translate('Plasma'); ?>(%) </th>
+                                                    <th> <?php echo $this->translate('Others'); ?>(%) </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td colspan="9" class="dataTables_empty">Loading data from server</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="tab-pane " id="provinceWiseSamplesReceivedSummary">
+                                        <table class="table table-striped table-bordered table-hover order-column" id="samplesReceivedProvince" style="width:100%;">
+                                            <thead>
+                                                <tr>
+                                                    <th> <?php echo $this->translate('Province'); ?> </th>
+                                                    <th> <?php echo $this->translate('Samples Registered'); ?> </th>
+                                                    <th> <?php echo $this->translate('Samples Tested'); ?></th>
+                                                    <th> <?php echo $this->translate('Results Not Available'); ?></th>
+                                                    <th> <?php echo $this->translate('Samples Rejected'); ?></th>
+                                                    <th> <?php echo $this->translate('DBS'); ?>(%) </th>
+                                                    <th> <?php echo $this->translate('Plasma'); ?>(%) </th>
+                                                    <th> <?php echo $this->translate('Others'); ?>(%) </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td colspan="9" class="dataTables_empty">Loading data from server</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="tab-pane" id="districtWiseSamplesReceivedSummary">
+                                        <table class="table table-striped table-bordered table-hover order-column" id="samplesReceivedDistrict" style="width:100%;">
+                                            <thead>
+                                                <tr>
+                                                    <th> <?php echo $this->translate('District/County'); ?> </th>
+                                                    <th> <?php echo $this->translate('Samples Registered'); ?> </th>
+                                                    <th> <?php echo $this->translate('Samples Tested'); ?></th>
+                                                    <th> <?php echo $this->translate('Results Not Available'); ?></th>
+                                                    <th> <?php echo $this->translate('Samples Rejected'); ?></th>
+                                                    <th> <?php echo $this->translate('DBS'); ?>(%) </th>
+                                                    <th> <?php echo $this->translate('Plasma'); ?>(%) </th>
+                                                    <th> <?php echo $this->translate('Others'); ?>(%) </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td colspan="8" class="dataTables_empty">Loading data from server</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div role="tabpanel" class="tab-pane fade" id="suppressionRateTab">
+            <div class="row" style="padding-top:5px;padding-bottom:10px;">
+                <div class="col-md-12">
+                    <div class="col-md-3">
+                        <select style="width:100%" name="suppressionProvinceName[]" id="suppressionProvinceName" class="form-control" multiple title="<?php echo $this->translate('Please select one or more province. Leave blank for All'); ?>">
+                            <?php
+                            foreach ($provinceName as $province) {
+                            ?>
+                                <option value="<?php echo $province['location_id']; ?>"><?php echo $province['location_name']; ?></option>
+                            <?php
+                            }
+                            ?>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select style="width:100%" name="suppressionDistrictName[]" id="suppressionDistrictName" class="form-control" multiple title="<?php echo $this->translate('Please select one or more district. Leave blank for All'); ?>">
+                            <?php
+                            foreach ($districtName as $district) {
+                            ?>
+                                <option data-parent-location="<?php echo $district['parent_location']; ?>" value="<?php echo $district['location_id']; ?>"><?php echo $district['location_name']; ?></option>
+                            <?php
+                            }
+                            ?>
+                            <option value="0">Empty</option>
+                        </select>
+                    </div>
+
+                    <div class="col-lg-4">
+                        <select style="width:100%" class="form-control" id="suppressionClinicId" name="suppressionClinicId[]" multiple title="<?php echo $this->translate('Please select one or more clinics. Leave blank for All'); ?>">
+                            <?php
+                            foreach ($clinicName as $clinic) {
+                            ?>
+                                <option value="<?php echo $clinic['facility_id']; ?>" data-district="<?php echo $clinic['facility_district']; ?>"><?php echo $clinic['facility_code'] . " - " . $clinic['facility_name']; ?></option>
+                            <?php
+                            }
+                            ?>
+                        </select>
+                    </div>
+                    <div class="col-lg-2">
+                        <div class="form-group" style="">
+                            <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="getSuppressionRateBarChartInfo();"><?php echo $this->translate('Search'); ?></a>
+                            <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="resetSuppressionEverything();"><?php echo $this->translate('Reset'); ?></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12 col-sm-12">
+                    <div class="portlet box blue">
+                        <div class="portlet-title">
+                            <div class="caption">
+                                <span class="caption-subject"><?php echo $this->translate('Suppression Rate'); ?></span>
+                            </div>
+                        </div>
+                        <div class="portlet-body" style="cursor:pointer;">
+                            <div id="suppressionRateBarChartContainer"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12 col-sm-12">
+                    <div class="portlet box">
+                        <div class="portlet box blue">
+                            <div class="portlet-title">
+                                <div class="caption" id="suppressionRateBlockTitle">
+                                    <i class="fa fa-cogs"></i><?php echo $this->translate('Facility Wise Suppression Rate Summary'); ?>
+                                </div>
+                            </div>
+                            <div class="portlet-body">
+                                <div class="form-group">
+                                    <div class="col-md-12 text-center">
+                                        <div class="btn-group" data-toggle="btns" style="margin-bottom:10px;">
+                                            <a class="btn btn-default active" href="#facilityWiseSuppressionRateSummary" data-toggle="tab" onclick="toggleSummary('facilityWiseSuppressionRateSummary','districtWiseSuppressionRateSummary','provinceWiseSuppressionRateSummary');" style="font-size:13px;padding:4px 12px;"><?php echo $this->translate('Facilities'); ?></a>
+                                            <a class="btn btn-default " href="#provinceWiseSuppressionRateSummary" data-toggle="tab" onclick="toggleSummary('provinceWiseSuppressionRateSummary','districtWiseSuppressionRateSummary','facilityWiseSuppressionRateSummary');provinceWiseSuppressionRateSummaryFn();" style="font-size:13px;padding:4px 12px;"><?php echo $this->translate('Province'); ?></a>
+                                            <a class="btn btn-default" href="#districtWiseSuppressionRateSummary" data-toggle="tab" onclick="toggleSummary('districtWiseSuppressionRateSummary','facilityWiseSuppressionRateSummary','provinceWiseSuppressionRateSummary');districtWiseSuppressionRateSummaryFn();" style="font-size:13px;padding:4px 12px;"><?php echo $this->translate('Districts'); ?></a>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="tab-content" style="border:none;height:560px;max-height:600px;overflow:scroll;">
+                                    <div class="tab-pane active" id="facilityWiseSuppressionRateSummary">
+
+                                        <button class="btn btn-primary pull-right" onclick="exportSuppressionRateByFacility();"><span><i class="fa fa-file-excel-o" aria-hidden="true"></i> <?php echo $this->translate('Export Excel'); ?></span></button> <br><br>
+                                        <table class="table table-striped table-bordered table-hover order-column" id="suppressionRateFacility" style="width:100%;">
+                                            <thead>
+                                                <tr>
+                                                    <th> <?php echo $this->translate('Facility'); ?> </th>
+                                                    <th> <?php echo $this->translate('Province'); ?> </th>
+                                                    <th> <?php echo $this->translate('District/County'); ?> </th>
+                                                    <th> <?php echo $this->translate('Valid Results'); ?> </th>
+                                                    <th> <?php echo $this->translate('Suppressed Results'); ?></th>
+                                                    <th> <?php echo $this->translate('Non Suppressed Results'); ?></th>
+                                                    <th> <?php echo $this->translate('Samples Rejected'); ?></th>
+                                                    <th> <?php echo $this->translate('Suppression Rate'); ?></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td colspan="6" class="dataTables_empty">Loading data from server</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="tab-pane " id="provinceWiseSuppressionRateSummary">
+                                        <table class="table table-striped table-bordered table-hover order-column" id="suppressionRateProvince" style="width:100%;">
+                                            <thead>
+                                                <tr>
+                                                    <th> <?php echo $this->translate('Province'); ?> </th>
+                                                    <th> <?php echo $this->translate('Valid Results'); ?> </th>
+                                                    <th> <?php echo $this->translate('Suppressed Results'); ?></th>
+                                                    <th> <?php echo $this->translate('Non Suppressed Results'); ?></th>
+                                                    <th> <?php echo $this->translate('Samples Rejected'); ?></th>
+                                                    <th> <?php echo $this->translate('Suppression Rate'); ?></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td colspan="6" class="dataTables_empty">Loading data from server</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="tab-pane " id="districtWiseSuppressionRateSummary">
+                                        <table class="table table-striped table-bordered table-hover order-column" id="suppressionRateDistrict" style="width:100%;">
+                                            <thead>
+                                                <tr>
+                                                    <th> <?php echo $this->translate('District/County'); ?> </th>
+                                                    <th> <?php echo $this->translate('Valid Results'); ?> </th>
+                                                    <th> <?php echo $this->translate('Suppressed Results'); ?></th>
+                                                    <th> <?php echo $this->translate('Non Suppressed Results'); ?></th>
+                                                    <th> <?php echo $this->translate('Samples Rejected'); ?></th>
+                                                    <th> <?php echo $this->translate('Suppression Rate'); ?></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td colspan="5" class="dataTables_empty">Loading data from server</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div role="tabpanel" class="tab-pane fade" id="samplesRejectedTab">
+            <div class="row" style="padding-top:5px;padding-bottom:10px;">
+                <div class="col-md-12">
+                    <div class="col-md-3">
+                        <select style="width:100%" name="rejectionProvinceName[]" id="rejectionProvinceName" class="form-control" multiple title="<?php echo $this->translate('Please select one or more province. Leave blank for All'); ?>">
+                            <?php
+                            foreach ($provinceName as $province) {
+                            ?>
+                                <option value="<?php echo $province['location_id']; ?>"><?php echo $province['location_name']; ?></option>
+                            <?php
+                            }
+                            ?>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select style="width:100%" name="rejectionDistrictName[]" id="rejectionDistrictName" class="form-control" multiple title="<?php echo $this->translate('Please select one or more district. Leave blank for All'); ?>">
+                            <?php
+                            foreach ($districtName as $district) {
+                            ?>
+                                <option data-parent-location="<?php echo $district['parent_location']; ?>" value="<?php echo $district['location_id']; ?>"><?php echo $district['location_name']; ?></option>
+                            <?php
+                            }
+                            ?>
+                            <option value="0">Empty</option>
+                        </select>
+                    </div>
+
+                    <div class="col-lg-4">
+                        <select style="width:100%" class="form-control" id="rejectionClinicId" name="rejectionClinicId[]" multiple title="<?php echo $this->translate('Please select one or more clinics. Leave blank for All'); ?>">
+                            <?php
+                            foreach ($clinicName as $clinic) {
+                            ?>
+                                <option value="<?php echo $clinic['facility_id']; ?>" data-district="<?php echo $clinic['facility_district']; ?>"><?php echo $clinic['facility_code'] . " - " . $clinic['facility_name']; ?></option>
+                            <?php
+                            }
+                            ?>
+                        </select>
+                    </div>
+                    <div class="col-lg-2">
+                        <div class="form-group" style="">
+                            <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="getSamplesRejectedBarChartInfo();"><?php echo $this->translate('Search'); ?></a>
+                            <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="resetRejectionEverything();"><?php echo $this->translate('Reset'); ?></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12 col-sm-12">
+                    <div class="portlet box blue">
+                        <div class="portlet-title">
+                            <div class="caption">
+                                <span class="caption-subject"><?php echo $this->translate('Samples Rejected'); ?></span>
+                            </div>
+                        </div>
+                        <div class="portlet-body" style="cursor:pointer;">
+                            <div id="samplesRejectedBarChartContainer"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12 col-sm-12">
+                    <div class="portlet box">
+                        <div class="portlet box blue">
+                            <div class="portlet-title">
+                                <div class="caption" id="samplesRejectedBlockTitle">
+                                    <i class="fa fa-cogs"></i><?php echo $this->translate('District Wise Samples Rejected Summary'); ?>
+                                </div>
+                            </div>
+                            <div class="portlet-body">
+                                <div class="form-group">
+                                    <div class="col-md-12 text-center">
+                                        <div class="btn-group" data-toggle="btns" style="margin-bottom:10px;">
+                                            <a class="btn btn-default active" href="#facilityWiseSamplesRejectedSummary" data-toggle="tab" onclick="toggleSummary('facilityWiseSamplesRejectedSummary','districtWiseSamplesRejectedSummary','provinceWiseSamplesRejectedSummary');" style="font-size:13px;padding:4px 12px;"><?php echo $this->translate('Facilities'); ?></a>
+                                            <a class="btn btn-default " href="#provinceWiseSamplesRejectedSummary" data-toggle="tab" onclick="toggleSummary('provinceWiseSamplesRejectedSummary','facilityWiseSamplesRejectedSummary','districtWiseSamplesRejectedSummary');provinceWiseSamplesRejectedSummaryFn();" style="font-size:13px;padding:4px 12px;"><?php echo $this->translate('Province'); ?></a>
+                                            <a class="btn btn-default" href="#districtWiseSamplesRejectedSummary" data-toggle="tab" onclick="toggleSummary('districtWiseSamplesRejectedSummary','facilityWiseSamplesRejectedSummary','provinceWiseSamplesRejectedSummary');districtWiseSamplesRejectedSummaryFn();" style="font-size:13px;padding:4px 12px;"><?php echo $this->translate('Districts'); ?></a>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="tab-content" style="border:none;height:560px;max-height:600px;overflow:scroll;">
+                                    <div class="tab-pane active" id="facilityWiseSamplesRejectedSummary">
+                                        <table class="table table-striped table-bordered table-hover order-column" id="samplesRejectedFacility" style="width:100%;">
+                                            <thead>
+                                                <tr>
+                                                    <th> <?php echo $this->translate('Facility'); ?> </th>
+                                                    <th> <?php echo $this->translate('Province'); ?> </th>
+                                                    <th> <?php echo $this->translate('District/County'); ?> </th>
+                                                    <th> <?php echo $this->translate('Samples Registered'); ?> </th>
+                                                    <th> <?php echo $this->translate('Rejection Rate(%)'); ?> </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td colspan="4" class="dataTables_empty">Loading data from server</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="tab-pane " id="provinceWiseSamplesRejectedSummary">
+                                        <table class="table table-striped table-bordered table-hover order-column" id="samplesRejectedProvince" style="width:100%;">
+                                            <thead>
+                                                <tr>
+                                                    <th> <?php echo $this->translate('Province'); ?> </th>
+                                                    <th> <?php echo $this->translate('Samples Registered'); ?> </th>
+                                                    <th> <?php echo $this->translate('Samples Rejected'); ?></th>
+                                                    <th> <?php echo $this->translate('Rejection Rate(%)'); ?> </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td colspan="4" class="dataTables_empty">Loading data from server</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="tab-pane " id="districtWiseSamplesRejectedSummary">
+                                        <table class="table table-striped table-bordered table-hover order-column" id="samplesRejectedDistrict" style="width:100%;">
+                                            <thead>
+                                                <tr>
+                                                    <th> <?php echo $this->translate('District/County'); ?> </th>
+                                                    <th> <?php echo $this->translate('Samples Registered'); ?> </th>
+                                                    <th> <?php echo $this->translate('Samples Rejected'); ?></th>
+                                                    <th> <?php echo $this->translate('Rejection Rate(%)'); ?> </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td colspan="4" class="dataTables_empty">Loading data from server</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div role="tabpanel" class="tab-pane fade" id="currentRegimenTab">
+            <div class="row" style="padding-top:5px;padding-bottom:10px;">
+                <div class="col-md-12">
+                    <div>
+                        <?php
+                        echo "&nbsp;&nbsp;&nbsp;<b>" . $this->translate('Number of samples on 1st line Current Regimen') . " = " . $summaryTabInfo[0]["1st_line_of_current_regimen_samples"] . "</b>";
+                        echo "&nbsp;&nbsp;&nbsp;<b>" . $this->translate('Total number of samples having valid Current Regimen') . " = " . $summaryTabInfo[0]["all_current_regimen_samples"] . "</b>";
+                        ?>
+                    </div>
+                    <br />
+                    <div class="col-md-3">
+                        <select style="width:100%" name="provinceName[]" id="provinceName" class="form-control" multiple title="<?php echo $this->translate('Please select one or more province. Leave blank for All'); ?>">
+                            <?php
+                            foreach ($provinceName as $province) {
+                            ?>
+                                <option value="<?php echo $province['location_id']; ?>"><?php echo $province['location_name']; ?></option>
+                            <?php
+                            }
+                            ?>
+                        </select>
+                    </div>
+                    <div class="col-md-3" id="districtHeight">
+                        <select style="width:100%" name="districtName[]" id="districtName" class="form-control" multiple title="<?php echo $this->translate('Please select one or more district. Leave blank for All'); ?>">
+                            <?php
+                            foreach ($districtName as $district) {
+                            ?>
+                                <option data-parent-location="<?php echo $district['parent_location']; ?>" value="<?php echo $district['location_id']; ?>"><?php echo $district['location_name']; ?></option>
+                            <?php
+                            }
+                            ?>
+                            <option value="0">Empty</option>
+                        </select>
+                    </div>
+
+                    <div class="col-lg-4" id="clinicHeight">
+                        <select style="width:100%" class="form-control" id="clinicId" name="clinicId[]" multiple title="<?php echo $this->translate('Please select one or more clinics. Leave blank for All'); ?>">
+                            <?php
+                            foreach ($clinicName as $clinic) {
+                            ?>
+                                <option value="<?php echo $clinic['facility_id']; ?>" data-district="<?php echo $clinic['facility_district']; ?>"><?php echo $clinic['facility_code'] . " - " . $clinic['facility_name']; ?></option>
+                            <?php
+                            }
+                            ?>
+                        </select>
+                    </div>
+                    <div class="col-lg-2">
+                        <div class="form-group" style="">
+                            <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="getRegimenGroupBarChartInfo();"><?php echo $this->translate('Search'); ?></a>
+                            <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="resetEverything();"><?php echo $this->translate('Reset'); ?></a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12 col-sm-12">
+                    <div class="portlet box blue">
+                        <div class="portlet-title">
+                            <div class="caption">
+                                <span class="caption-subject"><?php echo $this->translate('Regimen Groups'); ?></span>
+                            </div>
+                        </div>
+                        <div class="portlet-body" style="cursor:pointer;">
+                            <div id="regimenGroupBarChartContainer"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12 col-sm-12">
+                    <div class="portlet box">
+                        <div class="portlet box blue">
+                            <div class="portlet-title">
+                                <div class="caption">
+                                    <i class="fa fa-cogs"></i><?php echo $this->translate('Regimen Groups Summary'); ?>
+                                </div>
+                            </div>
+                            <div class="portlet-body">
+                                <table class="table table-striped table-bordered table-hover order-column" id="regimenGroupsDataTable" style="width:100%;">
+                                    <thead>
+                                        <tr>
+                                            <th> <?php echo $this->translate('Regimen'); ?> </th>
+                                            <th> <?php echo $this->translate('Samples Registered'); ?> </th>
+                                            <th> <?php echo $this->translate('Samples Tested'); ?></th>
+                                            <th> <?php echo $this->translate('Valid Results'); ?></th>
+                                            <th> <?php echo $this->translate('Number Suppressed'); ?></th>
+                                            <th> <?php echo $this->translate('Suppression Rate'); ?></th>
+                                            <th> <?php echo $this->translate('Percentage of Samples(%)'); ?> </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td colspan="7" class="dataTables_empty">Loading data from server</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div role="tabpanel" class="tab-pane fade" id="allRegimenTab">
+            <div class="row">
+                <div class="col-md-12 col-sm-12">
+                    <div class="portlet box" style="margin-bottom:0;">
+                        <div class="portlet-body" style="margin-bottom:0;padding-bottom:0;">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <td colspan="9" style="font-size:11px;"><?php echo $this->translate('By Line of Regimen'); ?></td>
+                                    </tr>
+                                    <tr>
+                                        <th></th>
+                                        <th colspan="2" style="text-align:center;font-size:11px;"><?php echo $this->translate('1st Line'); ?></th>
+                                        <th colspan="2" style="text-align:center;font-size:11px;"><?php echo $this->translate('2nd Line'); ?></th>
+                                        <th colspan="2" style="text-align:center;font-size:11px;"><?php echo $this->translate('Others'); ?></th>
+                                        <th colspan="2" style="text-align:center;font-size:11px;"><?php echo $this->translate('Total'); ?></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <th style="text-align:center;font-size:11px;"><?php echo $this->translate('Results'); ?></th>
+                                        <td style="text-align:center;font-size:11px;">#</td>
+                                        <td style="text-align:center;font-size:11px;">%</td>
+                                        <td style="text-align:center;font-size:11px;">#</td>
+                                        <td style="text-align:center;font-size:11px;">%</td>
+                                        <td style="text-align:center;font-size:11px;">#</td>
+                                        <td style="text-align:center;font-size:11px;">%</td>
+                                        <td style="text-align:center;font-size:11px;">#</td>
+                                        <td style="text-align:center;font-size:11px;">%</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="text-align:center;font-size:11px;">NS</td>
+                                        <td style="text-align:center;font-size:11px;"><?php echo $allLineofTreatmentInfo[0]['1stLineofNotSuppressed']; ?></td>
+                                        <td style="text-align:center;font-size:11px;"><?php echo ($allLineofTreatmentInfo[0]['1stLineofNotSuppressed'] > 0) ? round((($allLineofTreatmentInfo[0]['1stLineofNotSuppressed'] / ($allLineofTreatmentInfo[0]['1stLineofNotSuppressed'] + $allLineofTreatmentInfo[0]['1stLineofSuppressed'])) * 100), 2) : ''; ?></td>
+                                        <td style="text-align:center;font-size:11px;"><?php echo $allLineofTreatmentInfo[0]['2ndLineofNotSuppressed']; ?></td>
+                                        <td style="text-align:center;font-size:11px;"><?php echo ($allLineofTreatmentInfo[0]['2ndLineofNotSuppressed'] > 0) ? round((($allLineofTreatmentInfo[0]['2ndLineofNotSuppressed'] / ($allLineofTreatmentInfo[0]['2ndLineofNotSuppressed'] + $allLineofTreatmentInfo[0]['2ndLineofSuppressed'])) * 100), 2) : ''; ?></td>
+                                        <td style="text-align:center;font-size:11px;"><?php echo $allLineofTreatmentInfo[0]['otherLineofNotSuppressed']; ?></td>
+                                        <td style="text-align:center;font-size:11px;"><?php echo ($allLineofTreatmentInfo[0]['otherLineofNotSuppressed'] > 0) ? round((($allLineofTreatmentInfo[0]['otherLineofNotSuppressed'] / ($allLineofTreatmentInfo[0]['otherLineofNotSuppressed'] + $allLineofTreatmentInfo[0]['otherLineofSuppressed'])) * 100), 2) : ''; ?></td>
+                                        <td style="text-align:center;font-size:11px;"><?php echo $allLineofTreatmentInfo[0]['1stLineofNotSuppressed'] + $allLineofTreatmentInfo[0]['2ndLineofNotSuppressed'] + $allLineofTreatmentInfo[0]['otherLineofNotSuppressed']; ?></td>
+                                        <td style="text-align:center;font-size:11px;"><?php echo (($allLineofTreatmentInfo[0]['1stLineofNotSuppressed'] + $allLineofTreatmentInfo[0]['2ndLineofNotSuppressed'] + $allLineofTreatmentInfo[0]['otherLineofNotSuppressed']) > 0) ? round(((($allLineofTreatmentInfo[0]['1stLineofNotSuppressed'] + $allLineofTreatmentInfo[0]['2ndLineofNotSuppressed'] + $allLineofTreatmentInfo[0]['otherLineofNotSuppressed']) / ($allLineofTreatmentInfo[0]['1stLineofNotSuppressed'] + $allLineofTreatmentInfo[0]['2ndLineofNotSuppressed'] + $allLineofTreatmentInfo[0]['otherLineofNotSuppressed'] + $allLineofTreatmentInfo[0]['1stLineofSuppressed'] + $allLineofTreatmentInfo[0]['2ndLineofSuppressed'] + $allLineofTreatmentInfo[0]['otherLineofSuppressed'])) * 100), 2) : ''; ?></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="text-align:center;font-size:11px;">S</td>
+                                        <td style="text-align:center;font-size:11px;"><?php echo $allLineofTreatmentInfo[0]['1stLineofSuppressed']; ?></td>
+                                        <td style="text-align:center;font-size:11px;"><?php echo ($allLineofTreatmentInfo[0]['1stLineofSuppressed'] > 0) ? round((($allLineofTreatmentInfo[0]['1stLineofSuppressed'] / ($allLineofTreatmentInfo[0]['1stLineofSuppressed'] + $allLineofTreatmentInfo[0]['1stLineofNotSuppressed'])) * 100), 2) : ''; ?></td>
+                                        <td style="text-align:center;font-size:11px;"><?php echo $allLineofTreatmentInfo[0]['2ndLineofSuppressed']; ?></td>
+                                        <td style="text-align:center;font-size:11px;"><?php echo ($allLineofTreatmentInfo[0]['2ndLineofSuppressed'] > 0) ? round((($allLineofTreatmentInfo[0]['2ndLineofSuppressed'] / ($allLineofTreatmentInfo[0]['2ndLineofSuppressed'] + $allLineofTreatmentInfo[0]['2ndLineofNotSuppressed'])) * 100), 2) : ''; ?></td>
+                                        <td style="text-align:center;font-size:11px;"><?php echo $allLineofTreatmentInfo[0]['otherLineofSuppressed']; ?></td>
+                                        <td style="text-align:center;font-size:11px;"><?php echo ($allLineofTreatmentInfo[0]['otherLineofSuppressed'] > 0) ? round((($allLineofTreatmentInfo[0]['otherLineofSuppressed'] / ($allLineofTreatmentInfo[0]['otherLineofSuppressed'] + $allLineofTreatmentInfo[0]['otherLineofNotSuppressed'])) * 100), 2) : ''; ?></td>
+                                        <td style="text-align:center;font-size:11px;"><?php echo $allLineofTreatmentInfo[0]['1stLineofSuppressed'] + $allLineofTreatmentInfo[0]['2ndLineofSuppressed'] + $allLineofTreatmentInfo[0]['otherLineofSuppressed']; ?></td>
+                                        <td style="text-align:center;font-size:11px;"><?php echo (($allLineofTreatmentInfo[0]['1stLineofSuppressed'] + $allLineofTreatmentInfo[0]['2ndLineofSuppressed'] + $allLineofTreatmentInfo[0]['otherLineofSuppressed']) > 0) ? round(((($allLineofTreatmentInfo[0]['1stLineofSuppressed'] + $allLineofTreatmentInfo[0]['2ndLineofSuppressed'] + $allLineofTreatmentInfo[0]['otherLineofSuppressed']) / ($allLineofTreatmentInfo[0]['1stLineofSuppressed'] + $allLineofTreatmentInfo[0]['2ndLineofSuppressed'] + $allLineofTreatmentInfo[0]['otherLineofSuppressed'] + $allLineofTreatmentInfo[0]['1stLineofNotSuppressed'] + $allLineofTreatmentInfo[0]['2ndLineofNotSuppressed'] + $allLineofTreatmentInfo[0]['otherLineofNotSuppressed'])) * 100), 2) : ''; ?></td>
+                                    </tr>
+                                    <tr>
+                                        <th style="text-align:center;font-size:11px;"><?php echo $this->translate('Total'); ?></th>
+                                        <td style="text-align:center;font-size:11px;"><?php echo $allLineofTreatmentInfo[0]['1stLineofNotSuppressed'] + $allLineofTreatmentInfo[0]['1stLineofSuppressed']; ?></td>
+                                        <td style="text-align:center;font-size:11px;"></td>
+                                        <td style="text-align:center;font-size:11px;"><?php echo $allLineofTreatmentInfo[0]['2ndLineofNotSuppressed'] + $allLineofTreatmentInfo[0]['2ndLineofSuppressed']; ?></td>
+                                        <td style="text-align:center;font-size:11px;"></td>
+                                        <td style="text-align:center;font-size:11px;"><?php echo $allLineofTreatmentInfo[0]['otherLineofNotSuppressed'] + $allLineofTreatmentInfo[0]['otherLineofSuppressed']; ?></td>
+                                        <td style="text-align:center;font-size:11px;"></td>
+                                        <td style="text-align:center;font-size:11px;"><?php echo ($allLineofTreatmentInfo[0]['1stLineofNotSuppressed'] + $allLineofTreatmentInfo[0]['2ndLineofNotSuppressed'] + $allLineofTreatmentInfo[0]['otherLineofNotSuppressed']) + ($allLineofTreatmentInfo[0]['1stLineofSuppressed'] + $allLineofTreatmentInfo[0]['2ndLineofSuppressed'] + $allLineofTreatmentInfo[0]['otherLineofSuppressed']); ?></td>
+                                        <td style="text-align:center;font-size:11px;"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <hr style="border-bottom:1px solid #3598dc;">
+                            <?php $adult1stLineofTreatmentTotal = (isset($allCollapsibleLineofTreatmentResult['adult1stLineofTreatmentResult']) && count($allCollapsibleLineofTreatmentResult['adult1stLineofTreatmentResult']) > 0) ? count($allCollapsibleLineofTreatmentResult['adult1stLineofTreatmentResult']) : 0; ?>
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <td colspan="<?php echo ($adult1stLineofTreatmentTotal > 0) ? (2 * $adult1stLineofTreatmentTotal) + 3 : 3; ?>" style="font-size:11px;"><?php echo $this->translate('By first line regimens [Adult & Paeds]'); ?></td>
+                                    </tr>
+                                    <tr>
+                                        <th colspan="<?php echo ($adult1stLineofTreatmentTotal > 0) ? (2 * $adult1stLineofTreatmentTotal) + 3 : 3; ?>" style="text-align:center;font-size:11px;"><?php echo $this->translate('1st Line (ADULT)'); ?></th>
+                                    </tr>
+                                    <tr>
+                                        <th></th>
+                                        <?php
+                                        if (isset($allCollapsibleLineofTreatmentResult['adult1stLineofTreatmentResult']) && count($allCollapsibleLineofTreatmentResult['adult1stLineofTreatmentResult']) > 0) {
+                                            foreach ($allCollapsibleLineofTreatmentResult['adult1stLineofTreatmentResult'] as $adult1stLineofTreatment) {
+                                        ?>
+                                                <th colspan="2" style="font-size:11px;"><?php echo $adult1stLineofTreatment['current_regimen']; ?></th>
+                                        <?php }
+                                        } ?>
+                                        <th colspan="2" style="text-align:center;font-size:11px;"><?php echo $this->translate('Others'); ?></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <th style="text-align:center;font-size:11px;"><?php echo $this->translate('Results'); ?></th>
+                                        <?php
+                                        if (isset($allCollapsibleLineofTreatmentResult['adult1stLineofTreatmentResult']) && count($allCollapsibleLineofTreatmentResult['adult1stLineofTreatmentResult']) > 0) {
+                                            foreach ($allCollapsibleLineofTreatmentResult['adult1stLineofTreatmentResult'] as $adult1stLineofTreatmentLabel) {
+                                        ?>
+                                                <td style="text-align:center;font-size:11px;">#</td>
+                                                <td style="text-align:center;font-size:11px;">%</td>
+                                        <?php }
+                                        } ?>
+                                        <td style="text-align:center;font-size:11px;">#</td>
+                                        <td style="text-align:center;font-size:11px;">%</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="text-align:center;font-size:11px;">NS</td>
+                                        <?php
+                                        if (isset($allCollapsibleLineofTreatmentResult['adult1stLineofTreatmentResult']) && count($allCollapsibleLineofTreatmentResult['adult1stLineofTreatmentResult']) > 0) {
+                                            foreach ($allCollapsibleLineofTreatmentResult['adult1stLineofTreatmentResult'] as $adult1stLineofTreatmentNotSuppressed) {
+                                        ?>
+                                                <td style="text-align:center;font-size:11px;"><?php echo (isset($adult1stLineofTreatmentNotSuppressed['totalNotSuppressed'])) ? $adult1stLineofTreatmentNotSuppressed['totalNotSuppressed'] : 0; ?></td>
+                                                <td style="text-align:center;font-size:11px;"><?php echo (isset($adult1stLineofTreatmentNotSuppressed['totalNotSuppressed']) && $adult1stLineofTreatmentNotSuppressed['totalNotSuppressed'] > 0) ? round(((($adult1stLineofTreatmentNotSuppressed['totalNotSuppressed'] / ($adult1stLineofTreatmentNotSuppressed['totalNotSuppressed'] + $adult1stLineofTreatmentNotSuppressed['totalSuppressed'])) * 100)), 2) : ''; ?></td>
+                                        <?php }
+                                        } ?>
+                                        <?php
+                                        $totalAdult1stLineofTreatmentOthersNotSuppressed = 0;
+                                        $totalAdult1stLineofTreatmentOthersSuppressed = 0;
+                                        if (isset($allCollapsibleLineofTreatmentResult['adult1stLineofTreatmentOthersResult']) && count($allCollapsibleLineofTreatmentResult['adult1stLineofTreatmentOthersResult']) > 0) {
+                                            foreach ($allCollapsibleLineofTreatmentResult['adult1stLineofTreatmentOthersResult'] as $adult1stLineofTreatmentOthersNotSuppressed) {
+                                                $totalAdult1stLineofTreatmentOthersNotSuppressed += $adult1stLineofTreatmentOthersNotSuppressed['totalNotSuppressed'];
+                                                $totalAdult1stLineofTreatmentOthersSuppressed += $adult1stLineofTreatmentOthersNotSuppressed['totalSuppressed'];
+                                            }
+                                        }
+                                        ?>
+                                        <td style="text-align:center;font-size:11px;"><?php echo $totalAdult1stLineofTreatmentOthersNotSuppressed; ?></td>
+                                        <td style="text-align:center;font-size:11px;"><?php echo ($totalAdult1stLineofTreatmentOthersNotSuppressed > 0) ? round((($totalAdult1stLineofTreatmentOthersNotSuppressed / ($totalAdult1stLineofTreatmentOthersNotSuppressed + $totalAdult1stLineofTreatmentOthersSuppressed)) * 100), 2) : ''; ?></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="text-align:center;font-size:11px;">S</td>
+                                        <?php
+                                        if (isset($allCollapsibleLineofTreatmentResult['adult1stLineofTreatmentResult']) && count($allCollapsibleLineofTreatmentResult['adult1stLineofTreatmentResult']) > 0) {
+                                            foreach ($allCollapsibleLineofTreatmentResult['adult1stLineofTreatmentResult'] as $adult1stLineofTreatmentSuppressed) {
+                                        ?>
+                                                <td style="text-align:center;font-size:11px;"><?php echo (isset($adult1stLineofTreatmentSuppressed['totalSuppressed'])) ? $adult1stLineofTreatmentSuppressed['totalSuppressed'] : 0; ?></td>
+                                                <td style="text-align:center;font-size:11px;"><?php echo (isset($adult1stLineofTreatmentSuppressed['totalSuppressed']) && $adult1stLineofTreatmentSuppressed['totalSuppressed'] > 0) ? round(((($adult1stLineofTreatmentSuppressed['totalSuppressed'] / ($adult1stLineofTreatmentSuppressed['totalSuppressed'] + $adult1stLineofTreatmentSuppressed['totalNotSuppressed'])) * 100)), 2) : ''; ?></td>
+                                        <?php }
+                                        } ?>
+                                        <td style="text-align:center;font-size:11px;"><?php echo $totalAdult1stLineofTreatmentOthersSuppressed; ?></td>
+                                        <td style="text-align:center;font-size:11px;"><?php echo ($totalAdult1stLineofTreatmentOthersSuppressed > 0) ? round((($totalAdult1stLineofTreatmentOthersSuppressed / ($totalAdult1stLineofTreatmentOthersSuppressed + $totalAdult1stLineofTreatmentOthersNotSuppressed)) * 100), 2) : ''; ?></td>
+                                    </tr>
+                                    <tr>
+                                        <th style="text-align:center;font-size:11px;"><?php echo $this->translate('Total'); ?></th>
+                                        <?php
+                                        if (isset($allCollapsibleLineofTreatmentResult['adult1stLineofTreatmentResult']) && count($allCollapsibleLineofTreatmentResult['adult1stLineofTreatmentResult']) > 0) {
+                                            foreach ($allCollapsibleLineofTreatmentResult['adult1stLineofTreatmentResult'] as $adult1stLineofTreatmentGrandTotal) {
+                                                $adult1stLineNotSuppressed = (isset($adult1stLineofTreatmentGrandTotal['totalNotSuppressed'])) ? $adult1stLineofTreatmentGrandTotal['totalNotSuppressed'] : 0;
+                                                $adult1stLineSuppressed = (isset($adult1stLineofTreatmentGrandTotal['totalSuppressed'])) ? $adult1stLineofTreatmentGrandTotal['totalSuppressed'] : 0;
+                                        ?>
+                                                <td style="text-align:center;font-size:11px;"><?php echo $adult1stLineNotSuppressed + $adult1stLineSuppressed; ?></td>
+                                                <td style="text-align:center;font-size:11px;"></td>
+                                        <?php }
+                                        } ?>
+                                        <td style="text-align:center;font-size:11px;"><?php echo $totalAdult1stLineofTreatmentOthersNotSuppressed + $totalAdult1stLineofTreatmentOthersSuppressed; ?></td>
+                                        <td style="text-align:center;font-size:11px;"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <?php $paeds1stLineofTreatmentTotal = (isset($allCollapsibleLineofTreatmentResult['paeds1stLineofTreatmentResult']) && count($allCollapsibleLineofTreatmentResult['paeds1stLineofTreatmentResult']) > 0) ? count($allCollapsibleLineofTreatmentResult['paeds1stLineofTreatmentResult']) : 0; ?>
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <td colspan="<?php echo ($paeds1stLineofTreatmentTotal > 0) ? (2 * $paeds1stLineofTreatmentTotal) + 3 : 3; ?>"></td>
+                                    </tr>
+                                    <tr>
+                                        <th colspan="<?php echo ($paeds1stLineofTreatmentTotal > 0) ? (2 * $paeds1stLineofTreatmentTotal) + 3 : 3; ?>" style="text-align:center;font-size:11px;"><?php echo $this->translate('1st Line (PAEDS)'); ?></th>
+                                    </tr>
+                                    <tr>
+                                        <th></th>
+                                        <?php
+                                        if (isset($allCollapsibleLineofTreatmentResult['paeds1stLineofTreatmentResult']) && count($allCollapsibleLineofTreatmentResult['paeds1stLineofTreatmentResult']) > 0) {
+                                            foreach ($allCollapsibleLineofTreatmentResult['paeds1stLineofTreatmentResult'] as $paeds1stLineofTreatment) {
+                                        ?>
+                                                <th colspan="2" style="font-size:11px;"><?php echo $paeds1stLineofTreatment['current_regimen']; ?></th>
+                                        <?php }
+                                        } ?>
+                                        <th colspan="2" style="text-align:center;font-size:11px;"><?php echo $this->translate('Others'); ?></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <th style="text-align:center;font-size:11px;"><?php echo $this->translate('Results'); ?></th>
+                                        <?php
+                                        if (isset($allCollapsibleLineofTreatmentResult['paeds1stLineofTreatmentResult']) && count($allCollapsibleLineofTreatmentResult['paeds1stLineofTreatmentResult']) > 0) {
+                                            foreach ($allCollapsibleLineofTreatmentResult['paeds1stLineofTreatmentResult'] as $paeds1stLineofTreatmentLabel) {
+                                        ?>
+                                                <td style="text-align:center;font-size:11px;">#</td>
+                                                <td style="text-align:center;font-size:11px;">%</td>
+                                        <?php }
+                                        } ?>
+                                        <td style="text-align:center;font-size:11px;">#</td>
+                                        <td style="text-align:center;font-size:11px;">%</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="text-align:center;font-size:11px;">NS</td>
+                                        <?php
+                                        if (isset($allCollapsibleLineofTreatmentResult['paeds1stLineofTreatmentResult']) && count($allCollapsibleLineofTreatmentResult['paeds1stLineofTreatmentResult']) > 0) {
+                                            foreach ($allCollapsibleLineofTreatmentResult['paeds1stLineofTreatmentResult'] as $paeds1stLineofTreatmentNotSuppressed) {
+                                        ?>
+                                                <td style="text-align:center;font-size:11px;"><?php echo (isset($paeds1stLineofTreatmentNotSuppressed['totalNotSuppressed'])) ? $paeds1stLineofTreatmentNotSuppressed['totalNotSuppressed'] : 0; ?></td>
+                                                <td style="text-align:center;font-size:11px;"><?php echo (isset($paeds1stLineofTreatmentNotSuppressed['totalNotSuppressed']) && $paeds1stLineofTreatmentNotSuppressed['totalNotSuppressed'] > 0) ? round(((($paeds1stLineofTreatmentNotSuppressed['totalNotSuppressed'] / ($paeds1stLineofTreatmentNotSuppressed['totalNotSuppressed'] + $paeds1stLineofTreatmentNotSuppressed['totalSuppressed'])) * 100)), 2) : ''; ?></td>
+                                        <?php }
+                                        } ?>
+                                        <?php
+                                        $totalPaeds1stLineofTreatmentOthersNotSuppressed = 0;
+                                        $totalPaeds1stLineofTreatmentOthersSuppressed = 0;
+                                        if (isset($allCollapsibleLineofTreatmentResult['paeds1stLineofTreatmentOthersResult']) && count($allCollapsibleLineofTreatmentResult['paeds1stLineofTreatmentOthersResult']) > 0) {
+                                            foreach ($allCollapsibleLineofTreatmentResult['paeds1stLineofTreatmentOthersResult'] as $paeds1stLineofTreatmentOthersSuppressedNotSuppressed) {
+                                                $totalPaeds1stLineofTreatmentOthersNotSuppressed += $paeds1stLineofTreatmentOthersSuppressedNotSuppressed['totalNotSuppressed'];
+                                                $totalPaeds1stLineofTreatmentOthersSuppressed += $paeds1stLineofTreatmentOthersSuppressedNotSuppressed['totalSuppressed'];
+                                            }
+                                        }
+                                        ?>
+                                        <td style="text-align:center;font-size:11px;"><?php echo $totalPaeds1stLineofTreatmentOthersNotSuppressed; ?></td>
+                                        <td style="text-align:center;font-size:11px;"><?php echo ($totalPaeds1stLineofTreatmentOthersNotSuppressed > 0) ? round((($totalPaeds1stLineofTreatmentOthersNotSuppressed / ($totalPaeds1stLineofTreatmentOthersNotSuppressed + $totalPaeds1stLineofTreatmentOthersSuppressed)) * 100), 2) : ''; ?></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="text-align:center;font-size:11px;">S</td>
+                                        <?php
+                                        if (isset($allCollapsibleLineofTreatmentResult['paeds1stLineofTreatmentResult']) && count($allCollapsibleLineofTreatmentResult['paeds1stLineofTreatmentResult']) > 0) {
+                                            foreach ($allCollapsibleLineofTreatmentResult['paeds1stLineofTreatmentResult'] as $paeds1stLineofTreatmentSuppressed) {
+                                        ?>
+                                                <td style="text-align:center;font-size:11px;"><?php echo (isset($paeds1stLineofTreatmentSuppressed['totalSuppressed'])) ? $paeds1stLineofTreatmentSuppressed['totalSuppressed'] : 0; ?></td>
+                                                <td style="text-align:center;font-size:11px;"><?php echo (isset($paeds1stLineofTreatmentSuppressed['totalSuppressed']) && $paeds1stLineofTreatmentSuppressed['totalSuppressed'] > 0) ? round(((($paeds1stLineofTreatmentSuppressed['totalSuppressed'] / ($paeds1stLineofTreatmentSuppressed['totalSuppressed'] + $paeds1stLineofTreatmentSuppressed['totalNotSuppressed'])) * 100)), 2) : ''; ?></td>
+                                        <?php }
+                                        } ?>
+                                        <td style="text-align:center;font-size:11px;"><?php echo $totalPaeds1stLineofTreatmentOthersSuppressed; ?></td>
+                                        <td style="text-align:center;font-size:11px;"><?php echo ($totalPaeds1stLineofTreatmentOthersSuppressed > 0) ? round((($totalPaeds1stLineofTreatmentOthersSuppressed / ($totalPaeds1stLineofTreatmentOthersSuppressed + $totalPaeds1stLineofTreatmentOthersNotSuppressed)) * 100), 2) : ''; ?></td>
+                                    </tr>
+                                    <tr>
+                                        <th style="text-align:center;font-size:11px;"><?php echo $this->translate('Total'); ?></th>
+                                        <?php
+                                        if (isset($allCollapsibleLineofTreatmentResult['paeds1stLineofTreatmentResult']) && count($allCollapsibleLineofTreatmentResult['paeds1stLineofTreatmentResult']) > 0) {
+                                            foreach ($allCollapsibleLineofTreatmentResult['paeds1stLineofTreatmentResult'] as $paeds1stLineofTreatmentTotal) {
+                                                $paeds1stLineNotSuppressed = (isset($paeds1stLineofTreatmentTotal['totalNotSuppressed'])) ? $paeds1stLineofTreatmentTotal['totalNotSuppressed'] : 0;
+                                                $paeds1stLineSuppressed = (isset($paeds1stLineofTreatmentTotal['totalSuppressed'])) ? $paeds1stLineofTreatmentTotal['totalSuppressed'] : 0;
+                                        ?>
+                                                <td style="text-align:center;font-size:11px;"><?php echo $paeds1stLineNotSuppressed + $paeds1stLineSuppressed; ?></td>
+                                                <td style="text-align:center;font-size:11px;"></td>
+                                        <?php }
+                                        } ?>
+                                        <td style="text-align:center;font-size:11px;"><?php echo $totalPaeds1stLineofTreatmentOthersNotSuppressed + $totalPaeds1stLineofTreatmentOthersSuppressed; ?></td>
+                                        <td style="text-align:center;font-size:11px;"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <hr style="border-bottom:1px solid #3598dc;">
+                            <?php $adult2ndLineofTreatmentTotal = (isset($allCollapsibleLineofTreatmentResult['adult2ndLineofTreatmentResult']) && count($allCollapsibleLineofTreatmentResult['adult2ndLineofTreatmentResult']) > 0) ? count($allCollapsibleLineofTreatmentResult['adult2ndLineofTreatmentResult']) : 0; ?>
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <td colspan="<?php echo ($adult2ndLineofTreatmentTotal > 0) ? (2 * $adult2ndLineofTreatmentTotal) + 3 : 3; ?>" style="font-size:11px;"><?php echo $this->translate('By second line regimens [Adult & Paeds] & Others'); ?></td>
+                                    </tr>
+                                    <tr>
+                                        <th colspan="<?php echo ($adult2ndLineofTreatmentTotal > 0) ? (2 * $adult2ndLineofTreatmentTotal) + 3 : 3; ?>" style="text-align:center;font-size:11px;"><?php echo $this->translate('2nd Line (ADULT)'); ?></th>
+                                    </tr>
+                                    <tr>
+                                        <th></th>
+                                        <?php
+                                        if (isset($allCollapsibleLineofTreatmentResult['adult2ndLineofTreatmentResult']) && count($allCollapsibleLineofTreatmentResult['adult2ndLineofTreatmentResult']) > 0) {
+                                            foreach ($allCollapsibleLineofTreatmentResult['adult2ndLineofTreatmentResult'] as $adult2ndLineofTreatment) {
+                                        ?>
+                                                <th colspan="2" style="font-size:11px;"><?php echo $adult2ndLineofTreatment['current_regimen']; ?></th>
+                                        <?php }
+                                        } ?>
+                                        <th colspan="2" style="text-align:center;font-size:11px;"><?php echo $this->translate('Others'); ?></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <th style="text-align:center;font-size:11px;"><?php echo $this->translate('Results'); ?></th>
+                                        <?php
+                                        if (isset($allCollapsibleLineofTreatmentResult['adult2ndLineofTreatmentResult']) && count($allCollapsibleLineofTreatmentResult['adult2ndLineofTreatmentResult']) > 0) {
+                                            foreach ($allCollapsibleLineofTreatmentResult['adult2ndLineofTreatmentResult'] as $adult2ndLineofTreatmentLabel) {
+                                        ?>
+                                                <td style="text-align:center;font-size:11px;">#</td>
+                                                <td style="text-align:center;font-size:11px;">%</td>
+                                        <?php }
+                                        } ?>
+                                        <td style="text-align:center;font-size:11px;">#</td>
+                                        <td style="text-align:center;font-size:11px;">%</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="text-align:center;font-size:11px;">NS</td>
+                                        <?php
+                                        if (isset($allCollapsibleLineofTreatmentResult['adult2ndLineofTreatmentResult']) && count($allCollapsibleLineofTreatmentResult['adult2ndLineofTreatmentResult']) > 0) {
+                                            foreach ($allCollapsibleLineofTreatmentResult['adult2ndLineofTreatmentResult'] as $adult2ndLineofTreatmentNotSuppressed) {
+                                        ?>
+                                                <td style="text-align:center;font-size:11px;"><?php echo (isset($adult2ndLineofTreatmentNotSuppressed['totalNotSuppressed'])) ? $adult2ndLineofTreatmentNotSuppressed['totalNotSuppressed'] : 0; ?></td>
+                                                <td style="text-align:center;font-size:11px;"><?php echo (isset($adult2ndLineofTreatmentNotSuppressed['totalNotSuppressed']) && $adult2ndLineofTreatmentNotSuppressed['totalNotSuppressed'] > 0) ? round(((($adult2ndLineofTreatmentNotSuppressed['totalNotSuppressed'] / ($adult2ndLineofTreatmentNotSuppressed['totalNotSuppressed'] + $adult2ndLineofTreatmentNotSuppressed['totalSuppressed'])) * 100)), 2) : ''; ?></td>
+                                        <?php }
+                                        } ?>
+                                        <?php
+                                        $totalAdult2ndLineofTreatmentOthersNotSuppressed = 0;
+                                        $totalAdult2ndLineofTreatmentOthersSuppressed = 0;
+                                        if (isset($allCollapsibleLineofTreatmentResult['adult2ndLineofTreatmentOthersResult']) && count($allCollapsibleLineofTreatmentResult['adult2ndLineofTreatmentOthersResult']) > 0) {
+                                            foreach ($allCollapsibleLineofTreatmentResult['adult2ndLineofTreatmentOthersResult'] as $adult2ndLineofTreatmentOthersNotSuppressed) {
+                                                $totalAdult2ndLineofTreatmentOthersNotSuppressed += $adult2ndLineofTreatmentOthersNotSuppressed['totalNotSuppressed'];
+                                                $totalAdult2ndLineofTreatmentOthersSuppressed += $adult2ndLineofTreatmentOthersNotSuppressed['totalSuppressed'];
+                                            }
+                                        }
+                                        ?>
+                                        <td style="text-align:center;font-size:11px;"><?php echo $totalAdult2ndLineofTreatmentOthersNotSuppressed; ?></td>
+                                        <td style="text-align:center;font-size:11px;"><?php echo ($totalAdult2ndLineofTreatmentOthersNotSuppressed > 0) ? round((($totalAdult2ndLineofTreatmentOthersNotSuppressed / ($totalAdult2ndLineofTreatmentOthersNotSuppressed + $totalAdult2ndLineofTreatmentOthersSuppressed)) * 100), 2) : ''; ?></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="text-align:center;font-size:11px;">S</td>
+                                        <?php
+                                        if (isset($allCollapsibleLineofTreatmentResult['adult2ndLineofTreatmentResult']) && count($allCollapsibleLineofTreatmentResult['adult2ndLineofTreatmentResult']) > 0) {
+                                            foreach ($allCollapsibleLineofTreatmentResult['adult2ndLineofTreatmentResult'] as $adult2ndLineofTreatmentSuppressed) {
+                                        ?>
+                                                <td style="text-align:center;font-size:11px;"><?php echo (isset($adult2ndLineofTreatmentSuppressed['totalSuppressed'])) ? $adult2ndLineofTreatmentSuppressed['totalSuppressed'] : 0; ?></td>
+                                                <td style="text-align:center;font-size:11px;"><?php echo (isset($adult2ndLineofTreatmentSuppressed['totalSuppressed']) && $adult2ndLineofTreatmentSuppressed['totalSuppressed'] > 0) ? round(((($adult2ndLineofTreatmentSuppressed['totalSuppressed'] / ($adult2ndLineofTreatmentSuppressed['totalSuppressed'] + $adult2ndLineofTreatmentSuppressed['totalNotSuppressed'])) * 100)), 2) : ''; ?></td>
+                                        <?php }
+                                        } ?>
+                                        <td style="text-align:center;font-size:11px;"><?php echo $totalAdult2ndLineofTreatmentOthersSuppressed; ?></td>
+                                        <td style="text-align:center;font-size:11px;"><?php echo ($totalAdult2ndLineofTreatmentOthersSuppressed > 0) ? round((($totalAdult2ndLineofTreatmentOthersSuppressed / ($totalAdult2ndLineofTreatmentOthersSuppressed + $totalAdult2ndLineofTreatmentOthersNotSuppressed)) * 100), 2) : ''; ?></td>
+                                    </tr>
+                                    <tr>
+                                        <th style="text-align:center;font-size:11px;"><?php echo $this->translate('Total'); ?></th>
+                                        <?php
+                                        if (isset($allCollapsibleLineofTreatmentResult['adult2ndLineofTreatmentResult']) && count($allCollapsibleLineofTreatmentResult['adult2ndLineofTreatmentResult']) > 0) {
+                                            foreach ($allCollapsibleLineofTreatmentResult['adult2ndLineofTreatmentResult'] as $adult2ndLineofTreatmentGrandTotal) {
+                                                $adult2ndLineNotSuppressed = (isset($adult2ndLineofTreatmentGrandTotal['totalNotSuppressed'])) ? $adult2ndLineofTreatmentGrandTotal['totalNotSuppressed'] : 0;
+                                                $adult2ndLineSuppressed = (isset($adult2ndLineofTreatmentGrandTotal['totalSuppressed'])) ? $adult2ndLineofTreatmentGrandTotal['totalSuppressed'] : 0;
+                                        ?>
+                                                <td style="text-align:center;font-size:11px;"><?php echo $adult2ndLineNotSuppressed + $adult2ndLineSuppressed; ?></td>
+                                                <td style="text-align:center;font-size:11px;"></td>
+                                        <?php }
+                                        } ?>
+                                        <td style="text-align:center;font-size:11px;"><?php echo $totalAdult2ndLineofTreatmentOthersNotSuppressed + $totalAdult2ndLineofTreatmentOthersSuppressed; ?></td>
+                                        <td style="text-align:center;font-size:11px;"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <?php $paeds2ndLineofTreatmentTotal = (isset($allCollapsibleLineofTreatmentResult['paeds2ndLineofTreatmentResult']) && count($allCollapsibleLineofTreatmentResult['paeds2ndLineofTreatmentResult']) > 0) ? count($allCollapsibleLineofTreatmentResult['paeds2ndLineofTreatmentResult']) : 0; ?>
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <td colspan="<?php echo ($paeds2ndLineofTreatmentTotal > 0) ? (2 * $paeds2ndLineofTreatmentTotal) + 5 : 3; ?>"></td>
+                                    </tr>
+                                    <tr>
+                                        <th colspan="<?php echo ($paeds2ndLineofTreatmentTotal > 0) ? (2 * $paeds2ndLineofTreatmentTotal) + 3 : 3; ?>" style="text-align:center;font-size:11px;"><?php echo $this->translate('2nd Line (PAEDS)'); ?></th>
+                                        <th colspan="2" style="text-align:center;font-size:11px;"><?php echo $this->translate('Others'); ?></th>
+                                    </tr>
+                                    <tr>
+                                        <th></th>
+                                        <?php
+                                        if (isset($allCollapsibleLineofTreatmentResult['paeds2ndLineofTreatmentResult']) && count($allCollapsibleLineofTreatmentResult['paeds2ndLineofTreatmentResult']) > 0) {
+                                            foreach ($allCollapsibleLineofTreatmentResult['paeds2ndLineofTreatmentResult'] as $paeds2ndLineofTreatment) {
+                                        ?>
+                                                <th colspan="2" style="font-size:11px;"><?php echo $paeds2ndLineofTreatment['current_regimen']; ?></th>
+                                        <?php }
+                                        } ?>
+                                        <th colspan="2" style="text-align:center;font-size:11px;"><?php echo $this->translate('Others'); ?></th>
+                                        <th colspan="2" style="text-align:center;font-size:11px;"><?php echo $this->translate('Other'); ?></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <th style="text-align:center;font-size:11px;"><?php echo $this->translate('Results'); ?></th>
+                                        <?php
+                                        if (isset($allCollapsibleLineofTreatmentResult['paeds2ndLineofTreatmentResult']) && count($allCollapsibleLineofTreatmentResult['paeds2ndLineofTreatmentResult']) > 0) {
+                                            foreach ($allCollapsibleLineofTreatmentResult['paeds2ndLineofTreatmentResult'] as $paeds2ndLineofTreatmentLabel) {
+                                        ?>
+                                                <td style="text-align:center;font-size:11px;">#</td>
+                                                <td style="text-align:center;font-size:11px;">%</td>
+                                        <?php }
+                                        } ?>
+                                        <td style="text-align:center;font-size:11px;">#</td>
+                                        <td style="text-align:center;font-size:11px;">%</td>
+                                        <td style="text-align:center;font-size:11px;">#</td>
+                                        <td style="text-align:center;font-size:11px;">%</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="text-align:center;font-size:11px;">NS</td>
+                                        <?php
+                                        if (isset($allCollapsibleLineofTreatmentResult['paeds2ndLineofTreatmentResult']) && count($allCollapsibleLineofTreatmentResult['paeds2ndLineofTreatmentResult']) > 0) {
+                                            foreach ($allCollapsibleLineofTreatmentResult['paeds2ndLineofTreatmentResult'] as $paeds2ndLineofTreatmentNotSuppressed) {
+                                        ?>
+                                                <td style="text-align:center;font-size:11px;"><?php echo (isset($paeds2ndLineofTreatmentNotSuppressed['totalNotSuppressed'])) ? $paeds2ndLineofTreatmentNotSuppressed['totalNotSuppressed'] : 0; ?></td>
+                                                <td style="text-align:center;font-size:11px;"><?php echo (isset($paeds2ndLineofTreatmentNotSuppressed['totalNotSuppressed']) && $paeds2ndLineofTreatmentNotSuppressed['totalNotSuppressed'] > 0) ? round(((($paeds2ndLineofTreatmentNotSuppressed['totalNotSuppressed'] / ($paeds2ndLineofTreatmentNotSuppressed['totalNotSuppressed'] + $paeds2ndLineofTreatmentNotSuppressed['totalSuppressed'])) * 100)), 2) : ''; ?></td>
+                                        <?php }
+                                        } ?>
+                                        <?php
+                                        $totalPaeds2ndLineofTreatmentOthersNotSuppressed = 0;
+                                        $totalPaeds2ndLineofTreatmentOthersSuppressed = 0;
+                                        if (isset($allCollapsibleLineofTreatmentResult['paeds2ndLineofTreatmentOthersResult']) && count($allCollapsibleLineofTreatmentResult['paeds2ndLineofTreatmentOthersResult']) > 0) {
+                                            foreach ($allCollapsibleLineofTreatmentResult['paeds2ndLineofTreatmentOthersResult'] as $paeds2ndLineofTreatmentOthersSuppressedNotSuppressed) {
+                                                $totalPaeds2ndLineofTreatmentOthersNotSuppressed += $paeds2ndLineofTreatmentOthersSuppressedNotSuppressed['totalNotSuppressed'];
+                                                $totalPaeds2ndLineofTreatmentOthersSuppressed += $paeds2ndLineofTreatmentOthersSuppressedNotSuppressed['totalSuppressed'];
+                                            }
+                                        }
+                                        ?>
+                                        <td style="text-align:center;font-size:11px;"><?php echo $totalPaeds2ndLineofTreatmentOthersNotSuppressed; ?></td>
+                                        <td style="text-align:center;font-size:11px;"><?php echo ($totalPaeds2ndLineofTreatmentOthersNotSuppressed > 0) ? round((($totalPaeds2ndLineofTreatmentOthersNotSuppressed / ($totalPaeds2ndLineofTreatmentOthersNotSuppressed + $totalPaeds2ndLineofTreatmentOthersSuppressed)) * 100), 2) : ''; ?></td>
+                                        <?php
+                                        $totalOtherLineofTreatmentNotSuppressed = 0;
+                                        $totalOtherLineofTreatmentSuppressed = 0;
+                                        if (isset($allCollapsibleLineofTreatmentResult['otherLineofTreatmentResult']) && count($allCollapsibleLineofTreatmentResult['otherLineofTreatmentResult']) > 0) {
+                                            foreach ($allCollapsibleLineofTreatmentResult['otherLineofTreatmentResult'] as $otherLineofTreatmentSuppressedNotSuppressed) {
+                                                $totalOtherLineofTreatmentNotSuppressed += $otherLineofTreatmentSuppressedNotSuppressed['totalNotSuppressed'];
+                                                $totalOtherLineofTreatmentSuppressed += $otherLineofTreatmentSuppressedNotSuppressed['totalSuppressed'];
+                                            }
+                                        }
+                                        ?>
+                                        <td style="text-align:center;font-size:11px;"><?php echo $totalOtherLineofTreatmentNotSuppressed; ?></td>
+                                        <td style="text-align:center;font-size:11px;"><?php echo ($totalOtherLineofTreatmentNotSuppressed > 0) ? round((($totalOtherLineofTreatmentNotSuppressed / ($totalOtherLineofTreatmentNotSuppressed + $totalOtherLineofTreatmentSuppressed)) * 100), 2) : ''; ?></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="text-align:center;font-size:11px;">S</td>
+                                        <?php
+                                        if (isset($allCollapsibleLineofTreatmentResult['paeds2ndLineofTreatmentResult']) && count($allCollapsibleLineofTreatmentResult['paeds2ndLineofTreatmentResult']) > 0) {
+                                            foreach ($allCollapsibleLineofTreatmentResult['paeds2ndLineofTreatmentResult'] as $paeds2ndLineofTreatmentSuppressed) {
+                                        ?>
+                                                <td style="text-align:center;font-size:11px;"><?php echo (isset($paeds2ndLineofTreatmentSuppressed['totalSuppressed'])) ? $paeds2ndLineofTreatmentSuppressed['totalSuppressed'] : 0; ?></td>
+                                                <td style="text-align:center;font-size:11px;"><?php echo (isset($paeds2ndLineofTreatmentSuppressed['totalSuppressed']) && $paeds2ndLineofTreatmentSuppressed['totalSuppressed'] > 0) ? round(((($paeds2ndLineofTreatmentSuppressed['totalSuppressed'] / ($paeds2ndLineofTreatmentSuppressed['totalSuppressed'] + $paeds2ndLineofTreatmentSuppressed['totalNotSuppressed'])) * 100)), 2) : ''; ?></td>
+                                        <?php }
+                                        } ?>
+                                        <td style="text-align:center;font-size:11px;"><?php echo $totalPaeds2ndLineofTreatmentOthersSuppressed; ?></td>
+                                        <td style="text-align:center;font-size:11px;"><?php echo ($totalPaeds2ndLineofTreatmentOthersSuppressed > 0) ? round((($totalPaeds2ndLineofTreatmentOthersSuppressed / ($totalPaeds2ndLineofTreatmentOthersSuppressed + $totalPaeds2ndLineofTreatmentOthersNotSuppressed)) * 100), 2) : ''; ?></td>
+                                        <td style="text-align:center;font-size:11px;"><?php echo $totalOtherLineofTreatmentSuppressed; ?></td>
+                                        <td style="text-align:center;font-size:11px;"><?php echo ($totalOtherLineofTreatmentSuppressed > 0) ? round((($totalOtherLineofTreatmentSuppressed / ($totalOtherLineofTreatmentSuppressed + $totalOtherLineofTreatmentNotSuppressed)) * 100), 2) : ''; ?></td>
+                                    </tr>
+                                    <tr>
+                                        <th style="text-align:center;font-size:11px;"><?php echo $this->translate('Total'); ?></th>
+                                        <?php
+                                        if (isset($allCollapsibleLineofTreatmentResult['paeds2ndLineofTreatmentResult']) && count($allCollapsibleLineofTreatmentResult['paeds2ndLineofTreatmentResult']) > 0) {
+                                            foreach ($allCollapsibleLineofTreatmentResult['paeds2ndLineofTreatmentResult'] as $paeds2ndLineofTreatmentTotal) {
+                                                $paeds2ndLineNotSuppressed = (isset($paeds2ndLineofTreatmentTotal['totalNotSuppressed'])) ? $paeds2ndLineofTreatmentTotal['totalNotSuppressed'] : 0;
+                                                $paeds2ndLineSuppressed = (isset($paeds2ndLineofTreatmentTotal['totalSuppressed'])) ? $paeds2ndLineofTreatmentTotal['totalSuppressed'] : 0;
+                                        ?>
+                                                <td style="text-align:center;font-size:11px;"><?php echo $paeds2ndLineNotSuppressed + $paeds2ndLineSuppressed; ?></td>
+                                                <td style="text-align:center;font-size:11px;"></td>
+                                        <?php }
+                                        } ?>
+                                        <td style="text-align:center;font-size:11px;"><?php echo $totalPaeds2ndLineofTreatmentOthersNotSuppressed + $totalPaeds2ndLineofTreatmentOthersSuppressed; ?></td>
+                                        <td style="text-align:center;font-size:11px;"></td>
+                                        <td style="text-align:center;font-size:11px;"><?php echo $totalOtherLineofTreatmentNotSuppressed + $totalOtherLineofTreatmentSuppressed; ?></td>
+                                        <td style="text-align:center;font-size:11px;"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <hr style="border-bottom:1px solid #3598dc;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br>
+        <div class="row" id="summaryOfKeyIndicatorsDiv">
+            <div class="col-md-12 col-sm-12">
+                <div class="portlet box">
+                    <div class="portlet box blue">
+                        <div class="portlet-title">
+                            <div class="caption" id="blockTitle">
+                                <i class="fa fa-cogs"></i><?php echo $this->translate('SUMMARY OF KEY INDICATORS'); ?>
+                            </div>
+                            <div class="actions" style="width:<?php echo (isset($languagecontainer->locale) &&  $languagecontainer->locale == 'pt_BR') ? '36%' : '44%'; ?>;">
+                                <div class="tools" id="exportHighVlSample" style="float:right;text-align:right;">
+                                    <button class="btn btn-default" onclick="exportSummaryIndicatorResult();"><span><i class="fa fa-file-excel-o" aria-hidden="true"></i> <?php echo $this->translate('Export Excel'); ?></span></button>
+                                </div>&nbsp;&nbsp;
+                            </div>
+                        </div>
+                        <div class="portlet-body">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <select style="width:100%" name="indProvinceName[]" id="indProvinceName" multiple class="form-control" title="<?php echo $this->translate('Please select one or more province. Leave blank for All'); ?>">
+                                        <?php
+                                        foreach ($provinceName as $province) {
+                                        ?>
+                                            <option value="<?php echo $province['location_id']; ?>"><?php echo $province['location_name']; ?></option>
+                                        <?php
+                                        }
+                                        ?>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <select style="width:100%" name="indDistrictName[]" id="indDistrictName" multiple class="form-control" title="<?php echo $this->translate('Please select one or more district. Leave blank for All'); ?>">
+                                        <?php
+                                        foreach ($districtName as $district) {
+                                        ?>
+                                            <option data-parent-location="<?php echo $district['parent_location']; ?>" value="<?php echo $district['location_id']; ?>"><?php echo $district['location_name']; ?></option>
+                                        <?php
+                                        }
+                                        ?>
+                                        <option value="0">Empty</option>
+                                    </select>
+                                </div>
+                                <div class="col-lg-4">
+                                    <select style="width:100%" class="form-control" id="indClinicId" name="indClinicId[]" multiple title="<?php echo $this->translate('Please select one or more clinics. Leave blank for All'); ?>">
+                                        <?php
+                                        foreach ($clinicName as $clinic) {
+                                        ?>
+                                            <option value="<?php echo $clinic['facility_id']; ?>" data-district="<?php echo $clinic['facility_district']; ?>"><?php echo $clinic['facility_code'] . " - " . $clinic['facility_name']; ?></option>
+                                        <?php
+                                        }
+                                        ?>
+                                    </select>
+                                </div>
+                                <div class="col-lg-2">
+                                    <div class="form-group" style="">
+                                        <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="getSummaryIndicators();"><?php echo $this->translate('Search'); ?></a>
+                                        <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="resetIndicators();"><?php echo $this->translate('Reset'); ?></a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="table-toolbar" id="keyIndicatorsSummary" style="overflow-x:scroll;">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="<?php echo $this->basePath('assets/plugins/datepicker/bootstrap-datepicker.js') ?>"></script>
+<script src="<?php echo $this->basePath('assets/pages/scripts/dashboard.js'); ?>" type="text/javascript"></script>
+<script type="text/javascript">
+    var oTableSamplesReceivedDistrict = null;
+    var oTableSamplesReceivedFacility = null;
+    var oTableSamplesReceivedProvince = null;
+    var oTableSuppressionRateDistrict = null;
+    var oTableSuppressionRateFacility = null;
+    var oTableSuppressionRateProvince = null;
+    var oTableSamplesRejectedDistrict = null;
+    var oTableSamplesRejectedFacility = null;
+    var oTableSamplesRejectedProvince = null;
+    var otableRegimenGroups = null;
+
+
+    function getSamplesRegisteredTab() {
+
+        $(document).ajaxStart($.blockUI({
+            message: '<h2><?php echo $this->translate('Processing...'); ?></h2>'
+        })).ajaxStop($.unblockUI);
+        getSamplesReceivedBarChartInfo();
+        facilityWiseSamplesReceivedSummaryFn();
+
+
+    }
+
+    function getSuppressionRateTab() {
+        $(document).ajaxStart($.blockUI({
+            message: '<h2><?php echo $this->translate('Processing...'); ?></h2>'
+        })).ajaxStop($.unblockUI);
+        getSuppressionRateBarChartInfo();
+        facilityWiseSuppressionRateSummaryFn();
+    }
+
+    function getRejectionRateTab() {
+        $(document).ajaxStart($.blockUI({
+            message: '<h2><?php echo $this->translate('Processing...'); ?></h2>'
+        })).ajaxStop($.unblockUI);
+        getSamplesRejectedBarChartInfo();
+        facilityWiseSamplesRejectedSummaryFn();
+    }
+
+
+    function getCurrentRegimenTab() {
+        $(document).ajaxStart($.blockUI({
+            message: '<h2><?php echo $this->translate('Processing...'); ?></h2>'
+        })).ajaxStop($.unblockUI);
+        getRegimenGroupBarChartInfo();
+        regimenGroupsSummaryFn();
+
+    }
+
+    function isOnScreen(elem) {
+        // if the element doesn't exist, abort
+        if (elem.length == 0) {
+            return;
+        }
+        var $window = jQuery(window)
+        var viewport_top = $window.scrollTop()
+        var viewport_height = $window.height()
+        var viewport_bottom = viewport_top + viewport_height
+        var $elem = jQuery(elem)
+        //console.log($elem.offset().top);
+        var top = $elem.offset().top
+        var height = $elem.height()
+        var bottom = top + height
+
+        return (top >= viewport_top && top < viewport_bottom) ||
+            (bottom > viewport_top && bottom <= viewport_bottom) ||
+            (height > viewport_height && top <= viewport_top && bottom >= viewport_bottom)
+    }
+    var scrollCounter = 0;
+    $(function() {
+        window.addEventListener('scroll', function(e) {
+            // we dont want to call it each time there is a scroll event
+            if (scrollCounter == 0) {
+                if (isOnScreen(jQuery('#summaryOfKeyIndicatorsDiv'))) {
+                    scrollCounter++;
+                    getSummaryIndicators();
+                }
+            }
+
+        });
+
+        toggleSummary('facilityWiseSamplesReceivedSummary', 'provinceWiseSamplesReceivedSummary', 'districtWiseSamplesReceivedSummary');
+        toggleSummary('facilityWiseSuppressionRateSummary', 'provinceWiseSuppressionRateSummary', 'districtWiseSuppressionRateSummary');
+        toggleSummary('facilityWiseSamplesRejectedSummary', 'provinceWiseSamplesRejectedSummary', 'districtWiseSamplesRejectedSummary');
+
+        $.blockUI.defaults.css.border = '1px solid grey';
+        $(document).ajaxStart($.blockUI({
+            message: '<h2><?php echo $this->translate('Processing...'); ?></h2>'
+        })).ajaxStop($.unblockUI);
+
+        getSamplesRegisteredTab();
+
+
+        /* District ,Province and Facilities */
+        $('#provinceName').select2({
+            placeholder: "<?php echo $this->translate('All Province'); ?>",
+            allowClear: true
+        });
+        $('#districtName').select2({
+            placeholder: "<?php echo $this->translate('All Districts'); ?>",
+            allowClear: true,
+        });
+        $('#clinicId').select2({
+            placeholder: "<?php echo $this->translate('All Facilities'); ?>",
+            allowClear: true
+        });
+
+
+        $('#indProvinceName').select2({
+            placeholder: "<?php echo $this->translate('All Province'); ?>",
+            allowClear: true
+        });
+        $('#indDistrictName').select2({
+            placeholder: "<?php echo $this->translate('All Districts'); ?>",
+            allowClear: true,
+        });
+        $('#indClinicId').select2({
+            placeholder: "<?php echo $this->translate('All Facilities'); ?>",
+            allowClear: true
+        });
+
+        $('#sampleProvinceName').select2({
+            placeholder: "<?php echo $this->translate('All Province'); ?>",
+            allowClear: true
+        });
+        $('#sampleDistrictName').select2({
+            placeholder: "<?php echo $this->translate('All Districts'); ?>",
+            allowClear: true,
+        });
+        $('#sampleClinicId').select2({
+            placeholder: "<?php echo $this->translate('All Facilities'); ?>",
+            allowClear: true
+        });
+
+        $('#suppressionProvinceName').select2({
+            placeholder: "<?php echo $this->translate('All Province'); ?>",
+            allowClear: true
+        });
+        $('#suppressionDistrictName').select2({
+            placeholder: "<?php echo $this->translate('All Districts'); ?>",
+            allowClear: true,
+        });
+        $('#suppressionClinicId').select2({
+            placeholder: "<?php echo $this->translate('All Facilities'); ?>",
+            allowClear: true
+        });
+        $('#rejectionProvinceName').select2({
+            placeholder: "<?php echo $this->translate('All Province'); ?>",
+            allowClear: true
+        });
+        $('#rejectionDistrictName').select2({
+            placeholder: "<?php echo $this->translate('All Districts'); ?>",
+            allowClear: true,
+        });
+        $('#rejectionClinicId').select2({
+            placeholder: "<?php echo $this->translate('All Facilities'); ?>",
+            allowClear: true
+        });
+    });
+
+    function districtWiseSamplesReceivedSummaryFn() {
+        oTableSamplesReceivedDistrict = $('#samplesReceivedDistrict').DataTable({
+            "bProcessing": true,
+            "bServerSide": true,
+            "bRetrieve": true,
+            "bAutoWidth": true,
+            // "sScrollX": true,
+            "aoColumns": [{
+                    "sClass": "center"
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                }
+            ],
+            "iDisplayLength": 10,
+            "aaSorting": [
+                [1, "desc"]
+            ],
+            "pagingType": "simple",
+            "sAjaxSource": "<?php echo $this->url('summary', array('action' => 'samples-received-district')); ?>",
+            "fnServerData": function(sSource, aoData, fnCallback) {
+                aoData.push({
+                    "name": "fromDate",
+                    "value": formatDate($('#mrp-lowerDate').val())
+                });
+                aoData.push({
+                    "name": "toDate",
+                    "value": formatDate($('#mrp-upperDate').val())
+                });
+                $.ajax({
+                    "dataType": 'json',
+                    "type": "POST",
+                    "url": sSource,
+                    "data": aoData,
+                    "success": fnCallback
+                });
+            }
+        });
+    }
+
+    function facilityWiseSamplesReceivedSummaryFn() {
+        oTableSamplesReceivedFacility = $('#samplesReceivedFacility').DataTable({
+            "bProcessing": true,
+            "bServerSide": true,
+            "bRetrieve": true,
+            "bAutoWidth": true,
+            // "sScrollX": true,
+            "aoColumns": [{
+                    "sClass": "center"
+                },
+                {
+                    "sClass": "center"
+                },
+                {
+                    "sClass": "center"
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                },
+            ],
+            "iDisplayLength": 10,
+            "aaSorting": [
+                [3, "desc"]
+            ],
+            "pagingType": "simple",
+            "sAjaxSource": "<?php echo $this->url('summary', array('action' => 'samples-received-facility')); ?>",
+            "fnServerData": function(sSource, aoData, fnCallback) {
+                aoData.push({
+                    "name": "fromDate",
+                    "value": formatDate($('#mrp-lowerDate').val())
+                });
+                aoData.push({
+                    "name": "toDate",
+                    "value": formatDate($('#mrp-upperDate').val())
+                });
+                $.ajax({
+                    "dataType": 'json',
+                    "type": "POST",
+                    "url": sSource,
+                    "data": aoData,
+                    "success": fnCallback
+                });
+            }
+        });
+    }
+
+    function provinceWiseSamplesReceivedSummaryFn() {
+        oTableSamplesReceivedProvince = $('#samplesReceivedProvince').DataTable({
+            "bProcessing": true,
+            "bServerSide": true,
+            "bRetrieve": true,
+            "bAutoWidth": true,
+            // "sScrollX": true,
+            "aoColumns": [{
+                    "sClass": "center"
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                }
+            ],
+
+            "iDisplayLength": 10,
+            "aaSorting": [
+                [1, "desc"]
+            ],
+            "pagingType": "simple",
+            "sAjaxSource": "<?php echo $this->url('summary', array('action' => 'samples-received-province')); ?>",
+            "fnServerData": function(sSource, aoData, fnCallback) {
+                aoData.push({
+                    "name": "fromDate",
+                    "value": formatDate($('#mrp-lowerDate').val())
+                });
+                aoData.push({
+                    "name": "toDate",
+                    "value": formatDate($('#mrp-upperDate').val())
+                });
+                $.ajax({
+                    "dataType": 'json',
+                    "type": "POST",
+                    "url": sSource,
+                    "data": aoData,
+                    "success": fnCallback
+                });
+            }
+        });
+    }
+
+    function districtWiseSuppressionRateSummaryFn() {
+        oTableSuppressionRateDistrict = $('#suppressionRateDistrict').DataTable({
+            "bProcessing": true,
+            "bServerSide": true,
+            "bRetrieve": true,
+            "bAutoWidth": true,
+            //"sScrollX": true,
+            "aoColumns": [{
+                    "sClass": "center"
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                }
+            ],
+            "iDisplayLength": 10,
+            "aaSorting": [
+                [1, "desc"]
+            ],
+            "pagingType": "simple",
+            "sAjaxSource": "<?php echo $this->url('summary', array('action' => 'suppression-rate-district')); ?>",
+            "fnServerData": function(sSource, aoData, fnCallback) {
+                aoData.push({
+                    "name": "fromDate",
+                    "value": formatDate($('#mrp-lowerDate').val())
+                });
+                aoData.push({
+                    "name": "toDate",
+                    "value": formatDate($('#mrp-upperDate').val())
+                });
+                $.ajax({
+                    "dataType": 'json',
+                    "type": "POST",
+                    "url": sSource,
+                    "data": aoData,
+                    "success": fnCallback
+                });
+            }
+        });
+    }
+
+
+    function facilityWiseSuppressionRateSummaryFn() {
+        oTableSuppressionRateFacility = $('#suppressionRateFacility').DataTable({
+            "bProcessing": true,
+            "bServerSide": true,
+            "bRetrieve": true,
+            "bAutoWidth": true,
+            // "scrollX":false,
+            "aoColumns": [{
+                    "sClass": "center"
+                },
+                {
+                    "sClass": "center"
+                },
+                {
+                    "sClass": "center"
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                }
+            ],
+            "iDisplayLength": 10,
+            "aaSorting": [
+                [3, "desc"]
+            ],
+            "pagingType": "simple",
+            "sAjaxSource": "<?php echo $this->url('summary', array('action' => 'suppression-rate-facility')); ?>",
+            "fnServerData": function(sSource, aoData, fnCallback) {
+                aoData.push({
+                    "name": "fromDate",
+                    "value": formatDate($('#mrp-lowerDate').val())
+                });
+                aoData.push({
+                    "name": "toDate",
+                    "value": formatDate($('#mrp-upperDate').val())
+                });
+                $.ajax({
+                    "dataType": 'json',
+                    "type": "POST",
+                    "url": sSource,
+                    "data": aoData,
+                    "success": fnCallback
+                });
+            }
+        });
+    }
+
+    function provinceWiseSuppressionRateSummaryFn() {
+        oTableSuppressionRateProvince = $('#suppressionRateProvince').DataTable({
+            "bProcessing": true,
+            "bServerSide": true,
+            "bRetrieve": true,
+            "bAutoWidth": true,
+            // "scrollX":false,
+            "aoColumns": [{
+                    "sClass": "center"
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                }
+            ],
+            "iDisplayLength": 10,
+            "aaSorting": [
+                [1, "desc"]
+            ],
+            "pagingType": "simple",
+            "sAjaxSource": "<?php echo $this->url('summary', array('action' => 'suppression-rate-province')); ?>",
+            "fnServerData": function(sSource, aoData, fnCallback) {
+                aoData.push({
+                    "name": "fromDate",
+                    "value": formatDate($('#mrp-lowerDate').val())
+                });
+                aoData.push({
+                    "name": "toDate",
+                    "value": formatDate($('#mrp-upperDate').val())
+                });
+                $.ajax({
+                    "dataType": 'json',
+                    "type": "POST",
+                    "url": sSource,
+                    "data": aoData,
+                    "success": fnCallback
+                });
+            }
+        });
+    }
+
+    function districtWiseSamplesRejectedSummaryFn() {
+        oTableSamplesRejectedDistrict = $('#samplesRejectedDistrict').DataTable({
+            "bProcessing": true,
+            "bServerSide": true,
+            "bRetrieve": true,
+            "bAutoWidth": true,
+            //"scrollX":true,
+            "aoColumns": [{
+                    "sClass": "center"
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                }
+            ],
+            "iDisplayLength": 10,
+            "aaSorting": [
+                [1, "desc"]
+            ],
+            "pagingType": "simple",
+            "sAjaxSource": "<?php echo $this->url('summary', array('action' => 'samples-rejected-district')); ?>",
+            "fnServerData": function(sSource, aoData, fnCallback) {
+                aoData.push({
+                    "name": "fromDate",
+                    "value": formatDate($('#mrp-lowerDate').val())
+                });
+                aoData.push({
+                    "name": "toDate",
+                    "value": formatDate($('#mrp-upperDate').val())
+                });
+                $.ajax({
+                    "dataType": 'json',
+                    "type": "POST",
+                    "url": sSource,
+                    "data": aoData,
+                    "success": fnCallback
+                });
+            }
+        });
+    }
+
+    function facilityWiseSamplesRejectedSummaryFn() {
+        oTableSamplesRejectedDistrict = $('#samplesRejectedFacility').DataTable({
+            "bProcessing": true,
+            "bServerSide": true,
+            "bRetrieve": true,
+            "bAutoWidth": true,
+
+            //"scrollX":true,
+            "aoColumns": [{
+                    "sClass": "center"
+                },
+                {
+                    "sClass": "center"
+                },
+                {
+                    "sClass": "center"
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                }
+            ],
+            "iDisplayLength": 10,
+            "aaSorting": [
+                [3, "desc"]
+            ],
+            "pagingType": "simple",
+            "sAjaxSource": "<?php echo $this->url('summary', array('action' => 'samples-rejected-facility')); ?>",
+            "fnServerData": function(sSource, aoData, fnCallback) {
+                aoData.push({
+                    "name": "fromDate",
+                    "value": formatDate($('#mrp-lowerDate').val())
+                });
+                aoData.push({
+                    "name": "toDate",
+                    "value": formatDate($('#mrp-upperDate').val())
+                });
+                $.ajax({
+                    "dataType": 'json',
+                    "type": "POST",
+                    "url": sSource,
+                    "data": aoData,
+                    "success": fnCallback
+                });
+            }
+        });
+    }
+
+    function provinceWiseSamplesRejectedSummaryFn() {
+        oTableSamplesRejectedProvince = $('#samplesRejectedProvince').DataTable({
+            "bProcessing": true,
+            "bServerSide": true,
+            "bRetrieve": true,
+            "bAutoWidth": true,
+            //"scrollX":true,
+            "aoColumns": [{
+                    "sClass": "center"
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                }
+            ],
+            "iDisplayLength": 10,
+            "aaSorting": [
+                [3, "desc"]
+            ],
+            "pagingType": "simple",
+            "sAjaxSource": "<?php echo $this->url('summary', array('action' => 'samples-rejected-province')); ?>",
+            "fnServerData": function(sSource, aoData, fnCallback) {
+                aoData.push({
+                    "name": "fromDate",
+                    "value": formatDate($('#mrp-lowerDate').val())
+                });
+                aoData.push({
+                    "name": "toDate",
+                    "value": formatDate($('#mrp-upperDate').val())
+                });
+                $.ajax({
+                    "dataType": 'json',
+                    "type": "POST",
+                    "url": sSource,
+                    "data": aoData,
+                    "success": fnCallback
+                });
+            }
+        });
+    }
+
+    function regimenGroupsSummaryFn() {
+        otableRegimenGroups = $('#regimenGroupsDataTable').DataTable({
+            "bProcessing": true,
+            "bServerSide": true,
+            "bRetrieve": true,
+            "bAutoWidth": true,
+            //"scrollX":true,
+            "aoColumns": [{
+                    "sClass": "center"
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                }
+            ],
+            "iDisplayLength": 10,
+            "aaSorting": [
+                [1, "desc"]
+            ],
+            "pagingType": "simple",
+            "sAjaxSource": "<?php echo $this->url('summary', array('action' => 'get-regimen-group-details')); ?>",
+            "fnServerData": function(sSource, aoData, fnCallback) {
+                aoData.push({
+                    "name": "t_received",
+                    "value": '<?php echo $summaryTabInfo[0]["total_samples_received"]; ?>'
+                });
+                aoData.push({
+                    "name": "fromDate",
+                    "value": formatDate($('#mrp-lowerDate').val())
+                });
+                aoData.push({
+                    "name": "toDate",
+                    "value": formatDate($('#mrp-upperDate').val())
+                });
+                $.ajax({
+                    "dataType": 'json',
+                    "type": "POST",
+                    "url": sSource,
+                    "data": aoData,
+                    "success": fnCallback
+                });
+            }
+        });
+    }
+
+    function toggleSummary(showId, hideId, hideId2) {
+        $("#" + showId).show();
+        $("#" + hideId).hide();
+        $("#" + hideId2).hide();
+        if (showId === 'districtWiseSamplesReceivedSummary') {
+            $("#samplesReceivedBlockTitle").html("<i class='fa fa-cogs'></i><?php echo $this->translate('District Wise Samples Registered'); ?>");
+        } else if (showId === 'facilityWiseSamplesReceivedSummary') {
+            $("#samplesReceivedBlockTitle").html("<i class='fa fa-cogs'></i><?php echo $this->translate('Facility Wise Samples Registered'); ?>");
+        } else if (showId === 'provinceWiseSamplesReceivedSummary') {
+            $("#samplesReceivedBlockTitle").html("<i class='fa fa-cogs'></i><?php echo $this->translate('Province Wise Samples Registered'); ?>");
+        } else if (showId === 'districtWiseSuppressionRateSummary') {
+            $("#suppressionRateBlockTitle").html("<i class='fa fa-cogs'></i><?php echo $this->translate('District Wise Suppression Rate'); ?>");
+        } else if (showId === 'facilityWiseSuppressionRateSummary') {
+            $("#suppressionRateBlockTitle").html("<i class='fa fa-cogs'></i><?php echo $this->translate('Facility Wise Suppression Rate'); ?>");
+        } else if (showId === 'provinceWiseSuppressionRateSummary') {
+            $("#suppressionRateBlockTitle").html("<i class='fa fa-cogs'></i><?php echo $this->translate('Province Wise Suppression Rate'); ?>");
+        } else if (showId === 'districtWiseSamplesRejectedSummary') {
+            $("#samplesRejectedBlockTitle").html("<i class='fa fa-cogs'></i><?php echo $this->translate('District Wise Samples Rejected'); ?>");
+        } else if (showId === 'facilityWiseSamplesRejectedSummary') {
+            $("#samplesRejectedBlockTitle").html("<i class='fa fa-cogs'></i><?php echo $this->translate('Facility Wise Samples Rejected'); ?>");
+        } else if (showId === 'provinceWiseSamplesRejectedSummary') {
+            $("#samplesRejectedBlockTitle").html("<i class='fa fa-cogs'></i><?php echo $this->translate('Province Wise Samples Rejected'); ?>");
+        }
+
+    }
+
+    $('[data-toggle="btns"] .btn').on('click', function() {
+        var $this = $(this);
+        $this.parent().find('.active').removeClass('active');
+        $this.addClass('active');
+    });
+
+    function getSamplesReceivedBarChartInfo() {
+        sampDistrictIdList = ($("#sampleDistrictName").val() == null) ? '' : $("#sampleDistrictName").val().join(',');
+        sampProvinceIdList = ($("#sampleProvinceName").val() == null) ? '' : $("#sampleProvinceName").val().join(',');
+        sampClinicIdList = ($("#sampleClinicId").val() == null) ? '' : $('#sampleClinicId').val().join(',');
+        var fromDate = formatDate($('#mrp-lowerDate').val());
+        var toDate = formatDate($('#mrp-upperDate').val());
+        $.post("<?php echo $this->url('summary', array('action' => 'get-samples-received-bar-chart')); ?>", {
+                districts: sampDistrictIdList,
+                provinces: sampProvinceIdList,
+                clinics: sampClinicIdList,
+                fromDate: fromDate,
+                toDate: toDate
+            },
+            function(data) {
+                $("#samplesReceivedBarChartContainer").html(data);
+            });
+    }
+
+    function getSuppressionRateBarChartInfo() {
+        supDistrictIdList = ($("#suppressionDistrictName").val() == null) ? '' : $("#suppressionDistrictName").val().join(',');
+        supProvinceIdList = ($("#suppressionProvinceName").val() == null) ? '' : $("#suppressionProvinceName").val().join(',');
+        supClinicIdList = ($("#suppressionClinicId").val() == null) ? '' : $('#suppressionClinicId').val().join(',');
+        var fromDate = formatDate($('#mrp-lowerDate').val());
+        var toDate = formatDate($('#mrp-upperDate').val());
+        $.post("<?php echo $this->url('summary', array('action' => 'get-suppression-rate-bar-chart')); ?>", {
+                districts: supDistrictIdList,
+                provinces: supProvinceIdList,
+                clinics: supClinicIdList,
+                fromDate: fromDate,
+                toDate: toDate
+            },
+            function(data) {
+                $("#suppressionRateBarChartContainer").html(data);
+            });
+    }
+
+    function getSamplesRejectedBarChartInfo() {
+        rejDistrictIdList = ($("#rejectionDistrictName").val() == null) ? '' : $("#rejectionDistrictName").val().join(',');
+        rejProvinceIdList = ($("#rejectionProvinceName").val() == null) ? '' : $("#rejectionProvinceName").val().join(',');
+        rejClinicIdList = ($("#rejectionClinicId").val() == null) ? '' : $('#rejectionClinicId').val().join(',');
+        var fromDate = formatDate($('#mrp-lowerDate').val());
+        var toDate = formatDate($('#mrp-upperDate').val());
+        $.post("<?php echo $this->url('summary', array('action' => 'get-samples-rejected-bar-chart')); ?>", {
+                districts: rejDistrictIdList,
+                provinces: rejProvinceIdList,
+                clinics: rejClinicIdList,
+                fromDate: fromDate,
+                toDate: toDate
+            },
+            function(data) {
+                $("#samplesRejectedBarChartContainer").html(data);
+            });
+    }
+
+    function getRegimenGroupBarChartInfo() {
+        var districtIdList = ($("#districtName").val() == null) ? '' : $("#districtName").val().join(',');
+        var provinceIdList = ($("#provinceName").val() == null) ? '' : $("#provinceName").val().join(',');
+        var clinicIdList = ($("#clinicId").val() == null) ? '' : $('#clinicId').val().join(',');
+        var fromDate = formatDate($('#mrp-lowerDate').val());
+        var toDate = formatDate($('#mrp-upperDate').val());
+        $.post("<?php echo $this->url('summary', array('action' => 'get-regimen-group-bar-chart')); ?>", {
+                districts: districtIdList,
+                provinces: provinceIdList,
+                clinics: clinicIdList,
+                fromDate: fromDate,
+                toDate: toDate
+            },
+            function(data) {
+                $("#regimenGroupBarChartContainer").html(data);
+            });
+    }
+
+    /* Reset Everything Fn */
+    function resetEverything() {
+        $("#districtName").select2('val', '');
+        $("#provinceName").select2('val', '');
+        $('#clinicId').select2('val', '');
+    }
+
+
+
+    function getSummaryIndicators() {
+        $(document).ajaxStart($.blockUI({
+            message: '<h4> <?php echo ($this->translate('Processing Summary of Key Indicators')); ?> ... </h4>'
+        })).ajaxStop($.unblockUI);
+        var indDistrictIdList = ($("#indDistrictName").val() == null) ? '' : $("#indDistrictName").val().join(',');
+        var indProvinceIdList = ($("#indProvinceName").val() == null) ? '' : $("#indProvinceName").val().join(',');
+        var indClinicIdList = ($("#indClinicId").val() == null) ? '' : $('#indClinicId').val().join(',');
+        var fromDate = formatDate($('#mrp-lowerDate').val());
+        var toDate = formatDate($('#mrp-upperDate').val());
+        $.post("<?php echo $this->url('summary', array('action' => 'get-indicators')); ?>", {
+                districts: indDistrictIdList,
+                provinces: indProvinceIdList,
+                clinics: indClinicIdList,
+                fromDate: fromDate,
+                toDate: toDate
+            },
+            function(data) {
+                $("#keyIndicatorsSummary").html(data);
+                $.unblockUI();
+            });
+    }
+
+    function resetIndicators() {
+        $("#indDistrictName").select2('val', '');
+        $("#indProvinceName").select2('val', '');
+        $('#indClinicId').select2('val', '');
+        getSummaryIndicators();
+    }
+
+    function exportSummaryIndicatorResult() {
+        $.blockUI.defaults.css.border = '1px solid grey';
+        $(document).ajaxStart($.blockUI({
+            message: '<h2><?php echo $this->translate('Processing...'); ?></h2>'
+        })).ajaxStop($.unblockUI);
+        $.post("<?php echo $this->url('summary', array('action' => 'export-indicator-result-excel')); ?>", {
+                result: $("#sampleStatus").val()
+            },
+            function(data) {
+                if (data == "" || data == null || data == undefined) {
+                    alert('<?php echo $this->translate('Unable to export excel') ?>');
+                } else {
+                    window.open('/temporary/' + data, '_blank');
+                }
+            });
+    }
+
+    function exportSuppressionRateByFacility() {
+        $.blockUI.defaults.css.border = '1px solid grey';
+        $(document).ajaxStart($.blockUI({
+            message: '<h2><?php echo $this->translate('Processing...'); ?></h2>'
+        })).ajaxStop($.unblockUI);
+        $.post("<?php echo $this->url('summary', array('action' => 'export-suppression-rate-by-facility')); ?>", {
+                result: $("#sampleStatus").val()
+            },
+            function(data) {
+                if (data == "" || data == null || data == undefined) {
+                    alert('<?php echo $this->translate('Unable to export excel') ?>');
+                } else {
+                    window.open('/temporary/' + data, '_blank');
+                }
+            });
+    }
+
+    function resetSampleEverything() {
+        $.blockUI();
+        $("#sampleDistrictName").select2('val', '');
+        $("#sampleProvinceName").select2('val', '');
+        $('#sampleClinicId').select2('val', '');
+        getSamplesReceivedBarChartInfo();
+        $.unblockUI();
+    }
+
+    function resetSuppressionEverything() {
+        $.blockUI();
+        $("#suppressionDistrictName").select2('val', '');
+        $("#suppressionProvinceName").select2('val', '');
+        $('#suppressionClinicId').select2('val', '');
+        getSuppressionRateBarChartInfo();
+        $.unblockUI();
+    }
+
+    function resetRejectionEverything() {
+        $.blockUI();
+        $("#rejectionDistrictName").select2('val', '');
+        $("#rejectionProvinceName").select2('val', '');
+        $('#rejectionClinicId').select2('val', '');
+        getSamplesRejectedBarChartInfo();
+        $.unblockUI();
+    }
+
+    function summarize() {
+        var f = formatDate($('#mrp-lowerDate').val());
+        var t = formatDate($('#mrp-upperDate').val());
+        document.location.href = "/summary/dashboard?f=" + f + "&t=" + t
+    }
+
+    jQuery(function() {
+        var start = new Date();
+        var end = new Date(new Date().setYear(start.getFullYear()-1));
+
+        $('#dpMonthsStart').datepicker({
+            clearBtn: true,
+            autoclose: true,
+            todayHighlight: true,
+            format: 'M-yyyy',
+            viewMode: "months",
+            minViewMode: "months",
+            <?php if(isset($logincontainer->sampleTable) && $logincontainer->sampleTable == "dash_vl_request_form_current"){?>
+            startDate : end,
+            <?php }?>
+            endDate: "0m"
+        }).on('changeDate', function(e) {
+            $('#dpMonthsEnd').val('');
+			var _satrt = new Date(e.date.valueOf());
+			$('#dpMonthsEnd').datepicker('setStartDate', _satrt);
+        });
+        $('#dpMonthsEnd').datepicker({
+            clearBtn: true,
+            autoclose: true,
+            todayHighlight: true,
+            format: 'M-yyyy',
+            viewMode: "months",
+            minViewMode: "months",
+            <?php if(isset($logincontainer->sampleTable) && $logincontainer->sampleTable == "dash_vl_request_form_current"){?>
+            startDate : end,
+            <?php }?>
+            endDate: "0m"
+        })
+    });
+
+    function formatDate(date) {
+        var d = new Date(date),
+            month = '' + (d.getMonth() + 1),
+            year = d.getFullYear();
+        if (month.length < 2) month = '0' + month;
+
+        return [year, month].join('-');
+    }
+</script>

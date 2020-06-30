@@ -6,7 +6,6 @@ use Laminas\Session\Container;
 use Laminas\Db\Adapter\Adapter;
 use Laminas\Db\Sql\Sql;
 use Laminas\Db\TableGateway\AbstractTableGateway;
-use Zend\Debug\Debug;
 use Laminas\Db\Sql\Expression;
 //use Laminas\Db\Sql\Where;
 use \Application\Service\CommonService;
@@ -6901,8 +6900,6 @@ class SampleTable extends AbstractTableGateway
         //echo $queryStr;die;
         //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $sampleResult = $common->cacheQuery($queryStr, $dbAdapter);
-        //\Zend\Debug\Debug::dump($sampleResult);
-        //\Zend\Debug\Debug::dump("==========");
         //die;
         $j = 0;
         $result = array();
@@ -7232,7 +7229,7 @@ class SampleTable extends AbstractTableGateway
         $queryContainer->indicatorSummaryQuery = $samplesReceivedSummaryQuery;
         $samplesReceivedSummaryCacheQuery = $sql->getSqlStringForSqlObject($samplesReceivedSummaryQuery);
         $samplesReceivedSummaryResult = $common->cacheQuery($samplesReceivedSummaryCacheQuery, $dbAdapter);
-        //\Zend\Debug\Debug::dump($samplesReceivedSummaryResult);die;
+        //var_dump($samplesReceivedSummaryResult);die;
         $j = 0;
         foreach ($samplesReceivedSummaryResult as $row) {
             $summaryResult['sample'][$this->translator->translate('Samples Received')]['month'][$j] = (isset($row["total_samples_received"])) ? $row["total_samples_received"] : 0;
