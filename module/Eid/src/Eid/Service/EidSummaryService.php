@@ -109,6 +109,11 @@ class EidSummaryService
         return $sampleDb->fecthAllSamplesRejectedByProvince($parameters);
     }
 
+    public function getEidOutcomesDetails($params)
+    {
+        $sampleDb = $this->sm->get('EidSampleTable');
+        return $sampleDb->fetchEidOutcomesDetails($params);
+    }
     public function exportIndicatorResultExcel($params)
     {
         $queryContainer = new Container('query');

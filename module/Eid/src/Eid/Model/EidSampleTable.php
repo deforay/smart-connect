@@ -9,6 +9,8 @@ use Laminas\Db\TableGateway\AbstractTableGateway;
 use Laminas\Db\Sql\Expression;
 //use Laminas\Db\Sql\Where;
 use \Application\Service\CommonService;
+use Zend\Debug\Debug;
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -1963,6 +1965,39 @@ class EidSampleTable extends AbstractTableGateway
             $j++;
         }
         return $summaryResult;
+    }
+
+    public function fetchEidOutcomesDetails($params)
+    {
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $common = new CommonService($this->sm);
+        $eidOutcomesQuery = $sql->select()
+            ->from(array('vl' => 'dash_eid_form'))
+            ->columns(
+                array(
+                    "total_positive_samples" => new Expression("SUM(CASE WHEN ((vl.result like 'positive' OR vl.result = 'Positive' )) THEN AVG(DATEDIFF(sample_received_at_vl_lab_datetime, sample_collection_date)) ELSE 0 END)"),
+                    "total_negative_samples" => new Expression("SUM(CASE WHEN ((vl.result like 'negative' OR vl.result = 'Negative' )) THEN AVG(DATEDIFF(sample_received_at_vl_lab_datetime, sample_collection_date)) ELSE 0 END)"),
+                )
+            )
+            ->join(array('f' => 'facility_details'), 'f.facility_id = vl.facility_id')
+            ;
+
+        if (isset($params['provinces']) && trim($params['provinces']) != '') {
+            $eidOutcomesQuery = $eidOutcomesQuery->where('f.facility_state IN (' . $params['provinces'] . ')');
+        }
+        if (isset($params['districts']) && trim($params['districts']) != '') {
+            $eidOutcomesQuery = $eidOutcomesQuery->where('f.facility_district IN (' . $params['districts'] . ')');
+        }
+        if (isset($params['clinics']) && trim($params['clinics']) != '') {
+            $eidOutcomesQuery = $eidOutcomesQuery->where('vl.facility_id IN (' . $params['clinics'] . ')');
+        }
+
+        $eidOutcomesQueryStr = $sql->getSqlStringForSqlObject($eidOutcomesQuery);
+        echo $eidOutcomesQueryStr;die;
+        $result = $common->cacheQuery($eidOutcomesQueryStr, $dbAdapter);
+        Debug::dump($result);die;
+        return $result;
     }
 
 }

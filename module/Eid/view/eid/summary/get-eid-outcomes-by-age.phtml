@@ -1,0 +1,52 @@
+<script>
+    Highcharts.chart('eidOutcomesByAge', {
+
+        chart: {
+            type: 'column'
+        },
+
+        title: {
+            text: ''
+        },
+
+        xAxis: {
+            categories: ['less 2 months', '2-9 months','9-12 months', '12-24 months', 'Above 24 months']
+        },
+
+        yAxis: {
+            allowDecimals: false,
+            min: 0,
+            title: {
+                text: 'Number of fruits'
+            }
+        },
+
+        credits: {
+            enabled: false
+        },
+        
+        tooltip: {
+            formatter: function() {
+                return '<b>' + this.x + '</b><br/>' +
+                    this.series.name + ': ' + this.y + '<br/>' +
+                    'Total: ' + this.point.stackTotal;
+            }
+        },
+
+        plotOptions: {
+            column: {
+                stacking: 'normal'
+            }
+        },
+
+        series: [{
+            name: 'Positive',
+            data: [5, 3, 7, 4, 2],
+            stack: 'male'
+        }, {
+            name: 'Negative',
+            data: [3, 4, 8, 9, 6],
+            stack: 'Female'
+        }]
+    });
+</script>

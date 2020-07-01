@@ -5,6 +5,7 @@ namespace Eid\Controller;
 use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\ViewModel;
 use Laminas\Json\Json;
+use Zend\Debug\Debug;
 
 class SummaryController extends AbstractActionController
 {
@@ -195,6 +196,50 @@ class SummaryController extends AbstractActionController
       $viewModel = new ViewModel();
       $viewModel->setVariables(array(
         'keySummaryIndicators' => $keySummaryIndicatorsResult,
+      ))->setTerminal(true);
+      return $viewModel;
+    }
+  }
+  
+  public function getEidOutcomesAction()
+  {
+    $request = $this->getRequest();
+    if ($request->isPost()) {
+      $params = $request->getPost();
+      $result = $this->summaryService->getEidOutcomesDetails($params);
+      $viewModel = new ViewModel();
+      $viewModel->setVariables(array(
+        'result' => $result,
+      ))->setTerminal(true);
+      return $viewModel;
+    }
+  }
+  
+  public function getEidOutcomesByAgeAction()
+  {
+    $request = $this->getRequest();
+    if ($request->isPost()) {
+      $params = $request->getPost();
+      /* $summaryService = $this->getServiceLocator()->get('SummaryService');
+      $result = $summaryService->getEidOutcomesDetails($params); */
+      $viewModel = new ViewModel();
+      $viewModel->setVariables(array(
+        'result' => '',
+      ))->setTerminal(true);
+      return $viewModel;
+    }
+  }
+  
+  public function getEidOutcomesByProvinceAction()
+  {
+    $request = $this->getRequest();
+    if ($request->isPost()) {
+      $params = $request->getPost();
+      /* $summaryService = $this->getServiceLocator()->get('SummaryService');
+      $result = $summaryService->getEidOutcomesDetails($params); */
+      $viewModel = new ViewModel();
+      $viewModel->setVariables(array(
+        'result' => '',
       ))->setTerminal(true);
       return $viewModel;
     }
