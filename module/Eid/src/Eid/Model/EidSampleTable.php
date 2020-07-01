@@ -58,7 +58,8 @@ class EidSampleTable extends AbstractTableGateway
                 "total_samples_received" => new Expression("COUNT(*)"),
                 "total_samples_tested" => new Expression("(SUM(CASE WHEN (((vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL'))) THEN 1 ELSE 0 END))"),
                 "positive_samples" => new Expression("SUM(CASE WHEN ((vl.result like 'positive' OR vl.result like 'Positive' )) THEN 1 ELSE 0 END)"),
-                "rejected_samples" => new Expression("SUM(CASE WHEN (vl.reason_for_sample_rejection !='' AND vl.reason_for_sample_rejection !='0' AND vl.reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END)")
+                "rejected_samples" => new Expression("SUM(CASE WHEN (vl.reason_for_sample_rejection !='' AND vl.reason_for_sample_rejection !='0' AND vl.reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END)"),
+                "tat" => new Expression("AVG((DATEDIFF(result_printed_datetime,sample_collection_date)))")
             ));
 
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {

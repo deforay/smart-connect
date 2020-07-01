@@ -39,7 +39,9 @@ if (isset($summaryTabInfo[0]["positive_samples"]) && $summaryTabInfo[0]["positiv
     $positiveSampleTotal = $summaryTabInfo[0]["positive_samples"];
 }
 $positiveSamplepercentage = ($positiveSampleTotal > 0 && $totalSampleTested > 0) ? round((($positiveSampleTotal / $totalSampleTested) * 100), 2) : 0;
+
 $rejectionPercentage = ($summaryTabInfo[0]["total_samples_received"] > 0 && $rejectedSamples > 0) ? round((($rejectedSamples / $summaryTabInfo[0]["total_samples_received"]) * 100), 2) : 0;
+$tat = ceil($summaryTabInfo[0]["tat"]);
 
 ?>
 <link rel="stylesheet" href="<?php echo $this->basePath('assets/plugins/datepicker/datepicker3.css') ?>">
@@ -222,6 +224,12 @@ $rejectionPercentage = ($summaryTabInfo[0]["total_samples_received"] > 0 && $rej
                 <?php echo $this->translate('Rejection Rate'); ?>
             </a>
         </li>
+        <li role="presentation">
+            <a href="#tatTab" aria-controls="messages" onclick="getTat();" role="tab" data-toggle="tab">
+                <h3 class="tabPercentageVal"><?php echo $tat . " Days"; ?></h3>
+                <?php echo $this->translate('Turnaround Time'); ?>
+            </a>
+        </li>
     </ul>
     <div class="tab-content">
         <div role="tabpanel" class="tab-pane fade in active" id="samplesReceivedTab">
@@ -264,7 +272,7 @@ $rejectionPercentage = ($summaryTabInfo[0]["total_samples_received"] > 0 && $rej
                     </div>
                     <div class="col-lg-2">
                         <select style="width:100%" class="form-control" id="sampleResgisteredEidTestType" name="sampleResgisteredEidTestType" title="<?php echo $this->translate('Please select test type'); ?>">
-                        
+
                             <option value=""></option>
                             <option value="initialPcr">Initial PCR</option>
                             <option value="secondThirdPcr">2nd/3rd PCR</option>
@@ -675,70 +683,17 @@ $rejectionPercentage = ($summaryTabInfo[0]["total_samples_received"] > 0 && $rej
                 </div>
             </div>
         </div>
-
-
-        <br>
-        <div class="row" id="summaryOfKeyIndicatorsDiv">
-            <div class="col-md-12 col-sm-12">
-                <div class="portlet box">
+        <div role="tabpanel" class="tab-pane fade" id="tatTab">
+            <div class="row">
+                <div class="col-md-12 col-sm-12">
                     <div class="portlet box blue">
                         <div class="portlet-title">
-                            <div class="caption" id="blockTitle">
-                                <i class="fa fa-cogs"></i><?php echo $this->translate('SUMMARY OF KEY INDICATORS'); ?>
-                            </div>
-                            <div class="actions" style="width:<?php echo (isset($languagecontainer->locale) &&  $languagecontainer->locale == 'pt_BR') ? '36%' : '44%'; ?>;">
-                                <div class="tools" id="exportHighVlSample" style="float:right;text-align:right;">
-                                    <button class="btn btn-default" onclick="exportSummaryIndicatorResult();"><span><i class="fa fa-file-excel-o" aria-hidden="true"></i> <?php echo $this->translate('Export Excel'); ?></span></button>
-                                </div>&nbsp;&nbsp;
+                            <div class="caption">
+                                <span class="caption-subject"><?php echo $this->translate('Turnaround Time'); ?></span>
                             </div>
                         </div>
-                        <div class="portlet-body">
-                            <div class="row">
-                                <div class="col-md-3">
-                                    <select style="width:100%" name="indProvinceName[]" id="indProvinceName" multiple class="form-control" title="<?php echo $this->translate('Please select one or more province. Leave blank for All'); ?>">
-                                        <?php
-                                        foreach ($provinceName as $province) {
-                                        ?>
-                                            <option value="<?php echo $province['location_id']; ?>"><?php echo $province['location_name']; ?></option>
-                                        <?php
-                                        }
-                                        ?>
-                                    </select>
-                                </div>
-                                <div class="col-md-3">
-                                    <select style="width:100%" name="indDistrictName[]" id="indDistrictName" multiple class="form-control" title="<?php echo $this->translate('Please select one or more district. Leave blank for All'); ?>">
-                                        <?php
-                                        foreach ($districtName as $district) {
-                                        ?>
-                                            <option data-parent-location="<?php echo $district['parent_location']; ?>" value="<?php echo $district['location_id']; ?>"><?php echo $district['location_name']; ?></option>
-                                        <?php
-                                        }
-                                        ?>
-                                        <option value="0">Empty</option>
-                                    </select>
-                                </div>
-                                <div class="col-lg-4">
-                                    <select style="width:100%" class="form-control" id="indClinicId" name="indClinicId[]" multiple title="<?php echo $this->translate('Please select one or more clinics. Leave blank for All'); ?>">
-                                        <?php
-                                        foreach ($clinicName as $clinic) {
-                                        ?>
-                                            <option value="<?php echo $clinic['facility_id']; ?>" data-district="<?php echo $clinic['facility_district']; ?>"><?php echo $clinic['facility_code'] . " - " . $clinic['facility_name']; ?></option>
-                                        <?php
-                                        }
-                                        ?>
-                                    </select>
-                                </div>
-                                <div class="col-lg-2">
-                                    <div class="form-group" style="">
-                                        <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="getSummaryIndicators();"><?php echo $this->translate('Search'); ?></a>
-                                        <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="resetIndicators();"><?php echo $this->translate('Reset'); ?></a>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="table-toolbar" id="keyIndicatorsSummary" style="overflow-x:scroll;">
-
-                            </div>
+                        <div class="portlet-body" id="turnaroundTimeChartBody">
+                            <div id="turnaroundTimeChart" style="height:300px;"></div>
                         </div>
                     </div>
                 </div>
@@ -746,19 +701,132 @@ $rejectionPercentage = ($summaryTabInfo[0]["total_samples_received"] > 0 && $rej
         </div>
     </div>
 </div>
+
+<br>
+<div class="row" id="summaryOfKeyIndicatorsDiv">
+    <div class="col-md-12 col-sm-12">
+        <div class="portlet box">
+            <div class="portlet box blue">
+                <div class="portlet-title">
+                    <div class="caption" id="blockTitle">
+                        <i class="fa fa-cogs"></i><?php echo $this->translate('SUMMARY OF KEY INDICATORS'); ?>
+                    </div>
+                    <div class="actions" style="width:<?php echo (isset($languagecontainer->locale) &&  $languagecontainer->locale == 'pt_BR') ? '36%' : '44%'; ?>;">
+                        <div class="tools" id="exportHighVlSample" style="float:right;text-align:right;">
+                            <button class="btn btn-default" onclick="exportSummaryIndicatorResult();"><span><i class="fa fa-file-excel-o" aria-hidden="true"></i> <?php echo $this->translate('Export Excel'); ?></span></button>
+                        </div>&nbsp;&nbsp;
+                    </div>
+                </div>
+                <div class="portlet-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <select style="width:100%" name="indProvinceName[]" id="indProvinceName" multiple class="form-control" title="<?php echo $this->translate('Please select one or more province. Leave blank for All'); ?>">
+                                <?php
+                                foreach ($provinceName as $province) {
+                                ?>
+                                    <option value="<?php echo $province['location_id']; ?>"><?php echo $province['location_name']; ?></option>
+                                <?php
+                                }
+                                ?>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <select style="width:100%" name="indDistrictName[]" id="indDistrictName" multiple class="form-control" title="<?php echo $this->translate('Please select one or more district. Leave blank for All'); ?>">
+                                <?php
+                                foreach ($districtName as $district) {
+                                ?>
+                                    <option data-parent-location="<?php echo $district['parent_location']; ?>" value="<?php echo $district['location_id']; ?>"><?php echo $district['location_name']; ?></option>
+                                <?php
+                                }
+                                ?>
+                                <option value="0">Empty</option>
+                            </select>
+                        </div>
+                        <div class="col-lg-4">
+                            <select style="width:100%" class="form-control" id="indClinicId" name="indClinicId[]" multiple title="<?php echo $this->translate('Please select one or more clinics. Leave blank for All'); ?>">
+                                <?php
+                                foreach ($clinicName as $clinic) {
+                                ?>
+                                    <option value="<?php echo $clinic['facility_id']; ?>" data-district="<?php echo $clinic['facility_district']; ?>"><?php echo $clinic['facility_code'] . " - " . $clinic['facility_name']; ?></option>
+                                <?php
+                                }
+                                ?>
+                            </select>
+                        </div>
+                        <div class="col-lg-2">
+                            <div class="form-group" style="">
+                                <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="getSummaryIndicators();"><?php echo $this->translate('Search'); ?></a>
+                                <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="resetIndicators();"><?php echo $this->translate('Reset'); ?></a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-toolbar" id="keyIndicatorsSummary" style="overflow-x:scroll;">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="row">
+    <div class="col-md-6 col-sm-6">
+        <div class="portlet box blue">
+            <div class="portlet-title">
+                <div class="caption">
+                    <span class="caption-subject"><?php echo $this->translate('EID Outcomes'); ?></span>
+                </div>
+            </div>
+            <div class="portlet-body" id="eidOutcomesBody">
+                <div id="eidOutcomes" style="height:400px;"></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-sm-6">
+        <div class="portlet box blue">
+            <div class="portlet-title">
+                <div class="caption">
+                    <span class="caption-subject"><?php echo $this->translate('EID Outcomes by Age'); ?></span>
+                </div>
+            </div>
+            <div class="portlet-body" id="eidOutcomesByAgeBody">
+                <div id="eidOutcomesByAge" style="height:400px;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12 col-sm-12">
+        <div class="portlet box blue">
+            <div class="portlet-title">
+                <div class="caption">
+                    <span class="caption-subject"><?php echo $this->translate('EID Outcomes - By Province'); ?></span>
+                </div>
+            </div>
+            <div class="portlet-body" id="eidOutcomesProvinceBody">
+                <div id="eidOutcomesProvince" style="height:300px;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</div>
 <script src="<?php echo $this->basePath('assets/plugins/datepicker/bootstrap-datepicker.js') ?>"></script>
 <script src="<?php echo $this->basePath('assets/pages/scripts/dashboard.js'); ?>" type="text/javascript"></script>
 <script type="text/javascript">
     var oTableSamplesReceivedDistrict = null;
     var oTableSamplesReceivedFacility = null;
     var oTableSamplesReceivedProvince = null;
+
     var oTablePositiveRateDistrict = null;
     var oTablePositiveRateFacility = null;
     var oTablePositiveRateProvince = null;
+
     var oTableSamplesRejectedDistrict = null;
     var oTableSamplesRejectedFacility = null;
     var oTableSamplesRejectedProvince = null;
-    var otableRegimenGroups = null;
 
 
     function getSamplesRegisteredTab() {
@@ -768,7 +836,6 @@ $rejectionPercentage = ($summaryTabInfo[0]["total_samples_received"] > 0 && $rej
         })).ajaxStop($.unblockUI);
         getSamplesReceivedBarChartInfo();
         facilityWiseSamplesReceivedSummaryFn();
-
 
     }
 
