@@ -93,12 +93,16 @@ use Zend\Debug\Debug;
                     color: 'rgba(255,0,0,0.5)'
                 }, {
                     from: 40,
-                    to: 80,
+                    to: 70,
                     color: 'rgba(255,255,0,0.5)'
+                }, {
+                    from: 70,
+                    to: 80,
+                    color: 'rgba(0,255,0,0.5)'
                 }, {
                     from: 80,
                     to: 100,
-                    color: 'rgba(0,255,0,0.5)'
+                    color: 'rgba(0,0,0,0.5)'
                 }]
             },
             legend: {
@@ -107,9 +111,9 @@ use Zend\Debug\Debug;
 
             series: [
                 {
-                    name:'Sec1',
+                    name:'Collection Receipt (C-R)',
                     data: [<?php echo $result['sec1'];?>],
-                    color: '#000000',
+                    color: '#F64747',
                     dataLabels: {
                         enabled: true,
                         align: 'center',
@@ -118,9 +122,9 @@ use Zend\Debug\Debug;
                     }
                 },
                 {
-                    name:'Sec2',
+                    name:'Processing Dispatch (P-D)',
                     data: [<?php echo $result['sec2'];?>],
-                    color: '#000000',
+                    color: '#F9BF3B',
                     dataLabels: {
                         enabled: true,
                         align: 'center',
@@ -129,9 +133,9 @@ use Zend\Debug\Debug;
                     }
                 },
                 {
-                    name:'Sec3',
+                    name:'Receipt to Processing (R-P)',
                     data: [<?php echo $result['sec3'];?>],
-                    color: '#000000',
+                    color: '#26C281',
                     dataLabels: {
                         enabled: true,
                         align: 'center',
