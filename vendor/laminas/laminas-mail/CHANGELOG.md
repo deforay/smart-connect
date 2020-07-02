@@ -2,6 +2,52 @@
 
 All notable changes to this project will be documented in this file, in reverse chronological order by release.
 
+## 2.11.0 - 2020-06-30
+
+### Added
+
+- [#31](https://github.com/laminas/laminas-mail/pull/31) adds the class `Laminas\Main\Header\ContentDisposition`, which implements `Laminas\Mail\Header\UnstructuredInterface`, and which provides propery encoding and escaping for `Content-Disposition` mail headers.
+
+### Changed
+
+- Nothing.
+
+### Deprecated
+
+- Nothing.
+
+### Removed
+
+- Nothing.
+
+### Fixed
+
+- [#31](https://github.com/laminas/laminas-mail/pull/31) provides a fix to ensure that the `Content-Disposition` header is properly encoded.
+
+## 2.10.2 - 2020-06-30
+
+### Added
+
+- Nothing.
+
+### Changed
+
+- Nothing.
+
+### Deprecated
+
+- Nothing.
+
+### Removed
+
+- Nothing.
+
+### Fixed
+
+- [#89](https://github.com/laminas/laminas-mail/pull/89) corrects two parameter typehints within the Storage subcomponent to correctly detail what they allow.
+
+- [#93](https://github.com/laminas/laminas-mail/pull/93) fixes an issue whereby an address containing a `;` character was not getting quoted, causing it to be interpreted as an address separator instead of part of the address.
+
 ## 2.10.1 - 2020-04-21
 
 ### Added
