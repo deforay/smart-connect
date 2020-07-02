@@ -2,6 +2,96 @@
 
 All notable changes to this project will be documented in this file, in reverse chronological order by release.
 
+## 2.10.3 - 2020-03-29
+
+### Added
+
+- Nothing.
+
+### Changed
+
+- Nothing.
+
+### Deprecated
+
+- Nothing.
+
+### Removed
+
+- Nothing.
+
+### Fixed
+
+- Fixed `replace` version constraint in composer.json so repository can be used as replacement of `zendframework/zend-i18n:^2.10.1`.
+
+## 2.10.2 - 2020-03-20
+
+### Added
+
+- Nothing.
+
+### Changed
+
+- Nothing.
+
+### Deprecated
+
+- Nothing.
+
+### Removed
+
+- Nothing.
+
+### Fixed
+
+- [#29](https://github.com/laminas/laminas-i18n/pull/29) fixes typehint in `DateFormat` view helper.
+
+## 2.10.1 - 2019-12-12
+
+### Added
+
+- [zendframework/zend-i18n#130](https://github.com/zendframework/zend-i18n/pull/130) adds support for PHP 7.4.
+
+### Changed
+
+- Nothing.
+
+### Deprecated
+
+- Nothing.
+
+### Removed
+
+- Nothing.
+
+### Fixed
+
+- [zendframework/zend-i18n#129](https://github.com/zendframework/zend-i18n/pull/129) fixes Hungarian PhoneNumber validator (mobile numbers starting from 50).
+
+## 2.10.0 - 2019-11-18
+
+### Added
+
+- [zendframework/zend-i18n#102](https://github.com/zendframework/zend-i18n/pull/102) adds `Laminas\I18n\View\HelperTrait`, which provides annotations describing the various helpers laminas-i18n provides to a laminas-view renderer. The trait can be used in combination with `Laminas\View\Renderer\PhpRenderer` in annotations on the `$this` variable within view scripts to provide IDE autocompletion for helper-provided methods.
+
+### Changed
+
+- [zendframework/zend-i18n#110](https://github.com/zendframework/zend-i18n/pull/110) modifies how `translatePlural()` works when a msgid is present, but no translations are present. It now properly returns the source-code if unable to translate the message, instead of returning an empty string (which is the behavior under `translate()` as well).
+
+- [zendframework/zend-i18n#126](https://github.com/zendframework/zend-i18n/pull/126) modifies the package definition to put an explicit requirement on ext-intl, as it is required for the majority of functionality. Users have indicated multiple times confusion about why the component does not work after installation, when attempting to use intl functionality; requiring the extension resolves that issue.
+
+### Deprecated
+
+- Nothing.
+
+### Removed
+
+- Nothing.
+
+### Fixed
+
+- Nothing.
+
 ## 2.9.2 - 2019-09-30
 
 ### Added

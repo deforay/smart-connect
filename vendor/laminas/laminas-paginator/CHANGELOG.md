@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file, in reverse chronological order by release.
 
+## 2.8.3 - 2020-06-22
+
+### Added
+
+- Nothing.
+
+### Changed
+
+- Nothing.
+
+### Deprecated
+
+- Nothing.
+
+### Removed
+
+- Nothing.
+
+### Fixed
+
+- [#6](https://github.com/laminas/laminas-paginator/pull/6) fixes an issue that occurs when generating a cache identifier for a `DbSelect` adapter. Previously, it was done such that the cache identifier was always unique or never unique, which would lead to unexpected behavior.
+
 ## 2.8.2 - 2019-08-21
 
 ### Added
