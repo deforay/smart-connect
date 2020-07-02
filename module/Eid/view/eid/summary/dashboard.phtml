@@ -770,7 +770,20 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
     </div>
 </div>
 
-
+<div class="row">
+    <div class="col-md-12 col-sm-12">
+        <div class="portlet box blue">
+            <div class="portlet-title">
+                <div class="caption">
+                    <span class="caption-subject"><?php echo $this->translate('National TAT(Days)'); ?></span>
+                </div>
+            </div>
+            <div class="portlet-body" id="nationalTATBody">
+                <div id="nationalTAT" style="height:100px;"></div>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="row">
     <div class="col-md-6 col-sm-6">
         <div class="portlet box blue">
@@ -832,6 +845,7 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
     geteidOutcomes();
     geteidOutcomesByAge();
     geteidOutcomesByProvince();
+    nationalTAT();
 
     function getSamplesRegisteredTab() {
 
@@ -1623,14 +1637,14 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
         var indDistrictIdList = ($("#indDistrictName").val() == null) ? '' : $("#indDistrictName").val().join(',');
         var indProvinceIdList = ($("#indProvinceName").val() == null) ? '' : $("#indProvinceName").val().join(',');
         var indClinicIdList = ($("#indClinicId").val() == null) ? '' : $('#indClinicId').val().join(',');
-        // var fromDate = formatDate($('#mrp-lowerDate').val());
-        // var toDate = formatDate($('#mrp-upperDate').val());
+        var fromDate = formatDate($('#mrp-lowerDate').val());
+        var toDate = formatDate($('#mrp-upperDate').val());
         $.post("<?php echo $this->url('eid-summary', array('action' => 'get-eid-outcomes')); ?>", {
                 districts: indDistrictIdList,
                 provinces: indProvinceIdList,
                 clinics: indClinicIdList,
-                // fromDate: fromDate,
-                // toDate: toDate
+                fromDate: fromDate,
+                toDate: toDate
             },
             function(data) {
                 $("#eidOutcomes").html(data);
@@ -1645,14 +1659,14 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
         var indDistrictIdList = ($("#indDistrictName").val() == null) ? '' : $("#indDistrictName").val().join(',');
         var indProvinceIdList = ($("#indProvinceName").val() == null) ? '' : $("#indProvinceName").val().join(',');
         var indClinicIdList = ($("#indClinicId").val() == null) ? '' : $('#indClinicId').val().join(',');
-        // var fromDate = formatDate($('#mrp-lowerDate').val());
-        // var toDate = formatDate($('#mrp-upperDate').val());
+        var fromDate = formatDate($('#mrp-lowerDate').val());
+        var toDate = formatDate($('#mrp-upperDate').val());
         $.post("<?php echo $this->url('eid-summary', array('action' => 'get-eid-outcomes-by-age')); ?>", {
                 districts: indDistrictIdList,
                 provinces: indProvinceIdList,
                 clinics: indClinicIdList,
-                // fromDate: fromDate,
-                // toDate: toDate
+                fromDate: fromDate,
+                toDate: toDate
             },
             function(data) {
                 $("#eidOutcomesByAge").html(data);
@@ -1667,17 +1681,39 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
         var indDistrictIdList = ($("#indDistrictName").val() == null) ? '' : $("#indDistrictName").val().join(',');
         var indProvinceIdList = ($("#indProvinceName").val() == null) ? '' : $("#indProvinceName").val().join(',');
         var indClinicIdList = ($("#indClinicId").val() == null) ? '' : $('#indClinicId').val().join(',');
-        // var fromDate = formatDate($('#mrp-lowerDate').val());
-        // var toDate = formatDate($('#mrp-upperDate').val());
+        var fromDate = formatDate($('#mrp-lowerDate').val());
+        var toDate = formatDate($('#mrp-upperDate').val());
         $.post("<?php echo $this->url('eid-summary', array('action' => 'get-eid-outcomes-by-province')); ?>", {
                 districts: indDistrictIdList,
                 provinces: indProvinceIdList,
                 clinics: indClinicIdList,
-                // fromDate: fromDate,
-                // toDate: toDate
+                fromDate: fromDate,
+                toDate: toDate
             },
             function(data) {
                 $("#eidOutcomesProvince").html(data);
+                $.unblockUI();
+            });
+    }
+    
+    function nationalTAT() {
+        $(document).ajaxStart($.blockUI({
+            message: '<h4> <?php echo ($this->translate('Processing EID Outcomes By Province')); ?> ... </h4>'
+        })).ajaxStop($.unblockUI);
+        var indDistrictIdList = ($("#indDistrictName").val() == null) ? '' : $("#indDistrictName").val().join(',');
+        var indProvinceIdList = ($("#indProvinceName").val() == null) ? '' : $("#indProvinceName").val().join(',');
+        var indClinicIdList = ($("#indClinicId").val() == null) ? '' : $('#indClinicId').val().join(',');
+        var fromDate = formatDate($('#mrp-lowerDate').val());
+        var toDate = formatDate($('#mrp-upperDate').val());
+        $.post("<?php echo $this->url('eid-summary', array('action' => 'get-tat')); ?>", {
+                districts: indDistrictIdList,
+                provinces: indProvinceIdList,
+                clinics: indClinicIdList,
+                fromDate: fromDate,
+                toDate: toDate
+            },
+            function(data) {
+                $("#nationalTAT").html(data);
                 $.unblockUI();
             });
     }

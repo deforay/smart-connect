@@ -1993,6 +1993,14 @@ class EidSampleTable extends AbstractTableGateway
         if (isset($params['clinics']) && trim($params['clinics']) != '') {
             $eidOutcomesQuery = $eidOutcomesQuery->where('vl.facility_id IN (' . $params['clinics'] . ')');
         }
+        if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
+            $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
+            $endMonth = str_replace(' ', '-', $params['toDate']) . "-31";
+            $eidOutcomesQuery = $eidOutcomesQuery
+                ->where("(sample_collection_date is not null)
+                                        AND DATE(sample_collection_date) >= '" . $startMonth . "' 
+                                        AND DATE(sample_collection_date) <= '" . $endMonth . "'");
+        }
 
         $eidOutcomesQueryStr = $sql->getSqlStringForSqlObject($eidOutcomesQuery);
         $result = $common->cacheQuery($eidOutcomesQueryStr, $dbAdapter);
@@ -2045,6 +2053,14 @@ class EidSampleTable extends AbstractTableGateway
         if (isset($params['clinics']) && trim($params['clinics']) != '') {
             $eidOutcomesQuery = $eidOutcomesQuery->where('vl.facility_id IN (' . $params['clinics'] . ')');
         }
+        if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
+            $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
+            $endMonth = str_replace(' ', '-', $params['toDate']) . "-31";
+            $eidOutcomesQuery = $eidOutcomesQuery
+                ->where("(sample_collection_date is not null)
+                                        AND DATE(sample_collection_date) >= '" . $startMonth . "' 
+                                        AND DATE(sample_collection_date) <= '" . $endMonth . "'");
+        }
 
         $eidOutcomesQueryStr = $sql->getSqlStringForSqlObject($eidOutcomesQuery);
         $result = $common->cacheQuery($eidOutcomesQueryStr, $dbAdapter);
@@ -2085,4 +2101,43 @@ class EidSampleTable extends AbstractTableGateway
         return $result;
     }
 
+    public function fetchTATDetails($params)
+    {
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $common = new CommonService($this->sm);
+        $eidOutcomesQuery = $sql->select()
+            ->from(array('vl' => 'dash_eid_form'))
+            ->columns(
+                array(
+                    'sec1' => new Expression("AVG(DATEDIFF(sample_received_at_vl_lab_datetime, sample_collection_date))"),
+                    'sec2' => new Expression("AVG(DATEDIFF(sample_tested_datetime, sample_received_at_vl_lab_datetime))"),
+                    'sec3' => new Expression("AVG(DATEDIFF(result_printed_datetime, sample_tested_datetime))"),
+                )
+            )
+            ->join(array('f' => 'facility_details'), 'f.facility_id = vl.facility_id',array())
+            ;
+
+        if (isset($params['provinces']) && trim($params['provinces']) != '') {
+            $eidOutcomesQuery = $eidOutcomesQuery->where('f.facility_state IN (' . $params['provinces'] . ')');
+        }
+        if (isset($params['districts']) && trim($params['districts']) != '') {
+            $eidOutcomesQuery = $eidOutcomesQuery->where('f.facility_district IN (' . $params['districts'] . ')');
+        }
+        if (isset($params['clinics']) && trim($params['clinics']) != '') {
+            $eidOutcomesQuery = $eidOutcomesQuery->where('vl.facility_id IN (' . $params['clinics'] . ')');
+        }
+        if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
+            $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
+            $endMonth = str_replace(' ', '-', $params['toDate']) . "-31";
+            $eidOutcomesQuery = $eidOutcomesQuery
+                ->where("(sample_collection_date is not null)
+                                        AND DATE(sample_collection_date) >= '" . $startMonth . "' 
+                                        AND DATE(sample_collection_date) <= '" . $endMonth . "'");
+        }
+
+        $eidOutcomesQueryStr = $sql->getSqlStringForSqlObject($eidOutcomesQuery);
+        $result = $common->cacheQuery($eidOutcomesQueryStr, $dbAdapter);
+        return $result[0];
+    }
 }

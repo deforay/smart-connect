@@ -243,6 +243,20 @@ class SummaryController extends AbstractActionController
       return $viewModel;
     }
   }
+  
+  public function getTatAction()
+  {
+    $request = $this->getRequest();
+    if ($request->isPost()) {
+      $params = $request->getPost();
+      $result = $this->summaryService->getTATDetails($params);
+      $viewModel = new ViewModel();
+      $viewModel->setVariables(array(
+        'result' => $result,
+      ))->setTerminal(true);
+      return $viewModel;
+    }
+  }
 
   public function exportIndicatorResultExcelAction()
   {

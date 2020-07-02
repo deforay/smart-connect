@@ -120,6 +120,12 @@ class EidSummaryService
         $eidSampleDb = $this->sm->get('EidSampleTableWithoutCache');
         return $eidSampleDb->fetchEidOutcomesByAgeDetails($params);
     }
+   
+    public function getTATDetails($params)
+    {
+        $eidSampleDb = $this->sm->get('EidSampleTableWithoutCache');
+        return $eidSampleDb->fetchTATDetails($params);
+    }
     
     public function getEidOutcomesByProvinceDetails($params)
     {
