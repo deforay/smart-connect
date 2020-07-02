@@ -166,21 +166,26 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
     }
     .cr{
         background-color: rgba(255,0,0,0.5);
+        margin: 10px;
     }
     .rp{
         background-color: rgba(255,255,0,0.5);
+        margin: 28px 10px;
     }
     .pd{
         background-color: rgba(0,255,0,0.5);
+        margin: 10px;
     }
     .cd{
-        background-color: rgba(0,0,0,0.5);
-        color: white;
+        background-color: rgb(230, 235, 245);
+        margin: 10px;
     }
-    .title-name{
-        font-size: larger;
-        text-align: center;
-        width: 60px;
+    .cd-top {
+        width: 0px;
+        height: 0px;
+        border-left: 8px solid transparent;
+        border-right: 8px solid transparent;
+        border-top: 8px solid black;
         margin: auto;
     }
 </style>
@@ -805,13 +810,13 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
                                 <div id="nationalTAT" style="height:100px;"></div>
                             </div>
                             <div class="col-md-6">
-                                <div class="title-name">Key</div><br>
                                 <div class="col-md-6">
                                     <div class="key cr"><center>Collection Receipt (C-R)</center></div>
                                     <div class="key rp"><center>Receipt to Processing (R-P)</center></div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="key pd"><center>Processing Dispatch (P-D)</center></div>
+                                    <div class="cd-top"></div>
                                     <div class="key cd"><center><div class="cd"></div>Collection Dispatch (C-D)</center></div>
                                 </div>
                             </div>

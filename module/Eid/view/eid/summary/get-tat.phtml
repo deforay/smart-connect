@@ -89,20 +89,20 @@ use Zend\Debug\Debug;
                 },
                 plotBands: [{
                     from: 0,
-                    to: 40,
+                    to: <?php echo $result['sec1'];?>,
                     color: 'rgba(255,0,0,0.5)'
                 }, {
-                    from: 40,
-                    to: 70,
+                    from: <?php echo $result['sec1'];?>,
+                    to: <?php echo $result['sec1']+$result['sec2'];?>,
                     color: 'rgba(255,255,0,0.5)'
                 }, {
-                    from: 70,
-                    to: 80,
+                    from: <?php echo $result['sec1']+$result['sec2'];?>,
+                    to: <?php echo $result['sec1']+$result['sec2']+$result['sec3'];?>,
                     color: 'rgba(0,255,0,0.5)'
                 }, {
-                    from: 80,
-                    to: 100,
-                    color: 'rgba(0,0,0,0.5)'
+                    from: <?php echo $result['sec1']+$result['sec2']+$result['sec3'];?>,
+                    to: <?php $final = $result['sec1']+$result['sec2']+$result['sec3']; $final += $final /100; echo $final;?>,
+                    // color: 'rgba(0,0,0,0.5)'
                 }]
             },
             legend: {
@@ -111,6 +111,17 @@ use Zend\Debug\Debug;
 
             series: [
                 {
+                    name:'Collection Dispatch (C-D)',
+                    data: [<?php echo number_format(($result['sec1'] + $result['sec2'] + $result['sec3']),2);?>],
+                    color: 'black',
+                    dataLabels: {
+                        enabled: true,
+                        align: 'center',
+                        format: '{point.y}',
+                        y: 10
+                    }
+                },
+                /* {
                     name:'Collection Receipt (C-R)',
                     data: [<?php echo $result['sec1'];?>],
                     color: '#F64747',
@@ -142,7 +153,7 @@ use Zend\Debug\Debug;
                         format: '{point.y}',
                         y: 10
                     }
-                }
+                } */
             ]
 
         });
