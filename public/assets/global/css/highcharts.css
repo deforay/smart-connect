@@ -211,7 +211,7 @@ g.highcharts-series,
 
 /* Series options */
 /* Default colors */
-.highcharts-color-0 {
+/* .highcharts-color-0 {
   fill: #7cb5ec;
   stroke: #7cb5ec;
 }
@@ -219,7 +219,7 @@ g.highcharts-series,
 .highcharts-color-1 {
   fill: #434348;
   stroke: #434348;
-}
+} */
 
 .highcharts-color-2 {
   fill: #90ed7d;

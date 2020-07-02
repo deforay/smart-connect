@@ -2,28 +2,10 @@
 
 use Zend\Debug\Debug;
 
-Debug::dump($result);die;
+// Debug::dump($result);die;
 ?>
 <script>
-    // Radialize the colors
-    Highcharts.setOptions({
-        colors: Highcharts.map(Highcharts.getOptions().colors, function(color) {
-            return {
-                radialGradient: {
-                    cx: 0.5,
-                    cy: 0.3,
-                    r: 0.7
-                },
-                stops: [
-                    [0, color],
-                    [1, Highcharts.color(color).brighten(-0.3).get('rgb')] // darken
-                ]
-            };
-        })
-    });
-
-    // Build the chart
-    Highcharts.chart('eidOutcomes', {
+    $('#eidOutcomes').highcharts({
         chart: {
             plotBackgroundColor: null,
             plotBorderWidth: null,
@@ -33,16 +15,11 @@ Debug::dump($result);die;
         title: {
             text: ''
         },
-        tooltip: {
-            pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
-        },
-        accessibility: {
-            point: {
-                valueSuffix: '%'
-            }
-        },
         credits: {
             enabled: false
+        },
+        tooltip: {
+            pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
         },
         plotOptions: {
             pie: {
@@ -51,21 +28,28 @@ Debug::dump($result);die;
                 dataLabels: {
                     enabled: true,
                     format: '<b>{point.name}</b>: {point.percentage:.1f} %',
-                    connectorColor: 'silver'
-                }
+                    style: {
+                        color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                    }
+                },
+                showInLegend: true
             }
         },
         series: [{
-            name: 'Share',
-            data: [{
-                    name: 'Positive',
-                    y: 61.41
-                },
-                {
-                    name: 'Negative',
-                    y: 11.84
-                }
-            ]
+            "name": "Tests",
+            "colorByPoint": true,
+            "data": [{
+                "name": "Positive",
+                "y": <?php echo (($result['total_positive_samples'] / $result['total_samples']) * 100); ?>,
+                "sliced": true,
+                "selected": true,
+                "color": "red"
+            }, {
+                "name": "Negative",
+                "y": <?php echo (($result['total_negative_samples'] / $result['total_samples']) * 100); ?>,
+                "color": "green"
+            }]
         }]
+
     });
 </script>

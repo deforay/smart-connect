@@ -207,6 +207,7 @@ class SummaryController extends AbstractActionController
     if ($request->isPost()) {
       $params = $request->getPost();
       $result = $this->summaryService->getEidOutcomesDetails($params);
+      // Debug::dump($result);die;
       $viewModel = new ViewModel();
       $viewModel->setVariables(array(
         'result' => $result,
@@ -220,11 +221,10 @@ class SummaryController extends AbstractActionController
     $request = $this->getRequest();
     if ($request->isPost()) {
       $params = $request->getPost();
-      /* $summaryService = $this->getServiceLocator()->get('SummaryService');
-      $result = $summaryService->getEidOutcomesDetails($params); */
+      $result = $this->summaryService->getEidOutcomesByAgeDetails($params);
       $viewModel = new ViewModel();
       $viewModel->setVariables(array(
-        'result' => '',
+        'result' => $result,
       ))->setTerminal(true);
       return $viewModel;
     }
@@ -235,11 +235,10 @@ class SummaryController extends AbstractActionController
     $request = $this->getRequest();
     if ($request->isPost()) {
       $params = $request->getPost();
-      /* $summaryService = $this->getServiceLocator()->get('SummaryService');
-      $result = $summaryService->getEidOutcomesDetails($params); */
+      $result = $this->summaryService->getEidOutcomesByProvinceDetails($params);
       $viewModel = new ViewModel();
       $viewModel->setVariables(array(
-        'result' => '',
+        'result' => $result,
       ))->setTerminal(true);
       return $viewModel;
     }

@@ -111,9 +111,22 @@ class EidSummaryService
 
     public function getEidOutcomesDetails($params)
     {
-        $sampleDb = $this->sm->get('EidSampleTable');
-        return $sampleDb->fetchEidOutcomesDetails($params);
+        $eidSampleDb = $this->sm->get('EidSampleTableWithoutCache');
+        return $eidSampleDb->fetchEidOutcomesDetails($params);
     }
+
+    public function getEidOutcomesByAgeDetails($params)
+    {
+        $eidSampleDb = $this->sm->get('EidSampleTableWithoutCache');
+        return $eidSampleDb->fetchEidOutcomesByAgeDetails($params);
+    }
+    
+    public function getEidOutcomesByProvinceDetails($params)
+    {
+        $eidSampleDb = $this->sm->get('EidSampleTableWithoutCache');
+        return $eidSampleDb->fetchEidOutcomesByProvinceDetails($params);
+    }
+    
     public function exportIndicatorResultExcel($params)
     {
         $queryContainer = new Container('query');

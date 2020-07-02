@@ -1976,11 +1976,12 @@ class EidSampleTable extends AbstractTableGateway
             ->from(array('vl' => 'dash_eid_form'))
             ->columns(
                 array(
-                    "total_positive_samples" => new Expression("SUM(CASE WHEN ((vl.result like 'positive' OR vl.result = 'Positive' )) THEN AVG(DATEDIFF(sample_received_at_vl_lab_datetime, sample_collection_date)) ELSE 0 END)"),
-                    "total_negative_samples" => new Expression("SUM(CASE WHEN ((vl.result like 'negative' OR vl.result = 'Negative' )) THEN AVG(DATEDIFF(sample_received_at_vl_lab_datetime, sample_collection_date)) ELSE 0 END)"),
+                    "total_samples" => new Expression("SUM(CASE WHEN ((vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL')) THEN 1 ELSE 0 END)"),
+                    "total_positive_samples" => new Expression("SUM(CASE WHEN ((vl.result like 'positive' OR vl.result = 'Positive' )) THEN 1 ELSE 0 END)"),
+                    "total_negative_samples" => new Expression("SUM(CASE WHEN ((vl.result like 'negative' OR vl.result = 'Negative' )) THEN 1 ELSE 0 END)"),
                 )
             )
-            ->join(array('f' => 'facility_details'), 'f.facility_id = vl.facility_id')
+            ->join(array('f' => 'facility_details'), 'f.facility_id = vl.facility_id',array())
             ;
 
         if (isset($params['provinces']) && trim($params['provinces']) != '') {
@@ -1994,9 +1995,93 @@ class EidSampleTable extends AbstractTableGateway
         }
 
         $eidOutcomesQueryStr = $sql->getSqlStringForSqlObject($eidOutcomesQuery);
-        echo $eidOutcomesQueryStr;die;
         $result = $common->cacheQuery($eidOutcomesQueryStr, $dbAdapter);
-        Debug::dump($result);die;
+        return $result[0];
+    }
+    
+    public function fetchEidOutcomesByAgeDetails($params)
+    {
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $common = new CommonService($this->sm);
+        $eidOutcomesQuery = $sql->select()
+            ->from(array('vl' => 'dash_eid_form'))
+            ->columns(
+                array(
+                    'noDatan' => new Expression("SUM(CASE WHEN ((vl.result like 'negative' OR vl.result = 'Negative' ) AND (vl.child_dob IS NULL OR vl.child_dob ='0000-00-00'))THEN 1 ELSE 0 END)"),
+                    
+                    'noDatap' => new Expression("SUM(CASE WHEN ((vl.result like 'positive' OR vl.result = 'Positive' ) AND (vl.child_dob IS NULL OR vl.child_dob ='0000-00-00'))THEN 1 ELSE 0 END)"),
+                    
+                    'less2n' => new Expression("SUM(CASE WHEN ((vl.result like 'negative' OR vl.result = 'Negative' ) AND vl.child_dob <= '".date('Y-m-d',strtotime('-2 MONTHS'))."')THEN 1 ELSE 0 END)"),
+                    
+                    'less2p' => new Expression("SUM(CASE WHEN ((vl.result like 'positive' OR vl.result = 'Positive' ) AND vl.child_dob <= '".date('Y-m-d',strtotime('-2 MONTHS'))."')THEN 1 ELSE 0 END)"),
+                    
+                    '2to9n' => new Expression("SUM(CASE WHEN ((vl.result like 'negative' OR vl.result = 'Negative' ) AND (vl.child_dob >= '".date('Y-m-d',strtotime('-2 MONTHS'))."' AND vl.child_dob <= '".date('Y-m-d',strtotime('-9 MONTHS'))."'))THEN 1 ELSE 0 END)"),
+                    
+                    '2to9p' => new Expression("SUM(CASE WHEN ((vl.result like 'positive' OR vl.result = 'Positive' ) AND (vl.child_dob >= '".date('Y-m-d',strtotime('-2 MONTHS'))."' AND vl.child_dob <= '".date('Y-m-d',strtotime('-9 MONTHS'))."'))THEN 1 ELSE 0 END)"),
+                    
+                    '9to12n' => new Expression("SUM(CASE WHEN ((vl.result like 'negative' OR vl.result = 'Negative' ) AND (vl.child_dob >= '".date('Y-m-d',strtotime('-9 MONTHS'))."' AND vl.child_dob <= '".date('Y-m-d',strtotime('-12 MONTHS'))."'))THEN 1 ELSE 0 END)"),
+                    
+                    '9to12p' => new Expression("SUM(CASE WHEN ((vl.result like 'positive' OR vl.result = 'Positive' ) AND (vl.child_dob >= '".date('Y-m-d',strtotime('-9 MONTHS'))."' AND vl.child_dob <= '".date('Y-m-d',strtotime('-12 MONTHS'))."'))THEN 1 ELSE 0 END)"),
+                    
+                    '12to24n' => new Expression("SUM(CASE WHEN ((vl.result like 'negative' OR vl.result = 'Negative' ) AND (vl.child_dob >= '".date('Y-m-d',strtotime('-12 MONTHS'))."' AND vl.child_dob <= '".date('Y-m-d',strtotime('-24 MONTHS'))."'))THEN 1 ELSE 0 END)"),
+                    
+                    '12to24p' => new Expression("SUM(CASE WHEN ((vl.result like 'positive' OR vl.result = 'Positive' ) AND (vl.child_dob >= '".date('Y-m-d',strtotime('-12 MONTHS'))."' AND vl.child_dob <= '".date('Y-m-d',strtotime('-24 MONTHS'))."'))THEN 1 ELSE 0 END)"),
+                    
+                    'above24n' => new Expression("SUM(CASE WHEN ((vl.result like 'negative' OR vl.result = 'Negative' ) AND vl.child_dob >= '".date('Y-m-d',strtotime('-24 MONTHS'))."')THEN 1 ELSE 0 END)"),
+                    
+                    'above24p' => new Expression("SUM(CASE WHEN ((vl.result like 'positive' OR vl.result = 'Positive' ) AND vl.child_dob >= '".date('Y-m-d',strtotime('-24 MONTHS'))."')THEN 1 ELSE 0 END)"),
+                )
+            )
+            ->join(array('f' => 'facility_details'), 'f.facility_id = vl.facility_id',array())
+            ;
+
+        if (isset($params['provinces']) && trim($params['provinces']) != '') {
+            $eidOutcomesQuery = $eidOutcomesQuery->where('f.facility_state IN (' . $params['provinces'] . ')');
+        }
+        if (isset($params['districts']) && trim($params['districts']) != '') {
+            $eidOutcomesQuery = $eidOutcomesQuery->where('f.facility_district IN (' . $params['districts'] . ')');
+        }
+        if (isset($params['clinics']) && trim($params['clinics']) != '') {
+            $eidOutcomesQuery = $eidOutcomesQuery->where('vl.facility_id IN (' . $params['clinics'] . ')');
+        }
+
+        $eidOutcomesQueryStr = $sql->getSqlStringForSqlObject($eidOutcomesQuery);
+        $result = $common->cacheQuery($eidOutcomesQueryStr, $dbAdapter);
+        return $result[0];
+    }
+    
+    public function fetchEidOutcomesByProvinceDetails($params)
+    {
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $common = new CommonService($this->sm);
+        $eidOutcomesQuery = $sql->select()
+            ->from(array('vl' => 'dash_eid_form'))
+            ->columns(
+                array(
+                    "total_samples" => new Expression("SUM(CASE WHEN ((vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL')) THEN 1 ELSE 0 END)"),
+                    "total_positive_samples" => new Expression("SUM(CASE WHEN ((vl.result like 'positive' OR vl.result = 'Positive' )) THEN 1 ELSE 0 END)"),
+                    "total_negative_samples" => new Expression("SUM(CASE WHEN ((vl.result like 'negative' OR vl.result = 'Negative' )) THEN 1 ELSE 0 END)"),
+                )
+            )
+            ->join(array('f' => 'facility_details'), 'f.facility_id = vl.facility_id',array())
+            ->join(array('l' => 'location_details'), 'l.location_id = f.facility_state',array('location_name'))
+            ->group('f.facility_state')
+            ;
+
+        if (isset($params['provinces']) && trim($params['provinces']) != '') {
+            $eidOutcomesQuery = $eidOutcomesQuery->where('f.facility_state IN (' . $params['provinces'] . ')');
+        }
+        if (isset($params['districts']) && trim($params['districts']) != '') {
+            $eidOutcomesQuery = $eidOutcomesQuery->where('f.facility_district IN (' . $params['districts'] . ')');
+        }
+        if (isset($params['clinics']) && trim($params['clinics']) != '') {
+            $eidOutcomesQuery = $eidOutcomesQuery->where('vl.facility_id IN (' . $params['clinics'] . ')');
+        }
+
+        $eidOutcomesQueryStr = $sql->getSqlStringForSqlObject($eidOutcomesQuery);
+        $result = $common->cacheQuery($eidOutcomesQueryStr, $dbAdapter);
         return $result;
     }
 
