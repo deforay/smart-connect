@@ -72,7 +72,6 @@ use Zend\Debug\Debug;
             },
             yAxis: {
                 min: 0,
-                max: 100,
                 tickLength: 5,
                 tickWidth: 1,
                 tickColor: '#C0C0C0',
@@ -85,7 +84,7 @@ use Zend\Debug\Debug;
 
                 title: null,
                 labels: {
-                    format: '{value}%'
+                    format: '{value} days'
                 },
                 plotBands: [{
                     from: 0,
@@ -101,7 +100,7 @@ use Zend\Debug\Debug;
                     color: 'rgba(0,255,0,0.5)'
                 }, {
                     from: <?php echo $result['sec1']+$result['sec2']+$result['sec3'];?>,
-                    to: <?php $final = $result['sec1']+$result['sec2']+$result['sec3']; $final += $final /100; echo $final;?>,
+                    to: <?php $final = $result['sec1']+$result['sec2']+$result['sec3']; echo $final;?>,
                     // color: 'rgba(0,0,0,0.5)'
                 }]
             },
@@ -111,13 +110,13 @@ use Zend\Debug\Debug;
 
             series: [
                 {
-                    name:'Collection Dispatch (C-D)',
-                    data: [<?php echo number_format(($result['sec1'] + $result['sec2'] + $result['sec3']),2);?>],
+                    name:'Collection to Dispatch (C-D)',
+                    data: [<?php echo ceil(($result['total']));?>],
                     color: 'black',
                     dataLabels: {
                         enabled: true,
                         align: 'center',
-                        format: '{point.y}',
+                        format: '{point.y} days',
                         y: 10
                     }
                 },

@@ -165,16 +165,17 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
         font-weight: 600;
     }
     .cr{
+        margin-top:10px;
         background-color: rgba(255,0,0,0.5);
-        margin: 10px;
+        
     }
     .rp{
         background-color: rgba(255,255,0,0.5);
-        margin: 28px 10px;
+        
     }
     .pd{
         background-color: rgba(0,255,0,0.5);
-        margin: 10px;
+        
     }
     .cd{
         background-color: rgb(230, 235, 245);
@@ -187,6 +188,7 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
         border-right: 8px solid transparent;
         border-top: 8px solid black;
         margin: auto;
+        margin-top:20px;
     }
 </style>
 <div class="page-bar">
@@ -811,13 +813,14 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
                             </div>
                             <div class="col-md-6">
                                 <div class="col-md-6">
-                                    <div class="key cr"><center>Collection Receipt (C-R)</center></div>
+                                    <div class="key cr"><center>Collection to Receipt (C-R)</center></div>
                                     <div class="key rp"><center>Receipt to Processing (R-P)</center></div>
+                                    <div class="key pd"><center>Processing to Dispatch (P-D)</center></div>
                                 </div>
                                 <div class="col-md-6">
-                                    <div class="key pd"><center>Processing Dispatch (P-D)</center></div>
+                                    
                                     <div class="cd-top"></div>
-                                    <div class="key cd"><center><div class="cd"></div>Collection Dispatch (C-D)</center></div>
+                                    <div class="key cd"><center><div class="cd"></div>Collection to Dispatch (C-D)</center></div>
                                 </div>
                             </div>
                         </div>

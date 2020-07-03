@@ -2016,7 +2016,7 @@ class EidSampleTable extends AbstractTableGateway
             ->from(array('vl' => 'dash_eid_form'))
             ->columns(
                 array(
-                    'noDatan' => new Expression("SUM(CASE WHEN ((vl.result like 'negative' OR vl.result = 'Negative' ) AND (vl.child_dob IS NULL OR vl.child_dob ='0000-00-00'))THEN 1 ELSE 0 END)"),
+                    'noDatan' => new Expression("SUM(CASE WHEN ((vl.result like 'negative' OR vl.result = 'Negative' ) AND (vl.child_dob IS NULL OR vl.child_dob = '0000-00-00'))THEN 1 ELSE 0 END)"),
                     
                     'noDatap' => new Expression("SUM(CASE WHEN ((vl.result like 'positive' OR vl.result = 'Positive' ) AND (vl.child_dob IS NULL OR vl.child_dob ='0000-00-00'))THEN 1 ELSE 0 END)"),
                     
@@ -2113,6 +2113,7 @@ class EidSampleTable extends AbstractTableGateway
                     'sec1' => new Expression("AVG(DATEDIFF(sample_received_at_vl_lab_datetime, sample_collection_date))"),
                     'sec2' => new Expression("AVG(DATEDIFF(sample_tested_datetime, sample_received_at_vl_lab_datetime))"),
                     'sec3' => new Expression("AVG(DATEDIFF(result_printed_datetime, sample_tested_datetime))"),
+                    'total' => new Expression("AVG(DATEDIFF(result_printed_datetime, sample_collection_date))"),
                 )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id = vl.facility_id',array())
