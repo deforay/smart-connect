@@ -164,23 +164,28 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
     .tabPercentageVal {
         font-weight: 600;
     }
-    .cr{
-        margin-top:10px;
-        background-color: rgba(255,0,0,0.5);
-        
+
+    .cr {
+        margin-top: 10px;
+        background-color: rgba(255, 0, 0, 0.5);
+
     }
-    .rp{
-        background-color: rgba(255,255,0,0.5);
-        
+
+    .rp {
+        background-color: rgba(255, 255, 0, 0.5);
+
     }
-    .pd{
-        background-color: rgba(0,255,0,0.5);
-        
+
+    .pd {
+        background-color: rgba(0, 255, 0, 0.5);
+
     }
-    .cd{
+
+    .cd {
         background-color: rgb(230, 235, 245);
         margin: 10px;
     }
+
     .cd-top {
         width: 0px;
         height: 0px;
@@ -188,7 +193,6 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
         border-right: 8px solid transparent;
         border-top: 8px solid black;
         margin: auto;
-        margin-top:20px;
     }
 </style>
 <div class="page-bar">
@@ -253,7 +257,7 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
         <li role="presentation">
             <a href="#tatTab" aria-controls="messages" onclick="getTat();" role="tab" data-toggle="tab">
                 <h3 class="tabPercentageVal"><?php echo $tat . " Days"; ?></h3>
-                <?php echo $this->translate('Turnaround Time'); ?>
+                <?php echo $this->translate('Average TAT'); ?>
             </a>
         </li>
     </ul>
@@ -719,7 +723,39 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
                             </div>
                         </div>
                         <div class="portlet-body" id="turnaroundTimeChartBody">
-                            <div id="turnaroundTimeChart" style="height:300px;"></div>
+                            <div class="portlet-body" id="nationalTATBody">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div id="nationalTAT" style="height:100px;"></div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="col-md-6">
+                                                    <div class="key cr">
+                                                        <center>Collection to Receipt (C-R)</center>
+                                                    </div>
+                                                    <div class="key rp">
+                                                        <center>Receipt to Processing (R-P)</center>
+                                                    </div>
+                                                    <div class="key pd">
+                                                        <center>Processing to Dispatch (P-D)</center>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+
+                                                    <div class="cd-top"></div>
+                                                    <div class="key cd">
+                                                        <center>
+                                                            <div class="cd"></div>Avg. TAT<br>Collection to Dispatch (C-D)
+                                                        </center>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -796,40 +832,7 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
     </div>
 </div>
 
-<div class="row">
-    <div class="col-md-12 col-sm-12">
-        <div class="portlet box blue">
-            <div class="portlet-title">
-                <div class="caption">
-                    <span class="caption-subject"><?php echo $this->translate('National TAT(Days)'); ?></span>
-                </div>
-            </div>
-            <div class="portlet-body" id="nationalTATBody">
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div id="nationalTAT" style="height:100px;"></div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="col-md-6">
-                                    <div class="key cr"><center>Collection to Receipt (C-R)</center></div>
-                                    <div class="key rp"><center>Receipt to Processing (R-P)</center></div>
-                                    <div class="key pd"><center>Processing to Dispatch (P-D)</center></div>
-                                </div>
-                                <div class="col-md-6">
-                                    
-                                    <div class="cd-top"></div>
-                                    <div class="key cd"><center><div class="cd"></div>Collection to Dispatch (C-D)</center></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+
 <div class="row">
     <div class="col-md-6 col-sm-6">
         <div class="portlet box blue">
@@ -1675,7 +1678,7 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
                 $.unblockUI();
             });
     }
-    
+
     function geteidOutcomes() {
         $(document).ajaxStart($.blockUI({
             message: '<h4> <?php echo ($this->translate('Processing EID Outcomes')); ?> ... </h4>'
@@ -1697,7 +1700,7 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
                 $.unblockUI();
             });
     }
-    
+
     function geteidOutcomesByAge() {
         $(document).ajaxStart($.blockUI({
             message: '<h4> <?php echo ($this->translate('Processing EID Outcomes By Age')); ?> ... </h4>'
@@ -1719,7 +1722,7 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
                 $.unblockUI();
             });
     }
-    
+
     function geteidOutcomesByProvince() {
         $(document).ajaxStart($.blockUI({
             message: '<h4> <?php echo ($this->translate('Processing EID Outcomes By Province')); ?> ... </h4>'
@@ -1741,7 +1744,7 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
                 $.unblockUI();
             });
     }
-    
+
     function nationalTAT() {
         $(document).ajaxStart($.blockUI({
             message: '<h4> <?php echo ($this->translate('Processing EID Outcomes By Province')); ?> ... </h4>'
@@ -1763,7 +1766,7 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
                 $.unblockUI();
             });
     }
-    
+
     function resetIndicators() {
         $("#indDistrictName").select2('val', '');
         $("#indProvinceName").select2('val', '');
