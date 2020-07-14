@@ -51,14 +51,28 @@ return array(
                     ),
                 ),
             ),
+            
+            'api-vlsm' => array(
+                'type'    => 'segment',
+                'options' => array(
+                    'route'    => '/api/vlsm[/:id]',
+                    'constraints' => array(
+                        'id'     => '[0-9]+',
+                    ),
+                    'defaults' => array(
+                        'controller' => 'Api\Controller\Vlsm',
+                    ),
+                ),
+            ),
         ),
     ),
     'controllers' => array(
         'invokables' => array(
-            'Api\Controller\ImportViralLoad' => 'Api\Controller\ImportViralLoadController',
-            'Api\Controller\SourceData' => 'Api\Controller\SourceDataController',
-            'Api\Controller\User' => 'Api\Controller\UserController',
-            'Api\Controller\Facility' => 'Api\Controller\FacilityController',
+            'Api\Controller\ImportViralLoad'    => 'Api\Controller\ImportViralLoadController',
+            'Api\Controller\SourceData'         => 'Api\Controller\SourceDataController',
+            'Api\Controller\User'               => 'Api\Controller\UserController',
+            'Api\Controller\Facility'           => 'Api\Controller\FacilityController',
+            'Api\Controller\Vlsm'               => 'Api\Controller\VlsmController',
         ),
     ),
     'view_manager' => array(
