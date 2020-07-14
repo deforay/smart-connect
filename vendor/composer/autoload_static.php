@@ -92,6 +92,7 @@ class ComposerStaticInit50791b1b953694d6925f4685fb2412b4
         '75c79eb1b25749b05a47976f32b0d8a2' => __DIR__ . '/..' . '/markbaker/matrix/classes/src/operations/divideby.php',
         '6ab8ad87a734f276a6bcd5a0fe1289be' => __DIR__ . '/..' . '/markbaker/matrix/classes/src/operations/divideinto.php',
         '6124b4c8570aa390c21fafd04a26c69f' => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy/deep_copy.php',
+        'ace6d88241f812b4accb2d847454aef6' => __DIR__ . '/..' . '/halaxa/json-machine/src/functions.php',
         'fe6aee0c0ec174a325f8335f6c481d7d' => __DIR__ . '/..' . '/laminas/laminas-diagnostics/src/autoload.php',
     );
 
@@ -192,6 +193,10 @@ class ComposerStaticInit50791b1b953694d6925f4685fb2412b4
             'Laminas\\Cache\\' => 14,
             'Laminas\\Barcode\\' => 16,
             'Laminas\\Authentication\\' => 23,
+        ),
+        'J' => 
+        array (
+            'JsonMachine\\' => 12,
         ),
         'I' => 
         array (
@@ -508,6 +513,10 @@ class ComposerStaticInit50791b1b953694d6925f4685fb2412b4
         'Laminas\\Authentication\\' => 
         array (
             0 => __DIR__ . '/..' . '/laminas/laminas-authentication/src',
+        ),
+        'JsonMachine\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/halaxa/json-machine/src',
         ),
         'Interop\\Container\\' => 
         array (

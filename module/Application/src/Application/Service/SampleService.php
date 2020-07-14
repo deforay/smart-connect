@@ -499,7 +499,7 @@ class SampleService
     }
     //clinic details end
 
-    //get all smaple type
+    //get all sample types
     public function getSampleType()
     {
         $sampleDb = $this->sm->get('SampleTypeTable');

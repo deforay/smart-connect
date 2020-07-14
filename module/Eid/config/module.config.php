@@ -24,6 +24,26 @@ return array(
                     ),
                 ),
             ),
+            'eid-labs' => array(
+                'type' => 'segment',
+                'options' => array(
+                    'route' => '/eid/labs[/][:action][/:id]',
+                    'defaults' => array(
+                        'controller' => 'Eid\Controller\Labs',
+                        'action' => 'index',
+                    ),
+                ),
+            ),
+            'eid-clinics' => array(
+                'type' => 'segment',
+                'options' => array(
+                    'route' => '/eid/clinics[/][:action][/:id]',
+                    'defaults' => array(
+                        'controller' => 'Eid\Controller\Clinics',
+                        'action' => 'index',
+                    ),
+                ),
+            ),
         ),
     ),
     'view_manager' => array(
