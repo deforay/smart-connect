@@ -11,7 +11,7 @@ class VlsmController extends AbstractRestfulController
 {
     public function create($params) {
         $service = $this->getServiceLocator()->get('SampleService');
-        $response =$service->saveFileFromVlsmAPI($params);
+        $response =$service->saveFileFromVlsmAPI();
         return new JsonModel($response);
     }
 }
