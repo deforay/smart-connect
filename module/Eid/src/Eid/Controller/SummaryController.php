@@ -10,13 +10,13 @@ use Zend\Debug\Debug;
 class SummaryController extends AbstractActionController
 {
 
-  private $sampleService = null;
+  private $commonService = null;
   private $summaryService = null;
 
-  public function __construct($summaryService, $sampleService)
+  public function __construct($summaryService, $commonService)
   {
     $this->summaryService = $summaryService;
-    $this->sampleService = $sampleService;
+    $this->commonService = $commonService;
   }
 
   public function dashboardAction()
@@ -32,11 +32,10 @@ class SummaryController extends AbstractActionController
     $this->layout()->setVariable('activeTab', 'summary-dashboard');
     $summaryTabResult = $this->summaryService->fetchSummaryTabDetails($params);
 
-    /* District, Province and Facility */
-    // $sampleService = $this->getServiceLocator()->get('SampleService');        
-    $clinicName = $this->sampleService->getAllClinicName();
-    $provinceName = $this->sampleService->getAllProvinceList();
-    $districtName = $this->sampleService->getAllDistrictList();
+    /* District, Province and Facility */      
+    $clinicName = $this->commonService->getAllClinicName();
+    $provinceName = $this->commonService->getAllProvinceList();
+    $districtName = $this->commonService->getAllDistrictList();
     /* Ends Here*/
 
     return new ViewModel(array(

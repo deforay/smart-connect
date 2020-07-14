@@ -62,6 +62,7 @@
         "laminas/laminas-view": "^2.5",
         "laminas/laminas-xmlrpc": "^2.5",
         "zendframework/zendxml": "^1.0.1",
-        "zendframework/zftool": "dev-master"
+        "zendframework/zftool": "dev-master",
+        "halaxa/json-machine": "^0.3.3"
     }
 }

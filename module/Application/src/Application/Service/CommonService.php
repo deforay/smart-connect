@@ -1,4 +1,5 @@
 <?php
+
 namespace Application\Service;
 
 use Laminas\Session\Container;
@@ -11,19 +12,23 @@ use Laminas\Mime\Message as MimeMessage;
 use Laminas\Mime\Part as MimePart;
 
 
-class CommonService {
+class CommonService
+{
 
      public $sm = null;
 
-     public function __construct($sm=null) {
+     public function __construct($sm = null)
+     {
           $this->sm = $sm;
      }
 
-     public function getServiceManager() {
+     public function getServiceManager()
+     {
           return $this->sm;
      }
 
-     public static function generateRandomString($length = 8, $seeds = 'alphanum') {
+     public static function generateRandomString($length = 8, $seeds = 'alphanum')
+     {
           // Possible seeds
           $seedings['alpha'] = 'abcdefghijklmnopqrstuvwqyz';
           $seedings['numeric'] = '0123456789';
@@ -51,7 +56,8 @@ class CommonService {
           return $str;
      }
 
-     public function checkMultipleFieldValidations($params) {
+     public function checkMultipleFieldValidations($params)
+     {
           $adapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
           $jsonData = $params['json_data'];
           $tableName = $jsonData['tableName'];
@@ -75,7 +81,8 @@ class CommonService {
      }
 
 
-     public function checkFieldValidations($params) {
+     public function checkFieldValidations($params)
+     {
           $adapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
           $tableName = $params['tableName'];
           $fieldName = $params['fieldName'];
@@ -97,11 +104,11 @@ class CommonService {
                          $configResult = $config->fromFile(CONFIG_PATH . '/custom.config.ini');
                          $password = sha1($value . $configResult["password"]["salt"]);
                          //$password = $value;
-                         $select = $sql->select()->from($tableName)->where(array($fieldName=>$password,$table[0]=>$table[1]));
+                         $select = $sql->select()->from($tableName)->where(array($fieldName => $password, $table[0] => $table[1]));
                          $statement = $sql->prepareStatementForSqlObject($select);
                          $result = $statement->execute();
                          $data = count($result);
-                    }else{
+                    } else {
                          // first trying $table[1] without quotes. If this does not work, then in catch we try with single quotes
                          //$statement=$adapter->query('SELECT * FROM '.$tableName.' WHERE '.$fieldName." = '".$value."' and ".$table[0]."!=".$table[1] );
                          $select = $sql->select()->from($tableName)->where(array("$fieldName='$value'", $table[0] . "!=" . "'$table[1]'"));
@@ -117,7 +124,8 @@ class CommonService {
           }
      }
 
-     public function dateFormat($date) {
+     public function dateFormat($date)
+     {
           if (!isset($date) || $date == null || $date == "" || $date == "0000-00-00") {
                return "0000-00-00";
           } else {
@@ -138,7 +146,8 @@ class CommonService {
           }
      }
 
-     public function humanDateFormat($date) {
+     public function humanDateFormat($date)
+     {
           if ($date == null || $date == "" || $date == "0000-00-00" || $date == "0000-00-00 00:00:00") {
                return "";
           } else {
@@ -151,7 +160,8 @@ class CommonService {
           }
      }
 
-     public function viewDateFormat($date) {
+     public function viewDateFormat($date)
+     {
           if ($date == null || $date == "" || $date == "0000-00-00") {
                return "";
           } else {
@@ -165,12 +175,14 @@ class CommonService {
           }
      }
 
-     public function insertTempMail($to, $subject, $message, $fromMail, $fromName,$cc,$bcc) {
+     public function insertTempMail($to, $subject, $message, $fromMail, $fromName, $cc, $bcc)
+     {
           $tempmailDb = $this->sm->get('TempMailTable');
-          return $tempmailDb->insertTempMailDetails($to, $subject, $message, $fromMail, $fromName,$cc,$bcc);
+          return $tempmailDb->insertTempMailDetails($to, $subject, $message, $fromMail, $fromName, $cc, $bcc);
      }
 
-     public function sendTempMail() {
+     public function sendTempMail()
+     {
           try {
                $tempDb = $this->sm->get('TempMailTable');
                $config = new \Laminas\Config\Reader\Ini();
@@ -193,8 +205,8 @@ class CommonService {
                $transport->setOptions($options);
                $limit = '10';
                $mailQuery = $sql->select()->from(array('tm' => 'temp_mail'))
-               ->where("status='pending'")
-               ->limit($limit);
+                    ->where("status='pending'")
+                    ->limit($limit);
                $mailQueryStr = $sql->getSqlStringForSqlObject($mailQuery);
                $mailResult = $dbAdapter->query($mailQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
                if (count($mailResult) > 0) {
@@ -253,7 +265,8 @@ class CommonService {
           }
      }
 
-     function removeDirectory($dirname) {
+     function removeDirectory($dirname)
+     {
           // Sanity check
           if (!file_exists($dirname)) {
                return false;
@@ -281,8 +294,9 @@ class CommonService {
           return rmdir($dirname);
      }
 
-     public function removespecials($url){
-          $url=str_replace(" ","-",$url);
+     public function removespecials($url)
+     {
+          $url = str_replace(" ", "-", $url);
 
           $url = preg_replace('/[^a-zA-Z0-9\-]/', '', $url);
           $url = preg_replace('/^[\-]+/', '', $url);
@@ -292,17 +306,20 @@ class CommonService {
           return strtolower($url);
      }
 
-     public static function getDateTime($timezone = 'Asia/Calcutta') {
+     public static function getDateTime($timezone = 'Asia/Calcutta')
+     {
           $date = new \DateTime(date('Y-m-d H:i:s'), new \DateTimeZone($timezone));
           return $date->format('Y-m-d H:i:s');
      }
 
-     public static function getDate($timezone = 'Asia/Calcutta') {
+     public static function getDate($timezone = 'Asia/Calcutta')
+     {
           $date = new \DateTime(date('Y-m-d'), new \DateTimeZone($timezone));
           return $date->format('Y-m-d');
      }
 
-     public function humanMonthlyDateFormat($date) {
+     public function humanMonthlyDateFormat($date)
+     {
           if ($date == null || $date == "" || $date == "0000-00-00" || $date == "0000-00-00 00:00:00") {
                return "";
           } else {
@@ -310,7 +327,7 @@ class CommonService {
                $newDate =  "";
 
                $monthsArray = array('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec');
-               $mon = $monthsArray[$dateArray[1]*1];
+               $mon = $monthsArray[$dateArray[1] * 1];
 
                return $newDate .= $mon . " " . $dateArray[0];
           }
@@ -318,18 +335,19 @@ class CommonService {
 
 
 
-     public function cacheQuery($queryString,$dbAdapter, $fetchCurrent = false){
+     public function cacheQuery($queryString, $dbAdapter, $fetchCurrent = false)
+     {
           // $res = $dbAdapter->query($queryString, $dbAdapter::QUERY_MODE_EXECUTE);
           // return $res;
 
           $cacheObj = $this->sm->get('Cache\Persistent');
-          $cacheId = hash("sha512",$queryString);
+          $cacheId = hash("sha512", $queryString);
           $res = null;
-          try{
+          try {
                if (!$cacheObj->hasItem($cacheId)) {
-                    if(!$fetchCurrent){
+                    if (!$fetchCurrent) {
                          $res = $dbAdapter->query($queryString, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-                    }else{
+                    } else {
                          $res = $dbAdapter->query($queryString, $dbAdapter::QUERY_MODE_EXECUTE)->current();
                     }
                     $cacheObj->addItem($cacheId, ($res));
@@ -337,7 +355,7 @@ class CommonService {
                     $res = ($cacheObj->getItem($cacheId));
                }
                return $res;
-          }catch(Exception $e){
+          } catch (Exception $e) {
                error_log($e->getMessage());
                //if(!$fetchCurrent){
                //    $res = $dbAdapter->query($queryString, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -346,40 +364,46 @@ class CommonService {
                //}
                //return $res;
           }
-
      }
 
-     public function clearAllCache(){
+     public function clearAllCache()
+     {
           $cacheObj = $this->sm->get('Cache\Persistent');
           return $cacheObj->flush();
      }
 
-     public function getRoleFacilities($params){
+     public function getRoleFacilities($params)
+     {
           $facilityDb = $this->sm->get('FacilityTable');
           return $facilityDb->fetchRoleFacilities($params);
      }
 
-     public function getSampleTestedFacilityInfo($params){
+     public function getSampleTestedFacilityInfo($params)
+     {
           $facilityDb = $this->sm->get('FacilityTable');
           return $facilityDb->fetchSampleTestedFacilityInfo($params);
      }
 
-     public function getSampleTestedLocationInfo($params){
+     public function getSampleTestedLocationInfo($params)
+     {
           $facilityDb = $this->sm->get('FacilityTable');
           return $facilityDb->fetchSampleTestedLocationInfo($params);
      }
 
-     public function addBackupGeneration($params){
+     public function addBackupGeneration($params)
+     {
           $facilityDb = $this->sm->get('GenerateBackupTable');
           return $facilityDb->addBackupGeneration($params);
      }
 
-     public function translate($text){
+     public function translate($text)
+     {
           $translateObj = $this->sm->get('translator');
           return $translateObj->translate($text);
      }
 
-     public function crypto($action, $inputString, $secretIv) {
+     public function crypto($action, $inputString, $secretIv)
+     {
 
           // return $inputString;
           if (empty($inputString)) return "";
@@ -391,23 +415,74 @@ class CommonService {
           // hash
           $key = hash('sha256', $secret_key);
 
-          if(empty($secretIv)){
+          if (empty($secretIv)) {
                $secretIv = 'sd893urijsdf8w9eurj';
           }
           // iv - encrypt method AES-256-CBC expects 16 bytes - else you will get a warning
           $iv = substr(hash('sha256', $secretIv), 0, 16);
 
-          if ( $action == 'encrypt' ) {
+          if ($action == 'encrypt') {
                $output = openssl_encrypt($inputString, $encrypt_method, $key, 0, $iv);
                $output = base64_encode($output);
-
-          } else if( $action == 'decrypt' ) {
+          } else if ($action == 'decrypt') {
 
                $output = openssl_decrypt(base64_decode($inputString), $encrypt_method, $key, 0, $iv);
           }
           return $output;
      }
 
-}
+     //get all sample types
+     public function getSampleType()
+     {
+          $sampleDb = $this->sm->get('SampleTypeTable');
+          return $sampleDb->fetchAllSampleType();
+     }
+     //get all Lab Name
+     public function getAllLabName()
+     {
+          $logincontainer = new Container('credo');
+          $mappedFacilities = null;
+          if ($logincontainer->role != 1) {
+               $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : null;
+          }
+          $facilityDb = $this->sm->get('FacilityTable');
+          return $facilityDb->fetchAllLabName($mappedFacilities);
+     }
+     //get all Lab Name
+     public function getAllClinicName()
+     {
 
-?>
+          $logincontainer = new Container('credo');
+          $mappedFacilities = null;
+          if ($logincontainer->role != 1) {
+               $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : null;
+          }
+
+          $facilityDb = $this->sm->get('FacilityTable');
+          return $facilityDb->fetchAllClinicName($mappedFacilities);
+     }
+     //get all province name
+     public function getAllProvinceList()
+     {
+
+          $logincontainer = new Container('credo');
+          $mappedFacilities = null;
+          if ($logincontainer->role != 1) {
+               $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : null;
+          }
+
+          $locationDb = $this->sm->get('LocationDetailsTable');
+          return $locationDb->fetchLocationDetails($mappedFacilities);
+     }
+     public function getAllDistrictList()
+     {
+
+          $logincontainer = new Container('credo');
+          $mappedFacilities = null;
+          if ($logincontainer->role != 1) {
+               $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : null;
+          }
+          $locationDb = $this->sm->get('LocationDetailsTable');
+          return $locationDb->fetchAllDistrictsList();
+     }
+}
