@@ -64,6 +64,18 @@ return array(
                     ),
                 ),
             ),
+            'api-vlsm-eid' => array(
+                'type'    => 'segment',
+                'options' => array(
+                    'route'    => '/api/vlsm-eid[/:id]',
+                    'constraints' => array(
+                        'id'     => '[0-9]+',
+                    ),
+                    'defaults' => array(
+                        'controller' => 'Api\Controller\VlsmEid',
+                    ),
+                ),
+            ),
         ),
     ),
     'controllers' => array(
@@ -73,6 +85,7 @@ return array(
             'Api\Controller\User'               => 'Api\Controller\UserController',
             'Api\Controller\Facility'           => 'Api\Controller\FacilityController',
             'Api\Controller\Vlsm'               => 'Api\Controller\VlsmController',
+            'Api\Controller\VlsmEid'            => 'Api\Controller\VlsmEidController',
         ),
     ),
     'view_manager' => array(
