@@ -69,11 +69,11 @@ class EidSampleService
         if (!file_exists(TEMP_UPLOAD_PATH) && !is_dir(TEMP_UPLOAD_PATH)) {
             mkdir(APPLICATION_PATH . DIRECTORY_SEPARATOR . "uploads",0777);
         }
-        if (!file_exists(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm") && !is_dir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm")) {
-            mkdir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm",0777);
+        if (!file_exists(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-eid") && !is_dir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-eid")) {
+            mkdir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-eid",0777);
         }
 
-        $pathname = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm" . DIRECTORY_SEPARATOR . $fileName;
+        $pathname = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-eid" . DIRECTORY_SEPARATOR . $fileName;
         if (!file_exists($pathname)) {
             if (move_uploaded_file($_FILES['eidFile']['tmp_name'], $pathname)) {
                 // $apiData = (array)json_decode(file_get_contents($pathname));
@@ -85,7 +85,7 @@ class EidSampleService
                 // Debug::dump($rowData);die;
                 foreach($rowData as $row){
                     // Debug::dump($row['vlsm_instance_id']);die;
-                    if (trim($row['vlsm_instance_id']) != '' && trim($row['vlsm_instance_id']) != '') {
+                    if (trim($row['sample_code']) != '' && trim($row['vlsm_instance_id']) != '') {
                         $sampleCode = trim($row['sample_code']);
                         $instanceCode = trim($row['vlsm_instance_id']);
     
@@ -94,7 +94,6 @@ class EidSampleService
                         // $dateOfInitiationOfRegimen = (trim($row['date_of_initiation_of_current_regimen']) != '' ? trim(date('Y-m-d H:i', strtotime($row['date_of_initiation_of_current_regimen']))) : null);
                         $resultApprovedDateTime = (trim($row['result_approved_datetime']) != '' ? trim(date('Y-m-d H:i', strtotime($row['result_approved_datetime']))) : null);
                         $sampleTestedDateTime = (trim($row['sample_tested_datetime']) != '' ? trim(date('Y-m-d H:i', strtotime($row['sample_tested_datetime']))) : null);
-                        $sampleRegisteredAtLabDateTime = (trim($row['sample_registered_at_lab']) != '' ? trim(date('Y-m-d H:i', strtotime($row['sample_registered_at_lab']))) : null);
     
     
     
@@ -112,7 +111,6 @@ class EidSampleService
                         $data['sample_registered_at_lab']   = $sampleReceivedAtLab;
                         $data['result_approved_datetime']   = $resultApprovedDateTime;
                         $data['sample_tested_datetime']     = $sampleTestedDateTime;
-                        $data['sample_registered_at_lab']   = $sampleRegisteredAtLabDateTime;
     
                         $facilityData = array(
                             'vlsm_instance_id'          => trim($row['vlsm_instance_id']),

@@ -10,6 +10,7 @@ return array(
         'Application',
         'Api',
         'Eid',
+        'Covid19',
         'DataManagement'
     ),
     'module_listener_options' => array(

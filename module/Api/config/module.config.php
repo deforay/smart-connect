@@ -76,6 +76,18 @@ return array(
                     ),
                 ),
             ),
+            'api-vlsm-covid' => array(
+                'type'    => 'segment',
+                'options' => array(
+                    'route'    => '/api/vlsm-covid[/:id]',
+                    'constraints' => array(
+                        'id'     => '[0-9]+',
+                    ),
+                    'defaults' => array(
+                        'controller' => 'Api\Controller\VlsmCovid',
+                    ),
+                ),
+            ),
         ),
     ),
     'controllers' => array(
@@ -86,6 +98,7 @@ return array(
             'Api\Controller\Facility'           => 'Api\Controller\FacilityController',
             'Api\Controller\Vlsm'               => 'Api\Controller\VlsmController',
             'Api\Controller\VlsmEid'            => 'Api\Controller\VlsmEidController',
+            'Api\Controller\VlsmCovid'          => 'Api\Controller\VlsmCovidController',
         ),
     ),
     'view_manager' => array(

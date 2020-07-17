@@ -265,3 +265,7 @@ ALTER TABLE `r_eid_test_reasons`
 -- Amit 22 June 2020
 
 ALTER TABLE `dash_eid_form` ADD `pcr_test_performed_before` VARCHAR(255) NULL DEFAULT NULL AFTER `reason_for_eid_test`;
+
+-- Thana 17 Jul, 2020
+INSERT INTO `resources` (`resource_id`, `resource_name`, `display_name`) VALUES (NULL, 'covid19-dashboard', 'Covid-19 Dashboard');
+INSERT INTO `privileges` (`privilege_id`, `resource_id`, `privilege_name`, `display_name`) VALUES (NULL, '19', 'dashboard', 'Dashboard');

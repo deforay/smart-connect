@@ -2074,11 +2074,11 @@ class SampleService
         if (!file_exists(TEMP_UPLOAD_PATH) && !is_dir(TEMP_UPLOAD_PATH)) {
             mkdir(APPLICATION_PATH . DIRECTORY_SEPARATOR . "uploads",0777);
         }
-        if (!file_exists(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm") && !is_dir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm")) {
-            mkdir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm",0777);
+        if (!file_exists(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-vl") && !is_dir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-vl")) {
+            mkdir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-vl",0777);
         }
 
-        $pathname = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm" . DIRECTORY_SEPARATOR . $fileName;
+        $pathname = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-vl" . DIRECTORY_SEPARATOR . $fileName;
         if (!file_exists($pathname)) {
             if (move_uploaded_file($_FILES['vlFile']['tmp_name'], $pathname)) {
                 // $apiData = (array)json_decode(file_get_contents($pathname));
@@ -2089,7 +2089,7 @@ class SampleService
             foreach($apiData as $rowData){
                 // Debug::dump($rowData);die;
                 foreach($rowData as $row){
-                    if (trim($row['vlsm_instance_id']) != '' && trim($row['vlsm_instance_id']) != '') {
+                    if (trim($row['sample_code']) != '' && trim($row['vlsm_instance_id']) != '') {
                         $sampleCode = trim($row['sample_code']);
                         $instanceCode = trim($row['vlsm_instance_id']);
     
