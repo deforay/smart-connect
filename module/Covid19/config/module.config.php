@@ -4,13 +4,23 @@ namespace Eid;
 return array(
     'router' => array(
         'routes' => array(
-            'eid' => array(
+            'covid19' => array(
                 'type' => 'segment',
                 'options' => array(
                     'route' => '/covid19[/]',
                     'defaults' => array(
-                        'controller' => 'Covid19\Controller\Index',
+                        'controller' => 'Covid19\Controller\Summary',
                         'action' => 'dashboard'
+                    ),
+                ),
+            ),
+            'covid19-summary' => array(
+                'type' => 'segment',
+                'options' => array(
+                    'route' => '/covid19/summary[/][:action][/:id]',
+                    'defaults' => array(
+                        'controller' => 'Covid19\Controller\Summary',
+                        'action' => 'index',
                     ),
                 ),
             ),

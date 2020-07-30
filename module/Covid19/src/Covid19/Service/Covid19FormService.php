@@ -339,4 +339,34 @@ class Covid19FormService
         $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
         return $sResult;
     }
+
+    public function fetchSummaryTabDetails($params)
+    {
+        $eidSampleDb = $this->sm->get('Covid19FormTableWithoutCache');
+        return $eidSampleDb->getSummaryTabDetails($params);
+    }
+
+    public function getSamplesReceivedBarChartDetails($params)
+    {
+        $sampleDb = $this->sm->get('Covid19FormTableWithoutCache');
+        return $sampleDb->fetchSamplesReceivedBarChartDetails($params);
+    }
+
+    public function getAllSamplesReceivedByFacility($parameters)
+    {
+        $sampleDb = $this->sm->get('Covid19FormTableWithoutCache');
+        return $sampleDb->fetchAllSamplesReceivedByFacility($parameters);
+    }
+
+    public function getAllSamplesReceivedByProvince($parameters)
+    {
+        $sampleDb = $this->sm->get('Covid19FormTableWithoutCache');
+        return $sampleDb->fetchAllSamplesReceivedByProvince($parameters);
+    }
+
+    public function getAllSamplesReceivedByDistrict($parameters)
+    {
+        $sampleDb = $this->sm->get('Covid19FormTableWithoutCache');
+        return $sampleDb->fetchAllSamplesReceivedByDistrict($parameters);
+    }
 }

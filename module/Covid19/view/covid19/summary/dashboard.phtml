@@ -1,0 +1,1856 @@
+<?php
+
+use Laminas\Session\Container;
+
+$languagecontainer = new Container('language');
+$logincontainer = new Container('credo');
+
+$startArray = explode("-", $startDate);
+$endArray = explode("-", $endDate);
+// var_dump($logincontainer->sampleTable);die;
+if (isset($logincontainer->sampleTable) && $logincontainer->sampleTable == "dash_vl_request_form_current") {
+    $startYear = (int) date('Y', strtotime('-12 MONTH ' . date('Y-m-d')));
+    $startMonth = (int) date('M', strtotime('-12 MONTH ' . date('Y-m-d')));
+    $endYear = (int) date('y');
+    $endMonth = (int) date('M');
+} else {
+    $startYear = (int) $startArray[0];
+    $startMonth = (int) $startArray[1] - 1;
+    $endYear = (int) $endArray[0];
+    $endMonth = (int) $endArray[1] - 1;
+}
+
+
+$MONTHS = array("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
+
+
+
+$totalSampleTested = 0;
+$rejectedSamples = 0;
+$positiveSampleTotal = 0;
+$firstLineCurrentRegimenPercentage = 0;
+if (isset($summaryTabInfo[0]["total_samples_tested"]) && $summaryTabInfo[0]["total_samples_tested"] > 0) {
+    $totalSampleTested = $summaryTabInfo[0]["total_samples_tested"];
+}
+if (isset($summaryTabInfo[0]["rejected_samples"]) && $summaryTabInfo[0]["rejected_samples"] > 0) {
+    $rejectedSamples = $summaryTabInfo[0]["rejected_samples"];
+}
+if (isset($summaryTabInfo[0]["positive_samples"]) && $summaryTabInfo[0]["positive_samples"] > 0) {
+    $positiveSampleTotal = $summaryTabInfo[0]["positive_samples"];
+}
+$positiveSamplepercentage = ($positiveSampleTotal > 0 && $totalSampleTested > 0) ? round((($positiveSampleTotal / $totalSampleTested) * 100), 2) : 0;
+
+$rejectionPercentage = ($summaryTabInfo[0]["total_samples_received"] > 0 && $rejectedSamples > 0) ? round((($rejectedSamples / $summaryTabInfo[0]["total_samples_received"]) * 100), 2) : 0;
+$tat = ceil($summaryTabInfo[0]["tat"]);
+
+?>
+<link rel="stylesheet" href="<?php echo $this->basePath('assets/plugins/datepicker/datepicker3.css') ?>">
+<style>
+    /* .portlet-title{
+    background: #fd5454 !important
+    
+}
+
+.portlet.box.blue{
+    border-color: #fd5454 !important
+} */
+    .caption {}
+
+    .tabPercentageVal,
+    .tabbable ul.nav li a {
+        color: #aaa;
+        font-weight: normal !important;
+        text-transform: uppercase;
+    }
+
+    .tabbable ul.nav li.active a,
+    .tabbable ul.nav li.active .tabPercentageVal {
+        color: #fd5454 !important;
+        font-weight: 600 !important;
+
+
+    }
+
+    .tabbable ul.nav li.active a>.tabPercentageVal {}
+
+
+
+    .bluebox,
+    .dashboard-stat2 {
+        border: 1px solid #3598DC;
+    }
+
+
+    .datepicker table tr td span.disabled,
+    .datepicker table tr td span.disabled:hover {
+        color: #ddd;
+    }
+
+    .popover {
+        max-width: 1920px !important;
+    }
+
+    .table>tbody>tr>td,
+    .table>tbody>tr>th,
+    .table>tfoot>tr>td,
+    .table>tfoot>tr>th,
+    .table>thead>tr>td,
+    .table>thead>tr>th {
+        padding: <?php echo (isset($languagecontainer->locale) && $languagecontainer->locale == 'en_US') ? '8' : '3'; ?>px;
+        font-size: <?php echo (isset($languagecontainer->locale) && $languagecontainer->locale == 'en_US') ? '14' : '13'; ?>px;
+    }
+
+    @media screen and (min-width:320px) and (max-width: 760px) {
+        #daterange-container {
+            width: 100% !important;
+        }
+
+        #showDateRange,
+        #closeDateRange {
+            margin-left: 0% !important;
+        }
+    }
+
+    @media screen and (min-width:761px) and (max-width: 970px) {
+        #daterange-container {
+            width: 100% !important;
+        }
+
+        #showDateRange,
+        #closeDateRange {
+            margin-left: 52% !important;
+        }
+    }
+
+    .tabbable {
+        margin: 10px;
+        height: auto;
+        overflow: hidden;
+        border-bottom: 1px solid #869EA7;
+    }
+
+    .nav-tabs-justified>.active>a,
+    .nav-tabs-justified>.active>a:focus,
+    .nav-tabs-justified>.active>a:hover,
+    .nav-tabs.nav-justified>.active>a,
+    .nav-tabs.nav-justified>.active>a:focus,
+    .nav-tabs.nav-justified>.active>a:hover {
+        border: 1px solid #869EA7;
+        border-bottom: none;
+    }
+
+    .nav-tabs-justified>li>a,
+    .nav-tabs.nav-justified>li>a {
+        border-bottom: 1px solid #869EA7;
+        margin-bottom: -1px !important;
+    }
+
+    .nav-tabs {
+        margin: 0;
+    }
+
+    .tab-content {
+        height: 100%;
+
+        border-left: 1px solid #869EA7;
+        border-right: 1px solid #869EA7;
+        padding: 15px;
+    }
+
+    .page-content {
+        background-color: #fff !important;
+    }
+
+    .tabPercentageVal {
+        font-weight: 600;
+    }
+
+    .cr {
+        margin-top: 10px;
+        background-color: rgba(255, 0, 0, 0.5);
+
+    }
+
+    .rp {
+        background-color: rgba(255, 255, 0, 0.5);
+
+    }
+
+    .pd {
+        background-color: rgba(0, 255, 0, 0.5);
+
+    }
+
+    .cd {
+        background-color: rgb(230, 235, 245);
+        margin: 10px;
+    }
+
+    .cd-top {
+        width: 0px;
+        height: 0px;
+        border-left: 8px solid transparent;
+        border-right: 8px solid transparent;
+        border-top: 8px solid black;
+        margin: auto;
+    }
+</style>
+<div class="page-bar">
+    <h1 class="page-title">
+        <div class="col-lg-3">
+            <?php echo $this->translate('Covid19 Summary'); ?>
+        </div>
+
+
+        <div class="col-lg-3" style="margin-top:-5px;padding-bottom:10px;margin-left:0;display: flex;">
+            <!-- <div id="sla-date-range" class="mrp-container form-control">
+                <span class="mrp-icon"><i class="fa fa-calendar"></i> &nbsp;</span>
+                <div class="mrp-monthdisplay ">
+                    <span class="mrp-lowerMonth"><?php echo $MONTHS[$startMonth]; ?> <?php echo $startYear; ?></span>
+                    <span class="mrp-to"> to </span>
+                    <span class="mrp-upperMonth"><?php echo $MONTHS[$endMonth]; ?> <?php echo $endYear; ?></span>
+                </div>
+                <input type="hidden" value="<?php echo $startDate; ?>" id="mrp-lowerDate" onchange="" />
+                <input type="hidden" value="<?php echo $endDate; ?>" id="mrp-upperDate" />
+            </div> -->
+            <div class="input-append date" id="dpMonthsStart" data-date-format="M/yyyy" data-date-viewmode="years" data-date-minviewmode="months">
+                <input type="text" class="form-control isRequired readonly" id="mrp-lowerDate" name="mrp-lowerDate" placeholder="Select month & year" title="Please select month and year" readonly="readonly" value="<?php echo date('M-Y', strtotime($startDate)); ?>" />
+                <span class="add-on" style="display:none;"><i class="icon-calendar"></i></span>
+            </div>
+            <div class="input-group-prepend input-group-append">
+                <span class="input-group-text font-w600" style="padding: 0.100rem .35rem;font-size:0.7em;">
+                    <!-- <i class="fa fa-fw fa-arrow-right"></i> -->to
+                </span>
+            </div>
+            <div class="input-append date" id="dpMonthsEnd" data-date-format="M/yyyy" data-date-viewmode="years" data-date-minviewmode="months">
+                <input type="text" class="form-control isRequired readonly" id="mrp-upperDate" name="mrp-upperDate" placeholder="Select month & year" title="Please select month and year" readonly="readonly" value="<?php echo date('M-Y', strtotime($endDate)); ?>" />
+                <span class="add-on" style="display:none;"><i class="icon-calendar"></i></span>
+            </div>
+        </div>
+        <div class="col-lg-1" style="margin-top:-5px;padding-bottom:10px;margin-left:-20px;">
+            <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="summarize();"><?php echo $this->translate('Search'); ?></a>
+        </div>
+    </h1>
+</div>
+<br>
+
+<div class="tabbable">
+    <ul class="nav nav-tabs nav-justified" role="tablist">
+        <li role="presentation" class="active">
+            <a href="#samplesReceivedTab" aria-controls="samplesReceivedTab" role="tab" data-toggle="tab">
+                <h3 class="tabPercentageVal"><?php echo number_format($summaryTabInfo[0]["total_samples_received"]); ?></h3>
+                <?php echo $this->translate('Samples Registered'); ?>
+            </a>
+        </li>
+        <li role="presentation">
+            <a href="#positiveRateTab" aria-controls="positiveRateTab" onclick="getPositiveRateTab();" role="tab" data-toggle="tab">
+                <h3 class="tabPercentageVal"><?php echo $positiveSamplepercentage; ?>%</h3>
+                <?php echo $this->translate('Positive'); ?>
+            </a>
+        </li>
+        <li role="presentation">
+            <a href="#samplesRejectedTab" aria-controls="messages" onclick="getRejectionRateTab();" role="tab" data-toggle="tab">
+                <h3 class="tabPercentageVal"><?php echo $rejectionPercentage; ?>%</h3>
+                <?php echo $this->translate('Rejection Rate'); ?>
+            </a>
+        </li>
+        <li role="presentation">
+            <a href="#tatTab" aria-controls="messages" onclick="getTat();" role="tab" data-toggle="tab">
+                <h3 class="tabPercentageVal"><?php echo $tat . " Days"; ?></h3>
+                <?php echo $this->translate('Average TAT'); ?>
+            </a>
+        </li>
+    </ul>
+    <div class="tab-content">
+        <div role="tabpanel" class="tab-pane fade in active" id="samplesReceivedTab">
+            <div class="row" style="padding-top:5px;padding-bottom:10px;">
+                <div class="col-md-12">
+                    <div class="col-md-2">
+                        <select style="width:100%" name="sampleProvinceName[]" id="sampleProvinceName" class="form-control" multiple title="<?php echo $this->translate('Please select one or more province. Leave blank for All'); ?>">
+                            <?php
+                            foreach ($provinceName as $province) {
+                            ?>
+                                <option value="<?php echo $province['location_id']; ?>"><?php echo $province['location_name']; ?></option>
+                            <?php
+                            }
+                            ?>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <select style="width:100%" name="sampleDistrictName[]" id="sampleDistrictName" class="form-control" multiple title="<?php echo $this->translate('Please select one or more district. Leave blank for All'); ?>">
+                            <?php
+                            foreach ($districtName as $district) {
+                            ?>
+                                <option data-parent-location="<?php echo $district['parent_location']; ?>" value="<?php echo $district['location_id']; ?>"><?php echo $district['location_name']; ?></option>
+                            <?php
+                            }
+                            ?>
+                            <option value="0">Empty</option>
+                        </select>
+                    </div>
+
+                    <div class="col-lg-3">
+                        <select style="width:100%" class="form-control" id="sampleClinicId" name="sampleClinicId[]" multiple title="<?php echo $this->translate('Please select one or more clinics. Leave blank for All'); ?>">
+                            <?php
+                            foreach ($clinicName as $clinic) {
+                            ?>
+                                <option value="<?php echo $clinic['facility_id']; ?>" data-district="<?php echo $clinic['facility_district']; ?>"><?php echo $clinic['facility_code'] . " - " . $clinic['facility_name']; ?></option>
+                            <?php
+                            }
+                            ?>
+                        </select>
+                    </div>
+                    <!-- <div class="col-lg-2">
+                        <select style="width:100%" class="form-control" id="sampleResgisteredEidTestType" name="sampleResgisteredEidTestType" title="<?php echo $this->translate('Please select test type'); ?>">
+
+                            <option value=""></option>
+                            <option value="initialPcr">Initial PCR</option>
+                            <option value="secondThirdPcr">2nd/3rd PCR</option>
+                        </select>
+                    </div> -->
+                    <div class="col-lg-2">
+                        <div class="form-group" style="">
+                            <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="getSamplesReceivedBarChartInfo();"><?php echo $this->translate('Search'); ?></a>
+                            <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="resetSampleEverything();"><?php echo $this->translate('Reset'); ?></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12 col-sm-12">
+                    <div class="portlet box blue">
+                        <div class="portlet-title">
+                            <div class="caption">
+                                <span class="caption-subject"><?php echo $this->translate('Samples Registered'); ?></span>
+                            </div>
+                        </div>
+                        <div class="portlet-body" style="cursor:pointer;">
+                            <div id="samplesReceivedBarChartContainer"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12 col-sm-12">
+                    <div class="portlet box">
+                        <div class="portlet box blue">
+                            <div class="portlet-title">
+                                <div class="caption" id="samplesReceivedBlockTitle">
+                                    <i class="fa fa-cogs"></i><?php echo $this->translate('Districts/Facility Wise Samples Registered Summary'); ?>
+                                </div>
+                            </div>
+                            <div class="portlet-body">
+                                <div class="form-group">
+                                    <div class="col-md-12 text-center">
+                                        <div class="btn-group" data-toggle="btns" style="margin-bottom:10px;">
+                                            <a class="btn btn-default active" href="#facilityWiseSamplesReceivedSummary" data-toggle="tab" onclick="toggleSummary('facilityWiseSamplesReceivedSummary','districtWiseSamplesReceivedSummary','provinceWiseSamplesReceivedSummary');" style="font-size:13px;padding:4px 12px;"><?php echo $this->translate('Facilities'); ?></a>
+                                            <a class="btn btn-default" href="#provinceWiseSamplesReceivedSummary" data-toggle="tab" onclick="toggleSummary('provinceWiseSamplesReceivedSummary','districtWiseSamplesReceivedSummary','facilityWiseSamplesReceivedSummary');provinceWiseSamplesReceivedSummaryFn();" style="font-size:13px;padding:4px 12px;"><?php echo $this->translate('Province'); ?></a>
+                                            <a class="btn btn-default " href="#districtWiseSamplesReceivedSummary" data-toggle="tab" onclick="toggleSummary('districtWiseSamplesReceivedSummary','facilityWiseSamplesReceivedSummary','provinceWiseSamplesReceivedSummary');districtWiseSamplesReceivedSummaryFn();" style="font-size:13px;padding:4px 12px;"><?php echo $this->translate('Districts'); ?></a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="tab-content" style="border:none;height:560px;max-height:600px;overflow:scroll;">
+                                    <div class="tab-pane active" id="facilityWiseSamplesReceivedSummary">
+                                        <table class="table table-striped table-bordered table-hover order-column" id="samplesReceivedFacility" style="width:100%;">
+                                            <thead>
+                                                <tr>
+                                                    <th> <?php echo $this->translate('Facility'); ?> </th>
+                                                    <th> <?php echo $this->translate('Province'); ?> </th>
+                                                    <th> <?php echo $this->translate('District/County'); ?> </th>
+                                                    <th> <?php echo $this->translate('Samples Registered'); ?> </th>
+                                                    <th> <?php echo $this->translate('Samples Tested'); ?></th>
+                                                    <th> <?php echo $this->translate('Results Not Available'); ?></th>
+                                                    <th> <?php echo $this->translate('Samples Rejected'); ?></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td colspan="7" class="dataTables_empty">Loading data from server</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="tab-pane " id="provinceWiseSamplesReceivedSummary">
+                                        <table class="table table-striped table-bordered table-hover order-column" id="samplesReceivedProvince" style="width:100%;">
+                                            <thead>
+                                                <tr>
+                                                    <th> <?php echo $this->translate('Province'); ?> </th>
+                                                    <th> <?php echo $this->translate('Samples Registered'); ?> </th>
+                                                    <th> <?php echo $this->translate('Samples Tested'); ?></th>
+                                                    <th> <?php echo $this->translate('Results Not Available'); ?></th>
+                                                    <th> <?php echo $this->translate('Samples Rejected'); ?></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td colspan="5" class="dataTables_empty">Loading data from server</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="tab-pane" id="districtWiseSamplesReceivedSummary">
+                                        <table class="table table-striped table-bordered table-hover order-column" id="samplesReceivedDistrict" style="width:100%;">
+                                            <thead>
+                                                <tr>
+                                                    <th> <?php echo $this->translate('District/County'); ?> </th>
+                                                    <th> <?php echo $this->translate('Samples Registered'); ?> </th>
+                                                    <th> <?php echo $this->translate('Samples Tested'); ?></th>
+                                                    <th> <?php echo $this->translate('Results Not Available'); ?></th>
+                                                    <th> <?php echo $this->translate('Samples Rejected'); ?></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td colspan="5" class="dataTables_empty">Loading data from server</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div role="tabpanel" class="tab-pane fade" id="positiveRateTab">
+            <div class="row" style="padding-top:5px;padding-bottom:10px;">
+                <div class="col-md-12">
+                    <div class="col-md-3">
+                        <select style="width:100%" name="positiveProvinceName[]" id="positiveProvinceName" class="form-control" multiple title="<?php echo $this->translate('Please select one or more province. Leave blank for All'); ?>">
+                            <?php
+                            foreach ($provinceName as $province) {
+                            ?>
+                                <option value="<?php echo $province['location_id']; ?>"><?php echo $province['location_name']; ?></option>
+                            <?php
+                            }
+                            ?>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select style="width:100%" name="positiveDistrictName[]" id="positiveDistrictName" class="form-control" multiple title="<?php echo $this->translate('Please select one or more district. Leave blank for All'); ?>">
+                            <?php
+                            foreach ($districtName as $district) {
+                            ?>
+                                <option data-parent-location="<?php echo $district['parent_location']; ?>" value="<?php echo $district['location_id']; ?>"><?php echo $district['location_name']; ?></option>
+                            <?php
+                            }
+                            ?>
+                            <option value="0">Empty</option>
+                        </select>
+                    </div>
+
+                    <div class="col-lg-4">
+                        <select style="width:100%" class="form-control" id="positiveClinicId" name="positiveClinicId[]" multiple title="<?php echo $this->translate('Please select one or more clinics. Leave blank for All'); ?>">
+                            <?php
+                            foreach ($clinicName as $clinic) {
+                            ?>
+                                <option value="<?php echo $clinic['facility_id']; ?>" data-district="<?php echo $clinic['facility_district']; ?>"><?php echo $clinic['facility_code'] . " - " . $clinic['facility_name']; ?></option>
+                            <?php
+                            }
+                            ?>
+                        </select>
+                    </div>
+                    <div class="col-lg-2">
+                        <div class="form-group" style="">
+                            <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="getPositiveRateBarChartInfo();"><?php echo $this->translate('Search'); ?></a>
+                            <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="resetPositiveEverything();"><?php echo $this->translate('Reset'); ?></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12 col-sm-12">
+                    <div class="portlet box blue">
+                        <div class="portlet-title">
+                            <div class="caption">
+                                <span class="caption-subject"><?php echo $this->translate('Positive Rate'); ?></span>
+                            </div>
+                        </div>
+                        <div class="portlet-body" style="cursor:pointer;">
+                            <div id="positiveRateBarChartContainer"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12 col-sm-12">
+                    <div class="portlet box">
+                        <div class="portlet box blue">
+                            <div class="portlet-title">
+                                <div class="caption" id="positiveRateBlockTitle">
+                                    <i class="fa fa-cogs"></i><?php echo $this->translate('Facility Wise Positive Rate Summary'); ?>
+                                </div>
+                            </div>
+                            <div class="portlet-body">
+                                <div class="form-group">
+                                    <div class="col-md-12 text-center">
+                                        <div class="btn-group" data-toggle="btns" style="margin-bottom:10px;">
+                                            <a class="btn btn-default active" href="#facilityWisePositiveRateSummary" data-toggle="tab" onclick="toggleSummary('facilityWisePositiveRateSummary','districtWisePositiveRateSummary','provinceWisePositiveRateSummary');" style="font-size:13px;padding:4px 12px;"><?php echo $this->translate('Facilities'); ?></a>
+                                            <a class="btn btn-default " href="#provinceWisePositiveRateSummary" data-toggle="tab" onclick="toggleSummary('provinceWisePositiveRateSummary','districtWisePositiveRateSummary','facilityWisePositiveRateSummary');provinceWisePositiveRateSummaryFn();" style="font-size:13px;padding:4px 12px;"><?php echo $this->translate('Province'); ?></a>
+                                            <a class="btn btn-default" href="#districtWisePositiveRateSummary" data-toggle="tab" onclick="toggleSummary('districtWisePositiveRateSummary','facilityWisePositiveRateSummary','provinceWisePositiveRateSummary');districtWisePositiveRateSummaryFn();" style="font-size:13px;padding:4px 12px;"><?php echo $this->translate('Districts'); ?></a>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="tab-content" style="border:none;height:560px;max-height:600px;overflow:scroll;">
+                                    <div class="tab-pane active" id="facilityWisePositiveRateSummary">
+
+                                        <button class="btn btn-primary pull-right" onclick="exportPositiveRateByFacility();"><span><i class="fa fa-file-excel-o" aria-hidden="true"></i> <?php echo $this->translate('Export Excel'); ?></span></button> <br><br>
+                                        <table class="table table-striped table-bordered table-hover order-column" id="positiveRateFacility" style="width:100%;">
+                                            <thead>
+                                                <tr>
+                                                    <th> <?php echo $this->translate('Facility'); ?> </th>
+                                                    <th> <?php echo $this->translate('Province'); ?> </th>
+                                                    <th> <?php echo $this->translate('District/County'); ?> </th>
+                                                    <th> <?php echo $this->translate('Valid Results'); ?> </th>
+                                                    <th> <?php echo $this->translate('Suppressed Results'); ?></th>
+                                                    <th> <?php echo $this->translate('Non Suppressed Results'); ?></th>
+                                                    <th> <?php echo $this->translate('Samples Rejected'); ?></th>
+                                                    <th> <?php echo $this->translate('Positive Rate'); ?></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td colspan="6" class="dataTables_empty">Loading data from server</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="tab-pane " id="provinceWisePositiveRateSummary">
+                                        <table class="table table-striped table-bordered table-hover order-column" id="positiveRateProvince" style="width:100%;">
+                                            <thead>
+                                                <tr>
+                                                    <th> <?php echo $this->translate('Province'); ?> </th>
+                                                    <th> <?php echo $this->translate('Valid Results'); ?> </th>
+                                                    <th> <?php echo $this->translate('Suppressed Results'); ?></th>
+                                                    <th> <?php echo $this->translate('Non Suppressed Results'); ?></th>
+                                                    <th> <?php echo $this->translate('Samples Rejected'); ?></th>
+                                                    <th> <?php echo $this->translate('Positive Rate'); ?></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td colspan="6" class="dataTables_empty">Loading data from server</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="tab-pane " id="districtWisePositiveRateSummary">
+                                        <table class="table table-striped table-bordered table-hover order-column" id="positiveRateDistrict" style="width:100%;">
+                                            <thead>
+                                                <tr>
+                                                    <th> <?php echo $this->translate('District/County'); ?> </th>
+                                                    <th> <?php echo $this->translate('Valid Results'); ?> </th>
+                                                    <th> <?php echo $this->translate('Suppressed Results'); ?></th>
+                                                    <th> <?php echo $this->translate('Non Suppressed Results'); ?></th>
+                                                    <th> <?php echo $this->translate('Samples Rejected'); ?></th>
+                                                    <th> <?php echo $this->translate('Positive Rate'); ?></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td colspan="5" class="dataTables_empty">Loading data from server</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div role="tabpanel" class="tab-pane fade" id="samplesRejectedTab">
+            <div class="row" style="padding-top:5px;padding-bottom:10px;">
+                <div class="col-md-12">
+                    <div class="col-md-3">
+                        <select style="width:100%" name="rejectionProvinceName[]" id="rejectionProvinceName" class="form-control" multiple title="<?php echo $this->translate('Please select one or more province. Leave blank for All'); ?>">
+                            <?php
+                            foreach ($provinceName as $province) {
+                            ?>
+                                <option value="<?php echo $province['location_id']; ?>"><?php echo $province['location_name']; ?></option>
+                            <?php
+                            }
+                            ?>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select style="width:100%" name="rejectionDistrictName[]" id="rejectionDistrictName" class="form-control" multiple title="<?php echo $this->translate('Please select one or more district. Leave blank for All'); ?>">
+                            <?php
+                            foreach ($districtName as $district) {
+                            ?>
+                                <option data-parent-location="<?php echo $district['parent_location']; ?>" value="<?php echo $district['location_id']; ?>"><?php echo $district['location_name']; ?></option>
+                            <?php
+                            }
+                            ?>
+                            <option value="0">Empty</option>
+                        </select>
+                    </div>
+
+                    <div class="col-lg-4">
+                        <select style="width:100%" class="form-control" id="rejectionClinicId" name="rejectionClinicId[]" multiple title="<?php echo $this->translate('Please select one or more clinics. Leave blank for All'); ?>">
+                            <?php
+                            foreach ($clinicName as $clinic) {
+                            ?>
+                                <option value="<?php echo $clinic['facility_id']; ?>" data-district="<?php echo $clinic['facility_district']; ?>"><?php echo $clinic['facility_code'] . " - " . $clinic['facility_name']; ?></option>
+                            <?php
+                            }
+                            ?>
+                        </select>
+                    </div>
+                    <div class="col-lg-2">
+                        <div class="form-group" style="">
+                            <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="getSamplesRejectedBarChartInfo();"><?php echo $this->translate('Search'); ?></a>
+                            <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="resetRejectionEverything();"><?php echo $this->translate('Reset'); ?></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12 col-sm-12">
+                    <div class="portlet box blue">
+                        <div class="portlet-title">
+                            <div class="caption">
+                                <span class="caption-subject"><?php echo $this->translate('Samples Rejected'); ?></span>
+                            </div>
+                        </div>
+                        <div class="portlet-body" style="cursor:pointer;">
+                            <div id="samplesRejectedBarChartContainer"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12 col-sm-12">
+                    <div class="portlet box">
+                        <div class="portlet box blue">
+                            <div class="portlet-title">
+                                <div class="caption" id="samplesRejectedBlockTitle">
+                                    <i class="fa fa-cogs"></i><?php echo $this->translate('District Wise Samples Rejected Summary'); ?>
+                                </div>
+                            </div>
+                            <div class="portlet-body">
+                                <div class="form-group">
+                                    <div class="col-md-12 text-center">
+                                        <div class="btn-group" data-toggle="btns" style="margin-bottom:10px;">
+                                            <a class="btn btn-default active" href="#facilityWiseSamplesRejectedSummary" data-toggle="tab" onclick="toggleSummary('facilityWiseSamplesRejectedSummary','districtWiseSamplesRejectedSummary','provinceWiseSamplesRejectedSummary');" style="font-size:13px;padding:4px 12px;"><?php echo $this->translate('Facilities'); ?></a>
+                                            <a class="btn btn-default " href="#provinceWiseSamplesRejectedSummary" data-toggle="tab" onclick="toggleSummary('provinceWiseSamplesRejectedSummary','facilityWiseSamplesRejectedSummary','districtWiseSamplesRejectedSummary');provinceWiseSamplesRejectedSummaryFn();" style="font-size:13px;padding:4px 12px;"><?php echo $this->translate('Province'); ?></a>
+                                            <a class="btn btn-default" href="#districtWiseSamplesRejectedSummary" data-toggle="tab" onclick="toggleSummary('districtWiseSamplesRejectedSummary','facilityWiseSamplesRejectedSummary','provinceWiseSamplesRejectedSummary');districtWiseSamplesRejectedSummaryFn();" style="font-size:13px;padding:4px 12px;"><?php echo $this->translate('Districts'); ?></a>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="tab-content" style="border:none;height:560px;max-height:600px;overflow:scroll;">
+                                    <div class="tab-pane active" id="facilityWiseSamplesRejectedSummary">
+                                        <table class="table table-striped table-bordered table-hover order-column" id="samplesRejectedFacility" style="width:100%;">
+                                            <thead>
+                                                <tr>
+                                                    <th> <?php echo $this->translate('Facility'); ?> </th>
+                                                    <th> <?php echo $this->translate('Province'); ?> </th>
+                                                    <th> <?php echo $this->translate('District/County'); ?> </th>
+                                                    <th> <?php echo $this->translate('Samples Registered'); ?> </th>
+                                                    <th> <?php echo $this->translate('Rejection Rate(%)'); ?> </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td colspan="4" class="dataTables_empty">Loading data from server</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="tab-pane " id="provinceWiseSamplesRejectedSummary">
+                                        <table class="table table-striped table-bordered table-hover order-column" id="samplesRejectedProvince" style="width:100%;">
+                                            <thead>
+                                                <tr>
+                                                    <th> <?php echo $this->translate('Province'); ?> </th>
+                                                    <th> <?php echo $this->translate('Samples Registered'); ?> </th>
+                                                    <th> <?php echo $this->translate('Samples Rejected'); ?></th>
+                                                    <th> <?php echo $this->translate('Rejection Rate(%)'); ?> </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td colspan="4" class="dataTables_empty">Loading data from server</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="tab-pane " id="districtWiseSamplesRejectedSummary">
+                                        <table class="table table-striped table-bordered table-hover order-column" id="samplesRejectedDistrict" style="width:100%;">
+                                            <thead>
+                                                <tr>
+                                                    <th> <?php echo $this->translate('District/County'); ?> </th>
+                                                    <th> <?php echo $this->translate('Samples Registered'); ?> </th>
+                                                    <th> <?php echo $this->translate('Samples Rejected'); ?></th>
+                                                    <th> <?php echo $this->translate('Rejection Rate(%)'); ?> </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td colspan="4" class="dataTables_empty">Loading data from server</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div role="tabpanel" class="tab-pane fade" id="tatTab">
+            <div class="row">
+                <div class="col-md-12 col-sm-12">
+                    <div class="portlet box blue">
+                        <div class="portlet-title">
+                            <div class="caption">
+                                <span class="caption-subject"><?php echo $this->translate('Turnaround Time'); ?></span>
+                            </div>
+                        </div>
+                        <div class="portlet-body" id="turnaroundTimeChartBody">
+                            <div class="portlet-body" id="nationalTATBody">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div id="nationalTAT" style="height:100px;"></div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="col-md-6">
+                                                    <div class="key cr">
+                                                        <center>Collection to Receipt (C-R)</center>
+                                                    </div>
+                                                    <div class="key rp">
+                                                        <center>Receipt to Processing (R-P)</center>
+                                                    </div>
+                                                    <div class="key pd">
+                                                        <center>Processing to Dispatch (P-D)</center>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+
+                                                    <div class="cd-top"></div>
+                                                    <div class="key cd">
+                                                        <center>
+                                                            <div class="cd"></div>Avg. TAT<br>Collection to Dispatch (C-D)
+                                                        </center>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<br>
+<div class="row" id="summaryOfKeyIndicatorsDiv">
+    <div class="col-md-12 col-sm-12">
+        <div class="portlet box">
+            <div class="portlet box blue">
+                <div class="portlet-title">
+                    <div class="caption" id="blockTitle">
+                        <i class="fa fa-cogs"></i><?php echo $this->translate('SUMMARY OF KEY INDICATORS'); ?>
+                    </div>
+                    <div class="actions" style="width:<?php echo (isset($languagecontainer->locale) &&  $languagecontainer->locale == 'pt_BR') ? '36%' : '44%'; ?>;">
+                        <div class="tools" id="exportHighVlSample" style="float:right;text-align:right;">
+                            <button class="btn btn-default" onclick="exportSummaryIndicatorResult();"><span><i class="fa fa-file-excel-o" aria-hidden="true"></i> <?php echo $this->translate('Export Excel'); ?></span></button>
+                        </div>&nbsp;&nbsp;
+                    </div>
+                </div>
+                <div class="portlet-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <select style="width:100%" name="indProvinceName[]" id="indProvinceName" multiple class="form-control" title="<?php echo $this->translate('Please select one or more province. Leave blank for All'); ?>">
+                                <?php
+                                foreach ($provinceName as $province) {
+                                ?>
+                                    <option value="<?php echo $province['location_id']; ?>"><?php echo $province['location_name']; ?></option>
+                                <?php
+                                }
+                                ?>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <select style="width:100%" name="indDistrictName[]" id="indDistrictName" multiple class="form-control" title="<?php echo $this->translate('Please select one or more district. Leave blank for All'); ?>">
+                                <?php
+                                foreach ($districtName as $district) {
+                                ?>
+                                    <option data-parent-location="<?php echo $district['parent_location']; ?>" value="<?php echo $district['location_id']; ?>"><?php echo $district['location_name']; ?></option>
+                                <?php
+                                }
+                                ?>
+                                <option value="0">Empty</option>
+                            </select>
+                        </div>
+                        <div class="col-lg-4">
+                            <select style="width:100%" class="form-control" id="indClinicId" name="indClinicId[]" multiple title="<?php echo $this->translate('Please select one or more clinics. Leave blank for All'); ?>">
+                                <?php
+                                foreach ($clinicName as $clinic) {
+                                ?>
+                                    <option value="<?php echo $clinic['facility_id']; ?>" data-district="<?php echo $clinic['facility_district']; ?>"><?php echo $clinic['facility_code'] . " - " . $clinic['facility_name']; ?></option>
+                                <?php
+                                }
+                                ?>
+                            </select>
+                        </div>
+                        <div class="col-lg-2">
+                            <div class="form-group" style="">
+                                <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="getSummaryIndicators();"><?php echo $this->translate('Search'); ?></a>
+                                <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="resetIndicators();"><?php echo $this->translate('Reset'); ?></a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-toolbar" id="keyIndicatorsSummary" style="overflow-x:scroll;">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="row">
+    <div class="col-md-6 col-sm-6">
+        <div class="portlet box blue">
+            <div class="portlet-title">
+                <div class="caption">
+                    <span class="caption-subject"><?php echo $this->translate('EID Outcomes'); ?></span>
+                </div>
+            </div>
+            <div class="portlet-body" id="eidOutcomesBody">
+                <div id="eidOutcomes" style="height:400px;"></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-sm-6">
+        <div class="portlet box blue">
+            <div class="portlet-title">
+                <div class="caption">
+                    <span class="caption-subject"><?php echo $this->translate('EID Outcomes by Age'); ?></span>
+                </div>
+            </div>
+            <div class="portlet-body" id="eidOutcomesByAgeBody">
+                <div id="eidOutcomesByAge" style="height:400px;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12 col-sm-12">
+        <div class="portlet box blue">
+            <div class="portlet-title">
+                <div class="caption">
+                    <span class="caption-subject"><?php echo $this->translate('EID Outcomes - By Province'); ?></span>
+                </div>
+            </div>
+            <div class="portlet-body" id="eidOutcomesProvinceBody">
+                <div id="eidOutcomesProvince" style="height:300px;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</div>
+<script src="<?php echo $this->basePath('assets/plugins/datepicker/bootstrap-datepicker.js') ?>"></script>
+<script src="<?php echo $this->basePath('assets/pages/scripts/dashboard.js'); ?>" type="text/javascript"></script>
+<script src="<?php echo $this->basePath('assets/global/plugins/jquery.blockui.min.js'); ?>" type="text/javascript"></script>
+<script type="text/javascript">
+    var oTableSamplesReceivedDistrict = null;
+    var oTableSamplesReceivedFacility = null;
+    var oTableSamplesReceivedProvince = null;
+
+    var oTablePositiveRateDistrict = null;
+    var oTablePositiveRateFacility = null;
+    var oTablePositiveRateProvince = null;
+
+    var oTableSamplesRejectedDistrict = null;
+    var oTableSamplesRejectedFacility = null;
+    var oTableSamplesRejectedProvince = null;
+
+    geteidOutcomes();
+    geteidOutcomesByAge();
+    geteidOutcomesByProvince();
+    nationalTAT();
+
+    function getSamplesRegisteredTab() {
+
+        $(document).ajaxStart($.blockUI({
+            message: '<h2><?php echo $this->translate('Processing...'); ?></h2>'
+        })).ajaxStop($.unblockUI);
+        getSamplesReceivedBarChartInfo();
+        facilityWiseSamplesReceivedSummaryFn();
+
+    }
+
+    function getPositiveRateTab() {
+        $(document).ajaxStart($.blockUI({
+            message: '<h2><?php echo $this->translate('Processing...'); ?></h2>'
+        })).ajaxStop($.unblockUI);
+        getPositiveRateBarChartInfo();
+        facilityWisePositiveRateSummaryFn();
+    }
+
+    function getRejectionRateTab() {
+        $(document).ajaxStart($.blockUI({
+            message: '<h2><?php echo $this->translate('Processing...'); ?></h2>'
+        })).ajaxStop($.unblockUI);
+        getSamplesRejectedBarChartInfo();
+        facilityWiseSamplesRejectedSummaryFn();
+    }
+
+
+
+    function isOnScreen(elem) {
+        // if the element doesn't exist, abort
+        if (elem.length == 0) {
+            return;
+        }
+        var $window = jQuery(window)
+        var viewport_top = $window.scrollTop()
+        var viewport_height = $window.height()
+        var viewport_bottom = viewport_top + viewport_height
+        var $elem = jQuery(elem)
+        //console.log($elem.offset().top);
+        var top = $elem.offset().top
+        var height = $elem.height()
+        var bottom = top + height
+
+        return (top >= viewport_top && top < viewport_bottom) ||
+            (bottom > viewport_top && bottom <= viewport_bottom) ||
+            (height > viewport_height && top <= viewport_top && bottom >= viewport_bottom)
+    }
+    var scrollCounter = 0;
+    $(function() {
+        window.addEventListener('scroll', function(e) {
+            // we dont want to call it each time there is a scroll event
+            if (scrollCounter == 0) {
+                if (isOnScreen(jQuery('#summaryOfKeyIndicatorsDiv'))) {
+                    scrollCounter++;
+                    getSummaryIndicators();
+                }
+            }
+
+        });
+
+        toggleSummary('facilityWiseSamplesReceivedSummary', 'provinceWiseSamplesReceivedSummary', 'districtWiseSamplesReceivedSummary');
+        toggleSummary('facilityWisePositiveRateSummary', 'provinceWisePositiveRateSummary', 'districtWisePositiveRateSummary');
+        toggleSummary('facilityWiseSamplesRejectedSummary', 'provinceWiseSamplesRejectedSummary', 'districtWiseSamplesRejectedSummary');
+
+        $.blockUI.defaults.css.border = '1px solid grey';
+        $(document).ajaxStart($.blockUI({
+            message: '<h2><?php echo $this->translate('Processing...'); ?></h2>'
+        })).ajaxStop($.unblockUI);
+
+        getSamplesRegisteredTab();
+
+
+        /* District ,Province and Facilities */
+        $('#provinceName').select2({
+            placeholder: "<?php echo $this->translate('All Province'); ?>",
+            allowClear: true
+        });
+        $('#districtName').select2({
+            placeholder: "<?php echo $this->translate('All Districts'); ?>",
+            allowClear: true,
+        });
+        $('#clinicId').select2({
+            placeholder: "<?php echo $this->translate('All Facilities'); ?>",
+            allowClear: true
+        });
+
+
+        $('#indProvinceName').select2({
+            placeholder: "<?php echo $this->translate('All Province'); ?>",
+            allowClear: true
+        });
+        $('#indDistrictName').select2({
+            placeholder: "<?php echo $this->translate('All Districts'); ?>",
+            allowClear: true,
+        });
+        $('#indClinicId').select2({
+            placeholder: "<?php echo $this->translate('All Facilities'); ?>",
+            allowClear: true
+        });
+
+        $('#sampleProvinceName').select2({
+            placeholder: "<?php echo $this->translate('All Province'); ?>",
+            allowClear: true
+        });
+        $('#sampleDistrictName').select2({
+            placeholder: "<?php echo $this->translate('All Districts'); ?>",
+            allowClear: true,
+        });
+        $('#sampleClinicId').select2({
+            placeholder: "<?php echo $this->translate('All Facilities'); ?>",
+            allowClear: true
+        });
+        /* $('#sampleResgisteredEidTestType').select2({
+            placeholder: "<?php echo $this->translate('All PCR'); ?>",
+            allowClear: true
+        }); */
+
+        $('#positiveProvinceName').select2({
+            placeholder: "<?php echo $this->translate('All Province'); ?>",
+            allowClear: true
+        });
+        $('#positiveDistrictName').select2({
+            placeholder: "<?php echo $this->translate('All Districts'); ?>",
+            allowClear: true,
+        });
+        $('#positiveClinicId').select2({
+            placeholder: "<?php echo $this->translate('All Facilities'); ?>",
+            allowClear: true
+        });
+        $('#rejectionProvinceName').select2({
+            placeholder: "<?php echo $this->translate('All Province'); ?>",
+            allowClear: true
+        });
+        $('#rejectionDistrictName').select2({
+            placeholder: "<?php echo $this->translate('All Districts'); ?>",
+            allowClear: true,
+        });
+        $('#rejectionClinicId').select2({
+            placeholder: "<?php echo $this->translate('All Facilities'); ?>",
+            allowClear: true
+        });
+    });
+
+    function districtWiseSamplesReceivedSummaryFn() {
+        oTableSamplesReceivedDistrict = $('#samplesReceivedDistrict').DataTable({
+            "bProcessing": true,
+            "bServerSide": true,
+            "bRetrieve": true,
+            "bAutoWidth": true,
+            // "sScrollX": true,
+            "aoColumns": [{
+                    "sClass": "center"
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                }
+            ],
+            "iDisplayLength": 10,
+            "aaSorting": [
+                [1, "desc"]
+            ],
+            "pagingType": "simple",
+            "sAjaxSource": "<?php echo $this->url('covid19-summary', array('action' => 'samples-received-district')); ?>",
+            "fnServerData": function(sSource, aoData, fnCallback) {
+                aoData.push({
+                    "name": "fromDate",
+                    "value": formatDate($('#mrp-lowerDate').val())
+                });
+                aoData.push({
+                    "name": "toDate",
+                    "value": formatDate($('#mrp-upperDate').val())
+                });
+                $.ajax({
+                    "dataType": 'json',
+                    "type": "POST",
+                    "url": sSource,
+                    "data": aoData,
+                    "success": fnCallback
+                });
+            }
+        });
+    }
+
+    function facilityWiseSamplesReceivedSummaryFn() {
+        oTableSamplesReceivedFacility = $('#samplesReceivedFacility').DataTable({
+            "bProcessing": true,
+            "bServerSide": true,
+            "bRetrieve": true,
+            "bAutoWidth": true,
+            // "sScrollX": true,
+            "aoColumns": [{
+                    "sClass": "center"
+                },
+                {
+                    "sClass": "center"
+                },
+                {
+                    "sClass": "center"
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                }
+            ],
+            "iDisplayLength": 10,
+            "aaSorting": [
+                [3, "desc"]
+            ],
+            "pagingType": "simple",
+            "sAjaxSource": "<?php echo $this->url('covid19-summary', array('action' => 'samples-received-facility')); ?>",
+            "fnServerData": function(sSource, aoData, fnCallback) {
+                aoData.push({
+                    "name": "fromDate",
+                    "value": formatDate($('#mrp-lowerDate').val())
+                });
+                aoData.push({
+                    "name": "toDate",
+                    "value": formatDate($('#mrp-upperDate').val())
+                });
+                $.ajax({
+                    "dataType": 'json',
+                    "type": "POST",
+                    "url": sSource,
+                    "data": aoData,
+                    "success": fnCallback
+                });
+            }
+        });
+    }
+
+    function provinceWiseSamplesReceivedSummaryFn() {
+        oTableSamplesReceivedProvince = $('#samplesReceivedProvince').DataTable({
+            "bProcessing": true,
+            "bServerSide": true,
+            "bRetrieve": true,
+            "bAutoWidth": true,
+            // "sScrollX": true,
+            "aoColumns": [{
+                    "sClass": "center"
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                }
+            ],
+
+            "iDisplayLength": 10,
+            "aaSorting": [
+                [1, "desc"]
+            ],
+            "pagingType": "simple",
+            "sAjaxSource": "<?php echo $this->url('covid19-summary', array('action' => 'samples-received-province')); ?>",
+            "fnServerData": function(sSource, aoData, fnCallback) {
+                aoData.push({
+                    "name": "fromDate",
+                    "value": formatDate($('#mrp-lowerDate').val())
+                });
+                aoData.push({
+                    "name": "toDate",
+                    "value": formatDate($('#mrp-upperDate').val())
+                });
+                $.ajax({
+                    "dataType": 'json',
+                    "type": "POST",
+                    "url": sSource,
+                    "data": aoData,
+                    "success": fnCallback
+                });
+            }
+        });
+    }
+
+    function districtWisePositiveRateSummaryFn() {
+        oTablePositiveRateDistrict = $('#positiveRateDistrict').DataTable({
+            "bProcessing": true,
+            "bServerSide": true,
+            "bRetrieve": true,
+            "bAutoWidth": true,
+            //"sScrollX": true,
+            "aoColumns": [{
+                    "sClass": "center"
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                }
+            ],
+            "iDisplayLength": 10,
+            "aaSorting": [
+                [1, "desc"]
+            ],
+            "pagingType": "simple",
+            "sAjaxSource": "<?php echo $this->url('eid-summary', array('action' => 'positive-rate-district')); ?>",
+            "fnServerData": function(sSource, aoData, fnCallback) {
+                aoData.push({
+                    "name": "fromDate",
+                    "value": formatDate($('#mrp-lowerDate').val())
+                });
+                aoData.push({
+                    "name": "toDate",
+                    "value": formatDate($('#mrp-upperDate').val())
+                });
+                $.ajax({
+                    "dataType": 'json',
+                    "type": "POST",
+                    "url": sSource,
+                    "data": aoData,
+                    "success": fnCallback
+                });
+            }
+        });
+    }
+
+
+    function facilityWisePositiveRateSummaryFn() {
+        oTablePositiveRateFacility = $('#positiveRateFacility').DataTable({
+            "bProcessing": true,
+            "bServerSide": true,
+            "bRetrieve": true,
+            "bAutoWidth": true,
+            // "scrollX":false,
+            "aoColumns": [{
+                    "sClass": "center"
+                },
+                {
+                    "sClass": "center"
+                },
+                {
+                    "sClass": "center"
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                }
+            ],
+            "iDisplayLength": 10,
+            "aaSorting": [
+                [3, "desc"]
+            ],
+            "pagingType": "simple",
+            "sAjaxSource": "<?php echo $this->url('eid-summary', array('action' => 'positive-rate-facility')); ?>",
+            "fnServerData": function(sSource, aoData, fnCallback) {
+                aoData.push({
+                    "name": "fromDate",
+                    "value": formatDate($('#mrp-lowerDate').val())
+                });
+                aoData.push({
+                    "name": "toDate",
+                    "value": formatDate($('#mrp-upperDate').val())
+                });
+                $.ajax({
+                    "dataType": 'json',
+                    "type": "POST",
+                    "url": sSource,
+                    "data": aoData,
+                    "success": fnCallback
+                });
+            }
+        });
+    }
+
+    function provinceWisePositiveRateSummaryFn() {
+        oTablePositiveRateProvince = $('#positiveRateProvince').DataTable({
+            "bProcessing": true,
+            "bServerSide": true,
+            "bRetrieve": true,
+            "bAutoWidth": true,
+            // "scrollX":false,
+            "aoColumns": [{
+                    "sClass": "center"
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                }
+            ],
+            "iDisplayLength": 10,
+            "aaSorting": [
+                [1, "desc"]
+            ],
+            "pagingType": "simple",
+            "sAjaxSource": "<?php echo $this->url('eid-summary', array('action' => 'positive-rate-province')); ?>",
+            "fnServerData": function(sSource, aoData, fnCallback) {
+                aoData.push({
+                    "name": "fromDate",
+                    "value": formatDate($('#mrp-lowerDate').val())
+                });
+                aoData.push({
+                    "name": "toDate",
+                    "value": formatDate($('#mrp-upperDate').val())
+                });
+                $.ajax({
+                    "dataType": 'json',
+                    "type": "POST",
+                    "url": sSource,
+                    "data": aoData,
+                    "success": fnCallback
+                });
+            }
+        });
+    }
+
+    function districtWiseSamplesRejectedSummaryFn() {
+        oTableSamplesRejectedDistrict = $('#samplesRejectedDistrict').DataTable({
+            "bProcessing": true,
+            "bServerSide": true,
+            "bRetrieve": true,
+            "bAutoWidth": true,
+            //"scrollX":true,
+            "aoColumns": [{
+                    "sClass": "center"
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                }
+            ],
+            "iDisplayLength": 10,
+            "aaSorting": [
+                [1, "desc"]
+            ],
+            "pagingType": "simple",
+            "sAjaxSource": "<?php echo $this->url('eid-summary', array('action' => 'samples-rejected-district')); ?>",
+            "fnServerData": function(sSource, aoData, fnCallback) {
+                aoData.push({
+                    "name": "fromDate",
+                    "value": formatDate($('#mrp-lowerDate').val())
+                });
+                aoData.push({
+                    "name": "toDate",
+                    "value": formatDate($('#mrp-upperDate').val())
+                });
+                $.ajax({
+                    "dataType": 'json',
+                    "type": "POST",
+                    "url": sSource,
+                    "data": aoData,
+                    "success": fnCallback
+                });
+            }
+        });
+    }
+
+    function facilityWiseSamplesRejectedSummaryFn() {
+        oTableSamplesRejectedDistrict = $('#samplesRejectedFacility').DataTable({
+            "bProcessing": true,
+            "bServerSide": true,
+            "bRetrieve": true,
+            "bAutoWidth": true,
+
+            //"scrollX":true,
+            "aoColumns": [{
+                    "sClass": "center"
+                },
+                {
+                    "sClass": "center"
+                },
+                {
+                    "sClass": "center"
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                }
+            ],
+            "iDisplayLength": 10,
+            "aaSorting": [
+                [3, "desc"]
+            ],
+            "pagingType": "simple",
+            "sAjaxSource": "<?php echo $this->url('eid-summary', array('action' => 'samples-rejected-facility')); ?>",
+            "fnServerData": function(sSource, aoData, fnCallback) {
+                aoData.push({
+                    "name": "fromDate",
+                    "value": formatDate($('#mrp-lowerDate').val())
+                });
+                aoData.push({
+                    "name": "toDate",
+                    "value": formatDate($('#mrp-upperDate').val())
+                });
+                $.ajax({
+                    "dataType": 'json',
+                    "type": "POST",
+                    "url": sSource,
+                    "data": aoData,
+                    "success": fnCallback
+                });
+            }
+        });
+    }
+
+    function provinceWiseSamplesRejectedSummaryFn() {
+        oTableSamplesRejectedProvince = $('#samplesRejectedProvince').DataTable({
+            "bProcessing": true,
+            "bServerSide": true,
+            "bRetrieve": true,
+            "bAutoWidth": true,
+            //"scrollX":true,
+            "aoColumns": [{
+                    "sClass": "center"
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                },
+                {
+                    "sClass": "center",
+                    "bSortable": true
+                }
+            ],
+            "iDisplayLength": 10,
+            "aaSorting": [
+                [3, "desc"]
+            ],
+            "pagingType": "simple",
+            "sAjaxSource": "<?php echo $this->url('eid-summary', array('action' => 'samples-rejected-province')); ?>",
+            "fnServerData": function(sSource, aoData, fnCallback) {
+                aoData.push({
+                    "name": "fromDate",
+                    "value": formatDate($('#mrp-lowerDate').val())
+                });
+                aoData.push({
+                    "name": "toDate",
+                    "value": formatDate($('#mrp-upperDate').val())
+                });
+                $.ajax({
+                    "dataType": 'json',
+                    "type": "POST",
+                    "url": sSource,
+                    "data": aoData,
+                    "success": fnCallback
+                });
+            }
+        });
+    }
+
+
+
+    function toggleSummary(showId, hideId, hideId2) {
+        $("#" + showId).show();
+        $("#" + hideId).hide();
+        $("#" + hideId2).hide();
+        if (showId === 'districtWiseSamplesReceivedSummary') {
+            $("#samplesReceivedBlockTitle").html("<i class='fa fa-cogs'></i><?php echo $this->translate('District Wise Samples Registered'); ?>");
+        } else if (showId === 'facilityWiseSamplesReceivedSummary') {
+            $("#samplesReceivedBlockTitle").html("<i class='fa fa-cogs'></i><?php echo $this->translate('Facility Wise Samples Registered'); ?>");
+        } else if (showId === 'provinceWiseSamplesReceivedSummary') {
+            $("#samplesReceivedBlockTitle").html("<i class='fa fa-cogs'></i><?php echo $this->translate('Province Wise Samples Registered'); ?>");
+        } else if (showId === 'districtWisePositiveRateSummary') {
+            $("#positiveRateBlockTitle").html("<i class='fa fa-cogs'></i><?php echo $this->translate('District Wise Positive Rate'); ?>");
+        } else if (showId === 'facilityWisePositiveRateSummary') {
+            $("#positiveRateBlockTitle").html("<i class='fa fa-cogs'></i><?php echo $this->translate('Facility Wise Positive Rate'); ?>");
+        } else if (showId === 'provinceWisePositiveRateSummary') {
+            $("#positiveRateBlockTitle").html("<i class='fa fa-cogs'></i><?php echo $this->translate('Province Wise Positive Rate'); ?>");
+        } else if (showId === 'districtWiseSamplesRejectedSummary') {
+            $("#samplesRejectedBlockTitle").html("<i class='fa fa-cogs'></i><?php echo $this->translate('District Wise Samples Rejected'); ?>");
+        } else if (showId === 'facilityWiseSamplesRejectedSummary') {
+            $("#samplesRejectedBlockTitle").html("<i class='fa fa-cogs'></i><?php echo $this->translate('Facility Wise Samples Rejected'); ?>");
+        } else if (showId === 'provinceWiseSamplesRejectedSummary') {
+            $("#samplesRejectedBlockTitle").html("<i class='fa fa-cogs'></i><?php echo $this->translate('Province Wise Samples Rejected'); ?>");
+        }
+
+    }
+
+    $('[data-toggle="btns"] .btn').on('click', function() {
+        var $this = $(this);
+        $this.parent().find('.active').removeClass('active');
+        $this.addClass('active');
+    });
+
+    function getSamplesReceivedBarChartInfo() {
+        sampDistrictIdList = ($("#sampleDistrictName").val() == null) ? '' : $("#sampleDistrictName").val().join(',');
+        sampProvinceIdList = ($("#sampleProvinceName").val() == null) ? '' : $("#sampleProvinceName").val().join(',');
+        sampClinicIdList = ($("#sampleClinicId").val() == null) ? '' : $('#sampleClinicId').val().join(',');
+        // sampleResgisteredEidTestType = ($("#sampleResgisteredEidTestType").val() == null) ? '' : $('#sampleResgisteredEidTestType').val();
+        var fromDate = formatDate($('#mrp-lowerDate').val());
+        var toDate = formatDate($('#mrp-upperDate').val());
+        $.post("<?php echo $this->url('covid19-summary', array('action' => 'get-samples-received-bar-chart')); ?>", {
+                districts: sampDistrictIdList,
+                provinces: sampProvinceIdList,
+                clinics: sampClinicIdList,
+                // sampleResgisteredEidTestType: sampleResgisteredEidTestType,
+                fromDate: fromDate,
+                toDate: toDate
+            },
+            function(data) {
+                $("#samplesReceivedBarChartContainer").html(data);
+            });
+    }
+
+    function getPositiveRateBarChartInfo() {
+        supDistrictIdList = ($("#positiveDistrictName").val() == null) ? '' : $("#positiveDistrictName").val().join(',');
+        supProvinceIdList = ($("#positiveProvinceName").val() == null) ? '' : $("#positiveProvinceName").val().join(',');
+        supClinicIdList = ($("#positiveClinicId").val() == null) ? '' : $('#positiveClinicId').val().join(',');
+        var fromDate = formatDate($('#mrp-lowerDate').val());
+        var toDate = formatDate($('#mrp-upperDate').val());
+        $.post("<?php echo $this->url('eid-summary', array('action' => 'get-positive-rate-bar-chart')); ?>", {
+                districts: supDistrictIdList,
+                provinces: supProvinceIdList,
+                clinics: supClinicIdList,
+                fromDate: fromDate,
+                toDate: toDate
+            },
+            function(data) {
+                $("#positiveRateBarChartContainer").html(data);
+            });
+    }
+
+    function getSamplesRejectedBarChartInfo() {
+        rejDistrictIdList = ($("#rejectionDistrictName").val() == null) ? '' : $("#rejectionDistrictName").val().join(',');
+        rejProvinceIdList = ($("#rejectionProvinceName").val() == null) ? '' : $("#rejectionProvinceName").val().join(',');
+        rejClinicIdList = ($("#rejectionClinicId").val() == null) ? '' : $('#rejectionClinicId').val().join(',');
+        var fromDate = formatDate($('#mrp-lowerDate').val());
+        var toDate = formatDate($('#mrp-upperDate').val());
+        $.post("<?php echo $this->url('eid-summary', array('action' => 'get-samples-rejected-bar-chart')); ?>", {
+                districts: rejDistrictIdList,
+                provinces: rejProvinceIdList,
+                clinics: rejClinicIdList,
+                fromDate: fromDate,
+                toDate: toDate
+            },
+            function(data) {
+                $("#samplesRejectedBarChartContainer").html(data);
+            });
+    }
+
+
+    /* Reset Everything Fn */
+    function resetEverything() {
+        $("#districtName").select2('val', '');
+        $("#provinceName").select2('val', '');
+        $('#clinicId').select2('val', '');
+    }
+
+
+
+    function getSummaryIndicators() {
+        $(document).ajaxStart($.blockUI({
+            message: '<h4> <?php echo ($this->translate('Processing Summary of Key Indicators')); ?> ... </h4>'
+        })).ajaxStop($.unblockUI);
+        var indDistrictIdList = ($("#indDistrictName").val() == null) ? '' : $("#indDistrictName").val().join(',');
+        var indProvinceIdList = ($("#indProvinceName").val() == null) ? '' : $("#indProvinceName").val().join(',');
+        var indClinicIdList = ($("#indClinicId").val() == null) ? '' : $('#indClinicId').val().join(',');
+        var fromDate = formatDate($('#mrp-lowerDate').val());
+        var toDate = formatDate($('#mrp-upperDate').val());
+        $.post("<?php echo $this->url('eid-summary', array('action' => 'get-indicators')); ?>", {
+                districts: indDistrictIdList,
+                provinces: indProvinceIdList,
+                clinics: indClinicIdList,
+                fromDate: fromDate,
+                toDate: toDate
+            },
+            function(data) {
+                $("#keyIndicatorsSummary").html(data);
+                $.unblockUI();
+            });
+    }
+
+    function geteidOutcomes() {
+        $(document).ajaxStart($.blockUI({
+            message: '<h4> <?php echo ($this->translate('Processing EID Outcomes')); ?> ... </h4>'
+        })).ajaxStop($.unblockUI);
+        var indDistrictIdList = ($("#indDistrictName").val() == null) ? '' : $("#indDistrictName").val().join(',');
+        var indProvinceIdList = ($("#indProvinceName").val() == null) ? '' : $("#indProvinceName").val().join(',');
+        var indClinicIdList = ($("#indClinicId").val() == null) ? '' : $('#indClinicId').val().join(',');
+        var fromDate = formatDate($('#mrp-lowerDate').val());
+        var toDate = formatDate($('#mrp-upperDate').val());
+        $.post("<?php echo $this->url('eid-summary', array('action' => 'get-eid-outcomes')); ?>", {
+                districts: indDistrictIdList,
+                provinces: indProvinceIdList,
+                clinics: indClinicIdList,
+                fromDate: fromDate,
+                toDate: toDate
+            },
+            function(data) {
+                $("#eidOutcomes").html(data);
+                $.unblockUI();
+            });
+    }
+
+    function geteidOutcomesByAge() {
+        $(document).ajaxStart($.blockUI({
+            message: '<h4> <?php echo ($this->translate('Processing EID Outcomes By Age')); ?> ... </h4>'
+        })).ajaxStop($.unblockUI);
+        var indDistrictIdList = ($("#indDistrictName").val() == null) ? '' : $("#indDistrictName").val().join(',');
+        var indProvinceIdList = ($("#indProvinceName").val() == null) ? '' : $("#indProvinceName").val().join(',');
+        var indClinicIdList = ($("#indClinicId").val() == null) ? '' : $('#indClinicId').val().join(',');
+        var fromDate = formatDate($('#mrp-lowerDate').val());
+        var toDate = formatDate($('#mrp-upperDate').val());
+        $.post("<?php echo $this->url('eid-summary', array('action' => 'get-eid-outcomes-by-age')); ?>", {
+                districts: indDistrictIdList,
+                provinces: indProvinceIdList,
+                clinics: indClinicIdList,
+                fromDate: fromDate,
+                toDate: toDate
+            },
+            function(data) {
+                $("#eidOutcomesByAge").html(data);
+                $.unblockUI();
+            });
+    }
+
+    function geteidOutcomesByProvince() {
+        $(document).ajaxStart($.blockUI({
+            message: '<h4> <?php echo ($this->translate('Processing EID Outcomes By Province')); ?> ... </h4>'
+        })).ajaxStop($.unblockUI);
+        var indDistrictIdList = ($("#indDistrictName").val() == null) ? '' : $("#indDistrictName").val().join(',');
+        var indProvinceIdList = ($("#indProvinceName").val() == null) ? '' : $("#indProvinceName").val().join(',');
+        var indClinicIdList = ($("#indClinicId").val() == null) ? '' : $('#indClinicId').val().join(',');
+        var fromDate = formatDate($('#mrp-lowerDate').val());
+        var toDate = formatDate($('#mrp-upperDate').val());
+        $.post("<?php echo $this->url('eid-summary', array('action' => 'get-eid-outcomes-by-province')); ?>", {
+                districts: indDistrictIdList,
+                provinces: indProvinceIdList,
+                clinics: indClinicIdList,
+                fromDate: fromDate,
+                toDate: toDate
+            },
+            function(data) {
+                $("#eidOutcomesProvince").html(data);
+                $.unblockUI();
+            });
+    }
+
+    function nationalTAT() {
+        $(document).ajaxStart($.blockUI({
+            message: '<h4> <?php echo ($this->translate('Processing EID Outcomes By Province')); ?> ... </h4>'
+        })).ajaxStop($.unblockUI);
+        var indDistrictIdList = ($("#indDistrictName").val() == null) ? '' : $("#indDistrictName").val().join(',');
+        var indProvinceIdList = ($("#indProvinceName").val() == null) ? '' : $("#indProvinceName").val().join(',');
+        var indClinicIdList = ($("#indClinicId").val() == null) ? '' : $('#indClinicId').val().join(',');
+        var fromDate = formatDate($('#mrp-lowerDate').val());
+        var toDate = formatDate($('#mrp-upperDate').val());
+        $.post("<?php echo $this->url('eid-summary', array('action' => 'get-tat')); ?>", {
+                districts: indDistrictIdList,
+                provinces: indProvinceIdList,
+                clinics: indClinicIdList,
+                fromDate: fromDate,
+                toDate: toDate
+            },
+            function(data) {
+                $("#nationalTAT").html(data);
+                $.unblockUI();
+            });
+    }
+
+    function resetIndicators() {
+        $("#indDistrictName").select2('val', '');
+        $("#indProvinceName").select2('val', '');
+        $('#indClinicId').select2('val', '');
+        getSummaryIndicators();
+    }
+
+    function exportSummaryIndicatorResult() {
+        $.blockUI.defaults.css.border = '1px solid grey';
+        $(document).ajaxStart($.blockUI({
+            message: '<h2><?php echo $this->translate('Processing...'); ?></h2>'
+        })).ajaxStop($.unblockUI);
+        $.post("<?php echo $this->url('eid-summary', array('action' => 'export-indicator-result-excel')); ?>", {
+                result: $("#sampleStatus").val()
+            },
+            function(data) {
+                if (data == "" || data == null || data == undefined) {
+                    alert('<?php echo $this->translate('Unable to export excel') ?>');
+                } else {
+                    window.open('/temporary/' + data, '_blank');
+                }
+            });
+    }
+
+    function exportPositiveRateByFacility() {
+        $.blockUI.defaults.css.border = '1px solid grey';
+        $(document).ajaxStart($.blockUI({
+            message: '<h2><?php echo $this->translate('Processing...'); ?></h2>'
+        })).ajaxStop($.unblockUI);
+        $.post("<?php echo $this->url('eid-summary', array('action' => 'export-positive-rate-by-facility')); ?>", {
+                result: $("#sampleStatus").val()
+            },
+            function(data) {
+                if (data == "" || data == null || data == undefined) {
+                    alert('<?php echo $this->translate('Unable to export excel') ?>');
+                } else {
+                    window.open('/temporary/' + data, '_blank');
+                }
+            });
+    }
+
+    function resetSampleEverything() {
+        $.blockUI();
+        $("#sampleDistrictName").select2('val', '');
+        $("#sampleProvinceName").select2('val', '');
+        $('#sampleClinicId').select2('val', '');
+        getSamplesReceivedBarChartInfo();
+        $.unblockUI();
+    }
+
+    function resetPositiveEverything() {
+        $.blockUI();
+        $("#positiveDistrictName").select2('val', '');
+        $("#positiveProvinceName").select2('val', '');
+        $('#positiveClinicId').select2('val', '');
+        getPositiveRateBarChartInfo();
+        $.unblockUI();
+    }
+
+    function resetRejectionEverything() {
+        $.blockUI();
+        $("#rejectionDistrictName").select2('val', '');
+        $("#rejectionProvinceName").select2('val', '');
+        $('#rejectionClinicId').select2('val', '');
+        getSamplesRejectedBarChartInfo();
+        $.unblockUI();
+    }
+
+    function summarize() {
+        var f = formatDate($('#mrp-lowerDate').val());
+        var t = formatDate($('#mrp-upperDate').val());
+        document.location.href = "/summary/dashboard?f=" + f + "&t=" + t
+    }
+
+    jQuery(function() {
+        var start = new Date();
+        var end = new Date(new Date().setYear(start.getFullYear() - 1));
+
+        $('#dpMonthsStart').datepicker({
+            clearBtn: true,
+            autoclose: true,
+            todayHighlight: true,
+            format: 'M-yyyy',
+            viewMode: "months",
+            minViewMode: "months",
+            <?php if (isset($logincontainer->sampleTable) && $logincontainer->sampleTable == "dash_vl_request_form_current") { ?>
+                startDate: end,
+            <?php } ?>
+            endDate: "0m"
+        }).on('changeDate', function(e) {
+            $('#dpMonthsEnd').val('');
+            var _satrt = new Date(e.date.valueOf());
+            $('#dpMonthsEnd').datepicker('setStartDate', _satrt);
+        });
+        $('#dpMonthsEnd').datepicker({
+            clearBtn: true,
+            autoclose: true,
+            todayHighlight: true,
+            format: 'M-yyyy',
+            viewMode: "months",
+            minViewMode: "months",
+            <?php if (isset($logincontainer->sampleTable) && $logincontainer->sampleTable == "dash_vl_request_form_current") { ?>
+                startDate: end,
+            <?php } ?>
+            endDate: "0m"
+        })
+    });
+
+    function formatDate(date) {
+        var d = new Date(date),
+            month = '' + (d.getMonth() + 1),
+            year = d.getFullYear();
+        if (month.length < 2) month = '0' + month;
+
+        return [year, month].join('-');
+    }
+</script>

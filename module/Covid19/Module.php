@@ -17,9 +17,10 @@ class Module
     {
         return array(
             'factories' => array(
-                'Covid19\Controller\Index' => function ($sm) {
-                    $service = $sm->getServiceLocator()->get('Covid19FormService');
-                    return new \Covid19\Controller\IndexController($service);
+                'Covid19\Controller\Summary' => function ($sm) {
+                    $commonService = $sm->getServiceLocator()->get('CommonService');
+                    $summaryService = $sm->getServiceLocator()->get('Covid19FormService');
+                    return new \Covid19\Controller\SummaryController($summaryService, $commonService);
                 },
             )
         );
@@ -30,9 +31,31 @@ class Module
         return array(
             'factories' => array(
 
-                'Covid19FormTable' => function ($sm) {
+                /* 'Covid19FormTable' => function ($sm) {
                     $dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');
                     return new \Covid19\Model\Covid19FormTable($dbAdapter, $sm);
+                }, */
+                'Covid19FormTable' => function ($sm) {
+                    $session = new Container('credo');
+                    $mappedFacilities = (isset($session->mappedFacilities) && count($session->mappedFacilities) > 0) ? $session->mappedFacilities : array();
+                    $dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');
+                    $covid19SampleTable = isset($session->covid19SampleTable) ? $session->covid19SampleTable :  null;
+
+                    $tableObj = new \Covid19\Model\Covid19FormTable($dbAdapter, $sm, $mappedFacilities, $covid19SampleTable);
+                    $table = PatternFactory::factory('object', [
+                        'storage' => $sm->get('Cache\Persistent'),
+                        'object' => $tableObj,
+                        'object_key' => $covid19SampleTable // this makes sure we have different caches for both current and archive
+                    ]);
+                    return $table;
+                },
+
+                'Covid19FormTableWithoutCache' => function ($sm) {
+                    $session = new Container('credo');
+                    $mappedFacilities = (isset($session->mappedFacilities) && count($session->mappedFacilities) > 0) ? $session->mappedFacilities : array();
+                    $eidSampleTable = isset($session->sampleTable) ? $session->sampleTable :  null;
+                    $dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');
+                    return new \Covid19\Model\Covid19FormTable($dbAdapter, $sm, $mappedFacilities, $eidSampleTable);
                 },
 
                 'Covid19FormService' => function ($sm) {
