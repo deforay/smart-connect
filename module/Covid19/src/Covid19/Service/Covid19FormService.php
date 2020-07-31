@@ -32,7 +32,7 @@ class Covid19FormService
             // Debug::dump($_FILES['covid19File']);die;
             $apiData = array();
             $common = new CommonService();
-            $sampleDb = $this->sm->get('Covid19FormTable');
+            $sampleDb = $this->sm->get('Covid19FormTableWithoutCache');
             $facilityDb = $this->sm->get('FacilityTable');
             $facilityTypeDb = $this->sm->get('FacilityTypeTable');
             $testStatusDb = $this->sm->get('SampleStatusTable');
@@ -342,103 +342,103 @@ class Covid19FormService
 
     public function fetchSummaryTabDetails($params)
     {
-        $covid19SampleDb = $this->sm->get('Covid19FormTable');
+        $covid19SampleDb = $this->sm->get('Covid19FormTableWithoutCache');
         return $covid19SampleDb->getSummaryTabDetails($params);
     }
 
     public function getSamplesReceivedBarChartDetails($params)
     {
-        $sampleDb = $this->sm->get('Covid19FormTable');
+        $sampleDb = $this->sm->get('Covid19FormTableWithoutCache');
         return $sampleDb->fetchSamplesReceivedBarChartDetails($params);
     }
 
     public function getAllSamplesReceivedByFacility($parameters)
     {
-        $sampleDb = $this->sm->get('Covid19FormTable');
+        $sampleDb = $this->sm->get('Covid19FormTableWithoutCache');
         return $sampleDb->fetchAllSamplesReceivedByFacility($parameters);
     }
 
     public function getAllSamplesReceivedByProvince($parameters)
     {
-        $sampleDb = $this->sm->get('Covid19FormTable');
+        $sampleDb = $this->sm->get('Covid19FormTableWithoutCache');
         return $sampleDb->fetchAllSamplesReceivedByProvince($parameters);
     }
 
     public function getAllSamplesReceivedByDistrict($parameters)
     {
-        $sampleDb = $this->sm->get('Covid19FormTable');
+        $sampleDb = $this->sm->get('Covid19FormTableWithoutCache');
         return $sampleDb->fetchAllSamplesReceivedByDistrict($parameters);
     }
 
     public function getPositiveRateBarChartDetails($params)
     {
-        $sampleDb = $this->sm->get('Covid19FormTable');
+        $sampleDb = $this->sm->get('Covid19FormTableWithoutCache');
         return $sampleDb->fetchPositiveRateBarChartDetails($params);
     }
 
     public function getAllPositiveRateByDistrict($parameters)
     {
-        $sampleDb = $this->sm->get('Covid19FormTable');
+        $sampleDb = $this->sm->get('Covid19FormTableWithoutCache');
         return $sampleDb->fetchAllPositiveRateByDistrict($parameters);
     }
 
     public function getAllPositiveRateByProvince($parameters)
     {
-        $sampleDb = $this->sm->get('Covid19FormTable');
+        $sampleDb = $this->sm->get('Covid19FormTableWithoutCache');
         return $sampleDb->fetchAllPositiveRateByProvince($parameters);
     }
 
     public function getAllPositiveRateByFacility($parameters)
     {
-        $sampleDb = $this->sm->get('Covid19FormTable');
+        $sampleDb = $this->sm->get('Covid19FormTableWithoutCache');
         return $sampleDb->fetchAllPositiveRateByFacility($parameters);
     }
 
     public function getSamplesRejectedBarChartDetails($params)
     {
-        $sampleDb = $this->sm->get('Covid19FormTable');
+        $sampleDb = $this->sm->get('Covid19FormTableWithoutCache');
         return $sampleDb->fetchSamplesRejectedBarChartDetails($params);
     }
 
     public function getAllSamplesRejectedByDistrict($parameters)
     {
-        $sampleDb = $this->sm->get('Covid19FormTable');
+        $sampleDb = $this->sm->get('Covid19FormTableWithoutCache');
         return $sampleDb->fetchAllSamplesRejectedByDistrict($parameters);
     }
 
     public function getAllSamplesRejectedByFacility($parameters)
     {
-        $sampleDb = $this->sm->get('Covid19FormTable');
+        $sampleDb = $this->sm->get('Covid19FormTableWithoutCache');
         return $sampleDb->fecthAllSamplesRejectedByFacility($parameters);
     }
 
     public function getAllSamplesRejectedByProvince($parameters)
     {
-        $sampleDb = $this->sm->get('Covid19FormTable');
+        $sampleDb = $this->sm->get('Covid19FormTableWithoutCache');
         return $sampleDb->fecthAllSamplesRejectedByProvince($parameters);
     }
 
     public function getCovid19OutcomesDetails($params)
     {
-        $covid19SampleDb = $this->sm->get('Covid19FormTable');
+        $covid19SampleDb = $this->sm->get('Covid19FormTableWithoutCache');
         return $covid19SampleDb->fetchCovid19OutcomesDetails($params);
     }
 
     public function getCovid19OutcomesByAgeDetails($params)
     {
-        $covid19SampleDb = $this->sm->get('Covid19FormTable');
+        $covid19SampleDb = $this->sm->get('Covid19FormTableWithoutCache');
         return $covid19SampleDb->fetchCovid19OutcomesByAgeDetails($params);
     }
    
     public function getTATDetails($params)
     {
-        $covid19SampleDb = $this->sm->get('Covid19FormTable');
+        $covid19SampleDb = $this->sm->get('Covid19FormTableWithoutCache');
         return $covid19SampleDb->fetchTATDetails($params);
     }
     
     public function getCovid19OutcomesByProvinceDetails($params)
     {
-        $covid19SampleDb = $this->sm->get('Covid19FormTable');
+        $covid19SampleDb = $this->sm->get('Covid19FormTableWithoutCache');
         return $covid19SampleDb->fetchCovid19OutcomesByProvinceDetails($params);
     }
     
@@ -545,7 +545,7 @@ class Covid19FormService
                     }
 
                     $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($excel, 'Xlsx');
-                    $filename = 'EID-SUMMARY-KEY-INDICATORS-' . date('d-M-Y-H-i-s') . '.xlsx';
+                    $filename = 'COVID19-SUMMARY-KEY-INDICATORS-' . date('d-M-Y-H-i-s') . '.xlsx';
                     $writer->save(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . $filename);
                     return $filename;
                 } else {
@@ -711,7 +711,7 @@ class Covid19FormService
 
     public function getKeySummaryIndicatorsDetails($params)
     {
-        $sampleDb = $this->sm->get('Covid19FormTable');
+        $sampleDb = $this->sm->get('Covid19FormTableWithoutCache');
         return $sampleDb->fetchKeySummaryIndicatorsDetails($params);
     }
 }

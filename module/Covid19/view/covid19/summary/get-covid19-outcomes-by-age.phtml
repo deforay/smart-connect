@@ -2,20 +2,14 @@
 
 use Zend\Debug\Debug;
 
-// Debug::dump($result);die;
-
 $neg[] = $result['noDatan'];
 $pos[] = $result['noDatap'];
-$neg[] = $result['less2n'];
-$pos[] = $result['less2p'];
-$neg[] = $result['2to9n'];
-$pos[] = $result['2to9p'];
-$neg[] = $result['9to12n'];
-$pos[] = $result['9to12p'];
-$neg[] = $result['12to24n'];
-$pos[] = $result['12to24p'];
-$pos[] = $result['above24n'];
-$pos[] = $result['above24p'];
+/* Dynamic year range */
+$ageGroup = array('2', '2-5', '6-14', '15-49', '50');
+foreach($ageGroup as $key=>$age){
+    $neg[] = $result[$age.'n'];
+    $pos[] = $result[$age.'p'];
+}
 ?>
 <script type="text/javascript">
     $(function() {
@@ -27,7 +21,17 @@ $pos[] = $result['above24p'];
                 text: ''
             },
             xAxis: {
-                categories: ["No Data", "less 2 months", "2-9 months", "9-12 months", "12-24 months", "Above 24 months"],
+                categories: ["No Data", 
+                    <?php foreach($ageGroup as $key=>$age){
+                        if($key == 0){ ?>
+                            "less <?php echo $age;?> years",
+                        <?php } elseif($key == 4){ ?>
+                            "Above <?php echo $age;?> years"
+                        <?php } else{ ?>
+                            "<?php echo $age;?> years",
+                        <?php  }
+                    }?>
+                    ],
                 crosshair: true
             },
             yAxis: {

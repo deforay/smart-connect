@@ -1971,34 +1971,28 @@ class Covid19FormTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $common = new CommonService($this->sm);
+        /* Dynamic year range */
+        $ageGroup = array('2', '2-5', '6-14', '15-49', '50');
+
+        $ageGroupArray['noDatan'] = new Expression("SUM(CASE WHEN ((covid19.result like 'negative' OR covid19.result = 'Negative' ) AND (covid19.patient_dob IS NULL OR covid19.patient_dob = '0000-00-00'))THEN 1 ELSE 0 END)");
+        $ageGroupArray['noDatap'] = new Expression("SUM(CASE WHEN ((covid19.result like 'positive' OR covid19.result = 'Positive' ) AND (covid19.patient_dob IS NULL OR covid19.patient_dob = '0000-00-00'))THEN 1 ELSE 0 END)");
+        foreach($ageGroup as $key=>$age){
+            if($key == 0){
+                $ageGroupArray[$age.'n']   = new Expression("SUM(CASE WHEN ((covid19.result like 'negative' OR covid19.result = 'Negative' ) AND covid19.patient_dob >= '" . date('Y-m-d', strtotime("-".$age.' YEARS')) . "')THEN 1 ELSE 0 END)");
+                $ageGroupArray[$age.'p']   = new Expression("SUM(CASE WHEN ((covid19.result like 'positive' OR covid19.result = 'Positive' ) AND covid19.patient_dob >= '" . date('Y-m-d', strtotime("-".$age.' YEARS')) . "')THEN 1 ELSE 0 END)");
+            } elseif($key == 4){
+                $ageGroupArray[$age.'n']   = new Expression("SUM(CASE WHEN ((covid19.result like 'negative' OR covid19.result = 'Negative' ) AND covid19.patient_dob <= '" . date('Y-m-d', strtotime("-".$age.' YEARS')) . "')THEN 1 ELSE 0 END)");
+                $ageGroupArray[$age.'p']   = new Expression("SUM(CASE WHEN ((covid19.result like 'positive' OR covid19.result = 'Positive' ) AND covid19.patient_dob <= '" . date('Y-m-d', strtotime("-".$age.' YEARS')) . "')THEN 1 ELSE 0 END)");
+            } else{
+                $keyIndex = explode('-',$age);
+                $ageGroupArray[$age.'n']   = new Expression("SUM(CASE WHEN ((covid19.result like 'negative' OR covid19.result = 'Negative' ) AND covid19.patient_dob <= '" . date('Y-m-d', strtotime("-".$keyIndex[0].' YEARS')) . "' AND covid19.patient_dob >= '" . date('Y-m-d', strtotime("-".$keyIndex[1].' YEARS')) . "')THEN 1 ELSE 0 END)");
+                $ageGroupArray[$age.'p']   = new Expression("SUM(CASE WHEN ((covid19.result like 'positive' OR covid19.result = 'Positive' ) AND covid19.patient_dob <= '" . date('Y-m-d', strtotime("-".$keyIndex[0].' YEARS')) . "' AND covid19.patient_dob >= '" . date('Y-m-d', strtotime("-".$keyIndex[1].' YEARS')) . "')THEN 1 ELSE 0 END)");
+            }
+        }
         $covid19OutcomesQuery = $sql->select()
             ->from(array('covid19' => $this->table))
             ->columns(
-                array(
-                    'noDatan' => new Expression("SUM(CASE WHEN ((covid19.result like 'negative' OR covid19.result = 'Negative' ) AND (covid19.child_dob IS NULL OR covid19.child_dob = '0000-00-00'))THEN 1 ELSE 0 END)"),
-
-                    'noDatap' => new Expression("SUM(CASE WHEN ((covid19.result like 'positive' OR covid19.result = 'Positive' ) AND (covid19.child_dob IS NULL OR covid19.child_dob ='0000-00-00'))THEN 1 ELSE 0 END)"),
-
-                    'less2n' => new Expression("SUM(CASE WHEN ((covid19.result like 'negative' OR covid19.result = 'Negative' ) AND covid19.child_dob <= '" . date('Y-m-d', strtotime('-2 MONTHS')) . "')THEN 1 ELSE 0 END)"),
-
-                    'less2p' => new Expression("SUM(CASE WHEN ((covid19.result like 'positive' OR covid19.result = 'Positive' ) AND covid19.child_dob <= '" . date('Y-m-d', strtotime('-2 MONTHS')) . "')THEN 1 ELSE 0 END)"),
-
-                    '2to9n' => new Expression("SUM(CASE WHEN ((covid19.result like 'negative' OR covid19.result = 'Negative' ) AND (covid19.child_dob >= '" . date('Y-m-d', strtotime('-2 MONTHS')) . "' AND covid19.child_dob <= '" . date('Y-m-d', strtotime('-9 MONTHS')) . "'))THEN 1 ELSE 0 END)"),
-
-                    '2to9p' => new Expression("SUM(CASE WHEN ((covid19.result like 'positive' OR covid19.result = 'Positive' ) AND (covid19.child_dob >= '" . date('Y-m-d', strtotime('-2 MONTHS')) . "' AND covid19.child_dob <= '" . date('Y-m-d', strtotime('-9 MONTHS')) . "'))THEN 1 ELSE 0 END)"),
-
-                    '9to12n' => new Expression("SUM(CASE WHEN ((covid19.result like 'negative' OR covid19.result = 'Negative' ) AND (covid19.child_dob >= '" . date('Y-m-d', strtotime('-9 MONTHS')) . "' AND covid19.child_dob <= '" . date('Y-m-d', strtotime('-12 MONTHS')) . "'))THEN 1 ELSE 0 END)"),
-
-                    '9to12p' => new Expression("SUM(CASE WHEN ((covid19.result like 'positive' OR covid19.result = 'Positive' ) AND (covid19.child_dob >= '" . date('Y-m-d', strtotime('-9 MONTHS')) . "' AND covid19.child_dob <= '" . date('Y-m-d', strtotime('-12 MONTHS')) . "'))THEN 1 ELSE 0 END)"),
-
-                    '12to24n' => new Expression("SUM(CASE WHEN ((covid19.result like 'negative' OR covid19.result = 'Negative' ) AND (covid19.child_dob >= '" . date('Y-m-d', strtotime('-12 MONTHS')) . "' AND covid19.child_dob <= '" . date('Y-m-d', strtotime('-24 MONTHS')) . "'))THEN 1 ELSE 0 END)"),
-
-                    '12to24p' => new Expression("SUM(CASE WHEN ((covid19.result like 'positive' OR covid19.result = 'Positive' ) AND (covid19.child_dob >= '" . date('Y-m-d', strtotime('-12 MONTHS')) . "' AND covid19.child_dob <= '" . date('Y-m-d', strtotime('-24 MONTHS')) . "'))THEN 1 ELSE 0 END)"),
-
-                    'above24n' => new Expression("SUM(CASE WHEN ((covid19.result like 'negative' OR covid19.result = 'Negative' ) AND covid19.child_dob >= '" . date('Y-m-d', strtotime('-24 MONTHS')) . "')THEN 1 ELSE 0 END)"),
-
-                    'above24p' => new Expression("SUM(CASE WHEN ((covid19.result like 'positive' OR covid19.result = 'Positive' ) AND covid19.child_dob >= '" . date('Y-m-d', strtotime('-24 MONTHS')) . "')THEN 1 ELSE 0 END)"),
-                )
+                $ageGroupArray
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id = covid19.facility_id', array());
 
@@ -2021,6 +2015,7 @@ class Covid19FormTable extends AbstractTableGateway
         }
 
         $covid19OutcomesQueryStr = $sql->getSqlStringForSqlObject($covid19OutcomesQuery);
+        // echo $covid19OutcomesQueryStr;die;
         $result = $common->cacheQuery($covid19OutcomesQueryStr, $dbAdapter);
         return $result[0];
     }
@@ -2094,7 +2089,8 @@ class Covid19FormTable extends AbstractTableGateway
         }
         $covid19OutcomesQueryStr = $sql->getSqlStringForSqlObject($covid19OutcomesQuery);
         // echo $covid19OutcomesQueryStr;die;
-        $result = $common->cacheQuery($covid19OutcomesQueryStr, $dbAdapter);
+        $result = $dbAdapter->query($covid19OutcomesQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+        // $result = $common->cacheQuery($covid19OutcomesQueryStr, $dbAdapter);
         return $result[0];
     }
     // SUMMARY DASHBOARD END
