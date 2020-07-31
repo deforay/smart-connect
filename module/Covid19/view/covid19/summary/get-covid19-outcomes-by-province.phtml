@@ -1,0 +1,141 @@
+<?php
+
+use Zend\Debug\Debug;
+
+// Debug::dump($result);die;
+$countries = array();
+$postive = array();
+$negative = array();
+$posRate = array();
+foreach ($result as $row) {
+    $countries[] = '"' . $row['location_name'] . '"';
+    $postive[] = $row['total_positive_samples'];
+    $negative[] = $row['total_negative_samples'];
+    $posRate[] = number_format((($row['total_positive_samples'] / $row['total_samples']) * 100),2);
+}
+?>
+<script type="text/javascript">
+    $(function() {
+        $('#eidOutcomesProvince').highcharts({
+            plotOptions: {
+                column: {
+                    stacking: 'normal'
+                }
+            },
+            chart: {
+                zoomType: 'xy'
+            },
+            title: {
+                text: ''
+            },
+            xAxis: [{
+                categories: [<?php echo implode(",", $countries); ?>]
+            }],
+            yAxis: [{ // Primary yAxis
+                labels: {
+                    formatter: function() {
+                        return this.value + '%';
+                    },
+                    style: {
+
+                    }
+                },
+                title: {
+                    text: 'Percentage',
+                    style: {
+                        color: '#89A54E'
+                    }
+                },
+                opposite: true
+
+            }, { // Secondary yAxis
+                gridLineWidth: 1,
+                title: {
+                    text: 'Tests',
+                    style: {
+                        color: '#4572A7'
+                    }
+                },
+                labels: {
+                    formatter: function() {
+                        return this.value + '';
+                    },
+                    style: {
+                        color: '#4572A7'
+                    }
+                }
+            }],
+            tooltip: {
+                borderRadius: 2,
+                borderWidth: 1,
+                borderColor: '#999',
+                shadow: false,
+                shared: true,
+                useHTML: true,
+                yDecimals: 0,
+                valueDecimale: 0,
+                headerFormat: '<table class="tip"><caption>{point.key}</caption>' + '<tbody>',
+                pointFormat: '<tr><th style="color:{series.color}">{series.name}:</th>' + '<td style="text-align:right">{point.y}</td></tr>',
+                footerFormat: '<tr><th>Total:</th>' + '<td style="text-align:right"><b>{point.total}</b></td></tr>' + '</tbody></table>'
+            },
+            credits: {
+                enabled: false
+            },
+            legend: {
+                layout: 'vertical',
+                align: 'right',
+                x: -100,
+                verticalAlign: 'top',
+                y: 40,
+                floating: true,
+                backgroundColor: '#FFFFFF'
+            },
+            navigation: {
+                buttonOptions: {
+                    verticalAlign: 'bottom',
+                    y: -20
+                }
+            },
+            colors: [
+                '#FF1900',
+                '#60D18F',
+                '#5C5C61'
+            ],
+            series: [{
+                    "name": "Positive",
+                    "type": "column",
+                    "yAxis": 1,
+                    "tooltip": {
+                        "valueSuffix": " "
+                    },
+                    "data": [
+                        <?php echo implode(",", $postive); ?>
+                    ]
+                },
+                {
+                    "name": "Negative",
+                    "type": "column",
+                    "yAxis": 1,
+                    "tooltip": {
+                        "valueSuffix": " "
+                    },
+                    "data": [
+                        <?php echo implode(",", $negative); ?>
+                    ]
+                },
+                {
+                    "name": "Positivity",
+                    // "color": "#913D88",
+                    "type": "spline",
+                    "tooltip": {
+                        "valueSuffix": " %"
+                    },
+                    "data": [
+                        <?php echo implode(",",$posRate);?>    
+                    ]
+                }
+            ]
+
+        });
+    });
+</script>

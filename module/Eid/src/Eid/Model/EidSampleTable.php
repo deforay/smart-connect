@@ -936,6 +936,7 @@ class EidSampleTable extends AbstractTableGateway
         }
         return $output;
     }
+    
     public function fetchAllPositiveRateByDistrict($parameters)
     {
         /* Array of database columns which should be read and sent back to DataTables. Use a space where

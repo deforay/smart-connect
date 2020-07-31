@@ -1,6 +1,7 @@
 <?php
 
 use Laminas\Session\Container;
+use Zend\Debug\Debug;
 
 $languagecontainer = new Container('language');
 $logincontainer = new Container('credo');
@@ -42,7 +43,7 @@ $positiveSamplepercentage = ($positiveSampleTotal > 0 && $totalSampleTested > 0)
 
 $rejectionPercentage = ($summaryTabInfo[0]["total_samples_received"] > 0 && $rejectedSamples > 0) ? round((($rejectedSamples / $summaryTabInfo[0]["total_samples_received"]) * 100), 2) : 0;
 $tat = ceil($summaryTabInfo[0]["tat"]);
-
+// Debug::dump($summaryTabInfo);die;
 ?>
 <link rel="stylesheet" href="<?php echo $this->basePath('assets/plugins/datepicker/datepicker3.css') ?>">
 <style>
@@ -255,7 +256,7 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
             </a>
         </li>
         <li role="presentation">
-            <a href="#tatTab" aria-controls="messages" onclick="getTat();" role="tab" data-toggle="tab">
+            <a href="#tatTab" aria-controls="messages" onclick="nationalTAT();" role="tab" data-toggle="tab">
                 <h3 class="tabPercentageVal"><?php echo $tat . " Days"; ?></h3>
                 <?php echo $this->translate('Average TAT'); ?>
             </a>
@@ -832,7 +833,7 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
         <div class="portlet box blue">
             <div class="portlet-title">
                 <div class="caption">
-                    <span class="caption-subject"><?php echo $this->translate('EID Outcomes'); ?></span>
+                    <span class="caption-subject"><?php echo $this->translate('Covid19 Outcomes'); ?></span>
                 </div>
             </div>
             <div class="portlet-body" id="eidOutcomesBody">
@@ -844,7 +845,7 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
         <div class="portlet box blue">
             <div class="portlet-title">
                 <div class="caption">
-                    <span class="caption-subject"><?php echo $this->translate('EID Outcomes by Age'); ?></span>
+                    <span class="caption-subject"><?php echo $this->translate('Covid19 Outcomes by Age'); ?></span>
                 </div>
             </div>
             <div class="portlet-body" id="eidOutcomesByAgeBody">
@@ -858,7 +859,7 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
         <div class="portlet box blue">
             <div class="portlet-title">
                 <div class="caption">
-                    <span class="caption-subject"><?php echo $this->translate('EID Outcomes - By Province'); ?></span>
+                    <span class="caption-subject"><?php echo $this->translate('Covid19 Outcomes - By Province'); ?></span>
                 </div>
             </div>
             <div class="portlet-body" id="eidOutcomesProvinceBody">
@@ -1235,7 +1236,7 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
                 [1, "desc"]
             ],
             "pagingType": "simple",
-            "sAjaxSource": "<?php echo $this->url('eid-summary', array('action' => 'positive-rate-district')); ?>",
+            "sAjaxSource": "<?php echo $this->url('covid19-summary', array('action' => 'positive-rate-district')); ?>",
             "fnServerData": function(sSource, aoData, fnCallback) {
                 aoData.push({
                     "name": "fromDate",
@@ -1299,7 +1300,7 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
                 [3, "desc"]
             ],
             "pagingType": "simple",
-            "sAjaxSource": "<?php echo $this->url('eid-summary', array('action' => 'positive-rate-facility')); ?>",
+            "sAjaxSource": "<?php echo $this->url('covid19-summary', array('action' => 'positive-rate-facility')); ?>",
             "fnServerData": function(sSource, aoData, fnCallback) {
                 aoData.push({
                     "name": "fromDate",
@@ -1356,7 +1357,7 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
                 [1, "desc"]
             ],
             "pagingType": "simple",
-            "sAjaxSource": "<?php echo $this->url('eid-summary', array('action' => 'positive-rate-province')); ?>",
+            "sAjaxSource": "<?php echo $this->url('covid19-summary', array('action' => 'positive-rate-province')); ?>",
             "fnServerData": function(sSource, aoData, fnCallback) {
                 aoData.push({
                     "name": "fromDate",
@@ -1405,7 +1406,7 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
                 [1, "desc"]
             ],
             "pagingType": "simple",
-            "sAjaxSource": "<?php echo $this->url('eid-summary', array('action' => 'samples-rejected-district')); ?>",
+            "sAjaxSource": "<?php echo $this->url('covid19-summary', array('action' => 'samples-rejected-district')); ?>",
             "fnServerData": function(sSource, aoData, fnCallback) {
                 aoData.push({
                     "name": "fromDate",
@@ -1457,7 +1458,7 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
                 [3, "desc"]
             ],
             "pagingType": "simple",
-            "sAjaxSource": "<?php echo $this->url('eid-summary', array('action' => 'samples-rejected-facility')); ?>",
+            "sAjaxSource": "<?php echo $this->url('covid19-summary', array('action' => 'samples-rejected-facility')); ?>",
             "fnServerData": function(sSource, aoData, fnCallback) {
                 aoData.push({
                     "name": "fromDate",
@@ -1506,7 +1507,7 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
                 [3, "desc"]
             ],
             "pagingType": "simple",
-            "sAjaxSource": "<?php echo $this->url('eid-summary', array('action' => 'samples-rejected-province')); ?>",
+            "sAjaxSource": "<?php echo $this->url('covid19-summary', array('action' => 'samples-rejected-province')); ?>",
             "fnServerData": function(sSource, aoData, fnCallback) {
                 aoData.push({
                     "name": "fromDate",
@@ -1587,7 +1588,7 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
         supClinicIdList = ($("#positiveClinicId").val() == null) ? '' : $('#positiveClinicId').val().join(',');
         var fromDate = formatDate($('#mrp-lowerDate').val());
         var toDate = formatDate($('#mrp-upperDate').val());
-        $.post("<?php echo $this->url('eid-summary', array('action' => 'get-positive-rate-bar-chart')); ?>", {
+        $.post("<?php echo $this->url('covid19-summary', array('action' => 'get-positive-rate-bar-chart')); ?>", {
                 districts: supDistrictIdList,
                 provinces: supProvinceIdList,
                 clinics: supClinicIdList,
@@ -1605,7 +1606,7 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
         rejClinicIdList = ($("#rejectionClinicId").val() == null) ? '' : $('#rejectionClinicId').val().join(',');
         var fromDate = formatDate($('#mrp-lowerDate').val());
         var toDate = formatDate($('#mrp-upperDate').val());
-        $.post("<?php echo $this->url('eid-summary', array('action' => 'get-samples-rejected-bar-chart')); ?>", {
+        $.post("<?php echo $this->url('covid19-summary', array('action' => 'get-samples-rejected-bar-chart')); ?>", {
                 districts: rejDistrictIdList,
                 provinces: rejProvinceIdList,
                 clinics: rejClinicIdList,
@@ -1636,7 +1637,7 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
         var indClinicIdList = ($("#indClinicId").val() == null) ? '' : $('#indClinicId').val().join(',');
         var fromDate = formatDate($('#mrp-lowerDate').val());
         var toDate = formatDate($('#mrp-upperDate').val());
-        $.post("<?php echo $this->url('eid-summary', array('action' => 'get-indicators')); ?>", {
+        $.post("<?php echo $this->url('covid19-summary', array('action' => 'get-indicators')); ?>", {
                 districts: indDistrictIdList,
                 provinces: indProvinceIdList,
                 clinics: indClinicIdList,
@@ -1651,14 +1652,14 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
 
     function geteidOutcomes() {
         $(document).ajaxStart($.blockUI({
-            message: '<h4> <?php echo ($this->translate('Processing EID Outcomes')); ?> ... </h4>'
+            message: '<h4> <?php echo ($this->translate('Processing Covid19 Outcomes')); ?> ... </h4>'
         })).ajaxStop($.unblockUI);
         var indDistrictIdList = ($("#indDistrictName").val() == null) ? '' : $("#indDistrictName").val().join(',');
         var indProvinceIdList = ($("#indProvinceName").val() == null) ? '' : $("#indProvinceName").val().join(',');
         var indClinicIdList = ($("#indClinicId").val() == null) ? '' : $('#indClinicId').val().join(',');
         var fromDate = formatDate($('#mrp-lowerDate').val());
         var toDate = formatDate($('#mrp-upperDate').val());
-        $.post("<?php echo $this->url('eid-summary', array('action' => 'get-eid-outcomes')); ?>", {
+        $.post("<?php echo $this->url('covid19-summary', array('action' => 'get-covid19-outcomes')); ?>", {
                 districts: indDistrictIdList,
                 provinces: indProvinceIdList,
                 clinics: indClinicIdList,
@@ -1673,14 +1674,14 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
 
     function geteidOutcomesByAge() {
         $(document).ajaxStart($.blockUI({
-            message: '<h4> <?php echo ($this->translate('Processing EID Outcomes By Age')); ?> ... </h4>'
+            message: '<h4> <?php echo ($this->translate('Processing Covid19 Outcomes By Age')); ?> ... </h4>'
         })).ajaxStop($.unblockUI);
         var indDistrictIdList = ($("#indDistrictName").val() == null) ? '' : $("#indDistrictName").val().join(',');
         var indProvinceIdList = ($("#indProvinceName").val() == null) ? '' : $("#indProvinceName").val().join(',');
         var indClinicIdList = ($("#indClinicId").val() == null) ? '' : $('#indClinicId').val().join(',');
         var fromDate = formatDate($('#mrp-lowerDate').val());
         var toDate = formatDate($('#mrp-upperDate').val());
-        $.post("<?php echo $this->url('eid-summary', array('action' => 'get-eid-outcomes-by-age')); ?>", {
+        $.post("<?php echo $this->url('covid19-summary', array('action' => 'get-covid19-outcomes-by-age')); ?>", {
                 districts: indDistrictIdList,
                 provinces: indProvinceIdList,
                 clinics: indClinicIdList,
@@ -1695,14 +1696,14 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
 
     function geteidOutcomesByProvince() {
         $(document).ajaxStart($.blockUI({
-            message: '<h4> <?php echo ($this->translate('Processing EID Outcomes By Province')); ?> ... </h4>'
+            message: '<h4> <?php echo ($this->translate('Processing Covid19 Outcomes By Province')); ?> ... </h4>'
         })).ajaxStop($.unblockUI);
         var indDistrictIdList = ($("#indDistrictName").val() == null) ? '' : $("#indDistrictName").val().join(',');
         var indProvinceIdList = ($("#indProvinceName").val() == null) ? '' : $("#indProvinceName").val().join(',');
         var indClinicIdList = ($("#indClinicId").val() == null) ? '' : $('#indClinicId').val().join(',');
         var fromDate = formatDate($('#mrp-lowerDate').val());
         var toDate = formatDate($('#mrp-upperDate').val());
-        $.post("<?php echo $this->url('eid-summary', array('action' => 'get-eid-outcomes-by-province')); ?>", {
+        $.post("<?php echo $this->url('covid19-summary', array('action' => 'get-covid19-outcomes-by-province')); ?>", {
                 districts: indDistrictIdList,
                 provinces: indProvinceIdList,
                 clinics: indClinicIdList,
@@ -1717,14 +1718,14 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
 
     function nationalTAT() {
         $(document).ajaxStart($.blockUI({
-            message: '<h4> <?php echo ($this->translate('Processing EID Outcomes By Province')); ?> ... </h4>'
+            message: '<h4> <?php echo ($this->translate('Processing Covid19 Outcomes By Province')); ?> ... </h4>'
         })).ajaxStop($.unblockUI);
         var indDistrictIdList = ($("#indDistrictName").val() == null) ? '' : $("#indDistrictName").val().join(',');
         var indProvinceIdList = ($("#indProvinceName").val() == null) ? '' : $("#indProvinceName").val().join(',');
         var indClinicIdList = ($("#indClinicId").val() == null) ? '' : $('#indClinicId').val().join(',');
         var fromDate = formatDate($('#mrp-lowerDate').val());
         var toDate = formatDate($('#mrp-upperDate').val());
-        $.post("<?php echo $this->url('eid-summary', array('action' => 'get-tat')); ?>", {
+        $.post("<?php echo $this->url('covid19-summary', array('action' => 'get-tat')); ?>", {
                 districts: indDistrictIdList,
                 provinces: indProvinceIdList,
                 clinics: indClinicIdList,
@@ -1749,7 +1750,7 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
         $(document).ajaxStart($.blockUI({
             message: '<h2><?php echo $this->translate('Processing...'); ?></h2>'
         })).ajaxStop($.unblockUI);
-        $.post("<?php echo $this->url('eid-summary', array('action' => 'export-indicator-result-excel')); ?>", {
+        $.post("<?php echo $this->url('covid19-summary', array('action' => 'export-indicator-result-excel')); ?>", {
                 result: $("#sampleStatus").val()
             },
             function(data) {
@@ -1766,7 +1767,7 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
         $(document).ajaxStart($.blockUI({
             message: '<h2><?php echo $this->translate('Processing...'); ?></h2>'
         })).ajaxStop($.unblockUI);
-        $.post("<?php echo $this->url('eid-summary', array('action' => 'export-positive-rate-by-facility')); ?>", {
+        $.post("<?php echo $this->url('covid19-summary', array('action' => 'export-positive-rate-by-facility')); ?>", {
                 result: $("#sampleStatus").val()
             },
             function(data) {

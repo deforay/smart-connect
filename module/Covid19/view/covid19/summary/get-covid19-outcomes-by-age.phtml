@@ -1,0 +1,97 @@
+<?php
+
+use Zend\Debug\Debug;
+
+// Debug::dump($result);die;
+
+$neg[] = $result['noDatan'];
+$pos[] = $result['noDatap'];
+$neg[] = $result['less2n'];
+$pos[] = $result['less2p'];
+$neg[] = $result['2to9n'];
+$pos[] = $result['2to9p'];
+$neg[] = $result['9to12n'];
+$pos[] = $result['9to12p'];
+$neg[] = $result['12to24n'];
+$pos[] = $result['12to24p'];
+$pos[] = $result['above24n'];
+$pos[] = $result['above24p'];
+?>
+<script type="text/javascript">
+    $(function() {
+        $('#eidOutcomesByAge').highcharts({
+            chart: {
+                type: 'column'
+            },
+            title: {
+                text: ''
+            },
+            xAxis: {
+                categories: ["No Data", "less 2 months", "2-9 months", "9-12 months", "12-24 months", "Above 24 months"],
+                crosshair: true
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: 'Tests'
+                },
+                stackLabels: {
+                    rotation: -75,
+                    enabled: true,
+                    style: {
+                        fontWeight: 'bold',
+                        color: (Highcharts.theme && Highcharts.theme.textColor) || 'gray'
+                    },
+                    y: -20
+                }
+            },
+            credits: {
+                enabled: false
+            },
+            legend: {
+                align: 'right',
+                x: -30,
+                verticalAlign: 'bottom',
+                y: 5,
+                floating: false,
+                backgroundColor: (Highcharts.theme && Highcharts.theme.background2) || 'white',
+                borderColor: '#CCC',
+                borderWidth: 1,
+                shadow: true
+            },
+            tooltip: {
+                headerFormat: '<b>{point.x}</b><br/>',
+                pointFormat: '{series.name}: {point.y}<br/>% contribution: {point.percentage:.1f}%'
+            },
+            plotOptions: {
+                column: {
+                    stacking: 'normal',
+                    dataLabels: {
+                        enabled: false,
+                        color: (Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'white',
+                        style: {
+                            textShadow: '0 0 3px black'
+                        }
+                    }
+                }
+            },
+            colors: [
+                '#FF1900',
+                '#60D18F'
+            ],
+            series: [{
+                "name": "Positive",
+                "data": [<?php echo implode(",",$pos);?>],
+                "drilldown": {
+                    "color": "#913D88"
+                }
+            }, {
+                "name": "Negative",
+                "data": [<?php echo implode(",",$neg);?>],
+                "drilldown": {
+                    "color": "#96281B"
+                }
+            }]
+        });
+    });
+</script>
