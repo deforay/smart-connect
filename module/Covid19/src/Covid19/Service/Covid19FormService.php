@@ -16,10 +16,12 @@ class Covid19FormService
 {
 
     public $sm = null;
+    protected $translator = null;
 
     public function __construct($sm)
     {
         $this->sm = $sm;
+        $this->translator = $this->sm->get('translator');
     }
 
     public function getServiceManager()
