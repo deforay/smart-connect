@@ -214,7 +214,6 @@ return array(
             'Application\Controller\Hubs' => 'Application\Controller\HubsController',
             'Application\Controller\Import' => 'Application\Controller\ImportController',
             'Application\Controller\Source' => 'Application\Controller\SourceController',
-            //'Application\Controller\Common' => 'Application\Controller\CommonController',
             'Application\Controller\Config' => 'Application\Controller\ConfigController',
             'Application\Controller\Facility' => 'Application\Controller\FacilityController',
             //'Application\Controller\Summary' => 'Application\Controller\SummaryController',

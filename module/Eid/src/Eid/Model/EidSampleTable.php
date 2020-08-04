@@ -2304,7 +2304,7 @@ class EidSampleTable extends AbstractTableGateway
 
     public function getMonthlySampleCount($params)
     {
-        
+
         $logincontainer = new Container('credo');
         $result = array();
         $dbAdapter = $this->adapter;
@@ -2377,6 +2377,88 @@ class EidSampleTable extends AbstractTableGateway
                 $result['eidResult']['Positive'][$j] = (isset($sRow["positive"])) ? $sRow["positive"] : 0;
                 $result['eidResult']['Negative'][$j] = (isset($sRow["negative"])) ? $sRow["negative"] : 0;
                 $result['date'][$j] = $sRow["monthDate"];
+                $j++;
+            }
+        }
+        return $result;
+    }
+
+
+    public function getMonthlySampleCountByLabs($params)
+    {
+        $logincontainer = new Container('credo');
+        $result = array();
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $common = new CommonService($this->sm);
+        if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
+            $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
+            $endMonth = str_replace(' ', '-', $params['toDate']) . "-31";
+
+            $facilityIdList = null;
+
+            if (isset($params['facilityId']) && trim($params['facilityId']) != '') {
+                $fQuery = $sql->select()->from(array('f' => 'facility_details'))->columns(array('facility_id'))
+                    ->where('f.facility_type = 2 AND f.status="active"');
+                $fQuery = $fQuery->where('f.facility_id IN (' . $params['facilityId'] . ')');
+                $fQueryStr = $sql->getSqlStringForSqlObject($fQuery);
+                $facilityResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+                $facilityIdList = array_column($facilityResult, 'facility_id');
+            } else if (!empty($this->mappedFacilities)) {
+                $fQuery = $sql->select()->from(array('f' => 'facility_details'))->columns(array('facility_id'))
+                    //->where('f.facility_type = 2 AND f.status="active"')
+                    ->where('f.facility_id IN ("' . implode('", "', $this->mappedFacilities) . '")');
+                $fQueryStr = $sql->getSqlStringForSqlObject($fQuery);
+                $facilityResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+                $facilityIdList = array_column($facilityResult, 'facility_id');
+            }
+
+
+            $specimenTypes = null;
+            if (isset($params['sampleType']) && trim($params['sampleType']) != '') {
+                $rsQuery = $sql->select()->from(array('rs' => 'r_sample_type'))->columns(array('sample_id'));
+                $rsQuery = $rsQuery->where('rs.sample_id="' . base64_decode(trim($params['sampleType'])) . '"');
+                $rsQueryStr = $sql->getSqlStringForSqlObject($rsQuery);
+                //$sampleTypeResult = $dbAdapter->query($rsQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+                $specimenTypesResult = $common->cacheQuery($rsQueryStr, $dbAdapter);
+                $specimenTypes = array_column($specimenTypesResult, 'sample_id');
+            }
+
+
+
+            $query = $sql->select()->from(array('eid' => $this->table))
+
+                ->columns(
+                    array(
+                        "total" => new Expression("SUM(CASE WHEN (
+                                                        eid.result in ('negative', 'Negative','positive', 'Positive')) 
+                                                        THEN 1 ELSE 0 END)"),
+                        "negative" => new Expression("SUM(CASE WHEN ((eid.result like 'negative' OR eid.result like 'Negative')) THEN 1 ELSE 0 END)"),
+                        "positive" => new Expression("SUM(CASE WHEN ((eid.result like 'positive' OR eid.result like 'Positive' )) THEN 1 ELSE 0 END)"),
+                    )
+                )
+                ->join(array('f' => 'facility_details'), 'f.facility_id=eid.lab_id', array('facility_name'))
+                ->where(array("eid.sample_collection_date <='" . $endMonth . " 23:59:59" . "'", "eid.sample_collection_date >='" . $startMonth . " 00:00:00" . "'"))
+
+                ->group('eid.lab_id');
+
+            if ($specimenTypes != null) {
+                $query = $query->where('eid.sample_type IN ("' . implode('", "', $specimenTypes) . '")');
+            }
+            if ($facilityIdList != null) {
+                $query = $query->where('eid.lab_id IN ("' . implode('", "', $facilityIdList) . '")');
+            }
+
+            $queryStr = $sql->getSqlStringForSqlObject($query);
+            echo $queryStr;
+            die;
+            $testResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+
+            $j = 0;
+            foreach ($testResult as $data) {
+                $result['sampleName']['Negative'][$j] = $data['Negative'];
+                $result['sampleName']['Positive'][$j] = $data['Positive'];
+                $result['lab'][$j] = $data['facility_name'];
                 $j++;
             }
         }

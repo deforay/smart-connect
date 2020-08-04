@@ -37,31 +37,31 @@ class LabsController extends AbstractActionController
   }
   public function getMonthlySampleCountAction()
   {
-      $request = $this->getRequest();
-      
-      if ($request->isPost()) {
-          $params = $request->getPost();
-          $result = $this->sampleService->getMonthlySampleCount($params);
-          $sampleType = $this->sampleService->getSampleType();
-          $viewModel = new ViewModel();
-          $viewModel->setVariables(array('result' => $result, 'sampleType' => $sampleType))
-              ->setTerminal(true);
-          return $viewModel;
-      }
+    $request = $this->getRequest();
+
+    if ($request->isPost()) {
+      $params = $request->getPost();
+      $result = $this->sampleService->getMonthlySampleCount($params);
+      $sampleType = $this->sampleService->getSampleType();
+      $viewModel = new ViewModel();
+      $viewModel->setVariables(array('result' => $result, 'sampleType' => $sampleType))
+        ->setTerminal(true);
+      return $viewModel;
+    }
   }
   public function getMonthlySampleCountByLabsAction()
-    {
-        $request = $this->getRequest();
-        if ($request->isPost()) {
-            $params = $request->getPost();
-            // $sampleService = $this->getServiceLocator()->get('SampleService');
-            $result = $this->sampleService->getSampleTestedResultBasedVolumeDetails($params);
-            $sampleType = $this->sampleService->getSampleType();
-            $viewModel = new ViewModel();
-            $viewModel->setVariables(array('result' => $result, 'sampleType' => $sampleType))
-                ->setTerminal(true);
-            return $viewModel;
-        }
+  {
+    $request = $this->getRequest();
+    
+    if ($request->isPost()) {
+      $params = $request->getPost();
+      // $sampleService = $this->getServiceLocator()->get('SampleService');
+      $result = $this->sampleService->getMonthlySampleCountByLabs($params);
+      $sampleType = $this->sampleService->getSampleType();
+      $viewModel = new ViewModel();
+      $viewModel->setVariables(array('result' => $result, 'sampleType' => $sampleType))
+        ->setTerminal(true);
+      return $viewModel;
     }
-
+  }
 }

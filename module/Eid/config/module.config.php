@@ -20,7 +20,7 @@ return array(
                     'route' => '/eid/summary[/][:action][/:id]',
                     'defaults' => array(
                         'controller' => 'Eid\Controller\Summary',
-                        'action' => 'index',
+                        'action' => 'dashboard',
                     ),
                 ),
             ),

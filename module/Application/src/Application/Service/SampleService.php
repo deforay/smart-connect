@@ -2057,7 +2057,7 @@ class SampleService
     public function saveFileFromVlsmAPI(){
         $apiData = array();
         $common = new CommonService();
-        $sampleDb = $this->sm->get('SampleTable');
+        $sampleDb = $this->sm->get('SampleTableWithoutCache');
         $facilityDb = $this->sm->get('FacilityTable');
         $facilityTypeDb = $this->sm->get('FacilityTypeTable');
         $testStatusDb = $this->sm->get('SampleStatusTable');
@@ -2209,7 +2209,7 @@ class SampleService
                             }
                         }
                         //check facility type
-                        if (trim($row['facility_type']) != '') {
+                        if (isset($row['facility_type_name']) && trim($row['facility_type_name']) != '') {
                             $facilityTypeDataResult = $this->checkFacilityTypeDetails(trim($row['facility_type_name']));
                             if ($facilityTypeDataResult) {
                                 $facilityData['facility_type'] = $facilityTypeDataResult['facility_type_id'];
@@ -2220,7 +2220,7 @@ class SampleService
                         }
     
                         //check clinic details
-                        if (trim($row['facility_name']) != '') {
+                        if (isset($row['facility_name']) && trim($row['facility_name']) != '') {
                             $facilityDataResult = $this->checkFacilityDetails(trim($row['facility_name']));
                             if ($facilityDataResult) {
                                 $facilityDb->update($facilityData, array('facility_id' => $facilityDataResult['facility_id']));

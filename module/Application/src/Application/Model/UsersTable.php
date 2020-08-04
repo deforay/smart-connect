@@ -103,6 +103,7 @@ class UsersTable extends AbstractTableGateway
             if ($this->useCurrentSampleTable == true) {
                 $logincontainer->toggleStatus = $this->useCurrentSampleTable;
                 $logincontainer->sampleTable = 'dash_vl_request_form_current';
+                $logincontainer->eidSampleTable = 'dash_eid_form_current';
             } else {
                 //$logincontainer->sampleTable = 'dash_vl_request_form';
             }

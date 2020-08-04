@@ -54,7 +54,7 @@ class EidSampleService
     public function saveFileFromVlsmAPI(){
         $apiData = array();
         $common = new CommonService();
-        $sampleDb = $this->sm->get('EidSampleTable');
+        $sampleDb = $this->sm->get('EidSampleTableWithoutCache');
         $facilityDb = $this->sm->get('FacilityTable');
         $facilityTypeDb = $this->sm->get('FacilityTypeTable');
         $testStatusDb = $this->sm->get('SampleStatusTable');

@@ -6,9 +6,11 @@ use Laminas\Session\Container;
 use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\ViewModel;
 
-class LoginController extends AbstractActionController{
+class LoginController extends AbstractActionController
+{
 
-    public function indexAction(){
+    public function indexAction()
+    {
         $logincontainer = new Container('credo');
         $configService = $this->getServiceLocator()->get('ConfigService');
         $request = $this->getRequest();
@@ -21,15 +23,16 @@ class LoginController extends AbstractActionController{
         if (isset($logincontainer->userId) && $logincontainer->userId != "") {
             return $this->redirect()->toUrl("summary/dashboard");
         } else {
-            $config=$configService->getAllGlobalConfig();
+            $config = $configService->getAllGlobalConfig();
             $vm = new ViewModel();
-            $vm->setVariables(array('config'=>$config))
-               ->setTerminal(true);
+            $vm->setVariables(array('config' => $config))
+                ->setTerminal(true);
             return $vm;
         }
     }
 
-    public function otpAction(){
+    public function otpAction()
+    {
         $logincontainer = new Container('credo');
 
         $request = $this->getRequest();
@@ -40,20 +43,18 @@ class LoginController extends AbstractActionController{
             return $this->redirect()->toUrl($url);
         }
 
-        $configService = $this->getServiceLocator()->get('ConfigService');        
-        $config=$configService->getAllGlobalConfig();
+        $configService = $this->getServiceLocator()->get('ConfigService');
+        $config = $configService->getAllGlobalConfig();
         $vm = new ViewModel();
-        $vm->setVariables(array('config'=>$config))
-           ->setTerminal(true);
-        return $vm;        
+        $vm->setVariables(array('config' => $config))
+            ->setTerminal(true);
+        return $vm;
     }
 
-    public function logoutAction() {
+    public function logoutAction()
+    {
         $sessionLogin = new Container('credo');
         $sessionLogin->getManager()->getStorage()->clear();
         return $this->redirect()->toRoute("login");
-    }    
-
-
+    }
 }
-
