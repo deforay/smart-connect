@@ -1,0 +1,55 @@
+<?php
+
+use Zend\Debug\Debug;
+
+// Debug::dump($result);die;
+?>
+<script>
+    $('#eidOutcomes').highcharts({
+        chart: {
+            plotBackgroundColor: null,
+            plotBorderWidth: null,
+            plotShadow: false,
+            type: 'pie'
+        },
+        title: {
+            text: ''
+        },
+        credits: {
+            enabled: false
+        },
+        tooltip: {
+            pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+        },
+        plotOptions: {
+            pie: {
+                allowPointSelect: true,
+                cursor: 'pointer',
+                dataLabels: {
+                    enabled: true,
+                    format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                    style: {
+                        color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                    }
+                },
+                showInLegend: true
+            }
+        },
+        series: [{
+            "name": "Tests",
+            "colorByPoint": true,
+            "data": [{
+                "name": "Positive",
+                "y": <?php echo (($result['total_positive_samples'] / $result['total_samples']) * 100); ?>,
+                "sliced": true,
+                "selected": true,
+                "color": "#FF1900"
+            }, {
+                "name": "Negative",
+                "y": <?php echo (($result['total_negative_samples'] / $result['total_samples']) * 100); ?>,
+                "color": "#60D18F"
+            }]
+        }]
+
+    });
+</script>

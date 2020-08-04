@@ -1,0 +1,99 @@
+<?php
+if (count($result) > 0) {
+    // $colors = array('total' => '#FFD55A', 'Second/Third PCR' => '#869EA7');
+    $colors = array('total' => '#FFD55A');
+?>
+    <div id="samplesReceivedBarChartData" style="min-height:400px;"></div>
+    <script>
+        $(function() {
+            $('#samplesReceivedBarChartData').highcharts({
+                chart: {
+                    type: 'column',
+                    marginTop: 100
+                },
+                legend: {
+                    align: 'center',
+                    verticalAlign: 'top',
+                    floating: true,
+                    x: 0,
+                    y: 30
+                },
+                title: {
+                    text: ''
+                },
+                exporting: {
+                    chartOptions: {
+                        subtitle: {
+                            text: '<?php echo $this->translate('Samples Received'); ?>',
+                        }
+                    }
+                },
+                credits: {
+                    enabled: false
+                },
+                xAxis: {
+                    categories: [<?php
+                                    if (isset($result['date']) && count($result['date']) > 0) {
+                                        foreach ($result['date'] as $date) {
+                                            echo "'" . $date . "',";
+                                        }
+                                    }
+                                    ?>]
+                },
+                yAxis: {
+                    allowDecimals: false,
+                    min: 0,
+                    title: {
+                        text: '<?php echo $this->translate('No. of Samples'); ?>'
+                    }
+                },
+                tooltip: {
+                    formatter: function() {
+                        return '<b>' + this.x + '</b><br/>' +
+                            this.series.name + ': ' + this.y + '<br/>' +
+                            '<?php echo $this->translate('Total'); ?>: ' + this.point.stackTotal;
+                    }
+                },
+                plotOptions: {
+                    column: {
+                        stacking: 'normal',
+                        pointPadding: 0.2,
+                        borderWidth: 0,
+                        cursor: 'default',
+                        point: {
+                            events: {
+                                click: function(e) {
+
+                                }
+                            }
+                        }
+                    }
+                },
+                series: [<?php
+                            if (isset($result['sampleName']) && count($result['sampleName']) > 0) {
+                                foreach ($result['sampleName'] as $key => $condition) {
+                            ?> {
+
+                                name: '<?php echo strtoupper($this->translate(($key))); ?>',
+                                color: '<?php echo $colors[$key] ?>',
+                                data: [<?php
+                                        foreach ($condition as $count) {
+                                            echo '{y:' . $count . '},';
+                                        }
+                                        ?>],
+                            },
+                    <?php
+                                }
+                            }
+                    ?>
+                ],
+                colors: ['#FFD55A', '#869EA7', '#3E77A0']
+            });
+        });
+    </script>
+
+<?php } else {
+?>
+    <h3 style="text-align:center;">No data available</h3>
+<?php
+} ?>

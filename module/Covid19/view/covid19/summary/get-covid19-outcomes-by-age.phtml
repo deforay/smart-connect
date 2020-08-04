@@ -1,0 +1,101 @@
+<?php
+
+use Zend\Debug\Debug;
+
+$neg[] = $result['noDatan'];
+$pos[] = $result['noDatap'];
+/* Dynamic year range */
+$ageGroup = array('2', '2-5', '6-14', '15-49', '50');
+foreach($ageGroup as $key=>$age){
+    $neg[] = $result[$age.'n'];
+    $pos[] = $result[$age.'p'];
+}
+?>
+<script type="text/javascript">
+    $(function() {
+        $('#eidOutcomesByAge').highcharts({
+            chart: {
+                type: 'column'
+            },
+            title: {
+                text: ''
+            },
+            xAxis: {
+                categories: ["No Data", 
+                    <?php foreach($ageGroup as $key=>$age){
+                        if($key == 0){ ?>
+                            "less <?php echo $age;?> years",
+                        <?php } elseif($key == 4){ ?>
+                            "Above <?php echo $age;?> years"
+                        <?php } else{ ?>
+                            "<?php echo $age;?> years",
+                        <?php  }
+                    }?>
+                    ],
+                crosshair: true
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: 'Tests'
+                },
+                stackLabels: {
+                    rotation: -75,
+                    enabled: true,
+                    style: {
+                        fontWeight: 'bold',
+                        color: (Highcharts.theme && Highcharts.theme.textColor) || 'gray'
+                    },
+                    y: -20
+                }
+            },
+            credits: {
+                enabled: false
+            },
+            legend: {
+                align: 'right',
+                x: -30,
+                verticalAlign: 'bottom',
+                y: 5,
+                floating: false,
+                backgroundColor: (Highcharts.theme && Highcharts.theme.background2) || 'white',
+                borderColor: '#CCC',
+                borderWidth: 1,
+                shadow: true
+            },
+            tooltip: {
+                headerFormat: '<b>{point.x}</b><br/>',
+                pointFormat: '{series.name}: {point.y}<br/>% contribution: {point.percentage:.1f}%'
+            },
+            plotOptions: {
+                column: {
+                    stacking: 'normal',
+                    dataLabels: {
+                        enabled: false,
+                        color: (Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'white',
+                        style: {
+                            textShadow: '0 0 3px black'
+                        }
+                    }
+                }
+            },
+            colors: [
+                '#FF1900',
+                '#60D18F'
+            ],
+            series: [{
+                "name": "Positive",
+                "data": [<?php echo implode(",",$pos);?>],
+                "drilldown": {
+                    "color": "#913D88"
+                }
+            }, {
+                "name": "Negative",
+                "data": [<?php echo implode(",",$neg);?>],
+                "drilldown": {
+                    "color": "#96281B"
+                }
+            }]
+        });
+    });
+</script>

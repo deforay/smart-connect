@@ -16,10 +16,12 @@ class Covid19FormService
 {
 
     public $sm = null;
+    protected $translator = null;
 
     public function __construct($sm)
     {
         $this->sm = $sm;
+        $this->translator = $this->sm->get('translator');
     }
 
     public function getServiceManager()
@@ -32,7 +34,7 @@ class Covid19FormService
             // Debug::dump($_FILES['covid19File']);die;
             $apiData = array();
             $common = new CommonService();
-            $sampleDb = $this->sm->get('Covid19FormTable');
+            $sampleDb = $this->sm->get('Covid19FormTableWithoutCache');
             $facilityDb = $this->sm->get('FacilityTable');
             $facilityTypeDb = $this->sm->get('FacilityTypeTable');
             $testStatusDb = $this->sm->get('SampleStatusTable');
@@ -338,5 +340,380 @@ class Covid19FormService
         $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
         $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
         return $sResult;
+    }
+
+    public function fetchSummaryTabDetails($params)
+    {
+        $covid19SampleDb = $this->sm->get('Covid19FormTableWithoutCache');
+        return $covid19SampleDb->getSummaryTabDetails($params);
+    }
+
+    public function getSamplesReceivedBarChartDetails($params)
+    {
+        $sampleDb = $this->sm->get('Covid19FormTableWithoutCache');
+        return $sampleDb->fetchSamplesReceivedBarChartDetails($params);
+    }
+
+    public function getAllSamplesReceivedByFacility($parameters)
+    {
+        $sampleDb = $this->sm->get('Covid19FormTableWithoutCache');
+        return $sampleDb->fetchAllSamplesReceivedByFacility($parameters);
+    }
+
+    public function getAllSamplesReceivedByProvince($parameters)
+    {
+        $sampleDb = $this->sm->get('Covid19FormTableWithoutCache');
+        return $sampleDb->fetchAllSamplesReceivedByProvince($parameters);
+    }
+
+    public function getAllSamplesReceivedByDistrict($parameters)
+    {
+        $sampleDb = $this->sm->get('Covid19FormTableWithoutCache');
+        return $sampleDb->fetchAllSamplesReceivedByDistrict($parameters);
+    }
+
+    public function getPositiveRateBarChartDetails($params)
+    {
+        $sampleDb = $this->sm->get('Covid19FormTableWithoutCache');
+        return $sampleDb->fetchPositiveRateBarChartDetails($params);
+    }
+
+    public function getAllPositiveRateByDistrict($parameters)
+    {
+        $sampleDb = $this->sm->get('Covid19FormTableWithoutCache');
+        return $sampleDb->fetchAllPositiveRateByDistrict($parameters);
+    }
+
+    public function getAllPositiveRateByProvince($parameters)
+    {
+        $sampleDb = $this->sm->get('Covid19FormTableWithoutCache');
+        return $sampleDb->fetchAllPositiveRateByProvince($parameters);
+    }
+
+    public function getAllPositiveRateByFacility($parameters)
+    {
+        $sampleDb = $this->sm->get('Covid19FormTableWithoutCache');
+        return $sampleDb->fetchAllPositiveRateByFacility($parameters);
+    }
+
+    public function getSamplesRejectedBarChartDetails($params)
+    {
+        $sampleDb = $this->sm->get('Covid19FormTableWithoutCache');
+        return $sampleDb->fetchSamplesRejectedBarChartDetails($params);
+    }
+
+    public function getAllSamplesRejectedByDistrict($parameters)
+    {
+        $sampleDb = $this->sm->get('Covid19FormTableWithoutCache');
+        return $sampleDb->fetchAllSamplesRejectedByDistrict($parameters);
+    }
+
+    public function getAllSamplesRejectedByFacility($parameters)
+    {
+        $sampleDb = $this->sm->get('Covid19FormTableWithoutCache');
+        return $sampleDb->fecthAllSamplesRejectedByFacility($parameters);
+    }
+
+    public function getAllSamplesRejectedByProvince($parameters)
+    {
+        $sampleDb = $this->sm->get('Covid19FormTableWithoutCache');
+        return $sampleDb->fecthAllSamplesRejectedByProvince($parameters);
+    }
+
+    public function getCovid19OutcomesDetails($params)
+    {
+        $covid19SampleDb = $this->sm->get('Covid19FormTableWithoutCache');
+        return $covid19SampleDb->fetchCovid19OutcomesDetails($params);
+    }
+
+    public function getCovid19OutcomesByAgeDetails($params)
+    {
+        $covid19SampleDb = $this->sm->get('Covid19FormTableWithoutCache');
+        return $covid19SampleDb->fetchCovid19OutcomesByAgeDetails($params);
+    }
+   
+    public function getTATDetails($params)
+    {
+        $covid19SampleDb = $this->sm->get('Covid19FormTableWithoutCache');
+        return $covid19SampleDb->fetchTATDetails($params);
+    }
+    
+    public function getCovid19OutcomesByProvinceDetails($params)
+    {
+        $covid19SampleDb = $this->sm->get('Covid19FormTableWithoutCache');
+        return $covid19SampleDb->fetchCovid19OutcomesByProvinceDetails($params);
+    }
+    
+    public function exportIndicatorResultExcel($params)
+    {
+        $queryContainer = new Container('query');
+        $translator = $this->sm->get('translator');
+        $common = new CommonService();
+        if (isset($queryContainer->indicatorSummaryQuery)) {
+            try {
+                $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
+                $sql = new Sql($dbAdapter);
+                $sQueryStr = $sql->getSqlStringForSqlObject($queryContainer->indicatorSummaryQuery);
+                $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+                if (isset($sResult) && count($sResult) > 0) {
+                    $excel = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+
+                    // $cacheMethod = \PhpOffice\PhpSpreadsheet\Collection\CellsFactory::cache_to_phpTemp;
+                    // $cacheSettings = array('memoryCacheSize' => '80MB');
+                    // \PhpOffice\PhpSpreadsheet\Settings::setCacheStorageMethod($cacheMethod, $cacheSettings);
+                    $sheet = $excel->getActiveSheet();
+                    $output = array();
+                    $keySummaryIndicators = array();
+                    $j = 1;
+
+                    foreach ($sResult as $row) {
+                        $keySummaryIndicators['sample'][$this->translator->translate('Samples Received')]['month'][$j] = (isset($row["total_samples_received"])) ? $row["total_samples_received"] : 0;
+                        $keySummaryIndicators['sample'][$this->translator->translate('Samples Tested')]['month'][$j] = (isset($row["total_samples_tested"])) ? $row["total_samples_tested"] : 0;
+                        $keySummaryIndicators['sample'][$this->translator->translate('Samples Rejected')]['month'][$j] = (isset($row["total_samples_rejected"])) ? $row["total_samples_rejected"] : 0;
+                        $keySummaryIndicators['sample'][$this->translator->translate('Valid Tested')]['month'][$j]  = $valid = (isset($row["total_samples_tested"])) ? $row["total_samples_tested"] - $row["total_samples_rejected"] : 0;;
+                        $keySummaryIndicators['sample'][$this->translator->translate('No. of Positive')]['month'][$j] = (isset($row["total_positive_samples"])) ? $row["total_positive_samples"] : 0;
+                        $keySummaryIndicators['sample'][$this->translator->translate('Positive %') . ' (%)']['month'][$j] = ($valid > 0) ? round((($row["total_positive_samples"] / $valid) * 100), 2) . '' : '0';
+                        $keySummaryIndicators['sample'][$this->translator->translate('Rejection %') . ' (%)']['month'][$j] = (isset($row["total_samples_rejected"]) && $row["total_samples_rejected"] > 0 && $row["total_samples_received"] > 0) ? round((($row["total_samples_rejected"] / ($row["total_samples_tested"] + $row["total_samples_rejected"])) * 100), 2) . '' : '0';
+                        $keySummaryIndicators['month'][$j] = $row['monthyear'];
+                        $j++;
+                    }
+
+                    $styleArray = array(
+                        'font' => array(
+                            'bold' => true,
+                        ),
+                        'alignment' => array(
+                            'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                            'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+                        ),
+                        'borders' => array(
+                            'outline' => array(
+                                'style' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                            ),
+                        )
+                    );
+                    $borderStyle = array(
+                        'alignment' => array(
+                            'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT,
+                        ),
+                        'borders' => array(
+                            'outline' => array(
+                                'style' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                            ),
+                        )
+                    );
+                    $eRow = 0;
+                    $sheet->setCellValue('A1', html_entity_decode($this->translator->translate('Months'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+                    foreach ($keySummaryIndicators['month'] as $key => $month) {
+                        $colNo = $key + 1;
+                        $currentRow = 1;
+                        $sheet->getCellByColumnAndRow($colNo, $currentRow)->setValueExplicit(html_entity_decode($month, ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+                        $cellName = $sheet->getCellByColumnAndRow($colNo, $currentRow)->getColumn();
+                        $sheet->getStyle($cellName . $currentRow)->applyFromArray($styleArray);
+                    }
+
+
+                    foreach ($keySummaryIndicators['sample'] as $key => $indicators) {
+                        $row = array();
+                        $row[] = $key;
+                        foreach ($indicators['month'] as $months) {
+                            $row[] = $months;
+                        }
+                        $output[] = $row;
+                    }
+
+
+                    $currentRow = 2;
+                    foreach ($output as $rowData) {
+                        $colNo = 1;
+                        foreach ($rowData as $field => $value) {
+                            if (!isset($value)) {
+                                $value = "";
+                            }
+
+                            if (is_numeric($value)) {
+                                $sheet->getCellByColumnAndRow($colNo, $currentRow)->setValueExplicit(html_entity_decode($value, ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_NUMERIC);
+                            } else {
+                                $sheet->getCellByColumnAndRow($colNo, $currentRow)->setValueExplicit(html_entity_decode($value, ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+                            }
+                            $cellName = $sheet->getCellByColumnAndRow($colNo, $currentRow)->getColumn();
+                            $sheet->getStyle($cellName . $currentRow)->applyFromArray($borderStyle);
+                            $sheet->getDefaultRowDimension()->setRowHeight(20);
+                            $sheet->getColumnDimensionByColumn($colNo)->setWidth(20);
+                            $sheet->getStyleByColumnAndRow($colNo, $currentRow)->getAlignment()->setWrapText(true);
+                            $colNo++;
+                        }
+                        $currentRow++;
+                    }
+
+                    $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($excel, 'Xlsx');
+                    $filename = 'COVID19-SUMMARY-KEY-INDICATORS-' . date('d-M-Y-H-i-s') . '.xlsx';
+                    $writer->save(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . $filename);
+                    return $filename;
+                } else {
+                    return "";
+                }
+            } catch (Exception $exc) {
+                error_log("SUMMARY-INDICATORS-RESULT-REPORT--" . $exc->getMessage());
+                error_log($exc->getTraceAsString());
+                return "";
+            }
+        } else {
+            return "";
+        }
+    }
+
+    public function exportPositiveRateByFacility($params, $dashTable = 'dash_covid19_form')
+    {
+
+        $queryContainer = new Container('query');
+        $translator = $this->sm->get('translator');
+        // To set te session table
+        $logincontainer = new Container('credo');
+        if (isset($logincontainer->EidSampleTable) && $logincontainer->EidSampleTable != "") {
+            $dashTable = $logincontainer->EidSampleTable;
+        }
+        $common = new CommonService();
+
+        if (!isset($queryContainer->fetchAllPositiveRateByFacility)) {
+
+            $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
+            $sql = new Sql($dbAdapter);
+            $queryContainer->fetchAllPositiveRateByFacility = $sql->select()->from(array('covid19' => $dashTable))
+                ->columns(
+                    array(
+                        'covid19_id',
+                        'facility_id',
+                        'sampleCollectionDate' => new Expression('DATE(sample_collection_date)'),
+                        'result',
+                        "total_samples_received" => new Expression("(COUNT(*))"),
+                        "total_samples_valid" => new Expression("(SUM(CASE WHEN (((covid19.result IS NOT NULL AND covid19.result != '' AND covid19.result != 'NULL'))) THEN 1 ELSE 0 END))"),
+                        "total_samples_rejected" => new Expression("(SUM(CASE WHEN (reason_for_sample_rejection !='' AND reason_for_sample_rejection !='0' AND reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END))"),
+                        "total_positive_samples" => new Expression("SUM(CASE WHEN ((covid19.result like 'positive' OR covid19.result like 'Positive' )) THEN 1 ELSE 0 END)"),
+                        "total_negative_samples" => new Expression("SUM(CASE WHEN ((covid19.result like 'negative' OR covid19.result like 'Negative')) THEN 1 ELSE 0 END)"),
+                        "positive_rate" => new Expression("ROUND(((SUM(CASE WHEN ((covid19.result like 'positive' OR covid19.result like 'Positive' )) THEN 1 ELSE 0 END))/(SUM(CASE WHEN (((covid19.result IS NOT NULL AND covid19.result != '' AND covid19.result != 'NULL'))) THEN 1 ELSE 0 END)))*100,2)")
+                    )
+                )
+                ->join(array('f' => 'facility_details'), 'f.facility_id=covid19.facility_id', array('facility_name'))
+                ->join(array('f_d_l_dp' => 'location_details'), 'f_d_l_dp.location_id=f.facility_state', array('province' => 'location_name'))
+                ->join(array('f_d_l_d' => 'location_details'), 'f_d_l_d.location_id=f.facility_district', array('district' => 'location_name'))
+                ->where("(covid19.sample_collection_date is not null AND covid19.sample_collection_date != '' AND DATE(covid19.sample_collection_date) !='1970-01-01' AND DATE(covid19.sample_collection_date) !='0000-00-00')")
+                ->group('covid19.facility_id');
+        }
+
+
+
+        try {
+            $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
+            $sql = new Sql($dbAdapter);
+            $sQueryStr = $sql->getSqlStringForSqlObject($queryContainer->fetchAllSuppressionRateByFacility);
+            $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+            if (isset($sResult) && count($sResult) > 0) {
+                $excel = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+                //$cacheMethod = \PhpOffice\PhpSpreadsheet\Collection\CellsFactory::cache_to_phpTemp;
+                //$cacheSettings = array('memoryCacheSize' => '80MB');
+                //\PhpOffice\PhpSpreadsheet\Settings::setCacheStorageMethod($cacheMethod, $cacheSettings);
+                //var_dump('AAYA');die;
+                $sheet = $excel->getActiveSheet();
+                $output = array();
+                foreach ($sResult as $aRow) {
+
+                    $row = array();
+                    $row[] = ucwords($aRow['facility_name']);
+                    $row[] = ucwords($aRow['province']);
+                    $row[] = ucwords($aRow['district']);
+                    $row[] = $aRow['total_samples_valid'];
+                    $row[] = $aRow['total_positive_samples'];
+                    $row[] = $aRow['total_negative_samples'];
+                    $row[] = ($aRow['total_samples_rejected'] > 0 && $aRow['total_samples_received'] > 0) ? round((($aRow['total_samples_rejected'] / $aRow['total_samples_received']) * 100), 2) : '';
+                    $row[] = ($aRow['total_samples_valid'] > 0 && $aRow['total_positive_samples'] > 0) ? round((($aRow['total_positive_samples'] / $aRow['total_samples_valid']) * 100), 2) : '';
+                    $output[] = $row;
+                }
+                $styleArray = array(
+                    'font' => array(
+                        'bold' => true,
+                    ),
+                    'alignment' => array(
+                        'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                        'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+                    ),
+                    'borders' => array(
+                        'outline' => array(
+                            'style' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                        ),
+                    )
+                );
+                $borderStyle = array(
+                    'alignment' => array(
+                        'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT,
+                    ),
+                    'borders' => array(
+                        'outline' => array(
+                            'style' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                        ),
+                    )
+                );
+
+                $sheet->setCellValue('A1', html_entity_decode($this->translator->translate('Facility'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+                $sheet->setCellValue('B1', html_entity_decode($this->translator->translate('Province'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+                $sheet->setCellValue('C1', html_entity_decode($this->translator->translate('District/County'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+                $sheet->setCellValue('D1', html_entity_decode($this->translator->translate('Valid Results'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+                $sheet->setCellValue('E1', html_entity_decode($this->translator->translate('Positive Results'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+                $sheet->setCellValue('F1', html_entity_decode($this->translator->translate('Negative Results'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+                $sheet->setCellValue('G1', html_entity_decode($this->translator->translate('Samples Rejected in %'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+                $sheet->setCellValue('H1', html_entity_decode($this->translator->translate('Positive Rate in %'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+
+                $sheet->getStyle('A1')->applyFromArray($styleArray);
+                $sheet->getStyle('B1')->applyFromArray($styleArray);
+                $sheet->getStyle('C1')->applyFromArray($styleArray);
+                $sheet->getStyle('D1')->applyFromArray($styleArray);
+                $sheet->getStyle('E1')->applyFromArray($styleArray);
+                $sheet->getStyle('F1')->applyFromArray($styleArray);
+                $sheet->getStyle('G1')->applyFromArray($styleArray);
+                $sheet->getStyle('H1')->applyFromArray($styleArray);
+
+                $currentRow = 2;
+                foreach ($output as $rowData) {
+                    $colNo = 0;
+                    foreach ($rowData as $field => $value) {
+                        if (!isset($value)) {
+                            $value = "";
+                        }
+                        // if ($colNo > 5) {
+                        //     break;
+                        // }
+                        if (is_numeric($value)) {
+                            $sheet->getCellByColumnAndRow($colNo, $currentRow)->setValueExplicit(html_entity_decode($value, ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_NUMERIC);
+                        } else {
+                            $sheet->getCellByColumnAndRow($colNo, $currentRow)->setValueExplicit(html_entity_decode($value, ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+                        }
+                        $cellName = $sheet->getCellByColumnAndRow($colNo, $currentRow)->getColumn();
+                        $sheet->getStyle($cellName . $currentRow)->applyFromArray($borderStyle);
+                        $sheet->getDefaultRowDimension()->setRowHeight(20);
+                        $sheet->getColumnDimensionByColumn($colNo)->setWidth(20);
+                        $sheet->getStyleByColumnAndRow($colNo, $currentRow)->getAlignment()->setWrapText(true);
+                        $colNo++;
+                    }
+                    $currentRow++;
+                }
+
+                $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($excel, 'Xlsx');
+                $filename = 'COVID19-Facility-Wise-Positive-Rate-' . date('d-M-Y-H-i-s') . '.xlsx';
+                $writer->save(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . $filename);
+                return $filename;
+            } else {
+                return "";
+            }
+        } catch (Exception $exc) {
+            error_log("COVID19-Facility-Wise-Positive-Rate-" . $exc->getMessage());
+            error_log($exc->getTraceAsString());
+            return "";
+        }
+    }
+
+    public function getKeySummaryIndicatorsDetails($params)
+    {
+        $sampleDb = $this->sm->get('Covid19FormTableWithoutCache');
+        return $sampleDb->fetchKeySummaryIndicatorsDetails($params);
     }
 }
