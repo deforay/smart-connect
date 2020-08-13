@@ -249,7 +249,7 @@ class Covid19FormService
                     }
                 }
                 //remove directory
-                $common->removeDirectory($pathname);
+                // $common->removeDirectory($pathname);
                 return array(
                     'status'    => 'success',
                     'message'   => 'Uploaded successfully',
@@ -270,7 +270,7 @@ class Covid19FormService
     {
         $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
         $sql = new Sql($dbAdapter);
-        $sQuery = $sql->select()->from($dashTable)->where(array('sample_code' => $sampleCode, 'vlsm_instance_id' => $instanceCode));
+        $sQuery = $sql->select()->from($dashTable)->where(array('sample_code LIKE "%'.$sampleCode.'%"', 'vlsm_instance_id' => $instanceCode));
         $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
         $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
         return $sResult;

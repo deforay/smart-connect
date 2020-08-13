@@ -289,7 +289,7 @@ class SampleService
     {
         $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
         $sql = new Sql($dbAdapter);
-        $sQuery = $sql->select()->from($dashTable)->where(array('sample_code' => $sampleCode, 'vlsm_instance_id' => $instanceCode));
+        $sQuery = $sql->select()->from($dashTable)->where(array('sample_code LIKE "%'.$sampleCode.'%"', 'vlsm_instance_id' => $instanceCode));
         $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
         $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
         return $sResult;
@@ -2085,7 +2085,7 @@ class SampleService
                 $apiData = \JsonMachine\JsonMachine::fromFile($pathname);
             }
         }
-        if(count($apiData) > 0){
+        if($apiData !== FALSE){
             foreach($apiData as $rowData){
                 // Debug::dump($rowData);die;
                 foreach($rowData as $row){
@@ -2356,7 +2356,7 @@ class SampleService
                 }
             }
             //remove directory
-            $common->removeDirectory($pathname);
+            // $common->removeDirectory($pathname);
         }
         return array(
             'status'    => 'success',
