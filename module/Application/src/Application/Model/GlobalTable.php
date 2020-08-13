@@ -18,17 +18,20 @@ use Application\Service\CommonService;
  *
  * @author amit
  */
-class GlobalTable extends AbstractTableGateway {
+class GlobalTable extends AbstractTableGateway
+{
 
     protected $table = 'dash_global_config';
     public $sm = null;
 
-    public function __construct(Adapter $adapter, $sm=null) {
+    public function __construct(Adapter $adapter, $sm = null)
+    {
         $this->adapter = $adapter;
         $this->sm = $sm;
     }
-    
-    public function getGlobalValue($globalName) {
+
+    public function getGlobalValue($globalName)
+    {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->from('dash_global_config')->where(array('name' => $globalName));
@@ -36,8 +39,9 @@ class GlobalTable extends AbstractTableGateway {
         $configValues = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         return $configValues[0]['value'];
     }
-    
-    public function fetchAllConfig($parameters) {
+
+    public function fetchAllConfig($parameters)
+    {
         $common = new CommonService($this->sm);
         /* Array of database columns which should be read and sent back to DataTables. Use a space where
          * you want to insert a non-database field (for example a counter or static image)
@@ -60,7 +64,7 @@ class GlobalTable extends AbstractTableGateway {
         if (isset($parameters['iSortCol_0'])) {
             for ($i = 0; $i < intval($parameters['iSortingCols']); $i++) {
                 if ($parameters['bSortable_' . intval($parameters['iSortCol_' . $i])] == "true") {
-                    $sOrder .= $aColumns[intval($parameters['iSortCol_' . $i])] . " " . ( $parameters['sSortDir_' . $i] ) . ",";
+                    $sOrder .= $aColumns[intval($parameters['iSortCol_' . $i])] . " " . ($parameters['sSortDir_' . $i]) . ",";
                 }
             }
             $sOrder = substr_replace($sOrder, "", -1);
@@ -87,9 +91,9 @@ class GlobalTable extends AbstractTableGateway {
 
                 for ($i = 0; $i < $colSize; $i++) {
                     if ($i < $colSize - 1) {
-                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search ) . "%' OR ";
+                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search) . "%' OR ";
                     } else {
-                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search ) . "%' ";
+                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search) . "%' ";
                     }
                 }
                 $sWhereSub .= ")";
@@ -115,7 +119,7 @@ class GlobalTable extends AbstractTableGateway {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->from('dash_global_config')
-                                ->where(array('status'=>'active'));
+            ->where(array('status' => 'active'));
         if (isset($sWhere) && $sWhere != "") {
             $sQuery->where($sWhere);
         }
@@ -150,18 +154,19 @@ class GlobalTable extends AbstractTableGateway {
         );
         foreach ($rResult as $aRow) {
             $currentVal = $aRow['value'];
-            if($aRow['display_name'] == 'Language'){
-              $currentVal = $this->fetchLocaleDetailsById('display_name',$aRow['value']);
+            if ($aRow['display_name'] == 'Language') {
+                $currentVal = $this->fetchLocaleDetailsById('display_name', $aRow['value']);
             }
-           $row = array();
+            $row = array();
             $row[] = ucwords($common->translate($aRow['display_name']));
             $row[] = ucwords($currentVal);
             $output['aaData'][] = $row;
         }
-       return $output;
+        return $output;
     }
-    
-    public function fetchAllGlobalConfig() {
+
+    public function fetchAllGlobalConfig()
+    {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->from('dash_global_config');
@@ -173,57 +178,60 @@ class GlobalTable extends AbstractTableGateway {
         for ($i = 0; $i < $size; $i++) {
             $arr[$configValues[$i]['name']] = $configValues[$i]['value'];
         }
-        
+
         // using assign to automatically create view variables
         // the column names will now become view variables
         return $arr;
     }
-    
-    public function updateConfigDetails($params) {
+
+    public function updateConfigDetails($params)
+    {
         $updateRes = 0;
-        $common=new CommonService();
+        $common = new CommonService();
         //for logo deletion
-        if(isset($params['removedLogoImage']) && trim($params['removedLogoImage']) != "" && file_exists(UPLOAD_PATH . DIRECTORY_SEPARATOR . "logo" . DIRECTORY_SEPARATOR . $params['removedLogoImage'])){
+        if (isset($params['removedLogoImage']) && trim($params['removedLogoImage']) != "" && file_exists(UPLOAD_PATH . DIRECTORY_SEPARATOR . "logo" . DIRECTORY_SEPARATOR . $params['removedLogoImage'])) {
             unlink(UPLOAD_PATH . DIRECTORY_SEPARATOR . "logo" . DIRECTORY_SEPARATOR . $params['removedLogoImage']);
-            $this->update(array('value'=>''),array('name'=>'logo'));
+            $this->update(array('value' => ''), array('name' => 'logo'));
         }
         //for logo updation
-        if(isset($_FILES['logo']['name']) && $_FILES['logo']['name']!= ""){
-            if(!file_exists(UPLOAD_PATH . DIRECTORY_SEPARATOR . "logo") && !is_dir(UPLOAD_PATH . DIRECTORY_SEPARATOR . "logo")) {
+        if (isset($_FILES['logo']['name']) && $_FILES['logo']['name'] != "") {
+            if (!file_exists(UPLOAD_PATH . DIRECTORY_SEPARATOR . "logo") && !is_dir(UPLOAD_PATH . DIRECTORY_SEPARATOR . "logo")) {
                 mkdir(UPLOAD_PATH . DIRECTORY_SEPARATOR . "logo");
             }
             $extension = strtolower(pathinfo(UPLOAD_PATH . DIRECTORY_SEPARATOR . $_FILES['logo']['name'], PATHINFO_EXTENSION));
-            $string = $common->generateRandomString(6).".";
-            $imageName = "logo".$string.$extension;
+            $string = $common->generateRandomString(6) . ".";
+            $imageName = "logo" . $string . $extension;
             if (move_uploaded_file($_FILES["logo"]["tmp_name"], UPLOAD_PATH . DIRECTORY_SEPARATOR . "logo" . DIRECTORY_SEPARATOR . $imageName)) {
-                $this->update(array('value'=>$imageName),array('name'=>'logo'));
+                $this->update(array('value' => $imageName), array('name' => 'logo'));
             }
         }
         //for non-logo field updation
         foreach ($params as $fieldName => $fieldValue) {
-            if($fieldName!= 'removedLogoImage'){
-	       $updateRes = $this->update(array('value' => $fieldValue), array('name' => $fieldName));
+            if ($fieldName != 'removedLogoImage') {
+                $updateRes = $this->update(array('value' => $fieldValue), array('name' => $fieldName));
             }
         }
-      return $updateRes;
+        return $updateRes;
     }
-    
-    public function fetchActiveLocales(){
+
+    public function fetchActiveLocales()
+    {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $localeQuery = $sql->select()->from(array('locale' => 'locale_details'));
         $loclaeQueryStr = $sql->getSqlStringForSqlObject($localeQuery);
-       return $dbAdapter->query($loclaeQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+        return $dbAdapter->query($loclaeQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
     }
-    
-    public function fetchLocaleDetailsById($column,$localeId){
+
+    public function fetchLocaleDetailsById($column, $localeId)
+    {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $localeQuery = $sql->select()->from(array('locale' => 'locale_details'))
-                                     ->columns(array($column))
-                                     ->where(array('locale.locale_id'=>$localeId));
+            ->columns(array($column))
+            ->where(array('locale.locale_id' => $localeId));
         $loclaeQueryStr = $sql->getSqlStringForSqlObject($localeQuery);
         $localeResult = $dbAdapter->query($loclaeQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-       return $localeResult->$column;
+        return $localeResult->$column;
     }
 }

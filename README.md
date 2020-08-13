@@ -26,7 +26,7 @@ You can see an example below :
 ```
 
 #### Next Steps
-*Manually populate the r_vl_test_reasons, r_sample_type, and location_details tables in the database (we are working on adding UI in the application to populate these details)
+*Manually populate the r_vl_test_reasons, r_vl_sample_type, and location_details tables in the database (we are working on adding UI in the application to populate these details)
 * Make sure that your Viral Load data from LIS or other sources is populated in to the **dash_vl_request_form** table
 * Once you have the application set up, you can visit the URL http://vldashboard/ and log in with the credentials admin@example.com and 12345
 * Now you can start adding Users

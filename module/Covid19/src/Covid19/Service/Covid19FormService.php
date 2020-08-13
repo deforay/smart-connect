@@ -327,7 +327,7 @@ class Covid19FormService
     {
         $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
         $sql = new Sql($dbAdapter);
-        $sQuery = $sql->select()->from('r_sample_type')->where(array('sample_name' => $sampleType));
+        $sQuery = $sql->select()->from('r_covis19_sample_type')->where(array('sample_name' => $sampleType));
         $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
         $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
         return $sResult;

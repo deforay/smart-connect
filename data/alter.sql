@@ -371,3 +371,19 @@ CREATE TABLE `dash_covid19_form` (
  `data_sync` int NOT NULL DEFAULT '0',
  PRIMARY KEY (`covid19_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT;
+
+
+-- Amit 13 Aug 2020
+
+RENAME TABLE `r_sample_type` TO `r_vl_sample_type`;
+ALTER TABLE `dash_vl_request_form` ADD `province_id` VARCHAR(255) NULL DEFAULT NULL AFTER `facility_id`;
+ALTER TABLE `dash_vl_request_form` ADD `reason_for_vl_testing_other` VARCHAR(255) NULL DEFAULT NULL AFTER `reason_for_vl_testing`;
+ALTER TABLE `province_details` ADD `updated_datetime` DATETIME NULL DEFAULT NULL AFTER `province_code`;
+ALTER TABLE `r_vl_sample_type` ADD `updated_datetime` DATETIME NULL DEFAULT NULL AFTER `status`;
+ALTER TABLE `r_eid_sample_type` ADD `updated_datetime` DATETIME NULL DEFAULT NULL AFTER `status`;
+ALTER TABLE `r_covid19_sample_type` ADD `updated_datetime` DATETIME NULL DEFAULT NULL AFTER `status`;
+ALTER TABLE `r_covid19_comorbidities` ADD `updated_datetime` DATETIME NULL DEFAULT NULL AFTER `comorbidity_status`;
+ALTER TABLE `r_covid19_results` ADD `updated_datetime` DATETIME NULL DEFAULT NULL AFTER `status`;
+ALTER TABLE `r_covid19_symptoms` ADD `updated_datetime` DATETIME NULL DEFAULT NULL AFTER `symptom_status`;
+ALTER TABLE `r_covid19_test_reasons` ADD `updated_datetime` DATETIME NULL DEFAULT NULL AFTER `test_reason_status`;
+

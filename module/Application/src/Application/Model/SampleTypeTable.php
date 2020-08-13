@@ -21,7 +21,7 @@ use Laminas\Db\TableGateway\AbstractTableGateway;
  */
 class SampleTypeTable extends AbstractTableGateway {
 
-    protected $table = 'r_sample_type';
+    protected $table = 'r_vl_sample_type';
 
     public function __construct(Adapter $adapter) {
         $this->adapter = $adapter;

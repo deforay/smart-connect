@@ -427,7 +427,7 @@ class EidSampleTable extends AbstractTableGateway
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=eid.facility_id', array('facility_name'))
             ->join(array('f_d_l_d' => 'location_details'), 'f_d_l_d.location_id=f.facility_district', array('district' => 'location_name'))
-            //->join(array('rs' => 'r_sample_type'), 'rs.sample_id=eid.sample_type', array('sample_name'))
+            
             ->where("(eid.sample_collection_date is not null AND DATE(eid.sample_collection_date) !='1970-01-01' AND DATE(eid.sample_collection_date) !='0000-00-00')")
             ->group('f.facility_district');
         if (isset($sWhere) && $sWhere != "") {
@@ -473,7 +473,7 @@ class EidSampleTable extends AbstractTableGateway
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=eid.facility_id', array('facility_name'))
             ->join(array('f_d_l_d' => 'location_details'), 'f_d_l_d.location_id=f.facility_district', array('district' => 'location_name'))
-            //->join(array('rs' => 'r_sample_type'), 'rs.sample_id=eid.sample_type', array('sample_name'))
+            
             ->where("(eid.sample_collection_date is not null AND DATE(eid.sample_collection_date) !='1970-01-01' AND DATE(eid.sample_collection_date) !='0000-00-00')")
             ->group('f.facility_district');
 
@@ -2335,7 +2335,7 @@ class EidSampleTable extends AbstractTableGateway
 
             $specimenTypes = null;
             if (isset($params['sampleType']) && trim($params['sampleType']) != '') {
-                $rsQuery = $sql->select()->from(array('rs' => 'r_sample_type'))->columns(array('sample_id'));
+                $rsQuery = $sql->select()->from(array('rs' => 'r_eid_sample_type'))->columns(array('sample_id'));
                 $rsQuery = $rsQuery->where('rs.sample_id="' . base64_decode(trim($params['sampleType'])) . '"');
                 $rsQueryStr = $sql->getSqlStringForSqlObject($rsQuery);
                 //$sampleTypeResult = $dbAdapter->query($rsQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -2417,7 +2417,7 @@ class EidSampleTable extends AbstractTableGateway
 
             $specimenTypes = null;
             if (isset($params['sampleType']) && trim($params['sampleType']) != '') {
-                $rsQuery = $sql->select()->from(array('rs' => 'r_sample_type'))->columns(array('sample_id'));
+                $rsQuery = $sql->select()->from(array('rs' => 'r_eid_sample_type'))->columns(array('sample_id'));
                 $rsQuery = $rsQuery->where('rs.sample_id="' . base64_decode(trim($params['sampleType'])) . '"');
                 $rsQueryStr = $sql->getSqlStringForSqlObject($rsQuery);
                 //$sampleTypeResult = $dbAdapter->query($rsQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();

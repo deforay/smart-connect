@@ -253,7 +253,7 @@ class SampleTable extends AbstractTableGateway
 
             $specimenTypes = null;
             if (isset($params['sampleType']) && trim($params['sampleType']) != '') {
-                $rsQuery = $sql->select()->from(array('rs' => 'r_sample_type'))->columns(array('sample_id'));
+                $rsQuery = $sql->select()->from(array('rs' => 'r_vl_sample_type'))->columns(array('sample_id'));
                 $rsQuery = $rsQuery->where('rs.sample_id="' . base64_decode(trim($params['sampleType'])) . '"');
                 $rsQueryStr = $sql->getSqlStringForSqlObject($rsQuery);
                 //$sampleTypeResult = $dbAdapter->query($rsQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -400,7 +400,7 @@ class SampleTable extends AbstractTableGateway
 
             $specimenTypes = null;
             if (isset($params['sampleType']) && trim($params['sampleType']) != '') {
-                $rsQuery = $sql->select()->from(array('rs' => 'r_sample_type'))->columns(array('sample_id'));
+                $rsQuery = $sql->select()->from(array('rs' => 'r_vl_sample_type'))->columns(array('sample_id'));
                 $rsQuery = $rsQuery->where('rs.sample_id="' . base64_decode(trim($params['sampleType'])) . '"');
                 $rsQueryStr = $sql->getSqlStringForSqlObject($rsQuery);
                 //$sampleTypeResult = $dbAdapter->query($rsQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -2237,7 +2237,7 @@ class SampleTable extends AbstractTableGateway
             $hQuery = '';
             $hQuery = clone $sQuery;
             $hQuery->join(array('pat' => 'patients'), 'pat.patient_art_no=vl.patient_art_no', array('first_name', 'middle_name', 'last_name'), 'left')
-                ->join(array('st' => 'r_sample_type'), 'st.sample_id=vl.sample_type', array('sample_name'), 'left')
+                ->join(array('st' => 'r_vl_sample_type'), 'st.sample_id=vl.sample_type', array('sample_name'), 'left')
                 ->join(array('lds' => 'location_details'), 'lds.location_id=f.facility_state', array('facilityState' => 'location_name'), 'left')
                 ->join(array('ldd' => 'location_details'), 'ldd.location_id=f.facility_district', array('facilityDistrict' => 'location_name'), 'left')
                 ->where('DashVL_AnalysisResult="Not Suppressed"');
@@ -3148,7 +3148,7 @@ class SampleTable extends AbstractTableGateway
                 "rejected_samples" => new Expression("SUM(CASE WHEN (vl.reason_for_sample_rejection !='' AND vl.reason_for_sample_rejection !='0' AND vl.reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END)")
             ))
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'))
-            ->join(array('rs' => 'r_sample_type'), 'rs.sample_id=vl.sample_type', array('sample_name'))
+            ->join(array('rs' => 'r_vl_sample_type'), 'rs.sample_id=vl.sample_type', array('sample_name'))
             ->join(array('l' => 'facility_details'), 'l.facility_id=vl.lab_id', array(), 'left')
             ->where("sample_collection_date is not null AND sample_collection_date != '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00' AND f.facility_type = 1")
             ->group(new Expression('DATE(sample_collection_date)'))
@@ -3266,7 +3266,7 @@ class SampleTable extends AbstractTableGateway
                 "total_samples_received" => new Expression("(COUNT(*))")
             ))
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'))
-            ->join(array('rs' => 'r_sample_type'), 'rs.sample_id=vl.sample_type', array('sample_name'))
+            ->join(array('rs' => 'r_vl_sample_type'), 'rs.sample_id=vl.sample_type', array('sample_name'))
             ->join(array('l' => 'facility_details'), 'l.facility_id=vl.lab_id', array(), 'left')
             ->where("sample_collection_date is not null AND sample_collection_date != '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00' AND f.facility_type = 1")
             ->group(new Expression('DATE(sample_collection_date)'))
@@ -4370,7 +4370,7 @@ class SampleTable extends AbstractTableGateway
             ->columns(array('sample_code', 'collectionDate' => new Expression('DATE(sample_collection_date)'), 'receivedDate' => new Expression('DATE(sample_received_at_vl_lab_datetime)')))
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facilityName' => 'facility_name', 'facilityCode' => 'facility_code'))
             ->join(array('l' => 'facility_details'), 'l.facility_id=vl.lab_id', array('labName' => 'facility_name'), 'left')
-            ->join(array('rs' => 'r_sample_type'), 'rs.sample_id=vl.sample_type', array('sample_name'), 'left')
+            ->join(array('rs' => 'r_vl_sample_type'), 'rs.sample_id=vl.sample_type', array('sample_name'), 'left')
             ->where("(vl.DashVL_AnalysisResult is NULL OR vl.DashVL_AnalysisResult ='') AND (reason_for_sample_rejection is NULL or reason_for_sample_rejection ='' or vl.reason_for_sample_rejection = 0)");
         if (isset($parameters['daterange']) && trim($parameters['daterange']) != '' && trim($splitDate[0]) != '' && trim($splitDate[1]) != '') {
             $sQuery = $sQuery->where(array("vl.sample_collection_date >='" . $splitDate[0] . " 00:00:00" . "'", "vl.sample_collection_date <='" . $splitDate[1] . " 23:59:59" . "'"));
@@ -4481,7 +4481,7 @@ class SampleTable extends AbstractTableGateway
             ->columns(array('sample_code', 'collectionDate' => new Expression('DATE(sample_collection_date)'), 'receivedDate' => new Expression('DATE(sample_received_at_vl_lab_datetime)')))
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facilityName' => 'facility_name', 'facilityCode' => 'facility_code'))
             ->join(array('l' => 'facility_details'), 'l.facility_id=vl.lab_id', array('labName' => 'facility_name'), 'left')
-            ->join(array('rs' => 'r_sample_type'), 'rs.sample_id=vl.sample_type', array('sample_name'), 'left')
+            ->join(array('rs' => 'r_vl_sample_type'), 'rs.sample_id=vl.sample_type', array('sample_name'), 'left')
             ->where("(vl.DashVL_AnalysisResult is NULL OR vl.DashVL_AnalysisResult ='') AND (reason_for_sample_rejection is NULL or reason_for_sample_rejection ='' or vl.reason_for_sample_rejection = 0)");
         if ($logincontainer->role != 1) {
             $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : array(0);
@@ -4567,7 +4567,7 @@ class SampleTable extends AbstractTableGateway
             ->join(array('l' => 'facility_details'), 'l.facility_id=vl.lab_id', array('lab_name' => 'facility_name'), 'left')
             ->join(array('f_p_l_d' => 'location_details'), 'f_p_l_d.location_id=f.facility_state', array('province' => 'location_name'), 'left')
             ->join(array('f_d_l_d' => 'location_details'), 'f_d_l_d.location_id=f.facility_district', array('district' => 'location_name'), 'left')
-            //->join(array('rs'=>'r_sample_type'),'rs.sample_id=vl.sample_type',array('sample_name'),'left')
+            //->join(array('rs'=>'r_vl_sample_type'),'rs.sample_id=vl.sample_type',array('sample_name'),'left')
             ->where(array(
                 "MONTH(vl.sample_collection_date) in ($quarters)",
                 "YEAR(vl.sample_collection_date) = $year"
@@ -4714,7 +4714,7 @@ class SampleTable extends AbstractTableGateway
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'), 'left')
             ->join(array('f_p_l_d' => 'location_details'), 'f_p_l_d.location_id=f.facility_state', array('province' => 'location_name'), 'left')
             ->join(array('f_d_l_d' => 'location_details'), 'f_d_l_d.location_id=f.facility_district', array('district' => 'location_name'), 'left')
-            ->join(array('rs' => 'r_sample_type'), 'rs.sample_id=vl.sample_type', array('sample_name'), 'left')
+            ->join(array('rs' => 'r_vl_sample_type'), 'rs.sample_id=vl.sample_type', array('sample_name'), 'left')
             //->group('sample_code')
             //->group('facility_id')
             //->having('COUNT(*) > 1');
@@ -4751,7 +4751,7 @@ class SampleTable extends AbstractTableGateway
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'), 'left')
             ->join(array('f_p_l_d' => 'location_details'), 'f_p_l_d.location_id=f.facility_state', array('province' => 'location_name'), 'left')
             ->join(array('f_d_l_d' => 'location_details'), 'f_d_l_d.location_id=f.facility_district', array('district' => 'location_name'), 'left')
-            ->join(array('rs' => 'r_sample_type'), 'rs.sample_id=vl.sample_type', array('sample_name'), 'left')
+            ->join(array('rs' => 'r_vl_sample_type'), 'rs.sample_id=vl.sample_type', array('sample_name'), 'left')
             //->group('sample_code')
             //->group('facility_id')
             //->having('COUNT(*) > 1');
@@ -5001,9 +5001,9 @@ class SampleTable extends AbstractTableGateway
                                         AND DATE(sample_collection_date) <= '" . $endMonth . "'");
         }
         //->where("(vl.sample_collection_date is not null AND vl.sample_collection_date != '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')");        
-        $queryStr = $sql->getSqlStringForSqlObject($queryStr);
+        $queryStr = $sql->buildSqlString($queryStr);
 
-        // echo $queryStr;die;
+        //echo $queryStr;die;
 
         return $common->cacheQuery($queryStr, $dbAdapter);
     }
@@ -5024,7 +5024,7 @@ class SampleTable extends AbstractTableGateway
                     "total_others" => new Expression("SUM(CASE WHEN ((sample_type!= $this->dbsId AND sample_type!= $this->plasmaId) AND sample_type IS NOT NULL AND sample_type!= '') THEN 1 ELSE 0 END)")
                 )
             )
-            ->join(array('rs' => 'r_sample_type'), 'rs.sample_id=vl.sample_type', array('sample_name'))
+            ->join(array('rs' => 'r_vl_sample_type'), 'rs.sample_id=vl.sample_type', array('sample_name'))
             //->where("sample_collection_date <= NOW()")
             //->where("sample_collection_date >= DATE_ADD(Now(),interval - 12 month)")
             ->group(array(new Expression('YEAR(vl.sample_collection_date)'), new Expression('MONTH(vl.sample_collection_date)')));
@@ -5167,7 +5167,7 @@ class SampleTable extends AbstractTableGateway
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'))
             ->join(array('f_d_l_d' => 'location_details'), 'f_d_l_d.location_id=f.facility_state', array('province' => 'location_name'))
-            ->join(array('rs' => 'r_sample_type'), 'rs.sample_id=vl.sample_type', array('sample_name'))
+            ->join(array('rs' => 'r_vl_sample_type'), 'rs.sample_id=vl.sample_type', array('sample_name'))
             ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date != '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')")
             ->group('f.facility_state');
         if (isset($sWhere) && $sWhere != "") {
@@ -5213,7 +5213,7 @@ class SampleTable extends AbstractTableGateway
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'))
             ->join(array('f_d_l_d' => 'location_details'), 'f_d_l_d.location_id=f.facility_state', array('province' => 'location_name'))
-            ->join(array('rs' => 'r_sample_type'), 'rs.sample_id=vl.sample_type', array('sample_name'))
+            ->join(array('rs' => 'r_vl_sample_type'), 'rs.sample_id=vl.sample_type', array('sample_name'))
             ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date != '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')")
             ->group('f.facility_state');
 
@@ -5354,7 +5354,7 @@ class SampleTable extends AbstractTableGateway
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'))
             ->join(array('f_d_l_d' => 'location_details'), 'f_d_l_d.location_id=f.facility_district', array('district' => 'location_name'))
-            ->join(array('rs' => 'r_sample_type'), 'rs.sample_id=vl.sample_type', array('sample_name'))
+            ->join(array('rs' => 'r_vl_sample_type'), 'rs.sample_id=vl.sample_type', array('sample_name'))
             ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date != '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')")
             ->group('f.facility_district');
         if (isset($sWhere) && $sWhere != "") {
@@ -5400,7 +5400,7 @@ class SampleTable extends AbstractTableGateway
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'))
             ->join(array('f_d_l_d' => 'location_details'), 'f_d_l_d.location_id=f.facility_district', array('district' => 'location_name'))
-            ->join(array('rs' => 'r_sample_type'), 'rs.sample_id=vl.sample_type', array('sample_name'))
+            ->join(array('rs' => 'r_vl_sample_type'), 'rs.sample_id=vl.sample_type', array('sample_name'))
             ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date != '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')")
             ->group('f.facility_district');
 
@@ -5543,7 +5543,7 @@ class SampleTable extends AbstractTableGateway
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'))
             ->join(array('f_d_l_d' => 'location_details'), 'f_d_l_d.location_id=f.facility_district', array('district' => 'location_name'))
             ->join(array('f_d_l_dp' => 'location_details'), 'f_d_l_dp.location_id=f.facility_state', array('province' => 'location_name'))
-            ->join(array('rs' => 'r_sample_type'), 'rs.sample_id=vl.sample_type', array('sample_name'))
+            ->join(array('rs' => 'r_vl_sample_type'), 'rs.sample_id=vl.sample_type', array('sample_name'))
             ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date != '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')")
             ->group('vl.facility_id');
 
@@ -5587,7 +5587,7 @@ class SampleTable extends AbstractTableGateway
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array())
             ->join(array('f_d_l_d' => 'location_details'), 'f_d_l_d.location_id=f.facility_district', array())
             ->join(array('f_d_l_dp' => 'location_details'), 'f_d_l_dp.location_id=f.facility_state', array())
-            ->join(array('rs' => 'r_sample_type'), 'rs.sample_id=vl.sample_type', array())
+            ->join(array('rs' => 'r_vl_sample_type'), 'rs.sample_id=vl.sample_type', array())
             ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date != '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')")
             ->group('vl.facility_id');
 
@@ -7856,7 +7856,7 @@ class SampleTable extends AbstractTableGateway
             FROM  " . $this->table . "  as vl
             LEFT JOIN facility_details as f ON vl.facility_id=f.facility_id
             LEFT JOIN facility_details as l_f ON vl.lab_id=l_f.facility_id
-            LEFT JOIN r_sample_type as s ON s.sample_id=vl.sample_type
+            LEFT JOIN r_vl_sample_type as s ON s.sample_id=vl.sample_type
             LEFT JOIN r_sample_status as ts ON ts.status_id=vl.result_status
             LEFT JOIN r_vl_test_reasons as tr ON tr.test_reason_id=vl.reason_for_vl_testing
             LEFT JOIN facility_type as ft ON ft.facility_type_id=f.facility_type

@@ -2,15 +2,15 @@
 return array(
     'caches' => array(
         //'Cache\Transient' => array(
-            
-           
-            //'adapter' => 'redis',
-            //'ttl'     => 60,
-            //'plugins' => array(
-            //    'exception_handler' => array(
-            //        'throw_exceptions' => false,
-            //    ),
-            //),
+
+
+        //'adapter' => 'redis',
+        //'ttl'     => 60,
+        //'plugins' => array(
+        //    'exception_handler' => array(
+        //        'throw_exceptions' => false,
+        //    ),
+        //),
         //),
         'Cache\Persistent' => array(
             'adapter' => 'filesystem',
@@ -22,20 +22,20 @@ return array(
                 'dirLevel' => 1,
             ),
             'plugins' => array('serializer'),
-            
+
         ),
         'Cache\Memcached' => array( //can be called directly via SM in the name of 'memcached'
             'adapter' => array(
-                'name'     =>'memcached',
+                'name'     => 'memcached',
                 'options'  => array(
                     'ttl' => 1440,  // 1440 minutes = 1 day
                     'servers'   => array(
                         array(
-                            '127.0.0.1',11211
+                            '127.0.0.1', 11211
                         )
                     ),
                     'namespace'  => 'VLDASHBOARD',
-                    'liboptions' => array (
+                    'liboptions' => array(
                         'COMPRESSION' => true,
                         'binary_protocol' => true,
                         'no_block' => true,

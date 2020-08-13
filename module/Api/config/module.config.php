@@ -64,6 +64,18 @@ return array(
                     ),
                 ),
             ),
+            'weblims-vl' => array(
+                'type'    => 'segment',
+                'options' => array(
+                    'route'    => '/api/weblims-vl[/:id]',
+                    'constraints' => array(
+                        'id'     => '[0-9]+',
+                    ),
+                    'defaults' => array(
+                        'controller' => 'Api\Controller\WeblimsVL',
+                    ),
+                ),
+            ),
             'api-vlsm-eid' => array(
                 'type'    => 'segment',
                 'options' => array(
@@ -97,6 +109,7 @@ return array(
             'Api\Controller\User'               => 'Api\Controller\UserController',
             'Api\Controller\Facility'           => 'Api\Controller\FacilityController',
             'Api\Controller\Vlsm'               => 'Api\Controller\VlsmController',
+            'Api\Controller\WeblimsVL'               => 'Api\Controller\WeblimsVLController',
             'Api\Controller\VlsmEid'            => 'Api\Controller\VlsmEidController',
             'Api\Controller\VlsmCovid'          => 'Api\Controller\VlsmCovidController',
         ),

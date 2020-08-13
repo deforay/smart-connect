@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Zend Framework (http://framework.zend.com/)
  *
@@ -46,8 +47,7 @@ return array(
                                 'controller' => '[a-zA-Z][a-zA-Z0-9_-]*',
                                 'action'     => '[a-zA-Z][a-zA-Z0-9_-]*',
                             ),
-                            'defaults' => array(
-                            ),
+                            'defaults' => array(),
                         ),
                     ),
                 ),
@@ -195,13 +195,13 @@ return array(
     ),
     'translator' => array(
         'locale' => 'en_US',
-          'translation_file_patterns' => array(
+        'translation_file_patterns' => array(
             array(
-              'type' => 'gettext',
-              'base_dir' => __DIR__ . '/../language',
-              'pattern' => '%s.mo'
+                'type' => 'gettext',
+                'base_dir' => __DIR__ . '/../language',
+                'pattern' => '%s.mo'
             ),
-          )
+        )
     ),
     'controllers' => array(
         'invokables' => array(
