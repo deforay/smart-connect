@@ -289,10 +289,7 @@ class SampleService
     {
         $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
         $sql = new Sql($dbAdapter);
-        $sQuery = $sql->select()->from($dashTable)->where(array('sample_code LIKE "%'.$sampleCode.'%"'));
-        if(isset($instanceCode) && $instanceCode != ""){
-            $sQuery = $sQuery->where(array('vlsm_instance_id' => $instanceCode));
-        }
+        $sQuery = $sql->select()->from($dashTable)->where(array('sample_code LIKE "%'.$sampleCode.'%"','vlsm_instance_id' => $instanceCode));
         $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
         $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
         return $sResult;
@@ -2371,17 +2368,19 @@ class SampleService
     public function saveWeblimsVLAPI($params){
         $common = new CommonService();
         $sampleDb = $this->sm->get('SampleTableWithoutCache');
+        $facilityDb = $this->sm->get('FacilityTable');
+        $facilityTypeDb = $this->sm->get('FacilityTypeTable');
         $testStatusDb = $this->sm->get('SampleStatusTable');
         $testReasonDb = $this->sm->get('TestReasonTable');
         $sampleTypeDb = $this->sm->get('SampleTypeTable');
         $sampleRjtReasonDb = $this->sm->get('SampleRejectionReasonTable');
-        
+        $return = array();
         if($params['xmlmessage'] !== FALSE){
-            foreach($params['xmlmessage'] as $row){
+            foreach($params['xmlmessage'] as $key=>$row){
                 // Debug::dump($row);die;
                 if (trim($row['SampleID']) != '' && trim($row['TestName']) == 'HIV Viral Load') {
                     $sampleCode = trim($row['SampleID']);
-                    // $instanceCode = trim($row['vlsm_instance_id']);
+                    $instanceCode = 'nrl-weblims';
 
                     $VLAnalysisResult = (float) $row['result_value_absolute_decimal'];
                     $DashVL_Abs = NULL;
@@ -2419,23 +2418,18 @@ class SampleService
                         $DashVL_Abs = $VLAnalysisResult;
                     }
 
-
-
-
                     $dob = (trim($row['BirthDate']) != '' ? date('Y-m-d',strtotime(str_replace("T"," ",$row['BirthDate']))) : null);
                     $sampleCollectionDate = (trim($row['CollectionDate']) != '' ? trim(date('Y-m-d H:i', strtotime(str_replace("T"," ",$row['CollectionDate'])))) : null);
                     $sampleReceivedAtLab = ((trim($row['SampleReceivedDate']) != '' && $row['SampleReceivedDate'] != "T") ? trim(date('Y-m-d H:i', strtotime(str_replace("T"," ",$row['SampleReceivedDate'])))) : null);
                     $dateOfInitiationOfRegimen = (trim($row['date_of_initiation_of_current_regimen']) != '' ? trim(date('Y-m-d H:i', strtotime($row['date_of_initiation_of_current_regimen']))) : null);
                     $resultApprovedDateTime = (trim($row['result_approved_datetime']) != '' ? trim(date('Y-m-d H:i', strtotime($row['result_approved_datetime']))) : null);
                     $sampleTestedDateTime = (trim($row['SampleTestedDate']) != '' ? trim(date('Y-m-d H:i', strtotime(str_replace("T"," ",$row['SampleTestedDate'])))) : null);
+                    $resultPrinterDateTime = (trim($row['Result']['ResultReturnDate']) != '' ? trim(date('Y-m-d H:i', strtotime(str_replace("T"," ",$row['Result']['ResultReturnDate'])))) : null);
                     $sampleRegisteredAtLabDateTime = (trim($row['sample_registered_at_lab']) != '' ? trim(date('Y-m-d H:i', strtotime($row['sample_registered_at_lab']))) : null);
-
-
-
 
                     $data = array(
                         'sample_code'                           => $sampleCode,
-                        // 'vlsm_instance_id'                      => trim($row['vlsm_instance_id']),
+                        'vlsm_instance_id'                      => 'nrl-weblims',
                         'province_id'                           => (trim($row['TracnetID']) != '' ? trim($row['TracnetID']) : NULL),
                         'source'                                => '1',
                         'patient_gender'                        => (trim($row['patientGender']) != '' ? trim($row['patientGender']) : NULL),
@@ -2443,6 +2437,7 @@ class SampleService
                         'patient_dob'                           => $dob,
                         'sample_collection_date'                => $sampleCollectionDate,
                         'sample_registered_at_lab'              => $sampleReceivedAtLab,
+                        'result_printed_datetime'               => $resultPrinterDateTime,
                         'line_of_treatment'                     => (trim($row['CurrentTreatment']) != '' ? trim($row['CurrentTreatment']) : NULL),
                         'is_sample_rejected'                    => (trim($row['IsSampleRejected']) != '' ? trim($row['IsSampleRejected']) : NULL),
                         'is_patient_pregnant'                   => (trim($row['IsPatientPregnant']) != '' ? trim($row['IsPatientPregnant']) : NULL),
@@ -2471,22 +2466,25 @@ class SampleService
                         if ($facilityDataResult) {
                             $data['facility_id'] = $facilityDataResult['facility_id'];
                         } else {
-                            $data['facility_id'] = NULL;
+                            $facilityDb->insert(array(
+                                'vlsm_instance_id'  => 'nrl-weblims',
+                                'facility_name'     => $row['FacilityName'],
+                                'facility_code'     => !empty($row['FacilityName'])?$row['FacilityName']:null,
+                                'facility_type'     => '1',
+                                'status'            => 'active'
+                            ));
+                            $data['facility_id'] = $facilityDb->lastInsertValue;
                         }
                     } else {
                         $data['facility_id'] = NULL;
                     }
 
                     //check lab details
-                    if (trim($row['TestingLab']) != '') {
-                        $labDataResult = $this->checkFacilityDetails(trim($row['TestingLab']));
-                        if ($labDataResult) {
-                            $data['lab_id'] = $labDataResult['facility_id'];
-                        } else {
-                            $data['lab_id'] = 0;
-                        }
+                    $labDataResult = $this->checkFacilityDetailsByWeblims("NRL");
+                    if ($labDataResult) {
+                        $data['lab_id'] = $labDataResult['facility_id'];
                     } else {
-                        $data['lab_id'] = 0;
+                        $data['lab_id'] = NULL;
                     }
 
                     //check testing reason
@@ -2503,12 +2501,12 @@ class SampleService
                         $data['reason_for_vl_testing'] = 0;
                     }
                     //check testing reason
-                    if (trim($row['status_name']) != '') {
-                        $sampleStatusResult = $this->checkSampleStatus(trim($row['status_name']));
+                    if (trim($row['TestStatus']) != '') {
+                        $sampleStatusResult = $this->checkSampleStatus(trim($row['TestStatus']));
                         if ($sampleStatusResult) {
                             $data['result_status'] = $sampleStatusResult['status_id'];
                         } else {
-                            $testStatusDb->insert(array('status_name' => trim($row['status_name'])));
+                            $testStatusDb->insert(array('status_name' => trim($row['TestStatus'])));
                             $data['result_status'] = $testStatusDb->lastInsertValue;
                         }
                     } else {
@@ -2542,20 +2540,60 @@ class SampleService
                     }
 
                     //check existing sample code
-                    $sampleCode = $this->checkSampleCode($sampleCode, "");
+                    $sampleCode = $this->checkSampleCodeByWeblims($sampleCode, $instanceCode);
+                    $status = 0;
                     if ($sampleCode) {
                         //sample data update
-                        $sampleDb->update($data, array('vl_sample_id' => $sampleCode['vl_sample_id']));
+                        $status = $sampleDb->update($data, array('vl_sample_id' => $sampleCode['vl_sample_id']));
                     } else {
                         //sample data insert
-                        $sampleDb->insert($data);
+                        $status = $sampleDb->insert($data);
+                    }
+                    if($status == 0){
+                        $return[$key][] = $row['SampleID'];
                     }
                 }
             }
+        } else{
+            return array(
+                'status'    => 'fail',
+                'message'   => 'Missed recevied index xmlmessage',
+            );
         }
-        return array(
-            'status'    => 'success',
-            'message'   => 'API Connected',
-        );
+        if(count($return) > 0){
+            return array(
+                'status'    => 'success',
+                'message'   => 'Received '.count($params['xmlmessage']).' records. '.(count($params['xmlmessage']) - count($return)).' records successfully processed. '.count($return).' records failed or duplicate entry.',
+                "failed"    => $return
+            );
+        } else{
+            return array(
+                'status'    => 'success',
+                'message'   => 'API Connected',
+            );
+        }
+    }
+
+    public function checkSampleCodeByWeblims($sampleCode, $instanceCode, $dashTable = 'dash_vl_request_form')
+    {
+        $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
+        $sql = new Sql($dbAdapter);
+        $sQuery = $sql->select()->from($dashTable)->where(array('sample_code LIKE "%'.$sampleCode.'%"'));
+        if(isset($instanceCode) && $instanceCode != ""){
+            $sQuery = $sQuery->where(array('vlsm_instance_id' => $instanceCode));
+        }
+        $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
+        $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
+        return $sResult;
+    }
+
+    public function checkFacilityDetailsByWeblims($clinicName)
+    {
+        $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
+        $sql = new Sql($dbAdapter);
+        $fQuery = $sql->select()->from('facility_details')->where(array('facility_name' => $clinicName, 'facility_type' => 2));
+        $fQueryStr = $sql->getSqlStringForSqlObject($fQuery);
+        $fResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
+        return $fResult;
     }
 }
