@@ -142,7 +142,7 @@ class SummaryService
             try {
                 $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
                 $sql = new Sql($dbAdapter);
-                $sQueryStr = $sql->getSqlStringForSqlObject($queryContainer->indicatorSummaryQuery);
+                $sQueryStr = $sql->buildSqlString($queryContainer->indicatorSummaryQuery);
                 $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
                 if (isset($sResult) && count($sResult) > 0) {
                     $excel = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
@@ -296,7 +296,7 @@ class SummaryService
         try {
             $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
             $sql = new Sql($dbAdapter);
-            $sQueryStr = $sql->getSqlStringForSqlObject($queryContainer->fetchAllSuppressionRateByFacility);
+            $sQueryStr = $sql->buildSqlString($queryContainer->fetchAllSuppressionRateByFacility);
             $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             if (isset($sResult) && count($sResult) > 0) {
                 $excel = new \PhpOffice\PhpSpreadsheet\Spreadsheet();

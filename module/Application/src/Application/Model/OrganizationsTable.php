@@ -34,7 +34,7 @@ class OrganizationsTable extends AbstractTableGateway {
         $sQuery = $sql->select()->from(array('o' => 'organizations'))
                 ->join(array('ot' => 'organization_type'), 'o.org_type=ot.id', array('type'));
         
-        $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
+        $sQueryStr = $sql->buildSqlString($sQuery);
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         return $rResult;
     }
@@ -74,7 +74,7 @@ class OrganizationsTable extends AbstractTableGateway {
         $sQuery = $sql->select()->from(array('o' => 'organizations'))
                       ->where("org_id= $orgId");
         
-        $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
+        $sQueryStr = $sql->buildSqlString($sQuery);
 
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         if(count($rResult) > 0){

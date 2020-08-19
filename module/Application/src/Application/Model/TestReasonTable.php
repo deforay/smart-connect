@@ -29,7 +29,7 @@ class TestReasonTable extends AbstractTableGateway {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $rQuery = $sql->select()->from(array('r'=>'r_vl_test_reasons'))->where(array('test_reason_status' => 'active'));
-        $rQueryStr = $sql->getSqlStringForSqlObject($rQuery);
+        $rQueryStr = $sql->buildSqlString($rQuery);
         return $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
     }
 }

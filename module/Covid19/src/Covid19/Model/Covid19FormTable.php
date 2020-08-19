@@ -55,7 +55,7 @@ class Covid19FormTable extends AbstractTableGateway
                                         AND DATE(sample_collection_date) <= '" . $endMonth . "'");
         }
 
-        $queryStr = $sql->getSqlStringForSqlObject($queryStr);
+        $queryStr = $sql->buildSqlString($queryStr);
 
         // echo $queryStr;die;
 
@@ -99,7 +99,7 @@ class Covid19FormTable extends AbstractTableGateway
                                         AND DATE(sample_collection_date) >= '" . $startMonth . "' 
                                         AND DATE(sample_collection_date) <= '" . $endMonth . "'");
         }
-        $queryStr = $sql->getSqlStringForSqlObject($sQuery);
+        $queryStr = $sql->buildSqlString($sQuery);
         // echo $queryStr;die;
         //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $sampleResult = $common->cacheQuery($queryStr, $dbAdapter);
@@ -241,14 +241,14 @@ class Covid19FormTable extends AbstractTableGateway
             $sQuery->offset($sOffset);
         }
 
-        $sQueryStr = $sql->getSqlStringForSqlObject($sQuery); // Get the string of the Sql, instead of the Select-instance 
+        $sQueryStr = $sql->buildSqlString($sQuery); // Get the string of the Sql, instead of the Select-instance 
         // echo $sQueryStr;die;
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
 
         /* Data set length after filtering */
         $sQuery->reset('limit');
         $sQuery->reset('offset');
-        $fQuery = $sql->getSqlStringForSqlObject($sQuery);
+        $fQuery = $sql->buildSqlString($sQuery);
         $aResultFilterTotal = $dbAdapter->query($fQuery, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $iFilteredTotal = count($aResultFilterTotal);
 
@@ -271,7 +271,7 @@ class Covid19FormTable extends AbstractTableGateway
                         AND DATE(covid19.sample_collection_date) <= '" . $endMonth . "'");
         }
 
-        $iQueryStr = $sql->getSqlStringForSqlObject($iQuery);
+        $iQueryStr = $sql->buildSqlString($iQuery);
 
 
 
@@ -424,14 +424,14 @@ class Covid19FormTable extends AbstractTableGateway
             $sQuery->offset($sOffset);
         }
 
-        $sQueryStr = $sql->getSqlStringForSqlObject($sQuery); // Get the string of the Sql, instead of the Select-instance 
+        $sQueryStr = $sql->buildSqlString($sQuery); // Get the string of the Sql, instead of the Select-instance 
         // echo $sQueryStr;die;
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
 
         /* Data set length after filtering */
         $sQuery->reset('limit');
         $sQuery->reset('offset');
-        $fQuery = $sql->getSqlStringForSqlObject($sQuery);
+        $fQuery = $sql->buildSqlString($sQuery);
         $aResultFilterTotal = $dbAdapter->query($fQuery, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $iFilteredTotal = count($aResultFilterTotal);
 
@@ -455,7 +455,7 @@ class Covid19FormTable extends AbstractTableGateway
                         AND DATE(covid19.sample_collection_date) >= '" . $startMonth . "' 
                         AND DATE(covid19.sample_collection_date) <= '" . $endMonth . "'");
         }
-        $iQueryStr = $sql->getSqlStringForSqlObject($iQuery);
+        $iQueryStr = $sql->buildSqlString($iQuery);
         $iResult = $dbAdapter->query($iQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $iTotal = count($iResult);
 
@@ -604,14 +604,14 @@ class Covid19FormTable extends AbstractTableGateway
             $sQuery->offset($sOffset);
         }
 
-        $sQueryStr = $sql->getSqlStringForSqlObject($sQuery); // Get the string of the Sql, instead of the Select-instance 
+        $sQueryStr = $sql->buildSqlString($sQuery); // Get the string of the Sql, instead of the Select-instance 
         //echo $sQueryStr;die;
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
 
         /* Data set length after filtering */
         $sQuery->reset('limit');
         $sQuery->reset('offset');
-        $fQuery = $sql->getSqlStringForSqlObject($sQuery);
+        $fQuery = $sql->buildSqlString($sQuery);
         $aResultFilterTotal = $dbAdapter->query($fQuery, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $iFilteredTotal = count($aResultFilterTotal);
 
@@ -637,7 +637,7 @@ class Covid19FormTable extends AbstractTableGateway
                         AND DATE(covid19.sample_collection_date) >= '" . $startMonth . "' 
                         AND DATE(covid19.sample_collection_date) <= '" . $endMonth . "'");
         }
-        $iQueryStr = $sql->getSqlStringForSqlObject($iQuery);
+        $iQueryStr = $sql->buildSqlString($iQuery);
         $iResult = $dbAdapter->query($iQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $iTotal = count($iResult);
 
@@ -702,7 +702,7 @@ class Covid19FormTable extends AbstractTableGateway
                                         AND DATE(sample_collection_date) >= '" . $startMonth . "' 
                                         AND DATE(sample_collection_date) <= '" . $endMonth . "'");
         }
-        $queryStr = $sql->getSqlStringForSqlObject($sQuery);
+        $queryStr = $sql->buildSqlString($sQuery);
         //echo $queryStr;die;
         //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $sampleResult = $common->cacheQuery($queryStr, $dbAdapter);
@@ -842,14 +842,14 @@ class Covid19FormTable extends AbstractTableGateway
             $sQuery->offset($sOffset);
         }
 
-        $sQueryStr = $sql->getSqlStringForSqlObject($sQuery); // Get the string of the Sql, instead of the Select-instance 
+        $sQueryStr = $sql->buildSqlString($sQuery); // Get the string of the Sql, instead of the Select-instance 
         //echo $sQueryStr;die;
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
 
         /* Data set length after filtering */
         $sQuery->reset('limit');
         $sQuery->reset('offset');
-        $fQuery = $sql->getSqlStringForSqlObject($sQuery);
+        $fQuery = $sql->buildSqlString($sQuery);
         $aResultFilterTotal = $dbAdapter->query($fQuery, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $iFilteredTotal = count($aResultFilterTotal);
 
@@ -872,7 +872,7 @@ class Covid19FormTable extends AbstractTableGateway
                         AND DATE(covid19.sample_collection_date) >= '" . $startMonth . "' 
                         AND DATE(covid19.sample_collection_date) <= '" . $endMonth . "'");
         }
-        $iQueryStr = $sql->getSqlStringForSqlObject($iQuery);
+        $iQueryStr = $sql->buildSqlString($iQuery);
         $iResult = $dbAdapter->query($iQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $iTotal = count($iResult);
 
@@ -1020,14 +1020,14 @@ class Covid19FormTable extends AbstractTableGateway
             $sQuery->offset($sOffset);
         }
 
-        $sQueryStr = $sql->getSqlStringForSqlObject($sQuery); // Get the string of the Sql, instead of the Select-instance 
+        $sQueryStr = $sql->buildSqlString($sQuery); // Get the string of the Sql, instead of the Select-instance 
         //echo $sQueryStr;die;
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
 
         /* Data set length after filtering */
         $sQuery->reset('limit');
         $sQuery->reset('offset');
-        $fQuery = $sql->getSqlStringForSqlObject($sQuery);
+        $fQuery = $sql->buildSqlString($sQuery);
         $aResultFilterTotal = $dbAdapter->query($fQuery, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $iFilteredTotal = count($aResultFilterTotal);
 
@@ -1050,7 +1050,7 @@ class Covid19FormTable extends AbstractTableGateway
                         AND DATE(covid19.sample_collection_date) >= '" . $startMonth . "' 
                         AND DATE(covid19.sample_collection_date) <= '" . $endMonth . "'");
         }
-        $iQueryStr = $sql->getSqlStringForSqlObject($iQuery);
+        $iQueryStr = $sql->buildSqlString($iQuery);
         $iResult = $dbAdapter->query($iQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $iTotal = count($iResult);
 
@@ -1205,14 +1205,14 @@ class Covid19FormTable extends AbstractTableGateway
             $sQuery->offset($sOffset);
         }
 
-        $sQueryStr = $sql->getSqlStringForSqlObject($sQuery); // Get the string of the Sql, instead of the Select-instance 
+        $sQueryStr = $sql->buildSqlString($sQuery); // Get the string of the Sql, instead of the Select-instance 
         //echo $sQueryStr;die;
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
 
         /* Data set length after filtering */
         $sQuery->reset('limit');
         $sQuery->reset('offset');
-        $fQuery = $sql->getSqlStringForSqlObject($sQuery);
+        $fQuery = $sql->buildSqlString($sQuery);
         $aResultFilterTotal = $dbAdapter->query($fQuery, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $iFilteredTotal = count($aResultFilterTotal);
 
@@ -1236,7 +1236,7 @@ class Covid19FormTable extends AbstractTableGateway
                         AND DATE(covid19.sample_collection_date) >= '" . $startMonth . "' 
                         AND DATE(covid19.sample_collection_date) <= '" . $endMonth . "'");
         }
-        $iQueryStr = $sql->getSqlStringForSqlObject($iQuery);
+        $iQueryStr = $sql->buildSqlString($iQuery);
         $iResult = $dbAdapter->query($iQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $iTotal = count($iResult);
 
@@ -1293,7 +1293,7 @@ class Covid19FormTable extends AbstractTableGateway
                                         AND DATE(sample_collection_date) >= '" . $startMonth . "' 
                                         AND DATE(sample_collection_date) <= '" . $endMonth . "'");
         }
-        $mostRejectionQueryStr = $sql->getSqlStringForSqlObject($mostRejectionQuery);
+        $mostRejectionQueryStr = $sql->buildSqlString($mostRejectionQuery);
         $mostRejectionResult = $dbAdapter->query($mostRejectionQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         if (isset($mostRejectionResult) && count($mostRejectionResult) > 0) {
             foreach ($mostRejectionResult as $rejectionReason) {
@@ -1342,7 +1342,7 @@ class Covid19FormTable extends AbstractTableGateway
                 } else {
                     $rejectionQuery = $rejectionQuery->where('covid19.reason_for_sample_rejection = "' . $mostRejectionReasons[$m] . '"');
                 }
-                $rejectionQueryStr = $sql->getSqlStringForSqlObject($rejectionQuery);
+                $rejectionQueryStr = $sql->buildSqlString($rejectionQuery);
                 $rejectionResult = $common->cacheQuery($rejectionQueryStr, $dbAdapter);
                 $rejectionReasonName = ($mostRejectionReasons[$m] == 0) ? 'Others' : ucwords($rejectionResult[0]['rejection_reason_name']);
                 $result['rejection'][$rejectionReasonName][$j] = (isset($rejectionResult[0]['rejections'])) ? $rejectionResult[0]['rejections'] : 0;
@@ -1471,14 +1471,14 @@ class Covid19FormTable extends AbstractTableGateway
             $sQuery->offset($sOffset);
         }
 
-        $sQueryStr = $sql->getSqlStringForSqlObject($sQuery); // Get the string of the Sql, instead of the Select-instance 
+        $sQueryStr = $sql->buildSqlString($sQuery); // Get the string of the Sql, instead of the Select-instance 
         //echo $sQueryStr;die;
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
 
         /* Data set length after filtering */
         $sQuery->reset('limit');
         $sQuery->reset('offset');
-        $fQuery = $sql->getSqlStringForSqlObject($sQuery);
+        $fQuery = $sql->buildSqlString($sQuery);
         $aResultFilterTotal = $dbAdapter->query($fQuery, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $iFilteredTotal = count($aResultFilterTotal);
 
@@ -1501,7 +1501,7 @@ class Covid19FormTable extends AbstractTableGateway
                         AND DATE(covid19.sample_collection_date) >= '" . $startMonth . "' 
                         AND DATE(covid19.sample_collection_date) <= '" . $endMonth . "'");
         }
-        $iQueryStr = $sql->getSqlStringForSqlObject($iQuery);
+        $iQueryStr = $sql->buildSqlString($iQuery);
         $iResult = $dbAdapter->query($iQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $iTotal = count($iResult);
 
@@ -1639,14 +1639,14 @@ class Covid19FormTable extends AbstractTableGateway
             $sQuery->offset($sOffset);
         }
 
-        $sQueryStr = $sql->getSqlStringForSqlObject($sQuery); // Get the string of the Sql, instead of the Select-instance 
+        $sQueryStr = $sql->buildSqlString($sQuery); // Get the string of the Sql, instead of the Select-instance 
         //echo $sQueryStr;die;
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
 
         /* Data set length after filtering */
         $sQuery->reset('limit');
         $sQuery->reset('offset');
-        $fQuery = $sql->getSqlStringForSqlObject($sQuery);
+        $fQuery = $sql->buildSqlString($sQuery);
         $aResultFilterTotal = $dbAdapter->query($fQuery, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $iFilteredTotal = count($aResultFilterTotal);
 
@@ -1669,7 +1669,7 @@ class Covid19FormTable extends AbstractTableGateway
                         AND DATE(covid19.sample_collection_date) >= '" . $startMonth . "' 
                         AND DATE(covid19.sample_collection_date) <= '" . $endMonth . "'");
         }
-        $iQueryStr = $sql->getSqlStringForSqlObject($iQuery);
+        $iQueryStr = $sql->buildSqlString($iQuery);
         $iResult = $dbAdapter->query($iQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $iTotal = count($iResult);
 
@@ -1809,14 +1809,14 @@ class Covid19FormTable extends AbstractTableGateway
             $sQuery->offset($sOffset);
         }
 
-        $sQueryStr = $sql->getSqlStringForSqlObject($sQuery); // Get the string of the Sql, instead of the Select-instance 
+        $sQueryStr = $sql->buildSqlString($sQuery); // Get the string of the Sql, instead of the Select-instance 
         //echo $sQueryStr;die;
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
 
         /* Data set length after filtering */
         $sQuery->reset('limit');
         $sQuery->reset('offset');
-        $fQuery = $sql->getSqlStringForSqlObject($sQuery);
+        $fQuery = $sql->buildSqlString($sQuery);
         $aResultFilterTotal = $dbAdapter->query($fQuery, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $iFilteredTotal = count($aResultFilterTotal);
 
@@ -1840,7 +1840,7 @@ class Covid19FormTable extends AbstractTableGateway
                         AND DATE(covid19.sample_collection_date) >= '" . $startMonth . "' 
                         AND DATE(covid19.sample_collection_date) <= '" . $endMonth . "'");
         }
-        $iQueryStr = $sql->getSqlStringForSqlObject($iQuery);
+        $iQueryStr = $sql->buildSqlString($iQuery);
         $iResult = $dbAdapter->query($iQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $iTotal = count($iResult);
 
@@ -1908,7 +1908,7 @@ class Covid19FormTable extends AbstractTableGateway
         }
 
         $queryContainer->indicatorSummaryQuery = $samplesReceivedSummaryQuery;
-        $samplesReceivedSummaryCacheQuery = $sql->getSqlStringForSqlObject($samplesReceivedSummaryQuery);
+        $samplesReceivedSummaryCacheQuery = $sql->buildSqlString($samplesReceivedSummaryQuery);
         $samplesReceivedSummaryResult = $common->cacheQuery($samplesReceivedSummaryCacheQuery, $dbAdapter);
         //var_dump($samplesReceivedSummaryResult);die;
         $j = 0;
@@ -1961,7 +1961,7 @@ class Covid19FormTable extends AbstractTableGateway
                                         AND DATE(sample_collection_date) <= '" . $endMonth . "'");
         }
 
-        $covid19OutcomesQueryStr = $sql->getSqlStringForSqlObject($covid19OutcomesQuery);
+        $covid19OutcomesQueryStr = $sql->buildSqlString($covid19OutcomesQuery);
         $result = $common->cacheQuery($covid19OutcomesQueryStr, $dbAdapter);
         return $result[0];
     }
@@ -2014,7 +2014,7 @@ class Covid19FormTable extends AbstractTableGateway
                                         AND DATE(sample_collection_date) <= '" . $endMonth . "'");
         }
 
-        $covid19OutcomesQueryStr = $sql->getSqlStringForSqlObject($covid19OutcomesQuery);
+        $covid19OutcomesQueryStr = $sql->buildSqlString($covid19OutcomesQuery);
         // echo $covid19OutcomesQueryStr;die;
         $result = $common->cacheQuery($covid19OutcomesQueryStr, $dbAdapter);
         return $result[0];
@@ -2048,7 +2048,7 @@ class Covid19FormTable extends AbstractTableGateway
             $covid19OutcomesQuery = $covid19OutcomesQuery->where('covid19.facility_id IN (' . $params['clinics'] . ')');
         }
 
-        $covid19OutcomesQueryStr = $sql->getSqlStringForSqlObject($covid19OutcomesQuery);
+        $covid19OutcomesQueryStr = $sql->buildSqlString($covid19OutcomesQuery);
         $result = $common->cacheQuery($covid19OutcomesQueryStr, $dbAdapter);
         return $result;
     }
@@ -2087,7 +2087,7 @@ class Covid19FormTable extends AbstractTableGateway
                                         AND DATE(sample_collection_date) >= '" . $startMonth . "' 
                                         AND DATE(sample_collection_date) <= '" . $endMonth . "'");
         }
-        $covid19OutcomesQueryStr = $sql->getSqlStringForSqlObject($covid19OutcomesQuery);
+        $covid19OutcomesQueryStr = $sql->buildSqlString($covid19OutcomesQuery);
         // echo $covid19OutcomesQueryStr;die;
         $result = $dbAdapter->query($covid19OutcomesQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         // $result = $common->cacheQuery($covid19OutcomesQueryStr, $dbAdapter);

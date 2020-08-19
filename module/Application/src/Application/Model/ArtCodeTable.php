@@ -29,7 +29,7 @@ class ArtCodeTable extends AbstractTableGateway {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $rQuery = $sql->select()->from(array('r'=>'r_art_code_details'));
-        $rQueryStr = $sql->getSqlStringForSqlObject($rQuery);
+        $rQueryStr = $sql->buildSqlString($rQuery);
         $rResult = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         return $rResult;
     }
