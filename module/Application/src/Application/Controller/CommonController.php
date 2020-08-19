@@ -5,6 +5,7 @@ namespace Application\Controller;
 use Laminas\Session\Container;
 use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\ViewModel;
+use Zend\Debug\Debug;
 
 class CommonController extends AbstractActionController{
 
@@ -72,6 +73,28 @@ class CommonController extends AbstractActionController{
         $viewModel = new ViewModel();
         $viewModel->setVariables(array('result' => $logincontainer->sampleTable))->setTerminal(true);
         return $viewModel;
+    }
+
+    public function getDistrictListAction()
+    {
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $viewModel = new ViewModel();
+            $viewModel->setVariables(array('result' => $this->commonService->getDistrictList($params['provinceName'])))->setTerminal(true);
+            return $viewModel;
+        }
+    }
+    
+    public function getFacilityListAction()
+    {
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $viewModel = new ViewModel();
+            $viewModel->setVariables(array('result' => $this->commonService->getFacilityList($params['districtName'])))->setTerminal(true);
+            return $viewModel;
+        }
     }
 
 }

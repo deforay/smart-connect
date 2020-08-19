@@ -55,6 +55,15 @@ class LocationDetailsTable extends AbstractTableGateway {
         return $rResult;
     }
     
+    public function fetchDistrictListByIds($locationId){
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $sQuery = $sql->select()->from(array('l' => 'location_details'))->where(array('parent_location IN('. implode(",",$locationId).')'));
+        $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
+        $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+        return $rResult;
+    }
+    
     public function fetchAllDistrictsList($mappedFacilities = null){
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);

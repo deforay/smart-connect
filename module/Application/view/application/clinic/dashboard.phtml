@@ -1,5 +1,4 @@
 <?php
-
 use Laminas\Session\Container;
 $logincontainer = new Container('credo');
 $languagecontainer = new Container('language');
@@ -840,31 +839,32 @@ foreach ($sampleType as $samples) {
     }
 
     function selectDistrictName() {
+        $('#districtName,#clinicId').html('');
         var pName = $("#provinceName").val();
-        if (pName == null) {
-            $('#districtName').select2('val', []);
-        } else {
-            for (i = 0; i < pName.length; i++) {
-                $("#districtName option[data-parent-location='" + pName[i] + "']").attr("selected", "selected");
-
-            }
-            $('#districtName').select2('val', $("#districtName").val());
-
-            selectClinicName();
+        if(pName.length > 0){
+            $.post("<?php echo $this->url('common', array('action' => 'get-district-list')); ?>", {
+                provinceName : pName
+            },
+            function(data) {
+                if (data != "" || data != null || data != undefined) {
+                    $('#districtName').html(data);
+                }
+            });
         }
     }
 
     function selectClinicName() {
         var dName = $("#districtName").val();
-        var pName = $("#provinceName").val();
-        if (dName == null || pName == null) {
-            $('#clinicId').select2('val', []);
-        } else {
-            for (i = 0; i < dName.length; i++) {
-                $("#clinicId option[data-district='" + dName[i] + "']").attr("selected", "selected");
-            }
+        if(dName.length > 0){
+            $.post("<?php echo $this->url('common', array('action' => 'get-facility-list')); ?>", {
+                districtName : dName
+            },
+            function(data) {
+                if (data != "" || data != null || data != undefined) {
+                    $('#clinicId').html(data);
+                }
+            });
         }
-        $('#clinicId').select2('val', $("#clinicId").val());
     }
 
     function getTestedSampleResultBasedGender() {

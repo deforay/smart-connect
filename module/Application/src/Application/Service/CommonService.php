@@ -485,4 +485,16 @@ class CommonService
           $locationDb = $this->sm->get('LocationDetailsTable');
           return $locationDb->fetchAllDistrictsList();
      }
+     
+     public function getDistrictList($locationId)
+     {
+          $locationDb = $this->sm->get('LocationDetailsTable');
+          return $locationDb->fetchDistrictListByIds($locationId);
+     }
+     
+     public function getFacilityList($districtId)
+     {
+          $facilityDb = $this->sm->get('FacilityTable');
+          return $facilityDb->fetchFacilityListByDistrict($districtId);
+     }
 }

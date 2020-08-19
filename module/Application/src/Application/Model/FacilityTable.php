@@ -628,6 +628,19 @@ class FacilityTable extends AbstractTableGateway {
         $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
         return $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
     }
+    
+    public function fetchFacilityListByDistrict($districtId){
+        $logincontainer = new Container('credo');
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $sQuery = $sql->select()->from(array('f' => 'facility_details'))->where(array('facility_district IN('. implode(",",$districtId).')'));
+        if($logincontainer->role!= 1){
+            $mappedDistricts = (isset($logincontainer->districts) && count($logincontainer->districts) >0)?$logincontainer->districts:array(0);
+            $sQuery = $sQuery->where('f.facility_district IN ("' . implode('", "', array_values(array_filter($mappedDistricts))) . '")');
+        }
+        $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
+        return $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+    }
 
     public function fetchAllFacilitiesInApi(){
         $dbAdapter = $this->adapter;

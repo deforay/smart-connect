@@ -1,0 +1,7 @@
+<?php 
+$html = '<option value="">--Select--</option>';
+foreach($result as $facility){
+    $html.= '<option value="'.$facility['facility_id'].'">'.ucwords($facility['facility_name']).'</option>';
+}
+
+echo $html;

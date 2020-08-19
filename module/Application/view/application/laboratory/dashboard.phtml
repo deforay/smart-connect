@@ -1255,28 +1255,31 @@ foreach ($sampleType as $samples) {
     }
 
     function selectDistrictName() {
+        $('#districtName,#labName').html('');
         var pName = $("#provinceName").val();
-        if (pName == null) {
-            $('#districtName').select2('val', []);
-        } else {
-            for (i = 0; i < pName.length; i++) {
-                $("#districtName option[data-parent-location='" + pName[i] + "']").attr("selected", "selected");
-            }
-            $('#districtName').select2('val', $("#districtName").val());
-            selectLabName();
+        if(pName.length > 0){
+            $.post("<?php echo $this->url('common', array('action' => 'get-district-list')); ?>", {
+                provinceName : pName
+            },
+            function(data) {
+                if (data != "" || data != null || data != undefined) {
+                    $('#districtName').html(data);
+                }
+            });
         }
     }
 
     function selectLabName() {
         var dName = $("#districtName").val();
-        var pName = $("#provinceName").val();
-        if (dName == null || pName == null) {
-            $('#labName').select2('val', []);
-        } else {
-            for (i = 0; i < dName.length; i++) {
-                $("#labName option[data-district='" + dName[i] + "']").attr("selected", "selected");
-            }
-            $('#labName').select2('val', $("#labName").val());
+        if(dName.length > 0){
+            $.post("<?php echo $this->url('common', array('action' => 'get-facility-list')); ?>", {
+                districtName : dName
+            },
+            function(data) {
+                if (data != "" || data != null || data != undefined) {
+                    $('#labName').html(data);
+                }
+            });
         }
     }
 
