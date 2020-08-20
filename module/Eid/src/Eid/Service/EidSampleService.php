@@ -47,7 +47,7 @@ class EidSampleService
     }
     public function getMonthlySampleCountByLabs($params)
     {
-        $sampleDb = $this->sm->get('EidSampleTable');
+        $sampleDb = $this->sm->get('EidSampleTableWithoutCache');
         return $sampleDb->getMonthlySampleCountByLabs($params);
     }
 

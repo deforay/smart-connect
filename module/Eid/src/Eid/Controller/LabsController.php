@@ -55,7 +55,6 @@ class LabsController extends AbstractActionController
     
     if ($request->isPost()) {
       $params = $request->getPost();
-      // $sampleService = $this->getServiceLocator()->get('SampleService');
       $result = $this->sampleService->getMonthlySampleCountByLabs($params);
       $sampleType = $this->sampleService->getSampleType();
       $viewModel = new ViewModel();
