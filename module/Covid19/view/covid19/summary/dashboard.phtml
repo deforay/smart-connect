@@ -835,8 +835,8 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
                     <span class="caption-subject"><?php echo $this->translate('Covid19 Outcomes'); ?></span>
                 </div>
             </div>
-            <div class="portlet-body" id="eidOutcomesBody">
-                <div id="eidOutcomes" style="height:400px;"></div>
+            <div class="portlet-body" id="covid19OutcomesBody">
+                <div id="covid19Outcomes" style="height:400px;"></div>
             </div>
         </div>
     </div>
@@ -847,8 +847,8 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
                     <span class="caption-subject"><?php echo $this->translate('Covid19 Outcomes by Age'); ?></span>
                 </div>
             </div>
-            <div class="portlet-body" id="eidOutcomesByAgeBody">
-                <div id="eidOutcomesByAge" style="height:400px;"></div>
+            <div class="portlet-body" id="covid19OutcomesByAgeBody">
+                <div id="covid19OutcomesByAge" style="height:400px;"></div>
             </div>
         </div>
     </div>
@@ -861,8 +861,8 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
                     <span class="caption-subject"><?php echo $this->translate('Covid19 Outcomes - By Province'); ?></span>
                 </div>
             </div>
-            <div class="portlet-body" id="eidOutcomesProvinceBody">
-                <div id="eidOutcomesProvince" style="height:300px;"></div>
+            <div class="portlet-body" id="covid19OutcomesProvinceBody">
+                <div id="covid19OutcomesProvince" style="height:300px;"></div>
             </div>
         </div>
     </div>
@@ -885,9 +885,9 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
     var oTableSamplesRejectedFacility = null;
     var oTableSamplesRejectedProvince = null;
 
-    geteidOutcomes();
-    geteidOutcomesByAge();
-    geteidOutcomesByProvince();
+    getcovid19Outcomes();
+    getcovid19OutcomesByAge();
+    getcovid19OutcomesByProvince();
     nationalTAT();
 
     function getSamplesRegisteredTab() {
@@ -1649,7 +1649,7 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
             });
     }
 
-    function geteidOutcomes() {
+    function getcovid19Outcomes() {
         $(document).ajaxStart($.blockUI({
             message: '<h4> <?php echo ($this->translate('Processing Covid19 Outcomes')); ?> ... </h4>'
         })).ajaxStop($.unblockUI);
@@ -1666,12 +1666,12 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
                 toDate: toDate
             },
             function(data) {
-                $("#eidOutcomes").html(data);
+                $("#covid19Outcomes").html(data);
                 $.unblockUI();
             });
     }
 
-    function geteidOutcomesByAge() {
+    function getcovid19OutcomesByAge() {
         $(document).ajaxStart($.blockUI({
             message: '<h4> <?php echo ($this->translate('Processing Covid19 Outcomes By Age')); ?> ... </h4>'
         })).ajaxStop($.unblockUI);
@@ -1688,12 +1688,12 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
                 toDate: toDate
             },
             function(data) {
-                $("#eidOutcomesByAge").html(data);
+                $("#covid19OutcomesByAge").html(data);
                 $.unblockUI();
             });
     }
 
-    function geteidOutcomesByProvince() {
+    function getcovid19OutcomesByProvince() {
         $(document).ajaxStart($.blockUI({
             message: '<h4> <?php echo ($this->translate('Processing Covid19 Outcomes By Province')); ?> ... </h4>'
         })).ajaxStop($.unblockUI);
@@ -1710,7 +1710,7 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
                 toDate: toDate
             },
             function(data) {
-                $("#eidOutcomesProvince").html(data);
+                $("#covid19OutcomesProvince").html(data);
                 $.unblockUI();
             });
     }

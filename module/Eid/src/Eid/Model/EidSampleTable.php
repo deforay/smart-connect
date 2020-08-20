@@ -2451,8 +2451,7 @@ class EidSampleTable extends AbstractTableGateway
             }
 
             $queryStr = $sql->buildSqlString($query);
-            echo $queryStr;
-            die;
+            // echo $queryStr;die;
             $testResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
 
             $j = 0;
