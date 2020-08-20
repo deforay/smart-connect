@@ -250,27 +250,27 @@ foreach ($sampleType as $samples) {
         </div>
         <div class="col-lg-6" id="districtHeight">
             <select name="districtName[]" id="districtName" class="form-control" multiple title="<?php echo $this->translate('Please select one or more district. Leave blank for All'); ?>" onchange="selectLabName();">
-                <?php
+                <!-- <?php
                 foreach ($districtName as $district) {
                 ?>
                     <option data-parent-location="<?php echo $district['parent_location']; ?>" value="<?php echo $district['location_id']; ?>"><?php echo $district['location_name']; ?></option>
                 <?php
                 }
                 ?>
-                <option value="0">Empty</option>
+                <option value="0">Empty</option> -->
             </select>
         </div>
     </div>
     <div class="row" style="padding-top:5px;padding-bottom:20px;">
         <div class="col-lg-6" id="labHeight">
             <select name="labName[]" id="labName" class="form-control" multiple title="<?php echo $this->translate('Please select one or more labs. Leave blank for All'); ?>">
-                <?php
+                <!-- <?php
                 foreach ($labName as $lab) {
                 ?>
                     <option data-name="<?php echo $lab['facility_name']; ?>" data-district="<?php echo $lab['facility_district']; ?>" value="<?php echo $lab['facility_id']; ?>"><?php echo $lab['facility_code'] . " - " . $lab['facility_name']; ?></option>
                 <?php
                 }
-                ?>
+                ?> -->
 
             </select>
         </div>
@@ -594,11 +594,11 @@ foreach ($sampleType as $samples) {
             allowClear: true
         });
         $('#districtName').select2({
-            placeholder: "<?php echo $this->translate('All Districts'); ?>",
+            placeholder: "<?php echo $this->translate('Select Province First'); ?>",
             allowClear: true,
             //maxPlaceholderOpts : 10
         });
-        $('#provinceName').on('select2:close', function(evt) {
+        /* $('#provinceName').on('select2:close', function(evt) {
             var uldiv = $('#districtName').siblings('span.select2').find('ul');
             var count = uldiv.find('li').length - 1;
             uldiv.html("<li>" + count + " items selected</li>");
@@ -613,18 +613,13 @@ foreach ($sampleType as $samples) {
             var uldiv = $('#labName').siblings('span.select2').find('ul');
             var count = uldiv.find('li').length - 1;
             uldiv.html("<li>" + count + " items selected</li>");
-        });
+        }); */
 
         $('#labName').select2({
-            placeholder: "<?php echo $this->translate('All Labs'); ?>",
+            placeholder: "<?php echo $this->translate('Select District First'); ?>",
             allowClear: true
         });
-        $('#labName').on('select2:close', function(evt) {
-            var uldiv = $('#labName').siblings('span.select2').find('ul');
-            var count = uldiv.find('li').length - 1;
-            uldiv.html("<li>" + count + " items selected</li>");
-        });
-
+       
         $('#age').select2({
             placeholder: "<?php echo $this->translate('All Age Group'); ?>",
             allowClear: true
@@ -689,6 +684,16 @@ foreach ($sampleType as $samples) {
         getSampleResult('load');
         getEverything();
 
+        $('#provinceName,#districtName,#labName').on('select2:close', function() {
+            let select = $(this)
+            $(this).next('span.select2').find('ul').html(function() {
+                let count = select.select2('data').length
+                if(count > 2){
+                    return "<li>" + count + " items selected</li>"
+                }
+            })
+        })
+
     });
 
     function getEverything() {
@@ -745,30 +750,36 @@ foreach ($sampleType as $samples) {
         $('input[name="daterange"]').val('');
         getSampleResult('reset');
     }
-
     function selectDistrictName() {
+        $('#districtName,#labName').html('');
+        $('#districtName,#labName').select2('val', '');
+        
         var pName = $("#provinceName").val();
-        if (pName == null) {
-            $('#districtName').select2('val', []);
-        } else {
-            for (i = 0; i < pName.length; i++) {
-                $("#districtName option[data-parent-location='" + pName[i] + "']").attr("selected", "selected");
-            }
-            $('#districtName').select2('val', $("#districtName").val());
-            selectLabName();
+        if(pName != null && pName.length > 0){
+            $.post("<?php echo $this->url('common', array('action' => 'get-district-list')); ?>", {
+                provinceName : pName
+            },
+            function(data) {
+                if (data != "" || data != null || data != undefined) {
+                    $('#districtName').html(data);
+                }
+            });
         }
     }
 
     function selectLabName() {
+        $('#labName').html('');
+        $('#labName').select2('val', '');
         var dName = $("#districtName").val();
-        var pName = $("#provinceName").val();
-        if (dName == null || pName == null) {
-            $('#labName').select2('val', []);
-        } else {
-            for (i = 0; i < dName.length; i++) {
-                $("#labName option[data-district='" + dName[i] + "']").attr("selected", "selected");
-            }
-            $('#labName').select2('val', $("#labName").val());
+        if(dName != null && dName.length > 0){
+            $.post("<?php echo $this->url('common', array('action' => 'get-facility-list')); ?>", {
+                districtName : dName
+            },
+            function(data) {
+                if (data != "" || data != null || data != undefined) {
+                    $('#labName').html(data);
+                }
+            });
         }
     }
 

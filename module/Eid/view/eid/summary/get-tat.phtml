@@ -88,19 +88,19 @@ use Zend\Debug\Debug;
                 },
                 plotBands: [{
                     from: 0,
-                    to: <?php echo $result['sec1'];?>,
+                    to: <?php echo !empty($result['sec1'])?$result['sec1']:0;?>,
                     color: 'rgba(255,0,0,0.5)'
                 }, {
-                    from: <?php echo $result['sec1'];?>,
-                    to: <?php echo $result['sec1']+$result['sec2'];?>,
+                    from: <?php echo !empty($result['sec1'])?$result['sec1']:0;?>,
+                    to: <?php echo !empty($result['sec1']+$result['sec2'])?$result['sec1']+$result['sec2']:0;?>,
                     color: 'rgba(255,255,0,0.5)'
                 }, {
-                    from: <?php echo $result['sec1']+$result['sec2'];?>,
-                    to: <?php echo $result['sec1']+$result['sec2']+$result['sec3'];?>,
+                    from: <?php echo !empty($result['sec1']+$result['sec2'])?$result['sec1']+$result['sec2']:0;?>,
+                    to: <?php echo !empty($result['sec1']+$result['sec2']+$result['sec3'])?$result['sec1']+$result['sec2']+$result['sec3']:0;?>,
                     color: 'rgba(0,255,0,0.5)'
                 }, {
-                    from: <?php echo $result['sec1']+$result['sec2']+$result['sec3'];?>,
-                    to: <?php $final = $result['sec1']+$result['sec2']+$result['sec3']; echo $final;?>,
+                    from: <?php echo !empty($result['sec1']+$result['sec2']+$result['sec3'])?$result['sec1']+$result['sec2']+$result['sec3']:0;?>,
+                    to: <?php $final = !empty($result['sec1']+$result['sec2']+$result['sec3'])?$result['sec1']+$result['sec2']+$result['sec3']:0; echo $final;?>,
                     // color: 'rgba(0,0,0,0.5)'
                 }]
             },

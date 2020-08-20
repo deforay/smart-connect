@@ -67,7 +67,7 @@ class EidSampleTable extends AbstractTableGateway
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
             $endMonth = str_replace(' ', '-', $params['toDate']) . "-31";
-            $queryStr = $queryStr->where("(sample_collection_date is not null AND sample_collection_date != '')
+            $queryStr = $queryStr->where("(sample_collection_date is not null AND sample_collection_date not like '')
                                         AND DATE(sample_collection_date) >= '" . $startMonth . "' 
                                         AND DATE(sample_collection_date) <= '" . $endMonth . "'");
         }
@@ -2451,7 +2451,7 @@ class EidSampleTable extends AbstractTableGateway
             }
 
             $queryStr = $sql->buildSqlString($query);
-            
+            // echo $queryStr;die;
             $testResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
 
             $j = 0;

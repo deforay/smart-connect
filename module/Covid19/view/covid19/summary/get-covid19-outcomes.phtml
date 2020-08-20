@@ -1,11 +1,12 @@
 <?php
 
 use Zend\Debug\Debug;
-
-// Debug::dump($result);die;
+$val1 =  (($result['total_positive_samples'] / $result['total_samples']) * 100);
+$val2 = (($result['total_negative_samples'] / $result['total_samples']) * 100); 
+if($result['total_positive_samples'] != null && $result['total_negative_samples'] != null && $result['total_samples'] != null){
 ?>
 <script>
-    $('#eidOutcomes').highcharts({
+    $('#covid19Outcomes').highcharts({
         chart: {
             plotBackgroundColor: null,
             plotBorderWidth: null,
@@ -40,16 +41,17 @@ use Zend\Debug\Debug;
             "colorByPoint": true,
             "data": [{
                 "name": "Positive",
-                "y": <?php echo (($result['total_positive_samples'] / $result['total_samples']) * 100); ?>,
+                "y": <?php echo (!empty($val1) && $val1 != "" && $val1 != NAN)?$val1:0; ?>,
                 "sliced": true,
                 "selected": true,
                 "color": "#FF1900"
             }, {
                 "name": "Negative",
-                "y": <?php echo (($result['total_negative_samples'] / $result['total_samples']) * 100); ?>,
+                "y": <?php echo (!empty($val2) && $val2 != "" && $val2 != NAN)?$val2:0;?>,
                 "color": "#60D18F"
             }]
         }]
 
     });
 </script>
+<?php } ?>

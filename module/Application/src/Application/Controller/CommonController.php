@@ -96,6 +96,5 @@ class CommonController extends AbstractActionController{
             return $viewModel;
         }
     }
-
 }
 

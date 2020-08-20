@@ -267,7 +267,7 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
             <div class="row" style="padding-top:5px;padding-bottom:10px;">
                 <div class="col-md-12">
                     <div class="col-md-2">
-                        <select style="width:100%" name="sampleProvinceName[]" id="sampleProvinceName" class="form-control" multiple title="<?php echo $this->translate('Please select one or more province. Leave blank for All'); ?>">
+                        <select style="width:100%" name="sampleProvinceName[]" id="sampleProvinceName" class="form-control" multiple title="<?php echo $this->translate('Please select one or more province. Leave blank for All'); ?>" onchange="selectDistrictName();">
                             <?php
                             foreach ($provinceName as $province) {
                             ?>
@@ -278,27 +278,27 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
                         </select>
                     </div>
                     <div class="col-md-2">
-                        <select style="width:100%" name="sampleDistrictName[]" id="sampleDistrictName" class="form-control" multiple title="<?php echo $this->translate('Please select one or more district. Leave blank for All'); ?>">
-                            <?php
+                        <select style="width:100%" name="sampleDistrictName[]" id="sampleDistrictName" class="form-control" multiple title="<?php echo $this->translate('Please select one or more district. Leave blank for All'); ?>" onchange="selectLabName();">
+                            <!-- <?php
                             foreach ($districtName as $district) {
                             ?>
                                 <option data-parent-location="<?php echo $district['parent_location']; ?>" value="<?php echo $district['location_id']; ?>"><?php echo $district['location_name']; ?></option>
                             <?php
                             }
                             ?>
-                            <option value="0">Empty</option>
+                            <option value="0">Empty</option> -->
                         </select>
                     </div>
 
                     <div class="col-lg-3">
                         <select style="width:100%" class="form-control" id="sampleClinicId" name="sampleClinicId[]" multiple title="<?php echo $this->translate('Please select one or more clinics. Leave blank for All'); ?>">
-                            <?php
+                            <!-- <?php
                             foreach ($clinicName as $clinic) {
                             ?>
                                 <option value="<?php echo $clinic['facility_id']; ?>" data-district="<?php echo $clinic['facility_district']; ?>"><?php echo $clinic['facility_code'] . " - " . $clinic['facility_name']; ?></option>
                             <?php
                             }
-                            ?>
+                            ?> -->
                         </select>
                     </div>
                     <!-- <div class="col-lg-2">
@@ -835,8 +835,8 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
                     <span class="caption-subject"><?php echo $this->translate('Covid19 Outcomes'); ?></span>
                 </div>
             </div>
-            <div class="portlet-body" id="eidOutcomesBody">
-                <div id="eidOutcomes" style="height:400px;"></div>
+            <div class="portlet-body" id="covid19OutcomesBody">
+                <div id="covid19Outcomes" style="height:400px;"></div>
             </div>
         </div>
     </div>
@@ -847,8 +847,8 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
                     <span class="caption-subject"><?php echo $this->translate('Covid19 Outcomes by Age'); ?></span>
                 </div>
             </div>
-            <div class="portlet-body" id="eidOutcomesByAgeBody">
-                <div id="eidOutcomesByAge" style="height:400px;"></div>
+            <div class="portlet-body" id="covid19OutcomesByAgeBody">
+                <div id="covid19OutcomesByAge" style="height:400px;"></div>
             </div>
         </div>
     </div>
@@ -861,8 +861,8 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
                     <span class="caption-subject"><?php echo $this->translate('Covid19 Outcomes - By Province'); ?></span>
                 </div>
             </div>
-            <div class="portlet-body" id="eidOutcomesProvinceBody">
-                <div id="eidOutcomesProvince" style="height:300px;"></div>
+            <div class="portlet-body" id="covid19OutcomesProvinceBody">
+                <div id="covid19OutcomesProvince" style="height:300px;"></div>
             </div>
         </div>
     </div>
@@ -885,9 +885,9 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
     var oTableSamplesRejectedFacility = null;
     var oTableSamplesRejectedProvince = null;
 
-    geteidOutcomes();
-    geteidOutcomesByAge();
-    geteidOutcomesByProvince();
+    getcovid19Outcomes();
+    getcovid19OutcomesByAge();
+    getcovid19OutcomesByProvince();
     nationalTAT();
 
     function getSamplesRegisteredTab() {
@@ -995,11 +995,11 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
             allowClear: true
         });
         $('#sampleDistrictName').select2({
-            placeholder: "<?php echo $this->translate('All Districts'); ?>",
+            placeholder: "<?php echo $this->translate('Select Province First'); ?>",
             allowClear: true,
         });
         $('#sampleClinicId').select2({
-            placeholder: "<?php echo $this->translate('All Facilities'); ?>",
+            placeholder: "<?php echo $this->translate('Select District First'); ?>",
             allowClear: true
         });
         /* $('#sampleResgisteredEidTestType').select2({
@@ -1649,7 +1649,7 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
             });
     }
 
-    function geteidOutcomes() {
+    function getcovid19Outcomes() {
         $(document).ajaxStart($.blockUI({
             message: '<h4> <?php echo ($this->translate('Processing Covid19 Outcomes')); ?> ... </h4>'
         })).ajaxStop($.unblockUI);
@@ -1666,12 +1666,12 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
                 toDate: toDate
             },
             function(data) {
-                $("#eidOutcomes").html(data);
+                $("#covid19Outcomes").html(data);
                 $.unblockUI();
             });
     }
 
-    function geteidOutcomesByAge() {
+    function getcovid19OutcomesByAge() {
         $(document).ajaxStart($.blockUI({
             message: '<h4> <?php echo ($this->translate('Processing Covid19 Outcomes By Age')); ?> ... </h4>'
         })).ajaxStop($.unblockUI);
@@ -1688,12 +1688,12 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
                 toDate: toDate
             },
             function(data) {
-                $("#eidOutcomesByAge").html(data);
+                $("#covid19OutcomesByAge").html(data);
                 $.unblockUI();
             });
     }
 
-    function geteidOutcomesByProvince() {
+    function getcovid19OutcomesByProvince() {
         $(document).ajaxStart($.blockUI({
             message: '<h4> <?php echo ($this->translate('Processing Covid19 Outcomes By Province')); ?> ... </h4>'
         })).ajaxStop($.unblockUI);
@@ -1710,7 +1710,7 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
                 toDate: toDate
             },
             function(data) {
-                $("#eidOutcomesProvince").html(data);
+                $("#covid19OutcomesProvince").html(data);
                 $.unblockUI();
             });
     }
@@ -1835,5 +1835,39 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
         if (month.length < 2) month = '0' + month;
 
         return [year, month].join('-');
+    }
+
+    function selectDistrictName() {
+        $('#sampleDistrictName,#sampleClinicId').html('');
+        $('#sampleDistrictName,#sampleClinicId').select2('val', '');
+
+        var pName = $("#sampleProvinceName").val();
+        if(pName != null && pName.length > 0){
+            $.post("<?php echo $this->url('common', array('action' => 'get-district-list')); ?>", {
+                provinceName : pName
+            },
+            function(data) {
+                if (data != "" || data != null || data != undefined) {
+                    $('#sampleDistrictName').html(data);
+                }
+            });
+        }
+    }
+
+    function selectLabName() {
+        $('#sampleClinicId').html('');
+        $('#sampleClinicId').select2('val', '');
+
+        var dName = $("#sampleDistrictName").val();
+        if(dName != null && dName.length > 0){
+            $.post("<?php echo $this->url('common', array('action' => 'get-facility-list')); ?>", {
+                districtName : dName
+            },
+            function(data) {
+                if (data != "" || data != null || data != undefined) {
+                    $('#sampleClinicId').html(data);
+                }
+            });
+        }
     }
 </script>
