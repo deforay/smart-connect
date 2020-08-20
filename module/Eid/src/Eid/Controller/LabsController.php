@@ -21,6 +21,16 @@ class LabsController extends AbstractActionController
 
   public function dashboardAction()
   {
+    $labName = $this->sampleService->getAllLabName();
+    $provinceName = $this->sampleService->getAllProvinceList();
+    $districtName = $this->sampleService->getAllDistrictList();
+    $clinicName = $this->sampleService->getAllClinicName();
+    return new ViewModel(array(
+        'labName' => $labName,
+        'provinceName' => $provinceName,
+        'districtName' => $districtName,
+        'clinicName' => $clinicName,
+    ));
   }
 
   public function statsAction()

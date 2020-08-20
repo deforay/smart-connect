@@ -688,7 +688,7 @@ foreach ($sampleType as $samples) {
             let select = $(this)
             $(this).next('span.select2').find('ul').html(function() {
                 let count = select.select2('data').length
-                if(count > 1){
+                if(count > 2){
                     return "<li>" + count + " items selected</li>"
                 }
             })

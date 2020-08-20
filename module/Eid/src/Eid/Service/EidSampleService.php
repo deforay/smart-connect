@@ -357,4 +357,53 @@ class EidSampleService
         $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
         return $sResult;
     }
+
+    public function getAllLabName()
+    {
+        $logincontainer = new Container('credo');
+        $mappedFacilities = null;
+        if ($logincontainer->role != 1) {
+            $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : null;
+        }
+        $facilityDb = $this->sm->get('FacilityTable');
+        return $facilityDb->fetchAllLabName($mappedFacilities);
+    }
+
+    //get all Lab Name
+    public function getAllClinicName()
+    {
+
+        $logincontainer = new Container('credo');
+        $mappedFacilities = null;
+        if ($logincontainer->role != 1) {
+            $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : null;
+        }
+
+        $facilityDb = $this->sm->get('FacilityTable');
+        return $facilityDb->fetchAllClinicName($mappedFacilities);
+    }
+    //get all province name
+    public function getAllProvinceList()
+    {
+
+        $logincontainer = new Container('credo');
+        $mappedFacilities = null;
+        if ($logincontainer->role != 1) {
+            $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : null;
+        }
+
+        $locationDb = $this->sm->get('LocationDetailsTable');
+        return $locationDb->fetchLocationDetails($mappedFacilities);
+    }
+    public function getAllDistrictList()
+    {
+
+        $logincontainer = new Container('credo');
+        $mappedFacilities = null;
+        if ($logincontainer->role != 1) {
+            $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : null;
+        }
+        $locationDb = $this->sm->get('LocationDetailsTable');
+        return $locationDb->fetchAllDistrictsList();
+    }
 }
