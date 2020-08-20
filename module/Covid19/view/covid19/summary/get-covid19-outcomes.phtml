@@ -3,6 +3,7 @@
 use Zend\Debug\Debug;
 $val1 =  (($result['total_positive_samples'] / $result['total_samples']) * 100);
 $val2 = (($result['total_negative_samples'] / $result['total_samples']) * 100); 
+if($result['total_positive_samples'] != null && $result['total_negative_samples'] != null && $result['total_samples'] != null){
 ?>
 <script>
     $('#covid19Outcomes').highcharts({
@@ -53,3 +54,4 @@ $val2 = (($result['total_negative_samples'] / $result['total_samples']) * 100);
 
     });
 </script>
+<?php } ?>

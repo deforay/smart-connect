@@ -7,7 +7,7 @@ $logincontainer = new Container('credo');
 
 $startArray = explode("-", $startDate);
 $endArray = explode("-", $endDate);
-// var_dump($logincontainer->sampleTable);die;
+// \Zend\Debug\Debug::dump($summaryTabInfo);die;
 if (isset($logincontainer->sampleTable) && $logincontainer->sampleTable == "dash_vl_request_form_current") {
     $startYear = (int) date('Y', strtotime('-12 MONTH ' . date('Y-m-d')));
     $startMonth = (int) date('M', strtotime('-12 MONTH ' . date('Y-m-d')));
