@@ -207,7 +207,7 @@ class CommonService
                $mailQuery = $sql->select()->from(array('tm' => 'temp_mail'))
                     ->where("status='pending'")
                     ->limit($limit);
-               $mailQueryStr = $sql->getSqlStringForSqlObject($mailQuery);
+               $mailQueryStr = $sql->buildSqlString($mailQuery);
                $mailResult = $dbAdapter->query($mailQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
                if (count($mailResult) > 0) {
                     foreach ($mailResult as $result) {

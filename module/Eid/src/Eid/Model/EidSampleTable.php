@@ -72,7 +72,7 @@ class EidSampleTable extends AbstractTableGateway
                                         AND DATE(sample_collection_date) <= '" . $endMonth . "'");
         }
 
-        $queryStr = $sql->getSqlStringForSqlObject($queryStr);
+        $queryStr = $sql->buildSqlString($queryStr);
 
         // echo $queryStr;die;
 
@@ -118,7 +118,7 @@ class EidSampleTable extends AbstractTableGateway
                                         AND DATE(sample_collection_date) >= '" . $startMonth . "' 
                                         AND DATE(sample_collection_date) <= '" . $endMonth . "'");
         }
-        $queryStr = $sql->getSqlStringForSqlObject($sQuery);
+        $queryStr = $sql->buildSqlString($sQuery);
         //echo $queryStr;die;
         //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $sampleResult = $common->cacheQuery($queryStr, $dbAdapter);
@@ -269,14 +269,14 @@ class EidSampleTable extends AbstractTableGateway
             $sQuery->offset($sOffset);
         }
 
-        $sQueryStr = $sql->getSqlStringForSqlObject($sQuery); // Get the string of the Sql, instead of the Select-instance 
+        $sQueryStr = $sql->buildSqlString($sQuery); // Get the string of the Sql, instead of the Select-instance 
         //echo $sQueryStr;die;
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
 
         /* Data set length after filtering */
         $sQuery->reset('limit');
         $sQuery->reset('offset');
-        $fQuery = $sql->getSqlStringForSqlObject($sQuery);
+        $fQuery = $sql->buildSqlString($sQuery);
         $aResultFilterTotal = $dbAdapter->query($fQuery, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $iFilteredTotal = count($aResultFilterTotal);
 
@@ -300,7 +300,7 @@ class EidSampleTable extends AbstractTableGateway
                         AND DATE(eid.sample_collection_date) >= '" . $startMonth . "' 
                         AND DATE(eid.sample_collection_date) <= '" . $endMonth . "'");
         }
-        $iQueryStr = $sql->getSqlStringForSqlObject($iQuery);
+        $iQueryStr = $sql->buildSqlString($iQuery);
         $iResult = $dbAdapter->query($iQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $iTotal = count($iResult);
 
@@ -453,14 +453,14 @@ class EidSampleTable extends AbstractTableGateway
             $sQuery->offset($sOffset);
         }
 
-        $sQueryStr = $sql->getSqlStringForSqlObject($sQuery); // Get the string of the Sql, instead of the Select-instance 
+        $sQueryStr = $sql->buildSqlString($sQuery); // Get the string of the Sql, instead of the Select-instance 
         //echo $sQueryStr;die;
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
 
         /* Data set length after filtering */
         $sQuery->reset('limit');
         $sQuery->reset('offset');
-        $fQuery = $sql->getSqlStringForSqlObject($sQuery);
+        $fQuery = $sql->buildSqlString($sQuery);
         $aResultFilterTotal = $dbAdapter->query($fQuery, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $iFilteredTotal = count($aResultFilterTotal);
 
@@ -486,7 +486,7 @@ class EidSampleTable extends AbstractTableGateway
                         AND DATE(eid.sample_collection_date) >= '" . $startMonth . "' 
                         AND DATE(eid.sample_collection_date) <= '" . $endMonth . "'");
         }
-        $iQueryStr = $sql->getSqlStringForSqlObject($iQuery);
+        $iQueryStr = $sql->buildSqlString($iQuery);
         $iResult = $dbAdapter->query($iQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $iTotal = count($iResult);
 
@@ -641,14 +641,14 @@ class EidSampleTable extends AbstractTableGateway
             $sQuery->offset($sOffset);
         }
 
-        $sQueryStr = $sql->getSqlStringForSqlObject($sQuery); // Get the string of the Sql, instead of the Select-instance 
+        $sQueryStr = $sql->buildSqlString($sQuery); // Get the string of the Sql, instead of the Select-instance 
         //echo $sQueryStr;die;
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
 
         /* Data set length after filtering */
         $sQuery->reset('limit');
         $sQuery->reset('offset');
-        $fQuery = $sql->getSqlStringForSqlObject($sQuery);
+        $fQuery = $sql->buildSqlString($sQuery);
         $aResultFilterTotal = $dbAdapter->query($fQuery, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $iFilteredTotal = count($aResultFilterTotal);
 
@@ -671,7 +671,7 @@ class EidSampleTable extends AbstractTableGateway
                         AND DATE(eid.sample_collection_date) <= '" . $endMonth . "'");
         }
 
-        $iQueryStr = $sql->getSqlStringForSqlObject($iQuery);
+        $iQueryStr = $sql->buildSqlString($iQuery);
 
 
 
@@ -743,7 +743,7 @@ class EidSampleTable extends AbstractTableGateway
                                         AND DATE(sample_collection_date) >= '" . $startMonth . "' 
                                         AND DATE(sample_collection_date) <= '" . $endMonth . "'");
         }
-        $queryStr = $sql->getSqlStringForSqlObject($sQuery);
+        $queryStr = $sql->buildSqlString($sQuery);
         //echo $queryStr;die;
         //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $sampleResult = $common->cacheQuery($queryStr, $dbAdapter);
@@ -883,14 +883,14 @@ class EidSampleTable extends AbstractTableGateway
             $sQuery->offset($sOffset);
         }
 
-        $sQueryStr = $sql->getSqlStringForSqlObject($sQuery); // Get the string of the Sql, instead of the Select-instance 
+        $sQueryStr = $sql->buildSqlString($sQuery); // Get the string of the Sql, instead of the Select-instance 
         //echo $sQueryStr;die;
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
 
         /* Data set length after filtering */
         $sQuery->reset('limit');
         $sQuery->reset('offset');
-        $fQuery = $sql->getSqlStringForSqlObject($sQuery);
+        $fQuery = $sql->buildSqlString($sQuery);
         $aResultFilterTotal = $dbAdapter->query($fQuery, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $iFilteredTotal = count($aResultFilterTotal);
 
@@ -913,7 +913,7 @@ class EidSampleTable extends AbstractTableGateway
                         AND DATE(eid.sample_collection_date) >= '" . $startMonth . "' 
                         AND DATE(eid.sample_collection_date) <= '" . $endMonth . "'");
         }
-        $iQueryStr = $sql->getSqlStringForSqlObject($iQuery);
+        $iQueryStr = $sql->buildSqlString($iQuery);
         $iResult = $dbAdapter->query($iQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $iTotal = count($iResult);
 
@@ -1061,14 +1061,14 @@ class EidSampleTable extends AbstractTableGateway
             $sQuery->offset($sOffset);
         }
 
-        $sQueryStr = $sql->getSqlStringForSqlObject($sQuery); // Get the string of the Sql, instead of the Select-instance 
+        $sQueryStr = $sql->buildSqlString($sQuery); // Get the string of the Sql, instead of the Select-instance 
         //echo $sQueryStr;die;
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
 
         /* Data set length after filtering */
         $sQuery->reset('limit');
         $sQuery->reset('offset');
-        $fQuery = $sql->getSqlStringForSqlObject($sQuery);
+        $fQuery = $sql->buildSqlString($sQuery);
         $aResultFilterTotal = $dbAdapter->query($fQuery, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $iFilteredTotal = count($aResultFilterTotal);
 
@@ -1091,7 +1091,7 @@ class EidSampleTable extends AbstractTableGateway
                         AND DATE(eid.sample_collection_date) >= '" . $startMonth . "' 
                         AND DATE(eid.sample_collection_date) <= '" . $endMonth . "'");
         }
-        $iQueryStr = $sql->getSqlStringForSqlObject($iQuery);
+        $iQueryStr = $sql->buildSqlString($iQuery);
         $iResult = $dbAdapter->query($iQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $iTotal = count($iResult);
 
@@ -1246,14 +1246,14 @@ class EidSampleTable extends AbstractTableGateway
             $sQuery->offset($sOffset);
         }
 
-        $sQueryStr = $sql->getSqlStringForSqlObject($sQuery); // Get the string of the Sql, instead of the Select-instance 
+        $sQueryStr = $sql->buildSqlString($sQuery); // Get the string of the Sql, instead of the Select-instance 
         //echo $sQueryStr;die;
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
 
         /* Data set length after filtering */
         $sQuery->reset('limit');
         $sQuery->reset('offset');
-        $fQuery = $sql->getSqlStringForSqlObject($sQuery);
+        $fQuery = $sql->buildSqlString($sQuery);
         $aResultFilterTotal = $dbAdapter->query($fQuery, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $iFilteredTotal = count($aResultFilterTotal);
 
@@ -1277,7 +1277,7 @@ class EidSampleTable extends AbstractTableGateway
                         AND DATE(eid.sample_collection_date) >= '" . $startMonth . "' 
                         AND DATE(eid.sample_collection_date) <= '" . $endMonth . "'");
         }
-        $iQueryStr = $sql->getSqlStringForSqlObject($iQuery);
+        $iQueryStr = $sql->buildSqlString($iQuery);
         $iResult = $dbAdapter->query($iQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $iTotal = count($iResult);
 
@@ -1334,7 +1334,7 @@ class EidSampleTable extends AbstractTableGateway
                                         AND DATE(sample_collection_date) >= '" . $startMonth . "' 
                                         AND DATE(sample_collection_date) <= '" . $endMonth . "'");
         }
-        $mostRejectionQueryStr = $sql->getSqlStringForSqlObject($mostRejectionQuery);
+        $mostRejectionQueryStr = $sql->buildSqlString($mostRejectionQuery);
         $mostRejectionResult = $dbAdapter->query($mostRejectionQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         if (isset($mostRejectionResult) && count($mostRejectionResult) > 0) {
             foreach ($mostRejectionResult as $rejectionReason) {
@@ -1383,7 +1383,7 @@ class EidSampleTable extends AbstractTableGateway
                 } else {
                     $rejectionQuery = $rejectionQuery->where('eid.reason_for_sample_rejection = "' . $mostRejectionReasons[$m] . '"');
                 }
-                $rejectionQueryStr = $sql->getSqlStringForSqlObject($rejectionQuery);
+                $rejectionQueryStr = $sql->buildSqlString($rejectionQuery);
                 $rejectionResult = $common->cacheQuery($rejectionQueryStr, $dbAdapter);
                 $rejectionReasonName = ($mostRejectionReasons[$m] == 0) ? 'Others' : ucwords($rejectionResult[0]['rejection_reason_name']);
                 $result['rejection'][$rejectionReasonName][$j] = (isset($rejectionResult[0]['rejections'])) ? $rejectionResult[0]['rejections'] : 0;
@@ -1512,14 +1512,14 @@ class EidSampleTable extends AbstractTableGateway
             $sQuery->offset($sOffset);
         }
 
-        $sQueryStr = $sql->getSqlStringForSqlObject($sQuery); // Get the string of the Sql, instead of the Select-instance 
+        $sQueryStr = $sql->buildSqlString($sQuery); // Get the string of the Sql, instead of the Select-instance 
         //echo $sQueryStr;die;
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
 
         /* Data set length after filtering */
         $sQuery->reset('limit');
         $sQuery->reset('offset');
-        $fQuery = $sql->getSqlStringForSqlObject($sQuery);
+        $fQuery = $sql->buildSqlString($sQuery);
         $aResultFilterTotal = $dbAdapter->query($fQuery, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $iFilteredTotal = count($aResultFilterTotal);
 
@@ -1542,7 +1542,7 @@ class EidSampleTable extends AbstractTableGateway
                         AND DATE(eid.sample_collection_date) >= '" . $startMonth . "' 
                         AND DATE(eid.sample_collection_date) <= '" . $endMonth . "'");
         }
-        $iQueryStr = $sql->getSqlStringForSqlObject($iQuery);
+        $iQueryStr = $sql->buildSqlString($iQuery);
         $iResult = $dbAdapter->query($iQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $iTotal = count($iResult);
 
@@ -1680,14 +1680,14 @@ class EidSampleTable extends AbstractTableGateway
             $sQuery->offset($sOffset);
         }
 
-        $sQueryStr = $sql->getSqlStringForSqlObject($sQuery); // Get the string of the Sql, instead of the Select-instance 
+        $sQueryStr = $sql->buildSqlString($sQuery); // Get the string of the Sql, instead of the Select-instance 
         //echo $sQueryStr;die;
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
 
         /* Data set length after filtering */
         $sQuery->reset('limit');
         $sQuery->reset('offset');
-        $fQuery = $sql->getSqlStringForSqlObject($sQuery);
+        $fQuery = $sql->buildSqlString($sQuery);
         $aResultFilterTotal = $dbAdapter->query($fQuery, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $iFilteredTotal = count($aResultFilterTotal);
 
@@ -1710,7 +1710,7 @@ class EidSampleTable extends AbstractTableGateway
                         AND DATE(eid.sample_collection_date) >= '" . $startMonth . "' 
                         AND DATE(eid.sample_collection_date) <= '" . $endMonth . "'");
         }
-        $iQueryStr = $sql->getSqlStringForSqlObject($iQuery);
+        $iQueryStr = $sql->buildSqlString($iQuery);
         $iResult = $dbAdapter->query($iQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $iTotal = count($iResult);
 
@@ -1850,14 +1850,14 @@ class EidSampleTable extends AbstractTableGateway
             $sQuery->offset($sOffset);
         }
 
-        $sQueryStr = $sql->getSqlStringForSqlObject($sQuery); // Get the string of the Sql, instead of the Select-instance 
+        $sQueryStr = $sql->buildSqlString($sQuery); // Get the string of the Sql, instead of the Select-instance 
         //echo $sQueryStr;die;
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
 
         /* Data set length after filtering */
         $sQuery->reset('limit');
         $sQuery->reset('offset');
-        $fQuery = $sql->getSqlStringForSqlObject($sQuery);
+        $fQuery = $sql->buildSqlString($sQuery);
         $aResultFilterTotal = $dbAdapter->query($fQuery, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $iFilteredTotal = count($aResultFilterTotal);
 
@@ -1881,7 +1881,7 @@ class EidSampleTable extends AbstractTableGateway
                         AND DATE(eid.sample_collection_date) >= '" . $startMonth . "' 
                         AND DATE(eid.sample_collection_date) <= '" . $endMonth . "'");
         }
-        $iQueryStr = $sql->getSqlStringForSqlObject($iQuery);
+        $iQueryStr = $sql->buildSqlString($iQuery);
         $iResult = $dbAdapter->query($iQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $iTotal = count($iResult);
 
@@ -1949,7 +1949,7 @@ class EidSampleTable extends AbstractTableGateway
         }
 
         $queryContainer->indicatorSummaryQuery = $samplesReceivedSummaryQuery;
-        $samplesReceivedSummaryCacheQuery = $sql->getSqlStringForSqlObject($samplesReceivedSummaryQuery);
+        $samplesReceivedSummaryCacheQuery = $sql->buildSqlString($samplesReceivedSummaryQuery);
         $samplesReceivedSummaryResult = $common->cacheQuery($samplesReceivedSummaryCacheQuery, $dbAdapter);
         //var_dump($samplesReceivedSummaryResult);die;
         $j = 0;
@@ -2002,7 +2002,7 @@ class EidSampleTable extends AbstractTableGateway
                                         AND DATE(sample_collection_date) <= '" . $endMonth . "'");
         }
 
-        $eidOutcomesQueryStr = $sql->getSqlStringForSqlObject($eidOutcomesQuery);
+        $eidOutcomesQueryStr = $sql->buildSqlString($eidOutcomesQuery);
         $result = $common->cacheQuery($eidOutcomesQueryStr, $dbAdapter);
         return $result[0];
     }
@@ -2061,7 +2061,7 @@ class EidSampleTable extends AbstractTableGateway
                                         AND DATE(sample_collection_date) <= '" . $endMonth . "'");
         }
 
-        $eidOutcomesQueryStr = $sql->getSqlStringForSqlObject($eidOutcomesQuery);
+        $eidOutcomesQueryStr = $sql->buildSqlString($eidOutcomesQuery);
         $result = $common->cacheQuery($eidOutcomesQueryStr, $dbAdapter);
         return $result[0];
     }
@@ -2094,7 +2094,7 @@ class EidSampleTable extends AbstractTableGateway
             $eidOutcomesQuery = $eidOutcomesQuery->where('eid.facility_id IN (' . $params['clinics'] . ')');
         }
 
-        $eidOutcomesQueryStr = $sql->getSqlStringForSqlObject($eidOutcomesQuery);
+        $eidOutcomesQueryStr = $sql->buildSqlString($eidOutcomesQuery);
         $result = $common->cacheQuery($eidOutcomesQueryStr, $dbAdapter);
         return $result;
     }
@@ -2134,7 +2134,7 @@ class EidSampleTable extends AbstractTableGateway
                                         AND DATE(sample_collection_date) <= '" . $endMonth . "'");
         }
 
-        $eidOutcomesQueryStr = $sql->getSqlStringForSqlObject($eidOutcomesQuery);
+        $eidOutcomesQueryStr = $sql->buildSqlString($eidOutcomesQuery);
         $result = $common->cacheQuery($eidOutcomesQueryStr, $dbAdapter);
         return $result[0];
     }
@@ -2183,7 +2183,7 @@ class EidSampleTable extends AbstractTableGateway
         if ($logincontainer->role != 1) {
             $query = $query->where('eid.lab_id IN ("' . implode('", "', $this->mappedFacilities) . '")');
         }
-        $queryStr = $sql->getSqlStringForSqlObject($query);
+        $queryStr = $sql->buildSqlString($query);
         //echo $queryStr;die;
         //$result = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $result = $common->cacheQuery($queryStr, $dbAdapter);
@@ -2233,7 +2233,7 @@ class EidSampleTable extends AbstractTableGateway
         } else {
             $receivedQuery = $receivedQuery->where("DATE(sample_collection_date) IN ($qDates)");
         }
-        $cQueryStr = $sql->getSqlStringForSqlObject($receivedQuery);
+        $cQueryStr = $sql->buildSqlString($receivedQuery);
         //echo $cQueryStr;die;
         //$rResult = $dbAdapter->query($cQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $rResult = $common->cacheQuery($cQueryStr, $dbAdapter);
@@ -2261,7 +2261,7 @@ class EidSampleTable extends AbstractTableGateway
         } else {
             $testedQuery = $testedQuery->where("DATE(sample_tested_datetime) IN ($qDates)");
         }
-        $cQueryStr = $sql->getSqlStringForSqlObject($testedQuery);
+        $cQueryStr = $sql->buildSqlString($testedQuery);
         //echo $cQueryStr;//die;
         //$rResult = $dbAdapter->query($cQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $rResult = $common->cacheQuery($cQueryStr, $dbAdapter);
@@ -2289,7 +2289,7 @@ class EidSampleTable extends AbstractTableGateway
         } else {
             $rejectedQuery = $rejectedQuery->where("DATE(sample_collection_date) IN ($qDates)");
         }
-        $cQueryStr = $sql->getSqlStringForSqlObject($rejectedQuery);
+        $cQueryStr = $sql->buildSqlString($rejectedQuery);
         //echo $cQueryStr;die;
         //$rResult = $dbAdapter->query($cQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $rResult = $common->cacheQuery($cQueryStr, $dbAdapter);
@@ -2321,13 +2321,13 @@ class EidSampleTable extends AbstractTableGateway
                 $fQuery = $sql->select()->from(array('f' => 'facility_details'))->columns(array('facility_id'))
                     ->where('f.facility_type = 2 AND f.status="active"');
                 $fQuery = $fQuery->where('f.facility_id IN (' . $params['facilityId'] . ')');
-                $fQueryStr = $sql->getSqlStringForSqlObject($fQuery);
+                $fQueryStr = $sql->buildSqlString($fQuery);
                 $facilityResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
                 $facilityIdList = array_column($facilityResult, 'facility_id');
             } else if (!empty($this->mappedFacilities)) {
                 $fQuery = $sql->select()->from(array('f' => 'facility_details'))->columns(array('facility_id'))
                     ->where('f.facility_id IN ("' . implode('", "', $this->mappedFacilities) . '")');
-                $fQueryStr = $sql->getSqlStringForSqlObject($fQuery);
+                $fQueryStr = $sql->buildSqlString($fQuery);
                 $facilityResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
                 $facilityIdList = array_column($facilityResult, 'facility_id');
             }
@@ -2337,7 +2337,7 @@ class EidSampleTable extends AbstractTableGateway
             if (isset($params['sampleType']) && trim($params['sampleType']) != '') {
                 $rsQuery = $sql->select()->from(array('rs' => 'r_eid_sample_type'))->columns(array('sample_id'));
                 $rsQuery = $rsQuery->where('rs.sample_id="' . base64_decode(trim($params['sampleType'])) . '"');
-                $rsQueryStr = $sql->getSqlStringForSqlObject($rsQuery);
+                $rsQueryStr = $sql->buildSqlString($rsQuery);
                 //$sampleTypeResult = $dbAdapter->query($rsQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
                 $specimenTypesResult = $common->cacheQuery($rsQueryStr, $dbAdapter);
                 $specimenTypes = array_column($specimenTypesResult, 'sample_id');
@@ -2368,7 +2368,7 @@ class EidSampleTable extends AbstractTableGateway
 
             $queryStr = $queryStr->group(array(new Expression('MONTH(sample_collection_date)')));
             $queryStr = $queryStr->order(array(new Expression('DATE(sample_collection_date)')));
-            $queryStr = $sql->getSqlStringForSqlObject($queryStr);
+            $queryStr = $sql->buildSqlString($queryStr);
             //echo $queryStr;die;
             //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             $sampleResult = $common->cacheQuery($queryStr, $dbAdapter);
@@ -2402,14 +2402,14 @@ class EidSampleTable extends AbstractTableGateway
                 $fQuery = $sql->select()->from(array('f' => 'facility_details'))->columns(array('facility_id'))
                     ->where('f.facility_type = 2 AND f.status="active"');
                 $fQuery = $fQuery->where('f.facility_id IN (' . $params['facilityId'] . ')');
-                $fQueryStr = $sql->getSqlStringForSqlObject($fQuery);
+                $fQueryStr = $sql->buildSqlString($fQuery);
                 $facilityResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
                 $facilityIdList = array_column($facilityResult, 'facility_id');
             } else if (!empty($this->mappedFacilities)) {
                 $fQuery = $sql->select()->from(array('f' => 'facility_details'))->columns(array('facility_id'))
                     //->where('f.facility_type = 2 AND f.status="active"')
                     ->where('f.facility_id IN ("' . implode('", "', $this->mappedFacilities) . '")');
-                $fQueryStr = $sql->getSqlStringForSqlObject($fQuery);
+                $fQueryStr = $sql->buildSqlString($fQuery);
                 $facilityResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
                 $facilityIdList = array_column($facilityResult, 'facility_id');
             }
@@ -2419,7 +2419,7 @@ class EidSampleTable extends AbstractTableGateway
             if (isset($params['sampleType']) && trim($params['sampleType']) != '') {
                 $rsQuery = $sql->select()->from(array('rs' => 'r_eid_sample_type'))->columns(array('sample_id'));
                 $rsQuery = $rsQuery->where('rs.sample_id="' . base64_decode(trim($params['sampleType'])) . '"');
-                $rsQueryStr = $sql->getSqlStringForSqlObject($rsQuery);
+                $rsQueryStr = $sql->buildSqlString($rsQuery);
                 //$sampleTypeResult = $dbAdapter->query($rsQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
                 $specimenTypesResult = $common->cacheQuery($rsQueryStr, $dbAdapter);
                 $specimenTypes = array_column($specimenTypesResult, 'sample_id');
@@ -2450,7 +2450,7 @@ class EidSampleTable extends AbstractTableGateway
                 $query = $query->where('eid.lab_id IN ("' . implode('", "', $facilityIdList) . '")');
             }
 
-            $queryStr = $sql->getSqlStringForSqlObject($query);
+            $queryStr = $sql->buildSqlString($query);
             echo $queryStr;
             die;
             $testResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();

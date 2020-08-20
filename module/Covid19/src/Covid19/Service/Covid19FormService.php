@@ -271,7 +271,7 @@ class Covid19FormService
         $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->from($dashTable)->where(array('sample_code LIKE "%'.$sampleCode.'%"', 'vlsm_instance_id' => $instanceCode));
-        $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
+        $sQueryStr = $sql->buildSqlString($sQuery);
         $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
         return $sResult;
     }
@@ -282,7 +282,7 @@ class Covid19FormService
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->from(array('l' => 'location_details'))
             ->where(array('l.parent_location' => $parent, 'l.location_name' => trim($location)));
-        $sQuery = $sql->getSqlStringForSqlObject($sQuery);
+        $sQuery = $sql->buildSqlString($sQuery);
         $sQueryResult = $dbAdapter->query($sQuery, $dbAdapter::QUERY_MODE_EXECUTE)->current();
         return $sQueryResult;
     }
@@ -292,7 +292,7 @@ class Covid19FormService
         $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
         $sql = new Sql($dbAdapter);
         $fQuery = $sql->select()->from('facility_details')->where(array('facility_name' => $clinicName));
-        $fQueryStr = $sql->getSqlStringForSqlObject($fQuery);
+        $fQueryStr = $sql->buildSqlString($fQuery);
         $fResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
         return $fResult;
     }
@@ -301,7 +301,7 @@ class Covid19FormService
         $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
         $sql = new Sql($dbAdapter);
         $fQuery = $sql->select()->from('facility_type')->where(array('facility_type_name' => $facilityTypeName));
-        $fQueryStr = $sql->getSqlStringForSqlObject($fQuery);
+        $fQueryStr = $sql->buildSqlString($fQuery);
         $fResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
         return $fResult;
     }
@@ -310,7 +310,7 @@ class Covid19FormService
         $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
         $sql = new Sql($dbAdapter);
         $tQuery = $sql->select()->from('r_vl_test_reasons')->where(array('test_reason_name' => $testingReson));
-        $tQueryStr = $sql->getSqlStringForSqlObject($tQuery);
+        $tQueryStr = $sql->buildSqlString($tQuery);
         $tResult = $dbAdapter->query($tQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
         return $tResult;
     }
@@ -319,7 +319,7 @@ class Covid19FormService
         $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->from('r_sample_status')->where(array('status_name' => $testingStatus));
-        $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
+        $sQueryStr = $sql->buildSqlString($sQuery);
         $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
         return $sResult;
     }
@@ -328,7 +328,7 @@ class Covid19FormService
         $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->from('r_covis19_sample_type')->where(array('sample_name' => $sampleType));
-        $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
+        $sQueryStr = $sql->buildSqlString($sQuery);
         $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
         return $sResult;
     }
@@ -337,7 +337,7 @@ class Covid19FormService
         $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->from('r_sample_rejection_reasons')->where(array('rejection_reason_name' => $rejectReasonName));
-        $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
+        $sQueryStr = $sql->buildSqlString($sQuery);
         $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
         return $sResult;
     }
@@ -453,7 +453,7 @@ class Covid19FormService
             try {
                 $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
                 $sql = new Sql($dbAdapter);
-                $sQueryStr = $sql->getSqlStringForSqlObject($queryContainer->indicatorSummaryQuery);
+                $sQueryStr = $sql->buildSqlString($queryContainer->indicatorSummaryQuery);
                 $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
                 if (isset($sResult) && count($sResult) > 0) {
                     $excel = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
@@ -606,7 +606,7 @@ class Covid19FormService
         try {
             $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
             $sql = new Sql($dbAdapter);
-            $sQueryStr = $sql->getSqlStringForSqlObject($queryContainer->fetchAllSuppressionRateByFacility);
+            $sQueryStr = $sql->buildSqlString($queryContainer->fetchAllSuppressionRateByFacility);
             $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             if (isset($sResult) && count($sResult) > 0) {
                 $excel = new \PhpOffice\PhpSpreadsheet\Spreadsheet();

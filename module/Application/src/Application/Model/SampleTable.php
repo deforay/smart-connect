@@ -100,7 +100,7 @@ class SampleTable extends AbstractTableGateway
         if ($logincontainer->role != 1) {
             $query = $query->where('vl.lab_id IN ("' . implode('", "', $this->mappedFacilities) . '")');
         }
-        $queryStr = $sql->getSqlStringForSqlObject($query);
+        $queryStr = $sql->buildSqlString($query);
         //echo $queryStr;die;
         //$result = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $result = $common->cacheQuery($queryStr, $dbAdapter);
@@ -150,7 +150,7 @@ class SampleTable extends AbstractTableGateway
         } else {
             $receivedQuery = $receivedQuery->where("DATE(sample_collection_date) IN ($qDates)");
         }
-        $cQueryStr = $sql->getSqlStringForSqlObject($receivedQuery);
+        $cQueryStr = $sql->buildSqlString($receivedQuery);
         //echo $cQueryStr;die;
         //$rResult = $dbAdapter->query($cQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $rResult = $common->cacheQuery($cQueryStr, $dbAdapter);
@@ -178,7 +178,7 @@ class SampleTable extends AbstractTableGateway
         } else {
             $testedQuery = $testedQuery->where("DATE(sample_tested_datetime) IN ($qDates)");
         }
-        $cQueryStr = $sql->getSqlStringForSqlObject($testedQuery);
+        $cQueryStr = $sql->buildSqlString($testedQuery);
         //echo $cQueryStr;//die;
         //$rResult = $dbAdapter->query($cQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $rResult = $common->cacheQuery($cQueryStr, $dbAdapter);
@@ -206,7 +206,7 @@ class SampleTable extends AbstractTableGateway
         } else {
             $rejectedQuery = $rejectedQuery->where("DATE(sample_collection_date) IN ($qDates)");
         }
-        $cQueryStr = $sql->getSqlStringForSqlObject($rejectedQuery);
+        $cQueryStr = $sql->buildSqlString($rejectedQuery);
         //echo $cQueryStr;die;
         //$rResult = $dbAdapter->query($cQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $rResult = $common->cacheQuery($cQueryStr, $dbAdapter);
@@ -238,14 +238,14 @@ class SampleTable extends AbstractTableGateway
                 $fQuery = $sql->select()->from(array('f' => 'facility_details'))->columns(array('facility_id'))
                     ->where('f.facility_type = 2 AND f.status="active"');
                 $fQuery = $fQuery->where('f.facility_id IN (' . $params['facilityId'] . ')');
-                $fQueryStr = $sql->getSqlStringForSqlObject($fQuery);
+                $fQueryStr = $sql->buildSqlString($fQuery);
                 $facilityResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
                 $facilityIdList = array_column($facilityResult, 'facility_id');
             } else if (!empty($this->mappedFacilities)) {
                 $fQuery = $sql->select()->from(array('f' => 'facility_details'))->columns(array('facility_id'))
                     //->where('f.facility_type = 2 AND f.status="active"')
                     ->where('f.facility_id IN ("' . implode('", "', $this->mappedFacilities) . '")');
-                $fQueryStr = $sql->getSqlStringForSqlObject($fQuery);
+                $fQueryStr = $sql->buildSqlString($fQuery);
                 $facilityResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
                 $facilityIdList = array_column($facilityResult, 'facility_id');
             }
@@ -255,7 +255,7 @@ class SampleTable extends AbstractTableGateway
             if (isset($params['sampleType']) && trim($params['sampleType']) != '') {
                 $rsQuery = $sql->select()->from(array('rs' => 'r_vl_sample_type'))->columns(array('sample_id'));
                 $rsQuery = $rsQuery->where('rs.sample_id="' . base64_decode(trim($params['sampleType'])) . '"');
-                $rsQueryStr = $sql->getSqlStringForSqlObject($rsQuery);
+                $rsQueryStr = $sql->buildSqlString($rsQuery);
                 //$sampleTypeResult = $dbAdapter->query($rsQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
                 $specimenTypesResult = $common->cacheQuery($rsQueryStr, $dbAdapter);
                 $specimenTypes = array_column($specimenTypesResult, 'sample_id');
@@ -289,7 +289,7 @@ class SampleTable extends AbstractTableGateway
 
             $queryStr = $queryStr->group(array(new Expression('MONTH(sample_collection_date)')));
             $queryStr = $queryStr->order(array(new Expression('DATE(sample_collection_date)')));
-            $queryStr = $sql->getSqlStringForSqlObject($queryStr);
+            $queryStr = $sql->buildSqlString($queryStr);
             //echo $queryStr;die;
             //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             $sampleResult = $common->cacheQuery($queryStr, $dbAdapter);
@@ -320,7 +320,7 @@ class SampleTable extends AbstractTableGateway
             if (isset($params['testedReason']) && trim($params['testedReason']) != '') {
                 $rsQuery = $rsQuery->where('tr.test_reason_id="' . base64_decode(trim($params['testedReason'])) . '"');
             }
-            $rsQueryStr = $sql->getSqlStringForSqlObject($rsQuery);
+            $rsQueryStr = $sql->buildSqlString($rsQuery);
             $sampleTypeResult = $dbAdapter->query($rsQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             //$sampleTypeResult = $common->cacheQuery($rsQueryStr,$dbAdapter);
 
@@ -353,7 +353,7 @@ class SampleTable extends AbstractTableGateway
 
             $queryStr = $queryStr->group(array(new Expression('MONTH(sample_collection_date)')));
             $queryStr = $queryStr->order(array(new Expression('DATE(sample_collection_date)')));
-            $queryStr = $sql->getSqlStringForSqlObject($queryStr);
+            $queryStr = $sql->buildSqlString($queryStr);
             //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             $sampleResult = $common->cacheQuery($queryStr, $dbAdapter);
             $j = 0;
@@ -385,14 +385,14 @@ class SampleTable extends AbstractTableGateway
                 $fQuery = $sql->select()->from(array('f' => 'facility_details'))->columns(array('facility_id'))
                     ->where('f.facility_type = 2 AND f.status="active"');
                 $fQuery = $fQuery->where('f.facility_id IN (' . $params['facilityId'] . ')');
-                $fQueryStr = $sql->getSqlStringForSqlObject($fQuery);
+                $fQueryStr = $sql->buildSqlString($fQuery);
                 $facilityResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
                 $facilityIdList = array_column($facilityResult, 'facility_id');
             } else if (!empty($this->mappedFacilities)) {
                 $fQuery = $sql->select()->from(array('f' => 'facility_details'))->columns(array('facility_id'))
                     //->where('f.facility_type = 2 AND f.status="active"')
                     ->where('f.facility_id IN ("' . implode('", "', $this->mappedFacilities) . '")');
-                $fQueryStr = $sql->getSqlStringForSqlObject($fQuery);
+                $fQueryStr = $sql->buildSqlString($fQuery);
                 $facilityResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
                 $facilityIdList = array_column($facilityResult, 'facility_id');
             }
@@ -402,7 +402,7 @@ class SampleTable extends AbstractTableGateway
             if (isset($params['sampleType']) && trim($params['sampleType']) != '') {
                 $rsQuery = $sql->select()->from(array('rs' => 'r_vl_sample_type'))->columns(array('sample_id'));
                 $rsQuery = $rsQuery->where('rs.sample_id="' . base64_decode(trim($params['sampleType'])) . '"');
-                $rsQueryStr = $sql->getSqlStringForSqlObject($rsQuery);
+                $rsQueryStr = $sql->buildSqlString($rsQuery);
                 //$sampleTypeResult = $dbAdapter->query($rsQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
                 $specimenTypesResult = $common->cacheQuery($rsQueryStr, $dbAdapter);
                 $specimenTypes = array_column($specimenTypesResult, 'sample_id');
@@ -435,7 +435,7 @@ class SampleTable extends AbstractTableGateway
                 $query = $query->where('vl.lab_id IN ("' . implode('", "', $facilityIdList) . '")');
             }
 
-            $queryStr = $sql->getSqlStringForSqlObject($query);
+            $queryStr = $sql->buildSqlString($query);
             //echo $queryStr;die;
             $testResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
 
@@ -498,7 +498,7 @@ class SampleTable extends AbstractTableGateway
 
             $query = $query->group(array(new Expression('MONTH(sample_collection_date)')));
             $query = $query->order(array(new Expression('DATE(sample_collection_date)')));
-            $queryStr = $sql->getSqlStringForSqlObject($query);
+            $queryStr = $sql->buildSqlString($query);
             //echo $queryStr;die;
             //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             $sampleResult = $common->cacheQuery($queryStr, $dbAdapter);
@@ -542,14 +542,14 @@ class SampleTable extends AbstractTableGateway
             $fQuery = $sql->select()->from(array('f' => 'facility_details'))->columns(array('facility_id'))
                 ->where('f.facility_type = 2 AND f.status="active"');
             $fQuery = $fQuery->where('f.facility_id IN (' . $params['facilityId'] . ')');
-            $fQueryStr = $sql->getSqlStringForSqlObject($fQuery);
+            $fQueryStr = $sql->buildSqlString($fQuery);
             $facilityResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             $facilityIdList = array_column($facilityResult, 'facility_id');
         } else if (!empty($this->mappedFacilities)) {
             $fQuery = $sql->select()->from(array('f' => 'facility_details'))->columns(array('facility_id'))
                 //->where('f.facility_type = 2 AND f.status="active"')
                 ->where('f.facility_id IN ("' . implode('", "', $this->mappedFacilities) . '")');
-            $fQueryStr = $sql->getSqlStringForSqlObject($fQuery);
+            $fQueryStr = $sql->buildSqlString($fQuery);
             $facilityResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             $facilityIdList = array_column($facilityResult, 'facility_id');
         }
@@ -601,7 +601,7 @@ class SampleTable extends AbstractTableGateway
             $query = $query->group(array(new Expression('YEAR(vl.result_approved_datetime)')));
             $query = $query->group(array(new Expression('MONTH(vl.result_approved_datetime)')));
             $query = $query->order(array(new Expression('DATE(vl.result_approved_datetime) ASC')));
-            $queryStr = $sql->getSqlStringForSqlObject($query);
+            $queryStr = $sql->buildSqlString($query);
             //echo $queryStr;die;
             //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             $sampleResult = $common->cacheQuery($queryStr, $dbAdapter);
@@ -696,7 +696,7 @@ class SampleTable extends AbstractTableGateway
             }
             $query = $query->group(array(new Expression('MONTH(sample_collection_date)')));
             $query = $query->order(array(new Expression('DATE(sample_collection_date)')));
-            $queryStr = $sql->getSqlStringForSqlObject($query);
+            $queryStr = $sql->buildSqlString($query);
             //echo $queryStr;die;
             //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             $sampleResult = $common->cacheQuery($queryStr, $dbAdapter);
@@ -759,7 +759,7 @@ class SampleTable extends AbstractTableGateway
 
             $query = $query->group(array(new Expression('MONTH(sample_collection_date)')));
             $query = $query->order(array(new Expression('DATE(sample_collection_date)')));
-            $queryStr = $sql->getSqlStringForSqlObject($query);
+            $queryStr = $sql->buildSqlString($query);
             //echo $queryStr;die;
             //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             $sampleResult = $common->cacheQuery($queryStr, $dbAdapter);
@@ -811,7 +811,7 @@ class SampleTable extends AbstractTableGateway
 
             $query = $query->group(array(new Expression('MONTH(sample_collection_date)')));
             $query = $query->order(array(new Expression('DATE(sample_collection_date)')));
-            $queryStr = $sql->getSqlStringForSqlObject($query);
+            $queryStr = $sql->buildSqlString($query);
             //echo $queryStr;die;
             //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             $sampleResult = $common->cacheQuery($queryStr, $dbAdapter);
@@ -883,7 +883,7 @@ class SampleTable extends AbstractTableGateway
 
             $query = $query->group(array(new Expression('MONTH(sample_collection_date)')));
             $query = $query->order(array(new Expression('DATE(sample_collection_date)')));
-            $queryStr = $sql->getSqlStringForSqlObject($query);
+            $queryStr = $sql->buildSqlString($query);
             //echo $queryStr;die;
             //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             $sampleResult = $common->cacheQuery($queryStr, $dbAdapter);
@@ -923,7 +923,7 @@ class SampleTable extends AbstractTableGateway
                     $fQuery = $fQuery->where('f.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
                 }
             }
-            $fQueryStr = $sql->getSqlStringForSqlObject($fQuery);
+            $fQueryStr = $sql->buildSqlString($fQuery);
             $facilityResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             if (isset($facilityResult) && count($facilityResult) > 0) {
                 $i = 0;
@@ -938,7 +938,7 @@ class SampleTable extends AbstractTableGateway
                     } else if (isset($params['sampleStatus']) && $params['sampleStatus'] == 'sample_rejected') {
                         $countQuery = $countQuery->where("vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0");
                     }
-                    $cQueryStr = $sql->getSqlStringForSqlObject($countQuery);
+                    $cQueryStr = $sql->buildSqlString($countQuery);
                     $countResult = $dbAdapter->query($cQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
                     $result[$i][0] = (isset($countResult->total)) ? $countResult->total : 0;
                     $result[$i][1] = ucwords($facility['facility_name']);
@@ -986,7 +986,7 @@ class SampleTable extends AbstractTableGateway
                         AND DATE(sample_collection_date) >= '" . $startMonth . "' 
                         AND DATE(sample_collection_date) <= '" . $endMonth . "' AND (patient_gender='f' || patient_gender='F' || patient_gender='Female' || patient_gender='FEMALE')");
 
-            $queryStr = $sql->getSqlStringForSqlObject($query);
+            $queryStr = $sql->buildSqlString($query);
             $femaleTestResult = $common->cacheQuery($queryStr, $dbAdapter);
         }
         return $femaleTestResult;
@@ -1025,7 +1025,7 @@ class SampleTable extends AbstractTableGateway
                         AND DATE(sample_collection_date) >= '" . $startMonth . "'
                         AND DATE(sample_collection_date) <= '" . $endMonth . "'");
 
-            $queryStr = $sql->getSqlStringForSqlObject($query);
+            $queryStr = $sql->buildSqlString($query);
             $lineOfTreatmentResult = $common->cacheQuery($queryStr, $dbAdapter);
         }
         return $lineOfTreatmentResult;
@@ -1053,7 +1053,7 @@ class SampleTable extends AbstractTableGateway
                     $lQuery = $lQuery->where('vl.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
                 }
             }
-            $lQueryStr = $sql->getSqlStringForSqlObject($lQuery);
+            $lQueryStr = $sql->buildSqlString($lQuery);
             $lResult = $dbAdapter->query($lQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             if (isset($lResult) && count($lResult) > 0) {
                 $i = 0;
@@ -1065,7 +1065,7 @@ class SampleTable extends AbstractTableGateway
                             ->where(array("vl.sample_collection_date >='" . $startMonth . " 00:00:00" . "'", "vl.sample_collection_date <='" . $endMonth . " 23:59:59" . "'"))
                             ->where(array("vl.lab_id" => $lab['lab_id'], 'f.facility_type' => '1'))
                             ->group('vl.facility_id');
-                        $lcQueryStr = $sql->getSqlStringForSqlObject($lcQuery);
+                        $lcQueryStr = $sql->buildSqlString($lcQuery);
                         $lResult[$i]['clinic'] = $dbAdapter->query($lcQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
                         $i++;
                     }
@@ -1135,7 +1135,7 @@ class SampleTable extends AbstractTableGateway
         } else if (isset($params['isBreastfeeding']) && $params['isBreastfeeding'] == 'unreported') {
             $inCompleteQuery = $inCompleteQuery->where("(vl.is_patient_breastfeeding IS NULL OR vl.is_patient_breastfeeding = '' OR vl.is_patient_breastfeeding = 'Unreported')");
         }
-        $incQueryStr = $sql->getSqlStringForSqlObject($inCompleteQuery);
+        $incQueryStr = $sql->buildSqlString($inCompleteQuery);
         //echo $incQueryStr;die;
         $artInCompleteResult = $dbAdapter->query($incQueryStr . " AND (vl.patient_art_no IS NULL OR vl.patient_art_no ='')", $dbAdapter::QUERY_MODE_EXECUTE)->current();
         $currentRegimenInCompleteResult = $dbAdapter->query($incQueryStr . " AND (vl.current_regimen IS NULL OR vl.current_regimen ='')", $dbAdapter::QUERY_MODE_EXECUTE)->current();
@@ -1171,7 +1171,7 @@ class SampleTable extends AbstractTableGateway
                 $fQuery = $fQuery->where('vl.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
             }
         }
-        $fQueryStr = $sql->getSqlStringForSqlObject($fQuery);
+        $fQueryStr = $sql->buildSqlString($fQuery);
         //echo $fQueryStr;die;
         $facilityResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         if (isset($facilityResult) && count($facilityResult) > 0) {
@@ -1219,7 +1219,7 @@ class SampleTable extends AbstractTableGateway
             } else if (isset($params['isBreastfeeding']) && $params['isBreastfeeding'] == 'unreported') {
                 $countQuery = $countQuery->where("(vl.is_patient_breastfeeding IS NULL OR vl.is_patient_breastfeeding = '' OR vl.is_patient_breastfeeding = 'Unreported')");
             }
-            $cQueryStr = $sql->getSqlStringForSqlObject($countQuery);
+            $cQueryStr = $sql->buildSqlString($countQuery);
             $barResult = $dbAdapter->query($cQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
 
             $j = 0;
@@ -1343,7 +1343,7 @@ class SampleTable extends AbstractTableGateway
             } else if (isset($params['lineOfTreatment']) && $params['lineOfTreatment'] == 'not_specified') {
                 $sQuery = $sQuery->where("(vl.line_of_treatment IS NULL OR vl.line_of_treatment = '' OR vl.line_of_treatment = '0')");
             }
-            $queryStr = $sql->getSqlStringForSqlObject($sQuery);
+            $queryStr = $sql->buildSqlString($sQuery);
             $vlOutComeResult = $common->cacheQuery($queryStr, $dbAdapter);
         }
         return $vlOutComeResult;
@@ -1459,7 +1459,7 @@ class SampleTable extends AbstractTableGateway
                 $squery = $squery->where("(vl.is_patient_breastfeeding IS NULL OR vl.is_patient_breastfeeding = '' OR vl.is_patient_breastfeeding = 'Unreported')");
             }
 
-            $sQueryStr = $sql->getSqlStringForSqlObject($squery);
+            $sQueryStr = $sql->buildSqlString($squery);
             //echo $sQueryStr;die;
             $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         }
@@ -1567,7 +1567,7 @@ class SampleTable extends AbstractTableGateway
                 $query = $query->where("(vl.is_patient_breastfeeding IS NULL OR vl.is_patient_breastfeeding = '' OR vl.is_patient_breastfeeding = 'Unreported' OR vl.is_patient_breastfeeding = 'unreported')");
             }
 
-            $queryStr = $sql->getSqlStringForSqlObject($query);
+            $queryStr = $sql->buildSqlString($query);
 
             $sampleResult = $common->cacheQuery($queryStr, $dbAdapter);
             $j = 0;
@@ -1690,7 +1690,7 @@ class SampleTable extends AbstractTableGateway
             }
             $query = $query->group(array(new Expression('WEEK(sample_collection_date)')));
             $query = $query->order(array(new Expression('WEEK(sample_collection_date)')));
-            $queryStr = $sql->getSqlStringForSqlObject($query);
+            $queryStr = $sql->buildSqlString($query);
             //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             $sampleResult = $common->cacheQuery($queryStr, $dbAdapter);
             $j = 0;
@@ -1793,7 +1793,7 @@ class SampleTable extends AbstractTableGateway
             }
             $query = $query->group(array(new Expression('WEEK(sample_collection_date)')));
             $query = $query->order(array(new Expression('WEEK(sample_collection_date)')));
-            $queryStr = $sql->getSqlStringForSqlObject($query);
+            $queryStr = $sql->buildSqlString($query);
             //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             $sampleResult = $common->cacheQuery($queryStr, $dbAdapter);
             $j = 0;
@@ -1901,7 +1901,7 @@ class SampleTable extends AbstractTableGateway
             }
             $query = $query->group(array(new Expression('WEEK(sample_collection_date)')));
             $query = $query->order(array(new Expression('WEEK(sample_collection_date)')));
-            $queryStr = $sql->getSqlStringForSqlObject($query);
+            $queryStr = $sql->buildSqlString($query);
             //echo $queryStr;die;
             //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             $sampleResult = $common->cacheQuery($queryStr, $dbAdapter);
@@ -2012,7 +2012,7 @@ class SampleTable extends AbstractTableGateway
             if (isset($params['testReason']) && trim($params['testReason']) != '') {
                 $rQuery = $rQuery->where(array("vl.reason_for_vl_testing ='" . base64_decode($params['testReason']) . "'"));
             }
-            $rQueryStr = $sql->getSqlStringForSqlObject($rQuery);
+            $rQueryStr = $sql->buildSqlString($rQuery);
             //echo $rQueryStr;die;
             //$qResult = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             $qResult = $common->cacheQuery($rQueryStr, $dbAdapter);
@@ -2047,7 +2047,7 @@ class SampleTable extends AbstractTableGateway
                 $squery = $squery->where("Month(sample_collection_date)='" . $m . "' AND Year(sample_collection_date)='" . $year . "'");
             }
         }
-        $sQueryStr = $sql->getSqlStringForSqlObject($squery);
+        $sQueryStr = $sql->buildSqlString($squery);
         $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         return $sResult;
     }
@@ -2249,14 +2249,14 @@ class SampleTable extends AbstractTableGateway
             $sQuery->offset($sOffset);
         }
 
-        $sQueryStr = $sql->getSqlStringForSqlObject($sQuery); // Get the string of the Sql, instead of the Select-instance 
+        $sQueryStr = $sql->buildSqlString($sQuery); // Get the string of the Sql, instead of the Select-instance 
         //echo $sQueryStr;die;
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
 
         /* Data set length after filtering */
         $sQuery->reset('limit');
         $sQuery->reset('offset');
-        $fQuery = $sql->getSqlStringForSqlObject($sQuery);
+        $fQuery = $sql->buildSqlString($sQuery);
         $aResultFilterTotal = $dbAdapter->query($fQuery, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $iFilteredTotal = count($aResultFilterTotal);
 
@@ -2273,7 +2273,7 @@ class SampleTable extends AbstractTableGateway
         if (isset($parameters['sampleCollectionDate']) && trim($parameters['sampleCollectionDate']) != '') {
             $sQuery = $sQuery->where(array("DATE(vl.sample_collection_date) >='$startDate'", "DATE(vl.sample_collection_date) <='$endDate'"));
         }
-        $iQueryStr = $sql->getSqlStringForSqlObject($iQuery);
+        $iQueryStr = $sql->buildSqlString($iQuery);
         $iResult = $dbAdapter->query($iQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $iTotal = count($iResult);
 
@@ -2418,7 +2418,7 @@ class SampleTable extends AbstractTableGateway
 
             $queryStr = $queryStr->group(array(new Expression('WEEK(sample_collection_date)')));
             $queryStr = $queryStr->order(array(new Expression('WEEK(sample_collection_date)')));
-            $queryStr = $sql->getSqlStringForSqlObject($queryStr);
+            $queryStr = $sql->buildSqlString($queryStr);
             //echo $queryStr;die;
             $sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             $j = 0;
@@ -2455,7 +2455,7 @@ class SampleTable extends AbstractTableGateway
                     $facilityQuery = $facilityQuery->where('f.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
                 }
             }
-            $facilityQueryStr = $sql->getSqlStringForSqlObject($facilityQuery);
+            $facilityQueryStr = $sql->buildSqlString($facilityQuery);
             $facilityResult = $dbAdapter->query($facilityQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             if (isset($facilityResult) && count($facilityResult) > 0) {
 
@@ -2557,7 +2557,7 @@ class SampleTable extends AbstractTableGateway
                 } else if (isset($params['lineOfTreatment']) && $params['lineOfTreatment'] == 'not_specified') {
                     $countQuery = $countQuery->where("(vl.line_of_treatment IS NULL OR vl.line_of_treatment = '' OR vl.line_of_treatment = '0')");
                 }
-                $cQueryStr = $sql->getSqlStringForSqlObject($countQuery);
+                $cQueryStr = $sql->buildSqlString($countQuery);
                 //echo $cQueryStr;die;
                 $countResult = $dbAdapter->query($cQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
                 $i = 0;
@@ -2592,7 +2592,7 @@ class SampleTable extends AbstractTableGateway
                     $fQuery = $fQuery->where('f.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
                 }
             }
-            $fQueryStr = $sql->getSqlStringForSqlObject($fQuery);
+            $fQueryStr = $sql->buildSqlString($fQuery);
             $facilityResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             if (isset($facilityResult) && count($facilityResult) > 0) {
 
@@ -2699,7 +2699,7 @@ class SampleTable extends AbstractTableGateway
                 } else if (isset($params['lineOfTreatment']) && $params['lineOfTreatment'] == 'not_specified') {
                     $countQuery = $countQuery->where("(vl.line_of_treatment IS NULL OR vl.line_of_treatment = '' OR vl.line_of_treatment = '0')");
                 }
-                $cQueryStr = $sql->getSqlStringForSqlObject($countQuery);
+                $cQueryStr = $sql->buildSqlString($countQuery);
                 $barChartResult = $dbAdapter->query($cQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
 
                 $j = 0;
@@ -2818,7 +2818,7 @@ class SampleTable extends AbstractTableGateway
             $sQuery = $sQuery->group(array(new Expression('DATE(sample_collection_date)')));
             $sQuery = $sQuery->order(array(new Expression('DATE(sample_collection_date)')));
 
-            $sQuery = $sql->getSqlStringForSqlObject($sQuery);
+            $sQuery = $sql->buildSqlString($sQuery);
             $sampleResult = $dbAdapter->query($sQuery, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             $result['DBS'] = 0;
             $result['Others'] = 0;
@@ -2940,7 +2940,7 @@ class SampleTable extends AbstractTableGateway
             }
             $sQuery = $sQuery->group(array(new Expression('MONTH(sample_collection_date)')));
             $sQuery = $sQuery->order(array(new Expression('DATE(sample_collection_date)')));
-            $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
+            $sQueryStr = $sql->buildSqlString($sQuery);
             $barChartResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
 
             $j = 0;
@@ -3033,7 +3033,7 @@ class SampleTable extends AbstractTableGateway
             //     }else if(isset($params['isBreastfeeding']) && $params['isBreastfeeding']=='unreported'){
             //         $sQuery = $sQuery->where("(vl.is_patient_breastfeeding IS NULL OR vl.is_patient_breastfeeding = '' OR vl.is_patient_breastfeeding = 'Unreported')"); 
             //     }
-            //     $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
+            //     $sQueryStr = $sql->buildSqlString($sQuery);
             //     //echo $sQueryStr;die;
             //     $lessResult = $dbAdapter->query($sQueryStr." AND (vl.result < 1000 or vl.result = 'Target Not Detected' or vl.result = 'TND' or vl.result = 'tnd' or vl.result= 'Below Detection Level' or vl.result='BDL' or vl.result='bdl' or vl.result= 'Low Detection Level' or vl.result='LDL' or vl.result='ldl') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00'", $dbAdapter::QUERY_MODE_EXECUTE)->current();
             //     $result['rslt']['VL (< 1000 cp/ml)'][$j] = (isset($lessResult->samples))?$lessResult->samples:0;
@@ -3248,14 +3248,14 @@ class SampleTable extends AbstractTableGateway
             $sQuery->offset($sOffset);
         }
 
-        $sQueryStr = $sql->getSqlStringForSqlObject($sQuery); // Get the string of the Sql, instead of the Select-instance
+        $sQueryStr = $sql->buildSqlString($sQuery); // Get the string of the Sql, instead of the Select-instance
         //echo $sQueryStr;die;
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
 
         /* Data set length after filtering */
         $sQuery->reset('limit');
         $sQuery->reset('offset');
-        $fQuery = $sql->getSqlStringForSqlObject($sQuery);
+        $fQuery = $sql->buildSqlString($sQuery);
         $aResultFilterTotal = $dbAdapter->query($fQuery, $dbAdapter::QUERY_MODE_EXECUTE);
         $iFilteredTotal = count($aResultFilterTotal);
 
@@ -3276,7 +3276,7 @@ class SampleTable extends AbstractTableGateway
             $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : array(0);
             $iQuery = $iQuery->where('vl.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
         }
-        $iQueryStr = $sql->getSqlStringForSqlObject($iQuery);
+        $iQueryStr = $sql->buildSqlString($iQuery);
         $iResult = $dbAdapter->query($iQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $iTotal = count($iResult);
 
@@ -3510,14 +3510,14 @@ class SampleTable extends AbstractTableGateway
             $sQuery->offset($sOffset);
         }
 
-        $sQueryStr = $sql->getSqlStringForSqlObject($sQuery); // Get the string of the Sql, instead of the Select-instance
+        $sQueryStr = $sql->buildSqlString($sQuery); // Get the string of the Sql, instead of the Select-instance
         //echo $sQueryStr;die;
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
 
         /* Data set length after filtering */
         $sQuery->reset('limit');
         $sQuery->reset('offset');
-        $fQuery = $sql->getSqlStringForSqlObject($sQuery);
+        $fQuery = $sql->buildSqlString($sQuery);
         $aResultFilterTotal = $dbAdapter->query($fQuery, $dbAdapter::QUERY_MODE_EXECUTE);
         $iFilteredTotal = count($aResultFilterTotal);
 
@@ -3532,7 +3532,7 @@ class SampleTable extends AbstractTableGateway
             $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : array(0);
             $iQuery = $iQuery->where('vl.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
         }
-        $iQueryStr = $sql->getSqlStringForSqlObject($iQuery);
+        $iQueryStr = $sql->buildSqlString($iQuery);
         $iResult = $dbAdapter->query($iQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $iTotal = count($iResult);
 
@@ -3720,14 +3720,14 @@ class SampleTable extends AbstractTableGateway
         $sQuery = $sQuery->order(array(new Expression('DATE(sample_collection_date)')));
 
         $queryContainer->sampleResultTestedTATQuery = $sQuery;
-        $queryStr = $sql->getSqlStringForSqlObject($sQuery); // Get the string of the Sql, instead of the Select-instance
+        $queryStr = $sql->buildSqlString($sQuery); // Get the string of the Sql, instead of the Select-instance
         //echo $queryStr;die;
         $rResult = $common->cacheQuery($queryStr, $dbAdapter);
 
         /* Data set length after filtering */
         $sQuery->reset('limit');
         $sQuery->reset('offset');
-        $fQuery = $sql->getSqlStringForSqlObject($sQuery);
+        $fQuery = $sql->buildSqlString($sQuery);
         $aResultFilterTotal = $dbAdapter->query($fQuery, $dbAdapter::QUERY_MODE_EXECUTE);
         $iFilteredTotal = count($aResultFilterTotal);
 
@@ -3746,7 +3746,7 @@ class SampleTable extends AbstractTableGateway
         }
         $iQuery = $iQuery->group(array(new Expression('MONTH(sample_collection_date)')));
         $iQuery = $iQuery->order(array(new Expression('DATE(sample_collection_date)')));
-        $iQueryStr = $sql->getSqlStringForSqlObject($iQuery);
+        $iQueryStr = $sql->buildSqlString($iQuery);
         //error_log($iQueryStr);die;
         $iResult = $dbAdapter->query($iQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $iTotal = count($iResult);
@@ -3789,7 +3789,7 @@ class SampleTable extends AbstractTableGateway
         if (isset($params['provinces']) && trim($params['provinces']) != '') {
             $pQuery = $pQuery->where('l.location_id IN (' . $params['provinces'] . ')');
         }
-        $pQueryStr = $sql->getSqlStringForSqlObject($pQuery);
+        $pQueryStr = $sql->buildSqlString($pQuery);
         $pResult  = $dbAdapter->query($pQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         if (isset($pResult) && count($pResult) > 0) {
             $p = 0;
@@ -3878,7 +3878,7 @@ class SampleTable extends AbstractTableGateway
                 } else if (isset($params['isBreastfeeding']) && $params['isBreastfeeding'] == 'unreported') {
                     $countQuery = $countQuery->where("(vl.is_patient_breastfeeding IS NULL OR vl.is_patient_breastfeeding = '' OR vl.is_patient_breastfeeding = 'Unreported' OR vl.is_patient_breastfeeding = 'unreported')");
                 }
-                $countQueryStr = $sql->getSqlStringForSqlObject($countQuery);
+                $countQueryStr = $sql->buildSqlString($countQuery);
                 //echo $countQueryStr;die;
                 $countResult  = $dbAdapter->query($countQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
                 $result['province'][$p] = ($province['location_name'] != null && trim($province['location_name']) != '') ? ucwords($province['location_name']) : 'Not Specified';
@@ -3912,7 +3912,7 @@ class SampleTable extends AbstractTableGateway
                 $labQuery = $labQuery->where('f.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
             }
         }
-        $labQueryStr = $sql->getSqlStringForSqlObject($labQuery);
+        $labQueryStr = $sql->buildSqlString($labQuery);
         $labResult  = $dbAdapter->query($labQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         if (isset($labResult) && count($labResult) > 0) {
             $l = 0;
@@ -3996,7 +3996,7 @@ class SampleTable extends AbstractTableGateway
                 } else if (isset($params['isBreastfeeding']) && $params['isBreastfeeding'] == 'unreported') {
                     $countQuery = $countQuery->where("(vl.is_patient_breastfeeding IS NULL OR vl.is_patient_breastfeeding = '' OR vl.is_patient_breastfeeding = 'Unreported' OR vl.is_patient_breastfeeding = 'unreported')");
                 }
-                $countQueryStr = $sql->getSqlStringForSqlObject($countQuery);
+                $countQueryStr = $sql->buildSqlString($countQuery);
                 //echo $countQueryStr;die;
                 $countResult  = $dbAdapter->query($countQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
                 $result['lab'][$l] = ucwords($lab['facility_name']);
@@ -4027,7 +4027,7 @@ class SampleTable extends AbstractTableGateway
         if (isset($params['districts']) && trim($params['districts']) != '') {
             $dQuery = $dQuery->where('l.location_id IN (' . $params['districts'] . ')');
         }
-        $dQueryStr = $sql->getSqlStringForSqlObject($dQuery);
+        $dQueryStr = $sql->buildSqlString($dQuery);
         //echo $dQueryStr;die;
         $dResult  = $dbAdapter->query($dQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         if (isset($dResult) && count($dResult) > 0) {
@@ -4129,7 +4129,7 @@ class SampleTable extends AbstractTableGateway
                 } else if (isset($params['isBreastfeeding']) && $params['isBreastfeeding'] == 'unreported') {
                     $countQuery = $countQuery->where("(vl.is_patient_breastfeeding IS NULL OR vl.is_patient_breastfeeding = '' OR vl.is_patient_breastfeeding = 'Unreported' OR vl.is_patient_breastfeeding = 'unreported')");
                 }
-                $countQueryStr = $sql->getSqlStringForSqlObject($countQuery);
+                $countQueryStr = $sql->buildSqlString($countQuery);
                 $countResult  = $dbAdapter->query($countQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
                 $result['district'][$d] = ($district['location_name'] != null && trim($district['location_name']) != '') ? ucwords($district['location_name']) : 'Not Specified';
                 $result['sample']['Results Not Available'][$d] = (isset($countResult->total)) ? $countResult->total : 0;
@@ -4159,7 +4159,7 @@ class SampleTable extends AbstractTableGateway
         if (isset($params['clinicId']) && trim($params['clinicId']) != '') {
             $clinicQuery = $clinicQuery->where('f.facility_id IN (' . $params['clinicId'] . ')');
         }
-        $clinicQueryStr = $sql->getSqlStringForSqlObject($clinicQuery);
+        $clinicQueryStr = $sql->buildSqlString($clinicQuery);
         $clinicResult  = $dbAdapter->query($clinicQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         if (isset($clinicResult) && count($clinicResult) > 0) {
             $c = 0;
@@ -4269,7 +4269,7 @@ class SampleTable extends AbstractTableGateway
                 } else if (isset($params['isBreastfeeding']) && $params['isBreastfeeding'] == 'unreported') {
                     $countQuery = $countQuery->where("(vl.is_patient_breastfeeding IS NULL OR vl.is_patient_breastfeeding = '' OR vl.is_patient_breastfeeding = 'Unreported' OR vl.is_patient_breastfeeding = 'unreported')");
                 }
-                $countQueryStr = $sql->getSqlStringForSqlObject($countQuery);
+                $countQueryStr = $sql->buildSqlString($countQuery);
                 $countResult  = $dbAdapter->query($countQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
                 $result['clinic'][$c] = addslashes($clinic['facility_name']);
                 $result['sample']['Results Not Available'][$c] = (isset($countResult->total)) ? $countResult->total : 0;
@@ -4465,14 +4465,14 @@ class SampleTable extends AbstractTableGateway
         }
 
         $queryContainer->resultsAwaitedQuery = $sQuery;
-        $queryStr = $sql->getSqlStringForSqlObject($sQuery); // Get the string of the Sql, instead of the Select-instance
+        $queryStr = $sql->buildSqlString($sQuery); // Get the string of the Sql, instead of the Select-instance
         //echo $queryStr;die;
         $rResult = $common->cacheQuery($queryStr, $dbAdapter);
 
         /* Data set length after filtering */
         $sQuery->reset('limit');
         $sQuery->reset('offset');
-        $fQuery = $sql->getSqlStringForSqlObject($sQuery);
+        $fQuery = $sql->buildSqlString($sQuery);
         $aResultFilterTotal = $dbAdapter->query($fQuery, $dbAdapter::QUERY_MODE_EXECUTE);
         $iFilteredTotal = count($aResultFilterTotal);
 
@@ -4487,7 +4487,7 @@ class SampleTable extends AbstractTableGateway
             $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : array(0);
             $iQuery = $iQuery->where('vl.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
         }
-        $iQueryStr = $sql->getSqlStringForSqlObject($iQuery);
+        $iQueryStr = $sql->buildSqlString($iQuery);
         //error_log($iQueryStr);die;
         $iResult = $dbAdapter->query($iQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $iTotal = count($iResult);
@@ -4589,7 +4589,7 @@ class SampleTable extends AbstractTableGateway
 
         $queryContainer->sampleStatusResultQuery = $sQuery;
 
-        $sQueryStr = $sql->getSqlStringForSqlObject($sQuery); // Get the string of the Sql, instead of the Select-instance 
+        $sQueryStr = $sql->buildSqlString($sQuery); // Get the string of the Sql, instead of the Select-instance 
         //echo $sQueryStr;die;
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
 
@@ -4732,14 +4732,14 @@ class SampleTable extends AbstractTableGateway
             $sQuery->offset($sOffset);
         }
 
-        $sQueryStr = $sql->getSqlStringForSqlObject($sQuery); // Get the string of the Sql, instead of the Select-instance 
+        $sQueryStr = $sql->buildSqlString($sQuery); // Get the string of the Sql, instead of the Select-instance 
         //echo $sQueryStr;die;
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
 
         /* Data set length after filtering */
         $sQuery->reset('limit');
         $sQuery->reset('offset');
-        $fQuery = $sql->getSqlStringForSqlObject($sQuery);
+        $fQuery = $sql->buildSqlString($sQuery);
         $aResultFilterTotal = $dbAdapter->query($fQuery, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $iFilteredTotal = count($aResultFilterTotal);
 
@@ -4756,7 +4756,7 @@ class SampleTable extends AbstractTableGateway
             //->group('facility_id')
             //->having('COUNT(*) > 1');
             ->where('sample_code in (select sample_code from  ' . $this->table . '  group by sample_code,facility_id having count(*) > 1)');
-        $iQueryStr = $sql->getSqlStringForSqlObject($iQuery);
+        $iQueryStr = $sql->buildSqlString($iQuery);
         $iResult = $dbAdapter->query($iQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $iTotal = count($iResult);
 
@@ -4804,7 +4804,7 @@ class SampleTable extends AbstractTableGateway
             for ($r = 0; $r < count($duplicateSamples); $r++) {
                 $rQuery = $sql->select()->from(array('vl' => $this->table))
                     ->where(array('vl.vl_sample_id' => $duplicateSamples[$r]));
-                $rQueryStr = $sql->getSqlStringForSqlObject($rQuery);
+                $rQueryStr = $sql->buildSqlString($rQuery);
                 $rResult = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
                 if ($rResult) {
                     $data = array(
@@ -5048,7 +5048,7 @@ class SampleTable extends AbstractTableGateway
                                         AND DATE(sample_collection_date) >= '" . $startMonth . "' 
                                         AND DATE(sample_collection_date) <= '" . $endMonth . "'");
         }
-        $queryStr = $sql->getSqlStringForSqlObject($sQuery);
+        $queryStr = $sql->buildSqlString($sQuery);
         //echo $queryStr;die;
         //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $sampleResult = $common->cacheQuery($queryStr, $dbAdapter);
@@ -5193,14 +5193,14 @@ class SampleTable extends AbstractTableGateway
             $sQuery->offset($sOffset);
         }
 
-        $sQueryStr = $sql->getSqlStringForSqlObject($sQuery); // Get the string of the Sql, instead of the Select-instance 
+        $sQueryStr = $sql->buildSqlString($sQuery); // Get the string of the Sql, instead of the Select-instance 
         //echo $sQueryStr;die;
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
 
         /* Data set length after filtering */
         $sQuery->reset('limit');
         $sQuery->reset('offset');
-        $fQuery = $sql->getSqlStringForSqlObject($sQuery);
+        $fQuery = $sql->buildSqlString($sQuery);
         $aResultFilterTotal = $dbAdapter->query($fQuery, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $iFilteredTotal = count($aResultFilterTotal);
 
@@ -5225,7 +5225,7 @@ class SampleTable extends AbstractTableGateway
                         AND DATE(vl.sample_collection_date) >= '" . $startMonth . "' 
                         AND DATE(vl.sample_collection_date) <= '" . $endMonth . "'");
         }
-        $iQueryStr = $sql->getSqlStringForSqlObject($iQuery);
+        $iQueryStr = $sql->buildSqlString($iQuery);
         $iResult = $dbAdapter->query($iQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $iTotal = count($iResult);
 
@@ -5380,14 +5380,14 @@ class SampleTable extends AbstractTableGateway
             $sQuery->offset($sOffset);
         }
 
-        $sQueryStr = $sql->getSqlStringForSqlObject($sQuery); // Get the string of the Sql, instead of the Select-instance 
+        $sQueryStr = $sql->buildSqlString($sQuery); // Get the string of the Sql, instead of the Select-instance 
         //echo $sQueryStr;die;
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
 
         /* Data set length after filtering */
         $sQuery->reset('limit');
         $sQuery->reset('offset');
-        $fQuery = $sql->getSqlStringForSqlObject($sQuery);
+        $fQuery = $sql->buildSqlString($sQuery);
         $aResultFilterTotal = $dbAdapter->query($fQuery, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $iFilteredTotal = count($aResultFilterTotal);
 
@@ -5413,7 +5413,7 @@ class SampleTable extends AbstractTableGateway
                         AND DATE(vl.sample_collection_date) >= '" . $startMonth . "' 
                         AND DATE(vl.sample_collection_date) <= '" . $endMonth . "'");
         }
-        $iQueryStr = $sql->getSqlStringForSqlObject($iQuery);
+        $iQueryStr = $sql->buildSqlString($iQuery);
         $iResult = $dbAdapter->query($iQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $iTotal = count($iResult);
 
@@ -5570,14 +5570,14 @@ class SampleTable extends AbstractTableGateway
             $sQuery->offset($sOffset);
         }
 
-        $sQueryStr = $sql->getSqlStringForSqlObject($sQuery); // Get the string of the Sql, instead of the Select-instance 
+        $sQueryStr = $sql->buildSqlString($sQuery); // Get the string of the Sql, instead of the Select-instance 
         //echo $sQueryStr;die;
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
 
         /* Data set length after filtering */
         $sQuery->reset('limit');
         $sQuery->reset('offset');
-        $fQuery = $sql->getSqlStringForSqlObject($sQuery);
+        $fQuery = $sql->buildSqlString($sQuery);
         $aResultFilterTotal = $dbAdapter->query($fQuery, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $iFilteredTotal = count($aResultFilterTotal);
 
@@ -5601,7 +5601,7 @@ class SampleTable extends AbstractTableGateway
                         AND DATE(vl.sample_collection_date) <= '" . $endMonth . "'");
         }
 
-        $iQueryStr = $sql->getSqlStringForSqlObject($iQuery);
+        $iQueryStr = $sql->buildSqlString($iQuery);
 
 
 
@@ -5674,7 +5674,7 @@ class SampleTable extends AbstractTableGateway
                                         AND DATE(sample_collection_date) >= '" . $startMonth . "' 
                                         AND DATE(sample_collection_date) <= '" . $endMonth . "'");
         }
-        $queryStr = $sql->getSqlStringForSqlObject($sQuery);
+        $queryStr = $sql->buildSqlString($sQuery);
         //echo $queryStr;die;
         //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $sampleResult = $common->cacheQuery($queryStr, $dbAdapter);
@@ -5814,14 +5814,14 @@ class SampleTable extends AbstractTableGateway
             $sQuery->offset($sOffset);
         }
 
-        $sQueryStr = $sql->getSqlStringForSqlObject($sQuery); // Get the string of the Sql, instead of the Select-instance 
+        $sQueryStr = $sql->buildSqlString($sQuery); // Get the string of the Sql, instead of the Select-instance 
         //echo $sQueryStr;die;
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
 
         /* Data set length after filtering */
         $sQuery->reset('limit');
         $sQuery->reset('offset');
-        $fQuery = $sql->getSqlStringForSqlObject($sQuery);
+        $fQuery = $sql->buildSqlString($sQuery);
         $aResultFilterTotal = $dbAdapter->query($fQuery, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $iFilteredTotal = count($aResultFilterTotal);
 
@@ -5844,7 +5844,7 @@ class SampleTable extends AbstractTableGateway
                         AND DATE(vl.sample_collection_date) >= '" . $startMonth . "' 
                         AND DATE(vl.sample_collection_date) <= '" . $endMonth . "'");
         }
-        $iQueryStr = $sql->getSqlStringForSqlObject($iQuery);
+        $iQueryStr = $sql->buildSqlString($iQuery);
         $iResult = $dbAdapter->query($iQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $iTotal = count($iResult);
 
@@ -5991,14 +5991,14 @@ class SampleTable extends AbstractTableGateway
             $sQuery->offset($sOffset);
         }
 
-        $sQueryStr = $sql->getSqlStringForSqlObject($sQuery); // Get the string of the Sql, instead of the Select-instance 
+        $sQueryStr = $sql->buildSqlString($sQuery); // Get the string of the Sql, instead of the Select-instance 
         //echo $sQueryStr;die;
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
 
         /* Data set length after filtering */
         $sQuery->reset('limit');
         $sQuery->reset('offset');
-        $fQuery = $sql->getSqlStringForSqlObject($sQuery);
+        $fQuery = $sql->buildSqlString($sQuery);
         $aResultFilterTotal = $dbAdapter->query($fQuery, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $iFilteredTotal = count($aResultFilterTotal);
 
@@ -6021,7 +6021,7 @@ class SampleTable extends AbstractTableGateway
                         AND DATE(vl.sample_collection_date) >= '" . $startMonth . "' 
                         AND DATE(vl.sample_collection_date) <= '" . $endMonth . "'");
         }
-        $iQueryStr = $sql->getSqlStringForSqlObject($iQuery);
+        $iQueryStr = $sql->buildSqlString($iQuery);
         $iResult = $dbAdapter->query($iQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $iTotal = count($iResult);
 
@@ -6176,14 +6176,14 @@ class SampleTable extends AbstractTableGateway
             $sQuery->offset($sOffset);
         }
 
-        $sQueryStr = $sql->getSqlStringForSqlObject($sQuery); // Get the string of the Sql, instead of the Select-instance 
+        $sQueryStr = $sql->buildSqlString($sQuery); // Get the string of the Sql, instead of the Select-instance 
         //echo $sQueryStr;die;
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
 
         /* Data set length after filtering */
         $sQuery->reset('limit');
         $sQuery->reset('offset');
-        $fQuery = $sql->getSqlStringForSqlObject($sQuery);
+        $fQuery = $sql->buildSqlString($sQuery);
         $aResultFilterTotal = $dbAdapter->query($fQuery, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $iFilteredTotal = count($aResultFilterTotal);
 
@@ -6207,7 +6207,7 @@ class SampleTable extends AbstractTableGateway
                         AND DATE(vl.sample_collection_date) >= '" . $startMonth . "' 
                         AND DATE(vl.sample_collection_date) <= '" . $endMonth . "'");
         }
-        $iQueryStr = $sql->getSqlStringForSqlObject($iQuery);
+        $iQueryStr = $sql->buildSqlString($iQuery);
         $iResult = $dbAdapter->query($iQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $iTotal = count($iResult);
 
@@ -6264,7 +6264,7 @@ class SampleTable extends AbstractTableGateway
                                         AND DATE(sample_collection_date) >= '" . $startMonth . "' 
                                         AND DATE(sample_collection_date) <= '" . $endMonth . "'");
         }
-        $mostRejectionQueryStr = $sql->getSqlStringForSqlObject($mostRejectionQuery);
+        $mostRejectionQueryStr = $sql->buildSqlString($mostRejectionQuery);
         $mostRejectionResult = $dbAdapter->query($mostRejectionQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         if (isset($mostRejectionResult) && count($mostRejectionResult) > 0) {
             foreach ($mostRejectionResult as $rejectionReason) {
@@ -6313,7 +6313,7 @@ class SampleTable extends AbstractTableGateway
                 } else {
                     $rejectionQuery = $rejectionQuery->where('vl.reason_for_sample_rejection = "' . $mostRejectionReasons[$m] . '"');
                 }
-                $rejectionQueryStr = $sql->getSqlStringForSqlObject($rejectionQuery);
+                $rejectionQueryStr = $sql->buildSqlString($rejectionQuery);
                 $rejectionResult = $common->cacheQuery($rejectionQueryStr, $dbAdapter);
                 $rejectionReasonName = ($mostRejectionReasons[$m] == 0) ? 'Others' : ucwords($rejectionResult[0]['rejection_reason_name']);
                 $result['rejection'][$rejectionReasonName][$j] = (isset($rejectionResult[0]['rejections'])) ? $rejectionResult[0]['rejections'] : 0;
@@ -6442,14 +6442,14 @@ class SampleTable extends AbstractTableGateway
             $sQuery->offset($sOffset);
         }
 
-        $sQueryStr = $sql->getSqlStringForSqlObject($sQuery); // Get the string of the Sql, instead of the Select-instance 
+        $sQueryStr = $sql->buildSqlString($sQuery); // Get the string of the Sql, instead of the Select-instance 
         //echo $sQueryStr;die;
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
 
         /* Data set length after filtering */
         $sQuery->reset('limit');
         $sQuery->reset('offset');
-        $fQuery = $sql->getSqlStringForSqlObject($sQuery);
+        $fQuery = $sql->buildSqlString($sQuery);
         $aResultFilterTotal = $dbAdapter->query($fQuery, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $iFilteredTotal = count($aResultFilterTotal);
 
@@ -6472,7 +6472,7 @@ class SampleTable extends AbstractTableGateway
                         AND DATE(vl.sample_collection_date) >= '" . $startMonth . "' 
                         AND DATE(vl.sample_collection_date) <= '" . $endMonth . "'");
         }
-        $iQueryStr = $sql->getSqlStringForSqlObject($iQuery);
+        $iQueryStr = $sql->buildSqlString($iQuery);
         $iResult = $dbAdapter->query($iQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $iTotal = count($iResult);
 
@@ -6610,14 +6610,14 @@ class SampleTable extends AbstractTableGateway
             $sQuery->offset($sOffset);
         }
 
-        $sQueryStr = $sql->getSqlStringForSqlObject($sQuery); // Get the string of the Sql, instead of the Select-instance 
+        $sQueryStr = $sql->buildSqlString($sQuery); // Get the string of the Sql, instead of the Select-instance 
         //echo $sQueryStr;die;
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
 
         /* Data set length after filtering */
         $sQuery->reset('limit');
         $sQuery->reset('offset');
-        $fQuery = $sql->getSqlStringForSqlObject($sQuery);
+        $fQuery = $sql->buildSqlString($sQuery);
         $aResultFilterTotal = $dbAdapter->query($fQuery, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $iFilteredTotal = count($aResultFilterTotal);
 
@@ -6640,7 +6640,7 @@ class SampleTable extends AbstractTableGateway
                         AND DATE(vl.sample_collection_date) >= '" . $startMonth . "' 
                         AND DATE(vl.sample_collection_date) <= '" . $endMonth . "'");
         }
-        $iQueryStr = $sql->getSqlStringForSqlObject($iQuery);
+        $iQueryStr = $sql->buildSqlString($iQuery);
         $iResult = $dbAdapter->query($iQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $iTotal = count($iResult);
 
@@ -6780,14 +6780,14 @@ class SampleTable extends AbstractTableGateway
             $sQuery->offset($sOffset);
         }
 
-        $sQueryStr = $sql->getSqlStringForSqlObject($sQuery); // Get the string of the Sql, instead of the Select-instance 
+        $sQueryStr = $sql->buildSqlString($sQuery); // Get the string of the Sql, instead of the Select-instance 
         //echo $sQueryStr;die;
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
 
         /* Data set length after filtering */
         $sQuery->reset('limit');
         $sQuery->reset('offset');
-        $fQuery = $sql->getSqlStringForSqlObject($sQuery);
+        $fQuery = $sql->buildSqlString($sQuery);
         $aResultFilterTotal = $dbAdapter->query($fQuery, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $iFilteredTotal = count($aResultFilterTotal);
 
@@ -6811,7 +6811,7 @@ class SampleTable extends AbstractTableGateway
                         AND DATE(vl.sample_collection_date) >= '" . $startMonth . "' 
                         AND DATE(vl.sample_collection_date) <= '" . $endMonth . "'");
         }
-        $iQueryStr = $sql->getSqlStringForSqlObject($iQuery);
+        $iQueryStr = $sql->buildSqlString($iQuery);
         $iResult = $dbAdapter->query($iQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $iTotal = count($iResult);
 
@@ -6896,7 +6896,7 @@ class SampleTable extends AbstractTableGateway
         if (isset($params['clinics']) && trim($params['clinics']) != '') {
             $sQuery = $sQuery->where('vl.facility_id IN (' . $params['clinics'] . ')');
         }
-        $queryStr = $sql->getSqlStringForSqlObject($sQuery);
+        $queryStr = $sql->buildSqlString($sQuery);
         //echo $queryStr;die;
         //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $sampleResult = $common->cacheQuery($queryStr, $dbAdapter);
@@ -7059,14 +7059,14 @@ class SampleTable extends AbstractTableGateway
             $sQuery->offset($sOffset);
         }
 
-        $sQueryStr = $sql->getSqlStringForSqlObject($sQuery); // Get the string of the Sql, instead of the Select-instance 
+        $sQueryStr = $sql->buildSqlString($sQuery); // Get the string of the Sql, instead of the Select-instance 
         //echo $sQueryStr;die;
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
 
         /* Data set length after filtering */
         $sQuery->reset('limit');
         $sQuery->reset('offset');
-        $fQuery = $sql->getSqlStringForSqlObject($sQuery);
+        $fQuery = $sql->buildSqlString($sQuery);
         $aResultFilterTotal = $dbAdapter->query($fQuery, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $iFilteredTotal = count($aResultFilterTotal);
 
@@ -7090,7 +7090,7 @@ class SampleTable extends AbstractTableGateway
                         AND DATE(vl.sample_collection_date) >= '" . $startMonth . "' 
                         AND DATE(vl.sample_collection_date) <= '" . $endMonth . "'");
         }
-        $iQueryStr = $sql->getSqlStringForSqlObject($iQuery);
+        $iQueryStr = $sql->buildSqlString($iQuery);
         $iResult = $dbAdapter->query($iQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $iTotal = count($iResult);
 
@@ -7138,7 +7138,7 @@ class SampleTable extends AbstractTableGateway
                                         AND DATE(vl.sample_collection_date) >= '" . $startMonth . "' 
                                         AND DATE(vl.sample_collection_date) <= '" . $endMonth . "'");
         }
-        $queryStr = $sql->getSqlStringForSqlObject($sQuery);
+        $queryStr = $sql->buildSqlString($sQuery);
         //echo $queryStr;die;
         //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         return $common->cacheQuery($queryStr, $dbAdapter);
@@ -7165,7 +7165,7 @@ class SampleTable extends AbstractTableGateway
                                         AND DATE(vl.sample_collection_date) >= '" . $startMonth . "' 
                                         AND DATE(vl.sample_collection_date) <= '" . $endMonth . "'");
         }
-        $queryStr = $sql->getSqlStringForSqlObject($sQuery);
+        $queryStr = $sql->buildSqlString($sQuery);
         //lineofTreatmentResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $adult1stLineofTreatmentResult = $common->cacheQuery($queryStr . " AND line_of_treatment = 1 AND (patient_age_in_years IS NOT NULL AND patient_age_in_years!= '' AND patient_age_in_years >= 18) group by current_regimen order by validResults desc limit 9", $dbAdapter);
         $adult1stLineofTreatmentOthersResult = $common->cacheQuery($queryStr . " AND line_of_treatment = 1 AND (patient_age_in_years IS NOT NULL AND patient_age_in_years!= '' AND patient_age_in_years >= 18) group by current_regimen order by validResults desc limit 10,18446744073709551615", $dbAdapter);
@@ -7227,7 +7227,7 @@ class SampleTable extends AbstractTableGateway
         }
 
         $queryContainer->indicatorSummaryQuery = $samplesReceivedSummaryQuery;
-        $samplesReceivedSummaryCacheQuery = $sql->getSqlStringForSqlObject($samplesReceivedSummaryQuery);
+        $samplesReceivedSummaryCacheQuery = $sql->buildSqlString($samplesReceivedSummaryQuery);
         $samplesReceivedSummaryResult = $common->cacheQuery($samplesReceivedSummaryCacheQuery, $dbAdapter);
         //var_dump($samplesReceivedSummaryResult);die;
         $j = 0;
@@ -7342,7 +7342,7 @@ class SampleTable extends AbstractTableGateway
             } else if (isset($params['isBreastfeeding']) && $params['isBreastfeeding'] == 'unreported') {
                 $rQuery = $rQuery->where("(vl.is_patient_breastfeeding IS NULL OR vl.is_patient_breastfeeding = '' OR vl.is_patient_breastfeeding = 'Unreported')");
             }
-            $rQueryStr = $sql->getSqlStringForSqlObject($rQuery);
+            $rQueryStr = $sql->buildSqlString($rQuery);
             //$qResult = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             $qResult = $common->cacheQuery($rQueryStr, $dbAdapter);
             $rResult['total']['Age < 2'][0] = (isset($qResult[0]['AgeLt2'])) ? (int) $qResult[0]['AgeLt2'] : 0;
@@ -7449,7 +7449,7 @@ class SampleTable extends AbstractTableGateway
             } else if (isset($params['isBreastfeeding']) && $params['isBreastfeeding'] == 'unreported') {
                 $rQuery = $rQuery->where("(vl.is_patient_breastfeeding IS NULL OR vl.is_patient_breastfeeding = '' OR vl.is_patient_breastfeeding = 'Unreported')");
             }
-            $rQueryStr = $sql->getSqlStringForSqlObject($rQuery);
+            $rQueryStr = $sql->buildSqlString($rQuery);
             //$qResult = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             $qResult = $common->cacheQuery($rQueryStr, $dbAdapter);
             $rResult['total']['Male'][0] = (isset($qResult[0]['mTotal'])) ? (int) $qResult[0]['mTotal'] : 0;
@@ -7488,7 +7488,7 @@ class SampleTable extends AbstractTableGateway
                     $clinicQuery = $clinicQuery->where('vl.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
                 }
             }
-            $clinicQueryStr = $sql->getSqlStringForSqlObject($clinicQuery);
+            $clinicQueryStr = $sql->buildSqlString($clinicQuery);
             $clinicResult  = $dbAdapter->query($clinicQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             if (isset($clinicResult) && count($clinicResult) > 0) {
                 $c = 0;
@@ -7559,7 +7559,7 @@ class SampleTable extends AbstractTableGateway
                     } else if (isset($params['isBreastfeeding']) && $params['isBreastfeeding'] == 'unreported') {
                         $rQuery = $rQuery->where("(vl.is_patient_breastfeeding IS NULL OR vl.is_patient_breastfeeding = '' OR vl.is_patient_breastfeeding = 'Unreported')");
                     }
-                    $rQueryStr = $sql->getSqlStringForSqlObject($rQuery);
+                    $rQueryStr = $sql->buildSqlString($rQuery);
                     $rResult  = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
                     $result['clinic'][$c] = addslashes($clinic['facility_name']);
                     $result['sample']['total'][$c] = (isset($rResult->total)) ? $rResult->total : 0;
@@ -7624,7 +7624,7 @@ class SampleTable extends AbstractTableGateway
                 $squery = $squery->where('vl.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
             }
         }
-        $sQueryStr = $sql->getSqlStringForSqlObject($squery);
+        $sQueryStr = $sql->buildSqlString($squery);
         $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         return $sResult;
     }
@@ -7674,7 +7674,7 @@ class SampleTable extends AbstractTableGateway
                 $squery = $squery->where('vl.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
             }
         }
-        $sQueryStr = $sql->getSqlStringForSqlObject($squery);
+        $sQueryStr = $sql->buildSqlString($squery);
         $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         return $sResult;
     }
@@ -7724,7 +7724,7 @@ class SampleTable extends AbstractTableGateway
                 $squery = $squery->where('vl.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
             }
         }
-        $sQueryStr = $sql->getSqlStringForSqlObject($squery);
+        $sQueryStr = $sql->buildSqlString($squery);
         $sResult   = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         return $sResult;
     }
@@ -7746,7 +7746,7 @@ class SampleTable extends AbstractTableGateway
         $uQuery = $sql->select()->from(array('vl' => 'dash_users'))
             ->where(array('api_token' => $params['token'], 'role' => 6));
 
-        $uQueryStr = $sql->getSqlStringForSqlObject($uQuery);
+        $uQueryStr = $sql->buildSqlString($uQuery);
         $uResult = $dbAdapter->query($uQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
         if (isset($uResult['user_id'])) {
             $sQuery = $sql->select()->from(array('vl' => $this->table))->columns(array('sample_code', 'sample_collection_date', 'sample_tested_datetime', 'result', 'patient_art_no'))
@@ -7763,7 +7763,7 @@ class SampleTable extends AbstractTableGateway
                 $sQuery = $sQuery->order('vl_sample_id DESC')
                     ->limit(1);
             }
-            $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
+            $sQueryStr = $sql->buildSqlString($sQuery);
             $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             if (count($rResult) > 0) {
                 $result['status'] = '200';

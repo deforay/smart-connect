@@ -35,7 +35,7 @@ class GlobalTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->from('dash_global_config')->where(array('name' => $globalName));
-        $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
+        $sQueryStr = $sql->buildSqlString($sQuery);
         $configValues = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         return $configValues[0]['value'];
     }
@@ -132,14 +132,14 @@ class GlobalTable extends AbstractTableGateway
             $sQuery->offset($sOffset);
         }
 
-        $sQueryStr = $sql->getSqlStringForSqlObject($sQuery); // Get the string of the Sql, instead of the Select-instance 
+        $sQueryStr = $sql->buildSqlString($sQuery); // Get the string of the Sql, instead of the Select-instance 
         //echo $sQueryStr;die;
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
 
         /* Data set length after filtering */
         $sQuery->reset('limit');
         $sQuery->reset('offset');
-        $fQuery = $sql->getSqlStringForSqlObject($sQuery);
+        $fQuery = $sql->buildSqlString($sQuery);
         $aResultFilterTotal = $dbAdapter->query($fQuery, $dbAdapter::QUERY_MODE_EXECUTE);
         $iFilteredTotal = count($aResultFilterTotal);
 
@@ -170,7 +170,7 @@ class GlobalTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->from('dash_global_config');
-        $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
+        $sQueryStr = $sql->buildSqlString($sQuery);
         $configValues = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $size = sizeof($configValues);
         $arr = array();
@@ -219,7 +219,7 @@ class GlobalTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $localeQuery = $sql->select()->from(array('locale' => 'locale_details'));
-        $loclaeQueryStr = $sql->getSqlStringForSqlObject($localeQuery);
+        $loclaeQueryStr = $sql->buildSqlString($localeQuery);
         return $dbAdapter->query($loclaeQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
     }
 
@@ -230,7 +230,7 @@ class GlobalTable extends AbstractTableGateway
         $localeQuery = $sql->select()->from(array('locale' => 'locale_details'))
             ->columns(array($column))
             ->where(array('locale.locale_id' => $localeId));
-        $loclaeQueryStr = $sql->getSqlStringForSqlObject($localeQuery);
+        $loclaeQueryStr = $sql->buildSqlString($localeQuery);
         $localeResult = $dbAdapter->query($loclaeQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
         return $localeResult->$column;
     }

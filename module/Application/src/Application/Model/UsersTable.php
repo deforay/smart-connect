@@ -51,7 +51,7 @@ class UsersTable extends AbstractTableGateway
             $sQuery = $sQuery->where(array('otp' => $otp));
         }
 
-        $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
+        $sQueryStr = $sql->buildSqlString($sQuery);
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $container = new Container('alert');
         $logincontainer = new Container('credo');
@@ -64,7 +64,7 @@ class UsersTable extends AbstractTableGateway
             $mapQuery = $sql->select()->from(array('u_f_map' => 'dash_user_facility_map'))
                 ->join(array('f' => 'facility_details'), 'f.facility_id=u_f_map.facility_id', array('facility_name', 'facility_code', 'facility_state', 'facility_district'))
                 ->where(array('u_f_map.user_id' => $rResult[0]["user_id"]));
-            $mapQueryStr = $sql->getSqlStringForSqlObject($mapQuery);
+            $mapQueryStr = $sql->buildSqlString($mapQuery);
             $mapResult = $dbAdapter->query($mapQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             if (isset($mapResult) && count($mapResult) > 0) {
                 foreach ($mapResult as $facilities) {
@@ -157,7 +157,7 @@ class UsersTable extends AbstractTableGateway
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->from(array('u' => 'dash_users'))
             ->join(array('r' => 'dash_user_roles'), 'u.role=r.role_id');
-        $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
+        $sQueryStr = $sql->buildSqlString($sQuery);
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         return $rResult;
     }
@@ -198,13 +198,13 @@ class UsersTable extends AbstractTableGateway
         $sQuery = $sql->select()->from(array('u' => 'dash_users'))
             ->join(array('r' => 'dash_user_roles'), 'u.role=r.role_id')
             ->where("user_id= $userId");
-        $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
+        $sQueryStr = $sql->buildSqlString($sQuery);
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
         if ($rResult) {
             $userFacilityMapQuery = $sql->select()->from(array('u_f_map' => 'dash_user_facility_map'))
                 ->columns(array('facility_id'))
                 ->where("u_f_map.user_id= $userId");
-            $userFacilityMapStr = $sql->getSqlStringForSqlObject($userFacilityMapQuery);
+            $userFacilityMapStr = $sql->buildSqlString($userFacilityMapQuery);
             $rResult['facilities'] = $dbAdapter->query($userFacilityMapStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             return $rResult;
         } else {
@@ -222,7 +222,7 @@ class UsersTable extends AbstractTableGateway
         if (trim($params['userId']) != "") {
             $mapQuery = $sql->select()->from(array('u_f_map' => 'dash_user_facility_map'))
                 ->where(array('u_f_map.user_id' => $userId));
-            $mapQueryStr = $sql->getSqlStringForSqlObject($mapQuery);
+            $mapQueryStr = $sql->buildSqlString($mapQuery);
             $mapResult = $dbAdapter->query($mapQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             if (isset($mapResult) && count($mapResult) > 0) {
                 $userFacilityMapDb->delete(array('user_id' => $userId));
@@ -348,14 +348,14 @@ class UsersTable extends AbstractTableGateway
             $sQuery->offset($sOffset);
         }
 
-        $sQueryStr = $sql->getSqlStringForSqlObject($sQuery); // Get the string of the Sql, instead of the Select-instance 
+        $sQueryStr = $sql->buildSqlString($sQuery); // Get the string of the Sql, instead of the Select-instance 
         //echo $sQueryStr;die;
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
 
         /* Data set length after filtering */
         $sQuery->reset('limit');
         $sQuery->reset('offset');
-        $fQuery = $sql->getSqlStringForSqlObject($sQuery);
+        $fQuery = $sql->buildSqlString($sQuery);
         $aResultFilterTotal = $dbAdapter->query($fQuery, $dbAdapter::QUERY_MODE_EXECUTE);
         $iFilteredTotal = count($aResultFilterTotal);
 
@@ -393,7 +393,7 @@ class UsersTable extends AbstractTableGateway
             $sQuery = $sql->select()->from(array('u' => 'dash_users'))
                 ->join(array('r' => 'dash_user_roles'), 'u.role=r.role_id', array('role_code'))
                 ->where(array('email' => $username, 'password' => $password, 'u.status' => 'active', 'role' => '6'));
-            $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
+            $sQueryStr = $sql->buildSqlString($sQuery);
             $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
             if ($rResult != "") {
                 if (trim($rResult['api_token']) == '') {
@@ -404,7 +404,7 @@ class UsersTable extends AbstractTableGateway
                 $query = $sql->select()->from(array('u' => 'dash_users'))
                     ->columns(array('api_token'))
                     ->where(array('user_id' => $rResult['user_id']));
-                $queryStr = $sql->getSqlStringForSqlObject($query);
+                $queryStr = $sql->buildSqlString($query);
                 $dResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
                 if ($dResult != "") {
                     $response['status'] = '200';
@@ -434,7 +434,7 @@ class UsersTable extends AbstractTableGateway
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->from(array('u' => 'dash_users'))
             ->where(array('api_token' => $token));
-        $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
+        $sQueryStr = $sql->buildSqlString($sQuery);
         $result = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
         if ($result != "") {
             $this->generateApiToken();

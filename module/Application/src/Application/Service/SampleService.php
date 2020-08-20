@@ -290,7 +290,7 @@ class SampleService
         $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->from($dashTable)->where(array('sample_code LIKE "%'.$sampleCode.'%"','vlsm_instance_id' => $instanceCode));
-        $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
+        $sQueryStr = $sql->buildSqlString($sQuery);
         $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
         return $sResult;
     }
@@ -301,7 +301,7 @@ class SampleService
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->from(array('l' => 'location_details'))
             ->where(array('l.parent_location' => $parent, 'l.location_name' => trim($location)));
-        $sQuery = $sql->getSqlStringForSqlObject($sQuery);
+        $sQuery = $sql->buildSqlString($sQuery);
         $sQueryResult = $dbAdapter->query($sQuery, $dbAdapter::QUERY_MODE_EXECUTE)->current();
         return $sQueryResult;
     }
@@ -311,7 +311,7 @@ class SampleService
         $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
         $sql = new Sql($dbAdapter);
         $fQuery = $sql->select()->from('facility_details')->where(array('facility_name' => $clinicName));
-        $fQueryStr = $sql->getSqlStringForSqlObject($fQuery);
+        $fQueryStr = $sql->buildSqlString($fQuery);
         $fResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
         return $fResult;
     }
@@ -320,7 +320,7 @@ class SampleService
         $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
         $sql = new Sql($dbAdapter);
         $fQuery = $sql->select()->from('facility_type')->where(array('facility_type_name' => $facilityTypeName));
-        $fQueryStr = $sql->getSqlStringForSqlObject($fQuery);
+        $fQueryStr = $sql->buildSqlString($fQuery);
         $fResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
         return $fResult;
     }
@@ -329,7 +329,7 @@ class SampleService
         $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
         $sql = new Sql($dbAdapter);
         $tQuery = $sql->select()->from('r_vl_test_reasons')->where(array('test_reason_name' => $testingReson));
-        $tQueryStr = $sql->getSqlStringForSqlObject($tQuery);
+        $tQueryStr = $sql->buildSqlString($tQuery);
         $tResult = $dbAdapter->query($tQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
         return $tResult;
     }
@@ -338,7 +338,7 @@ class SampleService
         $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->from('r_sample_status')->where(array('status_name' => $testingStatus));
-        $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
+        $sQueryStr = $sql->buildSqlString($sQuery);
         $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
         return $sResult;
     }
@@ -347,7 +347,7 @@ class SampleService
         $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->from('r_vl_sample_type')->where(array('sample_name' => $sampleType));
-        $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
+        $sQueryStr = $sql->buildSqlString($sQuery);
         $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
         return $sResult;
     }
@@ -356,7 +356,7 @@ class SampleService
         $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->from('r_sample_rejection_reasons')->where(array('rejection_reason_name' => $rejectReasonName));
-        $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
+        $sQueryStr = $sql->buildSqlString($sQuery);
         $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
         return $sResult;
     }
@@ -649,7 +649,7 @@ class SampleService
             ->join(array('r_r_r' => 'r_sample_rejection_reasons'), 'r_r_r.rejection_reason_id=vl.reason_for_sample_rejection', array('rejection_reason_name'), 'left')
             ->join(array('rej_f' => 'facility_details'), 'rej_f.facility_id=vl.sample_rejection_facility', array('rejectionFacilityName' => 'facility_name'), 'left')
             ->where(array('vl.vl_sample_id' => $params['id']));
-        $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
+        $sQueryStr = $sql->buildSqlString($sQuery);
         return $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
     }
 
@@ -662,7 +662,7 @@ class SampleService
             try {
                 $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
                 $sql = new Sql($dbAdapter);
-                $sQueryStr = $sql->getSqlStringForSqlObject($queryContainer->resultQuery);
+                $sQueryStr = $sql->buildSqlString($queryContainer->resultQuery);
                 $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
                 if (isset($sResult) && count($sResult) > 0) {
                     $excel = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
@@ -804,7 +804,7 @@ class SampleService
             try {
                 $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
                 $sql = new Sql($dbAdapter);
-                $hQueryStr = $sql->getSqlStringForSqlObject($queryContainer->highVlSampleQuery);
+                $hQueryStr = $sql->buildSqlString($queryContainer->highVlSampleQuery);
                 //error_log($hQueryStr);die;
                 $sResult = $dbAdapter->query($hQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
                 if (isset($sResult) && count($sResult) > 0) {
@@ -988,7 +988,7 @@ class SampleService
                 try {
                     $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
                     $sql = new Sql($dbAdapter);
-                    $sQueryStr = $sql->getSqlStringForSqlObject($queryContainer->sampleResultQuery);
+                    $sQueryStr = $sql->buildSqlString($queryContainer->sampleResultQuery);
                     $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
                     if (isset($sResult) && count($sResult) > 0) {
                         $excel = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
@@ -1102,7 +1102,7 @@ class SampleService
             try {
                 $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
                 $sql = new Sql($dbAdapter);
-                $sQueryStr = $sql->getSqlStringForSqlObject($queryContainer->labTestedSampleQuery);
+                $sQueryStr = $sql->buildSqlString($queryContainer->labTestedSampleQuery);
                 $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
                 if (isset($sResult) && count($sResult) > 0) {
                     $excel = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
@@ -1222,7 +1222,7 @@ class SampleService
             try {
                 $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
                 $sql = new Sql($dbAdapter);
-                $sQueryStr = $sql->getSqlStringForSqlObject($queryContainer->sampleResultTestedTATQuery);
+                $sQueryStr = $sql->buildSqlString($queryContainer->sampleResultTestedTATQuery);
                 $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
                 if (isset($sResult) && count($sResult) > 0) {
                     $excel = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
@@ -1366,7 +1366,7 @@ class SampleService
             try {
                 $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
                 $sql = new Sql($dbAdapter);
-                $sQueryStr = $sql->getSqlStringForSqlObject($queryContainer->resultsAwaitedQuery);
+                $sQueryStr = $sql->buildSqlString($queryContainer->resultsAwaitedQuery);
                 $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
                 if (isset($sResult) && count($sResult) > 0) {
                     $excel = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
@@ -1930,7 +1930,7 @@ class SampleService
     //         try{
     //             $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
     //             $sql = new Sql($dbAdapter);
-    //             $sQueryStr = $sql->getSqlStringForSqlObject($queryContainer->sampleStatusResultQuery);
+    //             $sQueryStr = $sql->buildSqlString($queryContainer->sampleStatusResultQuery);
 
     //             $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
     //             if(isset($sResult) && count($sResult)>0){
@@ -2582,7 +2582,7 @@ class SampleService
         if(isset($instanceCode) && $instanceCode != ""){
             $sQuery = $sQuery->where(array('vlsm_instance_id' => $instanceCode));
         }
-        $sQueryStr = $sql->getSqlStringForSqlObject($sQuery);
+        $sQueryStr = $sql->buildSqlString($sQuery);
         $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
         return $sResult;
     }
@@ -2592,7 +2592,7 @@ class SampleService
         $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
         $sql = new Sql($dbAdapter);
         $fQuery = $sql->select()->from('facility_details')->where(array('facility_name' => $clinicName, 'facility_type' => 2));
-        $fQueryStr = $sql->getSqlStringForSqlObject($fQuery);
+        $fQueryStr = $sql->buildSqlString($fQuery);
         $fResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
         return $fResult;
     }
