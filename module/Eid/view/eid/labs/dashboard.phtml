@@ -251,11 +251,11 @@ foreach ($sampleType as $samples) {
         <div class="col-lg-6" id="districtHeight">
             <select name="districtName[]" id="districtName" class="form-control" multiple title="<?php echo $this->translate('Please select one or more district. Leave blank for All'); ?>" onchange="selectLabName();">
                 <!-- <?php
-                foreach ($districtName as $district) {
-                ?>
+                        foreach ($districtName as $district) {
+                        ?>
                     <option data-parent-location="<?php echo $district['parent_location']; ?>" value="<?php echo $district['location_id']; ?>"><?php echo $district['location_name']; ?></option>
                 <?php
-                }
+                        }
                 ?>
                 <option value="0">Empty</option> -->
             </select>
@@ -265,26 +265,17 @@ foreach ($sampleType as $samples) {
         <div class="col-lg-6" id="labHeight">
             <select name="labName[]" id="labName" class="form-control" multiple title="<?php echo $this->translate('Please select one or more labs. Leave blank for All'); ?>">
                 <!-- <?php
-                foreach ($labName as $lab) {
-                ?>
+                        foreach ($labName as $lab) {
+                        ?>
                     <option data-name="<?php echo $lab['facility_name']; ?>" data-district="<?php echo $lab['facility_district']; ?>" value="<?php echo $lab['facility_id']; ?>"><?php echo $lab['facility_code'] . " - " . $lab['facility_name']; ?></option>
                 <?php
-                }
+                        }
                 ?> -->
 
             </select>
         </div>
         <div class="col-lg-3" style="display: flex;">
-            <!-- <div id="sla-date-range" class="mrp-container form-control">
-                <span class="mrp-icon"><i class="fa fa-calendar"></i> &nbsp;</span>
-                <div class="mrp-monthdisplay ">
-                    <span class="mrp-lowerMonth"><?php echo date("M Y", strtotime('+1 month', strtotime('-1 year'))); ?></span>
-                    <span class="mrp-to"> to </span>
-                    <span class="mrp-upperMonth"><?php echo date('M Y'); ?></span>
-                </div>
-                <input type="hidden" value="<?php echo $startDate; ?>" id="mrp-lowerDate" onchange="" />
-                <input type="hidden" value="<?php echo $endDate; ?>" id="mrp-upperDate" />
-            </div> -->
+
             <div class="input-append date" id="dpMonthsStart" data-date-format="M/yyyy" data-date-viewmode="years" data-date-minviewmode="months">
                 <input type="text" class="form-control isRequired readonly" id="mrp-lowerDate" name="mrp-lowerDate" placeholder="Select month & year" title="Please select month and year" readonly="readonly" value="<?php echo date('M-Y', strtotime($startDate)); ?>" />
                 <span class="add-on" style="display:none;"><i class="icon-calendar"></i></span>
@@ -313,8 +304,7 @@ foreach ($sampleType as $samples) {
                 <div class="caption">
                     <span class="caption-subject"><?php echo $this->translate('Tests with valid outcomes'); ?></span>
                 </div>
-                <div class="actions">
-                    <!-- <a class="btn btn-danger" onclick="expandChart('stb');"><span><i class="fa fa-angle-double-right" aria-hidden="true"></i> <?php echo $this->translate('Expand'); ?></span></a> -->
+                <!-- <div class="actions">
                     <div class="btn-group">
                         <select id="sampleType" class="btn white btn-outline btn-circle btn-sm dropdown-toggle" onchange="getMonthlySampleCount()">
                             <option value=""><?php echo $this->translate('All Sample Types'); ?></option>
@@ -322,7 +312,7 @@ foreach ($sampleType as $samples) {
                         </select>
 
                     </div>
-                </div>
+                </div> -->
             </div>
             <div class="portlet-body" style="cursor:pointer;">
                 <div id="monthlyCounts"></div>
@@ -336,43 +326,22 @@ foreach ($sampleType as $samples) {
                 <div class="caption">
                     <span class="caption-subject"><?php echo $this->translate('Samples Tested per Lab'); ?></span>
                 </div>
-                <div class="actions">
+                <!-- <div class="actions">
                     <div class="btn-group">
                         <select id="sampleTypeVolume" class="btn white btn-outline btn-circle btn-sm dropdown-toggle" onchange="getSamplesTestedByLab();">
                             <option value=""><?php echo $this->translate('All Sample Types'); ?></option>
                             <?php echo $sType; ?>
                         </select>
                     </div>
-                </div>
+                </div> -->
             </div>
             <div class="portlet-body" style="cursor:pointer;">
-                <div id="samplesTestedLabResult"></div>
+                <div id="monthlyCountsByLab"></div>
             </div>
         </div>
     </div>
 </div>
 <div class="row">
-    <div class="col-md-12 col-sm-12 col-lg-12">
-        <div class="portlet box blue">
-            <div class="portlet-title">
-                <div class="caption">
-                    <span class="caption-subject"><?php echo $this->translate('Samples Tested based on Gender'); ?> </span>
-                </div>
-                <div class="actions">
-                    <div class="btn-group">
-                        <!--<select id="sampleTypeGender" class="btn white btn-outline btn-circle btn-sm dropdown-toggle" onchange="getTestedSampleResultBasedGender()">-->
-                        <!--    <option value="">< ?php echo $this->translate('All Sample Types'); ?></option>-->
-                        <!--    < ?php echo $sType;?>-->
-                        <!--</select>-->
-                    </div>
-                </div>
-            </div>
-            <div class="portlet-body">
-                <div id="samplesTestedResultGender" style="height:450px;"></div>
-            </div>
-        </div>
-    </div>
-
     <div class="col-md-12 col-sm-12 col-lg-12">
         <div class="portlet box blue">
             <div class="portlet-title">
@@ -388,91 +357,6 @@ foreach ($sampleType as $samples) {
 </div>
 
 
-
-
-
-
-
-<div class="row">
-    <div class="col-md-12 col-sm-12">
-        <div class="portlet box">
-            <div class="portlet-body">
-                <div class="portlet box blue">
-                    <div class="portlet-title">
-                        <div class="caption">
-                            <i class="fa fa-cogs"></i><?php echo $this->translate('Sample Overview'); ?>
-                        </div>
-
-
-                    </div>
-                    <div class="portlet-body">
-
-                        <div class="form-inline" style="clear:both !important;width:100% !important;">
-
-                            <select id="quarter" class="form-control" style="width:100px;">
-                                <option value="">Quarter</option>
-                                <option value="1">Q1</option>
-                                <option value="2">Q2</option>
-                                <option value="3">Q3</option>
-                                <option value="4">Q4</option>
-                            </select>
-                            <select id="year" class="form-control" style="width:100px;">
-                                <option value="">Year</option>
-                                <?php
-                                $year = date('Y');
-                                for ($i = $year; $i >= ($year - 5); $i--) {
-                                ?>
-                                    <option value="<?php echo $i; ?>"><?php echo $i; ?></option>
-                                <?php
-                                }
-
-
-                                ?>
-                            </select>
-                            <div class="btn-group" style="width:300px;">
-                                <select id="clinicId" class="form-control">
-                                    <option value="">--All Facilities--</option>
-                                    <?php
-                                    foreach ($clinicName as $clinic) {
-                                    ?>
-                                        <option value="<?php echo $clinic['facility_id']; ?>" data-district="<?php echo $clinic['facility_district']; ?>"><?php echo $clinic['facility_code'] . " - " . $clinic['facility_name']; ?></option>
-                                    <?php
-                                    }
-                                    ?>
-                                </select>
-                            </div>
-                            <button class="btn btn-primary" onclick="sampleStatusDataTable();return false;"><span>Filter</span></button>
-                        </div>
-                        <br>
-                        <div class="table-toolbar" id="sampleStatusDataTableDiv">
-
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-<div class="row" style="display:none;">
-    <div class="col-md-12 col-sm-12">
-        <div class="portlet box blue">
-            <div class="portlet-title">
-                <div class="caption">
-                    <span class="caption-subject"><?php echo $this->translate('All Facilities - Geolocation'); ?></span>
-                </div>
-                <div class="actions">
-                    <div class="btn-group">
-                        <button class="btn btn-danger" onclick="expandMap();"><span><i class="fa fa-angle-double-right" aria-hidden="true"></i> <?php echo $this->translate('Expand Map'); ?></span></button>
-                    </div>
-                </div>
-            </div>
-            <div class="portlet-body">
-                <div id="controls-polyline"></div>
-                <div id="gmap-polyline-data"></div>
-            </div>
-        </div>
-    </div>
-</div>
 <script src="<?php echo $this->basePath('assets/plugins/datepicker/bootstrap-datepicker.js') ?>"></script>
 <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAFpbfAKFJZ8Ps7yAGIDZtD4EeBlsb_ANA"></script>
 <script src="<?php echo $this->basePath('assets/pages/scripts/dashboard.js'); ?>" type="text/javascript"></script>
@@ -506,39 +390,6 @@ foreach ($sampleType as $samples) {
     }
 
 
-    function sampleStatusDataTable() {
-        var fromDate = formatDate($('#mrp-lowerDate').val());
-        var toDate = formatDate($('#mrp-upperDate').val());
-        var sampleType = ($("#sampleType").val() == null) ? '' : $("#sampleType").val();
-        var labID = ($("#labName").val() == null) ? '' : $("#labName").val().join(',');
-        var clinicId = $("#clinicId").val();
-        var year = $("#year").val();
-        var quarter = $("#quarter").val();
-
-        $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-status-data-table')); ?>", {
-                fromDate: fromDate,
-                toDate: toDate,
-                sampleType: sampleType,
-                labID: labID,
-                clinicId: clinicId,
-                quarter: quarter,
-                year: year
-            },
-            function(data) {
-                $("#sampleStatusDataTableDiv").html(data);
-                $("#sampleStatusTable").DataTable({
-                    dom: 'Bfrtip',
-                    buttons: [{
-                        extend: 'excelHtml5',
-                        text: 'Export To Excel',
-                        title: 'SampleStatus-VLDashboard',
-                        extension: '.xlsx'
-                    }]
-                });
-            });
-
-
-    }
 
     function getMonthlySampleCount() {
         var fromDate = formatDate($('#mrp-lowerDate').val());
@@ -568,25 +419,24 @@ foreach ($sampleType as $samples) {
                 facilityId: facilityId
             },
             function(data) {
-                $("#monthlyCounts").html(data);
+                $("#monthlyCountsByLab").html(data);
             });
     }
 
-
-    function getLabFacilities() {
+    function getAverageLabTAT() {
         var fromDate = formatDate($('#mrp-lowerDate').val());
         var toDate = formatDate($('#mrp-upperDate').val());
         var facilityId = ($("#labName").val() == null) ? '' : $("#labName").val().join(',');
-        return $.post("<?php echo $this->url('laboratory', array('action' => 'get-lab-facilities')); ?>", {
+        return $.post("<?php echo $this->url('eid-labs', array('action' => 'get-lab-turn-around-time')); ?>", {
                 fromDate: fromDate,
                 toDate: toDate,
-                facilityId: facilityId,
-                height: '600px;'
+                facilityId: facilityId
             },
             function(data) {
-                $("#gmap-polyline-data").html(data);
+                $("#labAverageTat").html(data);
             });
     }
+
 
     $(function() {
         $('#provinceName').select2({
@@ -619,7 +469,7 @@ foreach ($sampleType as $samples) {
             placeholder: "<?php echo $this->translate('Select District First'); ?>",
             allowClear: true
         });
-       
+
         $('#age').select2({
             placeholder: "<?php echo $this->translate('All Age Group'); ?>",
             allowClear: true
@@ -661,7 +511,7 @@ foreach ($sampleType as $samples) {
             separator: ' to ',
             startDate: start,
             endDate: end,
-            <?php if (isset($logincontainer->sampleTable) && $logincontainer->sampleTable == "dash_vl_request_form_current") { ?>
+            <?php if (isset($logincontainer->eidSampleTable) && $logincontainer->eidSampleTable == "dash_eid_form_current") { ?>
                 minDate: moment().subtract(12, 'months'),
             <?php } ?>
             maxDate: moment(),
@@ -688,7 +538,7 @@ foreach ($sampleType as $samples) {
             let select = $(this)
             $(this).next('span.select2').find('ul').html(function() {
                 let count = select.select2('data').length
-                if(count > 2){
+                if (count > 2) {
                     return "<li>" + count + " items selected</li>"
                 }
             })
@@ -705,9 +555,9 @@ foreach ($sampleType as $samples) {
 
 
 
-        $.when(getMonthlySampleCount(),getMonthlySampleCountbyLab())
+        $.when(getMonthlySampleCount(), getMonthlySampleCountbyLab())
             .done(function() {
-
+                getAverageLabTAT();
             });
 
 
@@ -750,20 +600,21 @@ foreach ($sampleType as $samples) {
         $('input[name="daterange"]').val('');
         getSampleResult('reset');
     }
+
     function selectDistrictName() {
         $('#districtName,#labName').html('');
         $('#districtName,#labName').select2('val', '');
-        
+
         var pName = $("#provinceName").val();
-        if(pName != null && pName.length > 0){
+        if (pName != null && pName.length > 0) {
             $.post("<?php echo $this->url('common', array('action' => 'get-district-list')); ?>", {
-                provinceName : pName
-            },
-            function(data) {
-                if (data != "" || data != null || data != undefined) {
-                    $('#districtName').html(data);
-                }
-            });
+                    provinceName: pName
+                },
+                function(data) {
+                    if (data != "" || data != null || data != undefined) {
+                        $('#districtName').html(data);
+                    }
+                });
         }
     }
 
@@ -771,15 +622,15 @@ foreach ($sampleType as $samples) {
         $('#labName').html('');
         $('#labName').select2('val', '');
         var dName = $("#districtName").val();
-        if(dName != null && dName.length > 0){
+        if (dName != null && dName.length > 0) {
             $.post("<?php echo $this->url('common', array('action' => 'get-facility-list')); ?>", {
-                districtName : dName
-            },
-            function(data) {
-                if (data != "" || data != null || data != undefined) {
-                    $('#labName').html(data);
-                }
-            });
+                    districtName: dName
+                },
+                function(data) {
+                    if (data != "" || data != null || data != undefined) {
+                        $('#labName').html(data);
+                    }
+                });
         }
     }
 
@@ -787,21 +638,8 @@ foreach ($sampleType as $samples) {
         var fromDate = formatDate($('#mrp-lowerDate').val());
         var toDate = formatDate($('#mrp-upperDate').val());
         var facilityId = ($("#labName").val() == null) ? '' : $("#labName").val().join(',');
-        showModal('labs/expand-bar-chart/?fromDate=' + fromDate + '&toDate=' + toDate + '&facilityId=' + facilityId + '&from=' + from, '800', '450');
+        showModal('eid/labs/expand-bar-chart/?fromDate=' + fromDate + '&toDate=' + toDate + '&facilityId=' + facilityId + '&from=' + from, '800', '450');
     }
-
-    // function exportSampleResult(){
-    //    $.blockUI.defaults.css.border = '1px solid grey';
-    //    $(document).ajaxStart($.blockUI({ message: '<h2><?php echo $this->translate('Processing...'); ?></h2>' })).ajaxStop($.unblockUI); 
-    //    $.post("<?php echo $this->url('laboratory', array('action' => 'export-sample-status-result-excel')); ?>", {result : $("#sampleStatus").val()},
-    //     function(data){
-    //         if(data == "" || data == null || data == undefined){
-    //             alert('<?php echo $this->translate('Unable to export excel') ?>');
-    //         }else{
-    //             window.open('../temporary/'+data,'_blank');
-    //         }
-    //     }); 
-    // }
 
     jQuery(function() {
         // set default dates
@@ -816,7 +654,7 @@ foreach ($sampleType as $samples) {
             format: 'M-yyyy',
             viewMode: "months",
             minViewMode: "months",
-            <?php if (isset($logincontainer->sampleTable) && $logincontainer->sampleTable == "dash_vl_request_form_current") { ?>
+            <?php if (isset($logincontainer->eidSampleTable) && $logincontainer->eidSampleTable == "dash_eid_form_current") { ?>
                 startDate: end,
             <?php } ?>
             endDate: "0m"
@@ -832,7 +670,7 @@ foreach ($sampleType as $samples) {
             format: 'M-yyyy',
             viewMode: "months",
             minViewMode: "months",
-            <?php if (isset($logincontainer->sampleTable) && $logincontainer->sampleTable == "dash_vl_request_form_current") { ?>
+            <?php if (isset($logincontainer->eidSampleTable) && $logincontainer->eidSampleTable == "dash_eid_form_current") { ?>
                 startDate: end,
             <?php } ?>
             endDate: "0m"

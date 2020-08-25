@@ -1,4 +1,5 @@
 <?php
+
 namespace Api;
 
 class Module
@@ -15,6 +16,17 @@ class Module
                 'namespaces' => array(
                     __NAMESPACE__ => __DIR__ . '/src/' . __NAMESPACE__,
                 ),
+            ),
+        );
+    }
+    public function getControllerConfig()
+    {
+        return array(
+            'factories' => array(
+                'Api\Controller\Vlsm' => function ($sm) {
+                    $sampleService = $sm->getServiceLocator()->get('SampleService');
+                    return new \Api\Controller\VlsmController($sampleService);
+                }
             ),
         );
     }

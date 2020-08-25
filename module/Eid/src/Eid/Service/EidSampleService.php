@@ -51,6 +51,16 @@ class EidSampleService
         return $sampleDb->getMonthlySampleCountByLabs($params);
     }
 
+
+    public function getLabTurnAroundTime($params)
+    {
+        $sampleDb = $this->sm->get('EidSampleTableWithoutCache');
+        return $sampleDb->fetchLabTurnAroundTime($params);
+    }
+
+    // END OF LABS DASHBOARD
+
+
     public function saveFileFromVlsmAPI(){
         $apiData = array();
         $common = new CommonService();

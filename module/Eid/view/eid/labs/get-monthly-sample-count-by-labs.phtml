@@ -1,20 +1,19 @@
 <?php
-$positivityAvg = array();
-
-if (isset($result['eidResult']) && count($result['eidResult']) > 0) {
-    $arrayKey = array_keys($result['eidResult']);
+$supAvg = array();
+if (isset($result['sampleName']) && count($result['sampleName']) > 0) {
+    $arrayKey = array_keys($result['sampleName']);
     $sumArray = array_map(function () {
         return array_sum(func_get_args());
-    }, $result['eidResult'][$arrayKey[0]], $result['eidResult'][$arrayKey[1]]);
-    foreach ($result['eidResult'][$arrayKey[0]] as $key => $positivity) {
-        $positivityAvg[] = (($positivity == 0) ? 0 : round(100 * ($positivity / $sumArray[$key]), 2));
+    }, $result['sampleName']['Positive'], $result['sampleName']['Negative']);
+    foreach ($result['sampleName']['Positive'] as $key => $positivity) {
+        $supAvg[] = (($positivity == 0) ? 0 : round(100 * ($positivity / $sumArray[$key]), 2));
     }
 }
 ?>
-<div id="monthyCountsByLabDiv"></div>
+<div id="facilitiesTestedVsSuppressed"></div>
 <script>
     $(function() {
-        $('#monthyCountsByLabDiv').highcharts({
+        $('#facilitiesTestedVsSuppressed').highcharts({
             chart: {
                 type: 'column'
             },
@@ -24,7 +23,7 @@ if (isset($result['eidResult']) && count($result['eidResult']) > 0) {
             exporting: {
                 chartOptions: {
                     subtitle: {
-                        text: '<?php echo $this->translate('Samples Tested'); ?>',
+                        text: '<?php echo $this->translate('Samples Tested per Lab'); ?>',
                     }
                 }
             },
@@ -33,36 +32,33 @@ if (isset($result['eidResult']) && count($result['eidResult']) > 0) {
             },
             xAxis: {
                 categories: [<?php
-                                if (isset($result['date']) && count($result['date']) > 0) {
-                                    foreach ($result['date'] as $date) {
-                                        echo "'" . $date . "',";
+                                if (isset($result['lab']) && count($result['lab']) > 0) {
+                                    foreach ($result['lab'] as $lab) {
+                                        echo "'" . $lab . "',";
                                     }
                                 }
                                 ?>]
             },
             yAxis: [{
-                    allowDecimals: false,
-                    min: 0,
-                    title: {
-                        text: '<?php echo $this->translate('No. of Samples'); ?>'
-                    },
-
-                },
-                { // Secondary yAxis
-                    allowDecimals: true,
-                    min: 0,
-                    max: 100,
-                    title: {
-                        text: '<?php echo $this->translate('Positivity %'); ?>',
-                        style: {}
-                    },
-                    labels: {
-                        format: '{value}%',
-                        style: {}
-                    },
-                    opposite: true
+                allowDecimals: false,
+                min: 0,
+                title: {
+                    text: '<?php echo $this->translate('No. of Samples'); ?>'
                 }
-            ],
+            }, { // Secondary yAxis
+                allowDecimals: true,
+                min: 0,
+                max: 100,
+                title: {
+                    text: '<?php echo $this->translate('Positivity %'); ?>',
+                    style: {}
+                },
+                labels: {
+                    format: '{value}%',
+                    style: {}
+                },
+                opposite: true
+            }],
             tooltip: {
                 formatter: function() {
                     return '<b>' + this.x + '</b><br/>' +
@@ -79,7 +75,11 @@ if (isset($result['eidResult']) && count($result['eidResult']) > 0) {
                     point: {
                         events: {
                             click: function(e) {
-                                doSampleTestedRedirect(e.point.category);
+                                fromMonth = $(".mrp-lowerMonth").html();
+                                fromMonth = fromMonth.replace(" ", "-");
+                                toMonth = $(".mrp-upperMonth").html();
+                                toMonth = toMonth.replace(" ", "-");
+                                window.open(e.point.url + 'fromMonth=' + fromMonth + '&toMonth=' + toMonth + '&lab=' + e.point.category, '_blank');
                             }
                         }
                     }
@@ -89,53 +89,55 @@ if (isset($result['eidResult']) && count($result['eidResult']) > 0) {
                     pointPadding: 0.2,
                     borderWidth: 0,
                     cursor: 'pointer',
+                    yAxis: 1,
+                    color: '#1B325F',
                     marker: {
                         symbol: 'diamond'
                     },
-                    color: '#1B325F',
-                    yAxis: 1,
                     point: {
                         events: {
                             click: function(e) {
-                                doSampleTestedRedirect(e.point.category);
+                                url = "/labs/samples-tested-lab?";
+                                fromMonth = $(".mrp-lowerMonth").html();
+                                fromMonth = fromMonth.replace(" ", "-");
+                                toMonth = $(".mrp-upperMonth").html();
+                                toMonth = toMonth.replace(" ", "-");
+                                window.open(url + 'fromMonth=' + fromMonth + '&toMonth=' + toMonth + '&lab=' + e.point.category, '_blank');
                             }
                         }
                     }
                 }
             },
-            series: [<?php
-                        if (isset($result['eidResult']) && count($result['eidResult']) > 0) {
-                            foreach ($result['eidResult'] as $key => $condition) {
-                                if ($key != 'No Result') {
-                                    $range = substr($key, 4, 6);
-                                    $range = preg_replace('/\s+/', '', $range);
-                                } else {
-                                    $range = 'nd';
-                                }
-                        ?> {
+            series: [
+                <?php
+                if (isset($result['sampleName']) && count($result['sampleName']) > 0) {
+                    foreach ($result['sampleName'] as $key => $condition) {
+
+                ?> {
                             name: '<?php echo $this->translate($key); ?>',
-                            <?php if ($key == 'Positive') { ?>
-                                color: '#ff1900',
-                            <?php } else if ($key == 'Negative') { ?>
-                                color: '#60d18f',
-                            <?php } ?>
                             data: [<?php
                                     foreach ($condition as $count) {
-                                        echo '{y:' . $count . '},';
+                                        echo '{y:' . $count . ',url:"/labs/samples-tested-lab?"},';
                                     }
                                     ?>],
+                            <?php if (strpos($key, 'Positive') !== false) { ?>
+                                color: '#ff1900',
+                            <?php } else if (strpos($key, 'Negative') !== false) { ?>
+                                color: '#60d18f',
+                            <?php } ?>
                         },
                     <?php
-                            }
-                        }
-                        if (count($positivityAvg) > 0) {
+                    }
+                }
+                if (count($supAvg) > 0) {
                     ?> {
                         name: '<?php echo $this->translate('Positivity %'); ?>',
                         type: 'scatter',
-                        data: [<?php echo implode(",", $positivityAvg); ?>],
+                        data: [<?php echo implode(",", $supAvg); ?>],
                     }
                 <?php } ?>
-            ]
+            ],
+            colors: ['#ff1900', '#60d18f', ],
         });
     });
 </script>

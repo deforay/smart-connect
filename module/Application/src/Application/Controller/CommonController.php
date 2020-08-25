@@ -7,7 +7,8 @@ use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\ViewModel;
 use Zend\Debug\Debug;
 
-class CommonController extends AbstractActionController{
+class CommonController extends AbstractActionController
+{
 
     private $sampleService = null;
     private $configService = null;
@@ -18,7 +19,8 @@ class CommonController extends AbstractActionController{
         $this->commonService = $commonService;
     }
 
-    public function indexAction(){
+    public function indexAction()
+    {
         $result = "";
         $request = $this->getRequest();
         if ($request->isPost()) {
@@ -27,11 +29,12 @@ class CommonController extends AbstractActionController{
         }
         $viewModel = new ViewModel();
         $viewModel->setVariables(array('result' => $result))
-                ->setTerminal(true);
+            ->setTerminal(true);
         return $viewModel;
     }
-    
-    public function multipleFieldValidationAction(){
+
+    public function multipleFieldValidationAction()
+    {
         $result = "";
         $request = $this->getRequest();
         if ($request->isPost()) {
@@ -40,11 +43,12 @@ class CommonController extends AbstractActionController{
         }
         $viewModel = new ViewModel();
         $viewModel->setVariables(array('result' => $result))
-                ->setTerminal(true);
+            ->setTerminal(true);
         return $viewModel;
     }
-    
-    public function clearCacheAction(){
+
+    public function clearCacheAction()
+    {
         $result = "";
         $request = $this->getRequest();
         if ($request->isPost()) {
@@ -53,21 +57,26 @@ class CommonController extends AbstractActionController{
         }
         $viewModel = new ViewModel();
         $viewModel->setVariables(array('result' => $result))
-                ->setTerminal(true);
+            ->setTerminal(true);
         return $viewModel;
     }
-    
-    public function setSessionAction(){
+
+    public function setSessionAction()
+    {
         $logincontainer = new Container('credo');
-        $logincontainer->sampleTable="";
+        $logincontainer->sampleTable = "";
         unset($logincontainer->sampleTable);
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            if($params['sessionType'] == "current"){
+            if ($params['sessionType'] == "current") {
                 $logincontainer->sampleTable = 'dash_vl_request_form_current';
-            }else{
+                $logincontainer->eidSampleTable = 'dash_eid_form_current';
+                $logincontainer->covidSampleTable = 'dash_form_covid19_current';
+            } else {
                 $logincontainer->sampleTable = 'dash_vl_request_form';
+                $logincontainer->eidSampleTable = 'dash_eid_form';
+                $logincontainer->covidSampleTable = 'dash_form_covid19';
             }
         }
         $viewModel = new ViewModel();
@@ -85,7 +94,7 @@ class CommonController extends AbstractActionController{
             return $viewModel;
         }
     }
-    
+
     public function getFacilityListAction()
     {
         $request = $this->getRequest();
@@ -97,4 +106,3 @@ class CommonController extends AbstractActionController{
         }
     }
 }
-

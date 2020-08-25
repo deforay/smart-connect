@@ -7,9 +7,22 @@ use Laminas\View\Model\JsonModel;
 
 class VlsmController extends AbstractRestfulController
 {
-    public function create($params) {
-        $service = $this->getServiceLocator()->get('SampleService');
-        $response =$service->saveFileFromVlsmAPI();
+
+    private $sampleService = null;
+
+    public function __construct($sampleService)
+    {
+        $this->sampleService = $sampleService;
+    }
+
+    public function getList()
+    {
+        exit('Nothing to see here');
+    }
+
+    public function create($params)
+    {
+        $response = $this->sampleService->saveFileFromVlsmAPI();
         return new JsonModel($response);
     }
 }

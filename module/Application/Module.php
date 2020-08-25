@@ -63,7 +63,7 @@ class Module
 	{
 		$session = new Container('credo');
 		$tempName = explode('Controller', $e->getRouteMatch()->getParam('controller'));
-		if (substr($tempName[0], 0, -1) == 'Application') {
+		if (substr($tempName[0], 0, -1) != 'Api') {
 			if ($e->getRouteMatch()->getParam('controller') != 'Application\Controller\Login') {
 				//$session->userId = 'guest';
 				//$session->accessType = 4;

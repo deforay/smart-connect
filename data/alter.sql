@@ -416,3 +416,8 @@ ALTER TABLE `r_covid19_results` ADD `updated_datetime` DATETIME NULL DEFAULT NUL
 ALTER TABLE `r_covid19_symptoms` ADD `updated_datetime` DATETIME NULL DEFAULT NULL AFTER `symptom_status`;
 ALTER TABLE `r_covid19_test_reasons` ADD `updated_datetime` DATETIME NULL DEFAULT NULL AFTER `test_reason_status`;
 
+
+-- Amit 24 August 2020
+ALTER TABLE `vl_request_form` ADD INDEX(`last_modified_datetime`);
+ALTER TABLE `eid_form` ADD INDEX(`last_modified_datetime`);
+ALTER TABLE `form_covid19` ADD INDEX(`last_modified_datetime`);

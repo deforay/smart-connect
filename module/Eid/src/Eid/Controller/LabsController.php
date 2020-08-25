@@ -21,15 +21,17 @@ class LabsController extends AbstractActionController
 
   public function dashboardAction()
   {
+
+
     $labName = $this->sampleService->getAllLabName();
     $provinceName = $this->sampleService->getAllProvinceList();
     $districtName = $this->sampleService->getAllDistrictList();
     $clinicName = $this->sampleService->getAllClinicName();
     return new ViewModel(array(
-        'labName' => $labName,
-        'provinceName' => $provinceName,
-        'districtName' => $districtName,
-        'clinicName' => $clinicName,
+      'labName' => $labName,
+      'provinceName' => $provinceName,
+      'districtName' => $districtName,
+      'clinicName' => $clinicName,
     ));
   }
 
@@ -62,11 +64,24 @@ class LabsController extends AbstractActionController
   public function getMonthlySampleCountByLabsAction()
   {
     $request = $this->getRequest();
-    
+
     if ($request->isPost()) {
       $params = $request->getPost();
       $result = $this->sampleService->getMonthlySampleCountByLabs($params);
       $sampleType = $this->sampleService->getSampleType();
+      $viewModel = new ViewModel();
+      $viewModel->setVariables(array('result' => $result, 'sampleType' => $sampleType))
+        ->setTerminal(true);
+      return $viewModel;
+    }
+  }
+  public function getLabTurnAroundTimeAction()
+  {
+    $request = $this->getRequest();
+    if ($request->isPost()) {
+      $params = $request->getPost();
+      $sampleType = $this->sampleService->getSampleType();
+      $result = $this->sampleService->getLabTurnAroundTime($params);
       $viewModel = new ViewModel();
       $viewModel->setVariables(array('result' => $result, 'sampleType' => $sampleType))
         ->setTerminal(true);

@@ -108,7 +108,6 @@ return array(
             'Api\Controller\SourceData'         => 'Api\Controller\SourceDataController',
             'Api\Controller\User'               => 'Api\Controller\UserController',
             'Api\Controller\Facility'           => 'Api\Controller\FacilityController',
-            'Api\Controller\Vlsm'               => 'Api\Controller\VlsmController',
             'Api\Controller\WeblimsVL'          => 'Api\Controller\WeblimsVLController',
             'Api\Controller\VlsmEid'            => 'Api\Controller\VlsmEidController',
             'Api\Controller\VlsmCovid'          => 'Api\Controller\VlsmCovidController',

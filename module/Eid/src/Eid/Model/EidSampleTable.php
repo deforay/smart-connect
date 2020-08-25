@@ -427,7 +427,7 @@ class EidSampleTable extends AbstractTableGateway
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=eid.facility_id', array('facility_name'))
             ->join(array('f_d_l_d' => 'location_details'), 'f_d_l_d.location_id=f.facility_district', array('district' => 'location_name'))
-            
+
             ->where("(eid.sample_collection_date is not null AND DATE(eid.sample_collection_date) !='1970-01-01' AND DATE(eid.sample_collection_date) !='0000-00-00')")
             ->group('f.facility_district');
         if (isset($sWhere) && $sWhere != "") {
@@ -473,7 +473,7 @@ class EidSampleTable extends AbstractTableGateway
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=eid.facility_id', array('facility_name'))
             ->join(array('f_d_l_d' => 'location_details'), 'f_d_l_d.location_id=f.facility_district', array('district' => 'location_name'))
-            
+
             ->where("(eid.sample_collection_date is not null AND DATE(eid.sample_collection_date) !='1970-01-01' AND DATE(eid.sample_collection_date) !='0000-00-00')")
             ->group('f.facility_district');
 
@@ -936,7 +936,7 @@ class EidSampleTable extends AbstractTableGateway
         }
         return $output;
     }
-    
+
     public function fetchAllPositiveRateByDistrict($parameters)
     {
         /* Array of database columns which should be read and sent back to DataTables. Use a space where
@@ -2439,9 +2439,10 @@ class EidSampleTable extends AbstractTableGateway
                     )
                 )
                 ->join(array('f' => 'facility_details'), 'f.facility_id=eid.lab_id', array('facility_name'))
-                ->where(array("eid.sample_collection_date <='" . $endMonth . " 23:59:59" . "'", "eid.sample_collection_date >='" . $startMonth . " 00:00:00" . "'"))
+                ->where(array("eid.sample_collection_date >='" . $startMonth . " 00:00:00" . "'", "eid.sample_collection_date <='" . $endMonth . " 23:59:59" . "'"))
 
-                ->group('eid.lab_id');
+                ->group('eid.lab_id')
+                ->order('total DESC');
 
             if ($specimenTypes != null) {
                 $query = $query->where('eid.sample_type IN ("' . implode('", "', $specimenTypes) . '")');
@@ -2451,14 +2452,111 @@ class EidSampleTable extends AbstractTableGateway
             }
 
             $queryStr = $sql->buildSqlString($query);
-            // echo $queryStr;die;
+            //echo $queryStr;die;
             $testResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
 
             $j = 0;
             foreach ($testResult as $data) {
-                $result['sampleName']['Negative'][$j] = $data['Negative'];
-                $result['sampleName']['Positive'][$j] = $data['Positive'];
+
+                $result['sampleName']['Positive'][$j] = !empty($data['positive']) ? $data['positive'] : 0;
+                $result['sampleName']['Negative'][$j] = !empty($data['negative']) ? $data['negative'] : 0;
                 $result['lab'][$j] = $data['facility_name'];
+                $j++;
+            }
+        }
+
+        return $result;
+    }
+
+    public function fetchLabTurnAroundTime($params)
+    {
+        $logincontainer = new Container('credo');
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $result = array();
+        $skipDays = isset($this->config['defaults']['tat-skipdays']) ? $this->config['defaults']['tat-skipdays'] : 120;
+        $common = new CommonService($this->sm);
+
+        $facilityIdList = null;
+
+        // FILTER :: Checking if the facility filter is set
+        // else if the user is mapped to one or more facilities
+
+        if (isset($params['facilityId']) && trim($params['facilityId']) != '') {
+            $fQuery = $sql->select()->from(array('f' => 'facility_details'))->columns(array('facility_id'))
+                ->where('f.facility_type = 2 AND f.status="active"');
+            $fQuery = $fQuery->where('f.facility_id IN (' . $params['facilityId'] . ')');
+            $fQueryStr = $sql->buildSqlString($fQuery);
+            $facilityResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+            $facilityIdList = array_column($facilityResult, 'facility_id');
+        } else if (!empty($this->mappedFacilities)) {
+            $fQuery = $sql->select()->from(array('f' => 'facility_details'))->columns(array('facility_id'))
+                //->where('f.facility_type = 2 AND f.status="active"')
+                ->where('f.facility_id IN ("' . implode('", "', $this->mappedFacilities) . '")');
+            $fQueryStr = $sql->buildSqlString($fQuery);
+            $facilityResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+            $facilityIdList = array_column($facilityResult, 'facility_id');
+        }
+
+        // FILTER :: Checking if the date range filter is set (which should be always set)
+
+        if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
+            $monthyear = date("Y-m");
+            $startMonth = $params['fromDate'];
+            $endMonth = $params['toDate'];
+
+            if (strtotime($startMonth) >= strtotime($monthyear)) {
+                $startMonth = $endMonth = date("Y-m", strtotime("-2 months"));
+            } else if (strtotime($endMonth) >= strtotime($monthyear)) {
+                $endMonth = date("Y-m", strtotime("-2 months"));
+            }
+
+
+            $startMonth = date("Y-m", strtotime(trim($startMonth))) . "-01";
+            $endMonth = date("Y-m", strtotime(trim($endMonth))) . "-31";
+
+            $query = $sql->select()->from(array('vl' => $this->table))
+                ->columns(
+                    array(
+                        "month" => new Expression("MONTH(result_approved_datetime)"),
+                        "year" => new Expression("YEAR(result_approved_datetime)"),
+                        "AvgDiff" => new Expression("CAST(ABS((TIMESTAMPDIFF(DAY,result_approved_datetime,sample_collection_date))) AS DECIMAL (10,2))"),
+                        "monthDate" => new Expression("DATE_FORMAT(DATE(result_approved_datetime), '%b-%Y')"),
+                        "total_samples_collected" => new Expression('COUNT(*)'),
+                        "total_samples_pending" => new Expression("(SUM(CASE WHEN ((vl.result IS NULL OR vl.result like '' OR vl.result like 'NULL') AND (vl.reason_for_sample_rejection IS NULL OR vl.reason_for_sample_rejection = '' OR vl.reason_for_sample_rejection = 0)) THEN 1 ELSE 0 END))")
+                    )
+                );
+            $query = $query->where("
+                    (vl.sample_collection_date is not null AND vl.sample_collection_date not like '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')
+                    AND (vl.result_approved_datetime is not null AND vl.result_approved_datetime not like '' AND DATE(vl.result_approved_datetime) !='1970-01-01' AND DATE(vl.result_approved_datetime) !='0000-00-00')");
+            $query = $query->where("
+                        DATE(vl.result_approved_datetime) >= '" . $startMonth . "'
+                        AND DATE(vl.result_approved_datetime) <= '" . $endMonth . "' ");
+
+
+            $skipDays = (isset($skipDays) && $skipDays > 0) ? $skipDays : 120;
+            $query = $query->where('
+                (DATEDIFF(result_approved_datetime,sample_collection_date) < ' . $skipDays . ' AND 
+                DATEDIFF(result_approved_datetime,sample_collection_date) >= 0)');
+
+            if ($facilityIdList != null) {
+                $query = $query->where('vl.lab_id IN ("' . implode('", "', $facilityIdList) . '")');
+            }
+            $query = $query->group(array(new Expression('YEAR(vl.result_approved_datetime)')));
+            $query = $query->group(array(new Expression('MONTH(vl.result_approved_datetime)')));
+            $query = $query->order(array(new Expression('DATE(vl.result_approved_datetime) ASC')));
+            $queryStr = $sql->buildSqlString($query);
+            //echo $queryStr;die;
+            //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+            $sampleResult = $common->cacheQuery($queryStr, $dbAdapter);
+            $j = 0;
+            $monthDateArray = array();
+            foreach ($sampleResult as $sRow) {
+                $result['all'][$j] = (isset($sRow["AvgDiff"]) && $sRow["AvgDiff"] != NULL && $sRow["AvgDiff"] > 0) ? round($sRow["AvgDiff"], 2) : null;
+                //$result['lab'][$j] = (isset($labsubQueryResult[0]["labCount"]) && $labsubQueryResult[0]["labCount"] != NULL && $labsubQueryResult[0]["labCount"] > 0) ? round($labsubQueryResult[0]["labCount"],2) : 0;
+                $result['sample']['Samples Collected'][$j] = (isset($sRow['total_samples_collected']) && $sRow['total_samples_collected'] != NULL) ? $sRow['total_samples_collected'] : null;
+                $result['sample']['Results Not Available'][$j] = (isset($sRow['total_samples_pending']) && $sRow['total_samples_pending'] != NULL) ? $sRow['total_samples_pending'] : null;
+                $result['date'][$j] = $sRow["monthDate"];
                 $j++;
             }
         }
