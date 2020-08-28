@@ -437,6 +437,9 @@ class CommonService
           $sampleDb = $this->sm->get('SampleTypeTable');
           return $sampleDb->fetchAllSampleType();
      }
+
+
+
      //get all Lab Name
      public function getAllLabName()
      {
@@ -497,4 +500,10 @@ class CommonService
           $facilityDb = $this->sm->get('FacilityTable');
           return $facilityDb->fetchFacilityListByDistrict($districtId);
      }
+
+
+     public function saveVlsmReferenceTablesFromAPI($params){
+
+     }
+
 }

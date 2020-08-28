@@ -60,8 +60,89 @@ class EidSampleService
 
     // END OF LABS DASHBOARD
 
+    public function saveFileFromVlsmAPIV2()
+    {
+        $apiData = array();
+        $this->config = $this->sm->get('Config');
+        $input = $this->config['db']['dsn'];
+        preg_match('~=(.*?);~', $input, $output);
+        $dbname = $output[1];
+        $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
 
-    public function saveFileFromVlsmAPI(){
+        $fileName = $_FILES['eidFile']['name'];
+        $ranNumber = str_pad(rand(0, pow(10, 6) - 1), 6, '0', STR_PAD_LEFT);
+        $extension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+        $fileName = $ranNumber . "." . $extension;
+
+        if (!file_exists(TEMP_UPLOAD_PATH) && !is_dir(TEMP_UPLOAD_PATH)) {
+            mkdir(APPLICATION_PATH . DIRECTORY_SEPARATOR . "uploads", 0777);
+        }
+        if (!file_exists(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-eid") && !is_dir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-eid")) {
+            mkdir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-eid", 0777);
+        }
+
+        $pathname = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-eid" . DIRECTORY_SEPARATOR . $fileName;
+        if (!file_exists($pathname)) {
+            if (move_uploaded_file($_FILES['eidFile']['tmp_name'], $pathname)) {
+                $apiData = json_decode(file_get_contents($pathname), true);
+                //$apiData = \JsonMachine\JsonMachine::fromFile($pathname);
+            }
+        }
+
+        // ob_start();
+        // var_dump($apiData);
+        // error_log(ob_get_clean());
+
+
+        $allColumns = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS where TABLE_SCHEMA = '" . $dbname . "' AND table_name='dash_eid_form'";
+        $sResult = $dbAdapter->query($allColumns, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+        $columnList = array_map('current', $sResult);
+
+        $removeKeys = array(
+            'eid_id'
+        );
+
+        $columnList = array_diff($columnList, $removeKeys);
+        $sampleDb = $this->sm->get('EidSampleTableWithoutCache');
+
+
+        $numRows = 0;
+        foreach ($apiData as $rowData) {
+
+
+            $data = array();
+            foreach ($columnList as $colName) {
+                if (isset($rowData[$colName])) {
+                    $data[$colName] = $rowData[$colName];
+                } else {
+                    $data[$colName] = null;
+                }
+            }
+
+            // ob_start();
+            // var_dump($data);
+            // error_log(ob_get_clean());
+            // exit(0);
+
+            $sampleCode = trim($data['sample_code']);
+            $instanceCode = trim($data['vlsm_instance_id']);
+            //check existing sample code
+            $sampleCode = $this->checkSampleCode($sampleCode, $instanceCode);
+            if ($sampleCode) {
+                //sample data update
+                $numRows += $sampleDb->update($data, array('eid_id' => $sampleCode['eid_id']));
+            } else {
+                //sample data insert
+                $numRows += $sampleDb->insert($data);
+            }
+        }
+        return array(
+            'status'    => 'success',
+            'message'   => $numRows. ' uploaded successfully',
+        );
+    }
+
+    public function saveFileFromVlsmAPIV1(){
         $apiData = array();
         $common = new CommonService();
         $sampleDb = $this->sm->get('EidSampleTableWithoutCache');

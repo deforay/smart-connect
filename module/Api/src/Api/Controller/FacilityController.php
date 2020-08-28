@@ -8,10 +8,20 @@ use Laminas\Json\Json;
 
 class FacilityController extends AbstractRestfulController
 {
-    public function create($params) {
-        $facilityService = $this->getServiceLocator()->get('FacilityService');
-        $response =$facilityService->getAllFacilitiesInApi($params);
+    private $facilityService = null;
+
+    public function __construct($facilityService)
+    {
+        $this->facilityService = $facilityService;
+    }
+
+    public function getList()
+    {
+        exit('Nothing to see here');
+    }
+    public function create($params)
+    {
+        $response = $this->facilityService->getAllFacilitiesInApi($params);
         return new JsonModel($response);
     }
-}   
-
+}

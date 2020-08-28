@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace Covid19\Service;
 
@@ -28,9 +28,92 @@ class Covid19FormService
     {
         return $this->sm;
     }
-    
-    public function saveFileFromVlsmAPI(){
-        try{
+
+    public function saveFileFromVlsmAPIV2()
+    {
+        $apiData = array();
+        $this->config = $this->sm->get('Config');
+        $input = $this->config['db']['dsn'];
+        preg_match('~=(.*?);~', $input, $output);
+        $dbname = $output[1];
+        $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
+
+        $fileName = $_FILES['covid19File']['name'];
+        $ranNumber = str_pad(rand(0, pow(10, 6) - 1), 6, '0', STR_PAD_LEFT);
+        $extension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+        $fileName = $ranNumber . "." . $extension;
+
+        if (!file_exists(TEMP_UPLOAD_PATH) && !is_dir(TEMP_UPLOAD_PATH)) {
+            mkdir(APPLICATION_PATH . DIRECTORY_SEPARATOR . "uploads", 0777);
+        }
+        if (!file_exists(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-covid19") && !is_dir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-covid19")) {
+            mkdir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-covid19", 0777);
+        }
+
+        $pathname = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-covid19" . DIRECTORY_SEPARATOR . $fileName;
+        if (!file_exists($pathname)) {
+            if (move_uploaded_file($_FILES['covid19File']['tmp_name'], $pathname)) {
+                $apiData = json_decode(file_get_contents($pathname), true);
+                //$apiData = \JsonMachine\JsonMachine::fromFile($pathname);
+            }
+        }
+
+        // ob_start();
+        // var_dump($apiData);
+        // error_log(ob_get_clean());
+
+
+        $allColumns = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS where TABLE_SCHEMA = '" . $dbname . "' AND table_name='dash_form_covid19'";
+        $sResult = $dbAdapter->query($allColumns, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+        $columnList = array_map('current', $sResult);
+
+        $removeKeys = array(
+            'covid19_id'
+        );
+
+        $columnList = array_diff($columnList, $removeKeys);
+        $sampleDb = $this->sm->get('Covid19FormTableWithoutCache');
+
+
+        $numRows = 0;
+        foreach ($apiData as $rowData) {
+
+
+            $data = array();
+            foreach ($columnList as $colName) {
+                if (isset($rowData[$colName])) {
+                    $data[$colName] = $rowData[$colName];
+                } else {
+                    $data[$colName] = null;
+                }
+            }
+
+            // ob_start();
+            // var_dump($data);
+            // error_log(ob_get_clean());
+            // exit(0);
+
+            $sampleCode = trim($data['sample_code']);
+            $instanceCode = trim($data['vlsm_instance_id']);
+            //check existing sample code
+            $sampleCode = $this->checkSampleCode($sampleCode, $instanceCode);
+            if ($sampleCode) {
+                //sample data update
+                $numRows += $sampleDb->update($data, array('covid19_id' => $sampleCode['covid19_id']));
+            } else {
+                //sample data insert
+                $numRows += $sampleDb->insert($data);
+            }
+        }
+        return array(
+            'status'    => 'success',
+            'message'   => $numRows . ' uploaded successfully',
+        );
+    }
+
+    public function saveFileFromVlsmAPIV1()
+    {
+        try {
             // Debug::dump($_FILES['covid19File']);die;
             $apiData = array();
             $common = new CommonService();
@@ -40,17 +123,17 @@ class Covid19FormService
             $testStatusDb = $this->sm->get('SampleStatusTable');
             $locationDb = $this->sm->get('LocationDetailsTable');
             $sampleRjtReasonDb = $this->sm->get('SampleRejectionReasonTable');
-            
+
             $fileName = $_FILES['covid19File']['name'];
             $ranNumber = str_pad(rand(0, pow(10, 6) - 1), 6, '0', STR_PAD_LEFT);
             $extension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
             $fileName = $ranNumber . "." . $extension;
 
             if (!file_exists(TEMP_UPLOAD_PATH) && !is_dir(TEMP_UPLOAD_PATH)) {
-                mkdir(APPLICATION_PATH . DIRECTORY_SEPARATOR . "uploads",0777);
+                mkdir(APPLICATION_PATH . DIRECTORY_SEPARATOR . "uploads", 0777);
             }
             if (!file_exists(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-covid19") && !is_dir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-covid19")) {
-                mkdir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-covid19",0777);
+                mkdir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-covid19", 0777);
             }
 
             $pathname = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-covid19" . DIRECTORY_SEPARATOR . $fileName;
@@ -60,28 +143,28 @@ class Covid19FormService
                 }
             }
 
-            if($apiData !== FALSE){
-                foreach($apiData as $rowData){
+            if ($apiData !== FALSE) {
+                foreach ($apiData as $rowData) {
                     // Debug::dump($rowData);die;
-                    foreach($rowData as $key=>$row){
+                    foreach ($rowData as $key => $row) {
                         // Debug::dump($row);die;
                         if (trim($row['sample_code']) != '' && trim($row['vlsm_instance_id']) != '') {
                             $sampleCode = trim($row['sample_code']);
                             $instanceCode = trim($row['vlsm_instance_id']);
-        
+
                             $sampleCollectionDate = (trim($row['sample_collection_date']) != '' ? trim(date('Y-m-d H:i', strtotime($row['sample_collection_date']))) : null);
                             $sampleReceivedAtLab = (trim($row['sample_registered_at_lab']) != '' ? trim(date('Y-m-d H:i', strtotime($row['sample_registered_at_lab']))) : null);
                             // $dateOfInitiationOfRegimen = (trim($row['date_of_initiation_of_current_regimen']) != '' ? trim(date('Y-m-d H:i', strtotime($row['date_of_initiation_of_current_regimen']))) : null);
                             $resultApprovedDateTime = (trim($row['result_approved_datetime']) != '' ? trim(date('Y-m-d H:i', strtotime($row['result_approved_datetime']))) : null);
                             $sampleTestedDateTime = (trim($row['sample_tested_datetime']) != '' ? trim(date('Y-m-d H:i', strtotime($row['sample_tested_datetime']))) : null);
-        
-        
-        
-                            foreach($row as $index=>$value){                
-                                if($index == 'status_id'){
+
+
+
+                            foreach ($row as $index => $value) {
+                                if ($index == 'status_id') {
                                     break;
-                                } else{
-                                    if($index != 'covid19_id'){
+                                } else {
+                                    if ($index != 'covid19_id') {
                                         $data[$index] = $value;
                                     }
                                 }
@@ -91,7 +174,7 @@ class Covid19FormService
                             $data['sample_registered_at_lab']   = $sampleReceivedAtLab;
                             $data['result_approved_datetime']   = $resultApprovedDateTime;
                             $data['sample_tested_datetime']     = $sampleTestedDateTime;
-        
+
                             $facilityData = array(
                                 'vlsm_instance_id'          => trim($row['vlsm_instance_id']),
                                 'facility_name'             => trim($row['facility_name']),
@@ -136,7 +219,7 @@ class Covid19FormService
                                     $facilityData['facility_type'] = $facilityTypeDb->lastInsertValue;
                                 }
                             }
-        
+
                             //check clinic details
                             if (trim($row['facility_name']) != '') {
                                 $facilityDataResult = $this->checkFacilityDetails(trim($row['facility_name']));
@@ -150,7 +233,7 @@ class Covid19FormService
                             } else {
                                 $data['facility_id'] = NULL;
                             }
-        
+
                             $labData = array(
                                 'vlsm_instance_id'          => trim($row['vlsm_instance_id']),
                                 'facility_name'             => trim($row['labName']),
@@ -195,7 +278,7 @@ class Covid19FormService
                                     $labData['facility_type'] = $facilityTypeDb->lastInsertValue;
                                 }
                             }
-        
+
                             //check lab details
                             if (trim($row['labName']) != '') {
                                 $labDataResult = $this->checkFacilityDetails(trim($row['labName']));
@@ -221,7 +304,7 @@ class Covid19FormService
                             } else {
                                 $data['result_status'] = 6;
                             }
-                            
+
                             //check sample rejection reason
                             if (trim($row['reason_for_sample_rejection']) != '') {
                                 $sampleRejectionReason = $this->checkSampleRejectionReason(trim($row['reason_for_sample_rejection']));
@@ -270,7 +353,7 @@ class Covid19FormService
     {
         $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
         $sql = new Sql($dbAdapter);
-        $sQuery = $sql->select()->from($dashTable)->where(array('sample_code LIKE "%'.$sampleCode.'%"', 'vlsm_instance_id' => $instanceCode));
+        $sQuery = $sql->select()->from($dashTable)->where(array('sample_code LIKE "%' . $sampleCode . '%"', 'vlsm_instance_id' => $instanceCode));
         $sQueryStr = $sql->buildSqlString($sQuery);
         $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
         return $sResult;
@@ -431,19 +514,19 @@ class Covid19FormService
         $covid19SampleDb = $this->sm->get('Covid19FormTableWithoutCache');
         return $covid19SampleDb->fetchCovid19OutcomesByAgeDetails($params);
     }
-   
+
     public function getTATDetails($params)
     {
         $covid19SampleDb = $this->sm->get('Covid19FormTableWithoutCache');
         return $covid19SampleDb->fetchTATDetails($params);
     }
-    
+
     public function getCovid19OutcomesByProvinceDetails($params)
     {
         $covid19SampleDb = $this->sm->get('Covid19FormTableWithoutCache');
         return $covid19SampleDb->fetchCovid19OutcomesByProvinceDetails($params);
     }
-    
+
     public function exportIndicatorResultExcel($params)
     {
         $queryContainer = new Container('query');
@@ -570,8 +653,8 @@ class Covid19FormService
         $translator = $this->sm->get('translator');
         // To set te session table
         $logincontainer = new Container('credo');
-        if (isset($logincontainer->EidSampleTable) && $logincontainer->EidSampleTable != "") {
-            $dashTable = $logincontainer->EidSampleTable;
+        if (isset($logincontainer->Covid19SampleTable) && $logincontainer->Covid19SampleTable != "") {
+            $dashTable = $logincontainer->Covid19SampleTable;
         }
         $common = new CommonService();
 

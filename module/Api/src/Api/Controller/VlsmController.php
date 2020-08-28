@@ -22,7 +22,16 @@ class VlsmController extends AbstractRestfulController
 
     public function create($params)
     {
-        $response = $this->sampleService->saveFileFromVlsmAPI();
+
+        if(!isset($params['api-version'])){
+            $params['api-version'] = 'v1';
+        }
+        if( $params['api-version'] == 'v1'){
+            $response = $this->sampleService->saveFileFromVlsmAPIV1();
+        }else if( $params['api-version'] == 'v2'){
+            $response = $this->sampleService->saveFileFromVlsmAPIV2();
+        }
+        
         return new JsonModel($response);
     }
 }

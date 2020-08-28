@@ -5,14 +5,14 @@ namespace Api\Controller;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\View\Model\JsonModel;
 
-class WeblimsVLController extends AbstractRestfulController
+class VlsmReferenceTablesController extends AbstractRestfulController
 {
 
-    private $sampleService = null;
+    private $commonService = null;
 
-    public function __construct($sampleService)
+    public function __construct($commonService)
     {
-        $this->sampleService = $sampleService;
+        $this->commonService = $commonService;
     }
 
     public function getList()
@@ -21,7 +21,7 @@ class WeblimsVLController extends AbstractRestfulController
     }
     public function create($params)
     {
-        $response = $this->sampleService->saveWeblimsVLAPI($params);
+        $response = $this->commonService->saveVlsmReferenceTablesFromAPI($params);
         return new JsonModel($response);
     }
 }

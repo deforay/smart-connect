@@ -9,10 +9,31 @@ use \Covid19\Service\Covid19FormService;
 
 class VlsmCovidController extends AbstractRestfulController
 {
-    public function create($params) {
-        // Debug::dump($_FILES);die;
-        $service = $this->getServiceLocator()->get('Covid19FormService');
-        $response =$service->saveFileFromVlsmAPI();
-        return new JsonModel($response);
+    private $covid19SampleService = null;
+
+    public function __construct($covid19SampleService)
+    {
+        $this->covid19SampleService = $covid19SampleService;
+    }
+
+    public function getList()
+    {
+        exit('Nothing to see here');
+    }
+    public function create($params)
+    {
+        
+        if (!isset($params['api-version'])) {
+            $params['api-version'] = 'v1';
+        }
+        if ($params['api-version'] == 'v1') {
+            $response = $this->covid19SampleService->saveFileFromVlsmAPIV1();
+        } else if ($params['api-version'] == 'v2') {
+            $response = $this->covid19SampleService->saveFileFromVlsmAPIV2();
+        }
+
+
+        return new JsonModel($response); 
+        
     }
 }
