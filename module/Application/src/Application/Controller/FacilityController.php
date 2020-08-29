@@ -8,61 +8,66 @@ use Laminas\Json\Json;
 
 class FacilityController extends AbstractActionController
 {
+
+    private $facilityService = null;
+
+    public function __construct($facilityService)
+    {
+        $this->facilityService = $facilityService;
+    }
     public function indexAction()
     {
         $this->layout()->setVariable('activeTab', 'facility');
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            $facilityService = $this->getServiceLocator()->get('FacilityService');
-            $result = $facilityService->getAllFacility($params);
+            $result = $this->facilityService->getAllFacility($params);
             return $this->getResponse()->setContent(Json::encode($result));
         }
     }
 
-    public function addAction(){
+    public function addAction()
+    {
         $this->layout()->setVariable('activeTab', 'facility');
-        $facilityService = $this->getServiceLocator()->get('FacilityService');
-        if($this->getRequest()->isPost()){
-            $params=$this->getRequest()->getPost();
-            $result=$facilityService->addFacility($params);
+        if ($this->getRequest()->isPost()) {
+            $params = $this->getRequest()->getPost();
+            $result = $this->facilityService->addFacility($params);
             return $this->_redirect()->toRoute('facility');
-        }else{
-            $facilityType = $facilityService->fetchFacilityType();
-            $facilityLocation = $facilityService->fetchLocationDetails();
-            return new ViewModel(array('facilityType' => $facilityType,'facilityLocation'=>$facilityLocation));
+        } else {
+            $facilityType = $this->facilityService->fetchFacilityType();
+            $facilityLocation = $this->facilityService->fetchLocationDetails();
+            return new ViewModel(array('facilityType' => $facilityType, 'facilityLocation' => $facilityLocation));
         }
     }
 
     public function editAction()
     {
         $this->layout()->setVariable('activeTab', 'facility');
-        $facilityService = $this->getServiceLocator()->get('FacilityService');
-        if($this->getRequest()->isPost()){
-            $params=$this->getRequest()->getPost();
-            $result=$facilityService->updateFacility($params);
+        if ($this->getRequest()->isPost()) {
+            $params = $this->getRequest()->getPost();
+            $result = $this->facilityService->updateFacility($params);
             return $this->_redirect()->toRoute('facility');
-        }else{
+        } else {
             $facilityId = base64_decode($this->params()->fromRoute('id'));
-            $facility = $facilityService->getFacility($facilityId);
-            $facilityType = $facilityService->fetchFacilityType();
-            $facilityLocation = $facilityService->fetchLocationDetails();
-            if($facility == false){
-                return $this->_redirect()->toRoute('facility'); 
-            }else{
-                return new ViewModel(array('facility'=>$facility,'facilityType' => $facilityType,'facilityLocation'=>$facilityLocation));
+            $facility = $this->facilityService->getFacility($facilityId);
+            $facilityType = $this->facilityService->fetchFacilityType();
+            $facilityLocation = $this->facilityService->fetchLocationDetails();
+            if ($facility == false) {
+                return $this->_redirect()->toRoute('facility');
+            } else {
+                return new ViewModel(array('facility' => $facility, 'facilityType' => $facilityType, 'facilityLocation' => $facilityLocation));
             }
         }
     }
-    public function getDistrictListAction(){
+    public function getDistrictListAction()
+    {
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            $commonService = $this->getServiceLocator()->get('FacilityService');
-            $result = $commonService->getDistrictList($params['state']);
+            $result = $this->facilityService->getDistrictList($params['state']);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('result' => $result))
-                        ->setTerminal(true);
+                ->setTerminal(true);
             return $viewModel;
         }
     }

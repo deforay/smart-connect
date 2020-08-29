@@ -9,21 +9,30 @@ use Laminas\View\Model\ViewModel;
 class LoginController extends AbstractActionController
 {
 
+    private $userService = null;
+    private $configService = null;
+
+    public function __construct($userService, $configService)
+    {
+        $this->userService = $userService;
+        $this->configService = $configService;
+    }
+
+
     public function indexAction()
     {
         $logincontainer = new Container('credo');
-        $configService = $this->getServiceLocator()->get('ConfigService');
+
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            $userService = $this->getServiceLocator()->get('UserService');
-            $url = $userService->login($params);
+            $url = $this->userService->login($params);
             return $this->redirect()->toUrl($url);
         }
         if (isset($logincontainer->userId) && $logincontainer->userId != "") {
             return $this->redirect()->toUrl("summary/dashboard");
         } else {
-            $config = $configService->getAllGlobalConfig();
+            $config = $this->configService->getAllGlobalConfig();
             $vm = new ViewModel();
             $vm->setVariables(array('config' => $config))
                 ->setTerminal(true);
@@ -33,18 +42,14 @@ class LoginController extends AbstractActionController
 
     public function otpAction()
     {
-        $logincontainer = new Container('credo');
-
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            $userService = $this->getServiceLocator()->get('UserService');
-            $url = $userService->otp($params);
+            $url = $this->userService->otp($params);
             return $this->redirect()->toUrl($url);
         }
 
-        $configService = $this->getServiceLocator()->get('ConfigService');
-        $config = $configService->getAllGlobalConfig();
+        $config = $this->configService->getAllGlobalConfig();
         $vm = new ViewModel();
         $vm->setVariables(array('config' => $config))
             ->setTerminal(true);

@@ -9,96 +9,106 @@ use Laminas\Json\Json;
 class UsersController extends AbstractActionController
 {
 
+    private $userService = null;
+    private $commonService = null;
+    private $orgService = null;
+
+    public function __construct($userService, $commonService, $orgService)
+    {
+        $this->userService = $userService;
+        $this->commonService = $commonService;
+        $this->orgService = $orgService;
+    }
+
     public function indexAction()
     {
         $this->layout()->setVariable('activeTab', 'users');
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            $userService = $this->getServiceLocator()->get('UserService');
-            $result = $userService->getAllUsers($params);
+            
+            $result = $this->userService->getAllUsers($params);
             return $this->getResponse()->setContent(Json::encode($result));
         }
-        
-      
     }
 
-    public function addAction(){
+    public function addAction()
+    {
         $this->layout()->setVariable('activeTab', 'users');
-        $userService = $this->getServiceLocator()->get('UserService');
         
-        if($this->getRequest()->isPost()){
-            $params=$this->getRequest()->getPost();
-            $result=$userService->addUser($params);
+
+        if ($this->getRequest()->isPost()) {
+            $params = $this->getRequest()->getPost();
+            $result = $this->userService->addUser($params);
             return $this->_redirect()->toRoute('users');
-        }        
-        
-        $roles = $userService->fetchRoles();
+        }
+
+        $roles = $this->userService->fetchRoles();
         return new ViewModel(array('roles' => $roles));
     }
 
     public function editAction()
     {
         $this->layout()->setVariable('activeTab', 'users');
-        $userService = $this->getServiceLocator()->get('UserService');
-        $commonService = $this->getServiceLocator()->get('CommonService');
-        if($this->getRequest()->isPost()){
-            $params=$this->getRequest()->getPost();
-            $result=$userService->updateUser($params);
+        
+        
+        if ($this->getRequest()->isPost()) {
+            $params = $this->getRequest()->getPost();
+            $result = $this->userService->updateUser($params);
             return $this->_redirect()->toRoute('users');
-        }else{
+        } else {
             $userId = base64_decode($this->params()->fromRoute('id'));
-            $user = $userService->getUser($userId);
-            if($user == false){
-                return $this->_redirect()->toRoute('users'); 
-            }else{
+            $user = $this->userService->getUser($userId);
+            if ($user == false) {
+                return $this->_redirect()->toRoute('users');
+            } else {
                 $params = array();
                 $facilities = array();
-                $roles = $userService->fetchRoles();
-                if($user->role!= null && trim($user->role)!= '' && $user->role > 1){
-                   $params['role']=$user->role;
-                   $facilities = $commonService->getRoleFacilities($params);
+                $roles = $this->userService->fetchRoles();
+                if ($user->role != null && trim($user->role) != '' && $user->role > 1) {
+                    $params['role'] = $user->role;
+                    $facilities = $this->commonService->getRoleFacilities($params);
                 }
-                return new ViewModel(array('user'=>$user,'roles' => $roles,'facilities'=>$facilities));
-            }   
+                return new ViewModel(array('user' => $user, 'roles' => $roles, 'facilities' => $facilities));
+            }
         }
     }
     public function mapAction()
     {
-        $this->layout()->setVariable('activeTab', 'admin');    
+        $this->layout()->setVariable('activeTab', 'admin');
         $this->layout()->setVariable('activeMenu', 'users');
-        $userService = $this->getServiceLocator()->get('UserService');
-        $orgService = $this->getServiceLocator()->get('OrganizationService');
-
         
-        if($this->getRequest()->isPost()){
-            $params=$this->getRequest()->getPost();
-            $result=$userService->mapUserOrganizations($params);
+        
+
+
+        if ($this->getRequest()->isPost()) {
+            $params = $this->getRequest()->getPost();
+            $result = $this->userService->mapUserOrganizations($params);
             return $this->_redirect()->toRoute('users');
-        }else{
+        } else {
             $userId = ($this->params()->fromRoute('id'));
-            $user = $userService->getUser($userId);
-            if($user == false){
-                return $this->_redirect()->toRoute('users'); 
-            }else{
-                $orgs = $orgService->fetchOrganizations();
-                $map = $userService->fetchUserOrganizations($userId);
-                return new ViewModel(array('user'=>$user,'facilities' => $orgs,'map'=>$map));
-            }   
+            $user = $this->userService->getUser($userId);
+            if ($user == false) {
+                return $this->_redirect()->toRoute('users');
+            } else {
+                $orgs = $this->orgService->fetchOrganizations();
+                $map = $this->userService->fetchUserOrganizations($userId);
+                return new ViewModel(array('user' => $user, 'facilities' => $orgs, 'map' => $map));
+            }
         }
     }
-    
-    public function getRoleFacilitiesAction(){
+
+    public function getRoleFacilitiesAction()
+    {
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            $commonService = $this->getServiceLocator()->get('CommonService');
-            $result = $commonService->getRoleFacilities($params);
+            
+            $result = $this->commonService->getRoleFacilities($params);
             $viewModel = new ViewModel();
-            $viewModel->setVariables(array('params'=>$params,'result' => $result))
-                        ->setTerminal(true);
+            $viewModel->setVariables(array('params' => $params, 'result' => $result))
+                ->setTerminal(true);
             return $viewModel;
         }
     }
 }
-

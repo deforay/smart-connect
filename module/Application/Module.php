@@ -28,7 +28,6 @@ use Application\Model\GenerateBackupTable;
 use Application\Service\CommonService;
 use Application\Service\UserService;
 use Application\Service\OrganizationService;
-use Application\Service\SourceService;
 use Application\Service\SampleService;
 use Application\Service\ConfigService;
 use Application\Service\FacilityService;
@@ -252,7 +251,7 @@ class Module
 				'SampleTableWithoutCache' => function ($sm) {
 					$session = new Container('credo');
 					$mappedFacilities = (isset($session->mappedFacilities) && count($session->mappedFacilities) > 0) ? $session->mappedFacilities : array();
-					$sampleTable = isset($session->sampleTable) ? $session->sampleTable :  null;			
+					$sampleTable = isset($session->sampleTable) ? $session->sampleTable :  null;
 					$dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');
 					return new SampleTable($dbAdapter, $sm, $mappedFacilities, $sampleTable);
 				},
@@ -336,9 +335,6 @@ class Module
 				'OrganizationService' => function ($sm) {
 					return new OrganizationService($sm);
 				},
-				'SourceService' => function ($sm) {
-					return new SourceService($sm);
-				},
 				'SampleService' => function ($sm) {
 					return new SampleService($sm);
 				},
@@ -363,29 +359,48 @@ class Module
 	{
 		return array(
 			'factories' => array(
+				'Application\Controller\Login' => function ($sm) {
+					$configService = $sm->getServiceLocator()->get('ConfigService');
+					$userService = $sm->getServiceLocator()->get('UserService');
+					return new \Application\Controller\LoginController($userService, $configService);
+				},
+				'Application\Controller\Users' => function ($sm) {
+					$commonService = $sm->getServiceLocator()->get('ConfigService');
+					$orgService = $sm->getServiceLocator()->get('OrganizationService');
+					$userService = $sm->getServiceLocator()->get('UserService');
+					return new \Application\Controller\UsersController($userService, $commonService, $orgService);
+				},
 				'Application\Controller\Cron' => function ($sm) {
 					$sampleService = $sm->getServiceLocator()->get('SampleService');
 					return new \Application\Controller\CronController($sampleService);
 				},
+				'Application\Controller\Config' => function ($sm) {
+					$configService = $sm->getServiceLocator()->get('ConfigService');
+					return new \Application\Controller\ConfigController($configService);
+				},
+				'Application\Controller\Facility' => function ($sm) {
+					$facilityService = $sm->getServiceLocator()->get('FacilityService');
+					return new \Application\Controller\FacilityController($facilityService);
+				},
 				'Application\Controller\Summary' => function ($sm) {
 					$sampleService = $sm->getServiceLocator()->get('SampleService');
 					$summaryService = $sm->getServiceLocator()->get('SummaryService');
-					return new \Application\Controller\SummaryController($summaryService,$sampleService);
+					return new \Application\Controller\SummaryController($summaryService, $sampleService);
 				},
 				'Application\Controller\Laboratory' => function ($sm) {
 					$sampleService = $sm->getServiceLocator()->get('SampleService');
 					$commonService = $sm->getServiceLocator()->get('CommonService');
-					return new \Application\Controller\LaboratoryController($sampleService,$commonService);
+					return new \Application\Controller\LaboratoryController($sampleService, $commonService);
 				},
 				'Application\Controller\Clinic' => function ($sm) {
 					$sampleService = $sm->getServiceLocator()->get('SampleService');
 					$configService = $sm->getServiceLocator()->get('ConfigService');
-					return new \Application\Controller\ClinicController($sampleService,$configService);
+					return new \Application\Controller\ClinicController($sampleService, $configService);
 				},
 				'Application\Controller\Common' => function ($sm) {
 					$commonService = $sm->getServiceLocator()->get('CommonService');
 					$configService = $sm->getServiceLocator()->get('ConfigService');
-					return new \Application\Controller\CommonController($commonService,$configService);
+					return new \Application\Controller\CommonController($commonService, $configService);
 				},
 			),
 		);
