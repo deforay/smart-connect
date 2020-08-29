@@ -10,7 +10,6 @@ use Application\Model\OrganizationTypesTable;
 use Application\Model\CountriesTable;
 use Application\Model\RolesTable;
 use Application\Model\UserOrganizationsMapTable;
-use Application\Model\SourceTable;
 use Application\Model\SampleTable;
 use Application\Model\FacilityTable;
 use Application\Model\FacilityTypeTable;
@@ -228,11 +227,6 @@ class Module
 				'UserOrganizationsMapTable' => function ($sm) {
 					$dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');
 					$table = new UserOrganizationsMapTable($dbAdapter);
-					return $table;
-				},
-				'SourceTable' => function ($sm) {
-					$dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');
-					$table = new SourceTable($dbAdapter);
 					return $table;
 				},
 				'SampleTable' => function ($sm) {

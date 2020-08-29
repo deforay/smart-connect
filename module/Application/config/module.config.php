@@ -122,16 +122,6 @@ return array(
                     ),
                 ),
             ),
-            'source' => array(
-                'type'    => 'segment',
-                'options' => array(
-                    'route'    => '/source[/][:action][/:id]',
-                    'defaults' => array(
-                        'controller' => 'Application\Controller\Source',
-                        'action' => 'index',
-                    ),
-                ),
-            ),
             'common' => array(
                 'type'    => 'segment',
                 'options' => array(
@@ -198,7 +188,6 @@ return array(
             'Application\Controller\Index' => 'Application\Controller\IndexController',
             'Application\Controller\Organizations' => 'Application\Controller\OrganizationsController',
             //'Application\Controller\Hubs' => 'Application\Controller\HubsController',
-            'Application\Controller\Source' => 'Application\Controller\SourceController',
             'Application\Controller\Time' => 'Application\Controller\TimeController'
         ),
     ),
