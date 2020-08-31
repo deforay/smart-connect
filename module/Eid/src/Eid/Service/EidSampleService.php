@@ -58,6 +58,12 @@ class EidSampleService
         return $sampleDb->fetchLabTurnAroundTime($params);
     }
 
+    public function fetchLabPerformance($params)
+    {
+        $sampleDb = $this->sm->get('EidSampleTableWithoutCache');
+        return $sampleDb->fetchLabPerformance($params);
+    }
+
     // END OF LABS DASHBOARD
 
     public function saveFileFromVlsmAPIV2()

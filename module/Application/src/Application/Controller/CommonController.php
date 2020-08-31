@@ -99,9 +99,12 @@ class CommonController extends AbstractActionController
     {
         $request = $this->getRequest();
         if ($request->isPost()) {
+            
             $params = $request->getPost();
             $viewModel = new ViewModel();
-            $viewModel->setVariables(array('result' => $this->commonService->getFacilityList($params['districtName'])))->setTerminal(true);
+            $params['facilityType'] = isset($params['facilityType']) ? $params['facilityType'] : 1;
+            $res = $this->commonService->getFacilityList($params['districtName'], $params['facilityType']);
+            $viewModel->setVariables(array('result' => $res))->setTerminal(true);
             return $viewModel;
         }
     }

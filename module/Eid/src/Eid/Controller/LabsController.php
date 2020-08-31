@@ -80,10 +80,21 @@ class LabsController extends AbstractActionController
     $request = $this->getRequest();
     if ($request->isPost()) {
       $params = $request->getPost();
-      $sampleType = $this->sampleService->getSampleType();
       $result = $this->sampleService->getLabTurnAroundTime($params);
       $viewModel = new ViewModel();
-      $viewModel->setVariables(array('result' => $result, 'sampleType' => $sampleType))
+      $viewModel->setVariables(array('result' => $result))
+        ->setTerminal(true);
+      return $viewModel;
+    }
+  }
+  public function getLabPerformanceAction()
+  {
+    $request = $this->getRequest();
+    if ($request->isPost()) {
+      $params = $request->getPost();
+      $result = $this->sampleService->fetchLabPerformance($params);
+      $viewModel = new ViewModel();
+      $viewModel->setVariables(array('result' => $result))
         ->setTerminal(true);
       return $viewModel;
     }

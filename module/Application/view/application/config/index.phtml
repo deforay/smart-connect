@@ -1,74 +1,78 @@
     <!-- BEGIN PAGE HEADER-->
-        <!-- BEGIN PAGE BAR -->
-        <div class="page-bar">
-            <ul class="page-breadcrumb">
-                <li>
-                    <a href="/"><?php echo $this->translate('Dashboard'); ?></a>
-                    <i class="fa fa-circle"></i>
-                </li>
-                <li>
-		    <?php echo $this->translate('Config'); ?>
-                </li>
-               
-            </ul>
-        </div>
-        
-        <!-- END PAGE BAR -->
-        <!-- BEGIN PAGE TITLE-->
-        <h3 class="page-title"> <?php echo $this->translate('Config'); ?> <a href="<?php echo $this->url('config',array('action' => 'edit'));?>" class="btn btn-primary pull-right" style="margin-top:-5px;"><i class="fa fa-edit"></i>&nbsp;<?php echo $this->translate('Edit Config'); ?></a></h3>
-        <!-- END PAGE TITLE-->
-        <!-- END PAGE HEADER-->
-        <div class="row">
-            <div class="col-md-12">
-                <!-- BEGIN EXAMPLE TABLE PORTLET-->
-                <div class="portlet light bordered">
-                    <div class="portlet-body">
-                        <div class="portlet-body form">
-                            <table class="table table-striped table-bordered table-hover order-column" id="globalDataTable">
-                                <thead>
-                                    <tr>
-                                        <th><?php echo $this->translate('Config Name'); ?></th>
-					<th><?php echo $this->translate('Value'); ?></th>                                           
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td colspan="2" class="dataTables_empty">Loading data from server</td>
-                                    </tr>
-                                </tbody>
-                                    
-                            </table>
-                        </div>
+    <!-- BEGIN PAGE BAR -->
+    <div class="page-bar">
+        <ul class="page-breadcrumb">
+            <li>
+                <a href="/"><?php echo $this->translate('Dashboard'); ?></a>
+                <i class="fa fa-circle"></i>
+            </li>
+            <li>
+                <?php echo $this->translate('Config'); ?>
+            </li>
+
+        </ul>
+    </div>
+
+    <!-- END PAGE BAR -->
+    <!-- BEGIN PAGE TITLE-->
+    <h3 class="page-title"> <?php echo $this->translate('Config'); ?> <a href="<?php echo $this->url('config', array('action' => 'edit')); ?>" class="btn btn-primary pull-right" style="margin-top:-5px;"><i class="fa fa-edit"></i>&nbsp;<?php echo $this->translate('Edit Config'); ?></a></h3>
+    <!-- END PAGE TITLE-->
+    <!-- END PAGE HEADER-->
+    <div class="row">
+        <div class="col-md-12">
+            <!-- BEGIN EXAMPLE TABLE PORTLET-->
+            <div class="portlet light bordered">
+                <div class="portlet-body">
+                    <div class="portlet-body form">
+                        <table class="table table-striped table-bordered table-hover order-column" id="globalDataTable">
+                            <thead>
+                                <tr>
+                                    <th><?php echo $this->translate('Config Name'); ?></th>
+                                    <th><?php echo $this->translate('Value'); ?></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="2" class="dataTables_empty">Loading data from server</td>
+                                </tr>
+                            </tbody>
+
+                        </table>
                     </div>
                 </div>
-                <!-- END EXAMPLE TABLE PORTLET-->
             </div>
+            <!-- END EXAMPLE TABLE PORTLET-->
         </div>
+    </div>
 
-<script type="text/javascript">
-    /* Table initialisation */
-    oTable = null;
-    $(document).ready(function() {
-        $('#globalDataTable').dataTable( {
-            "bAutoWidth": false,
-            "bProcessing": true,
-            "bServerSide": true,
-            "aoColumns": [
-                {"sClass":"center"},
-                {"sClass":"center"}
-            ],
-            "aaSorting": [[ 0, "asc" ]],
-            "sAjaxSource": "<?php echo $this->url('config',array('action' => 'index')); ?>",
-            "fnServerData": function ( sSource, aoData, fnCallback ) {
-                $.ajax({
-                    "dataType": 'json',
-                    "type": "POST",
-                    "url": sSource,
-                    "data": aoData,
-                    "success": fnCallback
-                });
-            }
-        } );
-    } );
-       
-</script>
+    <script type="text/javascript">
+        /* Table initialisation */
+        oTable = null;
+        $(document).ready(function() {
+            $('#globalDataTable').dataTable({
+                "bAutoWidth": false,
+                "bProcessing": true,
+                "bServerSide": true,
+                "aoColumns": [{
+                        "sClass": "center"
+                    },
+                    {
+                        "sClass": "center"
+                    }
+                ],
+                "aaSorting": [
+                    [0, "asc"]
+                ],
+                "sAjaxSource": "<?php echo $this->url('config', array('action' => 'index')); ?>",
+                "fnServerData": function(sSource, aoData, fnCallback) {
+                    $.ajax({
+                        "dataType": 'json',
+                        "type": "POST",
+                        "url": sSource,
+                        "data": aoData,
+                        "success": fnCallback
+                    });
+                }
+            });
+        });
+    </script>

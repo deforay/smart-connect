@@ -495,10 +495,10 @@ class CommonService
           return $locationDb->fetchDistrictListByIds($locationId);
      }
      
-     public function getFacilityList($districtId)
+     public function getFacilityList($districtId, $facilityType=1)
      {
           $facilityDb = $this->sm->get('FacilityTable');
-          return $facilityDb->fetchFacilityListByDistrict($districtId);
+          return $facilityDb->fetchFacilityListByDistrict($districtId,$facilityType);
      }
 
 

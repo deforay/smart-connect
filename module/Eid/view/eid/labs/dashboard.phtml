@@ -304,15 +304,7 @@ $endDate = date('Y-m');
                 <div class="caption">
                     <span class="caption-subject"><?php echo $this->translate('Tests with valid outcomes'); ?></span>
                 </div>
-                <!-- <div class="actions">
-                    <div class="btn-group">
-                        <select id="sampleType" class="btn white btn-outline btn-circle btn-sm dropdown-toggle" onchange="getMonthlySampleCount()">
-                            <option value=""><?php echo $this->translate('All Sample Types'); ?></option>
-                            <?php echo $sType; ?>
-                        </select>
 
-                    </div>
-                </div> -->
             </div>
             <div class="portlet-body" style="cursor:pointer;">
                 <div id="monthlyCounts"></div>
@@ -326,14 +318,6 @@ $endDate = date('Y-m');
                 <div class="caption">
                     <span class="caption-subject"><?php echo $this->translate('Samples Tested per Lab'); ?></span>
                 </div>
-                <!-- <div class="actions">
-                    <div class="btn-group">
-                        <select id="sampleTypeVolume" class="btn white btn-outline btn-circle btn-sm dropdown-toggle" onchange="getSamplesTestedByLab();">
-                            <option value=""><?php echo $this->translate('All Sample Types'); ?></option>
-                            <?php echo $sType; ?>
-                        </select>
-                    </div>
-                </div> -->
             </div>
             <div class="portlet-body" style="cursor:pointer;">
                 <div id="monthlyCountsByLab"></div>
@@ -351,6 +335,20 @@ $endDate = date('Y-m');
             </div>
             <div class="portlet-body">
                 <div id="labAverageTat" style="height:400px;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12 col-sm-12 col-lg-12">
+        <div class="portlet box blue">
+            <div class="portlet-title">
+                <div class="caption">
+                    <span class="caption-subject"><?php echo $this->translate('Laboratory Performance'); ?></span>
+                </div>
+            </div>
+            <div class="portlet-body">
+                <div id="labPerformance" style="height:400px;"></div>
             </div>
         </div>
     </div>
@@ -412,6 +410,8 @@ $endDate = date('Y-m');
         var toDate = formatDate($('#mrp-upperDate').val());
         var sampleType = ($("#sampleType").val() == null) ? '' : $("#sampleType").val();
         var facilityId = ($("#labName").val() == null) ? '' : $("#labName").val().join(',');
+
+
         return $.post("<?php echo $this->url('eid-labs', array('action' => 'get-monthly-sample-count-by-labs')); ?>", {
                 fromDate: fromDate,
                 toDate: toDate,
@@ -420,6 +420,8 @@ $endDate = date('Y-m');
             },
             function(data) {
                 $("#monthlyCountsByLab").html(data);
+
+
             });
     }
 
@@ -434,6 +436,20 @@ $endDate = date('Y-m');
             },
             function(data) {
                 $("#labAverageTat").html(data);
+            });
+    }
+
+    function getLabPerformance() {
+        var fromDate = formatDate($('#mrp-lowerDate').val());
+        var toDate = formatDate($('#mrp-upperDate').val());
+        var facilityId = ($("#labName").val() == null) ? '' : $("#labName").val().join(',');
+        return $.post("<?php echo $this->url('eid-labs', array('action' => 'get-lab-performance')); ?>", {
+                fromDate: fromDate,
+                toDate: toDate,
+                facilityId: facilityId
+            },
+            function(data) {
+                $("#labPerformance").html(data);
             });
     }
 
@@ -530,6 +546,8 @@ $endDate = date('Y-m');
 
     });
 
+
+
     function getEverything() {
         $.blockUI.defaults.css.border = '1px solid grey';
         //$(document).ajaxStart($.blockUI({ message: '<h2><?php echo $this->translate('Processing...'); ?></h2>' })).ajaxStop($.unblockUI);
@@ -542,6 +560,7 @@ $endDate = date('Y-m');
         $.when(getMonthlySampleCount(), getMonthlySampleCountbyLab())
             .done(function() {
                 getAverageLabTAT();
+                getLabPerformance();
             });
 
 
@@ -608,7 +627,8 @@ $endDate = date('Y-m');
         var dName = $("#districtName").val();
         if (dName != null && dName.length > 0) {
             $.post("<?php echo $this->url('common', array('action' => 'get-facility-list')); ?>", {
-                    districtName: dName
+                    districtName: dName,
+                    facilityType: 2
                 },
                 function(data) {
                     if (data != "" || data != null || data != undefined) {
