@@ -22,8 +22,15 @@ use Application\Model\ArtCodeTable;
 use Application\Model\UserFacilityMapTable;
 use Application\Model\LocationDetailsTable;
 use Application\Model\RemovedSamplesTable;
-use Application\Model\SampleRejectionReasonTable;
 use Application\Model\GenerateBackupTable;
+use Application\Model\SampleRejectionReasonTable;
+use Application\Model\EidSampleRejectionReasonTable;
+use Application\Model\Covid19SampleRejectionReasonsTable;
+use Application\Model\EidSampleTypeTable;
+use Application\Model\Covid19SampleTypeTable;
+use Application\Model\Covid19ComorbiditiesTable;
+use Application\Model\Covid19SymptomsTable;
+use Application\Model\Covid19TestReasonsTable;
 
 use Application\Service\CommonService;
 use Application\Service\UserService;
@@ -324,6 +331,41 @@ class Module
 				'SampleRejectionReasonTable' => function ($sm) {
 					$dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');
 					$table = new SampleRejectionReasonTable($dbAdapter);
+					return $table;
+				},
+				'EidSampleRejectionReasonTable' => function ($sm) {
+					$dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');
+					$table = new EidSampleRejectionReasonTable($dbAdapter);
+					return $table;
+				},
+				'Covid19SampleRejectionReasonsTable' => function ($sm) {
+					$dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');
+					$table = new Covid19SampleRejectionReasonsTable($dbAdapter);
+					return $table;
+				},
+				'EidSampleTypeTable' => function ($sm) {
+					$dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');
+					$table = new EidSampleTypeTable($dbAdapter);
+					return $table;
+				},
+				'Covid19SampleTypeTable' => function ($sm) {
+					$dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');
+					$table = new Covid19SampleTypeTable($dbAdapter);
+					return $table;
+				},
+				'Covid19ComorbiditiesTable' => function ($sm) {
+					$dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');
+					$table = new Covid19ComorbiditiesTable($dbAdapter);
+					return $table;
+				},
+				'Covid19SymptomsTable' => function ($sm) {
+					$dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');
+					$table = new Covid19SymptomsTable($dbAdapter);
+					return $table;
+				},
+				'Covid19TestReasonsTable' => function ($sm) {
+					$dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');
+					$table = new Covid19TestReasonsTable($dbAdapter);
 					return $table;
 				},
 

@@ -421,3 +421,58 @@ ALTER TABLE `r_covid19_test_reasons` ADD `updated_datetime` DATETIME NULL DEFAUL
 ALTER TABLE `vl_request_form` ADD INDEX(`last_modified_datetime`);
 ALTER TABLE `eid_form` ADD INDEX(`last_modified_datetime`);
 ALTER TABLE `form_covid19` ADD INDEX(`last_modified_datetime`);
+
+-- Thana 1 Sep 2020
+ALTER TABLE `facility_details` ADD `updated_datetime` DATETIME NULL DEFAULT NULL AFTER `facility_logo`;
+
+
+CREATE TABLE `r_covid19_test_reasons` (
+ `test_reason_id` int NOT NULL AUTO_INCREMENT,
+ `test_reason_name` varchar(255) DEFAULT NULL,
+ `parent_reason` int DEFAULT NULL,
+ `test_reason_status` varchar(45) DEFAULT NULL,
+ `updated_datetime` datetime DEFAULT NULL,
+ PRIMARY KEY (`test_reason_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
+
+CREATE TABLE `r_covid19_symptoms` (
+ `symptom_id` int NOT NULL AUTO_INCREMENT,
+ `symptom_name` varchar(255) DEFAULT NULL,
+ `parent_symptom` int DEFAULT NULL,
+ `symptom_status` varchar(45) DEFAULT NULL,
+ `updated_datetime` datetime DEFAULT NULL,
+ PRIMARY KEY (`symptom_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8;
+
+CREATE TABLE `r_covid19_sample_type` (
+ `sample_id` int NOT NULL AUTO_INCREMENT,
+ `sample_name` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci DEFAULT NULL,
+ `status` varchar(45) CHARACTER SET latin1 COLLATE latin1_swedish_ci DEFAULT NULL,
+ `updated_datetime` datetime DEFAULT NULL,
+ `data_sync` int NOT NULL DEFAULT '0',
+ PRIMARY KEY (`sample_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8;
+
+CREATE TABLE `r_covid19_sample_rejection_reasons` (
+ `rejection_reason_id` int NOT NULL AUTO_INCREMENT,
+ `rejection_reason_name` varchar(255) DEFAULT NULL,
+ `rejection_type` varchar(255) NOT NULL DEFAULT 'general',
+ `rejection_reason_status` varchar(255) DEFAULT NULL,
+ `rejection_reason_code` varchar(255) DEFAULT NULL,
+ `updated_datetime` datetime DEFAULT NULL,
+ `data_sync` int NOT NULL DEFAULT '0',
+ PRIMARY KEY (`rejection_reason_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=35 DEFAULT CHARSET=latin1;
+
+CREATE TABLE `r_covid19_comorbidities` (
+ `comorbidity_id` int NOT NULL AUTO_INCREMENT,
+ `comorbidity_name` varchar(255) DEFAULT NULL,
+ `comorbidity_status` varchar(45) DEFAULT NULL,
+ `updated_datetime` datetime DEFAULT NULL,
+ PRIMARY KEY (`comorbidity_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8;
+
+ALTER TABLE `facility_details` ADD `header_text` VARCHAR(255) NULL DEFAULT NULL AFTER `facility_type`;
+ALTER TABLE `r_art_code_details` ADD `updated_datetime` DATETIME NULL DEFAULT NULL AFTER `nation_identifier`;
+ALTER TABLE `r_art_code_details` ADD `headings` VARCHAR(255) NULL DEFAULT NULL AFTER `updated_datetime`, ADD `art_status` VARCHAR(45) NULL DEFAULT NULL AFTER `headings`;
+ALTER TABLE `r_sample_rejection_reasons` ADD `rejection_type` VARCHAR(255) NULL DEFAULT NULL AFTER `rejection_reason_id`, ADD `rejection_reason_code` VARCHAR(255) NULL DEFAULT NULL AFTER `rejection_type`;

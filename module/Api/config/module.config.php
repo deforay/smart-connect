@@ -100,6 +100,18 @@ return array(
                     ),
                 ),
             ),
+            'vlsm-reference-tables' => array(
+                'type'    => 'segment',
+                'options' => array(
+                    'route'    => '/api/vlsm-reference-tables[/:id]',
+                    'constraints' => array(
+                        'id'     => '[0-9]+',
+                    ),
+                    'defaults' => array(
+                        'controller' => 'Api\Controller\VlsmReferenceTables',
+                    ),
+                ),
+            ),
         ),
     ),
     'view_manager' => array(
