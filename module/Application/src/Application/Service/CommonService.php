@@ -563,16 +563,20 @@ class CommonService
           $pathname = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-reference" . DIRECTORY_SEPARATOR . $fileName;
           if (!file_exists($pathname)) {
                if (move_uploaded_file($_FILES['referenceFile']['tmp_name'], $pathname)) {
-                    $apiData = \JsonMachine\JsonMachine::fromFile($pathname);
+                    // $apiData = \JsonMachine\JsonMachine::fromFile($pathname);
                     $apiData = json_decode(file_get_contents($pathname));
                }
           }
-
+          // echo "<pre>";print_r($apiData->facility_details->tableStructure);die;
           if ($apiData !== FALSE) {
                /* For update the Facility Details */
-               if (isset($apiData->facility_details) && !empty($apiData->facility_details)) {
+               if(isset($apiData->facility_details) && !empty($apiData->facility_details)){
+                    /* if($apiData->forceSync){
+                         $rQueryStr = $apiData->facility_details->tableStructure;
+                         $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
+                    } */
                     $condition = "";
-                    if (isset($apiData->facility_details->lastModifiedTime) && !empty($apiData->facility_details->lastModifiedTime)) {
+                    if(isset($apiData->facility_details->lastModifiedTime) && !empty($apiData->facility_details->lastModifiedTime)){
                          $condition = "updated_datetime > '" . $apiData->facility_details->lastModifiedTime . "'";
                     }
                     $notUpdated = $this->getLastModifiedDateTime('facility_details', 'updated_datetime', $condition);
@@ -612,9 +616,13 @@ class CommonService
                     }
                }
                /* For update the Test Reasons */
-               if (isset($apiData->r_vl_test_reasons) && !empty($apiData->r_vl_test_reasons)) {
+               if(isset($apiData->r_vl_test_reasons) && !empty($apiData->r_vl_test_reasons)){
+                    /* if($apiData->forceSync){
+                         $rQueryStr = $apiData->r_vl_test_reasons->tableStructure;
+                         $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
+                    } */
                     $condition = "";
-                    if (isset($apiData->r_vl_test_reasons->lastModifiedTime) && !empty($apiData->r_vl_test_reasons->lastModifiedTime)) {
+                    if(isset($apiData->r_vl_test_reasons->lastModifiedTime) && !empty($apiData->r_vl_test_reasons->lastModifiedTime)){
                          $condition = "updated_datetime > '" . $apiData->r_vl_test_reasons->lastModifiedTime . "'";
                     }
                     $notUpdated = $this->getLastModifiedDateTime('r_vl_test_reasons', 'updated_datetime', $condition);
@@ -632,11 +640,15 @@ class CommonService
                          }
                     }
                }
-
+               
                /* For update the Covid19 Test Reasons */
-               if (isset($apiData->r_covid19_test_reasons) && !empty($apiData->r_covid19_test_reasons)) {
+               if(isset($apiData->r_covid19_test_reasons) && !empty($apiData->r_covid19_test_reasons)){
+                    /* if($apiData->forceSync){
+                         $rQueryStr = $apiData->r_covid19_test_reasons->tableStructure;
+                         $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
+                    } */
                     $condition = "";
-                    if (isset($apiData->r_covid19_test_reasons->lastModifiedTime) && !empty($apiData->r_covid19_test_reasons->lastModifiedTime)) {
+                    if(isset($apiData->r_covid19_test_reasons->lastModifiedTime) && !empty($apiData->r_covid19_test_reasons->lastModifiedTime)){
                          $condition = "updated_datetime > '" . $apiData->r_covid19_test_reasons->lastModifiedTime . "'";
                     }
                     $notUpdated = $this->getLastModifiedDateTime('r_covid19_test_reasons', 'updated_datetime', $condition);
@@ -654,11 +666,15 @@ class CommonService
                          }
                     }
                }
-
+               
                /* For update the Art Code Details */
-               if (isset($apiData->r_art_code_details) && !empty($apiData->r_art_code_details)) {
+               if(isset($apiData->r_art_code_details) && !empty($apiData->r_art_code_details)){
+                    /* if($apiData->forceSync){
+                         $rQueryStr = $apiData->r_art_code_details->tableStructure;
+                         $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
+                    } */
                     $condition = "";
-                    if (isset($apiData->r_art_code_details->lastModifiedTime) && !empty($apiData->r_art_code_details->lastModifiedTime)) {
+                    if(isset($apiData->r_art_code_details->lastModifiedTime) && !empty($apiData->r_art_code_details->lastModifiedTime)){
                          $condition = "updated_datetime > '" . $apiData->r_art_code_details->lastModifiedTime . "'";
                     }
                     $notUpdated = $this->getLastModifiedDateTime('r_art_code_details', 'updated_datetime', $condition);
@@ -677,11 +693,15 @@ class CommonService
                          }
                     }
                }
-
+               
                /* For update the Sample Rejection Reason Details */
-               if (isset($apiData->r_sample_rejection_reasons) && !empty($apiData->r_sample_rejection_reasons)) {
+               if(isset($apiData->r_sample_rejection_reasons) && !empty($apiData->r_sample_rejection_reasons)){
+                    /* if($apiData->forceSync){
+                         $rQueryStr = $apiData->r_sample_rejection_reasons->tableStructure;
+                         $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
+                    } */
                     $condition = "";
-                    if (isset($apiData->r_sample_rejection_reasons->lastModifiedTime) && !empty($apiData->r_sample_rejection_reasons->lastModifiedTime)) {
+                    if(isset($apiData->r_sample_rejection_reasons->lastModifiedTime) && !empty($apiData->r_sample_rejection_reasons->lastModifiedTime)){
                          $condition = "updated_datetime > '" . $apiData->r_sample_rejection_reasons->lastModifiedTime . "'";
                     }
                     $notUpdated = $this->getLastModifiedDateTime('r_sample_rejection_reasons', 'updated_datetime', $condition);
@@ -700,11 +720,15 @@ class CommonService
                          }
                     }
                }
-
+               
                /* For update the EID Sample Rejection Reason Details */
-               if (isset($apiData->r_eid_sample_rejection_reasons) && !empty($apiData->r_eid_sample_rejection_reasons)) {
+               if(isset($apiData->r_eid_sample_rejection_reasons) && !empty($apiData->r_eid_sample_rejection_reasons)){
+                    /* if($apiData->forceSync){
+                         $rQueryStr = $apiData->r_eid_sample_rejection_reasons->tableStructure;
+                         $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
+                    } */
                     $condition = "";
-                    if (isset($apiData->r_eid_sample_rejection_reasons->lastModifiedTime) && !empty($apiData->r_eid_sample_rejection_reasons->lastModifiedTime)) {
+                    if(isset($apiData->r_eid_sample_rejection_reasons->lastModifiedTime) && !empty($apiData->r_eid_sample_rejection_reasons->lastModifiedTime)){
                          $condition = "updated_datetime > '" . $apiData->r_eid_sample_rejection_reasons->lastModifiedTime . "'";
                     }
                     $notUpdated = $this->getLastModifiedDateTime('r_eid_sample_rejection_reasons', 'updated_datetime', $condition);
@@ -724,9 +748,13 @@ class CommonService
                }
 
                /* For update the Covid19 Sample Rejection Reason Details */
-               if (isset($apiData->r_covid19_sample_rejection_reasons) && !empty($apiData->r_covid19_sample_rejection_reasons)) {
+               if(isset($apiData->r_covid19_sample_rejection_reasons) && !empty($apiData->r_covid19_sample_rejection_reasons)){
+                    /* if($apiData->forceSync){
+                         $rQueryStr = $apiData->r_covid19_sample_rejection_reasons->tableStructure;
+                         $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
+                    } */
                     $condition = "";
-                    if (isset($apiData->r_covid19_sample_rejection_reasons->lastModifiedTime) && !empty($apiData->r_covid19_sample_rejection_reasons->lastModifiedTime)) {
+                    if(isset($apiData->r_covid19_sample_rejection_reasons->lastModifiedTime) && !empty($apiData->r_covid19_sample_rejection_reasons->lastModifiedTime)){
                          $condition = "updated_datetime > '" . $apiData->r_covid19_sample_rejection_reasons->lastModifiedTime . "'";
                     }
                     $notUpdated = $this->getLastModifiedDateTime('r_covid19_sample_rejection_reasons', 'updated_datetime', $condition);
@@ -744,11 +772,15 @@ class CommonService
                          }
                     }
                }
-
+               
                /* For update the EID Sample Type Details */
-               if (isset($apiData->r_eid_sample_type) && !empty($apiData->r_eid_sample_type)) {
+               if(isset($apiData->r_eid_sample_type) && !empty($apiData->r_eid_sample_type)){
+                    /* if($apiData->forceSync){
+                         $rQueryStr = $apiData->r_eid_sample_type->tableStructure;
+                         $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
+                    } */
                     $condition = "";
-                    if (isset($apiData->r_eid_sample_type->lastModifiedTime) && !empty($apiData->r_eid_sample_type->lastModifiedTime)) {
+                    if(isset($apiData->r_eid_sample_type->lastModifiedTime) && !empty($apiData->r_eid_sample_type->lastModifiedTime)){
                          $condition = "updated_datetime > '" . $apiData->r_eid_sample_type->lastModifiedTime . "'";
                     }
                     $notUpdated = $this->getLastModifiedDateTime('r_eid_sample_type', 'updated_datetime', $condition);
@@ -766,11 +798,15 @@ class CommonService
                          }
                     }
                }
-
+               
                /* For update the Covid19 Sample Type Details */
-               if (isset($apiData->r_covid19_sample_type) && !empty($apiData->r_covid19_sample_type)) {
+               if(isset($apiData->r_covid19_sample_type) && !empty($apiData->r_covid19_sample_type)){
+                    /* if($apiData->forceSync){
+                         $rQueryStr = $apiData->r_covid19_sample_type->tableStructure;
+                         $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
+                    } */
                     $condition = "";
-                    if (isset($apiData->r_covid19_sample_type->lastModifiedTime) && !empty($apiData->r_covid19_sample_type->lastModifiedTime)) {
+                    if(isset($apiData->r_covid19_sample_type->lastModifiedTime) && !empty($apiData->r_covid19_sample_type->lastModifiedTime)){
                          $condition = "updated_datetime > '" . $apiData->r_covid19_sample_type->lastModifiedTime . "'";
                     }
                     $notUpdated = $this->getLastModifiedDateTime('r_covid19_sample_type', 'updated_datetime', $condition);
@@ -788,11 +824,15 @@ class CommonService
                          }
                     }
                }
-
+               
                /* For update the  Covid19 Comorbidities */
-               if (isset($apiData->r_covid19_comorbidities) && !empty($apiData->r_covid19_comorbidities)) {
+               if(isset($apiData->r_covid19_comorbidities) && !empty($apiData->r_covid19_comorbidities)){
+                    /* if($apiData->forceSync){
+                         $rQueryStr = $apiData->r_covid19_comorbidities->tableStructure;
+                         $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
+                    } */
                     $condition = "";
-                    if (isset($apiData->r_covid19_comorbidities->lastModifiedTime) && !empty($apiData->r_covid19_comorbidities->lastModifiedTime)) {
+                    if(isset($apiData->r_covid19_comorbidities->lastModifiedTime) && !empty($apiData->r_covid19_comorbidities->lastModifiedTime)){
                          $condition = "updated_datetime > '" . $apiData->r_covid19_comorbidities->lastModifiedTime . "'";
                     }
                     $notUpdated = $this->getLastModifiedDateTime('r_covid19_comorbidities', 'updated_datetime', $condition);
@@ -810,11 +850,15 @@ class CommonService
                          }
                     }
                }
-
+               
                /* For update the  Covid19 Symptoms */
-               if (isset($apiData->r_covid19_symptoms) && !empty($apiData->r_covid19_symptoms)) {
+               if(isset($apiData->r_covid19_symptoms) && !empty($apiData->r_covid19_symptoms)){
+                    /* if($apiData->forceSync){
+                         $rQueryStr = $apiData->r_covid19_symptoms->tableStructure;
+                         $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
+                    } */
                     $condition = "";
-                    if (isset($apiData->r_covid19_symptoms->lastModifiedTime) && !empty($apiData->r_covid19_symptoms->lastModifiedTime)) {
+                    if(isset($apiData->r_covid19_symptoms->lastModifiedTime) && !empty($apiData->r_covid19_symptoms->lastModifiedTime)){
                          $condition = "updated_datetime > '" . $apiData->r_covid19_symptoms->lastModifiedTime . "'";
                     }
                     $notUpdated = $this->getLastModifiedDateTime('r_covid19_symptoms', 'updated_datetime', $condition);
