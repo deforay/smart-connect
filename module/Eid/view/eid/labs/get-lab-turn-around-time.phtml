@@ -28,8 +28,8 @@
         },
         xAxis: [{
             categories: [<?php
-                            if (isset($result['date']) && count($result['date']) > 0) {
-                                foreach ($result['date'] as $date) {
+                            if (isset($result['dates']) && count($result['dates']) > 0) {
+                                foreach ($result['dates'] as $date) {
                                     echo "'" . $date . "',";
                                 }
                             }
@@ -67,8 +67,8 @@
             }
         },
         series: [<?php
-                    if (isset($result['sample']) && count($result['sample']) > 0) {
-                        foreach ($result['sample'] as $key => $condition) {
+                    if (isset($result['data']) && count($result['data']) > 0) {
+                        foreach ($result['data'] as $key => $condition) {
                     ?> {
                         name: '<?php echo $this->translate($key); ?>',
                         type: 'column',
@@ -87,35 +87,7 @@
                                 }
                                 ?>],
                     },
-                    <?php
-                        }
-                    }
-                    foreach ($sampleType as $sample) {
-                        if (isset($result[$sample['sample_name']])) {
-                            foreach ($result[$sample['sample_name']] as $key => $condition) {
-                    ?> {
-                            name: '<?php echo $sample['sample_name']; ?>',
-                            type: 'spline',
-                            yAxis: 1,
-                            cursor: 'pointer',
-                            point: {
-                                events: {
-                                    click: function(e) {
-                                        doLabTATRedirect(this.category);
-                                        e.preventDefault();
-                                    }
-                                }
-                            },
-                            data: [<?php
-                                    foreach ($condition as $count) {
-                                        echo $count . ",";
-                                    }
-                                    ?>],
-                            color: getRandomColor(),
-                            visible: false
-                        },
                 <?php
-                            }
                         }
                     }
                     if (isset($result['all'])) {

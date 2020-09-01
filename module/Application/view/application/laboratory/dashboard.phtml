@@ -1249,7 +1249,8 @@ foreach ($sampleType as $samples) {
         var dName = $("#districtName").val();
         if(dName != null && dName.length > 0){
             $.post("<?php echo $this->url('common', array('action' => 'get-facility-list')); ?>", {
-                districtName : dName
+                districtName : dName,
+                facilityType: 2
             },
             function(data) {
                 if (data != "" || data != null || data != undefined) {

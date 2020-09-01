@@ -122,26 +122,6 @@ return array(
                     ),
                 ),
             ),
-            'import' => array(
-                'type'    => 'segment',
-                'options' => array(
-                    'route'    => '/import[/][:action][/:id]',
-                    'defaults' => array(
-                        'controller' => 'Application\Controller\Import',
-                        'action' => 'index',
-                    ),
-                ),
-            ),
-            'source' => array(
-                'type'    => 'segment',
-                'options' => array(
-                    'route'    => '/source[/][:action][/:id]',
-                    'defaults' => array(
-                        'controller' => 'Application\Controller\Source',
-                        'action' => 'index',
-                    ),
-                ),
-            ),
             'common' => array(
                 'type'    => 'segment',
                 'options' => array(
@@ -207,18 +187,8 @@ return array(
         'invokables' => array(
             'Application\Controller\Index' => 'Application\Controller\IndexController',
             'Application\Controller\Organizations' => 'Application\Controller\OrganizationsController',
-            'Application\Controller\Users' => 'Application\Controller\UsersController',
-            'Application\Controller\Login' => 'Application\Controller\LoginController',
-            //'Application\Controller\Laboratory' => 'Application\Controller\LaboratoryController',
-            //'Application\Controller\Clinic' => 'Application\Controller\ClinicController',
-            'Application\Controller\Hubs' => 'Application\Controller\HubsController',
-            'Application\Controller\Import' => 'Application\Controller\ImportController',
-            'Application\Controller\Source' => 'Application\Controller\SourceController',
-            'Application\Controller\Config' => 'Application\Controller\ConfigController',
-            'Application\Controller\Facility' => 'Application\Controller\FacilityController',
-            //'Application\Controller\Summary' => 'Application\Controller\SummaryController',
-            'Application\Controller\Time' => 'Application\Controller\TimeController',
-            //'Application\Controller\Cron' => 'Application\Controller\CronController'
+            //'Application\Controller\Hubs' => 'Application\Controller\HubsController',
+            'Application\Controller\Time' => 'Application\Controller\TimeController'
         ),
     ),
     'controller_plugins' => array(
