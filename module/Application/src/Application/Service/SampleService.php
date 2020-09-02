@@ -1070,28 +1070,28 @@ class SampleService
         }
     }
 
-    public function getProvinceBarSampleResultAwaitedDetails($params)
+    public function getProvinceWiseResultAwaitedDrillDown($params)
     {
         $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->fetchProvinceBarSampleResultAwaitedDetails($params);
+        return $sampleDb->fetchProvinceWiseResultAwaitedDrillDown($params);
     }
 
-    public function getFacilityBarSampleResultAwaitedDetails($params)
+    public function getLabWiseResultAwaitedDrillDown($params)
     {
         $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->fetchFacilityBarSampleResultAwaitedDetails($params);
+        return $sampleDb->fetchLabWiseResultAwaitedDrillDown($params);
     }
 
-    public function getDistrictBarSampleResultAwaitedDetails($params)
+    public function getDistrictWiseResultAwaitedDrillDown($params)
     {
         $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->fetchDistrictBarSampleResultAwaitedDetails($params);
+        return $sampleDb->fetchDistrictWiseResultAwaitedDrillDown($params);
     }
 
-    public function getClinicBarSampleResultAwaitedDetails($params)
+    public function getClinicWiseResultAwaitedDrillDown($params)
     {
-        $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->fetchClinicBarSampleResultAwaitedDetails($params);
+        $sampleDb = $this->sm->get('SampleTableWithoutCache');
+        return $sampleDb->fetchClinicWiseResultAwaitedDrillDown($params);
     }
 
     public function getFilterSampleResultAwaitedDetails($parameters)

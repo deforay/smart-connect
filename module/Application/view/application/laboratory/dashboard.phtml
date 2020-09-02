@@ -1152,32 +1152,32 @@ foreach ($sampleType as $samples) {
     }
 
     function doSampleResultAwaitedRedirect(frmSource) {
-        window.open("/labs/sample-result-awaited?src=" + frmSource);
+        window.open("/labs/drill-down-result-awaited?src=" + frmSource);
     }
 
     function doSampleTestedRedirect(month) {
         var selectedLabs = ($("#labName").val() == null) ? '' : $("#labName").val();
-        window.open('/labs/samples-tested?month=' + month + '&lab=' + selectedLabs, '_blank');
+        window.open('/labs/drill-down?month=' + month + '&lab=' + selectedLabs, '_blank');
     }
 
     function doSampleTestedBasedonGenderRedirect(month, gender) {
         var selectedLabs = ($("#labName").val() == null) ? '' : $("#labName").val();
-        window.open('/labs/samples-tested?month=' + month + '&gender=' + gender + '&lab=' + selectedLabs, '_blank');
+        window.open('/labs/drill-down?month=' + month + '&gender=' + gender + '&lab=' + selectedLabs, '_blank');
     }
 
     function doSampleTestedBasedonAgeRedirect(month, age) {
         var selectedLabs = ($("#labName").val() == null) ? '' : $("#labName").val();
-        window.open('/labs/samples-tested?month=' + month + '&age=' + age + '&lab=' + selectedLabs, '_blank');
+        window.open('/labs/drill-down?month=' + month + '&age=' + age + '&lab=' + selectedLabs, '_blank');
     }
 
     function doSampleTestedBasedonPregnantPatientRedirect(month) {
         var selectedLabs = ($("#labName").val() == null) ? '' : $("#labName").val();
-        window.open('/labs/samples-tested?month=' + month + '&gender=F&femaleFilter=P&lab=' + selectedLabs, '_blank');
+        window.open('/labs/drill-down?month=' + month + '&gender=F&femaleFilter=P&lab=' + selectedLabs, '_blank');
     }
 
     function doSampleTestedBasedonBreastfeedingPatientRedirect(month) {
         var selectedLabs = ($("#labName").val() == null) ? '' : $("#labName").val();
-        window.open('/labs/samples-tested?month=' + month + '&gender=F&femaleFilter=BF&lab=' + selectedLabs, '_blank');
+        window.open('/labs/drill-down?month=' + month + '&gender=F&femaleFilter=BF&lab=' + selectedLabs, '_blank');
     }
 
     function doLabTATRedirect(month) {
@@ -1196,12 +1196,12 @@ foreach ($sampleType as $samples) {
 
     function doFemalePatientRedirect(field) {
         var selectedLabs = ($("#labName").val() == null) ? '' : $("#labName").val();
-        window.open('/labs/samples-tested?fromMonth=' + formatDate($('#mrp-lowerDate').val()) + '&toMonth=' + formatDate($('#mrp-upperDate').val()) + '&gender=F&femaleFilter=' + field + '&lab=' + selectedLabs, '_blank');
+        window.open('/labs/drill-down?fromMonth=' + formatDate($('#mrp-lowerDate').val()) + '&toMonth=' + formatDate($('#mrp-upperDate').val()) + '&gender=F&femaleFilter=' + field + '&lab=' + selectedLabs, '_blank');
     }
 
     function doLineofTreatmentRedirect(field) {
         var selectedLabs = ($("#labName").val() == null) ? '' : $("#labName").val();
-        window.open('/labs/samples-tested?fromMonth=' + formatDate($('#mrp-lowerDate').val()) + '&toMonth=' + formatDate($('#mrp-upperDate').val()) + '&lt=' + field + '&lab=' + selectedLabs, '_blank');
+        window.open('/labs/drill-down?fromMonth=' + formatDate($('#mrp-lowerDate').val()) + '&toMonth=' + formatDate($('#mrp-upperDate').val()) + '&lt=' + field + '&lab=' + selectedLabs, '_blank');
     }
 
     function expandMap() {

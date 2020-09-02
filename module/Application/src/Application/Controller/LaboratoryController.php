@@ -65,51 +65,15 @@ class LaboratoryController extends AbstractActionController
         return new ViewModel();
     }
 
-    public function samplesTestedAction()
+    public function drillDownAction()
     {
         $this->layout()->setVariable('activeTab', 'labs-dashboard');
         $params = array();
-        $gender = "";
-        $month = "";
-        $range = "";
-        $age = "";
-        $fromMonth = "";
-        $toMonth = "";
-        $labFilter = "";
-        $femaleFilter = "";
-        $lt = "";
-        $result = "";
-        if ($this->params()->fromQuery('gender')) {
-            $gender = $this->params()->fromQuery('gender');
-        }
-        if ($this->params()->fromQuery('month')) {
-            $month = $this->params()->fromQuery('month');
-        }
-        if ($this->params()->fromQuery('range')) {
-            $range = $this->params()->fromQuery('range');
-        }
-        if ($this->params()->fromQuery('age')) {
-            $age = $this->params()->fromQuery('age');
-        }
-        if ($this->params()->fromQuery('fromMonth')) {
-            $fromMonth = $this->params()->fromQuery('fromMonth');
-        }
-        if ($this->params()->fromQuery('toMonth')) {
-            $toMonth = $this->params()->fromQuery('toMonth');
-        }
-        if ($this->params()->fromQuery('lab')) {
-            $labFilter = $this->params()->fromQuery('lab');
-            $params['labs'] = explode(',', $labFilter);
-        }
-        if ($this->params()->fromQuery('femaleFilter')) {
-            $femaleFilter = $this->params()->fromQuery('femaleFilter');
-        }
-        if ($this->params()->fromQuery('lt')) {
-            $lt = $this->params()->fromQuery('lt');
-        }
-        if ($this->params()->fromQuery('result')) {
-            $result = $this->params()->fromQuery('result');
-        }
+
+
+        $labFilter = $this->params()->fromQuery('lab');
+        $params['labs'] = explode(',', $labFilter);
+
         // $sampleService = $this->getServiceLocator()->get('SampleService');
         // $commonService = $this->getServiceLocator()->get('CommonService');
         $hubName = $this->sampleService->getAllHubName();
@@ -121,17 +85,17 @@ class LaboratoryController extends AbstractActionController
             'sampleType' => $sampleType,
             'hubName' => $hubName,
             'currentRegimen' => $currentRegimen,
-            'searchMonth' => $month,
-            'searchGender' => $gender,
-            'searchRange' => $range,
-            'fromMonth' => $fromMonth,
-            'toMonth' => $toMonth,
-            'labFilter' => $labFilter,
-            'age' => $age,
-            'femaleFilter' => $femaleFilter,
-            'lt' => $lt,
             'facilityInfo' => $facilityInfo,
-            'result' => $result
+            'searchMonth' => $this->params()->fromQuery('month'),
+            'searchGender' => $this->params()->fromQuery('gender'),
+            'searchRange' => $this->params()->fromQuery('range'),
+            'fromMonth' => $this->params()->fromQuery('fromMonth'),
+            'toMonth' => $this->params()->fromQuery('toMonth'),
+            'labFilter' => $this->params()->fromQuery('lab'),
+            'age' => $this->params()->fromQuery('age'),
+            'femaleFilter' => $this->params()->fromQuery('femaleFilter'),
+            'lt' => $this->params()->fromQuery('lt'),
+            'result' => $this->params()->fromQuery('result')
         ));
     }
 
@@ -735,7 +699,7 @@ class LaboratoryController extends AbstractActionController
         }
     }
 
-    public function sampleResultAwaitedAction()
+    public function drillDownResultAwaitedAction()
     {
         $this->layout()->setVariable('activeTab', 'labs-dashboard');
         $params = array();
@@ -764,13 +728,13 @@ class LaboratoryController extends AbstractActionController
         ));
     }
 
-    public function getProvinceBarSampleResultAwaitedDetailsAction()
+    public function getProvinceWiseResultAwaitedDrillDownAction()
     {
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
             // $sampleService = $this->getServiceLocator()->get('SampleService');
-            $result = $this->sampleService->getProvinceBarSampleResultAwaitedDetails($params);
+            $result = $this->sampleService->getProvinceWiseResultAwaitedDrillDown($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('result' => $result))
                 ->setTerminal(true);
@@ -778,13 +742,13 @@ class LaboratoryController extends AbstractActionController
         }
     }
 
-    public function getFacilityBarSampleResultAwaitedDetailsAction()
+    public function getLabWiseResultAwaitedDrillDownAction()
     {
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
             // $sampleService = $this->getServiceLocator()->get('SampleService');
-            $result = $this->sampleService->getFacilityBarSampleResultAwaitedDetails($params);
+            $result = $this->sampleService->getLabWiseResultAwaitedDrillDown($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('result' => $result))
                 ->setTerminal(true);
@@ -792,13 +756,13 @@ class LaboratoryController extends AbstractActionController
         }
     }
 
-    public function getDistrictBarSampleResultAwaitedDetailsAction()
+    public function getDistrictWiseResultAwaitedDrillDownAction()
     {
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
             // $sampleService = $this->getServiceLocator()->get('SampleService');
-            $result = $this->sampleService->getDistrictBarSampleResultAwaitedDetails($params);
+            $result = $this->sampleService->getDistrictWiseResultAwaitedDrillDown($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('result' => $result))
                 ->setTerminal(true);
@@ -806,13 +770,13 @@ class LaboratoryController extends AbstractActionController
         }
     }
 
-    public function getClinicBarSampleResultAwaitedDetailsAction()
+    public function getClinicWiseResultAwaitedDrillDownAction()
     {
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
             // $sampleService = $this->getServiceLocator()->get('SampleService');
-            $result = $this->sampleService->getClinicBarSampleResultAwaitedDetails($params);
+            $result = $this->sampleService->getClinicWiseResultAwaitedDrillDown($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('result' => $result))
                 ->setTerminal(true);
