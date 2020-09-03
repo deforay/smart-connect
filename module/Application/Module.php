@@ -446,9 +446,10 @@ class Module
 	{
 		return array(
 			'invokables' => array(
-				'humanDateFormat' => 'Application\View\Helper\HumanDateFormat',
-				'GetConfigData' => 'Application\View\Helper\GetConfigData',
-				'GetLocaleData' => 'Application\View\Helper\GetLocaleData'
+				'humanDateFormat' 		=> 'Application\View\Helper\HumanDateFormat',
+				'GetConfigData' 		=> 'Application\View\Helper\GetConfigData',
+				'GetActiveModules' 		=> 'Application\View\Helper\GetActiveModules',
+				'GetLocaleData' 		=> 'Application\View\Helper\GetLocaleData'
 			),
 		);
 	}
