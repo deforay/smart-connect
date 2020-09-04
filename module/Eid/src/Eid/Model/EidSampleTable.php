@@ -2549,15 +2549,12 @@ class EidSampleTable extends AbstractTableGateway
             //echo $queryStr;die;
             //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             $sampleResult = $common->cacheQuery($queryStr, $dbAdapter);
-            $j = 0;
-            $monthDateArray = array();
-            foreach ($sampleResult as $sRow) {
-                $result['all'][$j] = (isset($sRow["AvgDiff"]) && $sRow["AvgDiff"] != NULL && $sRow["AvgDiff"] > 0) ? round($sRow["AvgDiff"], 2) : null;
-                //$result['lab'][$j] = (isset($labsubQueryResult[0]["labCount"]) && $labsubQueryResult[0]["labCount"] != NULL && $labsubQueryResult[0]["labCount"] > 0) ? round($labsubQueryResult[0]["labCount"],2) : 0;
-                $result['data']['Samples Collected'][$j] = (isset($sRow['total_samples_collected']) && $sRow['total_samples_collected'] != NULL) ? $sRow['total_samples_collected'] : null;
-                $result['data']['Results Not Available'][$j] = (isset($sRow['total_samples_pending']) && $sRow['total_samples_pending'] != NULL) ? $sRow['total_samples_pending'] : null;
-                $result['dates'][$j] = $sRow["monthDate"];
-                $j++;
+            foreach ($sampleResult as $key=>$sRow) {
+                $result['all'][$key] = (isset($sRow["AvgDiff"]) && $sRow["AvgDiff"] != NULL && $sRow["AvgDiff"] > 0) ? round($sRow["AvgDiff"], 2) : null;
+                //$result['lab'][$key] = (isset($labsubQueryResult[0]["labCount"]) && $labsubQueryResult[0]["labCount"] != NULL && $labsubQueryResult[0]["labCount"] > 0) ? round($labsubQueryResult[0]["labCount"],2) : 0;
+                $result['data']['Samples Collected'][$key] = (isset($sRow['total_samples_collected']) && $sRow['total_samples_collected'] != NULL) ? $sRow['total_samples_collected'] : null;
+                $result['data']['Results Not Available'][$key] = (isset($sRow['total_samples_pending']) && $sRow['total_samples_pending'] != NULL) ? $sRow['total_samples_pending'] : null;
+                $result['dates'][$key] = $sRow["monthDate"];
             }
         }
         return $result;
@@ -2640,4 +2637,163 @@ class EidSampleTable extends AbstractTableGateway
     }
 
     // LABS DASHBOARD END
+
+    ////////////////////////////////////////////
+    /////////*** Turnaround Time Page ***///////
+    ///////////////////////////////////////////
+
+    public function getTATbyProvince($provinceID, $labs, $startDate, $endDate)
+    {
+        $logincontainer = new Container('credo');
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $skipDays = isset($this->config['defaults']['tat-skipdays']) ? $this->config['defaults']['tat-skipdays'] : 120;
+        $squery = $sql->select()->from(array('vl' => $this->table))
+            ->columns(
+                array(
+                    "Collection_Receive"  => new Expression("AVG(ABS(DATEDIFF(IF(`sample_received_at_vl_lab_datetime`='',NULL,IF(DATE(`sample_received_at_vl_lab_datetime`)='1970-01-01',NULL,IF(DATE(`sample_received_at_vl_lab_datetime`)='0000-00-00',NULL,IFNULL(`sample_received_at_vl_lab_datetime`,NULL)))), IF(`sample_collection_date`='',NULL,IF(DATE(`sample_collection_date`)='1970-01-01',NULL,IF(DATE(`sample_collection_date`)='0000-00-00',NULL, IFNULL(`sample_collection_date`,NULL)))))))"),
+                    "Receive_Register"    => new Expression("AVG(ABS(DATEDIFF(IF(`sample_registered_at_lab`='',NULL,IF(DATE(`sample_registered_at_lab`)='1970-01-01',NULL,IF(DATE(`sample_registered_at_lab`)='0000-00-00',NULL,IFNULL(`sample_registered_at_lab`,NULL)))), IF(`sample_received_at_vl_lab_datetime`='',NULL,IF(DATE(`sample_received_at_vl_lab_datetime`)='1970-01-01',NULL,IF(DATE(`sample_received_at_vl_lab_datetime`)='0000-00-00',NULL, IFNULL(`sample_received_at_vl_lab_datetime`,NULL)))))))"),
+                    "Register_Analysis"   => new Expression("AVG(ABS(DATEDIFF(IF(`sample_tested_datetime`='',NULL,IF(DATE(`sample_tested_datetime`)='1970-01-01',NULL,IF(DATE(`sample_tested_datetime`)='0000-00-00',NULL,IFNULL(`sample_tested_datetime`,NULL)))), IF(`sample_registered_at_lab`='',NULL,IF(DATE(`sample_registered_at_lab`)='1970-01-01',NULL,IF(DATE(`sample_registered_at_lab`)='0000-00-00',NULL, IFNULL(`sample_registered_at_lab`,NULL)))))))"),
+                    "Analysis_Authorise"  => new Expression("AVG(ABS(DATEDIFF(IF(`result_approved_datetime`='',NULL,IF(DATE(`result_approved_datetime`)='1970-01-01',NULL,IF(DATE(`result_approved_datetime`)='0000-00-00',NULL,IFNULL(`result_approved_datetime`,NULL)))), IF(`sample_tested_datetime`='',NULL,IF(DATE(`sample_tested_datetime`)='1970-01-01',NULL,IF(DATE(`sample_tested_datetime`)='0000-00-00',NULL, IFNULL(sample_tested_datetime,NULL)))))))")
+                )
+            )
+            ->join('facility_details', 'facility_details.facility_id = vl.facility_id')
+            ->where(
+                array(
+                    "sample_tested_datetime >= '$startDate' AND sample_tested_datetime <= '$endDate'",
+                    "facility_details.facility_state = '$provinceID'",
+                    "sample_collection_date is not null AND sample_collection_date not like '0000-00-00%' AND sample_collection_date not like ''"
+                )
+            );
+        if ($skipDays > 0) {
+            $squery = $squery->where('
+                DATEDIFF(sample_received_at_vl_lab_datetime,sample_collection_date) < ' . $skipDays . ' AND 
+                DATEDIFF(sample_received_at_vl_lab_datetime,sample_collection_date) >= 0 AND 
+
+                DATEDIFF(sample_registered_at_lab,sample_received_at_vl_lab_datetime) < ' . $skipDays . ' AND 
+                DATEDIFF(sample_registered_at_lab,sample_received_at_vl_lab_datetime) >= 0 AND 
+
+                DATEDIFF(sample_tested_datetime,sample_received_at_vl_lab_datetime) < ' . $skipDays . ' AND 
+                DATEDIFF(sample_tested_datetime,sample_registered_at_lab)>=0 AND 
+
+                DATEDIFF(result_approved_datetime,sample_tested_datetime) < ' . $skipDays . ' AND 
+                DATEDIFF(result_approved_datetime,sample_tested_datetime) >= 0');
+        }
+
+        if (isset($labs) && !empty($labs)) {
+            $squery = $squery->where('vl.lab_id IN (' . implode(',', $labs) . ')');
+        } else {
+            if ($logincontainer->role != 1) {
+                $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : array(0);
+                $squery = $squery->where('vl.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
+            }
+        }
+        $sQueryStr = $sql->buildSqlString($squery);
+        $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+        return $sResult;
+    }
+
+    public function getTATbyDistrict($districtID, $labs, $startDate, $endDate)
+    {
+        $logincontainer = new Container('credo');
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $skipDays = isset($this->config['defaults']['tat-skipdays']) ? $this->config['defaults']['tat-skipdays'] : 120;
+        $squery = $sql->select()->from(array('vl' => $this->table))
+            ->columns(
+                array(
+                    "Collection_Receive"  => new Expression("AVG(ABS(DATEDIFF(IF(`sample_received_at_vl_lab_datetime`='',NULL,IF(DATE(`sample_received_at_vl_lab_datetime`)='1970-01-01',NULL,IF(DATE(`sample_received_at_vl_lab_datetime`)='0000-00-00',NULL,IFNULL(`sample_received_at_vl_lab_datetime`,NULL)))), IF(`sample_collection_date`='',NULL,IF(DATE(`sample_collection_date`)='1970-01-01',NULL,IF(DATE(`sample_collection_date`)='0000-00-00',NULL, IFNULL(`sample_collection_date`,NULL)))))))"),
+                    "Receive_Register"    => new Expression("AVG(ABS(DATEDIFF(IF(`sample_registered_at_lab`='',NULL,IF(DATE(`sample_registered_at_lab`)='1970-01-01',NULL,IF(DATE(`sample_registered_at_lab`)='0000-00-00',NULL,IFNULL(`sample_registered_at_lab`,NULL)))), IF(`sample_received_at_vl_lab_datetime`='',NULL,IF(DATE(`sample_received_at_vl_lab_datetime`)='1970-01-01',NULL,IF(DATE(`sample_received_at_vl_lab_datetime`)='0000-00-00',NULL, IFNULL(`sample_received_at_vl_lab_datetime`,NULL)))))))"),
+                    "Register_Analysis"   => new Expression("AVG(ABS(DATEDIFF(IF(`sample_tested_datetime`='',NULL,IF(DATE(`sample_tested_datetime`)='1970-01-01',NULL,IF(DATE(`sample_tested_datetime`)='0000-00-00',NULL,IFNULL(`sample_tested_datetime`,NULL)))), IF(`sample_registered_at_lab`='',NULL,IF(DATE(`sample_registered_at_lab`)='1970-01-01',NULL,IF(DATE(`sample_registered_at_lab`)='0000-00-00',NULL, IFNULL(`sample_registered_at_lab`,NULL)))))))"),
+                    "Analysis_Authorise"  => new Expression("AVG(ABS(DATEDIFF(IF(`result_approved_datetime`='',NULL,IF(DATE(`result_approved_datetime`)='1970-01-01',NULL,IF(DATE(`result_approved_datetime`)='0000-00-00',NULL,IFNULL(`result_approved_datetime`,NULL)))), IF(`sample_tested_datetime`='',NULL,IF(DATE(`sample_tested_datetime`)='1970-01-01',NULL,IF(DATE(`sample_tested_datetime`)='0000-00-00',NULL, IFNULL(sample_tested_datetime,NULL)))))))")
+                )
+            )
+            ->join('facility_details', 'facility_details.facility_id = vl.facility_id')
+            ->where(
+                array(
+                    "sample_tested_datetime >= '$startDate' AND sample_tested_datetime <= '$endDate'",
+                    "facility_details.facility_district = '$districtID'"
+                )
+            );
+        if ($skipDays > 0) {
+            $squery = $squery->where('
+                DATEDIFF(sample_received_at_vl_lab_datetime,sample_collection_date)<120 AND 
+                DATEDIFF(sample_received_at_vl_lab_datetime,sample_collection_date)>=0 AND 
+
+                DATEDIFF(sample_registered_at_lab,sample_received_at_vl_lab_datetime)<120 AND 
+                DATEDIFF(sample_registered_at_lab,sample_received_at_vl_lab_datetime)>=0 AND 
+
+                DATEDIFF(sample_tested_datetime,sample_received_at_vl_lab_datetime)<120 AND 
+                DATEDIFF(sample_tested_datetime,sample_registered_at_lab)>=0 AND 
+
+                DATEDIFF(result_approved_datetime,sample_tested_datetime)<120 AND 
+                DATEDIFF(result_approved_datetime,sample_tested_datetime)>=0');
+        }
+
+        if (isset($labs) && !empty($labs)) {
+            $squery = $squery->where('vl.lab_id IN (' . implode(',', $labs) . ')');
+        } else {
+            if ($logincontainer->role != 1) {
+                $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : array(0);
+                $squery = $squery->where('vl.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
+            }
+        }
+        $sQueryStr = $sql->buildSqlString($squery);
+        $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+        return $sResult;
+    }
+
+    public function getTATbyClinic($clinicID, $labs, $startDate, $endDate)
+    {
+        $logincontainer = new Container('credo');
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $skipDays = isset($this->config['defaults']['tat-skipdays']) ? $this->config['defaults']['tat-skipdays'] : 120;
+        $squery = $sql->select()->from(array('vl' => $this->table))
+            ->columns(
+                array(
+                    "Collection_Receive"  => new Expression("AVG(ABS(DATEDIFF(IF(`sample_received_at_vl_lab_datetime`='',NULL,IF(DATE(`sample_received_at_vl_lab_datetime`)='1970-01-01',NULL,IF(DATE(`sample_received_at_vl_lab_datetime`)='0000-00-00',NULL,IFNULL(`sample_received_at_vl_lab_datetime`,NULL)))), IF(`sample_collection_date`='',NULL,IF(DATE(`sample_collection_date`)='1970-01-01',NULL,IF(DATE(`sample_collection_date`)='0000-00-00',NULL, IFNULL(`sample_collection_date`,NULL)))))))"),
+                    "Receive_Register"    => new Expression("AVG(ABS(DATEDIFF(IF(`sample_registered_at_lab`='',NULL,IF(DATE(`sample_registered_at_lab`)='1970-01-01',NULL,IF(DATE(`sample_registered_at_lab`)='0000-00-00',NULL,IFNULL(`sample_registered_at_lab`,NULL)))), IF(`sample_received_at_vl_lab_datetime`='',NULL,IF(DATE(`sample_received_at_vl_lab_datetime`)='1970-01-01',NULL,IF(DATE(`sample_received_at_vl_lab_datetime`)='0000-00-00',NULL, IFNULL(`sample_received_at_vl_lab_datetime`,NULL)))))))"),
+                    "Register_Analysis" => new Expression("AVG(ABS(DATEDIFF(IF(`sample_tested_datetime`='',NULL,IF(DATE(`sample_tested_datetime`)='1970-01-01',NULL,IF(DATE(`sample_tested_datetime`)='0000-00-00',NULL,IFNULL(`sample_tested_datetime`,NULL)))), IF(`sample_registered_at_lab`='',NULL,IF(DATE(`sample_registered_at_lab`)='1970-01-01',NULL,IF(DATE(`sample_registered_at_lab`)='0000-00-00',NULL, IFNULL(`sample_registered_at_lab`,NULL)))))))"),
+                    "Analysis_Authorise"  => new Expression("AVG(ABS(DATEDIFF(IF(`result_approved_datetime`='',NULL,IF(DATE(`result_approved_datetime`)='1970-01-01',NULL,IF(DATE(`result_approved_datetime`)='0000-00-00',NULL,IFNULL(`result_approved_datetime`,NULL)))), IF(`sample_tested_datetime`='',NULL,IF(DATE(`sample_tested_datetime`)='1970-01-01',NULL,IF(DATE(`sample_tested_datetime`)='0000-00-00',NULL, IFNULL(sample_tested_datetime,NULL)))))))")
+                )
+            )
+            ->join('facility_details', 'facility_details.facility_id = vl.facility_id')
+            ->where(
+                array(
+                    "sample_tested_datetime >= '$startDate' AND sample_tested_datetime <= '$endDate'",
+                    "vl.facility_id = '$clinicID'"
+                )
+            );
+        if ($skipDays > 0) {
+            $squery = $squery->where('
+                DATEDIFF(sample_received_at_vl_lab_datetime,sample_collection_date)<120 AND 
+                DATEDIFF(sample_received_at_vl_lab_datetime,sample_collection_date)>=0 AND 
+
+                DATEDIFF(sample_registered_at_lab,sample_received_at_vl_lab_datetime)<120 AND 
+                DATEDIFF(sample_registered_at_lab,sample_received_at_vl_lab_datetime)>=0 AND 
+
+                DATEDIFF(sample_tested_datetime,sample_received_at_vl_lab_datetime)<120 AND 
+                DATEDIFF(sample_tested_datetime,sample_registered_at_lab)>=0 AND 
+
+                DATEDIFF(result_approved_datetime,sample_tested_datetime)<120 AND 
+                DATEDIFF(result_approved_datetime,sample_tested_datetime)>=0');
+        }
+
+        if (isset($labs) && !empty($labs)) {
+            $squery = $squery->where('vl.lab_id IN (' . implode(',', $labs) . ')');
+        } else {
+            if ($logincontainer->role != 1) {
+                $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : array(0);
+                $squery = $squery->where('vl.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
+            }
+        }
+        $sQueryStr = $sql->buildSqlString($squery);
+        $sResult   = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+        return $sResult;
+    }
+
+    /////////////////////////////////////////////
+    /////////*** Turnaround Time Page ***////////
+    ////////////////////////////////////////////
 }

@@ -25,7 +25,7 @@ class ClinicController extends AbstractActionController{
     }
 
     public function dashboardAction(){
-        $this->layout()->setVariable('activeTab', 'clinics-dashboard');
+        $this->layout()->setVariable('activeTab', 'clinics');
         // $sampleService = $this->getServiceLocator()->get('SampleService');
         $sampleType = $this->sampleService->getSampleType();
         $clinicName = $this->sampleService->getAllClinicName();

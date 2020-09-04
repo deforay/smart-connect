@@ -28,7 +28,7 @@ class SummaryController extends AbstractActionController
 			$params['fromDate']  = date('Y-m', strtotime('+1 month', strtotime('-12 month')));
 			$params['toDate']  = date('Y-m');
 		}
-		$this->layout()->setVariable('activeTab', 'summary-dashboard');
+		$this->layout()->setVariable('activeTab', 'covid19-summary');
 		$summaryTabResult = $this->summaryService->fetchSummaryTabDetails($params);
 
 		/* District, Province and Facility */

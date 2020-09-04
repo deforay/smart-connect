@@ -6,7 +6,7 @@ return array(
         'tat-skipdays' => 0,
         'use-current-sample-table' => false,
         'vlModule'      => true,
-        'eidModule'     => false,
+        'eidModule'     => true,
         'covid19Module' => false
     ),
 );

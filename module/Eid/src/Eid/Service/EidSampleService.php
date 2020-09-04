@@ -503,4 +503,93 @@ class EidSampleService
         $locationDb = $this->sm->get('LocationDetailsTable');
         return $locationDb->fetchAllDistrictsList();
     }
+
+    ////////////////////////////////////////
+    /////////*** Turnaround Time ***///////
+    ///////////////////////////////////////
+
+    public function getTATbyProvince($facilities, $labs, $startDate, $endDate)
+    {
+        set_time_limit(10000);
+        $result = array();
+        $time = array();
+        $sampleDb = $this->sm->get('SampleTable');
+        foreach ($facilities as $facility) {
+            $time = $sampleDb->getTATbyProvince($facility['location_id'], $labs, $startDate, $endDate);
+            foreach ($time as $key) {
+                $collect_receive    = $key['Collection_Receive'];
+                $receive_register   = $key['Receive_Register'];
+                $register_analysis  = $key['Register_Analysis'];
+                $analysis_authorise = $key['Analysis_Authorise'];
+            }
+            $result[] = array(
+                "facility"           => $facility['location_name'],
+                "facility_id"        => $facility['location_id'],
+                "category"           => 0,
+                "collect_receive"    => round($collect_receive, 1),
+                "receive_register"   => round($receive_register, 1),
+                "register_analysis"  => round($register_analysis, 1),
+                "analysis_authorise" => round($analysis_authorise, 1)
+            );
+        }
+        return $result;
+    }
+
+    public function getTATbyDistrict($facilities, $labs, $startDate, $endDate)
+    {
+        set_time_limit(10000);
+        $result = array();
+        $time = array();
+        $sampleDb = $this->sm->get('SampleTable');
+        foreach ($facilities as $facility) {
+            $time = $sampleDb->getTATbyDistrict($facility['location_id'], $labs, $startDate, $endDate);
+            foreach ($time as $key) {
+                $collect_receive    = $key['Collection_Receive'];
+                $receive_register   = $key['Receive_Register'];
+                $register_analysis  = $key['Register_Analysis'];
+                $analysis_authorise = $key['Analysis_Authorise'];
+            }
+            $result[] = array(
+                "facility"           => $facility['location_name'],
+                "facility_id"        => $facility['location_id'],
+                "category"           => 0,
+                "collect_receive"    => round($collect_receive, 1),
+                "receive_register"   => round($receive_register, 1),
+                "register_analysis"  => round($register_analysis, 1),
+                "analysis_authorise" => round($analysis_authorise, 1)
+            );
+        }
+        return $result;
+    }
+
+    public function getTATbyClinic($facilities, $labs, $startDate, $endDate)
+    {
+        set_time_limit(10000);
+        $result = array();
+        $time = array();
+        $sampleDb = $this->sm->get('SampleTable');
+        foreach ($facilities as $facility) {
+            $time = $sampleDb->getTATbyClinic($facility['facility_id'], $labs, $startDate, $endDate);
+            foreach ($time as $key) {
+                $collect_receive    = $key['Collection_Receive'];
+                $receive_register   = $key['Receive_Register'];
+                $register_analysis  = $key['Register_Analysis'];
+                $analysis_authorise = $key['Analysis_Authorise'];
+            }
+            $result[] = array(
+                "facility"           => $facility['facility_name'],
+                "facility_id"        => $facility['facility_id'],
+                "category"           => 1,
+                "collect_receive"    => round($collect_receive, 1),
+                "receive_register"   => round($receive_register, 1),
+                "register_analysis"  => round($register_analysis, 1),
+                "analysis_authorise" => round($analysis_authorise, 1)
+            );
+        }
+        return $result;
+    }
+
+    ////////////////////////////////////////
+    ////////*** Turnaround Time ***////////
+    ///////////////////////////////////////
 }

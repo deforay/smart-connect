@@ -689,4 +689,9 @@ $endDate = date('Y-m');
 
         return [year, month].join('-');
     }
+
+    function doLabTATRedirect(month) {
+        var selectedLabs = ($("#labName").val() == null) ? '' : $("#labName").val();
+        window.open('/eid/labs/time?month=' + month + '&lab=' + selectedLabs, '_blank');
+    }
 </script>

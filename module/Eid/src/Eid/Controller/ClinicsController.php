@@ -19,5 +19,6 @@ class ClinicsController extends AbstractActionController
 
   public function dashboardAction()
   {
+    $this->layout()->setVariable('activeTab', 'eid-clinics');
   }
 }

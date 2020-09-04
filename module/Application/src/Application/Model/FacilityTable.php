@@ -645,12 +645,13 @@ class FacilityTable extends AbstractTableGateway
         $logincontainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $sQuery = $sql->select()->from(array('f' => 'facility_details'))
-            ->where(array('facility_district IN(' . implode(",", $districtId) . ')'))
-            ->where("f.facility_type = $facilityType");
-
-
-
+        $sQuery = $sql->select()->from(array('f' => 'facility_details'));
+        if(!empty($districtId)){
+            $sQuery = $sQuery->where(array('facility_district IN(' . $districtId . ')'));
+        }
+        if(!empty($facilityType)){
+            $sQuery = $sQuery->where("f.facility_type = $facilityType");
+        }
         if ($logincontainer->role != 1) {
             $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : array(0);
             $sQuery = $sQuery->where('f.facility_id IN ("' . implode('", "', array_values(array_filter($mappedFacilities))) . '")');

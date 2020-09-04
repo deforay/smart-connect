@@ -27,7 +27,7 @@ class LaboratoryController extends AbstractActionController
 
     public function dashboardAction()
     {
-        $this->layout()->setVariable('activeTab', 'labs-dashboard');
+        $this->layout()->setVariable('activeTab', 'laboratory');
         // $sampleService = $this->getServiceLocator()->get('SampleService');
         $sampleType = $this->sampleService->getSampleType();
         $labName = $this->sampleService->getAllLabName();
@@ -925,4 +925,6 @@ class LaboratoryController extends AbstractActionController
     //         return $viewModel;
     //     }
     // }
+
+    
 }

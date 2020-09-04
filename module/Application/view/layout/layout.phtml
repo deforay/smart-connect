@@ -197,7 +197,7 @@ if (!isset($activeTab)) {
                         $vlRoleCheck = true;
                     }
                     if($vlRoleCheck && $activeModule['vl']){?>
-                        <li class="nav-item <?php echo ($activeTab == 'summary' || $activeTab == 'laboratory' || $activeTab == 'clinics' || $activeTab == 'import') ? " active open " : ""; ?>">
+                        <li class="nav-item <?php echo ($activeTab == 'summary' || $activeTab == 'laboratory' || $activeTab == 'clinics') ? " active open " : ""; ?>">
                             <a href="javascript:;" class="nav-link nav-toggle">
                                 <i class="fa fa-flask"></i>
                                 <span class="title"><?php echo $this->translate('Viral Load'); ?></span>
