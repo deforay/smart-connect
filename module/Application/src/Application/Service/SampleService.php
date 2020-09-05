@@ -1249,30 +1249,26 @@ class SampleService
     /////////*** Turnaround Time ***///////
     ///////////////////////////////////////
 
-    public function getTATbyProvince($facilities, $labs, $startDate, $endDate)
+    public function getTATbyProvince($labs, $startDate, $endDate)
     {
-        set_time_limit(10000);
+        //set_time_limit(10000);
         $result = array();
-        $time = array();
-        $sampleDb = $this->sm->get('SampleTable');
-        foreach ($facilities as $facility) {
-            $time = $sampleDb->getTATbyProvince($facility['location_id'], $labs, $startDate, $endDate);
-            foreach ($time as $key) {
-                $collect_receive    = $key['Collection_Receive'];
-                $receive_register   = $key['Receive_Register'];
-                $register_analysis  = $key['Register_Analysis'];
-                $analysis_authorise = $key['Analysis_Authorise'];
-            }
+        $resultSet = array();
+        $sampleDb = $this->sm->get('SampleTableWithoutCache');
+        $resultSet = $sampleDb->getTATbyProvince($labs, $startDate, $endDate);
+        foreach ($resultSet as $key) {
             $result[] = array(
-                "facility"           => $facility['location_name'],
-                "facility_id"        => $facility['location_id'],
+                "facility"           => $key['location_name'],
+                "facility_id"        => $key['location_id'],
                 "category"           => 0,
-                "collect_receive"    => round($collect_receive, 1),
-                "receive_register"   => round($receive_register, 1),
-                "register_analysis"  => round($register_analysis, 1),
-                "analysis_authorise" => round($analysis_authorise, 1)
-            );
+                "collect_receive"    => $key['Collection_Receive'],
+                "receive_register"   => $key['Receive_Register'],
+                "register_analysis"  => $key['Register_Analysis'],
+                "analysis_authorise" => $key['Analysis_Authorise'],
+                "total" => $key['total']
+            );            
         }
+        
         return $result;
     }
 
@@ -1875,7 +1871,7 @@ class SampleService
         }
         return array(
             'status'    => 'success',
-            'message'   => $numRows. ' uploaded successfully',
+            'message'   => $numRows . ' uploaded successfully',
         );
     }
     public function saveFileFromVlsmAPIV1()

@@ -11,15 +11,15 @@ class LabsController extends AbstractActionController
 {
 
 	private $sampleService = null;
-	private $commonService = null;
+	private $facilityService = null;
 	const PROVINCE = 0;
 	const DISTRICT = 1;
 	const CLINIC   = 2;
 
-	public function __construct($sampleService, $commonService)
+	public function __construct($sampleService, $facilityService)
 	{
 		$this->sampleService = $sampleService;
-		$this->commonService = $commonService;
+		$this->facilityService = $facilityService;
 	}
 
 	public function dashboardAction()
@@ -127,9 +127,9 @@ class LabsController extends AbstractActionController
 			$labFilter = $this->params()->fromQuery('lab');
 			$params['labs'] = explode(',', $labFilter);
 		}
-		$facilityService = $this->getServiceLocator()->get('FacilityService');
-		$provinces       = $facilityService->fetchLocationDetails();
-		$districts       = $facilityService->getAllDistrictsList();
+
+		$provinces       = $this->facilityService->fetchLocationDetails();
+		$districts       = $this->facilityService->getAllDistrictsList();
 		$clinics         = $this->sampleService->getAllClinicName();
 		$labs            = $this->sampleService->getAllLabName();
 
@@ -154,12 +154,11 @@ class LabsController extends AbstractActionController
 		$request = $this->getRequest();
 		if ($request->isPost()) {
 			$params = $request->getPost();
-			$facilityService = $this->getServiceLocator()->get('FacilityService');
 			$dates = explode(" to ", $params['sampleCollectionDate']);
 			$category = $params['category'];
 			$labs = (isset($params['lab']) && !empty($params['lab'])) ? $params['lab'] : array();
 
-			$facilities = $facilityService->fetchLocationDetails();
+			$facilities = $this->facilityService->fetchLocationDetails();
 			$result = $this->sampleService->getTATbyProvince($facilities, $labs, $dates[0], $dates[1]);
 			$viewModel = new ViewModel();
 			$viewModel->setVariables(array('results' => $result, 'daterange' => $params['sampleCollectionDate'], 'labs' => implode(',', $labs), 'categoryChecked' => $category))
@@ -173,19 +172,19 @@ class LabsController extends AbstractActionController
 		$request = $this->getRequest();
 		if ($request->isPost()) {
 			$params = $request->getPost();
-			$facilityService = $this->getServiceLocator()->get('FacilityService');
+
 			$labs = (isset($params['lab']) && !empty($params['lab'])) ? $params['lab'] : array();
 			$dates = explode(" to ", $params['sampleCollectionDate']);
 			$place = $params['place'];
-			
+
 			if ($params['category'] == self::PROVINCE) { // If it is a Province: It brings the respective Districts TATs
-				$facilities = $facilityService->getDistrictList($params['province']);
+				$facilities = $this->facilityService->getDistrictList($params['province']);
 				$result = $this->sampleService->getTATbyDistrict($facilities, $labs, $dates[0], $dates[1]);
 			} else if ($params['category'] == self::DISTRICT) { // If it is a District: It brings the respective Clinics TATs
-				$facilities   = $facilityService->getFacilityByDistrict($params['district']);
+				$facilities   = $this->facilityService->getFacilityByDistrict($params['district']);
 				$result       = $this->sampleService->getTATbyClinic($facilities, $labs, $dates[0], $dates[1]);
 			} else { // Brings the TAT ordered by Province
-				$facilities = $facilityService->fetchLocationDetails();
+				$facilities = $this->facilityService->fetchLocationDetails();
 				$result = $this->sampleService->getTATbyProvince($facilities, $labs, $dates[0], $dates[1]);
 			}
 			$viewModel = new ViewModel();
@@ -209,7 +208,7 @@ class LabsController extends AbstractActionController
 		$request = $this->getRequest();
 		if ($request->isPost()) {
 			$params           = $request->getPost();
-			$facilityService  = $this->getServiceLocator()->get('FacilityService');
+
 			$category         = $params['category'];
 			$provinces        = $params['provinces'];
 			$districts        = $params['districts'];
@@ -232,7 +231,7 @@ class LabsController extends AbstractActionController
 					);
 				}
 			} else {
-				$provinceArray = $facilityService->fetchLocationDetails();
+				$provinceArray = $this->facilityService->fetchLocationDetails();
 			}
 
 			if (isset($districts) && !empty($districts)) {
@@ -245,7 +244,7 @@ class LabsController extends AbstractActionController
 			} else {
 				if (isset($provinces) && !empty($provinces)) {
 					for ($i = 0; $i < sizeOf($provinces); $i++) {
-						$districtArray = array_merge($districtArray, $facilityService->getDistrictList($provinces[$i]));
+						$districtArray = array_merge($districtArray, $this->facilityService->getDistrictList($provinces[$i]));
 					}
 				}
 			}
@@ -259,7 +258,7 @@ class LabsController extends AbstractActionController
 			} else {
 				if (isset($districts) && !empty($districts)) {
 					for ($i = 0; $i < sizeOf($districts); $i++) {
-						$clinicArray = array_merge($clinicArray, $facilityService->getFacilityByDistrict($districts[$i]));
+						$clinicArray = array_merge($clinicArray, $this->facilityService->getFacilityByDistrict($districts[$i]));
 					}
 				}
 			}

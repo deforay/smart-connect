@@ -576,15 +576,16 @@ class SampleTable extends AbstractTableGateway
                     array(
                         "month" => new Expression("MONTH(result_approved_datetime)"),
                         "year" => new Expression("YEAR(result_approved_datetime)"),
-                        "AvgDiff" => new Expression("CAST(ABS((TIMESTAMPDIFF(DAY,result_approved_datetime,sample_collection_date))) AS DECIMAL (10,2))"),
+                        "AvgDiff" => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,result_approved_datetime,sample_collection_date))) AS DECIMAL (10,2))"),
                         "monthDate" => new Expression("DATE_FORMAT(DATE(result_approved_datetime), '%b-%Y')"),
                         "total_samples_collected" => new Expression('COUNT(*)'),
                         "total_samples_pending" => new Expression("(SUM(CASE WHEN ((vl.DashVL_AnalysisResult IS NULL OR vl.DashVL_AnalysisResult = '' OR vl.DashVL_AnalysisResult = 'NULL') AND (vl.reason_for_sample_rejection IS NULL OR vl.reason_for_sample_rejection = '' OR vl.reason_for_sample_rejection = 0)) THEN 1 ELSE 0 END))")
                     )
                 );
             $query = $query->where("
-                    (vl.sample_collection_date is not null AND vl.sample_collection_date not like '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')
-                    AND (vl.result_approved_datetime is not null AND vl.result_approved_datetime not like '' AND DATE(vl.result_approved_datetime) !='1970-01-01' AND DATE(vl.result_approved_datetime) !='0000-00-00')");
+                        (vl.sample_collection_date is not null AND vl.sample_collection_date not like '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')
+                    AND (vl.result_approved_datetime is not null AND vl.result_approved_datetime not like '' AND DATE(vl.result_approved_datetime) !='1970-01-01' AND DATE(vl.result_approved_datetime) !='0000-00-00')"
+                    );
             $query = $query->where("
                         DATE(vl.result_approved_datetime) >= '" . $startMonth . "'
                         AND DATE(vl.result_approved_datetime) <= '" . $endMonth . "' ");
@@ -3652,7 +3653,7 @@ class SampleTable extends AbstractTableGateway
                     "suppressed_samples" => new Expression("SUM(CASE WHEN (vl.result < 1000 or vl.result='Target Not Detected') THEN 1 ELSE 0 END)"),
                     "not_suppressed_samples" => new Expression("SUM(CASE WHEN (vl.result >= 1000) THEN 1 ELSE 0 END)"),
                     "rejected_samples" => new Expression("SUM(CASE WHEN (vl.reason_for_sample_rejection !='' AND vl.reason_for_sample_rejection !='0' AND vl.reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END)"),
-                    "AvgDiff" => new Expression("CAST(ABS(AVG(TIMESTAMPDIFF(DAY,sample_tested_datetime,sample_collection_date))) AS DECIMAL (10,2))")
+                    "AvgDiff" => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,sample_tested_datetime,sample_collection_date))) AS DECIMAL (10,2))")
                 )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.lab_id', array(), 'left');
@@ -3698,12 +3699,13 @@ class SampleTable extends AbstractTableGateway
             $sQuery = $sQuery->where("(vl.is_patient_breastfeeding IS NULL OR vl.is_patient_breastfeeding = '' OR vl.is_patient_breastfeeding = 'Unreported')");
         }
         $sQuery = $sQuery->where("
-                                            (sample_collection_date is not null AND sample_collection_date != '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00')
-                        AND (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')
-                    AND result is not null
-                    AND result != '' 
-                    AND DATE(sample_collection_date) >= '" . $startMonth . "-01' 
-                    AND DATE(sample_collection_date) <= '" . $endMonth . "-31' AND vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL'");
+                (sample_collection_date is not null AND sample_collection_date not like '' AND DATE(sample_collection_date) not like '1970-01-01' AND DATE(sample_collection_date) not like '0000-00-00')
+                AND (sample_tested_datetime is not null AND sample_tested_datetime not like '' AND DATE(sample_tested_datetime) not like '1970-01-01' AND DATE(sample_tested_datetime) not like '0000-00-00')
+                AND DATE(sample_collection_date) >= '" . $startMonth . "-01' 
+                AND DATE(sample_collection_date) <= '" . $endMonth . "-31' 
+                AND vl.result IS NOT NULL 
+                AND vl.result != '' 
+                AND vl.result != 'NULL'");
 
         if (isset($sWhere) && $sWhere != "") {
             $sQuery->where($sWhere);
@@ -7539,7 +7541,7 @@ class SampleTable extends AbstractTableGateway
     /////////*** Turnaround Time Page ***///////
     ///////////////////////////////////////////
 
-    public function getTATbyProvince($provinceID, $labs, $startDate, $endDate)
+    public function getTATbyProvince($labs, $startDate, $endDate)
     {
         $logincontainer = new Container('credo');
         $dbAdapter = $this->adapter;
@@ -7548,20 +7550,29 @@ class SampleTable extends AbstractTableGateway
         $squery = $sql->select()->from(array('vl' => $this->table))
             ->columns(
                 array(
-                    "Collection_Receive"  => new Expression("AVG(ABS(DATEDIFF(IF(`sample_received_at_vl_lab_datetime`='',NULL,IF(DATE(`sample_received_at_vl_lab_datetime`)='1970-01-01',NULL,IF(DATE(`sample_received_at_vl_lab_datetime`)='0000-00-00',NULL,IFNULL(`sample_received_at_vl_lab_datetime`,NULL)))), IF(`sample_collection_date`='',NULL,IF(DATE(`sample_collection_date`)='1970-01-01',NULL,IF(DATE(`sample_collection_date`)='0000-00-00',NULL, IFNULL(`sample_collection_date`,NULL)))))))"),
-                    "Receive_Register"    => new Expression("AVG(ABS(DATEDIFF(IF(`sample_registered_at_lab`='',NULL,IF(DATE(`sample_registered_at_lab`)='1970-01-01',NULL,IF(DATE(`sample_registered_at_lab`)='0000-00-00',NULL,IFNULL(`sample_registered_at_lab`,NULL)))), IF(`sample_received_at_vl_lab_datetime`='',NULL,IF(DATE(`sample_received_at_vl_lab_datetime`)='1970-01-01',NULL,IF(DATE(`sample_received_at_vl_lab_datetime`)='0000-00-00',NULL, IFNULL(`sample_received_at_vl_lab_datetime`,NULL)))))))"),
-                    "Register_Analysis"   => new Expression("AVG(ABS(DATEDIFF(IF(`sample_tested_datetime`='',NULL,IF(DATE(`sample_tested_datetime`)='1970-01-01',NULL,IF(DATE(`sample_tested_datetime`)='0000-00-00',NULL,IFNULL(`sample_tested_datetime`,NULL)))), IF(`sample_registered_at_lab`='',NULL,IF(DATE(`sample_registered_at_lab`)='1970-01-01',NULL,IF(DATE(`sample_registered_at_lab`)='0000-00-00',NULL, IFNULL(`sample_registered_at_lab`,NULL)))))))"),
-                    "Analysis_Authorise"  => new Expression("AVG(ABS(DATEDIFF(IF(`result_approved_datetime`='',NULL,IF(DATE(`result_approved_datetime`)='1970-01-01',NULL,IF(DATE(`result_approved_datetime`)='0000-00-00',NULL,IFNULL(`result_approved_datetime`,NULL)))), IF(`sample_tested_datetime`='',NULL,IF(DATE(`sample_tested_datetime`)='1970-01-01',NULL,IF(DATE(`sample_tested_datetime`)='0000-00-00',NULL, IFNULL(sample_tested_datetime,NULL)))))))")
+                    "Collection_Receive"  => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,sample_received_at_vl_lab_datetime,sample_collection_date))) AS DECIMAL (10,2))"),
+                    "Receive_Register"    => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,sample_registered_at_lab,sample_received_at_vl_lab_datetime))) AS DECIMAL (10,2))"),
+                    "Register_Analysis"   => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,sample_registered_at_lab,sample_tested_datetime))) AS DECIMAL (10,2))"),
+                    "Analysis_Authorise"  => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,result_approved_datetime,sample_tested_datetime))) AS DECIMAL (10,2))"),
+                    "total"               => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,result_approved_datetime,sample_collection_date))) AS DECIMAL (10,2))")
                 )
             )
-            ->join('facility_details', 'facility_details.facility_id = vl.facility_id')
+            ->join('facility_details', 'facility_details.facility_id = vl.facility_id', array())
+            ->join('location_details', 'facility_details.facility_state = location_details.location_id')
             ->where(
                 array(
-                    "sample_tested_datetime >= '$startDate' AND sample_tested_datetime <= '$endDate'",
-                    "facility_details.facility_state = '$provinceID'",
-                    "sample_collection_date is not null AND sample_collection_date not like '0000-00-00%' AND sample_collection_date not like ''"
+                    "(sample_tested_datetime BETWEEN '$startDate' AND '$endDate')",
+                    "(vl.sample_collection_date is not null AND vl.sample_collection_date not like '' AND DATE(vl.sample_collection_date) not like '1970-01-01' AND DATE(vl.sample_collection_date) not like '0000-00-00')",
+                    //"facility_details.facility_state = '$provinceID'",
                 )
             );
+
+        // $squery = $squery->where("
+        //                 (vl.sample_collection_date is not null AND vl.sample_collection_date not like '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')
+        //                 AND (vl.sample_registered_at_lab is not null AND vl.sample_registered_at_lab not like '' AND DATE(vl.sample_registered_at_lab) !='1970-01-01' AND DATE(vl.sample_registered_at_lab) !='0000-00-00')
+        //                 AND (vl.sample_received_at_vl_lab_datetime is not null AND vl.sample_received_at_vl_lab_datetime not like '' AND DATE(vl.sample_received_at_vl_lab_datetime) !='1970-01-01' AND DATE(vl.sample_received_at_vl_lab_datetime) !='0000-00-00')
+        //                 AND (vl.result_approved_datetime is not null AND vl.result_approved_datetime not like '' AND DATE(vl.result_approved_datetime) !='1970-01-01' AND DATE(vl.result_approved_datetime) !='0000-00-00')"
+        //             );
         if ($skipDays > 0) {
             $squery = $squery->where('
                 DATEDIFF(sample_received_at_vl_lab_datetime,sample_collection_date) < ' . $skipDays . ' AND 
@@ -7585,6 +7596,7 @@ class SampleTable extends AbstractTableGateway
                 $squery = $squery->where('vl.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
             }
         }
+        $squery = $squery->group(array('location_id'));
         $sQueryStr = $sql->buildSqlString($squery);
         $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         return $sResult;
@@ -7599,16 +7611,18 @@ class SampleTable extends AbstractTableGateway
         $squery = $sql->select()->from(array('vl' => $this->table))
             ->columns(
                 array(
-                    "Collection_Receive"  => new Expression("AVG(ABS(DATEDIFF(IF(`sample_received_at_vl_lab_datetime`='',NULL,IF(DATE(`sample_received_at_vl_lab_datetime`)='1970-01-01',NULL,IF(DATE(`sample_received_at_vl_lab_datetime`)='0000-00-00',NULL,IFNULL(`sample_received_at_vl_lab_datetime`,NULL)))), IF(`sample_collection_date`='',NULL,IF(DATE(`sample_collection_date`)='1970-01-01',NULL,IF(DATE(`sample_collection_date`)='0000-00-00',NULL, IFNULL(`sample_collection_date`,NULL)))))))"),
-                    "Receive_Register"    => new Expression("AVG(ABS(DATEDIFF(IF(`sample_registered_at_lab`='',NULL,IF(DATE(`sample_registered_at_lab`)='1970-01-01',NULL,IF(DATE(`sample_registered_at_lab`)='0000-00-00',NULL,IFNULL(`sample_registered_at_lab`,NULL)))), IF(`sample_received_at_vl_lab_datetime`='',NULL,IF(DATE(`sample_received_at_vl_lab_datetime`)='1970-01-01',NULL,IF(DATE(`sample_received_at_vl_lab_datetime`)='0000-00-00',NULL, IFNULL(`sample_received_at_vl_lab_datetime`,NULL)))))))"),
-                    "Register_Analysis"   => new Expression("AVG(ABS(DATEDIFF(IF(`sample_tested_datetime`='',NULL,IF(DATE(`sample_tested_datetime`)='1970-01-01',NULL,IF(DATE(`sample_tested_datetime`)='0000-00-00',NULL,IFNULL(`sample_tested_datetime`,NULL)))), IF(`sample_registered_at_lab`='',NULL,IF(DATE(`sample_registered_at_lab`)='1970-01-01',NULL,IF(DATE(`sample_registered_at_lab`)='0000-00-00',NULL, IFNULL(`sample_registered_at_lab`,NULL)))))))"),
-                    "Analysis_Authorise"  => new Expression("AVG(ABS(DATEDIFF(IF(`result_approved_datetime`='',NULL,IF(DATE(`result_approved_datetime`)='1970-01-01',NULL,IF(DATE(`result_approved_datetime`)='0000-00-00',NULL,IFNULL(`result_approved_datetime`,NULL)))), IF(`sample_tested_datetime`='',NULL,IF(DATE(`sample_tested_datetime`)='1970-01-01',NULL,IF(DATE(`sample_tested_datetime`)='0000-00-00',NULL, IFNULL(sample_tested_datetime,NULL)))))))")
+                    "Collection_Receive"  => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,sample_received_at_vl_lab_datetime,sample_collection_date))) AS DECIMAL (10,2))"),
+                    "Receive_Register"    => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,sample_registered_at_lab,sample_received_at_vl_lab_datetime))) AS DECIMAL (10,2))"),
+                    "Register_Analysis"   => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,sample_registered_at_lab,sample_tested_datetime))) AS DECIMAL (10,2))"),
+                    "Analysis_Authorise"  => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,result_approved_datetime,sample_tested_datetime))) AS DECIMAL (10,2))"),
+                    "total"               => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,result_approved_datetime,sample_collection_date))) AS DECIMAL (10,2))")
                 )
             )
             ->join('facility_details', 'facility_details.facility_id = vl.facility_id')
             ->where(
                 array(
-                    "sample_tested_datetime >= '$startDate' AND sample_tested_datetime <= '$endDate'",
+                    "(sample_tested_datetime BETWEEN '$startDate' AND '$endDate')",
+                    "(vl.sample_collection_date is not null AND vl.sample_collection_date not like '' AND DATE(vl.sample_collection_date) not like '1970-01-01' AND DATE(vl.sample_collection_date) not like '0000-00-00')",
                     "facility_details.facility_district = '$districtID'"
                 )
             );
@@ -7649,16 +7663,18 @@ class SampleTable extends AbstractTableGateway
         $squery = $sql->select()->from(array('vl' => $this->table))
             ->columns(
                 array(
-                    "Collection_Receive"  => new Expression("AVG(ABS(DATEDIFF(IF(`sample_received_at_vl_lab_datetime`='',NULL,IF(DATE(`sample_received_at_vl_lab_datetime`)='1970-01-01',NULL,IF(DATE(`sample_received_at_vl_lab_datetime`)='0000-00-00',NULL,IFNULL(`sample_received_at_vl_lab_datetime`,NULL)))), IF(`sample_collection_date`='',NULL,IF(DATE(`sample_collection_date`)='1970-01-01',NULL,IF(DATE(`sample_collection_date`)='0000-00-00',NULL, IFNULL(`sample_collection_date`,NULL)))))))"),
-                    "Receive_Register"    => new Expression("AVG(ABS(DATEDIFF(IF(`sample_registered_at_lab`='',NULL,IF(DATE(`sample_registered_at_lab`)='1970-01-01',NULL,IF(DATE(`sample_registered_at_lab`)='0000-00-00',NULL,IFNULL(`sample_registered_at_lab`,NULL)))), IF(`sample_received_at_vl_lab_datetime`='',NULL,IF(DATE(`sample_received_at_vl_lab_datetime`)='1970-01-01',NULL,IF(DATE(`sample_received_at_vl_lab_datetime`)='0000-00-00',NULL, IFNULL(`sample_received_at_vl_lab_datetime`,NULL)))))))"),
-                    "Register_Analysis" => new Expression("AVG(ABS(DATEDIFF(IF(`sample_tested_datetime`='',NULL,IF(DATE(`sample_tested_datetime`)='1970-01-01',NULL,IF(DATE(`sample_tested_datetime`)='0000-00-00',NULL,IFNULL(`sample_tested_datetime`,NULL)))), IF(`sample_registered_at_lab`='',NULL,IF(DATE(`sample_registered_at_lab`)='1970-01-01',NULL,IF(DATE(`sample_registered_at_lab`)='0000-00-00',NULL, IFNULL(`sample_registered_at_lab`,NULL)))))))"),
-                    "Analysis_Authorise"  => new Expression("AVG(ABS(DATEDIFF(IF(`result_approved_datetime`='',NULL,IF(DATE(`result_approved_datetime`)='1970-01-01',NULL,IF(DATE(`result_approved_datetime`)='0000-00-00',NULL,IFNULL(`result_approved_datetime`,NULL)))), IF(`sample_tested_datetime`='',NULL,IF(DATE(`sample_tested_datetime`)='1970-01-01',NULL,IF(DATE(`sample_tested_datetime`)='0000-00-00',NULL, IFNULL(sample_tested_datetime,NULL)))))))")
+                    "Collection_Receive"  => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,sample_received_at_vl_lab_datetime,sample_collection_date))) AS DECIMAL (10,2))"),
+                    "Receive_Register"    => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,sample_registered_at_lab,sample_received_at_vl_lab_datetime))) AS DECIMAL (10,2))"),
+                    "Register_Analysis"   => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,sample_registered_at_lab,sample_tested_datetime))) AS DECIMAL (10,2))"),
+                    "Analysis_Authorise"  => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,result_approved_datetime,sample_tested_datetime))) AS DECIMAL (10,2))"),
+                    "total"               => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,result_approved_datetime,sample_collection_date))) AS DECIMAL (10,2))")
                 )
             )
             ->join('facility_details', 'facility_details.facility_id = vl.facility_id')
             ->where(
                 array(
-                    "sample_tested_datetime >= '$startDate' AND sample_tested_datetime <= '$endDate'",
+                    "(sample_tested_datetime BETWEEN '$startDate' AND '$endDate')",
+                    "(vl.sample_collection_date is not null AND vl.sample_collection_date not like '' AND DATE(vl.sample_collection_date) not like '1970-01-01' AND DATE(vl.sample_collection_date) not like '0000-00-00')",
                     "vl.facility_id = '$clinicID'"
                 )
             );
