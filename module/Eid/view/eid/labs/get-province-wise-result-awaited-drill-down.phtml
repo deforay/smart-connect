@@ -1,0 +1,89 @@
+<script>
+    $(function() {
+        $('#provincebarcontainer').highcharts({
+            chart: {
+                type: 'column'
+            },
+            title: {
+                text: '<?php echo $this->translate('Results Not Available (Province-wise)'); ?>'
+            },
+            credits: {
+                enabled: false
+            },
+            xAxis: {
+                categories: [<?php
+                                if (isset($result['province']) && count($result['province']) > 0) {
+                                    foreach ($result['province'] as $province) {
+                                        echo "'" . $this->translate($province) . "',";
+                                    }
+                                }
+                                ?>]
+            },
+            yAxis: {
+                allowDecimals: false,
+                min: 0,
+                title: {
+                    text: '<?php echo $this->translate('No. of Samples'); ?>'
+                },
+                labels: {
+                    formatter: function() {
+                        return this.value;
+                    }
+                },
+            },
+            legend: {
+                enabled: true
+            },
+            tooltip: {
+                formatter: function() {
+                    return '<b>' + this.x + '</b><br/>' +
+                        this.series.name + ': ' + this.y
+                }
+            },
+            plotOptions: {
+                column: {
+                    stacking: 'normal',
+                    pointPadding: 0.2,
+                    borderWidth: 0
+                },
+                series: {
+                    cursor: 'pointer',
+                    point: {
+                        events: {
+                            click: function(e) {
+                                for (var i = 0; i < this.series.data.length; i++) {
+                                    this.series.data[i].update({
+                                        color: '#4276A4'
+                                    }, true, false);
+                                }
+                                this.update({
+                                    color: '#4276A4'
+                                }, true, false);
+                                generateDistrictBarContainer(e.point.category, 'province');
+                                generateClinicBarContainer(e.point.category, 'province');
+                            }
+                        }
+                    }
+                }
+            },
+            series: [<?php
+                        if (isset($result['sample']) && count($result['sample']) > 0) {
+                            foreach ($result['sample'] as $key => $condition) {
+                        ?> {
+                            showInLegend: false,
+                            name: '<?php echo $this->translate('Samples'); ?>',
+                            data: [<?php
+                                    foreach ($condition as $count) {
+                                        echo '{y:' . $count . '},';
+                                    }
+                                    ?>],
+                        },
+                <?php
+                            }
+                        }
+                ?>
+            ],
+            colors: ['#4276A4']
+        });
+    });
+</script>

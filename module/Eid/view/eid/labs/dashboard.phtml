@@ -694,4 +694,32 @@ $endDate = date('Y-m');
         var selectedLabs = ($("#labName").val() == null) ? '' : $("#labName").val();
         window.open('/eid/labs/time?month=' + month + '&lab=' + selectedLabs, '_blank');
     }
+    function doSampleResultAwaitedRedirect(frmSource) {
+        window.open("/eid/labs/drill-down-result-awaited?src=" + frmSource);
+    }
+    function doSampleTestedRedirect(month) {
+        var selectedLabs = ($("#labName").val() == null) ? '' : $("#labName").val();
+        window.open('/eid/labs/drill-down?month=' + month + '&lab=' + selectedLabs, '_blank');
+    }
+
+    function doSampleTestedBasedonGenderRedirect(month, gender) {
+        var selectedLabs = ($("#labName").val() == null) ? '' : $("#labName").val();
+        window.open('/eid/labs/drill-down?month=' + month + '&gender=' + gender + '&lab=' + selectedLabs, '_blank');
+    }
+
+    function doSampleTestedBasedonAgeRedirect(month, age) {
+        var selectedLabs = ($("#labName").val() == null) ? '' : $("#labName").val();
+        window.open('/eid/labs/drill-down?month=' + month + '&age=' + age + '&lab=' + selectedLabs, '_blank');
+    }
+
+    function doSampleTestedBasedonPregnantPatientRedirect(month) {
+        var selectedLabs = ($("#labName").val() == null) ? '' : $("#labName").val();
+        window.open('/eid/labs/drill-down?month=' + month + '&gender=F&femaleFilter=P&lab=' + selectedLabs, '_blank');
+    }
+
+    function doSampleTestedBasedonBreastfeedingPatientRedirect(month) {
+        var selectedLabs = ($("#labName").val() == null) ? '' : $("#labName").val();
+        window.open('/eid/labs/drill-down?month=' + month + '&gender=F&femaleFilter=BF&lab=' + selectedLabs, '_blank');
+    }
+
 </script>

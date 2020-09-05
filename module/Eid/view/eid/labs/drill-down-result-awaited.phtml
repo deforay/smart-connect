@@ -1,0 +1,585 @@
+<?php
+//set selected labs
+$selectedLabs = array();
+if (isset($labFilter) && trim($labFilter) != '') {
+    $selectedLabs = explode(",", $labFilter);
+}
+?>
+
+<div class="page-bar">
+    <h1 class="page-title"><?php echo $this->translate('Results Not Available Overview'); ?>
+        <ul class="page-breadcrumb pull-right">
+            <li>
+                <i class="fa fa-arrow-left"></i>
+                <a href="/labs/dashboard"><?php echo $this->translate('Back to Labs Dashboard'); ?></a>
+            </li>
+        </ul>
+    </h1>
+</div>
+
+<h3 class="page-title"></h3>
+<form id="pageFilter" action="#" method="">
+    <div class="row">
+        <div class="col-md-12" style="padding-left:30px;">
+            <div class="col-md-12">
+                <div class="form-group col-lg-4">
+                    <label class="control-label"><?php echo $this->translate('Date Range'); ?>&nbsp;</label>
+                    <div id="daterange-container" class="btn btn-sm form-control" data-container="body" data-placement="bottom" data-original-title="Change date range">
+                        <i class="icon-calendar"></i>&nbsp;
+                        <span class="thin uppercase hidden-xs"></span>&nbsp;
+                        <i class="fa fa-angle-down"></i>
+                        <input type="hidden" name="daterange" id="daterange" />
+                    </div>
+                </div>
+                <div class="form-group col-lg-4">
+                    <label class="control-label"><?php echo $this->translate('Provinces'); ?>&nbsp;</label>
+                    <select name="provinces[]" id="provinces" class="form-control" multiple title="<?php echo $this->translate('Please choose provinces'); ?>" onchange="getLocationInfo('provinces');">
+                        <?php
+                        if (isset($facilityInfo['provinces']) && count($facilityInfo['provinces']) > 0) {
+                            foreach ($facilityInfo['provinces'] as $province) {
+                        ?>
+                                <option value="<?php echo $province['location_id']; ?>"><?php echo ucwords($province['location_name']); ?></option>
+                        <?php }
+                        } ?>
+                    </select>
+                </div>
+                <div class="form-group col-lg-4">
+                    <label class="control-label"><?php echo $this->translate('Districts'); ?>&nbsp;</label>
+                    <select name="districts[]" id="districts" class="form-control" multiple title="<?php echo $this->translate('Please choose districts'); ?>" onchange="getLocationInfo('districts');">
+                        <?php
+                        if (isset($facilityInfo['provinceDistricts']) && count($facilityInfo['provinceDistricts']) > 0) {
+                            foreach ($facilityInfo['provinceDistricts'] as $provinceDistrict) {
+                        ?>
+                                <option value="<?php echo $provinceDistrict['location_id']; ?>"><?php echo ucwords($provinceDistrict['location_name']); ?></option>
+                        <?php }
+                        } ?>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="form-group col-lg-4">
+                    <label class="control-label"><?php echo $this->translate('Labs'); ?>&nbsp;</label>
+                    <select name="labName[]" id="labName" class="form-control" multiple title="<?php echo $this->translate('Please choose labs'); ?>">
+                        <?php
+                        if (isset($facilityInfo['labs']) && count($facilityInfo['labs']) > 0) {
+                            foreach ($facilityInfo['labs'] as $labs) {
+                        ?>
+                                <option value="<?php echo $labs['facility_id']; ?>" <?php echo (in_array($labs['facility_id'], $selectedLabs)) ? 'selected="selected"' : ''; ?>><?php echo ucwords($labs['facility_name']); ?></option>
+                        <?php }
+                        } ?>
+                    </select>
+                </div>
+
+                <!--<div class="form-group col-lg-4">
+                        <label class="control-label">< ?php echo $this->translate('Hub'); ?> </label>
+                        <select class="form-control" id="hub" name="hub">
+                            <option value="">All Hubs</option>
+                            < ?php
+                            foreach($hubName as $hub){
+                            ?>
+                            <option value="< ?php echo base64_encode($hub['facility_id']);?>">< ?php echo $hub['facility_name'];?></option>
+                            < ?php
+                            }
+                            ?>
+                        </select>
+                    </div>  -->
+                <div class="form-group col-lg-4">
+                    <label class="control-label"><?php echo $this->translate('Clinics'); ?>&nbsp;</label>
+                    <select class="form-control" id="clinicId" name="clinicId[]" multiple title="<?php echo $this->translate('Please choose clinics'); ?>">
+                        <?php
+                        if (isset($facilityInfo['clinics']) && count($facilityInfo['clinics']) > 0) {
+                            foreach ($facilityInfo['clinics'] as $clinics) {
+                        ?>
+                                <option value="<?php echo $clinics['facility_id']; ?>"><?php echo ucwords($clinics['facility_name']); ?></option>
+                        <?php }
+                        } ?>
+                    </select>
+                </div>
+                
+                <div class="form-group col-lg-4">
+                    <label class="control-label"><?php echo $this->translate('Age Group'); ?></label>
+                    <select class="form-control" name="age[]" id="age" multiple title="<?php echo $this->translate('Please choose age group'); ?>">
+                        <option value="<2">
+                            < 2</option> <option value="2to5"> 2 - 5
+                        </option>
+                        <option value="6to14"> 6 - 14</option>
+                        <option value="15to49"> 15 - 49</option>
+                        <option value=">=50"> >= 50</option>
+                        <option value="unknown"> <?php echo $this->translate('Unknown'); ?></option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="form-group col-lg-4">
+                    <label class="control-label"><?php echo $this->translate('Sample Type'); ?></label>
+                    <select class="form-control" id="sampleType" name="sampleType">
+                        <option value=""><?php echo $this->translate('All'); ?></option>
+                        <?php
+                        foreach ($sampleType as $samples) {
+                        ?>
+                            <option value="<?php echo base64_encode($samples['sample_id']); ?>"><?php echo $samples['sample_name']; ?></option>
+                        <?php
+                        }
+                        ?>
+                    </select>
+                </div>
+                <div class="form-group col-lg-4">
+                    <label class="control-label"><?php echo $this->translate('Gender'); ?></label>
+                    <select class="form-control" name="gender" id="gender">
+                        <option value=""><?php echo $this->translate('All'); ?></option>
+                        <option value="M" <?php echo (isset($searchGender) && $searchGender == 'M') ? 'selected="selected"' : ''; ?>><?php echo $this->translate('Male'); ?></option>
+                        <option value="F" <?php echo (isset($searchGender) && $searchGender == 'F') ? 'selected="selected"' : ''; ?>><?php echo $this->translate('Female'); ?></option>
+                        <option value="not_specified" <?php echo (isset($searchGender) && $searchGender == 'Not Specified') ? 'selected="selected"' : ''; ?>><?php echo $this->translate('Not Specified'); ?></option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-12 femaleSection" style="display:none;">
+                <div class="form-group col-lg-4">
+                    <label class="control-label"><?php echo $this->translate('Is Patient Pregnant'); ?></label>
+                    <select class="form-control" name="isPregnant" id="isPregnant">
+                        <option value=""><?php echo $this->translate('All'); ?></option>
+                        <option value="yes"><?php echo $this->translate('Yes'); ?></option>
+                        <option value="no"><?php echo $this->translate('No'); ?></option>
+                        <option value="unreported"><?php echo $this->translate('Unreported'); ?></option>
+                    </select>
+                </div>
+                <div class="form-group col-lg-4">
+                    <label class="control-label"><?php echo $this->translate('Is Patient Breastfeeding'); ?></label>
+                    <select class="form-control" name="isBreastfeeding" id="isBreastfeeding">
+                        <option value=""><?php echo $this->translate('All'); ?></option>
+                        <option value="yes"><?php echo $this->translate('Yes'); ?></option>
+                        <option value="no"><?php echo $this->translate('No'); ?></option>
+                        <option value="unreported"><?php echo $this->translate('Unreported'); ?></option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="form-group col-lg-12" style="text-align:center;margin-top:10px;">
+                    <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="searchResultsAwaitedSample()"><?php echo $this->translate('Search'); ?></a>&nbsp;&nbsp;
+                    <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="resetEverything();"><?php echo $this->translate('Reset'); ?></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+<hr style="background: #000 !important;border-color:#ccc;">
+<div class="row">
+    <div class="col-lg-6">
+        <div id="provincebarcontainer" style="min-width: 310px; height: 400px; max-width: 100%; margin: 0 auto;padding:1.5%;"></div>
+    </div>
+    <div class="col-lg-6">
+        <div id="facilitybarcontainer" style="min-width: 310px; height: 400px; max-width: 100%; margin: 0 auto;padding:1.5%;"></div>
+    </div>
+</div>
+<br>
+<div class="row">
+    <div class="col-lg-12">
+        <div id="districtbarcontainer" style="min-width: 90%; height: 400px; max-width: 100%; margin: 0 auto;padding:1.5%;"></div>
+    </div>
+</div>
+<div class="row" style="margin-bottom:30px;">
+    <div class="col-lg-12">
+        <div id="clinicbarcontainer" style="min-width: 90%; height: 400px; max-width: 100%; margin: 0 auto;padding:1.5%;"></div>
+    </div>
+</div>
+<br>
+<div class="row">
+    <div class="col-md-12">
+        <!-- BEGIN EXAMPLE TABLE PORTLET-->
+        <div class="portlet box blue">
+            <div class="portlet-title">
+                <div class="caption">
+                    <i class="fa fa-cogs"></i><?php echo $this->translate('Results Not Available'); ?>
+                </div>
+                <div class="tools">
+                    <button class="btn btn-default" onclick="exportResultsAwaited();"><span><i class="fa fa-file-excel-o" aria-hidden="true"></i> <?php echo $this->translate('Excel'); ?></span></button>
+                </div>
+            </div>
+            <div class="portlet-body">
+                <div class="table-toolbar">
+                    <table class="table table-striped table-bordered table-hover order-column" id="resultsAwaitedDataTable">
+                        <thead>
+                            <tr>
+                                <th><?php echo $this->translate('Sample ID'); ?> </th>
+                                <th><?php echo $this->translate('Collection Date'); ?> </th>
+                                <th><?php echo $this->translate('Facility'); ?> </th>
+                                <th><?php echo $this->translate('Sample Type'); ?> </th>
+                                <th><?php echo $this->translate('Lab'); ?> </th>
+                                <th><?php echo $this->translate('Sample Received at Lab'); ?> </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="6" class="dataTables_empty">Loading data from server</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+        <!-- END EXAMPLE TABLE PORTLET-->
+    </div>
+</div>
+<script>
+    var oTable = null;
+
+    function generateProvinceBarContainer() {
+        $.blockUI.defaults.css.border = '1px solid grey';
+        $(document).ajaxStart($.blockUI({
+            message: '<h2><?php echo $this->translate('Processing...'); ?></h2>'
+        })).ajaxStop($.unblockUI);
+        var daterange = $('#daterange').val();
+        var provinces = ($("#provinces").val() == null) ? '' : $("#provinces").val().join(',');
+        var districts = ($("#districts").val() == null) ? '' : $("#districts").val().join(',');
+        var lab = ($("#labName").val() == null) ? '' : $("#labName").val().join(',');
+        var clinicId = ($("#clinicId").val() == null) ? '' : $("#clinicId").val().join(',');
+        var age = ($("#age").val() == null) ? '' : $("#age").val().join(',');
+        var sampleType = $("#sampleType").val();
+        var gender = $("#gender").val();
+        var isPregnant = $("#isPregnant").val();
+        var isBreastfeeding = $("#isBreastfeeding").val();
+        $.post("<?php echo $this->url('eid-labs', array('action' => 'get-province-wise-result-awaited-drill-down')); ?>", {
+                frmSource: '<?php echo $frmSource; ?>',
+                daterange: daterange,
+                provinces: provinces,
+                districts: districts,
+                lab: lab,
+                clinicId: clinicId,
+                age: age,
+                sampleType: sampleType,
+                gender: gender,
+                isPregnant: isPregnant,
+                isBreastfeeding: isBreastfeeding
+            },
+            function(data) {
+                $("#provincebarcontainer").html(data);
+            });
+    }
+
+    function generateFacilityBarContainer() {
+        $.blockUI.defaults.css.border = '1px solid grey';
+        $(document).ajaxStart($.blockUI({
+            message: '<h2><?php echo $this->translate('Processing...'); ?></h2>'
+        })).ajaxStop($.unblockUI);
+        var daterange = $('#daterange').val();
+        var provinces = ($("#provinces").val() == null) ? '' : $("#provinces").val().join(',');
+        var districts = ($("#districts").val() == null) ? '' : $("#districts").val().join(',');
+        var lab = ($("#labName").val() == null) ? '' : $("#labName").val().join(',');
+        var clinicId = ($("#clinicId").val() == null) ? '' : $("#clinicId").val().join(',');
+        var age = ($("#age").val() == null) ? '' : $("#age").val().join(',');
+        var sampleType = $("#sampleType").val();
+        var gender = $("#gender").val();
+        var isPregnant = $("#isPregnant").val();
+        var isBreastfeeding = $("#isBreastfeeding").val();
+        $.post("<?php echo $this->url('eid-labs', array('action' => 'get-lab-wise-result-awaited-drill-down')); ?>", {
+                frmSource: '<?php echo $frmSource; ?>',
+                daterange: daterange,
+                provinces: provinces,
+                districts: districts,
+                lab: lab,
+                clinicId: clinicId,
+                age: age,
+                sampleType: sampleType,
+                gender: gender,
+                isPregnant: isPregnant,
+                isBreastfeeding: isBreastfeeding
+            },
+            function(data) {
+                $("#facilitybarcontainer").html(data);
+            });
+    }
+
+    function generateDistrictBarContainer(srcVal, src) {
+        if (src == 'province') {
+            window.scrollTo(0, document.documentElement.offsetHeight - (window.innerHeight + 1200));
+        }
+        $.blockUI.defaults.css.border = '1px solid grey';
+        $(document).ajaxStart($.blockUI({
+            message: '<h2><?php echo $this->translate('Processing...'); ?></h2>'
+        })).ajaxStop($.unblockUI);
+        var daterange = $('#daterange').val();
+        var provinces = ($("#provinces").val() == null) ? '' : $("#provinces").val().join(',');
+        var districts = ($("#districts").val() == null) ? '' : $("#districts").val().join(',');
+        var lab = ($("#labName").val() == null) ? '' : $("#labName").val().join(',');
+        var clinicId = ($("#clinicId").val() == null) ? '' : $("#clinicId").val().join(',');
+        var age = ($("#age").val() == null) ? '' : $("#age").val().join(',');
+        var sampleType = $("#sampleType").val();
+        var gender = $("#gender").val();
+        var isPregnant = $("#isPregnant").val();
+        var isBreastfeeding = $("#isBreastfeeding").val();
+        $.post("<?php echo $this->url('eid-labs', array('action' => 'get-district-wise-result-awaited-drill-down')); ?>", {
+                frmSource: '<?php echo $frmSource; ?>',
+                daterange: daterange,
+                provinces: provinces,
+                districts: districts,
+                lab: lab,
+                clinicId: clinicId,
+                age: age,
+                sampleType: sampleType,
+                gender: gender,
+                isPregnant: isPregnant,
+                isBreastfeeding: isBreastfeeding,
+                srcVal: srcVal,
+                src: src
+            },
+            function(data) {
+                $("#districtbarcontainer").html(data);
+            });
+    }
+
+    function generateClinicBarContainer(srcVal, src) {
+        if (src == 'district') {
+            window.scrollTo(0, document.documentElement.offsetHeight - (window.innerHeight + 800));
+        }
+        $.blockUI.defaults.css.border = '1px solid grey';
+        $(document).ajaxStart($.blockUI({
+            message: '<h2><?php echo $this->translate('Processing...'); ?></h2>'
+        })).ajaxStop($.unblockUI);
+        var daterange = $('#daterange').val();
+        var provinces = ($("#provinces").val() == null) ? '' : $("#provinces").val().join(',');
+        var districts = ($("#districts").val() == null) ? '' : $("#districts").val().join(',');
+        var lab = ($("#labName").val() == null) ? '' : $("#labName").val().join(',');
+        var clinicId = ($("#clinicId").val() == null) ? '' : $("#clinicId").val().join(',');
+        var age = ($("#age").val() == null) ? '' : $("#age").val().join(',');
+        var sampleType = $("#sampleType").val();
+        var gender = $("#gender").val();
+        var isPregnant = $("#isPregnant").val();
+        var isBreastfeeding = $("#isBreastfeeding").val();
+        $.post("<?php echo $this->url('eid-labs', array('action' => 'get-clinic-wise-result-awaited-drill-down')); ?>", {
+                frmSource: '<?php echo $frmSource; ?>',
+                daterange: daterange,
+                provinces: provinces,
+                districts: districts,
+                lab: lab,
+                clinicId: clinicId,
+                age: age,
+                sampleType: sampleType,
+                gender: gender,
+                isPregnant: isPregnant,
+                isBreastfeeding: isBreastfeeding,
+                srcVal: srcVal,
+                src: src
+            },
+            function(data) {
+                $("#clinicbarcontainer").html(data);
+            });
+    }
+
+    function loadResultsAwaitedDataTable() {
+        $.blockUI.defaults.css.border = '1px solid grey';
+        $(document).ajaxStart($.blockUI({
+            message: '<h2><?php echo $this->translate('Processing...'); ?></h2>'
+        })).ajaxStop($.unblockUI);
+        oTable = $('#resultsAwaitedDataTable').dataTable({
+            "bAutoWidth": false,
+            "bProcessing": true,
+            "bServerSide": true,
+            "aoColumns": [{
+                    "sClass": "center"
+                },
+                {
+                    "sClass": "center"
+                },
+                {
+                    "sClass": "center"
+                },
+                {
+                    "sClass": "center"
+                },
+                {
+                    "sClass": "center"
+                },
+                {
+                    "sClass": "center"
+                }
+            ],
+            "aaSorting": [
+                [1, "desc"]
+            ],
+            "sAjaxSource": "<?php echo $this->url('eid-labs', array('action' => 'get-filter-sample-result-awaited-details')); ?>",
+            "fnServerData": function(sSource, aoData, fnCallback) {
+                aoData.push({
+                    "name": "frmSource",
+                    "value": "<?php echo $frmSource; ?>"
+                });
+                aoData.push({
+                    "name": "daterange",
+                    "value": $('#daterange').val()
+                });
+                aoData.push({
+                    "name": "provinces",
+                    "value": $('#provinces').val()
+                });
+                aoData.push({
+                    "name": "districts",
+                    "value": $('#districts').val()
+                });
+                aoData.push({
+                    "name": "lab",
+                    "value": $('#labName').val()
+                });
+                aoData.push({
+                    "name": "clinicId",
+                    "value": $('#clinicId').val()
+                });
+                
+                aoData.push({
+                    "name": "age",
+                    "value": $('#age').val()
+                });
+                aoData.push({
+                    "name": "sampleType",
+                    "value": $('#sampleType').val()
+                });
+                aoData.push({
+                    "name": "gender",
+                    "value": $('#gender').val()
+                });
+                aoData.push({
+                    "name": "isPregnant",
+                    "value": $("#isPregnant").val()
+                });
+                aoData.push({
+                    "name": "isBreastfeeding",
+                    "value": $("#isBreastfeeding").val()
+                });
+                $.ajax({
+                    "dataType": 'json',
+                    "type": "POST",
+                    "url": sSource,
+                    "data": aoData,
+                    "success": fnCallback
+                });
+            }
+        });
+    }
+
+    $(function() {
+        $('#provinces').select2({
+            placeholder: "<?php echo $this->translate('All Provinces'); ?>",
+            allowClear: true
+        });
+        $('#districts').select2({
+            placeholder: "<?php echo $this->translate('All Districts'); ?>",
+            allowClear: true
+        });
+        $('#labName').select2({
+            placeholder: "<?php echo $this->translate('All Labs'); ?>",
+            allowClear: true
+        });
+        $('#clinicId').select2({
+            placeholder: "<?php echo $this->translate('All Clinics'); ?>",
+            allowClear: true
+        });
+        $('#age').select2({
+            placeholder: "<?php echo $this->translate('All'); ?>",
+            allowClear: true
+        });
+
+        var start = moment().subtract(12, 'months');
+        var end = moment();
+
+        function cb(start, end) {
+            $('#daterange-container span').html(start.format('MMM D, YYYY') + ' to ' + end.format('MMM D, YYYY'));
+            $('#daterange').val(start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
+        }
+        $('#daterange-container').daterangepicker({
+            format: 'DD-MMM-YYYY',
+            separator: ' to ',
+            startDate: start,
+            endDate: end,
+            maxDate: moment(),
+            ranges: {
+                'Today': [moment(), moment()],
+                'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+                'This Month': [moment().startOf('month'), moment().endOf('month')],
+                'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+            }
+        }, cb);
+        cb(start, end);
+        $('#dashboard-range').show();
+        $('#daterange-container span').html('<?php echo $this->translate('Choose Date Range'); ?>');
+        $('input[name="daterange"]').val('');
+        generateProvinceBarContainer();
+        generateFacilityBarContainer();
+        generateDistrictBarContainer('', 'load');
+        generateClinicBarContainer('', 'load');
+        loadResultsAwaitedDataTable();
+    });
+
+    function searchResultsAwaitedSample() {
+        generateProvinceBarContainer();
+        generateFacilityBarContainer();
+        generateDistrictBarContainer('', 'search');
+        generateClinicBarContainer('', 'search');
+        oTable.fnDraw();
+    }
+
+    function resetEverything() {
+        $("#pageFilter")[0].reset();
+        $('#daterange-container span').html('<?php echo $this->translate('Choose Date Range'); ?>');
+        $('input[name="daterange"]').val('');
+        $('#provinces').val('').change();
+        $('#districts').val('').change();
+        $('#labName').val('').change();
+        $('#clinicId').val('').change();
+        $('#age').val('').change();
+        if ($('#gender').val() == 'F') {
+            $('.femaleSection').show();
+        } else {
+            $('.femaleSection').hide();
+        }
+        searchResultsAwaitedSample();
+    }
+
+    $('#gender').on('change', function() {
+        if (this.value == 'F') {
+            $('.femaleSection').show();
+        } else {
+            $('.femaleSection').hide();
+            $("#isPregnant").val('');
+            $("#isBreastfeeding").val('');
+        }
+    });
+
+    function getLocationInfo(fromSrc) {
+        var provinces = ($("#provinces").val() == null || $("#provinces").val() == '') ? [] : $("#provinces").val();
+        var districts = ($("#districts").val() == null || $("#districts").val() == '') ? [] : $("#districts").val();
+        $.post("<?php echo $this->url('laboratory', array('action' => 'get-location-info')); ?>", {
+                provinces: provinces,
+                districts: districts,
+                fromSrc: fromSrc
+            },
+            function(data) {
+                if (fromSrc == 'provinces') {
+                    $('#districts').val('').change();
+                }
+                $('#labName').val('').change();
+                $('#clinicId').val('').change();
+                var splitLocationInfo = data.split('##');
+                if (fromSrc == 'provinces') {
+                    $('#districts').html(splitLocationInfo[0]);
+                }
+                $('#labName').html(splitLocationInfo[1]);
+                $('#clinicId').html(splitLocationInfo[2]);
+            });
+    }
+
+    function exportResultsAwaited() {
+        $.blockUI.defaults.css.border = '1px solid grey';
+        $(document).ajaxStart($.blockUI({
+            message: '<h2><?php echo $this->translate('Processing...'); ?></h2>'
+        })).ajaxStop($.unblockUI);
+        $.post("<?php echo $this->url('eid-labs', array('action' => 'export-results-awaited-sample')); ?>", {},
+            function(data) {
+                if (data == "" || data == null || data == undefined) {
+                    alert('<?php echo $this->translate('Unable to export excel'); ?>');
+                } else {
+                    window.open('../temporary/' + data, '_blank');
+                }
+            });
+    }
+</script>
