@@ -583,8 +583,8 @@ class SampleTable extends AbstractTableGateway
                     )
                 );
             $query = $query->where("
-                        (vl.sample_collection_date is not null AND vl.sample_collection_date not like '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')
-                    AND (vl.result_approved_datetime is not null AND vl.result_approved_datetime not like '' AND DATE(vl.result_approved_datetime) !='1970-01-01' AND DATE(vl.result_approved_datetime) !='0000-00-00')"
+                        (vl.sample_collection_date is not null AND vl.sample_collection_date not like '' AND DATE(vl.sample_collection_date) not like '1970-01-01' AND DATE(vl.sample_collection_date) not like '0000-00-00')
+                    AND (vl.result_approved_datetime is not null AND vl.result_approved_datetime not like '' AND DATE(vl.result_approved_datetime) not like '1970-01-01' AND DATE(vl.result_approved_datetime) not like '0000-00-00')"
                     );
             $query = $query->where("
                         DATE(vl.result_approved_datetime) >= '" . $startMonth . "'

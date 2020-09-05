@@ -12,14 +12,16 @@ class LabsController extends AbstractActionController
 
 	private $sampleService = null;
 	private $facilityService = null;
+	private $commonService = null;
 	const PROVINCE = 0;
 	const DISTRICT = 1;
 	const CLINIC   = 2;
 
-	public function __construct($sampleService, $facilityService)
+	public function __construct($sampleService, $facilityService,$commonService)
 	{
 		$this->sampleService = $sampleService;
 		$this->facilityService = $facilityService;
+		$this->commonService = $commonService;
 	}
 
 	public function dashboardAction()

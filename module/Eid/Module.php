@@ -25,7 +25,8 @@ class Module
                 'Eid\Controller\Labs' => function ($sm) {
                     $facilityService = $sm->getServiceLocator()->get('FacilityService');
                     $sampleService = $sm->getServiceLocator()->get('EidSampleService');
-                    return new \Eid\Controller\LabsController($sampleService, $facilityService);
+                    $commonService = $sm->getServiceLocator()->get('CommonService');
+                    return new \Eid\Controller\LabsController($sampleService, $facilityService,$commonService);
                 },
                 'Eid\Controller\Clinics' => function ($sm) {
                     $commonService = $sm->getServiceLocator()->get('CommonService');
