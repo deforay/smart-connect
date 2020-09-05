@@ -593,4 +593,158 @@ class EidSampleService
     ////////////////////////////////////////
     ////////*** Turnaround Time ***////////
     ///////////////////////////////////////
+
+    //get all Hub Name
+    public function getAllHubName()
+    {
+        $facilityDb = $this->sm->get('FacilityTable');
+        return $facilityDb->fetchAllHubName();
+    }
+
+    //get all Current Regimen
+    public function getAllCurrentRegimen()
+    {
+        $artCodeDb = $this->sm->get('ArtCodeTable');
+        return $artCodeDb->fetchAllCurrentRegimen();
+    }
+
+    public function getProvinceWiseResultAwaitedDrillDown($params)
+    {
+        $sampleDb = $this->sm->get('EidSampleTable');
+        return $sampleDb->fetchProvinceWiseResultAwaitedDrillDown($params);
+    }
+
+    public function getLabWiseResultAwaitedDrillDown($params)
+    {
+        $sampleDb = $this->sm->get('EidSampleTable');
+        return $sampleDb->fetchLabWiseResultAwaitedDrillDown($params);
+    }
+
+    public function getDistrictWiseResultAwaitedDrillDown($params)
+    {
+        $sampleDb = $this->sm->get('EidSampleTable');
+        return $sampleDb->fetchDistrictWiseResultAwaitedDrillDown($params);
+    }
+
+    public function getClinicWiseResultAwaitedDrillDown($params)
+    {
+        $sampleDb = $this->sm->get('EidSampleTableWithoutCache');
+        return $sampleDb->fetchClinicWiseResultAwaitedDrillDown($params);
+    }
+
+    public function getFilterSampleResultAwaitedDetails($parameters)
+    {
+        $sampleDb = $this->sm->get('EidSampleTable');
+        return $sampleDb->fetchFilterSampleResultAwaitedDetails($parameters);
+    }
+
+    public function generateResultsAwaitedSampleExcel($params)
+    {
+        $queryContainer = new Container('query');
+        $translator = $this->sm->get('translator');
+        $common = new CommonService();
+        if (isset($queryContainer->resultsAwaitedQuery)) {
+            try {
+                $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
+                $sql = new Sql($dbAdapter);
+                $sQueryStr = $sql->buildSqlString($queryContainer->resultsAwaitedQuery);
+                $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+                if (isset($sResult) && count($sResult) > 0) {
+                    $excel = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+                    // $cacheMethod = \PhpOffice\PhpSpreadsheet\Collection\CellsFactory::cache_to_phpTemp;
+                    // $cacheSettings = array('memoryCacheSize' => '80MB');
+                    // \PhpOffice\PhpSpreadsheet\Settings::setCacheStorageMethod($cacheMethod, $cacheSettings);
+                    $sheet = $excel->getActiveSheet();
+                    $output = array();
+                    foreach ($sResult as $aRow) {
+                        $displayCollectionDate = $common->humanDateFormat($aRow['collectionDate']);
+                        $displayReceivedDate = $common->humanDateFormat($aRow['receivedDate']);
+                        $row = array();
+                        $row[] = $aRow['sample_code'];
+                        $row[] = $displayCollectionDate;
+                        $row[] = $aRow['facilityCode'] . ' - ' . ucwords($aRow['facilityName']);
+                        $row[] = (isset($aRow['sample_name'])) ? ucwords($aRow['sample_name']) : '';
+                        $row[] = ucwords($aRow['labName']);
+                        $row[] = $displayReceivedDate;
+                        $output[] = $row;
+                    }
+                    $styleArray = array(
+                        'font' => array(
+                            'bold' => true,
+                        ),
+                        'alignment' => array(
+                            'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                            'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+                        ),
+                        'borders' => array(
+                            'outline' => array(
+                                'style' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                            ),
+                        )
+                    );
+                    $borderStyle = array(
+                        'alignment' => array(
+                            'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT,
+                        ),
+                        'borders' => array(
+                            'outline' => array(
+                                'style' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                            ),
+                        )
+                    );
+
+                    $sheet->setCellValue('A1', html_entity_decode($translator->translate('Sample ID'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+                    $sheet->setCellValue('B1', html_entity_decode($translator->translate('Collection Date'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+                    $sheet->setCellValue('C1', html_entity_decode($translator->translate('Facility'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+                    $sheet->setCellValue('D1', html_entity_decode($translator->translate('Sample Type'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+                    $sheet->setCellValue('E1', html_entity_decode($translator->translate('Lab'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+                    $sheet->setCellValue('F1', html_entity_decode($translator->translate('Sample Received at Lab'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+
+                    $sheet->getStyle('A1')->applyFromArray($styleArray);
+                    $sheet->getStyle('B1')->applyFromArray($styleArray);
+                    $sheet->getStyle('C1')->applyFromArray($styleArray);
+                    $sheet->getStyle('D1')->applyFromArray($styleArray);
+                    $sheet->getStyle('E1')->applyFromArray($styleArray);
+                    $sheet->getStyle('F1')->applyFromArray($styleArray);
+
+                    $currentRow = 2;
+                    foreach ($output as $rowData) {
+                        $colNo = 0;
+                        foreach ($rowData as $field => $value) {
+                            if (!isset($value)) {
+                                $value = "";
+                            }
+                            if ($colNo > 5) {
+                                break;
+                            }
+                            if (is_numeric($value)) {
+                                $sheet->getCellByColumnAndRow($colNo, $currentRow)->setValueExplicit(html_entity_decode($value, ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_NUMERIC);
+                            } else {
+                                $sheet->getCellByColumnAndRow($colNo, $currentRow)->setValueExplicit(html_entity_decode($value, ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+                            }
+                            $cellName = $sheet->getCellByColumnAndRow($colNo, $currentRow)->getColumn();
+                            $sheet->getStyle($cellName . $currentRow)->applyFromArray($borderStyle);
+                            $sheet->getDefaultRowDimension()->setRowHeight(20);
+                            $sheet->getColumnDimensionByColumn($colNo)->setWidth(20);
+                            $sheet->getStyleByColumnAndRow($colNo, $currentRow)->getAlignment()->setWrapText(true);
+                            $colNo++;
+                        }
+                        $currentRow++;
+                    }
+                    $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($excel, 'Xlsx');
+                    $filename = 'RESULTS-AWAITED--' . date('d-M-Y-H-i-s') . '.xlsx';
+                    $writer->save(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . $filename);
+                    return $filename;
+                } else {
+                    return "";
+                }
+            } catch (Exception $exc) {
+                error_log("RESULTS-AWAITED--" . $exc->getMessage());
+                error_log($exc->getTraceAsString());
+                return "";
+            }
+        } else {
+            return "";
+        }
+    }
 }
