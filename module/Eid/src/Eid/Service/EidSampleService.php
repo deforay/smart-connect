@@ -492,6 +492,7 @@ class EidSampleService
         $locationDb = $this->sm->get('LocationDetailsTable');
         return $locationDb->fetchLocationDetails($mappedFacilities);
     }
+    // get all distrcit name
     public function getAllDistrictList()
     {
 
@@ -513,7 +514,7 @@ class EidSampleService
         set_time_limit(10000);
         $result = array();
         $time = array();
-        $sampleDb = $this->sm->get('SampleTable');
+        $sampleDb = $this->sm->get('EidSampleTable');
         foreach ($facilities as $facility) {
             $time = $sampleDb->getTATbyProvince($facility['location_id'], $labs, $startDate, $endDate);
             foreach ($time as $key) {
@@ -540,7 +541,7 @@ class EidSampleService
         set_time_limit(10000);
         $result = array();
         $time = array();
-        $sampleDb = $this->sm->get('SampleTable');
+        $sampleDb = $this->sm->get('EidSampleTable');
         foreach ($facilities as $facility) {
             $time = $sampleDb->getTATbyDistrict($facility['location_id'], $labs, $startDate, $endDate);
             foreach ($time as $key) {
@@ -567,7 +568,7 @@ class EidSampleService
         set_time_limit(10000);
         $result = array();
         $time = array();
-        $sampleDb = $this->sm->get('SampleTable');
+        $sampleDb = $this->sm->get('EidSampleTable');
         foreach ($facilities as $facility) {
             $time = $sampleDb->getTATbyClinic($facility['facility_id'], $labs, $startDate, $endDate);
             foreach ($time as $key) {

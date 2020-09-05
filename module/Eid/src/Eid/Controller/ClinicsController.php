@@ -10,15 +10,20 @@ use Zend\Debug\Debug;
 class ClinicsController extends AbstractActionController
 {
 
-  private $sampleService = null;
+	private $sampleService = null;
 
-  public function __construct($sampleService)
-  {
-    $this->sampleService = $sampleService;
-  }
+	public function __construct($sampleService)
+	{
+		$this->sampleService = $sampleService;
+	}
 
-  public function dashboardAction()
-  {
-    $this->layout()->setVariable('activeTab', 'eid-clinics');
-  }
+	public function indexAction(){
+		$this->layout()->setVariable('activeTab', 'eid-clinics');
+        return $this->_redirect()->toUrl('/eid/clinics/dashboard');
+    }
+
+	public function dashboardAction()
+	{
+		$this->layout()->setVariable('activeTab', 'eid-clinics');
+	}
 }

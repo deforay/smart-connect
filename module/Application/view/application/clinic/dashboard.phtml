@@ -506,8 +506,6 @@ foreach ($sampleType as $samples) {
             $('#sampleCollectionDate').val(moment().subtract('months', 1).format('YYYY-MM-DD') + ' to ' + moment().format('YYYY-MM-DD'));
         }
 
-
-
         $.when(getOverAllViralLoadStatus(),
                 getOverAllViralLoadbasedonGender())
             .done(function() {

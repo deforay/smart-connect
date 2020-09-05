@@ -33,12 +33,12 @@ class ClinicController extends AbstractActionController{
         $provinceName = $this->sampleService->getAllProvinceList();
         $districtName = $this->sampleService->getAllDistrictList();      
         return new ViewModel(array(
-                'sampleType' => $sampleType,
-                'clinicName' => $clinicName,
-                'testReason' => $testReasonName,
-                'provinceName'=>$provinceName,
-                'districtName'=>$districtName
-            ));
+            'sampleType' => $sampleType,
+            'clinicName' => $clinicName,
+            'testReason' => $testReasonName,
+            'provinceName'=>$provinceName,
+            'districtName'=>$districtName
+        ));
     }
     
     public function getOverallViralLoadStatusAction(){
