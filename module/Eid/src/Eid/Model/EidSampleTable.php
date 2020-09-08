@@ -95,7 +95,6 @@ class EidSampleTable extends AbstractTableGateway
                     "second_third_pcr" => new Expression("SUM(CASE WHEN (pcr_test_performed_before is not null AND pcr_test_performed_before like 'yes') THEN 1 ELSE 0 END)")
                 )
             )
-            ->join(array('rs' => 'r_eid_specimen_type'), 'rs.sample_id=eid.specimen_type', array('sample_name'), 'left')
             ->group(array(new Expression('YEAR(eid.sample_collection_date)'), new Expression('MONTH(eid.sample_collection_date)')));
 
         if (trim($params['provinces']) != '' || trim($params['districts']) != '' || trim($params['clinics']) != '') {
@@ -2333,16 +2332,6 @@ class EidSampleTable extends AbstractTableGateway
             }
 
 
-            $specimenTypes = null;
-            if (isset($params['sampleType']) && trim($params['sampleType']) != '') {
-                $rsQuery = $sql->select()->from(array('rs' => 'r_eid_specimen_type'))->columns(array('sample_id'));
-                $rsQuery = $rsQuery->where('rs.sample_id="' . base64_decode(trim($params['sampleType'])) . '"');
-                $rsQueryStr = $sql->buildSqlString($rsQuery);
-                //$sampleTypeResult = $dbAdapter->query($rsQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-                $specimenTypesResult = $common->cacheQuery($rsQueryStr, $dbAdapter);
-                $specimenTypes = array_column($specimenTypesResult, 'sample_id');
-            }
-
             $queryStr = $sql->select()->from(array('eid' => $this->table))
                 ->columns(
                     array(
@@ -2354,9 +2343,6 @@ class EidSampleTable extends AbstractTableGateway
                     )
                 );
 
-            if ($specimenTypes != null) {
-                $queryStr = $queryStr->where('eid.specimen_type IN ("' . implode('", "', $specimenTypes) . '")');
-            }
             if ($facilityIdList != null) {
                 $queryStr = $queryStr->where('eid.lab_id IN ("' . implode('", "', $facilityIdList) . '")');
             }
@@ -2369,7 +2355,7 @@ class EidSampleTable extends AbstractTableGateway
             $queryStr = $queryStr->group(array(new Expression('MONTH(sample_collection_date)')));
             $queryStr = $queryStr->order(array(new Expression('DATE(sample_collection_date)')));
             $queryStr = $sql->buildSqlString($queryStr);
-            //echo $queryStr;die;
+            // echo $queryStr;die;
             //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             $sampleResult = $common->cacheQuery($queryStr, $dbAdapter);
             $j = 0;
@@ -2415,18 +2401,6 @@ class EidSampleTable extends AbstractTableGateway
             }
 
 
-            $specimenTypes = null;
-            if (isset($params['sampleType']) && trim($params['sampleType']) != '') {
-                $rsQuery = $sql->select()->from(array('rs' => 'r_eid_specimen_type'))->columns(array('sample_id'));
-                $rsQuery = $rsQuery->where('rs.sample_id="' . base64_decode(trim($params['sampleType'])) . '"');
-                $rsQueryStr = $sql->buildSqlString($rsQuery);
-                //$sampleTypeResult = $dbAdapter->query($rsQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-                $specimenTypesResult = $common->cacheQuery($rsQueryStr, $dbAdapter);
-                $specimenTypes = array_column($specimenTypesResult, 'sample_id');
-            }
-
-
-
             $query = $sql->select()->from(array('eid' => $this->table))
 
                 ->columns(
@@ -2444,9 +2418,6 @@ class EidSampleTable extends AbstractTableGateway
                 ->group('eid.lab_id')
                 ->order('total DESC');
 
-            if ($specimenTypes != null) {
-                $query = $query->where('eid.specimen_type IN ("' . implode('", "', $specimenTypes) . '")');
-            }
             if ($facilityIdList != null) {
                 $query = $query->where('eid.lab_id IN ("' . implode('", "', $facilityIdList) . '")');
             }
@@ -3226,8 +3197,8 @@ class EidSampleTable extends AbstractTableGateway
         /* Array of database columns which should be read and sent back to DataTables. Use a space where
          * you want to insert a non-database field (for example a counter or static image)
         */
-        $aColumns = array('sample_code', "DATE_FORMAT(sample_collection_date,'%d-%b-%Y')", 'f.facility_code', 'f.facility_name', 'sample_name', 'l.facility_code', 'l.facility_name', "DATE_FORMAT(sample_received_at_vl_lab_datetime,'%d-%b-%Y')");
-        $orderColumns = array('sample_code', 'sample_collection_date', 'f.facility_code', 'sample_name', 'l.facility_name', 'sample_received_at_vl_lab_datetime');
+        $aColumns = array('sample_code', "DATE_FORMAT(sample_collection_date,'%d-%b-%Y')", 'f.facility_code', 'f.facility_name', 'specimen_type', 'l.facility_code', 'l.facility_name', "DATE_FORMAT(sample_received_at_vl_lab_datetime,'%d-%b-%Y')");
+        $orderColumns = array('sample_code', 'sample_collection_date', 'f.facility_code', 'specimen_type', 'l.facility_name', 'sample_received_at_vl_lab_datetime');
         /*
          * Paging
          */
@@ -3306,7 +3277,6 @@ class EidSampleTable extends AbstractTableGateway
             ->columns(array('sample_code', 'collectionDate' => new Expression('DATE(sample_collection_date)'), 'receivedDate' => new Expression('DATE(sample_received_at_vl_lab_datetime)')))
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facilityName' => 'facility_name', 'facilityCode' => 'facility_code'))
             ->join(array('l' => 'facility_details'), 'l.facility_id=vl.lab_id', array('labName' => 'facility_name'), 'left')
-            ->join(array('rs' => 'r_eid_specimen_type'), 'rs.sample_id=vl.specimen_type', array('sample_name'), 'left')
             ->where("(vl.is_sample_rejected is NULL OR vl.is_sample_rejected = '' OR vl.is_sample_rejected = 'no') AND (reason_for_sample_rejection is NULL or reason_for_sample_rejection ='' or vl.reason_for_sample_rejection = 0)");
         if (isset($parameters['daterange']) && trim($parameters['daterange']) != '' && trim($splitDate[0]) != '' && trim($splitDate[1]) != '') {
             $sQuery = $sQuery->where(array("vl.sample_collection_date >='" . $splitDate[0] . " 00:00:00" . "'", "vl.sample_collection_date <='" . $splitDate[1] . " 23:59:59" . "'"));
@@ -3401,7 +3371,6 @@ class EidSampleTable extends AbstractTableGateway
             ->columns(array('sample_code', 'collectionDate' => new Expression('DATE(sample_collection_date)'), 'receivedDate' => new Expression('DATE(sample_received_at_vl_lab_datetime)')))
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facilityName' => 'facility_name', 'facilityCode' => 'facility_code'))
             ->join(array('l' => 'facility_details'), 'l.facility_id=vl.lab_id', array('labName' => 'facility_name'), 'left')
-            ->join(array('rs' => 'r_eid_specimen_type'), 'rs.sample_id=vl.specimen_type', array('sample_name'), 'left')
             ->where("(vl.is_sample_rejected is NULL OR vl.is_sample_rejected = '' OR vl.is_sample_rejected = 'no') AND (reason_for_sample_rejection is NULL or reason_for_sample_rejection ='' or vl.reason_for_sample_rejection = 0)");
         if ($logincontainer->role != 1) {
             $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : array(0);
@@ -3424,7 +3393,7 @@ class EidSampleTable extends AbstractTableGateway
             $row[] = $aRow['sample_code'];
             $row[] = $displayCollectionDate;
             $row[] = $aRow['facilityCode'] . ' - ' . ucwords($aRow['facilityName']);
-            $row[] = (isset($aRow['sample_name'])) ? ucwords($aRow['sample_name']) : '';
+            $row[] = (isset($aRow['specimen_type'])) ? ucwords($aRow['specimen_type']) : '';
             $row[] = (isset($aRow['labName'])) ? ucwords($aRow['labName']) : '';
             $row[] = $displayReceivedDate;
             $output['aaData'][] = $row;
@@ -3687,10 +3656,6 @@ class EidSampleTable extends AbstractTableGateway
                 $sQuery = $sQuery->where('vl.facility_id IN (' . $params['clinicId'] . ')');
             }
 
-            
-
-            
-
             if (isset($params['age']) && trim($params['age']) != '') {
                 $age = explode(',', $params['age']);
                 $where = '';
@@ -3865,8 +3830,8 @@ class EidSampleTable extends AbstractTableGateway
         /* Array of database columns which should be read and sent back to DataTables. Use a space where
          * you want to insert a non-database field (for example a counter or static image)
         */
-        $aColumns = array('DATE_FORMAT(sample_collection_date,"%d-%b-%Y")', 'sample_name', 'facility_name');
-        $orderColumns = array('sample_collection_date', 'vl_sample_id', 'vl_sample_id', 'vl_sample_id', 'vl_sample_id', 'vl_sample_id', 'vl_sample_id', 'sample_name', 'facility_name');
+        $aColumns = array('DATE_FORMAT(sample_collection_date,"%d-%b-%Y")', 'specimen_type', 'facility_name');
+        $orderColumns = array('sample_collection_date', 'vl_sample_id', 'vl_sample_id', 'vl_sample_id', 'vl_sample_id', 'vl_sample_id', 'vl_sample_id', 'specimen_type', 'facility_name');
 
         /*
          * Paging
@@ -3952,7 +3917,6 @@ class EidSampleTable extends AbstractTableGateway
                 "rejected_samples" => new Expression("SUM(CASE WHEN (vl.reason_for_sample_rejection !='' AND vl.reason_for_sample_rejection !='0' AND vl.reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END)")
             ))
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'))
-            ->join(array('rs' => 'r_eid_sample_type'), 'rs.sample_id=vl.specimen_type', array('sample_name'))
             ->join(array('l' => 'facility_details'), 'l.facility_id=vl.lab_id', array(), 'left')
             ->where("sample_collection_date is not null AND sample_collection_date != '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00' AND f.facility_type = 1")
             ->group(new Expression('DATE(sample_collection_date)'))
@@ -4049,7 +4013,6 @@ class EidSampleTable extends AbstractTableGateway
                 "total_samples_received" => new Expression("(COUNT(*))")
             ))
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'))
-            ->join(array('rs' => 'r_eid_sample_type'), 'rs.sample_id=vl.specimen_type', array('sample_name'))
             ->join(array('l' => 'facility_details'), 'l.facility_id=vl.lab_id', array(), 'left')
             ->where("sample_collection_date is not null AND sample_collection_date != '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00' AND f.facility_type = 1")
             ->group(new Expression('DATE(sample_collection_date)'))
@@ -4081,7 +4044,7 @@ class EidSampleTable extends AbstractTableGateway
             $row[] = $aRow['total_samples_tested'];
             $row[] = $aRow['total_samples_pending'];
             $row[] = $aRow['rejected_samples'];
-            $row[] = ucwords($aRow['sample_name']);
+            $row[] = ucwords($aRow['specimen_type']);
             $row[] = ucwords($aRow['facility_name']);
             $output['aaData'][] = $row;
         }
