@@ -23,9 +23,10 @@ class Module
                     return new \Eid\Controller\SummaryController($summaryService, $commonService);
                 },
                 'Eid\Controller\Labs' => function ($sm) {
-                    $commonService = $sm->getServiceLocator()->get('CommonService');
+                    $facilityService = $sm->getServiceLocator()->get('FacilityService');
                     $sampleService = $sm->getServiceLocator()->get('EidSampleService');
-                    return new \Eid\Controller\LabsController($sampleService, $commonService);
+                    $commonService = $sm->getServiceLocator()->get('CommonService');
+                    return new \Eid\Controller\LabsController($sampleService, $facilityService,$commonService);
                 },
                 'Eid\Controller\Clinics' => function ($sm) {
                     $commonService = $sm->getServiceLocator()->get('CommonService');

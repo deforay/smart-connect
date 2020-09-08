@@ -20,8 +20,8 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "2.8.x-dev",
-            "dev-develop": "2.9.x-dev"
+            "dev-master": "2.9.x-dev",
+            "dev-develop": "2.10.x-dev"
         }
     },
     "require": {
@@ -29,7 +29,8 @@
         "laminas/laminas-config": "^3.1 || ^2.6",
         "laminas/laminas-eventmanager": "^3.2 || ^2.6.3",
         "laminas/laminas-stdlib": "^3.1 || ^2.7",
-        "laminas/laminas-zendframework-bridge": "^1.0"
+        "laminas/laminas-zendframework-bridge": "^1.0",
+        "webimpress/safe-writer": "^1.0.2 || ^2.1"
     },
     "require-dev": {
         "laminas/laminas-coding-standard": "~1.0.0",
@@ -73,6 +74,6 @@
         "test-coverage": "phpunit --colors=always --coverage-clover clover.xml"
     },
     "replace": {
-        "zendframework/zend-modulemanager": "self.version"
+        "zendframework/zend-modulemanager": "^2.8.4"
     }
 }

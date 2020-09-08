@@ -79,8 +79,7 @@ class TimeController extends AbstractActionController
 			$category = $params['category'];
 			$labs = (isset($params['lab']) && !empty($params['lab'])) ? $params['lab'] : array();
 
-			$facilities = $facilityService->fetchLocationDetails();
-			$result = $sampleService->getTATbyProvince($facilities, $labs, $dates[0], $dates[1]);
+			$result = $sampleService->getTATbyProvince($labs, $dates[0], $dates[1]);
 			$viewModel = new ViewModel();
 			$viewModel->setVariables(array('results' => $result, 'daterange' => $params['sampleCollectionDate'], 'labs' => implode(',', $labs), 'categoryChecked' => $category))
 				->setTerminal(true);
@@ -108,7 +107,7 @@ class TimeController extends AbstractActionController
 				$result       = $sampleService->getTATbyClinic($facilities, $labs, $dates[0], $dates[1]);
 			} else { // Brings the TAT ordered by Province
 				$facilities = $facilityService->fetchLocationDetails();
-				$result = $sampleService->getTATbyProvince($facilities, $labs, $dates[0], $dates[1]);
+				$result = $sampleService->getTATbyProvince($labs, $dates[0], $dates[1]);
 			}
 			$viewModel = new ViewModel();
 			$viewModel->setVariables(
@@ -192,7 +191,7 @@ class TimeController extends AbstractActionController
 				array(
 					'daterange'       => $params['sampleCollectionDate'],
 					'labs'            => (isset($labs) && !empty($labs)) ? implode(',', $labs) : '',
-					'resultProvinces' => $sampleService->getTATbyProvince($provinceArray, $labs, $dates[0], $dates[1]),
+					'resultProvinces' => $sampleService->getTATbyProvince($labs, $dates[0], $dates[1]),
 					'resultDistricts' => $sampleService->getTATbyDistrict($districtArray, $labs, $dates[0], $dates[1]),
 					'resultClinics'   => $sampleService->getTATbyClinic($clinicArray, $labs, $dates[0], $dates[1]),
 					'provinceNames'   => $provinceNames,
@@ -205,7 +204,7 @@ class TimeController extends AbstractActionController
 				)
 			)
 				->setTerminal(true);
-			//echo "<script type='text/javascript'>alert('".json_encode($sampleService -> getTATbyProvince($provinceArray,$labs,$dates[0],$dates[1]))."');</script>";
+			//echo "<script type='text/javascript'>alert('".json_encode($sampleService -> getTATbyProvince($labs,$dates[0],$dates[1]))."');</script>";
 			return $viewModel;
 		}
 	}

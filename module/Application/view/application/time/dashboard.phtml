@@ -1,520 +1,557 @@
 <?php
+
 use Laminas\Session\Container;
+
 $languagecontainer = new Container('language');
 $startDate = '';
 $endDate = '';
-if(isset($searchMonth) && trim($searchMonth)!= ''){
-    $splitSearchMonth = explode("-",$searchMonth);
-    $startDate = $splitSearchMonth[1].'-'.date('m', strtotime($splitSearchMonth[0])).'-01';
-    $endDate = date('Y-m-t',strtotime($splitSearchMonth[1].'-'.date('m', strtotime($splitSearchMonth[0])).'-01'));
-}else if(isset($searchRange) && trim($searchRange)!= ''){
-   $splitSearchRange = explode("to",$searchRange);
-   $startDate = $splitSearchRange[0];
-   $endDate = $splitSearchRange[1];
+if (isset($searchMonth) && trim($searchMonth) != '') {
+  $splitSearchMonth = explode("-", $searchMonth);
+  $startDate = $splitSearchMonth[1] . '-' . date('m', strtotime($splitSearchMonth[0])) . '-01';
+  $endDate = date('Y-m-t', strtotime($splitSearchMonth[1] . '-' . date('m', strtotime($splitSearchMonth[0])) . '-01'));
+} else if (isset($searchRange) && trim($searchRange) != '') {
+  $splitSearchRange = explode("to", $searchRange);
+  $startDate = $splitSearchRange[0];
+  $endDate = $splitSearchRange[1];
 }
 //set selected provinces
 $selectedProvinces = array();
-if(isset($provinceFilter) && trim($provinceFilter)!= ''){
+if (isset($provinceFilter) && trim($provinceFilter) != '') {
   $selectedProvinces[] = $provinceFilter;
 }
 //set selected districts
 $selectedDistricts = array();
-if(isset($districtFilter) && trim($districtFilter)!= ''){
+if (isset($districtFilter) && trim($districtFilter) != '') {
   $selectedDistricts[] = $districtFilter;
 }
 //set selected labs
 $selectedLabs = array();
-if(isset($labFilter) && trim($labFilter)!= ''){
-  $selectedLabs = explode(",",$labFilter);
+if (isset($labFilter) && trim($labFilter) != '') {
+  $selectedLabs = explode(",", $labFilter);
 }
 ?>
 <style type="text/css">
-    #row-provinceChart .active,
-    #row-districtChart .active,
-    #row-clinicChart .active{
-      display:none;
-    }
-    #row-provinceChart .chart-container.fullSize,
-    #row-districtChart .chart-container.fullSize,
-    #row-clinicChart .chart-container.fullSize{
-      width: 100% !important
-    }
-    .table-container{
-      /*margin: 0 !important;
+  #row-provinceChart .active,
+  #row-districtChart .active,
+  #row-clinicChart .active {
+    display: none;
+  }
+
+  #row-provinceChart .chart-container.fullSize,
+  #row-districtChart .chart-container.fullSize,
+  #row-clinicChart .chart-container.fullSize {
+    width: 100% !important
+  }
+
+  .table-container {
+    /*margin: 0 !important;
       padding: 0 !important;
       background-color: #cccccc;
       height: 100%;
       overflow-y: hidden !important;*/
-    }
-    .time-table{
-      margin: 0 !important;
-      padding: 0 !important;
-      width: 100% !important;
-      height: 100% !important;
-      display: none
-    }
-    .time-box{
-      /*background-color: #FFF;*/
-    }
+  }
 
-    .scrolltable {
-      overflow-x: hidden;
-      height: 400px;
-      width: 100%;
-      display: flex;
-      display: -webkit-flex;
-      flex-direction: column;
-      -webkit-flex-direction: column;
-      background-color: #f9f9f9
-    }
-    .scrolltable > .header {
-      width: calc(100% - 1px) !important;
-    }
-    .scrolltable > .body {
-        /*noinspection CssInvalidPropertyValue*/
-        width: 100%;
-        overflow-y:auto;
-        flex: 1;
-        -webkit-flex: 1;
-        background-color: #f9f9f9;
-    }
-    .scrolltable > .body table{
-        width:100%
-    }
-    table {
-        border-collapse: collapse;
-        table-layout: fixed;
-    }
-    td {
-        border: 1px solid rgb(227, 227, 227);
-        line-height: 1.42857143;
-    }
-    th {
-        background-color: lightgrey;
-        border-width: 1px;
-        border-color: none !important;
-        padding: 6px;
-        width:16.67%;
-        word-wrap:break-word
-    }
-    td {
-        border-width: 1px;
-        line-height: 20px;
-        padding: 6px;
-        color: #333;
-        width:16.67%;
-        word-wrap:break-word
-    }
-    tr:first-child td {
-        border-top-width: 0;
-    }
-    tr:nth-child(odd) {
-        background-color: #ffffff;
-    }
-    tr:nth-child(even) {
-        background-color: #f9f9f9;
-    }
-    .scrollbar{
-        margin: 0px;
-        float: left;
-        height: 100%;
-        width: 100%;
-        background: #FFF;
-        overflow-y: scroll;
-    }
+  .time-table {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    display: none
+  }
 
-    .style-3::-webkit-scrollbar-track{
-        -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
-        background-color: #F5F5F5;
-    }
+  .time-box {
+    /*background-color: #FFF;*/
+  }
 
-    .style-3::-webkit-scrollbar{
-        width: 6px;
-        background-color: #F5F5F5;
-    }
+  .scrolltable {
+    overflow-x: hidden;
+    height: 400px;
+    width: 100%;
+    display: flex;
+    display: -webkit-flex;
+    flex-direction: column;
+    -webkit-flex-direction: column;
+    background-color: #f9f9f9
+  }
 
-    .style-3::-webkit-scrollbar-thumb{
-        background-color: #000000;
-    }
-    .clickable{
-      cursor:pointer;
-    }
-    .clickable:hover{
-      background-color:#F5F5F5;
-    }
+  .scrolltable>.header {
+    width: calc(100% - 1px) !important;
+  }
+
+  .scrolltable>.body {
+    /*noinspection CssInvalidPropertyValue*/
+    width: 100%;
+    overflow-y: auto;
+    flex: 1;
+    -webkit-flex: 1;
+    background-color: #f9f9f9;
+  }
+
+  .scrolltable>.body table {
+    width: 100%
+  }
+
+  table {
+    border-collapse: collapse;
+    table-layout: fixed;
+  }
+
+  td {
+    border: 1px solid rgb(227, 227, 227);
+    line-height: 1.42857143;
+  }
+
+  th {
+    background-color: lightgrey;
+    border-width: 1px;
+    border-color: none !important;
+    padding: 6px;
+    width: 16.67%;
+    word-wrap: break-word
+  }
+
+  td {
+    border-width: 1px;
+    line-height: 20px;
+    padding: 6px;
+    color: #333;
+    width: 16.67%;
+    word-wrap: break-word
+  }
+
+  tr:first-child td {
+    border-top-width: 0;
+  }
+
+  tr:nth-child(odd) {
+    background-color: #ffffff;
+  }
+
+  tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+
+  .scrollbar {
+    margin: 0px;
+    float: left;
+    height: 100%;
+    width: 100%;
+    background: #FFF;
+    overflow-y: scroll;
+  }
+
+  .style-3::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+    background-color: #F5F5F5;
+  }
+
+  .style-3::-webkit-scrollbar {
+    width: 6px;
+    background-color: #F5F5F5;
+  }
+
+  .style-3::-webkit-scrollbar-thumb {
+    background-color: #000000;
+  }
+
+  .clickable {
+    cursor: pointer;
+  }
+
+  .clickable:hover {
+    background-color: #F5F5F5;
+  }
 </style>
 <!-- BEGIN PAGE BAR -->
 <div class="page-bar">
   <h1 class="page-title"><?php echo $this->translate('TAT Dashboard'); ?></h1>
 </div>
 <!-- END PAGE BAR -->
-<br/>
-<br/>
+<br />
+<br />
 
 <form id="pageFilter" action="#" method="">
-    <div class="row">
-          <div class="col-md-12">
-              <div class="form-group col-lg-4">
-                  <label class="control-label"><?php echo $this->translate('Provinces'); ?>&nbsp;</label>
-                  <select name="provinces[]" id="provinces" class="form-control" multiple title="<?php echo $this->translate('Please choose provinces'); ?>" onchange="getLocationInfo('provinces');">
-                      <?php
-                      if(isset($provinces) && count($provinces) > 0){
-                          foreach($provinces as $province){
-                      ?>
-                          <option value="<?php echo $province['location_id']; ?>" <?php echo(in_array($province['location_id'],$selectedProvinces))?'selected="selected"':''; ?>><?php echo ucwords($province['location_name']); ?></option>
-                      <?php } } ?>
-                  </select>
-              </div>
-              <div class="form-group col-lg-4">
-                  <label class="control-label"><?php echo $this->translate('Districts'); ?>&nbsp;</label>
-                  <select name="districts[]" id="districts" class="form-control" multiple title="<?php echo $this->translate('Please choose districts'); ?>" onchange="getLocationInfo('districts');">
-                      <?php
-                      if(isset($districts) && count($districts) > 0){
-                          foreach($districts as $district){
-                      ?>
-                          <option value="<?php echo $district['location_id']; ?>" <?php echo(in_array($district['location_id'],$selectedDistricts))?'selected="selected"':''; ?>><?php echo ucwords($district['location_name']); ?></option>
-                      <?php } } ?>
-                  </select>
-              </div>
-              <div class="form-group col-lg-4">
-                <label class="control-label"><?php echo $this->translate('Date Range'); ?>&nbsp;</label>
-                <div id="dashboard-range" class="btn btn-sm form-control"
-                    data-container="body" data-placement="bottom" data-original-title="Change dashboard date range">
-                    <?php echo $this->translate('Date Range'); ?>&nbsp;&nbsp;&nbsp;&nbsp;<i class="icon-calendar"></i>&nbsp;
-                    <span class="thin uppercase hidden-xs"></span>&nbsp;
-                    <i class="fa fa-angle-down"></i>
-                    <input type="hidden" name="sampleCollectionDate" id="sampleCollectionDate"/>
-                </div>
-              </div>
-          </div>
-          <div class="col-md-12">
-              <div class="form-group col-lg-4">
-                <label class="control-label"><?php echo $this->translate('Clinics'); ?>&nbsp;</label>
-                <select class="form-control" id="clinics" name="clinics[]" multiple title="<?php echo $this->translate('Please choose clinics'); ?>">
-                  <?php
-                  if(isset($clinics) && count($clinics) > 0){
-                    foreach($clinics as $clinic){
-                      ?>
-                      <option value="<?php echo $clinic['facility_id']; ?>"><?php echo ucwords($clinic['facility_name']); ?></option>
-                      <?php
-                    }
-                  } ?>
-                </select>
-              </div>
-              <div class="form-group col-lg-4">
-                  <label class="control-label"><?php echo $this->translate('Labs'); ?>&nbsp;</label>
-                  <select name="labs[]" id="labs" class="form-control" multiple title="<?php echo $this->translate('Please choose labs'); ?>">
-                      <?php
-                      if(isset($labs) && count($labs) > 0){
-                          foreach($labs as $lab){
-                      ?>
-                          <option value="<?php echo $lab['facility_id']; ?>" <?php echo(in_array($lab['facility_id'],$selectedLabs))?'selected="selected"':''; ?>><?php echo ucwords($lab['facility_name']); ?></option>
-                      <?php } } ?>
-                  </select>
-              </div>
-          </div>
-          <div class="col-md-12">
-              <div class="form-group col-lg-12" style="text-align:center;margin-top:10px;">
-                  <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="searchTATData();"><?php echo $this->translate('Search'); ?></a>&nbsp;&nbsp;
-                  <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="resetEverything();"><?php echo $this->translate('Reset'); ?></a>
-              </div>
-          </div>
+  <div class="row">
+    <div class="col-md-12">
+      <div class="form-group col-lg-4">
+        <label class="control-label"><?php echo $this->translate('Provinces'); ?>&nbsp;</label>
+        <select name="provinces[]" id="provinces" class="form-control" multiple title="<?php echo $this->translate('Please choose provinces'); ?>" onchange="getLocationInfo('provinces');">
+          <?php
+          if (isset($provinces) && count($provinces) > 0) {
+            foreach ($provinces as $province) {
+          ?>
+              <option value="<?php echo $province['location_id']; ?>" <?php echo (in_array($province['location_id'], $selectedProvinces)) ? 'selected="selected"' : ''; ?>><?php echo ucwords($province['location_name']); ?></option>
+          <?php }
+          } ?>
+        </select>
+      </div>
+      <div class="form-group col-lg-4">
+        <label class="control-label"><?php echo $this->translate('Districts'); ?>&nbsp;</label>
+        <select name="districts[]" id="districts" class="form-control" multiple title="<?php echo $this->translate('Please choose districts'); ?>" onchange="getLocationInfo('districts');">
+          <?php
+          if (isset($districts) && count($districts) > 0) {
+            foreach ($districts as $district) {
+          ?>
+              <option value="<?php echo $district['location_id']; ?>" <?php echo (in_array($district['location_id'], $selectedDistricts)) ? 'selected="selected"' : ''; ?>><?php echo ucwords($district['location_name']); ?></option>
+          <?php }
+          } ?>
+        </select>
+      </div>
+      <div class="form-group col-lg-4">
+        <label class="control-label"><?php echo $this->translate('Date Range'); ?>&nbsp;</label>
+        <div id="dashboard-range" class="btn btn-sm form-control" data-container="body" data-placement="bottom" data-original-title="Change dashboard date range">
+          <?php echo $this->translate('Date Range'); ?>&nbsp;&nbsp;&nbsp;&nbsp;<i class="icon-calendar"></i>&nbsp;
+          <span class="thin uppercase hidden-xs"></span>&nbsp;
+          <i class="fa fa-angle-down"></i>
+          <input type="hidden" name="sampleCollectionDate" id="sampleCollectionDate" />
+        </div>
+      </div>
     </div>
+    <div class="col-md-12">
+      <div class="form-group col-lg-4">
+        <label class="control-label"><?php echo $this->translate('Clinics'); ?>&nbsp;</label>
+        <select class="form-control" id="clinics" name="clinics[]" multiple title="<?php echo $this->translate('Please choose clinics'); ?>">
+          <?php
+          if (isset($clinics) && count($clinics) > 0) {
+            foreach ($clinics as $clinic) {
+          ?>
+              <option value="<?php echo $clinic['facility_id']; ?>"><?php echo ucwords($clinic['facility_name']); ?></option>
+          <?php
+            }
+          } ?>
+        </select>
+      </div>
+      <div class="form-group col-lg-4">
+        <label class="control-label"><?php echo $this->translate('Labs'); ?>&nbsp;</label>
+        <select name="labs[]" id="labs" class="form-control" multiple title="<?php echo $this->translate('Please choose labs'); ?>">
+          <?php
+          if (isset($labs) && count($labs) > 0) {
+            foreach ($labs as $lab) {
+          ?>
+              <option value="<?php echo $lab['facility_id']; ?>" <?php echo (in_array($lab['facility_id'], $selectedLabs)) ? 'selected="selected"' : ''; ?>><?php echo ucwords($lab['facility_name']); ?></option>
+          <?php }
+          } ?>
+        </select>
+      </div>
+    </div>
+    <div class="col-md-12">
+      <div class="form-group col-lg-12" style="text-align:center;margin-top:10px;">
+        <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="searchTATData();"><?php echo $this->translate('Search'); ?></a>&nbsp;&nbsp;
+        <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="resetEverything();"><?php echo $this->translate('Reset'); ?></a>
+      </div>
+    </div>
+  </div>
 </form>
 <hr style="background: #000 !important;border-color:#ccc;">
 <div id="page-data-viewer"></div>
-<script src="<?php echo $this->basePath('assets/js/month-year-range-picker.js'); ?>" type="text/javascript"></script>
+<script src="<?php echo $this->basePath('assets/js/month-year-range-picker.php'); ?>" type="text/javascript"></script>
 <script type="text/javascript">
-    $(function() {
-        $('#provinces').select2({
-            placeholder: "<?php echo $this->translate('All Provinces'); ?>",
-            allowClear: true
-        });
-        $('#districts').select2({
-            placeholder: "<?php echo $this->translate('All Districts'); ?>",
-            allowClear: true
-        });
-        $('#clinics').select2({
-            placeholder: "<?php echo $this->translate('All Clinics'); ?>",
-            allowClear: true
-        });
-        $('#labs').select2({
-            placeholder: "<?php echo $this->translate('All Labs'); ?>",
-            allowClear: true
-        });
-        if($("#provinces").val()!= null && $("#provinces").val()!= ''){
-          getLocationInfo('provinces');
-        }else if($("#districts").val()!= null && $("#districts").val()!= '') {
-          getLocationInfo('districts');
-        }
-        <?php if(trim($startDate)!= ''){ ?>
-          var start = moment('<?php echo $startDate; ?>', "YYYY-MM-DD");
-          var end = moment('<?php echo $endDate; ?>', "YYYY-MM-DD");
-        <?php } else { ?>
-          var start = moment().subtract(12, 'months');
-          var end = moment();
-        <?php } ?>
-        function cb(start, end) {
-            $('#dashboard-range span').html(start.format('MMM D, YYYY') + ' to ' + end.format('MMM D, YYYY'));
-            $('#sampleCollectionDate').val(start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
-        }
-        $('#dashboard-range').daterangepicker({
-            format: 'DD-MMM-YYYY',
-            separator: ' to ',
-            startDate: start,
-            endDate: end,
-            maxDate:moment(),
-            ranges: {
-               'Today': [moment(), moment()],
-               'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-               'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-               'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-               'This Month': [moment().startOf('month'), moment().endOf('month')],
-               'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
-            },
-            opens: "left"
-        }, cb);
-        cb(start,end);
-        $('#dashboard-range').show();
-        setProgress();
-        <?php
-          if(isset($_GET['place'])){
-        ?>
-            getTATfromURL();
-        <?php
-          }
-          else{
-        ?>
-            defaultTAT();
-        <?php
-          }
-        ?>
+  $(function() {
+    $('#provinces').select2({
+      placeholder: "<?php echo $this->translate('All Provinces'); ?>",
+      allowClear: true
     });
-
-    function setProgress(){
-        $.blockUI.defaults.css.border = '1px solid grey';
-        $(document).ajaxStart($.blockUI({ message: '<h2><?php echo $this->translate('Processing...'); ?></h2>' })).ajaxStop($.unblockUI);
-        if( !$('#sampleCollectionDate').val() ) {
-          $('#sampleCollectionDate').val(moment().subtract('days', 29).format('YYYY-MM-DD') + ' to ' + moment().format('YYYY-MM-DD'));
-        }
+    $('#districts').select2({
+      placeholder: "<?php echo $this->translate('All Districts'); ?>",
+      allowClear: true
+    });
+    $('#clinics').select2({
+      placeholder: "<?php echo $this->translate('All Clinics'); ?>",
+      allowClear: true
+    });
+    $('#labs').select2({
+      placeholder: "<?php echo $this->translate('All Labs'); ?>",
+      allowClear: true
+    });
+    if ($("#provinces").val() != null && $("#provinces").val() != '') {
+      getLocationInfo('provinces');
+    } else if ($("#districts").val() != null && $("#districts").val() != '') {
+      getLocationInfo('districts');
     }
+    <?php if (trim($startDate) != '') { ?>
+      var start = moment('<?php echo $startDate; ?>', "YYYY-MM-DD");
+      var end = moment('<?php echo $endDate; ?>', "YYYY-MM-DD");
+    <?php } else { ?>
+      var start = moment().subtract(12, 'months');
+      var end = moment();
+    <?php } ?>
 
-    function defaultTAT(){
-        var dateRange = $("#sampleCollectionDate").val();
-        var lab = ($("#labs").val() == null || $("#labs").val() == '')?[]:$("#labs").val();
-        var category  = $("input:radio[name='optradio']:checked").val();
-        $.post("<?php echo $this->url('times', array('action' => 'get-tat-default')); ?>",{sampleCollectionDate:dateRange,lab:lab,category:category},
-        function(data) {
-            $("#page-data-viewer").html(data);
-        });
+    function cb(start, end) {
+      $('#dashboard-range span').html(start.format('MMM D, YYYY') + ' to ' + end.format('MMM D, YYYY'));
+      $('#sampleCollectionDate').val(start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
     }
+    $('#dashboard-range').daterangepicker({
+      format: 'DD-MMM-YYYY',
+      separator: ' to ',
+      startDate: start,
+      endDate: end,
+      maxDate: moment(),
+      ranges: {
+        'Today': [moment(), moment()],
+        'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+        'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+        'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+        'This Month': [moment().startOf('month'), moment().endOf('month')],
+        'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+      },
+      opens: "left"
+    }, cb);
+    cb(start, end);
+    $('#dashboard-range').show();
+    setProgress();
+    <?php
+    if (isset($_GET['place'])) {
+    ?>
+      getTATfromURL();
+    <?php
+    } else {
+    ?>
+      defaultTAT();
+    <?php
+    }
+    ?>
+  });
 
-    function getTATfromURL(){
-      $.post("<?php echo $this->url('times', array('action' => 'get-tat-from-url')); ?>",{
-          province: ($("#provinces").val() == null || $("#provinces").val() == '')?'':$("#provinces").val().join(','),
-          district: ($("#districts").val() == null || $("#districts").val() == '')?'':$("#districts").val().join(','),
-          facility: ($("#clinics").val() == null || $("#clinics").val() == '')?[]:$("#clinics").val(),
-          lab: ($("#labs").val() == null || $("#labs").val() == '')?[]:$("#labs").val(),
-          category: '<?php if(isset($_GET['category'])){echo $_GET['category'];}?>',
-          place: '<?php if(isset($_GET['place'])){echo $_GET['place'];}?>',
-          sampleCollectionDate: $("#sampleCollectionDate").val()
+  function setProgress() {
+    $.blockUI.defaults.css.border = '1px solid grey';
+    $(document).ajaxStart($.blockUI({
+      message: '<h2><?php echo $this->translate('Processing...'); ?></h2>'
+    })).ajaxStop($.unblockUI);
+    if (!$('#sampleCollectionDate').val()) {
+      $('#sampleCollectionDate').val(moment().subtract('days', 29).format('YYYY-MM-DD') + ' to ' + moment().format('YYYY-MM-DD'));
+    }
+  }
+
+  function defaultTAT() {
+    var dateRange = $("#sampleCollectionDate").val();
+    var lab = ($("#labs").val() == null || $("#labs").val() == '') ? [] : $("#labs").val();
+    var category = $("input:radio[name='optradio']:checked").val();
+    $.post("<?php echo $this->url('times', array('action' => 'get-tat-default')); ?>", {
+        sampleCollectionDate: dateRange,
+        lab: lab,
+        category: category
       },
       function(data) {
-          $("#page-data-viewer").html(data);
+        $("#page-data-viewer").html(data);
       });
-    }
+  }
 
-    function getTATfromSearchField(provinces,districts,clinics,labs,dateRange,category,provinceNames,districtNames,clinicNames){
-      setProgress();
-      $.post("<?php echo $this->url('times', array('action' => 'get-tat-from-search-field')); ?>",
-      {
-        provinces:provinces,
-        districts:districts,
-        clinics:clinics,
-        labs:labs,
-        sampleCollectionDate:dateRange,
-        category:category,
-        provinceNames:provinceNames,
-        districtNames:districtNames,
+  function getTATfromURL() {
+    $.post("<?php echo $this->url('times', array('action' => 'get-tat-from-url')); ?>", {
+        province: ($("#provinces").val() == null || $("#provinces").val() == '') ? '' : $("#provinces").val().join(','),
+        district: ($("#districts").val() == null || $("#districts").val() == '') ? '' : $("#districts").val().join(','),
+        facility: ($("#clinics").val() == null || $("#clinics").val() == '') ? [] : $("#clinics").val(),
+        lab: ($("#labs").val() == null || $("#labs").val() == '') ? [] : $("#labs").val(),
+        category: '<?php if (isset($_GET['category'])) {
+                      echo $_GET['category'];
+                    } ?>',
+        place: '<?php if (isset($_GET['place'])) {
+                  echo $_GET['place'];
+                } ?>',
+        sampleCollectionDate: $("#sampleCollectionDate").val()
+      },
+      function(data) {
+        $("#page-data-viewer").html(data);
+      });
+  }
+
+  function getTATfromSearchField(provinces, districts, clinics, labs, dateRange, category, provinceNames, districtNames, clinicNames) {
+    setProgress();
+    $.post("<?php echo $this->url('times', array('action' => 'get-tat-from-search-field')); ?>", {
+        provinces: provinces,
+        districts: districts,
+        clinics: clinics,
+        labs: labs,
+        sampleCollectionDate: dateRange,
+        category: category,
+        provinceNames: provinceNames,
+        districtNames: districtNames,
         clinicNames: clinicNames
       },
       function(data) {
         $('#page-data-viewer').html(data);
       });
+  }
+
+  function searchTATData() {
+    var provinceIDs = $("#provinces").val();
+    var districtIDs = $("#districts").val();
+    var clinicIDs = $("#clinics").val();
+    var labIDs = $("#labs").val();
+    var dateRange = $("#sampleCollectionDate").val();
+    var category = $("input:radio[name='optradio']:checked").val();
+    var provinceNames = [];
+    var districtNames = [];
+    var clinicNames = [];
+    var provinces = $('#provinces').select2('data');
+    var districts = $('#districts').select2('data');
+    var clinics = $('#clinics').select2('data');
+
+    for (var i = 0; i < provinces.length; i++) {
+      provinceNames[i] = provinces[i].text;
     }
-
-    function searchTATData(){
-      var provinceIDs   = $("#provinces").val();
-      var districtIDs   = $("#districts").val();
-      var clinicIDs     = $("#clinics").val();
-      var labIDs        = $("#labs").val();
-      var dateRange     = $("#sampleCollectionDate").val();
-      var category      = $("input:radio[name='optradio']:checked").val();
-      var provinceNames = [];
-      var districtNames = [];
-      var clinicNames   = [];
-      var provinces = $('#provinces').select2('data');
-      var districts = $('#districts').select2('data');
-      var clinics   = $('#clinics').select2('data');
-
-      for(var i=0; i < provinces.length; i++){
-        provinceNames[i] = provinces[i].text;
-      }
-      for(var i=0; i < districts.length; i++){
-        districtNames[i] = districts[i].text;
-      }
-      for(var i=0; i < clinics.length; i++){
-        clinicNames[i] = clinics[i].text;
-      }
-      getTATfromSearchField(provinceIDs,districtIDs,clinicIDs,labIDs,dateRange,category,provinceNames,districtNames,clinicNames);
+    for (var i = 0; i < districts.length; i++) {
+      districtNames[i] = districts[i].text;
     }
-
-    $('#btl-display-table').click(function(){
-      if($('#table-container').is(":visible"))
-        $('#table-container').hide();
-      else
-        $('#table-container').show();
-    });
-
-    function getTATChartData(idTable){
-      var facilities = [];
-
-      for (var i = 0; i < $("#"+idTable+" tbody tr").length; i++) {
-        facilities[i] = $("#"+idTable).find("#td-"+i+"-0").text();
-      }
-      return facilities;
+    for (var i = 0; i < clinics.length; i++) {
+      clinicNames[i] = clinics[i].text;
     }
+    getTATfromSearchField(provinceIDs, districtIDs, clinicIDs, labIDs, dateRange, category, provinceNames, districtNames, clinicNames);
+  }
 
-    function fnExcelReport(clsTable,idTable,idButton) {
-        var tab_text = '<html xmlns:x="urn:schemas-microsoft-com:office:excel">';
-        tab_text = tab_text + '<head><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet>';
+  $('#btl-display-table').click(function() {
+    if ($('#table-container').is(":visible"))
+      $('#table-container').hide();
+    else
+      $('#table-container').show();
+  });
 
-        tab_text = tab_text + '<x:Name>Test Sheet</x:Name>';
+  function getTATChartData(idTable) {
+    var facilities = [];
 
-        tab_text = tab_text + '<x:WorksheetOptions><x:Panes></x:Panes></x:WorksheetOptions></x:ExcelWorksheet>';
-        tab_text = tab_text + '</x:ExcelWorksheets></x:ExcelWorkbook></xml> <meta charset="utf-8"></head><body>';
-
-        tab_text = tab_text + "<table border='1px'>";
-        tab_text = tab_text + $(clsTable).html();
-        tab_text = tab_text + $(idTable).html();
-        tab_text = tab_text + '</table></body></html>';
-
-        var data_type = 'data:application/vnd.ms-excel';
-
-        var ua = window.navigator.userAgent;
-        var msie = ua.indexOf("MSIE ");
-
-        if (msie > 0 || !!navigator.userAgent.match(/Trident.*rv\:11\./)) {
-            if (window.navigator.msSaveBlob) {
-                var blob = new Blob([tab_text], {
-                    type: "application/csv;charset=utf-8;"
-                });
-                navigator.msSaveBlob(blob, 'Test file.xls');
-            }
-        } else {
-            var fullDate = new Date();
-            var twoDigitMonth = ((fullDate.getMonth().length+1) === 1)? (fullDate.getMonth()+1) : '0' + (fullDate.getMonth()+1);
-            var currentDate = fullDate.getDate() + "_" + twoDigitMonth + "_" + fullDate.getFullYear();
-            var seconds = fullDate.getSeconds();
-            var minutes = fullDate.getMinutes();
-            var hour = fullDate.getHours();
-            $(idButton).attr('href', data_type + ', ' + encodeURIComponent(tab_text));
-            $(idButton).attr('download', 'TAR_'+currentDate+'_'+hour+minutes+seconds+'.xls');
-        }
+    for (var i = 0; i < $("#" + idTable + " tbody tr").length; i++) {
+      facilities[i] = $("#" + idTable).find("#td-" + i + "-0").text();
     }
+    return facilities;
+  }
 
-    function resetEverything(){
-        $('#pageFilter')[0].reset();
-        $('#provinces').val('').change();
-        $('#districts').val('').change();
-        $('#clinics').val('').change();
-        $('#labs').val('').change();
-        searchTATData();
-    }
+  function fnExcelReport(clsTable, idTable, idButton) {
+    var tab_text = '<html xmlns:x="urn:schemas-microsoft-com:office:excel">';
+    tab_text = tab_text + '<head><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet>';
 
-    function getLocationInfo(fromSrc){
-        var provinces = ($("#provinces").val() == null || $("#provinces").val() == '')?[]:$("#provinces").val();
-        var districts = ($("#districts").val() == null || $("#districts").val() == '')?[]:$("#districts").val();
-        $.post("<?php echo $this->url('laboratory', array('action' => 'get-location-info')); ?>", {provinces:provinces,districts:districts,fromSrc:fromSrc},
-        function(data){
-            var splitLocationInfo = data.split('##');
-            if(fromSrc == 'provinces'){ $('#districts').val('').change(); }
-            $('#labs').val('').change();
-            $('#clinics').val('').change();
-            if(fromSrc == 'provinces'){ $('#districts').html(splitLocationInfo[0]); }
-            $('#labs').html(splitLocationInfo[1]);
-            $('#clinics').html(splitLocationInfo[2]);
+    tab_text = tab_text + '<x:Name>Test Sheet</x:Name>';
+
+    tab_text = tab_text + '<x:WorksheetOptions><x:Panes></x:Panes></x:WorksheetOptions></x:ExcelWorksheet>';
+    tab_text = tab_text + '</x:ExcelWorksheets></x:ExcelWorkbook></xml> <meta charset="utf-8"></head><body>';
+
+    tab_text = tab_text + "<table border='1px'>";
+    tab_text = tab_text + $(clsTable).html();
+    tab_text = tab_text + $(idTable).html();
+    tab_text = tab_text + '</table></body></html>';
+
+    var data_type = 'data:application/vnd.ms-excel';
+
+    var ua = window.navigator.userAgent;
+    var msie = ua.indexOf("MSIE ");
+
+    if (msie > 0 || !!navigator.userAgent.match(/Trident.*rv\:11\./)) {
+      if (window.navigator.msSaveBlob) {
+        var blob = new Blob([tab_text], {
+          type: "application/csv;charset=utf-8;"
         });
-    }
-
-    function toogleTable(idRow){
-      $('#'+idRow+' .table-container').toggleClass('active');
-      if (this.resizeTO) clearTimeout(this.resizeTO);
-      this.resizeTO = setTimeout(function () {
-          // resizeEnd call function with pass context body
-          adjustGraph.call($('#'+idRow));
-      }, 500);
-      if($('#'+idRow+' .table-container').hasClass('active')){
-        $('#'+idRow+' .chart-container').addClass('fullSize');
+        navigator.msSaveBlob(blob, 'Test file.xls');
       }
-      else{
-        $('#'+idRow+' .chart-container').removeClass('fullSize');
-      }
+    } else {
+      var fullDate = new Date();
+      var twoDigitMonth = ((fullDate.getMonth().length + 1) === 1) ? (fullDate.getMonth() + 1) : '0' + (fullDate.getMonth() + 1);
+      var currentDate = fullDate.getDate() + "_" + twoDigitMonth + "_" + fullDate.getFullYear();
+      var seconds = fullDate.getSeconds();
+      var minutes = fullDate.getMinutes();
+      var hour = fullDate.getHours();
+      $(idButton).attr('href', data_type + ', ' + encodeURIComponent(tab_text));
+      $(idButton).attr('download', 'TAR_' + currentDate + '_' + hour + minutes + seconds + '.xls');
     }
+  }
 
-    $(window).resize(function(){
-        if (this.resizeTO) clearTimeout(this.resizeTO);
-        this.resizeTO = setTimeout(function () {
-            adjustGraph.call($('body'));
-        }, 5);
-     });
+  function resetEverything() {
+    $('#pageFilter')[0].reset();
+    $('#provinces').val('').change();
+    $('#districts').val('').change();
+    $('#clinics').val('').change();
+    $('#labs').val('').change();
+    searchTATData();
+  }
 
-     function adjustGraph(chart) {
-        try {
-            if (typeof (chart === 'undefined' || chart === null) && this instanceof jQuery) { // if no obj chart and the context is set
-                this.find('.chart-container:visible').each(function () { // for only visible charts container in the curent context
-                    $container = $(this); // context container
-                    $container.find('div[id$="Chart"]').each(function () { // for only chart
-                        $chart = $(this).highcharts(); // cast from JQuery to highcharts obj
-                        $chart.setSize($container.width() - 80, $chart.chartHeight, doAnimation = true); // adjust chart size with animation transition
-                    });
-                });
-            } else {
-                chart.setSize($('.chart-container:visible').width() - 80, chart.chartHeight, doAnimation = true); // if chart is set, adjust
-            }
-        } catch (err) {
-            // do nothing
+  function getLocationInfo(fromSrc) {
+    var provinces = ($("#provinces").val() == null || $("#provinces").val() == '') ? [] : $("#provinces").val();
+    var districts = ($("#districts").val() == null || $("#districts").val() == '') ? [] : $("#districts").val();
+    $.post("<?php echo $this->url('laboratory', array('action' => 'get-location-info')); ?>", {
+        provinces: provinces,
+        districts: districts,
+        fromSrc: fromSrc
+      },
+      function(data) {
+        var splitLocationInfo = data.split('##');
+        if (fromSrc == 'provinces') {
+          $('#districts').val('').change();
         }
-    }
+        $('#labs').val('').change();
+        $('#clinics').val('').change();
+        if (fromSrc == 'provinces') {
+          $('#districts').html(splitLocationInfo[0]);
+        }
+        $('#labs').html(splitLocationInfo[1]);
+        $('#clinics').html(splitLocationInfo[2]);
+      });
+  }
 
-    function getRow(table,idTbl,idChart,tblTitle,chartTtitle){
-      return '<div class="row time-box" id="row-'+idChart+'">'
-                +'<div class="col-md-6 col-sm-12 table-container"><div class="portlet box"><div class="portlet-body"><div class="portlet box blue">'
-                    +'<div class="portlet-title">'
-                       +'<div class="caption"><span class="caption-subject">'+tblTitle+'</span></div>'
-                       +'<div class="action" style="padding: 11px 0 9px">'
-                        +'<a id="'+idTbl+'-a-btl-display-table" href="javascript:fnExcelReport(\'.'+idTbl+'\',\'#'+idTbl+'\',\'#'+idTbl+'-a-btl-display-table\'); " style="color:#fff;float:right;">'
-                              +'<span id="btl-display" style="cursor:pointer">'
-                                +'<i class="fa fa-download" aria-hidden="true"></i>&nbsp;<?php echo $this->translate('Download Table'); ?>'
-                              +'</span>'
-                            +'</a>'
-                       +'</div>'
-                    +'</div>'
-                    +'<div class="portlet-body"><div class="scrolltable">'+table+'</div></div>'
-                    +'</div></div></div></div>'
-                +'<div class="col-md-6 col-sm-12 chart-container"><div class="portlet box"><div class="portlet-body"><div class="portlet box blue">'
-                    +'<div class="portlet-title">'
-                    +'<div class="caption"><span class="caption-subject">'+chartTtitle+'</span></div>'
-                        +'<div class="action" style="padding: 11px 0 9px">'
-                            +'<a id="a-btl-display-table" href="javascript:toogleTable(\'row-'+idChart+'\'); " style="color:#fff;float:right;">'
-                              +'<span style="cursor:pointer">'
-                                +'<i class="fa fa-expand" aria-hidden="true"></i>'
-                              +'</span>'
-                            +'</a>'
-                       +'</div>'
-                    +'</div>'
-                    +'<div class="portlet-body"><div id="'+idChart+'" style="width:100%; min-width:100%;max-width:100%; height: 400px; padding:0 !important; margin: 0"></div></div>'
-                    +'</div></div></div></div>'
-            +'</div><br>';
+  function toogleTable(idRow) {
+    $('#' + idRow + ' .table-container').toggleClass('active');
+    if (this.resizeTO) clearTimeout(this.resizeTO);
+    this.resizeTO = setTimeout(function() {
+      // resizeEnd call function with pass context body
+      adjustGraph.call($('#' + idRow));
+    }, 500);
+    if ($('#' + idRow + ' .table-container').hasClass('active')) {
+      $('#' + idRow + ' .chart-container').addClass('fullSize');
+    } else {
+      $('#' + idRow + ' .chart-container').removeClass('fullSize');
     }
+  }
+
+  $(window).resize(function() {
+    if (this.resizeTO) clearTimeout(this.resizeTO);
+    this.resizeTO = setTimeout(function() {
+      adjustGraph.call($('body'));
+    }, 5);
+  });
+
+  function adjustGraph(chart) {
+    try {
+      if (typeof(chart === 'undefined' || chart === null) && this instanceof jQuery) { // if no obj chart and the context is set
+        this.find('.chart-container:visible').each(function() { // for only visible charts container in the curent context
+          $container = $(this); // context container
+          $container.find('div[id$="Chart"]').each(function() { // for only chart
+            $chart = $(this).highcharts(); // cast from JQuery to highcharts obj
+            $chart.setSize($container.width() - 80, $chart.chartHeight, doAnimation = true); // adjust chart size with animation transition
+          });
+        });
+      } else {
+        chart.setSize($('.chart-container:visible').width() - 80, chart.chartHeight, doAnimation = true); // if chart is set, adjust
+      }
+    } catch (err) {
+      // do nothing
+    }
+  }
+
+  function getRow(table, idTbl, idChart, tblTitle, chartTtitle) {
+    return '<div class="row time-box" id="row-' + idChart + '">' +
+      '<div class="col-md-6 col-sm-12 table-container"><div class="portlet box"><div class="portlet-body"><div class="portlet box blue">' +
+      '<div class="portlet-title">' +
+      '<div class="caption"><span class="caption-subject">' + tblTitle + '</span></div>' +
+      '<div class="action" style="padding: 11px 0 9px">' +
+      '<a id="' + idTbl + '-a-btl-display-table" href="javascript:fnExcelReport(\'.' + idTbl + '\',\'#' + idTbl + '\',\'#' + idTbl + '-a-btl-display-table\'); " style="color:#fff;float:right;">' +
+      '<span id="btl-display" style="cursor:pointer">' +
+      '<i class="fa fa-download" aria-hidden="true"></i>&nbsp;<?php echo $this->translate('Download Table'); ?>' +
+      '</span>' +
+      '</a>' +
+      '</div>' +
+      '</div>' +
+      '<div class="portlet-body"><div class="scrolltable">' + table + '</div></div>' +
+      '</div></div></div></div>' +
+      '<div class="col-md-6 col-sm-12 chart-container"><div class="portlet box"><div class="portlet-body"><div class="portlet box blue">' +
+      '<div class="portlet-title">' +
+      '<div class="caption"><span class="caption-subject">' + chartTtitle + '</span></div>' +
+      '<div class="action" style="padding: 11px 0 9px">' +
+      '<a id="a-btl-display-table" href="javascript:toogleTable(\'row-' + idChart + '\'); " style="color:#fff;float:right;">' +
+      '<span style="cursor:pointer">' +
+      '<i class="fa fa-expand" aria-hidden="true"></i>' +
+      '</span>' +
+      '</a>' +
+      '</div>' +
+      '</div>' +
+      '<div class="portlet-body"><div id="' + idChart + '" style="width:100%; min-width:100%;max-width:100%; height: 400px; padding:0 !important; margin: 0"></div></div>' +
+      '</div></div></div></div>' +
+      '</div><br>';
+  }
 </script>

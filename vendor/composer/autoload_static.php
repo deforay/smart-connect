@@ -106,6 +106,7 @@ class ComposerStaticInit50791b1b953694d6925f4685fb2412b4
         'W' => 
         array (
             'Webmozart\\Assert\\' => 17,
+            'Webimpress\\SafeWriter\\' => 22,
         ),
         'T' => 
         array (
@@ -231,6 +232,10 @@ class ComposerStaticInit50791b1b953694d6925f4685fb2412b4
         'Webmozart\\Assert\\' => 
         array (
             0 => __DIR__ . '/..' . '/webmozart/assert/src',
+        ),
+        'Webimpress\\SafeWriter\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/webimpress/safe-writer/src',
         ),
         'TrueBV\\' => 
         array (
