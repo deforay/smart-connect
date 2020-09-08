@@ -217,8 +217,6 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
                                     <th><?php echo $this->translate('Samples Collected'); ?> </th>
                                     <th><?php echo $this->translate('Samples Tested'); ?> </th>
                                     <th><?php echo $this->translate('Results Not Available'); ?> </th>
-                                    <th><?php echo $this->translate('Samples Suppressed'); ?> </th>
-                                    <th><?php echo $this->translate('Samples Not Suppressed'); ?> </th>
                                     <th><?php echo $this->translate('Samples Rejected'); ?> </th>
                                 </tr>
                             </thead>
@@ -380,8 +378,6 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
                 {"sClass":"center","bSortable":false},
                 {"sClass":"center","bSortable":false},
                 {"sClass":"center","bSortable":false},
-                {"sClass":"center","bSortable":false},
-                {"sClass":"center","bSortable":false},
                 {"sClass":"center","bSortable":false}
             ],
             "aaSorting": [[ 0, "asc" ]],
@@ -393,14 +389,8 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
                 aoData.push({"name": "districts", "value": $('#districts').val()});
                 aoData.push({"name": "lab", "value": $('#labName').val()});
                 aoData.push({"name": "clinicId", "value": $('#clinicId').val()});
-                aoData.push({"name": "currentRegimen", "value": $('#currentRegimen').val()});
-                aoData.push({"name": "adherence", "value": $('#adherence').val()});
                 aoData.push({"name": "age", "value": $('#age').val()});
-                aoData.push({"name": "sampleType", "value": $('#sampleType').val()});
                 aoData.push({"name": "gender", "value": $('#gender').val()});
-                aoData.push({"name": "isPregnant", "value": $("#isPregnant").val()});
-                aoData.push({"name": "isBreastfeeding", "value": $("#isBreastfeeding").val()});
-                aoData.push({"name": "lineOfTreatment", "value": $("#lineOfTreatment").val()});
                 $.ajax({
                     "dataType": 'json',
                     "type": "POST",

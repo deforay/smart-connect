@@ -277,8 +277,6 @@ if (isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts'])
                                 <th><?php echo $this->translate('Samples Collected'); ?> </th>
                                 <th><?php echo $this->translate('Samples Tested'); ?> </th>
                                 <th><?php echo $this->translate('Results Not Available'); ?> </th>
-                                <th><?php echo $this->translate('Samples Suppressed'); ?> </th>
-                                <th><?php echo $this->translate('Samples Not Suppressed'); ?> </th>
                                 <th><?php echo $this->translate('Samples Rejected'); ?> </th>
                                 <th><?php echo $this->translate('Sample Type'); ?> </th>
                                 <th><?php echo $this->translate('Clinics'); ?> </th>
@@ -464,14 +462,7 @@ if (isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts'])
                     "sClass": "center",
                     "bSortable": false
                 },
-                {
-                    "sClass": "center",
-                    "bSortable": false
-                },
-                {
-                    "sClass": "center",
-                    "bSortable": false
-                },
+                
                 {
                     "sClass": "center"
                 },

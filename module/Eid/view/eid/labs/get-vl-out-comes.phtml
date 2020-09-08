@@ -8,7 +8,7 @@ $('#vlOutComePiechart').highcharts({
             type: 'pie'
         },
         title: {
-            text: '<?php echo $this->translate('EID Suppressed/Not Suppressed'); ?>'
+            text: '<?php echo $this->translate('EID Positive/Negative'); ?>'
         },
         credits: {
               enabled: false
@@ -44,23 +44,23 @@ $('#vlOutComePiechart').highcharts({
             colorByPoint: true,
             data: [<?php
             if(count($result)>0 && $result!=''){
-                if($result[0]['Not_Suppressed']!='' && $result[0]['Not_Suppressed']!=null){
+                if($result[0]['negative']!='' && $result[0]['negative']!=null){
                 ?>
                 {
-                  name:'<?php echo $this->translate("Not Suppressed");?>',
-                  y:<?php echo $result[0]['Not_Suppressed'];?>,
-                  number:<?php echo $result[0]['Not_Suppressed'];?>,
+                  name:'<?php echo $this->translate("Negative");?>',
+                  y:<?php echo $result[0]['negative'];?>,
+                  number:<?php echo $result[0]['negative'];?>,
                   sliced: true,
                   selected: true,
                   color:'#ff1900',
                 },
                 <?php }
-                if($result[0]['Suppressed']!='' && $result[0]['Suppressed']!=null){
+                if($result[0]['positive']!='' && $result[0]['positive']!=null){
                 ?>
                 {
-                  name:'<?php echo $this->translate("Suppressed"); ?>',
-                  y:<?php echo $result[0]['Suppressed'];?>,
-                  number:<?php echo $result[0]['Suppressed'];?>,
+                  name:'<?php echo $this->translate("Positive"); ?>',
+                  y:<?php echo $result[0]['positive'];?>,
+                  number:<?php echo $result[0]['positive'];?>,
                   color:'#60d18f'
                 },
                 <?php

@@ -3519,21 +3519,7 @@ class EidSampleTable extends AbstractTableGateway
                     $where = '(' . $where . ')';
                     $countQuery = $countQuery->where($where);
                 }
-                if (isset($params['testResult']) && $params['testResult'] == '<1000') {
-                    $countQuery = $countQuery->where("(vl.is_sample_rejected like 'suppressed%' OR vl.is_sample_rejected like 'Suppressed%' )");
-                } else if (isset($params['testResult']) && $params['testResult'] == '>=1000') {
-                    $countQuery = $countQuery->where("(vl.is_sample_rejected like 'not%' OR vl.is_sample_rejected like 'Not%')");
-                }
-                if (isset($params['sampleType']) && trim($params['sampleType']) != '') {
-                    $countQuery = $countQuery->where('vl.specimen_type="' . base64_decode(trim($params['sampleType'])) . '"');
-                }
-                if (isset($params['sampleStatus']) && $params['sampleStatus'] == 'sample_tested') {
-                    $countQuery = $countQuery->where("((vl.is_sample_rejected IS NOT NULL AND vl.is_sample_rejected != '' AND vl.is_sample_rejected != 'NULL') OR (vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0))");
-                } else if (isset($params['sampleStatus']) && $params['sampleStatus'] == 'samples_not_tested') {
-                    $countQuery = $countQuery->where("(vl.is_sample_rejected IS NULL OR vl.is_sample_rejected = '' OR vl.is_sample_rejected = 'NULL') AND (vl.reason_for_sample_rejection IS NULL OR vl.reason_for_sample_rejection = '' OR vl.reason_for_sample_rejection = 0)");
-                } else if (isset($params['sampleStatus']) && $params['sampleStatus'] == 'sample_rejected') {
-                    $countQuery = $countQuery->where("vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0");
-                }
+                
                 if (isset($params['gender']) && $params['gender'] == 'F') {
                     $countQuery = $countQuery->where("vl.child_gender IN ('f','female','F','FEMALE')");
                 } else if (isset($params['gender']) && $params['gender'] == 'M') {
@@ -3589,8 +3575,8 @@ class EidSampleTable extends AbstractTableGateway
                     ->columns(
                         array(
                             'total' => new Expression('COUNT(*)'),
-                            "suppressed" => new Expression("SUM(CASE WHEN ((vl.is_sample_rejected not like 'suppressed%' OR vl.is_sample_rejected not like 'Suppressed%')) THEN 1 ELSE 0 END)"),
-                            "not_suppressed" => new Expression("SUM(CASE WHEN ((vl.is_sample_rejected like 'no%' OR vl.is_sample_rejected like 'No%')) THEN 1 ELSE 0 END)"),
+                            "positive" => new Expression("SUM(CASE WHEN ((vl.result like 'positive%' OR vl.is_sample_rejected like 'Positive%') AND vl.result not like '') THEN 1 ELSE 0 END)"),
+                            "negative" => new Expression("SUM(CASE WHEN ((vl.result like 'negative%' OR vl.is_sample_rejected like 'Negative%') AND vl.result not like '') THEN 1 ELSE 0 END)"),
                             "rejected" => new Expression("SUM(CASE WHEN ((vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0)) THEN 1 ELSE 0 END)"),
                         )
                     )
@@ -3637,21 +3623,7 @@ class EidSampleTable extends AbstractTableGateway
                     $where = '(' . $where . ')';
                     $countQuery = $countQuery->where($where);
                 }
-                if (isset($params['testResult']) && $params['testResult'] == '<1000') {
-                    $countQuery = $countQuery->where("(vl.is_sample_rejected like 'suppressed%' OR vl.is_sample_rejected like 'Suppressed%' )");
-                } else if (isset($params['testResult']) && $params['testResult'] == '>=1000') {
-                    $countQuery = $countQuery->where("(vl.is_sample_rejected like 'not%' OR vl.is_sample_rejected like 'Not%')");
-                }
-                if (isset($params['sampleType']) && trim($params['sampleType']) != '') {
-                    $countQuery = $countQuery->where('vl.specimen_type="' . base64_decode(trim($params['sampleType'])) . '"');
-                }
-                if (isset($params['sampleStatus']) && $params['sampleStatus'] == 'sample_tested') {
-                    $countQuery = $countQuery->where("((vl.is_sample_rejected IS NOT NULL AND vl.is_sample_rejected != '' AND vl.is_sample_rejected != 'NULL') OR (vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0))");
-                } else if (isset($params['sampleStatus']) && $params['sampleStatus'] == 'samples_not_tested') {
-                    $countQuery = $countQuery->where("(vl.is_sample_rejected IS NULL OR vl.is_sample_rejected = '' OR vl.is_sample_rejected = 'NULL') AND (vl.reason_for_sample_rejection IS NULL OR vl.reason_for_sample_rejection = '' OR vl.reason_for_sample_rejection = 0)");
-                } else if (isset($params['sampleStatus']) && $params['sampleStatus'] == 'sample_rejected') {
-                    $countQuery = $countQuery->where("vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0");
-                }
+               
                 if (isset($params['gender']) && $params['gender'] == 'F') {
                     $countQuery = $countQuery->where("vl.child_gender IN ('f','female','F','FEMALE')");
                 } else if (isset($params['gender']) && $params['gender'] == 'M') {
@@ -3666,8 +3638,8 @@ class EidSampleTable extends AbstractTableGateway
 
                 $j = 0;
                 foreach ($barChartResult as $data) {
-                    $result['sample']['Suppressed'][$j] = $data['suppressed'];
-                    $result['sample']['Not Suppressed'][$j] = $data['not_suppressed'];
+                    $result['sample']['Positive'][$j] = $data['positive'];
+                    $result['sample']['Negative'][$j] = $data['negative'];
                     $result['sample']['Rejected'][$j] = $data['rejected'];
                     $result['lab'][$j] = ucwords($data['facility_name']);
                     $j++;
@@ -3977,8 +3949,6 @@ class EidSampleTable extends AbstractTableGateway
                 "total_samples_received" => new Expression("(COUNT(*))"),
                 "total_samples_tested" => new Expression("(SUM(CASE WHEN (((vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL') AND (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) OR (vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0)) THEN 1 ELSE 0 END))"),
                 "total_samples_pending" => new Expression("(SUM(CASE WHEN ((vl.result IS NULL OR vl.result = '' OR vl.result = 'NULL' OR sample_tested_datetime is null OR sample_tested_datetime = '' OR DATE(sample_tested_datetime) ='1970-01-01' OR DATE(sample_tested_datetime) ='0000-00-00') AND (vl.reason_for_sample_rejection IS NULL OR vl.reason_for_sample_rejection = '' OR vl.reason_for_sample_rejection = 0)) THEN 1 ELSE 0 END))"),
-                "suppressed_samples" => new Expression("SUM(CASE WHEN ((vl.result < 1000 or vl.result = 'Target Not Detected' or vl.result = 'TND' or vl.result = 'tnd' or vl.result= 'Below Detection Level' or vl.result='BDL' or vl.result='bdl' or vl.result= 'Low Detection Level' or vl.result='LDL' or vl.result='ldl' or vl.result like '%baixo%' or vl.result like 'Negative' or vl.result like 'NEGAT' or vl.result like 'Indeterminado' or vl.result like 'NON DETECTEE' or vl.result like '<40' or vl.result like '< 40' or vl.result like '<20' or vl.result like'< 20') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END)"),
-                "not_suppressed_samples" => new Expression("SUM(CASE WHEN (vl.result IS NOT NULL AND vl.result!= '' AND vl.result >= 1000 AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END)"),
                 "rejected_samples" => new Expression("SUM(CASE WHEN (vl.reason_for_sample_rejection !='' AND vl.reason_for_sample_rejection !='0' AND vl.reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END)")
             ))
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'))
@@ -4110,8 +4080,6 @@ class EidSampleTable extends AbstractTableGateway
             $row[] = $aRow['total_samples_received'];
             $row[] = $aRow['total_samples_tested'];
             $row[] = $aRow['total_samples_pending'];
-            $row[] = $aRow['suppressed_samples'];
-            $row[] = $aRow['not_suppressed_samples'];
             $row[] = $aRow['rejected_samples'];
             $row[] = ucwords($aRow['sample_name']);
             $row[] = ucwords($aRow['facility_name']);
@@ -4209,8 +4177,6 @@ class EidSampleTable extends AbstractTableGateway
                 "total_samples_received" => new Expression("(COUNT(*))"),
                 "total_samples_tested" => new Expression("(SUM(CASE WHEN (((vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL') AND (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) OR (vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0)) THEN 1 ELSE 0 END))"),
                 "total_samples_pending" => new Expression("(SUM(CASE WHEN ((vl.result IS NULL OR vl.result = '' OR vl.result = 'NULL' OR sample_tested_datetime is null OR sample_tested_datetime = '' OR DATE(sample_tested_datetime) ='1970-01-01' OR DATE(sample_tested_datetime) ='0000-00-00') AND (vl.reason_for_sample_rejection IS NULL OR vl.reason_for_sample_rejection = '' OR vl.reason_for_sample_rejection = 0)) THEN 1 ELSE 0 END))"),
-                "suppressed_samples" => new Expression("SUM(CASE WHEN ((vl.result < 1000 or vl.result = 'Target Not Detected' or vl.result = 'TND' or vl.result = 'tnd' or vl.result= 'Below Detection Level' or vl.result='BDL' or vl.result='bdl' or vl.result= 'Low Detection Level' or vl.result='LDL' or vl.result='ldl' or vl.result like '%baixo%' or vl.result like 'Negative' or vl.result like 'NEGAT' or vl.result like 'Indeterminado' or vl.result like 'NON DETECTEE' or vl.result like '<40' or vl.result like '< 40' or vl.result like '<20' or vl.result like'< 20') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END)"),
-                "not_suppressed_samples" => new Expression("SUM(CASE WHEN (vl.result IS NOT NULL AND vl.result!= '' AND vl.result >= 1000 AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') THEN 1 ELSE 0 END)"),
                 "rejected_samples" => new Expression("SUM(CASE WHEN (vl.reason_for_sample_rejection !='' AND vl.reason_for_sample_rejection !='0' AND vl.reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END)")
             ))
             ->where("sample_collection_date is not null AND sample_collection_date != '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00' AND vl.lab_id !=0")
@@ -4330,8 +4296,6 @@ class EidSampleTable extends AbstractTableGateway
             $row[] = $aRow['total_samples_received'];
             $row[] = $aRow['total_samples_tested'];
             $row[] = $aRow['total_samples_pending'];
-            $row[] = $aRow['suppressed_samples'];
-            $row[] = $aRow['not_suppressed_samples'];
             $row[] = $aRow['rejected_samples'];
             $output['aaData'][] = $row;
         }
@@ -4352,8 +4316,8 @@ class EidSampleTable extends AbstractTableGateway
             $sQuery = $sql->select()->from(array('vl' => $this->table))
                 ->columns(
                     array(
-                        "Suppressed" => new Expression("SUM(CASE WHEN ((vl.is_sample_rejected like 'suppressed%' OR vl.is_sample_rejected like 'Suppressed%' )) THEN 1 ELSE 0 END)"),
-                        "Not_Suppressed" => new Expression("SUM(CASE WHEN ((vl.is_sample_rejected like 'not suppressed%' OR vl.is_sample_rejected like 'Not Suppressed%' or vl.DashVL_Abs >= 1000)) THEN 1 ELSE 0 END)"),
+                        "positive" => new Expression("SUM(CASE WHEN ((vl.result like 'positive%' OR vl.result like 'Positive%' ) AND vl.result not like '') THEN 1 ELSE 0 END)"),
+                        "negative" => new Expression("SUM(CASE WHEN ((vl.result like 'negative%' OR vl.result like 'Negative%' ) AND vl.result not like '') THEN 1 ELSE 0 END)"),
                     )
                 )
                 ->join(array('f' => 'facility_details'), 'f.facility_id=vl.lab_id', array());
@@ -4406,14 +4370,7 @@ class EidSampleTable extends AbstractTableGateway
                 $where = '(' . $where . ')';
                 $sQuery = $sQuery->where($where);
             }
-            if (isset($params['testResult']) && $params['testResult'] == '<1000') {
-                $sQuery = $sQuery->where("vl.is_sample_rejected like 'suppressed%' OR vl.is_sample_rejected like 'Suppressed%' ");
-            } else if (isset($params['testResult']) && $params['testResult'] == '>=1000') {
-                $sQuery = $sQuery->where("vl.is_sample_rejected like 'not suppressed%' OR vl.is_sample_rejected like 'Not Suppressed%' or vl.DashVL_Abs >= 1000");
-            }
-            if (isset($params['sampleType']) && trim($params['sampleType']) != '') {
-                $sQuery = $sQuery->where('vl.specimen_type="' . base64_decode(trim($params['sampleType'])) . '"');
-            }
+            
             if (isset($params['gender']) && $params['gender'] == 'F') {
                 $sQuery = $sQuery->where("vl.child_gender IN ('f','female','F','FEMALE')");
             } else if (isset($params['gender']) && $params['gender'] == 'M') {
