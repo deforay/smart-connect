@@ -300,8 +300,6 @@ class LabsController extends AbstractActionController
             $labFilter = $this->params()->fromQuery('lab');
             $params['labs'] = explode(',', $labFilter);
 		}
-		// $sampleService = $this->getServiceLocator()->get('SampleService');
-		// $commonService = $this->getServiceLocator()->get('CommonService');
         $hubName = $this->sampleService->getAllHubName();
         $sampleType = $this->sampleService->getSampleType();
         $currentRegimen = $this->sampleService->getAllCurrentRegimen();
@@ -315,13 +313,13 @@ class LabsController extends AbstractActionController
             'facilityInfo' => $facilityInfo
         ));
 	}
-	
+
 	public function getProvinceWiseResultAwaitedDrillDownAction()
     {
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            // $sampleService = $this->getServiceLocator()->get('SampleService');
+            
             $result = $this->sampleService->getProvinceWiseResultAwaitedDrillDown($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('result' => $result))
@@ -335,7 +333,7 @@ class LabsController extends AbstractActionController
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            // $sampleService = $this->getServiceLocator()->get('SampleService');
+            
             $result = $this->sampleService->getLabWiseResultAwaitedDrillDown($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('result' => $result))
@@ -349,7 +347,7 @@ class LabsController extends AbstractActionController
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            // $sampleService = $this->getServiceLocator()->get('SampleService');
+            
             $result = $this->sampleService->getDistrictWiseResultAwaitedDrillDown($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('result' => $result))
@@ -363,7 +361,7 @@ class LabsController extends AbstractActionController
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            // $sampleService = $this->getServiceLocator()->get('SampleService');
+            
             $result = $this->sampleService->getClinicWiseResultAwaitedDrillDown($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('result' => $result))
@@ -377,9 +375,248 @@ class LabsController extends AbstractActionController
         $request = $this->getRequest();
         if ($request->isPost()) {
             $parameters = $request->getPost();
-            // $sampleService = $this->getServiceLocator()->get('SampleService');
+            
             $result = $this->sampleService->getFilterSampleResultAwaitedDetails($parameters);
             return $this->getResponse()->setContent(Json::encode($result));
+        }
+	}
+
+	public function drillDownAction()
+    {
+        $this->layout()->setVariable('activeTab', 'eid-labs');
+        $params = array();
+
+        $labFilter = $this->params()->fromQuery('lab');
+        $params['labs'] = explode(',', $labFilter);
+
+        $hubName = $this->sampleService->getAllHubName();
+        $sampleType = $this->sampleService->getSampleType();
+        $currentRegimen = $this->sampleService->getAllCurrentRegimen();
+        $facilityInfo = $this->commonService->getSampleTestedFacilityInfo($params);
+        //print_r($facilityInfo);die;
+        return new ViewModel(array(
+            'sampleType' => $sampleType,
+            'hubName' => $hubName,
+            'currentRegimen' => $currentRegimen,
+            'facilityInfo' => $facilityInfo,
+            'searchMonth' => $this->params()->fromQuery('month'),
+            'searchGender' => $this->params()->fromQuery('gender'),
+            'searchRange' => $this->params()->fromQuery('range'),
+            'fromMonth' => $this->params()->fromQuery('fromMonth'),
+            'toMonth' => $this->params()->fromQuery('toMonth'),
+            'labFilter' => $this->params()->fromQuery('lab'),
+            'age' => $this->params()->fromQuery('age'),
+            'femaleFilter' => $this->params()->fromQuery('femaleFilter'),
+            'lt' => $this->params()->fromQuery('lt'),
+            'result' => $this->params()->fromQuery('result')
+        ));
+    }
+	
+	public function getSampleDetailsAction()
+    {
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $result = $this->sampleService->getSampleDetails($params);
+            $viewModel = new ViewModel();
+            $viewModel->setVariables(array('params' => $params, 'result' => $result))
+                ->setTerminal(true);
+            return $viewModel;
+        }
+    }
+
+    public function getVlOutComesAction()
+    {
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $result = $this->sampleService->getVlOutComes($params);
+            $viewModel = new ViewModel();
+            $viewModel->setVariables(array('result' => $result))
+                ->setTerminal(true);
+            return $viewModel;
+        }
+    }
+
+    public function getBarSampleDetailsAction()
+    {
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $result = $this->sampleService->getBarSampleDetails($params);
+            $viewModel = new ViewModel();
+            $viewModel->setVariables(array('params' => $params, 'result' => $result))
+                ->setTerminal(true);
+            return $viewModel;
+        }
+    }
+
+    public function getFilterSampleDetailsAction()
+    {
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $parameters = $request->getPost();
+            $result = $this->sampleService->getFilterSampleDetails($parameters);
+            return $this->getResponse()->setContent(Json::encode($result));
+        }
+	}
+	
+	public function getLabFilterSampleDetailsAction()
+    {
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $parameters = $request->getPost();
+            $result = $this->sampleService->getLabFilterSampleDetails($parameters);
+            return $this->getResponse()->setContent(Json::encode($result));
+        }
+	}
+	
+	public function samplesTestedLabAction()
+    {
+        $this->layout()->setVariable('activeTab', 'labs-dashboard');
+        $params = array();
+        $gender = "";
+        $month = "";
+        $range = "";
+        $age = "";
+        $fromMonth = "";
+        $toMonth = "";
+        $labFilter = "";
+        $params['fromSrc'] = 'tested-lab';
+        if ($this->params()->fromQuery('gender')) {
+            $gender = $this->params()->fromQuery('gender');
+        }
+        if ($this->params()->fromQuery('month')) {
+            $month = $this->params()->fromQuery('month');
+        }
+        if ($this->params()->fromQuery('range')) {
+            $range = $this->params()->fromQuery('range');
+        }
+        if ($this->params()->fromQuery('age')) {
+            $age = $this->params()->fromQuery('age');
+        }
+        if ($this->params()->fromQuery('fromMonth')) {
+            $fromMonth = $this->params()->fromQuery('fromMonth');
+        }
+        if ($this->params()->fromQuery('toMonth')) {
+            $toMonth = $this->params()->fromQuery('toMonth');
+        }
+        if ($this->params()->fromQuery('lab')) {
+            $labFilter = $this->params()->fromQuery('lab');
+            $params['labNames'] = explode(',', $labFilter);
+        }
+
+        // $sampleService = $this->getServiceLocator()->get('SampleService');
+        // $commonService = $this->getServiceLocator()->get('CommonService');
+        $hubName = $this->sampleService->getAllHubName();
+        $sampleType = $this->sampleService->getSampleType();
+        $currentRegimen = $this->sampleService->getAllCurrentRegimen();
+        $facilityInfo = $this->commonService->getSampleTestedFacilityInfo($params);
+        return new ViewModel(array(
+            'sampleType' => $sampleType,
+            'hubName' => $hubName,
+            'currentRegimen' => $currentRegimen,
+            'searchMonth' => $month,
+            'searchGender' => $gender,
+            'searchRange' => $range,
+            'fromMonth' => $fromMonth,
+            'toMonth' => $toMonth,
+            'labFilter' => $labFilter,
+            'age' => $age,
+            'facilityInfo' => $facilityInfo
+        ));
+    }
+
+    public function getLabSampleDetailsAction()
+    {
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $result = $this->sampleService->getLabSampleDetails($params);
+            $viewModel = new ViewModel();
+            $viewModel->setVariables(array('result' => $result))
+                ->setTerminal(true);
+            return $viewModel;
+        }
+    }
+
+    public function getLabBarSampleDetailsAction()
+    {
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $result = $this->sampleService->getLabBarSampleDetails($params);
+            $viewModel = new ViewModel();
+            $viewModel->setVariables(array('result' => $result))
+                ->setTerminal(true);
+            return $viewModel;
+        }
+    }
+
+    public function sampleVolumeAction()
+    {
+        $this->layout()->setVariable('activeTab', 'labs-dashboard');
+        $params = array();
+        $fromMonth = "";
+        $toMonth = "";
+        $labFilter = "";
+        $sampleStatus = "";
+        $params['fromSrc'] = 'sample-volume';
+        if ($this->params()->fromQuery('fromMonth')) {
+            $fromMonth = $this->params()->fromQuery('fromMonth');
+        }
+        if ($this->params()->fromQuery('toMonth')) {
+            $toMonth = $this->params()->fromQuery('toMonth');
+        }
+        if ($this->params()->fromQuery('lab')) {
+            $labFilter = $this->params()->fromQuery('lab');
+            $params['labCodes'] = explode(',', $labFilter);
+        }
+        if ($this->params()->fromQuery('result')) {
+            $sampleStatus = $this->params()->fromQuery('result');
+        }
+        // $sampleService = $this->getServiceLocator()->get('SampleService');
+        // $commonService = $this->getServiceLocator()->get('CommonService');
+        $hubName = $this->sampleService->getAllHubName();
+        $sampleType = $this->sampleService->getSampleType();
+        $currentRegimen = $this->sampleService->getAllCurrentRegimen();
+        $facilityInfo = $this->commonService->getSampleTestedFacilityInfo($params);
+        return new ViewModel(array(
+            'sampleType' => $sampleType,
+            'hubName' => $hubName,
+            'currentRegimen' => $currentRegimen,
+            'fromMonth' => $fromMonth,
+            'toMonth' => $toMonth,
+            'labFilter' => $labFilter,
+            'sampleStatus' => $sampleStatus,
+            'facilityInfo' => $facilityInfo
+        ));
+    }
+
+    public function exportSampleResultExcelAction()
+    {
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            // $sampleService = $this->getServiceLocator()->get('SampleService');
+            $file = $this->sampleService->generateSampleResultExcel($params);
+            $viewModel = new ViewModel();
+            $viewModel->setVariables(array('file' => $file))
+                ->setTerminal(true);
+            return $viewModel;
+        }
+    }
+
+    public function exportLabTestedSampleExcelAction()
+    {
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $file = $this->sampleService->generateLabTestedSampleExcel($params);
+            $viewModel = new ViewModel();
+            $viewModel->setVariables(array('file' => $file))
+                ->setTerminal(true);
+            return $viewModel;
         }
     }
 }

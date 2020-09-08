@@ -76,9 +76,13 @@ if (isset($result['sampleName']) && count($result['sampleName']) > 0) {
                         events: {
                             click: function(e) {
                                 fromMonth = $(".mrp-lowerMonth").html();
-                                fromMonth = fromMonth.replace(" ", "-");
+                                if(fromMonth != undefined){
+                                    fromMonth = fromMonth.replace(" ", "-");
+                                }
                                 toMonth = $(".mrp-upperMonth").html();
-                                toMonth = toMonth.replace(" ", "-");
+                                if(fromMonth != undefined){
+                                    toMonth = toMonth.replace(" ", "-");
+                                }
                                 window.open(e.point.url + 'fromMonth=' + fromMonth + '&toMonth=' + toMonth + '&lab=' + e.point.category, '_blank');
                             }
                         }
@@ -97,11 +101,15 @@ if (isset($result['sampleName']) && count($result['sampleName']) > 0) {
                     point: {
                         events: {
                             click: function(e) {
-                                url = "/labs/samples-tested-lab?";
+                                url = "/eid/labs/samples-tested-lab?";
                                 fromMonth = $(".mrp-lowerMonth").html();
-                                fromMonth = fromMonth.replace(" ", "-");
+                                if(fromMonth != undefined){
+                                    fromMonth = fromMonth.replace(" ", "-");
+                                }
                                 toMonth = $(".mrp-upperMonth").html();
-                                toMonth = toMonth.replace(" ", "-");
+                                if(fromMonth != undefined){
+                                    toMonth = toMonth.replace(" ", "-");
+                                }
                                 window.open(url + 'fromMonth=' + fromMonth + '&toMonth=' + toMonth + '&lab=' + e.point.category, '_blank');
                             }
                         }
@@ -117,7 +125,7 @@ if (isset($result['sampleName']) && count($result['sampleName']) > 0) {
                             name: '<?php echo $this->translate($key); ?>',
                             data: [<?php
                                     foreach ($condition as $count) {
-                                        echo '{y:' . $count . ',url:"/labs/samples-tested-lab?"},';
+                                        echo '{y:' . $count . ',url:"/eid/labs/samples-tested-lab?"},';
                                     }
                                     ?>],
                             <?php if (strpos($key, 'Positive') !== false) { ?>

@@ -1,0 +1,53 @@
+<script>
+       $(function () {
+        $('#piecontainer').highcharts({
+        chart: {
+            plotBackgroundColor: null,
+            plotBorderWidth: null,
+            plotShadow: false,
+            type: 'pie'
+        },
+        title: {
+            text: '<?php echo $this->translate('Sample Type Volume'); ?>'
+        },
+        credits: {
+              enabled: false
+       },
+        tooltip: {
+            pointFormat: '{series.name}: <b>{point.percentage:.1f}% ({point.number})</b>'
+        },
+        legend: {
+            itemMarginBottom: 5,
+            labelFormatter: function () {
+                return '<div ><span style="float:left;font-size:10px;">' + this.myData + ' -  </span><span style="font-size:10px; ">'+ this.percentage.toFixed(1)+'% ('+Highcharts.numberFormat(this.y, 0)+')</span></div>';
+            }
+        },
+        plotOptions: {
+            pie: {
+              dataLabels: {
+                distance: -30
+              },
+              showInLegend: true
+            }
+        },
+        series: [{
+            name: '<?php echo $this->translate('Samples'); ?>',
+            colorByPoint: true,
+            data: [<?php
+            if(isset($result) && count($result)>0){
+              foreach($result as $key=>$lab){
+                  ?>
+                  {
+                    name:'<?php echo $this->translate($key); ?>',
+                    y:<?php echo $result[$key];?>,
+                    number:<?php echo $result[$key];?>,
+                    myData:'<?php echo $this->translate($key); ?>'
+                  },
+                  <?php
+              }
+            }
+            ?>]
+        }]
+    });
+    });
+</script>

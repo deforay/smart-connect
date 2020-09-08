@@ -1,0 +1,72 @@
+<div id="vlOutComePiechart" style="height:600px;"></div>
+<script>
+$('#vlOutComePiechart').highcharts({
+        chart: {
+            plotBackgroundColor: null,
+            plotBorderWidth: null,
+            plotShadow: false,
+            type: 'pie'
+        },
+        title: {
+            text: '<?php echo $this->translate('EID Suppressed/Not Suppressed'); ?>'
+        },
+        credits: {
+              enabled: false
+        },
+        tooltip: {
+            pointFormat: '{series.name}: <b>{point.percentage:.1f}% ({point.number})</b>'
+        },
+        legend: {
+            layout: 'vertical',
+            align: 'center',
+            useHTML: true,
+            itemMarginBottom: 5,
+            labelFormatter: function () {
+                return '<div style="width:230px"><span style="float:left;font-size:10px;">' + this.name + ' - </span><span style="font-size:10px;padding:1px; ">'+ this.percentage.toFixed(1)+'% ('+Highcharts.numberFormat(this.y, 0)+')</span></div>';
+            }
+        },
+        plotOptions: {
+            pie: {
+                //allowPointSelect: true,
+                //cursor: 'pointer',
+                dataLabels: {
+                    enabled: false,
+                    format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                    style: {
+                        color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                    }
+                },
+                showInLegend: true
+            }
+        },
+        series: [{
+            name: '<?php echo $this->translate('Samples'); ?>',
+            colorByPoint: true,
+            data: [<?php
+            if(count($result)>0 && $result!=''){
+                if($result[0]['Not_Suppressed']!='' && $result[0]['Not_Suppressed']!=null){
+                ?>
+                {
+                  name:'<?php echo $this->translate("Not Suppressed");?>',
+                  y:<?php echo $result[0]['Not_Suppressed'];?>,
+                  number:<?php echo $result[0]['Not_Suppressed'];?>,
+                  sliced: true,
+                  selected: true,
+                  color:'#ff1900',
+                },
+                <?php }
+                if($result[0]['Suppressed']!='' && $result[0]['Suppressed']!=null){
+                ?>
+                {
+                  name:'<?php echo $this->translate("Suppressed"); ?>',
+                  y:<?php echo $result[0]['Suppressed'];?>,
+                  number:<?php echo $result[0]['Suppressed'];?>,
+                  color:'#60d18f'
+                },
+                <?php
+                }
+            }
+            ?>]
+        }]
+    });
+</script>
