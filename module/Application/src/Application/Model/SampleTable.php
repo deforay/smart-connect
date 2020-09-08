@@ -7602,7 +7602,7 @@ class SampleTable extends AbstractTableGateway
         return $sResult;
     }
 
-    public function getTATbyDistrict($districtID, $labs, $startDate, $endDate)
+    public function getTATbyDistrict($labs, $startDate, $endDate)
     {
         $logincontainer = new Container('credo');
         $dbAdapter = $this->adapter;
@@ -7619,11 +7619,12 @@ class SampleTable extends AbstractTableGateway
                 )
             )
             ->join('facility_details', 'facility_details.facility_id = vl.facility_id')
+            ->join('location_details', 'facility_details.facility_state = location_details.location_id')
             ->where(
                 array(
                     "(sample_tested_datetime BETWEEN '$startDate' AND '$endDate')",
                     "(vl.sample_collection_date is not null AND vl.sample_collection_date not like '' AND DATE(vl.sample_collection_date) not like '1970-01-01' AND DATE(vl.sample_collection_date) not like '0000-00-00')",
-                    "facility_details.facility_district = '$districtID'"
+                    // "facility_details.facility_district = '$districtID'"
                 )
             );
         if ($skipDays > 0) {
@@ -7649,12 +7650,13 @@ class SampleTable extends AbstractTableGateway
                 $squery = $squery->where('vl.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
             }
         }
+        $squery = $squery->group(array('location_id'));
         $sQueryStr = $sql->buildSqlString($squery);
         $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         return $sResult;
     }
 
-    public function getTATbyClinic($clinicID, $labs, $startDate, $endDate)
+    public function getTATbyClinic($labs, $startDate, $endDate)
     {
         $logincontainer = new Container('credo');
         $dbAdapter = $this->adapter;
@@ -7671,11 +7673,12 @@ class SampleTable extends AbstractTableGateway
                 )
             )
             ->join('facility_details', 'facility_details.facility_id = vl.facility_id')
+            ->join('location_details', 'facility_details.facility_state = location_details.location_id')
             ->where(
                 array(
                     "(sample_tested_datetime BETWEEN '$startDate' AND '$endDate')",
                     "(vl.sample_collection_date is not null AND vl.sample_collection_date not like '' AND DATE(vl.sample_collection_date) not like '1970-01-01' AND DATE(vl.sample_collection_date) not like '0000-00-00')",
-                    "vl.facility_id = '$clinicID'"
+                    // "vl.facility_id = '$clinicID'"
                 )
             );
         if ($skipDays > 0) {
@@ -7701,6 +7704,7 @@ class SampleTable extends AbstractTableGateway
                 $squery = $squery->where('vl.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
             }
         }
+        $squery = $squery->group(array('location_id'));
         $sQueryStr = $sql->buildSqlString($squery);
         $sResult   = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         return $sResult;
