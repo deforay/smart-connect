@@ -898,4 +898,16 @@ class CommonService
           $sQueryResult = $dbAdapter->query($sQuery, $dbAdapter::QUERY_MODE_EXECUTE)->current();
           return $sQueryResult;
      }
+
+     function getMonthsInRange($startDate, $endDate)
+	{
+          $months = array();
+		while (strtotime($startDate) <= strtotime($endDate)) {
+               $monthYear = date('M', strtotime($startDate)) . "-" . date('Y', strtotime($startDate));
+               $monthYearDBForamt = date('Y', strtotime($startDate)) . "-" . date('m', strtotime($startDate));
+			$months[$monthYear] = $monthYearDBForamt;
+			$startDate = date('d M Y', strtotime($startDate . '+ 1 month'));
+          }
+		return $months;
+	}
 }

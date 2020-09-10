@@ -1078,4 +1078,10 @@ class EidSampleService
         $eidSampleDb = $this->sm->get('EidSampleTableWithoutCache');
         return $eidSampleDb->fetchEidOutcomesByAgeInLabsDetails($params);
     }
+    
+    public function getEidPositivityRateDetails($params)
+    {
+        $eidSampleDb = $this->sm->get('EidSampleTableWithoutCache');
+        return $eidSampleDb->fetchEidPositivityRateDetails($params);
+    }
 }

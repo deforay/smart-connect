@@ -4433,4 +4433,69 @@ class EidSampleTable extends AbstractTableGateway
         $result = $common->cacheQuery($eidOutcomesQueryStr, $dbAdapter);
         return $result[0];
     }
+
+    public function fetchEidPositivityRateDetails($params)
+    {
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $common = new CommonService($this->sm);
+        $startMonth = "";
+        $endMonth = "";
+        if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
+            $startMonth = date('Y-m-01',strtotime(str_replace(' ', '-', $params['fromDate'])));
+            $endMonth = date('Y-m-t',strtotime(str_replace(' ', '-', $params['toDate'])));
+            
+            $monthList = $common->getMonthsInRange($startMonth, $endMonth);
+            /* foreach($monthList as $key=>$list){
+                $searchVal[$key] =  new Expression("AVG(CASE WHEN (eid.result like 'positive%' AND eid.result not like '' AND sample_collection_date LIKE '%".$list."%') THEN 1 ELSE 0 END)");
+            } */
+            $sQuery = $sql->select()->from(array('eid' => 'dash_eid_form'))->columns(array(
+                'monthYear' => new Expression("DATE_FORMAT(sample_collection_date, '%b-%Y')"),
+                'positive_rate' => new Expression("ROUND(((SUM(CASE WHEN ((eid.result like 'positive' OR eid.result like 'Positive' )) THEN 1 ELSE 0 END))/(SUM(CASE WHEN (((eid.result IS NOT NULL AND eid.result != '' AND eid.result != 'NULL'))) THEN 1 ELSE 0 END)))*100,2)")
+            ))
+            ->join(array('f' => 'facility_details'), 'f.facility_id=eid.lab_id', array('facility_name'))
+            ->where("(sample_collection_date is not null)
+                                    AND DATE(sample_collection_date) >= '" . $startMonth . "' 
+                                    AND DATE(sample_collection_date) <= '" . $endMonth . "'")
+            ->group(array("lab_id",new Expression("DATE_FORMAT(sample_collection_date, '%m-%Y')")))
+            ->order(array("lab_id",new Expression("DATE_FORMAT(sample_collection_date, '%m-%Y')")));
+
+            if (isset($params['provinces']) && trim($params['provinces']) != '') {
+                $sQuery = $sQuery->where('f.facility_state IN (' . $params['provinces'] . ')');
+            }
+            if (isset($params['districts']) && trim($params['districts']) != '') {
+                $sQuery = $sQuery->where('f.facility_district IN (' . $params['districts'] . ')');
+            }
+            if (isset($params['clinics']) && trim($params['clinics']) != '') {
+                $sQuery = $sQuery->where('eid.facility_id IN (' . $params['clinics'] . ')');
+            }
+
+            $facilityIdList = array();
+            if (isset($params['facilityId']) && trim($params['facilityId']) != '') {
+                $mQuery = $sql->select()->from(array('f' => 'facility_details'))->columns(array('facility_id'))
+                    ->where('f.facility_type = 2 AND f.status="active"');
+                $mQuery = $mQuery->where('f.facility_id IN (' . $params['facilityId'] . ')');
+                $mQueryStr = $sql->buildSqlString($mQuery);
+                $facilityResult = $dbAdapter->query($mQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+                $facilityIdList = array_column($facilityResult, 'facility_id');
+            } else if (!empty($this->mappedFacilities)) {
+                $fQuery = $sql->select()->from(array('f' => 'facility_details'))->columns(array('facility_id'))
+                    ->where('f.facility_id IN ("' . implode('", "', $this->mappedFacilities) . '")');
+                $fQueryStr = $sql->buildSqlString($fQuery);
+                $facilityResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+                $facilityIdList = array_column($facilityResult, 'facility_id');
+            }
+
+            if ($facilityIdList != null) {
+                $sQuery = $sQuery->where('eid.lab_id IN ("' . implode('", "', $facilityIdList) . '")');
+            }
+
+            $sQueryStr = $sql->buildSqlString($sQuery);
+            // echo $sQueryStr;die;
+            $result = $common->cacheQuery($sQueryStr, $dbAdapter);
+            return array('result' => $result, 'month' => $monthList, 'title' => "Positivity rate from ".$common->humanDateFormat($startMonth)." to ".$common->humanDateFormat($endMonth)."");
+        } else{
+            return 0;
+        }
+    }
 }

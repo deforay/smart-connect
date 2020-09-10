@@ -633,4 +633,18 @@ class LabsController extends AbstractActionController
             return $viewModel;
         }
     }
+
+    public function getEidPositivityRateAction()
+    {
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $result = $this->sampleService->getEidPositivityRateDetails($params);
+            $viewModel = new ViewModel();
+            $viewModel->setVariables(array(
+                'result' => $result
+            ))->setTerminal(true);
+            return $viewModel;
+        }
+    }
 }
