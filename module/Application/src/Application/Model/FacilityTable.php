@@ -647,17 +647,16 @@ class FacilityTable extends AbstractTableGateway
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->from(array('f' => 'facility_details'));
         if(!empty($districtId)){
-            $sQuery = $sQuery->where(array('facility_district IN(' . $districtId . ')'));
+            $sQuery = $sQuery->where(array('facility_district IN(' . implode(",",$districtId) . ')'));
         }
         if(!empty($facilityType)){
             $sQuery = $sQuery->where("f.facility_type = $facilityType");
         }
         if ($logincontainer->role != 1) {
             $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : array(0);
-            $sQuery = $sQuery->where('f.facility_id IN ("' . implode('", "', array_values(array_filter($mappedFacilities))) . '")');
+            $facilities = implode('", "', array_values(array_filter($mappedFacilities)));
+            $sQuery = $sQuery->where('f.facility_id IN ("' . $facilities . '")');
         }
-
-
         $sQueryStr = $sql->buildSqlString($sQuery);
         return $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
     }

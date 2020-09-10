@@ -326,6 +326,20 @@ $endDate = date('Y-m');
     </div>
 </div>
 <div class="row">
+    <div class="col-md-12 col-sm-12">
+        <div class="portlet box blue">
+            <div class="portlet-title">
+                <div class="caption">
+                    <span class="caption-subject"><?php echo $this->translate('EID Outcomes by Age'); ?></span>
+                </div>
+            </div>
+            <div class="portlet-body" id="eidOutcomesByAgeBody">
+                <div id="eidOutcomesByAge" style="height:400px;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
     <div class="col-md-12 col-sm-12 col-lg-12">
         <div class="portlet box blue">
             <div class="portlet-title">
@@ -366,11 +380,13 @@ $endDate = date('Y-m');
 <script src="https://cdn.rawgit.com/bpampuch/pdfmake/0.1.18/build/pdfmake.min.js"></script>
 <script src="https://cdn.rawgit.com/bpampuch/pdfmake/0.1.18/build/vfs_fonts.js"></script>
 <script src="https://cdn.datatables.net/buttons/1.1.0/js/buttons.print.min.js"></script>
+<script src="<?php echo $this->basePath('assets/global/plugins/jquery.blockui.min.js'); ?>" type="text/javascript"></script>
 <script>
     //var gfxPath = 'https://raw.githubusercontent.com/highslide-software/pattern-fill/master/graphics/';
     var startDate;
     var endDate;
     var oTable;
+    geteidOutcomesByAge();
 
     function getSampleResult(frmSource) {
         var daterange = $('#daterange').val();
@@ -555,28 +571,12 @@ $endDate = date('Y-m');
             $('#sampleCollectionDate').val(moment().subtract('days', 179).format('YYYY-MM-DD') + ' to ' + moment().format('YYYY-MM-DD'));
         }
 
-
-
         $.when(getMonthlySampleCount(), getMonthlySampleCountbyLab())
-            .done(function() {
-                getAverageLabTAT();
-                getLabPerformance();
-            });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        .done(function() {
+            geteidOutcomesByAge();
+            getAverageLabTAT();
+            getLabPerformance();
+        });
     }
 
     function resetEverything() {
@@ -694,9 +694,11 @@ $endDate = date('Y-m');
         var selectedLabs = ($("#labName").val() == null) ? '' : $("#labName").val();
         window.open('/eid/labs/time?month=' + month + '&lab=' + selectedLabs, '_blank');
     }
+
     function doSampleResultAwaitedRedirect(frmSource) {
         window.open("/eid/labs/drill-down-result-awaited?src=" + frmSource);
     }
+
     function doSampleTestedRedirect(month) {
         var selectedLabs = ($("#labName").val() == null) ? '' : $("#labName").val();
         window.open('/eid/labs/drill-down?month=' + month + '&lab=' + selectedLabs, '_blank');
@@ -722,4 +724,23 @@ $endDate = date('Y-m');
         window.open('/eid/labs/drill-down?month=' + month + '&gender=F&femaleFilter=BF&lab=' + selectedLabs, '_blank');
     }
 
+    function geteidOutcomesByAge() {
+        $(document).ajaxStart($.blockUI({
+            message: '<h4> <?php echo ($this->translate('Processing EID Outcomes By Age')); ?> ... </h4>'
+        })).ajaxStop($.unblockUI);
+        
+        var fromDate = formatDate($('#mrp-lowerDate').val());
+        var toDate = formatDate($('#mrp-upperDate').val());
+        var facilityId = ($("#labName").val() == null) ? '' : $("#labName").val().join(',');
+
+        $.post("<?php echo $this->url('eid-labs', array('action' => 'get-eid-outcomes-by-age')); ?>", {
+            fromDate: fromDate,
+            toDate: toDate,
+            facilityId: facilityId
+        },
+        function(data) {
+            $("#eidOutcomesByAge").html(data);
+            $.unblockUI();
+        });
+    }
 </script>

@@ -1072,4 +1072,10 @@ class EidSampleService
             return "";
         }
     }
+
+    public function getEidOutcomesByAgeInLabsDetails($params)
+    {
+        $eidSampleDb = $this->sm->get('EidSampleTableWithoutCache');
+        return $eidSampleDb->fetchEidOutcomesByAgeInLabsDetails($params);
+    }
 }

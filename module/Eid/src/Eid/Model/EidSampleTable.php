@@ -4355,4 +4355,82 @@ class EidSampleTable extends AbstractTableGateway
     }
     //end lab dashboard details
 
+    public function fetchEidOutcomesByAgeInLabsDetails($params)
+    {
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $common = new CommonService($this->sm);
+        $eidOutcomesQuery = $sql->select()
+            ->from(array('eid' => 'dash_eid_form'))
+            ->columns(
+                array(
+                    'noDatan' => new Expression("SUM(CASE WHEN ((eid.result like 'negative' OR eid.result = 'Negative' ) AND (eid.child_dob IS NULL OR eid.child_dob = '0000-00-00'))THEN 1 ELSE 0 END)"),
+
+                    'noDatap' => new Expression("SUM(CASE WHEN ((eid.result like 'positive' OR eid.result = 'Positive' ) AND (eid.child_dob IS NULL OR eid.child_dob ='0000-00-00'))THEN 1 ELSE 0 END)"),
+
+                    'less2n' => new Expression("SUM(CASE WHEN ((eid.result like 'negative' OR eid.result = 'Negative' ) AND eid.child_dob <= '" . date('Y-m-d', strtotime('-2 MONTHS')) . "')THEN 1 ELSE 0 END)"),
+
+                    'less2p' => new Expression("SUM(CASE WHEN ((eid.result like 'positive' OR eid.result = 'Positive' ) AND eid.child_dob <= '" . date('Y-m-d', strtotime('-2 MONTHS')) . "')THEN 1 ELSE 0 END)"),
+
+                    '2to9n' => new Expression("SUM(CASE WHEN ((eid.result like 'negative' OR eid.result = 'Negative' ) AND (eid.child_dob >= '" . date('Y-m-d', strtotime('-2 MONTHS')) . "' AND eid.child_dob <= '" . date('Y-m-d', strtotime('-9 MONTHS')) . "'))THEN 1 ELSE 0 END)"),
+
+                    '2to9p' => new Expression("SUM(CASE WHEN ((eid.result like 'positive' OR eid.result = 'Positive' ) AND (eid.child_dob >= '" . date('Y-m-d', strtotime('-2 MONTHS')) . "' AND eid.child_dob <= '" . date('Y-m-d', strtotime('-9 MONTHS')) . "'))THEN 1 ELSE 0 END)"),
+
+                    '9to12n' => new Expression("SUM(CASE WHEN ((eid.result like 'negative' OR eid.result = 'Negative' ) AND (eid.child_dob >= '" . date('Y-m-d', strtotime('-9 MONTHS')) . "' AND eid.child_dob <= '" . date('Y-m-d', strtotime('-12 MONTHS')) . "'))THEN 1 ELSE 0 END)"),
+
+                    '9to12p' => new Expression("SUM(CASE WHEN ((eid.result like 'positive' OR eid.result = 'Positive' ) AND (eid.child_dob >= '" . date('Y-m-d', strtotime('-9 MONTHS')) . "' AND eid.child_dob <= '" . date('Y-m-d', strtotime('-12 MONTHS')) . "'))THEN 1 ELSE 0 END)"),
+
+                    '12to24n' => new Expression("SUM(CASE WHEN ((eid.result like 'negative' OR eid.result = 'Negative' ) AND (eid.child_dob >= '" . date('Y-m-d', strtotime('-12 MONTHS')) . "' AND eid.child_dob <= '" . date('Y-m-d', strtotime('-24 MONTHS')) . "'))THEN 1 ELSE 0 END)"),
+
+                    '12to24p' => new Expression("SUM(CASE WHEN ((eid.result like 'positive' OR eid.result = 'Positive' ) AND (eid.child_dob >= '" . date('Y-m-d', strtotime('-12 MONTHS')) . "' AND eid.child_dob <= '" . date('Y-m-d', strtotime('-24 MONTHS')) . "'))THEN 1 ELSE 0 END)"),
+
+                    'above24n' => new Expression("SUM(CASE WHEN ((eid.result like 'negative' OR eid.result = 'Negative' ) AND eid.child_dob >= '" . date('Y-m-d', strtotime('-24 MONTHS')) . "')THEN 1 ELSE 0 END)"),
+
+                    'above24p' => new Expression("SUM(CASE WHEN ((eid.result like 'positive' OR eid.result = 'Positive' ) AND eid.child_dob >= '" . date('Y-m-d', strtotime('-24 MONTHS')) . "')THEN 1 ELSE 0 END)"),
+                )
+            )
+            ->join(array('f' => 'facility_details'), 'f.facility_id = eid.facility_id', array());
+
+        if (isset($params['provinces']) && trim($params['provinces']) != '') {
+            $eidOutcomesQuery = $eidOutcomesQuery->where('f.facility_state IN (' . $params['provinces'] . ')');
+        }
+        if (isset($params['districts']) && trim($params['districts']) != '') {
+            $eidOutcomesQuery = $eidOutcomesQuery->where('f.facility_district IN (' . $params['districts'] . ')');
+        }
+        if (isset($params['clinics']) && trim($params['clinics']) != '') {
+            $eidOutcomesQuery = $eidOutcomesQuery->where('eid.facility_id IN (' . $params['clinics'] . ')');
+        }
+        if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
+            $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
+            $endMonth = str_replace(' ', '-', $params['toDate']) . "-31";
+            $eidOutcomesQuery = $eidOutcomesQuery
+                ->where("(sample_collection_date is not null)
+                                        AND DATE(sample_collection_date) >= '" . $startMonth . "' 
+                                        AND DATE(sample_collection_date) <= '" . $endMonth . "'");
+        }
+
+        $facilityIdList = array();
+        if (isset($params['facilityId']) && trim($params['facilityId']) != '') {
+            $fQuery = $sql->select()->from(array('f' => 'facility_details'))->columns(array('facility_id'))
+                ->where('f.facility_type = 2 AND f.status="active"');
+            $fQuery = $fQuery->where('f.facility_id IN (' . $params['facilityId'] . ')');
+            $fQueryStr = $sql->buildSqlString($fQuery);
+            $facilityResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+            $facilityIdList = array_column($facilityResult, 'facility_id');
+        } else if (!empty($this->mappedFacilities)) {
+            $fQuery = $sql->select()->from(array('f' => 'facility_details'))->columns(array('facility_id'))
+                ->where('f.facility_id IN ("' . implode('", "', $this->mappedFacilities) . '")');
+            $fQueryStr = $sql->buildSqlString($fQuery);
+            $facilityResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+            $facilityIdList = array_column($facilityResult, 'facility_id');
+        }
+
+        if ($facilityIdList != null) {
+            $queryStr = $queryStr->where('eid.lab_id IN ("' . implode('", "', $facilityIdList) . '")');
+        }
+
+        $eidOutcomesQueryStr = $sql->buildSqlString($eidOutcomesQuery);
+        $result = $common->cacheQuery($eidOutcomesQueryStr, $dbAdapter);
+        return $result[0];
+    }
 }
