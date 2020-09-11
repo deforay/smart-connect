@@ -3,14 +3,8 @@
 namespace Eid\Service;
 
 use Laminas\Session\Container;
-use Laminas\Db\Adapter\Adapter;
 use Laminas\Db\Sql\Sql;
-use Laminas\Db\Sql\Select;
-use Laminas\Db\TableGateway\AbstractTableGateway;
-use Laminas\Db\Sql\Expression;
 use Application\Service\CommonService;
-use \PhpOffice\PhpSpreadsheet\Spreadsheet;
-use Zend\Debug\Debug;
 
 class EidSampleService
 {
@@ -144,30 +138,30 @@ class EidSampleService
         }
         return array(
             'status'    => 'success',
-            'message'   => $numRows. ' uploaded successfully',
+            'message'   => $numRows . ' uploaded successfully',
         );
     }
 
-    public function saveFileFromVlsmAPIV1(){
+    public function saveFileFromVlsmAPIV1()
+    {
         $apiData = array();
         $common = new CommonService();
         $sampleDb = $this->sm->get('EidSampleTableWithoutCache');
         $facilityDb = $this->sm->get('FacilityTable');
         $facilityTypeDb = $this->sm->get('FacilityTypeTable');
-        $testStatusDb = $this->sm->get('SampleStatusTable');
         $locationDb = $this->sm->get('LocationDetailsTable');
         $sampleRjtReasonDb = $this->sm->get('SampleRejectionReasonTable');
-        
+
         $fileName = $_FILES['eidFile']['name'];
         $ranNumber = str_pad(rand(0, pow(10, 6) - 1), 6, '0', STR_PAD_LEFT);
         $extension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
         $fileName = $ranNumber . "." . $extension;
 
         if (!file_exists(TEMP_UPLOAD_PATH) && !is_dir(TEMP_UPLOAD_PATH)) {
-            mkdir(APPLICATION_PATH . DIRECTORY_SEPARATOR . "uploads",0777);
+            mkdir(APPLICATION_PATH . DIRECTORY_SEPARATOR . "uploads", 0777);
         }
         if (!file_exists(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-eid") && !is_dir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-eid")) {
-            mkdir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-eid",0777);
+            mkdir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-eid", 0777);
         }
 
         $pathname = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-eid" . DIRECTORY_SEPARATOR . $fileName;
@@ -177,28 +171,28 @@ class EidSampleService
                 $apiData = \JsonMachine\JsonMachine::fromFile($pathname);
             }
         }
-        if($apiData !== false){
-            foreach($apiData as $rowData){
+        if ($apiData !== false) {
+            foreach ($apiData as $rowData) {
                 // Debug::dump($rowData);die;
-                foreach($rowData as $row){
+                foreach ($rowData as $row) {
                     // Debug::dump($row['vlsm_instance_id']);die;
                     if (trim($row['sample_code']) != '' && trim($row['vlsm_instance_id']) != '') {
                         $sampleCode = trim($row['sample_code']);
                         $instanceCode = trim($row['vlsm_instance_id']);
-    
+
                         $sampleCollectionDate = (trim($row['sample_collection_date']) != '' ? trim(date('Y-m-d H:i', strtotime($row['sample_collection_date']))) : null);
                         $sampleReceivedAtLab = (trim($row['sample_registered_at_lab']) != '' ? trim(date('Y-m-d H:i', strtotime($row['sample_registered_at_lab']))) : null);
                         // $dateOfInitiationOfRegimen = (trim($row['date_of_initiation_of_current_regimen']) != '' ? trim(date('Y-m-d H:i', strtotime($row['date_of_initiation_of_current_regimen']))) : null);
                         $resultApprovedDateTime = (trim($row['result_approved_datetime']) != '' ? trim(date('Y-m-d H:i', strtotime($row['result_approved_datetime']))) : null);
                         $sampleTestedDateTime = (trim($row['sample_tested_datetime']) != '' ? trim(date('Y-m-d H:i', strtotime($row['sample_tested_datetime']))) : null);
-    
-    
-    
-                        foreach($row as $index=>$value){                
-                            if($index == 'status_id'){
+
+
+
+                        foreach ($row as $index => $value) {
+                            if ($index == 'status_id') {
                                 break;
-                            } else{
-                                if($index != 'eid_id'){
+                            } else {
+                                if ($index != 'eid_id') {
                                     $data[$index] = $value;
                                 }
                             }
@@ -208,7 +202,7 @@ class EidSampleService
                         $data['sample_registered_at_lab']   = $sampleReceivedAtLab;
                         $data['result_approved_datetime']   = $resultApprovedDateTime;
                         $data['sample_tested_datetime']     = $sampleTestedDateTime;
-    
+
                         $facilityData = array(
                             'vlsm_instance_id'          => trim($row['vlsm_instance_id']),
                             'facility_name'             => trim($row['facility_name']),
@@ -253,7 +247,7 @@ class EidSampleService
                                 $facilityData['facility_type'] = $facilityTypeDb->lastInsertValue;
                             }
                         }
-    
+
                         //check clinic details
                         if (trim($row['facility_name']) != '') {
                             $facilityDataResult = $this->checkFacilityDetails(trim($row['facility_name']));
@@ -267,7 +261,7 @@ class EidSampleService
                         } else {
                             $data['facility_id'] = NULL;
                         }
-    
+
                         $labData = array(
                             'vlsm_instance_id'          => trim($row['vlsm_instance_id']),
                             'facility_name'             => trim($row['labName']),
@@ -312,7 +306,7 @@ class EidSampleService
                                 $labData['facility_type'] = $facilityTypeDb->lastInsertValue;
                             }
                         }
-    
+
                         //check lab details
                         if (trim($row['labName']) != '') {
                             $labDataResult = $this->checkFacilityDetails(trim($row['labName']));
@@ -328,17 +322,11 @@ class EidSampleService
                         }
                         //check testing reason
                         if (trim($row['status_name']) != '') {
-                            $sampleStatusResult = $this->checkSampleStatus(trim($row['status_name']));
-                            if ($sampleStatusResult) {
-                                $data['result_status'] = $sampleStatusResult['status_id'];
-                            } else {
-                                $testStatusDb->insert(array('status_name' => trim($row['status_name'])));
-                                $data['result_status'] = $testStatusDb->lastInsertValue;
-                            }
+                            $data['result_status'] = $this->checkSampleStatus(trim($row['status_name']));
                         } else {
                             $data['result_status'] = 6;
                         }
-                        
+
                         //check sample rejection reason
                         if (trim($row['reason_for_sample_rejection']) != '') {
                             $sampleRejectionReason = $this->checkSampleRejectionReason(trim($row['reason_for_sample_rejection']));
@@ -376,14 +364,13 @@ class EidSampleService
             'status'    => 'fail',
             'message'   => 'Uploaded failed',
         );
-        
     }
 
     public function checkSampleCode($sampleCode, $instanceCode, $dashTable = 'dash_eid_form')
     {
         $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
         $sql = new Sql($dbAdapter);
-        $sQuery = $sql->select()->from($dashTable)->where(array('sample_code LIKE "%'.$sampleCode.'%"', 'vlsm_instance_id' => $instanceCode));
+        $sQuery = $sql->select()->from($dashTable)->where(array('sample_code LIKE "%' . $sampleCode . '%"', 'vlsm_instance_id' => $instanceCode));
         $sQueryStr = $sql->buildSqlString($sQuery);
         $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
         return $sResult;
@@ -422,7 +409,7 @@ class EidSampleService
     {
         $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
         $sql = new Sql($dbAdapter);
-        $tQuery = $sql->select()->from('r_vl_test_reasons')->where(array('test_reason_name' => $testingReson));
+        $tQuery = $sql->select()->from('r_eid_test_reasons')->where(array('test_reason_name' => $testingReson));
         $tQueryStr = $sql->buildSqlString($tQuery);
         $tResult = $dbAdapter->query($tQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
         return $tResult;
@@ -431,10 +418,17 @@ class EidSampleService
     {
         $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
         $sql = new Sql($dbAdapter);
+        $testStatusDb = $this->sm->get('SampleStatusTable');
         $sQuery = $sql->select()->from('r_sample_status')->where(array('status_name' => $testingStatus));
         $sQueryStr = $sql->buildSqlString($sQuery);
         $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-        return $sResult;
+        if ($sResult) {
+            $resultStatus = $sResult['status_id'];
+        } else {
+            $testStatusDb->insert(array('status_name' => trim($testingStatus)));
+            $resultStatus = $testStatusDb->lastInsertValue;
+        }
+        return $resultStatus;
     }
     public function checkSampleType($sampleType)
     {
@@ -449,7 +443,7 @@ class EidSampleService
     {
         $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
         $sql = new Sql($dbAdapter);
-        $sQuery = $sql->select()->from('r_sample_rejection_reasons')->where(array('rejection_reason_name' => $rejectReasonName));
+        $sQuery = $sql->select()->from('r_eid_sample_rejection_reasons')->where(array('rejection_reason_name' => $rejectReasonName));
         $sQueryStr = $sql->buildSqlString($sQuery);
         $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
         return $sResult;
@@ -525,7 +519,7 @@ class EidSampleService
                 "register_analysis"  => $key['Register_Analysis'],
                 "analysis_authorise" => $key['Analysis_Authorise'],
                 "total" => $key['total']
-            ); 
+            );
         }
         return $result;
     }
@@ -546,7 +540,7 @@ class EidSampleService
                 "register_analysis"  => $key['Register_Analysis'],
                 "analysis_authorise" => $key['Analysis_Authorise'],
                 "total" => $key['total']
-            ); 
+            );
         }
         return $result;
     }
@@ -568,7 +562,7 @@ class EidSampleService
                 "register_analysis"  => $key['Register_Analysis'],
                 "analysis_authorise" => $key['Analysis_Authorise'],
                 "total" => $key['total']
-            ); 
+            );
         }
         return $result;
     }
@@ -795,10 +789,10 @@ class EidSampleService
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name', 'facility_code', 'facility_logo'), 'left')
             ->join(array('l_s' => 'location_details'), 'l_s.location_id=f.facility_state', array('provinceName' => 'location_name'), 'left')
             ->join(array('l_d' => 'location_details'), 'l_d.location_id=f.facility_district', array('districtName' => 'location_name'), 'left')
-            ->join(array('rs' => 'r_vl_sample_type'), 'rs.sample_id=vl.sample_type', array('sample_name'), 'left')
+            ->join(array('rs' => 'r_eid_sample_type'), 'rs.sample_id=vl.sample_type', array('sample_name'), 'left')
             ->join(array('l' => 'facility_details'), 'l.facility_id=vl.lab_id', array('labName' => 'facility_name'), 'left')
             ->join(array('u' => 'user_details'), 'u.user_id=vl.result_approved_by', array('approvedBy' => 'user_name'), 'left')
-            ->join(array('r_r_r' => 'r_sample_rejection_reasons'), 'r_r_r.rejection_reason_id=vl.reason_for_sample_rejection', array('rejection_reason_name'), 'left')
+            ->join(array('r_r_r' => 'r_eid_sample_rejection_reasons'), 'r_r_r.rejection_reason_id=vl.reason_for_sample_rejection', array('rejection_reason_name'), 'left')
             ->join(array('rej_f' => 'facility_details'), 'rej_f.facility_id=vl.sample_rejection_facility', array('rejectionFacilityName' => 'facility_name'), 'left')
             ->where(array('vl.vl_sample_id' => $params['id']));
         $sQueryStr = $sql->buildSqlString($sQuery);
@@ -1078,7 +1072,7 @@ class EidSampleService
         $eidSampleDb = $this->sm->get('EidSampleTableWithoutCache');
         return $eidSampleDb->fetchEidOutcomesByAgeInLabsDetails($params);
     }
-    
+
     public function getEidPositivityRateDetails($params)
     {
         $eidSampleDb = $this->sm->get('EidSampleTableWithoutCache');

@@ -4493,7 +4493,7 @@ class EidSampleTable extends AbstractTableGateway
             $sQueryStr = $sql->buildSqlString($sQuery);
             // echo $sQueryStr;die;
             $result = $common->cacheQuery($sQueryStr, $dbAdapter);
-            return array('result' => $result, 'month' => $monthList, 'title' => "Positivity rate from ".$common->humanDateFormat($startMonth)." to ".$common->humanDateFormat($endMonth)."");
+            return array('result' => $result, 'month' => $monthList);
         } else{
             return 0;
         }

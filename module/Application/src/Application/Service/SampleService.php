@@ -28,11 +28,14 @@ class SampleService
         return $this->sm;
     }
 
-    public function checkSampleCode($sampleCode, $instanceCode, $dashTable = 'dash_vl_request_form')
+    public function checkSampleCode($sampleCode, $instanceCode = null, $dashTable = 'dash_vl_request_form')
     {
         $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
         $sql = new Sql($dbAdapter);
-        $sQuery = $sql->select()->from($dashTable)->where(array('sample_code LIKE "%' . $sampleCode . '%"', 'vlsm_instance_id' => $instanceCode));
+        $sQuery = $sql->select()->from($dashTable)->where(array('sample_code LIKE "%' . $sampleCode . '%"'));
+        if (isset($instanceCode) && $instanceCode != "") {
+            $sQuery = $sQuery->where(array('vlsm_instance_id' => $instanceCode));
+        }
         $sQueryStr = $sql->buildSqlString($sQuery);
         $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
         return $sResult;
@@ -1266,9 +1269,9 @@ class SampleService
                 "register_analysis"  => $key['Register_Analysis'],
                 "analysis_authorise" => $key['Analysis_Authorise'],
                 "total" => $key['total']
-            );            
+            );
         }
-        
+
         return $result;
     }
 
@@ -1288,7 +1291,7 @@ class SampleService
                 "register_analysis"  => $key['Register_Analysis'],
                 "analysis_authorise" => $key['Analysis_Authorise'],
                 "total" => $key['total']
-            );            
+            );
         }
         return $result;
     }
@@ -1309,7 +1312,7 @@ class SampleService
                 "register_analysis"  => $key['Register_Analysis'],
                 "analysis_authorise" => $key['Analysis_Authorise'],
                 "total" => $key['total']
-            );            
+            );
         }
         return $result;
     }
@@ -2209,8 +2212,6 @@ class SampleService
                         $VLAnalysisResult = 20;
                     } else if ($row['Result']['Copies'] == '< 40' || $row['Result']['Copies'] == '<40' || $row['result'] == '< 40' || $row['result'] == '<40') {
                         $VLAnalysisResult = 40;
-                    } else if ($row['Result']['Copies'] == 'Nivel de detecÁao baixo' || $row['Result']['Copies'] == 'NÌvel de detecÁ„o baixo' || $row['result'] == 'Nivel de detecÁao baixo' || $row['result'] == 'NÌvel de detecÁ„o baixo') {
-                        $VLAnalysisResult = 20;
                     } else if ($row['Result']['Copies'] == 'Suppressed' || $row['result'] == 'Suppressed') {
                         $VLAnalysisResult = 500;
                     } else if ($row['Result']['Copies'] == 'Not Suppressed' || $row['result'] == 'Not Suppressed') {
@@ -2219,8 +2220,6 @@ class SampleService
                         $VLAnalysisResult = 20;
                     } else if ($row['Result']['Copies'] == 'Positive' || $row['result'] == 'Positive') {
                         $VLAnalysisResult = 1500;
-                    } else if ($row['Result']['Copies'] == 'Indeterminado' || $row['result'] == 'Indeterminado') {
-                        $VLAnalysisResult = "";
                     }
 
 
@@ -2297,7 +2296,7 @@ class SampleService
                     }
 
                     //check lab details
-                    $labDataResult = $this->checkFacilityDetailsByWeblims("NRL");
+                    $labDataResult = $this->checkFacilityDetails("NRL");
                     if ($labDataResult) {
                         $data['lab_id'] = $labDataResult['facility_id'];
                     } else {
@@ -2357,7 +2356,7 @@ class SampleService
                     }
 
                     //check existing sample code
-                    $sampleCode = $this->checkSampleCodeByWeblims($sampleCode, $instanceCode);
+                    $sampleCode = $this->checkSampleCode($sampleCode, $instanceCode);
                     $status = 0;
                     if ($sampleCode) {
                         //sample data update
@@ -2391,26 +2390,4 @@ class SampleService
         }
     }
 
-    public function checkSampleCodeByWeblims($sampleCode, $instanceCode, $dashTable = 'dash_vl_request_form')
-    {
-        $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
-        $sql = new Sql($dbAdapter);
-        $sQuery = $sql->select()->from($dashTable)->where(array('sample_code LIKE "%' . $sampleCode . '%"'));
-        if (isset($instanceCode) && $instanceCode != "") {
-            $sQuery = $sQuery->where(array('vlsm_instance_id' => $instanceCode));
-        }
-        $sQueryStr = $sql->buildSqlString($sQuery);
-        $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-        return $sResult;
-    }
-
-    public function checkFacilityDetailsByWeblims($clinicName)
-    {
-        $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
-        $sql = new Sql($dbAdapter);
-        $fQuery = $sql->select()->from('facility_details')->where(array('facility_name' => $clinicName, 'facility_type' => 2));
-        $fQueryStr = $sql->buildSqlString($fQuery);
-        $fResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-        return $fResult;
-    }
 }
