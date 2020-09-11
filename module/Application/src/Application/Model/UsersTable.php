@@ -104,6 +104,7 @@ class UsersTable extends AbstractTableGateway
                 $logincontainer->toggleStatus = $this->useCurrentSampleTable;
                 $logincontainer->sampleTable = 'dash_vl_request_form_current';
                 $logincontainer->eidSampleTable = 'dash_eid_form_current';
+                $logincontainer->covid19SampleTable = 'dash_form_covid19_current';
             } else {
                 //$logincontainer->sampleTable = 'dash_vl_request_form';
             }
