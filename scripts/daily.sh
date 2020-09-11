@@ -5,7 +5,7 @@ mysql_host="localhost"
 mysql_dbname="vldashboard"
 mysql_username="root"
 mysql_password="zaq12345"
-mysql_port=3306
+mysql_port="3306"
 
 enable_vl=true
 enable_eid=false
