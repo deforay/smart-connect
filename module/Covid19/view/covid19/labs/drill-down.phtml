@@ -186,7 +186,7 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
             <div id="piecontainer" style="min-width: 310px; height: 600px; max-width: 100%; margin: 0 auto;padding:1.5%;"></div>
         </div>
         <div class="col-lg-6">
-            <div id="covdi19OutcomePieContainer" style="min-width: 310px; height: 600px; max-width: 100%; margin: 0 auto;padding:1.5%;"></div>
+            <div id="covid19OutcomePieContainer" style="min-width: 310px; height: 600px; max-width: 100%; margin: 0 auto;padding:1.5%;"></div>
         </div>
     </div>
     <div class="row" style="margin-bottom:30px;">
@@ -257,7 +257,7 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
         });
     }
     
-    function generateCovdi19OutcomePiechart(){
+    function generateCovid19OutcomePiechart(){
         var fromDate = $('#mrp-lowerDate').val();
         var toDate = $('#mrp-upperDate').val();
         var provinces = ($("#provinces").val() == null)?'':$("#provinces").val().join(',');
@@ -274,7 +274,7 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
         var lineOfTreatment = $("#lineOfTreatment").val();
         $.post("<?php echo $this->url('covid19-labs', array('action' => 'get-covid19-out-comes')); ?>",{fromDate:fromDate,toDate:toDate,provinces:provinces,districts:districts,lab:lab,clinicId:clinicId,adherence:adherence,age:age,testResult:testResult,sampleType:sampleType,gender:gender,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding,lineOfTreatment:lineOfTreatment},
         function(data) {
-            $("#covdi19OutcomePieContainer").html(data);
+            $("#covid19OutcomePieContainer").html(data);
         });
     }
     
@@ -335,7 +335,7 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
             });
         });
         generatePieContainer();
-        generateCovdi19OutcomePiechart();
+        generateCovid19OutcomePiechart();
         generateBarContainer();
         loadSampleDataTable();
     });
@@ -343,7 +343,7 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
     
     function searchSampleTestedResult(){
         generatePieContainer();
-        generateCovdi19OutcomePiechart();
+        generateCovid19OutcomePiechart();
         generateBarContainer();
         oTable.fnDraw();
     }
