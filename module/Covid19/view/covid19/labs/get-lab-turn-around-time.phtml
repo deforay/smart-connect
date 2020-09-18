@@ -1,0 +1,124 @@
+<div id="labAverageTat"></div>
+<script>
+    $('#labAverageTat').highcharts({
+        chart: {
+            zoomType: 'xy',
+            marginTop: 100
+        },
+        legend: {
+            align: 'center',
+            x: 0,
+            verticalAlign: 'top',
+            y: 30,
+            floating: true,
+            backgroundColor: (Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#FFFFFF'
+        },
+        title: {
+            text: ''
+        },
+        exporting: {
+            chartOptions: {
+                subtitle: {
+                    text: '<?php echo $this->translate('Laboratory Turnaround Time'); ?>',
+                }
+            }
+        },
+        credits: {
+            enabled: false
+        },
+        xAxis: [{
+            categories: [<?php
+                            if (isset($result['dates']) && count($result['dates']) > 0) {
+                                foreach ($result['dates'] as $date) {
+                                    echo "'" . $date . "',";
+                                }
+                            }
+                            ?>],
+            crosshair: true
+        }],
+        yAxis: [{
+            gridLineWidth: 0,
+            allowDecimals: false,
+            title: {
+                text: '<?php echo $this->translate('No. of Samples'); ?>',
+                style: {}
+            },
+            labels: {
+                format: '{value}',
+                style: {}
+            },
+            opposite: true
+
+        }, {
+            labels: {
+                format: '{value}',
+                style: {}
+            },
+            title: {
+                text: '<?php echo $this->translate('Average TAT in Days'); ?>',
+                style: {}
+            },
+            min: 0
+        }],
+        tooltip: {
+            formatter: function() {
+                return '<b>' + this.x + '</b><br/>' +
+                    this.series.name + ': ' + this.y
+            }
+        },
+        series: [<?php
+                    if (isset($result['data']) && count($result['data']) > 0) {
+                        foreach ($result['data'] as $key => $condition) {
+                    ?> {
+                        name: '<?php echo $this->translate($key); ?>',
+                        type: 'column',
+                        cursor: 'pointer',
+                        point: {
+                            events: {
+                                click: function(e) {
+                                    doLabTATRedirect(this.category);
+                                    e.preventDefault();
+                                }
+                            }
+                        },
+                        data: [<?php
+                                foreach ($condition as $count) {
+                                    echo '{y:' . $count . '},';
+                                }
+                                ?>],
+                    },
+                <?php
+                        }
+                    }
+                    if (isset($result['all'])) {
+                ?> {
+                    //showInLegend: false,
+                    name: '<?php echo $this->translate('TAT'); ?>',
+                    type: 'spline',
+                    yAxis: 1,
+                    cursor: 'pointer',
+                    point: {
+                        events: {
+                            click: function(e) {
+                                doLabTATRedirect(this.category);
+                                e.preventDefault();
+                            }
+                        }
+                    },
+                    data: [<?php echo implode(",", $result['all']); ?>],
+                    color: '#1B325F',
+
+                }
+            <?php } ?>
+        ]
+    });
+
+    function getRandomColor() {
+        var letters = '0123456789ABCDEF';
+        var color = '#';
+        for (var i = 0; i < 6; i++) {
+            color += letters[Math.floor(Math.random() * 16)];
+        }
+        return color;
+    }
+</script>

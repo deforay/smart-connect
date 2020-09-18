@@ -1,0 +1,151 @@
+<?php
+$supAvg = array();
+if (isset($result['sampleName']) && count($result['sampleName']) > 0) {
+    $arrayKey = array_keys($result['sampleName']);
+    $sumArray = array_map(function () {
+        return array_sum(func_get_args());
+    }, $result['sampleName']['Positive'], $result['sampleName']['Negative']);
+    foreach ($result['sampleName']['Positive'] as $key => $positivity) {
+        $supAvg[] = (($positivity == 0) ? 0 : round(100 * ($positivity / $sumArray[$key]), 2));
+    }
+}
+?>
+<div id="facilitiesTestedVsSuppressed"></div>
+<script>
+    $(function() {
+        $('#facilitiesTestedVsSuppressed').highcharts({
+            chart: {
+                type: 'column'
+            },
+            title: {
+                text: ''
+            },
+            exporting: {
+                chartOptions: {
+                    subtitle: {
+                        text: '<?php echo $this->translate('Samples Tested per Lab'); ?>',
+                    }
+                }
+            },
+            credits: {
+                enabled: false
+            },
+            xAxis: {
+                categories: [<?php
+                                if (isset($result['lab']) && count($result['lab']) > 0) {
+                                    foreach ($result['lab'] as $lab) {
+                                        echo "'" . $lab . "',";
+                                    }
+                                }
+                                ?>]
+            },
+            yAxis: [{
+                allowDecimals: false,
+                min: 0,
+                title: {
+                    text: '<?php echo $this->translate('No. of Samples'); ?>'
+                }
+            }, { // Secondary yAxis
+                allowDecimals: true,
+                min: 0,
+                max: 100,
+                title: {
+                    text: '<?php echo $this->translate('Positivity %'); ?>',
+                    style: {}
+                },
+                labels: {
+                    format: '{value}%',
+                    style: {}
+                },
+                opposite: true
+            }],
+            tooltip: {
+                formatter: function() {
+                    return '<b>' + this.x + '</b><br/>' +
+                        this.series.name + ': ' + this.y + '<br/>' +
+                        '<?php echo $this->translate('Total'); ?>: ' + this.point.stackTotal;
+                }
+            },
+            plotOptions: {
+                column: {
+                    stacking: 'normal',
+                    pointPadding: 0.2,
+                    borderWidth: 0,
+                    cursor: 'pointer',
+                    point: {
+                        events: {
+                            click: function(e) {
+                                fromMonth = $(".mrp-lowerMonth").html();
+                                if(fromMonth != undefined){
+                                    fromMonth = fromMonth.replace(" ", "-");
+                                }
+                                toMonth = $(".mrp-upperMonth").html();
+                                if(fromMonth != undefined){
+                                    toMonth = toMonth.replace(" ", "-");
+                                }
+                                window.open(e.point.url + 'fromMonth=' + fromMonth + '&toMonth=' + toMonth + '&lab=' + e.point.category, '_blank');
+                            }
+                        }
+                    }
+                },
+                scatter: {
+                    stacking: 'normal',
+                    pointPadding: 0.2,
+                    borderWidth: 0,
+                    cursor: 'pointer',
+                    yAxis: 1,
+                    color: '#1B325F',
+                    marker: {
+                        symbol: 'diamond'
+                    },
+                    point: {
+                        events: {
+                            click: function(e) {
+                                url = "/eid/labs/samples-tested-lab?";
+                                fromMonth = $(".mrp-lowerMonth").html();
+                                if(fromMonth != undefined){
+                                    fromMonth = fromMonth.replace(" ", "-");
+                                }
+                                toMonth = $(".mrp-upperMonth").html();
+                                if(fromMonth != undefined){
+                                    toMonth = toMonth.replace(" ", "-");
+                                }
+                                window.open(url + 'fromMonth=' + fromMonth + '&toMonth=' + toMonth + '&lab=' + e.point.category, '_blank');
+                            }
+                        }
+                    }
+                }
+            },
+            series: [
+                <?php
+                if (isset($result['sampleName']) && count($result['sampleName']) > 0) {
+                    foreach ($result['sampleName'] as $key => $condition) {
+
+                ?> {
+                            name: '<?php echo $this->translate($key); ?>',
+                            data: [<?php
+                                    foreach ($condition as $count) {
+                                        echo '{y:' . $count . ',url:"/eid/labs/samples-tested-lab?"},';
+                                    }
+                                    ?>],
+                            <?php if (strpos($key, 'Positive') !== false) { ?>
+                                color: '#ff1900',
+                            <?php } else if (strpos($key, 'Negative') !== false) { ?>
+                                color: '#60d18f',
+                            <?php } ?>
+                        },
+                    <?php
+                    }
+                }
+                if (count($supAvg) > 0) {
+                    ?> {
+                        name: '<?php echo $this->translate('Positivity %'); ?>',
+                        type: 'scatter',
+                        data: [<?php echo implode(",", $supAvg); ?>],
+                    }
+                <?php } ?>
+            ],
+            colors: ['#ff1900', '#60d18f', ],
+        });
+    });
+</script>

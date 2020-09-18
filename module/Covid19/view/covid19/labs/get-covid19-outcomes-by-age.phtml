@@ -2,6 +2,7 @@
 
 use Zend\Debug\Debug;
 
+// Debug::dump($result);die;
 $neg[] = $result['noDatan'];
 $pos[] = $result['noDatap'];
 /* Dynamic year range */
@@ -21,7 +22,17 @@ foreach($ageGroup as $key=>$age){
                 text: ''
             },
             xAxis: {
-                categories: ["No Data", <?php foreach($ageGroup as $key=>$age){ if($key == 0){ ?> "less <?php echo $age;?> years", <?php } elseif($key == 4){ ?> "Above <?php echo $age;?> years" <?php } else{ ?> "<?php echo $age;?> years", <?php  } }?> ],
+                categories: ["No Data", 
+                    <?php foreach($ageGroup as $key=>$age){
+                        if($key == 0){ ?>
+                            "less <?php echo $age;?> years",
+                        <?php } elseif($key == 4){ ?>
+                            "Above <?php echo $age;?> years"
+                        <?php } else{ ?>
+                            "<?php echo $age;?> years",
+                        <?php  }
+                    }?>
+                    ],
                 crosshair: true
             },
             yAxis: {

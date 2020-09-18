@@ -270,6 +270,12 @@ if (!isset($activeTab)) {
                                     <i class="fa fa-angle-right"></i> <span class="title"><?php echo $this->translate('Summary'); ?></span>
                                 </a>
                             </li>
+                            <?php } if ($logincontainer->role == 1 || $logincontainer->role == 2 || $logincontainer->role == 5) { ?>
+                            <li class="nav-item end <?php echo ($activeTab == 'covid19-labs') ? " active open" : ""; ?>">
+                                <a href="<?php echo $this->url('covid19-labs', array('action' => 'dashboard')) ?>" class="nav-link ">
+                                    <i class="fa fa-angle-right"></i> <span class="title"><?php echo $this->translate('Labs Dashboard'); ?></span>
+                                </a>
+                            </li>
                             <?php } ?>
                         </ul>
                     </li>

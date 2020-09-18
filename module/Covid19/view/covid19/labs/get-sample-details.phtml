@@ -1,0 +1,56 @@
+<?php
+$heading = (isset($params['fromSrc']) && $params['fromSrc'] == 'sampleVolume')?'Sample Volume':'EID Samples Tested';
+?>
+<script>
+       $(function () {
+        $('#piecontainer').highcharts({
+              chart: {
+                  plotBackgroundColor: null,
+                  plotBorderWidth: null,
+                  plotShadow: false,
+                  type: 'pie'
+              },
+              title: {
+                  text: '<?php echo $this->translate($heading); ?>'
+              },
+              credits: {
+                    enabled: false
+             },
+              tooltip: {
+                  pointFormat: '{series.name}: <b>{point.percentage:.1f}% ({point.number})</b>'
+              },
+              legend: {
+                  itemMarginBottom: 5,
+                  labelFormatter: function () {
+                      return '<div ><span style="float:left;font-size:10px;">' + this.myData + ' ('+ this.name + ') -  </span><span style="font-size:10px; ">'+ this.percentage.toFixed(1)+'% ('+Highcharts.numberFormat(this.y, 0)+')</span></div>';
+                  }
+              },
+              plotOptions: {
+                  pie: {
+                      dataLabels: {
+                      distance: -30
+                    },
+                      showInLegend: true
+                  }
+              },
+              series: [{
+                  name: '<?php echo $this->translate('Samples'); ?>',
+                  colorByPoint: true,
+                  data: [<?php
+                  if(isset($result) && count($result)>0){
+                    foreach($result as $lab){
+                        ?>
+                        {
+                          name:<?php echo "'".$lab[2]."'";?>,
+                          y:<?php echo $lab[0];?>,
+                          number:"<?php echo $lab[0]; ?>",
+                          myData:<?php echo "'".$lab[1]."'";?>,
+                        },
+                        <?php
+                    }
+                  }
+                  ?>]
+              }]
+          });
+      });
+</script>

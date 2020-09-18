@@ -22,6 +22,12 @@ class Module
                     $summaryService = $sm->getServiceLocator()->get('Covid19FormService');
                     return new \Covid19\Controller\SummaryController($summaryService, $commonService);
                 },
+                'Covid19\Controller\Labs' => function ($sm) {
+                    $facilityService = $sm->getServiceLocator()->get('FacilityService');
+                    $commonService = $sm->getServiceLocator()->get('CommonService');
+                    $summaryService = $sm->getServiceLocator()->get('Covid19FormService');
+                    return new \Covid19\Controller\LabsController($summaryService, $facilityService, $commonService);
+                },
             )
         );
     }

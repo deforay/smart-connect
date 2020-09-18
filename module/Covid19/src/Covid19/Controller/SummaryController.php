@@ -5,7 +5,6 @@ namespace Covid19\Controller;
 use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\ViewModel;
 use Laminas\Json\Json;
-use Zend\Debug\Debug;
 
 class SummaryController extends AbstractActionController
 {

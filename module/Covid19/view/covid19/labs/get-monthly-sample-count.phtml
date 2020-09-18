@@ -1,0 +1,142 @@
+<?php
+$positivityAvg = array();
+
+if (isset($result['covid19Result']) && count($result['covid19Result']) > 0) {
+    $arrayKey = array_keys($result['covid19Result']);
+    $sumArray = array_map(function () {
+        return array_sum(func_get_args());
+    }, $result['covid19Result'][$arrayKey[0]], $result['covid19Result'][$arrayKey[1]]);
+    foreach ($result['covid19Result'][$arrayKey[0]] as $key => $positivity) {
+        $positivityAvg[] = (($positivity == 0) ? 0 : round(100 * ($positivity / $sumArray[$key]), 2));
+    }
+}
+
+?>
+<div id="monthyCountsDiv"></div>
+<script>
+    $(function() {
+        $('#monthyCountsDiv').highcharts({
+            chart: {
+                type: 'column'
+            },
+            title: {
+                text: ''
+            },
+            exporting: {
+                chartOptions: {
+                    subtitle: {
+                        text: '<?php echo $this->translate('Samples Tested'); ?>',
+                    }
+                }
+            },
+            credits: {
+                enabled: false
+            },
+            xAxis: {
+                categories: [<?php
+                                if (isset($result['date']) && count($result['date']) > 0) {
+                                    foreach ($result['date'] as $date) {
+                                        echo "'" . $date . "',";
+                                    }
+                                }
+                                ?>]
+            },
+            yAxis: [{
+                    allowDecimals: false,
+                    min: 0,
+                    title: {
+                        text: '<?php echo $this->translate('No. of Samples'); ?>'
+                    },
+
+                },
+                { // Secondary yAxis
+                    allowDecimals: true,
+                    min: 0,
+                    max: 100,
+                    title: {
+                        text: '<?php echo $this->translate('Positivity %'); ?>',
+                        style: {}
+                    },
+                    labels: {
+                        format: '{value}%',
+                        style: {}
+                    },
+                    opposite: true
+                }
+            ],
+            tooltip: {
+                formatter: function() {
+                    return '<b>' + this.x + '</b><br/>' +
+                        this.series.name + ': ' + this.y + '<br/>' +
+                        '<?php echo $this->translate('Total'); ?>: ' + this.point.stackTotal;
+                }
+            },
+            plotOptions: {
+                column: {
+                    stacking: 'normal',
+                    pointPadding: 0.2,
+                    borderWidth: 0,
+                    cursor: 'pointer',
+                    point: {
+                        events: {
+                            click: function(e) {
+                                doSampleTestedRedirect(e.point.category);
+                            }
+                        }
+                    }
+                },
+                scatter: {
+                    stacking: 'normal',
+                    pointPadding: 0.2,
+                    borderWidth: 0,
+                    cursor: 'pointer',
+                    marker: {
+                        symbol: 'diamond'
+                    },
+                    color: '#1B325F',
+                    yAxis: 1,
+                    point: {
+                        events: {
+                            click: function(e) {
+                                doSampleTestedRedirect(e.point.category);
+                            }
+                        }
+                    }
+                }
+            },
+            series: [<?php
+                        if (isset($result['covid19Result']) && count($result['covid19Result']) > 0) {
+                            foreach ($result['covid19Result'] as $key => $condition) {
+                                if ($key != 'No Result') {
+                                    $range = substr($key, 4, 6);
+                                    $range = preg_replace('/\s+/', '', $range);
+                                } else {
+                                    $range = 'nd';
+                                }
+                                ?> {
+                                    name: '<?php echo $this->translate($key); ?>',
+                                    <?php if ($key == 'Positive') { ?>
+                                        color: '#ff1900',
+                                    <?php } else if ($key == 'Negative') { ?>
+                                        color: '#60d18f',
+                                    <?php } ?>
+                                    data: [
+                                        <?php foreach ($condition as $count) {
+                                            echo '{y:' . $count . '},';
+                                        } ?>
+                                    ],
+                                },
+                                <?php
+                            }
+                        }
+                        if (count($positivityAvg) > 0) {
+                    ?> {
+                        name: '<?php echo $this->translate('Positivity %'); ?>',
+                        type: 'scatter',
+                        data: [<?php echo implode(",", $positivityAvg); ?>],
+                    }
+                <?php } ?>
+            ]
+        });
+    });
+</script>

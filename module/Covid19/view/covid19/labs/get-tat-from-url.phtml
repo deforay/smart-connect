@@ -1,0 +1,232 @@
+<?php
+  $cont = 0;
+  $tableHeader = '';
+  $tableBody = '';
+  $tableFooter = '';
+  $categoryNext = 0;
+  $places = $this->translate('Places');
+  $collectReceive = $this->translate('Collect-Receive');
+  $receiveRegister = $this->translate('Receive-Register');
+  $registerAnalysis = $this->translate('Register-Analysis');
+  $analysisAuthorise = $this->translate('Analysis-Authorise');
+  $total = $this->translate('Total');
+ ?>
+<script type="text/javascript">
+    $(function(){
+      $('#page-data-viewer').html(
+        '<dic class="">'+
+            getRow('<?php generateTable($results,'downloadTable',$category+1,$labs,$daterange,$category,$places,$collectReceive,$receiveRegister,$registerAnalysis,$analysisAuthorise,$total) ?>','downloadTable','provinceChart','<?php echo $this->translate('TAT: '.$place); ?>','<?php echo $this->translate('TAT Chart'); ?>')
+        +'</div>'
+      );
+
+      $('.clickable').click(function(){
+          if($(this).attr('data-category') != 2){
+            window.location.href='/eid/labs/time?district='+$(this).attr('id')+'&lab=<?php echo $labs; ?>&range=<?php echo $daterange; ?>&category='+$(this).attr('data-category')+'&place='+$(this).attr('data-place');
+          }
+      });
+
+      // Stacked Bar Chart for the Turnaround Time
+      $('#provinceChart').highcharts({
+          chart: {
+              type: 'column'
+          },
+          title: {
+              text: ''
+          },
+          exporting:{
+            chartOptions:{
+                subtitle: {
+                    text:'<?php echo $this->translate('TAT Chart'); ?>',
+                }
+            },
+            width: 2000
+          },
+          credits: {
+              enabled: false
+          },
+          xAxis: {
+              categories: getTATChartData("downloadTable")
+          },
+          yAxis: {
+              min: 0,
+              title: {
+                  text: '<?php echo $this->translate('TAT in days'); ?>'
+              },
+              stackLabels: {
+                  enabled: true,
+                  style: {
+                      fontWeight: 'bold',
+                      color: (Highcharts.theme && Highcharts.theme.textColor) || 'gray'
+                  }
+              }
+          },
+          legend: {
+              align: 'center',
+              x: 0,
+              verticalAlign: 'top',
+              y: 0,
+              floating: true,
+              backgroundColor: (Highcharts.theme && Highcharts.theme.background2) || 'white',
+              borderColor: '#CCC',
+              borderWidth: 1,
+              shadow: false
+          },
+          tooltip: {
+              headerFormat: '<b>{point.x}</b><br/>',
+              pointFormat: '{series.name}: {point.y}<br/><?php echo $this->translate('Total'); ?>: {point.stackTotal}'
+          },
+          plotOptions: {
+              column: {
+                  stacking: 'normal',
+                  dataLabels: {
+                      enabled: true,
+                      color: (Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'white'
+                  },
+                  cursor: '<?php echo ($category ==  1)?'default':'pointer'; ?>',
+                  point: {
+                      events: {
+                        click: function () {
+                          <?php if($category!= 1){?>
+                            window.location.href='/eid/labs/time?district='+this.id+'&lab=<?php echo $labs; ?>&range=<?php echo $daterange; ?>&category=<?php echo $categoryNext+1; ?>&place='+this.category;
+                          <?php }?>
+                        },
+                        mouseOver: function(){
+                        }
+                      }
+                  }
+              }
+          },
+          series:[
+            {
+                name: '<?php echo $this->translate('Collect-Receive'); ?>',
+                data:[<?php
+                      foreach ($results as $key) { ?>
+                        {
+                          y: <?php
+                                if(!is_null($key['collect_receive'])){
+                                  echo $key['collect_receive'];
+                                }else{
+                                  echo 0;
+                                }
+                             ?>,
+                          id: '<?php
+                                if(!is_null($key['facility_id'])){
+                                  echo $key['facility_id'];
+                                }else{echo 0;}
+                              ?>'
+                        },
+                    <?php
+                      }
+                     ?> ]
+            },
+            {
+                name: '<?php echo $this->translate('Receive-Register'); ?>',
+                data:[<?php
+                      foreach ($results as $key) { ?>
+                        {
+                          y: <?php
+                                if(!is_null($key['receive_register'])){
+                                  echo $key['receive_register'];
+                                }else{echo 0;}
+                            ?>,
+                          id: '<?php
+                                if(!is_null($key['facility_id'])){
+                                  echo $key['facility_id'];
+                                }else{echo 0;}
+                              ?>'
+                        },
+                    <?php
+                      }
+                     ?>
+                  ]
+            },
+            {
+                name: '<?php echo $this->translate('Register-Analysis'); ?>',
+                data:[<?php
+                      foreach ($results as $key) { ?>
+                        {
+                          y: <?php
+                                if(!is_null($key['register_analysis'])){
+                                  echo $key['register_analysis'];
+                                }
+                                else{echo 0;}
+                              ?>,
+                          id: '<?php
+                                if(!is_null($key['facility_id'])){
+                                  echo $key['facility_id'];
+                                }else{echo 0;}
+                              ?>'
+                        },
+                    <?php
+                      }
+                     ?> ]
+            },
+            {
+                name: '<?php echo $this->translate('Analysis-Authorise'); ?>',
+                data:[<?php
+                      foreach ($results as $key) { ?>
+                        {
+                          y: <?php
+                              if(!is_null($key['register_analysis'])){
+                                echo $key['analysis_authorise'];
+                              }
+                              else{echo 0;}
+                            ?>,
+                          id: '<?php
+                                if(!is_null($key['facility_id'])){
+                                  echo $key['facility_id'];
+                                }else{echo 0;}
+                              ?>'
+                        },
+                    <?php
+                      }
+                     ?> ]
+            }
+          ]
+      });
+    });
+</script>
+<?php
+function generateTable($result,$idTable,$facilityCategory,$labs,$daterange,$categoryVal,$places,$collectReceive,$receiveRegister,$registerAnalysis,$analysisAuthorise,$total){
+  $cont = 0;
+  $tableHeader = '';
+  $tableBody = '';
+  $tableFooter = '';
+//  $category = '';
+  $categoryNext = 0;
+  $clickable = ($categoryVal == 1)?'':'clickable';
+  $tableHeader = '<table class="'.$idTable.' header">'
+                    .'<thead>'
+                        .'<th>'.$places.'</th>'
+                        .'<th>'.$collectReceive.'</th>'
+                        .'<th>'.$receiveRegister.'</th>'
+                        .'<th>'.$receiveRegister.'</th>'
+                        .'<th>'.$analysisAuthorise.'</th>'
+                        .'<th>'.$total.'</th>'
+                    .'</thead>'
+                  .'</table>';
+
+  foreach ($result as $key) {
+    $tableBody .= '<tr class="'.$clickable.'" id="'.$key['facility_id'].'" data-labs="'.$labs.'" data-date-range="'.$daterange.'" data-category="'.$facilityCategory.'" data-place="'.$key['facility'].'">'
+                    .'<td id="td-'.$cont.'-0">'.$key['facility'].'</td>'
+                    .'<td id="td-'.$cont.'-1">'.$key['collect_receive'].'</td>'
+                    .'<td id="td-'.$cont.'-2">'.$key['receive_register'].'</td>'
+                    .'<td id="td-'.$cont.'-3">'.$key['register_analysis'].'</td>'
+                    .'<td id="td-'.$cont.'-4">'.$key['analysis_authorise'].'</td>'
+                    .'<td id="td-'.$cont.'-5">'.($key['collect_receive']+$key['receive_register']+$key['register_analysis']+$key['analysis_authorise']).'</td>'
+                  .'</tr>';
+    $cont ++;
+    $category = $key['category'];
+  }
+  echo '<div class="scrolltable">'
+          .$tableHeader
+          .'<div class="body scrollbar style-3">'
+              .'<table id="'.$idTable.'">'
+                .'<tbody>'
+                  .$tableBody
+                .'</tbody>'
+              .'</table>'
+          .'</div>'
+       .'</div>';
+}
+?>

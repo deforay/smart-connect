@@ -7,6 +7,6 @@ return array(
         'use-current-sample-table' => false,
         'vlModule'      => true,
         'eidModule'     => true,
-        'covid19Module' => false
+        'covid19Module' => true
     ),
 );

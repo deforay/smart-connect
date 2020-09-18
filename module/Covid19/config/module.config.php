@@ -4,7 +4,7 @@ namespace Eid;
 return array(
     'router' => array(
         'routes' => array(
-            'covid19' => array(
+            /* 'covid19' => array(
                 'type' => 'segment',
                 'options' => array(
                     'route' => '/covid19[/]',
@@ -13,14 +13,24 @@ return array(
                         'action' => 'dashboard'
                     ),
                 ),
-            ),
+            ), */
             'covid19-summary' => array(
                 'type' => 'segment',
                 'options' => array(
                     'route' => '/covid19/summary[/][:action][/:id]',
                     'defaults' => array(
                         'controller' => 'Covid19\Controller\Summary',
-                        'action' => 'index',
+                        'action' => 'dashboard',
+                    ),
+                ),
+            ),
+            'covid19-labs' => array(
+                'type' => 'segment',
+                'options' => array(
+                    'route' => '/covid19/labs[/][:action][/:id]',
+                    'defaults' => array(
+                        'controller' => 'Covid19\Controller\Labs',
+                        'action' => 'dashboard',
                     ),
                 ),
             ),

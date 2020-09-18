@@ -77,8 +77,6 @@ class Covid19FormService
 
         $numRows = 0;
         foreach ($apiData as $rowData) {
-
-
             $data = array();
             foreach ($columnList as $colName) {
                 if (isset($rowData[$colName])) {
@@ -157,8 +155,6 @@ class Covid19FormService
                             // $dateOfInitiationOfRegimen = (trim($row['date_of_initiation_of_current_regimen']) != '' ? trim(date('Y-m-d H:i', strtotime($row['date_of_initiation_of_current_regimen']))) : null);
                             $resultApprovedDateTime = (trim($row['result_approved_datetime']) != '' ? trim(date('Y-m-d H:i', strtotime($row['result_approved_datetime']))) : null);
                             $sampleTestedDateTime = (trim($row['sample_tested_datetime']) != '' ? trim(date('Y-m-d H:i', strtotime($row['sample_tested_datetime']))) : null);
-
-
 
                             foreach ($row as $index => $value) {
                                 if ($index == 'status_id') {
@@ -798,5 +794,325 @@ class Covid19FormService
     {
         $sampleDb = $this->sm->get('Covid19FormTableWithoutCache');
         return $sampleDb->fetchKeySummaryIndicatorsDetails($params);
+    }
+    
+    /* Lab Dashboard Start */
+    public function getAllLabName()
+    {
+        $logincontainer = new Container('credo');
+        $mappedFacilities = null;
+        if ($logincontainer->role != 1) {
+            $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : null;
+        }
+        $facilityDb = $this->sm->get('FacilityTable');
+        return $facilityDb->fetchAllLabName($mappedFacilities);
+    }
+
+    //get all Lab Name
+    public function getAllClinicName()
+    {
+
+        $logincontainer = new Container('credo');
+        $mappedFacilities = null;
+        if ($logincontainer->role != 1) {
+            $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : null;
+        }
+
+        $facilityDb = $this->sm->get('FacilityTable');
+        return $facilityDb->fetchAllClinicName($mappedFacilities);
+    }
+    //get all province name
+    public function getAllProvinceList()
+    {
+
+        $logincontainer = new Container('credo');
+        $mappedFacilities = null;
+        if ($logincontainer->role != 1) {
+            $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : null;
+        }
+
+        $locationDb = $this->sm->get('LocationDetailsTable');
+        return $locationDb->fetchLocationDetails($mappedFacilities);
+    }
+    // get all distrcit name
+    public function getAllDistrictList()
+    {
+
+        $logincontainer = new Container('credo');
+        $mappedFacilities = null;
+        if ($logincontainer->role != 1) {
+            $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : null;
+        }
+        $locationDb = $this->sm->get('LocationDetailsTable');
+        return $locationDb->fetchAllDistrictsList();
+    }
+
+    public function getStats($params)
+    {
+        $sampleDb = $this->sm->get('Covid19FormTable');
+        return $sampleDb->getStats($params);
+    }
+
+    public function getMonthlySampleCount($params)
+    {
+        $sampleDb = $this->sm->get('Covid19FormTable');
+        return $sampleDb->getMonthlySampleCount($params);
+    }
+
+    //get all sample types
+    public function getSampleType()
+    {
+        $sampleDb = $this->sm->get('SampleTypeTable');
+        return $sampleDb->fetchAllSampleType();
+    }
+    public function getMonthlySampleCountByLabs($params)
+    {
+        $sampleDb = $this->sm->get('Covid19FormTableWithoutCache');
+        return $sampleDb->getMonthlySampleCountByLabs($params);
+    }
+
+    public function getLabTurnAroundTime($params)
+    {
+        $sampleDb = $this->sm->get('Covid19FormTableWithoutCache');
+        return $sampleDb->fetchLabTurnAroundTime($params);
+    }
+
+    public function getLabPerformance($params)
+    {
+        $sampleDb = $this->sm->get('Covid19FormTableWithoutCache');
+        return $sampleDb->fetchLabPerformance($params);
+    }
+
+    public function getCovid19OutcomesByAgeInLabsDetails($params)
+    {
+        $eidSampleDb = $this->sm->get('Covid19FormTableWithoutCache');
+        return $eidSampleDb->fetchCovid19OutcomesByAgeInLabsDetails($params);
+    }
+
+    public function getCovid19PositivityRateDetails($params)
+    {
+        $eidSampleDb = $this->sm->get('Covid19FormTableWithoutCache');
+        return $eidSampleDb->fetchCovid19PositivityRateDetails($params);
+    }
+
+    /* End of lab dashboard */
+
+    ////////////////////////////////////////
+    /////////*** Turnaround Time ***///////
+    ///////////////////////////////////////
+
+    public function getTATbyProvince($labs, $startDate, $endDate)
+    {
+        // set_time_limit(10000);
+        $result = array();
+        $sampleDb = $this->sm->get('Covid19FormTable');
+        $resultSet = $sampleDb->getTATbyProvince($labs, $startDate, $endDate);
+        foreach ($resultSet as $key) {
+            $result[] = array(
+                "facility"           => $key['location_name'],
+                "facility_id"        => $key['location_id'],
+                "category"           => 0,
+                "collect_receive"    => $key['Collection_Receive'],
+                "receive_register"   => $key['Receive_Register'],
+                "register_analysis"  => $key['Register_Analysis'],
+                "analysis_authorise" => $key['Analysis_Authorise'],
+                "total" => $key['total']
+            );
+        }
+        return $result;
+    }
+
+    public function getTATbyDistrict($labs, $startDate, $endDate)
+    {
+        // set_time_limit(10000);
+        $result = array();
+        $sampleDb = $this->sm->get('Covid19FormTable');
+        $resultSet = $sampleDb->getTATbyDistrict($labs, $startDate, $endDate);
+        foreach ($resultSet as $key) {
+            $result[] = array(
+                "facility"           => $key['location_name'],
+                "facility_id"        => $key['location_id'],
+                "category"           => 0,
+                "collect_receive"    => $key['Collection_Receive'],
+                "receive_register"   => $key['Receive_Register'],
+                "register_analysis"  => $key['Register_Analysis'],
+                "analysis_authorise" => $key['Analysis_Authorise'],
+                "total" => $key['total']
+            );
+        }
+        return $result;
+    }
+
+    public function getTATbyClinic($labs, $startDate, $endDate)
+    {
+        // set_time_limit(10000);
+        $result = array();
+        $time = array();
+        $sampleDb = $this->sm->get('Covid19FormTable');
+        $time = $sampleDb->getTATbyClinic($labs, $startDate, $endDate);
+        foreach ($resultSet as $key) {
+            $result[] = array(
+                "facility"           => $key['location_name'],
+                "facility_id"        => $key['location_id'],
+                "category"           => 0,
+                "collect_receive"    => $key['Collection_Receive'],
+                "receive_register"   => $key['Receive_Register'],
+                "register_analysis"  => $key['Register_Analysis'],
+                "analysis_authorise" => $key['Analysis_Authorise'],
+                "total" => $key['total']
+            );
+        }
+        return $result;
+    }
+
+    ////////////////////////////////////////
+    ////////*** Turnaround Time ***////////
+    ///////////////////////////////////////
+
+    //get all Hub Name
+    public function getAllHubName()
+    {
+        $facilityDb = $this->sm->get('FacilityTable');
+        return $facilityDb->fetchAllHubName();
+    }
+
+    public function getProvinceWiseResultAwaitedDrillDown($params)
+    {
+        $sampleDb = $this->sm->get('Covid19FormTable');
+        return $sampleDb->fetchProvinceWiseResultAwaitedDrillDown($params);
+    }
+
+    public function getLabWiseResultAwaitedDrillDown($params)
+    {
+        $sampleDb = $this->sm->get('Covid19FormTable');
+        return $sampleDb->fetchLabWiseResultAwaitedDrillDown($params);
+    }
+
+    public function getDistrictWiseResultAwaitedDrillDown($params)
+    {
+        $sampleDb = $this->sm->get('Covid19FormTable');
+        return $sampleDb->fetchDistrictWiseResultAwaitedDrillDown($params);
+    }
+
+    public function getClinicWiseResultAwaitedDrillDown($params)
+    {
+        $sampleDb = $this->sm->get('Covid19FormTableWithoutCache');
+        return $sampleDb->fetchClinicWiseResultAwaitedDrillDown($params);
+    }
+
+    public function getFilterSampleResultAwaitedDetails($parameters)
+    {
+        $sampleDb = $this->sm->get('Covid19FormTable');
+        return $sampleDb->fetchFilterSampleResultAwaitedDetails($parameters);
+    }
+
+    public function generateResultsAwaitedSampleExcel($params)
+    {
+        $queryContainer = new Container('query');
+        $translator = $this->sm->get('translator');
+        $common = new CommonService();
+        if (isset($queryContainer->resultsAwaitedQuery)) {
+            try {
+                $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
+                $sql = new Sql($dbAdapter);
+                $sQueryStr = $sql->buildSqlString($queryContainer->resultsAwaitedQuery);
+                $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+                if (isset($sResult) && count($sResult) > 0) {
+                    $excel = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+                    // $cacheMethod = \PhpOffice\PhpSpreadsheet\Collection\CellsFactory::cache_to_phpTemp;
+                    // $cacheSettings = array('memoryCacheSize' => '80MB');
+                    // \PhpOffice\PhpSpreadsheet\Settings::setCacheStorageMethod($cacheMethod, $cacheSettings);
+                    $sheet = $excel->getActiveSheet();
+                    $output = array();
+                    foreach ($sResult as $aRow) {
+                        $displayCollectionDate = $common->humanDateFormat($aRow['collectionDate']);
+                        $displayReceivedDate = $common->humanDateFormat($aRow['receivedDate']);
+                        $row = array();
+                        $row[] = $aRow['sample_code'];
+                        $row[] = $displayCollectionDate;
+                        $row[] = $aRow['facilityCode'] . ' - ' . ucwords($aRow['facilityName']);
+                        $row[] = (isset($aRow['sample_name'])) ? ucwords($aRow['sample_name']) : '';
+                        $row[] = ucwords($aRow['labName']);
+                        $row[] = $displayReceivedDate;
+                        $output[] = $row;
+                    }
+                    $styleArray = array(
+                        'font' => array(
+                            'bold' => true,
+                        ),
+                        'alignment' => array(
+                            'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                            'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+                        ),
+                        'borders' => array(
+                            'outline' => array(
+                                'style' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                            ),
+                        )
+                    );
+                    $borderStyle = array(
+                        'alignment' => array(
+                            'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT,
+                        ),
+                        'borders' => array(
+                            'outline' => array(
+                                'style' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                            ),
+                        )
+                    );
+
+                    $sheet->setCellValue('A1', html_entity_decode($translator->translate('Sample ID'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+                    $sheet->setCellValue('B1', html_entity_decode($translator->translate('Collection Date'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+                    $sheet->setCellValue('C1', html_entity_decode($translator->translate('Facility'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+                    $sheet->setCellValue('D1', html_entity_decode($translator->translate('Sample Type'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+                    $sheet->setCellValue('E1', html_entity_decode($translator->translate('Lab'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+                    $sheet->setCellValue('F1', html_entity_decode($translator->translate('Sample Received at Lab'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+
+                    $sheet->getStyle('A1')->applyFromArray($styleArray);
+                    $sheet->getStyle('B1')->applyFromArray($styleArray);
+                    $sheet->getStyle('C1')->applyFromArray($styleArray);
+                    $sheet->getStyle('D1')->applyFromArray($styleArray);
+                    $sheet->getStyle('E1')->applyFromArray($styleArray);
+                    $sheet->getStyle('F1')->applyFromArray($styleArray);
+
+                    $currentRow = 2;
+                    foreach ($output as $rowData) {
+                        $colNo = 0;
+                        foreach ($rowData as $field => $value) {
+                            if (!isset($value)) {
+                                $value = "";
+                            }
+                            if ($colNo > 5) {
+                                break;
+                            }
+                            if (is_numeric($value)) {
+                                $sheet->getCellByColumnAndRow($colNo, $currentRow)->setValueExplicit(html_entity_decode($value, ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_NUMERIC);
+                            } else {
+                                $sheet->getCellByColumnAndRow($colNo, $currentRow)->setValueExplicit(html_entity_decode($value, ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+                            }
+                            $cellName = $sheet->getCellByColumnAndRow($colNo, $currentRow)->getColumn();
+                            $sheet->getStyle($cellName . $currentRow)->applyFromArray($borderStyle);
+                            $sheet->getDefaultRowDimension()->setRowHeight(20);
+                            $sheet->getColumnDimensionByColumn($colNo)->setWidth(20);
+                            $sheet->getStyleByColumnAndRow($colNo, $currentRow)->getAlignment()->setWrapText(true);
+                            $colNo++;
+                        }
+                        $currentRow++;
+                    }
+                    $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($excel, 'Xlsx');
+                    $filename = 'RESULTS-AWAITED--' . date('d-M-Y-H-i-s') . '.xlsx';
+                    $writer->save(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . $filename);
+                    return $filename;
+                } else {
+                    return "";
+                }
+            } catch (Exception $exc) {
+                error_log("RESULTS-AWAITED--" . $exc->getMessage());
+                error_log($exc->getTraceAsString());
+                return "";
+            }
+        } else {
+            return "";
+        }
     }
 }

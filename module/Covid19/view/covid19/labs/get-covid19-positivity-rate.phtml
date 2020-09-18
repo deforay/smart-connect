@@ -1,0 +1,87 @@
+<?php 
+// \Zend\Debug\Debug::dump($result['result']);die;
+if(count($result) > 0){
+    /* To get the month from the filter result */
+    foreach($result['month'] as $key=>$val){
+        $month[] = "'".$key."'";
+        $monthList[] = $key;
+    }
+
+    /* To print the data and facility */
+    $print = "";
+    foreach($result['result'] as $row){
+        $facility[$row['facility_name']][$row['monthYear']] = $row['positive_rate'];
+    }
+    // \Zend\Debug\Debug::dump($facility);die;
+    foreach($facility as $key=>$row){
+        $print.='{
+            "name" : "'.$key.'",
+            "data" : [';
+            foreach($monthList as $m){
+                if(isset($row[$m]) && !empty($row[$m]) && $row[$m] != null){
+                    $print.= $row[$m].",";
+                } else{
+                    $print.= "0.00,";
+                }
+            }
+            $print.=']
+        },';
+    }
+    ?>
+    <div id=positivityRate >
+
+    </div>
+
+    <script type="text/javascript">
+
+    
+        $("#positivityRate").highcharts({
+            title: {
+                text: "",
+                x: -20 //center
+            },
+            legend: {
+                enabled: true,
+                floating: true,
+                verticalAlign: 'bottom',
+                align:'center',           
+            },
+            xAxis: {
+                plotLines : [{
+                    label: {
+                        text: 'Plot line',
+                        verticalAlign: 'bottom',
+                        textAlign: 'right',
+                        y: -10
+                    }
+                }],
+                categories: [<?php echo implode(",",$month);?>]
+            },
+            yAxis: {
+                title: {
+                    text: "Positivity (%)"
+                },
+                plotLines: [{
+                    value: 0,
+                    width: 1,
+                    color: '#808080'
+                }]
+            },
+            tooltip: {
+                valueSuffix: "%",
+
+            },
+            credits: {
+                enabled: false
+            },
+            legend: {
+                layout: 'vertical',
+                align: 'right',
+                verticalAlign: 'bottom',
+                floating: false,
+                borderWidth: 0
+            },
+            series: [<?php echo $print;?>]
+        });
+    </script>
+<?php } ?>

@@ -2300,8 +2300,6 @@ class EidSampleTable extends AbstractTableGateway
         return array('quickStats' => $quickStats, 'scResult' => $receivedResult, 'stResult' => $tResult, 'srResult' => $rejectedResult);
     }
 
-
-
     public function getMonthlySampleCount($params)
     {
 
@@ -2369,7 +2367,6 @@ class EidSampleTable extends AbstractTableGateway
         }
         return $result;
     }
-
 
     public function getMonthlySampleCountByLabs($params)
     {
@@ -2531,7 +2528,6 @@ class EidSampleTable extends AbstractTableGateway
         return $result;
     }
 
-
     public function fetchLabPerformance($params)
     {
         $logincontainer = new Container('credo');
@@ -2593,15 +2589,6 @@ class EidSampleTable extends AbstractTableGateway
             // echo $queryStr;
             // die;
             $result = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-
-            // $j = 0;
-            // foreach ($testResult as $data) {
-
-            //     $result['sampleName']['Positive'][$j] = !empty($data['positive']) ? $data['positive'] : 0;
-            //     $result['sampleName']['Negative'][$j] = !empty($data['negative']) ? $data['negative'] : 0;
-            //     $result['lab'][$j] = $data['lab_name'];
-            //     $j++;
-            // }
         }
 
         return $result;
