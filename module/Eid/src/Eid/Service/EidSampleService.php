@@ -24,7 +24,7 @@ class EidSampleService
     //get all sample types
     public function getSampleType()
     {
-        $sampleDb = $this->sm->get('SampleTypeTable');
+        $sampleDb = $this->sm->get('EidSampleTypeTable');
         return $sampleDb->fetchAllSampleType();
     }
 

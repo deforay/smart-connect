@@ -101,7 +101,7 @@ if (isset($result['sampleName']) && count($result['sampleName']) > 0) {
                     point: {
                         events: {
                             click: function(e) {
-                                url = "/eid/labs/samples-tested-lab?";
+                                url = "/covid19/labs/samples-tested-lab?";
                                 fromMonth = $(".mrp-lowerMonth").html();
                                 if(fromMonth != undefined){
                                     fromMonth = fromMonth.replace(" ", "-");
@@ -125,7 +125,7 @@ if (isset($result['sampleName']) && count($result['sampleName']) > 0) {
                             name: '<?php echo $this->translate($key); ?>',
                             data: [<?php
                                     foreach ($condition as $count) {
-                                        echo '{y:' . $count . ',url:"/eid/labs/samples-tested-lab?"},';
+                                        echo '{y:' . $count . ',url:"/covid19/labs/samples-tested-lab?"},';
                                     }
                                     ?>],
                             <?php if (strpos($key, 'Positive') !== false) { ?>

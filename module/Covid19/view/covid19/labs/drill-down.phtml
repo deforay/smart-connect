@@ -56,7 +56,7 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
         <ul class="page-breadcrumb pull-right">
             <li>
                 <i class="fa fa-arrow-left"></i>
-                <a href="/eid/labs/dashboard"><?php echo $this->translate('Back to Labs Dashboard'); ?></a>
+                <a href="/covid19/labs/dashboard"><?php echo $this->translate('Back to Labs Dashboard'); ?></a>
             </li>
         </ul>
         </h1>
@@ -186,7 +186,7 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
             <div id="piecontainer" style="min-width: 310px; height: 600px; max-width: 100%; margin: 0 auto;padding:1.5%;"></div>
         </div>
         <div class="col-lg-6">
-            <div id="vlSuppressedNotsuppressedPieContainer" style="min-width: 310px; height: 600px; max-width: 100%; margin: 0 auto;padding:1.5%;"></div>
+            <div id="covdi19OutcomePieContainer" style="min-width: 310px; height: 600px; max-width: 100%; margin: 0 auto;padding:1.5%;"></div>
         </div>
     </div>
     <div class="row" style="margin-bottom:30px;">
@@ -243,7 +243,6 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
         var districts = ($("#districts").val() == null)?'':$("#districts").val().join(',');
         var lab = ($("#labName").val() == null)?'':$("#labName").val().join(',');
         var clinicId = ($("#clinicId").val() == null)?'':$("#clinicId").val().join(',');
-        var currentRegimen = $("#currentRegimen").val();
         var adherence = $("#adherence").val();
         var age = ($("#age").val() == null)?'':$("#age").val().join(',');
         var testResult = $("#testResult").val();
@@ -252,20 +251,19 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
         var isPregnant = $("#isPregnant").val();
         var isBreastfeeding = $("#isBreastfeeding").val();
         var lineOfTreatment = $("#lineOfTreatment").val();
-        $.post("<?php echo $this->url('covid19-labs', array('action' => 'get-sample-details')); ?>",{fromDate:fromDate,toDate:toDate,provinces:provinces,districts:districts,lab:lab,clinicId:clinicId,currentRegimen:currentRegimen,adherence:adherence,age:age,testResult:testResult,sampleType:sampleType,gender:gender,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding,lineOfTreatment:lineOfTreatment},
+        $.post("<?php echo $this->url('covid19-labs', array('action' => 'get-sample-details')); ?>",{fromDate:fromDate,toDate:toDate,provinces:provinces,districts:districts,lab:lab,clinicId:clinicId,adherence:adherence,age:age,testResult:testResult,sampleType:sampleType,gender:gender,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding,lineOfTreatment:lineOfTreatment},
         function(data) {
             $("#piecontainer").html(data);
         });
     }
     
-    function generateVlOutComePiechart(){
+    function generateCovdi19OutcomePiechart(){
         var fromDate = $('#mrp-lowerDate').val();
         var toDate = $('#mrp-upperDate').val();
         var provinces = ($("#provinces").val() == null)?'':$("#provinces").val().join(',');
         var districts = ($("#districts").val() == null)?'':$("#districts").val().join(',');
         var lab = ($("#labName").val() == null)?'':$("#labName").val().join(',');
         var clinicId = ($("#clinicId").val() == null)?'':$("#clinicId").val().join(',');
-        var currentRegimen = $("#currentRegimen").val();
         var adherence = $("#adherence").val();
         var age = ($("#age").val() == null)?'':$("#age").val().join(',');
         var testResult = $("#testResult").val();
@@ -274,9 +272,9 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
         var isPregnant = $("#isPregnant").val();
         var isBreastfeeding = $("#isBreastfeeding").val();
         var lineOfTreatment = $("#lineOfTreatment").val();
-        $.post("<?php echo $this->url('covid19-labs', array('action' => 'get-vl-out-comes')); ?>",{fromDate:fromDate,toDate:toDate,provinces:provinces,districts:districts,lab:lab,clinicId:clinicId,currentRegimen:currentRegimen,adherence:adherence,age:age,testResult:testResult,sampleType:sampleType,gender:gender,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding,lineOfTreatment:lineOfTreatment},
+        $.post("<?php echo $this->url('covid19-labs', array('action' => 'get-covid19-out-comes')); ?>",{fromDate:fromDate,toDate:toDate,provinces:provinces,districts:districts,lab:lab,clinicId:clinicId,adherence:adherence,age:age,testResult:testResult,sampleType:sampleType,gender:gender,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding,lineOfTreatment:lineOfTreatment},
         function(data) {
-            $("#vlSuppressedNotsuppressedPieContainer").html(data);
+            $("#covdi19OutcomePieContainer").html(data);
         });
     }
     
@@ -289,7 +287,6 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
         var districts = ($("#districts").val() == null)?'':$("#districts").val().join(',');
         var lab = ($("#labName").val() == null)?'':$("#labName").val().join(',');
         var clinicId = ($("#clinicId").val() == null)?'':$("#clinicId").val().join(',');
-        var currentRegimen = $("#currentRegimen").val();
         var adherence = $("#adherence").val();
         var age = ($("#age").val() == null)?'':$("#age").val().join(',');
         var testResult = $("#testResult").val();
@@ -298,7 +295,7 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
         var isPregnant = $("#isPregnant").val();
         var isBreastfeeding = $("#isBreastfeeding").val();
         var lineOfTreatment = $("#lineOfTreatment").val();
-        $.post("<?php echo $this->url('covid19-labs', array('action' => 'get-bar-sample-details')); ?>",{fromDate:fromDate,toDate:toDate,provinces:provinces,districts:districts,lab:lab,clinicId:clinicId,currentRegimen:currentRegimen,adherence:adherence,age:age,testResult:testResult,sampleType:sampleType,gender:gender,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding,lineOfTreatment:lineOfTreatment},
+        $.post("<?php echo $this->url('covid19-labs', array('action' => 'get-bar-sample-details')); ?>",{fromDate:fromDate,toDate:toDate,provinces:provinces,districts:districts,lab:lab,clinicId:clinicId,adherence:adherence,age:age,testResult:testResult,sampleType:sampleType,gender:gender,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding,lineOfTreatment:lineOfTreatment},
         function(data) {
             $("#barcontainer").html(data);
         });
@@ -338,7 +335,7 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
             });
         });
         generatePieContainer();
-        generateVlOutComePiechart();
+        generateCovdi19OutcomePiechart();
         generateBarContainer();
         loadSampleDataTable();
     });
@@ -346,7 +343,7 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
     
     function searchSampleTestedResult(){
         generatePieContainer();
-        generateVlOutComePiechart();
+        generateCovdi19OutcomePiechart();
         generateBarContainer();
         oTable.fnDraw();
     }

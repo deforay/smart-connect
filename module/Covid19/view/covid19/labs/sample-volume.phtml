@@ -140,19 +140,6 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
                                         <?php } } ?>
                                     </select>
                                 </div>
-                                <div class="form-group col-lg-4">
-                                    <label class="control-label"><?php echo $this->translate('Current Regimen'); ?></label>
-                                    <select class="form-control" id="currentRegimen" name="currentRegimen">
-                                        <option value=""><?php echo $this->translate('All'); ?></option>
-                                        <?php
-                                        foreach($currentRegimen as $regimen){
-                                        ?>
-                                          <option value="<?php echo base64_encode($regimen['art_code']);?>"><?php echo $regimen['art_code'];?></option>
-                                        <?php
-                                        }
-                                        ?>
-                                    </select>
-                                </div>
                             </div>                                
                             <div class="col-md-12">
                                 <div class="form-group col-lg-4">
@@ -296,7 +283,6 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
         var districts = ($("#districts").val() == null)?'':$("#districts").val().join(',');
         var lab = ($("#labName").val() == null)?'':$("#labName").val().join(',');
         var clinicId = ($("#clinicId").val() == null)?'':$("#clinicId").val().join(',');
-        var currentRegimen = $("#currentRegimen").val();
         var adherence = $("#adherence").val();
         var age = ($("#age").val() == null)?'':$("#age").val().join(',');
         var sampleType = $("#sampleType").val();
@@ -304,7 +290,7 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
         var gender = $("#gender").val();
         var isPregnant = $("#isPregnant").val();
         var isBreastfeeding = $("#isBreastfeeding").val();
-        $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-details')); ?>",{fromDate:fromDate,toDate:toDate,provinces:provinces,districts:districts,lab:lab,clinicId:clinicId,currentRegimen:currentRegimen,adherence:adherence,age:age,sampleType:sampleType,sampleStatus:sampleStatus,gender:gender,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding,fromSrc:'sampleVolume'},
+        $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-details')); ?>",{fromDate:fromDate,toDate:toDate,provinces:provinces,districts:districts,lab:lab,clinicId:clinicId,adherence:adherence,age:age,sampleType:sampleType,sampleStatus:sampleStatus,gender:gender,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding,fromSrc:'sampleVolume'},
         function(data) {
             $("#piecontainer").html(data);
         });
@@ -319,7 +305,6 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
         var districts = ($("#districts").val() == null)?'':$("#districts").val().join(',');
         var lab = ($("#labName").val() == null)?'':$("#labName").val().join(',');
         var clinicId = ($("#clinicId").val() == null)?'':$("#clinicId").val().join(',');
-        var currentRegimen = $("#currentRegimen").val();
         var adherence = $("#adherence").val();
         var age = ($("#age").val() == null)?'':$("#age").val().join(',');
         var sampleType = $("#sampleType").val();
@@ -327,7 +312,7 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
         var gender = $("#gender").val();
         var isPregnant = $("#isPregnant").val();
         var isBreastfeeding = $("#isBreastfeeding").val();
-        $.post("<?php echo $this->url('laboratory', array('action' => 'get-bar-sample-details')); ?>",{fromDate:fromDate,toDate:toDate,provinces:provinces,districts:districts,lab:lab,clinicId:clinicId,currentRegimen:currentRegimen,adherence:adherence,age:age,sampleType:sampleType,sampleStatus:sampleStatus,gender:gender,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding,fromSrc:'sampleVolume'},
+        $.post("<?php echo $this->url('laboratory', array('action' => 'get-bar-sample-details')); ?>",{fromDate:fromDate,toDate:toDate,provinces:provinces,districts:districts,lab:lab,clinicId:clinicId,adherence:adherence,age:age,sampleType:sampleType,sampleStatus:sampleStatus,gender:gender,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding,fromSrc:'sampleVolume'},
         function(data) {
             $("#barcontainer").html(data);
         });

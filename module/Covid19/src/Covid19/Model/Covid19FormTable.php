@@ -675,7 +675,8 @@ class Covid19FormTable extends AbstractTableGateway
                     "monthyear" => new Expression("DATE_FORMAT(sample_collection_date, '%b %y')"),
                     "total_samples_tested" => new Expression("(SUM(CASE WHEN (covid19.result IS NOT NULL AND covid19.result != '' AND covid19.result != 'NULL') THEN 1 ELSE 0 END))"),
                     "total_samples_rejected" => new Expression("(SUM(CASE WHEN (reason_for_sample_rejection !='' AND reason_for_sample_rejection !='0' AND reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END))"),
-                    "total_positive_samples" => new Expression("SUM(CASE WHEN ((covid19.result like 'positive' OR covid19.result like 'Positive' )) THEN 1 ELSE 0 END)")
+                    "total_positive_samples" => new Expression("SUM(CASE WHEN ((covid19.result like 'positive' OR covid19.result like 'Positive' )) THEN 1 ELSE 0 END)"),
+                    "positive_rate" => new Expression("ROUND(((SUM(CASE WHEN ((covid19.result like 'positive' OR covid19.result like 'Positive' )) THEN 1 ELSE 0 END))/(SUM(CASE WHEN (((covid19.result IS NOT NULL AND covid19.result != '' AND covid19.result != 'NULL'))) THEN 1 ELSE 0 END)))*100,2)")
                 )
             )
 
@@ -703,7 +704,7 @@ class Covid19FormTable extends AbstractTableGateway
                                         AND DATE(sample_collection_date) <= '" . $endMonth . "'");
         }
         $queryStr = $sql->buildSqlString($sQuery);
-        //echo $queryStr;die;
+        // echo $queryStr;die;
         //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $sampleResult = $common->cacheQuery($queryStr, $dbAdapter);
         $j = 0;
@@ -2620,9 +2621,6 @@ class Covid19FormTable extends AbstractTableGateway
             $endMonth = date('Y-m-t',strtotime(str_replace(' ', '-', $params['toDate'])));
             
             $monthList = $common->getMonthsInRange($startMonth, $endMonth);
-            /* foreach($monthList as $key=>$list){
-                $searchVal[$key] =  new Expression("AVG(CASE WHEN (covid19.result like 'positive%' AND covid19.result not like '' AND sample_collection_date LIKE '%".$list."%') THEN 1 ELSE 0 END)");
-            } */
             $sQuery = $sql->select()->from(array('covid19' => 'dash_covid19_form'))->columns(array(
                 'monthYear' => new Expression("DATE_FORMAT(sample_collection_date, '%b-%Y')"),
                 'positive_rate' => new Expression("ROUND(((SUM(CASE WHEN ((covid19.result like 'positive' OR covid19.result like 'Positive' )) THEN 1 ELSE 0 END))/(SUM(CASE WHEN (((covid19.result IS NOT NULL AND covid19.result != '' AND covid19.result != 'NULL'))) THEN 1 ELSE 0 END)))*100,2)")
@@ -3472,5 +3470,1002 @@ class Covid19FormTable extends AbstractTableGateway
             $output['aaData'][] = $row;
         }
         return $output;
+    }
+
+    public function getMonthsByQuarter($quarter)
+    {
+        switch ($quarter) {
+            case 1:
+                return array('01', '02', '03');
+            case 2:
+                return array('04', '05', '06');
+            case 3:
+                return array('07', '08', '09');
+            case 4:
+                return array(10, 11, 12);
+        }
+    }
+
+    public function fetchSampleDetails($params)
+    {
+        $logincontainer = new Container('credo');
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $result = array();
+        $common = new CommonService($this->sm);
+        if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
+            $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
+            $endMonth = str_replace(' ', '-', $params['toDate']) . "-31";
+            $facilityQuery = $sql->select()->from(array('f' => 'facility_details'))
+                ->where(array('f.facility_type' => 2));
+            if (isset($params['lab']) && trim($params['lab']) != '') {
+                $facilityQuery = $facilityQuery->where('f.facility_id IN (' . $params['lab'] . ')');
+            } else {
+                if ($logincontainer->role != 1) {
+                    $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : array(0);
+                    $facilityQuery = $facilityQuery->where('f.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
+                }
+            }
+            $facilityQueryStr = $sql->buildSqlString($facilityQuery);
+            $facilityResult = $dbAdapter->query($facilityQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+            if (isset($facilityResult) && count($facilityResult) > 0) {
+
+                $facilityIdList = array_column($facilityResult, 'facility_id');
+
+                $countQuery = $sql->select()->from(array('covid19' => $this->table))->columns(array('total' => new Expression('COUNT(*)')))
+                    ->join(array('f' => 'facility_details'), 'f.facility_id=covid19.lab_id', array('facility_name', 'facility_code'))
+                    ->where('covid19.lab_id IN ("' . implode('", "', $facilityIdList) . '")')
+                    ->group('covid19.lab_id');
+
+                /* if (!isset($params['fromSrc'])) {
+                    $countQuery = $countQuery->where('(covid19.is_sample_rejected IS NOT NULL AND covid19.is_sample_rejected!= "")');
+                } */
+                if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
+                    $countQuery = $countQuery->where(array("covid19.sample_collection_date >='" . $startMonth . " 00:00:00" . "'", "covid19.sample_collection_date <='" . $endMonth . " 23:59:59" . "'"));
+                }
+                if (isset($params['provinces']) && trim($params['provinces']) != '') {
+                    $countQuery = $countQuery->where('f.facility_state IN (' . $params['provinces'] . ')');
+                }
+                if (isset($params['districts']) && trim($params['districts']) != '') {
+                    $countQuery = $countQuery->where('f.facility_district IN (' . $params['districts'] . ')');
+                }
+                if (isset($params['clinicId']) && trim($params['clinicId']) != '') {
+                    $countQuery = $countQuery->where('covid19.facility_id IN (' . $params['clinicId'] . ')');
+                }
+                
+                
+                //print_r($params['age']);die;
+                if (isset($params['age']) && trim($params['age']) != '') {
+                    $age = explode(',', $params['age']);
+                    $where = '';
+                    for ($a = 0; $a < count($age); $a++) {
+                        if (trim($where) != '') {
+                            $where .= ' OR ';
+                        }
+                        if ($age[$a] == '<2') {
+                            $where .= "(covid19.patient_age > 0 AND covid19.patient_age < 2)";
+                        } else if ($age[$a] == '2to5') {
+                            $where .= "(covid19.patient_age >= 2 AND covid19.patient_age <= 5)";
+                        } else if ($age[$a] == '6to14') {
+                            $where .= "(covid19.patient_age >= 6 AND covid19.patient_age <= 14)";
+                        } else if ($age[$a] == '15to49') {
+                            $where .= "(covid19.patient_age >= 15 AND covid19.patient_age <= 49)";
+                        } else if ($age[$a] == '>=50') {
+                            $where .= "(covid19.patient_age >= 50)";
+                        } else if ($age[$a] == 'unknown') {
+                            $where .= "(covid19.patient_age IS NULL OR covid19.patient_age = '' OR covid19.patient_age = 'Unknown' OR covid19.patient_age = 'unknown')";
+                        }
+                    }
+                    $where = '(' . $where . ')';
+                    $countQuery = $countQuery->where($where);
+                }
+                
+                if (isset($params['gender']) && $params['gender'] == 'F') {
+                    $countQuery = $countQuery->where("covid19.patient_gender IN ('f','female','F','FEMALE')");
+                } else if (isset($params['gender']) && $params['gender'] == 'M') {
+                    $countQuery = $countQuery->where("covid19.patient_gender IN ('m','male','M','MALE')");
+                } else if (isset($params['gender']) && $params['gender'] == 'not_specified') {
+                    $countQuery = $countQuery->where("(covid19.patient_gender IS NULL OR covid19.patient_gender = '' OR covid19.patient_gender ='Not Recorded' OR covid19.patient_gender = 'not recorded')");
+                }
+                
+                
+                
+                $cQueryStr = $sql->buildSqlString($countQuery);
+                // echo $cQueryStr;die;
+                $countResult = $dbAdapter->query($cQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+                $i = 0;
+                foreach ($countResult as $data) {
+                    $result[$i][0] = $data['total'];
+                    $result[$i][1] = ucwords($data['facility_name']);
+                    $result[$i][2] = $data['facility_code'];
+                    $i++;
+                }
+            }
+        }
+        return $result;
+    }
+
+    public function fetchBarSampleDetails($params)
+    {
+        $logincontainer = new Container('credo');
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $result = array();
+        $common = new CommonService($this->sm);
+        if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
+            $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
+            $endMonth = str_replace(' ', '-', $params['toDate']) . "-31";
+            $fQuery = $sql->select()->from(array('f' => 'facility_details'))
+                ->where(array('f.facility_type' => 2));
+            if (isset($params['lab']) && trim($params['lab']) != '') {
+                $fQuery = $fQuery->where('f.facility_id IN (' . $params['lab'] . ')');
+            } else {
+                if ($logincontainer->role != 1) {
+                    $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : array(0);
+                    $fQuery = $fQuery->where('f.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
+                }
+            }
+            $fQueryStr = $sql->buildSqlString($fQuery);
+            $facilityResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+            if (isset($facilityResult) && count($facilityResult) > 0) {
+
+                $facilityIdList = array_column($facilityResult, 'facility_id');
+
+                $countQuery = $sql->select()->from(array('covid19' => $this->table))
+                    ->columns(
+                        array(
+                            'total' => new Expression('COUNT(*)'),
+                            "positive" => new Expression("SUM(CASE WHEN ((covid19.result like 'positive%' OR covid19.is_sample_rejected like 'Positive%') AND covid19.result not like '') THEN 1 ELSE 0 END)"),
+                            "negative" => new Expression("SUM(CASE WHEN ((covid19.result like 'negative%' OR covid19.is_sample_rejected like 'Negative%') AND covid19.result not like '') THEN 1 ELSE 0 END)"),
+                            "rejected" => new Expression("SUM(CASE WHEN ((covid19.reason_for_sample_rejection IS NOT NULL AND covid19.reason_for_sample_rejection != '' AND covid19.reason_for_sample_rejection != 0)) THEN 1 ELSE 0 END)"),
+                        )
+                    )
+                    ->join(array('f' => 'facility_details'), 'f.facility_id=covid19.lab_id', array('facility_name'))
+                    ->where('covid19.lab_id IN ("' . implode('", "', $facilityIdList) . '")')
+                    ->group('covid19.lab_id');
+
+                if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
+                    $countQuery = $countQuery->where(array("covid19.sample_collection_date >='" . $startMonth . " 00:00:00" . "'", "covid19.sample_collection_date <='" . $endMonth . " 23:59:59" . "'"));
+                }
+                if (isset($params['provinces']) && trim($params['provinces']) != '') {
+                    $countQuery = $countQuery->where('f.facility_state IN (' . $params['provinces'] . ')');
+                }
+                if (isset($params['districts']) && trim($params['districts']) != '') {
+                    $countQuery = $countQuery->where('f.facility_district IN (' . $params['districts'] . ')');
+                }
+                if (isset($params['clinicId']) && trim($params['clinicId']) != '') {
+                    $countQuery = $countQuery->where('covid19.facility_id IN (' . $params['clinicId'] . ')');
+                }
+                
+                
+                //print_r($params['age']);die;
+                if (isset($params['age']) && trim($params['age']) != '') {
+                    $age = explode(',', $params['age']);
+                    $where = '';
+                    for ($a = 0; $a < count($age); $a++) {
+                        if (trim($where) != '') {
+                            $where .= ' OR ';
+                        }
+                        if ($age[$a] == '<2') {
+                            $where .= "(covid19.patient_age > 0 AND covid19.patient_age < 2)";
+                        } else if ($age[$a] == '2to5') {
+                            $where .= "(covid19.patient_age >= 2 AND covid19.patient_age <= 5)";
+                        } else if ($age[$a] == '6to14') {
+                            $where .= "(covid19.patient_age >= 6 AND covid19.patient_age <= 14)";
+                        } else if ($age[$a] == '15to49') {
+                            $where .= "(covid19.patient_age >= 15 AND covid19.patient_age <= 49)";
+                        } else if ($age[$a] == '>=50') {
+                            $where .= "(covid19.patient_age >= 50)";
+                        } else if ($age[$a] == 'unknown') {
+                            $where .= "(covid19.patient_age IS NULL OR covid19.patient_age = '' OR covid19.patient_age = 'Unknown' OR covid19.patient_age = 'unknown')";
+                        }
+                    }
+                    $where = '(' . $where . ')';
+                    $countQuery = $countQuery->where($where);
+                }
+               
+                if (isset($params['gender']) && $params['gender'] == 'F') {
+                    $countQuery = $countQuery->where("covid19.patient_gender IN ('f','female','F','FEMALE')");
+                } else if (isset($params['gender']) && $params['gender'] == 'M') {
+                    $countQuery = $countQuery->where("covid19.patient_gender IN ('m','male','M','MALE')");
+                } else if (isset($params['gender']) && $params['gender'] == 'not_specified') {
+                    $countQuery = $countQuery->where("(covid19.patient_gender IS NULL OR covid19.patient_gender = '' OR covid19.patient_gender ='Not Recorded' OR covid19.patient_gender = 'not recorded')");
+                }
+                
+                $cQueryStr = $sql->buildSqlString($countQuery);
+                // echo $cQueryStr;die;
+                $barChartResult = $dbAdapter->query($cQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+
+                $j = 0;
+                foreach ($barChartResult as $data) {
+                    $result['sample']['Positive'][$j] = $data['positive'];
+                    $result['sample']['Negative'][$j] = $data['negative'];
+                    $result['sample']['Rejected'][$j] = $data['rejected'];
+                    $result['lab'][$j] = ucwords($data['facility_name']);
+                    $j++;
+                }
+            }
+        }
+        return $result;
+    }
+
+    public function fetchLabBarSampleDetails($params)
+    {
+        $logincontainer = new Container('credo');
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $result = array();
+        $common = new CommonService($this->sm);
+        if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
+            $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
+            $endMonth = str_replace(' ', '-', $params['toDate']) . "-31";
+
+            $sQuery = $sql->select()->from(array('covid19' => $this->table))
+                ->columns(
+                    array(
+                        'samples' => new Expression('COUNT(*)'),
+                        "monthDate" => new Expression("DATE_FORMAT(DATE(sample_collection_date), '%b-%Y')"),
+                        "positive" => new Expression("SUM(CASE WHEN (((covid19.result = 'positive' or covid19.result = 'Positive' or covid19.result not like '') AND covid19.result IS NOT NULL AND covid19.result!= '' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) THEN 1 ELSE 0 END)"),
+                        "negative" => new Expression("SUM(CASE WHEN (( covid19.result IS NOT NULL AND covid19.result!= '' AND covid19.result ='negative' AND covid19.result ='Negative' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) THEN 1 ELSE 0 END)"),
+                    )
+                )
+                ->join(array('f' => 'facility_details'), 'f.facility_id=covid19.lab_id', array(), 'left')
+                //->where("Month(sample_collection_date)='".$month."' AND Year(sample_collection_date)='".$year."'")
+            ;
+
+            $sQuery = $sQuery->where(
+                "
+                                        (sample_collection_date is not null AND sample_collection_date != '')
+                                        AND DATE(sample_collection_date) >= '" . $startMonth . "' 
+                                        AND DATE(sample_collection_date) <= '" . $endMonth . "'"
+            );
+
+            if (isset($params['lab']) && trim($params['lab']) != '') {
+                $sQuery = $sQuery->where('covid19.lab_id IN (' . $params['lab'] . ')');
+            } else {
+                if ($logincontainer->role != 1) {
+                    $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : array(0);
+                    $sQuery = $sQuery->where('covid19.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
+                }
+            }
+            if (isset($params['provinces']) && trim($params['provinces']) != '') {
+                $sQuery = $sQuery->where('f.facility_state IN (' . $params['provinces'] . ')');
+            }
+            if (isset($params['districts']) && trim($params['districts']) != '') {
+                $sQuery = $sQuery->where('f.facility_district IN (' . $params['districts'] . ')');
+            }
+            if (isset($params['clinicId']) && trim($params['clinicId']) != '') {
+                $sQuery = $sQuery->where('covid19.facility_id IN (' . $params['clinicId'] . ')');
+            }
+            
+            
+            //print_r($params['age']);die;
+            if (isset($params['age']) && trim($params['age']) != '') {
+                $age = explode(',', $params['age']);
+                $where = '';
+                for ($a = 0; $a < count($age); $a++) {
+                    if (trim($where) != '') {
+                        $where .= ' OR ';
+                    }
+                    if ($age[$a] == '<2') {
+                        $where .= "(covid19.patient_age > 0 AND covid19.patient_age < 2)";
+                    } else if ($age[$a] == '2to5') {
+                        $where .= "(covid19.patient_age >= 2 AND covid19.patient_age <= 5)";
+                    } else if ($age[$a] == '6to14') {
+                        $where .= "(covid19.patient_age >= 6 AND covid19.patient_age <= 14)";
+                    } else if ($age[$a] == '15to49') {
+                        $where .= "(covid19.patient_age >= 15 AND covid19.patient_age <= 49)";
+                    } else if ($age[$a] == '>=50') {
+                        $where .= "(covid19.patient_age >= 50)";
+                    } else if ($age[$a] == 'unknown') {
+                        $where .= "(covid19.patient_age IS NULL OR covid19.patient_age = '' OR covid19.patient_age = 'Unknown' OR covid19.patient_age = 'unknown')";
+                    }
+                }
+                $where = '(' . $where . ')';
+                $sQuery = $sQuery->where($where);
+            }
+            if (isset($params['testResult']) && $params['testResult'] == '<1000') {
+                $sQuery = $sQuery->where("(covid19.result < 1000 or covid19.result = 'Target Not Detected' or covid19.result = 'TND' or covid19.result = 'tnd' or covid19.result= 'Below Detection Level' or covid19.result='BDL' or covid19.result='bdl' or covid19.result= 'Low Detection Level' or covid19.result='LDL' or covid19.result='ldl') AND covid19.result IS NOT NULL AND covid19.result!= '' AND covid19.result!='Failed' AND covid19.result!='failed' AND covid19.result!='Fail' AND covid19.result!='fail' AND covid19.result!='No Sample' AND covid19.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00'");
+            } else if (isset($params['testResult']) && $params['testResult'] == '>=1000') {
+                $sQuery = $sQuery->where("covid19.result IS NOT NULL AND covid19.result!= '' AND covid19.result >= 1000 AND covid19.result!='Failed' AND covid19.result!='failed' AND covid19.result!='Fail' AND covid19.result!='fail' AND covid19.result!='No Sample' AND covid19.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00'");
+            }
+            if (isset($params['sampleType']) && trim($params['sampleType']) != '') {
+                $sQuery = $sQuery->where('covid19.specimen_type="' . base64_decode(trim($params['sampleType'])) . '"');
+            }
+            if (isset($params['gender']) && $params['gender'] == 'F') {
+                $sQuery = $sQuery->where("covid19.patient_gender IN ('f','female','F','FEMALE')");
+            } else if (isset($params['gender']) && $params['gender'] == 'M') {
+                $sQuery = $sQuery->where("covid19.patient_gender IN ('m','male','M','MALE')");
+            } else if (isset($params['gender']) && $params['gender'] == 'not_specified') {
+                $sQuery = $sQuery->where("(covid19.patient_gender IS NULL OR covid19.patient_gender = '' OR covid19.patient_gender ='Not Recorded' OR covid19.patient_gender = 'not recorded')");
+            }
+            
+            
+            $sQuery = $sQuery->group(array(new Expression('MONTH(sample_collection_date)')));
+            $sQuery = $sQuery->order(array(new Expression('DATE(sample_collection_date)')));
+            $sQueryStr = $sql->buildSqlString($sQuery);
+            // echo $sQueryStr;die;
+            $barChartResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+
+            $j = 0;
+            foreach ($barChartResult as $data) {
+                $result['rslt']['POSTIVE'][$j] = $data['positive'];
+                $result['rslt']['NEGATIVE'][$j] = $data['negative'];
+                $result['date'][$j] = $data['monthDate'];
+                $j++;
+            }
+        }
+        return $result;
+    }
+
+    public function fetchLabFilterSampleDetails($parameters)
+    {
+        $logincontainer = new Container('credo');
+        $queryContainer = new Container('query');
+        $common = new CommonService($this->sm);
+        /* Array of database columns which should be read and sent back to DataTables. Use a space where
+         * you want to insert a non-database field (for example a counter or static image)
+        */
+        $aColumns = array('DATE_FORMAT(sample_collection_date,"%d-%b-%Y")', 'specimen_type', 'facility_name');
+        $orderColumns = array('sample_collection_date', 'sample_code', 'sample_code', 'sample_code', 'sample_code', 'sample_code', 'sample_code', 'specimen_type', 'facility_name');
+
+        /*
+         * Paging
+         */
+        $sLimit = "";
+        if (isset($parameters['iDisplayStart']) && $parameters['iDisplayLength'] != '-1') {
+            $sOffset = $parameters['iDisplayStart'];
+            $sLimit = $parameters['iDisplayLength'];
+        }
+
+        /*
+         * Ordering
+         */
+
+        $sOrder = "";
+        if (isset($parameters['iSortCol_0'])) {
+            for ($i = 0; $i < intval($parameters['iSortingCols']); $i++) {
+                if ($parameters['bSortable_' . intval($parameters['iSortCol_' . $i])] == "true") {
+                    $sOrder .= $orderColumns[intval($parameters['iSortCol_' . $i])] . " " . ($parameters['sSortDir_' . $i]) . ",";
+                }
+            }
+            $sOrder = substr_replace($sOrder, "", -1);
+        }
+
+        /*
+         * Filtering
+         * NOTE this does not match the built-in DataTables filtering which does it
+         * word by word on any field. It's possible to do here, but concerned about efficiency
+         * on very large tables, and MySQL's regex functionality is very limited
+         */
+
+        $sWhere = "";
+        if (isset($parameters['sSearch']) && $parameters['sSearch'] != "") {
+            $searchArray = explode(" ", $parameters['sSearch']);
+            $sWhereSub = "";
+            foreach ($searchArray as $search) {
+                if ($sWhereSub == "") {
+                    $sWhereSub .= "(";
+                } else {
+                    $sWhereSub .= " AND (";
+                }
+                $colSize = count($aColumns);
+
+                for ($i = 0; $i < $colSize; $i++) {
+                    if ($i < $colSize - 1) {
+                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search) . "%' OR ";
+                    } else {
+                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search) . "%' ";
+                    }
+                }
+                $sWhereSub .= ")";
+            }
+            $sWhere .= $sWhereSub;
+        }
+
+        /* Individual column filtering */
+        for ($i = 0; $i < count($aColumns); $i++) {
+            if (isset($parameters['bSearchable_' . $i]) && $parameters['bSearchable_' . $i] == "true" && $parameters['sSearch_' . $i] != '') {
+                if ($sWhere == "") {
+                    $sWhere .= $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
+                } else {
+                    $sWhere .= " AND " . $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
+                }
+            }
+        }
+
+        /*
+         * SQL queries
+         * Get data to display
+        */
+        if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
+            $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
+            $endMonth = str_replace(' ', '-', $parameters['toDate']) . "-31";
+        }
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $sQuery = $sql->select()->from(array('covid19' => $this->table))
+            ->columns(array(
+                'sampleCollectionDate' => new Expression('DATE(sample_collection_date)'),
+                "total_samples_received" => new Expression("(COUNT(*))"),
+                "total_samples_tested" => new Expression("(SUM(CASE WHEN (((covid19.result IS NOT NULL AND covid19.result != '' AND covid19.result != 'NULL') AND (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) OR (covid19.reason_for_sample_rejection IS NOT NULL AND covid19.reason_for_sample_rejection != '' AND covid19.reason_for_sample_rejection != 0)) THEN 1 ELSE 0 END))"),
+                "total_samples_pending" => new Expression("(SUM(CASE WHEN ((covid19.result IS NULL OR covid19.result = '' OR covid19.result = 'NULL' OR sample_tested_datetime is null OR sample_tested_datetime = '' OR DATE(sample_tested_datetime) ='1970-01-01' OR DATE(sample_tested_datetime) ='0000-00-00') AND (covid19.reason_for_sample_rejection IS NULL OR covid19.reason_for_sample_rejection = '' OR covid19.reason_for_sample_rejection = 0)) THEN 1 ELSE 0 END))"),
+                "rejected_samples" => new Expression("SUM(CASE WHEN (covid19.reason_for_sample_rejection !='' AND covid19.reason_for_sample_rejection !='0' AND covid19.reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END)")
+            ))
+            ->join(array('f' => 'facility_details'), 'f.facility_id=covid19.facility_id', array('facility_name'))
+            ->join(array('l' => 'facility_details'), 'l.facility_id=covid19.lab_id', array(), 'left')
+            ->where("sample_collection_date is not null AND sample_collection_date != '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00' AND f.facility_type = 1")
+            ->group(new Expression('DATE(sample_collection_date)'))
+            ->group('covid19.specimen_type')
+            ->group('covid19.facility_id');
+        //filter start
+        if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
+            $sQuery = $sQuery->where(array("covid19.sample_collection_date >='" . $startMonth . " 00:00:00" . "'", "covid19.sample_collection_date <='" . $endMonth . " 23:59:59" . "'"));
+        }
+        if (isset($parameters['lab']) && trim($parameters['lab']) != '') {
+            $sQuery = $sQuery->where('covid19.lab_id IN (' . $parameters['lab'] . ')');
+        } else {
+            if ($logincontainer->role != 1) {
+                $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : array(0);
+                $sQuery = $sQuery->where('covid19.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
+            }
+        }
+        if (isset($parameters['provinces']) && trim($parameters['provinces']) != '') {
+            $sQuery = $sQuery->where('l.facility_state IN (' . $parameters['provinces'] . ')');
+        }
+        if (isset($parameters['districts']) && trim($parameters['districts']) != '') {
+            $sQuery = $sQuery->where('l.facility_district IN (' . $parameters['districts'] . ')');
+        }
+        if (isset($parameters['clinicId']) && trim($parameters['clinicId']) != '') {
+            $sQuery = $sQuery->where('covid19.facility_id IN (' . $params['clinicId'] . ')');
+        }
+        
+        
+        if (isset($parameters['age']) && trim($parameters['age']) != '') {
+            $age = explode(',', $parameters['age']);
+            $where = '';
+            for ($a = 0; $a < count($age); $a++) {
+                if (trim($where) != '') {
+                    $where .= ' OR ';
+                }
+                if ($age[$a] == '<2') {
+                    $where .= "(covid19.patient_age > 0 AND covid19.patient_age < 2)";
+                } else if ($age[$a] == '2to5') {
+                    $where .= "(covid19.patient_age >= 2 AND covid19.patient_age <= 5)";
+                } else if ($age[$a] == '6to14') {
+                    $where .= "(covid19.patient_age >= 6 AND covid19.patient_age <= 14)";
+                } else if ($age[$a] == '15to49') {
+                    $where .= "(covid19.patient_age >= 15 AND covid19.patient_age <= 49)";
+                } else if ($age[$a] == '>=50') {
+                    $where .= "(covid19.patient_age >= 50)";
+                } else if ($age[$a] == 'unknown') {
+                    $where .= "(covid19.patient_age IS NULL OR covid19.patient_age = '' OR covid19.patient_age = 'Unknown' OR covid19.patient_age = 'unknown')";
+                }
+            }
+            $where = '(' . $where . ')';
+            $sQuery = $sQuery->where($where);
+        }
+        
+        
+        if (isset($parameters['gender']) && $parameters['gender'] == 'F') {
+            $sQuery = $sQuery->where("covid19.patient_gender IN ('f','female','F','FEMALE')");
+        } else if (isset($parameters['gender']) && $parameters['gender'] == 'M') {
+            $sQuery = $sQuery->where("covid19.patient_gender IN ('m','male','M','MALE')");
+        } else if (isset($parameters['gender']) && $parameters['gender'] == 'not_specified') {
+            $sQuery = $sQuery->where("(covid19.patient_gender IS NULL OR covid19.patient_gender = '' OR covid19.patient_gender ='Not Recorded' OR covid19.patient_gender = 'not recorded')");
+        }
+    
+        
+        //filter end
+        if (isset($sWhere) && $sWhere != "") {
+            $sQuery->where($sWhere);
+        }
+
+        if (isset($sOrder) && $sOrder != "") {
+            $sQuery->order($sOrder);
+        }
+        $queryContainer->labTestedSampleQuery = $sQuery;
+        if (isset($sLimit) && isset($sOffset)) {
+            $sQuery->limit($sLimit);
+            $sQuery->offset($sOffset);
+        }
+
+        $sQueryStr = $sql->buildSqlString($sQuery); // Get the string of the Sql, instead of the Select-instance
+        // echo $sQueryStr;die;
+        $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
+
+        /* Data set length after filtering */
+        $sQuery->reset('limit');
+        $sQuery->reset('offset');
+        $fQuery = $sql->buildSqlString($sQuery);
+        // die($fQuery);
+        $aResultFilterTotal = $dbAdapter->query($fQuery, $dbAdapter::QUERY_MODE_EXECUTE);
+        $iFilteredTotal = count($aResultFilterTotal);
+
+        /* Total data set length */
+        $iQuery = $sql->select()->from(array('covid19' => $this->table))
+            ->columns(array(
+                "total_samples_received" => new Expression("(COUNT(*))")
+            ))
+            ->join(array('f' => 'facility_details'), 'f.facility_id=covid19.facility_id', array('facility_name'))
+            ->join(array('l' => 'facility_details'), 'l.facility_id=covid19.lab_id', array(), 'left')
+            ->where("sample_collection_date is not null AND sample_collection_date != '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00' AND f.facility_type = 1")
+            ->group(new Expression('DATE(sample_collection_date)'))
+            ->group('covid19.specimen_type')
+            ->group('covid19.facility_id');
+        if ($logincontainer->role != 1) {
+            $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : array(0);
+            $iQuery = $iQuery->where('covid19.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
+        }
+        $iQueryStr = $sql->buildSqlString($iQuery);
+        $iResult = $dbAdapter->query($iQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+        $iTotal = count($iResult);
+
+        $output = array(
+            "sEcho" => intval($parameters['sEcho']),
+            "iTotalRecords" => $iTotal,
+            "iTotalDisplayRecords" => $iFilteredTotal,
+            "aaData" => array()
+        );
+
+        foreach ($rResult as $aRow) {
+            $row = array();
+            $sampleCollectionDate = '';
+            if (isset($aRow['sampleCollectionDate']) && $aRow['sampleCollectionDate'] != null && trim($aRow['sampleCollectionDate']) != "" && $aRow['sampleCollectionDate'] != '0000-00-00') {
+                $sampleCollectionDate = $common->humanDateFormat($aRow['sampleCollectionDate']);
+            }
+            $row[] = $sampleCollectionDate;
+            $row[] = $aRow['total_samples_received'];
+            $row[] = $aRow['total_samples_tested'];
+            $row[] = $aRow['total_samples_pending'];
+            $row[] = $aRow['rejected_samples'];
+            $row[] = ucwords($aRow['specimen_type']);
+            $row[] = ucwords($aRow['facility_name']);
+            $output['aaData'][] = $row;
+        }
+        return $output;
+    }
+
+    public function fetchFilterSampleDetails($parameters)
+    {
+        $logincontainer = new Container('credo');
+        $queryContainer = new Container('query');
+        $common = new CommonService($this->sm);
+        /* Array of database columns which should be read and sent back to DataTables. Use a space where
+         * you want to insert a non-database field (for example a counter or static image)
+        */
+        $aColumns = array('facility_name', 'sample_code', 'sample_code', 'sample_code', 'sample_code', 'sample_code', 'sample_code');
+        /*
+         * Paging
+         */
+        $sLimit = "";
+        if (isset($parameters['iDisplayStart']) && $parameters['iDisplayLength'] != '-1') {
+            $sOffset = $parameters['iDisplayStart'];
+            $sLimit = $parameters['iDisplayLength'];
+        }
+
+        /*
+         * Ordering
+         */
+
+        $sOrder = "";
+        if (isset($parameters['iSortCol_0'])) {
+            for ($i = 0; $i < intval($parameters['iSortingCols']); $i++) {
+                if ($parameters['bSortable_' . intval($parameters['iSortCol_' . $i])] == "true") {
+                    $sOrder .= $aColumns[intval($parameters['iSortCol_' . $i])] . " " . ($parameters['sSortDir_' . $i]) . ",";
+                }
+            }
+            $sOrder = substr_replace($sOrder, "", -1);
+        }
+
+        /*
+         * Filtering
+         * NOTE this does not match the built-in DataTables filtering which does it
+         * word by word on any field. It's possible to do here, but concerned about efficiency
+         * on very large tables, and MySQL's regex functionality is very limited
+         */
+
+        $sWhere = "";
+        if (isset($parameters['sSearch']) && $parameters['sSearch'] != "") {
+            $searchArray = explode(" ", $parameters['sSearch']);
+            $sWhereSub = "";
+            foreach ($searchArray as $search) {
+                if ($sWhereSub == "") {
+                    $sWhereSub .= "(";
+                } else {
+                    $sWhereSub .= " AND (";
+                }
+                $colSize = count($aColumns);
+
+                for ($i = 0; $i < $colSize; $i++) {
+                    if ($i < $colSize - 1) {
+                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search) . "%' OR ";
+                    } else {
+                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search) . "%' ";
+                    }
+                }
+                $sWhereSub .= ")";
+            }
+            $sWhere .= $sWhereSub;
+        }
+
+        /* Individual column filtering */
+        for ($i = 0; $i < count($aColumns); $i++) {
+            if (isset($parameters['bSearchable_' . $i]) && $parameters['bSearchable_' . $i] == "true" && $parameters['sSearch_' . $i] != '') {
+                if ($sWhere == "") {
+                    $sWhere .= $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
+                } else {
+                    $sWhere .= " AND " . $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
+                }
+            }
+        }
+
+        /*
+         * SQL queries
+         * Get data to display
+        */
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
+            $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
+            $endMonth = str_replace(' ', '-', $parameters['toDate']) . "-31";
+        }
+        $sQuery = $sql->select()->from(array('f' => 'facility_details'))
+            ->join(array('covid19' => $this->table), 'covid19.lab_id=f.facility_id', array(
+                "total_samples_received" => new Expression("(COUNT(*))"),
+                "total_samples_tested" => new Expression("(SUM(CASE WHEN (((covid19.result IS NOT NULL AND covid19.result != '' AND covid19.result != 'NULL') AND (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) OR (covid19.reason_for_sample_rejection IS NOT NULL AND covid19.reason_for_sample_rejection != '' AND covid19.reason_for_sample_rejection != 0)) THEN 1 ELSE 0 END))"),
+                "total_samples_pending" => new Expression("(SUM(CASE WHEN ((covid19.result IS NULL OR covid19.result = '' OR covid19.result = 'NULL' OR sample_tested_datetime is null OR sample_tested_datetime = '' OR DATE(sample_tested_datetime) ='1970-01-01' OR DATE(sample_tested_datetime) ='0000-00-00') AND (covid19.reason_for_sample_rejection IS NULL OR covid19.reason_for_sample_rejection = '' OR covid19.reason_for_sample_rejection = 0)) THEN 1 ELSE 0 END))"),
+                "rejected_samples" => new Expression("SUM(CASE WHEN (covid19.reason_for_sample_rejection !='' AND covid19.reason_for_sample_rejection !='0' AND covid19.reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END)")
+            ))
+            ->where("sample_collection_date is not null AND sample_collection_date != '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00' AND covid19.lab_id !=0")
+            ->group('covid19.lab_id');
+        if (isset($parameters['provinces']) && trim($parameters['provinces']) != '') {
+            $sQuery = $sQuery->where('f.facility_state IN (' . $parameters['provinces'] . ')');
+        }
+        if (isset($parameters['districts']) && trim($parameters['districts']) != '') {
+            $sQuery = $sQuery->where('f.facility_district IN (' . $parameters['districts'] . ')');
+        }
+        if (isset($parameters['lab']) && trim($parameters['lab']) != '') {
+            $sQuery = $sQuery->where('covid19.lab_id IN (' . $parameters['lab'] . ')');
+        } else {
+            if ($logincontainer->role != 1) {
+                $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : array(0);
+                $sQuery = $sQuery->where('covid19.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
+            }
+        }
+        if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
+            $sQuery = $sQuery->where(array("covid19.sample_collection_date >='" . $startMonth . " 00:00:00" . "'", "covid19.sample_collection_date <='" . $endMonth . " 23:59:59" . "'"));
+        }
+        if (isset($parameters['clinicId']) && trim($parameters['clinicId']) != '') {
+            $sQuery = $sQuery->where('covid19.facility_id IN (' . $parameters['clinicId'] . ')');
+        }
+        
+        
+        if (isset($parameters['age']) && trim($parameters['age']) != '') {
+            $where = '';
+            $parameters['age'] = explode(',', $parameters['age']);
+            for ($a = 0; $a < count($parameters['age']); $a++) {
+                if (trim($where) != '') {
+                    $where .= ' OR ';
+                }
+                if ($parameters['age'][$a] == '<2') {
+                    $where .= "(covid19.patient_age > 0 AND covid19.patient_age < 2)";
+                } else if ($parameters['age'][$a] == '2to5') {
+                    $where .= "(covid19.patient_age >= 2 AND covid19.patient_age <= 5)";
+                } else if ($parameters['age'][$a] == '6to14') {
+                    $where .= "(covid19.patient_age >= 6 AND covid19.patient_age <= 14)";
+                } else if ($parameters['age'][$a] == '15to49') {
+                    $where .= "(covid19.patient_age >= 15 AND covid19.patient_age <= 49)";
+                } else if ($parameters['age'][$a] == '>=50') {
+                    $where .= "(covid19.patient_age >= 50)";
+                } else if ($parameters['age'][$a] == 'unknown') {
+                    $where .= "(covid19.patient_age IS NULL OR covid19.patient_age = '' OR covid19.patient_age = 'Unknown' OR covid19.patient_age = 'unknown')";
+                }
+            }
+            $where = '(' . $where . ')';
+            $sQuery = $sQuery->where($where);
+        }
+        
+        
+        if (isset($parameters['sampleStatus']) && $parameters['sampleStatus'] == 'sample_tested') {
+            $sQuery = $sQuery->where("((covid19.result IS NOT NULL AND covid19.result != '' AND covid19.result != 'NULL' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') OR (covid19.reason_for_sample_rejection IS NOT NULL AND covid19.reason_for_sample_rejection != '' AND covid19.reason_for_sample_rejection != 0))");
+        } else if (isset($parameters['sampleStatus']) && $parameters['sampleStatus'] == 'samples_not_tested') {
+            $sQuery = $sQuery->where("(covid19.result IS NULL OR covid19.result = '' OR covid19.result = 'NULL' OR sample_tested_datetime is null OR sample_tested_datetime = '' OR DATE(sample_tested_datetime) ='1970-01-01' OR DATE(sample_tested_datetime) ='0000-00-00') AND (covid19.reason_for_sample_rejection IS NULL OR covid19.reason_for_sample_rejection = '' OR covid19.reason_for_sample_rejection = 0)");
+        } else if (isset($parameters['sampleStatus']) && $parameters['sampleStatus'] == 'sample_rejected') {
+            $sQuery = $sQuery->where("covid19.reason_for_sample_rejection IS NOT NULL AND covid19.reason_for_sample_rejection != '' AND covid19.reason_for_sample_rejection != 0");
+        }
+        if (isset($parameters['gender']) && $parameters['gender'] == 'F') {
+            $sQuery = $sQuery->where("covid19.patient_gender IN ('f','female','F','FEMALE')");
+        } else if (isset($parameters['gender']) && $parameters['gender'] == 'M') {
+            $sQuery = $sQuery->where("covid19.patient_gender IN ('m','male','M','MALE')");
+        } else if (isset($parameters['gender']) && $parameters['gender'] == 'not_specified') {
+            $sQuery = $sQuery->where("(covid19.patient_gender IS NULL OR covid19.patient_gender = '' OR covid19.patient_gender ='Not Recorded' OR covid19.patient_gender = 'not recorded')");
+        }
+    
+        if (isset($sWhere) && $sWhere != "") {
+            $sQuery->where($sWhere);
+        }
+
+        if (isset($sOrder) && $sOrder != "") {
+            $sQuery->order($sOrder);
+        }
+        $queryContainer->sampleResultQuery = $sQuery;
+        if (isset($sLimit) && isset($sOffset)) {
+            $sQuery->limit($sLimit);
+            $sQuery->offset($sOffset);
+        }
+
+        $sQueryStr = $sql->buildSqlString($sQuery); // Get the string of the Sql, instead of the Select-instance
+        // echo $sQueryStr;die;
+        $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
+
+        /* Data set length after filtering */
+        $sQuery->reset('limit');
+        $sQuery->reset('offset');
+        $fQuery = $sql->buildSqlString($sQuery);
+        $aResultFilterTotal = $dbAdapter->query($fQuery, $dbAdapter::QUERY_MODE_EXECUTE);
+        $iFilteredTotal = count($aResultFilterTotal);
+
+        /* Total data set length */
+        $iQuery = $sql->select()->from(array('f' => 'facility_details'))
+            ->join(array('covid19' => $this->table), 'covid19.lab_id=f.facility_id', array(
+                "total_samples_received" => new Expression("(COUNT(*))")
+            ))
+            ->where("sample_collection_date is not null AND sample_collection_date != '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00' AND covid19.lab_id !=0")
+            ->group('covid19.lab_id');
+        if ($logincontainer->role != 1) {
+            $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : array(0);
+            $iQuery = $iQuery->where('covid19.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
+        }
+        $iQueryStr = $sql->buildSqlString($iQuery);
+        $iResult = $dbAdapter->query($iQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+        $iTotal = count($iResult);
+
+        $output = array(
+            "sEcho" => intval($parameters['sEcho']),
+            "iTotalRecords" => $iTotal,
+            "iTotalDisplayRecords" => $iFilteredTotal,
+            "aaData" => array()
+        );
+        //print_r($parameters);die;
+        foreach ($rResult as $aRow) {
+            $row = array();
+            $row[] = ucwords($aRow['facility_name']);
+            $row[] = $aRow['total_samples_received'];
+            $row[] = $aRow['total_samples_tested'];
+            $row[] = $aRow['total_samples_pending'];
+            $row[] = $aRow['rejected_samples'];
+            $output['aaData'][] = $row;
+        }
+        return $output;
+    }
+
+    //get eid out comes result
+    public function fetchCovid19OutComes($params)
+    {
+        $logincontainer = new Container('credo');
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $vlOutComeResult = array();
+        $common = new CommonService($this->sm);
+        if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
+            $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
+            $endMonth = str_replace(' ', '-', $params['toDate']) . "-31";
+            $sQuery = $sql->select()->from(array('covid19' => $this->table))
+                ->columns(
+                    array(
+                        "positive" => new Expression("SUM(CASE WHEN ((covid19.result like 'positive%' OR covid19.result like 'Positive%' ) AND covid19.result not like '') THEN 1 ELSE 0 END)"),
+                        "negative" => new Expression("SUM(CASE WHEN ((covid19.result like 'negative%' OR covid19.result like 'Negative%' ) AND covid19.result not like '') THEN 1 ELSE 0 END)"),
+                    )
+                )
+                ->join(array('f' => 'facility_details'), 'f.facility_id=covid19.lab_id', array());
+            if (isset($params['provinces']) && trim($params['provinces']) != '') {
+                $sQuery = $sQuery->where('f.facility_state IN (' . $params['provinces'] . ')');
+            }
+            if (isset($params['districts']) && trim($params['districts']) != '') {
+                $sQuery = $sQuery->where('f.facility_district IN (' . $params['districts'] . ')');
+            }
+            if (isset($params['lab']) && trim($params['lab']) != '') {
+                $sQuery = $sQuery->where('covid19.lab_id IN (' . $params['lab'] . ')');
+            } else {
+                if ($logincontainer->role != 1) {
+                    $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : array(0);
+                    $sQuery = $sQuery->where('covid19.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
+                }
+            }
+            if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
+                $sQuery = $sQuery->where(array("covid19.sample_collection_date >='" . $startMonth . " 00:00:00" . "'", "covid19.sample_collection_date <='" . $endMonth . " 23:59:59" . "'"));
+            }
+            if (isset($params['clinicId']) && trim($params['clinicId']) != '') {
+                $sQuery = $sQuery->where('covid19.facility_id IN (' . $params['clinicId'] . ')');
+            }
+            
+            
+            if (isset($params['age']) && is_array($params['age'])) {
+                $params['age'] = implode(',', $params['age']);
+            }
+            if (isset($params['age']) && trim($params['age']) != '') {
+                $where = '';
+                $params['age'] = explode(',', $params['age']);
+                for ($a = 0; $a < count($params['age']); $a++) {
+                    if (trim($where) != '') {
+                        $where .= ' OR ';
+                    }
+                    if ($params['age'][$a] == '<2') {
+                        $where .= "(covid19.patient_age > 0 AND covid19.patient_age < 2)";
+                    } else if ($params['age'][$a] == '2to5') {
+                        $where .= "(covid19.patient_age >= 2 AND covid19.patient_age <= 5)";
+                    } else if ($params['age'][$a] == '6to14') {
+                        $where .= "(covid19.patient_age >= 6 AND covid19.patient_age <= 14)";
+                    } else if ($params['age'][$a] == '15to49') {
+                        $where .= "(covid19.patient_age >= 15 AND covid19.patient_age <= 49)";
+                    } else if ($params['age'][$a] == '>=50') {
+                        $where .= "(covid19.patient_age >= 50)";
+                    } else if ($params['age'][$a] == 'unknown') {
+                        $where .= "(covid19.patient_age IS NULL OR covid19.patient_age = '' OR covid19.patient_age = 'Unknown' OR covid19.patient_age = 'unknown')";
+                    }
+                }
+                $where = '(' . $where . ')';
+                $sQuery = $sQuery->where($where);
+            }
+            
+            if (isset($params['gender']) && $params['gender'] == 'F') {
+                $sQuery = $sQuery->where("covid19.patient_gender IN ('f','female','F','FEMALE')");
+            } else if (isset($params['gender']) && $params['gender'] == 'M') {
+                $sQuery = $sQuery->where("covid19.patient_gender IN ('m','male','M','MALE')");
+            } else if (isset($params['gender']) && $params['gender'] == 'not_specified') {
+                $sQuery = $sQuery->where("(covid19.patient_gender IS NULL OR covid19.patient_gender = '' OR covid19.patient_gender ='Not Recorded' OR covid19.patient_gender = 'not recorded')");
+            }
+            
+            $queryStr = $sql->buildSqlString($sQuery);
+            // die($queryStr);
+            $vlOutComeResult = $common->cacheQuery($queryStr, $dbAdapter);
+        }
+        return $vlOutComeResult;
+    }
+    //end lab dashboard details
+
+    public function fetchEidOutcomesByAgeInLabsDetails($params)
+    {
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $common = new CommonService($this->sm);
+        $eidOutcomesQuery = $sql->select()
+            ->from(array('covid19' => 'dash_covid19_form'))
+            ->columns(
+                array(
+                    'noDatan' => new Expression("SUM(CASE WHEN ((covid19.result like 'negative' OR covid19.result = 'Negative' ) AND (covid19.patient_dob IS NULL OR covid19.patient_dob = '0000-00-00'))THEN 1 ELSE 0 END)"),
+
+                    'noDatap' => new Expression("SUM(CASE WHEN ((covid19.result like 'positive' OR covid19.result = 'Positive' ) AND (covid19.patient_dob IS NULL OR covid19.patient_dob ='0000-00-00'))THEN 1 ELSE 0 END)"),
+
+                    'less2n' => new Expression("SUM(CASE WHEN ((covid19.result like 'negative' OR covid19.result = 'Negative' ) AND covid19.patient_dob <= '" . date('Y-m-d', strtotime('-2 MONTHS')) . "')THEN 1 ELSE 0 END)"),
+
+                    'less2p' => new Expression("SUM(CASE WHEN ((covid19.result like 'positive' OR covid19.result = 'Positive' ) AND covid19.patient_dob <= '" . date('Y-m-d', strtotime('-2 MONTHS')) . "')THEN 1 ELSE 0 END)"),
+
+                    '2to9n' => new Expression("SUM(CASE WHEN ((covid19.result like 'negative' OR covid19.result = 'Negative' ) AND (covid19.patient_dob >= '" . date('Y-m-d', strtotime('-2 MONTHS')) . "' AND covid19.patient_dob <= '" . date('Y-m-d', strtotime('-9 MONTHS')) . "'))THEN 1 ELSE 0 END)"),
+
+                    '2to9p' => new Expression("SUM(CASE WHEN ((covid19.result like 'positive' OR covid19.result = 'Positive' ) AND (covid19.patient_dob >= '" . date('Y-m-d', strtotime('-2 MONTHS')) . "' AND covid19.patient_dob <= '" . date('Y-m-d', strtotime('-9 MONTHS')) . "'))THEN 1 ELSE 0 END)"),
+
+                    '9to12n' => new Expression("SUM(CASE WHEN ((covid19.result like 'negative' OR covid19.result = 'Negative' ) AND (covid19.patient_dob >= '" . date('Y-m-d', strtotime('-9 MONTHS')) . "' AND covid19.patient_dob <= '" . date('Y-m-d', strtotime('-12 MONTHS')) . "'))THEN 1 ELSE 0 END)"),
+
+                    '9to12p' => new Expression("SUM(CASE WHEN ((covid19.result like 'positive' OR covid19.result = 'Positive' ) AND (covid19.patient_dob >= '" . date('Y-m-d', strtotime('-9 MONTHS')) . "' AND covid19.patient_dob <= '" . date('Y-m-d', strtotime('-12 MONTHS')) . "'))THEN 1 ELSE 0 END)"),
+
+                    '12to24n' => new Expression("SUM(CASE WHEN ((covid19.result like 'negative' OR covid19.result = 'Negative' ) AND (covid19.patient_dob >= '" . date('Y-m-d', strtotime('-12 MONTHS')) . "' AND covid19.patient_dob <= '" . date('Y-m-d', strtotime('-24 MONTHS')) . "'))THEN 1 ELSE 0 END)"),
+
+                    '12to24p' => new Expression("SUM(CASE WHEN ((covid19.result like 'positive' OR covid19.result = 'Positive' ) AND (covid19.patient_dob >= '" . date('Y-m-d', strtotime('-12 MONTHS')) . "' AND covid19.patient_dob <= '" . date('Y-m-d', strtotime('-24 MONTHS')) . "'))THEN 1 ELSE 0 END)"),
+
+                    'above24n' => new Expression("SUM(CASE WHEN ((covid19.result like 'negative' OR covid19.result = 'Negative' ) AND covid19.patient_dob >= '" . date('Y-m-d', strtotime('-24 MONTHS')) . "')THEN 1 ELSE 0 END)"),
+
+                    'above24p' => new Expression("SUM(CASE WHEN ((covid19.result like 'positive' OR covid19.result = 'Positive' ) AND covid19.patient_dob >= '" . date('Y-m-d', strtotime('-24 MONTHS')) . "')THEN 1 ELSE 0 END)"),
+                )
+            )
+            ->join(array('f' => 'facility_details'), 'f.facility_id = covid19.facility_id', array());
+
+        if (isset($params['provinces']) && trim($params['provinces']) != '') {
+            $eidOutcomesQuery = $eidOutcomesQuery->where('f.facility_state IN (' . $params['provinces'] . ')');
+        }
+        if (isset($params['districts']) && trim($params['districts']) != '') {
+            $eidOutcomesQuery = $eidOutcomesQuery->where('f.facility_district IN (' . $params['districts'] . ')');
+        }
+        if (isset($params['clinics']) && trim($params['clinics']) != '') {
+            $eidOutcomesQuery = $eidOutcomesQuery->where('covid19.facility_id IN (' . $params['clinics'] . ')');
+        }
+        if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
+            $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
+            $endMonth = str_replace(' ', '-', $params['toDate']) . "-31";
+            $eidOutcomesQuery = $eidOutcomesQuery
+                ->where("(sample_collection_date is not null)
+                                        AND DATE(sample_collection_date) >= '" . $startMonth . "' 
+                                        AND DATE(sample_collection_date) <= '" . $endMonth . "'");
+        }
+
+        $facilityIdList = array();
+        if (isset($params['facilityId']) && trim($params['facilityId']) != '') {
+            $fQuery = $sql->select()->from(array('f' => 'facility_details'))->columns(array('facility_id'))
+                ->where('f.facility_type = 2 AND f.status="active"');
+            $fQuery = $fQuery->where('f.facility_id IN (' . $params['facilityId'] . ')');
+            $fQueryStr = $sql->buildSqlString($fQuery);
+            $facilityResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+            $facilityIdList = array_column($facilityResult, 'facility_id');
+        } else if (!empty($this->mappedFacilities)) {
+            $fQuery = $sql->select()->from(array('f' => 'facility_details'))->columns(array('facility_id'))
+                ->where('f.facility_id IN ("' . implode('", "', $this->mappedFacilities) . '")');
+            $fQueryStr = $sql->buildSqlString($fQuery);
+            $facilityResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+            $facilityIdList = array_column($facilityResult, 'facility_id');
+        }
+
+        if ($facilityIdList != null) {
+            $eidOutcomesQuery = $eidOutcomesQuery->where('covid19.lab_id IN ("' . implode('", "', $facilityIdList) . '")');
+        }
+
+        $eidOutcomesQueryStr = $sql->buildSqlString($eidOutcomesQuery);
+        $result = $common->cacheQuery($eidOutcomesQueryStr, $dbAdapter);
+        return $result[0];
+    }
+
+    public function fetchEidPositivityRateDetails($params)
+    {
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $common = new CommonService($this->sm);
+        $startMonth = "";
+        $endMonth = "";
+        if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
+            $startMonth = date('Y-m-01',strtotime(str_replace(' ', '-', $params['fromDate'])));
+            $endMonth = date('Y-m-t',strtotime(str_replace(' ', '-', $params['toDate'])));
+            
+            $monthList = $common->getMonthsInRange($startMonth, $endMonth);
+            /* foreach($monthList as $key=>$list){
+                $searchVal[$key] =  new Expression("AVG(CASE WHEN (covid19.result like 'positive%' AND covid19.result not like '' AND sample_collection_date LIKE '%".$list."%') THEN 1 ELSE 0 END)");
+            } */
+            $sQuery = $sql->select()->from(array('covid19' => 'dash_covid19_form'))->columns(array(
+                'monthYear' => new Expression("DATE_FORMAT(sample_collection_date, '%b-%Y')"),
+                'positive_rate' => new Expression("ROUND(((SUM(CASE WHEN ((covid19.result like 'positive' OR covid19.result like 'Positive' )) THEN 1 ELSE 0 END))/(SUM(CASE WHEN (((covid19.result IS NOT NULL AND covid19.result != '' AND covid19.result != 'NULL'))) THEN 1 ELSE 0 END)))*100,2)")
+            ))
+            ->join(array('f' => 'facility_details'), 'f.facility_id=covid19.lab_id', array('facility_name'))
+            ->where("(sample_collection_date is not null)
+                                    AND DATE(sample_collection_date) >= '" . $startMonth . "' 
+                                    AND DATE(sample_collection_date) <= '" . $endMonth . "'")
+            ->group(array("lab_id",new Expression("DATE_FORMAT(sample_collection_date, '%m-%Y')")))
+            ->order(array("lab_id",new Expression("DATE_FORMAT(sample_collection_date, '%m-%Y')")));
+
+            if (isset($params['provinces']) && trim($params['provinces']) != '') {
+                $sQuery = $sQuery->where('f.facility_state IN (' . $params['provinces'] . ')');
+            }
+            if (isset($params['districts']) && trim($params['districts']) != '') {
+                $sQuery = $sQuery->where('f.facility_district IN (' . $params['districts'] . ')');
+            }
+            if (isset($params['clinics']) && trim($params['clinics']) != '') {
+                $sQuery = $sQuery->where('covid19.facility_id IN (' . $params['clinics'] . ')');
+            }
+
+            $facilityIdList = array();
+            if (isset($params['facilityId']) && trim($params['facilityId']) != '') {
+                $mQuery = $sql->select()->from(array('f' => 'facility_details'))->columns(array('facility_id'))
+                    ->where('f.facility_type = 2 AND f.status="active"');
+                $mQuery = $mQuery->where('f.facility_id IN (' . $params['facilityId'] . ')');
+                $mQueryStr = $sql->buildSqlString($mQuery);
+                $facilityResult = $dbAdapter->query($mQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+                $facilityIdList = array_column($facilityResult, 'facility_id');
+            } else if (!empty($this->mappedFacilities)) {
+                $fQuery = $sql->select()->from(array('f' => 'facility_details'))->columns(array('facility_id'))
+                    ->where('f.facility_id IN ("' . implode('", "', $this->mappedFacilities) . '")');
+                $fQueryStr = $sql->buildSqlString($fQuery);
+                $facilityResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+                $facilityIdList = array_column($facilityResult, 'facility_id');
+            }
+
+            if ($facilityIdList != null) {
+                $sQuery = $sQuery->where('covid19.lab_id IN ("' . implode('", "', $facilityIdList) . '")');
+            }
+
+            $sQueryStr = $sql->buildSqlString($sQuery);
+            // echo $sQueryStr;die;
+            $result = $common->cacheQuery($sQueryStr, $dbAdapter);
+            return array('result' => $result, 'month' => $monthList);
+        } else{
+            return 0;
+        }
     }
 }

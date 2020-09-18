@@ -384,13 +384,11 @@ class LabsController extends AbstractActionController
 
         $hubName = $this->sampleService->getAllHubName();
         $sampleType = $this->sampleService->getSampleType();
-        $currentRegimen = $this->sampleService->getAllCurrentRegimen();
         $facilityInfo = $this->commonService->getSampleTestedFacilityInfo($params);
         //print_r($facilityInfo);die;
         return new ViewModel(array(
             'sampleType' => $sampleType,
             'hubName' => $hubName,
-            'currentRegimen' => $currentRegimen,
             'facilityInfo' => $facilityInfo,
             'searchMonth' => $this->params()->fromQuery('month'),
             'searchGender' => $this->params()->fromQuery('gender'),
@@ -418,12 +416,12 @@ class LabsController extends AbstractActionController
         }
     }
 
-    public function getVlOutComesAction()
+    public function getCovid19OutComesAction()
     {
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            $result = $this->sampleService->getVlOutComes($params);
+            $result = $this->sampleService->getCovid19OutComes($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('result' => $result))
                 ->setTerminal(true);
@@ -466,7 +464,7 @@ class LabsController extends AbstractActionController
 
     public function samplesTestedLabAction()
     {
-        $this->layout()->setVariable('activeTab', 'labs-dashboard');
+        $this->layout()->setVariable('activeTab', 'covid19-labs');
         $params = array();
         $gender = "";
         $month = "";
@@ -503,12 +501,10 @@ class LabsController extends AbstractActionController
         // $commonService = $this->getServiceLocator()->get('CommonService');
         $hubName = $this->sampleService->getAllHubName();
         $sampleType = $this->sampleService->getSampleType();
-        $currentRegimen = $this->sampleService->getAllCurrentRegimen();
         $facilityInfo = $this->commonService->getSampleTestedFacilityInfo($params);
         return new ViewModel(array(
             'sampleType' => $sampleType,
             'hubName' => $hubName,
-            'currentRegimen' => $currentRegimen,
             'searchMonth' => $month,
             'searchGender' => $gender,
             'searchRange' => $range,
@@ -518,19 +514,6 @@ class LabsController extends AbstractActionController
             'age' => $age,
             'facilityInfo' => $facilityInfo
         ));
-    }
-
-    public function getLabSampleDetailsAction()
-    {
-        $request = $this->getRequest();
-        if ($request->isPost()) {
-            $params = $request->getPost();
-            $result = $this->sampleService->getLabSampleDetails($params);
-            $viewModel = new ViewModel();
-            $viewModel->setVariables(array('result' => $result))
-                ->setTerminal(true);
-            return $viewModel;
-        }
     }
 
     public function getLabBarSampleDetailsAction()

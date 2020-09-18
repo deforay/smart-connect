@@ -21,7 +21,7 @@
 
       $('.clickable').click(function(){
           if($(this).attr('data-category') != 2){
-            window.location.href='/eid/labs/time?district='+$(this).attr('id')+'&lab=<?php echo $labs; ?>&range=<?php echo $daterange; ?>&category='+$(this).attr('data-category')+'&place='+$(this).attr('data-place');
+            window.location.href='/covid19/labs/time?district='+$(this).attr('id')+'&lab=<?php echo $labs; ?>&range=<?php echo $daterange; ?>&category='+$(this).attr('data-category')+'&place='+$(this).attr('data-place');
           }
       });
 
@@ -87,7 +87,7 @@
                       events: {
                         click: function () {
                           <?php if($category!= 1){?>
-                            window.location.href='/eid/labs/time?district='+this.id+'&lab=<?php echo $labs; ?>&range=<?php echo $daterange; ?>&category=<?php echo $categoryNext+1; ?>&place='+this.category;
+                            window.location.href='/covid19/labs/time?district='+this.id+'&lab=<?php echo $labs; ?>&range=<?php echo $daterange; ?>&category=<?php echo $categoryNext+1; ?>&place='+this.category;
                           <?php }?>
                         },
                         mouseOver: function(){

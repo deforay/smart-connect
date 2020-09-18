@@ -57,7 +57,7 @@ if (isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts'])
         <ul class="page-breadcrumb pull-right">
             <li>
                 <i class="fa fa-arrow-left"></i>
-                <a href="/eid/labs/dashboard"><?php echo $this->translate('Back to Labs Dashboard'); ?></a>
+                <a href="/covid19/labs/dashboard"><?php echo $this->translate('Back to Labs Dashboard'); ?></a>
             </li>
         </ul>
     </h1>
@@ -150,19 +150,6 @@ if (isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts'])
                         } ?>
                     </select>
                 </div>
-                <div class="form-group col-lg-4">
-                    <label class="control-label"><?php echo $this->translate('Current Regimen'); ?></label>
-                    <select class="form-control" id="currentRegimen" name="currentRegimen">
-                        <option value=""><?php echo $this->translate('All'); ?></option>
-                        <?php
-                        foreach ($currentRegimen as $regimen) {
-                        ?>
-                            <option value="<?php echo base64_encode($regimen['art_code']); ?>"><?php echo $regimen['art_code']; ?></option>
-                        <?php
-                        }
-                        ?>
-                    </select>
-                </div>
             </div>
             <div class="col-md-12">
                 <div class="form-group col-lg-4">
@@ -247,10 +234,7 @@ if (isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts'])
 </form>
 <hr style="background: #000 !important;border-color:#ccc;">
 <div class="row" style="margin-bottom:30px;">
-    <div class="col-lg-6">
-        <div id="piecontainer" style="min-width: 310px; height: 400px; max-width: 100%; margin: 0 auto;padding:1.5%;"></div>
-    </div>
-    <div class="col-lg-6">
+    <div class="col-lg-12">
         <div id="barcontainer" style="min-width: 310px; height: 400px; max-width: 100%; margin: 0 auto;padding:1.5%;"></div>
     </div>
 </div>
@@ -296,46 +280,6 @@ if (isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts'])
     </div>
 </div>
 <script>
-    function generatePieContainer() {
-        $.blockUI.defaults.css.border = '1px solid grey';
-        $(document).ajaxStart($.blockUI({
-            message: '<h2><?php echo $this->translate('Processing...'); ?></h2>'
-        })).ajaxStop($.unblockUI);
-        var fromDate = $('#mrp-lowerDate').val();
-        var toDate = $('#mrp-upperDate').val();
-        var provinces = ($("#provinces").val() == null) ? '' : $("#provinces").val().join(',');
-        var districts = ($("#districts").val() == null) ? '' : $("#districts").val().join(',');
-        var lab = ($("#labName").val() == null) ? '' : $("#labName").val().join(',');
-        var clinicId = ($("#clinicId").val() == null) ? '' : $("#clinicId").val().join(',');
-        var currentRegimen = $("#currentRegimen").val();
-        var adherence = $("#adherence").val();
-        var age = ($("#age").val() == null) ? '' : $("#age").val().join(',');
-        var testResult = $("#testResult").val();
-        var sampleType = $("#sampleType").val();
-        var gender = $("#gender").val();
-        var isPregnant = $("#isPregnant").val();
-        var isBreastfeeding = $("#isBreastfeeding").val();
-        $.post("<?php echo $this->url('covid19-labs', array('action' => 'get-lab-sample-details')); ?>", {
-                fromDate: fromDate,
-                toDate: toDate,
-                provinces: provinces,
-                districts: districts,
-                lab: lab,
-                clinicId: clinicId,
-                currentRegimen: currentRegimen,
-                adherence: adherence,
-                age: age,
-                testResult: testResult,
-                sampleType: sampleType,
-                gender: gender,
-                isPregnant: isPregnant,
-                isBreastfeeding: isBreastfeeding
-            },
-            function(data) {
-                $("#piecontainer").html(data);
-            });
-    }
-
     function generateBarContainer() {
         $.blockUI.defaults.css.border = '1px solid grey';
         $(document).ajaxStart($.blockUI({
@@ -347,7 +291,6 @@ if (isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts'])
         var districts = ($("#districts").val() == null) ? '' : $("#districts").val().join(',');
         var lab = ($("#labName").val() == null) ? '' : $("#labName").val().join(',');
         var clinicId = ($("#clinicId").val() == null) ? '' : $("#clinicId").val().join(',');
-        var currentRegimen = $("#currentRegimen").val();
         var adherence = $("#adherence").val();
         var age = ($("#age").val() == null) ? '' : $("#age").val().join(',');
         var testResult = $("#testResult").val();
@@ -362,7 +305,6 @@ if (isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts'])
                 districts: districts,
                 lab: lab,
                 clinicId: clinicId,
-                currentRegimen: currentRegimen,
                 adherence: adherence,
                 age: age,
                 testResult: testResult,
@@ -398,23 +340,17 @@ if (isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts'])
             placeholder: "<?php echo $this->translate('All'); ?>",
             allowClear: true
         });
-        $('#piebutton').on('click', function() {
-            $('#piecontainer').fadeIn(function() {
-                generatePieContainer();
-            });
-        });
+        
         $('#barbutton').on('click', function() {
             $('#barcontainer').fadeIn(function() {
                 generateBarContainer();
             });
         });
-        generatePieContainer();
         generateBarContainer();
         loadSampleDataTable();
     });
 
     function searchSampleTestedLabResult() {
-        generatePieContainer();
         generateBarContainer();
         oTable.fnDraw();
     }
@@ -498,10 +434,6 @@ if (isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts'])
                 aoData.push({
                     "name": "clinicId",
                     "value": $('#clinicId').val()
-                });
-                aoData.push({
-                    "name": "currentRegimen",
-                    "value": $('#currentRegimen').val()
                 });
                 aoData.push({
                     "name": "adherence",
