@@ -30,6 +30,8 @@ use Application\Model\Covid19SampleTypeTable;
 use Application\Model\Covid19ComorbiditiesTable;
 use Application\Model\Covid19SymptomsTable;
 use Application\Model\Covid19TestReasonsTable;
+use Application\Model\ProvinceTable;
+use Application\Model\DashApiReceiverStatsTable;
 
 use Application\Service\CommonService;
 use Application\Service\UserService;
@@ -359,6 +361,16 @@ class Module
 				'Covid19TestReasonsTable' => function ($sm) {
 					$dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');
 					$table = new Covid19TestReasonsTable($dbAdapter);
+					return $table;
+				},
+				'ProvinceTable' => function ($sm) {
+					$dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');
+					$table = new ProvinceTable($dbAdapter);
+					return $table;
+				},
+				'DashApiReceiverStatsTable' => function ($sm) {
+					$dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');
+					$table = new DashApiReceiverStatsTable($dbAdapter);
 					return $table;
 				},
 

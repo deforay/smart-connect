@@ -2210,15 +2210,27 @@ class SampleService
         $testReasonDb = $this->sm->get('TestReasonTable');
         $sampleTypeDb = $this->sm->get('SampleTypeTable');
         $sampleRjtReasonDb = $this->sm->get('SampleRejectionReasonTable');
+        $provinceDb = $this->sm->get('ProvinceTable');
+        $apiTrackDb = $this->sm->get('DashApiReceiverStatsTable');
         $return = array();
         $params = json_decode($params, true);
-        //var_dump($params);die;
+        // var_dump($params);die;
         if (!empty($params)) {
             foreach ($params as $key => $row) {
                 //var_dump($row);die;
                 if (!empty(trim($row['SampleID'])) && trim($row['TestId']) == 'VIRAL_LOAD_2') {
                     $sampleCode = trim($row['SampleID']);
                     $instanceCode = 'nrl-weblims';
+
+                     // Check dublicate data
+                     $province = $provinceDb->select(array('province_name' => $row['ProvinceName']))->current();
+                     if(!$province){
+                         $provinceDb->insert(array(
+                             'province_name'     => $row['ProvinceName'],
+                             'updated_datetime'  => $common->getDateTime()
+                         ));
+                         $province['province_id'] = $provinceDb->lastInsertValue;
+                     }
 
                     $VLAnalysisResult = (float) $row['result_value_absolute_decimal'];
                     $DashVL_Abs = NULL;
@@ -2265,7 +2277,7 @@ class SampleService
                     $data = array(
                         'sample_code'                           => $sampleCode,
                         'vlsm_instance_id'                      => 'nrl-weblims',
-                        'province_id'                           => (trim($row['TracnetID']) != '' ? trim($row['TracnetID']) : NULL),
+                        'province_id'                           => (trim($province['province_id']) != '' ? trim($province['province_id']) : NULL),
                         'source'                                => '1',
                         'patient_gender'                        => (trim($row['patientGender']) != '' ? trim($row['patientGender']) : NULL),
                         'patient_age_in_years'                  => (trim($row['PatientAge']) != '' ? trim($row['PatientAge']) : NULL),
@@ -2384,19 +2396,55 @@ class SampleService
                         //sample data insert
                         $status = $sampleDb->insert($data);
                     }
+
+                    if ($status == 0) {
+                        $return[$key][] = $row['SampleID'];
+                    }
+                    $unique = $row['SampleID'];
                 }
             }
         } else {
             http_response_code(400);
-            return array(
+            $response = array(
                 'status'    => 'fail',
                 'message'   => 'Missing data in API request',
             );
         }
         http_response_code(202);
-        return array(
+        $status = 'success';
+        if (count($return) > 0) {
+            /* $response =  array(
+                'status'    => 'success',
+                'message'   => 'Received ' . count($params['xmlmessage']) . ' records. ' . (count($params['xmlmessage']) - count($return)) . ' records successfully processed. ' . count($return) . ' records failed or duplicate entry.',
+                "failed"    => $return
+            ); */
+            if((count($params['xmlmessage']) - count($return)) == 0){
+                $status = 'failed';
+            } else{
+                $status = 'partial';
+            }
+        }
+        $response = array(
             'status'    => 'success',
             'message'   => 'Received ' . count($params) . ' records.'
         );
+
+        // Track API Records
+        $apiTrackData = array(
+            'tracking_id'                   => $unique,
+            'received_on'                   => $common->getDateTime(),
+            'number_of_records_received'    => count($params),
+            'number_of_records_processed'   => (count($params) - count($return)),
+            'source'                        => 'Weblims VL',
+            'status'                        => $status
+        );
+        $trackResult = $apiTrackDb->select(array('tracking_id' => $unique))->current();
+        if($trackResult){
+            $apiTrackDb->update($apiTrackData, array('api_id' => $trackResult['api_id']));
+        } else{
+            $apiTrackDb->insert($apiTrackData);
+        }
+
+        return $response;
     }
 }
