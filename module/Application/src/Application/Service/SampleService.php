@@ -107,6 +107,22 @@ class SampleService
         return $sResult;
     }
 
+    public function checkTestReason($reasonName)
+    {
+
+        if (empty(trim($reasonName))) return null;
+
+        $testReasonDb = $this->sm->get('TestReasonTable');
+        $sResult = $testReasonDb->select(array('test_reason_name' => $reasonName))->toArray();
+        if ($sResult) {
+            $testReasonDb->update(array('test_reason_name' => trim($reasonName)), array('test_reason_id' => $sResult['test_reason_id']));
+            return $sResult['test_reason_id'];
+        } else {
+            $testReasonDb->insert(array('test_reason_name' => trim($reasonName), 'test_reason_status' => 'active', 'updated_datetime' => new Expression('NOW()')));
+            return $testReasonDb->lastInsertValue;
+        }
+    }
+
     //lab details start
     //get sample status for lab dash
     public function getSampleStatusDataTable($params)
@@ -2195,10 +2211,12 @@ class SampleService
         $sampleTypeDb = $this->sm->get('SampleTypeTable');
         $sampleRjtReasonDb = $this->sm->get('SampleRejectionReasonTable');
         $return = array();
-        if ($params['xmlmessage'] !== FALSE) {
-            foreach ($params['xmlmessage'] as $key => $row) {
-                // Debug::dump($row);die;
-                if (trim($row['SampleID']) != '' && trim($row['TestName']) == 'HIV Viral Load') {
+        $params = json_decode($params, true);
+        //var_dump($params);die;
+        if (!empty($params)) {
+            foreach ($params as $key => $row) {
+                //var_dump($row);die;
+                if (!empty(trim($row['SampleID'])) && trim($row['TestId']) == 'VIRAL_LOAD_2') {
                     $sampleCode = trim($row['SampleID']);
                     $instanceCode = 'nrl-weblims';
 
@@ -2234,14 +2252,15 @@ class SampleService
                         $DashVL_Abs = $VLAnalysisResult;
                     }
 
-                    $dob = (trim($row['BirthDate']) != '' ? date('Y-m-d', strtotime(str_replace("T", " ", $row['BirthDate']))) : null);
-                    $sampleCollectionDate = (trim($row['CollectionDate']) != '' ? trim(date('Y-m-d H:i', strtotime(str_replace("T", " ", $row['CollectionDate'])))) : null);
-                    $sampleReceivedAtLab = ((trim($row['SampleReceivedDate']) != '' && $row['SampleReceivedDate'] != "T") ? trim(date('Y-m-d H:i', strtotime(str_replace("T", " ", $row['SampleReceivedDate'])))) : null);
-                    $dateOfInitiationOfRegimen = (trim($row['date_of_initiation_of_current_regimen']) != '' ? trim(date('Y-m-d H:i', strtotime($row['date_of_initiation_of_current_regimen']))) : null);
-                    $resultApprovedDateTime = (trim($row['result_approved_datetime']) != '' ? trim(date('Y-m-d H:i', strtotime($row['result_approved_datetime']))) : null);
-                    $sampleTestedDateTime = (trim($row['SampleTestedDate']) != '' ? trim(date('Y-m-d H:i', strtotime(str_replace("T", " ", $row['SampleTestedDate'])))) : null);
-                    $resultPrinterDateTime = (trim($row['Result']['ResultReturnDate']) != '' ? trim(date('Y-m-d H:i', strtotime(str_replace("T", " ", $row['Result']['ResultReturnDate'])))) : null);
-                    $sampleRegisteredAtLabDateTime = (trim($row['sample_registered_at_lab']) != '' ? trim(date('Y-m-d H:i', strtotime($row['sample_registered_at_lab']))) : null);
+                    
+                    $sampleReceivedAtLab = ((trim($row['SampleReceivedDate']) != '' && $row['SampleReceivedDate'] != "T") ? trim(str_replace("T", " ", $row['SampleReceivedDate'])) : null);
+                    $sampleTestedDateTime = ((trim($row['SampleTestedDate']) != '' && $row['SampleTestedDate'] != "T") ? trim(str_replace("T", " ", $row['SampleTestedDate'])) : null);
+                    $sampleCollectionDate = ((trim($row['CollectionDate']) != '' && $row['CollectionDate'] != "T") ? trim(str_replace("T", " ", $row['CollectionDate'])) : null);
+                    $dob = ((trim($row['BirthDate']) != '' && $row['BirthDate'] != "T") ? trim(str_replace("T", " ", $row['BirthDate'])) : null);
+                    $resultApprovedDateTime = ((trim($row['SampleDateApprovedDateTime']) != '' && $row['SampleDateApprovedDateTime'] != "T") ? trim(str_replace("T", " ", $row['SampleDateApprovedDateTime'])) : null);
+                    $dateOfInitiationOfRegimen = ((trim($row['DateInitiaitonCurrentRegiment']) != '' && $row['DateInitiaitonCurrentRegiment'] != "T") ? trim(str_replace("T", " ", $row['DateInitiaitonCurrentRegiment'])) : null);
+                    $sampleRegisteredAtLabDateTime = ((trim($row['SampleRegisteredAtLabDate']) != '' && $row['SampleRegisteredAtLabDate'] != "T") ? trim(str_replace("T", " ", $row['SampleRegisteredAtLabDate'])) : null);
+                    $resultPrinterDateTime = ((trim($row['Result']['ResultReturnDate']) != '' && $row['Result']['ResultReturnDate'] != "T") ? trim(str_replace("T", " ", $row['Result']['ResultReturnDate'])) : null);
 
                     $data = array(
                         'sample_code'                           => $sampleCode,
@@ -2255,7 +2274,7 @@ class SampleService
                         'sample_registered_at_lab'              => $sampleReceivedAtLab,
                         'result_printed_datetime'               => $resultPrinterDateTime,
                         'line_of_treatment'                     => (trim($row['CurrentTreatment']) != '' ? trim($row['CurrentTreatment']) : NULL),
-                        'is_sample_rejected'                    => (trim($row['IsSampleRejected']) != '' ? trim($row['IsSampleRejected']) : NULL),
+                        'is_sample_rejected'                    => (trim($row['IsSampleRejected']) != '' ? strtolower($row['IsSampleRejected']) : NULL),
                         'is_patient_pregnant'                   => (trim($row['IsPatientPregnant']) != '' ? trim($row['IsPatientPregnant']) : NULL),
                         'is_patient_breastfeeding'              => (trim($row['IsPatientBreastfeeding']) != '' ? trim($row['IsPatientBreastfeeding']) : NULL),
                         'patient_mobile_number'                 => (trim($row['PhoneNumber']) != '' ? trim($row['PhoneNumber']) : NULL),
@@ -2265,7 +2284,8 @@ class SampleService
                         'is_adherance_poor'                     => (trim($row['is_adherance_poor']) != '' ? trim($row['is_adherance_poor']) : NULL),
                         'result_approved_datetime'              => $resultApprovedDateTime,
                         'sample_tested_datetime'                => $sampleTestedDateTime,
-                        'result_value_log'                      => (trim($row['Result']['log']) != '' ? trim($row['Result']['log']) : NULL),
+                        'vl_test_platform'                      => (trim($row['vlTestingPlatform']) != '' ? trim($row['vlTestingPlatform']) : NULL),
+                        'result_value_log'                      => (trim($row['Result']['log']) != '' ? (float)($row['Result']['log']) : NULL),
                         'result_value_absolute'                 => (trim($row['result_value_absolute']) != '' ? trim($row['result_value_absolute']) : NULL),
                         'result_value_text'                     => (trim($row['Result']['Copies']) != '' ? trim($row['Result']['Copies']) : NULL),
                         'result_value_absolute_decimal'         => (trim($row['result_value_absolute_decimal']) != '' ? trim($row['result_value_absolute_decimal']) : NULL),
@@ -2275,6 +2295,7 @@ class SampleService
                         'DashVL_AnalysisResult'                 => $DashVL_AnalysisResult,
                         'sample_registered_at_lab'              => $sampleRegisteredAtLabDateTime
                     );
+
 
                     //check clinic details
                     if (isset($row['FacilityName']) && trim($row['FacilityName']) != '') {
@@ -2304,19 +2325,6 @@ class SampleService
                     }
 
                     //check testing reason
-                    if (trim($row['test_reason_name']) != '') {
-                        $testReasonResult = $this->checkTestingReson(trim($row['test_reason_name']));
-                        if ($testReasonResult) {
-                            $testReasonDb->update(array('test_reason_name' => trim($row['test_reason_name']), 'test_reason_status' => trim($row['test_reason_status'])), array('test_reason_id' => $testReasonResult['test_reason_id']));
-                            $data['reason_for_vl_testing'] = $testReasonResult['test_reason_id'];
-                        } else {
-                            $testReasonDb->insert(array('test_reason_name' => trim($row['test_reason_name']), 'test_reason_status' => trim($row['test_reason_status'])));
-                            $data['reason_for_vl_testing'] = $testReasonDb->lastInsertValue;
-                        }
-                    } else {
-                        $data['reason_for_vl_testing'] = 0;
-                    }
-                    //check testing reason
                     if (trim($row['TestStatus']) != '') {
                         $sampleStatusResult = $this->checkSampleStatus(trim($row['TestStatus']));
                         if ($sampleStatusResult) {
@@ -2341,6 +2349,16 @@ class SampleService
                     } else {
                         $data['sample_type'] = NULL;
                     }
+
+                    //check sample test reason
+                    if (!empty(trim($row['ReasonForTesting']))) {
+                        $data['reason_for_vl_testing'] =  $this->checkTestReason(trim($row['ReasonForTesting']));
+                    } else {
+                        $data['reason_for_vl_testing'] = NULL;
+                    }
+
+
+
                     //check sample rejection reason
                     if (trim($row['SampleRejectionReason']) != '') {
                         $sampleRejectionReason = $this->checkSampleRejectionReason(trim($row['SampleRejectionReason']));
@@ -2358,6 +2376,7 @@ class SampleService
                     //check existing sample code
                     $sampleCode = $this->checkSampleCode($sampleCode, $instanceCode);
                     $status = 0;
+
                     if ($sampleCode) {
                         //sample data update
                         $status = $sampleDb->update($data, array('vl_sample_id' => $sampleCode['vl_sample_id']));
@@ -2365,29 +2384,19 @@ class SampleService
                         //sample data insert
                         $status = $sampleDb->insert($data);
                     }
-                    if ($status == 0) {
-                        $return[$key][] = $row['SampleID'];
-                    }
                 }
             }
         } else {
+            http_response_code(400);
             return array(
                 'status'    => 'fail',
-                'message'   => 'Missed recevied index xmlmessage',
+                'message'   => 'Missing data in API request',
             );
         }
-        if (count($return) > 0) {
-            return array(
-                'status'    => 'success',
-                'message'   => 'Received ' . count($params['xmlmessage']) . ' records. ' . (count($params['xmlmessage']) - count($return)) . ' records successfully processed. ' . count($return) . ' records failed or duplicate entry.',
-                "failed"    => $return
-            );
-        } else {
-            return array(
-                'status'    => 'success',
-                'message'   => 'API Connected',
-            );
-        }
+        http_response_code(202);
+        return array(
+            'status'    => 'success',
+            'message'   => 'Received ' . count($params) . ' records.'
+        );
     }
-
 }

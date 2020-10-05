@@ -17,19 +17,19 @@ use Laminas\Db\TableGateway\AbstractTableGateway;
  *
  * @author amit
  */
-class TestReasonTable extends AbstractTableGateway {
+class TestReasonTable extends AbstractTableGateway
+{
 
     protected $table = 'r_vl_test_reasons';
 
-    public function __construct(Adapter $adapter) {
+    public function __construct(Adapter $adapter)
+    {
         $this->adapter = $adapter;
     }
-    
-    public function fetchAllTestReasonName(){
-        $dbAdapter = $this->adapter;
-        $sql = new Sql($dbAdapter);
-        $rQuery = $sql->select()->from(array('r'=>'r_vl_test_reasons'))->where(array('test_reason_status' => 'active'));
-        $rQueryStr = $sql->buildSqlString($rQuery);
-        return $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+
+    public function fetchAllTestReasonName()
+    {
+        $query = $this->select(array('test_reason_status' => 'active'));
+        return $query;
     }
 }

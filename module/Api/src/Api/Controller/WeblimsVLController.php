@@ -17,10 +17,15 @@ class WeblimsVLController extends AbstractRestfulController
 
     public function getList()
     {
-        exit('Nothing to see here');
+        
+        return array(
+            'status'    => 'fail',
+            'message'   => 'Invalid Request',
+        );
     }
     public function create($params)
     {
+        $params = file_get_contents('php://input');
         $response = $this->sampleService->saveWeblimsVLAPI($params);
         return new JsonModel($response);
     }
