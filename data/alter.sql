@@ -480,3 +480,5 @@ ALTER TABLE `r_sample_rejection_reasons` ADD `rejection_type` VARCHAR(255) NULL 
 /* Thana 17 Sep 2020 */
 ALTER TABLE `dash_covid19_form` ADD `type_of_test_requested` VARCHAR(255) NULL DEFAULT NULL AFTER `reason_for_covid19_test`;
 ALTER TABLE `dash_covid19_form` ADD `patient_city` VARCHAR(255) NULL DEFAULT NULL AFTER `patient_district`;
+
+ALTER TABLE `r_vl_test_reasons` ADD `updated_datetime` DATETIME NULL DEFAULT NULL AFTER `test_reason_status`;

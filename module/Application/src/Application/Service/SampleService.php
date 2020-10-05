@@ -2205,19 +2205,19 @@ class SampleService
         $common = new CommonService();
         $sampleDb = $this->sm->get('SampleTableWithoutCache');
         $facilityDb = $this->sm->get('FacilityTable');
-        $facilityTypeDb = $this->sm->get('FacilityTypeTable');
+        // $facilityTypeDb = $this->sm->get('FacilityTypeTable');
         $testStatusDb = $this->sm->get('SampleStatusTable');
-        $testReasonDb = $this->sm->get('TestReasonTable');
+        // $testReasonDb = $this->sm->get('TestReasonTable');
         $sampleTypeDb = $this->sm->get('SampleTypeTable');
         $sampleRjtReasonDb = $this->sm->get('SampleRejectionReasonTable');
         $provinceDb = $this->sm->get('ProvinceTable');
         $apiTrackDb = $this->sm->get('DashApiReceiverStatsTable');
         $return = array();
         $params = json_decode($params, true);
-        // var_dump($params);die;
+        // Debug::dump($params);die;
         if (!empty($params)) {
             foreach ($params as $key => $row) {
-                //var_dump($row);die;
+                // Debug::dump($row);die;
                 if (!empty(trim($row['SampleID'])) && trim($row['TestId']) == 'VIRAL_LOAD_2') {
                     $sampleCode = trim($row['SampleID']);
                     $instanceCode = 'nrl-weblims';
@@ -2400,7 +2400,9 @@ class SampleService
                     if ($status == 0) {
                         $return[$key][] = $row['SampleID'];
                     }
-                    $unique = $row['SampleID'];
+                    if($row['SampleID'] != ""){
+                        $unique = $row['SampleID'];
+                    }
                 }
             }
         } else {
