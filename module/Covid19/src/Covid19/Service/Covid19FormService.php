@@ -32,6 +32,8 @@ class Covid19FormService
     public function saveFileFromVlsmAPIV2()
     {
         $apiData = array();
+        $apiTrackDb = $this->sm->get('DashApiReceiverStatsTable');
+
         $this->config = $this->sm->get('Config');
         $input = $this->config['db']['dsn'];
         preg_match('~=(.*?);~', $input, $output);
@@ -76,7 +78,7 @@ class Covid19FormService
 
 
         $numRows = 0;
-        foreach ($apiData as $rowData) {
+        foreach ($apiData['data'] as $rowData) {
             $data = array();
             foreach ($columnList as $colName) {
                 if (isset($rowData[$colName])) {
@@ -103,6 +105,31 @@ class Covid19FormService
                 $numRows += $sampleDb->insert($data);
             }
         }
+
+        $common = new CommonService();
+        if(count($apiData['data'])  == $numRows){
+            $status = "success";
+        } else if((count($apiData['data']) - $numRows) != 0){
+            $status = "partial";
+        } else if($numRows == 0){
+            $status = 'failed';
+        }
+        $apiTrackData = array(
+            'tracking_id'                   => $apiData['timestamp'],
+            'received_on'                   => $common->getDateTime(),
+            'number_of_records_received'    => $apiData['data'],
+            'number_of_records_processed'   => (count($apiData['data']) - $numRows),
+            'source'                        => 'Sync V2 Viral Load',
+            'status'                        => $status
+        );
+        $trackResult = $apiTrackDb->select(array('tracking_id' => $apiData['timestamp']))->current();
+        if($trackResult){
+            $apiTrackDb->update($apiTrackData, array('api_id' => $trackResult['api_id']));
+        } else{
+            $apiTrackDb->insert($apiTrackData);
+        }
+
+
         return array(
             'status'    => 'success',
             'message'   => $numRows . ' uploaded successfully',
