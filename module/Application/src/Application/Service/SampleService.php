@@ -2415,12 +2415,8 @@ class SampleService
         http_response_code(202);
         $status = 'success';
         if (count($return) > 0) {
-            /* $response =  array(
-                'status'    => 'success',
-                'message'   => 'Received ' . count($params['xmlmessage']) . ' records. ' . (count($params['xmlmessage']) - count($return)) . ' records successfully processed. ' . count($return) . ' records failed or duplicate entry.',
-                "failed"    => $return
-            ); */
-            if((count($params['xmlmessage']) - count($return)) == 0){
+            
+            if((count($params) - count($return)) == 0){
                 $status = 'failed';
             } else{
                 $status = 'partial';
