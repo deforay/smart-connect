@@ -117,8 +117,8 @@ class Covid19FormService
         $apiTrackData = array(
             'tracking_id'                   => $apiData['timestamp'],
             'received_on'                   => $common->getDateTime(),
-            'number_of_records_received'    => $apiData['data'],
-            'number_of_records_processed'   => (count($apiData['data']) - $numRows),
+            'number_of_records_received'    => count($apiData['data']),
+            'number_of_records_processed'   => $numRows,
             'source'                        => 'Sync V2 Viral Load',
             'status'                        => $status
         );
