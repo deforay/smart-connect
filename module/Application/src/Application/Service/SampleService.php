@@ -2432,11 +2432,11 @@ class SampleService
                 $status = 'failed';
             } else{
                 //remove directory  
-                $common->removeDirectory($pathname);
+                unlink($pathname);
             }
         } else{
             //remove directory  
-            $common->removeDirectory($pathname);
+            unlink($pathname);
         }
         $response = array(
             'status'    => 'success',
