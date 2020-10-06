@@ -1900,7 +1900,7 @@ class SampleService
         $fileName = $ranNumber . "." . $extension;
 
         if (!file_exists(TEMP_UPLOAD_PATH) && !is_dir(TEMP_UPLOAD_PATH)) {
-            mkdir(APPLICATION_PATH . DIRECTORY_SEPARATOR . "uploads", 0777);
+            mkdir(APPLICATION_PATH . DIRECTORY_SEPARATOR . "temporary", 0777);
         }
         if (!file_exists(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-vl") && !is_dir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-vl")) {
             mkdir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-vl", 0777);
@@ -2214,9 +2214,23 @@ class SampleService
         $apiTrackDb = $this->sm->get('DashApiReceiverStatsTable');
         $return = array();
         $params = json_decode($params, true);
-        // Debug::dump($params);die;
+        // Debug::dump($params['timestamp']);die;
         if (!empty($params)) {
-            foreach ($params as $key => $row) {
+            if (!file_exists(TEMP_UPLOAD_PATH) && !is_dir(TEMP_UPLOAD_PATH)) {
+                mkdir(APPLICATION_PATH . DIRECTORY_SEPARATOR . "temporary", 0777);
+            }
+            if (!file_exists(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "weblims-vl") && !is_dir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "weblims-vl")) {
+                mkdir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "weblims-vl", 0777);
+            }
+    
+            $pathname = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "weblims-vl" . DIRECTORY_SEPARATOR . $params['timestamp'].'.json';
+            if (!file_exists($pathname)) {
+                $file = file_put_contents($pathname, json_encode($params));
+                if (move_uploaded_file($pathname, $pathname)) {
+                    // $apiData = file_put_contents($pathname);
+                }
+            }
+            foreach ($params['data'] as $key => $row) {
                 // Debug::dump($row);die;
                 if (!empty(trim($row['SampleID'])) && trim($row['TestId']) == 'VIRAL_LOAD_2') {
                     $sampleCode = trim($row['SampleID']);
@@ -2400,9 +2414,6 @@ class SampleService
                     if ($status == 0) {
                         $return[$key][] = $row['SampleID'];
                     }
-                    if($row['SampleID'] != ""){
-                        $unique = $row['SampleID'];
-                    }
                 }
             }
         } else {
@@ -2416,11 +2427,16 @@ class SampleService
         $status = 'success';
         if (count($return) > 0) {
             
+            $status = 'partial';
             if((count($params) - count($return)) == 0){
                 $status = 'failed';
             } else{
-                $status = 'partial';
+                //remove directory  
+                $common->removeDirectory($pathname);
             }
+        } else{
+            //remove directory  
+            $common->removeDirectory($pathname);
         }
         $response = array(
             'status'    => 'success',
@@ -2429,14 +2445,14 @@ class SampleService
 
         // Track API Records
         $apiTrackData = array(
-            'tracking_id'                   => $unique,
+            'tracking_id'                   => $params['timestamp'],
             'received_on'                   => $common->getDateTime(),
             'number_of_records_received'    => count($params),
             'number_of_records_processed'   => (count($params) - count($return)),
             'source'                        => 'Weblims VL',
             'status'                        => $status
         );
-        $trackResult = $apiTrackDb->select(array('tracking_id' => $unique))->current();
+        $trackResult = $apiTrackDb->select(array('tracking_id' => $params['timestamp']))->current();
         if($trackResult){
             $apiTrackDb->update($apiTrackData, array('api_id' => $trackResult['api_id']));
         } else{
