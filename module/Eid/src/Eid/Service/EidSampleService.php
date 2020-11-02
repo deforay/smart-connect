@@ -396,7 +396,7 @@ class EidSampleService
     {
         $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
         $sql = new Sql($dbAdapter);
-        $sQuery = $sql->select()->from($dashTable)->where(array('sample_code LIKE "%' . $sampleCode . '%"', 'vlsm_instance_id' => $instanceCode));
+        $sQuery = $sql->select()->from($dashTable)->where(array('sample_code' => $sampleCode, 'vlsm_instance_id' => $instanceCode));
         $sQueryStr = $sql->buildSqlString($sQuery);
         $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
         return $sResult;
