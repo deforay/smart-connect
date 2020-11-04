@@ -499,6 +499,16 @@ class EidSampleService
         $facilityDb = $this->sm->get('FacilityTable');
         return $facilityDb->fetchAllClinicName($mappedFacilities);
     }
+    // Get all test reason name for eid
+    public function getAllTestReasonName()
+    {
+        $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
+        $sql = new Sql($dbAdapter);
+        $tQuery = $sql->select()->from('r_eid_test_reasons');
+        $tQueryStr = $sql->buildSqlString($tQuery);
+        $tResult = $dbAdapter->query($tQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
+        return $tResult;
+    }
     //get all province name
     public function getAllProvinceList()
     {
@@ -515,12 +525,6 @@ class EidSampleService
     // get all distrcit name
     public function getAllDistrictList()
     {
-
-        $logincontainer = new Container('credo');
-        $mappedFacilities = null;
-        if ($logincontainer->role != 1) {
-            $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : null;
-        }
         $locationDb = $this->sm->get('LocationDetailsTable');
         return $locationDb->fetchAllDistrictsList();
     }
@@ -1104,4 +1108,41 @@ class EidSampleService
         $eidSampleDb = $this->sm->get('EidSampleTableWithoutCache');
         return $eidSampleDb->fetchEidPositivityRateDetails($params);
     }
+
+    //clinic details start
+    public function getOverallEidResult($params)
+    {
+        $sampleDb = $this->sm->get('EidSampleTableWithoutCache');
+        return $sampleDb->fetchOverallEidResult($params);
+    }
+
+    public function getViralLoadStatusBasedOnGender($params)
+    {
+        $sampleDb = $this->sm->get('EidSampleTableWithoutCache');
+        return $sampleDb->fetchViralLoadStatusBasedOnGender($params);
+    }
+
+    public function getSampleTestedResultBasedGenderDetails($params)
+    {
+        $sampleDb = $this->sm->get('EidSampleTableWithoutCache');
+        return $sampleDb->fetchSampleTestedResultBasedGenderDetails($params);
+    }
+
+    public function fetchSampleTestedReason($params)
+    {
+        $sampleDb = $this->sm->get('EidSampleTableWithoutCache');
+        return $sampleDb->fetchSampleTestedReason($params);
+    }
+
+    public function getClinicSampleTestedResultAgeGroupDetails($params)
+    {
+        $sampleDb = $this->sm->get('EidSampleTableWithoutCache');
+        return $sampleDb->fetchClinicSampleTestedResultAgeGroupDetails($params);
+    }
+    public function getClinicRequisitionFormsTested($params)
+    {
+        $sampleDb = $this->sm->get('EidSampleTableWithoutCache');
+        return $sampleDb->fetchClinicRequisitionFormsTested($params);
+    }
+    //clinic details end
 }

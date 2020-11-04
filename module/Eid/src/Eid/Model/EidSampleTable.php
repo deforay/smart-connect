@@ -4485,4 +4485,647 @@ class EidSampleTable extends AbstractTableGateway
             return 0;
         }
     }
+
+    // CLINIC DASHBOARD STUFF
+    public function fetchOverallEidResult($params)
+    {
+        $logincontainer = new Container('credo');
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $sResult = array();
+        if (isset($params['sampleCollectionDate']) && trim($params['sampleCollectionDate']) != '') {
+            $s_c_date = explode("to", $params['sampleCollectionDate']);
+            if (isset($s_c_date[0]) && trim($s_c_date[0]) != "") {
+                $startDate = trim($s_c_date[0]);
+            }
+            if (isset($s_c_date[1]) && trim($s_c_date[1]) != "") {
+                $endDate = trim($s_c_date[1]);
+            }
+
+            $squery = $sql->select()->from(array('vl' => $this->table))
+                ->columns(
+                    array(
+                        "totalCollected" => new Expression("count(*)"),
+                        "testedTotal" => new Expression("SUM(CASE WHEN ((vl.result is NOT NULL OR vl.result != '')) THEN 1 ELSE 0 END)"),
+                        "notTestedTotal" => new Expression("SUM(CASE WHEN ((vl.result is NULL OR vl.result = '')) THEN 1 ELSE 0 END)"),
+                        "positive" => new Expression("SUM(CASE WHEN ((vl.result like 'positive%' OR vl.result like 'Positive%' )) THEN 1 ELSE 0 END)"),
+                        "negative" => new Expression("SUM(CASE WHEN ((vl.result like 'negative%' OR vl.result like 'Negative%')) THEN 1 ELSE 0 END)"),
+                    )
+                );
+            $squery = $squery->where(array("DATE(vl.sample_collection_date) BETWEEN '$startDate' AND '$endDate'"));
+
+            if (isset($params['clinicId']) && trim($params['clinicId']) != '') {
+                $squery = $squery->where('vl.facility_id IN (' . $params['clinicId'] . ')');
+            } else {
+                if ($logincontainer->role != 1) {
+                    $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : array(0);
+                    $squery = $squery->where('vl.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
+                }
+            }
+
+            if (isset($params['sampleTypeId']) && $params['sampleTypeId'] != '') {
+                $squery = $squery->where('vl.sample_type="' . base64_decode(trim($params['sampleTypeId'])) . '"');
+            }
+            
+            //print_r($params['age']);die;
+            $ageWhere = '';
+            if (isset($params['age']) && trim($params['age']) != '') {
+                $age = explode(',', $params['age']);
+                for ($a = 0; $a < count($age); $a++) {
+                    if (trim($ageWhere) != '') {
+                        $ageWhere .= ' OR ';
+                    }
+                    if ($age[$a] == '<2') {
+                        $ageWhere .= "(vl.child_age > 0 AND vl.child_age < 2)";
+                    } else if ($age[$a] == '2to5') {
+                        $ageWhere .= "(vl.child_age >= 2 AND vl.child_age <= 5)";
+                    } else if ($age[$a] == '6to14') {
+                        $ageWhere .= "(vl.child_age >= 6 AND vl.child_age <= 14)";
+                    } else if ($age[$a] == '15to49') {
+                        $ageWhere .= "(vl.child_age >= 15 AND vl.child_age <= 49)";
+                    } else if ($age[$a] == '>=50') {
+                        $ageWhere .= "(vl.child_age >= 50)";
+                    } else if ($age[$a] == 'unknown') {
+                        $ageWhere .= "(vl.child_age IS NULL OR vl.child_age = '' OR vl.child_age = 'Unknown' OR vl.child_age = 'unknown')";
+                    }
+                }
+                $ageWhere = '(' . $ageWhere . ')';
+                $squery = $squery->where($ageWhere);
+            }
+
+            if (isset($params['gender']) && $params['gender'] == 'F') {
+                $squery = $squery->where("vl.child_gender IN ('f','female','F','FEMALE')");
+            } else if (isset($params['gender']) && $params['gender'] == 'M') {
+                $squery = $squery->where("vl.child_gender IN ('m','male','M','MALE')");
+            } else if (isset($params['gender']) && $params['gender'] == 'not_specified') {
+                $squery = $squery->where("(vl.child_gender IS NULL OR vl.child_gender = '' OR vl.child_gender ='Not Recorded' OR vl.child_gender = 'not recorded')");
+            }
+            
+            $sQueryStr = $sql->buildSqlString($squery);
+            //echo $sQueryStr;die;
+            $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+        }
+        //var_dump($sResult);die;
+        return $sResult;
+    }
+
+    public function fetchViralLoadStatusBasedOnGender($params)
+    {
+        $logincontainer = new Container('credo');
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $result = array();
+        $common = new CommonService($this->sm);
+        if (isset($params['sampleCollectionDate']) && trim($params['sampleCollectionDate']) != '') {
+            $s_c_date = explode("to", $params['sampleCollectionDate']);
+            if (isset($s_c_date[0]) && trim($s_c_date[0]) != "") {
+                $startDate = trim($s_c_date[0]);
+            }
+            if (isset($s_c_date[1]) && trim($s_c_date[1]) != "") {
+                $endDate = trim($s_c_date[1]);
+            }
+            $query = $sql->select()->from(array('vl' => $this->table))
+                ->columns(
+                    array(
+                        "mTotal" => new Expression("SUM(CASE WHEN (vl.child_gender in('m','Male','M','MALE')) THEN 1 ELSE 0 END)"),
+                        "mGreaterThanEqual1000" => new Expression("SUM(CASE WHEN (vl.child_gender in('m','Male','M','MALE') and (vl.DashVL_AnalysisResult like 'not suppressed%' OR vl.DashVL_AnalysisResult like 'Not Suppressed%' or vl.DashVL_Abs >= 1000)) THEN 1 ELSE 0 END)"),
+                        "mLesserThan1000" => new Expression("SUM(CASE WHEN (vl.child_gender in('m','Male','M','MALE') and (vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' )) THEN 1 ELSE 0 END)"),
+
+                        "fTotal" => new Expression("SUM(CASE WHEN (vl.child_gender in('f','Female','F','FEMALE')) THEN 1 ELSE 0 END)"),
+                        "fGreaterThanEqual1000" => new Expression("SUM(CASE WHEN (vl.child_gender in('f','Female','F','FEMALE') and (vl.DashVL_AnalysisResult like 'not suppressed%' OR vl.DashVL_AnalysisResult like 'Not Suppressed%' or vl.DashVL_Abs >= 1000)) THEN 1 ELSE 0 END)"),
+                        "fLesserThan1000" => new Expression("SUM(CASE WHEN (vl.child_gender in('f','Female','F','FEMALE') and (vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' )) THEN 1 ELSE 0 END)"),
+
+                        "nsTotal" => new Expression("SUM(CASE WHEN ((vl.child_gender IS NULL OR vl.child_gender = '' OR vl.child_gender ='Not Recorded' OR vl.child_gender = 'not recorded')) THEN 1 ELSE 0 END)"),
+                        "nsGreaterThanEqual1000" => new Expression("SUM(CASE WHEN ((vl.child_gender IS NULL OR vl.child_gender = '' OR vl.child_gender ='Not Recorded' OR vl.child_gender = 'not recorded' OR vl.child_gender = 'Unreported' OR vl.child_gender = 'unreported') and (vl.DashVL_AnalysisResult like 'not suppressed%' OR vl.DashVL_AnalysisResult like 'Not Suppressed%' or vl.DashVL_Abs >= 1000)) THEN 1 ELSE 0 END)"),
+                        "nsLesserThan1000" => new Expression("SUM(CASE WHEN ((vl.child_gender IS NULL OR vl.child_gender = '' OR vl.child_gender ='Not Recorded' OR vl.child_gender = 'not recorded' OR vl.child_gender = 'Unreported' OR vl.child_gender = 'unreported') and (vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' )) THEN 1 ELSE 0 END)"),
+                    )
+                )
+                ->where(array("DATE(vl.sample_collection_date) BETWEEN '$startDate' AND '$endDate'"));
+
+            if (isset($params['clinicId']) && trim($params['clinicId']) != '') {
+                $query = $query->where('vl.facility_id IN (' . $params['clinicId'] . ')');
+            } else {
+                if ($logincontainer->role != 1) {
+                    $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : array(0);
+                    $query = $query->where('vl.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
+                }
+            }
+
+            if (isset($params['testResult']) && $params['testResult'] == '<1000') {
+                $query = $query->where("(vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' )");
+            } else if (isset($params['testResult']) && $params['testResult'] == '>=1000') {
+                $query = $query->where("(vl.DashVL_AnalysisResult like 'not suppressed%' OR vl.DashVL_AnalysisResult like 'Not Suppressed%' or vl.DashVL_Abs >= 1000)");
+            }
+            if (isset($params['sampleTypeId']) && $params['sampleTypeId'] != '') {
+                $query = $query->where('vl.sample_type="' . base64_decode(trim($params['sampleTypeId'])) . '"');
+            }
+            //print_r($params['age']);die;
+            if (isset($params['age']) && trim($params['age']) != '') {
+                $age = explode(',', $params['age']);
+                $where = '';
+                for ($a = 0; $a < count($age); $a++) {
+                    if (trim($where) != '') {
+                        $where .= ' OR ';
+                    }
+                    if ($age[$a] == '<2') {
+                        $where .= "(vl.child_age > 0 AND vl.child_age < 2)";
+                    } else if ($age[$a] == '2to5') {
+                        $where .= "(vl.child_age >= 2 AND vl.child_age <= 5)";
+                    } else if ($age[$a] == '6to14') {
+                        $where .= "(vl.child_age >= 6 AND vl.child_age <= 14)";
+                    } else if ($age[$a] == '15to49') {
+                        $where .= "(vl.child_age >= 15 AND vl.child_age <= 49)";
+                    } else if ($age[$a] == '>=50') {
+                        $where .= "(vl.child_age >= 50)";
+                    } else if ($age[$a] == 'unknown') {
+                        $where .= "(vl.child_age IS NULL OR vl.child_age = '' OR vl.child_age = 'Unknown' OR vl.child_age = 'unknown' OR vl.child_age = 'Unreported' OR vl.child_age = 'unreported')";
+                    }
+                }
+                $where = '(' . $where . ')';
+                $query = $query->where($where);
+            }
+            if (isset($params['adherence']) && trim($params['adherence']) != '') {
+                $query = $query->where(array("vl.arv_adherance_percentage = '" . $params['adherence'] . "'"));
+            }
+            if (isset($params['gender']) && $params['gender'] == 'F') {
+                $query = $query->where("vl.child_gender IN ('f','female','F','FEMALE')");
+            } else if (isset($params['gender']) && $params['gender'] == 'M') {
+                $query = $query->where("vl.child_gender IN ('m','male','M','MALE')");
+            } else if (isset($params['gender']) && $params['gender'] == 'not_specified') {
+                $query = $query->where("(vl.child_gender IS NULL OR vl.child_gender = '' OR vl.child_gender ='Not Recorded' OR vl.child_gender = 'not recorded OR vl.child_age = 'Unreported' OR vl.child_age = 'unreported')");
+            }
+            if (isset($params['isPregnant']) && $params['isPregnant'] == 'yes') {
+                $query = $query->where("vl.is_patient_pregnant = 'yes'");
+            } else if (isset($params['isPregnant']) && $params['isPregnant'] == 'no') {
+                $query = $query->where("vl.is_patient_pregnant = 'no'");
+            } else if (isset($params['isPregnant']) && $params['isPregnant'] == 'unreported') {
+                $query = $query->where("(vl.is_patient_pregnant IS NULL OR vl.is_patient_pregnant = '' OR vl.is_patient_pregnant = 'Unreported' OR vl.is_patient_pregnant = 'unreported')");
+            }
+            if (isset($params['isBreastfeeding']) && $params['isBreastfeeding'] == 'yes') {
+                $query = $query->where("vl.is_patient_breastfeeding = 'yes'");
+            } else if (isset($params['isBreastfeeding']) && $params['isBreastfeeding'] == 'no') {
+                $query = $query->where("vl.is_patient_breastfeeding = 'no'");
+            } else if (isset($params['isBreastfeeding']) && $params['isBreastfeeding'] == 'unreported') {
+                $query = $query->where("(vl.is_patient_breastfeeding IS NULL OR vl.is_patient_breastfeeding = '' OR vl.is_patient_breastfeeding = 'Unreported' OR vl.is_patient_breastfeeding = 'unreported')");
+            }
+
+            $queryStr = $sql->buildSqlString($query);
+
+            $sampleResult = $common->cacheQuery($queryStr, $dbAdapter);
+            $j = 0;
+            foreach ($sampleResult as $sample) {
+                $result['Total']['Male'][$j] = (isset($sample["mTotal"])) ? $sample["mTotal"] : 0;
+                $result['Total']['Female'][$j] = (isset($sample["fTotal"])) ? $sample["fTotal"] : 0;
+                $result['Total']['Not Specified'][$j] = (isset($sample["nsTotal"])) ? $sample["nsTotal"] : 0;
+                $result['Suppressed']['Male'][$j] = (isset($sample["mLesserThan1000"])) ? $sample["mLesserThan1000"] : 0;
+                $result['Suppressed']['Female'][$j] = (isset($sample["fLesserThan1000"])) ? $sample["fLesserThan1000"] : 0;
+                $result['Suppressed']['Not Specified'][$j] = (isset($sample["nsLesserThan1000"])) ? $sample["nsLesserThan1000"] : 0;
+                $result['Not Suppressed']['Male'][$j] = (isset($sample["mGreaterThanEqual1000"])) ? $sample["mGreaterThanEqual1000"] : 0;
+                $result['Not Suppressed']['Female'][$j] = (isset($sample["fGreaterThanEqual1000"])) ? $sample["fGreaterThanEqual1000"] : 0;
+                $result['Not Suppressed']['Not Specified'][$j] = (isset($sample["nsGreaterThanEqual1000"])) ? $sample["nsGreaterThanEqual1000"] : 0;
+                $j++;
+            }
+        }
+
+
+        return $result;
+    }
+
+    public function fetchSampleTestedResultBasedGenderDetails($params)
+    {
+        $logincontainer = new Container('credo');
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $result = array();
+        $common = new CommonService($this->sm);
+        if (isset($params['sampleCollectionDate']) && trim($params['sampleCollectionDate']) != '') {
+            $s_c_date = explode("to", $params['sampleCollectionDate']);
+            if (isset($s_c_date[0]) && trim($s_c_date[0]) != "") {
+                $startDate = trim($s_c_date[0]);
+            }
+            if (isset($s_c_date[1]) && trim($s_c_date[1]) != "") {
+                $endDate = trim($s_c_date[1]);
+            }
+            $query = $sql->select()->from(array('vl' => $this->table))
+                ->columns(
+                    array(
+
+                        "total" => new Expression('COUNT(*)'),
+                        "sampleCollectionDate" => new Expression("DATE_FORMAT(DATE(sample_collection_date), '%d-%b-%Y')"),
+
+                        "MGreaterThan1000" => new Expression("SUM(CASE WHEN (vl.child_gender is not null and vl.child_gender != '' and vl.child_gender !='unreported' and vl.child_gender in('m','Male','M','MALE') and (vl.DashVL_AnalysisResult like 'not suppressed%' OR vl.DashVL_AnalysisResult like 'Not Suppressed%' or vl.DashVL_Abs >= 1000)) THEN 1 ELSE 0 END)"),
+                        "MLesserThan1000" => new Expression("SUM(CASE WHEN (vl.child_gender is not null and vl.child_gender != '' and vl.child_gender !='unreported' and vl.child_gender in('m','Male','M','MALE') and (vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' )) THEN 1 ELSE 0 END)"),
+
+                        "FGreaterThan1000" => new Expression("SUM(CASE WHEN (vl.child_gender is not null and vl.child_gender != '' and vl.child_gender !='unreported' and vl.child_gender in('f','Female','F','FEMALE') and (vl.DashVL_AnalysisResult like 'not suppressed%' OR vl.DashVL_AnalysisResult like 'Not Suppressed%' or vl.DashVL_Abs >= 1000)) THEN 1 ELSE 0 END)"),
+                        "FLesserThan1000" => new Expression("SUM(CASE WHEN (vl.child_gender is not null and vl.child_gender != '' and vl.child_gender !='unreported' and vl.child_gender in('f','Female','F','FEMALE') and (vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' )) THEN 1 ELSE 0 END)"),
+
+                        "OGreaterThan1000" => new Expression("SUM(CASE WHEN ((vl.child_gender IS NULL or vl.child_gender = '' or vl.child_gender = 'Not Recorded' or vl.child_gender = 'not recorded') and (vl.DashVL_AnalysisResult like 'not suppressed%' OR vl.DashVL_AnalysisResult like 'Not Suppressed%' or vl.DashVL_Abs >= 1000)) THEN 1 ELSE 0 END)"),
+                        "OLesserThan1000" => new Expression("SUM(CASE WHEN ((vl.child_gender IS NULL or vl.child_gender ='NULL' or vl.child_gender = '' or vl.child_gender = 'Not Recorded' or vl.child_gender = 'not recorded' or vl.child_gender = 'Unreported' or vl.child_gender = 'unreported') and (vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' )) THEN 1 ELSE 0 END)"),
+
+                    )
+                )
+                ->where(array("DATE(vl.sample_collection_date) <='$endDate'", "DATE(vl.sample_collection_date) >='$startDate'"));
+            if (isset($params['clinicId']) && trim($params['clinicId']) != '') {
+                $query = $query->where('vl.facility_id IN (' . $params['clinicId'] . ')');
+            } else {
+                if ($logincontainer->role != 1) {
+                    $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : array(0);
+                    $query = $query->where('vl.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
+                }
+            }
+            if (isset($params['testResult']) && $params['testResult'] == '<1000') {
+                $query = $query->where("(vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' )");
+            } else if (isset($params['testResult']) && $params['testResult'] == '>=1000') {
+                $query = $query->where("(vl.DashVL_AnalysisResult like 'not suppressed%' OR vl.DashVL_AnalysisResult like 'Not Suppressed%' or vl.DashVL_Abs >= 1000)");
+            }
+            if (isset($params['sampleTypeId']) && $params['sampleTypeId'] != '') {
+                $query = $query->where('vl.sample_type="' . base64_decode(trim($params['sampleTypeId'])) . '"');
+            }
+            //print_r($params['age']);die;
+            if (isset($params['age']) && trim($params['age']) != '') {
+                $age = explode(',', $params['age']);
+                $where = '';
+                for ($a = 0; $a < count($age); $a++) {
+                    if (trim($where) != '') {
+                        $where .= ' OR ';
+                    }
+                    if ($age[$a] == '<2') {
+                        $where .= "(vl.child_age > 0 AND vl.child_age < 2)";
+                    } else if ($age[$a] == '2to5') {
+                        $where .= "(vl.child_age >= 2 AND vl.child_age <= 5)";
+                    } else if ($age[$a] == '6to14') {
+                        $where .= "(vl.child_age >= 6 AND vl.child_age <= 14)";
+                    } else if ($age[$a] == '15to49') {
+                        $where .= "(vl.child_age >= 15 AND vl.child_age <= 49)";
+                    } else if ($age[$a] == '>=50') {
+                        $where .= "(vl.child_age >= 50)";
+                    } else if ($age[$a] == 'unknown') {
+                        $where .= "(vl.child_age IS NULL OR vl.child_age = '' OR vl.child_age = 'Unknown' OR vl.child_age = 'unknown' OR vl.child_age = 'Unreported' OR vl.child_age = 'unreported')";
+                    }
+                }
+                $where = '(' . $where . ')';
+                $query = $query->where($where);
+            }
+            if (isset($params['adherence']) && trim($params['adherence']) != '') {
+                $query = $query->where(array("vl.arv_adherance_percentage = '" . $params['adherence'] . "'"));
+            }
+            if (isset($params['gender']) && $params['gender'] == 'F') {
+                $query = $query->where("vl.child_gender IN ('f','female','F','FEMALE')");
+            } else if (isset($params['gender']) && $params['gender'] == 'M') {
+                $query = $query->where("vl.child_gender IN ('m','male','M','MALE')");
+            } else if (isset($params['gender']) && $params['gender'] == 'not_specified') {
+                $query = $query->where("(vl.child_gender IS NULL OR vl.child_gender = '' OR vl.child_gender ='Not Recorded' OR vl.child_gender = 'not recorded OR vl.child_age = 'Unreported' OR vl.child_age = 'unreported')");
+            }
+            if (isset($params['isPregnant']) && $params['isPregnant'] == 'yes') {
+                $query = $query->where("vl.is_patient_pregnant = 'yes'");
+            } else if (isset($params['isPregnant']) && $params['isPregnant'] == 'no') {
+                $query = $query->where("vl.is_patient_pregnant = 'no'");
+            } else if (isset($params['isPregnant']) && $params['isPregnant'] == 'unreported') {
+                $query = $query->where("(vl.is_patient_pregnant IS NULL OR vl.is_patient_pregnant = '' OR vl.is_patient_pregnant = 'Unreported' OR vl.is_patient_pregnant = 'unreported')");
+            }
+            if (isset($params['isBreastfeeding']) && $params['isBreastfeeding'] == 'yes') {
+                $query = $query->where("vl.is_patient_breastfeeding = 'yes'");
+            } else if (isset($params['isBreastfeeding']) && $params['isBreastfeeding'] == 'no') {
+                $query = $query->where("vl.is_patient_breastfeeding = 'no'");
+            } else if (isset($params['isBreastfeeding']) && $params['isBreastfeeding'] == 'unreported') {
+                $query = $query->where("(vl.is_patient_breastfeeding IS NULL OR vl.is_patient_breastfeeding = '' OR vl.is_patient_breastfeeding = 'Unreported' OR vl.is_patient_breastfeeding = 'unreported')");
+            }
+            $query = $query->group(array(new Expression('WEEK(sample_collection_date)')));
+            $query = $query->order(array(new Expression('WEEK(sample_collection_date)')));
+            $queryStr = $sql->buildSqlString($query);
+            //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+            $sampleResult = $common->cacheQuery($queryStr, $dbAdapter);
+            $j = 0;
+            foreach ($sampleResult as $sRow) {
+                if ($sRow["sampleCollectionDate"] == null) continue;
+                $result['M']['VL (>= 1000 cp/ml)'][$j] = (isset($sRow["MGreaterThan1000"])) ? $sRow["MGreaterThan1000"] : 0;
+                //$result['M']['VL Not Detected'][$j] = $sRow["MTND"];
+                $result['M']['VL (< 1000 cp/ml)'][$j] = (isset($sRow["MLesserThan1000"])) ? $sRow["MLesserThan1000"] : 0;
+
+                $result['F']['VL (>= 1000 cp/ml)'][$j] = (isset($sRow["FGreaterThan1000"])) ? $sRow["FGreaterThan1000"] : 0;
+                //$result['F']['VL Not Detected'][$j] = $sRow["FTND"];
+                $result['F']['VL (< 1000 cp/ml)'][$j] = (isset($sRow["FLesserThan1000"])) ? $sRow["FLesserThan1000"] : 0;
+
+                $result['Not Specified']['VL (>= 1000 cp/ml)'][$j] = (isset($sRow["OGreaterThan1000"])) ? $sRow["OGreaterThan1000"] : 0;
+                //$result['Not Specified']['VL Not Detected'][$j] = $sRow["OTND"];
+                $result['Not Specified']['VL (< 1000 cp/ml)'][$j] = (isset($sRow["OLesserThan1000"])) ? $sRow["OLesserThan1000"] : 0;
+
+                $result['date'][$j] = $sRow["sampleCollectionDate"];
+                $j++;
+            }
+        }
+
+        return $result;
+    }
+
+    public function fetchClinicSampleTestedResultAgeGroupDetails($params)
+    {
+        $logincontainer = new Container('credo');
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $result = array();
+        $common = new CommonService($this->sm);
+        if (isset($params['sampleCollectionDate']) && trim($params['sampleCollectionDate']) != '') {
+            $s_c_date = explode("to", $params['sampleCollectionDate']);
+            if (isset($s_c_date[0]) && trim($s_c_date[0]) != "") {
+                $startDate = trim($s_c_date[0]);
+            }
+            if (isset($s_c_date[1]) && trim($s_c_date[1]) != "") {
+                $endDate = trim($s_c_date[1]);
+            }
+            if ($params['age']['from'] == 'unknown') {
+                $caseQuery1 = new Expression("SUM(CASE WHEN ((vl.child_age IS NULL OR vl.child_age = '' OR vl.child_age = 'Unknown' OR vl.child_age = 'unknown' OR vl.child_age = 'Unreported' OR vl.child_age = 'unreported') and (vl.DashVL_AnalysisResult like 'not suppressed%' OR vl.DashVL_AnalysisResult like 'Not Suppressed%' or vl.DashVL_Abs >= 1000)) THEN 1 ELSE 0 END)");
+                $caseQuery2 = new Expression("SUM(CASE WHEN ((vl.child_age IS NULL OR vl.child_age = '' OR vl.child_age = 'Unknown' OR vl.child_age = 'unknown' OR vl.child_age = 'Unreported' OR vl.child_age = 'unreported') and (vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' )) THEN 1 ELSE 0 END)");
+            } else {
+                $from = $params['age']['from'];
+                $to = $params['age']['to'];
+                $caseQuery1 = new Expression("SUM(CASE WHEN ((vl.child_age $from AND vl.child_age  $to) and (vl.DashVL_AnalysisResult like 'not suppressed%' OR vl.DashVL_AnalysisResult like 'Not Suppressed%' or vl.DashVL_Abs >= 1000)) THEN 1 ELSE 0 END)");
+                $caseQuery2 = new Expression("SUM(CASE WHEN ((vl.child_age $from AND vl.child_age  $to) and (vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' )) THEN 1 ELSE 0 END)");
+            }
+            $query = $sql->select()->from(array('vl' => $this->table))
+                ->columns(
+                    array(
+                        "monthDate" => new Expression("DATE_FORMAT(DATE(sample_collection_date), '%d-%b-%Y')"),
+
+                        "AgeLtVLGt1000" => $caseQuery1,
+                        "AgeLtVLLt1000" => $caseQuery2,
+                    )
+                )
+                ->where(array("DATE(vl.sample_collection_date) <='$endDate'", "DATE(vl.sample_collection_date) >='$startDate'"));
+            if (isset($params['clinicId']) && trim($params['clinicId']) != '') {
+                $query = $query->where('vl.facility_id IN (' . $params['clinicId'] . ')');
+            } else {
+                if ($logincontainer->role != 1) {
+                    $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : array(0);
+                    $query = $query->where('vl.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
+                }
+            }
+            if (isset($params['testResult']) && $params['testResult'] == '<1000') {
+                $query = $query->where("(vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' )");
+            } else if (isset($params['testResult']) && $params['testResult'] == '>=1000') {
+                $query = $query->where("(vl.DashVL_AnalysisResult like 'not suppressed%' OR vl.DashVL_AnalysisResult like 'Not Suppressed%' or vl.DashVL_Abs >= 1000)");
+            }
+            if (isset($params['sampleTypeId']) && $params['sampleTypeId'] != '') {
+                $query = $query->where('vl.sample_type="' . base64_decode(trim($params['sampleTypeId'])) . '"');
+            }
+
+            if (isset($params['adherence']) && trim($params['adherence']) != '') {
+                $query = $query->where(array("vl.arv_adherance_percentage = '" . $params['adherence'] . "'"));
+            }
+            if (isset($params['gender']) && $params['gender'] == 'F') {
+                $query = $query->where("vl.child_gender IN ('f','female','F','FEMALE')");
+            } else if (isset($params['gender']) && $params['gender'] == 'M') {
+                $query = $query->where("vl.child_gender IN ('m','male','M','MALE')");
+            } else if (isset($params['gender']) && $params['gender'] == 'not_specified') {
+                $query = $query->where("(vl.child_gender IS NULL OR vl.child_gender = '' OR vl.child_gender ='Not Recorded' OR vl.child_gender = 'not recorded OR vl.child_age = 'Unreported' OR vl.child_age = 'unreported')");
+            }
+            if (isset($params['isPregnant']) && $params['isPregnant'] == 'yes') {
+                $query = $query->where("vl.is_patient_pregnant = 'yes'");
+            } else if (isset($params['isPregnant']) && $params['isPregnant'] == 'no') {
+                $query = $query->where("vl.is_patient_pregnant = 'no'");
+            } else if (isset($params['isPregnant']) && $params['isPregnant'] == 'unreported') {
+                $query = $query->where("(vl.is_patient_pregnant IS NULL OR vl.is_patient_pregnant = '' OR vl.is_patient_pregnant = 'Unreported' OR vl.is_patient_pregnant = 'unreported')");
+            }
+            if (isset($params['isBreastfeeding']) && $params['isBreastfeeding'] == 'yes') {
+                $query = $query->where("vl.is_patient_breastfeeding = 'yes'");
+            } else if (isset($params['isBreastfeeding']) && $params['isBreastfeeding'] == 'no') {
+                $query = $query->where("vl.is_patient_breastfeeding = 'no'");
+            } else if (isset($params['isBreastfeeding']) && $params['isBreastfeeding'] == 'unreported') {
+                $query = $query->where("(vl.is_patient_breastfeeding IS NULL OR vl.is_patient_breastfeeding = '' OR vl.is_patient_breastfeeding = 'Unreported' OR vl.is_patient_breastfeeding = 'unreported')");
+            }
+            $query = $query->group(array(new Expression('WEEK(sample_collection_date)')));
+            $query = $query->order(array(new Expression('WEEK(sample_collection_date)')));
+            $queryStr = $sql->buildSqlString($query);
+            //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+            $sampleResult = $common->cacheQuery($queryStr, $dbAdapter);
+            $j = 0;
+            foreach ($sampleResult as $sRow) {
+                if ($sRow["monthDate"] == null) continue;
+                $result[$params['age']['ageName']]['VL (>= 1000 cp/ml)'][$j] = (isset($sRow["AgeLtVLGt1000"])) ? $sRow["AgeLtVLGt1000"] : 0;
+
+                $result[$params['age']['ageName']]['VL (< 1000 cp/ml)'][$j] = (isset($sRow["AgeLtVLLt1000"])) ? $sRow["AgeLtVLLt1000"] : 0;
+
+                $result['date'][$j] = $sRow["monthDate"];
+                $j++;
+            }
+        }
+        return $result;
+    }
+
+    public function fetchClinicRequisitionFormsTested($params)
+    {
+        $logincontainer = new Container('credo');
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $result = array();
+        $common = new CommonService($this->sm);
+        if (isset($params['sampleCollectionDate']) && trim($params['sampleCollectionDate']) != '') {
+            $s_c_date = explode("to", $params['sampleCollectionDate']);
+            if (isset($s_c_date[0]) && trim($s_c_date[0]) != "") {
+                $startDate = trim($s_c_date[0]);
+            }
+            if (isset($s_c_date[1]) && trim($s_c_date[1]) != "") {
+                $endDate = trim($s_c_date[1]);
+            }
+
+            $incompleteQuery = "(vl.patient_art_no IS NULL OR vl.patient_art_no='' OR vl.child_age IS NULL OR vl.child_age ='' OR vl.child_gender IS NULL OR vl.child_gender='' OR vl.current_regimen IS NOT NULL OR vl.current_regimen !='')";
+            $completeQuery = "vl.patient_art_no IS NOT NULL AND vl.patient_art_no !='' AND vl.child_age IS NOT NULL AND vl.child_age !='' AND vl.child_gender IS NOT NULL AND vl.child_gender !='' AND vl.current_regimen IS NOT NULL AND vl.current_regimen !=''";
+            if (isset($params['formFields']) && trim($params['formFields']) != '') {
+                $formFields = explode(',', $params['formFields']);
+                $incompleteQuery = '';
+                $completeQuery = '';
+                for ($f = 0; $f < count($formFields); $f++) {
+                    if (trim($formFields[$f]) != '') {
+                        $incompleteQuery .= 'vl.' . $formFields[$f] . ' IS NULL OR vl.' . $formFields[$f] . '=""';
+                        $completeQuery .= 'vl.' . $formFields[$f] . ' IS NOT NULL AND vl.' . $formFields[$f] . '!=""';
+                        if ((count($formFields) - $f) > 1) {
+                            $incompleteQuery .= ' OR ';
+                            $completeQuery .= ' AND ';
+                        }
+                    }
+                }
+            }
+            $i = 0;
+            $completeResultCount = 0;
+            $inCompleteResultCount = 0;
+            $query = $sql->select()->from(array('vl' => $this->table))
+                ->columns(
+                    array(
+                        "total" => new Expression('COUNT(*)'),
+                        "monthDate" => new Expression("DATE_FORMAT(DATE(sample_collection_date), '%d-%b-%Y')"),
+
+                        "CompletedForms" => new Expression("SUM(CASE WHEN ($completeQuery) THEN 1 ELSE 0 END)"),
+                        "IncompleteForms" => new Expression("SUM(CASE WHEN ($incompleteQuery) THEN 1 ELSE 0 END)"),
+
+                    )
+                )
+                ->where(array("DATE(vl.sample_collection_date) <='$endDate'", "DATE(vl.sample_collection_date) >='$startDate'"));
+            if (isset($params['clinicId']) && trim($params['clinicId']) != '') {
+                $query = $query->where('vl.facility_id IN (' . $params['clinicId'] . ')');
+            } else {
+                if ($logincontainer->role != 1) {
+                    $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : array(0);
+                    $query = $query->where('vl.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
+                }
+            }
+            if (isset($params['testResult']) && $params['testResult'] == '<1000') {
+                $query = $query->where("(vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' )");
+            } else if (isset($params['testResult']) && $params['testResult'] == '>=1000') {
+                $query = $query->where("(vl.DashVL_AnalysisResult like 'not suppressed%' OR vl.DashVL_AnalysisResult like 'Not Suppressed%' or vl.DashVL_Abs >= 1000)");
+            }
+            if (isset($params['sampleTypeId']) && $params['sampleTypeId'] != '') {
+                $query = $query->where('vl.sample_type="' . base64_decode(trim($params['sampleTypeId'])) . '"');
+            }
+
+            if (isset($params['adherence']) && trim($params['adherence']) != '') {
+                $query = $query->where(array("vl.arv_adherance_percentage = '" . $params['adherence'] . "'"));
+            }
+            if (isset($params['gender']) && $params['gender'] == 'F') {
+                $query = $query->where("vl.child_gender IN ('f','female','F','FEMALE')");
+            } else if (isset($params['gender']) && $params['gender'] == 'M') {
+                $query = $query->where("vl.child_gender IN ('m','male','M','MALE')");
+            } else if (isset($params['gender']) && $params['gender'] == 'not_specified') {
+                $query = $query->where("(vl.child_gender IS NULL OR vl.child_gender = '' OR vl.child_gender ='Not Recorded' OR vl.child_gender = 'not recorded OR vl.child_age = 'Unreported' OR vl.child_age = 'unreported')");
+            }
+            if (isset($params['isPregnant']) && $params['isPregnant'] == 'yes') {
+                $query = $query->where("vl.is_patient_pregnant = 'yes'");
+            } else if (isset($params['isPregnant']) && $params['isPregnant'] == 'no') {
+                $query = $query->where("vl.is_patient_pregnant = 'no'");
+            } else if (isset($params['isPregnant']) && $params['isPregnant'] == 'unreported') {
+                $query = $query->where("(vl.is_patient_pregnant IS NULL OR vl.is_patient_pregnant = '' OR vl.is_patient_pregnant = 'Unreported' OR vl.is_patient_pregnant = 'unreported')");
+            }
+            if (isset($params['isBreastfeeding']) && $params['isBreastfeeding'] == 'yes') {
+                $query = $query->where("vl.is_patient_breastfeeding = 'yes'");
+            } else if (isset($params['isBreastfeeding']) && $params['isBreastfeeding'] == 'no') {
+                $query = $query->where("vl.is_patient_breastfeeding = 'no'");
+            } else if (isset($params['isBreastfeeding']) && $params['isBreastfeeding'] == 'unreported') {
+                $query = $query->where("(vl.is_patient_breastfeeding IS NULL OR vl.is_patient_breastfeeding = '' OR vl.is_patient_breastfeeding = 'Unreported' OR vl.is_patient_breastfeeding = 'unreported')");
+            }
+            $query = $query->group(array(new Expression('WEEK(sample_collection_date)')));
+            $query = $query->order(array(new Expression('WEEK(sample_collection_date)')));
+            $queryStr = $sql->buildSqlString($query);
+            //echo $queryStr;die;
+            //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+            $sampleResult = $common->cacheQuery($queryStr, $dbAdapter);
+            $j = 0;
+            if (isset($sampleResult) && count($sampleResult) > 0) {
+                foreach ($sampleResult as $sRow) {
+                    if ($sRow["monthDate"] == null) continue;
+                    $result['Complete'][$j] = (isset($sRow["CompletedForms"])) ? (int) $sRow["CompletedForms"] : null;
+                    $result['Incomplete'][$j] = (isset($sRow["IncompleteForms"])) ? (int) $sRow["IncompleteForms"] : null;
+                    $completionRate = 100 * ($result['Complete'][$j] / ($result['Complete'][$j] + $result['Incomplete'][$j]));
+                    $result['CompletionRate'][$j] = ($completionRate > 0) ? round($completionRate, 2) : 0;
+                    $result['date'][$j] = $sRow["monthDate"];
+                    $j++;
+                }
+            }
+        }
+
+        return $result;
+    }
+
+    public function fetchSampleTestedReason($params)
+    {
+        $logincontainer = new Container('credo');
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $rResult = array();
+        $common = new CommonService($this->sm);
+        if (isset($params['sampleCollectionDate']) && trim($params['sampleCollectionDate']) != '') {
+            $s_c_date = explode("to", $params['sampleCollectionDate']);
+            if (isset($s_c_date[0]) && trim($s_c_date[0]) != "") {
+                $startDate = trim($s_c_date[0]);
+            }
+            if (isset($s_c_date[1]) && trim($s_c_date[1]) != "") {
+                $endDate = trim($s_c_date[1]);
+            }
+            $rQuery = $sql->select()->from(array('vl' => $this->table))
+                ->columns(array('total' => new Expression('COUNT(*)'), 'monthDate' => new Expression("DATE_FORMAT(DATE(sample_collection_date), '%d-%M-%Y')")))
+                ->join(array('tr' => 'r_vl_test_reasons'), 'tr.test_reason_id=vl.reason_for_vl_testing', array('test_reason_name'))
+                ->where(array("DATE(vl.sample_collection_date) >='$startDate'", "DATE(vl.sample_collection_date) <='$endDate'"))
+                //->where('vl.facility_id !=0')
+                //->where('vl.reason_for_vl_testing="'.$reason['test_reason_id'].'"');
+                ->group('tr.test_reason_id');
+            if (isset($params['clinicId']) && trim($params['clinicId']) != '') {
+                $rQuery = $rQuery->where('vl.facility_id IN (' . $params['clinicId'] . ')');
+            } else {
+                if ($logincontainer->role != 1) {
+                    $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : array(0);
+                    $rQuery = $rQuery->where('vl.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
+                }
+            }
+            if (isset($params['testResult']) && $params['testResult'] == '<1000') {
+                $rQuery = $rQuery->where("(vl.DashVL_AnalysisResult like 'suppressed%' OR vl.DashVL_AnalysisResult like 'Suppressed%' )");
+            } else if (isset($params['testResult']) && $params['testResult'] == '>=1000') {
+                $rQuery = $rQuery->where("(vl.DashVL_AnalysisResult like 'not suppressed%' OR vl.DashVL_AnalysisResult like 'Not Suppressed%' or vl.DashVL_Abs >= 1000)");
+            }
+            if (isset($params['sampleTypeId']) && $params['sampleTypeId'] != '') {
+                $rQuery = $rQuery->where('vl.sample_type="' . base64_decode(trim($params['sampleTypeId'])) . '"');
+            }
+            //print_r($params['age']);die;
+            if (isset($params['age']) && trim($params['age']) != '') {
+                $age = explode(',', $params['age']);
+                $where = '';
+                for ($a = 0; $a < count($age); $a++) {
+                    if (trim($where) != '') {
+                        $where .= ' OR ';
+                    }
+                    if ($age[$a] == '<2') {
+                        $where .= "(vl.child_age > 0 AND vl.child_age < 2)";
+                    } else if ($age[$a] == '2to5') {
+                        $where .= "(vl.child_age >= 2 AND vl.child_age <= 5)";
+                    } else if ($age[$a] == '6to14') {
+                        $where .= "(vl.child_age >= 6 AND vl.child_age <= 14)";
+                    } else if ($age[$a] == '15to49') {
+                        $where .= "(vl.child_age >= 15 AND vl.child_age <= 49)";
+                    } else if ($age[$a] == '>=50') {
+                        $where .= "(vl.child_age >= 50)";
+                    } else if ($age[$a] == 'unknown') {
+                        $where .= "(vl.child_age IS NULL OR vl.child_age = '' OR vl.child_age = 'Unknown' OR vl.child_age = 'unknown' OR vl.child_age = 'Unreported' OR vl.child_age = 'unreported')";
+                    }
+                }
+                $where = '(' . $where . ')';
+                $rQuery = $rQuery->where($where);
+            }
+            if (isset($params['adherence']) && trim($params['adherence']) != '') {
+                $rQuery = $rQuery->where(array("vl.arv_adherance_percentage ='" . $params['adherence'] . "'"));
+            }
+            if (isset($params['gender']) && $params['gender'] == 'F') {
+                $rQuery = $rQuery->where("vl.child_gender IN ('f','female','F','FEMALE')");
+            } else if (isset($params['gender']) && $params['gender'] == 'M') {
+                $rQuery = $rQuery->where("vl.child_gender IN ('m','male','M','MALE')");
+            } else if (isset($params['gender']) && $params['gender'] == 'not_specified') {
+                $rQuery = $rQuery->where("(vl.child_gender IS NULL OR vl.child_gender = '' OR vl.child_gender ='Not Recorded' OR vl.child_gender = 'not recorded' OR vl.child_gender = 'Unreported' OR vl.child_gender = 'unreported')");
+            }
+            if (isset($params['isPregnant']) && $params['isPregnant'] == 'yes') {
+                $rQuery = $rQuery->where("vl.is_patient_pregnant = 'yes'");
+            } else if (isset($params['isPregnant']) && $params['isPregnant'] == 'no') {
+                $rQuery = $rQuery->where("vl.is_patient_pregnant = 'no'");
+            } else if (isset($params['isPregnant']) && $params['isPregnant'] == 'unreported') {
+                $rQuery = $rQuery->where("(vl.is_patient_pregnant IS NULL OR vl.is_patient_pregnant = '' OR vl.is_patient_pregnant = 'Unreported' OR vl.is_patient_pregnant = 'unreported')");
+            }
+            if (isset($params['isBreastfeeding']) && $params['isBreastfeeding'] == 'yes') {
+                $rQuery = $rQuery->where("vl.is_patient_breastfeeding = 'yes'");
+            } else if (isset($params['isBreastfeeding']) && $params['isBreastfeeding'] == 'no') {
+                $rQuery = $rQuery->where("vl.is_patient_breastfeeding = 'no'");
+            } else if (isset($params['isBreastfeeding']) && $params['isBreastfeeding'] == 'unreported') {
+                $rQuery = $rQuery->where("(vl.is_patient_breastfeeding IS NULL OR vl.is_patient_breastfeeding = '' OR vl.is_patient_breastfeeding = 'Unreported' OR vl.is_patient_breastfeeding = 'unreported')");
+            }
+            if (isset($params['testReason']) && trim($params['testReason']) != '') {
+                $rQuery = $rQuery->where(array("vl.reason_for_vl_testing ='" . base64_decode($params['testReason']) . "'"));
+            }
+            $rQueryStr = $sql->buildSqlString($rQuery);
+            //echo $rQueryStr;die;
+            //$qResult = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+            $qResult = $common->cacheQuery($rQueryStr, $dbAdapter);
+            $j = 0;
+            foreach ($qResult as $r) {
+                $rResult[$r['test_reason_name']][$j]['total'] = (isset($r['total'])) ? (int) $r['total'] : 0;
+                $rResult['date'][$j] = $r['monthDate'];
+                $j++;
+            }
+        }
+        return $rResult;
+    }
+    //end clinic details
 }
