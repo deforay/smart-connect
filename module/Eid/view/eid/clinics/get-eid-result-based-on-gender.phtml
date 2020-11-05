@@ -1,0 +1,82 @@
+<?php
+$type = array('Total','Negative','Positive');
+// \Zend\Debug\Debug::dump($result);die;
+?>
+<script>
+$(function () {
+    $('#overall-eid-result-based-gender').highcharts({
+       chart: {
+            type: 'column'
+        },
+       
+       title: {
+            text: ''
+        },
+        exporting:{
+            chartOptions:{
+                subtitle: {
+                    text:'<?php echo $this->translate('Overall EID Results based on Gender'); ?>',
+                }
+            }
+        },
+       credits: {
+              enabled: false
+       },
+        xAxis: {
+            categories: ['<?php echo $this->translate('Male'); ?>','<?php echo $this->translate('Female'); ?>','<?php echo $this->translate('Not Specified'); ?>']
+        },
+        yAxis: {
+            allowDecimals: false,
+            min: 0,
+            title: {
+                text: '<?php echo $this->translate('No. of Samples'); ?>'
+            }
+        },
+        tooltip: {
+            formatter: function () {
+                var tipTxt = (this.series.name!= 'Total')?'<?php echo $this->translate('Total'); ?>: ' + this.point.stackTotal:'';
+                return '<b>' + this.x + '</b><br/>' +
+                    this.series.name + ': ' + this.y + '<br/>' + tipTxt;
+            }
+        },
+        plotOptions: {
+            column: {
+                stacking: 'normal',
+                pointPadding: 0.2,
+                borderWidth: 0
+                //cursor: 'pointer',
+                //point: {
+                //    events: {
+                //        click: function (e) {
+                //            
+                //        }
+                //    }
+                //}
+            }
+        },
+        series: [<?php
+              if(isset($result) && count($result) >0){
+                 for($t=0;$t<count($type);$t++){
+                     $typeColor = '#6e6e9e';
+                     if($type[$t] == 'Positive'){
+                         $typeColor = '#60d18f';   
+                     }else if($type[$t] == 'Negative'){
+                         $typeColor = '#ff1900';   
+                     }
+              ?>
+              {
+                     name:'<?php echo $this->translate($type[$t]); ?>',
+                     data:[<?php
+                          foreach($result[$type[$t]] as $key=>$val){
+                           ?>
+                            { y:<?php echo $val[0]; ?> },
+                        <?php } ?>
+                     ],
+                     stack:'<?php echo($type[$t] == 'Total')?'total':'others'; ?>',
+                     color: '<?php echo $typeColor; ?>'
+              },
+         <?php } } ?>
+        ]
+    });
+ });
+</script>

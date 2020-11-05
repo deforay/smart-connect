@@ -95,24 +95,8 @@ foreach ($sampleType as $samples) {
                 <label class="control-label"><?php echo $this->translate('Test Result'); ?>&nbsp;</label>
                 <select class="form-control" name="testResult" id="testResult" title="<?php echo $this->translate('Please choose result'); ?>">
                     <option value=""><?php echo $this->translate('All'); ?></option>
-                    <option value=">=1000"><?php echo $this->translate('>= 1000 cp/ml'); ?></option>
-                    <option value="<1000"><?php echo $this->translate('< 1000 cp/ml'); ?></option>
-                </select>
-            </div>
-        </div> 
-    </div> 
-    <div class="row">
-        <div class="col-md-12">
-            <div class="form-group col-lg-4" style="display:none;">
-                <label class="control-label"><?php echo $this->translate('Age Group'); ?>&nbsp;</label>
-                <select class="form-control" name="age[]" id="age" multiple title="<?php echo $this->translate('Please choose age group'); ?>">
-                    <option value="<2">
-                        < 2</option> <option value="2to5"> 2 - 5
-                    </option>
-                    <option value="6to14"> 6 - 14</option>
-                    <option value="15to49"> 15 - 49</option>
-                    <option value=">=50"> >= 50</option>
-                    <option value="unknown"> <?php echo $this->translate('Unknown'); ?></option>
+                    <option value="positive"><?php echo $this->translate('Positive'); ?></option>
+                    <option value="negative"><?php echo $this->translate('Negative'); ?></option>
                 </select>
             </div>
             <div class="form-group col-lg-4">
@@ -122,6 +106,22 @@ foreach ($sampleType as $samples) {
                     <option value="M"><?php echo $this->translate('Male'); ?></option>
                     <option value="F"><?php echo $this->translate('Female'); ?></option>
                     <option value="not_specified"><?php echo $this->translate('Other'); ?></option>
+                </select>
+            </div>
+        </div> 
+    </div> 
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group col-lg-4">
+                <label class="control-label"><?php echo $this->translate('Age Group'); ?>&nbsp;</label>
+                <select class="form-control" name="age" id="age" title="<?php echo $this->translate('Please choose age group'); ?>">
+                    <option value=""></option>
+                    <option value="<2">< 2</option>
+                    <option value="2to5" data-from="2" data-to="5"> 2 - 5</option>
+                    <option value="6to14" data-from="6" data-to="14"> 6 - 14</option>
+                    <option value="15to49" data-from="15" data-to="49"> 15 - 49</option>
+                    <option value=">=50"> >= 50</option>
+                    <option value="unknown"> <?php echo $this->translate('Unknown'); ?></option>
                 </select>
             </div>
         </div>
@@ -141,11 +141,11 @@ foreach ($sampleType as $samples) {
         <div class="portlet box blue">
             <div class="portlet-title">
                 <div class="caption">
-                    <span class="caption-subject"><?php echo $this->translate('Overall Viral Load Status'); ?></span>
+                    <span class="caption-subject"><?php echo $this->translate('Overall EID Results'); ?></span>
                 </div>
             </div>
             <div class="portlet-body">
-                <div id="overall-vl-status" style="min-width: 310px; height: 420px; margin: 0 auto"></div>
+                <div id="overall-eid-result" style="min-width: 310px; height: 420px; margin: 0 auto"></div>
             </div>
         </div>
     </div>
@@ -153,26 +153,11 @@ foreach ($sampleType as $samples) {
         <div class="portlet box blue">
             <div class="portlet-title">
                 <div class="caption">
-                    <span class="caption-subject"><?php echo $this->translate('Overall Viral Load Status based on Gender'); ?></span>
+                    <span class="caption-subject"><?php echo $this->translate('Overall EID Results based on Gender'); ?></span>
                 </div>
             </div>
             <div class="portlet-body">
-                <div id="overall-vl-status-based-gender" style="min-width: 310px; height: 420px; margin: 0 auto"></div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-md-12 col-sm-12">
-        <div class="portlet box blue">
-            <div class="portlet-title">
-                <div class="caption">
-                    <span class="caption-subject"><?php echo $this->translate('Samples Tested based on Gender'); ?></span>
-                </div>
-            </div>
-            <div class="portlet-body">
-                <div id="overall-sample-test-based-gender" style="min-width: 310px; height: 520px; margin: 0 auto"></div>
+                <div id="overall-eid-result-based-gender" style="min-width: 310px; height: 420px; margin: 0 auto"></div>
             </div>
         </div>
     </div>
@@ -183,77 +168,11 @@ foreach ($sampleType as $samples) {
         <div class="portlet box blue">
             <div class="portlet-title">
                 <div class="caption">
-                    <span class="caption-subject"><?php echo $this->translate('Samples Tested based on Age < 2'); ?></span>
+                    <span class="caption-subject"><?php echo $this->translate('Samples Tested based on Age'); ?></span>
                 </div>
             </div>
             <div class="portlet-body">
-                <div id="samplesTestedResultAgeGroupLessThanTwo" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-6 col-sm-6">
-        <div class="portlet box blue">
-            <div class="portlet-title">
-                <div class="caption">
-                    <span class="caption-subject"><?php echo $this->translate('Samples Tested based on Age 2-5'); ?></span>
-                </div>
-            </div>
-            <div class="portlet-body">
-                <div id="samplesTestedResultAgeGroupTwoToFive" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-md-6 col-sm-6">
-        <div class="portlet box blue">
-            <div class="portlet-title">
-                <div class="caption">
-                    <span class="caption-subject"><?php echo $this->translate('Samples Tested based on Age 6-14'); ?></span>
-                </div>
-            </div>
-            <div class="portlet-body">
-                <div id="samplesTestedResultAgeGroupSixToFourteen" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-6 col-sm-6">
-        <div class="portlet box blue">
-            <div class="portlet-title">
-                <div class="caption">
-                    <span class="caption-subject"><?php echo $this->translate('Samples Tested based on Age 15-49'); ?></span>
-                </div>
-            </div>
-            <div class="portlet-body">
-                <div id="samplesTestedResultAgeGroupFifteenToFourtyNine" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-md-6 col-sm-6">
-        <div class="portlet box blue">
-            <div class="portlet-title">
-                <div class="caption">
-                    <span class="caption-subject"><?php echo $this->translate('Samples Tested based on Age >=50'); ?></span>
-                </div>
-            </div>
-            <div class="portlet-body">
-                <div id="samplesTestedResultAgeGroupGreaterThanFifty" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-6 col-sm-6">
-        <div class="portlet box blue">
-            <div class="portlet-title">
-                <div class="caption">
-                    <span class="caption-subject"><?php echo $this->translate('Samples Tested based on Age unknown'); ?></span>
-                </div>
-            </div>
-            <div class="portlet-body">
-                <div id="samplesTestedResultAgeGroupUnknown" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+                <div id="samplesTestedResultAgeGroup" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
             </div>
         </div>
     </div>
@@ -273,7 +192,7 @@ foreach ($sampleType as $samples) {
                             <?php
                             foreach ($testReason as $test) {
                             ?>
-                                <option value="<?php echo base64_encode($test['test_reason_id']); ?>"><?php echo $test['test_reason_name']; ?></option>
+                                <option value="<?php echo base64_encode($test['test_reason_id']); ?>"><?php echo $this->translate($test['test_reason_name']); ?></option>
                             <?php
                             }
                             ?>
@@ -292,10 +211,9 @@ foreach ($sampleType as $samples) {
                 </div>
                 <div class="actions">
                     <div class="btn-group">
-                        <select id="sampleType" class="btn white btn-outline btn-circle btn-sm dropdown-toggle" onchange="getTestedSampleResult('change');" style="width:250px;max-width:250px;">
+                        <select id="sampleType" class="btn white btn-outline btn-circle btn-sm dropdown-toggle" onchange="getTestedSampleResult('null');" style="width:250px;max-width:250px;">
                             <option value=""><?php echo $this->translate('All Samples'); ?></option>
-                            <option value="dbs"><?php echo $this->translate('DBS'); ?></option>
-                            <option value="others"><?php echo $this->translate('Others'); ?></option>
+                            <?php echo $sType; ?>
                         </select>
                     </div>
                 </div>
@@ -482,36 +400,26 @@ foreach ($sampleType as $samples) {
             $('#sampleCollectionDate').val(moment().subtract('months', 1).format('YYYY-MM-DD') + ' to ' + moment().format('YYYY-MM-DD'));
         }
 
-        $.when(getOverAllViralLoadStatus(),
-                getOverAllViralLoadbasedonGender())
-            .done(function() {
-                getTestedSampleResultBasedGender();
-            });
-
-        $.when(getTestedSampleResultBasedAgeGroupLessThanTwo(),
-                getTestedSampleResultBasedAgeGroupTwoToFive(),
-                getTestedSampleResultBasedAgeGroupSixToFourteen(),
-                getTestedSampleResultBasedAgeGroupFifteenToFourtyNine(),
-                getTestedSampleResultBasedAgeGroupGreaterThanFifty(),
-                getTestedSampleResultBasedAgeGroupUnknown())
-            .done(function() {
-                getRequisitionFormsTested();
-                getAllTestReason();
-                getTestedSampleResult(typeOfCall);
-                loadTestResult();
-                fnShowHide();
-            });
-
+        $.when(getOverAllEidResults(),
+                getOverAllEidBasedonGender())
+        .done(function() {
+            getTestedSampleResultBasedAgeGroup();
+            getRequisitionFormsTested();
+            getAllTestReason();
+            getTestedSampleResult(typeOfCall);
+            loadTestResult();
+            fnShowHide();
+        });
     }
 
-    function getOverAllViralLoadStatus() {
+    function getOverAllEidResults() {
         var clinicId = ($("#clinicId").val() == null) ? '' : $("#clinicId").val().join(',');
         var dateRange = $("#sampleCollectionDate").val();
         var testResult = $("#testResult").val();
         var sampleTypeId = $("#sampleTypeId").val();
-        var age = ($("#age").val() == null) ? '' : $("#age").val().join(',');
+        var age = $("#age").val();
         var gender = $("#gender").val();
-        return $.post("<?php echo $this->url('clinics', array('action' => 'get-overall-viral-load-status')); ?>", {
+        return $.post("<?php echo $this->url('eid-clinics', array('action' => 'get-overall-eid')); ?>", {
                 clinicId: clinicId,
                 sampleCollectionDate: dateRange,
                 testResult: testResult,
@@ -520,18 +428,18 @@ foreach ($sampleType as $samples) {
                 gender: gender,
             },
             function(data) {
-                $("#overall-vl-status").html(data);
+                $("#overall-eid-result").html(data);
             });
     }
 
-    function getOverAllViralLoadbasedonGender() {
+    function getOverAllEidBasedonGender() {
         var clinicId = ($("#clinicId").val() == null) ? '' : $("#clinicId").val().join(',');
         var dateRange = $("#sampleCollectionDate").val();
         var testResult = $("#testResult").val();
         var sampleTypeId = $("#sampleTypeId").val();
-        var age = ($("#age").val() == null) ? '' : $("#age").val().join(',');
+        var age = $("#age").val();
         var gender = $("#gender").val();
-        return $.post("<?php echo $this->url('clinics', array('action' => 'get-viral-load-status-based-on-gender')); ?>", {
+        return $.post("<?php echo $this->url('eid-clinics', array('action' => 'get-eid-result-based-on-gender')); ?>", {
                 clinicId: clinicId,
                 sampleCollectionDate: dateRange,
                 testResult: testResult,
@@ -540,7 +448,7 @@ foreach ($sampleType as $samples) {
                 gender: gender,
             },
             function(data) {
-                $("#overall-vl-status-based-gender").html(data);
+                $("#overall-eid-result-based-gender").html(data);
             });
     }
 
@@ -549,10 +457,10 @@ foreach ($sampleType as $samples) {
         var dateRange = $("#sampleCollectionDate").val();
         var testResult = $("#testResult").val();
         var sampleTypeId = $("#sampleTypeId").val();
-        var age = ($("#age").val() == null) ? '' : $("#age").val().join(',');
+        var age = $("#age").val();
         var gender = $("#gender").val();
         var testReason = $("#testReason").val();
-        return $.post("<?php echo $this->url('clinics', array('action' => 'get-sample-test-reason')); ?>", {
+        return $.post("<?php echo $this->url('eid-clinics', array('action' => 'get-sample-test-reason')); ?>", {
                 clinicId: clinicId,
                 sampleCollectionDate: dateRange,
                 testResult: testResult,
@@ -571,12 +479,12 @@ foreach ($sampleType as $samples) {
         var dateRange = $("#sampleCollectionDate").val();
         var testResult = $("#testResult").val();
         var sampleTypeId = $("#sampleTypeId").val();
-        var age = ($("#age").val() == null) ? '' : $("#age").val().join(',');
+        var age = $("#age").val();
         var gender = $("#gender").val();
         var sampleType = $("#sampleType").val();
         $.blockUI.defaults.css.border = '1px solid grey';
 
-        return $.post("<?php echo $this->url('clinics', array('action' => 'get-sample-test-result')); ?>", {
+        return $.post("<?php echo $this->url('eid-clinics', array('action' => 'get-sample-test-result')); ?>", {
                 clinicId: clinicId,
                 sampleCollectionDate: dateRange,
                 testResult: testResult,
@@ -624,7 +532,7 @@ foreach ($sampleType as $samples) {
                 [2, "desc"]
             ],
 
-            "sAjaxSource": "<?php echo $this->url('clinics', array('action' => 'test-result')); ?>",
+            "sAjaxSource": "<?php echo $this->url('eid-clinics', array('action' => 'test-result')); ?>",
             "fnServerData": function(sSource, aoData, fnCallback) {
                 aoData.push({
                     "name": "sampleCollectionDate",
@@ -740,7 +648,7 @@ foreach ($sampleType as $samples) {
         $(document).ajaxStart($.blockUI({
             message: '<h2><?php echo $this->translate('Processing...'); ?></h2>'
         })).ajaxStop($.unblockUI);
-        $.post("<?php echo $this->url('clinics', array('action' => 'generate-result-pdf')); ?>", {
+        $.post("<?php echo $this->url('eid-clinics', array('action' => 'generate-result-pdf')); ?>", {
                 id: id
             },
             function(data) {
@@ -757,7 +665,7 @@ foreach ($sampleType as $samples) {
         $(document).ajaxStart($.blockUI({
             message: '<h2><?php echo $this->translate('Processing...'); ?></h2>'
         })).ajaxStop($.unblockUI);
-        $.post("<?php echo $this->url('clinics', array('action' => 'export-result-excel')); ?>", {
+        $.post("<?php echo $this->url('eid-clinics', array('action' => 'export-result-excel')); ?>", {
                 result: $("#sampleStatus").val(),
                 cFrom: cFrom
             },
@@ -775,7 +683,7 @@ foreach ($sampleType as $samples) {
         var dateRange = $("#sampleCollectionDate").val();
         var testResult = $("#testResult").val();
         var sampleTypeId = $("#sampleTypeId").val();
-        var age = ($("#age").val() == null) ? '' : $("#age").val().join(',');
+        var age = $("#age").val();
         var gender = $("#gender").val();
         window.open('/clinics/samples-test-reason?clinic=' + clinic + '&dRange=' + dateRange + '&r=' + reason + '&rlt=' + testResult + '&sTyp=' + sampleTypeId + '&adhr=' + adherence + '&age=' + age + '&gd=' + gender, '_blank');
     }
@@ -814,15 +722,39 @@ foreach ($sampleType as $samples) {
         }
     }
 
-    function getTestedSampleResultBasedGender() {
+    function getTestedSampleResultBasedAgeGroup() {
         var clinicId = ($("#clinicId").val() == null) ? '' : $("#clinicId").val().join(',');
         var dateRange = $("#sampleCollectionDate").val();
         var testResult = $("#testResult").val();
         var sampleTypeId = $("#sampleTypeId").val();
-        var age = ($("#age").val() == null) ? '' : $("#age").val().join(',');
         var gender = $("#gender").val();
-        
-        $.post("<?php echo $this->url('clinics', array('action' => 'get-sample-test-result-gender')); ?>", {
+        var ageField = $("#age").val();
+        if(ageField == '<2'){
+            var age = {
+                'from': '> 0',
+                'to': '< 2',
+                'ageName': 'Age < 2'
+            };
+        } else if(ageField == '>=50'){
+            var age = {
+                'from': '>= 50',
+                'to': '<= 250',
+                'ageName': 'Age >=50'   
+            };
+        } else if(ageField == 'unknown'){
+            var age = {
+                'from': 'unknown',
+                'to': 'unknown',
+                'ageName': 'Unknown'   
+            };
+        } else {
+            var age = {
+                'from': $('#age').attr('data-from'),
+                'to': $('#age').attr('data-to'),
+                'ageName': 'Age '+$("#age option:selected").text()   
+            };
+        }
+        $.post("<?php echo $this->url('eid-clinics', array('action' => 'get-sample-test-result-age-group')); ?>", {
                 clinicId: clinicId,
                 sampleCollectionDate: dateRange,
                 testResult: testResult,
@@ -831,150 +763,7 @@ foreach ($sampleType as $samples) {
                 gender: gender,
             },
             function(data) {
-                $("#overall-sample-test-based-gender").html(data);
-            });
-    }
-
-    function getTestedSampleResultBasedAgeGroupLessThanTwo() {
-        var clinicId = ($("#clinicId").val() == null) ? '' : $("#clinicId").val().join(',');
-        var dateRange = $("#sampleCollectionDate").val();
-        var testResult = $("#testResult").val();
-        var sampleTypeId = $("#sampleTypeId").val();
-        var gender = $("#gender").val();
-        var age = {
-            'from': '> 0',
-            'to': '< 2',
-            'ageName': 'Age < 2'
-        };
-        $.post("<?php echo $this->url('clinics', array('action' => 'get-sample-test-result-age-group')); ?>", {
-                clinicId: clinicId,
-                sampleCollectionDate: dateRange,
-                testResult: testResult,
-                sampleTypeId: sampleTypeId,
-                age: age,
-                gender: gender,
-            },
-            function(data) {
-                $("#samplesTestedResultAgeGroupLessThanTwo").html(data);
-            });
-    }
-
-    function getTestedSampleResultBasedAgeGroupTwoToFive() {
-        var clinicId = ($("#clinicId").val() == null) ? '' : $("#clinicId").val().join(',');
-        var dateRange = $("#sampleCollectionDate").val();
-        var testResult = $("#testResult").val();
-        var sampleTypeId = $("#sampleTypeId").val();
-        var gender = $("#gender").val();
-        var age = {
-            'from': '>= 2',
-            'to': '<= 5',
-            'ageName': 'Age 2-5'
-        };
-        $.post("<?php echo $this->url('clinics', array('action' => 'get-sample-test-result-age-group-two-to-five')); ?>", {
-                clinicId: clinicId,
-                sampleCollectionDate: dateRange,
-                testResult: testResult,
-                sampleTypeId: sampleTypeId,
-                age: age,
-                gender: gender,
-            },
-            function(data) {
-                $("#samplesTestedResultAgeGroupTwoToFive").html(data);
-            });
-    }
-
-    function getTestedSampleResultBasedAgeGroupSixToFourteen() {
-        var clinicId = ($("#clinicId").val() == null) ? '' : $("#clinicId").val().join(',');
-        var dateRange = $("#sampleCollectionDate").val();
-        var testResult = $("#testResult").val();
-        var sampleTypeId = $("#sampleTypeId").val();
-        var gender = $("#gender").val();
-        var age = {
-            'from': '>= 6',
-            'to': '<= 14',
-            'ageName': 'Age 6-14'
-        };
-        $.post("<?php echo $this->url('clinics', array('action' => 'get-sample-test-result-age-group-six-to-fourteen')); ?>", {
-                clinicId: clinicId,
-                sampleCollectionDate: dateRange,
-                testResult: testResult,
-                sampleTypeId: sampleTypeId,
-                age: age,
-                gender: gender,
-            },
-            function(data) {
-                $("#samplesTestedResultAgeGroupSixToFourteen").html(data);
-            });
-    }
-
-    function getTestedSampleResultBasedAgeGroupFifteenToFourtyNine() {
-        var clinicId = ($("#clinicId").val() == null) ? '' : $("#clinicId").val().join(',');
-        var dateRange = $("#sampleCollectionDate").val();
-        var testResult = $("#testResult").val();
-        var sampleTypeId = $("#sampleTypeId").val();
-        var gender = $("#gender").val();
-        var age = {
-            'from': '>= 15',
-            'to': '<= 49',
-            'ageName': 'Age 15-49'
-        };
-        $.post("<?php echo $this->url('clinics', array('action' => 'get-sample-test-result-age-group-fifteen-to-fourtynine')); ?>", {
-                clinicId: clinicId,
-                sampleCollectionDate: dateRange,
-                testResult: testResult,
-                sampleTypeId: sampleTypeId,
-                age: age,
-                gender: gender,
-            },
-            function(data) {
-                $("#samplesTestedResultAgeGroupFifteenToFourtyNine").html(data);
-            });
-    }
-
-    function getTestedSampleResultBasedAgeGroupGreaterThanFifty() {
-        var clinicId = ($("#clinicId").val() == null) ? '' : $("#clinicId").val().join(',');
-        var dateRange = $("#sampleCollectionDate").val();
-        var testResult = $("#testResult").val();
-        var sampleTypeId = $("#sampleTypeId").val();
-        var gender = $("#gender").val();
-        var age = {
-            'from': '>= 50',
-            'to': '<= 250',
-            'ageName': 'Age >=50'
-        };
-        $.post("<?php echo $this->url('clinics', array('action' => 'get-sample-test-result-age-group-greater-fifty')); ?>", {
-                clinicId: clinicId,
-                sampleCollectionDate: dateRange,
-                testResult: testResult,
-                sampleTypeId: sampleTypeId,
-                age: age,
-                gender: gender,
-            },
-            function(data) {
-                $("#samplesTestedResultAgeGroupGreaterThanFifty").html(data);
-            });
-    }
-
-    function getTestedSampleResultBasedAgeGroupUnknown() {
-        var clinicId = ($("#clinicId").val() == null) ? '' : $("#clinicId").val().join(',');
-        var dateRange = $("#sampleCollectionDate").val();
-        var testResult = $("#testResult").val();
-        var sampleTypeId = $("#sampleTypeId").val();
-        var gender = $("#gender").val();
-        var age = {
-            'from': 'unknown',
-            'ageName': 'Age Unknown'
-        };
-        $.post("<?php echo $this->url('clinics', array('action' => 'get-sample-test-result-age-group-unknown')); ?>", {
-                clinicId: clinicId,
-                sampleCollectionDate: dateRange,
-                testResult: testResult,
-                sampleTypeId: sampleTypeId,
-                age: age,
-                gender: gender,
-            },
-            function(data) {
-                $("#samplesTestedResultAgeGroupUnknown").html(data);
+                $("#samplesTestedResultAgeGroup").html(data);
             });
     }
 
@@ -985,7 +774,7 @@ foreach ($sampleType as $samples) {
         var sampleTypeId = $("#sampleTypeId").val();
         var gender = $("#gender").val();
         var formFields = ($('#formFields').val() == null) ? "patient_art_no,patient_age_in_years,patient_gender,current_regimen" : $('#formFields').val().join(',');
-        $.post("<?php echo $this->url('clinics', array('action' => 'get-requisition-forms')); ?>", {
+        $.post("<?php echo $this->url('eid-clinics', array('action' => 'get-requisition-forms')); ?>", {
                 clinicId: clinicId,
                 sampleCollectionDate: dateRange,
                 testResult: testResult,

@@ -1,0 +1,139 @@
+<script>
+$('#clinicDashReqFormBar').highcharts({
+
+        title: {
+            text: ''
+        },
+        exporting:{
+            chartOptions:{
+                subtitle: {
+                    text:'<?php echo $this->translate('Request Form Completeness'); ?>',
+                }
+            }
+        },
+       credits: {
+              enabled: false
+       },
+        xAxis: {
+            categories: [<?php
+                if(isset($result['date']) && count($result['date'])>0){
+                        foreach($result['date'] as $date){
+                            echo "'".$this->translate('Week of') . ' ' .$date."',";
+                        }
+                }
+            ?>]
+        },
+        yAxis: [{
+            min: 0,
+            title: {
+                text: '<?php echo $this->translate('Forms'); ?>'
+            },
+            labels: { formatter: function() { return this.value; } },
+            stackLabels: {
+                enabled: true,
+                style: {
+                    fontWeight: 'bold',
+                    color: (Highcharts.theme && Highcharts.theme.textColor) || 'gray'
+                }
+            }
+        },{ // Secondary yAxis
+                         allowDecimals: true,
+                         min: 0,
+                         max: 100,
+                         title: {
+                             text: '<?php echo $this->translate('Completion Rate'); ?>',
+                             style: {
+                                 color: Highcharts.getOptions().colors[1]
+                             }
+                         },
+                         labels: {
+                             format: '{value}%',
+                             style: {
+                                 color: Highcharts.getOptions().colors[1]
+                             }
+                         },
+                         opposite: true
+                     }
+        ],
+        legend: {
+            align: 'center',
+            verticalAlign: 'bottom',
+            floating: false,
+            backgroundColor: (Highcharts.theme && Highcharts.theme.background2) || 'white',
+            borderColor: '#CCC',
+            borderWidth: 1,
+            shadow: false
+        },
+        tooltip: {
+            shared: true
+        },
+        plotOptions: {
+            column: {
+                stacking: 'normal',
+                cursor: 'pointer',
+                point: {
+                    events: {
+                        click: function (e) {
+                           // doRequisitionFormRedirect(e.point.category);
+                        }
+                    }
+                },
+                dataLabels: {
+                    enabled: true,
+                    color: (Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'white',
+                    style: {
+                        textShadow: 'none'
+                    }
+                }
+            }
+        },
+        series: [
+              <?php if(isset($result['Complete'])){ ?>
+                {
+                    name: '<?php echo $this->translate('Complete'); ?>',
+                    type: 'column',
+                    color : '#8877a9',
+                    yAxis: 0,
+                    <?php if(array_sum($result['Complete']) == 0) { ?> visible: false,<?php } ?>
+                    data: [<?php echo implode(",",$result['Complete']);?>],
+                    tooltip: {
+                        valueSuffix: ' '
+                    }
+                },
+                <?php } if(isset($result['Incomplete'])){ ?>
+                {
+                    name: '<?php echo $this->translate('Incomplete'); ?>',
+                    type: 'column',
+                    color : '#64ade5',
+                    yAxis: 0,
+                    <?php if(array_sum($result['Incomplete']) == 0) { ?> visible: false,<?php } ?>
+                    data: [<?php echo implode(",",$result['Incomplete']);?>],
+                    tooltip: {
+                        valueSuffix: ' '
+                    }
+                },
+                <?php } if(isset($result['CompletionRate'])){ ?>
+                {
+                    name: '<?php echo $this->translate('Completion Percentage'); ?>',
+                    yAxis: 1,                    
+                    type: 'spline',
+                    lineWidth : 0,
+                    states: {
+                        hover: {
+                            lineWidthPlus: 0
+                        }
+                    },    
+                    color : '#000000', 
+                    marker: {
+                        symbol: 'diamond'
+                    },   
+                    data: [<?php echo implode(",",$result['CompletionRate']);?>],
+                    tooltip: {
+                        valueSuffix: '%'
+                    }
+                },
+                <?php } ?>                
+                ]
+    });
+    
+</script>

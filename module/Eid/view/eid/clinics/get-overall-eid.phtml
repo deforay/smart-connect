@@ -1,0 +1,76 @@
+<?php
+//var_dump($chartResult);die;
+
+?>
+
+<script>
+    $(function () {
+     $('#overall-eid-result').highcharts({
+        chart: {
+            type: 'column'
+        },
+
+        title: {
+            text: ''
+        },
+        exporting:{
+            chartOptions:{
+                subtitle: {
+                    text:'<?php echo $this->translate('Overall EID Results'); ?>',
+                }
+            }
+        },
+        credits: {
+            enabled: false
+        },
+        xAxis: {
+            categories: ['<?php echo $this->translate('Samples Registered'); ?>',
+                         '<?php echo $this->translate('Sample Tested'); ?>',
+                         '<?php echo $this->translate('Sample Not Tested'); ?>',
+                         '<?php echo $this->translate('Positive'); ?>',
+                         '<?php echo $this->translate('Negative'); ?>',
+                         ]
+        },
+
+        yAxis: {
+            allowDecimals: false,
+            min: 0,
+            title: {
+                text: '<?php echo $this->translate('No. of Samples'); ?>'
+            }
+        },
+
+        tooltip: {
+            formatter: function () {
+                return '<b>' + this.x + '</b><br/>' +
+                    this.series.name + ': ' + this.y + '<br/>' +
+                    '<?php echo $this->translate('Total'); ?>: ' + this.point.stackTotal;
+            }
+        },
+
+        plotOptions: {
+            column: {
+                stacking: 'normal',
+                dataLabels: {
+                    enabled: true
+                },
+                enableMouseTracking: false
+            }
+        },
+
+        series: [{
+            name: '<?php echo $this->translate('Sample'); ?>',
+            showInLegend: false, 
+            data: [
+                    { y : <?php echo (isset($chartResult[0]['totalCollected']))?$chartResult[0]['totalCollected']:0; ?> , color : '#6e6e9e' },
+                    { y : <?php echo (isset($chartResult[0]['testedTotal']))?$chartResult[0]['testedTotal']:0; ?> , color : '#039BE6' },
+                    { y : <?php echo (isset($chartResult[0]['notTestedTotal']))?$chartResult[0]['notTestedTotal']:0; ?> , color : '#492828' },
+                    { y : <?php echo (isset($chartResult[0]['positive']))?$chartResult[0]['positive']:0; ?> , color : '#60d18f' },
+                    { y : <?php echo (isset($chartResult[0]['negative']))?$chartResult[0]['negative']:0; ?> , color : '#ff1900' }
+                ],
+            stack: 'total',
+            color : 'red',
+        }]
+    });    
+    });
+</script>

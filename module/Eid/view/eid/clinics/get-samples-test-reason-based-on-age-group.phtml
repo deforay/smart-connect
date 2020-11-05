@@ -1,0 +1,61 @@
+<div id="vl-test-reason-age-group" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+<script>
+    $(function () {
+        $('#vl-test-reason-age-group').highcharts({
+        chart: {
+            plotBackgroundColor: null,
+            plotBorderWidth: null,
+            plotShadow: false,
+            type: 'pie'
+        },
+        title: {
+            text: ''
+        },
+        exporting:{
+            chartOptions:{
+                subtitle: {
+                    text:'<?php echo $this->translate('VL Ordered based on Age Group'); ?>',
+                }
+            }
+        },
+        credits: {
+            enabled: false
+       },
+        tooltip: {
+            pointFormat: '{series.name}: <b>{point.percentage:.1f}% ({point.number})</b>'
+        },
+        legend: {
+            itemMarginBottom: 5
+        },
+        plotOptions: {
+            pie: {
+                dataLabels: {
+                    distance:-30,
+                    style: {
+                        color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'white'
+                    }
+                },
+                showInLegend: true
+            }
+        },
+        series: [{
+            name: '<?php echo $this->translate('Samples'); ?>',
+            colorByPoint: true,
+            data: [<?php
+            if(isset($result['total']) && count($result['total'])>0){
+                foreach($result['total'] as $key=>$reason){
+                    ?>
+                    {
+                        name:'<?php echo ucwords($key); ?>',
+                        <?php if($reason[0] == 0){ ?> visible:false,<?php } ?>
+                        y:<?php echo $reason[0]; ?>,
+                        number:<?php echo $reason[0]; ?>
+                    },
+                    <?php
+                }
+            }
+            ?>]
+        }]
+       });
+    });
+</script>

@@ -26,7 +26,7 @@ class ClinicsController extends AbstractActionController
     }
 
     public function dashboardAction(){
-        $this->layout()->setVariable('activeTab', 'clinics');
+        $this->layout()->setVariable('activeTab', 'eid-clinics');
         // $sampleService = $this->getServiceLocator()->get('SampleService');
         $sampleType = $this->sampleService->getSampleType();
         $clinicName = $this->sampleService->getAllClinicName();
@@ -55,7 +55,7 @@ class ClinicsController extends AbstractActionController
         }
     }
     
-    public function getViralLoadStatusBasedOnGenderAction() {
+    public function getEidResultBasedOnGenderAction() {
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
@@ -87,8 +87,8 @@ class ClinicsController extends AbstractActionController
         if ($request->isPost()) {
             $params = $request->getPost();
             // $sampleService = $this->getServiceLocator()->get('SampleService');
-            $result = $this->sampleService->getClinicSampleTestedResults($params);
             $sampleType = $this->sampleService->getSampleType();
+            $result = $this->sampleService->getClinicSampleTestedResults($params, $sampleType);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('result' => $result,'sampleType'=>$sampleType))
                         ->setTerminal(true);
@@ -212,18 +212,6 @@ class ClinicsController extends AbstractActionController
             return $viewModel;
         }
     }
-    public function getSampleTestResultGenderAction(){
-        $request = $this->getRequest();
-        if ($request->isPost()) {
-            $params = $request->getPost();
-            // $sampleService = $this->getServiceLocator()->get('SampleService');
-            $result = $this->sampleService->getSampleTestedResultBasedGenderDetails($params);
-            $viewModel = new ViewModel();
-            $viewModel->setVariables(array('result' => $result))
-                        ->setTerminal(true);
-            return $viewModel;
-        }
-    }
 
     public function getSampleTestResultAgeGroupAction(){
         $request = $this->getRequest();
@@ -237,66 +225,7 @@ class ClinicsController extends AbstractActionController
             return $viewModel;
         }
     }
-    public function getSampleTestResultAgeGroupTwoToFiveAction(){
-        $request = $this->getRequest();
-        if ($request->isPost()) {
-            $params = $request->getPost();
-            // $sampleService = $this->getServiceLocator()->get('SampleService');
-            $result = $this->sampleService->getClinicSampleTestedResultAgeGroupDetails($params);
-            $viewModel = new ViewModel();
-            $viewModel->setVariables(array('result' => $result,'params'=>$params))
-                        ->setTerminal(true);
-            return $viewModel;
-        }
-    }
-    public function getSampleTestResultAgeGroupSixToFourteenAction(){
-        $request = $this->getRequest();
-        if ($request->isPost()) {
-            $params = $request->getPost();
-            // $sampleService = $this->getServiceLocator()->get('SampleService');
-            $result = $this->sampleService->getClinicSampleTestedResultAgeGroupDetails($params);
-            $viewModel = new ViewModel();
-            $viewModel->setVariables(array('result' => $result,'params'=>$params))
-                        ->setTerminal(true);
-            return $viewModel;
-        }
-    }
-    public function getSampleTestResultAgeGroupFifteenToFourtynineAction(){
-        $request = $this->getRequest();
-        if ($request->isPost()) {
-            $params = $request->getPost();
-            // $sampleService = $this->getServiceLocator()->get('SampleService');
-            $result = $this->sampleService->getClinicSampleTestedResultAgeGroupDetails($params);
-            $viewModel = new ViewModel();
-            $viewModel->setVariables(array('result' => $result,'params'=>$params))
-                        ->setTerminal(true);
-            return $viewModel;
-        }
-    }
-    public function getSampleTestResultAgeGroupGreaterFiftyAction(){
-        $request = $this->getRequest();
-        if ($request->isPost()) {
-            $params = $request->getPost();
-            // $sampleService = $this->getServiceLocator()->get('SampleService');
-            $result = $this->sampleService->getClinicSampleTestedResultAgeGroupDetails($params);
-            $viewModel = new ViewModel();
-            $viewModel->setVariables(array('result' => $result,'params'=>$params))
-                        ->setTerminal(true);
-            return $viewModel;
-        }
-    }
-    public function getSampleTestResultAgeGroupUnknownAction(){
-        $request = $this->getRequest();
-        if ($request->isPost()) {
-            $params = $request->getPost();
-            // $sampleService = $this->getServiceLocator()->get('SampleService');
-            $result = $this->sampleService->getClinicSampleTestedResultAgeGroupDetails($params);
-            $viewModel = new ViewModel();
-            $viewModel->setVariables(array('result' => $result,'params'=>$params))
-                        ->setTerminal(true);
-            return $viewModel;
-        }
-    }
+    
     public function getRequisitionFormsAction(){
         $request = $this->getRequest();
         if ($request->isPost()) {
