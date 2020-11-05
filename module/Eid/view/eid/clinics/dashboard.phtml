@@ -183,7 +183,7 @@ foreach ($sampleType as $samples) {
         <div class="portlet box blue">
             <div class="portlet-title">
                 <div class="caption">
-                    <span class="caption-subject"><?php echo $this->translate('VL Ordered'); ?></span>
+                    <span class="caption-subject"><?php echo $this->translate('EID Ordered'); ?></span>
                 </div>
                 <div class="actions">
                     <div class="btn-group">
@@ -207,7 +207,7 @@ foreach ($sampleType as $samples) {
         <div class="portlet box blue">
             <div class="portlet-title">
                 <div class="caption">
-                    <span class="caption-subject"><?php echo $this->translate('VL Suppression'); ?></span>
+                    <span class="caption-subject"><?php echo $this->translate('EID Result Percentage'); ?></span>
                 </div>
                 <div class="actions">
                     <div class="btn-group">
@@ -224,30 +224,6 @@ foreach ($sampleType as $samples) {
         </div>
     </div>
 </div>
-
-<div class="row">
-    <div class="col-md-12 col-sm-12">
-        <div class="portlet box blue">
-            <div class="portlet-title">
-                <div class="caption">
-                    <span class="caption-subject"><?php echo $this->translate('Request Form Completeness'); ?></span>
-                </div>
-                <div class="actions">
-                    <div class="btn-group">
-                        <select id="formFields" name="formFields[]" class="form-control" multiple title="<?php echo $this->translate('Please choose form fields'); ?>" onchange="getRequisitionFormsTested();">
-                            <option value="patient_art_no">Patient ART Number</option>
-                            <option value="patient_age_in_years"> Patient Age</option>
-                            <option value="patient_gender"> Patient Gender</option>
-                            <option value="current_regimen"> Current Regimen</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-            <div class="portlet-body" id="clinicDashReqFormBar" style="min-width: 310px; height: 430px; margin: 0 auto"></div>
-        </div>
-    </div>
-</div>
-
 
 <div class="row">
     <div class="col-md-12 col-sm-12">
@@ -268,7 +244,7 @@ foreach ($sampleType as $samples) {
                                 </select>
                             </div>
                             <div class="tools" id="exportHighVlSample" style="float:right;text-align:right;">
-                                <button class="btn btn-default" onclick="exportTestResult('high');"><span><i class="fa fa-file-excel-o" aria-hidden="true"></i> <?php echo $this->translate('Export High VL Samples'); ?></span></button>
+                                <button class="btn btn-default" onclick="exportTestResult('high');"><span><i class="fa fa-file-excel-o" aria-hidden="true"></i> <?php echo $this->translate('Export EID Samples'); ?></span></button>
                             </div>&nbsp;&nbsp;
                             <div class="tools" style="float:right;text-align:right;margin-right:5px;">
                                 <button class="btn btn-default" onclick="exportTestResult('');"><span><i class="fa fa-file-excel-o" aria-hidden="true"></i> <?php echo $this->translate('Excel'); ?></span></button>
@@ -285,7 +261,7 @@ foreach ($sampleType as $samples) {
                                         <th> <?php echo $this->translate('Date Collected'); ?></th>
                                         <th> <?php echo $this->translate('Rejection Reason'); ?></th>
                                         <th> <?php echo $this->translate('Date Tested'); ?></th>
-                                        <th> <?php echo $this->translate('Viral Load(cp/ml)'); ?> </th>
+                                        <th> <?php echo $this->translate('Result'); ?> </th>
                                         <th> <?php echo $this->translate('Action'); ?> </th>
                                     </tr>
                                 </thead>
@@ -404,7 +380,6 @@ foreach ($sampleType as $samples) {
                 getOverAllEidBasedonGender())
         .done(function() {
             getTestedSampleResultBasedAgeGroup();
-            getRequisitionFormsTested();
             getAllTestReason();
             getTestedSampleResult(typeOfCall);
             loadTestResult();
@@ -553,10 +528,6 @@ foreach ($sampleType as $samples) {
                 aoData.push({
                     "name": "age",
                     "value": $("#age").val()
-                });
-                aoData.push({
-                    "name": "adherence",
-                    "value": $("#adherence").val()
                 });
                 aoData.push({
                     "name": "gender",
@@ -764,26 +735,6 @@ foreach ($sampleType as $samples) {
             },
             function(data) {
                 $("#samplesTestedResultAgeGroup").html(data);
-            });
-    }
-
-    function getRequisitionFormsTested() {
-        var clinicId = ($("#clinicId").val() == null) ? '' : $("#clinicId").val().join(',');
-        var dateRange = $("#sampleCollectionDate").val();
-        var testResult = $("#testResult").val();
-        var sampleTypeId = $("#sampleTypeId").val();
-        var gender = $("#gender").val();
-        var formFields = ($('#formFields').val() == null) ? "patient_art_no,patient_age_in_years,patient_gender,current_regimen" : $('#formFields').val().join(',');
-        $.post("<?php echo $this->url('eid-clinics', array('action' => 'get-requisition-forms')); ?>", {
-                clinicId: clinicId,
-                sampleCollectionDate: dateRange,
-                testResult: testResult,
-                sampleTypeId: sampleTypeId,
-                gender: gender,
-                formFields: formFields
-            },
-            function(data) {
-                $("#clinicDashReqFormBar").html(data);
             });
     }
 </script>

@@ -3824,7 +3824,7 @@ class EidSampleTable extends AbstractTableGateway
          * you want to insert a non-database field (for example a counter or static image)
         */
         $aColumns = array('DATE_FORMAT(sample_collection_date,"%d-%b-%Y")', 'specimen_type', 'facility_name');
-        $orderColumns = array('sample_collection_date', 'vl_sample_id', 'vl_sample_id', 'vl_sample_id', 'vl_sample_id', 'vl_sample_id', 'vl_sample_id', 'specimen_type', 'facility_name');
+        $orderColumns = array('sample_collection_date', 'eid_id', 'eid_id', 'eid_id', 'eid_id', 'eid_id', 'eid_id', 'specimen_type', 'facility_name');
 
         /*
          * Paging
@@ -4052,7 +4052,7 @@ class EidSampleTable extends AbstractTableGateway
         /* Array of database columns which should be read and sent back to DataTables. Use a space where
          * you want to insert a non-database field (for example a counter or static image)
         */
-        $aColumns = array('facility_name', 'vl_sample_id', 'vl_sample_id', 'vl_sample_id', 'vl_sample_id', 'vl_sample_id', 'vl_sample_id');
+        $aColumns = array('facility_name', 'eid_id', 'eid_id', 'eid_id', 'eid_id', 'eid_id', 'eid_id');
         /*
          * Paging
          */
@@ -4131,6 +4131,8 @@ class EidSampleTable extends AbstractTableGateway
         $sQuery = $sql->select()->from(array('f' => 'facility_details'))
             ->join(array('vl' => $this->table), 'vl.lab_id=f.facility_id', array(
                 "total_samples_received" => new Expression("(COUNT(*))"),
+                "total_samples_positive" => new Expression("(SUM(CASE WHEN ((((vl.result ='positive%' OR vl.result = 'Positive%') AND vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL') AND (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) OR (vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0)) THEN 1 ELSE 0 END))"),
+                "total_samples_negative" => new Expression("(SUM(CASE WHEN ((((vl.result ='negative%' OR vl.result = 'Negative%') AND vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL') AND (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) OR (vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0)) THEN 1 ELSE 0 END))"),
                 "total_samples_tested" => new Expression("(SUM(CASE WHEN (((vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL') AND (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) OR (vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0)) THEN 1 ELSE 0 END))"),
                 "total_samples_pending" => new Expression("(SUM(CASE WHEN ((vl.result IS NULL OR vl.result = '' OR vl.result = 'NULL' OR sample_tested_datetime is null OR sample_tested_datetime = '' OR DATE(sample_tested_datetime) ='1970-01-01' OR DATE(sample_tested_datetime) ='0000-00-00') AND (vl.reason_for_sample_rejection IS NULL OR vl.reason_for_sample_rejection = '' OR vl.reason_for_sample_rejection = 0)) THEN 1 ELSE 0 END))"),
                 "rejected_samples" => new Expression("SUM(CASE WHEN (vl.reason_for_sample_rejection !='' AND vl.reason_for_sample_rejection !='0' AND vl.reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END)")
@@ -4747,101 +4749,6 @@ class EidSampleTable extends AbstractTableGateway
         return $result;
     }
 
-    public function fetchClinicRequisitionFormsTested($params)
-    {
-        $logincontainer = new Container('credo');
-        $dbAdapter = $this->adapter;
-        $sql = new Sql($dbAdapter);
-        $result = array();
-        $common = new CommonService($this->sm);
-        if (isset($params['sampleCollectionDate']) && trim($params['sampleCollectionDate']) != '') {
-            $s_c_date = explode("to", $params['sampleCollectionDate']);
-            if (isset($s_c_date[0]) && trim($s_c_date[0]) != "") {
-                $startDate = trim($s_c_date[0]);
-            }
-            if (isset($s_c_date[1]) && trim($s_c_date[1]) != "") {
-                $endDate = trim($s_c_date[1]);
-            }
-
-            $incompleteQuery = "(vl.patient_art_no IS NULL OR vl.patient_art_no='' OR vl.child_age IS NULL OR vl.child_age ='' OR vl.child_gender IS NULL OR vl.child_gender='' OR vl.current_regimen IS NOT NULL OR vl.current_regimen !='')";
-            $completeQuery = "vl.patient_art_no IS NOT NULL AND vl.patient_art_no !='' AND vl.child_age IS NOT NULL AND vl.child_age !='' AND vl.child_gender IS NOT NULL AND vl.child_gender !='' AND vl.current_regimen IS NOT NULL AND vl.current_regimen !=''";
-            if (isset($params['formFields']) && trim($params['formFields']) != '') {
-                $formFields = explode(',', $params['formFields']);
-                $incompleteQuery = '';
-                $completeQuery = '';
-                for ($f = 0; $f < count($formFields); $f++) {
-                    if (trim($formFields[$f]) != '') {
-                        $incompleteQuery .= 'vl.' . $formFields[$f] . ' IS NULL OR vl.' . $formFields[$f] . '=""';
-                        $completeQuery .= 'vl.' . $formFields[$f] . ' IS NOT NULL AND vl.' . $formFields[$f] . '!=""';
-                        if ((count($formFields) - $f) > 1) {
-                            $incompleteQuery .= ' OR ';
-                            $completeQuery .= ' AND ';
-                        }
-                    }
-                }
-            }
-            $i = 0;
-            $completeResultCount = 0;
-            $inCompleteResultCount = 0;
-            $query = $sql->select()->from(array('vl' => $this->table))
-                ->columns(
-                    array(
-                        "total" => new Expression('COUNT(*)'),
-                        "monthDate" => new Expression("DATE_FORMAT(DATE(sample_collection_date), '%d-%b-%Y')"),
-
-                        "CompletedForms" => new Expression("SUM(CASE WHEN ($completeQuery) THEN 1 ELSE 0 END)"),
-                        "IncompleteForms" => new Expression("SUM(CASE WHEN ($incompleteQuery) THEN 1 ELSE 0 END)"),
-
-                    )
-                )
-                ->where(array("DATE(vl.sample_collection_date) <='$endDate'", "DATE(vl.sample_collection_date) >='$startDate'"));
-            if (isset($params['clinicId']) && trim($params['clinicId']) != '') {
-                $query = $query->where('vl.facility_id IN (' . $params['clinicId'] . ')');
-            } else {
-                if ($logincontainer->role != 1) {
-                    $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : array(0);
-                    $query = $query->where('vl.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
-                }
-            }
-            if (isset($params['testResult']) && $params['testResult'] != '') {
-                $queryStr = $queryStr->where("(vl.result like '".$params['testResult']."%' OR vl.result like '".ucwords($params['testResult'])."%' )");
-            }
-            if (isset($params['sampleTypeId']) && $params['sampleTypeId'] != '') {
-                $query = $query->where('vl.specimen_type="' . base64_decode(trim($params['sampleTypeId'])) . '"');
-            }
-
-           
-            if (isset($params['gender']) && $params['gender'] == 'F') {
-                $query = $query->where("vl.child_gender IN ('f','female','F','FEMALE')");
-            } else if (isset($params['gender']) && $params['gender'] == 'M') {
-                $query = $query->where("vl.child_gender IN ('m','male','M','MALE')");
-            } else if (isset($params['gender']) && $params['gender'] == 'not_specified') {
-                $query = $query->where("(vl.child_gender IS NULL OR vl.child_gender = '' OR vl.child_gender ='Not Recorded' OR vl.child_gender = 'not recorded OR vl.child_age = 'Unreported' OR vl.child_age = 'unreported')");
-            }
-            
-            $query = $query->group(array(new Expression('WEEK(sample_collection_date)')));
-            $query = $query->order(array(new Expression('WEEK(sample_collection_date)')));
-            $queryStr = $sql->buildSqlString($query);
-            //echo $queryStr;die;
-            //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-            $sampleResult = $common->cacheQuery($queryStr, $dbAdapter);
-            $j = 0;
-            if (isset($sampleResult) && count($sampleResult) > 0) {
-                foreach ($sampleResult as $sRow) {
-                    if ($sRow["monthDate"] == null) continue;
-                    $result['Complete'][$j] = (isset($sRow["CompletedForms"])) ? (int) $sRow["CompletedForms"] : null;
-                    $result['Incomplete'][$j] = (isset($sRow["IncompleteForms"])) ? (int) $sRow["IncompleteForms"] : null;
-                    $completionRate = 100 * ($result['Complete'][$j] / ($result['Complete'][$j] + $result['Incomplete'][$j]));
-                    $result['CompletionRate'][$j] = ($completionRate > 0) ? round($completionRate, 2) : 0;
-                    $result['date'][$j] = $sRow["monthDate"];
-                    $j++;
-                }
-            }
-        }
-
-        return $result;
-    }
-
     public function fetchSampleTestedReason($params)
     {
         $logincontainer = new Container('credo');
@@ -4990,17 +4897,17 @@ class EidSampleTable extends AbstractTableGateway
                         $where .= ' OR ';
                     }
                     if ($age[$a] == '<2') {
-                        $where .= "(vl.patient_age_in_years > 0 AND vl.patient_age_in_years < 2)";
+                        $where .= "(vl.child_age > 0 AND vl.child_age < 2)";
                     } else if ($age[$a] == '2to5') {
-                        $where .= "(vl.patient_age_in_years >= 2 AND vl.patient_age_in_years <= 5)";
+                        $where .= "(vl.child_age >= 2 AND vl.child_age <= 5)";
                     } else if ($age[$a] == '6to14') {
-                        $where .= "(vl.patient_age_in_years >= 6 AND vl.patient_age_in_years <= 14)";
+                        $where .= "(vl.child_age >= 6 AND vl.child_age <= 14)";
                     } else if ($age[$a] == '15to49') {
-                        $where .= "(vl.patient_age_in_years >= 15 AND vl.patient_age_in_years <= 49)";
+                        $where .= "(vl.child_age >= 15 AND vl.child_age <= 49)";
                     } else if ($age[$a] == '>=50') {
-                        $where .= "(vl.patient_age_in_years >= 50)";
+                        $where .= "(vl.child_age >= 50)";
                     } else if ($age[$a] == 'unknown') {
-                        $where .= "(vl.patient_age_in_years IS NULL OR vl.patient_age_in_years = '' OR vl.patient_age_in_years = 'Unknown' OR vl.patient_age_in_years = 'unknown')";
+                        $where .= "(vl.child_age IS NULL OR vl.child_age = '' OR vl.child_age = 'Unknown' OR vl.child_age = 'unknown')";
                     }
                 }
                 $where = '(' . $where . ')';
@@ -5008,11 +4915,11 @@ class EidSampleTable extends AbstractTableGateway
             }
            
             if (isset($params['gender']) && $params['gender'] == 'F') {
-                $queryStr = $queryStr->where("vl.patient_gender IN ('f','female','F','FEMALE')");
+                $queryStr = $queryStr->where("vl.child_gender IN ('f','female','F','FEMALE')");
             } else if (isset($params['gender']) && $params['gender'] == 'M') {
-                $queryStr = $queryStr->where("vl.patient_gender IN ('m','male','M','MALE')");
+                $queryStr = $queryStr->where("vl.child_gender IN ('m','male','M','MALE')");
             } else if (isset($params['gender']) && $params['gender'] == 'not_specified') {
-                $queryStr = $queryStr->where("(vl.patient_gender IS NULL OR vl.patient_gender = '' OR vl.patient_gender ='Not Recorded' OR vl.patient_gender = 'not recorded')");
+                $queryStr = $queryStr->where("(vl.child_gender IS NULL OR vl.child_gender = '' OR vl.child_gender ='Not Recorded' OR vl.child_gender = 'not recorded')");
             }
             $queryStr = $queryStr->group(array('specimen_type'));
             $queryStr = $queryStr->group(array(new Expression('WEEK(sample_collection_date)')));
@@ -5030,6 +4937,245 @@ class EidSampleTable extends AbstractTableGateway
             }
         }
         return $result;
+    }
+
+    public function fetchAllTestResults($parameters)
+    {
+        $logincontainer = new Container('credo');
+        $queryContainer = new Container('query');
+        /* Array of database columns which should be read and sent back to DataTables. Use a space where
+         * you want to insert a non-database field (for example a counter or static image)
+        */
+        $aColumns = array('sample_code', 'facility_name', 'DATE_FORMAT(sample_collection_date,"%d-%b-%Y")', 'rejection_reason_name', 'DATE_FORMAT(sample_tested_datetime,"%d-%b-%Y")', 'result');
+        $orderColumns = array('sample_code', 'facility_name', 'sample_collection_date', 'rejection_reason_name', 'sample_tested_datetime', 'result');
+
+        /*
+         * Paging
+         */
+        $sLimit = "";
+        if (isset($parameters['iDisplayStart']) && $parameters['iDisplayLength'] != '-1') {
+            $sOffset = $parameters['iDisplayStart'];
+            $sLimit = $parameters['iDisplayLength'];
+        }
+
+        /*
+         * Ordering
+         */
+
+        $sOrder = "";
+        if (isset($parameters['iSortCol_0'])) {
+            for ($i = 0; $i < intval($parameters['iSortingCols']); $i++) {
+                if ($parameters['bSortable_' . intval($parameters['iSortCol_' . $i])] == "true") {
+                    $sOrder .= $orderColumns[intval($parameters['iSortCol_' . $i])] . " " . ($parameters['sSortDir_' . $i]) . ",";
+                }
+            }
+            $sOrder = substr_replace($sOrder, "", -1);
+        }
+
+        /*
+         * Filtering
+         * NOTE this does not match the built-in DataTables filtering which does it
+         * word by word on any field. It's possible to do here, but concerned about efficiency
+         * on very large tables, and MySQL's regex functionality is very limited
+         */
+
+        $sWhere = "";
+        if (isset($parameters['sSearch']) && $parameters['sSearch'] != "") {
+            $searchArray = explode(" ", $parameters['sSearch']);
+            $sWhereSub = "";
+            foreach ($searchArray as $search) {
+                if ($sWhereSub == "") {
+                    $sWhereSub .= "(";
+                } else {
+                    $sWhereSub .= " AND (";
+                }
+                $colSize = count($aColumns);
+
+                for ($i = 0; $i < $colSize; $i++) {
+                    if ($i < $colSize - 1) {
+                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search) . "%' OR ";
+                    } else {
+                        $sWhereSub .= $aColumns[$i] . " LIKE '%" . ($search) . "%' ";
+                    }
+                }
+                $sWhereSub .= ")";
+            }
+            $sWhere .= $sWhereSub;
+        }
+
+        /* Individual column filtering */
+        for ($i = 0; $i < count($aColumns); $i++) {
+            if (isset($parameters['bSearchable_' . $i]) && $parameters['bSearchable_' . $i] == "true" && $parameters['sSearch_' . $i] != '') {
+                if ($sWhere == "") {
+                    $sWhere .= $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
+                } else {
+                    $sWhere .= " AND " . $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
+                }
+            }
+        }
+
+        /*
+         * SQL queries
+         * Get data to display
+        */
+        $startDate = '';
+        $endDate = '';
+        if (isset($parameters['sampleCollectionDate']) && trim($parameters['sampleCollectionDate']) != '') {
+            $s_c_date = explode("to", $parameters['sampleCollectionDate']);
+            if (isset($s_c_date[0]) && trim($s_c_date[0]) != "") {
+                $startDate = trim($s_c_date[0]);
+            }
+            if (isset($s_c_date[1]) && trim($s_c_date[1]) != "") {
+                $endDate = trim($s_c_date[1]);
+            }
+        }
+
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $sQuery = $sql->select()->from(array('vl' => $this->table))
+            ->columns(array('eid_id', 'sample_code', 'sampleCollectionDate' => new Expression('DATE(sample_collection_date)'), 'specimen_type', 'sampleTestingDate' => new Expression('DATE(sample_tested_datetime)'), 'result', 'sample_received_at_vl_lab_datetime'))
+            ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'), 'left')
+            ->join(array('r_r_r' => 'r_eid_sample_rejection_reasons'), 'r_r_r.rejection_reason_id=vl.reason_for_sample_rejection', array('rejection_reason_name'), 'left');
+        //->where(array('f.facility_type'=>'1'));
+        if (isset($parameters['sampleCollectionDate']) && trim($parameters['sampleCollectionDate']) != '') {
+            //$sQuery = $sQuery->where(array("vl.sample_collection_date <='" . $endDate . " 23:59:59" . "'", "vl.sample_collection_date >='" . $startDate . " 00:00:00" . "'"));
+            $sQuery = $sQuery->where(array("DATE(vl.sample_collection_date) >='$startDate'", "DATE(vl.sample_collection_date) <='$endDate'"));
+        }
+        if (isset($parameters['clinicId']) && trim($parameters['clinicId']) != '') {
+            $sQuery = $sQuery->where('vl.facility_id IN (' . $parameters['clinicId'] . ')');
+        } else {
+            if ($logincontainer->role != 1) {
+                $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : array(0);
+                $sQuery = $sQuery->where('vl.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
+            }
+        }
+        if (isset($params['testResult']) && $params['testResult'] != '') {
+            $sQuery = $sQuery->where("(vl.result like '".$params['testResult']."%' OR vl.result like '".ucwords($params['testResult'])."%' )");
+        }
+        if (isset($parameters['sampleTypeId']) && trim($parameters['sampleTypeId']) != '') {
+            $sQuery = $sQuery->where('vl.specimen_type="' . base64_decode(trim($parameters['sampleTypeId'])) . '"');
+        }
+        //print_r($parameters['age']);die;
+        if (isset($parameters['age']) && trim($parameters['age']) != '') {
+            $age = explode(',', $parameters['age']);
+            $where = '';
+            for ($a = 0; $a < count($age); $a++) {
+                if (trim($where) != '') {
+                    $where .= ' OR ';
+                }
+                if ($age[$a] == '<2') {
+                    $where .= "(vl.child_age > 0 AND vl.child_age < 2)";
+                } else if ($age[$a] == '2to5') {
+                    $where .= "(vl.child_age >= 2 AND vl.child_age <= 5)";
+                } else if ($age[$a] == '6to14') {
+                    $where .= "(vl.child_age >= 6 AND vl.child_age <= 14)";
+                } else if ($age[$a] == '15to49') {
+                    $where .= "(vl.child_age >= 15 AND vl.child_age <= 49)";
+                } else if ($age[$a] == '>=50') {
+                    $where .= "(vl.child_age >= 50)";
+                } else if ($age[$a] == 'unknown') {
+                    $where .= "(vl.child_age IS NULL OR vl.child_age = '' OR vl.child_age = 'Unknown' OR vl.child_age = 'unknown' OR vl.child_age = 'Unreported' OR vl.child_age = 'unreported')";
+                }
+            }
+            $where = '(' . $where . ')';
+            $sQuery = $sQuery->where($where);
+        }
+        if (isset($parameters['gender']) && $parameters['gender'] == 'F') {
+            $sQuery = $sQuery->where("vl.child_gender IN ('f','female','F','FEMALE')");
+        } else if (isset($parameters['gender']) && $parameters['gender'] == 'M') {
+            $sQuery = $sQuery->where("vl.child_gender IN ('m','male','M','MALE')");
+        } else if (isset($parameters['gender']) && $parameters['gender'] == 'not_specified') {
+            $sQuery = $sQuery->where("(vl.child_gender IS NULL OR vl.child_gender = '' OR vl.child_gender ='Not Recorded' OR vl.child_gender = 'not recorded' OR vl.child_gender = 'unreported' OR vl.child_gender = 'Unreported')");
+        }
+        if (isset($parameters['sampleStatus']) && $parameters['sampleStatus'] == 'result') {
+            $sQuery = $sQuery->where("(vl.result_status is NOT NULL AND vl.result_status !='' AND vl.result_status !='4')");
+        } else if (isset($parameters['sampleStatus']) && $parameters['sampleStatus'] == 'noresult') {
+            $sQuery = $sQuery->where("(vl.result_status is NULL OR vl.result_status ='')");
+        } else if (isset($parameters['sampleStatus']) && $parameters['sampleStatus'] == 'rejected') {
+            $sQuery = $sQuery->where("vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0 OR vl.result_status = '4'");
+        }
+        if (isset($sWhere) && $sWhere != "") {
+            $sQuery->where($sWhere);
+        }
+
+        if (isset($sOrder) && $sOrder != "") {
+            $sQuery->order($sOrder);
+        }
+        if (isset($parameters['sampleStatus']) && $parameters['sampleStatus'] == 'result') {
+            $hQuery = '';
+            $hQuery = clone $sQuery;
+            $hQuery->join(array('st' => 'r_eid_sample_type'), 'st.sample_id=vl.specimen_type', array('sample_name'), 'left')
+                ->join(array('lds' => 'location_details'), 'lds.location_id=f.facility_state', array('facilityState' => 'location_name'), 'left')
+                ->join(array('ldd' => 'location_details'), 'ldd.location_id=f.facility_district', array('facilityDistrict' => 'location_name'), 'left')
+                ->where('result="Not Suppressed"');
+            $queryContainer->highVlSampleQuery = $hQuery;
+        }
+        $queryContainer->resultQuery = $sQuery;
+        if (isset($sLimit) && isset($sOffset)) {
+            $sQuery->limit($sLimit);
+            $sQuery->offset($sOffset);
+        }
+
+        $sQueryStr = $sql->buildSqlString($sQuery); // Get the string of the Sql, instead of the Select-instance 
+        // echo $sQueryStr;die;
+        $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+
+        /* Data set length after filtering */
+        $sQuery->reset('limit');
+        $sQuery->reset('offset');
+        $fQuery = $sql->buildSqlString($sQuery);
+        $aResultFilterTotal = $dbAdapter->query($fQuery, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+        $iFilteredTotal = count($aResultFilterTotal);
+
+        /* Total data set length */
+        $iQuery = $sql->select()->from(array('vl' => $this->table))
+            ->columns(array('eid_id'))
+            ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'))
+            ->join(array('r_r_r' => 'r_eid_sample_rejection_reasons'), 'r_r_r.rejection_reason_id=vl.reason_for_sample_rejection', array('rejection_reason_name'), 'left');
+        //->where(array('f.facility_type'=>'1'));
+        if ($logincontainer->role != 1) {
+            $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : array(0);
+            $iQuery = $iQuery->where('vl.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
+        }
+        if (isset($parameters['sampleCollectionDate']) && trim($parameters['sampleCollectionDate']) != '') {
+            $sQuery = $sQuery->where(array("DATE(vl.sample_collection_date) >='$startDate'", "DATE(vl.sample_collection_date) <='$endDate'"));
+        }
+        $iQueryStr = $sql->buildSqlString($iQuery);
+        $iResult = $dbAdapter->query($iQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+        $iTotal = count($iResult);
+
+        $output = array(
+            "sEcho" => intval($parameters['sEcho']),
+            "iTotalRecords" => $iTotal,
+            "iTotalDisplayRecords" => $iFilteredTotal,
+            "aaData" => array()
+        );
+
+        $common = new CommonService($this->sm);
+        $viewText = $common->translate('View');
+        $pdfText = $common->translate('PDF');
+        foreach ($rResult as $aRow) {
+            $row = array();
+            $sampleCollectionDate = '';
+            if (isset($aRow['sampleCollectionDate']) && $aRow['sampleCollectionDate'] != NULL && trim($aRow['sampleCollectionDate']) != "" && $aRow['sampleCollectionDate'] != '0000-00-00') {
+                $sampleCollectionDate = $common->humanDateFormat($aRow['sampleCollectionDate']);
+            }
+            $sampleTestedDate = '';
+            if (isset($aRow['sampleTestingDate']) && $aRow['sampleTestingDate'] != NULL && trim($aRow['sampleTestingDate']) != "" && $aRow['sampleTestingDate'] != '0000-00-00') {
+                $sampleTestedDate = $common->humanDateFormat($aRow['sampleTestingDate']);
+            }
+            $pdfButtCss = ($aRow['result'] == null || trim($aRow['result']) == "") ? 'display:none' : '';
+            $row[] = $aRow['sample_code'];
+            $row[] = ucwords($aRow['facility_name']);
+            $row[] = $sampleCollectionDate;
+            $row[] = (isset($aRow['rejection_reason_name'])) ? ucwords($aRow['rejection_reason_name']) : '';
+            $row[] = $sampleTestedDate;
+            $row[] = ucwords($aRow['result']);
+            $row[] = '<a href="/eid/clinics/test-result-view/' . base64_encode($aRow['eid_id']) . '" class="btn btn-primary btn-xs" target="_blank">' . $viewText . '</a>&nbsp;&nbsp;<a href="javascript:void(0);" class="btn btn-danger btn-xs" style="' . $pdfButtCss . '" onclick="generateResultPDF(' . $aRow['eid_id'] . ');">' . $pdfText . '</a>';
+            $output['aaData'][] = $row;
+        }
+
+        return $output;
     }
     //end clinic details
 }

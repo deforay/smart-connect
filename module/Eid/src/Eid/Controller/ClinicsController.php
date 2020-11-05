@@ -226,16 +226,4 @@ class ClinicsController extends AbstractActionController
         }
     }
     
-    public function getRequisitionFormsAction(){
-        $request = $this->getRequest();
-        if ($request->isPost()) {
-            $params = $request->getPost();
-            // $sampleService = $this->getServiceLocator()->get('SampleService');
-            $result = $this->sampleService->getClinicRequisitionFormsTested($params);
-            $viewModel = new ViewModel();
-            $viewModel->setVariables(array('result' => $result))
-                        ->setTerminal(true);
-            return $viewModel;
-        }
-    }
 }

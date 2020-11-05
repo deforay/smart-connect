@@ -604,7 +604,6 @@ class SampleService
                         $row[] = $aRow['facilityDistrict'];
                         $row[] = $aRow['facilityState'];
                         $row[] = $aRow['patient_art_no'];
-                        $row[] = ucwords($aRow['first_name'] . " " . $aRow['middle_name'] . " " . $aRow['last_name']);
                         $row[] = $patientDOB;
                         $row[] = $aRow['patient_age_in_years'];
                         $row[] = $aRow['patient_gender'];
@@ -612,7 +611,7 @@ class SampleService
                         $row[] = $aRow['sample_name'];
                         $row[] = $treatmentInitiateDate;
                         $row[] = $aRow['current_regimen'];
-                        $row[] = $treatmentInitiateCurrentRegimen;
+                        $row[] = $treatmentInitiateDate;
                         $row[] = $aRow['is_patient_pregnant'];
                         $row[] = $aRow['is_patient_breastfeeding'];
                         $row[] = $aRow['arv_adherance_percentage'];
@@ -657,7 +656,6 @@ class SampleService
                     $sheet->setCellValue('E1', html_entity_decode($translator->translate('District/County'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
                     $sheet->setCellValue('F1', html_entity_decode($translator->translate('Province/State'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
                     $sheet->setCellValue('G1', html_entity_decode($translator->translate('Unique ART No.'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('H1', html_entity_decode($translator->translate('Patient Name'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
                     $sheet->setCellValue('I1', html_entity_decode($translator->translate('Date of Birth'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
                     $sheet->setCellValue('J1', html_entity_decode($translator->translate('Age'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
                     $sheet->setCellValue('K1', html_entity_decode($translator->translate('Gender'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);

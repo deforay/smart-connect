@@ -9,16 +9,16 @@ $patientMobileNumber = '';
 
 //set patient details
 
-if(isset($result[0]['patient_first_name']) && $result[0]['patient_first_name']!= NULL && trim($result[0]['patient_first_name'])!= ''){
+if(isset($result[0]['child_name']) && $result[0]['child_name']!= NULL && trim($result[0]['child_name'])!= ''){
 
-     $patientFirstName =ucwords($common->crypto('decrypt',$result[0]['patient_first_name'],$result[0]['patient_art_no']));
+     $patientFirstName =ucwords($common->crypto('decrypt',$result[0]['child_name'],$result[0]['sample_code']));
 }
-if(isset($result[0]['patient_last_name']) && $result[0]['patient_last_name']!= NULL && trim($result[0]['patient_last_name'])!= ''){
+if(isset($result[0]['child_surname']) && $result[0]['child_surname']!= NULL && trim($result[0]['child_surname'])!= ''){
 
-     $patientLastName =ucwords($common->crypto('decrypt',$result[0]['patient_last_name'],$result[0]['patient_art_no']));
+     $patientLastName =ucwords($common->crypto('decrypt',$result[0]['child_surname'],$result[0]['sample_code']));
 }
-if(isset($result[0]['patient_mobile_number']) && $result[0]['patient_mobile_number']!= NULL && trim($result[0]['patient_mobile_number'])!= ''){
-     $patientMobileNumber = $result[0]['patient_mobile_number'];
+if(isset($result[0]['caretaker_phone_number']) && $result[0]['caretaker_phone_number']!= NULL && trim($result[0]['caretaker_phone_number'])!= ''){
+     $patientMobileNumber = $result[0]['caretaker_phone_number'];
 }
 
 
@@ -36,28 +36,20 @@ if(!isset($result[0]['districtName']) || $result[0]['districtName'] == NULL || t
      $result[0]['districtName'] = '';
 }
 //set gender
-if(!isset($result[0]['patient_gender']) || $result[0]['patient_gender'] == NULL || trim($result[0]['patient_gender'])== ''){
-     $result[0]['patient_gender'] = 'not reported';
+if(!isset($result[0]['child_gender']) || $result[0]['child_gender'] == NULL || trim($result[0]['child_gender'])== ''){
+     $result[0]['child_gender'] = 'not reported';
 }
 //set Age
 $age = 'Unknown';
-if(isset($result[0]['patient_dob']) && $result[0]['patient_dob']!= NULL && trim($result[0]['patient_dob'])!='' && $result[0]['patient_dob']!='0000-00-00'){
+if(isset($result[0]['child_dob']) && $result[0]['child_dob']!= NULL && trim($result[0]['child_dob'])!='' && $result[0]['child_dob']!='0000-00-00'){
      $todayDate = strtotime(date('Y-m-d'));
-     $dob = strtotime($result[0]['patient_dob']);
+     $dob = strtotime($result[0]['child_dob']);
      $difference = $todayDate - $dob;
      $seconds_per_year = 60*60*24*365;
      $age = round($difference / $seconds_per_year);
-}elseif(isset($result[0]['patient_age_in_years']) && $result[0]['patient_age_in_years']!= NULL && trim($result[0]['patient_age_in_years'])!='' && trim($result[0]['patient_age_in_years']) >0){
-     $age = $result[0]['patient_age_in_years'];
-}elseif(isset($result[0]['patient_age_in_months']) && $result[0]['patient_age_in_months']!= NULL && trim($result[0]['patient_age_in_months'])!='' && trim($result[0]['patient_age_in_months']) >0){
-     if($result[0]['patient_age_in_months'] > 1){
-          $age = $result[0]['patient_age_in_months'].' months';
-     }else{
-          $age = $result[0]['patient_age_in_months'].' month';
-     }
+}elseif(isset($result[0]['child_age']) && $result[0]['child_age']!= NULL && trim($result[0]['child_age'])!='' && trim($result[0]['child_age']) >0){
+     $age = $result[0]['child_age'];
 }
-
-
 
 //sample collection date
 $sampleCollectionDate = '';
@@ -76,11 +68,6 @@ $sampleTestedDate = '';
 if(isset($result[0]['sample_tested_datetime']) && $result[0]['sample_tested_datetime']!= NULL && trim($result[0]['sample_tested_datetime'])!='' && $result[0]['sample_tested_datetime']!='0000-00-00 00:00:00'){
      $expStr=explode(" ",$result[0]['sample_tested_datetime']);
      $sampleTestedDate=$this->humanDateFormat($expStr[0])." ".$expStr[1];
-}
-//last viral load test date
-$lastViralLoadDate = '';
-if(isset($result[0]['last_viral_load_date']) && $result[0]['last_viral_load_date']!= NULL && trim($result[0]['last_viral_load_date'])!='' && $result[0]['last_viral_load_date']!='0000-00-00'){
-     $lastViralLoadDate=$this->humanDateFormat($result[0]['last_viral_load_date']);
 }
 $resultApprovedBy = '';
 if(isset($result[0]['approvedBy']) && trim($result[0]['approvedBy'])!=''){
@@ -122,10 +109,6 @@ p{padding:4px;}
                                         <span class="labelTxt"><?php echo $this->translate('Sample Collection Date'); ?></span>
                                         <p><?php echo $sampleCollectionDate; ?></p>
                                    </div>
-                                   <div class="col-md-4">
-                                        <span class="labelTxt"><?php echo $this->translate('ART (TRACNET) No'); ?>.</span>
-                                        <p><?php echo $result[0]['patient_art_no'];?></p>
-                                   </div>
                               </div>
 
                               <div class="row">
@@ -148,7 +131,7 @@ p{padding:4px;}
                               <div class="row">
                                    <div class="col-md-4">
                                         <span class="labelTxt"><?php echo $this->translate('Gender'); ?></span>
-                                        <p><?php echo ucwords(str_replace("_"," ",$result[0]['patient_gender']));?></p>
+                                        <p><?php echo ucwords(str_replace("_"," ",$result[0]['child_gender']));?></p>
                                    </div>
                               </div>
 
@@ -211,8 +194,8 @@ p{padding:4px;}
                                              <p><?php echo ucwords($result[0]['vl_test_platform']);?></p>
                                         </div>
                                         <div class="col-md-4">
-                                             <span class="labelTxt"><?php echo $this->translate('VIRAL LOAD RESULT (copies/ml)'); ?></span>
-                                             <p><?php echo $result[0]['result'];?></p>
+                                             <span class="labelTxt"><?php echo $this->translate('RESULT'); ?></span>
+                                             <p><?php echo ucwords($result[0]['result']);?></p>
                                         </div>
                                         <div class="col-md-4">
                                              <span class="labelTxt"><?php echo $this->translate('Approved By'); ?></span>
@@ -226,19 +209,6 @@ p{padding:4px;}
                                         <p><?php echo ucfirst($result[0]['approver_comments']);?></p>
                                    </div>
                               </div>
-                              <span style="line-height:2px;border-bottom:2px solid #d3d3d3" class="col-sm-12"></span>
-                              <div class="row">
-                                   <h4><?php echo $this->translate('Previous Result'); ?></h4>
-                                   <div class="col-md-4">
-                                        <span class="labelTxt"><?php echo $this->translate('Date of Last Viral Load Test'); ?></span>
-                                        <p><?php echo $lastViralLoadDate; ?></p>
-                                   </div>
-                                   <div class="col-md-4">
-                                        <span class="labelTxt"><?php echo $this->translate('Result of previous viral load(copies/ml)'); ?> </span>
-                                        <p><?php echo $result[0]['last_viral_load_result'];?></p>
-                                   </div>
-                              </div>
-
                          </form>
                     </div>
                </div>
