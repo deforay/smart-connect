@@ -21,6 +21,7 @@ class VlsmReferenceTablesController extends AbstractRestfulController
     }
     public function create($params)
     {
+        // print_r($params);die;
         $response = $this->commonService->saveVlsmReferenceTablesFromAPI($params);
         return new JsonModel($response);
     }
