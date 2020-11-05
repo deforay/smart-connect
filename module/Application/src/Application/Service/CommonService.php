@@ -530,7 +530,6 @@ class CommonService
           /* if(empty($params['api-version'])){
                return array('status' => 'fail', 'message' => 'Please specify API version');
           } */
-          $facilityDb = $this->sm->get('FacilityTable');
           $testReasonDb = $this->sm->get('TestReasonTable');
           $covid19TestReasonDb = $this->sm->get('Covid19TestReasonsTable');
           $artCodeDb = $this->sm->get('ArtCodeTable');
@@ -541,26 +540,27 @@ class CommonService
           $covid19SampleTypeDb = $this->sm->get('Covid19SampleTypeTable');
           $covid19ComorbiditiesDb = $this->sm->get('Covid19ComorbiditiesTable');
           $covid19SymptomsDb = $this->sm->get('Covid19SymptomsTable');
+          $facilityDb = $this->sm->get('FacilityTable');
           $locationDb = $this->sm->get('LocationDetailsTable');
           $importConfigDb = $this->sm->get('ImportConfigMachineTable');
-
-
+          
+          
           $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
           $sql = new Sql($dbAdapter);
-
+          
           $apiData = array();
           $fileName = $_FILES['referenceFile']['name'];
           $ranNumber = str_pad(rand(0, pow(10, 6) - 1), 6, '0', STR_PAD_LEFT);
           $extension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
           $fileName = $ranNumber . "." . $extension;
-
+          // $fileName = 'ref.json';   // Testing
           if (!file_exists(TEMP_UPLOAD_PATH) && !is_dir(TEMP_UPLOAD_PATH)) {
                mkdir(APPLICATION_PATH . DIRECTORY_SEPARATOR . "uploads", 0777);
           }
           if (!file_exists(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-reference") && !is_dir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-reference")) {
                mkdir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-reference", 0777);
           }
-
+          
           $pathname = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-reference" . DIRECTORY_SEPARATOR . $fileName;
           if (!file_exists($pathname)) {
                if (move_uploaded_file($_FILES['referenceFile']['tmp_name'], $pathname)) {
@@ -568,6 +568,9 @@ class CommonService
                     $apiData = json_decode(file_get_contents($pathname));
                }
           }
+          
+          // $apiData = json_decode(file_get_contents($pathname)); // Testing
+          // print_r($apiData->import_config_machines);die;
           // echo "<pre>";print_r($apiData->facility_details->tableStructure);die;
           if ($apiData !== FALSE) {
                /* For update the Facility Details */
@@ -603,29 +606,29 @@ class CommonService
                                         $facilityData['facility_district'] = $locationDb->lastInsertValue;
                                    }
                               }
-
+                              
                               $rQuery = $sql->select()->from('facility_details')->where(array('facility_code LIKE "%' . $facilityData['facility_code'] . '%" OR facility_id = ' . $facilityData['facility_id']));
                               $rQueryStr = $sql->buildSqlString($rQuery);
                               // die($rQueryStr);
                               $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
                               if ($rowData) {
-                                   $facilityDb->update($facilityData, array('facility_id' => $facilityData['facility_id']));
-                              } else {
-                                   $facilityDb->insert($facilityData);
+                                        $facilityDb->update($facilityData, array('facility_id' => $facilityData['facility_id']));
+                                   } else {
+                                             $facilityDb->insert($facilityData);
+                                        }
+                                   }
                               }
                          }
-                    }
-               }
-               /* For update the Test Reasons */
-               if(isset($apiData->r_vl_test_reasons) && !empty($apiData->r_vl_test_reasons)){
-                    /* if($apiData->forceSync){
-                         $rQueryStr = $apiData->r_vl_test_reasons->tableStructure;
-                         $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
-                    } */
-                    $condition = "";
-                    if(isset($apiData->r_vl_test_reasons->lastModifiedTime) && !empty($apiData->r_vl_test_reasons->lastModifiedTime)){
-                         $condition = "updated_datetime > '" . $apiData->r_vl_test_reasons->lastModifiedTime . "'";
-                    }
+                         /* For update the Test Reasons */
+                         if(isset($apiData->r_vl_test_reasons) && !empty($apiData->r_vl_test_reasons)){
+                              /* if($apiData->forceSync){
+                                   $rQueryStr = $apiData->r_vl_test_reasons->tableStructure;
+                                   $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
+                              } */
+                              $condition = "";
+                              if(isset($apiData->r_vl_test_reasons->lastModifiedTime) && !empty($apiData->r_vl_test_reasons->lastModifiedTime)){
+                                   $condition = "updated_datetime > '" . $apiData->r_vl_test_reasons->lastModifiedTime . "'";
+                              }
                     $notUpdated = $this->getLastModifiedDateTime('r_vl_test_reasons', 'updated_datetime', $condition);
                     if (empty($notUpdated) || !isset($notUpdated)) {
                          foreach ((array)$apiData->r_vl_test_reasons->tableData as $row) {
@@ -747,7 +750,7 @@ class CommonService
                          }
                     }
                }
-
+               
                /* For update the Covid19 Sample Rejection Reason Details */
                if(isset($apiData->r_covid19_sample_rejection_reasons) && !empty($apiData->r_covid19_sample_rejection_reasons)){
                     /* if($apiData->forceSync){
@@ -773,7 +776,32 @@ class CommonService
                          }
                     }
                }
-               
+               /* For update the  Import Config Machine */
+               if(isset($apiData->import_config_machines) && !empty($apiData->import_config_machines)){
+                    /* if($apiData->forceSync){
+                         $rQueryStr = $apiData->r_covid19_symptoms->tableStructure;
+                         $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
+                    } */
+                    // $condition = "";
+                    // if(isset($apiData->import_config_machines->lastModifiedTime) && !empty($apiData->import_config_machines->lastModifiedTime)){
+                         //      $condition = "updated_datetime > '" . $apiData->import_config_machines->lastModifiedTime . "'";
+                    // }
+                    // $notUpdated = $this->getLastModifiedDateTime('r_covid19_symptoms', 'updated_datetime', $condition);
+                    // if (empty($notUpdated) || !isset($notUpdated)) {
+                         foreach ((array)$apiData->import_config_machines->tableData as $row) {
+                              $importConfigMachData = (array)$row;
+                              $rQuery = $sql->select()->from('import_config_machines')->where(array('config_machine_name LIKE "%' . $importConfigMachData['config_machine_name'] . '%" OR config_machine_id = ' . $importConfigMachData['config_machine_id']));
+                              $rQueryStr = $sql->buildSqlString($rQuery);
+                              $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
+                              if ($rowData) {
+                                   $importConfigMachDb->update($importConfigMachData, array('config_machine_id' => $importConfigMachData['config_machine_id']));
+                              } else {
+                                   $importConfigMachDb->insert($importConfigMachData);
+                                   // print_r($importConfigMachDb);die;
+                              }
+                         }
+                         // }
+                    }
                /* For update the EID Sample Type Details */
                if(isset($apiData->r_eid_sample_type) && !empty($apiData->r_eid_sample_type)){
                     /* if($apiData->forceSync){
@@ -877,6 +905,8 @@ class CommonService
                          }
                     }
                }
+
+              
                return array(
                     'status' => 'success',
                     'message' => 'All reference tables synced'

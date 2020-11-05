@@ -22,10 +22,10 @@ class VlsmCovidController extends AbstractRestfulController
     }
     public function create($params)
     {
-        
         if (!isset($params['api-version'])) {
             $params['api-version'] = 'v1';
         }
+        // print_r($params);die;
         if ($params['api-version'] == 'v1') {
             $response = $this->covid19SampleService->saveFileFromVlsmAPIV1();
         } else if ($params['api-version'] == 'v2') {
