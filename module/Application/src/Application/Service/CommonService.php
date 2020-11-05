@@ -542,6 +542,7 @@ class CommonService
           $covid19ComorbiditiesDb = $this->sm->get('Covid19ComorbiditiesTable');
           $covid19SymptomsDb = $this->sm->get('Covid19SymptomsTable');
           $locationDb = $this->sm->get('LocationDetailsTable');
+          $importConfigDb = $this->sm->get('ImportConfigMachineTable');
 
 
           $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
