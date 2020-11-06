@@ -2230,10 +2230,10 @@ class EidSampleTable extends AbstractTableGateway
         }
 
         if(isset($params['flag']) && $params['flag'] == 'poc'){
-            $receivedQuery = $receivedQuery->join(array('icm' => 'import_config_machines'), 'icm.config_machine_id = eid.import_machine_name')->where(array('icm.poc_device' => 'yes'));
+            $receivedQuery = $receivedQuery->join(array('icm' => 'import_config_machines'), 'icm.config_machine_id = eid.import_machine_name', array('poc_device'))->where(array('icm.poc_device' => 'yes'));
         }
         $cQueryStr = $sql->buildSqlString($receivedQuery);
-        //echo $cQueryStr;die;
+        // echo $cQueryStr;die;
         //$rResult = $dbAdapter->query($cQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $rResult = $common->cacheQuery($cQueryStr, $dbAdapter);
 
@@ -2261,10 +2261,10 @@ class EidSampleTable extends AbstractTableGateway
             $testedQuery = $testedQuery->where("DATE(sample_tested_datetime) IN ($qDates)");
         }
         if(isset($params['flag']) && $params['flag'] == 'poc'){
-            $testedQuery = $testedQuery->join(array('icm' => 'import_config_machines'), 'icm.config_machine_id = eid.import_machine_name')->where(array('icm.poc_device' => 'yes'));
+            $testedQuery = $testedQuery->join(array('icm' => 'import_config_machines'), 'icm.config_machine_id = eid.import_machine_name', array('poc_device'))->where(array('icm.poc_device' => 'yes'));
         }
         $cQueryStr = $sql->buildSqlString($testedQuery);
-        //echo $cQueryStr;//die;
+        // echo $cQueryStr;die;
         //$rResult = $dbAdapter->query($cQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $rResult = $common->cacheQuery($cQueryStr, $dbAdapter);
 
@@ -2292,10 +2292,10 @@ class EidSampleTable extends AbstractTableGateway
             $rejectedQuery = $rejectedQuery->where("DATE(sample_collection_date) IN ($qDates)");
         }
         if(isset($params['flag']) && $params['flag'] == 'poc'){
-            $rejectedQuery = $rejectedQuery->join(array('icm' => 'import_config_machines'), 'icm.config_machine_id = eid.import_machine_name')->where(array('icm.poc_device' => 'yes'));
+            $rejectedQuery = $rejectedQuery->join(array('icm' => 'import_config_machines'), 'icm.config_machine_id = eid.import_machine_name', array('poc_device'))->where(array('icm.poc_device' => 'yes'));
         }
         $cQueryStr = $sql->buildSqlString($rejectedQuery);
-        //echo $cQueryStr;die;
+        // echo $cQueryStr;die;
         //$rResult = $dbAdapter->query($cQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $rResult = $common->cacheQuery($cQueryStr, $dbAdapter);
         $rejTotal = 0;
@@ -2351,7 +2351,7 @@ class EidSampleTable extends AbstractTableGateway
                 $queryStr = $queryStr->where('eid.lab_id IN ("' . implode('", "', $facilityIdList) . '")');
             }
             if(isset($params['flag']) && $params['flag'] == 'poc'){
-                $queryStr = $queryStr->join(array('icm' => 'import_config_machines'), 'icm.config_machine_id = eid.import_machine_name')->where(array('icm.poc_device' => 'yes'));
+                $queryStr = $queryStr->join(array('icm' => 'import_config_machines'), 'icm.config_machine_id = eid.import_machine_name', array('poc_device'))->where(array('icm.poc_device' => 'yes'));
             }
             $queryStr = $queryStr->where("
                         (sample_collection_date is not null AND sample_collection_date != '')
@@ -2427,7 +2427,7 @@ class EidSampleTable extends AbstractTableGateway
                 $query = $query->where('eid.lab_id IN ("' . implode('", "', $facilityIdList) . '")');
             }
             if(isset($params['flag']) && $params['flag'] == 'poc'){
-                $query = $query->join(array('icm' => 'import_config_machines'), 'icm.config_machine_id = eid.import_machine_name')->where(array('icm.poc_device' => 'yes'));
+                $query = $query->join(array('icm' => 'import_config_machines'), 'icm.config_machine_id = eid.import_machine_name', array('poc_device'))->where(array('icm.poc_device' => 'yes'));
             }
             $queryStr = $sql->buildSqlString($query);
             // echo $queryStr;die;
@@ -2521,7 +2521,7 @@ class EidSampleTable extends AbstractTableGateway
                 $query = $query->where('vl.lab_id IN ("' . implode('", "', $facilityIdList) . '")');
             }
             if(isset($params['flag']) && $params['flag'] == 'poc'){
-                $query = $query->join(array('icm' => 'import_config_machines'), 'icm.config_machine_id = eid.import_machine_name')->where(array('icm.poc_device' => 'yes'));
+                $query = $query->join(array('icm' => 'import_config_machines'), 'icm.config_machine_id = eid.import_machine_name', array('poc_device'))->where(array('icm.poc_device' => 'yes'));
             }
             $query = $query->group(array(new Expression('YEAR(vl.result_approved_datetime)')));
             $query = $query->group(array(new Expression('MONTH(vl.result_approved_datetime)')));
@@ -2598,7 +2598,7 @@ class EidSampleTable extends AbstractTableGateway
                 $query = $query->where('eid.lab_id IN ("' . implode('", "', $facilityIdList) . '")');
             }
             if(isset($params['flag']) && $params['flag'] == 'poc'){
-                $query = $query->join(array('icm' => 'import_config_machines'), 'icm.config_machine_id = eid.import_machine_name')->where(array('icm.poc_device' => 'yes'));
+                $query = $query->join(array('icm' => 'import_config_machines'), 'icm.config_machine_id = eid.import_machine_name', array('poc_device'))->where(array('icm.poc_device' => 'yes'));
             }
             $queryStr = $sql->buildSqlString($query);
             // echo $queryStr;
@@ -2664,7 +2664,7 @@ class EidSampleTable extends AbstractTableGateway
             }
         }
         if(isset($params['flag']) && $params['flag'] == 'poc'){
-            $squery = $squery->join(array('icm' => 'import_config_machines'), 'icm.config_machine_id = eid.import_machine_name')->where(array('icm.poc_device' => 'yes'));
+            $squery = $squery->join(array('icm' => 'import_config_machines'), 'icm.config_machine_id = eid.import_machine_name', array('poc_device'))->where(array('icm.poc_device' => 'yes'));
         }
         $squery = $squery->group(array('location_id'));
         $sQueryStr = $sql->buildSqlString($squery);
@@ -2721,7 +2721,7 @@ class EidSampleTable extends AbstractTableGateway
             }
         }
         if(isset($params['flag']) && $params['flag'] == 'poc'){
-            $squery = $squery->join(array('icm' => 'import_config_machines'), 'icm.config_machine_id = eid.import_machine_name')->where(array('icm.poc_device' => 'yes'));
+            $squery = $squery->join(array('icm' => 'import_config_machines'), 'icm.config_machine_id = eid.import_machine_name', array('poc_device'))->where(array('icm.poc_device' => 'yes'));
         }
         $squery = $squery->group(array('location_id'));
         $sQueryStr = $sql->buildSqlString($squery);
@@ -2778,7 +2778,7 @@ class EidSampleTable extends AbstractTableGateway
             }
         }
         if(isset($params['flag']) && $params['flag'] == 'poc'){
-            $squery = $squery->join(array('icm' => 'import_config_machines'), 'icm.config_machine_id = eid.import_machine_name')->where(array('icm.poc_device' => 'yes'));
+            $squery = $squery->join(array('icm' => 'import_config_machines'), 'icm.config_machine_id = eid.import_machine_name', array('poc_device'))->where(array('icm.poc_device' => 'yes'));
         }
         $squery = $squery->group(array('location_id'));
         $sQueryStr = $sql->buildSqlString($squery);
@@ -2879,10 +2879,10 @@ class EidSampleTable extends AbstractTableGateway
             $countQuery = $countQuery->where("(vl.child_gender IS NULL OR vl.child_gender = '' OR vl.child_gender ='Not Recorded' OR vl.child_gender = 'not recorded' OR vl.child_gender = 'Unreported' OR vl.child_gender = 'unreported')");
         }
         if(isset($params['flag']) && $params['flag'] == 'poc'){
-            $countQuery = $countQuery->join(array('icm' => 'import_config_machines'), 'icm.config_machine_id = eid.import_machine_name')->where(array('icm.poc_device' => 'yes'));
+            $countQuery = $countQuery->join(array('icm' => 'import_config_machines'), 'icm.config_machine_id = eid.import_machine_name', array('poc_device'))->where(array('icm.poc_device' => 'yes'));
         }
         if(isset($params['flag']) && $params['flag'] == 'poc'){
-            $countQuery = $countQuery->join(array('icm' => 'import_config_machines'), 'icm.config_machine_id = eid.import_machine_name')->where(array('icm.poc_device' => 'yes'));
+            $countQuery = $countQuery->join(array('icm' => 'import_config_machines'), 'icm.config_machine_id = eid.import_machine_name', array('poc_device'))->where(array('icm.poc_device' => 'yes'));
         }
         $countQueryStr = $sql->buildSqlString($countQuery);
         // echo $countQueryStr;die;
@@ -2986,7 +2986,7 @@ class EidSampleTable extends AbstractTableGateway
         }
         
         if(isset($params['flag']) && $params['flag'] == 'poc'){
-            $countQuery = $countQuery->join(array('icm' => 'import_config_machines'), 'icm.config_machine_id = eid.import_machine_name')->where(array('icm.poc_device' => 'yes'));
+            $countQuery = $countQuery->join(array('icm' => 'import_config_machines'), 'icm.config_machine_id = eid.import_machine_name', array('poc_device'))->where(array('icm.poc_device' => 'yes'));
         }
         $countQueryStr = $sql->buildSqlString($countQuery);
         // echo $countQueryStr;die;
@@ -3089,7 +3089,7 @@ class EidSampleTable extends AbstractTableGateway
             $countQuery = $countQuery->where("(vl.child_gender IS NULL OR vl.child_gender = '' OR vl.child_gender ='Not Recorded' OR vl.child_gender = 'not recorded' OR vl.child_gender = 'unreported' OR vl.child_gender = 'Unreported')");
         }
         if(isset($params['flag']) && $params['flag'] == 'poc'){
-            $countQuery = $countQuery->join(array('icm' => 'import_config_machines'), 'icm.config_machine_id = eid.import_machine_name')->where(array('icm.poc_device' => 'yes'));
+            $countQuery = $countQuery->join(array('icm' => 'import_config_machines'), 'icm.config_machine_id = eid.import_machine_name', array('poc_device'))->where(array('icm.poc_device' => 'yes'));
         }
         
         $countQueryStr = $sql->buildSqlString($countQuery);
@@ -3197,7 +3197,7 @@ class EidSampleTable extends AbstractTableGateway
         }
         
         if(isset($params['flag']) && $params['flag'] == 'poc'){
-            $countQuery = $countQuery->join(array('icm' => 'import_config_machines'), 'icm.config_machine_id = eid.import_machine_name')->where(array('icm.poc_device' => 'yes'));
+            $countQuery = $countQuery->join(array('icm' => 'import_config_machines'), 'icm.config_machine_id = eid.import_machine_name', array('poc_device'))->where(array('icm.poc_device' => 'yes'));
         }
         $countQueryStr = $sql->buildSqlString($countQuery);
         // echo $countQueryStr;die;
@@ -3367,7 +3367,7 @@ class EidSampleTable extends AbstractTableGateway
             $sQuery = $sQuery->where("(vl.child_gender IS NULL OR vl.child_gender = '' OR vl.child_gender ='Not Recorded' OR vl.child_gender = 'not recorded' OR vl.child_gender = 'unreported' OR vl.child_gender = 'Unreported')");
         }
         if(isset($params['flag']) && $params['flag'] == 'poc'){
-            $sQuery = $sQuery->join(array('icm' => 'import_config_machines'), 'icm.config_machine_id = eid.import_machine_name')->where(array('icm.poc_device' => 'yes'));
+            $sQuery = $sQuery->join(array('icm' => 'import_config_machines'), 'icm.config_machine_id = eid.import_machine_name', array('poc_device'))->where(array('icm.poc_device' => 'yes'));
         }
         
 
@@ -3526,7 +3526,7 @@ class EidSampleTable extends AbstractTableGateway
                     $countQuery = $countQuery->where("(vl.child_gender IS NULL OR vl.child_gender = '' OR vl.child_gender ='Not Recorded' OR vl.child_gender = 'not recorded')");
                 }
                 if(isset($params['flag']) && $params['flag'] == 'poc'){
-                    $countQuery = $countQuery->join(array('icm' => 'import_config_machines'), 'icm.config_machine_id = eid.import_machine_name')->where(array('icm.poc_device' => 'yes'));
+                    $countQuery = $countQuery->join(array('icm' => 'import_config_machines'), 'icm.config_machine_id = eid.import_machine_name', array('poc_device'))->where(array('icm.poc_device' => 'yes'));
                 }
                 
                 
@@ -3632,7 +3632,7 @@ class EidSampleTable extends AbstractTableGateway
                     $countQuery = $countQuery->where("(vl.child_gender IS NULL OR vl.child_gender = '' OR vl.child_gender ='Not Recorded' OR vl.child_gender = 'not recorded')");
                 }
                 if(isset($params['flag']) && $params['flag'] == 'poc'){
-                    $countQuery = $countQuery->join(array('icm' => 'import_config_machines'), 'icm.config_machine_id = eid.import_machine_name')->where(array('icm.poc_device' => 'yes'));
+                    $countQuery = $countQuery->join(array('icm' => 'import_config_machines'), 'icm.config_machine_id = eid.import_machine_name', array('poc_device'))->where(array('icm.poc_device' => 'yes'));
                 }
                 $cQueryStr = $sql->buildSqlString($countQuery);
                 // echo $cQueryStr;die;
@@ -3729,7 +3729,7 @@ class EidSampleTable extends AbstractTableGateway
                 $sQuery = $sQuery->where("(vl.child_gender IS NULL OR vl.child_gender = '' OR vl.child_gender ='Not Recorded' OR vl.child_gender = 'not recorded')");
             }
             if(isset($params['flag']) && $params['flag'] == 'poc'){
-                $sQuery = $sQuery->join(array('icm' => 'import_config_machines'), 'icm.config_machine_id = eid.import_machine_name')->where(array('icm.poc_device' => 'yes'));
+                $sQuery = $sQuery->join(array('icm' => 'import_config_machines'), 'icm.config_machine_id = eid.import_machine_name', array('poc_device'))->where(array('icm.poc_device' => 'yes'));
             }
             
             $sQuery = $sQuery->group(array(new Expression('DATE(sample_collection_date)')));
@@ -3839,7 +3839,7 @@ class EidSampleTable extends AbstractTableGateway
                 $sQuery = $sQuery->where("(vl.child_gender IS NULL OR vl.child_gender = '' OR vl.child_gender ='Not Recorded' OR vl.child_gender = 'not recorded')");
             }
             if(isset($params['flag']) && $params['flag'] == 'poc'){
-                $sQuery = $sQuery->join(array('icm' => 'import_config_machines'), 'icm.config_machine_id = eid.import_machine_name')->where(array('icm.poc_device' => 'yes'));
+                $sQuery = $sQuery->join(array('icm' => 'import_config_machines'), 'icm.config_machine_id = eid.import_machine_name', array('poc_device'))->where(array('icm.poc_device' => 'yes'));
             }
             
             $sQuery = $sQuery->group(array(new Expression('MONTH(sample_collection_date)')));
@@ -4016,7 +4016,7 @@ class EidSampleTable extends AbstractTableGateway
             $sQuery = $sQuery->where("(vl.child_gender IS NULL OR vl.child_gender = '' OR vl.child_gender ='Not Recorded' OR vl.child_gender = 'not recorded')");
         }
         if(isset($params['flag']) && $params['flag'] == 'poc'){
-            $sQuery = $sQuery->join(array('icm' => 'import_config_machines'), 'icm.config_machine_id = eid.import_machine_name')->where(array('icm.poc_device' => 'yes'));
+            $sQuery = $sQuery->join(array('icm' => 'import_config_machines'), 'icm.config_machine_id = eid.import_machine_name', array('poc_device'))->where(array('icm.poc_device' => 'yes'));
         }
         
         //filter end
@@ -4248,7 +4248,7 @@ class EidSampleTable extends AbstractTableGateway
             $sQuery = $sQuery->where("(vl.child_gender IS NULL OR vl.child_gender = '' OR vl.child_gender ='Not Recorded' OR vl.child_gender = 'not recorded')");
         }
         if(isset($params['flag']) && $params['flag'] == 'poc'){
-            $sQuery = $sQuery->join(array('icm' => 'import_config_machines'), 'icm.config_machine_id = eid.import_machine_name')->where(array('icm.poc_device' => 'yes'));
+            $sQuery = $sQuery->join(array('icm' => 'import_config_machines'), 'icm.config_machine_id = eid.import_machine_name', array('poc_device'))->where(array('icm.poc_device' => 'yes'));
         }
     
         if (isset($sWhere) && $sWhere != "") {
@@ -4386,7 +4386,7 @@ class EidSampleTable extends AbstractTableGateway
                 $sQuery = $sQuery->where("(vl.child_gender IS NULL OR vl.child_gender = '' OR vl.child_gender ='Not Recorded' OR vl.child_gender = 'not recorded')");
             }
             if(isset($params['flag']) && $params['flag'] == 'poc'){
-                $sQuery = $sQuery->join(array('icm' => 'import_config_machines'), 'icm.config_machine_id = eid.import_machine_name')->where(array('icm.poc_device' => 'yes'));
+                $sQuery = $sQuery->join(array('icm' => 'import_config_machines'), 'icm.config_machine_id = eid.import_machine_name', array('poc_device'))->where(array('icm.poc_device' => 'yes'));
             }
             $queryStr = $sql->buildSqlString($sQuery);
             $vlOutComeResult = $common->cacheQuery($queryStr, $dbAdapter);
@@ -4469,7 +4469,7 @@ class EidSampleTable extends AbstractTableGateway
             $eidOutcomesQuery = $eidOutcomesQuery->where('eid.lab_id IN ("' . implode('", "', $facilityIdList) . '")');
         }
         if(isset($params['flag']) && $params['flag'] == 'poc'){
-            $eidOutcomesQuery = $eidOutcomesQuery->join(array('icm' => 'import_config_machines'), 'icm.config_machine_id = eid.import_machine_name')->where(array('icm.poc_device' => 'yes'));
+            $eidOutcomesQuery = $eidOutcomesQuery->join(array('icm' => 'import_config_machines'), 'icm.config_machine_id = eid.import_machine_name', array('poc_device'))->where(array('icm.poc_device' => 'yes'));
         }
         $eidOutcomesQueryStr = $sql->buildSqlString($eidOutcomesQuery);
         $result = $common->cacheQuery($eidOutcomesQueryStr, $dbAdapter);
@@ -4532,7 +4532,7 @@ class EidSampleTable extends AbstractTableGateway
                 $sQuery = $sQuery->where('eid.lab_id IN ("' . implode('", "', $facilityIdList) . '")');
             }
             if(isset($params['flag']) && $params['flag'] == 'poc'){
-                $sQuery = $sQuery->join(array('icm' => 'import_config_machines'), 'icm.config_machine_id = eid.import_machine_name')->where(array('icm.poc_device' => 'yes'));
+                $sQuery = $sQuery->join(array('icm' => 'import_config_machines'), 'icm.config_machine_id = eid.import_machine_name', array('poc_device'))->where(array('icm.poc_device' => 'yes'));
             }
             $sQueryStr = $sql->buildSqlString($sQuery);
             // echo $sQueryStr;die;
