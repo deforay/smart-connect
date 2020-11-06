@@ -569,7 +569,6 @@ class CommonService
                }
           }
           
-          // $apiData = json_decode(file_get_contents($pathname)); // Testing
           // print_r($apiData->import_config_machines);die;
           // echo "<pre>";print_r($apiData->facility_details->tableStructure);die;
           if ($apiData !== FALSE) {
@@ -782,25 +781,25 @@ class CommonService
                          $rQueryStr = $apiData->r_covid19_symptoms->tableStructure;
                          $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
                     } */
-                    // $condition = "";
-                    // if(isset($apiData->import_config_machines->lastModifiedTime) && !empty($apiData->import_config_machines->lastModifiedTime)){
-                         //      $condition = "updated_datetime > '" . $apiData->import_config_machines->lastModifiedTime . "'";
-                    // }
-                    // $notUpdated = $this->getLastModifiedDateTime('r_covid19_symptoms', 'updated_datetime', $condition);
-                    // if (empty($notUpdated) || !isset($notUpdated)) {
+                    $condition = "";
+                    if(isset($apiData->import_config_machines->lastModifiedTime) && !empty($apiData->import_config_machines->lastModifiedTime)){
+                              $condition = "updated_datetime > '" . $apiData->import_config_machines->lastModifiedTime . "'";
+                    }
+                    $notUpdated = $this->getLastModifiedDateTime('import_config_machines', 'updated_datetime', $condition);
+                    if (empty($notUpdated) || !isset($notUpdated)) {
                          foreach ((array)$apiData->import_config_machines->tableData as $row) {
                               $importConfigMachData = (array)$row;
+                              // \Zend\Debug\Debug::dump($importConfigMachData);die;
                               $rQuery = $sql->select()->from('import_config_machines')->where(array('config_machine_name LIKE "%' . $importConfigMachData['config_machine_name'] . '%" OR config_machine_id = ' . $importConfigMachData['config_machine_id']));
                               $rQueryStr = $sql->buildSqlString($rQuery);
                               $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
                               if ($rowData) {
-                                   $importConfigMachDb->update($importConfigMachData, array('config_machine_id' => $importConfigMachData['config_machine_id']));
+                                   $importConfigDb->update($importConfigMachData, array('config_machine_id' => $importConfigMachData['config_machine_id']));
                               } else {
-                                   $importConfigMachDb->insert($importConfigMachData);
-                                   // print_r($importConfigMachDb);die;
+                                   $importConfigDb->insert($importConfigMachData);
                               }
                          }
-                         // }
+                         }
                     }
                /* For update the EID Sample Type Details */
                if(isset($apiData->r_eid_sample_type) && !empty($apiData->r_eid_sample_type)){

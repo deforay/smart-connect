@@ -17,19 +17,13 @@ use Laminas\Db\TableGateway\AbstractTableGateway;
 /**
  * Description of Countries
  *
- * @author amit
+ * @author thanaseelan
  */
 class ImportConfigMachineTable extends AbstractTableGateway {
 
-    protected $table = 'r_eid_sample_type';
+    protected $table = 'import_config_machines';
 
     public function __construct(Adapter $adapter) {
         $this->adapter = $adapter;
-    }
-
-    public function fetchAllSampleType()
-    {
-        $query = $this->select(array('status' => 'active'));
-        return $query;
     }
 }
