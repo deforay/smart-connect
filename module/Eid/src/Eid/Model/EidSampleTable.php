@@ -4701,7 +4701,6 @@ class EidSampleTable extends AbstractTableGateway
                 ->columns(
                     array(
                         "monthDate" => new Expression("DATE_FORMAT(DATE(sample_collection_date), '%d-%b-%Y')"),
-
                         "negative" => $caseQuery1,
                         "positive" => $caseQuery2,
                     )
@@ -4733,14 +4732,16 @@ class EidSampleTable extends AbstractTableGateway
             $query = $query->group(array(new Expression('WEEK(sample_collection_date)')));
             $query = $query->order(array(new Expression('WEEK(sample_collection_date)')));
             $queryStr = $sql->buildSqlString($query);
+            // die($queryStr);
             //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             $sampleResult = $common->cacheQuery($queryStr, $dbAdapter);
             $j = 0;
             foreach ($sampleResult as $sRow) {
                 if ($sRow["monthDate"] == null) continue;
-                $result[$params['age']['ageName']]['negative'][$j] = (isset($sRow["negative"])) ? $sRow["negative"] : 0;
-
-                $result[$params['age']['ageName']]['positive'][$j] = (isset($sRow["positive"])) ? $sRow["positive"] : 0;
+                $result[$params['age']['ageName']]['Negative']['color'] = '#60d18f';
+                $result[$params['age']['ageName']]['Negative'][$j] = (isset($sRow["negative"])) ? $sRow["negative"] : 0;
+                $result[$params['age']['ageName']]['Positive']['color'] = '#ff1900';
+                $result[$params['age']['ageName']]['Positive'][$j] = (isset($sRow["positive"])) ? $sRow["positive"] : 0;
 
                 $result['date'][$j] = $sRow["monthDate"];
                 $j++;

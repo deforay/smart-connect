@@ -861,13 +861,9 @@ class EidSampleService
                         $row[] = $aRow['sample_code'];
                         $row[] = ucwords($aRow['facility_name']);
                         $row[] = $sampleCollectionDate;
-                        if (trim($params['result']) == '' || trim($params['result']) == 'rejected') {
-                            $row[] = (isset($aRow['rejection_reason_name'])) ? ucwords($aRow['rejection_reason_name']) : '';
-                        }
-                        if (trim($params['result']) == '' || trim($params['result']) == 'result') {
-                            $row[] = $sampleTestedDate;
-                            $row[] = ucwords($aRow['result']);
-                        }
+                        $row[] = (isset($aRow['rejection_reason_name'])) ? ucwords($aRow['rejection_reason_name']) : '';
+                        $row[] = $sampleTestedDate;
+                        $row[] = ucwords($aRow['result']);
                         $output[] = $row;
                     }
                     $styleArray = array(
@@ -898,39 +894,18 @@ class EidSampleService
                     $sheet->setCellValue('A1', html_entity_decode($translator->translate('Sample ID'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
                     $sheet->setCellValue('B1', html_entity_decode($translator->translate('Facility Name'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
                     $sheet->setCellValue('C1', html_entity_decode($translator->translate('Date Collected'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    if (trim($params['result']) == '') {
-                        $sheet->setCellValue('D1', html_entity_decode($translator->translate('Rejection Reason'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                        $sheet->setCellValue('E1', html_entity_decode($translator->translate('Date Tested'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                        $sheet->setCellValue('F1', html_entity_decode($translator->translate('Result'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    } else if (trim($params['result']) == 'result') {
-                        $sheet->setCellValue('D1', html_entity_decode($translator->translate('Date Tested'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                        $sheet->setCellValue('E1', html_entity_decode($translator->translate('REsult'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    } else if (trim($params['result']) == 'rejected') {
-                        $sheet->setCellValue('D1', html_entity_decode($translator->translate('Rejection Reason'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    }
+                    $sheet->setCellValue('D1', html_entity_decode($translator->translate('Rejection Reason'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+                    $sheet->setCellValue('E1', html_entity_decode($translator->translate('Date Tested'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+                    $sheet->setCellValue('F1', html_entity_decode($translator->translate('Result'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
 
                     $sheet->getStyle('A1')->applyFromArray($styleArray);
                     $sheet->getStyle('B1')->applyFromArray($styleArray);
                     $sheet->getStyle('C1')->applyFromArray($styleArray);
-                    if (trim($params['result']) == '') {
-                        $sheet->getStyle('D1')->applyFromArray($styleArray);
-                        $sheet->getStyle('E1')->applyFromArray($styleArray);
-                        $sheet->getStyle('F1')->applyFromArray($styleArray);
-                    } else if (trim($params['result']) == 'result') {
-                        $sheet->getStyle('D1')->applyFromArray($styleArray);
-                        $sheet->getStyle('E1')->applyFromArray($styleArray);
-                    } else if (trim($params['result']) == 'rejected') {
-                        $sheet->getStyle('D1')->applyFromArray($styleArray);
-                    }
+                    $sheet->getStyle('D1')->applyFromArray($styleArray);
+                    $sheet->getStyle('E1')->applyFromArray($styleArray);
+                    $sheet->getStyle('F1')->applyFromArray($styleArray);
                     $currentRow = 2;
                     $endColumn = 5;
-                    if (trim($params['result']) == 'result') {
-                        $endColumn = 4;
-                    } else if (trim($params['result']) == 'noresult') {
-                        $endColumn = 2;
-                    } else if (trim($params['result']) == 'rejected') {
-                        $endColumn = 3;
-                    }
                     foreach ($output as $rowData) {
                         $colNo = 0;
                         foreach ($rowData as $field => $value) {

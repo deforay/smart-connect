@@ -1,6 +1,5 @@
 <?php
-$lt1000 = array($params['age']['ageName'] => '#60d18f');
-$gt1000 = array($params['age']['ageName'] => '#ff1900');
+// \Zend\Debug\Debug::dump($result);die;
 $supAvg = array();
 if (isset($result[$params['age']['ageName']]) && count($result[$params['age']['ageName']]) > 0) {
     $arrayKey = array_keys($result[$params['age']['ageName']]);
@@ -124,38 +123,20 @@ if (isset($result[$params['age']['ageName']]) && count($result[$params['age']['a
                         for ($i = 0; $i < count($age); $i++) {
                             if (!isset($result[$age[$i]])) continue;
                             foreach ($result[$age[$i]] as $key => $condition) {
-                                if ($key != 'VL Not Detected') {
-                                    $range = substr($key, 4, 6);
-                                    $range = preg_replace('/\s+/', '', $range);
-                                } else {
-                                    $range = 'nd';
-                                }
                                 $translatedKey = $this->translate($key);
                         ?> {
                             name: '<?php echo $translatedKey . "(" . htmlspecialchars($age[$i]) . ")"; ?>',
                             <?php if (array_sum($condition) == 0) { ?> visible: false,
                             <?php } ?>
                             data: [<?php
-                                    foreach ($condition as $count) {
-                                        echo '{y:' . $count . ',age:"' . $age[$i] . '"},';
+                                    foreach ($condition as $ckey=>$count) {
+                                        if($ckey != 'color'){
+                                            echo '{y:' . $count . ',age:"' . $age[$i] . '"},';
+                                        }
                                     }
                                     ?>],
                             stack: '<?php echo $age[$i]; ?>',
-                            <?php
-                                if ($key == "VL (< 1000 cp/ml)") {
-
-                                    if (isset($lt1000[$age[$i]])) { ?>
-
-                                    color: '<?php echo $lt1000[$age[$i]]; ?>'
-
-                                <?php } else { ?>
-                                    color: '<?php echo $gt1000[$age[$i]]; ?>'
-                                <?php }
-                                } else { ?>
-                                color: '#ff1900'
-                            <?php
-                                }
-                            ?>
+                            color: '<?php echo $condition['color']; ?>'
                         },
                     <?php
                             }

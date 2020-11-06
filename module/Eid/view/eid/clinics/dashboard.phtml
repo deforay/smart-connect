@@ -722,7 +722,7 @@ foreach ($sampleType as $samples) {
             var age = {
                 'from': $('#age').attr('data-from'),
                 'to': $('#age').attr('data-to'),
-                'ageName': 'Age '+$("#age option:selected").text()   
+                'ageName': 'Age'+$("#age option:selected").text()   
             };
         }
         $.post("<?php echo $this->url('eid-clinics', array('action' => 'get-sample-test-result-age-group')); ?>", {
