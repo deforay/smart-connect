@@ -480,5 +480,16 @@ ALTER TABLE `r_sample_rejection_reasons` ADD `rejection_type` VARCHAR(255) NULL 
 /* Thana 17 Sep 2020 */
 ALTER TABLE `dash_covid19_form` ADD `type_of_test_requested` VARCHAR(255) NULL DEFAULT NULL AFTER `reason_for_covid19_test`;
 ALTER TABLE `dash_covid19_form` ADD `patient_city` VARCHAR(255) NULL DEFAULT NULL AFTER `patient_district`;
-
+/* Thana 05 Nov 2020 */
 ALTER TABLE `r_vl_test_reasons` ADD `updated_datetime` DATETIME NULL DEFAULT NULL AFTER `test_reason_status`;
+/* Thana 06 Nov 2020 */
+CREATE TABLE `import_config_machines` (
+ `config_machine_id` int(11) NOT NULL AUTO_INCREMENT,
+ `config_id` int(11) NOT NULL,
+ `config_machine_name` varchar(255) NOT NULL,
+ `poc_device` varchar(255) DEFAULT NULL,
+ `latitude` varchar(255) DEFAULT NULL,
+ `longitude` varchar(255) DEFAULT NULL,
+ `updated_datetime` datetime DEFAULT NULL,
+ PRIMARY KEY (`config_machine_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;

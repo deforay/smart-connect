@@ -1,0 +1,154 @@
+<?php
+// \Zend\Debug\Debug::dump($result);die;
+$supAvg = array();
+if (isset($result[$params['age']['ageName']]) && count($result[$params['age']['ageName']]) > 0) {
+    $arrayKey = array_keys($result[$params['age']['ageName']]);
+    $sumArray = array_map(function () {
+        return array_sum(func_get_args());
+    }, $result[$params['age']['ageName']][$arrayKey[0]], $result[$params['age']['ageName']][$arrayKey[1]]);
+    foreach ($result[$params['age']['ageName']][$arrayKey[1]] as $key => $avg) {
+        $supAvg[] = (($avg == 0) ? 0 : round(100 * ($avg / $sumArray[$key]), 2));
+    }
+}
+?>
+<div id="samplesTestedResultAgeGroup"></div>
+<script>
+    $(function() {
+        $('#samplesTestedResultAgeGroup').highcharts({
+            chart: {
+                type: 'column'
+            },
+            title: {
+                text: ''
+            },
+            exporting: {
+                chartOptions: {
+                    subtitle: {
+                        text: '<?php echo $this->translate('Samples Tested based on "' . $params['age']['ageName'] . '"'); ?>',
+                    }
+                }
+            },
+            credits: {
+                enabled: false
+            },
+            xAxis: {
+                categories: [<?php
+                                if (isset($result['date']) && count($result['date']) > 0) {
+                                    foreach ($result['date'] as $date) {
+                                        echo "'" . $this->translate('Week of') . ' ' . $date . "',";
+                                    }
+                                }
+                                ?>]
+            },
+            yAxis: [{
+                min: 0,
+                title: {
+                    text: '<?php echo $this->translate('No. of Samples'); ?>'
+                },
+                labels: {
+                    formatter: function() {
+                        return this.value;
+                    }
+                },
+                stackLabels: {
+                    style: {}
+                }
+            }, { // Secondary yAxis
+                allowDecimals: true,
+                min: 0,
+                max: 100,
+                title: {
+                    text: '<?php echo $this->translate('Percentage %'); ?>',
+                    style: {}
+                },
+                labels: {
+                    format: '{value}%',
+                    style: {}
+                },
+                opposite: true
+            }],
+
+            tooltip: {
+                shared: true
+                // formatter: function () {
+                //     return '<b>' + this.x + '</b><br/>' +
+                //         this.series.name + ': ' + this.y + '<br/>' +
+                //         '< ?php echo $this->translate('Total'); ?>: ' + this.point.stackTotal;
+                // }
+            },
+            plotOptions: {
+                column: {
+                    stacking: 'normal',
+                    pointPadding: 0.2,
+                    borderWidth: 0,
+                    cursor: 'pointer',
+                    point: {
+                        events: {
+                            click: function(e) {
+                                //doSampleTestedBasedonAgeRedirect(e.point.category,e.point.age.replace('Age ', ''));
+                            }
+                        }
+                    },
+                    dataLabels: {
+                        style: {
+                            textShadow: 'none'
+                        }
+                    }
+                },
+                spline: {
+                    stacking: 'normal',
+                    yAxis: 1,
+                    type: 'spline',
+                    lineWidth: 0,
+                    states: {
+                        hover: {
+                            lineWidthPlus: 0
+                        }
+                    },
+                    marker: {
+                        symbol: 'diamond'
+                    },
+                    color: '#1B325F',
+                    point: {
+                        events: {
+                            click: function(e) {
+                                //doSampleTestedBasedonAgeRedirect(e.point.category,e.point.age.replace('Age ', ''));
+                            }
+                        }
+                    }
+                }
+            },
+            series: [<?php
+                        $age = array($params['age']['ageName']);
+                        for ($i = 0; $i < count($age); $i++) {
+                            if (!isset($result[$age[$i]])) continue;
+                            foreach ($result[$age[$i]] as $key => $condition) {
+                                $translatedKey = $this->translate($key);
+                        ?> {
+                            name: '<?php echo $translatedKey . "(" . htmlspecialchars($age[$i]) . ")"; ?>',
+                            <?php if (array_sum($condition) == 0) { ?> visible: false,
+                            <?php } ?>
+                            data: [<?php
+                                    foreach ($condition as $ckey=>$count) {
+                                        if($ckey != 'color'){
+                                            echo '{y:' . $count . ',age:"' . $age[$i] . '"},';
+                                        }
+                                    }
+                                    ?>],
+                            stack: '<?php echo $age[$i]; ?>',
+                            color: '<?php echo $condition['color']; ?>'
+                        },
+                    <?php
+                            }
+                        }
+                        if (count($supAvg) > 0) {
+                    ?> {
+                        name: '<?php echo $this->translate('Percentage %'); ?>',
+                        type: 'spline',
+                        data: [<?php echo implode(",", $supAvg); ?>],
+                    }
+                <?php } ?>
+            ]
+        });
+    });
+</script>

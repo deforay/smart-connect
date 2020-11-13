@@ -38,6 +38,21 @@ class LabsController extends AbstractActionController
             'clinicName' => $clinicName,
         ));
     }
+    
+    public function pocLabsDashboardAction()
+    {
+        $this->layout()->setVariable('activeTab', 'eid-poc-labs');
+        $labName = $this->sampleService->getAllLabName();
+        $provinceName = $this->sampleService->getAllProvinceList();
+        $districtName = $this->sampleService->getAllDistrictList();
+        $clinicName = $this->sampleService->getAllClinicName();
+        return new ViewModel(array(
+            'labName' => $labName,
+            'provinceName' => $provinceName,
+            'districtName' => $districtName,
+            'clinicName' => $clinicName,
+        ));
+    }
 
     public function statsAction()
     {

@@ -32,6 +32,7 @@ use Application\Model\Covid19SymptomsTable;
 use Application\Model\Covid19TestReasonsTable;
 use Application\Model\ProvinceTable;
 use Application\Model\DashApiReceiverStatsTable;
+use Application\Model\ImportConfigMachineTable;
 
 use Application\Service\CommonService;
 use Application\Service\UserService;
@@ -371,6 +372,11 @@ class Module
 				'DashApiReceiverStatsTable' => function ($sm) {
 					$dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');
 					$table = new DashApiReceiverStatsTable($dbAdapter);
+					return $table;
+				},
+				'ImportConfigMachineTable' => function ($sm) {
+					$dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');
+					$table = new ImportConfigMachineTable($dbAdapter);
 					return $table;
 				},
 

@@ -32,6 +32,8 @@ class Covid19FormService
     public function saveFileFromVlsmAPIV2()
     {
         $apiData = array();
+        $apiTrackDb = $this->sm->get('DashApiReceiverStatsTable');
+
         $this->config = $this->sm->get('Config');
         $input = $this->config['db']['dsn'];
         preg_match('~=(.*?);~', $input, $output);
@@ -76,7 +78,7 @@ class Covid19FormService
 
 
         $numRows = 0;
-        foreach ($apiData as $rowData) {
+        foreach ($apiData['data'] as $rowData) {
             $data = array();
             foreach ($columnList as $colName) {
                 if (isset($rowData[$colName])) {
@@ -103,6 +105,31 @@ class Covid19FormService
                 $numRows += $sampleDb->insert($data);
             }
         }
+
+        $common = new CommonService();
+        if(count($apiData['data'])  == $numRows){
+            $status = "success";
+        } else if((count($apiData['data']) - $numRows) != 0){
+            $status = "partial";
+        } else if($numRows == 0){
+            $status = 'failed';
+        }
+        $apiTrackData = array(
+            'tracking_id'                   => $apiData['timestamp'],
+            'received_on'                   => $common->getDateTime(),
+            'number_of_records_received'    => count($apiData['data']),
+            'number_of_records_processed'   => $numRows,
+            'source'                        => 'Sync V2 Viral Load',
+            'status'                        => $status
+        );
+        $trackResult = $apiTrackDb->select(array('tracking_id' => $apiData['timestamp']))->current();
+        if($trackResult){
+            $apiTrackDb->update($apiTrackData, array('api_id' => $trackResult['api_id']));
+        } else{
+            $apiTrackDb->insert($apiTrackData);
+        }
+
+
         return array(
             'status'    => 'success',
             'message'   => $numRows . ' uploaded successfully',
@@ -116,36 +143,37 @@ class Covid19FormService
             $apiData = array();
             $common = new CommonService();
             $sampleDb = $this->sm->get('Covid19FormTableWithoutCache');
-            $facilityDb = $this->sm->get('FacilityTable');
             $facilityTypeDb = $this->sm->get('FacilityTypeTable');
             $testStatusDb = $this->sm->get('SampleStatusTable');
             $locationDb = $this->sm->get('LocationDetailsTable');
+            $facilityDb = $this->sm->get('FacilityTable');
             $sampleRjtReasonDb = $this->sm->get('SampleRejectionReasonTable');
-
+            
             $fileName = $_FILES['covid19File']['name'];
             $ranNumber = str_pad(rand(0, pow(10, 6) - 1), 6, '0', STR_PAD_LEFT);
             $extension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
             $fileName = $ranNumber . "." . $extension;
-
+            
             if (!file_exists(TEMP_UPLOAD_PATH) && !is_dir(TEMP_UPLOAD_PATH)) {
                 mkdir(APPLICATION_PATH . DIRECTORY_SEPARATOR . "uploads", 0777);
             }
             if (!file_exists(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-covid19") && !is_dir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-covid19")) {
                 mkdir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-covid19", 0777);
             }
-
+            
             $pathname = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-covid19" . DIRECTORY_SEPARATOR . $fileName;
             if (!file_exists($pathname)) {
                 if (move_uploaded_file($_FILES['covid19File']['tmp_name'], $pathname)) {
                     $apiData = \JsonMachine\JsonMachine::fromFile($pathname);
                 }
             }
-
+            
             if ($apiData !== FALSE) {
                 foreach ($apiData as $rowData) {
                     // Debug::dump($rowData);die;
                     foreach ($rowData as $key => $row) {
                         // Debug::dump($row);die;
+                        // print_r($apiData);die;
                         if (trim($row['sample_code']) != '' && trim($row['vlsm_instance_id']) != '') {
                             $sampleCode = trim($row['sample_code']);
                             $instanceCode = trim($row['vlsm_instance_id']);
@@ -155,11 +183,11 @@ class Covid19FormService
                             // $dateOfInitiationOfRegimen = (trim($row['date_of_initiation_of_current_regimen']) != '' ? trim(date('Y-m-d H:i', strtotime($row['date_of_initiation_of_current_regimen']))) : null);
                             $resultApprovedDateTime = (trim($row['result_approved_datetime']) != '' ? trim(date('Y-m-d H:i', strtotime($row['result_approved_datetime']))) : null);
                             $sampleTestedDateTime = (trim($row['sample_tested_datetime']) != '' ? trim(date('Y-m-d H:i', strtotime($row['sample_tested_datetime']))) : null);
-
+                            
                             foreach ($row as $index => $value) {
                                 if ($index == 'status_id') {
-                                    break;
-                                } else {
+                                break;
+                            } else {
                                     if ($index != 'covid19_id') {
                                         $data[$index] = $value;
                                     }
@@ -170,7 +198,7 @@ class Covid19FormService
                             $data['sample_registered_at_lab']   = $sampleReceivedAtLab;
                             $data['result_approved_datetime']   = $resultApprovedDateTime;
                             $data['sample_tested_datetime']     = $sampleTestedDateTime;
-
+                            
                             $facilityData = array(
                                 'vlsm_instance_id'          => trim($row['vlsm_instance_id']),
                                 'facility_name'             => trim($row['facility_name']),
@@ -229,7 +257,7 @@ class Covid19FormService
                             } else {
                                 $data['facility_id'] = NULL;
                             }
-
+                            
                             $labData = array(
                                 'vlsm_instance_id'          => trim($row['vlsm_instance_id']),
                                 'facility_name'             => trim($row['labName']),

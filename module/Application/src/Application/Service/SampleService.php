@@ -604,7 +604,6 @@ class SampleService
                         $row[] = $aRow['facilityDistrict'];
                         $row[] = $aRow['facilityState'];
                         $row[] = $aRow['patient_art_no'];
-                        $row[] = ucwords($aRow['first_name'] . " " . $aRow['middle_name'] . " " . $aRow['last_name']);
                         $row[] = $patientDOB;
                         $row[] = $aRow['patient_age_in_years'];
                         $row[] = $aRow['patient_gender'];
@@ -612,7 +611,7 @@ class SampleService
                         $row[] = $aRow['sample_name'];
                         $row[] = $treatmentInitiateDate;
                         $row[] = $aRow['current_regimen'];
-                        $row[] = $treatmentInitiateCurrentRegimen;
+                        $row[] = $treatmentInitiateDate;
                         $row[] = $aRow['is_patient_pregnant'];
                         $row[] = $aRow['is_patient_breastfeeding'];
                         $row[] = $aRow['arv_adherance_percentage'];
@@ -657,7 +656,6 @@ class SampleService
                     $sheet->setCellValue('E1', html_entity_decode($translator->translate('District/County'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
                     $sheet->setCellValue('F1', html_entity_decode($translator->translate('Province/State'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
                     $sheet->setCellValue('G1', html_entity_decode($translator->translate('Unique ART No.'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('H1', html_entity_decode($translator->translate('Patient Name'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
                     $sheet->setCellValue('I1', html_entity_decode($translator->translate('Date of Birth'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
                     $sheet->setCellValue('J1', html_entity_decode($translator->translate('Age'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
                     $sheet->setCellValue('K1', html_entity_decode($translator->translate('Gender'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
@@ -1802,6 +1800,8 @@ class SampleService
 
     public function saveFileFromVlsmAPIV2()
     {
+        $apiTrackDb = $this->sm->get('DashApiReceiverStatsTable');
+
         $apiData = array();
         $this->config = $this->sm->get('Config');
         $input = $this->config['db']['dsn'];
@@ -1844,10 +1844,10 @@ class SampleService
 
         $columnList = array_diff($columnList, $removeKeys);
         $sampleDb = $this->sm->get('SampleTableWithoutCache');
-
+        // Debug::dump($apiData);die;
 
         $numRows = 0;
-        foreach ($apiData as $rowData) {
+        foreach ($apiData['data'] as $rowData) {
 
 
             $data = array();
@@ -1876,6 +1876,29 @@ class SampleService
                 $numRows += $sampleDb->insert($data);
             }
         }
+        $common = new CommonService();
+        if(count($apiData['data'])  == $numRows){
+            $status = "success";
+        } else if((count($apiData['data']) - $numRows) != 0){
+            $status = "partial";
+        } else if($numRows == 0){
+            $status = 'failed';
+        }
+        $apiTrackData = array(
+            'tracking_id'                   => $apiData['timestamp'],
+            'received_on'                   => $common->getDateTime(),
+            'number_of_records_received'    => count($apiData['data']),
+            'number_of_records_processed'   => $numRows,
+            'source'                        => 'Sync V2 Viral Load',
+            'status'                        => $status
+        );
+        $trackResult = $apiTrackDb->select(array('tracking_id' => $apiData['timestamp']))->current();
+        if($trackResult){
+            $apiTrackDb->update($apiTrackData, array('api_id' => $trackResult['api_id']));
+        } else{
+            $apiTrackDb->insert($apiTrackData);
+        }
+
         return array(
             'status'    => 'success',
             'message'   => $numRows . ' uploaded successfully',
