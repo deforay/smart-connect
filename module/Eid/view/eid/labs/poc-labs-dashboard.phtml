@@ -408,7 +408,7 @@ $endDate = date('Y-m');
             return false;
         }
         //if(frmSource !='load'){$.blockUI.defaults.css.border = '1px solid grey'; $(document).ajaxStart($.blockUI({ message: '<h2><?php echo $this->translate('Processing...'); ?></h2>' })).ajaxStop($.unblockUI);}
-        return $.post("<?php echo $this->url('eid-labs', array('action' => 'stats')); ?>", {
+        return $.post("<?php echo $this->url('eid-labs', array('action' => 'poc-stats')); ?>", {
                 daterange: daterange,
                 flag : 'poc'
             },
