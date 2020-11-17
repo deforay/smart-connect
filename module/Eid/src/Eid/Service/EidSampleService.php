@@ -34,6 +34,12 @@ class EidSampleService
         return $sampleDb->getStats($params);
     }
 
+    public function getPocStats($params)
+    {
+        $sampleDb = $this->sm->get('EidSampleTable');
+        return $sampleDb->getPocStats($params);
+    }
+
     public function getMonthlySampleCount($params)
     {
         $sampleDb = $this->sm->get('EidSampleTable');

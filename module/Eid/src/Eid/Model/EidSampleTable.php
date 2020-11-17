@@ -2306,6 +2306,177 @@ class EidSampleTable extends AbstractTableGateway
         return array('quickStats' => $quickStats, 'scResult' => $receivedResult, 'stResult' => $tResult, 'srResult' => $rejectedResult);
     }
 
+    public function fetchPocQuickStats($params)
+    {
+        $logincontainer = new Container('credo');
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $common = new CommonService($this->sm);
+        $globalDb = $this->sm->get('GlobalTable');
+        $samplesWaitingFromLastXMonths = $globalDb->getGlobalValue('sample_waiting_month_range');
+        $lastSevenDay = date('Y-m-d', strtotime('-7 days'));
+        $query = $sql->select()->from(array('eid' => $this->table))
+            ->columns(
+                array(
+                    $this->translator->translate("Total Samples") => new Expression('COUNT(*)'),
+                    $this->translator->translate("Samples Tested") => new Expression("SUM(CASE 
+                                                                                WHEN (((eid.result is NOT NULL AND eid.result !='') OR (eid.reason_for_sample_rejection IS NOT NULL AND eid.reason_for_sample_rejection != '' AND eid.reason_for_sample_rejection != 0))) THEN 1
+                                                                                ELSE 0
+                                                                                END)"),
+                    $this->translator->translate("Total Failed Samples") => new Expression("SUM(CASE WHEN ((result = 'failed')) THEN 1
+                                                                                ELSE 0 END)"),
+                    $this->translator->translate("Total No. of Devices") => new Expression("SUM(CASE WHEN ((icm.poc_device = 'yes')) THEN 1
+                                                                                ELSE 0 END)"),
+                    $this->translator->translate("No. of Devices online in last 7 days") => new Expression("SUM(CASE WHEN ((icm.poc_device = 'yes' AND DATE(sample_tested_datetime) > '".$lastSevenDay."')) THEN 1
+                                                                                ELSE 0 END)"),
+                    $this->translator->translate("Gender Missing") => new Expression("SUM(CASE 
+                                                                                    WHEN ((child_gender IS NULL OR child_gender ='' OR child_gender ='unreported' OR child_gender ='Unreported')) THEN 1
+                                                                                    ELSE 0
+                                                                                    END)"),
+                    $this->translator->translate("Age Missing") => new Expression("SUM(CASE 
+                                                                                WHEN ((child_age IS NULL OR child_age ='' OR child_age ='Unreported'  OR child_age ='unreported')) THEN 1
+                                                                                ELSE 0
+                                                                                END)")
+                    // $this->translator->translate("Results Not Available (< 6 months)") => new Expression("SUM(CASE
+                    //                                                                                                             WHEN ((eid.result is NULL OR eid.result ='') AND (sample_collection_date < DATE_SUB(NOW(), INTERVAL $samplesWaitingFromLastXMonths MONTH)) AND (reason_for_sample_rejection is NULL or reason_for_sample_rejection ='' or reason_for_sample_rejection = 0)) THEN 1
+                    //                                                                                                             ELSE 0
+                    //                                                                                                             END)"),
+                    // $this->translator->translate("Results Not Available (> 6 months)") => new Expression("SUM(CASE
+                    //                                                                                                             WHEN ((eid.result is NULL OR eid.result ='') AND (sample_collection_date > DATE_SUB(NOW(), INTERVAL $samplesWaitingFromLastXMonths MONTH)) AND (reason_for_sample_rejection is NULL or reason_for_sample_rejection ='' or reason_for_sample_rejection = 0)) THEN 1
+                    //                                                                                                             ELSE 0
+                    //                                                                                                             END)")
+                                                                                                                               
+                                                                                                                                
+                )
+            )
+            ->join(array('icm' => 'import_config_machines'), 'icm.config_machine_id=eid.import_machine_name', array(), 'left')
+            ;
+        //$query = $query->where("(eid.sample_collection_date is not null AND eid.sample_collection_date != '' AND DATE(eid.sample_collection_date) !='1970-01-01' AND DATE(eid.sample_collection_date) !='0000-00-00')");
+        if ($logincontainer->role != 1) {
+            $query = $query->where('eid.lab_id IN ("' . implode('", "', $this->mappedFacilities) . '")');
+        }
+        $queryStr = $sql->buildSqlString($query);
+        // echo $queryStr;die;
+        //$result = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+        $result = $common->cacheQuery($queryStr, $dbAdapter);
+        return $result[0];
+    }
+    public function getPocStats($params)
+    {
+        $logincontainer = new Container('credo');
+        $quickStats = $this->fetchPocQuickStats($params);
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $common = new CommonService($this->sm);
+        $testedTotal = 0;
+        $receivedResult = array();
+        $tResult = array();
+        $rejectedResult = array();
+        if (trim($params['daterange']) != '') {
+            $splitDate = explode('to', $params['daterange']);
+        } else {
+            $timestamp = time();
+            $qDates = array();
+            for ($i = 0; $i < 28; $i++) {
+                $qDates[] = "'" . date('Y-m-d', $timestamp) . "'";
+                $timestamp -= 24 * 3600;
+            }
+            $qDates = implode(",", $qDates);
+        }
+
+        //get received data
+        $receivedQuery = $sql->select()->from(array('eid' => $this->table))
+            ->columns(array('total' => new Expression('COUNT(*)'), 'receivedDate' => new Expression('DATE(sample_collection_date)')))
+            ->where("sample_collection_date is not null AND sample_collection_date != '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00'")
+            ->group(array("receivedDate"));
+        if ($logincontainer->role != 1) {
+            $receivedQuery = $receivedQuery->where('eid.lab_id IN ("' . implode('", "', $this->mappedFacilities) . '")');
+        }
+        if (trim($params['daterange']) != '') {
+            if (trim($splitDate[0]) != '' && trim($splitDate[1]) != '') {
+                $receivedQuery = $receivedQuery->where(array("DATE(eid.sample_collection_date) <='$splitDate[1]'", "DATE(eid.sample_collection_date) >='$splitDate[0]'"));
+            }
+        } else {
+            $receivedQuery = $receivedQuery->where("DATE(sample_collection_date) IN ($qDates)");
+        }
+
+        if(isset($params['flag']) && $params['flag'] == 'poc'){
+            $receivedQuery = $receivedQuery->join(array('icm' => 'import_config_machines'), 'icm.config_machine_id = eid.import_machine_name', array('poc_device'))->where(array('icm.poc_device' => 'yes'));
+        }
+        $cQueryStr = $sql->buildSqlString($receivedQuery);
+        // echo $cQueryStr;die;
+        //$rResult = $dbAdapter->query($cQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+        $rResult = $common->cacheQuery($cQueryStr, $dbAdapter);
+
+        //var_dump($receivedResult);die;
+        $recTotal = 0;
+        foreach ($rResult as $rRow) {
+            $displayDate = $common->humanDateFormat($rRow['receivedDate']);
+            $receivedResult[] = array(array('total' => $rRow['total']), 'date' => $displayDate, 'receivedDate' => $displayDate, 'receivedTotal' => $recTotal += $rRow['total']);
+        }
+
+        //tested data
+        $testedQuery = $sql->select()->from(array('eid' => $this->table))
+            ->columns(array('total' => new Expression('COUNT(*)'), 'testedDate' => new Expression('DATE(sample_tested_datetime)')))
+            ->where("((eid.result IS NOT NULL AND eid.result != '' AND eid.result != 'NULL') OR (eid.reason_for_sample_rejection IS NOT NULL AND eid.reason_for_sample_rejection != '' AND eid.reason_for_sample_rejection != 0))")
+            ->where("sample_collection_date is not null AND sample_collection_date != '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00'")
+            ->group(array("testedDate"));
+        if ($logincontainer->role != 1) {
+            $testedQuery = $testedQuery->where('eid.lab_id IN ("' . implode('", "', $this->mappedFacilities) . '")');
+        }
+        if (trim($params['daterange']) != '') {
+            if (trim($splitDate[0]) != '' && trim($splitDate[1]) != '') {
+                $testedQuery = $testedQuery->where(array("DATE(eid.sample_tested_datetime) <='$splitDate[1]'", "DATE(eid.sample_tested_datetime) >='$splitDate[0]'"));
+            }
+        } else {
+            $testedQuery = $testedQuery->where("DATE(sample_tested_datetime) IN ($qDates)");
+        }
+        if(isset($params['flag']) && $params['flag'] == 'poc'){
+            $testedQuery = $testedQuery->join(array('icm' => 'import_config_machines'), 'icm.config_machine_id = eid.import_machine_name', array('poc_device'))->where(array('icm.poc_device' => 'yes'));
+        }
+        $cQueryStr = $sql->buildSqlString($testedQuery);
+        // echo $cQueryStr;die;
+        //$rResult = $dbAdapter->query($cQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+        $rResult = $common->cacheQuery($cQueryStr, $dbAdapter);
+
+        //var_dump($receivedResult);die;
+        $testedTotal = 0;
+        foreach ($rResult as $rRow) {
+            $displayDate = $common->humanDateFormat($rRow['testedDate']);
+            $tResult[] = array(array('total' => $rRow['total']), 'date' => $displayDate, 'testedDate' => $displayDate, 'testedTotal' => $testedTotal += $rRow['total']);
+        }
+
+        //get rejected data
+        $rejectedQuery = $sql->select()->from(array('eid' => $this->table))
+            ->columns(array('total' => new Expression('COUNT(*)'), 'rejectDate' => new Expression('DATE(sample_collection_date)')))
+            ->where("eid.reason_for_sample_rejection IS NOT NULL AND eid.reason_for_sample_rejection !='' AND eid.reason_for_sample_rejection!= 0")
+            ->where("sample_collection_date is not null AND sample_collection_date != '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00'")
+            ->group(array("rejectDate"));
+        if ($logincontainer->role != 1) {
+            $rejectedQuery = $rejectedQuery->where('eid.lab_id IN ("' . implode('", "', $this->mappedFacilities) . '")');
+        }
+        if (trim($params['daterange']) != '') {
+            if (trim($splitDate[0]) != '' && trim($splitDate[1]) != '') {
+                $rejectedQuery = $rejectedQuery->where(array("DATE(eid.sample_collection_date) <='$splitDate[1]'", "DATE(eid.sample_collection_date) >='$splitDate[0]'"));
+            }
+        } else {
+            $rejectedQuery = $rejectedQuery->where("DATE(sample_collection_date) IN ($qDates)");
+        }
+        if(isset($params['flag']) && $params['flag'] == 'poc'){
+            $rejectedQuery = $rejectedQuery->join(array('icm' => 'import_config_machines'), 'icm.config_machine_id = eid.import_machine_name', array('poc_device'))->where(array('icm.poc_device' => 'yes'));
+        }
+        $cQueryStr = $sql->buildSqlString($rejectedQuery);
+        // echo $cQueryStr;die;
+        //$rResult = $dbAdapter->query($cQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+        $rResult = $common->cacheQuery($cQueryStr, $dbAdapter);
+        $rejTotal = 0;
+        foreach ($rResult as $rRow) {
+            $displayDate = $common->humanDateFormat($rRow['rejectDate']);
+            $rejectedResult[] = array(array('total' => $rRow['total']), 'date' => $displayDate, 'rejectDate' => $displayDate, 'rejectTotal' => $rejTotal += $rRow['total']);
+        }
+        return array('quickStats' => $quickStats, 'scResult' => $receivedResult, 'stResult' => $tResult, 'srResult' => $rejectedResult);
+    }
+
     public function getMonthlySampleCount($params)
     {
 
