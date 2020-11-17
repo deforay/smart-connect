@@ -40,11 +40,18 @@ class EidSampleService
         return $sampleDb->getPocStats($params);
     }
 
+    public function getTestFailedByTestingPlatform($params)
+    {
+        $sampleDb = $this->sm->get('EidSampleTable');
+        return $sampleDb->getTestFailedByTestingPlatform($params);
+    }
+
     public function getMonthlySampleCount($params)
     {
         $sampleDb = $this->sm->get('EidSampleTable');
         return $sampleDb->getMonthlySampleCount($params);
     }
+
     public function getMonthlySampleCountByLabs($params)
     {
         $sampleDb = $this->sm->get('EidSampleTableWithoutCache');

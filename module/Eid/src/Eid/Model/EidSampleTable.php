@@ -2477,6 +2477,31 @@ class EidSampleTable extends AbstractTableGateway
         return array('quickStats' => $quickStats, 'scResult' => $receivedResult, 'stResult' => $tResult, 'srResult' => $rejectedResult);
     }
 
+    public function getTestFailedByTestingPlatform($params)
+    {
+
+        $logincontainer = new Container('credo');
+        $result = array();
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $common = new CommonService($this->sm);
+        $queryStr = $sql->select()->from(array('eid' => $this->table))
+            ->columns(
+                array(
+                    "total" => new Expression('COUNT(*)'),
+                )
+            )
+            ->join(array('icm' => 'import_config_machines'), 'icm.config_machine_id = eid.import_machine_name', array('config_machine_name'))
+            ->where(array('eid.result' => 'failed'))
+            ->group('eid.import_machine_name')
+            ;
+
+        $queryStr = $sql->buildSqlString($queryStr);
+        // echo $queryStr;die;
+        $sampleResult = $common->cacheQuery($queryStr, $dbAdapter);
+        return $sampleResult;
+    }
+
     public function getMonthlySampleCount($params)
     {
 

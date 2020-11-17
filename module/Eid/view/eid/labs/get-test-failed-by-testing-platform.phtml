@@ -1,0 +1,90 @@
+<div id="failedTestByPlatform"></div>
+<script>
+    
+
+    $(function() {
+        $('#failedTestByPlatform').highcharts({
+            chart: {
+                type: 'column'
+            },
+            title: {
+                text: '<?php echo $this->translate('Failed Tests By Testing Platform'); ?>'
+            },
+            xAxis: {
+                categories: [
+                    <?php 
+                    $data ='';
+                                if (isset($result) && count($result) > 0) {
+                                    foreach ($result as $res) {
+                                        echo "'" . $res['config_machine_name'] . "',";
+                                        // array_push($data, $res['total']);
+                                        if($data)
+                                            $data = $data.','.$res['total'];
+                                        else
+                                            $data = $res['total'];
+                                    }
+                                }
+                    ?>
+                ],
+                crosshair: true
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: '<?php echo $this->translate('No. of Samples'); ?>'
+                },
+                stackLabels: {
+                    rotation: -75,
+                    enabled: true,
+                    style: {
+                        fontWeight: 'bold',
+                        color: (Highcharts.theme && Highcharts.theme.textColor) || 'gray'
+                    },
+                    y: -20
+                }
+            },
+            credits: {
+                enabled: false
+            },
+            legend: {
+                align: 'right',
+                x: -30,
+                verticalAlign: 'bottom',
+                y: 5,
+                floating: false,
+                backgroundColor: (Highcharts.theme && Highcharts.theme.background2) || 'white',
+                borderColor: '#CCC',
+                borderWidth: 1,
+                shadow: true
+            },
+            tooltip: {
+                headerFormat: '<b>{point.x}</b><br/>',
+                pointFormat: '{series.name}: {point.y}<br/>% contribution: {point.percentage:.1f}%'
+            },
+            plotOptions: {
+                column: {
+                    stacking: 'normal',
+                    dataLabels: {
+                        enabled: false,
+                        color: (Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'white',
+                        style: {
+                            textShadow: '0 0 3px black'
+                        }
+                    }
+                }
+            },
+            colors: [
+                '#FF1900',
+                '#60D18F'
+            ],
+            series: [{
+                "name": "Failed Tests",
+                "data": [<?php echo $data; ?>],
+                "drilldown": {
+                    "color": "#913D88"
+                }
+            }
+            ]
+        });
+    });
+</script>
