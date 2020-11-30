@@ -2182,6 +2182,9 @@ class EidSampleTable extends AbstractTableGateway
         if ($logincontainer->role != 1) {
             $query = $query->where('eid.lab_id IN ("' . implode('", "', $this->mappedFacilities) . '")');
         }
+        if(isset($params['flag']) && $params['flag'] == 'poc'){
+            $query = $query->join(array('icm' => 'import_config_machines'), 'icm.config_machine_id = eid.import_machine_name', array('poc_device'))->where(array('icm.poc_device' => 'yes'));
+        }
         $queryStr = $sql->buildSqlString($query);
         //echo $queryStr;die;
         //$result = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
