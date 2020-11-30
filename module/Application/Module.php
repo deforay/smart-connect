@@ -33,6 +33,11 @@ use Application\Model\Covid19TestReasonsTable;
 use Application\Model\ProvinceTable;
 use Application\Model\DashApiReceiverStatsTable;
 use Application\Model\ImportConfigMachineTable;
+use Application\Model\HepatitisSampleTypeTable;
+use Application\Model\HepatitisSampleRejectionReasonTable;
+use Application\Model\HepatitisResultsTable;
+use Application\Model\HepatitisRiskFactorTable;
+use Application\Model\HepatitisTestReasonsTable;
 
 use Application\Service\CommonService;
 use Application\Service\UserService;
@@ -377,6 +382,31 @@ class Module
 				'ImportConfigMachineTable' => function ($sm) {
 					$dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');
 					$table = new ImportConfigMachineTable($dbAdapter);
+					return $table;
+				},
+				'HepatitisSampleTypeTable' => function ($sm) {
+					$dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');
+					$table = new HepatitisSampleTypeTable($dbAdapter);
+					return $table;
+				},
+				'HepatitisSampleRejectionReasonTable' => function ($sm) {
+					$dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');
+					$table = new HepatitisSampleRejectionReasonTable($dbAdapter);
+					return $table;
+				},
+				'HepatitisResultsTable' => function ($sm) {
+					$dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');
+					$table = new HepatitisResultsTable($dbAdapter);
+					return $table;
+				},
+				'HepatitisRiskFactorTable' => function ($sm) {
+					$dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');
+					$table = new HepatitisRiskFactorTable($dbAdapter);
+					return $table;
+				},
+				'HepatitisTestReasonsTable' => function ($sm) {
+					$dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');
+					$table = new HepatitisTestReasonsTable($dbAdapter);
 					return $table;
 				},
 
