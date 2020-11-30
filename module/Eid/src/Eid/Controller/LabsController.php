@@ -66,6 +66,18 @@ class LabsController extends AbstractActionController
             return $viewModel;
         }
     }
+    public function pocStatsAction()
+    {
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $result = $this->sampleService->getPocStats($params);
+            $viewModel = new ViewModel();
+            $viewModel->setVariables(array('params' => $params, 'result' => $result))
+                ->setTerminal(true);
+            return $viewModel;
+        }
+    }
     public function getMonthlySampleCountAction()
     {
         $request = $this->getRequest();
@@ -94,6 +106,21 @@ class LabsController extends AbstractActionController
             return $viewModel;
         }
     }
+
+    public function getTestFailedByTestingPlatformAction()
+    {
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $result = $this->sampleService->getTestFailedByTestingPlatform($params);
+            // $sampleType = $this->sampleService->getSampleType();
+            $viewModel = new ViewModel();
+            $viewModel->setVariables(array('result' => $result))
+                ->setTerminal(true);
+            return $viewModel;
+        }
+    }
+
     public function getLabTurnAroundTimeAction()
     {
         $request = $this->getRequest();

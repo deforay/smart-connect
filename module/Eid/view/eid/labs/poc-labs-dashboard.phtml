@@ -381,6 +381,20 @@ $endDate = date('Y-m');
         </div>
     </div>
 </div>
+<div class="row">
+    <div class="col-md-6 col-sm-6">
+        <div class="portlet box blue">
+            <div class="portlet-title">
+                <div class="caption">
+                    <span class="caption-subject"><?php echo $this->translate('Failed Tests By Testing Platform'); ?></span>
+                </div>
+            </div>
+            <div class="portlet-body" style="cursor:pointer;">
+                <div id="failedTestByMachine"></div>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 <script src="<?php echo $this->basePath('assets/plugins/datepicker/bootstrap-datepicker.js') ?>"></script>
@@ -408,7 +422,7 @@ $endDate = date('Y-m');
             return false;
         }
         //if(frmSource !='load'){$.blockUI.defaults.css.border = '1px solid grey'; $(document).ajaxStart($.blockUI({ message: '<h2><?php echo $this->translate('Processing...'); ?></h2>' })).ajaxStop($.unblockUI);}
-        return $.post("<?php echo $this->url('eid-labs', array('action' => 'stats')); ?>", {
+        return $.post("<?php echo $this->url('eid-labs', array('action' => 'poc-stats')); ?>", {
                 daterange: daterange,
                 flag : 'poc'
             },
@@ -452,6 +466,28 @@ $endDate = date('Y-m');
             },
             function(data) {
                 $("#monthlyCountsByLab").html(data);
+
+
+            });
+    }
+
+    function getTestFailedByTestingPlatform() {
+        var fromDate = formatDate($('#mrp-lowerDate').val());
+        var toDate = formatDate($('#mrp-upperDate').val());
+        var sampleType = ($("#sampleType").val() == null) ? '' : $("#sampleType").val();
+        var facilityId = ($("#labName").val() == null) ? '' : $("#labName").val().join(',');
+
+
+        return $.post("<?php echo $this->url('eid-labs', array('action' => 'get-test-failed-by-testing-platform')); ?>", {
+                fromDate: fromDate,
+                toDate: toDate,
+                sampleType: sampleType,
+                facilityId: facilityId,
+                flag : 'poc'
+            },
+            function(data) {
+                console.log(data);
+                $("#failedTestByMachine").html(data);
 
 
             });
@@ -596,6 +632,7 @@ $endDate = date('Y-m');
             getAverageLabTAT();
             getLabPerformance();
         });
+        getTestFailedByTestingPlatform();
     }
 
     function resetEverything() {
