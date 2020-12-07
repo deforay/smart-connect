@@ -13,11 +13,12 @@ $startDate = date('Y-m', strtotime('+1 month', strtotime('-1 year')));
 $endDate = date('Y-m');
 ?>
 <link rel="stylesheet" href="<?php echo $this->basePath('assets/plugins/datepicker/datepicker3.css') ?>">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.3.6/proj4.js"></script>
 <script src="https://code.highcharts.com/maps/highmaps.js"></script>
-<script src="https://code.highcharts.com/maps/modules/data.js"></script>
 <script src="https://code.highcharts.com/maps/modules/data.js"></script>
 <script src="https://code.highcharts.com/maps/modules/exporting.js"></script>
 <script src="https://code.highcharts.com/maps/modules/offline-exporting.js"></script>
+<script src="https://code.highcharts.com/mapdata/countries/us/us-all.js"></script>
 <script src="https://code.highcharts.com/mapdata/custom/world.js"></script>
 
 
@@ -193,6 +194,13 @@ $endDate = date('Y-m');
 
     .select2-container--default .select2-selection--single {
         height: 34px !important;
+    }
+
+    #container {
+        height: 500px;
+        min-width: 310px;
+        max-width: 800px;
+        margin: 0 auto;
     }
 </style>
 
@@ -406,7 +414,7 @@ $endDate = date('Y-m');
         <div class="portlet box blue">
             <div class="portlet-title">
                 <div class="caption">
-                    <span class="caption-subject"><?php echo $this->translate('Failed Tests By Testing Platform'); ?></span>
+                    <span class="caption-subject"><?php echo $this->translate('Sample Tested'); ?></span>
                 </div>
             </div>
             <div class="portlet-body" style="cursor:pointer;">
@@ -659,50 +667,114 @@ $endDate = date('Y-m');
 
     function getMapBubble()
     {
-        Highcharts.getJSON('https://cdn.jsdelivr.net/gh/highcharts/highcharts@v7.0.0/samples/data/world-population.json', function (data) {
 
-Highcharts.mapChart('container', {
-  chart: {
-    borderWidth: 1,
-    map: 'custom/world'
-  },
+        var H = Highcharts,
+        map = H.maps['custom/world'],
+        chart;
+        // url = 'https://cdn.jsdelivr.net/gh/highcharts/highcharts@v7.0.0/samples/data/us-capitals.json'
+        json = '<?php echo json_encode($chartDetail); ?>'
+        json = JSON.parse(json)
+        // Add series with state capital bubbles
+        // Highcharts.getJSON(url, function (json) {
+        var data = [];
+        json.forEach(function (p) {
+            p.z = parseInt(p.total);
+            data.push(p);
+        });
+        // console.log(data)
 
-  title: {
-    text: 'Number of sample tested'
-  },
+        chart = Highcharts.mapChart('container', {
+            title: {
+            text: 'Sample tested based on latitude and longitude'
+            },
 
-  subtitle: {
-    text: 'Based on latitude and longitude'
-  },
+            tooltip: {
+            pointFormat: 
+                'Lat: {point.lat}<br>' +
+                'Lon: {point.long}<br>' +
+                'Total: {point.total}'
+            },
 
-  legend: {
-    enabled: false
-  },
+            xAxis: {
+            crosshair: {
+                zIndex: 5,
+                dashStyle: 'dot',
+                snap: false,
+                color: 'gray'
+            }
+            },
 
-  mapNavigation: {
-    enabled: true,
-    buttonOptions: {
-      verticalAlign: 'bottom'
-    }
-  },
+            yAxis: {
+            crosshair: {
+                zIndex: 5,
+                dashStyle: 'dot',
+                snap: false,
+                color: 'gray'
+            }
+            },
 
-  series: [{
-    name: 'Countries',
-    color: '#E0E0E0',
-    enableMouseTracking: false
-  }, {
-    type: 'mapbubble',
-    name: 'Population 2016',
-    joinBy: ['iso-a3', 'code3'],
-    data: data,
-    minSize: 4,
-    maxSize: '12%',
-    tooltip: {
-      pointFormat: '{point.properties.hc-a2}: {point.z} thousands'
-    }
-  }]
-});
-});
+            series: [{
+            name: 'Basemap',
+            mapData: map,
+            borderColor: '#606060',
+            nullColor: 'rgba(200, 200, 200, 0.2)',
+            showInLegend: false
+            }, {
+            name: 'Separators',
+            type: 'mapline',
+            data: H.geojson(map, 'mapline'),
+            color: '#101010',
+            enableMouseTracking: false,
+            showInLegend: false
+            }, {
+            type: 'mapbubble',
+            dataLabels: {
+                enabled: true,
+                format: '{point.total}'
+            },
+            name: 'Number of Sample Tested',
+            data: data,
+            maxSize: '12%',
+            color: H.getOptions().colors[0]
+            }]
+        });
+        // });
+
+        document.getElementById('container').addEventListener('mousemove', function (e) {
+        var position;
+        if (chart) {
+            if (!chart.lab) {
+            chart.lab = chart.renderer.text('', 0, 0)
+                .attr({
+                zIndex: 5
+                })
+                .css({
+                color: '#505050'
+                })
+                .add();
+            }
+
+            e = chart.pointer.normalize(e);
+            position = chart.fromPointToLatLon({
+            x: chart.xAxis[0].toValue(e.chartX),
+            y: chart.yAxis[0].toValue(e.chartY)
+            });
+
+            chart.lab.attr({
+            x: e.chartX + 5,
+            y: e.chartY - 22,
+            text: 'Lat: ' + position.lat.toFixed(2) + '<br>Lon: ' + position.lon.toFixed(2)
+            });
+        }
+        });
+
+        document.getElementById('container').addEventListener('mouseout', function () {
+        if (chart && chart.lab) {
+            chart.lab.destroy();
+            chart.lab = null;
+        }
+        });
+  
 
     }
 
