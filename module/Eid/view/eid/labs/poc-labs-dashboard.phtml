@@ -13,6 +13,14 @@ $startDate = date('Y-m', strtotime('+1 month', strtotime('-1 year')));
 $endDate = date('Y-m');
 ?>
 <link rel="stylesheet" href="<?php echo $this->basePath('assets/plugins/datepicker/datepicker3.css') ?>">
+<script src="https://code.highcharts.com/maps/highmaps.js"></script>
+<script src="https://code.highcharts.com/maps/modules/data.js"></script>
+<script src="https://code.highcharts.com/maps/modules/data.js"></script>
+<script src="https://code.highcharts.com/maps/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/maps/modules/offline-exporting.js"></script>
+<script src="https://code.highcharts.com/mapdata/custom/world.js"></script>
+
+
 <style>
     .bluebox,
     .dashboard-stat2 {
@@ -394,6 +402,19 @@ $endDate = date('Y-m');
             </div>
         </div>
     </div>
+    <div class="col-md-6 col-sm-6">
+        <div class="portlet box blue">
+            <div class="portlet-title">
+                <div class="caption">
+                    <span class="caption-subject"><?php echo $this->translate('Failed Tests By Testing Platform'); ?></span>
+                </div>
+            </div>
+            <div class="portlet-body" style="cursor:pointer;">
+                <div id="container" style="height: 500px; min-width: 310px; max-width: 800px; margin: 0 auto">
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 
@@ -633,6 +654,56 @@ $endDate = date('Y-m');
             getLabPerformance();
         });
         getTestFailedByTestingPlatform();
+        getMapBubble();
+    }
+
+    function getMapBubble()
+    {
+        Highcharts.getJSON('https://cdn.jsdelivr.net/gh/highcharts/highcharts@v7.0.0/samples/data/world-population.json', function (data) {
+
+Highcharts.mapChart('container', {
+  chart: {
+    borderWidth: 1,
+    map: 'custom/world'
+  },
+
+  title: {
+    text: 'Number of sample tested'
+  },
+
+  subtitle: {
+    text: 'Based on latitude and longitude'
+  },
+
+  legend: {
+    enabled: false
+  },
+
+  mapNavigation: {
+    enabled: true,
+    buttonOptions: {
+      verticalAlign: 'bottom'
+    }
+  },
+
+  series: [{
+    name: 'Countries',
+    color: '#E0E0E0',
+    enableMouseTracking: false
+  }, {
+    type: 'mapbubble',
+    name: 'Population 2016',
+    joinBy: ['iso-a3', 'code3'],
+    data: data,
+    minSize: 4,
+    maxSize: '12%',
+    tooltip: {
+      pointFormat: '{point.properties.hc-a2}: {point.z} thousands'
+    }
+  }]
+});
+});
+
     }
 
     function resetEverything() {
