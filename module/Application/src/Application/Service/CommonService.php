@@ -1014,7 +1014,32 @@ class CommonService
                          }
                     }
                }
-               
+
+                /* For update the Hepatitis Sample Type Details */
+                if(isset($apiData->r_hepatitis_sample_type) && !empty($apiData->r_hepatitis_sample_type)){
+                    /* if($apiData->forceSync){
+                         $rQueryStr = $apiData->r_hepatitis_sample_type->tableStructure;
+                         $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
+                    } */
+                    $condition = "";
+                    if(isset($apiData->r_hepatitis_sample_type->lastModifiedTime) && !empty($apiData->r_hepatitis_sample_type->lastModifiedTime)){
+                         $condition = "updated_datetime > '" . $apiData->r_hepatitis_sample_type->lastModifiedTime . "'";
+                    }
+                    $notUpdated = $this->getLastModifiedDateTime('r_hepatitis_sample_type', 'updated_datetime', $condition);
+                    if (empty($notUpdated) || !isset($notUpdated)) {
+                         foreach ((array)$apiData->r_hepatitis_sample_type->tableData as $row) {
+                              $hepatitisSampleTypeData = (array)$row;
+                              $rQuery = $sql->select()->from('r_hepatitis_sample_type')->where(array('sample_name LIKE "%' . $hepatitisSampleTypeData['sample_name'] . '%" OR sample_id = "' .$hepatitisSampleTypeData['sample_id'].'" '));
+                              $rQueryStr = $sql->buildSqlString($rQuery);
+                              $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
+                              if ($rowData) {
+                                   $hepatitisSampleTypeDb->update($hepatitisSampleTypeData, array('sample_id' => $hepatitisSampleTypeData['sample_id']));
+                              } else {
+                                   $hepatitisSampleTypeDb->insert($hepatitisSampleTypeData);
+                              }
+                         }
+                    }
+               }
                return array(
                     'status' => 'success',
                     'message' => 'All reference tables synced'

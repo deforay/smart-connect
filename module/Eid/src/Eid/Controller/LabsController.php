@@ -46,11 +46,14 @@ class LabsController extends AbstractActionController
         $provinceName = $this->sampleService->getAllProvinceList();
         $districtName = $this->sampleService->getAllDistrictList();
         $clinicName = $this->sampleService->getAllClinicName();
+        $chartDetail = $this->sampleService->getEidFormDetail();
+        // print_r(json_encode($chartDetail));die;
         return new ViewModel(array(
             'labName' => $labName,
             'provinceName' => $provinceName,
             'districtName' => $districtName,
             'clinicName' => $clinicName,
+            'chartDetail' => $chartDetail,
         ));
     }
 

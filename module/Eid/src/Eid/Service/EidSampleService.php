@@ -512,6 +512,12 @@ class EidSampleService
         $facilityDb = $this->sm->get('FacilityTable');
         return $facilityDb->fetchAllClinicName($mappedFacilities);
     }
+
+    public function getEidFormDetail()
+    {
+        $sampleDb = $this->sm->get('SampleTableWithoutCache');
+        return $sampleDb->fetchEidFormDetail();
+    }
     // Get all test reason name for eid
     public function getAllTestReasonName()
     {
