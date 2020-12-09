@@ -493,3 +493,67 @@ CREATE TABLE `import_config_machines` (
  `updated_datetime` datetime DEFAULT NULL,
  PRIMARY KEY (`config_machine_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
+
+--Sudarmathi 27 Nov 2020
+
+DROP TABLE IF EXISTS r_vl_test_reasons;
+CREATE TABLE `r_vl_test_reasons` (
+ `test_reason_id` int(11) NOT NULL AUTO_INCREMENT,
+ `test_reason_name` varchar(255) DEFAULT NULL,
+ `parent_reason` int(11) DEFAULT '0',
+ `test_reason_status` varchar(45) DEFAULT NULL,
+ `updated_datetime` datetime DEFAULT NULL,
+ `data_sync` int(11) DEFAULT '0',
+ PRIMARY KEY (`test_reason_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
+
+DROP TABLE IF EXISTS r_hepatitis_sample_rejection_reasons;
+CREATE TABLE `r_hepatitis_sample_rejection_reasons` (
+ `rejection_reason_id` int NOT NULL AUTO_INCREMENT,
+ `rejection_reason_name` varchar(255) DEFAULT NULL,
+ `rejection_type` varchar(255) NOT NULL DEFAULT 'general',
+ `rejection_reason_status` varchar(255) DEFAULT NULL,
+ `rejection_reason_code` varchar(255) DEFAULT NULL,
+ `updated_datetime` datetime DEFAULT NULL,
+ `data_sync` int NOT NULL DEFAULT '0',
+ PRIMARY KEY (`rejection_reason_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
+
+DROP TABLE IF EXISTS r_hepatitis_sample_type;
+CREATE TABLE `r_hepatitis_sample_type` (
+ `sample_id` int NOT NULL AUTO_INCREMENT,
+ `sample_name` varchar(255) CHARACTER SET latin1 DEFAULT NULL,
+ `status` varchar(45) CHARACTER SET latin1 DEFAULT NULL,
+ `updated_datetime` datetime DEFAULT NULL,
+ `data_sync` int NOT NULL DEFAULT '0',
+ PRIMARY KEY (`sample_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
+
+DROP TABLE IF EXISTS r_hepatitis_test_reasons;
+CREATE TABLE `r_hepatitis_test_reasons` (
+ `test_reason_id` int NOT NULL AUTO_INCREMENT,
+ `test_reason_name` varchar(255) DEFAULT NULL,
+ `parent_reason` int DEFAULT NULL,
+ `test_reason_status` varchar(45) DEFAULT NULL,
+ `updated_datetime` datetime DEFAULT NULL,
+ PRIMARY KEY (`test_reason_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
+
+DROP TABLE IF EXISTS r_hepatitis_results;
+CREATE TABLE `r_hepatitis_results` (
+ `result_id` varchar(255) NOT NULL,
+ `result` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
+ `status` varchar(255) NOT NULL DEFAULT 'active',
+ `updated_datetime` datetime DEFAULT NULL,
+ `data_sync` int NOT NULL DEFAULT '0',
+ PRIMARY KEY (`result_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+DROP TABLE IF EXISTS r_hepatitis_rick_factors;
+CREATE TABLE `r_hepatitis_rick_factors` (
+ `riskfactor_id` int(11) NOT NULL AUTO_INCREMENT,
+ `riskfactor_name` varchar(255) DEFAULT NULL,
+ `riskfactor_status` varchar(45) DEFAULT NULL,
+ `updated_datetime` datetime DEFAULT NULL,
+ PRIMARY KEY (`riskfactor_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;

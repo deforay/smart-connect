@@ -1797,6 +1797,7 @@ class SampleService
             $generateBackupDb->completeBackup($response['backupId']);
         }
     }
+    
 
     public function saveFileFromVlsmAPIV2()
     {
@@ -2235,6 +2236,7 @@ class SampleService
         $sampleRjtReasonDb = $this->sm->get('SampleRejectionReasonTable');
         $provinceDb = $this->sm->get('ProvinceTable');
         $apiTrackDb = $this->sm->get('DashApiReceiverStatsTable');
+        $userDb = $this->sm->get('UsersTable');
         $return = array();
         $params = json_decode($params, true);
         // Debug::dump($params['timestamp']);die;
@@ -2316,6 +2318,7 @@ class SampleService
                         'vlsm_instance_id'                      => 'nrl-weblims',
                         'province_id'                           => (trim($province['province_id']) != '' ? trim($province['province_id']) : NULL),
                         'source'                                => '1',
+                        'patient_art_no'                        => (trim($row['TracnetID']) != '' ? trim($row['TracnetID']) : NULL),
                         'patient_gender'                        => (trim($row['patientGender']) != '' ? trim($row['patientGender']) : NULL),
                         'patient_age_in_years'                  => (trim($row['PatientAge']) != '' ? trim($row['PatientAge']) : NULL),
                         'patient_dob'                           => $dob,
@@ -2339,7 +2342,7 @@ class SampleService
                         'result_value_text'                     => (trim($row['Result']['Copies']) != '' ? trim($row['Result']['Copies']) : NULL),
                         'result_value_absolute_decimal'         => (trim($row['result_value_absolute_decimal']) != '' ? trim($row['result_value_absolute_decimal']) : NULL),
                         'result'                                => (trim($row['result']) != '' ? trim($row['result']) : NULL),
-                        'result_approved_by'                    => (trim($row['ApprovedBy']) != '' ? trim($row['ApprovedBy']) : NULL),
+                        'result_approved_by'                    => (trim($row['ApprovedBy']) != '' ? $userDb->checkExistUser($row['ApprovedBy']) : NULL),
                         'DashVL_Abs'                            => $DashVL_Abs,
                         'DashVL_AnalysisResult'                 => $DashVL_AnalysisResult,
                         'sample_registered_at_lab'              => $sampleRegisteredAtLabDateTime
@@ -2392,7 +2395,7 @@ class SampleService
                             $sampleTypeDb->update(array('sample_name' => trim($row['SampleType'])), array('sample_id' => $sampleType['sample_id']));
                             $data['sample_type'] = $sampleType['sample_id'];
                         } else {
-                            $sampleTypeDb->insert(array('sample_name' => trim($row['SampleType'])));
+                            $sampleTypeDb->insert(array('sample_name' => trim($row['SampleType']), 'status' => 'active'));
                             $data['sample_type'] = $sampleTypeDb->lastInsertValue;
                         }
                     } else {
@@ -2415,7 +2418,7 @@ class SampleService
                             $sampleRjtReasonDb->update(array('rejection_reason_name' => trim($row['SampleRejectionReason'])), array('rejection_reason_id' => $sampleRejectionReason['rejection_reason_id']));
                             $data['reason_for_sample_rejection'] = $sampleRejectionReason['rejection_reason_id'];
                         } else {
-                            $sampleRjtReasonDb->insert(array('rejection_reason_name' => trim($row['SampleRejectionReason'])));
+                            $sampleRjtReasonDb->insert(array('rejection_reason_name' => trim($row['SampleRejectionReason']), 'rejection_reason_status' => 'active'));
                             $data['reason_for_sample_rejection'] = $sampleRjtReasonDb->lastInsertValue;
                         }
                     } else {
@@ -2463,15 +2466,15 @@ class SampleService
         }
         $response = array(
             'status'    => 'success',
-            'message'   => 'Received ' . count($params) . ' records.'
+            'message'   => 'Received ' . count($params['data']) . ' records.'
         );
 
         // Track API Records
         $apiTrackData = array(
             'tracking_id'                   => $params['timestamp'],
             'received_on'                   => $common->getDateTime(),
-            'number_of_records_received'    => count($params),
-            'number_of_records_processed'   => (count($params) - count($return)),
+            'number_of_records_received'    => count($params['data']),
+            'number_of_records_processed'   => (count($params['data']) - count($return)),
             'source'                        => 'Weblims VL',
             'status'                        => $status
         );

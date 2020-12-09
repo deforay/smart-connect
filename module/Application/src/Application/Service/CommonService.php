@@ -543,7 +543,11 @@ class CommonService
           $facilityDb = $this->sm->get('FacilityTable');
           $locationDb = $this->sm->get('LocationDetailsTable');
           $importConfigDb = $this->sm->get('ImportConfigMachineTable');
-          
+          $hepatitisSampleTypeDb = $this->sm->get('HepatitisSampleTypeTable');
+          $hepatitisSampleRejectionDb = $this->sm->get('HepatitisSampleRejectionReasonTable');
+          $hepatitisResultsDb = $this->sm->get('HepatitisResultsTable');
+          $hepatitisRiskFactorDb = $this->sm->get('HepatitisRiskFactorTable');
+          $hepatitisTestReasonsDb = $this->sm->get('HepatitisTestReasonsTable');
           
           $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
           $sql = new Sql($dbAdapter);
@@ -569,7 +573,6 @@ class CommonService
                }
           }
           
-          // print_r($apiData->import_config_machines);die;
           // echo "<pre>";print_r($apiData->facility_details->tableStructure);die;
           if ($apiData !== FALSE) {
                /* For update the Facility Details */
@@ -611,23 +614,24 @@ class CommonService
                               // die($rQueryStr);
                               $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
                               if ($rowData) {
-                                        $facilityDb->update($facilityData, array('facility_id' => $facilityData['facility_id']));
-                                   } else {
-                                             $facilityDb->insert($facilityData);
-                                        }
-                                   }
+                                   $facilityDb->update($facilityData, array('facility_id' => $facilityData['facility_id']));
+                              } else {
+                                   $facilityDb->insert($facilityData);
                               }
                          }
-                         /* For update the Test Reasons */
-                         if(isset($apiData->r_vl_test_reasons) && !empty($apiData->r_vl_test_reasons)){
-                              /* if($apiData->forceSync){
-                                   $rQueryStr = $apiData->r_vl_test_reasons->tableStructure;
-                                   $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
-                              } */
-                              $condition = "";
-                              if(isset($apiData->r_vl_test_reasons->lastModifiedTime) && !empty($apiData->r_vl_test_reasons->lastModifiedTime)){
-                                   $condition = "updated_datetime > '" . $apiData->r_vl_test_reasons->lastModifiedTime . "'";
-                              }
+                    }
+               }
+               
+               /* For update the Test Reasons */
+               if(isset($apiData->r_vl_test_reasons) && !empty($apiData->r_vl_test_reasons)){
+                    /* if($apiData->forceSync){
+                         $rQueryStr = $apiData->r_vl_test_reasons->tableStructure;
+                         $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
+                    } */
+                    $condition = "";
+                    if(isset($apiData->r_vl_test_reasons->lastModifiedTime) && !empty($apiData->r_vl_test_reasons->lastModifiedTime)){
+                         $condition = "updated_datetime > '" . $apiData->r_vl_test_reasons->lastModifiedTime . "'";
+                    }
                     $notUpdated = $this->getLastModifiedDateTime('r_vl_test_reasons', 'updated_datetime', $condition);
                     if (empty($notUpdated) || !isset($notUpdated)) {
                          foreach ((array)$apiData->r_vl_test_reasons->tableData as $row) {
@@ -643,7 +647,7 @@ class CommonService
                          }
                     }
                }
-               
+
                /* For update the Covid19 Test Reasons */
                if(isset($apiData->r_covid19_test_reasons) && !empty($apiData->r_covid19_test_reasons)){
                     /* if($apiData->forceSync){
@@ -775,6 +779,7 @@ class CommonService
                          }
                     }
                }
+               
                /* For update the  Import Config Machine */
                if(isset($apiData->import_config_machines) && !empty($apiData->import_config_machines)){
                     /* if($apiData->forceSync){
@@ -799,8 +804,9 @@ class CommonService
                                    $importConfigDb->insert($importConfigMachData);
                               }
                          }
-                         }
                     }
+               }
+               
                /* For update the EID Sample Type Details */
                if(isset($apiData->r_eid_sample_type) && !empty($apiData->r_eid_sample_type)){
                     /* if($apiData->forceSync){
@@ -905,7 +911,135 @@ class CommonService
                     }
                }
 
-              
+               /* For update the Hepatitis Sample Rejection Reasons Details */
+               if(isset($apiData->r_hepatitis_sample_rejection_reasons) && !empty($apiData->r_hepatitis_sample_rejection_reasons)){
+                    /* if($apiData->forceSync){
+                         $rQueryStr = $apiData->r_hepatitis_sample_rejection_reasons->tableStructure;
+                         $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
+                    } */
+                    $condition = "";
+                    if(isset($apiData->r_hepatitis_sample_rejection_reasons->lastModifiedTime) && !empty($apiData->r_hepatitis_sample_rejection_reasons->lastModifiedTime)){
+                         $condition = "updated_datetime > '" . $apiData->r_hepatitis_sample_rejection_reasons->lastModifiedTime . "'";
+                    }
+                    $notUpdated = $this->getLastModifiedDateTime('r_hepatitis_sample_rejection_reasons', 'updated_datetime', $condition);
+                    if (empty($notUpdated) || !isset($notUpdated)) {
+                         foreach ((array)$apiData->r_hepatitis_sample_rejection_reasons->tableData as $row) {
+                              $hepatitisSampleRejectionData = (array)$row;
+                              $rQuery = $sql->select()->from('r_hepatitis_sample_rejection_reasons')->where(array('rejection_reason_name LIKE "%' . $hepatitisSampleRejectionData['rejection_reason_name'] . '%" OR rejection_reason_id = ' . $hepatitisSampleRejectionData['rejection_reason_id']));
+                              $rQueryStr = $sql->buildSqlString($rQuery);
+                              $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
+                              if ($rowData) {
+                                   $hepatitisSampleRejectionDb->update($hepatitisSampleRejectionData, array('rejection_reason_id' => $hepatitisSampleRejectionData['rejection_reason_id']));
+                              } else {
+                                   $hepatitisSampleRejectionDb->insert($hepatitisSampleRejectionData);
+                              }
+                         }
+                    }
+               }
+
+               /* For update the Hepatitis Risk Factor Details */
+               if(isset($apiData->r_hepatitis_rick_factors) && !empty($apiData->r_hepatitis_rick_factors)){
+                    /* if($apiData->forceSync){
+                         $rQueryStr = $apiData->r_hepatitis_rick_factors->tableStructure;
+                         $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
+                    } */
+                    $condition = "";
+                    if(isset($apiData->r_hepatitis_rick_factors->lastModifiedTime) && !empty($apiData->r_hepatitis_rick_factors->lastModifiedTime)){
+                         $condition = "updated_datetime > '" . $apiData->r_hepatitis_rick_factors->lastModifiedTime . "'";
+                    }
+                    $notUpdated = $this->getLastModifiedDateTime('r_hepatitis_rick_factors', 'updated_datetime', $condition);
+                    if (empty($notUpdated) || !isset($notUpdated)) {
+                         foreach ((array)$apiData->r_hepatitis_rick_factors->tableData as $row) {
+                              $hepatitisRiskData = (array)$row;
+                              $rQuery = $sql->select()->from('r_hepatitis_rick_factors')->where(array('riskfactor_name LIKE "%' . $hepatitisRiskData['riskfactor_name'] . '%" OR riskfactor_id = ' . $hepatitisRiskData['riskfactor_id']));
+                              $rQueryStr = $sql->buildSqlString($rQuery);
+                              $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
+                              if ($rowData) {
+                                   $hepatitisRiskFactorDb->update($hepatitisRiskData, array('riskfactor_id' => $hepatitisRiskData['riskfactor_id']));
+                              } else {
+                                   $hepatitisRiskFactorDb->insert($hepatitisRiskData);
+                              }
+                         }
+                    }
+               }
+               
+               /* For update the Hepatitis Results Details */
+               if(isset($apiData->r_hepatitis_test_reasons) && !empty($apiData->r_hepatitis_test_reasons)){
+                    /* if($apiData->forceSync){
+                         $rQueryStr = $apiData->r_hepatitis_test_reasons->tableStructure;
+                         $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
+                    } */
+                    $condition = "";
+                    if(isset($apiData->r_hepatitis_test_reasons->lastModifiedTime) && !empty($apiData->r_hepatitis_test_reasons->lastModifiedTime)){
+                         $condition = "updated_datetime > '" . $apiData->r_hepatitis_test_reasons->lastModifiedTime . "'";
+                    }
+                    $notUpdated = $this->getLastModifiedDateTime('r_hepatitis_test_reasons', 'updated_datetime', $condition);
+                    if (empty($notUpdated) || !isset($notUpdated)) {
+                         foreach ((array)$apiData->r_hepatitis_test_reasons->tableData as $row) {
+                              $hepatitisTestReasonData = (array)$row;
+                              $rQuery = $sql->select()->from('r_hepatitis_test_reasons')->where(array('test_reason_name LIKE "%' . $hepatitisTestReasonData['test_reason_name'] . '%" OR test_reason_id = ' . $hepatitisTestReasonData['test_reason_id']));
+                              $rQueryStr = $sql->buildSqlString($rQuery);
+                              $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
+                              if ($rowData) {
+                                   $hepatitisTestReasonsDb->update($hepatitisTestReasonData, array('test_reason_id' => $hepatitisTestReasonData['test_reason_id']));
+                              } else {
+                                   $hepatitisTestReasonsDb->insert($hepatitisTestReasonData);
+                              }
+                         }
+                    }
+               }
+
+               /* For update the Hepatitis Results Details */
+               if(isset($apiData->r_hepatitis_results) && !empty($apiData->r_hepatitis_results)){
+                    /* if($apiData->forceSync){
+                         $rQueryStr = $apiData->r_hepatitis_results->tableStructure;
+                         $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
+                    } */
+                    $condition = "";
+                    if(isset($apiData->r_hepatitis_results->lastModifiedTime) && !empty($apiData->r_hepatitis_results->lastModifiedTime)){
+                         $condition = "updated_datetime > '" . $apiData->r_hepatitis_results->lastModifiedTime . "'";
+                    }
+                    $notUpdated = $this->getLastModifiedDateTime('r_hepatitis_results', 'updated_datetime', $condition);
+                    if (empty($notUpdated) || !isset($notUpdated)) {
+                         foreach ((array)$apiData->r_hepatitis_results->tableData as $row) {
+                              $hepatitisResultData = (array)$row;
+                              $rQuery = $sql->select()->from('r_hepatitis_results')->where(array('result LIKE "%' . $hepatitisResultData['result'] . '%" OR result_id = "' .$hepatitisResultData['result_id'].'" '));
+                              $rQueryStr = $sql->buildSqlString($rQuery);
+                              $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
+                              if ($rowData) {
+                                   $hepatitisResultsDb->update($hepatitisResultData, array('result_id' => $hepatitisResultData['result_id']));
+                              } else {
+                                   $hepatitisResultsDb->insert($hepatitisResultData);
+                              }
+                         }
+                    }
+               }
+
+                /* For update the Hepatitis Sample Type Details */
+                if(isset($apiData->r_hepatitis_sample_type) && !empty($apiData->r_hepatitis_sample_type)){
+                    /* if($apiData->forceSync){
+                         $rQueryStr = $apiData->r_hepatitis_sample_type->tableStructure;
+                         $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
+                    } */
+                    $condition = "";
+                    if(isset($apiData->r_hepatitis_sample_type->lastModifiedTime) && !empty($apiData->r_hepatitis_sample_type->lastModifiedTime)){
+                         $condition = "updated_datetime > '" . $apiData->r_hepatitis_sample_type->lastModifiedTime . "'";
+                    }
+                    $notUpdated = $this->getLastModifiedDateTime('r_hepatitis_sample_type', 'updated_datetime', $condition);
+                    if (empty($notUpdated) || !isset($notUpdated)) {
+                         foreach ((array)$apiData->r_hepatitis_sample_type->tableData as $row) {
+                              $hepatitisSampleTypeData = (array)$row;
+                              $rQuery = $sql->select()->from('r_hepatitis_sample_type')->where(array('sample_name LIKE "%' . $hepatitisSampleTypeData['sample_name'] . '%" OR sample_id = "' .$hepatitisSampleTypeData['sample_id'].'" '));
+                              $rQueryStr = $sql->buildSqlString($rQuery);
+                              $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
+                              if ($rowData) {
+                                   $hepatitisSampleTypeDb->update($hepatitisSampleTypeData, array('sample_id' => $hepatitisSampleTypeData['sample_id']));
+                              } else {
+                                   $hepatitisSampleTypeDb->insert($hepatitisSampleTypeData);
+                              }
+                         }
+                    }
+               }
                return array(
                     'status' => 'success',
                     'message' => 'All reference tables synced'

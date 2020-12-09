@@ -7925,4 +7925,21 @@ class SampleTable extends AbstractTableGateway
             return array('fileName' => $csvFile, 'backupId' => $generateResult[0]['id']);
         }
     }
+
+    public function fetchEidFormDetail()
+    {
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $lResult = array();
+        $common = new CommonService($this->sm);
+        $lQuery = $sql->select()->from(array('eid' => 'dash_eid_form'))->columns(array('total' => new Expression('COUNT(*)')))
+                    ->join(array('f' => 'import_config_machines'), 'f.config_machine_id=eid.import_machine_name', array('lat'=>'latitude','lon'=>'longitude'))
+                    ->where("(eid.sample_tested_datetime is not null  AND f.poc_device ='yes')")
+                    ->group(array("f.latitude","f.longitude"));
+        $lQueryStr = $sql->buildSqlString($lQuery);
+        // print_r($lQueryStr);die;
+        $lResult = $dbAdapter->query($lQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+        
+        return $lResult;
+    }
 }

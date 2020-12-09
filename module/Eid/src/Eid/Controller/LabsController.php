@@ -46,11 +46,14 @@ class LabsController extends AbstractActionController
         $provinceName = $this->sampleService->getAllProvinceList();
         $districtName = $this->sampleService->getAllDistrictList();
         $clinicName = $this->sampleService->getAllClinicName();
+        $chartDetail = $this->sampleService->getEidFormDetail();
+        // print_r(json_encode($chartDetail));die;
         return new ViewModel(array(
             'labName' => $labName,
             'provinceName' => $provinceName,
             'districtName' => $districtName,
             'clinicName' => $clinicName,
+            'chartDetail' => $chartDetail,
         ));
     }
 
@@ -106,6 +109,21 @@ class LabsController extends AbstractActionController
             return $viewModel;
         }
     }
+
+    public function getTestFailedByTestingPlatformAction()
+    {
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $result = $this->sampleService->getTestFailedByTestingPlatform($params);
+            // $sampleType = $this->sampleService->getSampleType();
+            $viewModel = new ViewModel();
+            $viewModel->setVariables(array('result' => $result))
+                ->setTerminal(true);
+            return $viewModel;
+        }
+    }
+
     public function getLabTurnAroundTimeAction()
     {
         $request = $this->getRequest();
