@@ -557,3 +557,6 @@ CREATE TABLE `r_hepatitis_rick_factors` (
  `updated_datetime` datetime DEFAULT NULL,
  PRIMARY KEY (`riskfactor_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
+
+-- Thana 09-Dec-2020
+ALTER TABLE `r_eid_test_reasons` ADD `updated_datetime` DATETIME NULL DEFAULT NULL AFTER `test_reason_status`;

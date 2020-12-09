@@ -4,6 +4,7 @@ namespace Eid\Service;
 
 use Laminas\Session\Container;
 use Laminas\Db\Sql\Sql;
+use Laminas\Db\Sql\Expression;
 use Application\Service\CommonService;
 
 class EidSampleService
@@ -478,6 +479,23 @@ class EidSampleService
         $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
         return $sResult;
     }
+
+    public function checkTestReason($reasonName)
+    {
+
+        if (empty(trim($reasonName))) return null;
+        
+        $testReasonDb = $this->sm->get('TestReasonTable');
+        $sResult = $testReasonDb->select(array('test_reason_name' => $reasonName))->toArray();
+        if ($sResult) {
+            $testReasonDb->update(array('test_reason_name' => trim($reasonName)), array('test_reason_id' => $sResult['test_reason_id']));
+            return $sResult['test_reason_id'];
+        } else {
+            $testReasonDb->insert(array('test_reason_name' => trim($reasonName), 'test_reason_status' => 'active', 'updated_datetime' => new Expression('NOW()')));
+            return $testReasonDb->lastInsertValue;
+        }
+    }
+
     public function checkSampleRejectionReason($rejectReasonName)
     {
         $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
@@ -1408,4 +1426,272 @@ class EidSampleService
         }
     }
     //clinic details end
+
+    public function saveVLDataFromAPI($params)
+    {
+        $common = new CommonService();
+        $sampleDb = $this->sm->get('SampleTableWithoutCache');
+        $facilityDb = $this->sm->get('FacilityTable');
+        $testStatusDb = $this->sm->get('SampleStatusTable');
+        $sampleTypeDb = $this->sm->get('SampleTypeTable');
+        $sampleRjtReasonDb = $this->sm->get('SampleRejectionReasonTable');
+        $provinceDb = $this->sm->get('ProvinceTable');
+        $apiTrackDb = $this->sm->get('DashApiReceiverStatsTable');
+        $userDb = $this->sm->get('UsersTable');
+        $return = array();
+        $params = json_decode($params, true);
+        $config = $this->sm->get('Config');
+        if (!empty($params)) {
+            if (!file_exists(TEMP_UPLOAD_PATH) && !is_dir(TEMP_UPLOAD_PATH)) {
+                mkdir(APPLICATION_PATH . DIRECTORY_SEPARATOR . "temporary", 0777);
+            }
+            if (!file_exists(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "API-data-vl") && !is_dir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "API-data-vl")) {
+                mkdir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "API-data-vl", 0777);
+            }
+    
+            $pathname = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "API-data-vl" . DIRECTORY_SEPARATOR . $params['timestamp'].'.json';
+            if (!file_exists($pathname)) {
+                $file = file_put_contents($pathname, json_encode($params));
+                if (move_uploaded_file($pathname, $pathname)) {
+                    // $apiData = file_put_contents($pathname);
+                }
+            }
+            foreach ($params['data'] as $key => $row) {
+                // Debug::dump($row);die;
+                if (!empty(trim($row['sample_code'])) && trim($params['api_version']) == $config['defaults']['vl-api-version']) {
+                    $sampleCode = trim($row['sample_code']);
+                    $instanceCode = 'api-data';
+
+                     // Check dublicate data
+                     $province = $provinceDb->select(array('province_name' => $row['health_centre_province']))->current();
+                     if(!$province){
+                         $provinceDb->insert(array(
+                             'province_name'     => $row['health_centre_province'],
+                             'updated_datetime'  => $common->getDateTime()
+                         ));
+                         $province['province_id'] = $provinceDb->lastInsertValue;
+                     }
+
+                    $VLAnalysisResult = (float) $row['result_value_absolute_decimal'];
+                    $DashVL_Abs = NULL;
+                    $DashVL_AnalysisResult = NULL;
+
+                    if ($row['result_value_copies'] == 'Target not Detected' || $row['result_value_copies'] == 'Target Not Detected' || strtolower($row['result_value_copies']) == 'target not detected' || strtolower($row['result_value_copies']) == 'tnd' || $row['result'] == 'Target not Detected' || $row['result'] == 'Target Not Detected' || strtolower($row['result']) == 'target not detected' || strtolower($row['result']) == 'tnd') {
+                        $VLAnalysisResult = 20;
+                    } else if ($row['result_value_copies'] == '< 20' || $row['result_value_copies'] == '<20' || $row['result_value'] == '< 20' || $row['result_value'] == '<20') {
+                        $VLAnalysisResult = 20;
+                    } else if ($row['result_value_copies'] == '< 40' || $row['result_value_copies'] == '<40' || $row['result_value'] == '< 40' || $row['result_value'] == '<40') {
+                        $VLAnalysisResult = 40;
+                    } else if ($row['result_value_copies'] == 'Suppressed' || $row['result_value'] == 'Suppressed') {
+                        $VLAnalysisResult = 500;
+                    } else if ($row['result_value_copies'] == 'Not Suppressed' || $row['result_value'] == 'Not Suppressed') {
+                        $VLAnalysisResult = 1500;
+                    } else if ($row['result_value_copies'] == 'Negative' || $row['result_value_copies'] == 'NEGAT' || $row['result_value'] == 'Negative' || $row['result_value'] == 'NEGAT') {
+                        $VLAnalysisResult = 20;
+                    } else if ($row['result_value_copies'] == 'Positive' || $row['result_value'] == 'Positive') {
+                        $VLAnalysisResult = 1500;
+                    }
+
+
+                    if ($VLAnalysisResult == 'NULL' || $VLAnalysisResult == '' || $VLAnalysisResult == NULL) {
+                        $DashVL_Abs = NULL;
+                        $DashVL_AnalysisResult = NULL;
+                    } else if ($VLAnalysisResult < 1000) {
+                        $DashVL_AnalysisResult = 'Suppressed';
+                        $DashVL_Abs = $VLAnalysisResult;
+                    } else if ($VLAnalysisResult >= 1000) {
+                        $DashVL_AnalysisResult = 'Not Suppressed';
+                        $DashVL_Abs = $VLAnalysisResult;
+                    }
+
+                    
+                    $sampleReceivedAtLab = ((trim($row['sample_received_date']) != '' && $row['sample_received_date'] != "") ? trim($row['sample_received_date']) : null);
+                    $sampleTestedDateTime = ((trim($row['sample_tested_date']) != '' && $row['sample_tested_date'] != "") ? trim($row['sample_tested_date']) : null);
+                    $sampleCollectionDate = ((trim($row['sample_collection_date']) != '' && $row['sample_collection_date'] != "") ? trim($row['sample_collection_date']) : null);
+                    $dob = ((trim($row['patient_birth_date']) != '' && $row['patient_birth_date'] != "") ? trim($row['patient_birth_date']) : null);
+                    $resultApprovedDateTime = ((trim($row['result_approved_datetime']) != '' && $row['result_approved_datetime'] != "") ? trim($row['result_approved_datetime']) : null);
+                    $dateOfInitiationOfRegimen = ((trim($row['date_of_initiation_of_current_regimen']) != '' && $row['date_of_initiation_of_current_regimen'] != "") ? trim($row['date_of_initiation_of_current_regimen']) : null);
+                    $sampleRegisteredAtLabDateTime = ((trim($row['sample_registered_at_lab']) != '' && $row['sample_registered_at_lab'] != "") ? trim($row['sample_registered_at_lab']) : null);
+                    $resultPrinterDateTime = ((trim($row['result_printed_datetime']) != '' && $row['result_printed_datetime'] != "") ? trim($row['result_printed_datetime']) : null);
+
+                    $data = array(
+                        'sample_code'                           => $sampleCode,
+                        'vlsm_instance_id'                      => $instanceCode,
+                        'province_id'                           => (trim($province['province_id']) != '' ? trim($province['province_id']) : NULL),
+                        'source'                                => '1',
+                        'patient_art_no'                        => (trim($row['patient_art_no']) != '' ? trim($row['patient_art_no']) : NULL),
+                        'patient_gender'                        => (trim($row['patient_gender']) != '' ? trim($row['patient_gender']) : NULL),
+                        'patient_age_in_years'                  => (trim($row['patient_age_in_years']) != '' ? trim($row['patient_age_in_years']) : NULL),
+                        'patient_mobile_number'                 => (trim($row['patient_mobile_number']) != '' ? trim($row['patient_mobile_number']) : NULL),
+                        'patient_dob'                           => $dob,
+                        'sample_collection_date'                => $sampleCollectionDate,
+                        'sample_registered_at_lab'              => $sampleReceivedAtLab,
+                        'result_printed_datetime'               => $resultPrinterDateTime,
+                        'line_of_treatment'                     => (trim($row['line_of_treatment']) != '' ? trim($row['line_of_treatment']) : NULL),
+                        'is_sample_rejected'                    => (trim($row['is_sample_rejected']) != '' ? strtolower($row['is_sample_rejected']) : NULL),
+                        'is_patient_pregnant'                   => (trim($row['is_patient_pregnant']) != '' ? trim($row['is_patient_pregnant']) : NULL),
+                        'is_patient_breastfeeding'              => (trim($row['is_patient_breastfeeding']) != '' ? trim($row['is_patient_breastfeeding']) : NULL),
+                        'current_regimen'                       => (trim($row['current_regimen']) != '' ? trim($row['current_regimen']) : NULL),
+                        'date_of_initiation_of_current_regimen' => $dateOfInitiationOfRegimen,
+                        'arv_adherance_percentage'              => (trim($row['arv_adherance_percentage']) != '' ? trim($row['arv_adherance_percentage']) : NULL),
+                        'is_adherance_poor'                     => (trim($row['is_adherance_poor']) != '' ? trim($row['is_adherance_poor']) : NULL),
+                        'result_approved_datetime'              => $resultApprovedDateTime,
+                        'sample_tested_datetime'                => $sampleTestedDateTime,
+                        'vl_test_platform'                      => (trim($row['vl_test_platform']) != '' ? trim($row['vl_test_platform']) : NULL),
+                        'result_value_log'                      => (trim($row['result_value_log']) != '' ? (float)($row['result_value_log']) : NULL),
+                        'result_value_absolute'                 => (trim($row['result_value_absolute']) != '' ? trim($row['result_value_absolute']) : NULL),
+                        'result_value_text'                     => (trim($row['result_value_copies']) != '' ? trim($row['result_value_copies']) : NULL),
+                        'result_value_absolute_decimal'         => (trim($row['result_value_absolute_decimal']) != '' ? trim($row['result_value_absolute_decimal']) : NULL),
+                        'result'                                => (trim($row['result_value']) != '' ? trim($row['result_value']) : NULL),
+                        'tested_by'                             => (trim($row['tested_by']) != '' ? $userDb->checkExistUser($row['tested_by']) : NULL),
+                        'result_approved_by'                    => (trim($row['result_approved_by']) != '' ? $userDb->checkExistUser($row['result_approved_by']) : NULL),
+                        'DashVL_Abs'                            => $DashVL_Abs,
+                        'DashVL_AnalysisResult'                 => $DashVL_AnalysisResult,
+                        'sample_registered_at_lab'              => $sampleRegisteredAtLabDateTime
+                    );
+
+
+                    //check clinic details
+                    if (isset($row['facility_name']) && trim($row['facility_name']) != '') {
+                        $facilityDataResult = $this->checkFacilityDetails(trim($row['facility_name']));
+                        if ($facilityDataResult) {
+                            $data['facility_id'] = $facilityDataResult['facility_id'];
+                        } else {
+                            $facilityDb->insert(array(
+                                'vlsm_instance_id'  => $instanceCode,
+                                'facility_name'     => $row['facility_name'],
+                                'facility_code'     => !empty($row['facility_name']) ? $row['facility_name'] : null,
+                                'facility_type'     => '1',
+                                'status'            => 'active'
+                            ));
+                            $data['facility_id'] = $facilityDb->lastInsertValue;
+                        }
+                    } else {
+                        $data['facility_id'] = NULL;
+                    }
+
+                    //check lab details
+                    $labDataResult = $this->checkFacilityDetails(trim($row['testing_lab_name']));
+                    if ($labDataResult) {
+                        $data['lab_id'] = $labDataResult['facility_id'];
+                    } else {
+                        $facilityDb->insert(array(
+                            'vlsm_instance_id'  => $instanceCode,
+                            'facility_name'     => $row['testing_lab_name'],
+                            'facility_code'     => !empty($row['testing_lab_code']) ? $row['testing_lab_code'] : null,
+                            'facility_type'     => '2',
+                            'status'            => 'active'
+                        ));
+                        $data['lab_id'] = $facilityDb->lastInsertValue;
+                    }
+
+                    //check testing reason
+                    if (trim($row['result_value_status']) != '') {
+                        $sampleStatusResult = $this->checkSampleStatus(trim($row['result_value_status']));
+                        if ($sampleStatusResult) {
+                            $data['result_status'] = $sampleStatusResult['status_id'];
+                        } else {
+                            $testStatusDb->insert(array('status_name' => trim($row['result_value_status'])));
+                            $data['result_status'] = $testStatusDb->lastInsertValue;
+                        }
+                    } else {
+                        $data['result_status'] = 6;
+                    }
+                    //check sample type
+                    if (trim($row['sample_type']) != '') {
+                        $sampleType = $this->checkSampleType(trim($row['sample_type']));
+                        if ($sampleType) {
+                            $sampleTypeDb->update(array('sample_name' => trim($row['sample_type'])), array('sample_id' => $sampleType['sample_id']));
+                            $data['sample_type'] = $sampleType['sample_id'];
+                        } else {
+                            $sampleTypeDb->insert(array('sample_name' => trim($row['sample_type']), 'status' => 'active'));
+                            $data['sample_type'] = $sampleTypeDb->lastInsertValue;
+                        }
+                    } else {
+                        $data['sample_type'] = NULL;
+                    }
+
+                    //check sample test reason
+                    if (!empty(trim($row['reason_for_vl_testing']))) {
+                        $data['reason_for_vl_testing'] =  $this->checkTestReason(trim($row['reason_for_vl_testing']));
+                    } else {
+                        $data['reason_for_vl_testing'] = NULL;
+                    }
+
+                    //check sample rejection reason
+                    if (trim($row['rejection_reason_name']) != '') {
+                        $sampleRejectionReason = $this->checkSampleRejectionReason(trim($row['rejection_reason_name']));
+                        if ($sampleRejectionReason) {
+                            $sampleRjtReasonDb->update(array('rejection_reason_name' => trim($row['rejection_reason_name'])), array('rejection_reason_id' => $sampleRejectionReason['rejection_reason_id']));
+                            $data['reason_for_sample_rejection'] = $sampleRejectionReason['rejection_reason_id'];
+                        } else {
+                            $sampleRjtReasonDb->insert(array('rejection_reason_name' => trim($row['rejection_reason_name']), 'rejection_reason_status' => 'active'));
+                            $data['reason_for_sample_rejection'] = $sampleRjtReasonDb->lastInsertValue;
+                        }
+                    } else {
+                        $data['reason_for_sample_rejection'] = NULL;
+                    }
+
+                    //check existing sample code
+                    $sampleCode = $this->checkSampleCode($sampleCode, $instanceCode);
+                    $status = 0;
+
+                    if ($sampleCode) {
+                        //sample data update
+                        $status = $sampleDb->update($data, array('vl_sample_id' => $sampleCode['vl_sample_id']));
+                    } else {
+                        //sample data insert
+                        $status = $sampleDb->insert($data);
+                    }
+
+                    if ($status == 0) {
+                        $return[$key][] = $sampleCode;
+                    }
+                }
+            }
+        } else {
+            http_response_code(400);
+            $response = array(
+                'status'    => 'fail',
+                'message'   => 'Missing data in API request',
+            );
+        }
+        http_response_code(202);
+        $status = 'success';
+        if (count($return) > 0) {
+            
+            $status = 'partial';
+            if((count($params['data']) - count($return)) == 0){
+                $status = 'failed';
+            } else{
+                //remove directory  
+                unlink($pathname);
+            }
+        } else{
+            //remove directory  
+            unlink($pathname);
+        }
+        $response = array(
+            'status'    => 'success',
+            'message'   => 'Received ' . count($params['data']) . ' records. Processed '.(count($params['data']) - count($return)).' records.'
+        );
+
+        // Track API Records
+        $apiTrackData = array(
+            'tracking_id'                   => $params['timestamp'],
+            'received_on'                   => $common->getDateTime(),
+            'number_of_records_received'    => count($params['data']),
+            'number_of_records_processed'   => (count($params['data']) - count($return)),
+            'source'                        => 'API Data',
+            'status'                        => $status
+        );
+        $trackResult = $apiTrackDb->select(array('tracking_id' => $params['timestamp']))->current();
+        if($trackResult){
+            $apiTrackDb->update($apiTrackData, array('api_id' => $trackResult['api_id']));
+        } else{
+            $apiTrackDb->insert($apiTrackData);
+        }
+
+        return $response;
+    }
 }

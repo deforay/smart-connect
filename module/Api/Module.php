@@ -58,6 +58,14 @@ class Module
                 'Api\Controller\ImportViral' => function () {
                     return new \Api\Controller\ImportViralLoadController();
                 },
+                'Api\Controller\ReceiveVLData' => function ($sm) {
+                    $sampleService = $sm->getServiceLocator()->get('SampleService');
+                    return new \Api\Controller\ReceiveVLDataController($sampleService);
+                },
+                'Api\Controller\ReceiveEidData' => function ($sm) {
+                    $sampleService = $sm->getServiceLocator()->get('EidSampleService');
+                    return new \Api\Controller\ReceiveEidDataController($sampleService);
+                },
             ),
         );
     }

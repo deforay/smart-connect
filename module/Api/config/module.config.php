@@ -112,6 +112,30 @@ return array(
                     ),
                 ),
             ),
+            'receive-vl-data' => array(
+                'type'    => 'segment',
+                'options' => array(
+                    'route'    => '/api/receiver/vl[/:id]',
+                    'constraints' => array(
+                        'id'     => '[0-9]+',
+                    ),
+                    'defaults' => array(
+                        'controller' => 'Api\Controller\ReceiveVLData',
+                    ),
+                ),
+            ),
+            'receive-eid-data' => array(
+                'type'    => 'segment',
+                'options' => array(
+                    'route'    => '/api/receiver/eid[/:id]',
+                    'constraints' => array(
+                        'id'     => '[0-9]+',
+                    ),
+                    'defaults' => array(
+                        'controller' => 'Api\Controller\ReceiveEidData',
+                    ),
+                ),
+            ),
         ),
     ),
     'view_manager' => array(
