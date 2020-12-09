@@ -2720,7 +2720,7 @@ class EidSampleTable extends AbstractTableGateway
                 $query = $query->where('vl.lab_id IN ("' . implode('", "', $facilityIdList) . '")');
             }
             if(isset($params['flag']) && $params['flag'] == 'poc'){
-                $query = $query->join(array('icm' => 'import_config_machines'), 'icm.config_machine_id = eid.import_machine_name', array('poc_device'))->where(array('icm.poc_device' => 'yes'));
+                $query = $query->join(array('icm' => 'import_config_machines'), 'icm.config_machine_id = vl.import_machine_name', array('poc_device'))->where(array('icm.poc_device' => 'yes'));
             }
             $query = $query->group(array(new Expression('YEAR(vl.result_approved_datetime)')));
             $query = $query->group(array(new Expression('MONTH(vl.result_approved_datetime)')));
