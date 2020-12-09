@@ -2253,7 +2253,7 @@ class SampleService
                     // $apiData = file_put_contents($pathname);
                 }
             }
-            foreach ($params['Data'] as $key => $row) {
+            foreach ($params['data'] as $key => $row) {
                 // Debug::dump($row);die;
                 if (!empty(trim($row['SampleID'])) && trim($row['TestId']) == 'VIRAL_LOAD_2') {
                     $sampleCode = trim($row['SampleID']);
