@@ -443,4 +443,19 @@ class UsersTable extends AbstractTableGateway
             return $token;
         }
     }
+
+    public function checkExistUser($name)
+    {
+        $userInfo = $this->select(array('user_name LIKE "'.$name.'%"'))->current();
+        if($userInfo){
+            return $userInfo['user_id'];
+        } else{
+            $this->insert(array(
+                'user_name' => $name,
+                'role'      => 9999,
+                'status'    => 'inactive'
+            ));
+            return $this->lastInsertValue;
+        }
+    }
 }

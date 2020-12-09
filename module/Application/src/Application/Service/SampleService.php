@@ -1797,6 +1797,7 @@ class SampleService
             $generateBackupDb->completeBackup($response['backupId']);
         }
     }
+    
 
     public function saveFileFromVlsmAPIV2()
     {
@@ -2235,6 +2236,7 @@ class SampleService
         $sampleRjtReasonDb = $this->sm->get('SampleRejectionReasonTable');
         $provinceDb = $this->sm->get('ProvinceTable');
         $apiTrackDb = $this->sm->get('DashApiReceiverStatsTable');
+        $userDb = $this->sm->get('UsersTable');
         $return = array();
         $params = json_decode($params, true);
         // Debug::dump($params['timestamp']);die;
@@ -2245,8 +2247,8 @@ class SampleService
             if (!file_exists(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "weblims-vl") && !is_dir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "weblims-vl")) {
                 mkdir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "weblims-vl", 0777);
             }
-    
-            $pathname = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "weblims-vl" . DIRECTORY_SEPARATOR . $params['timestamp'].'.json';
+
+            $pathname = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "weblims-vl" . DIRECTORY_SEPARATOR . $params['timestamp'] . '.json';
             if (!file_exists($pathname)) {
                 $file = file_put_contents($pathname, json_encode($params));
                 if (move_uploaded_file($pathname, $pathname)) {
@@ -2259,15 +2261,15 @@ class SampleService
                     $sampleCode = trim($row['SampleID']);
                     $instanceCode = 'nrl-weblims';
 
-                     // Check dublicate data
-                     $province = $provinceDb->select(array('province_name' => $row['ProvinceName']))->current();
-                     if(!$province){
-                         $provinceDb->insert(array(
-                             'province_name'     => $row['ProvinceName'],
-                             'updated_datetime'  => $common->getDateTime()
-                         ));
-                         $province['province_id'] = $provinceDb->lastInsertValue;
-                     }
+                    // Check duplicate data
+                    $province = $provinceDb->select(array('province_name' => $row['ProvinceName']))->current();
+                    if (!$province) {
+                        $provinceDb->insert(array(
+                            'province_name'     => $row['ProvinceName'],
+                            'updated_datetime'  => $common->getDateTime()
+                        ));
+                        $province['province_id'] = $provinceDb->lastInsertValue;
+                    }
 
                     $VLAnalysisResult = (float) $row['result_value_absolute_decimal'];
                     $DashVL_Abs = NULL;
@@ -2301,7 +2303,7 @@ class SampleService
                         $DashVL_Abs = $VLAnalysisResult;
                     }
 
-                    
+
                     $sampleReceivedAtLab = ((trim($row['SampleReceivedDate']) != '' && $row['SampleReceivedDate'] != "T") ? trim(str_replace("T", " ", $row['SampleReceivedDate'])) : null);
                     $sampleTestedDateTime = ((trim($row['SampleTestedDate']) != '' && $row['SampleTestedDate'] != "T") ? trim(str_replace("T", " ", $row['SampleTestedDate'])) : null);
                     $sampleCollectionDate = ((trim($row['CollectionDate']) != '' && $row['CollectionDate'] != "T") ? trim(str_replace("T", " ", $row['CollectionDate'])) : null);
@@ -2316,6 +2318,7 @@ class SampleService
                         'vlsm_instance_id'                      => 'nrl-weblims',
                         'province_id'                           => (trim($province['province_id']) != '' ? trim($province['province_id']) : NULL),
                         'source'                                => '1',
+                        'patient_art_no'                        => (trim($row['TracnetID']) != '' ? trim($row['TracnetID']) : NULL),
                         'patient_gender'                        => (trim($row['patientGender']) != '' ? trim($row['patientGender']) : NULL),
                         'patient_age_in_years'                  => (trim($row['PatientAge']) != '' ? trim($row['PatientAge']) : NULL),
                         'patient_dob'                           => $dob,
@@ -2339,7 +2342,7 @@ class SampleService
                         'result_value_text'                     => (trim($row['Result']['Copies']) != '' ? trim($row['Result']['Copies']) : NULL),
                         'result_value_absolute_decimal'         => (trim($row['result_value_absolute_decimal']) != '' ? trim($row['result_value_absolute_decimal']) : NULL),
                         'result'                                => (trim($row['result']) != '' ? trim($row['result']) : NULL),
-                        'result_approved_by'                    => (trim($row['ApprovedBy']) != '' ? trim($row['ApprovedBy']) : NULL),
+                        'result_approved_by'                    => (trim($row['ApprovedBy']) != '' ? $userDb->checkExistUser($row['ApprovedBy']) : NULL),
                         'DashVL_Abs'                            => $DashVL_Abs,
                         'DashVL_AnalysisResult'                 => $DashVL_AnalysisResult,
                         'sample_registered_at_lab'              => $sampleRegisteredAtLabDateTime
@@ -2392,7 +2395,7 @@ class SampleService
                             $sampleTypeDb->update(array('sample_name' => trim($row['SampleType'])), array('sample_id' => $sampleType['sample_id']));
                             $data['sample_type'] = $sampleType['sample_id'];
                         } else {
-                            $sampleTypeDb->insert(array('sample_name' => trim($row['SampleType'])));
+                            $sampleTypeDb->insert(array('sample_name' => trim($row['SampleType']), 'status' => 'active'));
                             $data['sample_type'] = $sampleTypeDb->lastInsertValue;
                         }
                     } else {
@@ -2415,7 +2418,7 @@ class SampleService
                             $sampleRjtReasonDb->update(array('rejection_reason_name' => trim($row['SampleRejectionReason'])), array('rejection_reason_id' => $sampleRejectionReason['rejection_reason_id']));
                             $data['reason_for_sample_rejection'] = $sampleRejectionReason['rejection_reason_id'];
                         } else {
-                            $sampleRjtReasonDb->insert(array('rejection_reason_name' => trim($row['SampleRejectionReason'])));
+                            $sampleRjtReasonDb->insert(array('rejection_reason_name' => trim($row['SampleRejectionReason']), 'rejection_reason_status' => 'active'));
                             $data['reason_for_sample_rejection'] = $sampleRjtReasonDb->lastInsertValue;
                         }
                     } else {
@@ -2449,36 +2452,36 @@ class SampleService
         http_response_code(202);
         $status = 'success';
         if (count($return) > 0) {
-            
+
             $status = 'partial';
-            if((count($params) - count($return)) == 0){
+            if ((count($params) - count($return)) == 0) {
                 $status = 'failed';
-            } else{
+            } else {
                 //remove directory  
                 unlink($pathname);
             }
-        } else{
+        } else {
             //remove directory  
             unlink($pathname);
         }
         $response = array(
             'status'    => 'success',
-            'message'   => 'Received ' . count($params) . ' records.'
+            'message'   => 'Received ' . count($params['data']) . ' records.'
         );
 
         // Track API Records
         $apiTrackData = array(
             'tracking_id'                   => $params['timestamp'],
             'received_on'                   => $common->getDateTime(),
-            'number_of_records_received'    => count($params),
-            'number_of_records_processed'   => (count($params) - count($return)),
+            'number_of_records_received'    => count($params['data']),
+            'number_of_records_processed'   => (count($params['data']) - count($return)),
             'source'                        => 'Weblims VL',
             'status'                        => $status
         );
         $trackResult = $apiTrackDb->select(array('tracking_id' => $params['timestamp']))->current();
-        if($trackResult){
+        if ($trackResult) {
             $apiTrackDb->update($apiTrackData, array('api_id' => $trackResult['api_id']));
-        } else{
+        } else {
             $apiTrackDb->insert($apiTrackData);
         }
 
