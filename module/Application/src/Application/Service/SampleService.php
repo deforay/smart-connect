@@ -2604,7 +2604,7 @@ class SampleService
                         'result_value_text'                     => (trim($row['result_value_copies']) != '' ? trim($row['result_value_copies']) : NULL),
                         'result_value_absolute_decimal'         => (trim($row['result_value_absolute_decimal']) != '' ? trim($row['result_value_absolute_decimal']) : NULL),
                         'result'                                => (trim($row['result_value']) != '' ? trim($row['result_value']) : NULL),
-                        'tested_by'                             => (trim($row['tested_by']) != '' ? $userDb->checkExistUser($row['tested_by']) : NULL),
+                        // 'tested_by'                             => (trim($row['tested_by']) != '' ? $userDb->checkExistUser($row['tested_by']) : NULL),
                         'result_approved_by'                    => (trim($row['result_approved_by']) != '' ? $userDb->checkExistUser($row['result_approved_by']) : NULL),
                         'DashVL_Abs'                            => $DashVL_Abs,
                         'DashVL_AnalysisResult'                 => $DashVL_AnalysisResult,
