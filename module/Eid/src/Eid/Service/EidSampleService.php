@@ -1458,7 +1458,7 @@ class EidSampleService
             }
             foreach ($params['data'] as $key => $row) {
                 // Debug::dump($row);die;
-                if (!empty(trim($row['sample_code'])) && trim($params['api_version']) == $config['defaults']['vl-api-version']) {
+                if (!empty(trim($row['sample_code'])) && trim($params['api_version']) == $config['defaults']['eid-api-version']) {
                     $sampleCode = trim($row['sample_code']);
                     $instanceCode = 'api-data';
 

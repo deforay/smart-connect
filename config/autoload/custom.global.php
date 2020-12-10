@@ -6,6 +6,7 @@ return array(
         'tat-skipdays' => 120,
         'use-current-sample-table' => false,
         'vl-api-version' => 1.0,
+        'eid-api-version' => 1.0,
         'vlModule'      => true,
         'eidModule'     => true,
         'covid19Module' => true,
