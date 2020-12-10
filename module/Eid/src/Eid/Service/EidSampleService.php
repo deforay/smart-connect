@@ -1430,11 +1430,11 @@ class EidSampleService
     public function saveEidDataFromAPI($params)
     {
         $common = new CommonService();
-        $sampleDb = $this->sm->get('SampleTableWithoutCache');
+        $sampleDb = $this->sm->get('EidSampleTableWithoutCache');
         $facilityDb = $this->sm->get('FacilityTable');
         $testStatusDb = $this->sm->get('SampleStatusTable');
         $sampleTypeDb = $this->sm->get('SampleTypeTable');
-        $sampleRjtReasonDb = $this->sm->get('SampleRejectionReasonTable');
+        $sampleRjtReasonDb = $this->sm->get('EidSampleRejectionReasonTable');
         $provinceDb = $this->sm->get('ProvinceTable');
         $apiTrackDb = $this->sm->get('DashApiReceiverStatsTable');
         $userDb = $this->sm->get('UsersTable');
@@ -1472,43 +1472,14 @@ class EidSampleService
                          $province['province_id'] = $provinceDb->lastInsertValue;
                      }
 
-                    $VLAnalysisResult = (float) $row['result_value_absolute_decimal'];
-                    $DashVL_Abs = NULL;
-                    $DashVL_AnalysisResult = NULL;
-
-                    if ($row['result_value_copies'] == 'Target not Detected' || $row['result_value_copies'] == 'Target Not Detected' || strtolower($row['result_value_copies']) == 'target not detected' || strtolower($row['result_value_copies']) == 'tnd' || $row['result'] == 'Target not Detected' || $row['result'] == 'Target Not Detected' || strtolower($row['result']) == 'target not detected' || strtolower($row['result']) == 'tnd') {
-                        $VLAnalysisResult = 20;
-                    } else if ($row['result_value_copies'] == '< 20' || $row['result_value_copies'] == '<20' || $row['result_value'] == '< 20' || $row['result_value'] == '<20') {
-                        $VLAnalysisResult = 20;
-                    } else if ($row['result_value_copies'] == '< 40' || $row['result_value_copies'] == '<40' || $row['result_value'] == '< 40' || $row['result_value'] == '<40') {
-                        $VLAnalysisResult = 40;
-                    } else if ($row['result_value_copies'] == 'Suppressed' || $row['result_value'] == 'Suppressed') {
-                        $VLAnalysisResult = 500;
-                    } else if ($row['result_value_copies'] == 'Not Suppressed' || $row['result_value'] == 'Not Suppressed') {
-                        $VLAnalysisResult = 1500;
-                    } else if ($row['result_value_copies'] == 'Negative' || $row['result_value_copies'] == 'NEGAT' || $row['result_value'] == 'Negative' || $row['result_value'] == 'NEGAT') {
-                        $VLAnalysisResult = 20;
-                    } else if ($row['result_value_copies'] == 'Positive' || $row['result_value'] == 'Positive') {
-                        $VLAnalysisResult = 1500;
-                    }
-
-
-                    if ($VLAnalysisResult == 'NULL' || $VLAnalysisResult == '' || $VLAnalysisResult == NULL) {
-                        $DashVL_Abs = NULL;
-                        $DashVL_AnalysisResult = NULL;
-                    } else if ($VLAnalysisResult < 1000) {
-                        $DashVL_AnalysisResult = 'Suppressed';
-                        $DashVL_Abs = $VLAnalysisResult;
-                    } else if ($VLAnalysisResult >= 1000) {
-                        $DashVL_AnalysisResult = 'Not Suppressed';
-                        $DashVL_Abs = $VLAnalysisResult;
-                    }
+                    
 
                     
                     $sampleReceivedAtLab = ((trim($row['sample_received_date']) != '' && $row['sample_received_date'] != "") ? trim($row['sample_received_date']) : null);
                     $sampleTestedDateTime = ((trim($row['sample_tested_date']) != '' && $row['sample_tested_date'] != "") ? trim($row['sample_tested_date']) : null);
                     $sampleCollectionDate = ((trim($row['sample_collection_date']) != '' && $row['sample_collection_date'] != "") ? trim($row['sample_collection_date']) : null);
-                    $dob = ((trim($row['patient_birth_date']) != '' && $row['patient_birth_date'] != "") ? trim($row['patient_birth_date']) : null);
+                    $dob = ((trim($row['mother_dob']) != '' && $row['mother_dob'] != "") ? trim($row['mother_dob']) : null);
+                    $child_dob = ((trim($row['child_dob']) != '' && $row['child_dob'] != "") ? trim($row['child_dob']) : null);
                     $resultApprovedDateTime = ((trim($row['result_approved_datetime']) != '' && $row['result_approved_datetime'] != "") ? trim($row['result_approved_datetime']) : null);
                     $dateOfInitiationOfRegimen = ((trim($row['date_of_initiation_of_current_regimen']) != '' && $row['date_of_initiation_of_current_regimen'] != "") ? trim($row['date_of_initiation_of_current_regimen']) : null);
                     $sampleRegisteredAtLabDateTime = ((trim($row['sample_registered_at_lab']) != '' && $row['sample_registered_at_lab'] != "") ? trim($row['sample_registered_at_lab']) : null);
@@ -1518,35 +1489,40 @@ class EidSampleService
                         'sample_code'                           => $sampleCode,
                         'vlsm_instance_id'                      => $instanceCode,
                         'province_id'                           => (trim($province['province_id']) != '' ? trim($province['province_id']) : NULL),
-                        'source'                                => '1',
-                        'patient_art_no'                        => (trim($row['patient_art_no']) != '' ? trim($row['patient_art_no']) : NULL),
-                        'patient_gender'                        => (trim($row['patient_gender']) != '' ? trim($row['patient_gender']) : NULL),
-                        'patient_age_in_years'                  => (trim($row['patient_age_in_years']) != '' ? trim($row['patient_age_in_years']) : NULL),
-                        'patient_mobile_number'                 => (trim($row['patient_mobile_number']) != '' ? trim($row['patient_mobile_number']) : NULL),
-                        'patient_dob'                           => $dob,
+                        'mother_id'                             => (trim($row['mother_id']) != '' ? trim($row['mother_id']) : NULL),
+                        'caretaker_phone_number'                => (trim($row['caretaker_phone_number']) != '' ? trim($row['caretaker_phone_number']) : NULL),
+                        'mother_age_in_years'                  => (trim($row['mother_age_in_years']) != '' ? trim($row['mother_age_in_years']) : NULL),
+                        'mother_marital_status'                 => (trim($row['mother_marital_status']) != '' ? trim($row['mother_marital_status']) : NULL),
+                        'mother_dob'                           => $dob,
                         'sample_collection_date'                => $sampleCollectionDate,
                         'sample_registered_at_lab'              => $sampleReceivedAtLab,
                         'result_printed_datetime'               => $resultPrinterDateTime,
-                        'line_of_treatment'                     => (trim($row['line_of_treatment']) != '' ? trim($row['line_of_treatment']) : NULL),
+                        'child_id'                            => (trim($row['child_id']) != '' ? trim($row['child_id']) : NULL),
+                        'child_dob'                           => $child_dob,
+                        'child_age'                            => (trim($row['child_age']) != '' ? trim($row['child_age']) : NULL),
+                        'child_gender'                            => (trim($row['child_gender']) != '' ? trim($row['child_gender']) : NULL),
+                        'mother_hiv_status'                            => (trim($row['mother_hiv_status']) != '' ? trim($row['mother_hiv_status']) : NULL),
+                        'mother_vl_result'                            => (trim($row['mother_vl_result']) != '' ? trim($row['mother_vl_result']) : NULL),
+                        'mother_vl_test_date'                            => (trim($row['mother_vl_test_date']) != '' ? trim($row['mother_vl_test_date']) : NULL),
+                        'is_infant_receiving_treatment'                            => (trim($row['is_infant_receiving_treatment']) != '' ? trim($row['is_infant_receiving_treatment']) : NULL),
+                        'pcr_test_performed_before'                            => (trim($row['pcr_test_performed_before']) != '' ? trim($row['pcr_test_performed_before']) : NULL),
+                        'specimen_type'                            => (trim($row['specimen_type']) != '' ? trim($row['specimen_type']) : NULL),
+                        'reason_for_eid_test'                            => (trim($row['reason_for_eid_test']) != '' ? trim($row['reason_for_eid_test']) : NULL),
+                        'last_pcr_id'                            => (trim($row['last_pcr_id']) != '' ? trim($row['last_pcr_id']) : NULL),
+                        'last_pcr_date'                            => (trim($row['last_pcr_date']) != '' ? trim($row['last_pcr_date']) : NULL),
+                        'reason_for_pcr'                            => (trim($row['reason_for_pcr']) != '' ? trim($row['reason_for_pcr']) : NULL),
+                        'rapid_test_performed'                            => (trim($row['rapid_test_performed']) != '' ? trim($row['rapid_test_performed']) : NULL),
+                        'rapid_test_result'                            => (trim($row['rapid_test_result']) != '' ? trim($row['rapid_test_result']) : NULL),
+                        'rapid_test_date'                            => (trim($row['rapid_test_date']) != '' ? trim($row['rapid_test_date']) : NULL),
+                        // 'line_of_treatment'                     => (trim($row['line_of_treatment']) != '' ? trim($row['line_of_treatment']) : NULL),
                         'is_sample_rejected'                    => (trim($row['is_sample_rejected']) != '' ? strtolower($row['is_sample_rejected']) : NULL),
-                        'is_patient_pregnant'                   => (trim($row['is_patient_pregnant']) != '' ? trim($row['is_patient_pregnant']) : NULL),
-                        'is_patient_breastfeeding'              => (trim($row['is_patient_breastfeeding']) != '' ? trim($row['is_patient_breastfeeding']) : NULL),
-                        'current_regimen'                       => (trim($row['current_regimen']) != '' ? trim($row['current_regimen']) : NULL),
-                        'date_of_initiation_of_current_regimen' => $dateOfInitiationOfRegimen,
-                        'arv_adherance_percentage'              => (trim($row['arv_adherance_percentage']) != '' ? trim($row['arv_adherance_percentage']) : NULL),
-                        'is_adherance_poor'                     => (trim($row['is_adherance_poor']) != '' ? trim($row['is_adherance_poor']) : NULL),
+                        // 'result_tested_by'                      => (trim($row['result_tested_by']) != '' ? trim($row['result_tested_by']) : NULL),
+                        // 'current_regimen'                       => (trim($row['current_regimen']) != '' ? trim($row['current_regimen']) : NULL),
                         'result_approved_datetime'              => $resultApprovedDateTime,
                         'sample_tested_datetime'                => $sampleTestedDateTime,
-                        'vl_test_platform'                      => (trim($row['vl_test_platform']) != '' ? trim($row['vl_test_platform']) : NULL),
-                        'result_value_log'                      => (trim($row['result_value_log']) != '' ? (float)($row['result_value_log']) : NULL),
-                        'result_value_absolute'                 => (trim($row['result_value_absolute']) != '' ? trim($row['result_value_absolute']) : NULL),
-                        'result_value_text'                     => (trim($row['result_value_copies']) != '' ? trim($row['result_value_copies']) : NULL),
-                        'result_value_absolute_decimal'         => (trim($row['result_value_absolute_decimal']) != '' ? trim($row['result_value_absolute_decimal']) : NULL),
+                        'eid_test_platform'                      => (trim($row['eid_test_platform']) != '' ? trim($row['eid_test_platform']) : NULL),
                         'result'                                => (trim($row['result_value']) != '' ? trim($row['result_value']) : NULL),
-                        'tested_by'                             => (trim($row['tested_by']) != '' ? $userDb->checkExistUser($row['tested_by']) : NULL),
                         'result_approved_by'                    => (trim($row['result_approved_by']) != '' ? $userDb->checkExistUser($row['result_approved_by']) : NULL),
-                        'DashVL_Abs'                            => $DashVL_Abs,
-                        'DashVL_AnalysisResult'                 => $DashVL_AnalysisResult,
                         'sample_registered_at_lab'              => $sampleRegisteredAtLabDateTime
                     );
 
@@ -1583,39 +1559,6 @@ class EidSampleService
                             'status'            => 'active'
                         ));
                         $data['lab_id'] = $facilityDb->lastInsertValue;
-                    }
-
-                    //check testing reason
-                    if (trim($row['result_value_status']) != '') {
-                        $sampleStatusResult = $this->checkSampleStatus(trim($row['result_value_status']));
-                        if ($sampleStatusResult) {
-                            $data['result_status'] = $sampleStatusResult['status_id'];
-                        } else {
-                            $testStatusDb->insert(array('status_name' => trim($row['result_value_status'])));
-                            $data['result_status'] = $testStatusDb->lastInsertValue;
-                        }
-                    } else {
-                        $data['result_status'] = 6;
-                    }
-                    //check sample type
-                    if (trim($row['sample_type']) != '') {
-                        $sampleType = $this->checkSampleType(trim($row['sample_type']));
-                        if ($sampleType) {
-                            $sampleTypeDb->update(array('sample_name' => trim($row['sample_type'])), array('sample_id' => $sampleType['sample_id']));
-                            $data['sample_type'] = $sampleType['sample_id'];
-                        } else {
-                            $sampleTypeDb->insert(array('sample_name' => trim($row['sample_type']), 'status' => 'active'));
-                            $data['sample_type'] = $sampleTypeDb->lastInsertValue;
-                        }
-                    } else {
-                        $data['sample_type'] = NULL;
-                    }
-
-                    //check sample test reason
-                    if (!empty(trim($row['reason_for_vl_testing']))) {
-                        $data['reason_for_vl_testing'] =  $this->checkTestReason(trim($row['reason_for_vl_testing']));
-                    } else {
-                        $data['reason_for_vl_testing'] = NULL;
                     }
 
                     //check sample rejection reason
