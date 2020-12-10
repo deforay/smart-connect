@@ -66,6 +66,10 @@ class Module
                     $sampleService = $sm->getServiceLocator()->get('EidSampleService');
                     return new \Api\Controller\ReceiveEidDataController($sampleService);
                 },
+                'Api\Controller\ReceiveCovidData' => function ($sm) {
+                    $sampleService = $sm->getServiceLocator()->get('Covid19FormService');
+                    return new \Api\Controller\ReceiveCovidDataController($sampleService);
+                },
             ),
         );
     }
