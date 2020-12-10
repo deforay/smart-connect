@@ -1427,7 +1427,7 @@ class EidSampleService
     }
     //clinic details end
 
-    public function saveVLDataFromAPI($params)
+    public function saveEidDataFromAPI($params)
     {
         $common = new CommonService();
         $sampleDb = $this->sm->get('SampleTableWithoutCache');
