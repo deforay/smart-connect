@@ -58,9 +58,9 @@ class Module
                 'Api\Controller\ImportViral' => function () {
                     return new \Api\Controller\ImportViralLoadController();
                 },
-                'Api\Controller\ReceiveVLData' => function ($sm) {
+                'Api\Controller\ReceiveVlData' => function ($sm) {
                     $sampleService = $sm->getServiceLocator()->get('SampleService');
-                    return new \Api\Controller\ReceiveVLDataController($sampleService);
+                    return new \Api\Controller\ReceiveVlDataController($sampleService);
                 },
                 'Api\Controller\ReceiveEidData' => function ($sm) {
                     $sampleService = $sm->getServiceLocator()->get('EidSampleService');

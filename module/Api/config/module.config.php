@@ -120,7 +120,7 @@ return array(
                         'id'     => '[0-9]+',
                     ),
                     'defaults' => array(
-                        'controller' => 'Api\Controller\ReceiveVLData',
+                        'controller' => 'Api\Controller\ReceiveVlData',
                     ),
                 ),
             ),

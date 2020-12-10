@@ -24,7 +24,8 @@ class ReceiveVlDataController extends AbstractRestfulController
     }
     public function create($params)
     {
-        \Zend\Debug\Debug::dump("hi");die;
+        // print_r("Prasath");die;
+        // \Zend\Debug\Debug::dump("hi");die;
         $params = file_get_contents('php://input');
         $response = $this->sampleService->saveVLDataFromAPI($params);
         return new JsonModel($response);
