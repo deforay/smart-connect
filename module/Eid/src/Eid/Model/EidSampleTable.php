@@ -2332,14 +2332,14 @@ class EidSampleTable extends AbstractTableGateway
                                                                                 ELSE 0 END)"),
                     $this->translator->translate("No. of Devices online in last 7 days") => new Expression("SUM(CASE WHEN ((icm.poc_device = 'yes' AND DATE(sample_tested_datetime) > '".$lastSevenDay."')) THEN 1
                                                                                 ELSE 0 END)"),
-                    $this->translator->translate("Gender Missing") => new Expression("SUM(CASE 
-                                                                                    WHEN ((child_gender IS NULL OR child_gender ='' OR child_gender ='unreported' OR child_gender ='Unreported')) THEN 1
-                                                                                    ELSE 0
-                                                                                    END)"),
-                    $this->translator->translate("Age Missing") => new Expression("SUM(CASE 
-                                                                                WHEN ((child_age IS NULL OR child_age ='' OR child_age ='Unreported'  OR child_age ='unreported')) THEN 1
-                                                                                ELSE 0
-                                                                                END)")
+                    // $this->translator->translate("Gender Missing") => new Expression("SUM(CASE 
+                    //                                                                 WHEN ((child_gender IS NULL OR child_gender ='' OR child_gender ='unreported' OR child_gender ='Unreported')) THEN 1
+                    //                                                                 ELSE 0
+                    //                                                                 END)"),
+                    // $this->translator->translate("Age Missing") => new Expression("SUM(CASE 
+                    //                                                             WHEN ((child_age IS NULL OR child_age ='' OR child_age ='Unreported'  OR child_age ='unreported')) THEN 1
+                    //                                                             ELSE 0
+                    //                                                             END)")
                     // $this->translator->translate("Results Not Available (< 6 months)") => new Expression("SUM(CASE
                     //                                                                                                             WHEN ((eid.result is NULL OR eid.result ='') AND (sample_collection_date < DATE_SUB(NOW(), INTERVAL $samplesWaitingFromLastXMonths MONTH)) AND (reason_for_sample_rejection is NULL or reason_for_sample_rejection ='' or reason_for_sample_rejection = 0)) THEN 1
                     //                                                                                                             ELSE 0
