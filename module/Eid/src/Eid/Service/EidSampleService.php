@@ -47,6 +47,12 @@ class EidSampleService
         return $sampleDb->getTestFailedByTestingPlatform($params);
     }
 
+    public function getInstrumentWiseTest($params)
+    {
+        $sampleDb = $this->sm->get('EidSampleTable');
+        return $sampleDb->getInstrumentWiseTest($params);
+    }
+
     public function getMonthlySampleCount($params)
     {
         $sampleDb = $this->sm->get('EidSampleTable');

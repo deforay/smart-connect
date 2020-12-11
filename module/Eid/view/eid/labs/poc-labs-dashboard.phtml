@@ -424,6 +424,20 @@ $endDate = date('Y-m');
         </div>
     </div>
 </div>
+<div class="row">
+    <div class="col-md-6 col-sm-6">
+        <div class="portlet box blue">
+            <div class="portlet-title">
+                <div class="caption">
+                    <span class="caption-subject"><?php echo $this->translate('Instrument wise Test'); ?></span>
+                </div>
+            </div>
+            <div class="portlet-body" style="cursor:pointer; min-height:528px">
+                <div id="instrumentWiseTest"></div>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 <script src="<?php echo $this->basePath('assets/plugins/datepicker/bootstrap-datepicker.js') ?>"></script>
@@ -517,6 +531,28 @@ $endDate = date('Y-m');
             function(data) {
                 console.log(data);
                 $("#failedTestByMachine").html(data);
+
+
+            });
+    }
+
+    function getInstrumentWiseTest() {
+        var fromDate = formatDate($('#mrp-lowerDate').val());
+        var toDate = formatDate($('#mrp-upperDate').val());
+        var sampleType = ($("#sampleType").val() == null) ? '' : $("#sampleType").val();
+        var facilityId = ($("#labName").val() == null) ? '' : $("#labName").val().join(',');
+
+
+        return $.post("<?php echo $this->url('eid-labs', array('action' => 'get-instrument-wise-test')); ?>", {
+                fromDate: fromDate,
+                toDate: toDate,
+                sampleType: sampleType,
+                facilityId: facilityId,
+                flag : 'poc'
+            },
+            function(data) {
+                console.log(data);
+                $("#instrumentWiseTest").html(data);
 
 
             });
@@ -663,6 +699,7 @@ $endDate = date('Y-m');
         });
         getTestFailedByTestingPlatform();
         getMapBubble();
+        getInstrumentWiseTest();
     }
 
     function getMapBubble()

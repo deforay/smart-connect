@@ -124,6 +124,20 @@ class LabsController extends AbstractActionController
         }
     }
 
+    public function getInstrumentWiseTestAction()
+    {
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $result = $this->sampleService->getInstrumentWiseTest($params);
+            // $sampleType = $this->sampleService->getSampleType();
+            $viewModel = new ViewModel();
+            $viewModel->setVariables(array('result' => $result))
+                ->setTerminal(true);
+            return $viewModel;
+        }
+    }
+
     public function getLabTurnAroundTimeAction()
     {
         $request = $this->getRequest();
