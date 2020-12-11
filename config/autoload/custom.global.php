@@ -10,5 +10,6 @@ return array(
         'vlModule'      => true,
         'eidModule'     => true,
         'covid19Module' => true,
+        'pocDashboard'     => true,
     ),
 );

@@ -246,11 +246,13 @@ if (!isset($activeTab)) {
                                     <i class="fa fa-angle-right"></i> <span class="title"><?php echo $this->translate('Labs Dashboard'); ?></span>
                                 </a>
                             </li>
+                            <?php if(isset($activeModule['poc']) && $activeModule['poc']  ) { ?>
                             <li class="nav-item end <?php echo ($activeTab == 'eid-poc-labs') ? " active open" : ""; ?>">
                                 <a href="<?php echo $this->url('eid-labs', array('action' => 'poc-labs-dashboard')) ?>" class="nav-link ">
                                     <i class="fa fa-angle-right"></i> <span class="title"><?php echo $this->translate('POC Labs Dashboard'); ?></span>
                                 </a>
                             </li>
+                            <?php } ?>
                             <li class="nav-item end <?php echo ($activeTab == 'eid-clinics') ? " active open" : ""; ?>">
                                 <a href="<?php echo $this->url('eid-clinics', array('action' => 'dashboard')) ?>" class="nav-link ">
                                     <i class="fa fa-angle-right"></i> <span class="title"><?php echo $this->translate('Clinics Dashboard'); ?></span>

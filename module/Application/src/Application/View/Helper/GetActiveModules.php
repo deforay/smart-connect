@@ -26,7 +26,8 @@ class GetActiveModules extends AbstractHelper implements ServiceLocatorAwareInte
         $dashModules =  array(
             'vl' => $config['defaults']['vlModule'],
             'eid' => $config['defaults']['eidModule'],
-            'covid19' => $config['defaults']['covid19Module']
+            'covid19' => $config['defaults']['covid19Module'],
+            'poc' => $config['defaults']['pocDashboard']
         );
         return $dashModules;
     }
