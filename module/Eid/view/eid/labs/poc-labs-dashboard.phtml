@@ -754,7 +754,10 @@ $endDate = date('Y-m');
                     cursor: 'pointer',
                     events: {
                         click: function (event) {
-                            console.log(event)
+                            console.log(event.point.lat)
+                            lat = event.point.lat;
+                            lon = event.point.lon;
+                            window.open('/eid/labs/lat-lon-map?lat=' + lat + '&lon=' + lon, '_blank');
                         }
                     }
                 }

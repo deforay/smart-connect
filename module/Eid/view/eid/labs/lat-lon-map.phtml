@@ -92,6 +92,8 @@ $endDate = date('Y-m');
 
     function getSampleTested() {
         return $.post("<?php echo $this->url('eid-labs', array('action' => 'get-lat-lon-map')); ?>", {
+            lat : '<?php echo $lat; ?>',
+            lon : '<?php echo $lon; ?>'
             },
             function(data) {
                 $("#labPerformance").html(data);

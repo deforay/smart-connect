@@ -59,8 +59,22 @@ class LabsController extends AbstractActionController
 
     public function latLonMapAction()
     {
-        return new ViewModel(array(
-        ));
+        $lat =  $lon = '';
+        if ($this->params()->fromQuery('lat')) {
+			$lat = $this->params()->fromQuery('lat');
+		}
+		if ($this->params()->fromQuery('lon')) {
+			$lon = $this->params()->fromQuery('lon');
+        }
+        if($lat!='' && $lon!='')
+        {
+            return new ViewModel(array(
+                'lat' => $lat,
+                'lon' => $lon
+            ));
+        }
+        else
+            die;
     }
 
     public function statsAction()
