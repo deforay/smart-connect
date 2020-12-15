@@ -398,6 +398,22 @@ $endDate = date('Y-m');
     </div>
 </div>
 <div class="row">
+    <div class="col-md-12 col-sm-12">
+        <div class="portlet box blue">
+            <div class="portlet-title">
+                <div class="caption">
+                    <span class="caption-subject"><?php echo $this->translate('Sample Tested'); ?></span>
+                </div>
+            </div>
+            <div class="portlet-body" style="cursor:pointer;">
+                <div id="container" style="height: 500px; min-width: 310px; max-width: 800px; margin: 0 auto">
+                </div>
+            </div>
+        </div>
+    </div>
+    
+</div>
+<div class="row">
     <div class="col-md-6 col-sm-6">
         <div class="portlet box blue">
             <div class="portlet-title">
@@ -414,21 +430,6 @@ $endDate = date('Y-m');
         <div class="portlet box blue">
             <div class="portlet-title">
                 <div class="caption">
-                    <span class="caption-subject"><?php echo $this->translate('Sample Tested'); ?></span>
-                </div>
-            </div>
-            <div class="portlet-body" style="cursor:pointer;">
-                <div id="container" style="height: 500px; min-width: 310px; max-width: 800px; margin: 0 auto">
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-<div class="row">
-    <div class="col-md-6 col-sm-6">
-        <div class="portlet box blue">
-            <div class="portlet-title">
-                <div class="caption">
                     <span class="caption-subject"><?php echo $this->translate('Instrument wise Test Count'); ?></span>
                 </div>
             </div>
@@ -438,6 +439,7 @@ $endDate = date('Y-m');
         </div>
     </div>
 </div>
+
 
 
 <script src="<?php echo $this->basePath('assets/plugins/datepicker/bootstrap-datepicker.js') ?>"></script>
