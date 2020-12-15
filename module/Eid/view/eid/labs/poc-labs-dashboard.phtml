@@ -749,7 +749,16 @@ $endDate = date('Y-m');
                 color: 'gray'
             }
             },
-
+            plotOptions: {
+                series: {
+                    cursor: 'pointer',
+                    events: {
+                        click: function (event) {
+                            console.log(event)
+                        }
+                    }
+                }
+            },
             series: [{
             name: 'Basemap',
             mapData: map,

@@ -7942,4 +7942,23 @@ class SampleTable extends AbstractTableGateway
         
         return $lResult;
     }
+
+    public function fetchLatLonMap($params)
+    {
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $lResult = array();
+        $common = new CommonService($this->sm);
+        $lQuery = $sql->select()->from(array('eid' => 'dash_eid_form'))->columns(array('child_name','mother_name','caretaker_phone_number','result'))
+                    ->join(array('f' => 'import_config_machines'), 'f.config_machine_id=eid.import_machine_name', array('lat'=>'latitude','lon'=>'longitude'))
+                    ->where("(eid.sample_tested_datetime is not null  AND f.poc_device ='yes')")
+                    ->join(array('lab' => 'facility_details'), 'lab.facility_id=eid.lab_id', array('lab_name' => 'facility_name'))
+                    // ->group(array("f.latitude","f.longitude"))
+                    ;
+        $lQueryStr = $sql->buildSqlString($lQuery);
+        // print_r($lQueryStr);die;
+        $lResult = $dbAdapter->query($lQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+        
+        return $lResult;
+    }
 }

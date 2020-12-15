@@ -57,6 +57,12 @@ class LabsController extends AbstractActionController
         ));
     }
 
+    public function latLonMapAction()
+    {
+        return new ViewModel(array(
+        ));
+    }
+
     public function statsAction()
     {
         $request = $this->getRequest();
@@ -156,6 +162,19 @@ class LabsController extends AbstractActionController
         if ($request->isPost()) {
             $params = $request->getPost();
             $result = $this->sampleService->fetchLabPerformance($params);
+            $viewModel = new ViewModel();
+            $viewModel->setVariables(array('result' => $result))
+                ->setTerminal(true);
+            return $viewModel;
+        }
+    }
+
+    public function getLatLonMapAction()
+    {
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $result = $this->sampleService->fetchLatLonMap($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('result' => $result))
                 ->setTerminal(true);
