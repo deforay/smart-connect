@@ -2,9 +2,9 @@
     <thead>
         <tr>
             <th><?php echo $this->translate('Lab Name'); ?></th>
-            <th><?php echo $this->translate('Child Name'); ?></th>
-            <th><?php echo $this->translate('Mother Name'); ?></th>
-            <th><?php echo $this->translate('Care Taker Phone Number'); ?></th>
+            <th><?php echo $this->translate('Facility Email'); ?></th>
+            <th><?php echo $this->translate('Contact Person'); ?></th>
+            <th><?php echo $this->translate('Mobile Number'); ?></th>
             <th><?php echo $this->translate('Status'); ?></th>
         </tr>
     </thead>
@@ -12,9 +12,9 @@
         <?php foreach ($result as $row) { ?>
             <tr>
                 <td><?= $row['lab_name']; ?></td>
-                <td class="center"><?= $row['child_name']; ?></td>
-                <td class="center"><?= $row['mother_name']; ?></td>
-                <td class="center"><?= $row['caretaker_phone_number']; ?></td>
+                <td class="center"><?= $row['facility_emails']; ?></td>
+                <td class="center"><?= $row['contact_person']; ?></td>
+                <td class="center"><?= $row['facility_mobile_numbers']; ?></td>
                 <td class="center"><?= $row['result']; ?></td>
             </tr>
         <?php } ?>
