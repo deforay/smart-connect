@@ -1,26 +1,45 @@
-<table class="table table-striped table-bordered table-hover order-column" id="labPerformanceTable">
-    <thead>
-        <tr>
-            <th><?php echo $this->translate('Lab Name'); ?></th>
-            <th><?php echo $this->translate('Facility Email'); ?></th>
-            <th><?php echo $this->translate('Contact Person'); ?></th>
-            <th><?php echo $this->translate('Mobile Number'); ?></th>
-            <th><?php echo $this->translate('Status'); ?></th>
-        </tr>
-    </thead>
-    <tbody>
-        <?php foreach ($result as $row) { ?>
-            <tr>
-                <td><?= $row['lab_name']; ?></td>
-                <td class="center"><?= $row['facility_emails']; ?></td>
-                <td class="center"><?= $row['contact_person']; ?></td>
-                <td class="center"><?= $row['facility_mobile_numbers']; ?></td>
-                <td class="center"><?= $row['result']; ?></td>
-            </tr>
-        <?php } ?>
-    </tbody>
 
-</table>
+<div class="table-responsive">
+    <table class="table table-striped table-bordered table-hover order-column" id="labPerformanceTable">
+        <thead>
+            <tr>
+                <th><?php echo $this->translate('Facility Name'); ?></th>
+                <th><?php echo $this->translate('Facility Code'); ?></th>
+                <th><?php echo $this->translate('District/County'); ?></th>
+                <th><?php echo $this->translate('Total Samples Registered'); ?></th>
+                <th><?php echo $this->translate('Rejected Samples'); ?></th>
+                <th><?php echo $this->translate('Total Tests'); ?></th>
+                <th><?php echo $this->translate('Initial PCR'); ?></th>
+                <th><?php echo $this->translate('Initial PCR Positives'); ?></th>
+                <th><?php echo $this->translate('Second/Third PCR'); ?></th>
+                <th><?php echo $this->translate('Second/Third PCR Positives'); ?></th>
+                <th><?php echo $this->translate('Tests with Valid Outcomes'); ?></th>
+                <th><?php echo $this->translate('Contact Person'); ?></th>
+                <th><?php echo $this->translate('Mobile Number'); ?></th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach ($result as $row) { ?>
+                <tr>
+                    <td><?= $row['lab_name']; ?></td>
+                    <td><?= $row['lab_code']; ?></td>
+                    <td><?= $row['location_name']; ?></td>
+                    <td class="center"><?= $row['total']; ?></td>
+                    <td class="center"><?= $row['rejected']; ?></td>
+                    <td class="center"><?= $row['total_valid_tests']; ?></td>
+                    <td class="center"><?= $row['initial_pcr']; ?></td>
+                    <td class="center"><?= $row['initial_pcr_positives']; ?></td>
+                    <td class="center"><?= $row['second_third_pcr']; ?></td>
+                    <td class="center"><?= $row['second_third_pcr_positives']; ?></td>
+                    <td class="center"><?= $row['valid_outcomes']; ?></td>
+                    <td><?= $row['contact_person']; ?></td>
+                    <td><?= $row['facility_mobile_numbers']; ?></td>
+                </tr>
+            <?php } ?>
+        </tbody>
+
+    </table>
+</div>
 
 <script>
     $(function() {
