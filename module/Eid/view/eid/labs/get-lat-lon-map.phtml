@@ -1,5 +1,5 @@
 
-<div class="table-responsive">
+<!-- <div class="table-responsive"> -->
     <table class="table table-striped table-bordered table-hover order-column" id="labPerformanceTable">
         <thead>
             <tr>
@@ -39,10 +39,20 @@
         </tbody>
 
     </table>
-</div>
+<!-- </div> -->
 
 <script>
     $(function() {
-        $("#labPerformanceTable").DataTable();
+        $("#labPerformanceTable").DataTable({
+                    dom: 'Bfrtip',
+                    buttons: [{
+                        extend: 'excelHtml5',
+                        text: 'Export To Excel',
+                        title: 'Samples-Tested-POC-Dashboard',
+                        extension: '.xlsx'
+                    }],
+                    "scrollX": true
+                });
+        // $("#labPerformanceTable").DataTable();
     });
 </script>
