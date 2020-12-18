@@ -36,8 +36,8 @@
         <tr>
             <td>Failed Samples: </td>
             <td><?php echo $result[0]['failed']; ?> </td>
-            <td> </td>
-            <td></td>
+            <td>Rejected Samples </td>
+            <td><?php echo $result[0]['rej_sample']; ?> </td>
         </tr>
     </tbody>    
 </table>
@@ -107,6 +107,10 @@
             name: 'Negative',
             y: <?php echo $result[0]["negative"]; ?>,
             color: "green"
+            }, {
+            name: 'Failed',
+            y: <?php echo $result[0]["failed"]; ?>,
+            color: "grey"
             }]
         }]
     });

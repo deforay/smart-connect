@@ -8016,6 +8016,7 @@ class SampleTable extends AbstractTableGateway
                 "above_2" => new Expression("SUM(CASE WHEN ((eid.child_age >2)) THEN 1 ELSE 0 END)"),
                 "above_2_positives" => new Expression("SUM(CASE WHEN ((eid.result like 'positive' OR eid.result like 'Positive' AND eid.child_age >2)) THEN 1 ELSE 0 END)"),
                 "failed" => new Expression("SUM(CASE WHEN ((eid.result like 'failed' OR eid.result like 'Failed' )) THEN 1 ELSE 0 END)"),
+                "rej_sample" => new Expression("SUM(CASE WHEN ((eid.is_sample_rejected = 'yes' )) THEN 1 ELSE 0 END)"),
                 "valid_outcomes" => new Expression("SUM(CASE WHEN ((eid.result is not null  AND eid.result not like '' )) THEN 1 ELSE 0 END)"),
             )
         )
