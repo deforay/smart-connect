@@ -73,6 +73,20 @@ $endDate = date('Y-m');
         </div>
     </div>
 </div>
+<div class="row">
+    <div class="col-md-6 col-sm-6 col-lg-6">
+        <div class="portlet box blue">
+            <div class="portlet-title">
+                <div class="caption">
+                    <span class="caption-subject"><?php echo $this->translate('Summary Outcomes'); ?></span>
+                </div>
+            </div>
+            <div class="portlet-body">
+                <div id="samTestPosNeg"></div>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 
@@ -100,8 +114,19 @@ $endDate = date('Y-m');
             });
     }
 
+    function getSampleTestedPositiveNegative() {
+        return $.post("<?php echo $this->url('eid-labs', array('action' => 'get-lat-lon-map-pos-neg')); ?>", {
+            lat : '<?php echo $lat; ?>',
+            lon : '<?php echo $lon; ?>'
+            },
+            function(data) {
+                $("#samTestPosNeg").html(data);
+            });
+    }
+
     $(function() {
         getSampleTested();
+        getSampleTestedPositiveNegative();
     });
 
     function resetEverything() {

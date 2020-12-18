@@ -7972,12 +7972,60 @@ class SampleTable extends AbstractTableGateway
             )
         )
         ->join(array('if' => 'import_config_machines'), 'if.config_machine_id=eid.import_machine_name', array('lat'=>'latitude','lon'=>'longitude'))
-        ->join(array('f' => 'facility_details'), 'f.facility_id=eid.facility_id', array('total_facilities' => new Expression("COUNT(f.facility_id)")))
-        ->join(array('loc' => 'location_details'), 'loc.location_id=f.facility_district', array('location_name' => 'location_name'))
+        // ->join(array('f' => 'facility_details'), 'f.facility_id=eid.facility_id', array('total_facilities' => new Expression("COUNT(f.facility_id)")))
         ->join(array('lab' => 'facility_details'), 'lab.facility_id=eid.lab_id', array('lab_name' => 'facility_name','lab_code' => 'facility_code','contact_person' => 'contact_person' ,'facility_emails','facility_mobile_numbers'))
+        ->join(array('loc' => 'location_details'), 'loc.location_id=lab.facility_district', array('location_name' => 'location_name'))
         ->where("(eid.sample_tested_datetime is not null  AND if.poc_device ='yes' AND if.latitude = '".$params['lat']."' AND if.longitude = '".$params['lon']."')")
 
         ->group('eid.lab_id')
+        ->order('total DESC');
+        $lQueryStr = $sql->buildSqlString($lQuery);
+        // print_r($lQueryStr);die;
+        $lResult = $dbAdapter->query($lQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+        
+        return $lResult;
+    }
+
+    public function fetchLatLonMapPosNeg($params)
+    {
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $lResult = array();
+        $common = new CommonService($this->sm);
+        // $lQuery = $sql->select()->from(array('eid' => 'dash_eid_form'))->columns(array('child_name','mother_name','caretaker_phone_number','result'))
+        //             ->join(array('f' => 'import_config_machines'), 'f.config_machine_id=eid.import_machine_name', array('lat'=>'latitude','lon'=>'longitude'))
+        //             ->where("(eid.sample_tested_datetime is not null  AND f.poc_device ='yes' AND f.latitude = '".$params['lat']."' AND f.longitude = '".$params['lon']."')")
+        //             ->join(array('lab' => 'facility_details'), 'lab.facility_id=eid.lab_id', array('lab_name' => 'facility_name','contact_person' => 'contact_person' ,'facility_emails','facility_mobile_numbers'))
+                    // ->group(array("f.latitude","f.longitude"))
+                    ;
+        $lQuery = $sql->select()->from(array('eid' => 'dash_eid_form'))
+
+        ->columns(
+            array(
+                "total" => new Expression("COUNT(*)"),
+                "initial_pcr" => new Expression("SUM(CASE WHEN (pcr_test_performed_before like 'no' OR pcr_test_performed_before is NULL OR pcr_test_performed_before like '') THEN 1 ELSE 0 END)"),
+                "initial_pcr_positives" => new Expression("SUM(CASE WHEN ((eid.result like 'positive' OR eid.result like 'Positive' ) AND (pcr_test_performed_before like 'no' OR pcr_test_performed_before is NULL OR pcr_test_performed_before like '')) THEN 1 ELSE 0 END)"),
+                "second_third_pcr" => new Expression("SUM(CASE WHEN (pcr_test_performed_before is not null AND pcr_test_performed_before like 'yes') THEN 1 ELSE 0 END)"),
+                "second_third_pcr_positives" => new Expression("SUM(CASE WHEN ((eid.result like 'positive' OR eid.result like 'Positive' ) AND (pcr_test_performed_before is not null AND pcr_test_performed_before like 'yes')) THEN 1 ELSE 0 END)"),
+                "rejected" => new Expression("SUM(CASE WHEN ((eid.is_sample_rejected like 'yes')) THEN 1 ELSE 0 END)"),
+                "total_valid_tests" => new Expression("SUM(CASE WHEN ((eid.result like 'negative' OR eid.result like 'Negative') OR (eid.result like 'positive' OR eid.result like 'Positive' )) THEN 1 ELSE 0 END)"),
+                "negative" => new Expression("SUM(CASE WHEN ((eid.result like 'negative' OR eid.result like 'Negative')) THEN 1 ELSE 0 END)"),
+                "positive" => new Expression("SUM(CASE WHEN ((eid.result like 'positive' OR eid.result like 'Positive' )) THEN 1 ELSE 0 END)"),
+                "infant_2" => new Expression("SUM(CASE WHEN ((eid.child_age <=2)) THEN 1 ELSE 0 END)"),
+                "infant_2_positives" => new Expression("SUM(CASE WHEN ((eid.result like 'positive' OR eid.result like 'Positive' AND eid.child_age <=2)) THEN 1 ELSE 0 END)"),
+                "above_2" => new Expression("SUM(CASE WHEN ((eid.child_age >2)) THEN 1 ELSE 0 END)"),
+                "above_2_positives" => new Expression("SUM(CASE WHEN ((eid.result like 'positive' OR eid.result like 'Positive' AND eid.child_age >2)) THEN 1 ELSE 0 END)"),
+                "failed" => new Expression("SUM(CASE WHEN ((eid.result like 'failed' OR eid.result like 'Failed' )) THEN 1 ELSE 0 END)"),
+                "valid_outcomes" => new Expression("SUM(CASE WHEN ((eid.result is not null  AND eid.result not like '' )) THEN 1 ELSE 0 END)"),
+            )
+        )
+        ->join(array('if' => 'import_config_machines'), 'if.config_machine_id=eid.import_machine_name', array('lat'=>'latitude','lon'=>'longitude'))
+        // ->join(array('f' => 'facility_details'), 'f.facility_id=eid.facility_id', array('total_facilities' => new Expression("COUNT(f.facility_id)")))
+        // ->join(array('loc' => 'location_details'), 'loc.location_id=f.facility_district', array('location_name' => 'location_name'))
+        // ->join(array('lab' => 'facility_details'), 'lab.facility_id=eid.lab_id', array('lab_name' => 'facility_name','lab_code' => 'facility_code','contact_person' => 'contact_person' ,'facility_emails','facility_mobile_numbers'))
+        ->where("(eid.sample_tested_datetime is not null  AND if.poc_device ='yes' AND if.latitude = '".$params['lat']."' AND if.longitude = '".$params['lon']."')")
+
+        // ->group('eid.lab_id')
         ->order('total DESC');
         $lQueryStr = $sql->buildSqlString($lQuery);
         // print_r($lQueryStr);die;

@@ -1,0 +1,114 @@
+<div id="posNeg" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+<table class="table table-striped table-bordered table-hover order-column" id="pieData">
+    <!-- <thead>
+        <tr>
+            <th>
+            <th>
+            <th>
+            <th>
+        </tr>
+    </thead> -->
+    <tbody>
+        <tr>
+            <td>Initial PCR: </td>
+            <td><?php echo $result[0]['initial_pcr']; ?> </td>
+            <td>Positive (+): </td>
+            <td><?php echo $result[0]['initial_pcr_positives']; ?> </td>
+        </tr>
+        <tr>
+            <td>2nd/3rd PCR: </td>
+            <td><?php echo $result[0]['second_third_pcr']; ?> </td>
+            <td>Positive (+): </td>
+            <td><?php echo $result[0]['second_third_pcr_positives']; ?> </td>
+        </tr>
+        <tr>
+            <td> Infants <= 2Y: </td>
+            <td><?php echo $result[0]['infant_2']; ?> </td>
+            <td>	Infants <= 2Y Positive:	 </td>
+            <td><?php echo $result[0]['infant_2_positives']; ?> </td>
+        </tr>
+        <tr>
+            <td> Above 2 years Tested: </td>
+            <td><?php echo $result[0]['above_2']; ?> </td>
+            <td>Positive (+): </td>
+            <td><?php echo $result[0]['above_2_positives']; ?> </td>
+        </tr>
+        <tr>
+            <td>Failed Samples: </td>
+            <td><?php echo $result[0]['failed']; ?> </td>
+            <td> </td>
+            <td></td>
+        </tr>
+    </tbody>    
+</table>
+<script>
+    $(function () {
+        // $("#pieData").DataTable();
+        $('#posNeg').highcharts({
+        chart: {
+            plotBackgroundColor: null,
+            plotBorderWidth: null,
+            plotShadow: false,
+            type: 'pie'
+        },
+        title: {
+            text: ''
+        },
+        exporting:{
+            chartOptions:{
+                subtitle: {
+                    text:'<?php echo $this->translate('Summary outcomes'); ?>',
+                }
+            }
+        },
+        credits: {
+            enabled: false
+       },
+        tooltip: {
+            pointFormat: '{series.name}: <b>{point.percentage:.1f}% ({point.number})</b>'
+        },
+        legend: {
+            itemMarginBottom: 5,
+            labelFormatter: function () {
+                return '<div ><span style="float:left;font-size:10px;">' + this.name + ' -  </span><span style="font-size:10px; ">'+ this.percentage.toFixed(1)+'% ('+Highcharts.numberFormat(this.y, 0)+')</span></div>';
+            }
+        },
+        plotOptions: {
+            pie: {
+                allowPointSelect: true,
+                cursor: 'pointer',
+                dataLabels: {
+                    distance:-30,
+                    style: {
+                        color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'white'
+                    }
+                },
+                showInLegend: true
+            }
+        },
+        series: [{
+            name: '<?php echo $this->translate('Samples'); ?>',
+            // point: {
+            //   events: {
+            //       click: function(e) {
+            //          doSamplesTestReasonRedirect(this.name);
+            //          e.preventDefault();
+            //       }
+            //   }
+            // },
+            colorByPoint: true,
+            data: [{
+            name: 'Positive',
+            y: <?php echo $result[0]["positive"]; ?>,
+            sliced: true,
+            selected: true,
+            color: "red"
+            }, {
+            name: 'Negative',
+            y: <?php echo $result[0]["negative"]; ?>,
+            color: "green"
+            }]
+        }]
+    });
+    });
+</script>

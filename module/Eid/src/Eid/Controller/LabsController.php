@@ -196,6 +196,20 @@ class LabsController extends AbstractActionController
         }
     }
 
+    public function getLatLonMapPosNegAction()
+    {
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $result = $this->sampleService->fetchLatLonMapPosNeg($params);
+            // $result = array();
+            $viewModel = new ViewModel();
+            $viewModel->setVariables(array('result' => $result))
+                ->setTerminal(true);
+            return $viewModel;
+        }
+    }
+
     public function timeAction()
     {
         $params = array();

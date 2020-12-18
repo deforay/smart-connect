@@ -84,6 +84,12 @@ class EidSampleService
         return $sampleDb->fetchLatLonMap($params);
     }
 
+    public function fetchLatLonMapPosNeg($params)
+    {
+        $sampleDb = $this->sm->get('SampleTableWithoutCache');
+        return $sampleDb->fetchLatLonMapPosNeg($params);
+    }
+
     // END OF LABS DASHBOARD
 
     public function saveFileFromVlsmAPIV2()
