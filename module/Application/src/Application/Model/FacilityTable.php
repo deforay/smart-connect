@@ -370,7 +370,7 @@ class FacilityTable extends AbstractTableGateway
             $fQuery = $fQuery->where('f.facility_id IN ("' . implode('", "', array_values(array_filter($mappedFacilities))) . '")');
         }
         $fQueryStr = $sql->buildSqlString($fQuery);
-        //error_log($fQueryStr);
+        // print_r($fQueryStr);die;
         $facilityResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         return $facilityResult;
     }

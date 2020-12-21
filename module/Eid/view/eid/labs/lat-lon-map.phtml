@@ -58,7 +58,23 @@ $endDate = date('Y-m');
 
 
 <!-- <hr style="background: #000 !important;border-color:#ccc;"> -->
+<div class="row" style="padding-top:5px;padding-bottom:20px;">
+    <div class="col-lg-1" id="labHeight">
+        <p>Lab Name </p>
+    </div>
+        <div class="col-lg-4" id="labHeight" style="margin-top: 12px;">
+            <select name="labName[]" id="labName" class="form-control" onchange="labChange();"  title="<?php echo $this->translate('Please select one or more labs. Leave blank for All'); ?>">
+                 <?php
+                        foreach ($labName as $lab1) {
+                        ?>
+                    <option data-name="<?php echo $lab1['facility_name']; ?>"  value="<?php echo $lab1['facility_id']; ?>" <?php  if($lab1['facility_id']==$lab){ echo 'selected';} ?>><?php echo $lab1['facility_code'] . " - " . $lab1['facility_name']; ?></option>
+                <?php
+                        }
+                ?> 
 
+            </select>
+        </div>
+</div>
 <div class="row">
     <div class="col-md-12 col-sm-12 col-lg-12">
         <div class="portlet box blue">
@@ -105,9 +121,10 @@ $endDate = date('Y-m');
    
 
     function getSampleTested() {
+        var lab = $("#labName").val();
         return $.post("<?php echo $this->url('eid-labs', array('action' => 'get-lat-lon-map')); ?>", {
             daterange : '<?php echo $daterange; ?>',
-            lab : '<?php echo $lab; ?>'
+            lab : lab
             },
             function(data) {
                 $("#labPerformance").html(data);
@@ -115,13 +132,19 @@ $endDate = date('Y-m');
     }
 
     function getSampleTestedPositiveNegative() {
+        var lab = $("#labName").val();
         return $.post("<?php echo $this->url('eid-labs', array('action' => 'get-lat-lon-map-pos-neg')); ?>", {
             daterange : '<?php echo $daterange; ?>',
-            lab : '<?php echo $lab; ?>'
+            lab : lab
             },
             function(data) {
                 $("#samTestPosNeg").html(data);
             });
+    }
+
+    function labChange(){
+        getSampleTested();
+        getSampleTestedPositiveNegative();
     }
 
     $(function() {

@@ -66,11 +66,14 @@ class LabsController extends AbstractActionController
 		if ($this->params()->fromQuery('lab')) {
 			$lab = $this->params()->fromQuery('lab');
         }
+        $labName = $this->sampleService->getAllLabName();
+        // print_r($lab);die;
         if($lab!='')
         {
             return new ViewModel(array(
                 'daterange' => $daterange,
-                'lab' => $lab
+                'lab' => $lab,
+                'labName' => $labName
             ));
         }
         else
