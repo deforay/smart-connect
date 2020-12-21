@@ -74,6 +74,14 @@ $endDate = date('Y-m');
 
             </select>
         </div>
+        <div class='col-lg-5' style="margin-top: 12px;">
+            <div id="daterange-container" class="btn btn-sm form-control" data-container="body" data-placement="bottom" data-original-title="Change date range" style="text-align:center;width:50%;">
+                <i class="icon-calendar"></i>&nbsp;
+                <span class="thin uppercase hidden-xs"></span>&nbsp;
+                <i class="fa fa-angle-down"></i>
+                <input type="hidden" name="daterange" id="daterange" />
+            </div>
+        </div>
 </div>
 <div class="row">
     <div class="col-md-12 col-sm-12 col-lg-12">
@@ -108,7 +116,7 @@ $endDate = date('Y-m');
 
 <!-- <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAFpbfAKFJZ8Ps7yAGIDZtD4EeBlsb_ANA"></script> -->
 <script src="https://cdn.datatables.net/1.10.10/js/jquery.dataTables.min.js"></script>
-
+<script src="<?php echo $this->basePath('assets/plugins/datepicker/bootstrap-datepicker.js') ?>"></script>
 <script src="https://cdn.datatables.net/buttons/1.1.0/js/dataTables.buttons.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/1.1.0/js/buttons.flash.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/1.1.0/js/buttons.print.min.js"></script>
@@ -122,8 +130,9 @@ $endDate = date('Y-m');
 
     function getSampleTested() {
         var lab = $("#labName").val();
+        var daterange = $('#daterange').val();
         return $.post("<?php echo $this->url('eid-labs', array('action' => 'get-lat-lon-map')); ?>", {
-            daterange : '<?php echo $daterange; ?>',
+            daterange : daterange,
             lab : lab
             },
             function(data) {
@@ -133,8 +142,9 @@ $endDate = date('Y-m');
 
     function getSampleTestedPositiveNegative() {
         var lab = $("#labName").val();
+        var daterange = $('#daterange').val();
         return $.post("<?php echo $this->url('eid-labs', array('action' => 'get-lat-lon-map-pos-neg')); ?>", {
-            daterange : '<?php echo $daterange; ?>',
+            daterange : daterange,
             lab : lab
             },
             function(data) {
@@ -148,6 +158,45 @@ $endDate = date('Y-m');
     }
 
     $(function() {
+        var daterange =  '<?php echo str_replace(array('%20',' '),array('',''),$daterange); ?>'
+        if(daterange)
+        {
+            var date = daterange.split("to");
+            var start = date[0];
+            var end = date[1];
+            daterange = start+' to '+end
+            var start = moment().subtract(12, 'months');
+            var end = moment();
+            console.log(start);
+
+            function cb(start, end) {
+                $('#daterange-container span').html(start.format('MMM D, YYYY') + ' to ' + end.format('MMM D, YYYY'));
+                $('#daterange').val(start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
+            }
+            $('#daterange-container').daterangepicker({
+                format: 'DD-MMM-YYYY',
+                separator: ' to ',
+                startDate: start,
+                endDate: end,
+                <?php if (isset($logincontainer->eidSampleTable) && $logincontainer->eidSampleTable == "dash_eid_form_current") { ?>
+                    minDate: moment().subtract(12, 'months'),
+                <?php } ?>
+                maxDate: moment(),
+                ranges: {
+                    'Today': [moment(), moment()],
+                    'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                    'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                    'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+                    'This Month': [moment().startOf('month'), moment().endOf('month')],
+                    'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+                }
+            }, cb);
+            cb(start, end);
+            $('#dashboard-range').show();
+            $('input[name="daterange"]').val(daterange);
+        }
+        else
+            $('#daterange-container span').html('<?php echo $this->translate('Choose Date Range'); ?>');
         getSampleTested();
         getSampleTestedPositiveNegative();
     });
