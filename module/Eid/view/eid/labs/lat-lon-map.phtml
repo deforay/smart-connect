@@ -79,8 +79,10 @@ $endDate = date('Y-m');
                 <i class="icon-calendar"></i>&nbsp;
                 <span class="thin uppercase hidden-xs"></span>&nbsp;
                 <i class="fa fa-angle-down"></i>
-                <input type="hidden" name="daterange" id="daterange" />
+                <input type="hidden" name="daterange" id="daterange" onchange="labChange();" />
             </div>
+            &nbsp;&nbsp;
+            <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="labChange();"><?php echo $this->translate('Search'); ?></a>&nbsp;&nbsp;
         </div>
 </div>
 <div class="row">
