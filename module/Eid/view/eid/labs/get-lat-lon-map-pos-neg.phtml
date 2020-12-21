@@ -80,7 +80,7 @@
                 dataLabels: {
                     distance:-30,
                     style: {
-                        color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'white'
+                        // color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'white'
                     }
                 },
                 showInLegend: true
@@ -104,13 +104,13 @@
             selected: true,
             color: "red"
             }, {
-            name: 'Negative',
-            y: <?php echo $result[0]["negative"]; ?>,
-            color: "green"
-            }, {
             name: 'Failed',
             y: <?php echo $result[0]["failed"]; ?>,
-            color: "grey"
+            // color: "black"
+            }, {
+            name: 'Negative',
+            y: <?php echo $result[0]["negative"]; ?>,
+            // color: "green"
             }]
         }]
     });

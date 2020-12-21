@@ -7932,7 +7932,7 @@ class SampleTable extends AbstractTableGateway
         $sql = new Sql($dbAdapter);
         $lResult = array();
         $common = new CommonService($this->sm);
-        $lQuery = $sql->select()->from(array('eid' => 'dash_eid_form'))->columns(array('total' => new Expression('COUNT(*)')))
+        $lQuery = $sql->select()->from(array('eid' => 'dash_eid_form'))->columns(array('total' => new Expression('COUNT(*)'), 'lab_id'))
                     ->join(array('f' => 'import_config_machines'), 'f.config_machine_id=eid.import_machine_name', array('lat'=>'latitude','lon'=>'longitude'))
                     ->where("(eid.sample_tested_datetime is not null  AND f.poc_device ='yes')")
                     ->group(array("f.latitude","f.longitude"));
@@ -7954,7 +7954,18 @@ class SampleTable extends AbstractTableGateway
         //             ->where("(eid.sample_tested_datetime is not null  AND f.poc_device ='yes' AND f.latitude = '".$params['lat']."' AND f.longitude = '".$params['lon']."')")
         //             ->join(array('lab' => 'facility_details'), 'lab.facility_id=eid.lab_id', array('lab_name' => 'facility_name','contact_person' => 'contact_person' ,'facility_emails','facility_mobile_numbers'))
                     // ->group(array("f.latitude","f.longitude"))
-                    ;
+                    // ;
+        if (trim($params['daterange']) != '') {
+            $splitDate = explode('to', $params['daterange']);
+        } else {
+            $timestamp = time();
+            $qDates = array();
+            for ($i = 0; $i < 28; $i++) {
+                $qDates[] = "'" . date('Y-m-d', $timestamp) . "'";
+                $timestamp -= 24 * 3600;
+            }
+            $qDates = implode(",", $qDates);
+        }
         $lQuery = $sql->select()->from(array('eid' => 'dash_eid_form'))
 
         ->columns(
@@ -7975,10 +7986,21 @@ class SampleTable extends AbstractTableGateway
         // ->join(array('f' => 'facility_details'), 'f.facility_id=eid.facility_id', array('total_facilities' => new Expression("COUNT(f.facility_id)")))
         ->join(array('lab' => 'facility_details'), 'lab.facility_id=eid.lab_id', array('lab_name' => 'facility_name','lab_code' => 'facility_code','contact_person' => 'contact_person' ,'facility_emails','facility_mobile_numbers'))
         ->join(array('loc' => 'location_details'), 'loc.location_id=lab.facility_district', array('location_name' => 'location_name'))
-        ->where("(eid.sample_tested_datetime is not null  AND if.poc_device ='yes' AND if.latitude = '".$params['lat']."' AND if.longitude = '".$params['lon']."')")
+        ->where("(eid.sample_tested_datetime is not null  AND if.poc_device ='yes')")
 
         ->group('eid.lab_id')
         ->order('total DESC');
+
+        if (trim($params['daterange']) != '') {
+            if (trim($splitDate[0]) != '' && trim($splitDate[1]) != '') {
+                $lQuery = $lQuery->where(array("DATE(eid.sample_collection_date) <='$splitDate[1]'", "DATE(eid.sample_collection_date) >='$splitDate[0]'"));
+            }
+        } else {
+            $lQuery = $lQuery->where("DATE(sample_collection_date) IN ($qDates)");
+        }
+        if (trim($params['lab']) != '') {
+            $lQuery = $lQuery->where("eid.lab_id = '".$params['lab']."'");
+        }
         $lQueryStr = $sql->buildSqlString($lQuery);
         // print_r($lQueryStr);die;
         $lResult = $dbAdapter->query($lQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -7997,7 +8019,18 @@ class SampleTable extends AbstractTableGateway
         //             ->where("(eid.sample_tested_datetime is not null  AND f.poc_device ='yes' AND f.latitude = '".$params['lat']."' AND f.longitude = '".$params['lon']."')")
         //             ->join(array('lab' => 'facility_details'), 'lab.facility_id=eid.lab_id', array('lab_name' => 'facility_name','contact_person' => 'contact_person' ,'facility_emails','facility_mobile_numbers'))
                     // ->group(array("f.latitude","f.longitude"))
-                    ;
+                    // ;
+        if (trim($params['daterange']) != '') {
+            $splitDate = explode('to', $params['daterange']);
+        } else {
+            $timestamp = time();
+            $qDates = array();
+            for ($i = 0; $i < 28; $i++) {
+                $qDates[] = "'" . date('Y-m-d', $timestamp) . "'";
+                $timestamp -= 24 * 3600;
+            }
+            $qDates = implode(",", $qDates);
+        }
         $lQuery = $sql->select()->from(array('eid' => 'dash_eid_form'))
 
         ->columns(
@@ -8024,10 +8057,20 @@ class SampleTable extends AbstractTableGateway
         // ->join(array('f' => 'facility_details'), 'f.facility_id=eid.facility_id', array('total_facilities' => new Expression("COUNT(f.facility_id)")))
         // ->join(array('loc' => 'location_details'), 'loc.location_id=f.facility_district', array('location_name' => 'location_name'))
         // ->join(array('lab' => 'facility_details'), 'lab.facility_id=eid.lab_id', array('lab_name' => 'facility_name','lab_code' => 'facility_code','contact_person' => 'contact_person' ,'facility_emails','facility_mobile_numbers'))
-        ->where("(eid.sample_tested_datetime is not null  AND if.poc_device ='yes' AND if.latitude = '".$params['lat']."' AND if.longitude = '".$params['lon']."')")
+        ->where("(eid.sample_tested_datetime is not null  AND if.poc_device ='yes')")
 
         // ->group('eid.lab_id')
         ->order('total DESC');
+        if (trim($params['daterange']) != '') {
+            if (trim($splitDate[0]) != '' && trim($splitDate[1]) != '') {
+                $lQuery = $lQuery->where(array("DATE(eid.sample_collection_date) <='$splitDate[1]'", "DATE(eid.sample_collection_date) >='$splitDate[0]'"));
+            }
+        } else {
+            $lQuery = $lQuery->where("DATE(sample_collection_date) IN ($qDates)");
+        }
+        if (trim($params['lab']) != '') {
+            $lQuery = $lQuery->where("eid.lab_id = '".$params['lab']."'");
+        }
         $lQueryStr = $sql->buildSqlString($lQuery);
         // print_r($lQueryStr);die;
         $lResult = $dbAdapter->query($lQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
