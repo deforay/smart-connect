@@ -1,0 +1,175 @@
+<div id="countyOutcomes" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+
+<script>
+    $(function () {
+    
+$('#countyOutcomes').highcharts({
+  chart: {
+    type: 'column',
+    zoomType: 'xy'
+  },
+  title: {
+    text: 'County Outcomes',
+    align: 'left'
+  },
+  xAxis: [{
+    // categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+    //   'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+    categories: [<?php
+            if(isset($result) && count($result)>0){
+              foreach($result as $date){
+                  echo "'".$date['location_name']."',";
+              }
+            }
+            ?>],
+    crosshair: true
+  }],
+  yAxis: [{ // Primary yAxis
+    labels: {
+      format: '{value}%',
+      style: {
+        color: "rgb(145, 61, 136)"
+      }
+    },
+    title: {
+      text: 'Percentage',
+      style: {
+        color: "rgb(145, 61, 136)"
+      }
+    },
+    opposite: true
+
+  }, { // Secondary yAxis
+    gridLineWidth: 0,
+    title: {
+      text: 'Test',
+      style: {
+        color: Highcharts.getOptions().colors[0]
+      }
+    },
+    labels: {
+      format: '{value}',
+      style: {
+        color: Highcharts.getOptions().colors[0]
+      }
+    }
+
+  }],
+  tooltip: {
+    shared: true
+  },
+//   legend: {
+//     layout: 'vertical',
+//     align: 'left',
+//     x: 80,
+//     verticalAlign: 'top',
+//     y: 55,
+//     floating: true,
+//     backgroundColor:
+//       Highcharts.defaultOptions.legend.backgroundColor || // theme
+//       'rgba(255,255,255,0.25)'
+//   },
+legend: {
+            align: 'center',
+            x: 0,
+            verticalAlign: 'top',
+            y: 30,
+            floating: true,
+            backgroundColor: (Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#FFFFFF'
+        },
+  plotOptions: {
+    column: {
+      stacking: 'normal'
+    //   dataLabels: {
+    //     enabled: true
+    //   }
+    }
+  },
+  series: [{
+    name: 'Positive',
+    type: 'column',
+    yAxis: 1,
+    // data: [49.9, 71.5, 106.4, 129.2, 144.0, 176.0, 135.6, 148.5, 216.4, 194.1, 95.6, 54.4],
+    data: [<?php
+            if(isset($result) && count($result)>0){
+              foreach($result as $date){
+                  echo "".$date['positive'].",";
+              }
+            }
+            ?>],
+    // tooltip: {
+    //   valueSuffix: ''
+    // },
+    color: "#f2784b"
+
+  },{
+    name: 'Negative',
+    type: 'column',
+    yAxis: 1,
+    // data: [49.9, 71.5, 52.4, 45.2, 45.0, 24.0, 5.6, 98.5, 54.4, 45.1, 95.6, 54.4],
+    data: [<?php
+            if(isset($result) && count($result)>0){
+              foreach($result as $date){
+                  echo "".$date['negative'].",";
+              }
+            }
+            ?>],
+    // tooltip: {
+    //   valueSuffix: ''
+    // },
+    color: "#42a49c"
+
+  }, {
+    name: 'Positivity',
+    type: 'spline',
+    data: [<?php
+            if(isset($result) && count($result)>0){
+              foreach($result as $date){
+                  $positiity = round($date['positive']/$date['total_samples_collected'],2);
+                  echo "".$positiity.",";
+              }
+            }
+            ?>],
+    // tooltip: {
+    //   valueSuffix: ' %'
+    // },
+    color: "rgb(145, 61, 136)"
+  }],
+  responsive: {
+    rules: [{
+      condition: {
+        maxWidth: 500
+      },
+      chartOptions: {
+        legend: {
+          floating: false,
+          layout: 'horizontal',
+          align: 'center',
+          verticalAlign: 'bottom',
+          x: 0,
+          y: 0
+        },
+        yAxis: [{
+          labels: {
+            align: 'right',
+            x: 0,
+            y: -6
+          },
+          showLastLabel: false
+        }, {
+          labels: {
+            align: 'left',
+            x: 0,
+            y: -6
+          },
+          showLastLabel: false
+        }, {
+          visible: false
+        }]
+      }
+    }]
+  }
+});
+
+    });
+</script>

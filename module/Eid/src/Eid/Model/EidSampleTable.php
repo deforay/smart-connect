@@ -2764,6 +2764,68 @@ class EidSampleTable extends AbstractTableGateway
         return $result;
     }
 
+    public function fetchCountyOutcomes($params)
+    {
+        $logincontainer = new Container('credo');
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $result = array();
+        $common = new CommonService($this->sm);
+
+        $facilityIdList = null;
+        $startMonth = '';
+        $endMonth = '';
+        // FILTER :: Checking if the facility filter is set
+        // else if the user is mapped to one or more facilities
+
+        // FILTER :: Checking if the date range filter is set (which should be always set)
+
+        if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
+            $monthyear = date("Y-m");
+            $startMonth = $params['fromDate'];
+            $endMonth = $params['toDate'];
+
+            if (strtotime($startMonth) >= strtotime($monthyear)) {
+                $startMonth = $endMonth = date("Y-m", strtotime("-2 months"));
+            } else if (strtotime($endMonth) >= strtotime($monthyear)) {
+                $endMonth = date("Y-m", strtotime("-2 months"));
+            }
+
+
+            $startMonth = date("Y-m", strtotime(trim($startMonth))) . "-01";
+            $endMonth = date("Y-m", strtotime(trim($endMonth))) . "-31";
+        }
+            $query = $sql->select()->from(array('loc' => 'location_details'))
+            ->columns(
+                array(
+                    "total_samples_collected" => new Expression('COUNT(*)'),
+                    "negative" => new Expression("SUM(CASE WHEN ((vl.result like 'negative' OR vl.result like 'Negative')) THEN 1 ELSE 0 END)"),
+                    "positive" => new Expression("SUM(CASE WHEN ((vl.result like 'positive' OR vl.result like 'Positive' )) THEN 1 ELSE 0 END)"),
+                    'location_name' => 'location_name'
+                )
+            )
+            ->join(array('lab' => 'facility_details'),'loc.location_id=lab.facility_district', array())
+            ->join(array('vl' => $this->table), 'lab.facility_id=vl.lab_id' , array(),'left')
+            ;
+        // if($startMonth && $endMonth)
+        // {
+        //     $query = $query->where("
+        //                 DATE(vl.result_approved_datetime) >= '" . $startMonth . "'
+        //                 AND DATE(vl.result_approved_datetime) <= '" . $endMonth . "' ");
+        // }
+
+
+        
+        
+        $query = $query->group('lab.facility_district');
+        $query = $query->order(array(new Expression('negative DESC')));
+        $queryStr = $sql->buildSqlString($query);
+        // print_r($queryStr);die;
+        //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+        $result = $common->cacheQuery($queryStr, $dbAdapter);
+        return $result;
+    }
+
     public function fetchLabPerformance($params)
     {
         $logincontainer = new Container('credo');

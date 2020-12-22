@@ -72,6 +72,12 @@ class EidSampleService
         return $sampleDb->fetchLabTurnAroundTime($params);
     }
 
+    public function getCountyOutcomes($params)
+    {
+        $sampleDb = $this->sm->get('EidSampleTableWithoutCache');
+        return $sampleDb->fetchCountyOutcomes($params);
+    }
+
     public function fetchLabPerformance($params)
     {
         $sampleDb = $this->sm->get('EidSampleTableWithoutCache');

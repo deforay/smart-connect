@@ -173,6 +173,19 @@ class LabsController extends AbstractActionController
             return $viewModel;
         }
     }
+
+    public function getCountyOutcomesAction()
+    {
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $result = $this->sampleService->getCountyOutcomes($params);
+            $viewModel = new ViewModel();
+            $viewModel->setVariables(array('result' => $result))
+                ->setTerminal(true);
+            return $viewModel;
+        }
+    }
     public function getLabPerformanceAction()
     {
         $request = $this->getRequest();
