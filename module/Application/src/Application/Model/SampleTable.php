@@ -7932,9 +7932,12 @@ class SampleTable extends AbstractTableGateway
         $sql = new Sql($dbAdapter);
         $lResult = array();
         $common = new CommonService($this->sm);
-        $lQuery = $sql->select()->from(array('eid' => 'dash_eid_form'))->columns(array('total' => new Expression('COUNT(*)'), 'lab_id'))
+        $lQuery = $sql->select()->from(array('eid' => 'dash_eid_form'))->columns(array(
+                            'total' => new Expression("SUM(CASE WHEN ( eid.sample_collection_date is not NULL AND eid.sample_collection_date!='0000-00-00 00:00:00') THEN 1 ELSE 0 END)"),
+                            "samplenottested" => new Expression("SUM(CASE WHEN (eid.sample_collection_date is NULL OR eid.sample_collection_date='0000-00-00 00:00:00') THEN 1 ELSE 0 END)"),
+                            'lab_id'))
                     ->join(array('f' => 'import_config_machines'), 'f.config_machine_id=eid.import_machine_name', array('lat'=>'latitude','lon'=>'longitude'))
-                    ->where("(eid.sample_tested_datetime is not null  AND f.poc_device ='yes')")
+                    ->where("( f.poc_device ='yes')")
                     ->group(array("f.latitude","f.longitude"));
         $lQueryStr = $sql->buildSqlString($lQuery);
         // print_r($lQueryStr);die;
