@@ -26,6 +26,11 @@ class LoginController extends AbstractActionController
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
+            if ($params["csrf_token"] != $_SESSION["csrf_token"]) {
+                // Reset token
+                unset($_SESSION["csrf_token"]);
+                die("CSRF token validation failed");
+              }
             $url = $this->userService->login($params);
             return $this->redirect()->toUrl($url);
         }
