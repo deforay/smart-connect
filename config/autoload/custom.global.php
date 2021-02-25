@@ -4,7 +4,7 @@ return array(
         'dbsId' => 1,
         'plasmaId' => 2,
         'tat-skipdays' => 120,
-        'use-current-sample-table' => false,
+        'use-current-sample-table' => true,
         'vl-api-version' => 1.0,
         'eid-api-version' => 1.0,
         'vlModule'      => true,

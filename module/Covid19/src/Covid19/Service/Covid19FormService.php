@@ -10,7 +10,7 @@ use Laminas\Db\TableGateway\AbstractTableGateway;
 use Laminas\Db\Sql\Expression;
 use Application\Service\CommonService;
 use \PhpOffice\PhpSpreadsheet\Spreadsheet;
-use Zend\Debug\Debug;
+use Exception;
 
 class Covid19FormService
 {
@@ -31,109 +31,113 @@ class Covid19FormService
 
     public function saveFileFromVlsmAPIV2()
     {
-        $apiData = array();
-        $apiTrackDb = $this->sm->get('DashApiReceiverStatsTable');
+        try {
+            $apiData = array();
+            $apiTrackDb = $this->sm->get('DashApiReceiverStatsTable');
 
-        $this->config = $this->sm->get('Config');
-        $input = $this->config['db']['dsn'];
-        preg_match('~=(.*?);~', $input, $output);
-        $dbname = $output[1];
-        $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
+            $this->config = $this->sm->get('Config');
+            $input = $this->config['db']['dsn'];
+            preg_match('~=(.*?);~', $input, $output);
+            $dbname = $output[1];
+            $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
 
-        $fileName = $_FILES['covid19File']['name'];
-        $ranNumber = str_pad(rand(0, pow(10, 6) - 1), 6, '0', STR_PAD_LEFT);
-        $extension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-        $fileName = $ranNumber . "." . $extension;
+            $fileName = $_FILES['covid19File']['name'];
+            $ranNumber = str_pad(rand(0, pow(10, 6) - 1), 6, '0', STR_PAD_LEFT);
+            $extension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+            $fileName = $ranNumber . "." . $extension;
 
-        if (!file_exists(TEMP_UPLOAD_PATH) && !is_dir(TEMP_UPLOAD_PATH)) {
-            mkdir(APPLICATION_PATH . DIRECTORY_SEPARATOR . "uploads", 0777);
-        }
-        if (!file_exists(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-covid19") && !is_dir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-covid19")) {
-            mkdir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-covid19", 0777);
-        }
-
-        $pathname = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-covid19" . DIRECTORY_SEPARATOR . $fileName;
-        if (!file_exists($pathname)) {
-            if (move_uploaded_file($_FILES['covid19File']['tmp_name'], $pathname)) {
-                $apiData = json_decode(file_get_contents($pathname), true);
-                //$apiData = \JsonMachine\JsonMachine::fromFile($pathname);
+            if (!file_exists(TEMP_UPLOAD_PATH) && !is_dir(TEMP_UPLOAD_PATH)) {
+                mkdir(APPLICATION_PATH . DIRECTORY_SEPARATOR . "uploads", 0777);
             }
-        }
+            if (!file_exists(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-covid19") && !is_dir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-covid19")) {
+                mkdir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-covid19", 0777);
+            }
 
-        // ob_start();
-        // var_dump($apiData);
-        // error_log(ob_get_clean());
-
-
-        $allColumns = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS where TABLE_SCHEMA = '" . $dbname . "' AND table_name='dash_form_covid19'";
-        $sResult = $dbAdapter->query($allColumns, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-        $columnList = array_map('current', $sResult);
-
-        $removeKeys = array(
-            'covid19_id'
-        );
-
-        $columnList = array_diff($columnList, $removeKeys);
-        $sampleDb = $this->sm->get('Covid19FormTableWithoutCache');
-
-
-        $numRows = 0;
-        foreach ($apiData['data'] as $rowData) {
-            $data = array();
-            foreach ($columnList as $colName) {
-                if (isset($rowData[$colName])) {
-                    $data[$colName] = $rowData[$colName];
-                } else {
-                    $data[$colName] = null;
+            $pathname = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-covid19" . DIRECTORY_SEPARATOR . $fileName;
+            if (!file_exists($pathname)) {
+                if (move_uploaded_file($_FILES['covid19File']['tmp_name'], $pathname)) {
+                    $apiData = json_decode(file_get_contents($pathname), true);
+                    //$apiData = \JsonMachine\JsonMachine::fromFile($pathname);
                 }
             }
 
             // ob_start();
-            // var_dump($data);
+            // var_dump($apiData);
             // error_log(ob_get_clean());
-            // exit(0);
 
-            $sampleCode = trim($data['sample_code']);
-            $instanceCode = trim($data['vlsm_instance_id']);
-            //check existing sample code
-            $sampleCode = $this->checkSampleCode($sampleCode, $instanceCode);
-            if ($sampleCode) {
-                //sample data update
-                $numRows += $sampleDb->update($data, array('covid19_id' => $sampleCode['covid19_id']));
-            } else {
-                //sample data insert
-                $numRows += $sampleDb->insert($data);
+
+            $allColumns = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS where TABLE_SCHEMA = '" . $dbname . "' AND table_name='dash_form_covid19'";
+            $sResult = $dbAdapter->query($allColumns, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+            $columnList = array_map('current', $sResult);
+
+            $removeKeys = array(
+                'covid19_id'
+            );
+
+            $columnList = array_diff($columnList, $removeKeys);
+            $sampleDb = $this->sm->get('Covid19FormTableWithoutCache');
+
+
+            $numRows = 0;
+            foreach ($apiData['data'] as $rowData) {
+                $data = array();
+                foreach ($columnList as $colName) {
+                    if (isset($rowData[$colName])) {
+                        $data[$colName] = $rowData[$colName];
+                    } else {
+                        $data[$colName] = null;
+                    }
+                }
+
+                // ob_start();
+                // var_dump($data);
+                // error_log(ob_get_clean());
+                // exit(0);
+
+                $sampleCode = trim($data['sample_code']);
+                $instanceCode = trim($data['vlsm_instance_id']);
+                //check existing sample code
+                $sampleCode = $this->checkSampleCode($sampleCode, $instanceCode);
+                if ($sampleCode) {
+                    //sample data update
+                    $numRows += $sampleDb->update($data, array('covid19_id' => $sampleCode['covid19_id']));
+                } else {
+                    //sample data insert
+                    $numRows += $sampleDb->insert($data);
+                }
             }
-        }
 
-        $common = new CommonService();
-        if(count($apiData['data'])  == $numRows){
-            $status = "success";
-        } else if((count($apiData['data']) - $numRows) != 0){
-            $status = "partial";
-        } else if($numRows == 0){
-            $status = 'failed';
-        }
-        $apiTrackData = array(
-            'tracking_id'                   => $apiData['timestamp'],
-            'received_on'                   => $common->getDateTime(),
-            'number_of_records_received'    => count($apiData['data']),
-            'number_of_records_processed'   => $numRows,
-            'source'                        => 'Sync V2 Viral Load',
-            'status'                        => $status
-        );
-        $trackResult = $apiTrackDb->select(array('tracking_id' => $apiData['timestamp']))->current();
-        if($trackResult){
-            $apiTrackDb->update($apiTrackData, array('api_id' => $trackResult['api_id']));
-        } else{
-            $apiTrackDb->insert($apiTrackData);
-        }
+            $common = new CommonService();
+            if (count($apiData['data'])  == $numRows) {
+                $status = "success";
+            } else if ((count($apiData['data']) - $numRows) != 0) {
+                $status = "partial";
+            } else if ($numRows == 0) {
+                $status = 'failed';
+            }
+            $apiTrackData = array(
+                'tracking_id'                   => $apiData['timestamp'],
+                'received_on'                   => $common->getDateTime(),
+                'number_of_records_received'    => count($apiData['data']),
+                'number_of_records_processed'   => $numRows,
+                'source'                        => 'Sync V2 Viral Load',
+                'status'                        => $status
+            );
+            $trackResult = $apiTrackDb->select(array('tracking_id' => $apiData['timestamp']))->current();
+            if ($trackResult) {
+                $apiTrackDb->update($apiTrackData, array('api_id' => $trackResult['api_id']));
+            } else {
+                $apiTrackDb->insert($apiTrackData);
+            }
 
 
-        return array(
-            'status'    => 'success',
-            'message'   => $numRows . ' uploaded successfully',
-        );
+            return array(
+                'status'    => 'success',
+                'message'   => $numRows . ' uploaded successfully',
+            );
+        } catch (Exception $e) {
+            error_log($e->getMessage());
+        }
     }
 
     public function saveFileFromVlsmAPIV1()
@@ -148,26 +152,26 @@ class Covid19FormService
             $locationDb = $this->sm->get('LocationDetailsTable');
             $facilityDb = $this->sm->get('FacilityTable');
             $sampleRjtReasonDb = $this->sm->get('SampleRejectionReasonTable');
-            
+
             $fileName = $_FILES['covid19File']['name'];
             $ranNumber = str_pad(rand(0, pow(10, 6) - 1), 6, '0', STR_PAD_LEFT);
             $extension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
             $fileName = $ranNumber . "." . $extension;
-            
+
             if (!file_exists(TEMP_UPLOAD_PATH) && !is_dir(TEMP_UPLOAD_PATH)) {
                 mkdir(APPLICATION_PATH . DIRECTORY_SEPARATOR . "uploads", 0777);
             }
             if (!file_exists(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-covid19") && !is_dir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-covid19")) {
                 mkdir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-covid19", 0777);
             }
-            
+
             $pathname = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-covid19" . DIRECTORY_SEPARATOR . $fileName;
             if (!file_exists($pathname)) {
                 if (move_uploaded_file($_FILES['covid19File']['tmp_name'], $pathname)) {
                     $apiData = \JsonMachine\JsonMachine::fromFile($pathname);
                 }
             }
-            
+
             if ($apiData !== FALSE) {
                 foreach ($apiData as $rowData) {
                     // Debug::dump($rowData);die;
@@ -183,11 +187,11 @@ class Covid19FormService
                             // $dateOfInitiationOfRegimen = (trim($row['date_of_initiation_of_current_regimen']) != '' ? trim(date('Y-m-d H:i', strtotime($row['date_of_initiation_of_current_regimen']))) : null);
                             $resultApprovedDateTime = (trim($row['result_approved_datetime']) != '' ? trim(date('Y-m-d H:i', strtotime($row['result_approved_datetime']))) : null);
                             $sampleTestedDateTime = (trim($row['sample_tested_datetime']) != '' ? trim(date('Y-m-d H:i', strtotime($row['sample_tested_datetime']))) : null);
-                            
+
                             foreach ($row as $index => $value) {
                                 if ($index == 'status_id') {
-                                break;
-                            } else {
+                                    break;
+                                } else {
                                     if ($index != 'covid19_id') {
                                         $data[$index] = $value;
                                     }
@@ -198,7 +202,7 @@ class Covid19FormService
                             $data['sample_registered_at_lab']   = $sampleReceivedAtLab;
                             $data['result_approved_datetime']   = $resultApprovedDateTime;
                             $data['sample_tested_datetime']     = $sampleTestedDateTime;
-                            
+
                             $facilityData = array(
                                 'vlsm_instance_id'          => trim($row['vlsm_instance_id']),
                                 'facility_name'             => trim($row['facility_name']),
@@ -257,7 +261,7 @@ class Covid19FormService
                             } else {
                                 $data['facility_id'] = NULL;
                             }
-                            
+
                             $labData = array(
                                 'vlsm_instance_id'          => trim($row['vlsm_instance_id']),
                                 'facility_name'             => trim($row['labName']),
@@ -823,7 +827,7 @@ class Covid19FormService
         $sampleDb = $this->sm->get('Covid19FormTableWithoutCache');
         return $sampleDb->fetchKeySummaryIndicatorsDetails($params);
     }
-    
+
     /* Lab Dashboard Start */
     public function getAllLabName()
     {
@@ -1514,8 +1518,8 @@ class Covid19FormService
             if (!file_exists(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "API-data-vl") && !is_dir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "API-data-vl")) {
                 mkdir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "API-data-vl", 0777);
             }
-    
-            $pathname = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "API-data-vl" . DIRECTORY_SEPARATOR . $params['timestamp'].'.json';
+
+            $pathname = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "API-data-vl" . DIRECTORY_SEPARATOR . $params['timestamp'] . '.json';
             if (!file_exists($pathname)) {
                 $file = file_put_contents($pathname, json_encode($params));
                 if (move_uploaded_file($pathname, $pathname)) {
@@ -1528,19 +1532,19 @@ class Covid19FormService
                     $sampleCode = trim($row['sample_code']);
                     $instanceCode = 'api-data';
 
-                     // Check dublicate data
-                     $province = $provinceDb->select(array('province_name' => $row['health_centre_province']))->current();
-                     if(!$province){
-                         $provinceDb->insert(array(
-                             'province_name'     => $row['health_centre_province'],
-                             'updated_datetime'  => $common->getDateTime()
-                         ));
-                         $province['province_id'] = $provinceDb->lastInsertValue;
-                     }
+                    // Check dublicate data
+                    $province = $provinceDb->select(array('province_name' => $row['health_centre_province']))->current();
+                    if (!$province) {
+                        $provinceDb->insert(array(
+                            'province_name'     => $row['health_centre_province'],
+                            'updated_datetime'  => $common->getDateTime()
+                        ));
+                        $province['province_id'] = $provinceDb->lastInsertValue;
+                    }
 
-                    
 
-                    
+
+
                     $sampleReceivedAtLab = ((trim($row['sample_received_date']) != '' && $row['sample_received_date'] != "") ? trim($row['sample_received_date']) : null);
                     $sampleTestedDateTime = ((trim($row['sample_tested_date']) != '' && $row['sample_tested_date'] != "") ? trim($row['sample_tested_date']) : null);
                     $sampleCollectionDate = ((trim($row['sample_collection_date']) != '' && $row['sample_collection_date'] != "") ? trim($row['sample_collection_date']) : null);
@@ -1604,7 +1608,7 @@ class Covid19FormService
                         $data['lab_id'] = $facilityDb->lastInsertValue;
                     }
 
-                   
+
 
 
                     //check sample rejection reason
@@ -1648,21 +1652,21 @@ class Covid19FormService
         http_response_code(202);
         $status = 'success';
         if (count($return) > 0) {
-            
+
             $status = 'partial';
-            if((count($params['data']) - count($return)) == 0){
+            if ((count($params['data']) - count($return)) == 0) {
                 $status = 'failed';
-            } else{
+            } else {
                 //remove directory  
                 unlink($pathname);
             }
-        } else{
+        } else {
             //remove directory  
             unlink($pathname);
         }
         $response = array(
             'status'    => 'success',
-            'message'   => 'Received ' . count($params['data']) . ' records. Processed '.(count($params['data']) - count($return)).' records.'
+            'message'   => 'Received ' . count($params['data']) . ' records. Processed ' . (count($params['data']) - count($return)) . ' records.'
         );
 
         // Track API Records
@@ -1675,9 +1679,9 @@ class Covid19FormService
             'status'                        => $status
         );
         $trackResult = $apiTrackDb->select(array('tracking_id' => $params['timestamp']))->current();
-        if($trackResult){
+        if ($trackResult) {
             $apiTrackDb->update($apiTrackData, array('api_id' => $trackResult['api_id']));
-        } else{
+        } else {
             $apiTrackDb->insert($apiTrackData);
         }
 
