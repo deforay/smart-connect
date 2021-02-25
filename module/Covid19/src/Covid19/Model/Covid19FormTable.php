@@ -2294,7 +2294,7 @@ class Covid19FormTable extends AbstractTableGateway
             }
 
             $queryStr = $queryStr->where("
-                        (sample_collection_date is not null AND sample_collection_date != '')
+                        (sample_collection_date is not null AND sample_collection_date not like '')
                         AND DATE(sample_collection_date) >= '" . $startMonth . "' 
                         AND DATE(sample_collection_date) <= '" . $endMonth . "'");
 
