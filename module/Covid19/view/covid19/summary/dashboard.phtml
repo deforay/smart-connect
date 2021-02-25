@@ -1,7 +1,7 @@
 <?php
 
 use Laminas\Session\Container;
-use Zend\Debug\Debug;
+// \Zend\Debug\Debug::dump($summaryTabInfo);die;
 
 $languagecontainer = new Container('language');
 $logincontainer = new Container('credo');
@@ -1791,7 +1791,7 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
     function summarize() {
         var f = formatDate($('#mrp-lowerDate').val());
         var t = formatDate($('#mrp-upperDate').val());
-        document.location.href = "/summary/dashboard?f=" + f + "&t=" + t
+        document.location.href = "/covid19/summary/dashboard?f=" + f + "&t=" + t
     }
 
     jQuery(function() {
