@@ -8,7 +8,7 @@ $logincontainer = new Container('credo');
 $startArray = explode("-", $startDate);
 $endArray = explode("-", $endDate);
 // var_dump($logincontainer->sampleTable);die;
-if(isset($logincontainer->sampleTable) && $logincontainer->sampleTable == "dash_vl_request_form_current"){
+if(isset($logincontainer->useCurrentTables) && $logincontainer->useCurrentTables == true){
     $startYear = (int) date('Y',strtotime('-12 MONTH '.date('Y-m-d')));
     $startMonth = (int) date('M',strtotime('-12 MONTH '.date('Y-m-d')));
     $endYear = (int) date('y');
@@ -2277,7 +2277,7 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
             format: 'M-yyyy',
             viewMode: "months",
             minViewMode: "months",
-            <?php if(isset($logincontainer->sampleTable) && $logincontainer->sampleTable == "dash_vl_request_form_current"){?>
+            <?php if(isset($logincontainer->useCurrentTables) && $logincontainer->useCurrentTables == true){?>
             startDate : end,
             <?php }?>
             endDate: "0m"
@@ -2293,7 +2293,7 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
             format: 'M-yyyy',
             viewMode: "months",
             minViewMode: "months",
-            <?php if(isset($logincontainer->sampleTable) && $logincontainer->sampleTable == "dash_vl_request_form_current"){?>
+            <?php if(isset($logincontainer->useCurrentTables) && $logincontainer->useCurrentTables == true){?>
             startDate : end,
             <?php }?>
             endDate: "0m"

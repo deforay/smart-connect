@@ -337,7 +337,7 @@ foreach ($sampleType as $samples) {
             separator: ' to ',
             startDate: start,
             endDate: end,
-            <?php if (isset($logincontainer->sampleTable) && $logincontainer->sampleTable == "dash_vl_request_form_current") { ?>
+            <?php if (isset($logincontainer->useCurrentTables) && $logincontainer->useCurrentTables == true) { ?>
                 minDate: moment().subtract(12, 'months'),
                 maxDate: moment(),
             <?php } ?>

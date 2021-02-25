@@ -64,23 +64,27 @@ class CommonController extends AbstractActionController
     public function setSessionAction()
     {
         $logincontainer = new Container('credo');
-        $logincontainer->sampleTable = "";
+        //$logincontainer->sampleTable = "";
         unset($logincontainer->sampleTable);
+        unset($logincontainer->eidSampleTable);
+        unset($logincontainer->covid19SampleTable);
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
             if ($params['sessionType'] == "current") {
+                $logincontainer->useCurrentTables = true;
                 $logincontainer->sampleTable = 'dash_vl_request_form_current';
                 $logincontainer->eidSampleTable = 'dash_eid_form_current';
-                $logincontainer->covidSampleTable = 'dash_form_covid19_current';
+                $logincontainer->covid19SampleTable = 'dash_form_covid19_current';
             } else {
+                $logincontainer->useCurrentTables = false;
                 $logincontainer->sampleTable = 'dash_vl_request_form';
                 $logincontainer->eidSampleTable = 'dash_eid_form';
-                $logincontainer->covidSampleTable = 'dash_form_covid19';
+                $logincontainer->covid19SampleTable = 'dash_form_covid19';
             }
         }
         $viewModel = new ViewModel();
-        $viewModel->setVariables(array('result' => $logincontainer->sampleTable))->setTerminal(true);
+        $viewModel->setVariables(array('result' => true))->setTerminal(true);
         return $viewModel;
     }
 

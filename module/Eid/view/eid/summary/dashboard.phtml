@@ -8,7 +8,7 @@ $logincontainer = new Container('credo');
 $startArray = explode("-", $startDate);
 $endArray = explode("-", $endDate);
 // \Zend\Debug\Debug::dump($summaryTabInfo);die;
-if (isset($logincontainer->eidSampleTable) && $logincontainer->eidSampleTable == "dash_eid_form_current") {
+if (isset($logincontainer->useCurrentTables) && $logincontainer->useCurrentTables == true) {
     $startYear = (int) date('Y', strtotime('-12 MONTH ' . date('Y-m-d')));
     $startMonth = (int) date('M', strtotime('-12 MONTH ' . date('Y-m-d')));
     $endYear = (int) date('y');
@@ -1862,7 +1862,7 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
             format: 'M-yyyy',
             viewMode: "months",
             minViewMode: "months",
-            <?php if (isset($logincontainer->eidSampleTable) && $logincontainer->eidSampleTable == "dash_eid_form_current") { ?>
+            <?php if (isset($logincontainer->useCurrentTables) && $logincontainer->useCurrentTables == true) { ?>
                 startDate: end,
             <?php } ?>
             endDate: "0m"
@@ -1878,7 +1878,7 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
             format: 'M-yyyy',
             viewMode: "months",
             minViewMode: "months",
-            <?php if (isset($logincontainer->eidSampleTable) && $logincontainer->eidSampleTable == "dash_eid_form_current") { ?>
+            <?php if (isset($logincontainer->useCurrentTables) && $logincontainer->useCurrentTables == true) { ?>
                 startDate: end,
             <?php } ?>
             endDate: "0m"

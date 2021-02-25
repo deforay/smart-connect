@@ -131,13 +131,10 @@ class Covid19FormService
             }
 
 
-            return array(
-                'status'    => 'success',
-                'message'   => $numRows . ' uploaded successfully',
-            );
-        } catch (Exception $e) {
-            error_log($e->getMessage());
-        }
+        return array(
+            'status'    => 'success',
+            'message'   => $numRows . ' uploaded successfully',
+        );
     }
 
     public function saveFileFromVlsmAPIV1()
