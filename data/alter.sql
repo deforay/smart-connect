@@ -271,7 +271,7 @@ INSERT INTO `resources` (`resource_id`, `resource_name`, `display_name`) VALUES 
 INSERT INTO `privileges` (`privilege_id`, `resource_id`, `privilege_name`, `display_name`) VALUES (NULL, '19', 'dashboard', 'Dashboard');
 
 -- Thana 31-Jul-2020
-CREATE TABLE `dash_covid19_form` (
+CREATE TABLE `dash_form_covid19` (
  `covid19_id` int NOT NULL AUTO_INCREMENT,
  `vlsm_instance_id` varchar(255) DEFAULT NULL,
  `vlsm_country_id` int NOT NULL,
@@ -420,7 +420,7 @@ ALTER TABLE `r_covid19_test_reasons` ADD `updated_datetime` DATETIME NULL DEFAUL
 -- Amit 24 August 2020
 ALTER TABLE `dash_vl_request_form` ADD INDEX(`last_modified_datetime`);
 ALTER TABLE `dash_eid_form` ADD INDEX(`last_modified_datetime`);
-ALTER TABLE `dash_covid19_form` ADD INDEX(`last_modified_datetime`);
+ALTER TABLE `dash_form_covid19` ADD INDEX(`last_modified_datetime`);
 
 -- Thana 1 Sep 2020
 ALTER TABLE `facility_details` ADD `updated_datetime` DATETIME NULL DEFAULT NULL AFTER `facility_logo`;
@@ -478,8 +478,8 @@ ALTER TABLE `r_art_code_details` ADD `headings` VARCHAR(255) NULL DEFAULT NULL A
 ALTER TABLE `r_sample_rejection_reasons` ADD `rejection_type` VARCHAR(255) NULL DEFAULT NULL AFTER `rejection_reason_id`, ADD `rejection_reason_code` VARCHAR(255) NULL DEFAULT NULL AFTER `rejection_type`;
 
 /* Thana 17 Sep 2020 */
-ALTER TABLE `dash_covid19_form` ADD `type_of_test_requested` VARCHAR(255) NULL DEFAULT NULL AFTER `reason_for_covid19_test`;
-ALTER TABLE `dash_covid19_form` ADD `patient_city` VARCHAR(255) NULL DEFAULT NULL AFTER `patient_district`;
+ALTER TABLE `dash_form_covid19` ADD `type_of_test_requested` VARCHAR(255) NULL DEFAULT NULL AFTER `reason_for_covid19_test`;
+ALTER TABLE `dash_form_covid19` ADD `patient_city` VARCHAR(255) NULL DEFAULT NULL AFTER `patient_district`;
 /* Thana 05 Nov 2020 */
 ALTER TABLE `r_vl_test_reasons` ADD `updated_datetime` DATETIME NULL DEFAULT NULL AFTER `test_reason_status`;
 /* Thana 06 Nov 2020 */
@@ -560,3 +560,6 @@ CREATE TABLE `r_hepatitis_rick_factors` (
 
 -- Thana 09-Dec-2020
 ALTER TABLE `r_eid_test_reasons` ADD `updated_datetime` DATETIME NULL DEFAULT NULL AFTER `test_reason_status`;
+-- Thana 25-Feb-2021
+RENAME TABLE `ss-vldashboard`.`dash_form_covid19` TO `ss-vldashboard`.`dash_form_covid19`;
+ALTER TABLE `dash_form_covid19` CHANGE `is_sample_rejected` `is_sample_rejected` VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT 'no', CHANGE `data_sync` `data_sync` INT NULL DEFAULT '0';

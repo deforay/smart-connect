@@ -4,10 +4,8 @@ namespace Api\Controller;
 
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\View\Model\JsonModel;
-use Zend\Debug\Debug;
-use \Covid19\Service\Covid19FormService;
 
-class VlsmCovidController extends AbstractRestfulController
+class VlsmCovid19Controller extends AbstractRestfulController
 {
     private $covid19SampleService = null;
 
@@ -25,7 +23,6 @@ class VlsmCovidController extends AbstractRestfulController
         if (!isset($params['api-version'])) {
             $params['api-version'] = 'v1';
         }
-        // print_r($params);die;
         if ($params['api-version'] == 'v1') {
             $response = $this->covid19SampleService->saveFileFromVlsmAPIV1();
         } else if ($params['api-version'] == 'v2') {

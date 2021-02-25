@@ -19,7 +19,7 @@ use Zend\Debug\Debug;
 class Covid19FormTable extends AbstractTableGateway
 {
 
-    protected $table = 'dash_covid19_form';
+    protected $table = 'dash_form_covid19';
     public $sm = null;
     public $config = null;
     protected $translator = null;
@@ -2621,7 +2621,7 @@ class Covid19FormTable extends AbstractTableGateway
             $endMonth = date('Y-m-t',strtotime(str_replace(' ', '-', $params['toDate'])));
             
             $monthList = $common->getMonthsInRange($startMonth, $endMonth);
-            $sQuery = $sql->select()->from(array('covid19' => 'dash_covid19_form'))->columns(array(
+            $sQuery = $sql->select()->from(array('covid19' => 'dash_form_covid19'))->columns(array(
                 'monthYear' => new Expression("DATE_FORMAT(sample_collection_date, '%b-%Y')"),
                 'positive_rate' => new Expression("ROUND(((SUM(CASE WHEN ((covid19.result like 'positive' OR covid19.result like 'Positive' )) THEN 1 ELSE 0 END))/(SUM(CASE WHEN (((covid19.result IS NOT NULL AND covid19.result != '' AND covid19.result != 'NULL'))) THEN 1 ELSE 0 END)))*100,2)")
             ))
@@ -4331,7 +4331,7 @@ class Covid19FormTable extends AbstractTableGateway
         $sql = new Sql($dbAdapter);
         $common = new CommonService($this->sm);
         $eidOutcomesQuery = $sql->select()
-            ->from(array('covid19' => 'dash_covid19_form'))
+            ->from(array('covid19' => 'dash_form_covid19'))
             ->columns(
                 array(
                     'noDatan' => new Expression("SUM(CASE WHEN ((covid19.result like 'negative' OR covid19.result = 'Negative' ) AND (covid19.patient_dob IS NULL OR covid19.patient_dob = '0000-00-00'))THEN 1 ELSE 0 END)"),
@@ -4419,7 +4419,7 @@ class Covid19FormTable extends AbstractTableGateway
             /* foreach($monthList as $key=>$list){
                 $searchVal[$key] =  new Expression("AVG(CASE WHEN (covid19.result like 'positive%' AND covid19.result not like '' AND sample_collection_date LIKE '%".$list."%') THEN 1 ELSE 0 END)");
             } */
-            $sQuery = $sql->select()->from(array('covid19' => 'dash_covid19_form'))->columns(array(
+            $sQuery = $sql->select()->from(array('covid19' => 'dash_form_covid19'))->columns(array(
                 'monthYear' => new Expression("DATE_FORMAT(sample_collection_date, '%b-%Y')"),
                 'positive_rate' => new Expression("ROUND(((SUM(CASE WHEN ((covid19.result like 'positive' OR covid19.result like 'Positive' )) THEN 1 ELSE 0 END))/(SUM(CASE WHEN (((covid19.result IS NOT NULL AND covid19.result != '' AND covid19.result != 'NULL'))) THEN 1 ELSE 0 END)))*100,2)")
             ))

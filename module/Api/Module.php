@@ -35,9 +35,9 @@ class Module
                     $sampleService = $sm->getServiceLocator()->get('EidSampleService');
                     return new \Api\Controller\VlsmEidController($sampleService);
                 },
-                'Api\Controller\VlsmCovid' => function ($sm) {
+                'Api\Controller\VlsmCovid19' => function ($sm) {
                     $sampleService = $sm->getServiceLocator()->get('Covid19FormService');
-                    return new \Api\Controller\VlsmCovidController($sampleService);
+                    return new \Api\Controller\VlsmCovid19Controller($sampleService);
                 },
                 'Api\Controller\WeblimsVL' => function ($sm) {
                     $sampleService = $sm->getServiceLocator()->get('SampleService');
@@ -66,9 +66,9 @@ class Module
                     $sampleService = $sm->getServiceLocator()->get('EidSampleService');
                     return new \Api\Controller\ReceiveEidDataController($sampleService);
                 },
-                'Api\Controller\ReceiveCovidData' => function ($sm) {
+                'Api\Controller\ReceiveCovid19Data' => function ($sm) {
                     $sampleService = $sm->getServiceLocator()->get('Covid19FormService');
-                    return new \Api\Controller\ReceiveCovidDataController($sampleService);
+                    return new \Api\Controller\ReceiveCovid19DataController($sampleService);
                 },
             ),
         );

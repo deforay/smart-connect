@@ -5,7 +5,7 @@ namespace Api\Controller;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\View\Model\JsonModel;
 
-class ReceiveCovidDataController extends AbstractRestfulController
+class ReceiveCovid19DataController extends AbstractRestfulController
 {
 
     private $covid19FormService = null;

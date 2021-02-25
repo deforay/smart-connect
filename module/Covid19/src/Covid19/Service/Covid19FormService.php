@@ -31,39 +31,39 @@ class Covid19FormService
 
     public function saveFileFromVlsmAPIV2()
     {
-        try {
-            $apiData = array();
-            $apiTrackDb = $this->sm->get('DashApiReceiverStatsTable');
+        // Debug::dump($_FILES['covid19File']);die;
+        $apiData = array();
+        $apiTrackDb = $this->sm->get('DashApiReceiverStatsTable');
 
-            $this->config = $this->sm->get('Config');
-            $input = $this->config['db']['dsn'];
-            preg_match('~=(.*?);~', $input, $output);
-            $dbname = $output[1];
-            $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
+        $this->config = $this->sm->get('Config');
+        $input = $this->config['db']['dsn'];
+        preg_match('~=(.*?);~', $input, $output);
+        $dbname = $output[1];
+        $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
 
-            $fileName = $_FILES['covid19File']['name'];
-            $ranNumber = str_pad(rand(0, pow(10, 6) - 1), 6, '0', STR_PAD_LEFT);
-            $extension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-            $fileName = $ranNumber . "." . $extension;
+        $fileName = $_FILES['covid19File']['name'];
+        $ranNumber = str_pad(rand(0, pow(10, 6) - 1), 6, '0', STR_PAD_LEFT);
+        $extension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+        $fileName = $ranNumber . "." . $extension;
 
-            if (!file_exists(TEMP_UPLOAD_PATH) && !is_dir(TEMP_UPLOAD_PATH)) {
-                mkdir(APPLICATION_PATH . DIRECTORY_SEPARATOR . "uploads", 0777);
+        if (!file_exists(TEMP_UPLOAD_PATH) && !is_dir(TEMP_UPLOAD_PATH)) {
+            mkdir(APPLICATION_PATH . DIRECTORY_SEPARATOR . "uploads", 0777);
+        }
+        if (!file_exists(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-covid19") && !is_dir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-covid19")) {
+            mkdir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-covid19", 0777);
+        }
+
+        $pathname = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-covid19" . DIRECTORY_SEPARATOR . $fileName;
+        if (!file_exists($pathname)) {
+            if (move_uploaded_file($_FILES['covid19File']['tmp_name'], $pathname)) {
+                $apiData = json_decode(file_get_contents($pathname), true);
+                //$apiData = \JsonMachine\JsonMachine::fromFile($pathname);
             }
-            if (!file_exists(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-covid19") && !is_dir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-covid19")) {
-                mkdir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-covid19", 0777);
-            }
+        }
 
-            $pathname = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-covid19" . DIRECTORY_SEPARATOR . $fileName;
-            if (!file_exists($pathname)) {
-                if (move_uploaded_file($_FILES['covid19File']['tmp_name'], $pathname)) {
-                    $apiData = json_decode(file_get_contents($pathname), true);
-                    //$apiData = \JsonMachine\JsonMachine::fromFile($pathname);
-                }
-            }
-
-            // ob_start();
-            // var_dump($apiData);
-            // error_log(ob_get_clean());
+        // ob_start();
+        // var_dump($apiData);
+        // error_log(ob_get_clean());
 
 
             $allColumns = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS where TABLE_SCHEMA = '" . $dbname . "' AND table_name='dash_form_covid19'";
@@ -377,7 +377,7 @@ class Covid19FormService
         }
     }
 
-    public function checkSampleCode($sampleCode, $instanceCode, $dashTable = 'dash_covid19_form')
+    public function checkSampleCode($sampleCode, $instanceCode, $dashTable = 'dash_form_covid19')
     {
         $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
         $sql = new Sql($dbAdapter);
@@ -674,7 +674,7 @@ class Covid19FormService
         }
     }
 
-    public function exportPositiveRateByFacility($params, $dashTable = 'dash_covid19_form')
+    public function exportPositiveRateByFacility($params, $dashTable = 'dash_form_covid19')
     {
 
         $queryContainer = new Container('query');
