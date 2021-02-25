@@ -561,5 +561,5 @@ CREATE TABLE `r_hepatitis_rick_factors` (
 -- Thana 09-Dec-2020
 ALTER TABLE `r_eid_test_reasons` ADD `updated_datetime` DATETIME NULL DEFAULT NULL AFTER `test_reason_status`;
 -- Thana 25-Feb-2021
-RENAME TABLE `ss-vldashboard`.`dash_form_covid19` TO `ss-vldashboard`.`dash_form_covid19`;
+RENAME TABLE  `dash_covid19_form` TO `dash_form_covid19`;
 ALTER TABLE `dash_form_covid19` CHANGE `is_sample_rejected` `is_sample_rejected` VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT 'no', CHANGE `data_sync` `data_sync` INT NULL DEFAULT '0';

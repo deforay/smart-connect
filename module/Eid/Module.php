@@ -59,7 +59,7 @@ class Module
                 'EidSampleTableWithoutCache' => function ($sm) {
                     $session = new Container('credo');
                     $mappedFacilities = (isset($session->mappedFacilities) && count($session->mappedFacilities) > 0) ? $session->mappedFacilities : array();
-                    $eidSampleTable = isset($session->sampleTable) ? $session->sampleTable :  null;
+                    $eidSampleTable = isset($session->eidSampleTable) ? $session->eidSampleTable :  null;
                     $dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');
                     return new \Eid\Model\EidSampleTable($dbAdapter, $sm, $mappedFacilities, $eidSampleTable);
                 },

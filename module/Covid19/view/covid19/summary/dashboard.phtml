@@ -9,7 +9,7 @@ $logincontainer = new Container('credo');
 $startArray = explode("-", $startDate);
 $endArray = explode("-", $endDate);
 // var_dump($logincontainer->sampleTable);die;
-if (isset($logincontainer->sampleTable) && $logincontainer->sampleTable == "dash_vl_request_form_current") {
+if (isset($logincontainer->useCurrentTables) && $logincontainer->useCurrentTables == true) {
     $startYear = (int) date('Y', strtotime('-12 MONTH ' . date('Y-m-d')));
     $startMonth = (int) date('M', strtotime('-12 MONTH ' . date('Y-m-d')));
     $endYear = (int) date('y');
@@ -199,7 +199,7 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
 <div class="page-bar">
     <h1 class="page-title">
         <div class="col-lg-3">
-            <?php echo $this->translate('Covid19 Summary'); ?>
+            <?php echo $this->translate('Covid-19 Summary'); ?>
         </div>
 
 
@@ -832,7 +832,7 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
         <div class="portlet box blue">
             <div class="portlet-title">
                 <div class="caption">
-                    <span class="caption-subject"><?php echo $this->translate('Covid19 Outcomes'); ?></span>
+                    <span class="caption-subject"><?php echo $this->translate('Test Outcomes'); ?></span>
                 </div>
             </div>
             <div class="portlet-body" id="covid19OutcomesBody">
@@ -844,7 +844,7 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
         <div class="portlet box blue">
             <div class="portlet-title">
                 <div class="caption">
-                    <span class="caption-subject"><?php echo $this->translate('Covid19 Outcomes by Age'); ?></span>
+                    <span class="caption-subject"><?php echo $this->translate('Test Outcomes by Age'); ?></span>
                 </div>
             </div>
             <div class="portlet-body" id="covid19OutcomesByAgeBody">
@@ -858,7 +858,7 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
         <div class="portlet box blue">
             <div class="portlet-title">
                 <div class="caption">
-                    <span class="caption-subject"><?php echo $this->translate('Covid19 Outcomes - By Province'); ?></span>
+                    <span class="caption-subject"><?php echo $this->translate('Test Outcomes - By Province'); ?></span>
                 </div>
             </div>
             <div class="portlet-body" id="covid19OutcomesProvinceBody">
@@ -1651,7 +1651,7 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
 
     function getcovid19Outcomes() {
         $(document).ajaxStart($.blockUI({
-            message: '<h4> <?php echo ($this->translate('Processing Covid19 Outcomes')); ?> ... </h4>'
+            message: '<h4> <?php echo ($this->translate('Processing Test Outcomes')); ?> ... </h4>'
         })).ajaxStop($.unblockUI);
         var indDistrictIdList = ($("#indDistrictName").val() == null) ? '' : $("#indDistrictName").val().join(',');
         var indProvinceIdList = ($("#indProvinceName").val() == null) ? '' : $("#indProvinceName").val().join(',');
@@ -1673,7 +1673,7 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
 
     function getcovid19OutcomesByAge() {
         $(document).ajaxStart($.blockUI({
-            message: '<h4> <?php echo ($this->translate('Processing Covid19 Outcomes By Age')); ?> ... </h4>'
+            message: '<h4> <?php echo ($this->translate('Processing Test Outcomes By Age')); ?> ... </h4>'
         })).ajaxStop($.unblockUI);
         var indDistrictIdList = ($("#indDistrictName").val() == null) ? '' : $("#indDistrictName").val().join(',');
         var indProvinceIdList = ($("#indProvinceName").val() == null) ? '' : $("#indProvinceName").val().join(',');
@@ -1695,7 +1695,7 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
 
     function getcovid19OutcomesByProvince() {
         $(document).ajaxStart($.blockUI({
-            message: '<h4> <?php echo ($this->translate('Processing Covid19 Outcomes By Province')); ?> ... </h4>'
+            message: '<h4> <?php echo ($this->translate('Processing Test Outcomes By Province')); ?> ... </h4>'
         })).ajaxStop($.unblockUI);
         var indDistrictIdList = ($("#indDistrictName").val() == null) ? '' : $("#indDistrictName").val().join(',');
         var indProvinceIdList = ($("#indProvinceName").val() == null) ? '' : $("#indProvinceName").val().join(',');
@@ -1717,7 +1717,7 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
 
     function nationalTAT() {
         $(document).ajaxStart($.blockUI({
-            message: '<h4> <?php echo ($this->translate('Processing Covid19 Outcomes By Province')); ?> ... </h4>'
+            message: '<h4> <?php echo ($this->translate('Processing Test Outcomes By Province')); ?> ... </h4>'
         })).ajaxStop($.unblockUI);
         var indDistrictIdList = ($("#indDistrictName").val() == null) ? '' : $("#indDistrictName").val().join(',');
         var indProvinceIdList = ($("#indProvinceName").val() == null) ? '' : $("#indProvinceName").val().join(',');
@@ -1805,7 +1805,7 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
             format: 'M-yyyy',
             viewMode: "months",
             minViewMode: "months",
-            <?php if (isset($logincontainer->sampleTable) && $logincontainer->sampleTable == "dash_vl_request_form_current") { ?>
+            <?php if (isset($logincontainer->useCurrentTables) && $logincontainer->useCurrentTables == true) { ?>
                 startDate: end,
             <?php } ?>
             endDate: "0m"
@@ -1821,7 +1821,7 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
             format: 'M-yyyy',
             viewMode: "months",
             minViewMode: "months",
-            <?php if (isset($logincontainer->sampleTable) && $logincontainer->sampleTable == "dash_vl_request_form_current") { ?>
+            <?php if (isset($logincontainer->useCurrentTables) && $logincontainer->useCurrentTables == true) { ?>
                 startDate: end,
             <?php } ?>
             endDate: "0m"

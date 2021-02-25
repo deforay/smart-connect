@@ -9,6 +9,7 @@ use Laminas\Db\Sql\Select;
 use Laminas\Db\TableGateway\AbstractTableGateway;
 use Laminas\Db\Sql\Expression;
 use Application\Service\CommonService;
+use Exception;
 use \PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Zend\Debug\Debug;
 use JsonMachine\JsonMachine;
@@ -1797,7 +1798,7 @@ class SampleService
             $generateBackupDb->completeBackup($response['backupId']);
         }
     }
-    
+
 
     public function saveFileFromVlsmAPIV2()
     {
@@ -1865,24 +1866,31 @@ class SampleService
             // error_log(ob_get_clean());
             // exit(0);
 
+
+
             $sampleCode = trim($data['sample_code']);
             $instanceCode = trim($data['vlsm_instance_id']);
-            //check existing sample code
-            $sampleCode = $this->checkSampleCode($sampleCode, $instanceCode);
-            if ($sampleCode) {
-                //sample data update
-                $numRows += $sampleDb->update($data, array('vl_sample_id' => $sampleCode['vl_sample_id']));
-            } else {
-                //sample data insert
-                $numRows += $sampleDb->insert($data);
+
+            try {
+                //check existing sample code
+                $sampleCode = $this->checkSampleCode($sampleCode, $instanceCode);
+                if ($sampleCode) {
+                    //sample data update
+                    $numRows += $sampleDb->update($data, array('vl_sample_id' => $sampleCode['vl_sample_id']));
+                } else {
+                    //sample data insert
+                    $numRows += $sampleDb->insert($data);
+                }
+            } catch (Exception $e) {
+                error_log($e->getMessage());
             }
         }
         $common = new CommonService();
-        if(count($apiData['data'])  == $numRows){
+        if (count($apiData['data'])  == $numRows) {
             $status = "success";
-        } else if((count($apiData['data']) - $numRows) != 0){
+        } else if ((count($apiData['data']) - $numRows) != 0) {
             $status = "partial";
-        } else if($numRows == 0){
+        } else if ($numRows == 0) {
             $status = 'failed';
         }
         $apiTrackData = array(
@@ -1894,9 +1902,9 @@ class SampleService
             'status'                        => $status
         );
         $trackResult = $apiTrackDb->select(array('tracking_id' => $apiData['timestamp']))->current();
-        if($trackResult){
+        if ($trackResult) {
             $apiTrackDb->update($apiTrackData, array('api_id' => $trackResult['api_id']));
-        } else{
+        } else {
             $apiTrackDb->insert($apiTrackData);
         }
 
@@ -2487,7 +2495,7 @@ class SampleService
 
         return $response;
     }
-    
+
     public function saveVLDataFromAPI($params)
     {
         $common = new CommonService();
@@ -2509,8 +2517,8 @@ class SampleService
             if (!file_exists(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "API-data-vl") && !is_dir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "API-data-vl")) {
                 mkdir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "API-data-vl", 0777);
             }
-    
-            $pathname = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "API-data-vl" . DIRECTORY_SEPARATOR . $params['timestamp'].'.json';
+
+            $pathname = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "API-data-vl" . DIRECTORY_SEPARATOR . $params['timestamp'] . '.json';
             if (!file_exists($pathname)) {
                 $file = file_put_contents($pathname, json_encode($params));
                 if (move_uploaded_file($pathname, $pathname)) {
@@ -2523,15 +2531,15 @@ class SampleService
                     $sampleCode = trim($row['sample_code']);
                     $instanceCode = 'api-data';
 
-                     // Check dublicate data
-                     $province = $provinceDb->select(array('province_name' => $row['health_centre_province']))->current();
-                     if(!$province){
-                         $provinceDb->insert(array(
-                             'province_name'     => $row['health_centre_province'],
-                             'updated_datetime'  => $common->getDateTime()
-                         ));
-                         $province['province_id'] = $provinceDb->lastInsertValue;
-                     }
+                    // Check dublicate data
+                    $province = $provinceDb->select(array('province_name' => $row['health_centre_province']))->current();
+                    if (!$province) {
+                        $provinceDb->insert(array(
+                            'province_name'     => $row['health_centre_province'],
+                            'updated_datetime'  => $common->getDateTime()
+                        ));
+                        $province['province_id'] = $provinceDb->lastInsertValue;
+                    }
 
                     $VLAnalysisResult = (float) $row['result_value_absolute_decimal'];
                     $DashVL_Abs = NULL;
@@ -2565,7 +2573,7 @@ class SampleService
                         $DashVL_Abs = $VLAnalysisResult;
                     }
 
-                    
+
                     $sampleReceivedAtLab = ((trim($row['sample_received_date']) != '' && $row['sample_received_date'] != "") ? trim($row['sample_received_date']) : null);
                     $sampleTestedDateTime = ((trim($row['sample_tested_date']) != '' && $row['sample_tested_date'] != "") ? trim($row['sample_tested_date']) : null);
                     $sampleCollectionDate = ((trim($row['sample_collection_date']) != '' && $row['sample_collection_date'] != "") ? trim($row['sample_collection_date']) : null);
@@ -2720,21 +2728,21 @@ class SampleService
         http_response_code(202);
         $status = 'success';
         if (count($return) > 0) {
-            
+
             $status = 'partial';
-            if((count($params['data']) - count($return)) == 0){
+            if ((count($params['data']) - count($return)) == 0) {
                 $status = 'failed';
-            } else{
+            } else {
                 //remove directory  
                 unlink($pathname);
             }
-        } else{
+        } else {
             //remove directory  
             unlink($pathname);
         }
         $response = array(
             'status'    => 'success',
-            'message'   => 'Received ' . count($params['data']) . ' records. Processed '.(count($params['data']) - count($return)).' records.'
+            'message'   => 'Received ' . count($params['data']) . ' records. Processed ' . (count($params['data']) - count($return)) . ' records.'
         );
 
         // Track API Records
@@ -2747,9 +2755,9 @@ class SampleService
             'status'                        => $status
         );
         $trackResult = $apiTrackDb->select(array('tracking_id' => $params['timestamp']))->current();
-        if($trackResult){
+        if ($trackResult) {
             $apiTrackDb->update($apiTrackData, array('api_id' => $trackResult['api_id']));
-        } else{
+        } else {
             $apiTrackDb->insert($apiTrackData);
         }
 

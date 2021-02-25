@@ -56,7 +56,9 @@ if (!isset($activeTab)) {
     <link href="<?php echo $this->basePath('assets/bootstrap-toggle/bootstrap-toggle.min.css'); ?>" rel="stylesheet">
 
     <style>
-        <?php if ($activeTab != 'duplicate-data') { ?>table.dataTable td.sorting_1,
+        <?php if ($activeTab != 'duplicate-data') { ?>
+        
+        table.dataTable td.sorting_1,
         table.dataTable td.sorting_2,
         table.dataTable td.sorting_3,
         table.dataTable th.sorting_1,
@@ -65,7 +67,11 @@ if (!isset($activeTab)) {
             background: #fbfcfd !important
         }
 
-        <?php } ?><?php if (isset($logincontainer->sampleTable) && $logincontainer->sampleTable != "dash_vl_request_form_current") { ?>body,
+        <?php } 
+        
+        if (isset($logincontainer->useCurrentTables) && $logincontainer->useCurrentTables == true) { ?>
+        
+        body,
         .nav-item,
         .page-header.navbar,
         .portlet.blue,
@@ -74,7 +80,11 @@ if (!isset($activeTab)) {
             background-image: url('/assets/img/patterns/blue-pattern.png');
         }
 
-        <?php } ?>.resize-page-logo {
+        <?php } ?>
+        
+        
+        
+        .resize-page-logo {
             width: auto !important;
         }
 
@@ -134,11 +144,11 @@ if (!isset($activeTab)) {
 
                     <!-- BEGIN USER LOGIN DROPDOWN -->
                     <!-- DOC: Apply "dropdown-dark" class after below "dropdown-extended" to change the dropdown styte -->
-                    <?php if ($logincontainer->toggleStatus) { ?>
+                    <?php if (isset($logincontainer->showCurrentTablesToggle) && $logincontainer->showCurrentTablesToggle) { ?>
                         <li style="width:200px;margin-top:6px;">
                             <select class="form-control" onchange="changeTable(this);" id="change-table">
-                                <option value='current' <?php echo (isset($logincontainer->sampleTable) && $logincontainer->sampleTable == "dash_vl_request_form_current") ? "selected" : ""; ?>><?php echo $this->translate("LAST ONE YEAR"); ?></option>
-                                <option value='archive' <?php echo (isset($logincontainer->sampleTable) && $logincontainer->sampleTable == "dash_vl_request_form") ? "selected" : ""; ?>><?php echo $this->translate("FULL DATA"); ?></option>
+                                <option value='current' <?php echo (isset($logincontainer->useCurrentTables) && $logincontainer->useCurrentTables == true) ? "selected" : ""; ?>><?php echo $this->translate("LAST ONE YEAR"); ?></option>
+                                <option value='archive' <?php echo (isset($logincontainer->useCurrentTables) && $logincontainer->useCurrentTables == false) ? "selected" : ""; ?>><?php echo $this->translate("FULL DATA"); ?></option>
                             </select>
                         </li>
                     <?php } ?>

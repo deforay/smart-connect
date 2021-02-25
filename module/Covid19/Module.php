@@ -45,8 +45,7 @@ class Module
                     $session = new Container('credo');
                     $mappedFacilities = (isset($session->mappedFacilities) && count($session->mappedFacilities) > 0) ? $session->mappedFacilities : array();
                     $dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');
-                    $covid19SampleTable = isset($session->covid19SampleTable) ? $session->covid19SampleTable :  null;
-
+                    $covid19SampleTable = isset($session->covid19SampleTable) ? $session->covid19SampleTable :  'dash_form_covid19';
                     $tableObj = new \Covid19\Model\Covid19FormTable($dbAdapter, $sm, $mappedFacilities, $covid19SampleTable);
                     $table = PatternFactory::factory('object', [
                         'storage' => $sm->get('Cache\Persistent'),
@@ -59,9 +58,9 @@ class Module
                 'Covid19FormTableWithoutCache' => function ($sm) {
                     $session = new Container('credo');
                     $mappedFacilities = (isset($session->mappedFacilities) && count($session->mappedFacilities) > 0) ? $session->mappedFacilities : array();
-                    $eidSampleTable = isset($session->sampleTable) ? $session->sampleTable :  null;
+                    $covid19SampleTable = isset($session->covid19SampleTable) ? $session->covid19SampleTable :    'dash_form_covid19';
                     $dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');
-                    return new \Covid19\Model\Covid19FormTable($dbAdapter, $sm, $mappedFacilities, $eidSampleTable);
+                    return new \Covid19\Model\Covid19FormTable($dbAdapter, $sm, $mappedFacilities, $covid19SampleTable);
                 },
 
                 'Covid19FormService' => function ($sm) {
