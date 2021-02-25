@@ -31,6 +31,7 @@ class Covid19FormService
 
     public function saveFileFromVlsmAPIV2()
     {
+        // Debug::dump($_FILES['covid19File']);die;
         $apiData = array();
         $apiTrackDb = $this->sm->get('DashApiReceiverStatsTable');
 
@@ -373,7 +374,7 @@ class Covid19FormService
         }
     }
 
-    public function checkSampleCode($sampleCode, $instanceCode, $dashTable = 'dash_covid19_form')
+    public function checkSampleCode($sampleCode, $instanceCode, $dashTable = 'dash_form_covid19')
     {
         $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
         $sql = new Sql($dbAdapter);
@@ -670,7 +671,7 @@ class Covid19FormService
         }
     }
 
-    public function exportPositiveRateByFacility($params, $dashTable = 'dash_covid19_form')
+    public function exportPositiveRateByFacility($params, $dashTable = 'dash_form_covid19')
     {
 
         $queryContainer = new Container('query');

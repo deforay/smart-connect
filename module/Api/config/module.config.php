@@ -88,15 +88,15 @@ return array(
                     ),
                 ),
             ),
-            'api-vlsm-covid' => array(
+            'api-vlsm-covid19' => array(
                 'type'    => 'segment',
                 'options' => array(
-                    'route'    => '/api/vlsm-covid[/:id]',
+                    'route'    => '/api/vlsm-covid19[/:id]',
                     'constraints' => array(
                         'id'     => '[0-9]+',
                     ),
                     'defaults' => array(
-                        'controller' => 'Api\Controller\VlsmCovid',
+                        'controller' => 'Api\Controller\VlsmCovid19',
                     ),
                 ),
             ),
@@ -136,15 +136,15 @@ return array(
                     ),
                 ),
             ),
-            'receive-covid-data' => array(
+            'receive-covid19-data' => array(
                 'type'    => 'segment',
                 'options' => array(
-                    'route'    => '/api/receiver/covid[/:id]',
+                    'route'    => '/api/receiver/covid19[/:id]',
                     'constraints' => array(
                         'id'     => '[0-9]+',
                     ),
                     'defaults' => array(
-                        'controller' => 'Api\Controller\ReceiveCovidData',
+                        'controller' => 'Api\Controller\ReceiveCovid19Data',
                     ),
                 ),
             ),
