@@ -2123,7 +2123,7 @@ class Covid19FormTable extends AbstractTableGateway
         //get received data
         $receivedQuery = $sql->select()->from(array('covid19' => $this->table))
             ->columns(array('total' => new Expression('COUNT(*)'), 'receivedDate' => new Expression('DATE(sample_collection_date)')))
-            ->where("sample_collection_date is not null AND sample_collection_date != '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00'")
+            ->where("sample_collection_date is not null AND sample_collection_date not like '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00'")
             ->group(array("receivedDate"));
         if ($logincontainer->role != 1) {
             $receivedQuery = $receivedQuery->where('covid19.lab_id IN ("' . implode('", "', $this->mappedFacilities) . '")');
@@ -2151,7 +2151,7 @@ class Covid19FormTable extends AbstractTableGateway
         $testedQuery = $sql->select()->from(array('covid19' => $this->table))
             ->columns(array('total' => new Expression('COUNT(*)'), 'testedDate' => new Expression('DATE(sample_tested_datetime)')))
             ->where("((covid19.result IS NOT NULL AND covid19.result != '' AND covid19.result != 'NULL') OR (covid19.reason_for_sample_rejection IS NOT NULL AND covid19.reason_for_sample_rejection != '' AND covid19.reason_for_sample_rejection != 0))")
-            ->where("sample_collection_date is not null AND sample_collection_date != '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00'")
+            ->where("sample_collection_date is not null AND sample_collection_date not like '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00'")
             ->group(array("testedDate"));
         if ($logincontainer->role != 1) {
             $testedQuery = $testedQuery->where('covid19.lab_id IN ("' . implode('", "', $this->mappedFacilities) . '")');
@@ -2179,7 +2179,7 @@ class Covid19FormTable extends AbstractTableGateway
         $rejectedQuery = $sql->select()->from(array('covid19' => $this->table))
             ->columns(array('total' => new Expression('COUNT(*)'), 'rejectDate' => new Expression('DATE(sample_collection_date)')))
             ->where("covid19.reason_for_sample_rejection IS NOT NULL AND covid19.reason_for_sample_rejection !='' AND covid19.reason_for_sample_rejection!= 0")
-            ->where("sample_collection_date is not null AND sample_collection_date != '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00'")
+            ->where("sample_collection_date is not null AND sample_collection_date not like '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00'")
             ->group(array("rejectDate"));
         if ($logincontainer->role != 1) {
             $rejectedQuery = $rejectedQuery->where('covid19.lab_id IN ("' . implode('", "', $this->mappedFacilities) . '")');
