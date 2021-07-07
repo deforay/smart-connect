@@ -1898,15 +1898,10 @@ class SampleService
             'received_on'                   => $common->getDateTime(),
             'number_of_records_received'    => count($apiData['data']),
             'number_of_records_processed'   => $numRows,
-            'source'                        => 'Sync V2 Viral Load',
+            'source'                        => 'VLSM-VIRAL-LOAD',
             'status'                        => $status
         );
-        $trackResult = $apiTrackDb->select(array('tracking_id' => $apiData['timestamp']))->current();
-        if ($trackResult) {
-            $apiTrackDb->update($apiTrackData, array('api_id' => $trackResult['api_id']));
-        } else {
-            $apiTrackDb->insert($apiTrackData);
-        }
+        $apiTrackDb->insert($apiTrackData);
 
         return array(
             'status'    => 'success',
@@ -2483,15 +2478,10 @@ class SampleService
             'received_on'                   => $common->getDateTime(),
             'number_of_records_received'    => count($params['data']),
             'number_of_records_processed'   => (count($params['data']) - count($return)),
-            'source'                        => 'Weblims VL',
+            'source'                        => 'WEBLIMS-VIRAL-LOAD',
             'status'                        => $status
         );
-        $trackResult = $apiTrackDb->select(array('tracking_id' => $params['timestamp']))->current();
-        if ($trackResult) {
-            $apiTrackDb->update($apiTrackData, array('api_id' => $trackResult['api_id']));
-        } else {
-            $apiTrackDb->insert($apiTrackData);
-        }
+        $apiTrackDb->insert($apiTrackData);
 
         return $response;
     }
@@ -2751,7 +2741,7 @@ class SampleService
             'received_on'                   => $common->getDateTime(),
             'number_of_records_received'    => count($params['data']),
             'number_of_records_processed'   => (count($params['data']) - count($return)),
-            'source'                        => 'API Data',
+            'source'                        => 'API-VIRAL-LOAD',
             'status'                        => $status
         );
         $trackResult = $apiTrackDb->select(array('tracking_id' => $params['timestamp']))->current();

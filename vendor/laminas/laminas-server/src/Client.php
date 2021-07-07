@@ -10,6 +10,7 @@ namespace Laminas\Server;
 
 /**
  * Client Interface
+ * @deprecated Since 2.9.0; Client is replaced by ClientInterface and will be removed in 3.0.
  */
 interface Client
 {

@@ -65,6 +65,8 @@ class ReflectionClass
         $this->name = $reflection->getName();
         $this->setNamespace($namespace);
 
+        $argv = is_array($argv) ? $argv : [];
+
         foreach ($reflection->getMethods() as $method) {
             // Don't aggregate magic methods
             if ('__' == substr($method->getName(), 0, 2)) {

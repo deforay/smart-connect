@@ -13,6 +13,8 @@ use ReflectionClass as PhpReflectionClass;
 use ReflectionFunction as PhpReflectionFunction;
 use ReflectionFunctionAbstract;
 use ReflectionMethod as PhpReflectionMethod;
+use ReflectionNamedType;
+use ReflectionParameter as PhpReflectionParameter;
 
 /**
  * Function/Method Reflection
@@ -82,7 +84,11 @@ abstract class AbstractFunction
      */
     protected $docComment = '';
 
-    protected $return;
+    /**
+     * @var array
+     */
+    protected $return = [];
+
     protected $returnDesc;
     protected $paramDesc;
     protected $sigParams;
@@ -178,9 +184,10 @@ abstract class AbstractFunction
      * @param string $returnDesc Return value description
      * @param array $paramTypes Array of arguments (each an array of types)
      * @param array $paramDesc Array of parameter descriptions
-     * @return array
+     *
+     * @return void
      */
-    protected function buildSignatures($return, $returnDesc, $paramTypes, $paramDesc)
+    protected function buildSignatures($return, $returnDesc, $paramTypes, $paramDesc): void
     {
         $this->return         = $return;
         $this->returnDesc     = $returnDesc;
@@ -241,7 +248,8 @@ abstract class AbstractFunction
      * ReflectionFunction and parsing of DocBlock @param and @return values.
      *
      * @throws Exception\RuntimeException
-     * @return array
+     *
+     * @return void
      */
     protected function reflect()
     {
@@ -283,7 +291,9 @@ abstract class AbstractFunction
         $paramDesc     = [];
         if (empty($paramTags)) {
             foreach ($parameters as $param) {
-                $paramTypesTmp[] = [($param->isArray()) ? 'array' : 'mixed'];
+                // Suppressing, because false positive
+                /** @psalm-suppress TooManyArguments **/
+                $paramTypesTmp[] = [$this->paramIsArray($param) ? 'array' : 'mixed'];
                 $paramDesc[]     = '';
             }
         } else {
@@ -482,5 +492,15 @@ abstract class AbstractFunction
         } else {
             $this->reflection = new PhpReflectionFunction($this->name);
         }
+    }
+
+    private function paramIsArray(PhpReflectionParameter $param): bool
+    {
+        if (PHP_VERSION_ID >= 80000) {
+            $type = $param->getType();
+            return $type instanceof ReflectionNamedType && $type->getName() === 'array';
+        }
+
+        return $param->isArray();
     }
 }

@@ -37,7 +37,7 @@ class Reflection
     {
         if (is_object($class)) {
             $reflection = new \ReflectionObject($class);
-        } elseif (is_string($class) && class_exists($class)) {
+        } elseif (class_exists($class)) {
             $reflection = new \ReflectionClass($class);
         } else {
             throw new Reflection\Exception\InvalidArgumentException('Invalid class or object passed to attachClass()');
@@ -60,7 +60,7 @@ class Reflection
      * may be provided as an array to $argv.
      *
      * @param string $function Function name
-     * @param  bool|array $argv Optional arguments to be used during the method call
+     * @param  null|bool|array $argv Optional arguments to be used during the method call
      * @param string $namespace Optional namespace with which to prefix the
      * function name (used for the signature key). Primarily to avoid
      * collisions, also for XmlRpc namespacing
@@ -76,7 +76,10 @@ class Reflection
             ));
         }
 
-        if ($argv && ! is_array($argv)) {
+        // Cast null or false values to empty array
+        $argv = in_array($argv, [false, null], true) ? [] : $argv;
+
+        if (! is_array($argv)) {
             throw new Reflection\Exception\InvalidArgumentException('Invalid argv argument passed to reflectFunction');
         }
 

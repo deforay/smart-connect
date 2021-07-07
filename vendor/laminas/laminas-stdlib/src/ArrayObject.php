@@ -168,7 +168,7 @@ class ArrayObject implements IteratorAggregate, ArrayAccess, Serializable, Count
      */
     public function count()
     {
-        return count($this->storage);
+        return is_countable($this->storage) ? count($this->storage) : 1;
     }
 
     /**

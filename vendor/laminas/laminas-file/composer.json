@@ -18,14 +18,8 @@
     "config": {
         "sort-packages": true
     },
-    "extra": {
-        "branch-alias": {
-            "dev-master": "2.8.x-dev",
-            "dev-develop": "2.9.x-dev"
-        }
-    },
     "require": {
-        "php": "^5.6 || ^7.0",
+        "php": "^7.3 || ~8.0.0",
         "laminas/laminas-stdlib": "^2.7.7 || ^3.1",
         "laminas/laminas-zendframework-bridge": "^1.0"
     },
@@ -37,7 +31,7 @@
         "laminas/laminas-servicemanager": "^2.7.8 || ^3.3",
         "laminas/laminas-session": "^2.8",
         "laminas/laminas-validator": "^2.10.1",
-        "phpunit/phpunit": "^5.7.27 || ^6.5.8 || ^7.1.2"
+        "phpunit/phpunit": "^9.3.0"
     },
     "suggest": {
         "laminas/laminas-filter": "Laminas\\Filter component",
@@ -65,6 +59,6 @@
         "test-coverage": "phpunit --colors=always --coverage-clover clover.xml"
     },
     "replace": {
-        "zendframework/zend-file": "self.version"
+        "zendframework/zend-file": "^2.8.3"
     }
 }

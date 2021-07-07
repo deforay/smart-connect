@@ -31,39 +31,40 @@ class Covid19FormService
 
     public function saveFileFromVlsmAPIV2()
     {
-        // Debug::dump($_FILES['covid19File']);die;
-        $apiData = array();
-        $apiTrackDb = $this->sm->get('DashApiReceiverStatsTable');
+        ini_set('memory_limit', -1);
+        try {
+            $apiData = array();
+            $apiTrackDb = $this->sm->get('DashApiReceiverStatsTable');
 
-        $this->config = $this->sm->get('Config');
-        $input = $this->config['db']['dsn'];
-        preg_match('~=(.*?);~', $input, $output);
-        $dbname = $output[1];
-        $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
+            $this->config = $this->sm->get('Config');
+            $input = $this->config['db']['dsn'];
+            preg_match('~=(.*?);~', $input, $output);
+            $dbname = $output[1];
+            $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
 
-        $fileName = $_FILES['covid19File']['name'];
-        $ranNumber = str_pad(rand(0, pow(10, 6) - 1), 6, '0', STR_PAD_LEFT);
-        $extension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-        $fileName = $ranNumber . "." . $extension;
+            $fileName = $_FILES['covid19File']['name'];
+            $ranNumber = str_pad(rand(0, pow(10, 6) - 1), 6, '0', STR_PAD_LEFT);
+            $extension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+            $fileName = $ranNumber . "." . $extension;
 
-        if (!file_exists(TEMP_UPLOAD_PATH) && !is_dir(TEMP_UPLOAD_PATH)) {
-            mkdir(APPLICATION_PATH . DIRECTORY_SEPARATOR . "uploads", 0777);
-        }
-        if (!file_exists(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-covid19") && !is_dir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-covid19")) {
-            mkdir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-covid19", 0777);
-        }
-
-        $pathname = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-covid19" . DIRECTORY_SEPARATOR . $fileName;
-        if (!file_exists($pathname)) {
-            if (move_uploaded_file($_FILES['covid19File']['tmp_name'], $pathname)) {
-                $apiData = json_decode(file_get_contents($pathname), true);
-                //$apiData = \JsonMachine\JsonMachine::fromFile($pathname);
+            if (!file_exists(TEMP_UPLOAD_PATH) && !is_dir(TEMP_UPLOAD_PATH)) {
+                mkdir(APPLICATION_PATH . DIRECTORY_SEPARATOR . "uploads", 0777);
             }
-        }
+            if (!file_exists(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-covid19") && !is_dir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-covid19")) {
+                mkdir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-covid19", 0777);
+            }
 
-        // ob_start();
-        // var_dump($apiData);
-        // error_log(ob_get_clean());
+            $pathname = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-covid19" . DIRECTORY_SEPARATOR . $fileName;
+            if (!file_exists($pathname)) {
+                if (move_uploaded_file($_FILES['covid19File']['tmp_name'], $pathname)) {
+                    $apiData = json_decode(file_get_contents($pathname), true);
+                    //$apiData = \JsonMachine\JsonMachine::fromFile($pathname);
+                }
+            }
+
+            // ob_start();
+            // var_dump($apiData);
+            // error_log(ob_get_clean());
 
 
             $allColumns = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS where TABLE_SCHEMA = '" . $dbname . "' AND table_name='dash_form_covid19'";
@@ -120,21 +121,23 @@ class Covid19FormService
                 'received_on'                   => $common->getDateTime(),
                 'number_of_records_received'    => count($apiData['data']),
                 'number_of_records_processed'   => $numRows,
-                'source'                        => 'Sync V2 Viral Load',
+                'source'                        => 'VLSM-Covid-19',
                 'status'                        => $status
             );
-            $trackResult = $apiTrackDb->select(array('tracking_id' => $apiData['timestamp']))->current();
-            if ($trackResult) {
-                $apiTrackDb->update($apiTrackData, array('api_id' => $trackResult['api_id']));
-            } else {
-                $apiTrackDb->insert($apiTrackData);
-            }
+            $apiTrackDb->insert($apiTrackData);
 
 
-        return array(
-            'status'    => 'success',
-            'message'   => $numRows . ' uploaded successfully',
-        );
+            return array(
+                'status'    => 'success',
+                'message'   => $numRows . ' uploaded successfully',
+            );
+        } catch (Exception $exc) {
+            error_log($exc->getMessage());
+            error_log($exc->getTraceAsString());
+            return array(
+                'status'    => 'error'
+            );
+        }
     }
 
     public function saveFileFromVlsmAPIV1()
@@ -370,7 +373,6 @@ class Covid19FormService
         } catch (Exception $exc) {
             error_log($exc->getMessage());
             error_log($exc->getTraceAsString());
-            Debug::dump($exc->getMessage());
         }
     }
 
@@ -1672,7 +1674,7 @@ class Covid19FormService
             'received_on'                   => $common->getDateTime(),
             'number_of_records_received'    => count($params['data']),
             'number_of_records_processed'   => (count($params['data']) - count($return)),
-            'source'                        => 'API Data',
+            'source'                        => 'API-COVID-19',
             'status'                        => $status
         );
         $trackResult = $apiTrackDb->select(array('tracking_id' => $params['timestamp']))->current();

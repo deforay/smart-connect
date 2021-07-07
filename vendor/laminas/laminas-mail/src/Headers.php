@@ -13,7 +13,6 @@ namespace Laminas\Mail;
 use ArrayIterator;
 use Countable;
 use Iterator;
-use Laminas\Loader\PluginClassLoader;
 use Laminas\Loader\PluginClassLocator;
 use Laminas\Mail\Header\GenericHeader;
 use Laminas\Mail\Header\HeaderInterface;
@@ -27,10 +26,10 @@ use Traversable;
 class Headers implements Countable, Iterator
 {
     /** @var string End of Line for fields */
-    const EOL = "\r\n";
+    public const EOL = "\r\n";
 
     /** @var string Start of Line when folding */
-    const FOLDING = "\r\n ";
+    public const FOLDING = "\r\n ";
 
     /**
      * @var null|Header\HeaderLocatorInterface
@@ -84,13 +83,16 @@ class Headers implements Countable, Iterator
         for ($i = 0; $i < $total; $i += 1) {
             $line = $lines[$i];
 
-            // Empty line indicates end of headers
-            // EXCEPT if there are more lines, in which case, there's a possible error condition
-            if (preg_match('/^\s*$/', $line)) {
+            if ($line === "") {
+                // Empty line indicates end of headers
+                // EXCEPT if there are more lines, in which case, there's a possible error condition
                 $emptyLine += 1;
                 if ($emptyLine > 2) {
                     throw new Exception\RuntimeException('Malformed header detected');
                 }
+                continue;
+            } elseif (preg_match('/^\s*$/', $line)) {
+                // skip empty continuation line
                 continue;
             }
 
@@ -377,7 +379,7 @@ class Headers implements Countable, Iterator
         $key = $this->normalizeFieldName($name);
         $results = [];
 
-        foreach (array_keys($this->headersKeys, $key) as $index) {
+        foreach (array_keys($this->headersKeys, $key, true) as $index) {
             if ($this->headers[$index] instanceof Header\GenericHeader) {
                 $results[] = $this->lazyLoadHeader($index);
             } else {
@@ -391,10 +393,8 @@ class Headers implements Countable, Iterator
             case 1:
                 if ($results[0] instanceof Header\MultipleHeadersInterface) {
                     return new ArrayIterator($results);
-                } else {
-                    return $results[0];
                 }
-                //fall-trough
+                return $results[0];
             default:
                 return new ArrayIterator($results);
         }
@@ -409,7 +409,7 @@ class Headers implements Countable, Iterator
     public function has($name)
     {
         $name = $this->normalizeFieldName($name);
-        return in_array($name, $this->headersKeys);
+        return in_array($name, $this->headersKeys, true);
     }
 
     /**
@@ -541,7 +541,7 @@ class Headers implements Countable, Iterator
      */
     public function loadHeader($headerLine)
     {
-        list($name, ) = Header\GenericHeader::splitHeaderLine($headerLine);
+        list($name) = Header\GenericHeader::splitHeaderLine($headerLine);
 
         /** @var HeaderInterface $class */
         $class = $this->resolveHeaderClass($name);

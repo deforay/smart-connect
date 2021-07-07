@@ -6,13 +6,15 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
-    'phpDocumentor\\Reflection\\' => array($vendorDir . '/phpdocumentor/reflection-common/src', $vendorDir . '/phpdocumentor/reflection-docblock/src', $vendorDir . '/phpdocumentor/type-resolver/src'),
+    'phpDocumentor\\Reflection\\' => array($vendorDir . '/phpdocumentor/reflection-common/src', $vendorDir . '/phpdocumentor/type-resolver/src', $vendorDir . '/phpdocumentor/reflection-docblock/src'),
     'ZipStream\\' => array($vendorDir . '/maennchen/zipstream-php/src'),
     'Zend\\Version\\' => array($vendorDir . '/zendframework/zend-version/src'),
     'Zend\\Debug\\' => array($vendorDir . '/zendframework/zend-debug/src'),
+    'ZendDiagnostics\\' => array($vendorDir . '/zendframework/zenddiagnostics/src'),
     'Webmozart\\Assert\\' => array($vendorDir . '/webmozart/assert/src'),
     'Webimpress\\SafeWriter\\' => array($vendorDir . '/webimpress/safe-writer/src'),
     'TrueBV\\' => array($vendorDir . '/true/punycode/src'),
+    'Symfony\\Polyfill\\Php73\\' => array($vendorDir . '/symfony/polyfill-php73'),
     'Symfony\\Polyfill\\Mbstring\\' => array($vendorDir . '/symfony/polyfill-mbstring'),
     'Symfony\\Polyfill\\Ctype\\' => array($vendorDir . '/symfony/polyfill-ctype'),
     'Symfony\\Component\\Yaml\\' => array($vendorDir . '/symfony/yaml'),
@@ -67,10 +69,8 @@ return array(
     'Laminas\\EventManager\\' => array($vendorDir . '/laminas/laminas-eventmanager/src'),
     'Laminas\\Escaper\\' => array($vendorDir . '/laminas/laminas-escaper/src'),
     'Laminas\\Dom\\' => array($vendorDir . '/laminas/laminas-dom/src'),
-    'Laminas\\Diagnostics\\' => array($vendorDir . '/laminas/laminas-diagnostics/src'),
     'Laminas\\Diactoros\\' => array($vendorDir . '/laminas/laminas-diactoros/src'),
     'Laminas\\Di\\' => array($vendorDir . '/laminas/laminas-di/src'),
-    'Laminas\\DependencyPlugin\\' => array($vendorDir . '/laminas/laminas-dependency-plugin/src'),
     'Laminas\\Db\\' => array($vendorDir . '/laminas/laminas-db/src'),
     'Laminas\\Crypt\\' => array($vendorDir . '/laminas/laminas-crypt/src'),
     'Laminas\\Console\\' => array($vendorDir . '/laminas/laminas-console/src'),

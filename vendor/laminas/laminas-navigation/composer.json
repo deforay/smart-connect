@@ -19,17 +19,13 @@
         "sort-packages": true
     },
     "extra": {
-        "branch-alias": {
-            "dev-master": "2.9.x-dev",
-            "dev-develop": "2.10.x-dev"
-        },
         "laminas": {
             "component": "Laminas\\Navigation",
             "config-provider": "Laminas\\Navigation\\ConfigProvider"
         }
     },
     "require": {
-        "php": "^5.6 || ^7.0",
+        "php": "^7.3 || ~8.0.0",
         "laminas/laminas-stdlib": "^2.7 || ^3.0",
         "laminas/laminas-zendframework-bridge": "^1.0"
     },
@@ -43,10 +39,11 @@
         "laminas/laminas-mvc": "^2.7.9 || ^3.0.4",
         "laminas/laminas-permissions-acl": "^2.6",
         "laminas/laminas-router": "^3.0.2",
-        "laminas/laminas-servicemanager": "^2.7.5 || ^3.0.3",
+        "laminas/laminas-servicemanager": "^3.2.1",
         "laminas/laminas-uri": "^2.5.2",
         "laminas/laminas-view": "^2.9",
-        "phpunit/phpunit": "^5.7.27 || ^6.5.8 || ^7.1.2"
+        "phpspec/prophecy-phpunit": "^2.0",
+        "phpunit/phpunit": "^9.4.1"
     },
     "suggest": {
         "laminas/laminas-config": "^2.6 || ^3.1, to provide page configuration (optional, as arrays and Traversables are also allowed)",
@@ -76,6 +73,6 @@
         "test-coverage": "phpunit --colors=always --coverage-clover clover.xml"
     },
     "replace": {
-        "zendframework/zend-navigation": "self.version"
+        "zendframework/zend-navigation": "^2.9.1"
     }
 }

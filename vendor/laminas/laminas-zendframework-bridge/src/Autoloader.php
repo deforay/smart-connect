@@ -1,11 +1,5 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-zendframework-bridge for the canonical source repository
- * @copyright https://github.com/laminas/laminas-zendframework-bridge/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-zendframework-bridge/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\ZendFrameworkBridge;
 
 use ArrayObject;
@@ -66,7 +60,7 @@ class Autoloader
      */
     private static function getClassLoader()
     {
-        if (file_exists(getenv('COMPOSER_VENDOR_DIR') . '/autoload.php')) {
+        if (getenv('COMPOSER_VENDOR_DIR') && file_exists(getenv('COMPOSER_VENDOR_DIR') . '/autoload.php')) {
             return include getenv('COMPOSER_VENDOR_DIR') . '/autoload.php';
         }
 

@@ -10,6 +10,7 @@ namespace Laminas\Server;
 
 /**
  * Server Interface
+ * @deprecated Since 2.9.0; Server is replaced by ServerInterface and will be removed in 3.0.
  */
 interface Server
 {
@@ -105,7 +106,7 @@ interface Server
      * To unify all servers, default behavior should be to auto-emit response.
      *
      * @param  bool $flag
-     * @return Server Self instance.
+     * @return ServerInterface Self instance.
      */
     public function setReturnResponse($flag = true);
 

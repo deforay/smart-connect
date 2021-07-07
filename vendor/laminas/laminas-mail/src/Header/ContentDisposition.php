@@ -18,7 +18,7 @@ class ContentDisposition implements UnstructuredInterface
      *
      * @var int
      */
-    const MAX_PARAMETER_LENGTH = 76;
+    public const MAX_PARAMETER_LENGTH = 76;
 
     /**
      * @var string
@@ -68,6 +68,22 @@ class ContentDisposition implements UnstructuredInterface
 
                 if (strpos($name, '*')) {
                     list($name, $count) = explode('*', $name);
+                    // allow optional count:
+                    // Content-Disposition: attachment; filename*=UTF-8''%64%61%61%6D%69%2D%6D%C3%B5%72%76%2E%6A%70%67
+                    if ($count === "") {
+                        $count = 0;
+                    }
+
+                    if (! is_numeric($count)) {
+                        $type = gettype($count);
+                        $value = var_export($count, 1);
+                        throw new Exception\InvalidArgumentException(sprintf(
+                            "Invalid header line for Content-Disposition string".
+                            " - count expected to be numeric, got %s with value %s",
+                            $type,
+                            $value
+                        ));
+                    }
                     if (! isset($continuedValues[$name])) {
                         $continuedValues[$name] = [];
                     }
@@ -79,10 +95,11 @@ class ContentDisposition implements UnstructuredInterface
 
             foreach ($continuedValues as $name => $values) {
                 $value = '';
-                for ($i = 0; $i < count($values); $i++) {
+                for ($i = 0, $iMax = count($values); $i < $iMax; $i++) {
                     if (! isset($values[$i])) {
                         throw new Exception\InvalidArgumentException(
-                            'Invalid header line for Content-Disposition string - incomplete continuation'
+                            'Invalid header line for Content-Disposition string - incomplete continuation'.
+                            '; HeaderLine: '.$headerLine
                         );
                     }
                     $value .= $values[$i];
@@ -137,26 +154,34 @@ class ContentDisposition implements UnstructuredInterface
                 }
             } else {
                 // Use 'continuation' per RFC 2231
-                $maxValueLength = strlen($value);
-                do {
-                    $maxValueLength = ceil(0.6 * $maxValueLength);
-                } while ($maxValueLength > self::MAX_PARAMETER_LENGTH);
-
                 if ($valueIsEncoded) {
-                    $encodedLength = strlen($value);
                     $value = HeaderWrap::mimeDecodeValue($value);
-                    $decodedLength = strlen($value);
-                    $maxValueLength -= ($encodedLength - $decodedLength);
                 }
 
-                $valueParts = str_split($value, $maxValueLength);
                 $i = 0;
-                foreach ($valueParts as $valuePart) {
-                    $attributePart = $attribute . '*' . $i++;
-                    if ($valueIsEncoded) {
-                        $valuePart = $this->getEncodedValue($valuePart);
+                $fullLength = mb_strlen($value, 'UTF-8');
+                while ($fullLength > 0) {
+                    $attributePart = $attribute . '*' . $i++ . '="';
+                    $attLen = mb_strlen($attributePart, 'UTF-8');
+
+                    $subPos = 1;
+                    $valuePart = '';
+                    while ($subPos <= $fullLength) {
+                        $sub = mb_substr($value, 0, $subPos, 'UTF-8');
+                        if ($valueIsEncoded) {
+                            $sub = $this->getEncodedValue($sub);
+                        }
+                        if ($attLen + mb_strlen($sub, 'UTF-8') >= self::MAX_PARAMETER_LENGTH) {
+                            $subPos--;
+                            break;
+                        }
+                        $subPos++;
+                        $valuePart = $sub;
                     }
-                    $result .= sprintf(';%s%s="%s"', Headers::FOLDING, $attributePart, $valuePart);
+
+                    $value = mb_substr($value, $subPos, null, 'UTF-8');
+                    $fullLength = mb_strlen($value, 'UTF-8');
+                    $result .= ';' . Headers::FOLDING . $attributePart . $valuePart . '"';
                 }
             }
         }

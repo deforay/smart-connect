@@ -9,7 +9,6 @@
     "homepage": "http://framework.zend.com/",
     "require": {
         "php": ">=5.5",
-        "laminas/laminas-dependency-plugin": "^1.0",
         "phpoffice/phpspreadsheet": "^1.10",
         "laminas/laminas-authentication": "^2.5",
         "laminas/laminas-barcode": "^2.5",
