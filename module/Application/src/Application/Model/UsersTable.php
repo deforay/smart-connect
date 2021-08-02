@@ -449,10 +449,10 @@ class UsersTable extends AbstractTableGateway
 
     public function checkExistUser($name)
     {
-        $userInfo = $this->select(array('user_name LIKE "'.$name.'%"'))->current();
-        if($userInfo){
+        $userInfo = $this->select(array('user_name LIKE "' . $name . '%"'))->current();
+        if ($userInfo) {
             return $userInfo['user_id'];
-        } else{
+        } else {
             $this->insert(array(
                 'user_name' => $name,
                 'role'      => 9999,
