@@ -19,7 +19,7 @@ use Laminas\Db\TableGateway\AbstractTableGateway;
  */
 class ArtCodeTable extends AbstractTableGateway {
 
-    protected $table = 'r_art_code_details';
+    protected $table = 'r_vl_art_regimen';
 
     public function __construct(Adapter $adapter) {
         $this->adapter = $adapter;
@@ -28,7 +28,7 @@ class ArtCodeTable extends AbstractTableGateway {
     public function fetchAllCurrentRegimen(){
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $rQuery = $sql->select()->from(array('r'=>'r_art_code_details'));
+        $rQuery = $sql->select()->from(array('r'=>'r_vl_art_regimen'));
         $rQueryStr = $sql->buildSqlString($rQuery);
         $rResult = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         return $rResult;

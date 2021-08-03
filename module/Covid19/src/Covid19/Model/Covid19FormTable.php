@@ -1270,7 +1270,7 @@ class Covid19FormTable extends AbstractTableGateway
         $mostRejectionReasons = array();
         $mostRejectionQuery = $sql->select()->from(array('covid19' => $this->table))
             ->columns(array('rejections' => new Expression('COUNT(*)')))
-            ->join(array('r_r_r' => 'r_sample_rejection_reasons'), 'r_r_r.rejection_reason_id=covid19.reason_for_sample_rejection', array('rejection_reason_id'))
+            ->join(array('r_r_r' => 'r_vl_sample_rejection_reasons'), 'r_r_r.rejection_reason_id=covid19.reason_for_sample_rejection', array('rejection_reason_id'))
             ->group('covid19.reason_for_sample_rejection')
             ->order('rejections DESC')
             ->limit(4);
@@ -1315,7 +1315,7 @@ class Covid19FormTable extends AbstractTableGateway
             for ($m = 0; $m < count($mostRejectionReasons); $m++) {
                 $rejectionQuery = $sql->select()->from(array('covid19' => $this->table))
                     ->columns(array('rejections' => new Expression('COUNT(*)')))
-                    ->join(array('r_r_r' => 'r_sample_rejection_reasons'), 'r_r_r.rejection_reason_id=covid19.reason_for_sample_rejection', array('rejection_reason_name'))
+                    ->join(array('r_r_r' => 'r_vl_sample_rejection_reasons'), 'r_r_r.rejection_reason_id=covid19.reason_for_sample_rejection', array('rejection_reason_name'))
                     ->where("MONTH(sample_collection_date)='" . $month . "' AND Year(sample_collection_date)='" . $year . "'");
 
 
@@ -3715,7 +3715,7 @@ class Covid19FormTable extends AbstractTableGateway
 
             $sQuery = $sQuery->where(
                 "
-                                        (sample_collection_date is not null AND sample_collection_date != '')
+                                        (sample_collection_date is not null AND sample_collection_date not like '')
                                         AND DATE(sample_collection_date) >= '" . $startMonth . "' 
                                         AND DATE(sample_collection_date) <= '" . $endMonth . "'"
             );
@@ -3894,7 +3894,7 @@ class Covid19FormTable extends AbstractTableGateway
             ))
             ->join(array('f' => 'facility_details'), 'f.facility_id=covid19.facility_id', array('facility_name'))
             ->join(array('l' => 'facility_details'), 'l.facility_id=covid19.lab_id', array(), 'left')
-            ->where("sample_collection_date is not null AND sample_collection_date != '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00' AND f.facility_type = 1")
+            ->where("sample_collection_date is not null AND sample_collection_date not like '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00' AND f.facility_type = 1")
             ->group(new Expression('DATE(sample_collection_date)'))
             ->group('covid19.specimen_type')
             ->group('covid19.facility_id');
@@ -3989,7 +3989,7 @@ class Covid19FormTable extends AbstractTableGateway
             ))
             ->join(array('f' => 'facility_details'), 'f.facility_id=covid19.facility_id', array('facility_name'))
             ->join(array('l' => 'facility_details'), 'l.facility_id=covid19.lab_id', array(), 'left')
-            ->where("sample_collection_date is not null AND sample_collection_date != '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00' AND f.facility_type = 1")
+            ->where("sample_collection_date is not null AND sample_collection_date not like '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00' AND f.facility_type = 1")
             ->group(new Expression('DATE(sample_collection_date)'))
             ->group('covid19.specimen_type')
             ->group('covid19.facility_id');
@@ -4117,7 +4117,7 @@ class Covid19FormTable extends AbstractTableGateway
                 "total_samples_pending" => new Expression("(SUM(CASE WHEN ((covid19.result IS NULL OR covid19.result = '' OR covid19.result = 'NULL' OR sample_tested_datetime is null OR sample_tested_datetime = '' OR DATE(sample_tested_datetime) ='1970-01-01' OR DATE(sample_tested_datetime) ='0000-00-00') AND (covid19.reason_for_sample_rejection IS NULL OR covid19.reason_for_sample_rejection = '' OR covid19.reason_for_sample_rejection = 0)) THEN 1 ELSE 0 END))"),
                 "rejected_samples" => new Expression("SUM(CASE WHEN (covid19.reason_for_sample_rejection !='' AND covid19.reason_for_sample_rejection !='0' AND covid19.reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END)")
             ))
-            ->where("sample_collection_date is not null AND sample_collection_date != '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00' AND covid19.lab_id !=0")
+            ->where("sample_collection_date is not null AND sample_collection_date not like '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00' AND covid19.lab_id !=0")
             ->group('covid19.lab_id');
         if (isset($parameters['provinces']) && trim($parameters['provinces']) != '') {
             $sQuery = $sQuery->where('f.facility_state IN (' . $parameters['provinces'] . ')');
@@ -4211,7 +4211,7 @@ class Covid19FormTable extends AbstractTableGateway
             ->join(array('covid19' => $this->table), 'covid19.lab_id=f.facility_id', array(
                 "total_samples_received" => new Expression("(COUNT(*))")
             ))
-            ->where("sample_collection_date is not null AND sample_collection_date != '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00' AND covid19.lab_id !=0")
+            ->where("sample_collection_date is not null AND sample_collection_date not like '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00' AND covid19.lab_id !=0")
             ->group('covid19.lab_id');
         if ($logincontainer->role != 1) {
             $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : array(0);

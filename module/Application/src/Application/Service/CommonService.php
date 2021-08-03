@@ -675,21 +675,21 @@ class CommonService
                }
                
                /* For update the Art Code Details */
-               if(isset($apiData->r_art_code_details) && !empty($apiData->r_art_code_details)){
+               if(isset($apiData->r_vl_art_regimen) && !empty($apiData->r_vl_art_regimen)){
                     /* if($apiData->forceSync){
-                         $rQueryStr = $apiData->r_art_code_details->tableStructure;
+                         $rQueryStr = $apiData->r_vl_art_regimen->tableStructure;
                          $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
                     } */
                     $condition = "";
-                    if(isset($apiData->r_art_code_details->lastModifiedTime) && !empty($apiData->r_art_code_details->lastModifiedTime)){
-                         $condition = "updated_datetime > '" . $apiData->r_art_code_details->lastModifiedTime . "'";
+                    if(isset($apiData->r_vl_art_regimen->lastModifiedTime) && !empty($apiData->r_vl_art_regimen->lastModifiedTime)){
+                         $condition = "updated_datetime > '" . $apiData->r_vl_art_regimen->lastModifiedTime . "'";
                     }
-                    $notUpdated = $this->getLastModifiedDateTime('r_art_code_details', 'updated_datetime', $condition);
+                    $notUpdated = $this->getLastModifiedDateTime('r_vl_art_regimen', 'updated_datetime', $condition);
                     if (empty($notUpdated) || !isset($notUpdated)) {
-                         foreach ((array)$apiData->r_art_code_details->tableData as $row) {
+                         foreach ((array)$apiData->r_vl_art_regimen->tableData as $row) {
                               $artCodeData = (array)$row;
                               unset($artCodeData['data_sync']);
-                              $rQuery = $sql->select()->from('r_art_code_details')->where(array('art_code LIKE "%' . $artCodeData['art_code'] . '%" OR art_id = ' . $artCodeData['art_id']));
+                              $rQuery = $sql->select()->from('r_vl_art_regimen')->where(array('art_code LIKE "%' . $artCodeData['art_code'] . '%" OR art_id = ' . $artCodeData['art_id']));
                               $rQueryStr = $sql->buildSqlString($rQuery);
                               $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
                               if ($rowData) {
@@ -702,21 +702,21 @@ class CommonService
                }
                
                /* For update the Sample Rejection Reason Details */
-               if(isset($apiData->r_sample_rejection_reasons) && !empty($apiData->r_sample_rejection_reasons)){
+               if(isset($apiData->r_vl_sample_rejection_reasons) && !empty($apiData->r_vl_sample_rejection_reasons)){
                     /* if($apiData->forceSync){
-                         $rQueryStr = $apiData->r_sample_rejection_reasons->tableStructure;
+                         $rQueryStr = $apiData->r_vl_sample_rejection_reasons->tableStructure;
                          $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
                     } */
                     $condition = "";
-                    if(isset($apiData->r_sample_rejection_reasons->lastModifiedTime) && !empty($apiData->r_sample_rejection_reasons->lastModifiedTime)){
-                         $condition = "updated_datetime > '" . $apiData->r_sample_rejection_reasons->lastModifiedTime . "'";
+                    if(isset($apiData->r_vl_sample_rejection_reasons->lastModifiedTime) && !empty($apiData->r_vl_sample_rejection_reasons->lastModifiedTime)){
+                         $condition = "updated_datetime > '" . $apiData->r_vl_sample_rejection_reasons->lastModifiedTime . "'";
                     }
-                    $notUpdated = $this->getLastModifiedDateTime('r_sample_rejection_reasons', 'updated_datetime', $condition);
+                    $notUpdated = $this->getLastModifiedDateTime('r_vl_sample_rejection_reasons', 'updated_datetime', $condition);
                     if (empty($notUpdated) || !isset($notUpdated)) {
-                         foreach ((array)$apiData->r_sample_rejection_reasons->tableData as $row) {
+                         foreach ((array)$apiData->r_vl_sample_rejection_reasons->tableData as $row) {
                               $sampleRejectionReasonData = (array)$row;
                               unset($sampleRejectionReasonData['data_sync']);
-                              $rQuery = $sql->select()->from('r_sample_rejection_reasons')->where(array('rejection_reason_name LIKE "%' . $sampleRejectionReasonData['rejection_reason_name'] . '%" OR rejection_reason_id = ' . $sampleRejectionReasonData['rejection_reason_id']));
+                              $rQuery = $sql->select()->from('r_vl_sample_rejection_reasons')->where(array('rejection_reason_name LIKE "%' . $sampleRejectionReasonData['rejection_reason_name'] . '%" OR rejection_reason_id = ' . $sampleRejectionReasonData['rejection_reason_id']));
                               $rQueryStr = $sql->buildSqlString($rQuery);
                               $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
                               if ($rowData) {

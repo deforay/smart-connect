@@ -21,7 +21,7 @@ use Laminas\Db\TableGateway\AbstractTableGateway;
  */
 class SampleRejectionReasonTable extends AbstractTableGateway {
 
-    protected $table = 'r_sample_rejection_reasons';
+    protected $table = 'r_vl_sample_rejection_reasons';
 
     public function __construct(Adapter $adapter) {
         $this->adapter = $adapter;
