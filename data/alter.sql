@@ -563,3 +563,7 @@ ALTER TABLE `r_eid_test_reasons` ADD `updated_datetime` DATETIME NULL DEFAULT NU
 -- Thana 25-Feb-2021
 RENAME TABLE  `dash_covid19_form` TO `dash_form_covid19`;
 ALTER TABLE `dash_form_covid19` CHANGE `is_sample_rejected` `is_sample_rejected` VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT 'no', CHANGE `data_sync` `data_sync` INT NULL DEFAULT '0';
+
+-- Thana 02-Aug-2021
+ALTER TABLE `location_details` ADD `updated_datetime` DATETIME NULL DEFAULT CURRENT_TIMESTAMP AFTER `longitude`; 
+ALTER TABLE `facility_details` ADD `email` VARCHAR(256) NULL DEFAULT NULL AFTER `facility_code`;

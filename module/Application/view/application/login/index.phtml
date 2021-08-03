@@ -6,9 +6,10 @@ $languagecontainer = new Container('language');
 $config = $this->GetConfigData();
 $languagecontainer->locale = $this->GetLocaleData('locale', $config['language']);
 session_start();
-  function generate_token() {
+function generate_token()
+{
     // Check if a token is present for the current session
-    if(!isset($_SESSION["csrf_token"])) {
+    if (!isset($_SESSION["csrf_token"])) {
         // No token present, generate a new one
         $token = bin2hex(random_bytes(64));
         $_SESSION["csrf_token"] = $token;
@@ -18,7 +19,7 @@ session_start();
     }
     // print_r($token);die;
     return $token;
-  }
+}
 ?>
 <!DOCTYPE html>
 <!--[if IE 8]> <html lang="en" class="ie8 no-js"> <![endif]-->
@@ -82,7 +83,7 @@ session_start();
     <div class="content" style="margin-top:0;">
         <!-- BEGIN LOGIN FORM -->
         <form class="login-form" action="" method="post">
-        <input type="hidden" name="csrf_token" value="<?php echo generate_token();?>" />
+            <input type="hidden" name="csrf_token" value="<?php echo generate_token(); ?>" />
             <div class="form-title">
                 <span class="form-title"><?php echo $this->translate('Welcome'); ?>.</span>
                 <span class="form-subtitle"><?php echo $this->translate('Please login to continue'); ?>.</span>
@@ -94,10 +95,12 @@ session_start();
             <div class="form-group">
                 <!--ie8, ie9 does not support html5 placeholder, so we just show field title for that-->
                 <label class="control-label visible-ie8 visible-ie9"><?php echo $this->translate('Email'); ?></label>
-                <input class="form-control form-control-solid placeholder-no-fix" type="text" autocomplete="off" placeholder="login@example.com" name="email" autofocus /> </div>
+                <input class="form-control form-control-solid placeholder-no-fix" type="text" autocomplete="off" placeholder="login@example.com" name="email" autofocus />
+            </div>
             <div class="form-group">
                 <label class="control-label visible-ie8 visible-ie9"><?php echo $this->translate('Password'); ?></label>
-                <input class="form-control form-control-solid placeholder-no-fix" type="password" autocomplete="off" placeholder="<?php echo $this->translate('Password'); ?>" name="password" /> </div>
+                <input class="form-control form-control-solid placeholder-no-fix" type="password" autocomplete="off" placeholder="<?php echo $this->translate('Password'); ?>" name="password" />
+            </div>
             <div class="form-actions">
                 <button type="submit" class="btn red btn-block uppercase"><?php echo $this->translate('Login'); ?></button>
             </div>

@@ -18,65 +18,69 @@ use Laminas\Db\TableGateway\AbstractTableGateway;
  *
  * @author amit
  */
-class LocationDetailsTable extends AbstractTableGateway {
+class LocationDetailsTable extends AbstractTableGateway
+{
 
     protected $table = 'location_details';
 
-    public function __construct(Adapter $adapter) {
+    public function __construct(Adapter $adapter)
+    {
         $this->adapter = $adapter;
     }
-    public function fetchLocationDetails($mappedFacilities = null){
+    public function fetchLocationDetails($mappedFacilities = null)
+    {
 
 
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->quantifier(\Laminas\Db\Sql\Select::QUANTIFIER_DISTINCT)
-                                ->from(array('l' => 'location_details'))
-                                ->join(array('f'=>'facility_details'),'f.facility_state=l.location_id',array())
-                                ->join(array('ft'=>'facility_type'),'ft.facility_type_id=f.facility_type')
-                                ->where('ft.facility_type_name="clinic"')
-                                ->where(array('parent_location'=>0));
-        if($mappedFacilities != null){
+            ->from(array('l' => 'location_details'))
+            ->join(array('f' => 'facility_details'), 'f.facility_state=l.location_id', array())
+            ->join(array('ft' => 'facility_type'), 'ft.facility_type_id=f.facility_type')
+            ->where('ft.facility_type_name="clinic"')
+            ->where(array('parent_location' => 0));
+        if ($mappedFacilities != null) {
             $sQuery = $sQuery->where('f.facility_id IN ("' . implode('", "', array_values(array_filter($mappedFacilities))) . '")');
-        }                                
+        }
         $sQueryStr = $sql->buildSqlString($sQuery);
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         return $rResult;
-
-
     }
-    
-    public function fetchDistrictList($locationId){
+
+    public function fetchDistrictList($locationId)
+    {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $sQuery = $sql->select()->from(array('l' => 'location_details'))->where(array('parent_location'=>$locationId));
+        $sQuery = $sql->select()->from(array('l' => 'location_details'))->where(array('parent_location' => $locationId));
         $sQueryStr = $sql->buildSqlString($sQuery);
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         return $rResult;
     }
-    
-    public function fetchDistrictListByIds($locationId){
+
+    public function fetchDistrictListByIds($locationId)
+    {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $sQuery = $sql->select()->from(array('l' => 'location_details'))->where(array('parent_location IN('. implode(",",$locationId).')'));
+        $sQuery = $sql->select()->from(array('l' => 'location_details'))->where(array('parent_location IN(' . implode(",", $locationId) . ')'));
         $sQueryStr = $sql->buildSqlString($sQuery);
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         return $rResult;
     }
-    
-    public function fetchAllDistrictsList($mappedFacilities = null){
+
+    public function fetchAllDistrictsList($mappedFacilities = null)
+    {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()
-                                ->quantifier(\Laminas\Db\Sql\Select::QUANTIFIER_DISTINCT)
-                                ->from(array('l' => 'location_details'))
-                                ->join(array('f'=>'facility_details'),'f.facility_district=l.location_id',array())
-                                ->join(array('ft'=>'facility_type'),'ft.facility_type_id=f.facility_type')
-                                ->where('ft.facility_type_name="clinic"')
-                                ->where(array("parent_location <> 0"));
-        if($mappedFacilities != null){
+            ->quantifier(\Laminas\Db\Sql\Select::QUANTIFIER_DISTINCT)
+            ->from(array('l' => 'location_details'))
+            ->join(array('f' => 'facility_details'), 'f.facility_district=l.location_id', array())
+            ->join(array('ft' => 'facility_type'), 'ft.facility_type_id=f.facility_type')
+            ->where('ft.facility_type_name="clinic"')
+            ->where(array("parent_location <> 0"));
+        if ($mappedFacilities != null) {
             $sQuery = $sQuery->where('f.facility_id IN ("' . implode('", "', array_values(array_filter($mappedFacilities))) . '")');
-        }                                
+        }
         $sQueryStr = $sql->buildSqlString($sQuery);
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         return $rResult;
