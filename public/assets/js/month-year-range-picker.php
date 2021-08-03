@@ -1,4 +1,5 @@
 <?php
+header('Content-Type: text/javascript');
 
 if (empty($startYear) || empty($startMonth) || empty($endYear) || empty($endDate)) {
 

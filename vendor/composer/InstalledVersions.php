@@ -31,7 +31,7 @@ private static $installed = array (
     array (
     ),
     'reference' => NULL,
-    'name' => 'laminas/skeleton-application',
+    'name' => 'deforay/vldashboard',
   ),
   'versions' => 
   array (
@@ -52,6 +52,15 @@ private static $installed = array (
       array (
       ),
       'reference' => '79cbf1341c22ec75643d841642dd5d6acd83bdb8',
+    ),
+    'deforay/vldashboard' => 
+    array (
+      'pretty_version' => 'dev-default',
+      'version' => 'dev-default',
+      'aliases' => 
+      array (
+      ),
+      'reference' => NULL,
     ),
     'doctrine/instantiator' => 
     array (
@@ -566,15 +575,6 @@ private static $installed = array (
       ),
       'reference' => '13af2502d9bb6f7d33be2de4b51fb68c6cdb476e',
     ),
-    'laminas/skeleton-application' => 
-    array (
-      'pretty_version' => 'dev-default',
-      'version' => 'dev-default',
-      'aliases' => 
-      array (
-      ),
-      'reference' => NULL,
-    ),
     'maennchen/zipstream-php' => 
     array (
       'pretty_version' => '2.1.0',
@@ -939,12 +939,12 @@ private static $installed = array (
     ),
     'symfony/console' => 
     array (
-      'pretty_version' => 'v5.3.4',
-      'version' => '5.3.4.0',
+      'pretty_version' => 'v5.3.6',
+      'version' => '5.3.6.0',
       'aliases' => 
       array (
       ),
-      'reference' => 'ebd610dacd40d75b6a12bf64b5ccd494fc7d6ab1',
+      'reference' => '51b71afd6d2dc8f5063199357b9880cea8d8bfe2',
     ),
     'symfony/deprecation-contracts' => 
     array (
@@ -991,12 +991,12 @@ private static $installed = array (
     ),
     'symfony/polyfill-intl-grapheme' => 
     array (
-      'pretty_version' => 'v1.23.0',
-      'version' => '1.23.0.0',
+      'pretty_version' => 'v1.23.1',
+      'version' => '1.23.1.0',
       'aliases' => 
       array (
       ),
-      'reference' => '24b72c6baa32c746a4d0840147c9715e42bb68ab',
+      'reference' => '16880ba9c5ebe3642d1995ab866db29270b36535',
     ),
     'symfony/polyfill-intl-normalizer' => 
     array (
@@ -1009,12 +1009,12 @@ private static $installed = array (
     ),
     'symfony/polyfill-mbstring' => 
     array (
-      'pretty_version' => 'v1.23.0',
-      'version' => '1.23.0.0',
+      'pretty_version' => 'v1.23.1',
+      'version' => '1.23.1.0',
       'aliases' => 
       array (
       ),
-      'reference' => '2df51500adbaebdc4c38dea4c89a2e131c45c8a1',
+      'reference' => '9174a3d80210dca8daa7f31fec659150bbeabfc6',
     ),
     'symfony/polyfill-php73' => 
     array (
@@ -1027,12 +1027,12 @@ private static $installed = array (
     ),
     'symfony/polyfill-php80' => 
     array (
-      'pretty_version' => 'v1.23.0',
-      'version' => '1.23.0.0',
+      'pretty_version' => 'v1.23.1',
+      'version' => '1.23.1.0',
       'aliases' => 
       array (
       ),
-      'reference' => 'eca0bf41ed421bed1b57c4958bab16aa86b757d0',
+      'reference' => '1100343ed1a92e3a38f9ae122fc0eb21602547be',
     ),
     'symfony/service-contracts' => 
     array (
@@ -1054,12 +1054,12 @@ private static $installed = array (
     ),
     'symfony/yaml' => 
     array (
-      'pretty_version' => 'v4.4.27',
-      'version' => '4.4.27.0',
+      'pretty_version' => 'v4.4.29',
+      'version' => '4.4.29.0',
       'aliases' => 
       array (
       ),
-      'reference' => '2b5f2ae892b489e51d81616fbc475c8238b533dc',
+      'reference' => '3abcc4db06d4e776825eaa3ed8ad924d5bc7432a',
     ),
     'true/punycode' => 
     array (
