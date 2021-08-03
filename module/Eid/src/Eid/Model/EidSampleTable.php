@@ -254,7 +254,7 @@ class EidSampleTable extends AbstractTableGateway
             $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
             $endMonth = str_replace(' ', '-', $parameters['toDate']) . "-31";
             $sQuery = $sQuery
-                ->where("(eid.sample_collection_date is not null AND eid.sample_collection_date != '')
+                ->where("(eid.sample_collection_date is not null AND eid.sample_collection_date not like '')
                         AND DATE(eid.sample_collection_date) >= '" . $startMonth . "' 
                         AND DATE(eid.sample_collection_date) <= '" . $endMonth . "'");
         }
@@ -288,14 +288,14 @@ class EidSampleTable extends AbstractTableGateway
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=eid.facility_id', array('facility_name'))
             ->join(array('f_d_l_d' => 'location_details'), 'f_d_l_d.location_id=f.facility_state', array('province' => 'location_name'))
-            ->where("(eid.sample_collection_date is not null AND eid.sample_collection_date != '' AND DATE(eid.sample_collection_date) !='1970-01-01' AND DATE(eid.sample_collection_date) !='0000-00-00')")
+            ->where("(eid.sample_collection_date is not null AND eid.sample_collection_date not like '' AND DATE(eid.sample_collection_date) !='1970-01-01' AND DATE(eid.sample_collection_date) !='0000-00-00')")
             ->group('f.facility_state');
 
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
             $endMonth = str_replace(' ', '-', $parameters['toDate']) . "-31";
             $iQuery = $iQuery
-                ->where("(eid.sample_collection_date is not null AND eid.sample_collection_date != '')
+                ->where("(eid.sample_collection_date is not null AND eid.sample_collection_date not like '')
                         AND DATE(eid.sample_collection_date) >= '" . $startMonth . "' 
                         AND DATE(eid.sample_collection_date) <= '" . $endMonth . "'");
         }
@@ -438,7 +438,7 @@ class EidSampleTable extends AbstractTableGateway
             $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
             $endMonth = str_replace(' ', '-', $parameters['toDate']) . "-31";
             $sQuery = $sQuery
-                ->where("(eid.sample_collection_date is not null AND eid.sample_collection_date != '')
+                ->where("(eid.sample_collection_date is not null AND eid.sample_collection_date not like '')
                         AND DATE(eid.sample_collection_date) >= '" . $startMonth . "' 
                         AND DATE(eid.sample_collection_date) <= '" . $endMonth . "'");
         }
@@ -481,7 +481,7 @@ class EidSampleTable extends AbstractTableGateway
             $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
             $endMonth = str_replace(' ', '-', $parameters['toDate']) . "-31";
             $iQuery = $iQuery
-                ->where("(eid.sample_collection_date is not null AND eid.sample_collection_date != '')
+                ->where("(eid.sample_collection_date is not null AND eid.sample_collection_date not like '')
                         AND DATE(eid.sample_collection_date) >= '" . $startMonth . "' 
                         AND DATE(eid.sample_collection_date) <= '" . $endMonth . "'");
         }
@@ -1654,7 +1654,7 @@ class EidSampleTable extends AbstractTableGateway
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=eid.facility_id', array('facility_name'))
             ->join(array('f_d_l_d' => 'location_details'), 'f_d_l_d.location_id=f.facility_state', array('province' => 'location_name'))
-            ->where("(eid.sample_collection_date is not null AND eid.sample_collection_date != '' AND DATE(eid.sample_collection_date) !='1970-01-01' AND DATE(eid.sample_collection_date) !='0000-00-00')")
+            ->where("(eid.sample_collection_date is not null AND eid.sample_collection_date not like '' AND DATE(eid.sample_collection_date) !='1970-01-01' AND DATE(eid.sample_collection_date) !='0000-00-00')")
             ->group('f.facility_district');
 
         if (isset($sWhere) && $sWhere != "") {
@@ -1665,7 +1665,7 @@ class EidSampleTable extends AbstractTableGateway
             $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
             $endMonth = str_replace(' ', '-', $parameters['toDate']) . "-31";
             $sQuery = $sQuery
-                ->where("(eid.sample_collection_date is not null AND eid.sample_collection_date != '')
+                ->where("(eid.sample_collection_date is not null AND eid.sample_collection_date not like '')
                         AND DATE(eid.sample_collection_date) >= '" . $startMonth . "' 
                         AND DATE(eid.sample_collection_date) <= '" . $endMonth . "'");
         }
@@ -1699,13 +1699,13 @@ class EidSampleTable extends AbstractTableGateway
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=eid.facility_id', array('facility_name'))
             ->join(array('f_d_l_d' => 'location_details'), 'f_d_l_d.location_id=f.facility_state', array('province' => 'location_name'))
-            ->where("(eid.sample_collection_date is not null AND eid.sample_collection_date != '' AND DATE(eid.sample_collection_date) !='1970-01-01' AND DATE(eid.sample_collection_date) !='0000-00-00')")
+            ->where("(eid.sample_collection_date is not null AND eid.sample_collection_date not like '' AND DATE(eid.sample_collection_date) !='1970-01-01' AND DATE(eid.sample_collection_date) !='0000-00-00')")
             ->group('f.facility_district');
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
             $endMonth = str_replace(' ', '-', $parameters['toDate']) . "-31";
             $iQuery = $iQuery
-                ->where("(eid.sample_collection_date is not null AND eid.sample_collection_date != '')
+                ->where("(eid.sample_collection_date is not null AND eid.sample_collection_date not like '')
                         AND DATE(eid.sample_collection_date) >= '" . $startMonth . "' 
                         AND DATE(eid.sample_collection_date) <= '" . $endMonth . "'");
         }
@@ -1824,7 +1824,7 @@ class EidSampleTable extends AbstractTableGateway
             ->join(array('f' => 'facility_details'), 'f.facility_id=eid.facility_id', array('facility_name'))
             ->join(array('f_d_l_dp' => 'location_details'), 'f_d_l_dp.location_id=f.facility_state', array('province' => 'location_name'))
             ->join(array('f_d_l_d' => 'location_details'), 'f_d_l_d.location_id=f.facility_district', array('district' => 'location_name'))
-            ->where("(eid.sample_collection_date is not null AND eid.sample_collection_date != '' AND DATE(eid.sample_collection_date) !='1970-01-01' AND DATE(eid.sample_collection_date) !='0000-00-00')")
+            ->where("(eid.sample_collection_date is not null AND eid.sample_collection_date not like '' AND DATE(eid.sample_collection_date) !='1970-01-01' AND DATE(eid.sample_collection_date) !='0000-00-00')")
             ->group('f.facility_id');
 
         if (isset($sWhere) && $sWhere != "") {
@@ -1835,7 +1835,7 @@ class EidSampleTable extends AbstractTableGateway
             $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
             $endMonth = str_replace(' ', '-', $parameters['toDate']) . "-31";
             $sQuery = $sQuery
-                ->where("(eid.sample_collection_date is not null AND eid.sample_collection_date != '')
+                ->where("(eid.sample_collection_date is not null AND eid.sample_collection_date not like '')
                         AND DATE(eid.sample_collection_date) >= '" . $startMonth . "' 
                         AND DATE(eid.sample_collection_date) <= '" . $endMonth . "'");
         }
@@ -1870,13 +1870,13 @@ class EidSampleTable extends AbstractTableGateway
             ->join(array('f' => 'facility_details'), 'f.facility_id=eid.facility_id', array('facility_name'))
             ->join(array('f_d_l_dp' => 'location_details'), 'f_d_l_dp.location_id=f.facility_state', array('province' => 'location_name'))
             ->join(array('f_d_l_d' => 'location_details'), 'f_d_l_d.location_id=f.facility_district', array('district' => 'location_name'))
-            ->where("(eid.sample_collection_date is not null AND eid.sample_collection_date != '' AND DATE(eid.sample_collection_date) !='1970-01-01' AND DATE(eid.sample_collection_date) !='0000-00-00')")
+            ->where("(eid.sample_collection_date is not null AND eid.sample_collection_date not like '' AND DATE(eid.sample_collection_date) !='1970-01-01' AND DATE(eid.sample_collection_date) !='0000-00-00')")
             ->group('f.facility_id');
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
             $endMonth = str_replace(' ', '-', $parameters['toDate']) . "-31";
             $iQuery = $iQuery
-                ->where("(eid.sample_collection_date is not null AND eid.sample_collection_date != '')
+                ->where("(eid.sample_collection_date is not null AND eid.sample_collection_date not like '')
                         AND DATE(eid.sample_collection_date) >= '" . $startMonth . "' 
                         AND DATE(eid.sample_collection_date) <= '" . $endMonth . "'");
         }
@@ -2178,7 +2178,7 @@ class EidSampleTable extends AbstractTableGateway
                                                                                                                                 END)")
                 )
             );
-        //$query = $query->where("(eid.sample_collection_date is not null AND eid.sample_collection_date != '' AND DATE(eid.sample_collection_date) !='1970-01-01' AND DATE(eid.sample_collection_date) !='0000-00-00')");
+        //$query = $query->where("(eid.sample_collection_date is not null AND eid.sample_collection_date not like '' AND DATE(eid.sample_collection_date) !='1970-01-01' AND DATE(eid.sample_collection_date) !='0000-00-00')");
         if ($logincontainer->role != 1) {
             $query = $query->where('eid.lab_id IN ("' . implode('", "', $this->mappedFacilities) . '")');
         }
@@ -2219,7 +2219,7 @@ class EidSampleTable extends AbstractTableGateway
         //get received data
         $receivedQuery = $sql->select()->from(array('eid' => $this->table))
             ->columns(array('total' => new Expression('COUNT(*)'), 'receivedDate' => new Expression('DATE(sample_collection_date)')))
-            ->where("sample_collection_date is not null AND sample_collection_date != '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00'")
+            ->where("sample_collection_date is not null AND sample_collection_date not like '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00'")
             ->group(array("receivedDate"));
         if ($logincontainer->role != 1) {
             $receivedQuery = $receivedQuery->where('eid.lab_id IN ("' . implode('", "', $this->mappedFacilities) . '")');
@@ -2251,7 +2251,7 @@ class EidSampleTable extends AbstractTableGateway
         $testedQuery = $sql->select()->from(array('eid' => $this->table))
             ->columns(array('total' => new Expression('COUNT(*)'), 'testedDate' => new Expression('DATE(sample_tested_datetime)')))
             ->where("((eid.result IS NOT NULL AND eid.result != '' AND eid.result != 'NULL') OR (eid.reason_for_sample_rejection IS NOT NULL AND eid.reason_for_sample_rejection != '' AND eid.reason_for_sample_rejection != 0))")
-            ->where("sample_collection_date is not null AND sample_collection_date != '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00'")
+            ->where("sample_collection_date is not null AND sample_collection_date not like '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00'")
             ->group(array("testedDate"));
         if ($logincontainer->role != 1) {
             $testedQuery = $testedQuery->where('eid.lab_id IN ("' . implode('", "', $this->mappedFacilities) . '")');
@@ -2282,7 +2282,7 @@ class EidSampleTable extends AbstractTableGateway
         $rejectedQuery = $sql->select()->from(array('eid' => $this->table))
             ->columns(array('total' => new Expression('COUNT(*)'), 'rejectDate' => new Expression('DATE(sample_collection_date)')))
             ->where("eid.reason_for_sample_rejection IS NOT NULL AND eid.reason_for_sample_rejection !='' AND eid.reason_for_sample_rejection!= 0")
-            ->where("sample_collection_date is not null AND sample_collection_date != '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00'")
+            ->where("sample_collection_date is not null AND sample_collection_date not like '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00'")
             ->group(array("rejectDate"));
         if ($logincontainer->role != 1) {
             $rejectedQuery = $rejectedQuery->where('eid.lab_id IN ("' . implode('", "', $this->mappedFacilities) . '")');
@@ -2354,7 +2354,7 @@ class EidSampleTable extends AbstractTableGateway
             )
             ->join(array('icm' => 'import_config_machines'), 'icm.config_machine_id=eid.import_machine_name', array(), 'left')
             ;
-        //$query = $query->where("(eid.sample_collection_date is not null AND eid.sample_collection_date != '' AND DATE(eid.sample_collection_date) !='1970-01-01' AND DATE(eid.sample_collection_date) !='0000-00-00')");
+        //$query = $query->where("(eid.sample_collection_date is not null AND eid.sample_collection_date not like '' AND DATE(eid.sample_collection_date) !='1970-01-01' AND DATE(eid.sample_collection_date) !='0000-00-00')");
         if ($logincontainer->role != 1) {
             $query = $query->where('eid.lab_id IN ("' . implode('", "', $this->mappedFacilities) . '")');
         }
@@ -2390,7 +2390,7 @@ class EidSampleTable extends AbstractTableGateway
         //get received data
         $receivedQuery = $sql->select()->from(array('eid' => $this->table))
             ->columns(array('total' => new Expression('COUNT(*)'), 'receivedDate' => new Expression('DATE(sample_collection_date)')))
-            ->where("sample_collection_date is not null AND sample_collection_date != '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00'")
+            ->where("sample_collection_date is not null AND sample_collection_date not like '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00'")
             ->group(array("receivedDate"));
         if ($logincontainer->role != 1) {
             $receivedQuery = $receivedQuery->where('eid.lab_id IN ("' . implode('", "', $this->mappedFacilities) . '")');
@@ -2422,7 +2422,7 @@ class EidSampleTable extends AbstractTableGateway
         $testedQuery = $sql->select()->from(array('eid' => $this->table))
             ->columns(array('total' => new Expression('COUNT(*)'), 'testedDate' => new Expression('DATE(sample_tested_datetime)')))
             ->where("((eid.result IS NOT NULL AND eid.result != '' AND eid.result != 'NULL') OR (eid.reason_for_sample_rejection IS NOT NULL AND eid.reason_for_sample_rejection != '' AND eid.reason_for_sample_rejection != 0))")
-            ->where("sample_collection_date is not null AND sample_collection_date != '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00'")
+            ->where("sample_collection_date is not null AND sample_collection_date not like '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00'")
             ->group(array("testedDate"));
         if ($logincontainer->role != 1) {
             $testedQuery = $testedQuery->where('eid.lab_id IN ("' . implode('", "', $this->mappedFacilities) . '")');
@@ -2453,7 +2453,7 @@ class EidSampleTable extends AbstractTableGateway
         $rejectedQuery = $sql->select()->from(array('eid' => $this->table))
             ->columns(array('total' => new Expression('COUNT(*)'), 'rejectDate' => new Expression('DATE(sample_collection_date)')))
             ->where("eid.reason_for_sample_rejection IS NOT NULL AND eid.reason_for_sample_rejection !='' AND eid.reason_for_sample_rejection!= 0")
-            ->where("sample_collection_date is not null AND sample_collection_date != '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00'")
+            ->where("sample_collection_date is not null AND sample_collection_date not like '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00'")
             ->group(array("rejectDate"));
         if ($logincontainer->role != 1) {
             $rejectedQuery = $rejectedQuery->where('eid.lab_id IN ("' . implode('", "', $this->mappedFacilities) . '")');
@@ -2577,7 +2577,7 @@ class EidSampleTable extends AbstractTableGateway
                 $queryStr = $queryStr->join(array('icm' => 'import_config_machines'), 'icm.config_machine_id = eid.import_machine_name', array('poc_device'))->where(array('icm.poc_device' => 'yes'));
             }
             $queryStr = $queryStr->where("
-                        (sample_collection_date is not null AND sample_collection_date != '')
+                        (sample_collection_date is not null AND sample_collection_date not like '')
                         AND DATE(sample_collection_date) >= '" . $startMonth . "' 
                         AND DATE(sample_collection_date) <= '" . $endMonth . "'");
 
@@ -4061,7 +4061,7 @@ class EidSampleTable extends AbstractTableGateway
 
             $sQuery = $sQuery->where(
                 "
-                                        (sample_collection_date is not null AND sample_collection_date != '')
+                                        (sample_collection_date is not null AND sample_collection_date not like '')
                                         AND DATE(sample_collection_date) >= '" . $startMonth . "' 
                                         AND DATE(sample_collection_date) <= '" . $endMonth . "'"
             );
@@ -4242,7 +4242,7 @@ class EidSampleTable extends AbstractTableGateway
             ))
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'))
             ->join(array('l' => 'facility_details'), 'l.facility_id=vl.lab_id', array(), 'left')
-            ->where("sample_collection_date is not null AND sample_collection_date != '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00' AND f.facility_type = 1")
+            ->where("sample_collection_date is not null AND sample_collection_date not like '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00' AND f.facility_type = 1")
             ->group(new Expression('DATE(sample_collection_date)'))
             ->group('vl.specimen_type')
             ->group('vl.facility_id');
@@ -4340,7 +4340,7 @@ class EidSampleTable extends AbstractTableGateway
             ))
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'))
             ->join(array('l' => 'facility_details'), 'l.facility_id=vl.lab_id', array(), 'left')
-            ->where("sample_collection_date is not null AND sample_collection_date != '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00' AND f.facility_type = 1")
+            ->where("sample_collection_date is not null AND sample_collection_date not like '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00' AND f.facility_type = 1")
             ->group(new Expression('DATE(sample_collection_date)'))
             ->group('vl.specimen_type')
             ->group('vl.facility_id');
@@ -4470,7 +4470,7 @@ class EidSampleTable extends AbstractTableGateway
                 "total_samples_pending" => new Expression("(SUM(CASE WHEN ((vl.result IS NULL OR vl.result = '' OR vl.result = 'NULL' OR sample_tested_datetime is null OR sample_tested_datetime = '' OR DATE(sample_tested_datetime) ='1970-01-01' OR DATE(sample_tested_datetime) ='0000-00-00') AND (vl.reason_for_sample_rejection IS NULL OR vl.reason_for_sample_rejection = '' OR vl.reason_for_sample_rejection = 0)) THEN 1 ELSE 0 END))"),
                 "rejected_samples" => new Expression("SUM(CASE WHEN (vl.reason_for_sample_rejection !='' AND vl.reason_for_sample_rejection !='0' AND vl.reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END)")
             ))
-            ->where("sample_collection_date is not null AND sample_collection_date != '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00' AND vl.lab_id !=0")
+            ->where("sample_collection_date is not null AND sample_collection_date not like '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00' AND vl.lab_id !=0")
             ->group('vl.lab_id');
         if (isset($parameters['provinces']) && trim($parameters['provinces']) != '') {
             $sQuery = $sQuery->where('f.facility_state IN (' . $parameters['provinces'] . ')');
@@ -4567,7 +4567,7 @@ class EidSampleTable extends AbstractTableGateway
             ->join(array('vl' => $this->table), 'vl.lab_id=f.facility_id', array(
                 "total_samples_received" => new Expression("(COUNT(*))")
             ))
-            ->where("sample_collection_date is not null AND sample_collection_date != '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00' AND vl.lab_id !=0")
+            ->where("sample_collection_date is not null AND sample_collection_date not like '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00' AND vl.lab_id !=0")
             ->group('vl.lab_id');
         if ($logincontainer->role != 1) {
             $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : array(0);

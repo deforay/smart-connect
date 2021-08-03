@@ -475,7 +475,7 @@ CREATE TABLE `r_covid19_comorbidities` (
 ALTER TABLE `facility_details` ADD `header_text` VARCHAR(255) NULL DEFAULT NULL AFTER `facility_type`;
 ALTER TABLE `r_art_code_details` ADD `updated_datetime` DATETIME NULL DEFAULT NULL AFTER `nation_identifier`;
 ALTER TABLE `r_art_code_details` ADD `headings` VARCHAR(255) NULL DEFAULT NULL AFTER `updated_datetime`, ADD `art_status` VARCHAR(45) NULL DEFAULT NULL AFTER `headings`;
-ALTER TABLE `r_sample_rejection_reasons` ADD `rejection_type` VARCHAR(255) NULL DEFAULT NULL AFTER `rejection_reason_id`, ADD `rejection_reason_code` VARCHAR(255) NULL DEFAULT NULL AFTER `rejection_type`;
+ALTER TABLE `r_vl_sample_rejection_reasons` ADD `rejection_type` VARCHAR(255) NULL DEFAULT NULL AFTER `rejection_reason_id`, ADD `rejection_reason_code` VARCHAR(255) NULL DEFAULT NULL AFTER `rejection_type`;
 
 /* Thana 17 Sep 2020 */
 ALTER TABLE `dash_form_covid19` ADD `type_of_test_requested` VARCHAR(255) NULL DEFAULT NULL AFTER `reason_for_covid19_test`;
