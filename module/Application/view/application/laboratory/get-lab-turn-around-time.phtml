@@ -1,6 +1,119 @@
+<?php
+/* \Zend\Debug\Debug::dump($result);
+die; */
+?>
 <div id="labAverageTat"></div>
 <script>
     $('#labAverageTat').highcharts({
+        chart: {
+            type: 'line'
+        },
+        title: {
+            text: 'Laboratory Turnaround Time'
+        },
+        exporting: {
+            chartOptions: {
+                subtitle: {
+                    text: 'Laboratory Turnaround Time',
+                }
+            }
+        },
+        credits: {
+            enabled: false
+        },
+        xAxis: {
+            //categories: ["21 Mar", "22 Mar", "23 Mar", "24 Mar", "25 Mar", "26 Mar", "27 Mar"]
+            categories: [<?php
+                            if (isset($result['date']) && count($result['date']) > 0) {
+                                foreach ($result['date'] as $date) {
+                                    echo "'" . $date . "',";
+                                }
+                            }
+                            ?>]
+        },
+        yAxis: [{
+            title: {
+                text: 'Average TAT in Days'
+            },
+            labels: {
+                formatter: function() {
+                    return this.value;
+                }
+            }
+        }, { // Secondary yAxis
+            gridLineWidth: 0,
+            title: {
+                text: 'No. of Tests'
+            },
+            labels: {
+                format: '{value}'
+            },
+            opposite: true
+        }],
+        plotOptions: {
+            line: {
+                dataLabels: {
+                    enabled: true
+                },
+                cursor: 'pointer',
+                point: {
+                    events: {
+                        click: function(e) {
+                            //doLabTATRedirect(e.point.category);
+                        }
+                    }
+                }
+            },
+            series: {
+                dataLabels: {
+                    enabled: true
+                }
+            }
+        },
+
+        series: [{
+                type: 'column',
+                name: 'No. of Samples Tested',
+                data: [<?php echo implode(",", $result['totalSamples']); ?>],
+                color: '#7CB5ED',
+                yAxis: 1
+            },
+            <?php
+            if (isset($result['sampleReceivedDiff'])) {
+            ?> {
+                    connectNulls: false,
+                    showInLegend: true,
+                    name: 'Collected - Received at Lab',
+                    data: [<?php echo implode(",", $result['sampleReceivedDiff']); ?>],
+                    color: '#edb47c',
+                },
+            <?php
+            }
+            if (isset($result['sampleReceivedTested'])) {
+            ?> {
+                    connectNulls: false,
+                    showInLegend: true,
+                    name: 'Received - Tested',
+                    data: [<?php echo implode(",", $result['sampleReceivedTested']); ?>],
+                    color: '#0f3f6e',
+                },
+            <?php
+            }
+            if (isset($result['sampleTestedDiff'])) {
+            ?> {
+                    connectNulls: false,
+                    showInLegend: true,
+                    name: 'Collected - Tested',
+                    data: [<?php echo implode(",", $result['sampleTestedDiff']); ?>],
+                    color: '#ed7c7d',
+                },
+            <?php
+            }
+            ?>
+        ],
+    });
+
+    /* $('#labAverageTat').highcharts({
         chart: {
             zoomType: 'xy',
             marginTop: 100
@@ -139,7 +252,7 @@
                 }
             <?php } ?>
         ]
-    });
+    }); */
 
     function getRandomColor() {
         var letters = '0123456789ABCDEF';
