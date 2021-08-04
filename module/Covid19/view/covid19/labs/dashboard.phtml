@@ -264,14 +264,9 @@ $endDate = date('Y-m');
     <div class="row" style="padding-top:5px;padding-bottom:20px;">
         <div class="col-lg-6" id="labHeight">
             <select name="labName[]" id="labName" class="form-control" multiple title="<?php echo $this->translate('Please select one or more labs. Leave blank for All'); ?>">
-                <!-- <?php
-                        foreach ($labName as $lab) {
-                        ?>
+                <?php foreach ($labName as $lab) { ?>
                     <option data-name="<?php echo $lab['facility_name']; ?>" data-district="<?php echo $lab['facility_district']; ?>" value="<?php echo $lab['facility_id']; ?>"><?php echo $lab['facility_code'] . " - " . $lab['facility_name']; ?></option>
-                <?php
-                        }
-                ?> -->
-
+                <?php } ?>
             </select>
         </div>
         <div class="col-lg-3" style="display: flex;">
@@ -585,12 +580,12 @@ $endDate = date('Y-m');
         }
 
         $.when(getMonthlySampleCount(), getMonthlySampleCountbyLab())
-        .done(function() {
-            getcovid19OutcomesByAge();
-            positivityRate();
-            getAverageLabTAT();
-            getLabPerformance();
-        });
+            .done(function() {
+                getcovid19OutcomesByAge();
+                positivityRate();
+                getAverageLabTAT();
+                getLabPerformance();
+            });
     }
 
     function resetEverything() {
@@ -619,7 +614,7 @@ $endDate = date('Y-m');
     }
 
     function selectDistrictName() {
-        $('#districtName,#labName').html('');
+        $('#districtName').html('');
         $('#districtName,#labName').select2('val', '');
 
         var pName = $("#provinceName").val();
@@ -636,7 +631,7 @@ $endDate = date('Y-m');
     }
 
     function selectLabName() {
-        $('#labName').html('');
+        /* $('#labName').html('');
         $('#labName').select2('val', '');
         var dName = $("#districtName").val();
         if (dName != null && dName.length > 0) {
@@ -649,7 +644,7 @@ $endDate = date('Y-m');
                         $('#labName').html(data);
                     }
                 });
-        }
+        } */
     }
 
     function expandChart(from) {
@@ -742,39 +737,39 @@ $endDate = date('Y-m');
         $(document).ajaxStart($.blockUI({
             message: '<h4> <?php echo ($this->translate('Processing test outcomes by age')); ?> ... </h4>'
         })).ajaxStop($.unblockUI);
-        
+
         var fromDate = formatDate($('#mrp-lowerDate').val());
         var toDate = formatDate($('#mrp-upperDate').val());
         var facilityId = ($("#labName").val() == null) ? '' : $("#labName").val().join(',');
 
         $.post("<?php echo $this->url('covid19-labs', array('action' => 'get-covid19-outcomes-by-age')); ?>", {
-            fromDate: fromDate,
-            toDate: toDate,
-            facilityId: facilityId
-        },
-        function(data) {
-            $("#covid19OutcomesByAge").html(data);
-            $.unblockUI();
-        });
+                fromDate: fromDate,
+                toDate: toDate,
+                facilityId: facilityId
+            },
+            function(data) {
+                $("#covid19OutcomesByAge").html(data);
+                $.unblockUI();
+            });
     }
-    
+
     function positivityRate() {
         $(document).ajaxStart($.blockUI({
             message: '<h4> <?php echo ($this->translate('Processing Positivity Rate')); ?> ... </h4>'
         })).ajaxStop($.unblockUI);
-        
+
         var fromDate = formatDate($('#mrp-lowerDate').val());
         var toDate = formatDate($('#mrp-upperDate').val());
         var facilityId = ($("#labName").val() == null) ? '' : $("#labName").val().join(',');
 
         $.post("<?php echo $this->url('covid19-labs', array('action' => 'get-covid19-positivity-rate')); ?>", {
-            fromDate: fromDate,
-            toDate: toDate,
-            facilityId: facilityId
-        },
-        function(data) {
-            $("#positivityRate").html(data);
-            $.unblockUI();
-        });
+                fromDate: fromDate,
+                toDate: toDate,
+                facilityId: facilityId
+            },
+            function(data) {
+                $("#positivityRate").html(data);
+                $.unblockUI();
+            });
     }
 </script>
