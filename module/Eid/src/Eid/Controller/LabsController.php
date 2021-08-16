@@ -38,7 +38,7 @@ class LabsController extends AbstractActionController
             'clinicName' => $clinicName,
         ));
     }
-    
+
     public function pocLabsDashboardAction()
     {
         $this->layout()->setVariable('activeTab', 'eid-poc-labs');
@@ -61,22 +61,20 @@ class LabsController extends AbstractActionController
     {
         $daterange =  $lab = '';
         if ($this->params()->fromQuery('daterange')) {
-			$daterange = $this->params()->fromQuery('daterange');
-		}
-		if ($this->params()->fromQuery('lab')) {
-			$lab = $this->params()->fromQuery('lab');
+            $daterange = $this->params()->fromQuery('daterange');
+        }
+        if ($this->params()->fromQuery('lab')) {
+            $lab = $this->params()->fromQuery('lab');
         }
         $labName = $this->sampleService->getAllLabName();
         // print_r($lab);die;
-        if($lab!='')
-        {
+        if ($lab != '') {
             return new ViewModel(array(
                 'daterange' => $daterange,
                 'lab' => $lab,
                 'labName' => $labName
             ));
-        }
-        else
+        } else
             die;
     }
 
