@@ -2534,7 +2534,7 @@ class Covid19FormTable extends AbstractTableGateway
                         "positive" => new Expression("SUM(CASE WHEN ((covid19.result like 'positive' OR covid19.result like 'Positive' )) THEN 1 ELSE 0 END)"),
                     )
                 )
-                ->join(array('f' => 'facility_details'), 'f.facility_id=covid19.facility_id', array('total_facilities' => new Expression("COUNT(f.facility_id)")))
+                ->join(array('f' => 'facility_details'), 'f.facility_id=covid19.facility_id', array('total_facilities' => new Expression("COUNT(DISTINCT f.facility_id)")))
                 ->join(array('lab' => 'facility_details'), 'lab.facility_id=covid19.lab_id', array('lab_name' => 'facility_name'))
                 ->where(array("covid19.sample_collection_date >='" . $startMonth . " 00:00:00" . "'", "covid19.sample_collection_date <='" . $endMonth . " 23:59:59" . "'"))
 

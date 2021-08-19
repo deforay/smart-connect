@@ -2301,11 +2301,12 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
     });
 
     function formatDate(date) {
-        var d = new Date(date),
+        // We are formatting Mon-Year date as 01/Mon/Year 
+        // because firefox was not able to parse Mon-Year format
+        var d = new Date('01/'+date.replace("-" , "/")),
             month = '' + (d.getMonth() + 1),
             year = d.getFullYear();
         if (month.length < 2) month = '0' + month;
-
         return [year, month].join('-');
     }
 </script>

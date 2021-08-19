@@ -878,6 +878,8 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
 <script src="<?php echo $this->basePath('assets/plugins/datepicker/bootstrap-datepicker.js') ?>"></script>
 <script src="<?php echo $this->basePath('assets/pages/scripts/dashboard.js'); ?>" type="text/javascript"></script>
 <script src="<?php echo $this->basePath('assets/global/plugins/jquery.blockui.min.js'); ?>" type="text/javascript"></script>
+
+
 <script type="text/javascript">
     var oTableSamplesReceivedDistrict = null;
     var oTableSamplesReceivedFacility = null;
@@ -1886,11 +1888,12 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
     });
 
     function formatDate(date) {
-        var d = new Date(date),
+        // We are formatting Mon-Year date as 01/Mon/Year 
+        // because firefox was not able to parse Mon-Year format
+        var d = new Date('01/'+date.replace("-" , "/")),
             month = '' + (d.getMonth() + 1),
             year = d.getFullYear();
         if (month.length < 2) month = '0' + month;
-
         return [year, month].join('-');
     }
 
