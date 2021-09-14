@@ -225,7 +225,7 @@ class Covid19FormTable extends AbstractTableGateway
 
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . "-31";
+            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $sQuery = $sQuery
                 ->where("(sample_collection_date is not null)
                         AND DATE(sample_collection_date) >= '" . $startMonth . "' 
@@ -264,7 +264,7 @@ class Covid19FormTable extends AbstractTableGateway
 
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . "-31";
+            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $iQuery = $iQuery
                 ->where("(covid19.sample_collection_date is not null)
                         AND DATE(covid19.sample_collection_date) >= '" . $startMonth . "' 
@@ -408,7 +408,7 @@ class Covid19FormTable extends AbstractTableGateway
 
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . "-31";
+            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $sQuery = $sQuery
                 ->where("(covid19.sample_collection_date is not null AND covid19.sample_collection_date not like '')
                         AND DATE(covid19.sample_collection_date) >= '" . $startMonth . "' 
@@ -449,7 +449,7 @@ class Covid19FormTable extends AbstractTableGateway
 
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . "-31";
+            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $iQuery = $iQuery
                 ->where("(covid19.sample_collection_date is not null AND covid19.sample_collection_date not like '')
                         AND DATE(covid19.sample_collection_date) >= '" . $startMonth . "' 
@@ -588,7 +588,7 @@ class Covid19FormTable extends AbstractTableGateway
 
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . "-31";
+            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $sQuery = $sQuery
                 ->where("(covid19.sample_collection_date is not null AND covid19.sample_collection_date not like '')
                         AND DATE(covid19.sample_collection_date) >= '" . $startMonth . "' 
@@ -631,7 +631,7 @@ class Covid19FormTable extends AbstractTableGateway
 
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . "-31";
+            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $iQuery = $iQuery
                 ->where("(covid19.sample_collection_date is not null AND covid19.sample_collection_date not like '')
                         AND DATE(covid19.sample_collection_date) >= '" . $startMonth . "' 
@@ -827,7 +827,7 @@ class Covid19FormTable extends AbstractTableGateway
 
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . "-31";
+            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $sQuery = $sQuery
                 ->where("(covid19.sample_collection_date is not null)
                         AND DATE(covid19.sample_collection_date) >= '" . $startMonth . "' 
@@ -867,7 +867,7 @@ class Covid19FormTable extends AbstractTableGateway
             ->group('f.facility_state');
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . "-31";
+            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $iQuery = $iQuery
                 ->where("(covid19.sample_collection_date is not null)
                         AND DATE(covid19.sample_collection_date) >= '" . $startMonth . "' 
@@ -1005,7 +1005,7 @@ class Covid19FormTable extends AbstractTableGateway
         }
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . "-31";
+            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $sQuery = $sQuery
                 ->where("(covid19.sample_collection_date is not null)
                         AND DATE(covid19.sample_collection_date) >= '" . $startMonth . "' 
@@ -1045,7 +1045,7 @@ class Covid19FormTable extends AbstractTableGateway
             ->group('f.facility_district');
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . "-31";
+            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $iQuery = $iQuery
                 ->where("(covid19.sample_collection_date is not null)
                         AND DATE(covid19.sample_collection_date) >= '" . $startMonth . "' 
@@ -1188,7 +1188,7 @@ class Covid19FormTable extends AbstractTableGateway
 
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . "-31";
+            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $sQuery = $sQuery
                 ->where("(covid19.sample_collection_date is not null)
                         AND DATE(covid19.sample_collection_date) >= '" . $startMonth . "' 
@@ -1231,7 +1231,7 @@ class Covid19FormTable extends AbstractTableGateway
             ->group('covid19.facility_id');
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . "-31";
+            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $iQuery = $iQuery
                 ->where("(covid19.sample_collection_date is not null)
                         AND DATE(covid19.sample_collection_date) >= '" . $startMonth . "' 
@@ -1456,7 +1456,7 @@ class Covid19FormTable extends AbstractTableGateway
 
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . "-31";
+            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $sQuery = $sQuery
                 ->where("(covid19.sample_collection_date is not null)
                         AND DATE(covid19.sample_collection_date) >= '" . $startMonth . "' 
@@ -1496,7 +1496,7 @@ class Covid19FormTable extends AbstractTableGateway
             ->group('f.facility_district');
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . "-31";
+            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $iQuery = $iQuery
                 ->where("(covid19.sample_collection_date is not null)
                         AND DATE(covid19.sample_collection_date) >= '" . $startMonth . "' 
@@ -1624,7 +1624,7 @@ class Covid19FormTable extends AbstractTableGateway
 
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . "-31";
+            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $sQuery = $sQuery
                 ->where("(covid19.sample_collection_date is not null AND covid19.sample_collection_date not like '')
                         AND DATE(covid19.sample_collection_date) >= '" . $startMonth . "' 
@@ -1664,7 +1664,7 @@ class Covid19FormTable extends AbstractTableGateway
             ->group('f.facility_district');
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . "-31";
+            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $iQuery = $iQuery
                 ->where("(covid19.sample_collection_date is not null AND covid19.sample_collection_date not like '')
                         AND DATE(covid19.sample_collection_date) >= '" . $startMonth . "' 
@@ -1794,7 +1794,7 @@ class Covid19FormTable extends AbstractTableGateway
 
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . "-31";
+            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $sQuery = $sQuery
                 ->where("(covid19.sample_collection_date is not null AND covid19.sample_collection_date not like '')
                         AND DATE(covid19.sample_collection_date) >= '" . $startMonth . "' 
@@ -1835,7 +1835,7 @@ class Covid19FormTable extends AbstractTableGateway
             ->group('f.facility_id');
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . "-31";
+            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $iQuery = $iQuery
                 ->where("(covid19.sample_collection_date is not null AND covid19.sample_collection_date not like '')
                         AND DATE(covid19.sample_collection_date) >= '" . $startMonth . "' 
@@ -3895,7 +3895,7 @@ class Covid19FormTable extends AbstractTableGateway
         */
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . "-31";
+            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
         }
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
@@ -4123,7 +4123,7 @@ class Covid19FormTable extends AbstractTableGateway
         $sql = new Sql($dbAdapter);
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . "-31";
+            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
         }
         $sQuery = $sql->select()->from(array('f' => 'facility_details'))
             ->join(array('covid19' => $this->table), 'covid19.lab_id=f.facility_id', array(

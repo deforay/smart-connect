@@ -288,7 +288,7 @@ class SampleTable extends AbstractTableGateway
                         AND DATE(sample_collection_date) <= '" . $endMonth . "'");
 
             $queryStr = $queryStr->group(array(new Expression('MONTH(sample_collection_date)')));
-            $queryStr = $queryStr->order(array(new Expression('DATE(sample_collection_date)')));
+            $queryStr = $queryStr->order('sample_collection_date ASC');
             $queryStr = $sql->buildSqlString($queryStr);
             // echo $queryStr;die;
             //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -352,7 +352,7 @@ class SampleTable extends AbstractTableGateway
                         AND vl.reason_for_vl_testing IN ($sampleTestedReason)");
 
             $queryStr = $queryStr->group(array(new Expression('MONTH(sample_collection_date)')));
-            $queryStr = $queryStr->order(array(new Expression('DATE(sample_collection_date)')));
+            $queryStr = $queryStr->order('sample_collection_date ASC');
             $queryStr = $sql->buildSqlString($queryStr);
             //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             $sampleResult = $common->cacheQuery($queryStr, $dbAdapter);
@@ -497,7 +497,7 @@ class SampleTable extends AbstractTableGateway
                         AND DATE(sample_collection_date) <= '" . $endMonth . "' ");
 
             $query = $query->group(array(new Expression('MONTH(sample_collection_date)')));
-            $query = $query->order(array(new Expression('DATE(sample_collection_date)')));
+            $query = $query->order('sample_collection_date ASC');
             $queryStr = $sql->buildSqlString($query);
             //echo $queryStr;die;
             //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -714,7 +714,7 @@ class SampleTable extends AbstractTableGateway
                 $query = $query->where($where);
             }
             $query = $query->group(array(new Expression('MONTH(sample_collection_date)')));
-            $query = $query->order(array(new Expression('DATE(sample_collection_date)')));
+            $query = $query->order('sample_collection_date ASC');
             $queryStr = $sql->buildSqlString($query);
             //echo $queryStr;die;
             //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -777,7 +777,7 @@ class SampleTable extends AbstractTableGateway
                         AND DATE(sample_collection_date) <= '" . $endMonth . "' ");
 
             $query = $query->group(array(new Expression('MONTH(sample_collection_date)')));
-            $query = $query->order(array(new Expression('DATE(sample_collection_date)')));
+            $query = $query->order('sample_collection_date ASC');
             $queryStr = $sql->buildSqlString($query);
             //echo $queryStr;die;
             //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -829,7 +829,7 @@ class SampleTable extends AbstractTableGateway
                         AND DATE(sample_collection_date) <= '" . $endMonth . "' ");
 
             $query = $query->group(array(new Expression('MONTH(sample_collection_date)')));
-            $query = $query->order(array(new Expression('DATE(sample_collection_date)')));
+            $query = $query->order('sample_collection_date ASC');
             $queryStr = $sql->buildSqlString($query);
             //echo $queryStr;die;
             //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -901,7 +901,7 @@ class SampleTable extends AbstractTableGateway
                         AND DATE(sample_collection_date) <= '" . $endMonth . "' ");
 
             $query = $query->group(array(new Expression('MONTH(sample_collection_date)')));
-            $query = $query->order(array(new Expression('DATE(sample_collection_date)')));
+            $query = $query->order('sample_collection_date ASC');
             $queryStr = $sql->buildSqlString($query);
             //echo $queryStr;die;
             //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -2167,7 +2167,7 @@ class SampleTable extends AbstractTableGateway
         $sQuery = $sql->select()->from(array('vl' => $this->table))
             ->columns(array('vl_sample_id', 'sample_code', 'DashVL_AnalysisResult', 'DashVL_Abs', 'sampleCollectionDate' => new Expression('DATE(sample_collection_date)'), 'sample_type', 'sampleTestingDate' => new Expression('DATE(sample_tested_datetime)'), 'result_value_log', 'result_value_absolute', 'result_value_text', 'result'))
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'), 'left')
-            ->join(array('r_r_r' => 'r_sample_rejection_reasons'), 'r_r_r.rejection_reason_id=vl.reason_for_sample_rejection', array('rejection_reason_name'), 'left');
+            ->join(array('r_r_r' => 'r_vl_sample_rejection_reasons'), 'r_r_r.rejection_reason_id=vl.reason_for_sample_rejection', array('rejection_reason_name'), 'left');
         //->where(array('f.facility_type'=>'1'));
         if (isset($parameters['sampleCollectionDate']) && trim($parameters['sampleCollectionDate']) != '') {
             //$sQuery = $sQuery->where(array("vl.sample_collection_date <='" . $endDate . " 23:59:59" . "'", "vl.sample_collection_date >='" . $startDate . " 00:00:00" . "'"));
@@ -2283,7 +2283,7 @@ class SampleTable extends AbstractTableGateway
         $iQuery = $sql->select()->from(array('vl' => $this->table))
             ->columns(array('vl_sample_id'))
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'))
-            ->join(array('r_r_r' => 'r_sample_rejection_reasons'), 'r_r_r.rejection_reason_id=vl.reason_for_sample_rejection', array('rejection_reason_name'), 'left');
+            ->join(array('r_r_r' => 'r_vl_sample_rejection_reasons'), 'r_r_r.rejection_reason_id=vl.reason_for_sample_rejection', array('rejection_reason_name'), 'left');
         //->where(array('f.facility_type'=>'1'));
         if ($logincontainer->role != 1) {
             $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : array(0);
@@ -2436,7 +2436,7 @@ class SampleTable extends AbstractTableGateway
             }
 
             $queryStr = $queryStr->group(array(new Expression('WEEK(sample_collection_date)')));
-            $queryStr = $queryStr->order(array(new Expression('WEEK(sample_collection_date)')));
+            $queryStr = $queryStr->order('sample_collection_date ASC');
             $queryStr = $sql->buildSqlString($queryStr);
             //echo $queryStr;die;
             $sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -2835,7 +2835,7 @@ class SampleTable extends AbstractTableGateway
                 $sQuery = $sQuery->where("(vl.is_patient_breastfeeding IS NULL OR vl.is_patient_breastfeeding = '' OR vl.is_patient_breastfeeding = 'Unreported')");
             }
             $sQuery = $sQuery->group(array(new Expression('DATE(sample_collection_date)')));
-            $sQuery = $sQuery->order(array(new Expression('DATE(sample_collection_date)')));
+            $sQuery = $sQuery->order('sample_collection_date ASC');
 
             $sQuery = $sql->buildSqlString($sQuery);
             $sampleResult = $dbAdapter->query($sQuery, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -2958,7 +2958,7 @@ class SampleTable extends AbstractTableGateway
                 $sQuery = $sQuery->where("(vl.is_patient_breastfeeding IS NULL OR vl.is_patient_breastfeeding = '' OR vl.is_patient_breastfeeding = 'Unreported')");
             }
             $sQuery = $sQuery->group(array(new Expression('MONTH(sample_collection_date)')));
-            $sQuery = $sQuery->order(array(new Expression('DATE(sample_collection_date)')));
+            $sQuery = $sQuery->order('sample_collection_date ASC');
             $sQueryStr = $sql->buildSqlString($sQuery);
             $barChartResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
 
@@ -3152,7 +3152,7 @@ class SampleTable extends AbstractTableGateway
         */
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . "-31";
+            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
         }
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
@@ -3408,7 +3408,7 @@ class SampleTable extends AbstractTableGateway
         $sql = new Sql($dbAdapter);
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . "-31";
+            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
         }
         $sQuery = $sql->select()->from(array('f' => 'facility_details'))
             ->join(array('vl' => $this->table), 'vl.lab_id=f.facility_id', array(
@@ -3737,7 +3737,7 @@ class SampleTable extends AbstractTableGateway
             $sQuery->offset($sOffset);
         }
         $sQuery = $sQuery->group(array(new Expression('MONTH(sample_collection_date)')));
-        $sQuery = $sQuery->order(array(new Expression('DATE(sample_collection_date)')));
+        $sQuery = $sQuery->order('sample_collection_date ASC');
 
         $queryContainer->sampleResultTestedTATQuery = $sQuery;
         $queryStr = $sql->buildSqlString($sQuery); // Get the string of the Sql, instead of the Select-instance
@@ -3765,7 +3765,7 @@ class SampleTable extends AbstractTableGateway
             $iQuery = $iQuery->where('vl.lab_id IN ("' . implode('", "', array_values(array_filter($mappedFacilities))) . '")');
         }
         $iQuery = $iQuery->group(array(new Expression('MONTH(sample_collection_date)')));
-        $iQuery = $iQuery->order(array(new Expression('DATE(sample_collection_date)')));
+        $iQuery = $iQuery->order('sample_collection_date ASC');
         $iQueryStr = $sql->buildSqlString($iQuery);
         //error_log($iQueryStr);die;
         $iResult = $dbAdapter->query($iQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -5027,6 +5027,7 @@ class SampleTable extends AbstractTableGateway
                                         AND DATE(sample_collection_date) >= '" . $startMonth . "' 
                                         AND DATE(sample_collection_date) <= '" . $endMonth . "'");
         }
+        $sQuery = $sQuery->order('sample_collection_date ASC');
         $queryStr = $sql->buildSqlString($sQuery);
         //echo $queryStr;die;
         //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -5156,7 +5157,7 @@ class SampleTable extends AbstractTableGateway
 
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . "-31";
+            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $sQuery = $sQuery
                 ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '')
                         AND DATE(vl.sample_collection_date) >= '" . $startMonth . "' 
@@ -5198,7 +5199,7 @@ class SampleTable extends AbstractTableGateway
 
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . "-31";
+            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $iQuery = $iQuery
                 ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '')
                         AND DATE(vl.sample_collection_date) >= '" . $startMonth . "' 
@@ -5343,7 +5344,7 @@ class SampleTable extends AbstractTableGateway
 
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . "-31";
+            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $sQuery = $sQuery
                 ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '')
                         AND DATE(vl.sample_collection_date) >= '" . $startMonth . "' 
@@ -5386,7 +5387,7 @@ class SampleTable extends AbstractTableGateway
 
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . "-31";
+            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $iQuery = $iQuery
                 ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '')
                         AND DATE(vl.sample_collection_date) >= '" . $startMonth . "' 
@@ -5533,7 +5534,7 @@ class SampleTable extends AbstractTableGateway
 
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . "-31";
+            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $sQuery = $sQuery
                 ->where("(sample_collection_date is not null AND sample_collection_date not like '')
                         AND DATE(sample_collection_date) >= '" . $startMonth . "' 
@@ -5573,7 +5574,7 @@ class SampleTable extends AbstractTableGateway
 
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . "-31";
+            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $iQuery = $iQuery
                 ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '')
                         AND DATE(vl.sample_collection_date) >= '" . $startMonth . "' 
@@ -5653,6 +5654,7 @@ class SampleTable extends AbstractTableGateway
                                         AND DATE(sample_collection_date) >= '" . $startMonth . "' 
                                         AND DATE(sample_collection_date) <= '" . $endMonth . "'");
         }
+        $sQuery = $sQuery->order('sample_collection_date ASC');
         $queryStr = $sql->buildSqlString($sQuery);
         //echo $queryStr;die;
         //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -5777,7 +5779,7 @@ class SampleTable extends AbstractTableGateway
 
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . "-31";
+            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $sQuery = $sQuery
                 ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '')
                         AND DATE(vl.sample_collection_date) >= '" . $startMonth . "' 
@@ -5817,7 +5819,7 @@ class SampleTable extends AbstractTableGateway
             ->group('f.facility_state');
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . "-31";
+            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $iQuery = $iQuery
                 ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '')
                         AND DATE(vl.sample_collection_date) >= '" . $startMonth . "' 
@@ -5954,7 +5956,7 @@ class SampleTable extends AbstractTableGateway
         }
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . "-31";
+            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $sQuery = $sQuery
                 ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '')
                         AND DATE(vl.sample_collection_date) >= '" . $startMonth . "' 
@@ -5994,7 +5996,7 @@ class SampleTable extends AbstractTableGateway
             ->group('f.facility_district');
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . "-31";
+            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $iQuery = $iQuery
                 ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '')
                         AND DATE(vl.sample_collection_date) >= '" . $startMonth . "' 
@@ -6137,7 +6139,7 @@ class SampleTable extends AbstractTableGateway
 
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . "-31";
+            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $sQuery = $sQuery
                 ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '')
                         AND DATE(vl.sample_collection_date) >= '" . $startMonth . "' 
@@ -6180,7 +6182,7 @@ class SampleTable extends AbstractTableGateway
             ->group('vl.facility_id');
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . "-31";
+            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $iQuery = $iQuery
                 ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '')
                         AND DATE(vl.sample_collection_date) >= '" . $startMonth . "' 
@@ -6219,7 +6221,7 @@ class SampleTable extends AbstractTableGateway
         $mostRejectionReasons = array();
         $mostRejectionQuery = $sql->select()->from(array('vl' => $this->table))
             ->columns(array('rejections' => new Expression('COUNT(*)')))
-            ->join(array('r_r_r' => 'r_sample_rejection_reasons'), 'r_r_r.rejection_reason_id=vl.reason_for_sample_rejection', array('rejection_reason_id'))
+            ->join(array('r_r_r' => 'r_vl_sample_rejection_reasons'), 'r_r_r.rejection_reason_id=vl.reason_for_sample_rejection', array('rejection_reason_id'))
             ->group('vl.reason_for_sample_rejection')
             ->order('rejections DESC')
             ->limit(4);
@@ -6264,7 +6266,7 @@ class SampleTable extends AbstractTableGateway
             for ($m = 0; $m < count($mostRejectionReasons); $m++) {
                 $rejectionQuery = $sql->select()->from(array('vl' => $this->table))
                     ->columns(array('rejections' => new Expression('COUNT(*)')))
-                    ->join(array('r_r_r' => 'r_sample_rejection_reasons'), 'r_r_r.rejection_reason_id=vl.reason_for_sample_rejection', array('rejection_reason_name'))
+                    ->join(array('r_r_r' => 'r_vl_sample_rejection_reasons'), 'r_r_r.rejection_reason_id=vl.reason_for_sample_rejection', array('rejection_reason_name'))
                     ->where("MONTH(sample_collection_date)='" . $month . "' AND Year(sample_collection_date)='" . $year . "'");
 
 
@@ -6405,7 +6407,7 @@ class SampleTable extends AbstractTableGateway
 
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . "-31";
+            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $sQuery = $sQuery
                 ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '')
                         AND DATE(vl.sample_collection_date) >= '" . $startMonth . "' 
@@ -6445,7 +6447,7 @@ class SampleTable extends AbstractTableGateway
             ->group('f.facility_district');
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . "-31";
+            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $iQuery = $iQuery
                 ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '')
                         AND DATE(vl.sample_collection_date) >= '" . $startMonth . "' 
@@ -6573,7 +6575,7 @@ class SampleTable extends AbstractTableGateway
 
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . "-31";
+            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $sQuery = $sQuery
                 ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '')
                         AND DATE(vl.sample_collection_date) >= '" . $startMonth . "' 
@@ -6613,7 +6615,7 @@ class SampleTable extends AbstractTableGateway
             ->group('f.facility_district');
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . "-31";
+            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $iQuery = $iQuery
                 ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '')
                         AND DATE(vl.sample_collection_date) >= '" . $startMonth . "' 
@@ -6743,7 +6745,7 @@ class SampleTable extends AbstractTableGateway
 
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . "-31";
+            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $sQuery = $sQuery
                 ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '')
                         AND DATE(vl.sample_collection_date) >= '" . $startMonth . "' 
@@ -6784,7 +6786,7 @@ class SampleTable extends AbstractTableGateway
             ->group('f.facility_id');
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . "-31";
+            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $iQuery = $iQuery
                 ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '')
                         AND DATE(vl.sample_collection_date) >= '" . $startMonth . "' 
@@ -7022,7 +7024,7 @@ class SampleTable extends AbstractTableGateway
 
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . "-31";
+            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $sQuery = $sQuery
                 ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '')
                         AND DATE(vl.sample_collection_date) >= '" . $startMonth . "' 
@@ -7063,7 +7065,7 @@ class SampleTable extends AbstractTableGateway
             ->group('vl.current_regimen');
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . "-31";
+            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $iQuery = $iQuery
                 ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '')
                         AND DATE(vl.sample_collection_date) >= '" . $startMonth . "' 
@@ -7205,6 +7207,8 @@ class SampleTable extends AbstractTableGateway
                                         AND DATE(sample_collection_date) <= '" . $endMonth . "'");
         }
 
+
+        $samplesReceivedSummaryQuery = $samplesReceivedSummaryQuery->order('sample_collection_date ASC');
         $queryContainer->indicatorSummaryQuery = $samplesReceivedSummaryQuery;
         $samplesReceivedSummaryCacheQuery = $sql->buildSqlString($samplesReceivedSummaryQuery);
         $samplesReceivedSummaryResult = $common->cacheQuery($samplesReceivedSummaryCacheQuery, $dbAdapter);
@@ -7614,6 +7618,7 @@ class SampleTable extends AbstractTableGateway
         }
         $squery = $squery->group(array('location_id'));
         $sQueryStr = $sql->buildSqlString($squery);
+        //echo $sQueryStr;die;
         $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         return $sResult;
     }
@@ -7747,7 +7752,7 @@ class SampleTable extends AbstractTableGateway
         $uResult = $dbAdapter->query($uQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
         if (isset($uResult['user_id'])) {
             $sQuery = $sql->select()->from(array('vl' => $this->table))->columns(array('sample_code', 'sample_collection_date', 'sample_tested_datetime', 'result', 'patient_art_no'))
-                ->join(array('r_r_r' => 'r_sample_rejection_reasons'), 'r_r_r.rejection_reason_id=vl.reason_for_sample_rejection', array('rejection_reason_name'), 'left')
+                ->join(array('r_r_r' => 'r_vl_sample_rejection_reasons'), 'r_r_r.rejection_reason_id=vl.reason_for_sample_rejection', array('rejection_reason_name'), 'left')
                 ->join(array('rss' => 'r_sample_status'), 'rss.status_id=vl.result_status', array('status_name'), 'left');
 
             if (isset($params['patient_id']) && $params['patient_id'] != '') {
@@ -7858,7 +7863,7 @@ class SampleTable extends AbstractTableGateway
             LEFT JOIN r_vl_test_reasons as tr ON tr.test_reason_id=vl.reason_for_vl_testing
             LEFT JOIN facility_type as ft ON ft.facility_type_id=f.facility_type
             LEFT JOIN facility_type as lft ON lft.facility_type_id=l_f.facility_type
-            LEFT JOIN r_sample_rejection_reasons as rsrr ON rsrr.rejection_reason_id=vl.reason_for_sample_rejection
+            LEFT JOIN r_vl_sample_rejection_reasons as rsrr ON rsrr.rejection_reason_id=vl.reason_for_sample_rejection
             WHERE sample_code is not null AND sample_code !='' ";
 
             $sQuery .= " AND DATE(vl.sample_collection_date) >= '$startDate' AND DATE(vl.sample_collection_date) <= '$endDate'";

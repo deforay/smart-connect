@@ -252,7 +252,7 @@ class EidSampleTable extends AbstractTableGateway
 
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . "-31";
+            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $sQuery = $sQuery
                 ->where("(eid.sample_collection_date is not null AND eid.sample_collection_date not like '')
                         AND DATE(eid.sample_collection_date) >= '" . $startMonth . "' 
@@ -293,7 +293,7 @@ class EidSampleTable extends AbstractTableGateway
 
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . "-31";
+            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $iQuery = $iQuery
                 ->where("(eid.sample_collection_date is not null AND eid.sample_collection_date not like '')
                         AND DATE(eid.sample_collection_date) >= '" . $startMonth . "' 
@@ -436,7 +436,7 @@ class EidSampleTable extends AbstractTableGateway
 
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . "-31";
+            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $sQuery = $sQuery
                 ->where("(eid.sample_collection_date is not null AND eid.sample_collection_date not like '')
                         AND DATE(eid.sample_collection_date) >= '" . $startMonth . "' 
@@ -479,7 +479,7 @@ class EidSampleTable extends AbstractTableGateway
 
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . "-31";
+            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $iQuery = $iQuery
                 ->where("(eid.sample_collection_date is not null AND eid.sample_collection_date not like '')
                         AND DATE(eid.sample_collection_date) >= '" . $startMonth . "' 
@@ -624,7 +624,7 @@ class EidSampleTable extends AbstractTableGateway
 
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . "-31";
+            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $sQuery = $sQuery
                 ->where("(sample_collection_date is not null)
                         AND DATE(sample_collection_date) >= '" . $startMonth . "' 
@@ -663,7 +663,7 @@ class EidSampleTable extends AbstractTableGateway
 
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . "-31";
+            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $iQuery = $iQuery
                 ->where("(eid.sample_collection_date is not null)
                         AND DATE(eid.sample_collection_date) >= '" . $startMonth . "' 
@@ -866,7 +866,7 @@ class EidSampleTable extends AbstractTableGateway
 
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . "-31";
+            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $sQuery = $sQuery
                 ->where("(eid.sample_collection_date is not null)
                         AND DATE(eid.sample_collection_date) >= '" . $startMonth . "' 
@@ -906,7 +906,7 @@ class EidSampleTable extends AbstractTableGateway
             ->group('f.facility_state');
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . "-31";
+            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $iQuery = $iQuery
                 ->where("(eid.sample_collection_date is not null)
                         AND DATE(eid.sample_collection_date) >= '" . $startMonth . "' 
@@ -1044,7 +1044,7 @@ class EidSampleTable extends AbstractTableGateway
         }
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . "-31";
+            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $sQuery = $sQuery
                 ->where("(eid.sample_collection_date is not null)
                         AND DATE(eid.sample_collection_date) >= '" . $startMonth . "' 
@@ -1084,7 +1084,7 @@ class EidSampleTable extends AbstractTableGateway
             ->group('f.facility_district');
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . "-31";
+            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $iQuery = $iQuery
                 ->where("(eid.sample_collection_date is not null)
                         AND DATE(eid.sample_collection_date) >= '" . $startMonth . "' 
@@ -1227,7 +1227,7 @@ class EidSampleTable extends AbstractTableGateway
 
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . "-31";
+            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $sQuery = $sQuery
                 ->where("(eid.sample_collection_date is not null)
                         AND DATE(eid.sample_collection_date) >= '" . $startMonth . "' 
@@ -1270,7 +1270,7 @@ class EidSampleTable extends AbstractTableGateway
             ->group('eid.facility_id');
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . "-31";
+            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $iQuery = $iQuery
                 ->where("(eid.sample_collection_date is not null)
                         AND DATE(eid.sample_collection_date) >= '" . $startMonth . "' 
@@ -1495,7 +1495,7 @@ class EidSampleTable extends AbstractTableGateway
 
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . "-31";
+            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $sQuery = $sQuery
                 ->where("(eid.sample_collection_date is not null)
                         AND DATE(eid.sample_collection_date) >= '" . $startMonth . "' 
@@ -1535,7 +1535,7 @@ class EidSampleTable extends AbstractTableGateway
             ->group('f.facility_district');
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . "-31";
+            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $iQuery = $iQuery
                 ->where("(eid.sample_collection_date is not null)
                         AND DATE(eid.sample_collection_date) >= '" . $startMonth . "' 
@@ -1663,7 +1663,7 @@ class EidSampleTable extends AbstractTableGateway
 
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . "-31";
+            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $sQuery = $sQuery
                 ->where("(eid.sample_collection_date is not null AND eid.sample_collection_date not like '')
                         AND DATE(eid.sample_collection_date) >= '" . $startMonth . "' 
@@ -1703,7 +1703,7 @@ class EidSampleTable extends AbstractTableGateway
             ->group('f.facility_district');
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . "-31";
+            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $iQuery = $iQuery
                 ->where("(eid.sample_collection_date is not null AND eid.sample_collection_date not like '')
                         AND DATE(eid.sample_collection_date) >= '" . $startMonth . "' 
@@ -1833,7 +1833,7 @@ class EidSampleTable extends AbstractTableGateway
 
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . "-31";
+            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $sQuery = $sQuery
                 ->where("(eid.sample_collection_date is not null AND eid.sample_collection_date not like '')
                         AND DATE(eid.sample_collection_date) >= '" . $startMonth . "' 
@@ -1874,7 +1874,7 @@ class EidSampleTable extends AbstractTableGateway
             ->group('f.facility_id');
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . "-31";
+            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $iQuery = $iQuery
                 ->where("(eid.sample_collection_date is not null AND eid.sample_collection_date not like '')
                         AND DATE(eid.sample_collection_date) >= '" . $startMonth . "' 
@@ -4239,7 +4239,7 @@ class EidSampleTable extends AbstractTableGateway
         */
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . "-31";
+            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
         }
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
@@ -4470,7 +4470,7 @@ class EidSampleTable extends AbstractTableGateway
         $sql = new Sql($dbAdapter);
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
-            $endMonth = str_replace(' ', '-', $parameters['toDate']) . "-31";
+            $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
         }
         $sQuery = $sql->select()->from(array('f' => 'facility_details'))
             ->join(array('vl' => $this->table), 'vl.lab_id=f.facility_id', array(
