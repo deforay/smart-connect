@@ -27,10 +27,12 @@ class UsersTable extends AbstractTableGateway
     public $sm = null;
     public $config = null;
     public $useCurrentSampleTable = null;
-    public function __construct(Adapter $adapter, $sm = null)
+    public $commonService = null;
+    public function __construct(Adapter $adapter, $sm = null, $commonService = null)
     {
         $this->adapter = $adapter;
         $this->sm = $sm;
+        $this->commonService = $commonService;
         $this->config = $this->sm->get('Config');
         $this->useCurrentSampleTable = $this->config['defaults']['use-current-sample-table'];
     }
@@ -56,6 +58,20 @@ class UsersTable extends AbstractTableGateway
         $container = new Container('alert');
         $logincontainer = new Container('credo');
         if (count($rResult) > 0) {
+
+            date_default_timezone_set(isset($this->config['defaults']['time-zone']) ? $this->config['defaults']['time-zone'] : 'UTC');
+            // Let us flush the file cache
+            $cacheExpiryInMins = isset($this->config['defaults']['cache-expiry']) ? $this->config['defaults']['cache-expiry'] : 120;
+            clearstatcache();
+
+            $cacheDirLastModified = filemtime(realpath(APPLICATION_PATH . "/../data/cache"));
+            $cacheExpiryInMins = strtotime("-$cacheExpiryInMins mins");
+            
+            if($cacheDirLastModified > strtotime("-$cacheExpiryInMins mins")){
+                $this->commonService->clearAllCache();
+            }
+
+
             $facilities_id = array();
             $facilities_name = array();
             $facilities_code = array();
@@ -150,7 +166,6 @@ class UsersTable extends AbstractTableGateway
         } else {
             $container = new Container('alert');
             $container->alertMsg = 'Please check your login credentials';
-            //die('login');
             return '/login';
         }
     }
@@ -258,7 +273,7 @@ class UsersTable extends AbstractTableGateway
 
     public function fetchAllUsers($parameters)
     {
-        $common = new CommonService($this->sm);
+        
         /* Array of database columns which should be read and sent back to DataTables. Use a space where
          * you want to insert a non-database field (for example a counter or static image)
          */
@@ -372,7 +387,7 @@ class UsersTable extends AbstractTableGateway
             "aaData" => array()
         );
 
-        $buttText = $common->translate('Edit');
+        $buttText = $this->commonService->translate('Edit');
         foreach ($rResult as $aRow) {
             $row = array();
             $row[] = ucwords($aRow['user_name']);

@@ -11,5 +11,7 @@ return array(
         'eidModule'     => true,
         'covid19Module' => true,
         'pocDashboard'     => true,
+        'time-zone' => 'Asia/Kolkata',
+        'cache-expiry' => 1440, // in minutes
     ),
 );

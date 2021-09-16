@@ -218,7 +218,8 @@ class Module
 			'factories' => array(
 				'UsersTable' => function ($sm) {
 					$dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');
-					$table = new UsersTable($dbAdapter, $sm);
+					$commonService = $sm->getServiceLocator()->get('CommonService');
+					$table = new UsersTable($dbAdapter, $sm, $commonService);
 					return $table;
 				},
 				'OrganizationsTable' => function ($sm) {
@@ -255,14 +256,13 @@ class Module
 					$tableObj = new SampleTable($dbAdapter, $sm, $mappedFacilities, $sampleTable,$commonService);
 					$storage = $sm->get('Cache\Persistent');
 					
-					$table = new ObjectCache(
+					return new ObjectCache(
 						$storage,
 						new PatternOptions([
 							'object' => $tableObj,
 							'object_key' => $sampleTable // this makes sure we have different caches for both current and archive
 						])
 					);
-					return $table;
 				},
 				'SampleTableWithoutCache' => function ($sm) {
 					$session = new Container('credo');
@@ -276,13 +276,12 @@ class Module
 					$dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');
 					$tableObj = new FacilityTable($dbAdapter, $sm);
 					$storage = $sm->get('Cache\Persistent');
-					$table = new ObjectCache(
+					return new ObjectCache(
 						$storage,
 						new PatternOptions([
 							'object' => $tableObj
 						])
-					);
-					return $table;					
+					);				
 				},
 				'FacilityTableWithoutCache' => function ($sm) {
 					$dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');

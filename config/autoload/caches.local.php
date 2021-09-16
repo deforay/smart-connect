@@ -7,7 +7,7 @@ return array(
             'maxTtl' => 1,  // 1440 minutes = 1 day
             'lockOnExpire' => false,  // 1440 minutes = 1 day
             'options' => [
-                'cache_dir' => realpath(__DIR__ . '/../../data/cache/'),
+                'cache_dir' => getcwd() . "/data/cache/",
                 'dir_permission' => 0755,
                 'file_permission' => 0666,
                 'dir_level' => 1,

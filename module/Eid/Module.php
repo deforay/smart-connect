@@ -3,7 +3,8 @@
 namespace Eid;
 
 use Laminas\Session\Container;
-use Laminas\Cache\PatternFactory;
+use Laminas\Cache\Pattern\ObjectCache;
+use Laminas\Cache\Pattern\PatternOptions;
 
 
 class Module
@@ -26,7 +27,7 @@ class Module
                     $facilityService = $sm->getServiceLocator()->get('FacilityService');
                     $sampleService = $sm->getServiceLocator()->get('EidSampleService');
                     $commonService = $sm->getServiceLocator()->get('CommonService');
-                    return new \Eid\Controller\LabsController($sampleService, $facilityService,$commonService);
+                    return new \Eid\Controller\LabsController($sampleService, $facilityService, $commonService);
                 },
                 'Eid\Controller\Clinics' => function ($sm) {
                     $commonService = $sm->getServiceLocator()->get('CommonService');
@@ -49,12 +50,16 @@ class Module
                     $eidSampleTable = isset($session->eidSampleTable) ? $session->eidSampleTable :  null;
 
                     $tableObj = new \Eid\Model\EidSampleTable($dbAdapter, $sm, $mappedFacilities, $eidSampleTable);
-                    $table = PatternFactory::factory('object', [
-                        'storage' => $sm->get('Cache\Persistent'),
-                        'object' => $tableObj,
-                        'object_key' => $eidSampleTable // this makes sure we have different caches for both current and archive
-                    ]);
-                    return $table;
+
+
+                    $storage = $sm->get('Cache\Persistent');
+                    return new ObjectCache(
+                        $storage,
+                        new PatternOptions([
+                            'object' => $tableObj,
+                            'object_key' => $eidSampleTable // this makes sure we have different caches for both current and archive
+                        ])
+                    );
                 },
                 'EidSampleTableWithoutCache' => function ($sm) {
                     $session = new Container('credo');

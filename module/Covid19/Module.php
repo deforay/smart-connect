@@ -3,7 +3,8 @@
 namespace Covid19;
 
 use Laminas\Session\Container;
-use Laminas\Cache\PatternFactory;
+use Laminas\Cache\Pattern\ObjectCache;
+use Laminas\Cache\Pattern\PatternOptions;
 
 
 class Module
@@ -47,12 +48,15 @@ class Module
                     $dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');
                     $covid19SampleTable = isset($session->covid19SampleTable) ? $session->covid19SampleTable :  'dash_form_covid19';
                     $tableObj = new \Covid19\Model\Covid19FormTable($dbAdapter, $sm, $mappedFacilities, $covid19SampleTable);
-                    $table = PatternFactory::factory('object', [
-                        'storage' => $sm->get('Cache\Persistent'),
-                        'object' => $tableObj,
-                        'object_key' => $covid19SampleTable // this makes sure we have different caches for both current and archive
-                    ]);
-                    return $table;
+
+                    $storage = $sm->get('Cache\Persistent');
+                    return new ObjectCache(
+                        $storage,
+                        new PatternOptions([
+                            'object' => $tableObj,
+                            'object_key' => $covid19SampleTable // this makes sure we have different caches for both current and archive
+                        ])
+                    );
                 },
 
                 'Covid19FormTableWithoutCache' => function ($sm) {
