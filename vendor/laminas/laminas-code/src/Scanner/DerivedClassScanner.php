@@ -10,17 +10,22 @@ namespace Laminas\Code\Scanner;
 
 use Laminas\Code\Exception;
 
+use function array_keys;
+use function array_merge;
+use function sprintf;
+use function trigger_error;
+
 class DerivedClassScanner extends ClassScanner
 {
     /**
      * @var DirectoryScanner
      */
-    protected $directoryScanner = null;
+    protected $directoryScanner;
 
     /**
      * @var ClassScanner
      */
-    protected $classScanner = null;
+    protected $classScanner;
 
     /**
      * @var array
@@ -46,9 +51,9 @@ class DerivedClassScanner extends ClassScanner
         while ($currentScannerClass && $currentScannerClass->hasParentClass()) {
             $currentParentClassName = $currentScannerClass->getParentClass();
             if ($directoryScanner->hasClass($currentParentClassName)) {
-                $currentParentClass                                 = $directoryScanner->getClass($currentParentClassName);
+                $currentParentClass = $directoryScanner->getClass($currentParentClassName);
                 $this->parentClassScanners[$currentParentClassName] = $currentParentClass;
-                $currentScannerClass                                = $currentParentClass;
+                $currentScannerClass = $currentParentClass;
             } else {
                 $currentScannerClass = false;
             }
@@ -122,7 +127,7 @@ class DerivedClassScanner extends ClassScanner
      */
     public function hasParentClass()
     {
-        return ($this->classScanner->getParentClass() !== null);
+        return $this->classScanner->getParentClass() !== null;
     }
 
     /**

@@ -38,7 +38,7 @@ class SimpleStreamResponseSender extends AbstractResponseSender
     public function __invoke(SendResponseEvent $event)
     {
         $response = $event->getResponse();
-        if (!$response instanceof Stream) {
+        if (! $response instanceof Stream) {
             return $this;
         }
 

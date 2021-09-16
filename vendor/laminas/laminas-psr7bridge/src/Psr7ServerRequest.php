@@ -11,6 +11,7 @@ namespace Laminas\Psr7Bridge;
 use Laminas\Diactoros\ServerRequest;
 use Laminas\Diactoros\Stream;
 use Laminas\Diactoros\UploadedFile;
+use Laminas\Http\PhpEnvironment\Request as LaminasPhpEnvironmentRequest;
 use Laminas\Http\Request as LaminasRequest;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -64,7 +65,9 @@ final class Psr7ServerRequest
     public static function fromLaminas(LaminasRequest $laminasRequest)
     {
         $body = new Stream('php://memory', 'wb+');
-        $body->write($laminasRequest->getContent());
+        if ($laminasRequest->getContent() !== null) {
+            $body->write($laminasRequest->getContent());
+        }
 
         $headers = empty($laminasRequest->getHeaders()) ? [] : $laminasRequest->getHeaders()->toArray();
         $query   = empty($laminasRequest->getQuery()) ? [] : $laminasRequest->getQuery()->toArray();
@@ -72,7 +75,9 @@ final class Psr7ServerRequest
         $files   = empty($laminasRequest->getFiles()) ? [] : $laminasRequest->getFiles()->toArray();
 
         $request = new ServerRequest(
-            [],
+            $laminasRequest instanceof LaminasPhpEnvironmentRequest
+                ? iterator_to_array($laminasRequest->getServer())
+                : [],
             self::convertFilesToUploaded($files),
             $laminasRequest->getUriString(),
             $laminasRequest->getMethod(),
@@ -104,12 +109,15 @@ final class Psr7ServerRequest
                 continue;
             }
 
+            $uploadError = $upload->getError();
+            $isUploadError = $uploadError !== UPLOAD_ERR_OK;
+
             $files[$name] = [
                 'name'     => $upload->getClientFilename(),
                 'type'     => $upload->getClientMediaType(),
                 'size'     => $upload->getSize(),
-                'tmp_name' => $upload->getStream()->getMetadata('uri'),
-                'error'    => $upload->getError(),
+                'tmp_name' => ! $isUploadError ? $upload->getStream()->getMetadata('uri') : '',
+                'error'    => $uploadError,
             ];
         }
         return $files;

@@ -8,6 +8,10 @@
 
 namespace Laminas\Code\Reflection\DocBlock\Tag;
 
+use function explode;
+use function preg_match;
+use function rtrim;
+
 class MethodTag implements TagInterface, PhpDocTypedTagInterface
 {
     /**
@@ -20,12 +24,12 @@ class MethodTag implements TagInterface, PhpDocTypedTagInterface
     /**
      * @var string
      */
-    protected $methodName = null;
+    protected $methodName;
 
     /**
      * @var string
      */
-    protected $description = null;
+    protected $description;
 
     /**
      * Is static method
@@ -51,7 +55,7 @@ class MethodTag implements TagInterface, PhpDocTypedTagInterface
     {
         $match = [];
 
-        if (!preg_match('#^(static[\s]+)?(.+[\s]+)?(.+\(\))[\s]*(.*)$#m', $tagDocblockLine, $match)) {
+        if (! preg_match('#^(static[\s]+)?(.+[\s]+)?(.+\(\))[\s]*(.*)$#m', $tagDocblockLine, $match)) {
             return;
         }
 
@@ -116,6 +120,6 @@ class MethodTag implements TagInterface, PhpDocTypedTagInterface
 
     public function __toString()
     {
-        return 'DocBlock Tag [ * @' . $this->getName() . ' ]' . PHP_EOL;
+        return 'DocBlock Tag [ * @' . $this->getName() . ' ]' . "\n";
     }
 }

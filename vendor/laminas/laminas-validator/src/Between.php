@@ -1,22 +1,25 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-validator for the canonical source repository
- * @copyright https://github.com/laminas/laminas-validator/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-validator/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Validator;
 
 use Laminas\Stdlib\ArrayUtils;
 use Traversable;
 
+use function array_key_exists;
+use function array_shift;
+use function func_get_args;
+use function is_array;
+use function is_numeric;
+use function is_string;
+
+use const PHP_INT_MAX;
+
 class Between extends AbstractValidator
 {
-    const NOT_BETWEEN        = 'notBetween';
-    const NOT_BETWEEN_STRICT = 'notBetweenStrict';
-    const VALUE_NOT_NUMERIC  = 'valueNotNumeric';
-    const VALUE_NOT_STRING   = 'valueNotString';
+    public const NOT_BETWEEN        = 'notBetween';
+    public const NOT_BETWEEN_STRICT = 'notBetweenStrict';
+    public const VALUE_NOT_NUMERIC  = 'valueNotNumeric';
+    public const VALUE_NOT_STRING   = 'valueNotString';
 
     /**
      * Retain if min and max are numeric values. Allow to not compare string and numeric types
@@ -35,7 +38,7 @@ class Between extends AbstractValidator
         self::NOT_BETWEEN_STRICT => "The input is not strictly between '%min%' and '%max%'",
         self::VALUE_NOT_NUMERIC  => "The min ('%min%') and max ('%max%') values are numeric, but the input is not",
         self::VALUE_NOT_STRING   => "The min ('%min%') and max ('%max%') values are non-numeric strings, "
-        .    "but the input is not a string",
+            . 'but the input is not a string',
     ];
 
     /**
@@ -54,7 +57,7 @@ class Between extends AbstractValidator
      * @var array
      */
     protected $options = [
-        'inclusive' => true,  // Whether to do inclusive comparisons, allowing equivalence to min and/or max
+        'inclusive' => true, // Whether to do inclusive comparisons, allowing equivalence to min and/or max
         'min'       => 0,
         'max'       => PHP_INT_MAX,
     ];
@@ -67,7 +70,6 @@ class Between extends AbstractValidator
      *   'inclusive' => boolean, inclusive border values
      *
      * @param  array|Traversable $options
-     *
      * @throws Exception\InvalidArgumentException
      */
     public function __construct($options = null)
@@ -76,7 +78,7 @@ class Between extends AbstractValidator
             $options = ArrayUtils::iteratorToArray($options);
         }
         if (! is_array($options)) {
-            $options = func_get_args();
+            $options     = func_get_args();
             $temp['min'] = array_shift($options);
             if (! empty($options)) {
                 $temp['max'] = array_shift($options);
@@ -93,11 +95,13 @@ class Between extends AbstractValidator
             throw new Exception\InvalidArgumentException("Missing option: 'min' and 'max' have to be given");
         }
 
-        if ((isset($options['min']) && is_numeric($options['min']))
+        if (
+            (isset($options['min']) && is_numeric($options['min']))
             && (isset($options['max']) && is_numeric($options['max']))
         ) {
             $this->numeric = true;
-        } elseif ((isset($options['min']) && is_string($options['min']))
+        } elseif (
+            (isset($options['min']) && is_string($options['min']))
             && (isset($options['max']) && is_string($options['max']))
         ) {
             $this->numeric = false;
@@ -124,7 +128,7 @@ class Between extends AbstractValidator
      * Sets the min option
      *
      * @param  mixed $min
-     * @return Between Provides a fluent interface
+     * @return $this Provides a fluent interface
      */
     public function setMin($min)
     {
@@ -146,7 +150,7 @@ class Between extends AbstractValidator
      * Sets the max option
      *
      * @param  mixed $max
-     * @return Between Provides a fluent interface
+     * @return $this Provides a fluent interface
      */
     public function setMax($max)
     {
@@ -168,7 +172,7 @@ class Between extends AbstractValidator
      * Sets the inclusive option
      *
      * @param  bool $inclusive
-     * @return Between Provides a fluent interface
+     * @return $this Provides a fluent interface
      */
     public function setInclusive($inclusive)
     {

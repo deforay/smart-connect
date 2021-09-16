@@ -1,11 +1,5 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-form for the canonical source repository
- * @copyright https://github.com/laminas/laminas-form/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-form/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Form\View\Helper;
 
 use Laminas\Form\Element\Button;
@@ -14,6 +8,12 @@ use Laminas\Form\Element\MonthSelect;
 use Laminas\Form\ElementInterface;
 use Laminas\Form\Exception;
 use Laminas\Form\LabelAwareInterface;
+
+use function in_array;
+use function is_null;
+use function method_exists;
+use function sprintf;
+use function strtolower;
 
 class FormRow extends AbstractHelper
 {
@@ -115,7 +115,7 @@ class FormRow extends AbstractHelper
      *
      * @param  ElementInterface $element
      * @param  null|string      $labelPosition
-     * @throws \Laminas\Form\Exception\DomainException
+     * @throws Exception\DomainException
      * @return string
      */
     public function render(ElementInterface $element, $labelPosition = null)
@@ -141,7 +141,7 @@ class FormRow extends AbstractHelper
 
         // Does this element have errors ?
         if ($element->getMessages() && $inputErrorClass) {
-            $classAttributes = ($element->hasAttribute('class') ? $element->getAttribute('class') . ' ' : '');
+            $classAttributes = $element->hasAttribute('class') ? $element->getAttribute('class') . ' ' : '';
             $classAttributes = $classAttributes . $inputErrorClass;
 
             $element->setAttribute('class', $classAttributes);
@@ -252,7 +252,7 @@ class FormRow extends AbstractHelper
      * Set the class that is added to element that have errors
      *
      * @param  string $inputErrorClass
-     * @return FormRow
+     * @return $this
      */
     public function setInputErrorClass($inputErrorClass)
     {
@@ -274,7 +274,7 @@ class FormRow extends AbstractHelper
      * Set the attributes for the row label
      *
      * @param  array $labelAttributes
-     * @return FormRow
+     * @return $this
      */
     public function setLabelAttributes($labelAttributes)
     {
@@ -296,8 +296,8 @@ class FormRow extends AbstractHelper
      * Set the label position
      *
      * @param  string $labelPosition
-     * @throws \Laminas\Form\Exception\InvalidArgumentException
-     * @return FormRow
+     * @throws Exception\InvalidArgumentException
+     * @return $this
      */
     public function setLabelPosition($labelPosition)
     {
@@ -330,7 +330,7 @@ class FormRow extends AbstractHelper
      * Set if the errors are rendered by this helper
      *
      * @param  bool $renderErrors
-     * @return FormRow
+     * @return $this
      */
     public function setRenderErrors($renderErrors)
     {
@@ -352,7 +352,7 @@ class FormRow extends AbstractHelper
      * Set a partial view script to use for rendering the row
      *
      * @param null|string $partial
-     * @return FormRow
+     * @return $this
      */
     public function setPartial($partial)
     {
@@ -381,7 +381,7 @@ class FormRow extends AbstractHelper
             return $this->labelHelper;
         }
 
-        if (method_exists($this->view, 'plugin')) {
+        if ($this->view !== null && method_exists($this->view, 'plugin')) {
             $this->labelHelper = $this->view->plugin('form_label');
         }
 
@@ -410,7 +410,7 @@ class FormRow extends AbstractHelper
             return $this->elementHelper;
         }
 
-        if (method_exists($this->view, 'plugin')) {
+        if ($this->view !== null && method_exists($this->view, 'plugin')) {
             $this->elementHelper = $this->view->plugin('form_element');
         }
 
@@ -432,7 +432,7 @@ class FormRow extends AbstractHelper
             return $this->elementErrorsHelper;
         }
 
-        if (method_exists($this->view, 'plugin')) {
+        if ($this->view !== null && method_exists($this->view, 'plugin')) {
             $this->elementErrorsHelper = $this->view->plugin('form_element_errors');
         }
 

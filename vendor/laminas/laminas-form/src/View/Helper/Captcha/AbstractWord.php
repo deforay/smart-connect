@@ -1,17 +1,18 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-form for the canonical source repository
- * @copyright https://github.com/laminas/laminas-form/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-form/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Form\View\Helper\Captcha;
 
 use Laminas\Captcha\AdapterInterface as CaptchaAdapter;
 use Laminas\Form\ElementInterface;
 use Laminas\Form\Exception;
 use Laminas\Form\View\Helper\FormInput;
+
+use function array_key_exists;
+use function in_array;
+use function is_array;
+use function method_exists;
+use function sprintf;
+use function strtolower;
 
 abstract class AbstractWord extends FormInput
 {
@@ -154,7 +155,7 @@ abstract class AbstractWord extends FormInput
      *
      * @param  mixed $captchaPosition
      * @throws Exception\InvalidArgumentException
-     * @return AbstractWord
+     * @return $this
      */
     public function setCaptchaPosition($captchaPosition)
     {
@@ -187,7 +188,7 @@ abstract class AbstractWord extends FormInput
      * Set separator string for captcha and inputs
      *
      * @param  string $separator
-     * @return AbstractWord
+     * @return $this
      */
     public function setSeparator($separator)
     {

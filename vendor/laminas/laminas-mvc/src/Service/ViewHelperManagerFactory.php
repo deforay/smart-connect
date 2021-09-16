@@ -9,9 +9,7 @@
 namespace Laminas\Mvc\Service;
 
 use Interop\Container\ContainerInterface;
-use Laminas\Console\Console;
-use Laminas\Mvc\Router\RouteMatch;
-use Laminas\ServiceManager\ConfigInterface;
+use Laminas\Router\RouteMatch;
 use Laminas\ServiceManager\Exception\ServiceNotCreatedException;
 use Laminas\View\Helper as ViewHelper;
 use Laminas\View\HelperPluginManager;
@@ -25,19 +23,17 @@ class ViewHelperManagerFactory extends AbstractPluginManagerFactory
      *
      * These are *not* imported; that way they can be optional dependencies.
      *
-     * @todo Re-enable these once their components have been updated to laminas-servicemanager v3
+     * @todo Remove these once their components have Modules defined.
      * @var array
      */
-    protected $defaultHelperMapClasses = [
-        'Laminas\Form\View\HelperConfig',
-        'Laminas\I18n\View\HelperConfig',
-        'Laminas\Navigation\View\HelperConfig',
-    ];
+    protected $defaultHelperMapClasses = [];
 
     /**
      * Create and return the view helper manager
      *
      * @param  ContainerInterface $container
+     * @param  string             $requestedName
+     * @param  null|array         $options
      * @return HelperPluginManager
      * @throws ServiceNotCreatedException
      */
@@ -47,43 +43,8 @@ class ViewHelperManagerFactory extends AbstractPluginManagerFactory
         $options['factories'] = isset($options['factories']) ? $options['factories'] : [];
         $plugins = parent::__invoke($container, $requestedName, $options);
 
-        // Configure default helpers from other components
-        $plugins = $this->configureHelpers($plugins);
-
         // Override plugin factories
         $plugins = $this->injectOverrideFactories($plugins, $container);
-
-        return $plugins;
-    }
-
-    /**
-     * Configure helpers from other components.
-     *
-     * Loops through the list of default helper configuration classes, and uses
-     * each to configure the helper plugin manager.
-     *
-     * @param HelperPluginManager $plugins
-     * @return HelperPluginManager
-     */
-    private function configureHelpers(HelperPluginManager $plugins)
-    {
-        foreach ($this->defaultHelperMapClasses as $configClass) {
-            if (! is_string($configClass) || ! class_exists($configClass)) {
-                continue;
-            }
-
-            $config = new $configClass();
-
-            if (! $config instanceof ConfigInterface) {
-                throw new ServiceNotCreatedException(sprintf(
-                    'Invalid service manager configuration class provided; received "%s", expected class implementing %s',
-                    $configClass,
-                    ConfigInterface::class
-                ));
-            }
-
-            $config->configureServiceManager($plugins);
-        }
 
         return $plugins;
     }
@@ -129,8 +90,7 @@ class ViewHelperManagerFactory extends AbstractPluginManagerFactory
     {
         return function () use ($services) {
             $helper = new ViewHelper\Url;
-            $router = Console::isConsole() ? 'HttpRouter' : 'Router';
-            $helper->setRouter($services->get($router));
+            $helper->setRouter($services->get('HttpRouter'));
 
             $match = $services->get('Application')
                 ->getMvcEvent()
@@ -158,13 +118,6 @@ class ViewHelperManagerFactory extends AbstractPluginManagerFactory
         return function () use ($services) {
             $config = $services->has('config') ? $services->get('config') : [];
             $helper = new ViewHelper\BasePath;
-
-            if (Console::isConsole()
-                && isset($config['view_manager']['base_path_console'])
-            ) {
-                $helper->setBasePath($config['view_manager']['base_path_console']);
-                return $helper;
-            }
 
             if (isset($config['view_manager']) && isset($config['view_manager']['base_path'])) {
                 $helper->setBasePath($config['view_manager']['base_path']);

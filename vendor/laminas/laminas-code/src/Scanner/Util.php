@@ -11,6 +11,16 @@ namespace Laminas\Code\Scanner;
 use Laminas\Code\Exception;
 use stdClass;
 
+use function array_key_exists;
+use function is_object;
+use function ltrim;
+use function property_exists;
+use function sprintf;
+use function strlen;
+use function strpos;
+use function substr;
+use function substr_replace;
+
 /**
  * Shared utility methods used by scanners
  */
@@ -27,9 +37,9 @@ class Util
      */
     public static function resolveImports(&$value, $key = null, stdClass $data = null)
     {
-        if (!is_object($data)
-            || !property_exists($data, 'uses')
-            || !property_exists($data, 'namespace')
+        if (! is_object($data)
+            || ! property_exists($data, 'uses')
+            || ! property_exists($data, 'namespace')
         ) {
             throw new Exception\InvalidArgumentException(sprintf(
                 '%s expects a data object containing "uses" and "namespace" properties; on or both missing',
@@ -37,13 +47,13 @@ class Util
             ));
         }
 
-        if ($data->namespace && !$data->uses && strlen($value) > 0 && $value{0} != '\\') {
+        if ($data->namespace && ! $data->uses && strlen($value) > 0 && $value[0] != '\\') {
             $value = $data->namespace . '\\' . $value;
 
             return;
         }
 
-        if (!$data->uses || strlen($value) <= 0 || $value{0} == '\\') {
+        if (! $data->uses || strlen($value) <= 0 || $value[0] == '\\') {
             $value = ltrim($value, '\\');
 
             return;

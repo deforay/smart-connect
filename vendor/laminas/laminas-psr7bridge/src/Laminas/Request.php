@@ -11,6 +11,7 @@ namespace Laminas\Psr7Bridge\Laminas;
 use Laminas\Http\Header\Cookie;
 use Laminas\Http\PhpEnvironment\Request as BaseRequest;
 use Laminas\Stdlib\Parameters;
+use Psr\Http\Message\UriInterface;
 
 class Request extends BaseRequest
 {
@@ -42,7 +43,8 @@ class Request extends BaseRequest
         $this->setAllowCustomMethods(true);
 
         $this->setMethod($method);
-        $this->setRequestUri((string) $uri);
+        // Remove the "http(s)://hostname" part from the URI
+        $this->setRequestUri(preg_replace('#^[^/:]+://[^/]+#', '', (string) $uri));
         $this->setUri((string) $uri);
 
         $headerCollection = $this->getHeaders();

@@ -1,11 +1,5 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-cache for the canonical source repository
- * @copyright https://github.com/laminas/laminas-cache/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-cache/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Cache\Storage\Adapter;
 
 use ArrayObject;
@@ -14,16 +8,16 @@ use Laminas\Cache\Storage\Capabilities;
 use Laminas\Cache\Storage\Event;
 use Laminas\Cache\Storage\ExceptionEvent;
 use Laminas\Cache\Storage\Plugin;
+use Laminas\Cache\Storage\PluginAwareInterface;
 use Laminas\Cache\Storage\PostEvent;
 use Laminas\Cache\Storage\StorageInterface;
 use Laminas\EventManager\EventManager;
 use Laminas\EventManager\EventManagerInterface;
-use Laminas\EventManager\EventsCapableInterface;
 use SplObjectStorage;
 use stdClass;
 use Traversable;
 
-abstract class AbstractAdapter implements StorageInterface, EventsCapableInterface
+abstract class AbstractAdapter implements StorageInterface, PluginAwareInterface
 {
     /**
      * The used EventManager if any
@@ -252,10 +246,7 @@ abstract class AbstractAdapter implements StorageInterface, EventsCapableInterfa
     }
 
     /**
-     * Check if a plugin is registered
-     *
-     * @param  Plugin\PluginInterface $plugin
-     * @return bool
+     * {@inheritdoc}
      */
     public function hasPlugin(Plugin\PluginInterface $plugin)
     {
@@ -264,12 +255,7 @@ abstract class AbstractAdapter implements StorageInterface, EventsCapableInterfa
     }
 
     /**
-     * Register a plugin
-     *
-     * @param  Plugin\PluginInterface $plugin
-     * @param  int $priority
-     * @return AbstractAdapter Provides a fluent interface
-     * @throws Exception\LogicException
+     * {@inheritdoc}
      */
     public function addPlugin(Plugin\PluginInterface $plugin, $priority = 1)
     {
@@ -288,11 +274,7 @@ abstract class AbstractAdapter implements StorageInterface, EventsCapableInterfa
     }
 
     /**
-     * Unregister an already registered plugin
-     *
-     * @param  Plugin\PluginInterface $plugin
-     * @return AbstractAdapter Provides a fluent interface
-     * @throws Exception\LogicException
+     * {@inheritdoc}
      */
     public function removePlugin(Plugin\PluginInterface $plugin)
     {
@@ -305,9 +287,7 @@ abstract class AbstractAdapter implements StorageInterface, EventsCapableInterfa
     }
 
     /**
-     * Return registry of plugins
-     *
-     * @return SplObjectStorage
+     * {@inheritdoc}
      */
     public function getPluginRegistry()
     {

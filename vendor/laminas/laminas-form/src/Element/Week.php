@@ -1,17 +1,13 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-form for the canonical source repository
- * @copyright https://github.com/laminas/laminas-form/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-form/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Form\Element;
 
+use DateInterval;
 use Laminas\Validator\DateStep as DateStepValidator;
 use Laminas\Validator\GreaterThan as GreaterThanValidator;
 use Laminas\Validator\LessThan as LessThanValidator;
 use Laminas\Validator\Regex as RegexValidator;
+use Laminas\Validator\ValidatorInterface;
 
 class Week extends DateTime
 {
@@ -27,7 +23,7 @@ class Week extends DateTime
     /**
      * Retrieves a Date Validator configured for a Week Input type
      *
-     * @return \Laminas\Validator\ValidatorInterface
+     * @return ValidatorInterface
      */
     protected function getDateValidator()
     {
@@ -37,20 +33,18 @@ class Week extends DateTime
     /**
      * Retrieves a DateStep Validator configured for a Week Input type
      *
-     * @return \Laminas\Validator\ValidatorInterface
+     * @return ValidatorInterface
      */
     protected function getStepValidator()
     {
-        $stepValue = (isset($this->attributes['step']))
-                     ? $this->attributes['step'] : 1; // Weeks
+        $stepValue = isset($this->attributes['step']) ? $this->attributes['step'] : 1; // Weeks
 
-        $baseValue = (isset($this->attributes['min']))
-                     ? $this->attributes['min'] : '1970-W01';
+        $baseValue = isset($this->attributes['min']) ? $this->attributes['min'] : '1970-W01';
 
         return new DateStepValidator([
             'format'    => 'Y-\WW',
             'baseValue' => $baseValue,
-            'step'      => new \DateInterval("P{$stepValue}W"),
+            'step'      => new DateInterval("P{$stepValue}W"),
         ]);
     }
 

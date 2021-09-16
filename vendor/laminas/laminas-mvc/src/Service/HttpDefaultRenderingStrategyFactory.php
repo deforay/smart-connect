@@ -10,8 +10,7 @@ namespace Laminas\Mvc\Service;
 
 use Interop\Container\ContainerInterface;
 use Laminas\Mvc\View\Http\DefaultRenderingStrategy;
-use Laminas\ServiceManager\FactoryInterface;
-use Laminas\ServiceManager\ServiceLocatorInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 use Laminas\View\View;
 
 class HttpDefaultRenderingStrategyFactory implements FactoryInterface
@@ -35,24 +34,11 @@ class HttpDefaultRenderingStrategyFactory implements FactoryInterface
     }
 
     /**
-     * Create and return DefaultRendererStrategy instance
-     *
-     * For use with laminas-servicemanager v2; proxies to __invoke().
-     *
-     * @param ServiceLocatorInterface $container
-     * @return DefaultRendererStrategy
-     */
-    public function createService(ServiceLocatorInterface $container)
-    {
-        return $this($container, DefaultRendererStrategy::class);
-    }
-
-    /**
      * Inject layout template.
      *
      * Uses layout template from configuration; if none available, defaults to "layout/layout".
      *
-     * @param DefaultRendererStrategy $strategy
+     * @param DefaultRenderingStrategy $strategy
      * @param array $config
      */
     private function injectLayoutTemplate(DefaultRenderingStrategy $strategy, array $config)

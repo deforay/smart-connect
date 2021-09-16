@@ -9,8 +9,7 @@
 namespace Laminas\Mvc\Service;
 
 use Interop\Container\ContainerInterface;
-use Laminas\ServiceManager\FactoryInterface;
-use Laminas\ServiceManager\ServiceLocatorInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 use Laminas\View\Renderer\PhpRenderer;
 
 class ViewPhpRendererFactory implements FactoryInterface
@@ -28,18 +27,5 @@ class ViewPhpRendererFactory implements FactoryInterface
         $renderer->setResolver($container->get('ViewResolver'));
 
         return $renderer;
-    }
-
-    /**
-     * Create and return PhpRenderer instance
-     *
-     * For use with laminas-servicemanager v2; proxies to __invoke().
-     *
-     * @param ServiceLocatorInterface $container
-     * @return PhpRenderer
-     */
-    public function createService(ServiceLocatorInterface $container)
-    {
-        return $this($container, PhpRenderer::class);
     }
 }

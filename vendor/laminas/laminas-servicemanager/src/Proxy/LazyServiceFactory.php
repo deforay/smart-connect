@@ -1,18 +1,17 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-servicemanager for the canonical source repository
- * @copyright https://github.com/laminas/laminas-servicemanager/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-servicemanager/blob/master/LICENSE.md New BSD License
- */
+declare(strict_types=1);
 
 namespace Laminas\ServiceManager\Proxy;
 
-use Laminas\ServiceManager\DelegatorFactoryInterface;
+use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Exception;
-use Laminas\ServiceManager\ServiceLocatorInterface;
+use Laminas\ServiceManager\Factory\DelegatorFactoryInterface;
 use ProxyManager\Factory\LazyLoadingValueHolderFactory;
 use ProxyManager\Proxy\LazyLoadingInterface;
+use ProxyManager\Proxy\VirtualProxyInterface;
+
+use function sprintf;
 
 /**
  * Delegator factory responsible of instantiating lazy loading value holder proxies of
@@ -20,22 +19,17 @@ use ProxyManager\Proxy\LazyLoadingInterface;
  *
  * @link https://github.com/Ocramius/ProxyManager/blob/master/docs/lazy-loading-value-holder.md
  */
-class LazyServiceFactory implements DelegatorFactoryInterface
+final class LazyServiceFactory implements DelegatorFactoryInterface
 {
-    /**
-     * @var \ProxyManager\Factory\LazyLoadingValueHolderFactory
-     */
-    protected $proxyFactory;
+    /** @var LazyLoadingValueHolderFactory */
+    private $proxyFactory;
+
+    /** @var array<string, class-string> map of service names to class names */
+    private $servicesMap;
 
     /**
-     * @var string[] map of service names to class names
-     */
-    protected $servicesMap;
-
-    /**
-     * @param LazyLoadingValueHolderFactory $proxyFactory
-     * @param string[]                      $servicesMap  a map of service names to class names of their
-     *                                                    respective classes
+     * @param array<string, class-string> $servicesMap A map of service names to
+     *     class names of their respective classes
      */
     public function __construct(LazyLoadingValueHolderFactory $proxyFactory, array $servicesMap)
     {
@@ -46,26 +40,24 @@ class LazyServiceFactory implements DelegatorFactoryInterface
     /**
      * {@inheritDoc}
      *
-     * @return object|\ProxyManager\Proxy\LazyLoadingInterface|\ProxyManager\Proxy\ValueHolderInterface
+     * @param string $name
+     * @return VirtualProxyInterface
      */
-    public function createDelegatorWithName(ServiceLocatorInterface $serviceLocator, $name, $requestedName, $callback)
+    public function __invoke(ContainerInterface $container, $name, callable $callback, ?array $options = null)
     {
-        $initializer = function (& $wrappedInstance, LazyLoadingInterface $proxy) use ($callback) {
-            $proxy->setProxyInitializer(null);
+        if (isset($this->servicesMap[$name])) {
+            $initializer = function (&$wrappedInstance, LazyLoadingInterface $proxy) use ($callback) {
+                $proxy->setProxyInitializer(null);
+                $wrappedInstance = $callback();
 
-            $wrappedInstance = call_user_func($callback);
+                return true;
+            };
 
-            return true;
-        };
-
-        if (isset($this->servicesMap[$requestedName])) {
-            return $this->proxyFactory->createProxy($this->servicesMap[$requestedName], $initializer);
-        } elseif (isset($this->servicesMap[$name])) {
             return $this->proxyFactory->createProxy($this->servicesMap[$name], $initializer);
         }
 
-        throw new Exception\InvalidServiceNameException(
-            sprintf('The requested service "%s" was not found in the provided services map', $requestedName)
+        throw new Exception\ServiceNotFoundException(
+            sprintf('The requested service "%s" was not found in the provided services map', $name)
         );
     }
 }

@@ -1,12 +1,24 @@
 # laminas-servicemanager
 
-[![Build Status](https://travis-ci.org/laminas/laminas-servicemanager.svg?branch=master)](https://travis-ci.org/laminas/laminas-servicemanager)
-[![Coverage Status](https://coveralls.io/repos/laminas/laminas-servicemanager/badge.svg?branch=master)](https://coveralls.io/r/laminas/laminas-servicemanager?branch=master)
+[![Build Status](https://github.com/laminas/laminas-servicemanager/actions/workflows/continuous-integration.yml/badge.svg)](https://github.com/laminas/laminas-servicemanager/actions/workflows/continuous-integration.yml)
+[![Psalm coverage](https://shepherd.dev/github/laminas/laminas-servicemanager/coverage.svg?)](https://shepherd.dev/github/laminas/laminas-servicemanager)
 
 The Service Locator design pattern is implemented by the `Laminas\ServiceManager`
 component. The Service Locator is a service/object locator, tasked with
 retrieving other objects.
 
-
 - File issues at https://github.com/laminas/laminas-servicemanager/issues
-- Documentation is at https://docs.laminas.dev/laminas-servicemanager
+- [Online documentation](https://docs.laminas.dev/laminas-servicemanager)
+- [Documentation source files](docs/book/)
+
+## Benchmarks
+
+We provide scripts for benchmarking laminas-servicemanager using the
+[PHPBench](https://github.com/phpbench/phpbench) framework; these can be
+found in the `benchmarks/` directory.
+
+To execute the benchmarks you can run the following command:
+
+```bash
+$ vendor/bin/phpbench run --report=aggregate
+```

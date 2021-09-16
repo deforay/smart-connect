@@ -1,16 +1,17 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-form for the canonical source repository
- * @copyright https://github.com/laminas/laminas-form/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-form/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Form\View\Helper;
 
 use Laminas\Form\ElementInterface;
 use Laminas\Form\Exception;
 use Laminas\Form\LabelAwareInterface;
+
+use function array_merge;
+use function get_class;
+use function gettype;
+use function is_array;
+use function is_object;
+use function sprintf;
 
 class FormLabel extends AbstractHelper
 {
@@ -52,8 +53,8 @@ class FormLabel extends AbstractHelper
             if (empty($label)) {
                 throw new Exception\DomainException(
                     sprintf(
-                        '%s expects either label content as the second argument, ' .
-                        'or that the element provided has a label attribute; neither found',
+                        '%s expects either label content as the second argument, '
+                        . 'or that the element provided has a label attribute; neither found',
                         __METHOD__
                     )
                 );
@@ -111,7 +112,7 @@ class FormLabel extends AbstractHelper
             throw new Exception\InvalidArgumentException(sprintf(
                 '%s expects an array or Laminas\Form\ElementInterface instance; received "%s"',
                 __METHOD__,
-                (is_object($attributesOrElement) ? get_class($attributesOrElement) : gettype($attributesOrElement))
+                is_object($attributesOrElement) ? get_class($attributesOrElement) : gettype($attributesOrElement)
             ));
         }
 

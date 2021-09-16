@@ -16,10 +16,12 @@ class CommonService
 {
 
      public $sm = null;
+     public $cache = null;
 
-     public function __construct($sm = null)
+     public function __construct($sm = null, $cache = null)
      {
           $this->sm = $sm;
+          $this->cache = $cache;
      }
 
      public function getServiceManager()
@@ -343,39 +345,31 @@ class CommonService
 
      public function cacheQuery($queryString, $dbAdapter, $fetchCurrent = false)
      {
-          // $res = $dbAdapter->query($queryString, $dbAdapter::QUERY_MODE_EXECUTE);
-          // return $res;
-
-          $cacheObj = $this->sm->get('Cache\Persistent');
-          $cacheId = hash("sha512", $queryString);
+          // in case fetchCurrent is true, we want to ensure it is treated as a
+          // separate query compared to fetchCurrent = false
+          $cacheId = hash("sha512", ($fetchCurrent) ? 'current-' : '' . $queryString);
           $res = null;
+
           try {
-               if (!$cacheObj->hasItem($cacheId)) {
+               if (!$this->cache->hasItem($cacheId)) {
                     if (!$fetchCurrent) {
                          $res = $dbAdapter->query($queryString, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
                     } else {
                          $res = $dbAdapter->query($queryString, $dbAdapter::QUERY_MODE_EXECUTE)->current();
                     }
-                    $cacheObj->addItem($cacheId, ($res));
+                    $this->cache->addItem($cacheId, ($res));
                } else {
-                    $res = ($cacheObj->getItem($cacheId));
+                    $res = ($this->cache->getItem($cacheId));
                }
                return $res;
           } catch (Exception $e) {
                error_log($e->getMessage());
-               //if(!$fetchCurrent){
-               //    $res = $dbAdapter->query($queryString, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-               //}else{
-               //    $res = $dbAdapter->query($queryString, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-               //}
-               //return $res;
           }
      }
 
      public function clearAllCache()
      {
-          $cacheObj = $this->sm->get('Cache\Persistent');
-          return $cacheObj->flush();
+          return $this->cache->flush();
      }
 
      public function getRoleFacilities($params)
@@ -713,15 +707,15 @@ class CommonService
                          }
                     }
                }
-               
+
                /* For update the Art Code Details */
-               if(isset($apiData->r_vl_art_regimen) && !empty($apiData->r_vl_art_regimen)){
+               if (isset($apiData->r_vl_art_regimen) && !empty($apiData->r_vl_art_regimen)) {
                     /* if($apiData->forceSync){
                          $rQueryStr = $apiData->r_vl_art_regimen->tableStructure;
                          $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
                     } */
                     $condition = "";
-                    if(isset($apiData->r_vl_art_regimen->lastModifiedTime) && !empty($apiData->r_vl_art_regimen->lastModifiedTime)){
+                    if (isset($apiData->r_vl_art_regimen->lastModifiedTime) && !empty($apiData->r_vl_art_regimen->lastModifiedTime)) {
                          $condition = "updated_datetime > '" . $apiData->r_vl_art_regimen->lastModifiedTime . "'";
                     }
                     $notUpdated = $this->getLastModifiedDateTime('r_vl_art_regimen', 'updated_datetime', $condition);
@@ -740,15 +734,15 @@ class CommonService
                          }
                     }
                }
-               
+
                /* For update the Sample Rejection Reason Details */
-               if(isset($apiData->r_vl_sample_rejection_reasons) && !empty($apiData->r_vl_sample_rejection_reasons)){
+               if (isset($apiData->r_vl_sample_rejection_reasons) && !empty($apiData->r_vl_sample_rejection_reasons)) {
                     /* if($apiData->forceSync){
                          $rQueryStr = $apiData->r_vl_sample_rejection_reasons->tableStructure;
                          $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
                     } */
                     $condition = "";
-                    if(isset($apiData->r_vl_sample_rejection_reasons->lastModifiedTime) && !empty($apiData->r_vl_sample_rejection_reasons->lastModifiedTime)){
+                    if (isset($apiData->r_vl_sample_rejection_reasons->lastModifiedTime) && !empty($apiData->r_vl_sample_rejection_reasons->lastModifiedTime)) {
                          $condition = "updated_datetime > '" . $apiData->r_vl_sample_rejection_reasons->lastModifiedTime . "'";
                     }
                     $notUpdated = $this->getLastModifiedDateTime('r_vl_sample_rejection_reasons', 'updated_datetime', $condition);

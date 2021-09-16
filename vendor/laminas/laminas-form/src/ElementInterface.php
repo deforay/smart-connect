@@ -1,12 +1,8 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-form for the canonical source repository
- * @copyright https://github.com/laminas/laminas-form/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-form/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Form;
+
+use Traversable;
 
 interface ElementInterface
 {
@@ -17,7 +13,7 @@ interface ElementInterface
      * present to indicate that elements are generally named.
      *
      * @param  string $name
-     * @return ElementInterface
+     * @return $this
      */
     public function setName($name);
 
@@ -31,8 +27,8 @@ interface ElementInterface
     /**
      * Set options for an element
      *
-     * @param  array|\Traversable $options
-     * @return ElementInterface
+     * @param  array|Traversable $options
+     * @return $this
      */
     public function setOptions($options);
 
@@ -41,7 +37,7 @@ interface ElementInterface
      *
      * @param  string $key
      * @param  mixed $value
-     * @return self
+     * @return $this
      */
     public function setOption($key, $value);
 
@@ -65,7 +61,7 @@ interface ElementInterface
      *
      * @param  string $key
      * @param  mixed $value
-     * @return ElementInterface
+     * @return $this
      */
     public function setAttribute($key, $value);
 
@@ -90,15 +86,15 @@ interface ElementInterface
      *
      * Implementation will decide if this will overwrite or merge.
      *
-     * @param  array|\Traversable $arrayOrTraversable
-     * @return ElementInterface
+     * @param  array|Traversable $arrayOrTraversable
+     * @return $this
      */
     public function setAttributes($arrayOrTraversable);
 
     /**
      * Retrieve all attributes at once
      *
-     * @return array|\Traversable
+     * @return array|Traversable
      */
     public function getAttributes();
 
@@ -106,7 +102,7 @@ interface ElementInterface
      * Set the value of the element
      *
      * @param  mixed $value
-     * @return ElementInterface
+     * @return $this
      */
     public function setValue($value);
 
@@ -121,7 +117,7 @@ interface ElementInterface
      * Set the label (if any) used for this element
      *
      * @param  $label
-     * @return ElementInterface
+     * @return $this
      */
     public function setLabel($label);
 
@@ -135,8 +131,8 @@ interface ElementInterface
     /**
      * Set a list of messages to report when validation fails
      *
-     * @param  array|\Traversable $messages
-     * @return ElementInterface
+     * @param  array|Traversable $messages
+     * @return $this
      */
     public function setMessages($messages);
 
@@ -145,7 +141,7 @@ interface ElementInterface
      *
      * Returns a list of validation failure messages, if any.
      *
-     * @return array|\Traversable
+     * @return array|Traversable
      */
     public function getMessages();
 }

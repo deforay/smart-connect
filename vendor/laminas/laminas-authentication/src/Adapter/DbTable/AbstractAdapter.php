@@ -224,6 +224,7 @@ abstract class AbstractAdapter extends BaseAdapter
      * attempt to find a record matching the provided identity.
      *
      * @throws Exception\RuntimeException if answering the authentication query is impossible
+     *
      * @return AuthenticationResult
      */
     public function authenticate()
@@ -347,7 +348,7 @@ abstract class AbstractAdapter extends BaseAdapter
      */
     protected function authenticateValidateResultSet(array $resultIdentities)
     {
-        if (count($resultIdentities) < 1) {
+        if (! $resultIdentities) {
             $this->authenticateResultInfo['code']       = AuthenticationResult::FAILURE_IDENTITY_NOT_FOUND;
             $this->authenticateResultInfo['messages'][] = 'A record with the supplied identity could not be found.';
             return $this->authenticateCreateAuthResult();

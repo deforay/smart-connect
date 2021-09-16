@@ -1,22 +1,25 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-stdlib for the canonical source repository
- * @copyright https://github.com/laminas/laminas-stdlib/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-stdlib/blob/master/LICENSE.md New BSD License
- */
+declare(strict_types=1);
 
 namespace Laminas\Stdlib\StringWrapper;
 
 use Laminas\Stdlib\Exception;
+
+use function extension_loaded;
+use function iconv;
+use function iconv_strlen;
+use function iconv_strpos;
+use function iconv_substr;
 
 class Iconv extends AbstractStringWrapper
 {
     /**
      * List of supported character sets (upper case)
      *
-     * @var string[]
      * @link http://www.gnu.org/software/libiconv/
+     *
+     * @var string[]
      */
     protected static $encodings = [
         // European languages
@@ -213,7 +216,7 @@ class Iconv extends AbstractStringWrapper
      */
     public function __construct()
     {
-        if (!extension_loaded('iconv')) {
+        if (! extension_loaded('iconv')) {
             throw new Exception\ExtensionNotLoadedException(
                 'PHP extension "iconv" is required for this wrapper'
             );
@@ -280,6 +283,10 @@ class Iconv extends AbstractStringWrapper
 
         $fromEncoding = $reverse ? $convertEncoding : $encoding;
         $toEncoding   = $reverse ? $encoding : $convertEncoding;
+
+        if (null === $toEncoding || null === $fromEncoding) {
+            return $str;
+        }
 
         // automatically add "//IGNORE" to not stop converting on invalid characters
         // invalid characters triggers a notice anyway

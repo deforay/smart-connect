@@ -1,11 +1,5 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-form for the canonical source repository
- * @copyright https://github.com/laminas/laminas-form/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-form/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Form\Element;
 
 use DateTime as PhpDateTime;
@@ -13,10 +7,12 @@ use Laminas\Form\Element;
 use Laminas\Form\ElementPrepareAwareInterface;
 use Laminas\Form\FormInterface;
 use Laminas\InputFilter\InputProviderInterface;
-use Laminas\Stdlib\ArrayUtils;
 use Laminas\Validator\Regex as RegexValidator;
 use Laminas\Validator\ValidatorInterface;
 use Traversable;
+
+use function date;
+use function sprintf;
 
 class MonthSelect extends Element implements InputProviderInterface, ElementPrepareAwareInterface
 {
@@ -97,38 +93,34 @@ class MonthSelect extends Element implements InputProviderInterface, ElementPrep
      * - max_year: max year to use in the year select
      *
      * @param array|Traversable $options
-     * @return self
+     * @return $this
      */
     public function setOptions($options)
     {
         parent::setOptions($options);
 
-        if ($options instanceof Traversable) {
-            $options = ArrayUtils::iteratorToArray($options);
+        if (isset($this->options['month_attributes'])) {
+            $this->setMonthAttributes($this->options['month_attributes']);
         }
 
-        if (isset($options['month_attributes'])) {
-            $this->setMonthAttributes($options['month_attributes']);
+        if (isset($this->options['year_attributes'])) {
+            $this->setYearAttributes($this->options['year_attributes']);
         }
 
-        if (isset($options['year_attributes'])) {
-            $this->setYearAttributes($options['year_attributes']);
+        if (isset($this->options['min_year'])) {
+            $this->setMinYear($this->options['min_year']);
         }
 
-        if (isset($options['min_year'])) {
-            $this->setMinYear($options['min_year']);
+        if (isset($this->options['max_year'])) {
+            $this->setMaxYear($this->options['max_year']);
         }
 
-        if (isset($options['max_year'])) {
-            $this->setMaxYear($options['max_year']);
+        if (isset($this->options['create_empty_option'])) {
+            $this->setShouldCreateEmptyOption($this->options['create_empty_option']);
         }
 
-        if (isset($options['create_empty_option'])) {
-            $this->setShouldCreateEmptyOption($options['create_empty_option']);
-        }
-
-        if (isset($options['render_delimiters'])) {
-            $this->setShouldRenderDelimiters($options['render_delimiters']);
+        if (isset($this->options['render_delimiters'])) {
+            $this->setShouldRenderDelimiters($this->options['render_delimiters']);
         }
 
         return $this;
@@ -164,7 +156,7 @@ class MonthSelect extends Element implements InputProviderInterface, ElementPrep
      * Set the month attributes
      *
      * @param  array $monthAttributes
-     * @return self
+     * @return $this
      */
     public function setMonthAttributes(array $monthAttributes)
     {
@@ -186,7 +178,7 @@ class MonthSelect extends Element implements InputProviderInterface, ElementPrep
      * Set the year attributes
      *
      * @param  array $yearAttributes
-     * @return self
+     * @return $this
      */
     public function setYearAttributes(array $yearAttributes)
     {
@@ -206,7 +198,7 @@ class MonthSelect extends Element implements InputProviderInterface, ElementPrep
 
     /**
      * @param  int $minYear
-     * @return self
+     * @return $this
      */
     public function setMinYear($minYear)
     {
@@ -224,7 +216,7 @@ class MonthSelect extends Element implements InputProviderInterface, ElementPrep
 
     /**
      * @param  int $maxYear
-     * @return self
+     * @return $this
      */
     public function setMaxYear($maxYear)
     {
@@ -242,7 +234,7 @@ class MonthSelect extends Element implements InputProviderInterface, ElementPrep
 
     /**
      * @param  bool $createEmptyOption
-     * @return self
+     * @return $this
      */
     public function setShouldCreateEmptyOption($createEmptyOption)
     {
@@ -260,7 +252,7 @@ class MonthSelect extends Element implements InputProviderInterface, ElementPrep
 
     /**
      * @param  bool $renderDelimiters
-     * @return self
+     * @return $this
      */
     public function setShouldRenderDelimiters($renderDelimiters)
     {
@@ -278,14 +270,14 @@ class MonthSelect extends Element implements InputProviderInterface, ElementPrep
 
     /**
      * @param mixed $value
-     * @return self
+     * @return $this
      */
     public function setValue($value)
     {
         if ($value instanceof PhpDateTime) {
             $value = [
                 'year'  => $value->format('Y'),
-                'month' => $value->format('m')
+                'month' => $value->format('m'),
             ];
         }
 

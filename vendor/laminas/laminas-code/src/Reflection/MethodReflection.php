@@ -13,6 +13,21 @@ use Laminas\Code\Scanner\AnnotationScanner;
 use Laminas\Code\Scanner\CachingFileScanner;
 use ReflectionMethod as PhpReflectionMethod;
 
+use function array_shift;
+use function array_slice;
+use function class_exists;
+use function count;
+use function file;
+use function file_exists;
+use function implode;
+use function is_array;
+use function rtrim;
+use function strlen;
+use function substr;
+use function token_get_all;
+use function token_name;
+use function var_export;
+
 class MethodReflection extends PhpReflectionMethod implements ReflectionInterface
 {
     /**
@@ -28,7 +43,7 @@ class MethodReflection extends PhpReflectionMethod implements ReflectionInterfac
     /**
      * @var AnnotationScanner
      */
-    protected $annotations = null;
+    protected $annotations;
 
     /**
      * Retrieve method DocBlock reflection
@@ -48,7 +63,7 @@ class MethodReflection extends PhpReflectionMethod implements ReflectionInterfac
 
     /**
      * @param  AnnotationManager $annotationManager
-     * @return AnnotationScanner
+     * @return AnnotationScanner|false
      */
     public function getAnnotations(AnnotationManager $annotationManager)
     {
@@ -63,7 +78,7 @@ class MethodReflection extends PhpReflectionMethod implements ReflectionInterfac
         $cachingFileScanner = $this->createFileScanner($this->getFileName());
         $nameInformation    = $cachingFileScanner->getClassNameInformation($this->getDeclaringClass()->getName());
 
-        if (!$nameInformation) {
+        if (! $nameInformation) {
             return false;
         }
 
@@ -106,7 +121,8 @@ class MethodReflection extends PhpReflectionMethod implements ReflectionInterfac
     /**
      * Get method prototype
      *
-     * @return array
+     * @param string $format
+     * @return array|string
      */
     public function getPrototype($format = MethodReflection::PROTOTYPE_AS_ARRAY)
     {
@@ -123,7 +139,7 @@ class MethodReflection extends PhpReflectionMethod implements ReflectionInterfac
             'namespace'  => $declaringClass->getNamespaceName(),
             'class'      => substr($declaringClass->getName(), strlen($declaringClass->getNamespaceName()) + 1),
             'name'       => $this->getName(),
-            'visibility' => ($this->isPublic() ? 'public' : ($this->isPrivate() ? 'private' : 'protected')),
+            'visibility' => $this->isPublic() ? 'public' : ($this->isPrivate() ? 'private' : 'protected'),
             'return'     => $returnType,
             'arguments'  => [],
         ];
@@ -131,8 +147,8 @@ class MethodReflection extends PhpReflectionMethod implements ReflectionInterfac
         $parameters = $this->getParameters();
         foreach ($parameters as $parameter) {
             $prototype['arguments'][$parameter->getName()] = [
-                'type'     => $parameter->getType(),
-                'required' => !$parameter->isOptional(),
+                'type'     => $parameter->detectType(),
+                'required' => ! $parameter->isOptional(),
                 'by_ref'   => $parameter->isPassedByReference(),
                 'default'  => $parameter->isDefaultValueAvailable() ? $parameter->getDefaultValue() : null,
             ];
@@ -142,8 +158,10 @@ class MethodReflection extends PhpReflectionMethod implements ReflectionInterfac
             $line = $prototype['visibility'] . ' ' . $prototype['return'] . ' ' . $prototype['name'] . '(';
             $args = [];
             foreach ($prototype['arguments'] as $name => $argument) {
-                $argsLine = ($argument['type'] ? $argument['type'] . ' ' : '') . ($argument['by_ref'] ? '&' : '') . '$' . $name;
-                if (!$argument['required']) {
+                $argsLine = ($argument['type'] ?
+                    $argument['type'] . ' '
+                    : '') . ($argument['by_ref'] ? '&' : '') . '$' . $name;
+                if (! $argument['required']) {
                     $argsLine .= ' = ' . var_export($argument['default'], true);
                 }
                 $args[] = $argsLine;
@@ -188,7 +206,7 @@ class MethodReflection extends PhpReflectionMethod implements ReflectionInterfac
     public function getContents($includeDocBlock = true)
     {
         $docComment = $this->getDocComment();
-        $content  = ($includeDocBlock && !empty($docComment)) ? $docComment . "\n" : '';
+        $content  = $includeDocBlock && ! empty($docComment) ? $docComment . "\n" : '';
         $content .= $this->extractMethodContents();
 
         return $content;
@@ -221,17 +239,17 @@ class MethodReflection extends PhpReflectionMethod implements ReflectionInterfac
         $lines = array_slice(
             file($fileName, FILE_IGNORE_NEW_LINES),
             $this->getStartLine() - 1,
-            ($this->getEndLine() - ($this->getStartLine() - 1)),
+            $this->getEndLine() - ($this->getStartLine() - 1),
             true
         );
 
         $functionLine = implode("\n", $lines);
-        $tokens = token_get_all("<?php ". $functionLine);
+        $tokens = token_get_all('<?php ' . $functionLine);
 
         //remove first entry which is php open tag
         array_shift($tokens);
 
-        if (!count($tokens)) {
+        if (! count($tokens)) {
             return '';
         }
 
@@ -240,17 +258,17 @@ class MethodReflection extends PhpReflectionMethod implements ReflectionInterfac
         $body = '';
 
         foreach ($tokens as $key => $token) {
-            $tokenType  = (is_array($token)) ? token_name($token[0]) : $token;
-            $tokenValue = (is_array($token)) ? $token[1] : $token;
+            $tokenType  = is_array($token) ? token_name($token[0]) : $token;
+            $tokenValue = is_array($token) ? $token[1] : $token;
 
             switch ($tokenType) {
-                case "T_FINAL":
-                case "T_ABSTRACT":
-                case "T_PUBLIC":
-                case "T_PROTECTED":
-                case "T_PRIVATE":
-                case "T_STATIC":
-                case "T_FUNCTION":
+                case 'T_FINAL':
+                case 'T_ABSTRACT':
+                case 'T_PUBLIC':
+                case 'T_PROTECTED':
+                case 'T_PRIVATE':
+                case 'T_STATIC':
+                case 'T_FUNCTION':
                     // check to see if we have a valid function
                     // then check if we are inside function and have a closure
                     if ($this->isValidFunction($tokens, $key, $this->getName())) {
@@ -266,33 +284,33 @@ class MethodReflection extends PhpReflectionMethod implements ReflectionInterfac
                         $capture = true;
                     } else {
                         //closure test
-                        if ($firstBrace && $tokenType == "T_FUNCTION") {
+                        if ($firstBrace && $tokenType == 'T_FUNCTION') {
                             $body .= $tokenValue;
-                            continue;
+                            break;
                         }
                         $capture = false;
-                        continue;
+                        break;
                     }
                     break;
 
-                case "{":
+                case '{':
                     if ($capture === false) {
-                        continue;
+                        break;
                     }
 
                     if ($firstBrace === false) {
                         $firstBrace = true;
                         if ($bodyOnly === true) {
-                            continue;
+                            break;
                         }
                     }
 
                     $body .= $tokenValue;
                     break;
 
-                case "}":
+                case '}':
                     if ($capture === false) {
-                        continue;
+                        break;
                     }
 
                     //check to see if this is the last brace
@@ -310,12 +328,12 @@ class MethodReflection extends PhpReflectionMethod implements ReflectionInterfac
 
                 default:
                     if ($capture === false) {
-                        continue;
+                        break;
                     }
 
                     // if returning body only wait for first brace before capturing
                     if ($bodyOnly === true && $firstBrace !== true) {
-                        continue;
+                        break;
                     }
 
                     $body .= $tokenValue;
@@ -338,16 +356,16 @@ class MethodReflection extends PhpReflectionMethod implements ReflectionInterfac
     {
         $content = '';
         $count = count($haystack);
-        if ($position+1 == $count) {
+        if ($position + 1 == $count) {
             return $content;
         }
 
-        for ($i = $position-1;$i >= 0;$i--) {
-            $tokenType = (is_array($haystack[$i])) ? token_name($haystack[$i][0]) : $haystack[$i];
-            $tokenValue = (is_array($haystack[$i])) ? $haystack[$i][1] : $haystack[$i];
+        for ($i = $position - 1; $i >= 0; $i--) {
+            $tokenType = is_array($haystack[$i]) ? token_name($haystack[$i][0]) : $haystack[$i];
+            $tokenValue = is_array($haystack[$i]) ? $haystack[$i][1] : $haystack[$i];
 
             //search only for whitespace
-            if ($tokenType == "T_WHITESPACE") {
+            if ($tokenType == 'T_WHITESPACE') {
                 $content .= $tokenValue;
             } else {
                 break;
@@ -369,24 +387,24 @@ class MethodReflection extends PhpReflectionMethod implements ReflectionInterfac
         $count = count($haystack);
 
         //advance one position
-        $position = $position+1;
+        $position = $position + 1;
 
         if ($position == $count) {
             return true;
         }
 
-        for ($i = $position;$i < $count; $i++) {
-            $tokenType = (is_array($haystack[$i])) ? token_name($haystack[$i][0]) : $haystack[$i];
+        for ($i = $position; $i < $count; $i++) {
+            $tokenType = is_array($haystack[$i]) ? token_name($haystack[$i][0]) : $haystack[$i];
             switch ($tokenType) {
-                case "T_FINAL":
-                case "T_ABSTRACT":
-                case "T_PUBLIC":
-                case "T_PROTECTED":
-                case "T_PRIVATE":
-                case "T_STATIC":
+                case 'T_FINAL':
+                case 'T_ABSTRACT':
+                case 'T_PUBLIC':
+                case 'T_PROTECTED':
+                case 'T_PRIVATE':
+                case 'T_STATIC':
                     return true;
 
-                case "T_FUNCTION":
+                case 'T_FUNCTION':
                     // If a function is encountered and that function is not a closure
                     // then return true.  otherwise the function is a closure, return false
                     if ($this->isValidFunction($haystack, $i)) {
@@ -394,32 +412,31 @@ class MethodReflection extends PhpReflectionMethod implements ReflectionInterfac
                     }
                     return false;
 
-                case "}":
-                case ";";
-                case "T_BREAK":
-                case "T_CATCH":
-                case "T_DO":
-                case "T_ECHO":
-                case "T_ELSE":
-                case "T_ELSEIF":
-                case "T_EVAL":
-                case "T_EXIT":
-                case "T_FINALLY":
-                case "T_FOR":
-                case "T_FOREACH":
-                case "T_GOTO":
-                case "T_IF":
-                case "T_INCLUDE":
-                case "T_INCLUDE_ONCE":
-                case "T_PRINT":
-                case "T_STRING":
-                case "T_STRING_VARNAME":
-                case "T_THROW":
-                case "T_USE":
-                case "T_VARIABLE":
-                case "T_WHILE":
-                case "T_YIELD":
-
+                case '}':
+                case ';':
+                case 'T_BREAK':
+                case 'T_CATCH':
+                case 'T_DO':
+                case 'T_ECHO':
+                case 'T_ELSE':
+                case 'T_ELSEIF':
+                case 'T_EVAL':
+                case 'T_EXIT':
+                case 'T_FINALLY':
+                case 'T_FOR':
+                case 'T_FOREACH':
+                case 'T_GOTO':
+                case 'T_IF':
+                case 'T_INCLUDE':
+                case 'T_INCLUDE_ONCE':
+                case 'T_PRINT':
+                case 'T_STRING':
+                case 'T_STRING_VARNAME':
+                case 'T_THROW':
+                case 'T_USE':
+                case 'T_VARIABLE':
+                case 'T_WHILE':
+                case 'T_YIELD':
                     return false;
             }
         }
@@ -438,12 +455,12 @@ class MethodReflection extends PhpReflectionMethod implements ReflectionInterfac
     {
         $isValid = false;
         $count = count($haystack);
-        for ($i = $position+1; $i < $count; $i++) {
-            $tokenType = (is_array($haystack[$i])) ? token_name($haystack[$i][0]) : $haystack[$i];
-            $tokenValue = (is_array($haystack[$i])) ? $haystack[$i][1] : $haystack[$i];
+        for ($i = $position + 1; $i < $count; $i++) {
+            $tokenType = is_array($haystack[$i]) ? token_name($haystack[$i][0]) : $haystack[$i];
+            $tokenValue = is_array($haystack[$i]) ? $haystack[$i][1] : $haystack[$i];
 
-            //check for occurance of ( or
-            if ($tokenType == "T_STRING") {
+            //check for occurrence of ( or
+            if ($tokenType == 'T_STRING') {
                 //check to see if function name is passed, if so validate against that
                 if ($functionName !== null && $tokenValue != $functionName) {
                     $isValid = false;
@@ -452,7 +469,7 @@ class MethodReflection extends PhpReflectionMethod implements ReflectionInterfac
 
                 $isValid = true;
                 break;
-            } elseif ($tokenValue == "(") {
+            } elseif ($tokenValue == '(') {
                 break;
             }
         }
@@ -479,7 +496,7 @@ class MethodReflection extends PhpReflectionMethod implements ReflectionInterfac
     /**
      * Creates a new FileScanner instance.
      *
-     * By having this as a seperate method it allows the method to be overridden
+     * By having this as a separate method it allows the method to be overridden
      * if a different FileScanner is needed.
      *
      * @param  string $filename

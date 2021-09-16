@@ -10,10 +10,32 @@ namespace Laminas\Code\Generator;
 
 use Laminas\Code\Reflection\ClassReflection;
 
-class ClassGenerator extends AbstractGenerator
+use function array_diff;
+use function array_map;
+use function array_pop;
+use function array_search;
+use function array_values;
+use function array_walk;
+use function explode;
+use function get_class;
+use function gettype;
+use function implode;
+use function in_array;
+use function is_array;
+use function is_scalar;
+use function is_string;
+use function ltrim;
+use function sprintf;
+use function str_replace;
+use function strpos;
+use function strrpos;
+use function strtolower;
+use function substr;
+
+class ClassGenerator extends AbstractGenerator implements TraitUsageInterface
 {
-    const OBJECT_TYPE = "class";
-    const IMPLEMENTS_KEYWORD = "implements";
+    const OBJECT_TYPE = 'class';
+    const IMPLEMENTS_KEYWORD = 'implements';
 
     const FLAG_ABSTRACT = 0x01;
     const FLAG_FINAL    = 0x02;
@@ -21,22 +43,22 @@ class ClassGenerator extends AbstractGenerator
     /**
      * @var FileGenerator
      */
-    protected $containingFileGenerator = null;
+    protected $containingFileGenerator;
 
     /**
      * @var string
      */
-    protected $namespaceName = null;
+    protected $namespaceName;
 
     /**
      * @var DocBlockGenerator
      */
-    protected $docBlock = null;
+    protected $docBlock;
 
     /**
      * @var string
      */
-    protected $name = null;
+    protected $name;
 
     /**
      * @var bool
@@ -46,7 +68,7 @@ class ClassGenerator extends AbstractGenerator
     /**
      * @var string
      */
-    protected $extendedClass = null;
+    protected $extendedClass;
 
     /**
      * @var array Array of string names
@@ -77,7 +99,7 @@ class ClassGenerator extends AbstractGenerator
      * Build a Code Generation Php Object from a Class Reflection
      *
      * @param  ClassReflection $classReflection
-     * @return ClassGenerator
+     * @return self
      */
     public static function fromReflection(ClassReflection $classReflection)
     {
@@ -130,7 +152,7 @@ class ClassGenerator extends AbstractGenerator
         foreach ($classReflection->getConstants() as $name => $value) {
             $constants[] = [
                 'name' => $name,
-                'value' => $value
+                'value' => $value,
             ];
         }
 
@@ -139,7 +161,7 @@ class ClassGenerator extends AbstractGenerator
         $methods = [];
 
         foreach ($classReflection->getMethods() as $reflectionMethod) {
-            $className = ($cg->getNamespaceName()) ? $cg->getNamespaceName() . "\\" . $cg->getName() : $cg->getName();
+            $className = $cg->getNamespaceName() ? $cg->getNamespaceName() . '\\' . $cg->getName() : $cg->getName();
 
             if ($reflectionMethod->getDeclaringClass()->getName() == $className) {
                 $methods[] = MethodGenerator::fromReflection($reflectionMethod);
@@ -166,11 +188,11 @@ class ClassGenerator extends AbstractGenerator
      *
      * @throws Exception\InvalidArgumentException
      * @param  array $array
-     * @return ClassGenerator
+     * @return self
      */
     public static function fromArray(array $array)
     {
-        if (!isset($array['name'])) {
+        if (! isset($array['name'])) {
             throw new Exception\InvalidArgumentException(
                 'Class generator requires that a name is provided for this object'
             );
@@ -187,7 +209,7 @@ class ClassGenerator extends AbstractGenerator
                     $cg->setNamespaceName($value);
                     break;
                 case 'docblock':
-                    $docBlock = ($value instanceof DocBlockGenerator) ? $value : DocBlockGenerator::fromArray($value);
+                    $docBlock = $value instanceof DocBlockGenerator ? $value : DocBlockGenerator::fromArray($value);
                     $cg->setDocBlock($docBlock);
                     break;
                 case 'flags':
@@ -261,11 +283,11 @@ class ClassGenerator extends AbstractGenerator
 
     /**
      * @param  string $name
-     * @return ClassGenerator
+     * @return self
      */
     public function setName($name)
     {
-        if (strstr($name, '\\')) {
+        if (false !== strpos($name, '\\')) {
             $namespace = substr($name, 0, strrpos($name, '\\'));
             $name      = substr($name, strrpos($name, '\\') + 1);
             $this->setNamespaceName($namespace);
@@ -285,7 +307,7 @@ class ClassGenerator extends AbstractGenerator
 
     /**
      * @param  string $namespaceName
-     * @return ClassGenerator
+     * @return self
      */
     public function setNamespaceName($namespaceName)
     {
@@ -303,7 +325,7 @@ class ClassGenerator extends AbstractGenerator
 
     /**
      * @param  FileGenerator $fileGenerator
-     * @return ClassGenerator
+     * @return self
      */
     public function setContainingFileGenerator(FileGenerator $fileGenerator)
     {
@@ -321,7 +343,7 @@ class ClassGenerator extends AbstractGenerator
 
     /**
      * @param  DocBlockGenerator $docBlock
-     * @return ClassGenerator
+     * @return self
      */
     public function setDocBlock(DocBlockGenerator $docBlock)
     {
@@ -339,7 +361,7 @@ class ClassGenerator extends AbstractGenerator
 
     /**
      * @param  array|string $flags
-     * @return ClassGenerator
+     * @return self
      */
     public function setFlags($flags)
     {
@@ -358,7 +380,7 @@ class ClassGenerator extends AbstractGenerator
 
     /**
      * @param  string $flag
-     * @return ClassGenerator
+     * @return self
      */
     public function addFlag($flag)
     {
@@ -368,7 +390,7 @@ class ClassGenerator extends AbstractGenerator
 
     /**
      * @param  string $flag
-     * @return ClassGenerator
+     * @return self
      */
     public function removeFlag($flag)
     {
@@ -378,11 +400,11 @@ class ClassGenerator extends AbstractGenerator
 
     /**
      * @param  bool $isAbstract
-     * @return ClassGenerator
+     * @return self
      */
     public function setAbstract($isAbstract)
     {
-        return (($isAbstract) ? $this->addFlag(self::FLAG_ABSTRACT) : $this->removeFlag(self::FLAG_ABSTRACT));
+        return $isAbstract ? $this->addFlag(self::FLAG_ABSTRACT) : $this->removeFlag(self::FLAG_ABSTRACT);
     }
 
     /**
@@ -395,11 +417,11 @@ class ClassGenerator extends AbstractGenerator
 
     /**
      * @param  bool $isFinal
-     * @return ClassGenerator
+     * @return self
      */
     public function setFinal($isFinal)
     {
-        return (($isFinal) ? $this->addFlag(self::FLAG_FINAL) : $this->removeFlag(self::FLAG_FINAL));
+        return $isFinal ? $this->addFlag(self::FLAG_FINAL) : $this->removeFlag(self::FLAG_FINAL);
     }
 
     /**
@@ -407,12 +429,12 @@ class ClassGenerator extends AbstractGenerator
      */
     public function isFinal()
     {
-        return ($this->flags & self::FLAG_FINAL);
+        return $this->flags & self::FLAG_FINAL;
     }
 
     /**
      * @param  string $extendedClass
-     * @return ClassGenerator
+     * @return self
      */
     public function setExtendedClass($extendedClass)
     {
@@ -429,11 +451,32 @@ class ClassGenerator extends AbstractGenerator
     }
 
     /**
+     * @return bool
+     */
+    public function hasExtentedClass()
+    {
+        return ! empty($this->extendedClass);
+    }
+
+    /**
+     * @return self
+     */
+    public function removeExtentedClass()
+    {
+        $this->setExtendedClass(null);
+        return $this;
+    }
+
+    /**
      * @param  array $implementedInterfaces
-     * @return ClassGenerator
+     * @return self
      */
     public function setImplementedInterfaces(array $implementedInterfaces)
     {
+        array_map(function ($implementedInterface) {
+            return (string) TypeGenerator::fromTypeString($implementedInterface);
+        }, $implementedInterfaces);
+
         $this->implementedInterfaces = $implementedInterfaces;
         return $this;
     }
@@ -447,8 +490,28 @@ class ClassGenerator extends AbstractGenerator
     }
 
     /**
+     * @param string $implementedInterface
+     * @return bool
+     */
+    public function hasImplementedInterface($implementedInterface)
+    {
+        $implementedInterface = (string) TypeGenerator::fromTypeString($implementedInterface);
+        return in_array($implementedInterface, $this->implementedInterfaces);
+    }
+
+    /**
+     * @param string $implementedInterface
+     * @return self
+     */
+    public function removeImplementedInterface($implementedInterface)
+    {
+        $implementedInterface = (string) TypeGenerator::fromTypeString($implementedInterface);
+        unset($this->implementedInterfaces[array_search($implementedInterface, $this->implementedInterfaces)]);
+        return $this;
+    }
+
+    /**
      * @param  string $constantName
-     *
      * @return PropertyGenerator|false
      */
     public function getConstant($constantName)
@@ -470,6 +533,17 @@ class ClassGenerator extends AbstractGenerator
 
     /**
      * @param  string $constantName
+     * @return self
+     */
+    public function removeConstant($constantName)
+    {
+        unset($this->constants[$constantName]);
+
+        return $this;
+    }
+
+    /**
+     * @param  string $constantName
      * @return bool
      */
     public function hasConstant($constantName)
@@ -482,7 +556,7 @@ class ClassGenerator extends AbstractGenerator
      *
      * @param  PropertyGenerator           $constant
      * @throws Exception\InvalidArgumentException
-     * @return ClassGenerator
+     * @return self
      */
     public function addConstantFromGenerator(PropertyGenerator $constant)
     {
@@ -510,16 +584,16 @@ class ClassGenerator extends AbstractGenerator
     /**
      * Add Constant
      *
-     * @param  string                      $name non-empty string
-     * @param  string|int|null|float|array $value scalar
+     * @param  string                      $name Non-empty string
+     * @param  string|int|null|float|array $value Scalar
      *
      * @throws Exception\InvalidArgumentException
      *
-     * @return ClassGenerator
+     * @return self
      */
     public function addConstant($name, $value)
     {
-        if (empty($name) || !is_string($name)) {
+        if (empty($name) || ! is_string($name)) {
             throw new Exception\InvalidArgumentException(sprintf(
                 '%s expects string for name',
                 __METHOD__
@@ -536,7 +610,7 @@ class ClassGenerator extends AbstractGenerator
     /**
      * @param  PropertyGenerator[]|array[] $constants
      *
-     * @return ClassGenerator
+     * @return self
      */
     public function addConstants(array $constants)
     {
@@ -545,7 +619,7 @@ class ClassGenerator extends AbstractGenerator
                 $this->addPropertyFromGenerator($constant);
             } else {
                 if (is_array($constant)) {
-                    call_user_func_array([$this, 'addConstant'], $constant);
+                    $this->addConstant(...array_values($constant));
                 }
             }
         }
@@ -555,7 +629,7 @@ class ClassGenerator extends AbstractGenerator
 
     /**
      * @param  array $properties
-     * @return ClassGenerator
+     * @return self
      */
     public function addProperties(array $properties)
     {
@@ -566,7 +640,7 @@ class ClassGenerator extends AbstractGenerator
                 if (is_string($property)) {
                     $this->addProperty($property);
                 } elseif (is_array($property)) {
-                    call_user_func_array([$this, 'addProperty'], $property);
+                    $this->addProperty(...array_values($property));
                 }
             }
         }
@@ -581,11 +655,11 @@ class ClassGenerator extends AbstractGenerator
      * @param  string|array $defaultValue
      * @param  int $flags
      * @throws Exception\InvalidArgumentException
-     * @return ClassGenerator
+     * @return self
      */
     public function addProperty($name, $defaultValue = null, $flags = PropertyGenerator::FLAG_PUBLIC)
     {
-        if (!is_string($name)) {
+        if (! is_string($name)) {
             throw new Exception\InvalidArgumentException(sprintf(
                 '%s::%s expects string for name',
                 get_class($this),
@@ -607,7 +681,7 @@ class ClassGenerator extends AbstractGenerator
      *
      * @param  PropertyGenerator           $property
      * @throws Exception\InvalidArgumentException
-     * @return ClassGenerator
+     * @return self
      */
     public function addPropertyFromGenerator(PropertyGenerator $property)
     {
@@ -658,11 +732,49 @@ class ClassGenerator extends AbstractGenerator
      *
      * @param  string $use
      * @param  string|null $useAlias
-     * @return ClassGenerator
+     * @return self
      */
     public function addUse($use, $useAlias = null)
     {
         $this->traitUsageGenerator->addUse($use, $useAlias);
+        return $this;
+    }
+
+    /**
+     * @param string $use
+     * @return bool
+     */
+    public function hasUse($use)
+    {
+        return $this->traitUsageGenerator->hasUse($use);
+    }
+
+    /**
+     * @param  string $use
+     * @return self
+     */
+    public function removeUse($use)
+    {
+        $this->traitUsageGenerator->removeUse($use);
+        return $this;
+    }
+
+    /**
+     * @param string $use
+     * @return bool
+     */
+    public function hasUseAlias($use)
+    {
+        return $this->traitUsageGenerator->hasUseAlias($use);
+    }
+
+    /**
+     * @param string $use
+     * @return self
+     */
+    public function removeUseAlias($use)
+    {
+        $this->traitUsageGenerator->removeUseAlias($use);
         return $this;
     }
 
@@ -678,6 +790,17 @@ class ClassGenerator extends AbstractGenerator
 
     /**
      * @param  string $propertyName
+     * @return self
+     */
+    public function removeProperty($propertyName)
+    {
+        unset($this->properties[$propertyName]);
+
+        return $this;
+    }
+
+    /**
+     * @param  string $propertyName
      * @return bool
      */
     public function hasProperty($propertyName)
@@ -687,7 +810,7 @@ class ClassGenerator extends AbstractGenerator
 
     /**
      * @param  array $methods
-     * @return ClassGenerator
+     * @return self
      */
     public function addMethods(array $methods)
     {
@@ -698,7 +821,7 @@ class ClassGenerator extends AbstractGenerator
                 if (is_string($method)) {
                     $this->addMethod($method);
                 } elseif (is_array($method)) {
-                    call_user_func_array([$this, 'addMethod'], $method);
+                    $this->addMethod(...array_values($method));
                 }
             }
         }
@@ -715,16 +838,16 @@ class ClassGenerator extends AbstractGenerator
      * @param  string $body
      * @param  string $docBlock
      * @throws Exception\InvalidArgumentException
-     * @return ClassGenerator
+     * @return self
      */
     public function addMethod(
-        $name = null,
+        $name,
         array $parameters = [],
         $flags = MethodGenerator::FLAG_PUBLIC,
         $body = null,
         $docBlock = null
     ) {
-        if (!is_string($name)) {
+        if (! is_string($name)) {
             throw new Exception\InvalidArgumentException(sprintf(
                 '%s::%s expects string for name',
                 get_class($this),
@@ -740,7 +863,7 @@ class ClassGenerator extends AbstractGenerator
      *
      * @param  MethodGenerator                    $method
      * @throws Exception\InvalidArgumentException
-     * @return ClassGenerator
+     * @return self
      */
     public function addMethodFromGenerator(MethodGenerator $method)
     {
@@ -776,13 +899,11 @@ class ClassGenerator extends AbstractGenerator
 
     /**
      * @param  string $methodName
-     * @return ClassGenerator
+     * @return self
      */
     public function removeMethod($methodName)
     {
-        if ($this->hasMethod($methodName)) {
-            unset($this->methods[strtolower($methodName)]);
-        }
+        unset($this->methods[strtolower($methodName)]);
 
         return $this;
     }
@@ -797,7 +918,7 @@ class ClassGenerator extends AbstractGenerator
     }
 
     /**
-     * @inherit Laminas\Code\Generator\TraitUsageInterface
+     * @inheritDoc
      */
     public function addTrait($trait)
     {
@@ -806,7 +927,7 @@ class ClassGenerator extends AbstractGenerator
     }
 
     /**
-     * @inherit Laminas\Code\Generator\TraitUsageInterface
+     * @inheritDoc
      */
     public function addTraits(array $traits)
     {
@@ -815,7 +936,7 @@ class ClassGenerator extends AbstractGenerator
     }
 
     /**
-     * @inherit Laminas\Code\Generator\TraitUsageInterface
+     * @inheritDoc
      */
     public function hasTrait($traitName)
     {
@@ -823,7 +944,7 @@ class ClassGenerator extends AbstractGenerator
     }
 
     /**
-     * @inherit Laminas\Code\Generator\TraitUsageInterface
+     * @inheritDoc
      */
     public function getTraits()
     {
@@ -831,7 +952,7 @@ class ClassGenerator extends AbstractGenerator
     }
 
     /**
-     * @inherit Laminas\Code\Generator\TraitUsageInterface
+     * @inheritDoc
      */
     public function removeTrait($traitName)
     {
@@ -839,7 +960,7 @@ class ClassGenerator extends AbstractGenerator
     }
 
     /**
-     * @inherit Laminas\Code\Generator\TraitUsageInterface
+     * @inheritDoc
      */
     public function addTraitAlias($method, $alias, $visibility = null)
     {
@@ -848,7 +969,7 @@ class ClassGenerator extends AbstractGenerator
     }
 
     /**
-     * @inherit Laminas\Code\Generator\TraitUsageInterface
+     * @inheritDoc
      */
     public function getTraitAliases()
     {
@@ -856,7 +977,7 @@ class ClassGenerator extends AbstractGenerator
     }
 
     /**
-     * @inherit Laminas\Code\Generator\TraitUsageInterface
+     * @inheritDoc
      */
     public function addTraitOverride($method, $traitsToReplace)
     {
@@ -865,7 +986,7 @@ class ClassGenerator extends AbstractGenerator
     }
 
     /**
-     * @inherit Laminas\Code\Generator\TraitUsageInterface
+     * @inheritDoc
      */
     public function removeTraitOverride($method, $overridesToRemove = null)
     {
@@ -875,7 +996,7 @@ class ClassGenerator extends AbstractGenerator
     }
 
     /**
-     * @inherit Laminas\Code\Generator\TraitUsageInterface
+     * @inheritDoc
      */
     public function getTraitOverrides()
     {
@@ -907,13 +1028,13 @@ class ClassGenerator extends AbstractGenerator
     }
 
     /**
-     * @inherit Laminas\Code\Generator\GeneratorInterface
+     * @inheritDoc
      */
     public function generate()
     {
-        if (!$this->isSourceDirty()) {
+        if (! $this->isSourceDirty()) {
             $output = $this->getSourceContent();
-            if (!empty($output)) {
+            if (! empty($output)) {
                 return $output;
             }
         }
@@ -927,7 +1048,7 @@ class ClassGenerator extends AbstractGenerator
 
         $uses = $this->getUses();
 
-        if (!empty($uses)) {
+        if (! empty($uses)) {
             foreach ($uses as $use) {
                 $output .= 'use ' . $use . ';' . self::LINE_FEED;
             }
@@ -948,13 +1069,14 @@ class ClassGenerator extends AbstractGenerator
 
         $output .= static::OBJECT_TYPE . ' ' . $this->getName();
 
-        if (!empty($this->extendedClass)) {
-            $output .= ' extends ' . $this->extendedClass;
+        if (! empty($this->extendedClass)) {
+            $output .= ' extends ' . $this->generateShortOrCompleteClassname($this->extendedClass);
         }
 
         $implemented = $this->getImplementedInterfaces();
 
-        if (!empty($implemented)) {
+        if (! empty($implemented)) {
+            $implemented = array_map([$this, 'generateShortOrCompleteClassname'], $implemented);
             $output .= ' ' . static::IMPLEMENTS_KEYWORD . ' ' . implode(', ', $implemented);
         }
 
@@ -1007,5 +1129,39 @@ class ClassGenerator extends AbstractGenerator
             'Expected value for constant, value must be a "scalar" or "null", "%s" found',
             gettype($value)
         ));
+    }
+
+    /**
+     * @param string $fqnClassName
+     *
+     * @return string
+     */
+    private function generateShortOrCompleteClassname($fqnClassName)
+    {
+        $fqnClassName = ltrim($fqnClassName, '\\');
+        $parts = explode('\\', $fqnClassName);
+        $className = array_pop($parts);
+        $classNamespace = implode('\\', $parts);
+        $currentNamespace = (string) $this->getNamespaceName();
+
+        if ($this->hasUseAlias($fqnClassName)) {
+            return $this->traitUsageGenerator->getUseAlias($fqnClassName);
+        }
+        if ($this->hasUseAlias($classNamespace)) {
+            $namespaceAlias = $this->traitUsageGenerator->getUseAlias($classNamespace);
+
+            return $namespaceAlias . '\\' . $className;
+        }
+        if ($this->traitUsageGenerator->isUseAlias($fqnClassName)) {
+            return $fqnClassName;
+        }
+        if ($this->traitUsageGenerator->isUseAlias($classNamespace)) {
+            return $fqnClassName;
+        }
+        if ($classNamespace === $currentNamespace || in_array($fqnClassName, $this->getUses())) {
+            return $className;
+        }
+
+        return '\\' . $fqnClassName;
     }
 }

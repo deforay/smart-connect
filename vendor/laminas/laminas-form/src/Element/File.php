@@ -1,16 +1,11 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-form for the canonical source repository
- * @copyright https://github.com/laminas/laminas-form/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-form/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Form\Element;
 
 use Laminas\Form\Element;
 use Laminas\Form\ElementPrepareAwareInterface;
 use Laminas\Form\FormInterface;
+use Laminas\InputFilter\FileInput;
 use Laminas\InputFilter\InputProviderInterface;
 
 class File extends Element implements InputProviderInterface, ElementPrepareAwareInterface
@@ -45,7 +40,7 @@ class File extends Element implements InputProviderInterface, ElementPrepareAwar
     public function getInputSpecification()
     {
         return [
-            'type'     => 'Laminas\InputFilter\FileInput',
+            'type'     => FileInput::class,
             'name'     => $this->getName(),
             'required' => false,
         ];

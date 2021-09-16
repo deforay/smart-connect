@@ -1,15 +1,12 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-form for the canonical source repository
- * @copyright https://github.com/laminas/laminas-form/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-form/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Form\View\Helper\File;
 
 use Laminas\Form\ElementInterface;
 use Laminas\Form\View\Helper\FormInput;
+
+use function sprintf;
+use function uniqid;
 
 /**
  * A view helper to render the hidden input with a UploadProgress id
@@ -41,7 +38,7 @@ class FormFileUploadProgress extends FormInput
             'id'    => 'progress_key',
             'name'  => $this->getName(),
             'type'  => 'hidden',
-            'value' => $this->getValue()
+            'value' => $this->getValue(),
         ];
 
         return sprintf(

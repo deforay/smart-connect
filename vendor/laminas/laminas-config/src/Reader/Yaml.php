@@ -1,14 +1,20 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-config for the canonical source repository
- * @copyright https://github.com/laminas/laminas-config/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-config/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Config\Reader;
 
 use Laminas\Config\Exception;
+
+use function array_replace_recursive;
+use function call_user_func;
+use function dirname;
+use function file_get_contents;
+use function function_exists;
+use function is_array;
+use function is_callable;
+use function is_file;
+use function is_readable;
+use function sprintf;
+use function trim;
 
 /**
  * YAML config reader.
@@ -48,13 +54,13 @@ class Yaml implements ReaderInterface
     /**
      * Set callback for decoding YAML
      *
-     * @param  string|callable $yamlDecoder the decoder to set
-     * @return Yaml
+     * @param string|callable $yamlDecoder the decoder to set
+     * @return self
      * @throws Exception\RuntimeException
      */
     public function setYamlDecoder($yamlDecoder)
     {
-        if (!is_callable($yamlDecoder)) {
+        if (! is_callable($yamlDecoder)) {
             throw new Exception\RuntimeException(
                 'Invalid parameter to setYamlDecoder() - must be callable'
             );
@@ -83,7 +89,7 @@ class Yaml implements ReaderInterface
      */
     public function fromFile($filename)
     {
-        if (!is_file($filename) || !is_readable($filename)) {
+        if (! is_file($filename) || ! is_readable($filename)) {
             throw new Exception\RuntimeException(sprintf(
                 "File '%s' doesn't exist or not readable",
                 $filename

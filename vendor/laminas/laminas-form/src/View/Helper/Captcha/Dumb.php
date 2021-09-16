@@ -1,16 +1,13 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-form for the canonical source repository
- * @copyright https://github.com/laminas/laminas-form/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-form/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Form\View\Helper\Captcha;
 
 use Laminas\Captcha\Dumb as CaptchaAdapter;
 use Laminas\Form\ElementInterface;
 use Laminas\Form\Exception;
+
+use function sprintf;
+use function strrev;
 
 class Dumb extends AbstractWord
 {

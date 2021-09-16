@@ -1,14 +1,12 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-hydrator for the canonical source repository
- * @copyright https://github.com/laminas/laminas-hydrator/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-hydrator/blob/master/LICENSE.md New BSD License
- */
+declare(strict_types=1);
 
 namespace Laminas\Hydrator\Aggregate;
 
 use Laminas\EventManager\Event;
+
+use function array_merge;
 
 /**
  * Event triggered when the {@see AggregateHydrator} extracts
@@ -16,49 +14,35 @@ use Laminas\EventManager\Event;
  */
 class ExtractEvent extends Event
 {
-    const EVENT_EXTRACT = 'extract';
+    public const EVENT_EXTRACT = 'extract';
 
     /**
      * {@inheritDoc}
      */
     protected $name = self::EVENT_EXTRACT;
 
-    /**
-     * @var object
-     */
+    /** @var object */
     protected $extractionObject;
 
-    /**
-     * @var array
-     */
+    /** @var mixed[] Data being extracted from the $extractionObject */
     protected $extractedData = [];
 
-    /**
-     * @param object $target
-     * @param object $extractionObject
-     */
-    public function __construct($target, $extractionObject)
+    public function __construct(object $target, object $extractionObject)
     {
+        parent::__construct();
         $this->target           = $target;
         $this->extractionObject = $extractionObject;
     }
 
     /**
      * Retrieves the object from which data is extracted
-     *
-     * @return object
      */
-    public function getExtractionObject()
+    public function getExtractionObject(): object
     {
         return $this->extractionObject;
     }
 
-    /**
-     * @param object $extractionObject
-     *
-     * @return void
-     */
-    public function setExtractionObject($extractionObject)
+    public function setExtractionObject(object $extractionObject): void
     {
         $this->extractionObject = $extractionObject;
     }
@@ -66,19 +50,17 @@ class ExtractEvent extends Event
     /**
      * Retrieves the data that has been extracted
      *
-     * @return array
+     * @return mixed[]
      */
-    public function getExtractedData()
+    public function getExtractedData(): array
     {
         return $this->extractedData;
     }
 
     /**
-     * @param array $extractedData
-     *
-     * @return void
+     * @param mixed[] $extractedData
      */
-    public function setExtractedData(array $extractedData)
+    public function setExtractedData(array $extractedData): void
     {
         $this->extractedData = $extractedData;
     }
@@ -86,11 +68,9 @@ class ExtractEvent extends Event
     /**
      * Merge provided data with the extracted data
      *
-     * @param array $additionalData
-     *
-     * @return void
+     * @param mixed[] $additionalData
      */
-    public function mergeExtractedData(array $additionalData)
+    public function mergeExtractedData(array $additionalData): void
     {
         $this->extractedData = array_merge($this->extractedData, $additionalData);
     }

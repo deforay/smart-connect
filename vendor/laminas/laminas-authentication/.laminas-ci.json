@@ -1,0 +1,7 @@
+{
+    "extensions": [
+        "ldap",
+        "pdo-sqlite",
+        "sqlite3"
+    ]
+}

@@ -1,27 +1,27 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-http for the canonical source repository
- * @copyright https://github.com/laminas/laminas-http/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-http/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Http\Header;
 
+use function sprintf;
+use function strtolower;
+
 /**
- * @throws Exception\InvalidArgumentException
  * @see http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.13
+ *
+ * @throws Exception\InvalidArgumentException
  */
 class ContentLength implements HeaderInterface
 {
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $value;
 
+    /**
+     * @param string $headerLine
+     * @return static
+     */
     public static function fromString($headerLine)
     {
-        list($name, $value) = GenericHeader::splitHeaderLine($headerLine);
+        [$name, $value] = GenericHeader::splitHeaderLine($headerLine);
 
         // check to ensure proper header type for this factory
         if (strtolower($name) !== 'content-length') {
@@ -32,11 +32,10 @@ class ContentLength implements HeaderInterface
         }
 
         // @todo implementation details
-        $header = new static($value);
-
-        return $header;
+        return new static($value);
     }
 
+    /** @param null|string $value */
     public function __construct($value = null)
     {
         if (null !== $value) {
@@ -45,16 +44,19 @@ class ContentLength implements HeaderInterface
         }
     }
 
+    /** @return string */
     public function getFieldName()
     {
         return 'Content-Length';
     }
 
+    /** @return string */
     public function getFieldValue()
     {
-        return $this->value;
+        return (string) $this->value;
     }
 
+    /** @return string */
     public function toString()
     {
         return 'Content-Length: ' . $this->getFieldValue();

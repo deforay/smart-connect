@@ -30,8 +30,9 @@ class SampleTable extends AbstractTableGateway
     protected $plasmaId = null;
     protected $mappedFacilities = null;
     protected $translator = null;
+    protected $commonService = null;
 
-    public function __construct(Adapter $adapter, $sm = null, $mappedFacilities = null, $table = null)
+    public function __construct(Adapter $adapter, $sm = null, $mappedFacilities = null, $table = null, $commonService = null)
     {
         $this->adapter = $adapter;
         $this->sm = $sm;
@@ -43,6 +44,7 @@ class SampleTable extends AbstractTableGateway
         $this->dbsId = $this->config['defaults']['dbsId'];
         $this->plasmaId = $this->config['defaults']['plasmaId'];
         $this->mappedFacilities = $mappedFacilities;
+        $this->commonService = $commonService;
     }
 
     public function fetchQuickStats($params)
@@ -50,7 +52,7 @@ class SampleTable extends AbstractTableGateway
         $logincontainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $common = new CommonService($this->sm);
+        
         //        $query = "SELECT count(*) as 'Total', 
         //		SUM(CASE 
         //            WHEN patient_gender IS NULL OR patient_gender ='' THEN 0
@@ -103,7 +105,7 @@ class SampleTable extends AbstractTableGateway
         $queryStr = $sql->buildSqlString($query);
         //echo $queryStr;die;
         //$result = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-        $result = $common->cacheQuery($queryStr, $dbAdapter);
+        $result = $this->commonService->cacheQuery($queryStr, $dbAdapter);
         return $result[0];
     }
 
@@ -114,7 +116,7 @@ class SampleTable extends AbstractTableGateway
         $quickStats = $this->fetchQuickStats($params);
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $common = new CommonService($this->sm);
+        
         $waitingTotal = 0;
         $receivedTotal = 0;
         $testedTotal = 0;
@@ -153,12 +155,12 @@ class SampleTable extends AbstractTableGateway
         $cQueryStr = $sql->buildSqlString($receivedQuery);
         //echo $cQueryStr;die;
         //$rResult = $dbAdapter->query($cQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-        $rResult = $common->cacheQuery($cQueryStr, $dbAdapter);
+        $rResult = $this->commonService->cacheQuery($cQueryStr, $dbAdapter);
 
         //var_dump($receivedResult);die;
         $recTotal = 0;
         foreach ($rResult as $rRow) {
-            $displayDate = $common->humanDateFormat($rRow['receivedDate']);
+            $displayDate = $this->commonService->humanDateFormat($rRow['receivedDate']);
             $receivedResult[] = array(array('total' => $rRow['total']), 'date' => $displayDate, 'receivedDate' => $displayDate, 'receivedTotal' => $recTotal += $rRow['total']);
         }
 
@@ -181,12 +183,12 @@ class SampleTable extends AbstractTableGateway
         $cQueryStr = $sql->buildSqlString($testedQuery);
         //echo $cQueryStr;//die;
         //$rResult = $dbAdapter->query($cQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-        $rResult = $common->cacheQuery($cQueryStr, $dbAdapter);
+        $rResult = $this->commonService->cacheQuery($cQueryStr, $dbAdapter);
 
         //var_dump($receivedResult);die;
         $testedTotal = 0;
         foreach ($rResult as $rRow) {
-            $displayDate = $common->humanDateFormat($rRow['testedDate']);
+            $displayDate = $this->commonService->humanDateFormat($rRow['testedDate']);
             $tResult[] = array(array('total' => $rRow['total']), 'date' => $displayDate, 'testedDate' => $displayDate, 'testedTotal' => $testedTotal += $rRow['total']);
         }
 
@@ -209,10 +211,10 @@ class SampleTable extends AbstractTableGateway
         $cQueryStr = $sql->buildSqlString($rejectedQuery);
         //echo $cQueryStr;die;
         //$rResult = $dbAdapter->query($cQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-        $rResult = $common->cacheQuery($cQueryStr, $dbAdapter);
+        $rResult = $this->commonService->cacheQuery($cQueryStr, $dbAdapter);
         $rejTotal = 0;
         foreach ($rResult as $rRow) {
-            $displayDate = $common->humanDateFormat($rRow['rejectDate']);
+            $displayDate = $this->commonService->humanDateFormat($rRow['rejectDate']);
             $rejectedResult[] = array(array('total' => $rRow['total']), 'date' => $displayDate, 'rejectDate' => $displayDate, 'rejectTotal' => $rejTotal += $rRow['total']);
         }
         return array('quickStats' => $quickStats, 'scResult' => $receivedResult, 'stResult' => $tResult, 'srResult' => $rejectedResult);
@@ -225,7 +227,7 @@ class SampleTable extends AbstractTableGateway
         $result = array();
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $common = new CommonService($this->sm);
+        
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
@@ -257,7 +259,7 @@ class SampleTable extends AbstractTableGateway
                 $rsQuery = $rsQuery->where('rs.sample_id="' . base64_decode(trim($params['sampleType'])) . '"');
                 $rsQueryStr = $sql->buildSqlString($rsQuery);
                 //$sampleTypeResult = $dbAdapter->query($rsQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-                $specimenTypesResult = $common->cacheQuery($rsQueryStr, $dbAdapter);
+                $specimenTypesResult = $this->commonService->cacheQuery($rsQueryStr, $dbAdapter);
                 $specimenTypes = array_column($specimenTypesResult, 'sample_id');
             }
 
@@ -292,7 +294,7 @@ class SampleTable extends AbstractTableGateway
             $queryStr = $sql->buildSqlString($queryStr);
             // echo $queryStr;die;
             //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-            $sampleResult = $common->cacheQuery($queryStr, $dbAdapter);
+            $sampleResult = $this->commonService->cacheQuery($queryStr, $dbAdapter);
             $j = 0;
             foreach ($sampleResult as $sRow) {
                 if ($sRow["monthDate"] == null) continue;
@@ -312,7 +314,7 @@ class SampleTable extends AbstractTableGateway
         $result = array();
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $common = new CommonService($this->sm);
+        
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
@@ -322,7 +324,7 @@ class SampleTable extends AbstractTableGateway
             }
             $rsQueryStr = $sql->buildSqlString($rsQuery);
             $sampleTypeResult = $dbAdapter->query($rsQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-            //$sampleTypeResult = $common->cacheQuery($rsQueryStr,$dbAdapter);
+            //$sampleTypeResult = $this->commonService->cacheQuery($rsQueryStr,$dbAdapter);
 
             $sampleTestReasonId = array_column($sampleTypeResult, 'test_reason_id');
             $sampleTestedReason = implode(',', $sampleTestReasonId);
@@ -355,7 +357,7 @@ class SampleTable extends AbstractTableGateway
             $queryStr = $queryStr->order('sample_collection_date ASC');
             $queryStr = $sql->buildSqlString($queryStr);
             //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-            $sampleResult = $common->cacheQuery($queryStr, $dbAdapter);
+            $sampleResult = $this->commonService->cacheQuery($queryStr, $dbAdapter);
             $j = 0;
             foreach ($sampleResult as $sRow) {
                 if ($sRow["monthDate"] == null) continue;
@@ -374,7 +376,7 @@ class SampleTable extends AbstractTableGateway
         $result = array();
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $common = new CommonService($this->sm);
+        
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
@@ -404,7 +406,7 @@ class SampleTable extends AbstractTableGateway
                 $rsQuery = $rsQuery->where('rs.sample_id="' . base64_decode(trim($params['sampleType'])) . '"');
                 $rsQueryStr = $sql->buildSqlString($rsQuery);
                 //$sampleTypeResult = $dbAdapter->query($rsQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-                $specimenTypesResult = $common->cacheQuery($rsQueryStr, $dbAdapter);
+                $specimenTypesResult = $this->commonService->cacheQuery($rsQueryStr, $dbAdapter);
                 $specimenTypes = array_column($specimenTypesResult, 'sample_id');
             }
 
@@ -457,7 +459,7 @@ class SampleTable extends AbstractTableGateway
         $result = array();
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $common = new CommonService($this->sm);
+        
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
@@ -501,7 +503,7 @@ class SampleTable extends AbstractTableGateway
             $queryStr = $sql->buildSqlString($query);
             //echo $queryStr;die;
             //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-            $sampleResult = $common->cacheQuery($queryStr, $dbAdapter);
+            $sampleResult = $this->commonService->cacheQuery($queryStr, $dbAdapter);
             $j = 0;
             foreach ($sampleResult as $sRow) {
                 if ($sRow["monthDate"] == null) continue;
@@ -532,7 +534,7 @@ class SampleTable extends AbstractTableGateway
         $sql = new Sql($dbAdapter);
         $result = array();
         $skipDays = isset($this->config['defaults']['tat-skipdays']) ? $this->config['defaults']['tat-skipdays'] : 120;
-        $common = new CommonService($this->sm);
+        
 
         $facilityIdList = null;
 
@@ -613,7 +615,7 @@ class SampleTable extends AbstractTableGateway
             /* echo $queryStr;
             die; */
             //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-            $sampleResult = $common->cacheQuery($queryStr, $dbAdapter);
+            $sampleResult = $this->commonService->cacheQuery($queryStr, $dbAdapter);
             $j = 0;
             $monthDateArray = array();
             foreach ($sampleResult as $sRow) {
@@ -644,7 +646,7 @@ class SampleTable extends AbstractTableGateway
         $result = array();
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $common = new CommonService($this->sm);
+        
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
@@ -718,7 +720,7 @@ class SampleTable extends AbstractTableGateway
             $queryStr = $sql->buildSqlString($query);
             //echo $queryStr;die;
             //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-            $sampleResult = $common->cacheQuery($queryStr, $dbAdapter);
+            $sampleResult = $this->commonService->cacheQuery($queryStr, $dbAdapter);
             $j = 0;
             foreach ($sampleResult as $sRow) {
                 if ($sRow["monthDate"] == null) continue;
@@ -749,7 +751,7 @@ class SampleTable extends AbstractTableGateway
         $result = array();
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $common = new CommonService($this->sm);
+        
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
@@ -781,7 +783,7 @@ class SampleTable extends AbstractTableGateway
             $queryStr = $sql->buildSqlString($query);
             //echo $queryStr;die;
             //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-            $sampleResult = $common->cacheQuery($queryStr, $dbAdapter);
+            $sampleResult = $this->commonService->cacheQuery($queryStr, $dbAdapter);
             $j = 0;
             foreach ($sampleResult as $sRow) {
                 if ($sRow["monthDate"] == null) continue;
@@ -801,7 +803,7 @@ class SampleTable extends AbstractTableGateway
         $result = array();
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $common = new CommonService($this->sm);
+        
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
@@ -833,7 +835,7 @@ class SampleTable extends AbstractTableGateway
             $queryStr = $sql->buildSqlString($query);
             //echo $queryStr;die;
             //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-            $sampleResult = $common->cacheQuery($queryStr, $dbAdapter);
+            $sampleResult = $this->commonService->cacheQuery($queryStr, $dbAdapter);
             $j = 0;
             foreach ($sampleResult as $sRow) {
                 if ($sRow["monthDate"] == null) continue;
@@ -853,7 +855,7 @@ class SampleTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = array();
-        $common = new CommonService($this->sm);
+        
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
@@ -905,7 +907,7 @@ class SampleTable extends AbstractTableGateway
             $queryStr = $sql->buildSqlString($query);
             //echo $queryStr;die;
             //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-            $sampleResult = $common->cacheQuery($queryStr, $dbAdapter);
+            $sampleResult = $this->commonService->cacheQuery($queryStr, $dbAdapter);
             $j = 0;
             if (isset($sampleResult) && count($sampleResult) > 0) {
                 foreach ($sampleResult as $sRow) {
@@ -928,7 +930,7 @@ class SampleTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = array();
-        $common = new CommonService($this->sm);
+        
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
@@ -976,7 +978,7 @@ class SampleTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $femaleTestResult = array();
-        $common = new CommonService($this->sm);
+        
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
@@ -1006,7 +1008,7 @@ class SampleTable extends AbstractTableGateway
                         AND DATE(sample_collection_date) <= '" . $endMonth . "' AND (patient_gender='f' || patient_gender='F' || patient_gender='Female' || patient_gender='FEMALE')");
 
             $queryStr = $sql->buildSqlString($query);
-            $femaleTestResult = $common->cacheQuery($queryStr, $dbAdapter);
+            $femaleTestResult = $this->commonService->cacheQuery($queryStr, $dbAdapter);
         }
         return $femaleTestResult;
     }
@@ -1018,7 +1020,7 @@ class SampleTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $lineOfTreatmentResult = array();
-        $common = new CommonService($this->sm);
+        
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
@@ -1045,7 +1047,7 @@ class SampleTable extends AbstractTableGateway
                         AND DATE(sample_collection_date) <= '" . $endMonth . "'");
 
             $queryStr = $sql->buildSqlString($query);
-            $lineOfTreatmentResult = $common->cacheQuery($queryStr, $dbAdapter);
+            $lineOfTreatmentResult = $this->commonService->cacheQuery($queryStr, $dbAdapter);
         }
         return $lineOfTreatmentResult;
     }
@@ -1056,7 +1058,7 @@ class SampleTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $lResult = array();
-        $common = new CommonService($this->sm);
+        
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
@@ -1100,7 +1102,7 @@ class SampleTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = array();
-        $common = new CommonService($this->sm);
+        
         $i = 0;
         $j = 1;
         $k = 2;
@@ -1173,7 +1175,7 @@ class SampleTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = array();
-        $common = new CommonService($this->sm);
+        
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
@@ -1259,7 +1261,7 @@ class SampleTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $vlOutComeResult = array();
-        $common = new CommonService($this->sm);
+        
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
@@ -1363,7 +1365,7 @@ class SampleTable extends AbstractTableGateway
                 $sQuery = $sQuery->where("(vl.line_of_treatment IS NULL OR vl.line_of_treatment = '' OR vl.line_of_treatment = '0')");
             }
             $queryStr = $sql->buildSqlString($sQuery);
-            $vlOutComeResult = $common->cacheQuery($queryStr, $dbAdapter);
+            $vlOutComeResult = $this->commonService->cacheQuery($queryStr, $dbAdapter);
         }
         return $vlOutComeResult;
     }
@@ -1376,7 +1378,7 @@ class SampleTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $sResult = array();
-        $common = new CommonService($this->sm);
+        
         if (isset($params['sampleCollectionDate']) && trim($params['sampleCollectionDate']) != '') {
             $s_c_date = explode("to", $params['sampleCollectionDate']);
             if (isset($s_c_date[0]) && trim($s_c_date[0]) != "") {
@@ -1492,7 +1494,7 @@ class SampleTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = array();
-        $common = new CommonService($this->sm);
+        
         if (isset($params['sampleCollectionDate']) && trim($params['sampleCollectionDate']) != '') {
             $s_c_date = explode("to", $params['sampleCollectionDate']);
             if (isset($s_c_date[0]) && trim($s_c_date[0]) != "") {
@@ -1588,7 +1590,7 @@ class SampleTable extends AbstractTableGateway
 
             $queryStr = $sql->buildSqlString($query);
 
-            $sampleResult = $common->cacheQuery($queryStr, $dbAdapter);
+            $sampleResult = $this->commonService->cacheQuery($queryStr, $dbAdapter);
             $j = 0;
             foreach ($sampleResult as $sample) {
                 $result['Total']['Male'][$j] = (isset($sample["mTotal"])) ? $sample["mTotal"] : 0;
@@ -1614,7 +1616,7 @@ class SampleTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = array();
-        $common = new CommonService($this->sm);
+        
         if (isset($params['sampleCollectionDate']) && trim($params['sampleCollectionDate']) != '') {
             $s_c_date = explode("to", $params['sampleCollectionDate']);
             if (isset($s_c_date[0]) && trim($s_c_date[0]) != "") {
@@ -1711,7 +1713,7 @@ class SampleTable extends AbstractTableGateway
             $query = $query->order(array(new Expression('WEEK(sample_collection_date)')));
             $queryStr = $sql->buildSqlString($query);
             //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-            $sampleResult = $common->cacheQuery($queryStr, $dbAdapter);
+            $sampleResult = $this->commonService->cacheQuery($queryStr, $dbAdapter);
             $j = 0;
             foreach ($sampleResult as $sRow) {
                 if ($sRow["sampleCollectionDate"] == null) continue;
@@ -1741,7 +1743,7 @@ class SampleTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = array();
-        $common = new CommonService($this->sm);
+        
         if (isset($params['sampleCollectionDate']) && trim($params['sampleCollectionDate']) != '') {
             $s_c_date = explode("to", $params['sampleCollectionDate']);
             if (isset($s_c_date[0]) && trim($s_c_date[0]) != "") {
@@ -1814,7 +1816,7 @@ class SampleTable extends AbstractTableGateway
             $query = $query->order(array(new Expression('WEEK(sample_collection_date)')));
             $queryStr = $sql->buildSqlString($query);
             //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-            $sampleResult = $common->cacheQuery($queryStr, $dbAdapter);
+            $sampleResult = $this->commonService->cacheQuery($queryStr, $dbAdapter);
             $j = 0;
             foreach ($sampleResult as $sRow) {
                 if ($sRow["monthDate"] == null) continue;
@@ -1835,7 +1837,7 @@ class SampleTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = array();
-        $common = new CommonService($this->sm);
+        
         if (isset($params['sampleCollectionDate']) && trim($params['sampleCollectionDate']) != '') {
             $s_c_date = explode("to", $params['sampleCollectionDate']);
             if (isset($s_c_date[0]) && trim($s_c_date[0]) != "") {
@@ -1923,7 +1925,7 @@ class SampleTable extends AbstractTableGateway
             $queryStr = $sql->buildSqlString($query);
             //echo $queryStr;die;
             //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-            $sampleResult = $common->cacheQuery($queryStr, $dbAdapter);
+            $sampleResult = $this->commonService->cacheQuery($queryStr, $dbAdapter);
             $j = 0;
             if (isset($sampleResult) && count($sampleResult) > 0) {
                 foreach ($sampleResult as $sRow) {
@@ -1947,7 +1949,7 @@ class SampleTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $rResult = array();
-        $common = new CommonService($this->sm);
+        
         if (isset($params['sampleCollectionDate']) && trim($params['sampleCollectionDate']) != '') {
             $s_c_date = explode("to", $params['sampleCollectionDate']);
             if (isset($s_c_date[0]) && trim($s_c_date[0]) != "") {
@@ -2034,7 +2036,7 @@ class SampleTable extends AbstractTableGateway
             $rQueryStr = $sql->buildSqlString($rQuery);
             //echo $rQueryStr;die;
             //$qResult = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-            $qResult = $common->cacheQuery($rQueryStr, $dbAdapter);
+            $qResult = $this->commonService->cacheQuery($rQueryStr, $dbAdapter);
             $j = 0;
             foreach ($qResult as $r) {
                 $rResult[$r['test_reason_name']][$j]['total'] = (isset($r['total'])) ? (int) $r['total'] : 0;
@@ -2303,18 +2305,18 @@ class SampleTable extends AbstractTableGateway
             "aaData" => array()
         );
 
-        $common = new CommonService($this->sm);
-        $viewText = $common->translate('View');
-        $pdfText = $common->translate('PDF');
+        
+        $viewText = $this->commonService->translate('View');
+        $pdfText = $this->commonService->translate('PDF');
         foreach ($rResult as $aRow) {
             $row = array();
             $sampleCollectionDate = '';
             if (isset($aRow['sampleCollectionDate']) && $aRow['sampleCollectionDate'] != NULL && trim($aRow['sampleCollectionDate']) != "" && $aRow['sampleCollectionDate'] != '0000-00-00') {
-                $sampleCollectionDate = $common->humanDateFormat($aRow['sampleCollectionDate']);
+                $sampleCollectionDate = $this->commonService->humanDateFormat($aRow['sampleCollectionDate']);
             }
             $sampleTestedDate = '';
             if (isset($aRow['sampleTestingDate']) && $aRow['sampleTestingDate'] != NULL && trim($aRow['sampleTestingDate']) != "" && $aRow['sampleTestingDate'] != '0000-00-00') {
-                $sampleTestedDate = $common->humanDateFormat($aRow['sampleTestingDate']);
+                $sampleTestedDate = $this->commonService->humanDateFormat($aRow['sampleTestingDate']);
             }
             $pdfButtCss = ($aRow['result'] == null || trim($aRow['result']) == "") ? 'display:none' : '';
             $row[] = $aRow['sample_code'];
@@ -2337,7 +2339,7 @@ class SampleTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = array();
-        $common = new CommonService($this->sm);
+        
 
 
         if (isset($params['sampleCollectionDate']) && trim($params['sampleCollectionDate']) != '') {
@@ -2460,7 +2462,7 @@ class SampleTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = array();
-        $common = new CommonService($this->sm);
+        
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
@@ -2597,7 +2599,7 @@ class SampleTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = array();
-        $common = new CommonService($this->sm);
+        
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
@@ -2742,7 +2744,7 @@ class SampleTable extends AbstractTableGateway
         $result = array();
 
 
-        $common = new CommonService($this->sm);
+        
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
             $startMonth = date("Y-m", strtotime(trim($params['fromDate']))) . "-01";
             $endMonth = date("Y-m", strtotime(trim($params['toDate']))) . "-31";
@@ -2855,7 +2857,7 @@ class SampleTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = array();
-        $common = new CommonService($this->sm);
+        
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
@@ -3074,7 +3076,7 @@ class SampleTable extends AbstractTableGateway
     {
         $logincontainer = new Container('credo');
         $queryContainer = new Container('query');
-        $common = new CommonService($this->sm);
+        
         /* Array of database columns which should be read and sent back to DataTables. Use a space where
          * you want to insert a non-database field (for example a counter or static image)
         */
@@ -3310,7 +3312,7 @@ class SampleTable extends AbstractTableGateway
             $row = array();
             $sampleCollectionDate = '';
             if (isset($aRow['sampleCollectionDate']) && $aRow['sampleCollectionDate'] != null && trim($aRow['sampleCollectionDate']) != "" && $aRow['sampleCollectionDate'] != '0000-00-00') {
-                $sampleCollectionDate = $common->humanDateFormat($aRow['sampleCollectionDate']);
+                $sampleCollectionDate = $this->commonService->humanDateFormat($aRow['sampleCollectionDate']);
             }
             $row[] = $sampleCollectionDate;
             $row[] = $aRow['total_samples_received'];
@@ -3330,7 +3332,7 @@ class SampleTable extends AbstractTableGateway
     {
         $logincontainer = new Container('credo');
         $queryContainer = new Container('query');
-        $common = new CommonService($this->sm);
+        
         /* Array of database columns which should be read and sent back to DataTables. Use a space where
          * you want to insert a non-database field (for example a counter or static image)
         */
@@ -3580,7 +3582,7 @@ class SampleTable extends AbstractTableGateway
     {
         $logincontainer = new Container('credo');
         $queryContainer = new Container('query');
-        $common = new CommonService($this->sm);
+        
         /* Array of database columns which should be read and sent back to DataTables. Use a space where
          * you want to insert a non-database field (for example a counter or static image)
         */
@@ -3742,7 +3744,7 @@ class SampleTable extends AbstractTableGateway
         $queryContainer->sampleResultTestedTATQuery = $sQuery;
         $queryStr = $sql->buildSqlString($sQuery); // Get the string of the Sql, instead of the Select-instance
         //echo $queryStr;die;
-        $rResult = $common->cacheQuery($queryStr, $dbAdapter);
+        $rResult = $this->commonService->cacheQuery($queryStr, $dbAdapter);
 
         /* Data set length after filtering */
         $sQuery->reset('limit');
@@ -4262,7 +4264,7 @@ class SampleTable extends AbstractTableGateway
     {
         $logincontainer = new Container('credo');
         $queryContainer = new Container('query');
-        $common = new CommonService($this->sm);
+        
         //$globalDb = new \Application\Model\GlobalTable($this->adapter);
         $globalDb = $this->sm->get('GlobalTable');
         $samplesWaitingFromLastXMonths = $globalDb->getGlobalValue('sample_waiting_month_range');
@@ -4446,7 +4448,7 @@ class SampleTable extends AbstractTableGateway
         $queryContainer->resultsAwaitedQuery = $sQuery;
         $queryStr = $sql->buildSqlString($sQuery); // Get the string of the Sql, instead of the Select-instance
         //echo $queryStr;die;
-        $rResult = $common->cacheQuery($queryStr, $dbAdapter);
+        $rResult = $this->commonService->cacheQuery($queryStr, $dbAdapter);
 
         /* Data set length after filtering */
         $sQuery->reset('limit');
@@ -4477,8 +4479,8 @@ class SampleTable extends AbstractTableGateway
             "aaData" => array()
         );
         foreach ($rResult as $aRow) {
-            $displayCollectionDate = $common->humanDateFormat($aRow['collectionDate']);
-            $displayReceivedDate = $common->humanDateFormat($aRow['receivedDate']);
+            $displayCollectionDate = $this->commonService->humanDateFormat($aRow['collectionDate']);
+            $displayReceivedDate = $this->commonService->humanDateFormat($aRow['receivedDate']);
             $row = array();
             $row[] = $aRow['sample_code'];
             $row[] = $displayCollectionDate;
@@ -4746,12 +4748,12 @@ class SampleTable extends AbstractTableGateway
             "aaData" => array()
         );
 
-        $common = new CommonService($this->sm);
-        $buttText = $common->translate('Edit');
+        
+        $buttText = $this->commonService->translate('Edit');
         foreach ($rResult as $aRow) {
             $sampleCollectionDate = '';
             if (isset($aRow['sampleCollectionDate']) && $aRow['sampleCollectionDate'] != NULL && trim($aRow['sampleCollectionDate']) != "" && $aRow['sampleCollectionDate'] != '0000-00-00') {
-                $sampleCollectionDate = $common->humanDateFormat($aRow['sampleCollectionDate']);
+                $sampleCollectionDate = $this->commonService->humanDateFormat($aRow['sampleCollectionDate']);
             }
             $row = array();
             $row[] = '<input type="checkbox" name="duplicate-select[]" class="' . $aRow['sample_code'] . '" id="' . $aRow['vl_sample_id'] . '" value="' . $aRow['vl_sample_id'] . '" onchange="duplicateCheck(this);"/>';
@@ -4941,7 +4943,6 @@ class SampleTable extends AbstractTableGateway
     {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $common = new CommonService($this->sm);
         // $queryStr = $sql->select()->from(array('vl'=>$this->table))
         //                 ->columns(array(
         //                 "total_samples_received" => new Expression("COUNT(*)"),
@@ -4982,9 +4983,7 @@ class SampleTable extends AbstractTableGateway
         //->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')");        
         $queryStr = $sql->buildSqlString($queryStr);
 
-        //echo $queryStr;die;
-
-        return $common->cacheQuery($queryStr, $dbAdapter);
+        return $this->commonService->cacheQuery($queryStr, $dbAdapter);
     }
 
     public function fetchSamplesReceivedBarChartDetails($params)
@@ -4992,7 +4991,7 @@ class SampleTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = array();
-        $common = new CommonService($this->sm);
+        
 
         $sQuery = $sql->select()->from(array('vl' => $this->table))
             ->columns(
@@ -5031,7 +5030,7 @@ class SampleTable extends AbstractTableGateway
         $queryStr = $sql->buildSqlString($sQuery);
         //echo $queryStr;die;
         //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-        $sampleResult = $common->cacheQuery($queryStr, $dbAdapter);
+        $sampleResult = $this->commonService->cacheQuery($queryStr, $dbAdapter);
         $j = 0;
         foreach ($sampleResult as $row) {
             $result['sampleName']['dbs'][$j] = (isset($row["total_dbs"])) ? $row["total_dbs"] : 0;
@@ -5618,7 +5617,7 @@ class SampleTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = array();
-        $common = new CommonService($this->sm);
+        
 
         $sQuery = $sql->select()
             ->from(array('vl' => $this->table))
@@ -5658,7 +5657,7 @@ class SampleTable extends AbstractTableGateway
         $queryStr = $sql->buildSqlString($sQuery);
         //echo $queryStr;die;
         //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-        $sampleResult = $common->cacheQuery($queryStr, $dbAdapter);
+        $sampleResult = $this->commonService->cacheQuery($queryStr, $dbAdapter);
         $j = 0;
         foreach ($sampleResult as $row) {
             $result['valid_results'][$j] = (isset($row["total_samples_valid"])) ? $row["total_samples_valid"] : 0;
@@ -6254,7 +6253,7 @@ class SampleTable extends AbstractTableGateway
             $mostRejectionReasons[] = 0;
         }
         $result = array();
-        $common = new CommonService($this->sm);
+        
         $start = strtotime($params['fromDate']);
         $end = strtotime($params['toDate']);
 
@@ -6295,7 +6294,7 @@ class SampleTable extends AbstractTableGateway
                     $rejectionQuery = $rejectionQuery->where('vl.reason_for_sample_rejection = "' . $mostRejectionReasons[$m] . '"');
                 }
                 $rejectionQueryStr = $sql->buildSqlString($rejectionQuery);
-                $rejectionResult = $common->cacheQuery($rejectionQueryStr, $dbAdapter);
+                $rejectionResult = $this->commonService->cacheQuery($rejectionQueryStr, $dbAdapter);
                 $rejectionReasonName = ($mostRejectionReasons[$m] == 0) ? 'Others' : ucwords($rejectionResult[0]['rejection_reason_name']);
                 $result['rejection'][$rejectionReasonName][$j] = (isset($rejectionResult[0]['rejections'])) ? $rejectionResult[0]['rejections'] : 0;
                 $result['date'][$j] = $monthYearFormat;
@@ -6819,7 +6818,7 @@ class SampleTable extends AbstractTableGateway
     {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $common = new CommonService($this->sm);
+        
 
 
         $validQuery = $sql->select()->from(array('vl' => $this->table))
@@ -6880,7 +6879,7 @@ class SampleTable extends AbstractTableGateway
         $queryStr = $sql->buildSqlString($sQuery);
         //echo $queryStr;die;
         //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-        $sampleResult = $common->cacheQuery($queryStr, $dbAdapter);
+        $sampleResult = $this->commonService->cacheQuery($queryStr, $dbAdapter);
         //die;
         $j = 0;
         $result = array();
@@ -7100,7 +7099,7 @@ class SampleTable extends AbstractTableGateway
     {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $common = new CommonService($this->sm);
+        
         $sQuery = $sql->select()->from(array('vl' => $this->table))
             ->columns(
                 array(
@@ -7122,14 +7121,14 @@ class SampleTable extends AbstractTableGateway
         $queryStr = $sql->buildSqlString($sQuery);
         //echo $queryStr;die;
         //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-        return $common->cacheQuery($queryStr, $dbAdapter);
+        return $this->commonService->cacheQuery($queryStr, $dbAdapter);
     }
 
     public function fetchAllCollapsibleLineOfTreatmentDetails($params)
     {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $common = new CommonService($this->sm);
+        
         $sQuery = $sql->select()->from(array('vl' => $this->table))
             ->columns(
                 array(
@@ -7148,19 +7147,19 @@ class SampleTable extends AbstractTableGateway
         }
         $queryStr = $sql->buildSqlString($sQuery);
         //lineofTreatmentResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-        $adult1stLineofTreatmentResult = $common->cacheQuery($queryStr . " AND line_of_treatment = 1 AND (patient_age_in_years IS NOT NULL AND patient_age_in_years!= '' AND patient_age_in_years >= 18) group by current_regimen order by validResults desc limit 9", $dbAdapter);
-        $adult1stLineofTreatmentOthersResult = $common->cacheQuery($queryStr . " AND line_of_treatment = 1 AND (patient_age_in_years IS NOT NULL AND patient_age_in_years!= '' AND patient_age_in_years >= 18) group by current_regimen order by validResults desc limit 10,18446744073709551615", $dbAdapter);
+        $adult1stLineofTreatmentResult = $this->commonService->cacheQuery($queryStr . " AND line_of_treatment = 1 AND (patient_age_in_years IS NOT NULL AND patient_age_in_years!= '' AND patient_age_in_years >= 18) group by current_regimen order by validResults desc limit 9", $dbAdapter);
+        $adult1stLineofTreatmentOthersResult = $this->commonService->cacheQuery($queryStr . " AND line_of_treatment = 1 AND (patient_age_in_years IS NOT NULL AND patient_age_in_years!= '' AND patient_age_in_years >= 18) group by current_regimen order by validResults desc limit 10,18446744073709551615", $dbAdapter);
 
-        $paeds1stLineofTreatmentResult = $common->cacheQuery($queryStr . " AND line_of_treatment = 1 AND (patient_age_in_years IS NOT NULL AND patient_age_in_years!= '' AND patient_age_in_years < 18) group by current_regimen order by validResults desc limit 9", $dbAdapter);
-        $paeds1stLineofTreatmentOthersResult = $common->cacheQuery($queryStr . " AND line_of_treatment = 1 AND (patient_age_in_years IS NOT NULL AND patient_age_in_years!= '' AND patient_age_in_years < 18) group by current_regimen order by validResults desc limit 10,18446744073709551615", $dbAdapter);
+        $paeds1stLineofTreatmentResult = $this->commonService->cacheQuery($queryStr . " AND line_of_treatment = 1 AND (patient_age_in_years IS NOT NULL AND patient_age_in_years!= '' AND patient_age_in_years < 18) group by current_regimen order by validResults desc limit 9", $dbAdapter);
+        $paeds1stLineofTreatmentOthersResult = $this->commonService->cacheQuery($queryStr . " AND line_of_treatment = 1 AND (patient_age_in_years IS NOT NULL AND patient_age_in_years!= '' AND patient_age_in_years < 18) group by current_regimen order by validResults desc limit 10,18446744073709551615", $dbAdapter);
 
-        $adult2ndLineofTreatmentResult = $common->cacheQuery($queryStr . " AND line_of_treatment = 2 AND (patient_age_in_years IS NOT NULL AND patient_age_in_years!= '' AND patient_age_in_years >= 18) group by current_regimen order by validResults desc limit 9", $dbAdapter);
-        $adult2ndLineofTreatmentOthersResult = $common->cacheQuery($queryStr . " AND line_of_treatment = 2 AND patient_age_in_years IS NOT NULL AND patient_age_in_years!= '' AND patient_age_in_years >= 18 group by current_regimen order by validResults desc limit 10,18446744073709551615", $dbAdapter);
+        $adult2ndLineofTreatmentResult = $this->commonService->cacheQuery($queryStr . " AND line_of_treatment = 2 AND (patient_age_in_years IS NOT NULL AND patient_age_in_years!= '' AND patient_age_in_years >= 18) group by current_regimen order by validResults desc limit 9", $dbAdapter);
+        $adult2ndLineofTreatmentOthersResult = $this->commonService->cacheQuery($queryStr . " AND line_of_treatment = 2 AND patient_age_in_years IS NOT NULL AND patient_age_in_years!= '' AND patient_age_in_years >= 18 group by current_regimen order by validResults desc limit 10,18446744073709551615", $dbAdapter);
 
-        $paeds2ndLineofTreatmentResult = $common->cacheQuery($queryStr . " AND line_of_treatment = 2 AND (patient_age_in_years IS NOT NULL AND patient_age_in_years!= '' AND patient_age_in_years < 18) group by current_regimen order by validResults desc limit 8", $dbAdapter);
-        $paeds2ndLineofTreatmentOthersResult = $common->cacheQuery($queryStr . " AND line_of_treatment = 2 AND (patient_age_in_years IS NOT NULL AND patient_age_in_years!= '' AND patient_age_in_years < 18) group by current_regimen order by validResults desc limit 9,18446744073709551615", $dbAdapter);
+        $paeds2ndLineofTreatmentResult = $this->commonService->cacheQuery($queryStr . " AND line_of_treatment = 2 AND (patient_age_in_years IS NOT NULL AND patient_age_in_years!= '' AND patient_age_in_years < 18) group by current_regimen order by validResults desc limit 8", $dbAdapter);
+        $paeds2ndLineofTreatmentOthersResult = $this->commonService->cacheQuery($queryStr . " AND line_of_treatment = 2 AND (patient_age_in_years IS NOT NULL AND patient_age_in_years!= '' AND patient_age_in_years < 18) group by current_regimen order by validResults desc limit 9,18446744073709551615", $dbAdapter);
 
-        $otherLineofTreatmentResult = $common->cacheQuery($queryStr . " AND line_of_treatment is not null AND line_of_treatment!= '' AND line_of_treatment!= 1 AND line_of_treatment!= 2 group by current_regimen", $dbAdapter);
+        $otherLineofTreatmentResult = $this->commonService->cacheQuery($queryStr . " AND line_of_treatment is not null AND line_of_treatment!= '' AND line_of_treatment!= 1 AND line_of_treatment!= 2 group by current_regimen", $dbAdapter);
         return array('adult1stLineofTreatmentResult' => $adult1stLineofTreatmentResult, 'adult1stLineofTreatmentOthersResult' => $adult1stLineofTreatmentOthersResult, 'paeds1stLineofTreatmentResult' => $paeds1stLineofTreatmentResult, 'paeds1stLineofTreatmentOthersResult' => $paeds1stLineofTreatmentOthersResult, 'adult2ndLineofTreatmentResult' => $adult2ndLineofTreatmentResult, 'adult2ndLineofTreatmentOthersResult' => $adult2ndLineofTreatmentOthersResult, 'paeds2ndLineofTreatmentResult' => $paeds2ndLineofTreatmentResult, 'paeds2ndLineofTreatmentOthersResult' => $paeds2ndLineofTreatmentOthersResult, 'otherLineofTreatmentResult' => $otherLineofTreatmentResult);
     }
 
@@ -7170,7 +7169,7 @@ class SampleTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $summaryResult = array();
-        $common = new CommonService($this->sm);
+        
 
         $samplesReceivedSummaryQuery = $sql->select()
             ->from(array('vl' => $this->table))
@@ -7211,7 +7210,7 @@ class SampleTable extends AbstractTableGateway
         $samplesReceivedSummaryQuery = $samplesReceivedSummaryQuery->order('sample_collection_date ASC');
         $queryContainer->indicatorSummaryQuery = $samplesReceivedSummaryQuery;
         $samplesReceivedSummaryCacheQuery = $sql->buildSqlString($samplesReceivedSummaryQuery);
-        $samplesReceivedSummaryResult = $common->cacheQuery($samplesReceivedSummaryCacheQuery, $dbAdapter);
+        $samplesReceivedSummaryResult = $this->commonService->cacheQuery($samplesReceivedSummaryCacheQuery, $dbAdapter);
         //var_dump($samplesReceivedSummaryResult);die;
         $j = 0;
         foreach ($samplesReceivedSummaryResult as $row) {
@@ -7234,7 +7233,7 @@ class SampleTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $rResult = array();
-        $common = new CommonService($this->sm);
+        
         if (isset($params['sampleCollectionDate']) && trim($params['sampleCollectionDate']) != '') {
             $s_c_date = explode("to", $params['sampleCollectionDate']);
             if (isset($s_c_date[0]) && trim($s_c_date[0]) != "") {
@@ -7327,7 +7326,7 @@ class SampleTable extends AbstractTableGateway
             }
             $rQueryStr = $sql->buildSqlString($rQuery);
             //$qResult = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-            $qResult = $common->cacheQuery($rQueryStr, $dbAdapter);
+            $qResult = $this->commonService->cacheQuery($rQueryStr, $dbAdapter);
             $rResult['total']['Age < 2'][0] = (isset($qResult[0]['AgeLt2'])) ? (int) $qResult[0]['AgeLt2'] : 0;
             $rResult['total']['Age 2-5'][0] = (isset($qResult[0]['AgeGte2Lte5'])) ? (int) $qResult[0]['AgeGte2Lte5'] : 0;
             $rResult['total']['Age 6-14'][0] = (isset($qResult[0]['AgeGte6Lte14'])) ? (int) $qResult[0]['AgeGte6Lte14'] : 0;
@@ -7344,7 +7343,7 @@ class SampleTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $rResult = array();
-        $common = new CommonService($this->sm);
+        
         if (isset($params['sampleCollectionDate']) && trim($params['sampleCollectionDate']) != '') {
             $s_c_date = explode("to", $params['sampleCollectionDate']);
             if (isset($s_c_date[0]) && trim($s_c_date[0]) != "") {
@@ -7434,7 +7433,7 @@ class SampleTable extends AbstractTableGateway
             }
             $rQueryStr = $sql->buildSqlString($rQuery);
             //$qResult = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-            $qResult = $common->cacheQuery($rQueryStr, $dbAdapter);
+            $qResult = $this->commonService->cacheQuery($rQueryStr, $dbAdapter);
             $rResult['total']['Male'][0] = (isset($qResult[0]['mTotal'])) ? (int) $qResult[0]['mTotal'] : 0;
             $rResult['total']['Female'][0] = (isset($qResult[0]['fTotal'])) ? (int) $qResult[0]['fTotal'] : 0;
             $rResult['total']['Other'][0] = (isset($qResult[0]['nsTotal'])) ? (int) $qResult[0]['nsTotal'] : 0;
@@ -7952,7 +7951,7 @@ class SampleTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $lResult = array();
-        $common = new CommonService($this->sm);
+        
         $lQuery = $sql->select()->from(array('eid' => 'dash_eid_form'))->columns(array(
             'total' => new Expression("SUM(CASE WHEN ( eid.sample_collection_date is not NULL AND eid.sample_collection_date!='0000-00-00 00:00:00') THEN 1 ELSE 0 END)"),
             "samplenottested" => new Expression("SUM(CASE WHEN (eid.sample_collection_date is NULL OR eid.sample_collection_date='0000-00-00 00:00:00') THEN 1 ELSE 0 END)"),
@@ -7973,7 +7972,7 @@ class SampleTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $lResult = array();
-        $common = new CommonService($this->sm);
+        
         // $lQuery = $sql->select()->from(array('eid' => 'dash_eid_form'))->columns(array('child_name','mother_name','caretaker_phone_number','result'))
         //             ->join(array('f' => 'import_config_machines'), 'f.config_machine_id=eid.import_machine_name', array('lat'=>'latitude','lon'=>'longitude'))
         //             ->where("(eid.sample_tested_datetime is not null  AND f.poc_device ='yes' AND f.latitude = '".$params['lat']."' AND f.longitude = '".$params['lon']."')")
@@ -8038,7 +8037,7 @@ class SampleTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $lResult = array();
-        $common = new CommonService($this->sm);
+        
         // $lQuery = $sql->select()->from(array('eid' => 'dash_eid_form'))->columns(array('child_name','mother_name','caretaker_phone_number','result'))
         //             ->join(array('f' => 'import_config_machines'), 'f.config_machine_id=eid.import_machine_name', array('lat'=>'latitude','lon'=>'longitude'))
         //             ->where("(eid.sample_tested_datetime is not null  AND f.poc_device ='yes' AND f.latitude = '".$params['lat']."' AND f.longitude = '".$params['lon']."')")

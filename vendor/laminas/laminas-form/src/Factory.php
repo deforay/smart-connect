@@ -1,11 +1,5 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-form for the canonical source repository
- * @copyright https://github.com/laminas/laminas-form/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-form/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Form;
 
 use ArrayAccess;
@@ -15,6 +9,18 @@ use Laminas\InputFilter\InputFilterInterface;
 use Laminas\ServiceManager\ServiceManager;
 use Laminas\Stdlib\ArrayUtils;
 use Traversable;
+
+use function class_exists;
+use function get_class;
+use function gettype;
+use function is_array;
+use function is_object;
+use function is_string;
+use function method_exists;
+use function sprintf;
+use function trigger_error;
+
+use const E_USER_DEPRECATED;
 
 class Factory
 {
@@ -48,7 +54,7 @@ class Factory
      * Set input filter factory to use when creating forms
      *
      * @param  InputFilterFactory $inputFilterFactory
-     * @return Factory
+     * @return $this
      */
     public function setInputFilterFactory(InputFilterFactory $inputFilterFactory)
     {
@@ -75,7 +81,7 @@ class Factory
      * Set the form element manager
      *
      * @param  FormElementManager $formElementManager
-     * @return Factory
+     * @return $this
      */
     public function setFormElementManager(FormElementManager $formElementManager)
     {
@@ -156,7 +162,7 @@ class Factory
      * Create a fieldset
      *
      * @param  array $spec
-     * @return ElementInterface
+     * @return FieldsetInterface
      */
     public function createFieldset($spec)
     {
@@ -171,7 +177,7 @@ class Factory
      * Create a form
      *
      * @param  array $spec
-     * @return ElementInterface
+     * @return FormInterface
      */
     public function createForm($spec)
     {
@@ -188,14 +194,13 @@ class Factory
      * Specification can contain any of the following:
      * - type: the Element class to use; defaults to \Laminas\Form\Element
      * - name: what name to provide the element, if any
-     * - options: an array, Traversable, or ArrayAccess object of element options
-     * - attributes: an array, Traversable, or ArrayAccess object of element
-     *   attributes to assign
+     * - options: an array or Traversable object of element options
+     * - attributes: an array or Traversable object of element attributes to assign
      *
      * @param  ElementInterface              $element
      * @param  array|Traversable|ArrayAccess $spec
-     * @throws Exception\DomainException
      * @return ElementInterface
+     * @throws Exception\DomainException
      */
     public function configureElement(ElementInterface $element, $spec)
     {
@@ -209,11 +214,11 @@ class Factory
             $element->setName($name);
         }
 
-        if (is_array($options) || $options instanceof Traversable || $options instanceof ArrayAccess) {
+        if (is_array($options) || $options instanceof Traversable) {
             $element->setOptions($options);
         }
 
-        if (is_array($attributes) || $attributes instanceof Traversable || $attributes instanceof ArrayAccess) {
+        if (is_array($attributes) || $attributes instanceof Traversable) {
             $element->setAttributes($attributes);
         }
 
@@ -236,8 +241,8 @@ class Factory
      *
      * @param  FieldsetInterface             $fieldset
      * @param  array|Traversable|ArrayAccess $spec
-     * @throws Exception\DomainException
      * @return FieldsetInterface
+     * @throws Exception\DomainException
      */
     public function configureFieldset(FieldsetInterface $fieldset, $spec)
     {
@@ -260,7 +265,7 @@ class Factory
             $this->prepareAndInjectFieldsets($spec['fieldsets'], $fieldset, __METHOD__);
         }
 
-        $factory = (isset($spec['factory']) ? $spec['factory'] : $this);
+        $factory = isset($spec['factory']) ? $spec['factory'] : $this;
         $this->prepareAndInjectFactory($factory, $fieldset, __METHOD__);
 
         return $fieldset;
@@ -321,7 +326,7 @@ class Factory
             throw new Exception\InvalidArgumentException(sprintf(
                 '%s expects an array, or object implementing Traversable or ArrayAccess; received "%s"',
                 $method,
-                (is_object($spec) ? get_class($spec) : gettype($spec))
+                is_object($spec) ? get_class($spec) : gettype($spec)
             ));
         }
 
@@ -349,7 +354,7 @@ class Factory
             $spec  = isset($elementSpecification['spec']) ? $elementSpecification['spec'] : [];
 
             if (! isset($spec['type'])) {
-                $spec['type'] = 'Laminas\Form\Element';
+                $spec['type'] = Element::class;
             }
 
             $element = $this->create($spec);
@@ -384,9 +389,9 @@ class Factory
      * Takes a string indicating a class name, instantiates the class
      * by that name, and injects the class instance as the bound object.
      *
-     * @param  string           $objectName
+     * @param  string            $objectName
      * @param  FieldsetInterface $fieldset
-     * @param  string           $method
+     * @param  string            $method
      * @throws Exception\DomainException
      * @return void
      */
@@ -396,7 +401,7 @@ class Factory
             throw new Exception\DomainException(sprintf(
                 '%s expects string class name; received "%s"',
                 $method,
-                (is_object($objectName) ? get_class($objectName) : gettype($objectName))
+                is_object($objectName) ? get_class($objectName) : gettype($objectName)
             ));
         }
 
@@ -438,7 +443,7 @@ class Factory
                     $method
                 ));
             }
-            $hydratorOptions = (isset($hydratorOrName['options'])) ? $hydratorOrName['options'] : [];
+            $hydratorOptions = isset($hydratorOrName['options']) ? $hydratorOrName['options'] : [];
             $hydratorOrName = $hydratorOrName['type'];
         } else {
             $hydratorOptions = [];

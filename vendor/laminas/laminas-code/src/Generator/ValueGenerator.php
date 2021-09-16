@@ -12,6 +12,24 @@ use ArrayObject as SplArrayObject;
 use Laminas\Code\Exception\InvalidArgumentException;
 use Laminas\Stdlib\ArrayObject as StdlibArrayObject;
 
+use function addcslashes;
+use function array_keys;
+use function array_merge;
+use function array_search;
+use function count;
+use function get_class;
+use function get_defined_constants;
+use function gettype;
+use function implode;
+use function in_array;
+use function is_array;
+use function is_int;
+use function is_object;
+use function max;
+use function sprintf;
+use function str_repeat;
+use function strpos;
+
 class ValueGenerator extends AbstractGenerator
 {
     /**#@+
@@ -41,7 +59,7 @@ class ValueGenerator extends AbstractGenerator
     /**
      * @var mixed
      */
-    protected $value = null;
+    protected $value;
 
     /**
      * @var string
@@ -61,9 +79,11 @@ class ValueGenerator extends AbstractGenerator
     /**
      * @var array
      */
-    protected $allowedTypes = null;
+    protected $allowedTypes;
+
     /**
      * Autodetectable constants
+     *
      * @var SplArrayObject|StdlibArrayObject
      */
     protected $constants;
@@ -74,8 +94,12 @@ class ValueGenerator extends AbstractGenerator
      * @param string      $outputMode
      * @param null|SplArrayObject|StdlibArrayObject $constants
      */
-    public function __construct($value = null, $type = self::TYPE_AUTO, $outputMode = self::OUTPUT_MULTIPLE_LINE, $constants = null)
-    {
+    public function __construct(
+        $value = null,
+        $type = self::TYPE_AUTO,
+        $outputMode = self::OUTPUT_MULTIPLE_LINE,
+        $constants = null
+    ) {
         // strict check is important here if $type = AUTO
         if ($value !== null) {
             $this->setValue($value);
@@ -88,7 +112,7 @@ class ValueGenerator extends AbstractGenerator
         }
         if ($constants === null) {
             $constants = new SplArrayObject();
-        } elseif (!(($constants instanceof SplArrayObject) || ($constants instanceof StdlibArrayObject))) {
+        } elseif (! ($constants instanceof SplArrayObject || $constants instanceof StdlibArrayObject)) {
             throw new InvalidArgumentException(
                 '$constants must be an instance of ArrayObject or Laminas\Stdlib\ArrayObject'
             );
@@ -110,7 +134,7 @@ class ValueGenerator extends AbstractGenerator
             '__METHOD__',
             '__FUNCTION__',
             '__NAMESPACE__',
-            '::'
+            '::',
         ];
         $constants = array_merge($constants, array_keys(get_defined_constants()), $this->constants->getArrayCopy());
         $this->constants->exchangeArray($constants);
@@ -161,14 +185,16 @@ class ValueGenerator extends AbstractGenerator
      */
     public function isValidConstantType()
     {
-        if ($this->type == self::TYPE_AUTO) {
+        if ($this->type === self::TYPE_AUTO) {
             $type = $this->getAutoDeterminedType($this->value);
         } else {
             $type = $this->type;
         }
 
-        // valid types for constants
-        $scalarTypes = [
+        $validConstantTypes = [
+            self::TYPE_ARRAY,
+            self::TYPE_ARRAY_LONG,
+            self::TYPE_ARRAY_SHORT,
             self::TYPE_BOOLEAN,
             self::TYPE_BOOL,
             self::TYPE_NUMBER,
@@ -178,10 +204,10 @@ class ValueGenerator extends AbstractGenerator
             self::TYPE_DOUBLE,
             self::TYPE_STRING,
             self::TYPE_CONSTANT,
-            self::TYPE_NULL
+            self::TYPE_NULL,
         ];
 
-        return in_array($type, $scalarTypes);
+        return in_array($type, $validConstantTypes);
     }
 
     /**
@@ -260,7 +286,7 @@ class ValueGenerator extends AbstractGenerator
             self::TYPE_CONSTANT,
             self::TYPE_NULL,
             self::TYPE_OBJECT,
-            self::TYPE_OTHER
+            self::TYPE_OTHER,
         ];
 
         if (in_array($type, $types)) {
@@ -310,13 +336,13 @@ class ValueGenerator extends AbstractGenerator
     {
         $type = $this->type;
 
-        if ($type != self::TYPE_AUTO) {
+        if ($type !== self::TYPE_AUTO) {
             $type = $this->getValidatedType($type);
         }
 
         $value = $this->value;
 
-        if ($type == self::TYPE_AUTO) {
+        if ($type === self::TYPE_AUTO) {
             $type = $this->getAutoDeterminedType($value);
         }
 
@@ -335,6 +361,7 @@ class ValueGenerator extends AbstractGenerator
                 }
 
                 $curValue = new self($curValue, $newType, self::OUTPUT_MULTIPLE_LINE, $this->getConstants());
+                $curValue->setIndentation($this->indentation);
             }
         }
 
@@ -343,7 +370,7 @@ class ValueGenerator extends AbstractGenerator
         switch ($type) {
             case self::TYPE_BOOLEAN:
             case self::TYPE_BOOL:
-                $output .= ($value ? 'true' : 'false');
+                $output .= $value ? 'true' : 'false';
                 break;
             case self::TYPE_STRING:
                 $output .= self::escape($value);
@@ -362,12 +389,12 @@ class ValueGenerator extends AbstractGenerator
             case self::TYPE_ARRAY:
             case self::TYPE_ARRAY_LONG:
             case self::TYPE_ARRAY_SHORT:
-                if ($type == self::TYPE_ARRAY_SHORT) {
-                    $startArray = '[';
-                    $endArray   = ']';
-                } else {
+                if ($type === self::TYPE_ARRAY_LONG) {
                     $startArray = 'array(';
-                    $endArray = ')';
+                    $endArray   = ')';
+                } else {
+                    $startArray = '[';
+                    $endArray = ']';
                 }
 
                 $output .= $startArray;
@@ -396,7 +423,7 @@ class ValueGenerator extends AbstractGenerator
                         $outputParts[] = (is_int($n) ? $n : self::escape($n)) . ' => ' . $partV;
                     }
                 }
-                $padding = ($this->outputMode == self::OUTPUT_MULTIPLE_LINE)
+                $padding = $this->outputMode == self::OUTPUT_MULTIPLE_LINE
                     ? self::LINE_FEED . str_repeat($this->indentation, $this->arrayDepth + 1)
                     : ' ';
                 $output .= implode(',' . $padding, $outputParts);
@@ -410,9 +437,10 @@ class ValueGenerator extends AbstractGenerator
                 break;
             case self::TYPE_OTHER:
             default:
-                throw new Exception\RuntimeException(
-                    sprintf('Type "%s" is unknown or cannot be used as property default value.', get_class($value))
-                );
+                throw new Exception\RuntimeException(sprintf(
+                    'Type "%s" is unknown or cannot be used as property default value.',
+                    is_object($value) ? get_class($value) : gettype($value)
+                ));
         }
 
         return $output;

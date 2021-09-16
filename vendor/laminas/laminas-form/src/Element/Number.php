@@ -1,19 +1,15 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-form for the canonical source repository
- * @copyright https://github.com/laminas/laminas-form/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-form/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Form\Element;
 
+use Laminas\Filter\StringTrim;
 use Laminas\Form\Element;
 use Laminas\InputFilter\InputProviderInterface;
 use Laminas\Validator\GreaterThan as GreaterThanValidator;
 use Laminas\Validator\LessThan as LessThanValidator;
 use Laminas\Validator\Regex as RegexValidator;
 use Laminas\Validator\Step as StepValidator;
+use Laminas\Validator\ValidatorInterface;
 
 class Number extends Element implements InputProviderInterface
 {
@@ -34,7 +30,7 @@ class Number extends Element implements InputProviderInterface
     /**
      * Get validator
      *
-     * @return \Laminas\Validator\ValidatorInterface[]
+     * @return ValidatorInterface[]
      */
     protected function getValidators()
     {
@@ -57,13 +53,13 @@ class Number extends Element implements InputProviderInterface
         if (isset($this->attributes['min'])) {
             $validators[] = new GreaterThanValidator([
                 'min' => $this->attributes['min'],
-                'inclusive' => $inclusive
+                'inclusive' => $inclusive,
             ]);
         }
         if (isset($this->attributes['max'])) {
             $validators[] = new LessThanValidator([
                 'max' => $this->attributes['max'],
-                'inclusive' => $inclusive
+                'inclusive' => $inclusive,
             ]);
         }
 
@@ -71,8 +67,8 @@ class Number extends Element implements InputProviderInterface
             || 'any' !== $this->attributes['step']
         ) {
             $validators[] = new StepValidator([
-                'baseValue' => (isset($this->attributes['min'])) ? $this->attributes['min'] : 0,
-                'step'      => (isset($this->attributes['step'])) ? $this->attributes['step'] : 1,
+                'baseValue' => isset($this->attributes['min']) ? $this->attributes['min'] : 0,
+                'step'      => isset($this->attributes['step']) ? $this->attributes['step'] : 1,
             ]);
         }
 
@@ -93,7 +89,7 @@ class Number extends Element implements InputProviderInterface
             'name' => $this->getName(),
             'required' => true,
             'filters' => [
-                ['name' => 'Laminas\Filter\StringTrim']
+                ['name' => StringTrim::class],
             ],
             'validators' => $this->getValidators(),
         ];

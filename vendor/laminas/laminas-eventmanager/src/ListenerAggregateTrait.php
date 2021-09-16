@@ -1,11 +1,5 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-eventmanager for the canonical source repository
- * @copyright https://github.com/laminas/laminas-eventmanager/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-eventmanager/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\EventManager;
 
 /**
@@ -14,9 +8,7 @@ namespace Laminas\EventManager;
  */
 trait ListenerAggregateTrait
 {
-    /**
-     * @var \Laminas\Stdlib\CallbackHandler[]
-     */
+    /** @var callable[] */
     protected $listeners = [];
 
     /**
@@ -25,9 +17,8 @@ trait ListenerAggregateTrait
     public function detach(EventManagerInterface $events)
     {
         foreach ($this->listeners as $index => $callback) {
-            if ($events->detach($callback)) {
-                unset($this->listeners[$index]);
-            }
+            $events->detach($callback);
+            unset($this->listeners[$index]);
         }
     }
 }

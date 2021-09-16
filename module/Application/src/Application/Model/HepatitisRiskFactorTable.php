@@ -21,7 +21,7 @@ use Laminas\Db\TableGateway\AbstractTableGateway;
  */
 class HepatitisRiskFactorTable extends AbstractTableGateway {
 
-    protected $table = 'r_hepatitis_rick_factors';
+    protected $table = 'r_hepatitis_risk_factors';
 
     public function __construct(Adapter $adapter) {
         $this->adapter = $adapter;

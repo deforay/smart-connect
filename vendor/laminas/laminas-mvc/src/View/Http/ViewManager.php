@@ -14,8 +14,6 @@ use Laminas\EventManager\EventManagerInterface;
 use Laminas\EventManager\ListenerAggregateInterface;
 use Laminas\Mvc\MvcEvent;
 use Laminas\ServiceManager\ServiceManager;
-use Laminas\View\HelperPluginManager as ViewHelperManager;
-use Laminas\View\Resolver as ViewResolver;
 use Laminas\View\View;
 use Traversable;
 
@@ -93,9 +91,11 @@ class ViewManager extends AbstractListenerAggregate
         $events       = $application->getEventManager();
         $sharedEvents = $events->getSharedManager();
 
-        $this->config   = isset($config['view_manager']) && (is_array($config['view_manager']) || $config['view_manager'] instanceof ArrayAccess)
-                        ? $config['view_manager']
-                        : [];
+        $this->config   = isset($config['view_manager'])
+            && (is_array($config['view_manager'])
+            || $config['view_manager'] instanceof ArrayAccess)
+                ? $config['view_manager']
+                : [];
         $this->services = $services;
         $this->event    = $event;
 
@@ -118,11 +118,36 @@ class ViewManager extends AbstractListenerAggregate
         $events->attach(MvcEvent::EVENT_RENDER_ERROR, [$injectViewModelListener, 'injectViewModel'], -100);
         $mvcRenderingStrategy->attach($events);
 
-        $sharedEvents->attach('Laminas\Stdlib\DispatchableInterface', MvcEvent::EVENT_DISPATCH, [$createViewModelListener, 'createViewModelFromArray'], -80);
-        $sharedEvents->attach('Laminas\Stdlib\DispatchableInterface', MvcEvent::EVENT_DISPATCH, [$routeNotFoundStrategy, 'prepareNotFoundViewModel'], -90);
-        $sharedEvents->attach('Laminas\Stdlib\DispatchableInterface', MvcEvent::EVENT_DISPATCH, [$createViewModelListener, 'createViewModelFromNull'], -80);
-        $sharedEvents->attach('Laminas\Stdlib\DispatchableInterface', MvcEvent::EVENT_DISPATCH, [$injectTemplateListener, 'injectTemplate'], -90);
-        $sharedEvents->attach('Laminas\Stdlib\DispatchableInterface', MvcEvent::EVENT_DISPATCH, [$injectViewModelListener, 'injectViewModel'], -100);
+        $sharedEvents->attach(
+            'Laminas\Stdlib\DispatchableInterface',
+            MvcEvent::EVENT_DISPATCH,
+            [$createViewModelListener, 'createViewModelFromArray'],
+            -80
+        );
+        $sharedEvents->attach(
+            'Laminas\Stdlib\DispatchableInterface',
+            MvcEvent::EVENT_DISPATCH,
+            [$routeNotFoundStrategy, 'prepareNotFoundViewModel'],
+            -90
+        );
+        $sharedEvents->attach(
+            'Laminas\Stdlib\DispatchableInterface',
+            MvcEvent::EVENT_DISPATCH,
+            [$createViewModelListener, 'createViewModelFromNull'],
+            -80
+        );
+        $sharedEvents->attach(
+            'Laminas\Stdlib\DispatchableInterface',
+            MvcEvent::EVENT_DISPATCH,
+            [$injectTemplateListener, 'injectTemplate'],
+            -90
+        );
+        $sharedEvents->attach(
+            'Laminas\Stdlib\DispatchableInterface',
+            MvcEvent::EVENT_DISPATCH,
+            [$injectViewModelListener, 'injectViewModel'],
+            -100
+        );
     }
 
     /**

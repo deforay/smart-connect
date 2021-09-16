@@ -16,6 +16,9 @@ use Laminas\Stdlib\ArrayUtils;
 use Laminas\Validator\AbstractValidator;
 use Traversable;
 
+use function is_array;
+use function is_string;
+
 /**
  * Authentication Validator
  */
@@ -41,6 +44,12 @@ class Authentication extends AbstractValidator
         Result::FAILURE_IDENTITY_AMBIGUOUS => self::IDENTITY_AMBIGUOUS,
         Result::FAILURE_UNCATEGORIZED      => self::UNCATEGORIZED,
     ];
+
+    /**
+     * Authentication\Result codes mapping configurable overrides
+     * @var string[]
+     */
+    protected $codeMap = [];
 
     /**
      * Error Messages
@@ -90,17 +99,30 @@ class Authentication extends AbstractValidator
         }
 
         if (is_array($options)) {
-            if (array_key_exists('adapter', $options)) {
+            if (isset($options['adapter'])) {
                 $this->setAdapter($options['adapter']);
             }
-            if (array_key_exists('identity', $options)) {
+            if (isset($options['identity'])) {
                 $this->setIdentity($options['identity']);
             }
-            if (array_key_exists('credential', $options)) {
+            if (isset($options['credential'])) {
                 $this->setCredential($options['credential']);
             }
-            if (array_key_exists('service', $options)) {
+            if (isset($options['service'])) {
                 $this->setService($options['service']);
+            }
+            if (isset($options['code_map'])) {
+                foreach ($options['code_map'] as $code => $template) {
+                    if (empty($template) || ! is_string($template)) {
+                        throw new Exception\InvalidArgumentException(
+                            'Message key in code_map option must be a non-empty string'
+                        );
+                    }
+                    if (! isset($this->messageTemplates[$template])) {
+                        $this->messageTemplates[$template] = $this->messageTemplates[static::GENERAL];
+                    }
+                    $this->codeMap[(int) $code] = $template;
+                }
             }
         }
         parent::__construct($options);
@@ -245,13 +267,25 @@ class Authentication extends AbstractValidator
             return true;
         }
 
-        $code = self::GENERAL;
-        if (array_key_exists($result->getCode(), self::CODE_MAP)) {
-            $code = self::CODE_MAP[$result->getCode()];
-        }
-        $this->error($code);
+        $messageKey = $this->mapResultCodeToMessageKey($result->getCode());
+        $this->error($messageKey);
 
         return false;
+    }
+
+    /**
+     * @param int $code Authentication result code
+     * @return string Message key that should be used for the code
+     */
+    protected function mapResultCodeToMessageKey($code)
+    {
+        if (isset($this->codeMap[$code])) {
+            return $this->codeMap[$code];
+        }
+        if (array_key_exists($code, static::CODE_MAP)) {
+            return static::CODE_MAP[$code];
+        }
+        return self::GENERAL;
     }
 
     /**

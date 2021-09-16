@@ -1,11 +1,5 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-form for the canonical source repository
- * @copyright https://github.com/laminas/laminas-form/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-form/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Form\View\Helper;
 
 use DateTime;
@@ -14,6 +8,18 @@ use Laminas\Form\Element\DateTimeSelect as DateTimeSelectElement;
 use Laminas\Form\ElementInterface;
 use Laminas\Form\Exception;
 use Laminas\Form\View\Helper\FormDateSelect as FormDateSelectHelper;
+
+use function is_numeric;
+use function preg_split;
+use function rtrim;
+use function sprintf;
+use function str_replace;
+use function stripos;
+use function strpos;
+use function trim;
+
+use const PREG_SPLIT_DELIM_CAPTURE;
+use const PREG_SPLIT_NO_EMPTY;
 
 class FormDateTimeSelect extends FormDateSelectHelper
 {
@@ -71,8 +77,8 @@ class FormDateTimeSelect extends FormDateSelectHelper
      *
      * @param  ElementInterface $element
      * @return string
-     * @throws \Laminas\Form\Exception\InvalidArgumentException
-     * @throws \Laminas\Form\Exception\DomainException
+     * @throws Exception\InvalidArgumentException
+     * @throws Exception\DomainException
      */
     public function render(ElementInterface $element)
     {
@@ -149,7 +155,7 @@ class FormDateTimeSelect extends FormDateSelectHelper
 
     /**
      * @param  int $timeType
-     * @return FormDateTimeSelect
+     * @return $this
      */
     public function setTimeType($timeType)
     {

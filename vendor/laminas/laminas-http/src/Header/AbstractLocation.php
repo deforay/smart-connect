@@ -1,20 +1,20 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-http for the canonical source repository
- * @copyright https://github.com/laminas/laminas-http/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-http/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Http\Header;
 
 use Laminas\Uri\Exception as UriException;
 use Laminas\Uri\UriFactory;
 use Laminas\Uri\UriInterface;
 
+use function is_string;
+use function sprintf;
+use function strtolower;
+use function trim;
+
 /**
  * Abstract Location Header
  * Supports headers that have URI as value
+ *
  * @see Laminas\Http\Header\Location
  * @see Laminas\Http\Header\ContentLocation
  * @see Laminas\Http\Header\Referer
@@ -36,7 +36,7 @@ abstract class AbstractLocation implements HeaderInterface
      * Create location-based header from string
      *
      * @param string $headerLine
-     * @return AbstractLocation
+     * @return static
      * @throws Exception\InvalidArgumentException
      */
     public static function fromString($headerLine)
@@ -44,7 +44,7 @@ abstract class AbstractLocation implements HeaderInterface
         $locationHeader = new static();
 
         // Laminas-5520 - IIS bug, no space after colon
-        list($name, $uri) = GenericHeader::splitHeaderLine($headerLine);
+        [$name, $uri] = GenericHeader::splitHeaderLine($headerLine);
 
         // check to ensure proper header type for this factory
         if (strtolower($name) !== strtolower($locationHeader->getFieldName())) {
@@ -63,7 +63,7 @@ abstract class AbstractLocation implements HeaderInterface
      * Set the URI/URL for this header, this can be a string or an instance of Laminas\Uri\Http
      *
      * @param string|UriInterface $uri
-     * @return AbstractLocation
+     * @return $this
      * @throws Exception\InvalidArgumentException
      */
     public function setUri($uri)
@@ -84,7 +84,7 @@ abstract class AbstractLocation implements HeaderInterface
                     $e
                 );
             }
-        } elseif (! ($uri instanceof UriInterface)) {
+        } elseif (! $uri instanceof UriInterface) {
             throw new Exception\InvalidArgumentException('URI must be an instance of Laminas\Uri\Http or a string');
         }
         $this->uri = $uri;

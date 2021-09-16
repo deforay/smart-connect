@@ -32,7 +32,7 @@ class FacilityController extends AbstractActionController
         if ($this->getRequest()->isPost()) {
             $params = $this->getRequest()->getPost();
             $result = $this->facilityService->addFacility($params);
-            return $this->_redirect()->toRoute('facility');
+            return $this->redirect()->toRoute('facility');
         } else {
             $facilityType = $this->facilityService->fetchFacilityType();
             $facilityLocation = $this->facilityService->fetchLocationDetails();
@@ -46,14 +46,14 @@ class FacilityController extends AbstractActionController
         if ($this->getRequest()->isPost()) {
             $params = $this->getRequest()->getPost();
             $result = $this->facilityService->updateFacility($params);
-            return $this->_redirect()->toRoute('facility');
+            return $this->redirect()->toRoute('facility');
         } else {
             $facilityId = base64_decode($this->params()->fromRoute('id'));
             $facility = $this->facilityService->getFacility($facilityId);
             $facilityType = $this->facilityService->fetchFacilityType();
             $facilityLocation = $this->facilityService->fetchLocationDetails();
             if ($facility == false) {
-                return $this->_redirect()->toRoute('facility');
+                return $this->redirect()->toRoute('facility');
             } else {
                 return new ViewModel(array('facility' => $facility, 'facilityType' => $facilityType, 'facilityLocation' => $facilityLocation));
             }

@@ -1,11 +1,5 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-cache for the canonical source repository
- * @copyright https://github.com/laminas/laminas-cache/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-cache/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Cache\Service;
 
 use Interop\Container\ContainerInterface;
@@ -19,6 +13,8 @@ use Laminas\ServiceManager\ServiceLocatorInterface;
  */
 class StorageCacheFactory implements FactoryInterface
 {
+    public const CACHE_CONFIGURATION_KEY = 'cache';
+
     use PluginManagerLookupTrait;
 
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
@@ -26,7 +22,7 @@ class StorageCacheFactory implements FactoryInterface
         $this->prepareStorageFactory($container);
 
         $config = $container->get('config');
-        $cacheConfig = isset($config['cache']) ? $config['cache'] : [];
+        $cacheConfig = $config[self::CACHE_CONFIGURATION_KEY] ?? [];
         return StorageFactory::factory($cacheConfig);
     }
 

@@ -1,11 +1,5 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-form for the canonical source repository
- * @copyright https://github.com/laminas/laminas-form/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-form/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Form\View\Helper;
 
 use Laminas\Form\Element\Hidden;
@@ -13,6 +7,15 @@ use Laminas\Form\Element\Select as SelectElement;
 use Laminas\Form\ElementInterface;
 use Laminas\Form\Exception;
 use Laminas\Stdlib\ArrayUtils;
+
+use function array_key_exists;
+use function array_merge;
+use function compact;
+use function implode;
+use function is_array;
+use function is_scalar;
+use function method_exists;
+use function sprintf;
 
 class FormSelect extends AbstractHelper
 {
@@ -38,7 +41,7 @@ class FormSelect extends AbstractHelper
         'form'         => true,
         'multiple'     => true,
         'required'     => true,
-        'size'         => true
+        'size'         => true,
     ];
 
     /**
@@ -180,7 +183,7 @@ class FormSelect extends AbstractHelper
             if (is_scalar($optionSpec)) {
                 $optionSpec = [
                     'label' => $optionSpec,
-                    'value' => $key
+                    'value' => $key,
                 ];
             }
 

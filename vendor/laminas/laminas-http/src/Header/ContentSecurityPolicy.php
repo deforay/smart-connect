@@ -1,19 +1,23 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-http for the canonical source repository
- * @copyright https://github.com/laminas/laminas-http/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-http/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Http\Header;
 
+use function array_pad;
+use function array_walk;
+use function explode;
+use function implode;
+use function in_array;
+use function sprintf;
+use function str_replace;
+use function strcasecmp;
+use function trim;
+
 /**
- * Content Security Policy 1.0 Header
+ * Content Security Policy Level 3 Header
  *
  * @link http://www.w3.org/TR/CSP/
  */
-class ContentSecurityPolicy implements HeaderInterface
+class ContentSecurityPolicy implements MultipleHeaderInterface
 {
     /**
      * Valid directive names
@@ -22,17 +26,44 @@ class ContentSecurityPolicy implements HeaderInterface
      */
     protected $validDirectiveNames = [
         // As per http://www.w3.org/TR/CSP/#directives
-        'default-src',
-        'script-src',
-        'object-src',
-        'style-src',
-        'img-src',
-        'media-src',
-        'frame-src',
-        'font-src',
+        // Fetch directives
+        'child-src',
         'connect-src',
+        'default-src',
+        'font-src',
+        'frame-src',
+        'img-src',
+        'manifest-src',
+        'media-src',
+        'object-src',
+        'prefetch-src',
+        'script-src',
+        'script-src-elem',
+        'script-src-attr',
+        'style-src',
+        'style-src-elem',
+        'style-src-attr',
+        'worker-src',
+
+        // Document directives
+        'base-uri',
+        'plugin-types',
         'sandbox',
+
+        // Navigation directives
+        'form-action',
+        'frame-ancestors',
+        'navigate-to',
+
+        // Reporting directives
         'report-uri',
+        'report-to',
+
+        // Other directives
+        'block-all-mixed-content',
+        'require-sri-for',
+        'trusted-types',
+        'upgrade-insecure-requests',
     ];
 
     /**
@@ -59,7 +90,7 @@ class ContentSecurityPolicy implements HeaderInterface
      *
      * @param string $name The directive name.
      * @param array $sources The source list.
-     * @return self
+     * @return $this
      * @throws Exception\InvalidArgumentException If the name is not a valid directive name.
      */
     public function setDirective($name, array $sources)
@@ -71,6 +102,22 @@ class ContentSecurityPolicy implements HeaderInterface
                 (string) $name
             ));
         }
+
+        if (
+            $name === 'block-all-mixed-content'
+            || $name === 'upgrade-insecure-requests'
+        ) {
+            if ($sources) {
+                throw new Exception\InvalidArgumentException(sprintf(
+                    'Received value for %s directive; none expected',
+                    $name
+                ));
+            }
+
+            $this->directives[$name] = '';
+            return $this;
+        }
+
         if (empty($sources)) {
             if ('report-uri' === $name) {
                 if (isset($this->directives[$name])) {
@@ -78,13 +125,14 @@ class ContentSecurityPolicy implements HeaderInterface
                 }
                 return $this;
             }
+
             $this->directives[$name] = "'none'";
             return $this;
         }
 
         array_walk($sources, [__NAMESPACE__ . '\HeaderValue', 'assertValid']);
-
         $this->directives[$name] = implode(' ', $sources);
+
         return $this;
     }
 
@@ -92,16 +140,16 @@ class ContentSecurityPolicy implements HeaderInterface
      * Create Content Security Policy header from a given header line
      *
      * @param string $headerLine The header line to parse.
-     * @return self
+     * @return static
      * @throws Exception\InvalidArgumentException If the name field in the given header line does not match.
      */
     public static function fromString($headerLine)
     {
-        $header = new static();
-        $headerName = $header->getFieldName();
-        list($name, $value) = GenericHeader::splitHeaderLine($headerLine);
+        $header         = new static();
+        $headerName     = $header->getFieldName();
+        [$name, $value] = GenericHeader::splitHeaderLine($headerLine);
         // Ensure the proper header name
-        if (strcasecmp($name, $headerName) != 0) {
+        if (strcasecmp($name, $headerName) !== 0) {
             throw new Exception\InvalidArgumentException(sprintf(
                 'Invalid header line for %s string: "%s"',
                 $headerName,
@@ -113,9 +161,12 @@ class ContentSecurityPolicy implements HeaderInterface
         foreach ($tokens as $token) {
             $token = trim($token);
             if ($token) {
-                list($directiveName, $directiveValue) = explode(' ', $token, 2);
+                [$directiveName, $directiveValue] = array_pad(explode(' ', $token, 2), 2, null);
                 if (! isset($header->directives[$directiveName])) {
-                    $header->setDirective($directiveName, [$directiveValue]);
+                    $header->setDirective(
+                        $directiveName,
+                        $directiveValue === null ? [] : [$directiveValue]
+                    );
                 }
             }
         }
@@ -143,7 +194,7 @@ class ContentSecurityPolicy implements HeaderInterface
         foreach ($this->directives as $name => $value) {
             $directives[] = sprintf('%s %s;', $name, $value);
         }
-        return implode(' ', $directives);
+        return str_replace(' ;', ';', implode(' ', $directives));
     }
 
     /**
@@ -154,5 +205,22 @@ class ContentSecurityPolicy implements HeaderInterface
     public function toString()
     {
         return sprintf('%s: %s', $this->getFieldName(), $this->getFieldValue());
+    }
+
+    /** @return string */
+    public function toStringMultipleHeaders(array $headers)
+    {
+        $strings = [$this->toString()];
+        foreach ($headers as $header) {
+            if (! $header instanceof ContentSecurityPolicy) {
+                throw new Exception\RuntimeException(
+                    'The ContentSecurityPolicy multiple header implementation can only'
+                    . ' accept an array of ContentSecurityPolicy headers'
+                );
+            }
+            $strings[] = $header->toString();
+        }
+
+        return implode("\r\n", $strings) . "\r\n";
     }
 }

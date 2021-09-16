@@ -10,6 +10,8 @@ namespace Laminas\Code\Reflection;
 
 use ReflectionParameter;
 
+use function method_exists;
+
 class ParameterReflection extends ReflectionParameter implements ReflectionInterface
 {
     /**
@@ -34,17 +36,17 @@ class ParameterReflection extends ReflectionParameter implements ReflectionInter
     /**
      * Get class reflection object
      *
-     * @return ClassReflection
+     * @return null|ClassReflection
      */
     public function getClass()
     {
-        $phpReflection = parent::getClass();
-        if ($phpReflection === null) {
-            return;
+        $phpReflectionType = parent::getType();
+        if ($phpReflectionType === null) {
+            return null;
         }
 
-        $laminasReflection = new ClassReflection($phpReflection->getName());
-        unset($phpReflection);
+        $laminasReflection = new ClassReflection($phpReflectionType->getName());
+        unset($phpReflectionType);
 
         return $laminasReflection;
     }
@@ -70,14 +72,19 @@ class ParameterReflection extends ReflectionParameter implements ReflectionInter
     /**
      * Get parameter type
      *
-     * @return string
+     * @return string|null
      */
-    public function getType()
+    public function detectType()
     {
-        if ($this->isArray()) {
-            return 'array';
-        } elseif (method_exists($this, 'isCallable') && $this->isCallable()) {
-            return 'callable';
+        if (method_exists($this, 'getType')
+            && null !== ($type = $this->getType())
+            && $type->isBuiltin()
+        ) {
+            return $type->getName();
+        }
+
+        if (null !== $type && $type->getName() === 'self') {
+            return $this->getDeclaringClass()->getName();
         }
 
         if (($class = $this->getClass()) instanceof \ReflectionClass) {
@@ -85,16 +92,18 @@ class ParameterReflection extends ReflectionParameter implements ReflectionInter
         }
 
         $docBlock = $this->getDeclaringFunction()->getDocBlock();
-        if (!$docBlock instanceof DocBlockReflection) {
-            return;
+
+        if (! $docBlock instanceof DocBlockReflection) {
+            return null;
         }
 
         $params = $docBlock->getTags('param');
+
         if (isset($params[$this->getPosition()])) {
             return $params[$this->getPosition()]->getType();
         }
 
-        return;
+        return null;
     }
 
     /**

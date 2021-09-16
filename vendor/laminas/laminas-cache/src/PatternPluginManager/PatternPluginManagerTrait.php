@@ -1,11 +1,5 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-cache for the canonical source repository
- * @copyright https://github.com/laminas/laminas-cache/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-cache/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Cache\PatternPluginManager;
 
 use Laminas\Cache\Exception;
@@ -18,6 +12,8 @@ use Laminas\ServiceManager\Exception\InvalidServiceException;
  * Trait does not define properties, as the properties common between the
  * two versions are originally defined in their parent class, causing a
  * resolution conflict.
+ *
+ * @deprecated This will be removed in v3.0.0 and should never have been used in upstream projects anyways.
  */
 trait PatternPluginManagerTrait
 {
@@ -28,7 +24,9 @@ trait PatternPluginManagerTrait
      */
     public function build($plugin, array $options = null)
     {
-        if (empty($options)) {
+        $options = $options ?? [];
+
+        if ($options === []) {
             return parent::build($plugin);
         }
 

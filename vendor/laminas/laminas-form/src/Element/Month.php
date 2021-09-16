@@ -1,20 +1,14 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-form for the canonical source repository
- * @copyright https://github.com/laminas/laminas-form/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-form/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Form\Element;
 
+use DateInterval;
 use Laminas\Validator\DateStep as DateStepValidator;
 use Laminas\Validator\Regex as RegexValidator;
 use Laminas\Validator\ValidatorInterface;
 
 class Month extends DateTime
 {
-
     const DATETIME_FORMAT = 'Y-m';
 
     /**
@@ -50,16 +44,14 @@ class Month extends DateTime
      */
     protected function getStepValidator()
     {
-        $stepValue = (isset($this->attributes['step']))
-                     ? $this->attributes['step'] : 1; // Months
+        $stepValue = isset($this->attributes['step']) ? $this->attributes['step'] : 1; // Months
 
-        $baseValue = (isset($this->attributes['min']))
-                     ? $this->attributes['min'] : '1970-01';
+        $baseValue = isset($this->attributes['min']) ? $this->attributes['min'] : '1970-01';
 
         return new DateStepValidator([
-            'format'    => "Y-m",
+            'format'    => 'Y-m',
             'baseValue' => $baseValue,
-            'step'      => new \DateInterval("P{$stepValue}M"),
+            'step'      => new DateInterval("P{$stepValue}M"),
         ]);
     }
 }

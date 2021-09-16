@@ -1,11 +1,5 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-form for the canonical source repository
- * @copyright https://github.com/laminas/laminas-form/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-form/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Form\Element;
 
 use Laminas\Form\ElementInterface;
@@ -13,6 +7,9 @@ use Laminas\Form\Exception\InvalidArgumentException;
 use Laminas\Validator\Explode as ExplodeValidator;
 use Laminas\Validator\InArray as InArrayValidator;
 use Laminas\Validator\ValidatorInterface;
+use Traversable;
+
+use function is_array;
 
 class MultiCheckbox extends Checkbox
 {
@@ -55,7 +52,7 @@ class MultiCheckbox extends Checkbox
 
     /**
      * @param  array $options
-     * @return MultiCheckbox
+     * @return $this
      */
     public function setValueOptions(array $options)
     {
@@ -72,7 +69,7 @@ class MultiCheckbox extends Checkbox
 
     /**
      * @param string $key
-     * @return self
+     * @return $this
      */
     public function unsetValueOption($key)
     {
@@ -89,7 +86,7 @@ class MultiCheckbox extends Checkbox
      * - label_attributes: attributes to use when the label is rendered
      * - value_options: list of values and labels for the select options
      *
-     * @param  array|\Traversable $options
+     * @param  array|Traversable $options
      * @return MultiCheckbox|ElementInterface
      * @throws InvalidArgumentException
      */
@@ -116,7 +113,7 @@ class MultiCheckbox extends Checkbox
      *
      * @param  string $key
      * @param  mixed  $value
-     * @return MultiCheckbox|ElementInterface
+     * @return $this
      */
     public function setAttribute($key, $value)
     {
@@ -132,8 +129,8 @@ class MultiCheckbox extends Checkbox
     /**
      * Set the flag to allow for disabling the automatic addition of an InArray validator.
      *
-     * @param bool $disableOption
-     * @return Select
+     * @param  bool $disableOption
+     * @return $this
      */
     public function setDisableInArrayValidator($disableOption)
     {
@@ -181,7 +178,7 @@ class MultiCheckbox extends Checkbox
         $values = [];
         $options = $this->getValueOptions();
         foreach ($options as $key => $optionSpec) {
-            $value = (is_array($optionSpec)) ? $optionSpec['value'] : $key;
+            $value = is_array($optionSpec) ? $optionSpec['value'] : $key;
             $values[] = $value;
         }
         if ($this->useHiddenElement()) {
@@ -193,8 +190,8 @@ class MultiCheckbox extends Checkbox
     /**
      * Sets the value that should be selected.
      *
-     * @param mixed $value The value to set.
-     * @return MultiCheckbox
+     * @param  mixed $value The value to set.
+     * @return $this
      */
     public function setValue($value)
     {

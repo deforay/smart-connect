@@ -1,32 +1,33 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-validator for the canonical source repository
- * @copyright https://github.com/laminas/laminas-validator/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-validator/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Validator\File;
 
-use finfo;
-use Laminas\Validator\Exception;
+use function array_merge;
+use function class_exists;
+use function explode;
+use function finfo_file;
+use function finfo_open;
+use function in_array;
+use function is_readable;
+
+use const FILEINFO_MIME_TYPE;
 
 /**
  * Validator for the mime type of a file
  */
 class ExcludeMimeType extends MimeType
 {
-    const FALSE_TYPE   = 'fileExcludeMimeTypeFalse';
-    const NOT_DETECTED = 'fileExcludeMimeTypeNotDetected';
-    const NOT_READABLE = 'fileExcludeMimeTypeNotReadable';
+    use FileInformationTrait;
 
-    /**
-     * @var array Error message templates
-     */
+    public const FALSE_TYPE   = 'fileExcludeMimeTypeFalse';
+    public const NOT_DETECTED = 'fileExcludeMimeTypeNotDetected';
+    public const NOT_READABLE = 'fileExcludeMimeTypeNotReadable';
+
+    /** @var array Error message templates */
     protected $messageTemplates = [
         self::FALSE_TYPE   => "File has an incorrect mimetype of '%type%'",
-        self::NOT_DETECTED => "The mimetype could not be detected from the file",
-        self::NOT_READABLE => "File is not readable or does not exist",
+        self::NOT_DETECTED => 'The mimetype could not be detected from the file',
+        self::NOT_READABLE => 'File is not readable or does not exist',
     ];
 
     /**
@@ -40,29 +41,12 @@ class ExcludeMimeType extends MimeType
      */
     public function isValid($value, $file = null)
     {
-        if (is_string($value) && is_array($file)) {
-            // Legacy Laminas\Transfer API support
-            $filename = $file['name'];
-            $filetype = $file['type'];
-            $file     = $file['tmp_name'];
-        } elseif (is_array($value)) {
-            if (! isset($value['tmp_name']) || ! isset($value['name']) || ! isset($value['type'])) {
-                throw new Exception\InvalidArgumentException(
-                    'Value array must be in $_FILES format'
-                );
-            }
-            $file     = $value['tmp_name'];
-            $filename = $value['name'];
-            $filetype = $value['type'];
-        } else {
-            $file     = $value;
-            $filename = basename($file);
-            $filetype = null;
-        }
-        $this->setValue($filename);
+        $fileInfo = $this->getFileInfo($value, $file, true);
+
+        $this->setValue($fileInfo['filename']);
 
         // Is file readable ?
-        if (empty($file) || false === is_readable($file)) {
+        if (empty($fileInfo['file']) || false === is_readable($fileInfo['file'])) {
             $this->error(self::NOT_READABLE);
             return false;
         }
@@ -79,12 +63,12 @@ class ExcludeMimeType extends MimeType
 
             $this->type = null;
             if (! empty($this->finfo)) {
-                $this->type = finfo_file($this->finfo, $file);
+                $this->type = finfo_file($this->finfo, $fileInfo['file']);
             }
         }
 
         if (empty($this->type) && $this->getHeaderCheck()) {
-            $this->type = $filetype;
+            $this->type = $fileInfo['filetype'];
         }
 
         if (empty($this->type)) {

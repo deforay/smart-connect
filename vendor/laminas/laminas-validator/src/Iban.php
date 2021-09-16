@@ -1,36 +1,40 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-validator for the canonical source repository
- * @copyright https://github.com/laminas/laminas-validator/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-validator/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Validator;
 
 use Laminas\Stdlib\ArrayUtils;
 use Traversable;
+
+use function array_key_exists;
+use function in_array;
+use function intval;
+use function is_string;
+use function preg_match;
+use function str_replace;
+use function strlen;
+use function strtoupper;
+use function substr;
 
 /**
  * Validates IBAN Numbers (International Bank Account Numbers)
  */
 class Iban extends AbstractValidator
 {
-    const NOTSUPPORTED     = 'ibanNotSupported';
-    const SEPANOTSUPPORTED = 'ibanSepaNotSupported';
-    const FALSEFORMAT      = 'ibanFalseFormat';
-    const CHECKFAILED      = 'ibanCheckFailed';
+    public const NOTSUPPORTED     = 'ibanNotSupported';
+    public const SEPANOTSUPPORTED = 'ibanSepaNotSupported';
+    public const FALSEFORMAT      = 'ibanFalseFormat';
+    public const CHECKFAILED      = 'ibanCheckFailed';
 
     /**
      * Validation failure message template definitions
      *
-     * @var array
+     * @var array<string, string>
      */
     protected $messageTemplates = [
-        self::NOTSUPPORTED     => "Unknown country within the IBAN",
-        self::SEPANOTSUPPORTED => "Countries outside the Single Euro Payments Area (SEPA) are not supported",
-        self::FALSEFORMAT      => "The input has a false IBAN format",
-        self::CHECKFAILED      => "The input has failed the IBAN check",
+        self::NOTSUPPORTED     => 'Unknown country within the IBAN',
+        self::SEPANOTSUPPORTED => 'Countries outside the Single Euro Payments Area (SEPA) are not supported',
+        self::FALSEFORMAT      => 'The input has a false IBAN format',
+        self::CHECKFAILED      => 'The input has failed the IBAN check',
     ];
 
     /**
@@ -50,12 +54,45 @@ class Iban extends AbstractValidator
     /**
      * The SEPA country codes
      *
-     * @var array<ISO 3166-1>
+     * @var string[] ISO 3166-1 codes
      */
     protected static $sepaCountries = [
-        'AT', 'BE', 'BG', 'CY', 'CZ', 'DK', 'FO', 'GL', 'EE', 'FI', 'FR', 'DE',
-        'GI', 'GR', 'HU', 'IS', 'IE', 'IT', 'LV', 'LI', 'LT', 'LU', 'MT', 'MC',
-        'NL', 'NO', 'PL', 'PT', 'RO', 'SK', 'SI', 'ES', 'SE', 'CH', 'GB', 'SM',
+        'AT',
+        'BE',
+        'BG',
+        'CY',
+        'CZ',
+        'DK',
+        'FO',
+        'GL',
+        'EE',
+        'FI',
+        'FR',
+        'DE',
+        'GI',
+        'GR',
+        'HU',
+        'IS',
+        'IE',
+        'IT',
+        'LV',
+        'LI',
+        'LT',
+        'LU',
+        'MT',
+        'MC',
+        'NL',
+        'NO',
+        'PL',
+        'PT',
+        'RO',
+        'SK',
+        'SI',
+        'ES',
+        'SE',
+        'CH',
+        'GB',
+        'SM',
         'HR',
     ];
 
@@ -168,7 +205,7 @@ class Iban extends AbstractValidator
      * Sets an optional country code by ISO 3166-1
      *
      * @param  string|null $countryCode
-     * @return Iban provides a fluent interface
+     * @return $this provides a fluent interface
      * @throws Exception\InvalidArgumentException
      */
     public function setCountryCode($countryCode = null)
@@ -201,7 +238,7 @@ class Iban extends AbstractValidator
      * Sets the optional allow non-sepa countries setting
      *
      * @param  bool $allowNonSepa
-     * @return Iban provides a fluent interface
+     * @return $this provides a fluent interface
      */
     public function setAllowNonSepa($allowNonSepa)
     {
@@ -249,10 +286,62 @@ class Iban extends AbstractValidator
 
         $format = substr($value, 4) . substr($value, 0, 4);
         $format = str_replace(
-            ['A',  'B',  'C',  'D',  'E',  'F',  'G',  'H',  'I',  'J',  'K',  'L',  'M',
-                  'N',  'O',  'P',  'Q',  'R',  'S',  'T',  'U',  'V',  'W',  'X',  'Y',  'Z'],
-            ['10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22',
-                  '23', '24', '25', '26', '27', '28', '29', '30', '31', '32', '33', '34', '35'],
+            [
+                'A',
+                'B',
+                'C',
+                'D',
+                'E',
+                'F',
+                'G',
+                'H',
+                'I',
+                'J',
+                'K',
+                'L',
+                'M',
+                'N',
+                'O',
+                'P',
+                'Q',
+                'R',
+                'S',
+                'T',
+                'U',
+                'V',
+                'W',
+                'X',
+                'Y',
+                'Z',
+            ],
+            [
+                '10',
+                '11',
+                '12',
+                '13',
+                '14',
+                '15',
+                '16',
+                '17',
+                '18',
+                '19',
+                '20',
+                '21',
+                '22',
+                '23',
+                '24',
+                '25',
+                '26',
+                '27',
+                '28',
+                '29',
+                '30',
+                '31',
+                '32',
+                '33',
+                '34',
+                '35',
+            ],
             $format
         );
 
@@ -264,7 +353,7 @@ class Iban extends AbstractValidator
             $temp %= 97;
         }
 
-        if ($temp != 1) {
+        if ($temp !== 1) {
             $this->error(self::CHECKFAILED);
             return false;
         }

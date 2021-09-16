@@ -1,11 +1,5 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-validator for the canonical source repository
- * @copyright https://github.com/laminas/laminas-validator/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-validator/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Validator\File;
 
 use Laminas\Stdlib\ArrayUtils;
@@ -14,38 +8,58 @@ use Laminas\Validator\AbstractValidator;
 use Laminas\Validator\Exception;
 use Traversable;
 
+use function array_key_exists;
+use function array_keys;
+use function array_merge;
+use function array_unique;
+use function class_exists;
+use function explode;
+use function finfo_file;
+use function finfo_open;
+use function getenv;
+use function implode;
+use function in_array;
+use function is_array;
+use function is_file;
+use function is_int;
+use function is_readable;
+use function is_string;
+use function sprintf;
+use function trim;
+
+use const E_NOTICE;
+use const E_WARNING;
+use const FILEINFO_MIME_TYPE;
+
 /**
  * Validator for the mime type of a file
  */
 class MimeType extends AbstractValidator
 {
+    use FileInformationTrait;
+
     /**#@+
+     *
      * @const Error type constants
      */
-    const FALSE_TYPE   = 'fileMimeTypeFalse';
-    const NOT_DETECTED = 'fileMimeTypeNotDetected';
-    const NOT_READABLE = 'fileMimeTypeNotReadable';
+    public const FALSE_TYPE   = 'fileMimeTypeFalse';
+    public const NOT_DETECTED = 'fileMimeTypeNotDetected';
+    public const NOT_READABLE = 'fileMimeTypeNotReadable';
     /**#@-*/
 
-    /**
-     * @var array Error message templates
-     */
+    /** @var array Error message templates */
     protected $messageTemplates = [
         self::FALSE_TYPE   => "File has an incorrect mimetype of '%type%'",
-        self::NOT_DETECTED => "The mimetype could not be detected from the file",
-        self::NOT_READABLE => "File is not readable or does not exist",
+        self::NOT_DETECTED => 'The mimetype could not be detected from the file',
+        self::NOT_READABLE => 'File is not readable or does not exist',
     ];
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $messageVariables = [
-        'type' => 'type'
+        'type' => 'type',
     ];
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $type;
 
     /**
@@ -57,6 +71,7 @@ class MimeType extends AbstractValidator
 
     /**
      * If no environment variable 'MAGIC' is set, try and autodiscover it based on common locations
+     *
      * @var array
      */
     protected $magicFiles = [
@@ -77,10 +92,10 @@ class MimeType extends AbstractValidator
      * @var array
      */
     protected $options = [
-        'enableHeaderCheck' => false,  // Allow header check
-        'disableMagicFile'  => false,  // Disable usage of magicfile
-        'magicFile'         => null,   // Magicfile to use
-        'mimeType'          => null,   // Mimetype to allow
+        'enableHeaderCheck' => false, // Allow header check
+        'disableMagicFile'  => false, // Disable usage of magicfile
+        'magicFile'         => null, // Magicfile to use
+        'mimeType'          => null, // Mimetype to allow
     ];
 
     /**
@@ -175,10 +190,10 @@ class MimeType extends AbstractValidator
      * if false, the default MAGIC file from PHP will be used
      *
      * @param  string $file
-     * @throws Exception\RuntimeException When finfo can not read the magicfile
+     * @throws Exception\RuntimeException When finfo can not read the magicfile.
      * @throws Exception\InvalidArgumentException
      * @throws Exception\InvalidMagicMimeFileException
-     * @return self Provides fluid interface
+     * @return $this Provides fluid interface
      */
     public function setMagicFile($file)
     {
@@ -186,7 +201,7 @@ class MimeType extends AbstractValidator
             $this->options['magicFile'] = false;
         } elseif (empty($file)) {
             $this->options['magicFile'] = null;
-        } elseif (! (class_exists('finfo', false))) {
+        } elseif (! class_exists('finfo', false)) {
             $this->options['magicFile'] = null;
             throw new Exception\RuntimeException('Magicfile can not be set; there is no finfo extension installed');
         } elseif (! is_file($file) || ! is_readable($file)) {
@@ -214,7 +229,7 @@ class MimeType extends AbstractValidator
     /**
      * Disables usage of MagicFile
      *
-     * @param $disable boolean False disables usage of magic file
+     * @param bool $disable False disables usage of magic file; true enables it.
      * @return self Provides fluid interface
      */
     public function disableMagicFile($disable)
@@ -248,7 +263,7 @@ class MimeType extends AbstractValidator
      * Note that this is unsafe and therefor the default value is false
      *
      * @param  bool $headerCheck
-     * @return self Provides fluid interface
+     * @return $this Provides fluid interface
      */
     public function enableHeaderCheck($headerCheck = true)
     {
@@ -277,7 +292,7 @@ class MimeType extends AbstractValidator
      * Sets the mimetypes
      *
      * @param  string|array $mimetype The mimetypes to validate
-     * @return self Provides a fluent interface
+     * @return $this Provides a fluent interface
      */
     public function setMimeType($mimetype)
     {
@@ -291,7 +306,7 @@ class MimeType extends AbstractValidator
      *
      * @param  string|array $mimetype The mimetypes to add for validation
      * @throws Exception\InvalidArgumentException
-     * @return self Provides a fluent interface
+     * @return $this Provides a fluent interface
      */
     public function addMimeType($mimetype)
     {
@@ -300,7 +315,7 @@ class MimeType extends AbstractValidator
         if (is_string($mimetype)) {
             $mimetype = explode(',', $mimetype);
         } elseif (! is_array($mimetype)) {
-            throw new Exception\InvalidArgumentException("Invalid options to validator provided");
+            throw new Exception\InvalidArgumentException('Invalid options to validator provided');
         }
 
         if (isset($mimetype['magicFile'])) {
@@ -340,29 +355,12 @@ class MimeType extends AbstractValidator
      */
     public function isValid($value, $file = null)
     {
-        if (is_string($value) && is_array($file)) {
-            // Legacy Laminas\Transfer API support
-            $filename = $file['name'];
-            $filetype = $file['type'];
-            $file     = $file['tmp_name'];
-        } elseif (is_array($value)) {
-            if (! isset($value['tmp_name']) || ! isset($value['name']) || ! isset($value['type'])) {
-                throw new Exception\InvalidArgumentException(
-                    'Value array must be in $_FILES format'
-                );
-            }
-            $file     = $value['tmp_name'];
-            $filename = $value['name'];
-            $filetype = $value['type'];
-        } else {
-            $file     = $value;
-            $filename = basename($file);
-            $filetype = null;
-        }
-        $this->setValue($filename);
+        $fileInfo = $this->getFileInfo($value, $file, true);
+
+        $this->setValue($fileInfo['filename']);
 
         // Is file readable ?
-        if (empty($file) || false === is_readable($file)) {
+        if (empty($fileInfo['file']) || false === is_readable($fileInfo['file'])) {
             $this->error(static::NOT_READABLE);
             return false;
         }
@@ -383,13 +381,13 @@ class MimeType extends AbstractValidator
 
             $this->type = null;
             if (! empty($this->finfo)) {
-                $this->type = finfo_file($this->finfo, $file);
+                $this->type = finfo_file($this->finfo, $fileInfo['file']);
                 unset($this->finfo);
             }
         }
 
         if (empty($this->type) && $this->getHeaderCheck()) {
-            $this->type = $filetype;
+            $this->type = $fileInfo['filetype'];
         }
 
         if (empty($this->type)) {

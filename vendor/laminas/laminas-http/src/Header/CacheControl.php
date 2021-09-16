@@ -1,22 +1,27 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-http for the canonical source repository
- * @copyright https://github.com/laminas/laminas-http/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-http/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Http\Header;
 
+use function array_key_exists;
+use function implode;
+use function is_bool;
+use function ksort;
+use function preg_match;
+use function rtrim;
+use function sprintf;
+use function strlen;
+use function strtolower;
+use function substr;
+use function trim;
+
 /**
- * @throws Exception\InvalidArgumentException
  * @see http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9
+ *
+ * @throws Exception\InvalidArgumentException
  */
 class CacheControl implements HeaderInterface
 {
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $value;
 
     /**
@@ -31,11 +36,11 @@ class CacheControl implements HeaderInterface
      *
      * @param string $headerLine
      * @throws Exception\InvalidArgumentException
-     * @return CacheControl
+     * @return static
      */
     public static function fromString($headerLine)
     {
-        list($name, $value) = GenericHeader::splitHeaderLine($headerLine);
+        [$name, $value] = GenericHeader::splitHeaderLine($headerLine);
 
         // check to ensure proper header type for this factory
         if (strtolower($name) !== 'cache-control') {
@@ -84,7 +89,7 @@ class CacheControl implements HeaderInterface
      *
      * @param string $key
      * @param string|bool $value
-     * @return CacheControl - provides the fluent interface
+     * @return $this
      */
     public function addDirective($key, $value = true)
     {
@@ -122,7 +127,7 @@ class CacheControl implements HeaderInterface
      * Remove a directive
      *
      * @param string $key
-     * @return CacheControl - provides the fluent interface
+     * @return $this
      */
     public function removeDirective($key)
     {
@@ -177,11 +182,13 @@ class CacheControl implements HeaderInterface
         $directives = [];
 
         // handle empty string early so we don't need a separate start state
-        if ($value == '') {
+        if ($value === '') {
             return $directives;
         }
 
         $lastMatch = null;
+
+        // phpcs:disable Generic.PHP.DiscourageGoto.Found
 
         state_directive:
         switch (static::match(['[a-zA-Z][a-zA-Z_-]*'], $value, $lastMatch)) {
@@ -223,6 +230,8 @@ class CacheControl implements HeaderInterface
             default:
                 throw new Exception\InvalidArgumentException('expected SEPARATOR or END');
         }
+
+        // phpcs:enable
     }
 
     /**
@@ -241,7 +250,7 @@ class CacheControl implements HeaderInterface
         foreach ($tokens as $i => $token) {
             if (preg_match('/^' . $token . '/', $value, $matches)) {
                 $lastMatch = $matches[0];
-                $string = substr($value, strlen($matches[0]));
+                $string    = substr($value, strlen($matches[0]));
                 return $i;
             }
         }

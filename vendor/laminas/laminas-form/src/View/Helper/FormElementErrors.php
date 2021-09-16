@@ -1,16 +1,20 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-form for the canonical source repository
- * @copyright https://github.com/laminas/laminas-form/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-form/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Form\View\Helper;
 
 use Laminas\Form\ElementInterface;
 use Laminas\Form\Exception;
 use Traversable;
+
+use function array_merge;
+use function array_walk_recursive;
+use function get_class;
+use function gettype;
+use function implode;
+use function is_array;
+use function is_object;
+use function iterator_to_array;
+use function sprintf;
 
 class FormElementErrors extends AbstractHelper
 {
@@ -65,22 +69,23 @@ class FormElementErrors extends AbstractHelper
     public function render(ElementInterface $element, array $attributes = [])
     {
         $messages = $element->getMessages();
-        if (empty($messages)) {
-            return '';
-        }
-
-        $messages = $messages instanceof Traversable ? iterator_to_array($messages) : $messages;
-        if (! is_array($messages)) {
+        if ($messages instanceof Traversable) {
+            $messages = iterator_to_array($messages);
+        } elseif (! is_array($messages)) {
             throw new Exception\DomainException(sprintf(
                 '%s expects that $element->getMessages() will return an array or Traversable; received "%s"',
                 __METHOD__,
-                (is_object($messages) ? get_class($messages) : gettype($messages))
+                is_object($messages) ? get_class($messages) : gettype($messages)
             ));
+        }
+
+        if (! $messages) {
+            return '';
         }
 
         // Flatten message array
         $messages = $this->flattenMessages($messages);
-        if (empty($messages)) {
+        if (! $messages) {
             return '';
         }
 
@@ -103,7 +108,7 @@ class FormElementErrors extends AbstractHelper
      * Set the attributes that will go on the message open format
      *
      * @param  array $attributes key value pairs of attributes
-     * @return FormElementErrors
+     * @return $this
      */
     public function setAttributes(array $attributes)
     {
@@ -125,7 +130,7 @@ class FormElementErrors extends AbstractHelper
      * Set the string used to close message representation
      *
      * @param  string $messageCloseString
-     * @return FormElementErrors
+     * @return $this
      */
     public function setMessageCloseString($messageCloseString)
     {
@@ -147,7 +152,7 @@ class FormElementErrors extends AbstractHelper
      * Set the formatted string used to open message representation
      *
      * @param  string $messageOpenFormat
-     * @return FormElementErrors
+     * @return $this
      */
     public function setMessageOpenFormat($messageOpenFormat)
     {
@@ -169,7 +174,7 @@ class FormElementErrors extends AbstractHelper
      * Set the string used to separate messages
      *
      * @param  string $messageSeparatorString
-     * @return FormElementErrors
+     * @return $this
      */
     public function setMessageSeparatorString($messageSeparatorString)
     {
@@ -191,7 +196,7 @@ class FormElementErrors extends AbstractHelper
      * Set the flag detailing whether or not to translate error messages.
      *
      * @param bool $flag
-     * @return self
+     * @return $this
      */
     public function setTranslateMessages($flag)
     {
@@ -217,7 +222,7 @@ class FormElementErrors extends AbstractHelper
     private function flattenMessagesWithoutTranslator(array $messages)
     {
         $messagesToPrint = [];
-        array_walk_recursive($messages, function ($item) use (&$messagesToPrint) {
+        array_walk_recursive($messages, static function ($item) use (&$messagesToPrint) {
             $messagesToPrint[] = $item;
         });
         return $messagesToPrint;
@@ -232,7 +237,7 @@ class FormElementErrors extends AbstractHelper
         $translator      = $this->getTranslator();
         $textDomain      = $this->getTranslatorTextDomain();
         $messagesToPrint = [];
-        $messageCallback = function ($item) use (&$messagesToPrint, $translator, $textDomain) {
+        $messageCallback = static function ($item) use (&$messagesToPrint, $translator, $textDomain) {
             $messagesToPrint[] = $translator->translate($item, $textDomain);
         };
         array_walk_recursive($messages, $messageCallback);

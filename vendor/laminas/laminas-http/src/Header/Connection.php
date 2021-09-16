@@ -1,12 +1,9 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-http for the canonical source repository
- * @copyright https://github.com/laminas/laminas-http/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-http/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Http\Header;
+
+use function strtolower;
+use function trim;
 
 /**
  * Connection Header
@@ -15,8 +12,8 @@ namespace Laminas\Http\Header;
  */
 class Connection implements HeaderInterface
 {
-    const CONNECTION_CLOSE      = 'close';
-    const CONNECTION_KEEP_ALIVE = 'keep-alive';
+    public const CONNECTION_CLOSE      = 'close';
+    public const CONNECTION_KEEP_ALIVE = 'keep-alive';
 
     /**
      * Value of this header
@@ -27,14 +24,14 @@ class Connection implements HeaderInterface
 
     /**
      * @param string $headerLine
-     * @return Connection
+     * @return static
      * @throws Exception\InvalidArgumentException
      */
     public static function fromString($headerLine)
     {
         $header = new static();
 
-        list($name, $value) = GenericHeader::splitHeaderLine($headerLine);
+        [$name, $value] = GenericHeader::splitHeaderLine($headerLine);
 
         // check to ensure proper header type for this factory
         if (strtolower($name) !== 'connection') {
@@ -50,7 +47,7 @@ class Connection implements HeaderInterface
      * Set Connection header to define persistent connection
      *
      * @param  bool $flag
-     * @return Connection
+     * @return $this
      */
     public function setPersistent($flag)
     {
@@ -67,7 +64,7 @@ class Connection implements HeaderInterface
      */
     public function isPersistent()
     {
-        return ($this->value === self::CONNECTION_KEEP_ALIVE);
+        return $this->value === self::CONNECTION_KEEP_ALIVE;
     }
 
     /**
@@ -75,7 +72,7 @@ class Connection implements HeaderInterface
      * RFC allows any token as value, 'close' and 'keep-alive' are commonly used
      *
      * @param string $value
-     * @return Connection
+     * @return $this
      */
     public function setValue($value)
     {

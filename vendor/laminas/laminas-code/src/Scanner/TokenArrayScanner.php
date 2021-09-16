@@ -12,6 +12,13 @@ use Laminas\Code\Annotation\AnnotationManager;
 use Laminas\Code\Exception;
 use Laminas\Code\NameInformation;
 
+use function array_shift;
+use function array_slice;
+use function in_array;
+use function is_array;
+use function is_int;
+use function is_string;
+
 class TokenArrayScanner implements ScannerInterface
 {
     /**
@@ -27,12 +34,12 @@ class TokenArrayScanner implements ScannerInterface
     /**
      * @var null
      */
-    protected $docComment = null;
+    protected $docComment;
 
     /**
      * @var NameInformation
      */
-    protected $nameInformation = null;
+    protected $nameInformation;
 
     /**
      * @var array
@@ -42,7 +49,7 @@ class TokenArrayScanner implements ScannerInterface
     /**
      * @var AnnotationManager
      */
-    protected $annotationManager = null;
+    protected $annotationManager;
 
     /**
      * @param null|array $tokens
@@ -68,7 +75,7 @@ class TokenArrayScanner implements ScannerInterface
      * @todo Assignment of $this->docComment should probably be done in scan()
      *       and then $this->getDocComment() just retrieves it.
      *
-     * @return string
+     * @return string|null
      */
     public function getDocComment()
     {
@@ -117,7 +124,7 @@ class TokenArrayScanner implements ScannerInterface
     }
 
     /**
-     * @return array
+     * @return void
      */
     public function getIncludes()
     {
@@ -168,7 +175,7 @@ class TokenArrayScanner implements ScannerInterface
      *
      * @param  string|int $name
      * @throws Exception\InvalidArgumentException
-     * @return ClassScanner
+     * @return ClassScanner|false
      */
     public function getClass($name)
     {
@@ -188,7 +195,7 @@ class TokenArrayScanner implements ScannerInterface
                 }
             }
 
-            if (!$classFound) {
+            if (! $classFound) {
                 return false;
             }
         }
@@ -197,7 +204,7 @@ class TokenArrayScanner implements ScannerInterface
             array_slice(
                 $this->tokens,
                 $info['tokenStart'],
-                ($info['tokenEnd'] - $info['tokenStart'] + 1)
+                $info['tokenEnd'] - $info['tokenStart'] + 1
             ), // zero indexed array
             new NameInformation($info['namespace'], $info['uses'])
         );
@@ -219,11 +226,11 @@ class TokenArrayScanner implements ScannerInterface
             }
         }
 
-        if (!$classFound) {
+        if (! $classFound) {
             return false;
         }
 
-        if (!isset($info)) {
+        if (! isset($info)) {
             return;
         }
 
@@ -254,11 +261,11 @@ class TokenArrayScanner implements ScannerInterface
         $this->scan();
 
         $functions = [];
-        foreach ($this->infos as $info) {
-            if ($info['type'] == 'function') {
-                // @todo $functions[] = new FunctionScanner($info['name']);
-            }
-        }
+//        foreach ($this->infos as $info) {
+//            if ($info['type'] == 'function') {
+//                // @todo $functions[] = new FunctionScanner($info['name']);
+//            }
+//        }
 
         return $functions;
     }
@@ -266,7 +273,7 @@ class TokenArrayScanner implements ScannerInterface
     /**
      * Export
      *
-     * @param $tokens
+     * @param mixed $tokens
      */
     public static function export($tokens)
     {
@@ -293,14 +300,13 @@ class TokenArrayScanner implements ScannerInterface
             return;
         }
 
-        if (!$this->tokens) {
+        if (! $this->tokens) {
             throw new Exception\RuntimeException('No tokens were provided');
         }
 
         /**
          * Variables & Setup
          */
-
         $tokens          = &$this->tokens; // localize
         $infos           = &$this->infos; // localize
         $tokenIndex      = null;
@@ -315,9 +321,16 @@ class TokenArrayScanner implements ScannerInterface
         /*
          * MACRO creation
          */
-        $MACRO_TOKEN_ADVANCE             = function () use (&$tokens, &$tokenIndex, &$token, &$tokenType, &$tokenContent, &$tokenLine) {
-            $tokenIndex = ($tokenIndex === null) ? 0 : $tokenIndex + 1;
-            if (!isset($tokens[$tokenIndex])) {
+        $MACRO_TOKEN_ADVANCE = function () use (
+            &$tokens,
+            &$tokenIndex,
+            &$token,
+            &$tokenType,
+            &$tokenContent,
+            &$tokenLine
+        ) {
+            $tokenIndex = $tokenIndex === null ? 0 : $tokenIndex + 1;
+            if (! isset($tokens[$tokenIndex])) {
                 $token        = false;
                 $tokenContent = false;
                 $tokenType    = false;
@@ -328,7 +341,7 @@ class TokenArrayScanner implements ScannerInterface
             if (is_string($tokens[$tokenIndex]) && $tokens[$tokenIndex] === '"') {
                 do {
                     $tokenIndex++;
-                } while (!(is_string($tokens[$tokenIndex]) && $tokens[$tokenIndex] === '"'));
+                } while (! (is_string($tokens[$tokenIndex]) && $tokens[$tokenIndex] === '"'));
             }
             $token = $tokens[$tokenIndex];
             if (is_array($token)) {
@@ -341,7 +354,7 @@ class TokenArrayScanner implements ScannerInterface
             return $tokenIndex;
         };
         $MACRO_TOKEN_LOGICAL_START_INDEX = function () use (&$tokenIndex, &$docCommentIndex) {
-            return ($docCommentIndex === false) ? $tokenIndex : $docCommentIndex;
+            return $docCommentIndex === false ? $tokenIndex : $docCommentIndex;
         };
         $MACRO_DOC_COMMENT_START = function () use (&$tokenIndex, &$docCommentIndex) {
             $docCommentIndex = $tokenIndex;
@@ -353,7 +366,7 @@ class TokenArrayScanner implements ScannerInterface
             if ($validTrailingTokens === null) {
                 $validTrailingTokens = [T_WHITESPACE, T_FINAL, T_ABSTRACT, T_INTERFACE, T_CLASS, T_FUNCTION];
             }
-            if ($docCommentIndex !== false && !in_array($tokenType, $validTrailingTokens)) {
+            if ($docCommentIndex !== false && ! in_array($tokenType, $validTrailingTokens)) {
                 $docCommentIndex = false;
             }
 
@@ -367,10 +380,17 @@ class TokenArrayScanner implements ScannerInterface
             return $infoIndex;
         };
 
+        // ensure php backwards compatibility
+        if (! defined('T_NAME_QUALIFIED')) {
+            define('T_NAME_QUALIFIED', 24001);
+        }
+        if (! defined('T_NAME_FULLY_QUALIFIED')) {
+            define('T_NAME_FULLY_QUALIFIED', 24002);
+        }
+
         /**
          * START FINITE STATE MACHINE FOR SCANNING TOKENS
          */
-
         // Initialize token
         $MACRO_TOKEN_ADVANCE();
 
@@ -384,15 +404,12 @@ class TokenArrayScanner implements ScannerInterface
         $MACRO_DOC_COMMENT_VALIDATE();
 
         switch ($tokenType) {
-
             case T_DOC_COMMENT:
-
                 $MACRO_DOC_COMMENT_START();
                 goto SCANNER_CONTINUE;
-                //goto no break needed
+                // goto no break needed
 
             case T_NAMESPACE:
-
                 $infos[$infoIndex] = [
                     'type'       => 'namespace',
                     'tokenStart' => $MACRO_TOKEN_LOGICAL_START_INDEX(),
@@ -409,7 +426,7 @@ class TokenArrayScanner implements ScannerInterface
 
                 SCANNER_NAMESPACE_TOP:
 
-                if ($tokenType === null && $tokenContent === ';' || $tokenContent === '{') {
+                if (($tokenType === null && $tokenContent === ';') || $tokenContent === '{') {
                     goto SCANNER_NAMESPACE_END;
                 }
 
@@ -417,7 +434,11 @@ class TokenArrayScanner implements ScannerInterface
                     goto SCANNER_NAMESPACE_CONTINUE;
                 }
 
-                if ($tokenType === T_NS_SEPARATOR || $tokenType === T_STRING) {
+                if ($tokenType === T_NS_SEPARATOR
+                    || $tokenType === T_STRING
+                    || $tokenType === T_NAME_QUALIFIED
+                    || $tokenType === T_NAME_FULLY_QUALIFIED
+                ) {
                     $infos[$infoIndex]['namespace'] .= $tokenContent;
                 }
 
@@ -434,10 +455,9 @@ class TokenArrayScanner implements ScannerInterface
 
                 $MACRO_INFO_ADVANCE();
                 goto SCANNER_CONTINUE;
-                //goto no break needed
+                // goto no break needed
 
             case T_USE:
-
                 $infos[$infoIndex] = [
                     'type'       => 'use',
                     'tokenStart' => $MACRO_TOKEN_LOGICAL_START_INDEX(),
@@ -445,8 +465,12 @@ class TokenArrayScanner implements ScannerInterface
                     'lineStart'  => $tokens[$tokenIndex][2],
                     'lineEnd'    => null,
                     'namespace'  => $namespace,
-                    'statements' => [0 => ['use' => null,
-                                                     'as'  => null]],
+                    'statements' => [
+                        0 => [
+                            'use' => null,
+                            'as'  => null,
+                        ],
+                    ],
                 ];
 
                 $useStatementIndex = 0;
@@ -465,8 +489,10 @@ class TokenArrayScanner implements ScannerInterface
                     } elseif ($tokenContent === ',') {
                         $useAsContext = false;
                         $useStatementIndex++;
-                        $infos[$infoIndex]['statements'][$useStatementIndex] = ['use' => null,
-                                                                                     'as'  => null];
+                        $infos[$infoIndex]['statements'][$useStatementIndex] = [
+                            'use' => null,
+                            'as'  => null,
+                        ];
                     }
                 }
 
@@ -477,7 +503,11 @@ class TokenArrayScanner implements ScannerInterface
                         goto SCANNER_USE_CONTINUE;
                     }
 
-                    if ($tokenType == T_NS_SEPARATOR || $tokenType == T_STRING) {
+                    if ($tokenType == T_NS_SEPARATOR
+                        || $tokenType == T_STRING
+                        || $tokenType == T_NAME_QUALIFIED
+                        || $tokenType == T_NAME_FULLY_QUALIFIED
+                    ) {
                         if ($useAsContext == false) {
                             $infos[$infoIndex]['statements'][$useStatementIndex]['use'] .= $tokenContent;
                         } else {
@@ -497,19 +527,18 @@ class TokenArrayScanner implements ScannerInterface
 
                 $MACRO_INFO_ADVANCE();
                 goto SCANNER_CONTINUE;
-                //goto no break needed
+                // goto no break needed
 
             case T_INCLUDE:
             case T_INCLUDE_ONCE:
             case T_REQUIRE:
             case T_REQUIRE_ONCE:
-
                 // Static for performance
                 static $includeTypes = [
                     T_INCLUDE      => 'include',
                     T_INCLUDE_ONCE => 'include_once',
                     T_REQUIRE      => 'require',
-                    T_REQUIRE_ONCE => 'require_once'
+                    T_REQUIRE_ONCE => 'require_once',
                 ];
 
                 $infos[$infoIndex] = [
@@ -546,7 +575,7 @@ class TokenArrayScanner implements ScannerInterface
 
                 $MACRO_INFO_ADVANCE();
                 goto SCANNER_CONTINUE;
-                //goto no break needed
+                // goto no break needed
 
             case T_FUNCTION:
             case T_FINAL:
@@ -554,9 +583,8 @@ class TokenArrayScanner implements ScannerInterface
             case T_CLASS:
             case T_INTERFACE:
             case T_TRAIT:
-
                 $infos[$infoIndex] = [
-                    'type'        => ($tokenType === T_FUNCTION) ? 'function' : 'class',
+                    'type'        => $tokenType === T_FUNCTION ? 'function' : 'class',
                     'tokenStart'  => $MACRO_TOKEN_LOGICAL_START_INDEX(),
                     'tokenEnd'    => null,
                     'lineStart'   => $tokens[$tokenIndex][2],
@@ -575,11 +603,18 @@ class TokenArrayScanner implements ScannerInterface
 
                 // process the name
                 if ($infos[$infoIndex]['shortName'] == ''
-                    && (($tokenType === T_CLASS || $tokenType === T_INTERFACE || $tokenType === T_TRAIT) && $infos[$infoIndex]['type'] === 'class'
+                    && (($tokenType === T_CLASS
+                            || $tokenType === T_INTERFACE
+                            || $tokenType === T_TRAIT)
+                        && $infos[$infoIndex]['type'] === 'class'
                         || ($tokenType === T_FUNCTION && $infos[$infoIndex]['type'] === 'function'))
                 ) {
-                    $infos[$infoIndex]['shortName'] = $tokens[$tokenIndex + 2][1];
-                    $infos[$infoIndex]['name']      = (($namespace !== null) ? $namespace . '\\' : '') . $infos[$infoIndex]['shortName'];
+                    $infos[$infoIndex]['shortName'] = is_array($tokens[$tokenIndex + 2])
+                        ? $tokens[$tokenIndex + 2][1]
+                        : $tokens[$tokenIndex + 2];
+                    $infos[$infoIndex]['name']      = ($namespace !== null
+                        ? $namespace . '\\'
+                        : '') . $infos[$infoIndex]['shortName'];
                 }
 
                 if ($tokenType === null) {
@@ -605,7 +640,7 @@ class TokenArrayScanner implements ScannerInterface
 
                 $MACRO_INFO_ADVANCE();
                 goto SCANNER_CONTINUE;
-
+                // goto no break needed
         }
 
         SCANNER_CONTINUE:
@@ -620,7 +655,6 @@ class TokenArrayScanner implements ScannerInterface
         /**
          * END FINITE STATE MACHINE FOR SCANNING TOKENS
          */
-
         $this->isScanned = true;
     }
 
@@ -658,9 +692,9 @@ class TokenArrayScanner implements ScannerInterface
 
         if ($namespace === null) {
             $namespace = array_shift($namespaces);
-        } elseif (!is_string($namespace)) {
+        } elseif (! is_string($namespace)) {
             throw new Exception\InvalidArgumentException('Invalid namespace provided');
-        } elseif (!in_array($namespace, $namespaces)) {
+        } elseif (! in_array($namespace, $namespaces)) {
             return;
         }
 

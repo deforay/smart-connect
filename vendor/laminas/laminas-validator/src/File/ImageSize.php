@@ -1,54 +1,54 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-validator for the canonical source repository
- * @copyright https://github.com/laminas/laminas-validator/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-validator/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Validator\File;
 
 use Laminas\Stdlib\ErrorHandler;
 use Laminas\Validator\AbstractValidator;
 use Laminas\Validator\Exception;
+use Traversable;
+
+use function array_shift;
+use function func_get_args;
+use function func_num_args;
+use function getimagesize;
+use function is_array;
+use function is_readable;
 
 /**
  * Validator for the image size of an image file
  */
 class ImageSize extends AbstractValidator
 {
+    use FileInformationTrait;
+
     /**
      * @const string Error constants
      */
-    const WIDTH_TOO_BIG    = 'fileImageSizeWidthTooBig';
-    const WIDTH_TOO_SMALL  = 'fileImageSizeWidthTooSmall';
-    const HEIGHT_TOO_BIG   = 'fileImageSizeHeightTooBig';
-    const HEIGHT_TOO_SMALL = 'fileImageSizeHeightTooSmall';
-    const NOT_DETECTED     = 'fileImageSizeNotDetected';
-    const NOT_READABLE     = 'fileImageSizeNotReadable';
+    public const WIDTH_TOO_BIG    = 'fileImageSizeWidthTooBig';
+    public const WIDTH_TOO_SMALL  = 'fileImageSizeWidthTooSmall';
+    public const HEIGHT_TOO_BIG   = 'fileImageSizeHeightTooBig';
+    public const HEIGHT_TOO_SMALL = 'fileImageSizeHeightTooSmall';
+    public const NOT_DETECTED     = 'fileImageSizeNotDetected';
+    public const NOT_READABLE     = 'fileImageSizeNotReadable';
 
-    /**
-     * @var array Error message template
-     */
+    /** @var array Error message template */
     protected $messageTemplates = [
         self::WIDTH_TOO_BIG    => "Maximum allowed width for image should be '%maxwidth%' but '%width%' detected",
         self::WIDTH_TOO_SMALL  => "Minimum expected width for image should be '%minwidth%' but '%width%' detected",
         self::HEIGHT_TOO_BIG   => "Maximum allowed height for image should be '%maxheight%' but '%height%' detected",
         self::HEIGHT_TOO_SMALL => "Minimum expected height for image should be '%minheight%' but '%height%' detected",
-        self::NOT_DETECTED     => "The size of image could not be detected",
-        self::NOT_READABLE     => "File is not readable or does not exist",
+        self::NOT_DETECTED     => 'The size of image could not be detected',
+        self::NOT_READABLE     => 'File is not readable or does not exist',
     ];
 
-    /**
-     * @var array Error message template variables
-     */
+    /** @var array Error message template variables */
     protected $messageVariables = [
         'minwidth'  => ['options' => 'minWidth'],
         'maxwidth'  => ['options' => 'maxWidth'],
         'minheight' => ['options' => 'minHeight'],
         'maxheight' => ['options' => 'maxHeight'],
         'width'     => 'width',
-        'height'    => 'height'
+        'height'    => 'height',
     ];
 
     /**
@@ -71,10 +71,10 @@ class ImageSize extends AbstractValidator
      * @var array
      */
     protected $options = [
-        'minWidth'  => null,  // Minimum image width
-        'maxWidth'  => null,  // Maximum image width
-        'minHeight' => null,  // Minimum image height
-        'maxHeight' => null,  // Maximum image height
+        'minWidth'  => null, // Minimum image width
+        'maxWidth'  => null, // Maximum image width
+        'minHeight' => null, // Minimum image height
+        'maxHeight' => null, // Maximum image height
     ];
 
     /**
@@ -86,7 +86,7 @@ class ImageSize extends AbstractValidator
      * - maxheight
      * - maxwidth
      *
-     * @param  array|\Traversable $options
+     * @param null|array|Traversable $options
      */
     public function __construct($options = null)
     {
@@ -123,19 +123,19 @@ class ImageSize extends AbstractValidator
      * Sets the minimum allowed width
      *
      * @param  int $minWidth
-     * @throws Exception\InvalidArgumentException When minwidth is greater than maxwidth
-     * @return self Provides a fluid interface
+     * @return $this Provides a fluid interface
+     * @throws Exception\InvalidArgumentException When minwidth is greater than maxwidth.
      */
     public function setMinWidth($minWidth)
     {
         if (($this->getMaxWidth() !== null) && ($minWidth > $this->getMaxWidth())) {
             throw new Exception\InvalidArgumentException(
-                "The minimum image width must be less than or equal to the "
+                'The minimum image width must be less than or equal to the '
                 . " maximum image width, but {$minWidth} > {$this->getMaxWidth()}"
             );
         }
 
-        $this->options['minWidth']  = (int) $minWidth;
+        $this->options['minWidth'] = (int) $minWidth;
         return $this;
     }
 
@@ -153,19 +153,19 @@ class ImageSize extends AbstractValidator
      * Sets the maximum allowed width
      *
      * @param  int $maxWidth
-     * @throws Exception\InvalidArgumentException When maxwidth is less than minwidth
-     * @return self Provides a fluid interface
+     * @return $this Provides a fluid interface
+     * @throws Exception\InvalidArgumentException When maxwidth is less than minwidth.
      */
     public function setMaxWidth($maxWidth)
     {
         if (($this->getMinWidth() !== null) && ($maxWidth < $this->getMinWidth())) {
             throw new Exception\InvalidArgumentException(
-                "The maximum image width must be greater than or equal to the "
+                'The maximum image width must be greater than or equal to the '
                 . "minimum image width, but {$maxWidth} < {$this->getMinWidth()}"
             );
         }
 
-        $this->options['maxWidth']  = (int) $maxWidth;
+        $this->options['maxWidth'] = (int) $maxWidth;
         return $this;
     }
 
@@ -183,19 +183,19 @@ class ImageSize extends AbstractValidator
      * Sets the minimum allowed height
      *
      * @param  int $minHeight
-     * @throws Exception\InvalidArgumentException When minheight is greater than maxheight
-     * @return self Provides a fluid interface
+     * @return $this Provides a fluid interface
+     * @throws Exception\InvalidArgumentException When minheight is greater than maxheight.
      */
     public function setMinHeight($minHeight)
     {
         if (($this->getMaxHeight() !== null) && ($minHeight > $this->getMaxHeight())) {
             throw new Exception\InvalidArgumentException(
-                "The minimum image height must be less than or equal to the "
+                'The minimum image height must be less than or equal to the '
                 . " maximum image height, but {$minHeight} > {$this->getMaxHeight()}"
             );
         }
 
-        $this->options['minHeight']  = (int) $minHeight;
+        $this->options['minHeight'] = (int) $minHeight;
         return $this;
     }
 
@@ -213,19 +213,19 @@ class ImageSize extends AbstractValidator
      * Sets the maximum allowed height
      *
      * @param  int $maxHeight
-     * @throws Exception\InvalidArgumentException When maxheight is less than minheight
-     * @return self Provides a fluid interface
+     * @return $this Provides a fluid interface
+     * @throws Exception\InvalidArgumentException When maxheight is less than minheight.
      */
     public function setMaxHeight($maxHeight)
     {
         if (($this->getMinHeight() !== null) && ($maxHeight < $this->getMinHeight())) {
             throw new Exception\InvalidArgumentException(
-                "The maximum image height must be greater than or equal to the "
+                'The maximum image height must be greater than or equal to the '
                 . "minimum image height, but {$maxHeight} < {$this->getMinHeight()}"
             );
         }
 
-        $this->options['maxHeight']  = (int) $maxHeight;
+        $this->options['maxHeight'] = (int) $maxHeight;
         return $this;
     }
 
@@ -273,7 +273,7 @@ class ImageSize extends AbstractValidator
      * Sets the minimum image size
      *
      * @param  array $options                 The minimum image dimensions
-     * @return self Provides a fluent interface
+     * @return $this Provides a fluent interface
      */
     public function setImageMin($options)
     {
@@ -284,8 +284,8 @@ class ImageSize extends AbstractValidator
     /**
      * Sets the maximum image size
      *
-     * @param  array|\Traversable $options The maximum image dimensions
-     * @return self Provides a fluent interface
+     * @param array|Traversable $options The maximum image dimensions
+     * @return $this Provides a fluent interface
      */
     public function setImageMax($options)
     {
@@ -297,7 +297,7 @@ class ImageSize extends AbstractValidator
      * Sets the minimum and maximum image width
      *
      * @param  array $options               The image width dimensions
-     * @return self Provides a fluent interface
+     * @return $this Provides a fluent interface
      */
     public function setImageWidth($options)
     {
@@ -311,7 +311,7 @@ class ImageSize extends AbstractValidator
      * Sets the minimum and maximum image height
      *
      * @param  array $options               The image height dimensions
-     * @return self Provides a fluent interface
+     * @return $this Provides a fluent interface
      */
     public function setImageHeight($options)
     {
@@ -331,32 +331,18 @@ class ImageSize extends AbstractValidator
      */
     public function isValid($value, $file = null)
     {
-        if (is_string($value) && is_array($file)) {
-            // Legacy Laminas\Transfer API support
-            $filename = $file['name'];
-            $file     = $file['tmp_name'];
-        } elseif (is_array($value)) {
-            if (! isset($value['tmp_name']) || ! isset($value['name'])) {
-                throw new Exception\InvalidArgumentException(
-                    'Value array must be in $_FILES format'
-                );
-            }
-            $file     = $value['tmp_name'];
-            $filename = $value['name'];
-        } else {
-            $file     = $value;
-            $filename = basename($file);
-        }
-        $this->setValue($filename);
+        $fileInfo = $this->getFileInfo($value, $file);
+
+        $this->setValue($fileInfo['filename']);
 
         // Is file readable ?
-        if (empty($file) || false === is_readable($file)) {
+        if (empty($fileInfo['file']) || false === is_readable($fileInfo['file'])) {
             $this->error(self::NOT_READABLE);
             return false;
         }
 
         ErrorHandler::start();
-        $size = getimagesize($file);
+        $size = getimagesize($fileInfo['file']);
         ErrorHandler::stop();
 
         if (empty($size) || ($size[0] === 0) || ($size[1] === 0)) {

@@ -1,0 +1,72 @@
+{
+    "name": "laminas/laminas-mvc-middleware",
+    "description": "Dispatch middleware pipelines in place of controllers in laminas-mvc.",
+    "license": "BSD-3-Clause",
+    "keywords": [
+        "laminas",
+        "components",
+        "middleware",
+        "mvc",
+        "psr-7",
+        "psr-15"
+    ],
+    "homepage": "https://laminas.dev",
+    "support": {
+        "docs": "https://docs.laminas.dev/laminas-mvc-middleware/",
+        "issues": "https://github.com/laminas/laminas-mvc-middleware/issues",
+        "source": "https://github.com/laminas/laminas-mvc-middleware",
+        "rss": "https://github.com/laminas/laminas-mvc-middleware/releases.atom",
+        "chat": "https://laminas.dev/chat",
+        "forum": "https://discourse.laminas.dev"
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "laminas": {
+            "component": "Laminas\\Mvc\\Middleware"
+        }
+    },
+    "require": {
+        "php": "^7.3 || ~8.0.0",
+        "laminas/laminas-mvc": "^3.2",
+        "laminas/laminas-psr7bridge": "^1.2.2",
+        "laminas/laminas-servicemanager": "^3.4",
+        "laminas/laminas-stratigility": "^3.3",
+        "psr/http-server-handler": "^1.0",
+        "psr/http-server-middleware": "^1.0",
+        "webmozart/assert": "^1.9"
+    },
+    "require-dev": {
+        "brick/varexporter": "^0.3.2",
+        "container-interop/container-interop": "^1.2",
+        "laminas/laminas-coding-standard": "^2.1",
+        "laminas/laminas-diactoros": "^2.4",
+        "laminas/laminas-router": "^3.3",
+        "phpspec/prophecy-phpunit": "^2.0",
+        "phpunit/phpunit": "^9.4",
+        "psalm/plugin-phpunit": "^0.15.1",
+        "vimeo/psalm": "^4.6"
+    },
+    "autoload": {
+        "psr-4": {
+            "Laminas\\Mvc\\Middleware\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "LaminasTest\\Mvc\\Middleware\\": "test/"
+        }
+    },
+    "scripts": {
+        "check": [
+            "@cs-check",
+            "@test"
+        ],
+        "cs-check": "phpcs",
+        "cs-fix": "phpcbf",
+        "static-analysis": "psalm --shepherd --stats",
+        "test": "phpunit --colors=always",
+        "test-coverage": "phpunit --colors=always --coverage-clover clover.xml"
+    }
+}

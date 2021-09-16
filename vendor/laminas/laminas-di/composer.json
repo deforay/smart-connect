@@ -1,10 +1,11 @@
 {
     "name": "laminas/laminas-di",
-    "description": " ",
+    "description": "Automated dependency injection for PSR-11 containers",
     "license": "BSD-3-Clause",
     "keywords": [
         "laminas",
-        "di"
+        "di",
+        "psr-11"
     ],
     "homepage": "https://laminas.dev",
     "support": {
@@ -19,21 +20,33 @@
         "sort-packages": true
     },
     "extra": {
-        "branch-alias": {
-            "dev-master": "2.6-dev",
-            "dev-develop": "2.7-dev"
+        "laminas": {
+            "component": "Laminas\\Di",
+            "config-provider": "Laminas\\Di\\ConfigProvider"
         }
     },
     "require": {
-        "php": "^5.5 || ^7.0",
-        "container-interop/container-interop": "^1.1",
-        "laminas/laminas-code": "^2.6 || ^3.0",
-        "laminas/laminas-stdlib": "^2.7 || ^3.0",
-        "laminas/laminas-zendframework-bridge": "^0.4.5 || ^1.0"
+        "php": "^7.3 || ~8.0.0",
+        "laminas/laminas-stdlib": "^3.3",
+        "laminas/laminas-zendframework-bridge": "^0.4.5 || ^1.0",
+        "psr/container": "^1.0",
+        "psr/log": "^1.0"
     },
     "require-dev": {
-        "fabpot/php-cs-fixer": "1.7.*",
-        "phpunit/phpunit": "~4.0"
+        "container-interop/container-interop": "^1.2.0",
+        "laminas/laminas-coding-standard": "^2",
+        "laminas/laminas-servicemanager": "^3.4",
+        "mikey179/vfsstream": "^1.6.7",
+        "phpstan/phpstan": "^0.12.64",
+        "phpspec/prophecy-phpunit": "^2.0",
+        "phpunit/phpunit": "^9.3"
+    },
+    "conflict": {
+        "laminas/laminas-servicemanager-di": "*",
+        "phpspec/prophecy": "<1.9.0"
+    },
+    "suggest": {
+        "laminas/laminas-servicemanager": "An IoC container without auto wiring capabilities"
     },
     "autoload": {
         "psr-4": {
@@ -45,7 +58,19 @@
             "LaminasTest\\Di\\": "test/"
         }
     },
+    "scripts": {
+        "check": [
+            "@cs-check",
+            "@analyse",
+            "@test"
+        ],
+        "cs-check": "phpcs",
+        "cs-fix": "phpcbf",
+        "analyse": "phpstan analyse --no-progress -c phpstan.neon",
+        "test": "phpunit --colors=always",
+        "test-coverage": "phpunit --colors=always --coverage-clover clover.xml"
+    },
     "replace": {
-        "zendframework/zend-di": "self.version"
+        "zendframework/zend-di": "^3.1.2"
     }
 }

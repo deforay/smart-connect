@@ -1,17 +1,31 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-http for the canonical source repository
- * @copyright https://github.com/laminas/laminas-http/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-http/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Http\Client\Adapter;
 
 use Laminas\Http\Client;
 use Laminas\Http\Client\Adapter\Exception as AdapterException;
 use Laminas\Http\Response;
+use Laminas\Stdlib\ArrayUtils;
 use Laminas\Stdlib\ErrorHandler;
+use Laminas\Uri\Uri;
+use Traversable;
+
+use function base64_encode;
+use function fgets;
+use function fwrite;
+use function gettype;
+use function is_array;
+use function is_resource;
+use function is_string;
+use function preg_match;
+use function rtrim;
+use function sprintf;
+use function stream_context_set_option;
+use function stream_copy_to_stream;
+use function strlen;
+use function strpos;
+use function strtolower;
+use function substr;
 
 /**
  * HTTP Proxy-supporting Laminas\Http\Client adapter class, based on the default
@@ -31,7 +45,7 @@ class Proxy extends Socket
      */
     protected $config = [
         'persistent'         => false,
-        'ssltransport'       => 'ssl',
+        'ssltransport'       => 'tls',
         'sslcert'            => null,
         'sslpassphrase'      => null,
         'sslverifypeer'      => true,
@@ -61,6 +75,15 @@ class Proxy extends Socket
      */
     public function setOptions($options = [])
     {
+        if ($options instanceof Traversable) {
+            $options = ArrayUtils::iteratorToArray($options);
+        }
+        if (! is_array($options)) {
+            throw new AdapterException\InvalidArgumentException(
+                'Array or Laminas\Config object expected, got ' . gettype($options)
+            );
+        }
+
         //enforcing that the proxy keys are set in the form proxy_*
         foreach ($options as $k => $v) {
             if (preg_match('/^proxy[a-z]+/', $k)) {
@@ -94,6 +117,7 @@ class Proxy extends Socket
         /* Url might require stream context even if proxy connection doesn't */
         if ($secure) {
             $this->config['sslusecontext'] = true;
+            $this->setSslCryptoMethod      = false;
         }
 
         // Connect (a non-secure connection) to the proxy server
@@ -108,7 +132,7 @@ class Proxy extends Socket
      * Send request to the proxy server
      *
      * @param string        $method
-     * @param \Laminas\Uri\Uri $uri
+     * @param Uri $uri
      * @param string        $httpVer
      * @param array         $headers
      * @param string        $body
@@ -130,7 +154,10 @@ class Proxy extends Socket
         $host = $this->config['proxy_host'];
         $port = $this->config['proxy_port'];
 
-        if ($this->connectedTo[0] != sprintf('tcp://%s', $host) || $this->connectedTo[1] != $port) {
+        $isSecure      = strtolower($uri->getScheme()) === 'https';
+        $connectedHost = ($isSecure ? $this->config['ssltransport'] : 'tcp') . '://' . $host;
+
+        if ($this->connectedTo[1] !== $port || $this->connectedTo[0] !== $connectedHost) {
             throw new AdapterException\RuntimeException(
                 'Trying to write but we are connected to the wrong proxy server'
             );
@@ -146,7 +173,7 @@ class Proxy extends Socket
         }
 
         // if we are proxying HTTPS, preform CONNECT handshake with the proxy
-        if ($uri->getScheme() == 'https' && ! $this->negotiated) {
+        if ($isSecure && ! $this->negotiated) {
             $this->connectHandshake($uri->getHost(), $uri->getPort(), $httpVer, $headers);
             $this->negotiated = true;
         }
@@ -154,15 +181,20 @@ class Proxy extends Socket
         // Save request method for later
         $this->method = $method;
 
-        // Build request headers
-        if ($this->negotiated) {
-            $path = $uri->getPath();
-            $query = $uri->getQuery();
-            $path .= $query ? '?' . $query : '';
-            $request = sprintf('%s %s HTTP/%s%s', $method, $path, $httpVer, "\r\n");
-        } else {
-            $request = sprintf('%s %s HTTP/%s%s', $method, $uri, $httpVer, "\r\n");
+        if ($uri->getUserInfo()) {
+            $headers['Authorization'] = 'Basic ' . base64_encode($uri->getUserInfo());
         }
+
+        $path  = $uri->getPath();
+        $query = $uri->getQuery();
+        $path .= $query ? '?' . $query : '';
+
+        if (! $this->negotiated) {
+            $path = $uri->getScheme() . '://' . $uri->getHost() . $path;
+        }
+
+        // Build request headers
+        $request = sprintf('%s %s HTTP/%s%s', $method, $path, $httpVer, "\r\n");
 
         // Add all headers to the request string
         foreach ($headers as $k => $v) {
@@ -183,12 +215,12 @@ class Proxy extends Socket
         ErrorHandler::start();
         $test  = fwrite($this->socket, $request);
         $error = ErrorHandler::stop();
-        if (! $test) {
+        if ($test === false) {
             throw new AdapterException\RuntimeException('Error writing request to proxy server', 0, $error);
         }
 
         if (is_resource($body)) {
-            if (stream_copy_to_stream($body, $this->socket) == 0) {
+            if (stream_copy_to_stream($body, $this->socket) === 0) {
                 throw new AdapterException\RuntimeException('Error writing request to server');
             }
         }
@@ -233,7 +265,7 @@ class Proxy extends Socket
         }
 
         // Read response headers only
-        $response = '';
+        $response  = '';
         $gotStatus = false;
         ErrorHandler::start();
         while ($line = fgets($this->socket)) {
@@ -248,33 +280,24 @@ class Proxy extends Socket
         ErrorHandler::stop();
 
         // Check that the response from the proxy is 200
-        if (Response::fromString($response)->getStatusCode() != 200) {
+        if (Response::fromString($response)->getStatusCode() !== 200) {
             throw new AdapterException\RuntimeException(sprintf(
                 'Unable to connect to HTTPS proxy. Server response: %s',
                 $response
             ));
         }
 
-        // If all is good, switch socket to secure mode. We have to fall back
-        // through the different modes
-        $modes = [
-            STREAM_CRYPTO_METHOD_TLS_CLIENT,
-            STREAM_CRYPTO_METHOD_SSLv3_CLIENT,
-            STREAM_CRYPTO_METHOD_SSLv23_CLIENT,
-            STREAM_CRYPTO_METHOD_SSLv2_CLIENT,
-        ];
+        // provide hostname to ssl for SNI
+        $context = $this->getStreamContext();
+        stream_context_set_option($context, 'ssl', 'peer_name', $host);
 
-        $success = false;
-        foreach ($modes as $mode) {
-            $success = stream_socket_enable_crypto($this->socket, true, $mode);
-            if ($success) {
-                break;
-            }
-        }
-
-        if (! $success) {
+        try {
+            $this->enableCryptoTransport($this->config['ssltransport'], $this->socket, $host);
+        } catch (AdapterException\RuntimeException $e) {
             throw new AdapterException\RuntimeException(
-                'Unable to connect to HTTPS server through proxy: could not negotiate secure connection.'
+                'Unable to connect to HTTPS server through proxy: could not negotiate secure connection.',
+                0,
+                $e
             );
         }
     }

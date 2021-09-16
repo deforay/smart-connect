@@ -1,11 +1,5 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-cache for the canonical source repository
- * @copyright https://github.com/laminas/laminas-cache/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-cache/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Cache\Psr\CacheItemPool;
 
 use Laminas\Cache\Exception;
@@ -15,6 +9,9 @@ use Laminas\Cache\Storage\FlushableInterface;
 use Laminas\Cache\Storage\StorageInterface;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
+use function array_unique;
+use function in_array;
+use function is_array;
 
 /**
  * Decorate laminas-cache adapters as PSR-6 cache item pools.
@@ -194,13 +191,25 @@ class CacheItemPoolDecorator implements CacheItemPoolInterface
         $this->deferred = array_diff_key($this->deferred, array_flip($keys));
 
         try {
-            return null !== $this->storage->removeItems($keys);
+            $result = $this->storage->removeItems($keys);
         } catch (Exception\InvalidArgumentException $e) {
             throw new InvalidArgumentException($e->getMessage(), $e->getCode(), $e);
         } catch (Exception\ExceptionInterface $e) {
+            return false;
         }
 
-        return false;
+        // BC compatibility can be removed in 3.0
+        if (! is_array($result)) {
+            return $result !== null;
+        }
+
+        if ($result === []) {
+            return true;
+        }
+
+        $existing = $this->storage->hasItems($result);
+        $unified = array_unique($existing);
+        return ! in_array(true, $unified, true);
     }
 
     /**
@@ -255,6 +264,11 @@ class CacheItemPoolDecorator implements CacheItemPoolInterface
     {
         if (! $item instanceof CacheItem) {
             throw new InvalidArgumentException('$item must be an instance of ' . CacheItem::class);
+        }
+
+        $ttl = $item->getTtl();
+        if ($ttl !== null && $ttl <= 0) {
+            return false;
         }
 
         // deferred items should always be a 'hit' until they expire

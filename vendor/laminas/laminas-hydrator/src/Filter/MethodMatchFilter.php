@@ -1,38 +1,39 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-hydrator for the canonical source repository
- * @copyright https://github.com/laminas/laminas-hydrator/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-hydrator/blob/master/LICENSE.md New BSD License
- */
+declare(strict_types=1);
 
 namespace Laminas\Hydrator\Filter;
 
-class MethodMatchFilter implements FilterInterface
+use function strpos;
+use function substr;
+
+final class MethodMatchFilter implements FilterInterface
 {
     /**
      * The method to exclude
+     *
      * @var string
      */
-    protected $method = null;
+    protected $method;
 
     /**
      * Either an exclude or an include
+     *
      * @var bool
      */
-    protected $exclude = null;
+    protected $exclude;
 
     /**
      * @param string $method The method to exclude or include
      * @param bool $exclude If the method should be excluded
      */
-    public function __construct($method, $exclude = true)
+    public function __construct(string $method, bool $exclude = true)
     {
-        $this->method = $method;
+        $this->method  = $method;
         $this->exclude = $exclude;
     }
 
-    public function filter($property)
+    public function filter(string $property, ?object $instance = null): bool
     {
         $pos = strpos($property, '::');
         if ($pos !== false) {
@@ -40,9 +41,9 @@ class MethodMatchFilter implements FilterInterface
         } else {
             $pos = 0;
         }
-        if (substr($property, $pos) === $this->method) {
-            return !$this->exclude;
-        }
-        return $this->exclude;
+
+        return substr($property, $pos) === $this->method
+            ? ! $this->exclude
+            : $this->exclude;
     }
 }

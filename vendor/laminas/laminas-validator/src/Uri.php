@@ -1,11 +1,5 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-validator for the canonical source repository
- * @copyright https://github.com/laminas/laminas-validator/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-validator/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Validator;
 
 use Laminas\Uri\Exception\ExceptionInterface as UriException;
@@ -13,32 +7,33 @@ use Laminas\Uri\Uri as UriHandler;
 use Laminas\Validator\Exception\InvalidArgumentException;
 use Traversable;
 
+use function array_shift;
+use function class_exists;
+use function func_get_args;
+use function is_a;
+use function is_array;
+use function is_string;
+use function iterator_to_array;
+use function sprintf;
+
 class Uri extends AbstractValidator
 {
-    const INVALID = 'uriInvalid';
-    const NOT_URI = 'notUri';
+    public const INVALID = 'uriInvalid';
+    public const NOT_URI = 'notUri';
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $messageTemplates = [
-        self::INVALID => "Invalid type given. String expected",
-        self::NOT_URI => "The input does not appear to be a valid Uri",
+        self::INVALID => 'Invalid type given. String expected',
+        self::NOT_URI => 'The input does not appear to be a valid Uri',
     ];
 
-    /**
-     * @var UriHandler
-     */
+    /** @var UriHandler */
     protected $uriHandler;
 
-    /**
-     * @var bool
-     */
+    /** @var bool */
     protected $allowRelative = true;
 
-    /**
-     * @var bool
-     */
+    /** @var bool */
     protected $allowAbsolute = true;
 
     /**
@@ -51,7 +46,7 @@ class Uri extends AbstractValidator
         if ($options instanceof Traversable) {
             $options = iterator_to_array($options);
         } elseif (! is_array($options)) {
-            $options = func_get_args();
+            $options            = func_get_args();
             $temp['uriHandler'] = array_shift($options);
             if (! empty($options)) {
                 $temp['allowRelative'] = array_shift($options);
@@ -87,25 +82,23 @@ class Uri extends AbstractValidator
             $this->uriHandler = new UriHandler();
         } elseif (is_string($this->uriHandler) && class_exists($this->uriHandler)) {
             // Instantiate string Uri handler that references a class
-            $this->uriHandler = new $this->uriHandler;
+            $this->uriHandler = new $this->uriHandler();
         }
-
-        if (! $this->uriHandler instanceof UriHandler) {
-            throw new InvalidArgumentException('URI handler is expected to be a Laminas\Uri\Uri object');
-        }
-
         return $this->uriHandler;
     }
 
     /**
-     * @param  UriHandler $uriHandler
+     * @param  UriHandler|string $uriHandler
      * @throws InvalidArgumentException
-     * @return Uri
+     * @return $this
      */
     public function setUriHandler($uriHandler)
     {
-        if (! is_subclass_of($uriHandler, 'Laminas\Uri\Uri')) {
-            throw new InvalidArgumentException('Expecting a subclass name or instance of Laminas\Uri\Uri as $uriHandler');
+        if (! is_a($uriHandler, UriHandler::class, true)) {
+            throw new InvalidArgumentException(sprintf(
+                'Expecting a subclass name or instance of %s as $uriHandler',
+                UriHandler::class
+            ));
         }
 
         $this->uriHandler = $uriHandler;
@@ -126,7 +119,7 @@ class Uri extends AbstractValidator
      * Sets the allowAbsolute option
      *
      * @param  bool $allowAbsolute
-     * @return Uri
+     * @return $this
      */
     public function setAllowAbsolute($allowAbsolute)
     {
@@ -148,7 +141,7 @@ class Uri extends AbstractValidator
      * Sets the allowRelative option
      *
      * @param  bool $allowRelative
-     * @return Uri
+     * @return $this
      */
     public function setAllowRelative($allowRelative)
     {
@@ -174,7 +167,8 @@ class Uri extends AbstractValidator
             $uriHandler->parse($value);
             if ($uriHandler->isValid()) {
                 // It will either be a valid absolute or relative URI
-                if (($this->allowRelative && $this->allowAbsolute)
+                if (
+                    ($this->allowRelative && $this->allowAbsolute)
                     || ($this->allowAbsolute && $uriHandler->isAbsolute())
                     || ($this->allowRelative && $uriHandler->isValidRelative())
                 ) {

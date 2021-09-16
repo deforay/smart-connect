@@ -19,28 +19,27 @@
         "sort-packages": true
     },
     "extra": {
-        "branch-alias": {
-            "dev-master": "2.9.x-dev",
-            "dev-develop": "2.10.x-dev"
-        },
         "laminas": {
             "component": "Laminas\\Filter",
             "config-provider": "Laminas\\Filter\\ConfigProvider"
         }
     },
     "require": {
-        "php": "^5.6 || ^7.0",
-        "laminas/laminas-stdlib": "^2.7.7 || ^3.1",
+        "php": "^7.3 || ~8.0.0",
+        "laminas/laminas-stdlib": "^3.3",
         "laminas/laminas-zendframework-bridge": "^1.0"
     },
     "require-dev": {
         "laminas/laminas-coding-standard": "~1.0.0",
         "laminas/laminas-crypt": "^3.2.1",
-        "laminas/laminas-servicemanager": "^2.7.8 || ^3.3",
+        "laminas/laminas-servicemanager": "^3.3",
         "laminas/laminas-uri": "^2.6",
         "pear/archive_tar": "^1.4.3",
-        "phpunit/phpunit": "^5.7.23 || ^6.4.3",
-        "psr/http-factory": "^1.0"
+        "phpspec/prophecy-phpunit": "^2.0",
+        "phpunit/phpunit": "^9.3",
+        "psalm/plugin-phpunit": "^0.15.1",
+        "psr/http-factory": "^1.0",
+        "vimeo/psalm": "^4.6"
     },
     "conflict": {
         "laminas/laminas-validator": "<2.10.1"
@@ -70,7 +69,8 @@
         "cs-check": "phpcs",
         "cs-fix": "phpcbf",
         "test": "phpunit --colors=always",
-        "test-coverage": "phpunit --colors=always --coverage-clover clover.xml"
+        "test-coverage": "phpunit --colors=always --coverage-clover clover.xml",
+        "static-analysis": "psalm --shepherd --stats"
     },
     "replace": {
         "zendframework/zend-filter": "^2.9.2"

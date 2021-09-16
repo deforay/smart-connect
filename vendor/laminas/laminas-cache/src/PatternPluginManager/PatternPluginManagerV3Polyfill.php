@@ -1,11 +1,5 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-cache for the canonical source repository
- * @copyright https://github.com/laminas/laminas-cache/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-cache/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Cache\PatternPluginManager;
 
 use Laminas\Cache\Pattern;
@@ -18,6 +12,8 @@ use Laminas\ServiceManager\Factory\InvokableFactory;
  * Enforces that retrieved adapters are instances of
  * Pattern\PatternInterface. Additionally, it registers a number of default
  * patterns available.
+ * @deprecated This will be removed in v3.0.0. Cache pattern will require dependency injection and thus, a generic
+ *             plugin manager makes no sense anymore.
  */
 class PatternPluginManagerV3Polyfill extends AbstractPluginManager
 {
@@ -51,18 +47,18 @@ class PatternPluginManagerV3Polyfill extends AbstractPluginManager
     ];
 
     protected $factories = [
-        Pattern\CallbackCache::class    => InvokableFactory::class,
-        Pattern\CaptureCache::class     => InvokableFactory::class,
-        Pattern\ClassCache::class       => InvokableFactory::class,
-        Pattern\ObjectCache::class      => InvokableFactory::class,
-        Pattern\OutputCache::class      => InvokableFactory::class,
+        Pattern\CallbackCache::class    => Pattern\StoragePatternCacheFactory::class,
+        Pattern\CaptureCache::class     => Pattern\PatternCacheFactory::class,
+        Pattern\ClassCache::class       => Pattern\StoragePatternCacheFactory::class,
+        Pattern\ObjectCache::class      => Pattern\StoragePatternCacheFactory::class,
+        Pattern\OutputCache::class      => Pattern\StoragePatternCacheFactory::class,
 
         // v2 normalized FQCNs
-        'laminascachepatterncallbackcache' => InvokableFactory::class,
-        'laminascachepatterncapturecache'  => InvokableFactory::class,
-        'laminascachepatternclasscache'    => InvokableFactory::class,
-        'laminascachepatternobjectcache'   => InvokableFactory::class,
-        'laminascachepatternoutputcache'   => InvokableFactory::class,
+        'laminascachepatterncallbackcache' => Pattern\StoragePatternCacheFactory::class,
+        'laminascachepatterncapturecache'  => Pattern\PatternCacheFactory::class,
+        'laminascachepatternclasscache'    => Pattern\StoragePatternCacheFactory::class,
+        'laminascachepatternobjectcache'   => Pattern\StoragePatternCacheFactory::class,
+        'laminascachepatternoutputcache'   => Pattern\StoragePatternCacheFactory::class,
     ];
 
     /**

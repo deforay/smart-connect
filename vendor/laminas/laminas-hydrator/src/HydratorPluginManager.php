@@ -1,10 +1,6 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-hydrator for the canonical source repository
- * @copyright https://github.com/laminas/laminas-hydrator/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-hydrator/blob/master/LICENSE.md New BSD License
- */
+declare(strict_types=1);
 
 namespace Laminas\Hydrator;
 
@@ -12,67 +8,78 @@ use Laminas\ServiceManager\AbstractPluginManager;
 use Laminas\ServiceManager\Exception\InvalidServiceException;
 use Laminas\ServiceManager\Factory\InvokableFactory;
 
+use function get_class;
+use function gettype;
+use function is_object;
+use function sprintf;
+
 /**
  * Plugin manager implementation for hydrators.
  *
  * Enforces that adapters retrieved are instances of HydratorInterface
  */
-class HydratorPluginManager extends AbstractPluginManager
+class HydratorPluginManager extends AbstractPluginManager implements HydratorPluginManagerInterface
 {
     /**
      * Default aliases
      *
-     * @var array
+     * @var string[]
      */
     protected $aliases = [
-        'arrayserializable'  => ArraySerializable::class,
-        'arraySerializable'  => ArraySerializable::class,
-        'ArraySerializable'  => ArraySerializable::class,
-        'classmethods'       => ClassMethods::class,
-        'classMethods'       => ClassMethods::class,
-        'ClassMethods'       => ClassMethods::class,
-        'delegatinghydrator' => DelegatingHydrator::class,
-        'delegatingHydrator' => DelegatingHydrator::class,
-        'DelegatingHydrator' => DelegatingHydrator::class,
-        'objectproperty'     => ObjectProperty::class,
-        'objectProperty'     => ObjectProperty::class,
-        'ObjectProperty'     => ObjectProperty::class,
-        'reflection'         => Reflection::class,
-        'Reflection'         => Reflection::class,
+        ArraySerializable::class    => ArraySerializableHydrator::class,
+        ClassMethods::class         => ClassMethodsHydrator::class,
+        ObjectProperty::class       => ObjectPropertyHydrator::class,
+        Reflection::class           => ReflectionHydrator::class,
+        'arrayserializable'         => ArraySerializableHydrator::class,
+        'arraySerializable'         => ArraySerializableHydrator::class,
+        'ArraySerializable'         => ArraySerializableHydrator::class,
+        'arrayserializablehydrator' => ArraySerializableHydrator::class,
+        'arraySerializableHydrator' => ArraySerializableHydrator::class,
+        'ArraySerializableHydrator' => ArraySerializableHydrator::class,
+        'classmethods'              => ClassMethodsHydrator::class,
+        'classMethods'              => ClassMethodsHydrator::class,
+        'ClassMethods'              => ClassMethodsHydrator::class,
+        'classmethodshydrator'      => ClassMethodsHydrator::class,
+        'classMethodsHydrator'      => ClassMethodsHydrator::class,
+        'ClassMethodsHydrator'      => ClassMethodsHydrator::class,
+        'delegatinghydrator'        => DelegatingHydrator::class,
+        'delegatingHydrator'        => DelegatingHydrator::class,
+        'DelegatingHydrator'        => DelegatingHydrator::class,
+        'objectproperty'            => ObjectPropertyHydrator::class,
+        'objectProperty'            => ObjectPropertyHydrator::class,
+        'ObjectProperty'            => ObjectPropertyHydrator::class,
+        'objectpropertyhydrator'    => ObjectPropertyHydrator::class,
+        'objectPropertyHydrator'    => ObjectPropertyHydrator::class,
+        'ObjectPropertyHydrator'    => ObjectPropertyHydrator::class,
+        'reflection'                => ReflectionHydrator::class,
+        'Reflection'                => ReflectionHydrator::class,
+        'reflectionhydrator'        => ReflectionHydrator::class,
+        'reflectionHydrator'        => ReflectionHydrator::class,
+        'ReflectionHydrator'        => ReflectionHydrator::class,
 
         // Legacy Zend Framework aliases
-        \Zend\Hydrator\ArraySerializable::class => ArraySerializable::class,
-        \Zend\Hydrator\ClassMethods::class => ClassMethods::class,
-        \Zend\Hydrator\DelegatingHydrator::class => DelegatingHydrator::class,
-        \Zend\Hydrator\ObjectProperty::class => ObjectProperty::class,
-        \Zend\Hydrator\Reflection::class => Reflection::class,
-
-        // v2 normalized FQCNs
-        'zendhydratorarrayserializable' => ArraySerializable::class,
-        'zendhydratorclassmethods' => ClassMethods::class,
-        'zendhydratordelegatinghydrator' => DelegatingHydrator::class,
-        'zendhydratorobjectproperty' => ObjectProperty::class,
-        'zendhydratorreflection' => Reflection::class,
+        \Zend\Hydrator\ArraySerializableHydrator::class => ArraySerializableHydrator::class,
+        \Zend\Hydrator\ClassMethodsHydrator::class      => ClassMethodsHydrator::class,
+        \Zend\Hydrator\DelegatingHydrator::class        => DelegatingHydrator::class,
+        \Zend\Hydrator\ObjectPropertyHydrator::class    => ObjectPropertyHydrator::class,
+        \Zend\Hydrator\ReflectionHydrator::class        => ReflectionHydrator::class,
+        \Zend\Hydrator\ArraySerializable::class         => ArraySerializableHydrator::class,
+        \Zend\Hydrator\ClassMethods::class              => ClassMethodsHydrator::class,
+        \Zend\Hydrator\ObjectProperty::class            => ObjectPropertyHydrator::class,
+        \Zend\Hydrator\Reflection::class                => ReflectionHydrator::class,
     ];
 
     /**
      * Default factory-based adapters
      *
-     * @var array
+     * @var string[]|callable[]
      */
     protected $factories = [
-        ArraySerializable::class                => InvokableFactory::class,
-        ClassMethods::class                     => InvokableFactory::class,
-        DelegatingHydrator::class               => DelegatingHydratorFactory::class,
-        ObjectProperty::class                   => InvokableFactory::class,
-        Reflection::class                       => InvokableFactory::class,
-
-        // v2 normalized FQCNs
-        'laminashydratorarrayserializable'         => InvokableFactory::class,
-        'laminashydratorclassmethods'              => InvokableFactory::class,
-        'laminashydratordelegatinghydrator'        => DelegatingHydratorFactory::class,
-        'laminashydratorobjectproperty'            => InvokableFactory::class,
-        'laminashydratorreflection'                => InvokableFactory::class,
+        ArraySerializableHydrator::class => InvokableFactory::class,
+        ClassMethodsHydrator::class      => InvokableFactory::class,
+        DelegatingHydrator::class        => DelegatingHydratorFactory::class,
+        ObjectPropertyHydrator::class    => InvokableFactory::class,
+        ReflectionHydrator::class        => InvokableFactory::class,
     ];
 
     /**
@@ -91,14 +98,15 @@ class HydratorPluginManager extends AbstractPluginManager
 
     /**
      * {inheritDoc}
+     *
+     * @var null|string
      */
     protected $instanceOf = HydratorInterface::class;
 
     /**
-     * Validate the plugin is of the expected type (v3).
+     * Validate the plugin is of the expected type.
      *
-     * Checks that the filter loaded is either a valid callback or an instance
-     * of FilterInterface.
+     * Checks that the filter loaded is a valid hydrator.
      *
      * @param mixed $instance
      * @throws InvalidServiceException
@@ -111,20 +119,9 @@ class HydratorPluginManager extends AbstractPluginManager
         }
 
         throw new InvalidServiceException(sprintf(
-            'Plugin of type %s is invalid; must implement Laminas\Hydrator\HydratorInterface',
-            (is_object($instance) ? get_class($instance) : gettype($instance))
+            'Plugin of type %s is invalid; must implement %s',
+            is_object($instance) ? get_class($instance) : gettype($instance),
+            HydratorInterface::class
         ));
-    }
-
-    /**
-     * {@inheritDoc} (v2)
-     */
-    public function validatePlugin($plugin)
-    {
-        try {
-            $this->validate($plugin);
-        } catch (InvalidServiceException $e) {
-            throw new Exception\RuntimeException($e->getMessage(), $e->getCode(), $e);
-        }
     }
 }

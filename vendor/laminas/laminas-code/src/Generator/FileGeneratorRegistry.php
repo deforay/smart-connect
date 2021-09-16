@@ -10,6 +10,8 @@ namespace Laminas\Code\Generator;
 
 use Laminas\Code\Generator\Exception\RuntimeException;
 
+use function str_replace;
+
 class FileGeneratorRegistry
 {
     /**

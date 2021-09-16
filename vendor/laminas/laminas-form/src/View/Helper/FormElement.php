@@ -1,15 +1,12 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-form for the canonical source repository
- * @copyright https://github.com/laminas/laminas-form/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-form/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Form\View\Helper;
 
+use Laminas\Form\Element;
 use Laminas\Form\ElementInterface;
 use Laminas\View\Helper\AbstractHelper as BaseAbstractHelper;
+
+use function method_exists;
 
 class FormElement extends BaseAbstractHelper
 {
@@ -21,13 +18,13 @@ class FormElement extends BaseAbstractHelper
      * @var array
      */
     protected $classMap = [
-        'Laminas\Form\Element\Button'         => 'formbutton',
-        'Laminas\Form\Element\Captcha'        => 'formcaptcha',
-        'Laminas\Form\Element\Csrf'           => 'formhidden',
-        'Laminas\Form\Element\Collection'     => 'formcollection',
-        'Laminas\Form\Element\DateTimeSelect' => 'formdatetimeselect',
-        'Laminas\Form\Element\DateSelect'     => 'formdateselect',
-        'Laminas\Form\Element\MonthSelect'    => 'formmonthselect',
+        Element\Button::class         => 'formbutton',
+        Element\Captcha::class        => 'formcaptcha',
+        Element\Csrf::class           => 'formhidden',
+        Element\Collection::class     => 'formcollection',
+        Element\DateTimeSelect::class => 'formdatetimeselect',
+        Element\DateSelect::class     => 'formdateselect',
+        Element\MonthSelect::class    => 'formmonthselect',
     ];
 
     /**
@@ -99,7 +96,7 @@ class FormElement extends BaseAbstractHelper
     public function render(ElementInterface $element)
     {
         $renderer = $this->getView();
-        if (! method_exists($renderer, 'plugin')) {
+        if ($renderer === null || ! method_exists($renderer, 'plugin')) {
             // Bail early if renderer is not pluggable
             return '';
         }
@@ -123,7 +120,7 @@ class FormElement extends BaseAbstractHelper
      * Set default helper name
      *
      * @param string $name
-     * @return self
+     * @return $this
      */
     public function setDefaultHelper($name)
     {
@@ -137,7 +134,7 @@ class FormElement extends BaseAbstractHelper
      *
      * @param string $type
      * @param string $plugin
-     * @return self
+     * @return $this
      */
     public function addType($type, $plugin)
     {
@@ -151,7 +148,7 @@ class FormElement extends BaseAbstractHelper
      *
      * @param string $class
      * @param string $plugin
-     * @return self
+     * @return $this
      */
     public function addClass($class, $plugin)
     {
@@ -186,7 +183,8 @@ class FormElement extends BaseAbstractHelper
                 return $this->renderHelper($pluginName, $element);
             }
         }
-        return;
+
+        return null;
     }
 
     /**
@@ -202,6 +200,7 @@ class FormElement extends BaseAbstractHelper
         if (isset($this->typeMap[$type])) {
             return $this->renderHelper($this->typeMap[$type], $element);
         }
-        return;
+
+        return null;
     }
 }

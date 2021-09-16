@@ -10,34 +10,54 @@ namespace Laminas\Psr7Bridge;
 
 use Laminas\Diactoros\Response;
 use Laminas\Diactoros\Stream;
+use Laminas\Http\Header\GenericHeader;
+use Laminas\Http\Headers;
 use Laminas\Http\Response as LaminasResponse;
 use Psr\Http\Message\ResponseInterface;
 
 final class Psr7Response
 {
+    const URI_TEMP = 'php://temp';
+    const URI_MEMORY = 'php://memory';
+
     /**
      * Convert a PSR-7 response in a Laminas\Http\Response
      *
      * @param  ResponseInterface $psr7Response
+     *
      * @return LaminasResponse
      */
     public static function toLaminas(ResponseInterface $psr7Response)
     {
-        $response = sprintf(
-            "HTTP/%s %d %s\r\n%s\r\n%s",
-            $psr7Response->getProtocolVersion(),
-            $psr7Response->getStatusCode(),
-            $psr7Response->getReasonPhrase(),
-            self::psr7HeadersToString($psr7Response),
-            (string) $psr7Response->getBody()
-        );
-        return LaminasResponse::fromString($response);
+        $uri = $psr7Response->getBody()->getMetadata('uri');
+
+        if ($uri === static::URI_TEMP || $uri === static::URI_MEMORY) {
+            $response = sprintf(
+                "HTTP/%s %d %s\r\n%s\r\n%s",
+                $psr7Response->getProtocolVersion(),
+                $psr7Response->getStatusCode(),
+                $psr7Response->getReasonPhrase(),
+                self::psr7HeadersToString($psr7Response),
+                (string)$psr7Response->getBody()
+            );
+
+            return LaminasResponse::fromString($response);
+        }
+
+        $response = new LaminasResponse\Stream();
+        $laminasHeaders = Headers::fromString(self::psr7HeadersToString($psr7Response));
+        $response->setStatusCode($psr7Response->getStatusCode());
+        $response->setHeaders($laminasHeaders);
+        $response->setStream(fopen($uri, 'rb'));
+
+        return $response;
     }
 
     /**
      * Convert a Laminas\Http\Response in a PSR-7 response, using laminas-diactoros
      *
      * @param  LaminasResponse $laminasResponse
+     *
      * @return Response
      */
     public static function fromLaminas(LaminasResponse $laminasResponse)
@@ -56,6 +76,7 @@ final class Psr7Response
      * Convert the PSR-7 headers to string
      *
      * @param ResponseInterface $psr7Response
+     *
      * @return string
      */
     private static function psr7HeadersToString(ResponseInterface $psr7Response)
@@ -64,6 +85,7 @@ final class Psr7Response
         foreach ($psr7Response->getHeaders() as $name => $value) {
             $headers .= $name . ": " . implode(", ", $value) . "\r\n";
         }
+
         return $headers;
     }
 

@@ -1,22 +1,22 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-session for the canonical source repository
- * @copyright https://github.com/laminas/laminas-session/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-session/blob/master/LICENSE.md New BSD License
- */
 namespace Laminas\Session\Validator;
 
 use Laminas\Session\Storage\StorageInterface;
+use Laminas\Stdlib\CallbackHandler;
+
+use function array_shift;
+use function array_unshift;
+use function is_array;
 
 /**
  * Base trait for validator chain implementations
+ *
+ * @deprecated Use {@see \Laminas\Session\ValidatorChain} directly
  */
 trait ValidatorChainTrait
 {
-    /**
-     * @var StorageInterface
-     */
+    /** @var StorageInterface */
     protected $storage;
 
     /**
@@ -36,7 +36,7 @@ trait ValidatorChainTrait
      * @param  string $event
      * @param  callable $callback
      * @param  int $priority
-     * @return \Laminas\Stdlib\CallbackHandler|callable
+     * @return CallbackHandler|callable
      */
     private function attachValidator($event, $callback, $priority)
     {
@@ -56,7 +56,6 @@ trait ValidatorChainTrait
             $this->getStorage()->setMetadata('_VALID', [$name => $data]);
         }
 
-        $listener = parent::attach($event, $callback, $priority);
-        return $listener;
+        return parent::attach($event, $callback, $priority);
     }
 }

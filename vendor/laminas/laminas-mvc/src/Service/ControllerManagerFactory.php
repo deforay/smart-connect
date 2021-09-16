@@ -10,8 +10,7 @@ namespace Laminas\Mvc\Service;
 
 use Interop\Container\ContainerInterface;
 use Laminas\Mvc\Controller\ControllerManager;
-use Laminas\ServiceManager\FactoryInterface;
-use Laminas\ServiceManager\ServiceLocatorInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class ControllerManagerFactory implements FactoryInterface
 {
@@ -26,7 +25,7 @@ class ControllerManagerFactory implements FactoryInterface
      * if the controller implements a setPluginManager() method.
      *
      * @param  ContainerInterface $container
-     * @param  string $Name
+     * @param  string $name
      * @param  null|array $options
      * @return ControllerManager
      */
@@ -36,18 +35,5 @@ class ControllerManagerFactory implements FactoryInterface
             return new ControllerManager($container, $options);
         }
         return new ControllerManager($container);
-    }
-
-    /**
-     * Create and return ControllerManager instance
-     *
-     * For use with laminas-servicemanager v2; proxies to __invoke().
-     *
-     * @param ServiceLocatorInterface $container
-     * @return ControllerManager
-     */
-    public function createService(ServiceLocatorInterface $container)
-    {
-        return $this($container, ControllerManager::class);
     }
 }

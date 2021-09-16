@@ -13,8 +13,7 @@ use Laminas\ModuleManager\Listener\DefaultListenerAggregate;
 use Laminas\ModuleManager\Listener\ListenerOptions;
 use Laminas\ModuleManager\ModuleEvent;
 use Laminas\ModuleManager\ModuleManager;
-use Laminas\ServiceManager\FactoryInterface;
-use Laminas\ServiceManager\ServiceLocatorInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class ModuleManagerFactory implements FactoryInterface
 {
@@ -67,64 +66,10 @@ class ModuleManagerFactory implements FactoryInterface
             'getViewHelperConfig'
         );
         $serviceListener->addServiceManager(
-            'ValidatorManager',
-            'validators',
-            'Laminas\ModuleManager\Feature\ValidatorProviderInterface',
-            'getValidatorConfig'
-        );
-        $serviceListener->addServiceManager(
-            'FilterManager',
-            'filters',
-            'Laminas\ModuleManager\Feature\FilterProviderInterface',
-            'getFilterConfig'
-        );
-        $serviceListener->addServiceManager(
-            'FormElementManager',
-            'form_elements',
-            'Laminas\ModuleManager\Feature\FormElementProviderInterface',
-            'getFormElementConfig'
-        );
-        $serviceListener->addServiceManager(
             'RoutePluginManager',
             'route_manager',
             'Laminas\ModuleManager\Feature\RouteProviderInterface',
             'getRouteConfig'
-        );
-        $serviceListener->addServiceManager(
-            'SerializerAdapterManager',
-            'serializers',
-            'Laminas\ModuleManager\Feature\SerializerProviderInterface',
-            'getSerializerConfig'
-        );
-        $serviceListener->addServiceManager(
-            'HydratorManager',
-            'hydrators',
-            'Laminas\ModuleManager\Feature\HydratorProviderInterface',
-            'getHydratorConfig'
-        );
-        $serviceListener->addServiceManager(
-            'InputFilterManager',
-            'input_filters',
-            'Laminas\ModuleManager\Feature\InputFilterProviderInterface',
-            'getInputFilterConfig'
-        );
-        $serviceListener->addServiceManager(
-            'LogProcessorManager',
-            'log_processors',
-            'Laminas\ModuleManager\Feature\LogProcessorProviderInterface',
-            'getLogProcessorConfig'
-        );
-        $serviceListener->addServiceManager(
-            'LogWriterManager',
-            'log_writers',
-            'Laminas\ModuleManager\Feature\LogWriterProviderInterface',
-            'getLogWriterConfig'
-        );
-        $serviceListener->addServiceManager(
-            'TranslatorPluginManager',
-            'translator_plugins',
-            'Laminas\ModuleManager\Feature\TranslatorPluginProviderInterface',
-            'getTranslatorPluginConfig'
         );
 
         $events = $container->get('EventManager');
@@ -138,18 +83,5 @@ class ModuleManagerFactory implements FactoryInterface
         $moduleManager->setEvent($moduleEvent);
 
         return $moduleManager;
-    }
-
-    /**
-     * Create and return ModuleManager instance
-     *
-     * For use with laminas-servicemanager v2; proxies to __invoke().
-     *
-     * @param ServiceLocatorInterface $container
-     * @return ModuleManager
-     */
-    public function createService(ServiceLocatorInterface $container)
-    {
-        return $this($container, ModuleManager::class);
     }
 }

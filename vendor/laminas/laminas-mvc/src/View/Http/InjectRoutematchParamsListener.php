@@ -8,7 +8,6 @@
 
 namespace Laminas\Mvc\View\Http;
 
-use Laminas\Console\Request as ConsoleRequest;
 use Laminas\EventManager\AbstractListenerAggregate;
 use Laminas\EventManager\EventManagerInterface;
 use Laminas\Http\Request as HttpRequest;
@@ -42,25 +41,25 @@ class InjectRoutematchParamsListener extends AbstractListenerAggregate
         $routeMatchParams = $e->getRouteMatch()->getParams();
         $request = $e->getRequest();
 
-        /** @var $params \Laminas\Stdlib\Parameters */
-        if ($request instanceof ConsoleRequest) {
-            $params = $request->params();
-        } elseif ($request instanceof HttpRequest) {
-            $params = $request->get();
-        } else {
+        if (! $request instanceof HttpRequest) {
             // unsupported request type
             return;
         }
 
+        $params = $request->get();
+
         if ($this->overwrite) {
+            // Overwrite existing parameters, or create new ones if not present.
             foreach ($routeMatchParams as $key => $val) {
                 $params->$key = $val;
             }
-        } else {
-            foreach ($routeMatchParams as $key => $val) {
-                if (!$params->offsetExists($key)) {
-                    $params->$key = $val;
-                }
+            return;
+        }
+
+        // Only create new parameters.
+        foreach ($routeMatchParams as $key => $val) {
+            if (! $params->offsetExists($key)) {
+                $params->$key = $val;
             }
         }
     }

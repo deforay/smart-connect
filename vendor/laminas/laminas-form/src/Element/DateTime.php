@@ -1,16 +1,11 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-form for the canonical source repository
- * @copyright https://github.com/laminas/laminas-form/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-form/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Form\Element;
 
 use DateInterval;
 use DateTime as PhpDateTime;
 use DateTimeInterface;
+use Laminas\Filter\StringTrim;
 use Laminas\Form\Element;
 use Laminas\Form\Exception\InvalidArgumentException;
 use Laminas\InputFilter\InputProviderInterface;
@@ -18,6 +13,10 @@ use Laminas\Validator\Date as DateValidator;
 use Laminas\Validator\DateStep as DateStepValidator;
 use Laminas\Validator\GreaterThan as GreaterThanValidator;
 use Laminas\Validator\LessThan as LessThanValidator;
+use Traversable;
+
+use function date;
+use function sprintf;
 
 class DateTime extends Element implements InputProviderInterface
 {
@@ -48,8 +47,8 @@ class DateTime extends Element implements InputProviderInterface
      * Accepted options for DateTime:
      * - format: A \DateTime compatible string
      *
-     * @param array|\Traversable $options
-     * @return DateTime
+     * @param array|Traversable $options
+     * @return $this
      */
     public function setOptions($options)
     {
@@ -89,7 +88,7 @@ class DateTime extends Element implements InputProviderInterface
      * Set value for format
      *
      * @param  string $format
-     * @return DateTime
+     * @return $this
      */
     public function setFormat($format)
     {
@@ -184,11 +183,9 @@ class DateTime extends Element implements InputProviderInterface
     protected function getStepValidator()
     {
         $format    = $this->getFormat();
-        $stepValue = (isset($this->attributes['step']))
-                   ? $this->attributes['step'] : 1; // Minutes
+        $stepValue = isset($this->attributes['step']) ? $this->attributes['step'] : 1; // Minutes
 
-        $baseValue = (isset($this->attributes['min']))
-                   ? $this->attributes['min'] : date($format, 0);
+        $baseValue = isset($this->attributes['min']) ? $this->attributes['min'] : date($format, 0);
 
         return new DateStepValidator([
             'format'    => $format,
@@ -210,7 +207,7 @@ class DateTime extends Element implements InputProviderInterface
             'name' => $this->getName(),
             'required' => true,
             'filters' => [
-                ['name' => 'Laminas\Filter\StringTrim'],
+                ['name' => StringTrim::class],
             ],
             'validators' => $this->getValidators(),
         ];

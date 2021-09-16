@@ -40,7 +40,7 @@ class UsersController extends AbstractActionController
         if ($this->getRequest()->isPost()) {
             $params = $this->getRequest()->getPost();
             $result = $this->userService->addUser($params);
-            return $this->_redirect()->toRoute('users');
+            return $this->redirect()->toRoute('users');
         }
 
         $roles = $this->userService->fetchRoles();
@@ -55,12 +55,12 @@ class UsersController extends AbstractActionController
         if ($this->getRequest()->isPost()) {
             $params = $this->getRequest()->getPost();
             $result = $this->userService->updateUser($params);
-            return $this->_redirect()->toRoute('users');
+            return $this->redirect()->toRoute('users');
         } else {
             $userId = base64_decode($this->params()->fromRoute('id'));
             $user = $this->userService->getUser($userId);
             if ($user == false) {
-                return $this->_redirect()->toRoute('users');
+                return $this->redirect()->toRoute('users');
             } else {
                 $params = array();
                 $facilities = array();
@@ -84,12 +84,12 @@ class UsersController extends AbstractActionController
         if ($this->getRequest()->isPost()) {
             $params = $this->getRequest()->getPost();
             $result = $this->userService->mapUserOrganizations($params);
-            return $this->_redirect()->toRoute('users');
+            return $this->redirect()->toRoute('users');
         } else {
             $userId = ($this->params()->fromRoute('id'));
             $user = $this->userService->getUser($userId);
             if ($user == false) {
-                return $this->_redirect()->toRoute('users');
+                return $this->redirect()->toRoute('users');
             } else {
                 $orgs = $this->orgService->fetchOrganizations();
                 $map = $this->userService->fetchUserOrganizations($userId);

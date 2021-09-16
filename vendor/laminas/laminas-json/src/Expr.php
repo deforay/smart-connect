@@ -1,21 +1,16 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-json for the canonical source repository
- * @copyright https://github.com/laminas/laminas-json/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-json/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Json;
 
 /**
- * Class for Laminas\Json\Json encode method.
+ * Encode a string to a native JavaScript expression.
  *
- * This class simply holds a string with a native Javascript Expression,
- * so objects | arrays to be encoded with Laminas\Json\Json can contain native
- * Javascript Expressions.
+ * This class simply holds a string with a native JavaScript expression,
+ * so objects or arrays to be encoded with Laminas\Json\Json can contain native
+ * JavaScript expressions.
  *
  * Example:
+ *
  * <code>
  * $foo = array(
  *     'integer'  => 9,
@@ -25,9 +20,17 @@ namespace Laminas\Json;
  *     ),
  * );
  *
- * Laminas\Json\Json::encode($foo, false, array('enableJsonExprFinder' => true));
- * // it will returns json encoded string:
- * // {"integer":9,"string":"test string","function":function () {window.alert("javascript function encoded by Laminas\Json\Json")}}
+ * echo Laminas\Json\Json::encode($foo, false, ['enableJsonExprFinder' => true]);
+ * </code>
+ *
+ * The above returns the following JSON (formatted for readability):
+ *
+ * <code>
+ * {
+ *   "integer": 9,
+ *   "string": "test string",
+ *   "function": function () {window.alert("javascript function encoded by Laminas\Json\Json")}
+ * }
  * </code>
  */
 class Expr
@@ -40,9 +43,7 @@ class Expr
     protected $expression;
 
     /**
-     * Constructor
-     *
-     * @param  string $expression the expression to hold.
+     * @param string $expression The expression to represent.
      */
     public function __construct($expression)
     {

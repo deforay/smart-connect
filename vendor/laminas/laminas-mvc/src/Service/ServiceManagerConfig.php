@@ -16,11 +16,8 @@ use Laminas\EventManager\SharedEventManager;
 use Laminas\EventManager\SharedEventManagerInterface;
 use Laminas\ModuleManager\Listener\ServiceListener;
 use Laminas\ModuleManager\ModuleManager;
-use Laminas\ServiceManager\AbstractPluginManager;
 use Laminas\ServiceManager\Config;
-use Laminas\ServiceManager\ServiceLocatorAwareInterface;
 use Laminas\ServiceManager\ServiceManager;
-use Laminas\ServiceManager\ServiceManagerAwareInterface;
 use Laminas\Stdlib\ArrayUtils;
 
 class ServiceManagerConfig extends Config
@@ -68,8 +65,6 @@ class ServiceManagerConfig extends Config
      *
      * - factory for the service 'SharedEventManager'.
      * - initializer for EventManagerAwareInterface implementations
-     * - initializer for ServiceManagerAwareInterface implementations
-     * - initializer for ServiceLocatorAwareInterface implementations
      *
      * @param  array $config
      */
@@ -108,80 +103,7 @@ class ServiceManagerConfig extends Config
 
                 $instance->setEventManager($container->get('EventManager'));
             },
-            'ServiceManagerAwareInitializer' => function ($first, $second) {
-                if ($first instanceof ContainerInterface) {
-                    // laminas-servicemanager v3
-                    $container = $first;
-                    $instance = $second;
-                } else {
-                    // laminas-servicemanager v2
-                    $container = $second;
-                    $instance = $first;
-                }
-
-                if ($container instanceof ServiceManager && $instance instanceof ServiceManagerAwareInterface) {
-                    trigger_error(sprintf(
-                        'ServiceManagerAwareInterface is deprecated and will be removed in version 3.0, along '
-                        . 'with the ServiceManagerAwareInitializer. Please update your class %s to remove '
-                        . 'the implementation, and start injecting your dependencies via factory instead.',
-                        get_class($instance)
-                    ), E_USER_DEPRECATED);
-                    $instance->setServiceManager($container);
-                }
-            },
-            'ServiceLocatorAwareInitializer' => function ($first, $second) {
-                if ($first instanceof AbstractPluginManager) {
-                    // Edge case under laminas-servicemanager v2
-                    $container = $second;
-                    $instance = $first;
-                } elseif ($first instanceof ContainerInterface) {
-                    // laminas-servicemanager v3
-                    $container = $first;
-                    $instance = $second;
-                } else {
-                    // laminas-servicemanager v2
-                    $container = $second;
-                    $instance = $first;
-                }
-
-                // For service locator aware classes, inject the service
-                // locator, but emit a deprecation notice. Skip plugin manager
-                // implementations; they're dealt with later.
-                if ($instance instanceof ServiceLocatorAwareInterface
-                    && ! $instance instanceof AbstractPluginManager
-                ) {
-                    trigger_error(sprintf(
-                        'ServiceLocatorAwareInterface is deprecated and will be removed in version 3.0, along '
-                        . 'with the ServiceLocatorAwareInitializer. Please update your class %s to remove '
-                        . 'the implementation, and start injecting your dependencies via factory instead.',
-                        get_class($instance)
-                    ), E_USER_DEPRECATED);
-                    $instance->setServiceLocator($container);
-                }
-
-                // For service locator aware plugin managers that do not have
-                // the service locator already injected, inject it, but emit a
-                // deprecation notice.
-                if ($instance instanceof ServiceLocatorAwareInterface
-                    && $instance instanceof AbstractPluginManager
-                    && ! $instance->getServiceLocator()
-                ) {
-                    trigger_error(sprintf(
-                        'ServiceLocatorAwareInterface is deprecated and will be removed in version 3.0, along '
-                        . 'with the ServiceLocatorAwareInitializer. Please update your %s plugin manager factory '
-                        . 'to inject the parent service locator via the constructor.',
-                        get_class($instance)
-                    ), E_USER_DEPRECATED);
-                    $instance->setServiceLocator($container);
-                }
-            },
         ]);
-
-        // In laminas-servicemanager v2, incoming configuration is not merged
-        // with existing; it replaces. So we need to detect that and merge.
-        if (method_exists($this, 'getAllowOverride')) {
-            $config = ArrayUtils::merge($this->config, $config);
-        }
 
         parent::__construct($config);
     }
@@ -202,35 +124,6 @@ class ServiceManagerConfig extends Config
     {
         $this->config['services'][ServiceManager::class] = $services;
 
-        /*
-        printf("Configuration prior to configuring servicemanager:\n");
-        foreach ($this->config as $type => $list) {
-            switch ($type) {
-                case 'aliases':
-                case 'delegators':
-                case 'factories':
-                case 'invokables':
-                case 'lazy_services':
-                case 'services':
-                case 'shared':
-                    foreach (array_keys($list) as $name) {
-                        printf("    %s (%s)\n", $name, $type);
-                    }
-                    break;
-
-                case 'initializers':
-                case 'abstract_factories':
-                    foreach ($list as $callable) {
-                        printf("    %s (%s)\n", (is_object($callable) ? get_class($callable) : $callable), $type);
-                    }
-                    break;
-
-                default:
-                    break;
-            }
-        }
-         */
-
         // This is invoked as part of the bootstrapping process, and requires
         // the ability to override services.
         $services->setAllowOverride(true);
@@ -241,7 +134,7 @@ class ServiceManagerConfig extends Config
     }
 
     /**
-     * Return all service configuration (v3)
+     * Return all service configuration
      *
      * @return array
      */

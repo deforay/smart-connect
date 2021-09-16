@@ -10,6 +10,8 @@ namespace Laminas\Code\Annotation;
 
 use ArrayObject;
 
+use function get_class;
+
 class AnnotationCollection extends ArrayObject
 {
     /**

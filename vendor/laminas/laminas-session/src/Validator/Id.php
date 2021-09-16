@@ -1,12 +1,12 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-session for the canonical source repository
- * @copyright https://github.com/laminas/laminas-session/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-session/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Session\Validator;
+
+use function ini_get;
+use function preg_match;
+use function session_id;
+use function strrpos;
+use function substr;
 
 /**
  * session_id validator
@@ -46,9 +46,9 @@ class Id implements ValidatorInterface
      */
     public function isValid()
     {
-        $id = $this->id;
+        $id          = $this->id;
         $saveHandler = ini_get('session.save_handler');
-        if ($saveHandler == 'cluster') { // Zend Server SC, validate only after last dash
+        if ($saveHandler === 'cluster') { // Zend Server SC, validate only after last dash
             $dashPos = strrpos($id, '-');
             if ($dashPos) {
                 $id = substr($id, $dashPos + 1);
@@ -56,10 +56,7 @@ class Id implements ValidatorInterface
         }
 
         // Get the session id bits per character INI setting, using 5 if unavailable
-        $bitsPerCharacter = PHP_VERSION_ID >= 70100
-            ? 'session.sid_bits_per_character'
-            : 'session.hash_bits_per_character';
-        $hashBitsPerChar = ini_get($bitsPerCharacter) ?: 5;
+        $hashBitsPerChar = ini_get('session.sid_bits_per_character') ?: 5;
 
         switch ($hashBitsPerChar) {
             case 4:
@@ -95,6 +92,6 @@ class Id implements ValidatorInterface
      */
     public function getName()
     {
-        return __CLASS__;
+        return self::class;
     }
 }

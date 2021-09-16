@@ -1,16 +1,30 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-http for the canonical source repository
- * @copyright https://github.com/laminas/laminas-http/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-http/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Http;
 
-use Laminas\Http\Exception\RuntimeException;
 use Laminas\Stdlib\ErrorHandler;
 use Laminas\Stdlib\ResponseInterface;
+
+use function array_shift;
+use function count;
+use function explode;
+use function function_exists;
+use function gettype;
+use function gzinflate;
+use function gzuncompress;
+use function hexdec;
+use function implode;
+use function is_array;
+use function is_float;
+use function is_numeric;
+use function is_scalar;
+use function preg_match;
+use function sprintf;
+use function strlen;
+use function strtolower;
+use function substr;
+use function trim;
+use function unpack;
 
 /**
  * HTTP Response
@@ -20,78 +34,87 @@ use Laminas\Stdlib\ResponseInterface;
 class Response extends AbstractMessage implements ResponseInterface
 {
     /**#@+
+     *
      * @const int Status codes
      */
-    const STATUS_CODE_CUSTOM = 0;
-    const STATUS_CODE_100 = 100;
-    const STATUS_CODE_101 = 101;
-    const STATUS_CODE_102 = 102;
-    const STATUS_CODE_200 = 200;
-    const STATUS_CODE_201 = 201;
-    const STATUS_CODE_202 = 202;
-    const STATUS_CODE_203 = 203;
-    const STATUS_CODE_204 = 204;
-    const STATUS_CODE_205 = 205;
-    const STATUS_CODE_206 = 206;
-    const STATUS_CODE_207 = 207;
-    const STATUS_CODE_208 = 208;
-    const STATUS_CODE_226 = 226;
-    const STATUS_CODE_300 = 300;
-    const STATUS_CODE_301 = 301;
-    const STATUS_CODE_302 = 302;
-    const STATUS_CODE_303 = 303;
-    const STATUS_CODE_304 = 304;
-    const STATUS_CODE_305 = 305;
-    const STATUS_CODE_306 = 306;
-    const STATUS_CODE_307 = 307;
-    const STATUS_CODE_308 = 308;
-    const STATUS_CODE_400 = 400;
-    const STATUS_CODE_401 = 401;
-    const STATUS_CODE_402 = 402;
-    const STATUS_CODE_403 = 403;
-    const STATUS_CODE_404 = 404;
-    const STATUS_CODE_405 = 405;
-    const STATUS_CODE_406 = 406;
-    const STATUS_CODE_407 = 407;
-    const STATUS_CODE_408 = 408;
-    const STATUS_CODE_409 = 409;
-    const STATUS_CODE_410 = 410;
-    const STATUS_CODE_411 = 411;
-    const STATUS_CODE_412 = 412;
-    const STATUS_CODE_413 = 413;
-    const STATUS_CODE_414 = 414;
-    const STATUS_CODE_415 = 415;
-    const STATUS_CODE_416 = 416;
-    const STATUS_CODE_417 = 417;
-    const STATUS_CODE_418 = 418;
-    const STATUS_CODE_422 = 422;
-    const STATUS_CODE_423 = 423;
-    const STATUS_CODE_424 = 424;
-    const STATUS_CODE_425 = 425;
-    const STATUS_CODE_426 = 426;
-    const STATUS_CODE_428 = 428;
-    const STATUS_CODE_429 = 429;
-    const STATUS_CODE_431 = 431;
-    const STATUS_CODE_451 = 451;
-    const STATUS_CODE_444 = 444;
-    const STATUS_CODE_499 = 499;
-    const STATUS_CODE_500 = 500;
-    const STATUS_CODE_501 = 501;
-    const STATUS_CODE_502 = 502;
-    const STATUS_CODE_503 = 503;
-    const STATUS_CODE_504 = 504;
-    const STATUS_CODE_505 = 505;
-    const STATUS_CODE_506 = 506;
-    const STATUS_CODE_507 = 507;
-    const STATUS_CODE_508 = 508;
-    const STATUS_CODE_510 = 510;
-    const STATUS_CODE_511 = 511;
-    const STATUS_CODE_599 = 599;
+    public const STATUS_CODE_CUSTOM = 0;
+    public const STATUS_CODE_100    = 100;
+    public const STATUS_CODE_101    = 101;
+    public const STATUS_CODE_102    = 102;
+    public const STATUS_CODE_200    = 200;
+    public const STATUS_CODE_201    = 201;
+    public const STATUS_CODE_202    = 202;
+    public const STATUS_CODE_203    = 203;
+    public const STATUS_CODE_204    = 204;
+    public const STATUS_CODE_205    = 205;
+    public const STATUS_CODE_206    = 206;
+    public const STATUS_CODE_207    = 207;
+    public const STATUS_CODE_208    = 208;
+    public const STATUS_CODE_226    = 226;
+    public const STATUS_CODE_300    = 300;
+    public const STATUS_CODE_301    = 301;
+    public const STATUS_CODE_302    = 302;
+    public const STATUS_CODE_303    = 303;
+    public const STATUS_CODE_304    = 304;
+    public const STATUS_CODE_305    = 305;
+    public const STATUS_CODE_306    = 306;
+    public const STATUS_CODE_307    = 307;
+    public const STATUS_CODE_308    = 308;
+    public const STATUS_CODE_400    = 400;
+    public const STATUS_CODE_401    = 401;
+    public const STATUS_CODE_402    = 402;
+    public const STATUS_CODE_403    = 403;
+    public const STATUS_CODE_404    = 404;
+    public const STATUS_CODE_405    = 405;
+    public const STATUS_CODE_406    = 406;
+    public const STATUS_CODE_407    = 407;
+    public const STATUS_CODE_408    = 408;
+    public const STATUS_CODE_409    = 409;
+    public const STATUS_CODE_410    = 410;
+    public const STATUS_CODE_411    = 411;
+    public const STATUS_CODE_412    = 412;
+    public const STATUS_CODE_413    = 413;
+    public const STATUS_CODE_414    = 414;
+    public const STATUS_CODE_415    = 415;
+    public const STATUS_CODE_416    = 416;
+    public const STATUS_CODE_417    = 417;
+    public const STATUS_CODE_418    = 418;
+    public const STATUS_CODE_422    = 422;
+    public const STATUS_CODE_423    = 423;
+    public const STATUS_CODE_424    = 424;
+    public const STATUS_CODE_425    = 425;
+    public const STATUS_CODE_426    = 426;
+    public const STATUS_CODE_428    = 428;
+    public const STATUS_CODE_429    = 429;
+    public const STATUS_CODE_431    = 431;
+    public const STATUS_CODE_451    = 451;
+    public const STATUS_CODE_444    = 444;
+    public const STATUS_CODE_499    = 499;
+    public const STATUS_CODE_500    = 500;
+    public const STATUS_CODE_501    = 501;
+    public const STATUS_CODE_502    = 502;
+    public const STATUS_CODE_503    = 503;
+    public const STATUS_CODE_504    = 504;
+    public const STATUS_CODE_505    = 505;
+    public const STATUS_CODE_506    = 506;
+    public const STATUS_CODE_507    = 507;
+    public const STATUS_CODE_508    = 508;
+    public const STATUS_CODE_510    = 510;
+    public const STATUS_CODE_511    = 511;
+    public const STATUS_CODE_599    = 599;
     /**#@-*/
 
     /**
-     * @var array Recommended Reason Phrases
+     * @internal
      */
+    public const MIN_STATUS_CODE_VALUE = 100;
+
+    /**
+     * @internal
+     */
+    public const MAX_STATUS_CODE_VALUE = 599;
+
+    /** @var array Recommended Reason Phrases */
     protected $recommendedReasonPhrases = [
         // INFORMATIONAL CODES
         100 => 'Continue',
@@ -164,21 +187,17 @@ class Response extends AbstractMessage implements ResponseInterface
         599 => 'Network Connect Timeout Error',
     ];
 
-    /**
-     * @var int Status code
-     */
+    /** @var int Status code */
     protected $statusCode = 200;
 
-    /**
-     * @var string|null Null means it will be looked up from the $reasonPhrase list above
-     */
+    /** @var string|null Null means it will be looked up from the $reasonPhrase list above */
     protected $reasonPhrase;
 
     /**
      * Populate object from string
      *
      * @param  string $string
-     * @return self
+     * @return static
      * @throws Exception\InvalidArgumentException
      */
     public static function fromString($string)
@@ -207,7 +226,7 @@ class Response extends AbstractMessage implements ResponseInterface
         }
 
         $isHeader = true;
-        $headers = $content = [];
+        $headers  = $content = [];
 
         foreach ($lines as $line) {
             if ($isHeader && $line === '') {
@@ -223,7 +242,8 @@ class Response extends AbstractMessage implements ResponseInterface
                 continue;
             }
 
-            if (empty($content)
+            if (
+                empty($content)
                 && preg_match('/^[a-z0-9!#$%&\'*+.^_`|~-]+:$/i', $line)
             ) {
                 throw new Exception\RuntimeException('CRLF injection detected');
@@ -246,11 +266,11 @@ class Response extends AbstractMessage implements ResponseInterface
     /**
      * @param string $line
      * @throws Exception\InvalidArgumentException
-     * @throws Exception\RuntimeException
+     * @throws RuntimeException
      */
     protected function parseStatusLine($line)
     {
-        $regex   = '/^HTTP\/(?P<version>1\.[01]) (?P<status>\d{3})(?:[ ]+(?P<reason>.*))?$/';
+        $regex   = '/^HTTP\/(?P<version>1\.[01]|2) (?P<status>\d{3})(?:[ ]+(?P<reason>.*))?$/';
         $matches = [];
         if (! preg_match($regex, $line, $matches)) {
             throw new Exception\InvalidArgumentException(
@@ -260,7 +280,7 @@ class Response extends AbstractMessage implements ResponseInterface
 
         $this->version = $matches['version'];
         $this->setStatusCode($matches['status']);
-        $this->setReasonPhrase((isset($matches['reason']) ? $matches['reason'] : ''));
+        $this->setReasonPhrase($matches['reason'] ?? '');
     }
 
     /**
@@ -276,16 +296,21 @@ class Response extends AbstractMessage implements ResponseInterface
      *
      * @param  int $code
      * @throws Exception\InvalidArgumentException
-     * @return self
+     * @return $this
      */
     public function setStatusCode($code)
     {
-        $const = get_class($this) . '::STATUS_CODE_' . $code;
-        if (! is_numeric($code) || ! defined($const)) {
-            $code = is_scalar($code) ? $code : gettype($code);
+        if (
+            ! is_numeric($code)
+            || is_float($code)
+            || $code < static::MIN_STATUS_CODE_VALUE
+            || $code > static::MAX_STATUS_CODE_VALUE
+        ) {
             throw new Exception\InvalidArgumentException(sprintf(
-                'Invalid status code provided: "%s"',
-                $code
+                'Invalid status code "%s"; must be an integer between %d and %d, inclusive',
+                is_scalar($code) ? $code : gettype($code),
+                static::MIN_STATUS_CODE_VALUE,
+                static::MAX_STATUS_CODE_VALUE
             ));
         }
 
@@ -307,7 +332,7 @@ class Response extends AbstractMessage implements ResponseInterface
      *
      * @param  int $code
      * @throws Exception\InvalidArgumentException
-     * @return self
+     * @return $this
      */
     public function setCustomStatusCode($code)
     {
@@ -326,18 +351,18 @@ class Response extends AbstractMessage implements ResponseInterface
      * Assign status code
      *
      * @param int $code
-     * @return self
+     * @return $this
      */
     protected function saveStatusCode($code)
     {
         $this->reasonPhrase = null;
-        $this->statusCode = (int) $code;
+        $this->statusCode   = (int) $code;
         return $this;
     }
 
     /**
      * @param string $reasonPhrase
-     * @return self
+     * @return $this
      */
     public function setReasonPhrase($reasonPhrase)
     {
@@ -352,7 +377,7 @@ class Response extends AbstractMessage implements ResponseInterface
      */
     public function getReasonPhrase()
     {
-        if (null == $this->reasonPhrase && isset($this->recommendedReasonPhrases[$this->statusCode])) {
+        if (empty($this->reasonPhrase) && isset($this->recommendedReasonPhrases[$this->statusCode])) {
             $this->reasonPhrase = $this->recommendedReasonPhrases[$this->statusCode];
         }
         return $this->reasonPhrase;
@@ -397,7 +422,7 @@ class Response extends AbstractMessage implements ResponseInterface
     public function isClientError()
     {
         $code = $this->getStatusCode();
-        return ($code < 500 && $code >= 400);
+        return $code < 500 && $code >= 400;
     }
 
     /**
@@ -407,7 +432,7 @@ class Response extends AbstractMessage implements ResponseInterface
      */
     public function isForbidden()
     {
-        return (403 === $this->getStatusCode());
+        return 403 === $this->getStatusCode();
     }
 
     /**
@@ -418,7 +443,7 @@ class Response extends AbstractMessage implements ResponseInterface
     public function isInformational()
     {
         $code = $this->getStatusCode();
-        return ($code >= 100 && $code < 200);
+        return $code >= 100 && $code < 200;
     }
 
     /**
@@ -428,7 +453,7 @@ class Response extends AbstractMessage implements ResponseInterface
      */
     public function isNotFound()
     {
-        return (404 === $this->getStatusCode());
+        return 404 === $this->getStatusCode();
     }
 
     /**
@@ -438,7 +463,7 @@ class Response extends AbstractMessage implements ResponseInterface
      */
     public function isGone()
     {
-        return (410 === $this->getStatusCode());
+        return 410 === $this->getStatusCode();
     }
 
     /**
@@ -448,7 +473,7 @@ class Response extends AbstractMessage implements ResponseInterface
      */
     public function isOk()
     {
-        return (200 === $this->getStatusCode());
+        return 200 === $this->getStatusCode();
     }
 
     /**
@@ -459,7 +484,7 @@ class Response extends AbstractMessage implements ResponseInterface
     public function isServerError()
     {
         $code = $this->getStatusCode();
-        return (500 <= $code && 600 > $code);
+        return 500 <= $code && 600 > $code;
     }
 
     /**
@@ -470,7 +495,7 @@ class Response extends AbstractMessage implements ResponseInterface
     public function isRedirect()
     {
         $code = $this->getStatusCode();
-        return (300 <= $code && 400 > $code);
+        return 300 <= $code && 400 > $code;
     }
 
     /**
@@ -481,7 +506,7 @@ class Response extends AbstractMessage implements ResponseInterface
     public function isSuccess()
     {
         $code = $this->getStatusCode();
-        return (200 <= $code && 300 > $code);
+        return 200 <= $code && 300 > $code;
     }
 
     /**
@@ -519,7 +544,7 @@ class Response extends AbstractMessage implements ResponseInterface
      *
      * @param  string $body
      * @return string
-     * @throws Exception\RuntimeException
+     * @throws RuntimeException
      */
     protected function decodeChunkedBody($body)
     {
@@ -542,7 +567,7 @@ class Response extends AbstractMessage implements ResponseInterface
             $length   = hexdec(trim($m[1]));
             $cut      = strlen($m[0]);
             $decBody .= substr($body, $offset + $cut, $length);
-            $offset += $cut + $length + 2;
+            $offset  += $cut + $length + 2;
         }
 
         return $decBody;
@@ -555,7 +580,7 @@ class Response extends AbstractMessage implements ResponseInterface
      *
      * @param  string $body
      * @return string
-     * @throws Exception\RuntimeException
+     * @throws RuntimeException
      */
     protected function decodeGzip($body)
     {
@@ -565,9 +590,17 @@ class Response extends AbstractMessage implements ResponseInterface
             );
         }
 
+        if (
+            $body === ''
+            || ($this->getHeaders()->has('content-length')
+                && (int) $this->getHeaders()->get('content-length')->getFieldValue() === 0)
+        ) {
+            return '';
+        }
+
         ErrorHandler::start();
         $return = gzinflate(substr($body, 10));
-        $test = ErrorHandler::stop();
+        $test   = ErrorHandler::stop();
         if ($test) {
             throw new Exception\RuntimeException(
                 'Error occurred during gzip inflation',
@@ -585,7 +618,7 @@ class Response extends AbstractMessage implements ResponseInterface
      *
      * @param  string $body
      * @return string
-     * @throws Exception\RuntimeException
+     * @throws RuntimeException
      */
     protected function decodeDeflate($body)
     {
@@ -593,6 +626,13 @@ class Response extends AbstractMessage implements ResponseInterface
             throw new Exception\RuntimeException(
                 'zlib extension is required in order to decode "deflate" encoding'
             );
+        }
+
+        if (
+            $this->getHeaders()->has('content-length')
+            && 0 === (int) $this->getHeaders()->get('content-length')->getFieldValue()
+        ) {
+            return '';
         }
 
         /**

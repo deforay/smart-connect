@@ -1,16 +1,12 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-form for the canonical source repository
- * @copyright https://github.com/laminas/laminas-form/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-form/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Form\View;
 
 use Laminas\Form\ConfigProvider;
 use Laminas\ServiceManager\ConfigInterface;
 use Laminas\ServiceManager\ServiceManager;
+
+use function method_exists;
 
 /**
  * Service manager configuration for form view helpers

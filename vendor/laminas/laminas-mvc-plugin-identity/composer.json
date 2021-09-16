@@ -1,0 +1,62 @@
+{
+    "name": "laminas/laminas-mvc-plugin-identity",
+    "description": "Plugin for retrieving the current authenticated identity within laminas-mvc controllers",
+    "license": "BSD-3-Clause",
+    "keywords": [
+        "laminas",
+        "mvc"
+    ],
+    "homepage": "https://laminas.dev",
+    "support": {
+        "docs": "https://docs.laminas.dev/laminas-mvc-plugin-identity/",
+        "issues": "https://github.com/laminas/laminas-mvc-plugin-identity/issues",
+        "source": "https://github.com/laminas/laminas-mvc-plugin-identity",
+        "rss": "https://github.com/laminas/laminas-mvc-plugin-identity/releases.atom",
+        "chat": "https://laminas.dev/chat",
+        "forum": "https://discourse.laminas.dev"
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "laminas": {
+            "component": "Laminas\\Mvc\\Plugin\\Identity"
+        }
+    },
+    "require": {
+        "php": "^7.3 || ~8.0.0 || ~8.1.0",
+        "container-interop/container-interop": "^1.1",
+        "laminas/laminas-authentication": "^2.5.3",
+        "laminas/laminas-mvc": "^3.0",
+        "laminas/laminas-servicemanager": "^2.7.5 || ^3.0.3"
+    },
+    "require-dev": {
+        "laminas/laminas-coding-standard": "~1.0.0",
+        "phpspec/prophecy-phpunit": "^2.0",
+        "phpunit/phpunit": "^9.5"
+    },
+    "conflict": {
+        "laminas/laminas-mvc": "<3.0.0",
+        "zendframework/zend-mvc-plugin-identity": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Laminas\\Mvc\\Plugin\\Identity\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "LaminasTest\\Mvc\\Plugin\\Identity\\": "test/"
+        }
+    },
+    "scripts": {
+        "check": [
+            "@cs-check",
+            "@test"
+        ],
+        "cs-check": "phpcs",
+        "cs-fix": "phpcbf",
+        "test": "phpunit --colors=always",
+        "test-coverage": "phpunit --colors=always --coverage-clover clover.xml"
+    }
+}

@@ -9,8 +9,7 @@
 namespace Laminas\Mvc\Service;
 
 use Interop\Container\ContainerInterface;
-use Laminas\ServiceManager\FactoryInterface;
-use Laminas\ServiceManager\ServiceLocatorInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 use Laminas\View\Strategy\PhpRendererStrategy;
 use Laminas\View\View;
 
@@ -31,18 +30,5 @@ class ViewFactory implements FactoryInterface
         $container->get(PhpRendererStrategy::class)->attach($events);
 
         return $view;
-    }
-
-    /**
-     * Create and return View instance
-     *
-     * For use with laminas-servicemanager v2; proxies to __invoke().
-     *
-     * @param ServiceLocatorInterface $container
-     * @return View
-     */
-    public function createService(ServiceLocatorInterface $container)
-    {
-        return $this($container, View::class);
     }
 }

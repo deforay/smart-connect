@@ -1,11 +1,5 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-form for the canonical source repository
- * @copyright https://github.com/laminas/laminas-form/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-form/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Form;
 
 use Interop\Container\ContainerInterface;
@@ -13,6 +7,18 @@ use Laminas\ServiceManager\Exception\InvalidServiceException;
 use Laminas\ServiceManager\FactoryInterface;
 use Laminas\ServiceManager\ServiceLocatorInterface;
 use Traversable;
+
+use function array_pop;
+use function class_exists;
+use function explode;
+use function get_class;
+use function gettype;
+use function is_array;
+use function is_object;
+use function is_string;
+use function iterator_to_array;
+use function sprintf;
+use function strtolower;
 
 /**
  * Factory for instantiating form elements
@@ -35,6 +41,16 @@ final class ElementFactory implements FactoryInterface
     {
         if (null === $creationOptions) {
             return;
+        }
+
+        if ($creationOptions instanceof Traversable) {
+            $creationOptions = iterator_to_array($creationOptions);
+        } elseif (! is_array($creationOptions)) {
+            throw new InvalidServiceException(sprintf(
+                '%s cannot use non-array, non-traversable, non-null creation options; received %s',
+                __CLASS__,
+                is_object($creationOptions) ? get_class($creationOptions) : gettype($creationOptions)
+            ));
         }
 
         $this->setCreationOptions($creationOptions);
@@ -117,18 +133,6 @@ final class ElementFactory implements FactoryInterface
      */
     public function setCreationOptions(array $creationOptions)
     {
-        if ($creationOptions instanceof Traversable) {
-            $creationOptions = iterator_to_array($creationOptions);
-        }
-
-        if (! is_array($creationOptions)) {
-            throw new InvalidServiceException(sprintf(
-                '%s cannot use non-array, non-traversable creation options; received %s',
-                __CLASS__,
-                (is_object($creationOptions) ? get_class($creationOptions) : gettype($creationOptions))
-            ));
-        }
-
         $this->creationOptions = $creationOptions;
     }
 }

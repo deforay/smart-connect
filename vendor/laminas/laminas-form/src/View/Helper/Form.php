@@ -1,16 +1,15 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-form for the canonical source repository
- * @copyright https://github.com/laminas/laminas-form/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-form/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Form\View\Helper;
 
 use Laminas\Form\FieldsetInterface;
 use Laminas\Form\FormInterface;
 use Laminas\View\Helper\Doctype;
+
+use function array_key_exists;
+use function array_merge;
+use function method_exists;
+use function sprintf;
 
 /**
  * View helper for rendering Form objects

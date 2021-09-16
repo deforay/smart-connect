@@ -1,31 +1,37 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-validator for the canonical source repository
- * @copyright https://github.com/laminas/laminas-validator/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-validator/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Validator\File;
 
 use Laminas\Validator\AbstractValidator;
 use Laminas\Validator\Exception;
+use Traversable;
+
+use function array_key_exists;
+use function array_unique;
+use function explode;
+use function file_exists;
+use function implode;
+use function is_array;
+use function is_string;
+use function trim;
+
+use const DIRECTORY_SEPARATOR;
 
 /**
  * Validator which checks if the file already exists in the directory
  */
 class Exists extends AbstractValidator
 {
+    use FileInformationTrait;
+
     /**
      * @const string Error constants
      */
-    const DOES_NOT_EXIST = 'fileExistsDoesNotExist';
+    public const DOES_NOT_EXIST = 'fileExistsDoesNotExist';
 
-    /**
-     * @var array Error message templates
-     */
+    /** @var array Error message templates */
     protected $messageTemplates = [
-        self::DOES_NOT_EXIST => "File does not exist",
+        self::DOES_NOT_EXIST => 'File does not exist',
     ];
 
     /**
@@ -34,12 +40,10 @@ class Exists extends AbstractValidator
      * @var array
      */
     protected $options = [
-        'directory' => null,  // internal list of directories
+        'directory' => null, // internal list of directories
     ];
 
-    /**
-     * @var array Error message template variables
-     */
+    /** @var array Error message template variables */
     protected $messageVariables = [
         'directory' => ['options' => 'directory'],
     ];
@@ -47,7 +51,7 @@ class Exists extends AbstractValidator
     /**
      * Sets validator options
      *
-     * @param  string|array|\Traversable $options
+     * @param string|array|Traversable $options
      */
     public function __construct($options = null)
     {
@@ -82,8 +86,8 @@ class Exists extends AbstractValidator
     /**
      * Sets the file directory which will be checked
      *
-     * @param  string|array $directory The directories to validate
-     * @return Extension Provides a fluent interface
+     * @param string|array $directory The directories to validate
+     * @return self Provides a fluent interface
      */
     public function setDirectory($directory)
     {
@@ -95,8 +99,8 @@ class Exists extends AbstractValidator
     /**
      * Adds the file directory which will be checked
      *
-     * @param  string|array $directory The directory to add for validation
-     * @return Extension Provides a fluent interface
+     * @param string|array $directory The directory to add for validation
+     * @return self Provides a fluent interface
      * @throws Exception\InvalidArgumentException
      */
     public function addDirectory($directory)
@@ -128,7 +132,7 @@ class Exists extends AbstractValidator
             }
         }
 
-        $this->options['directory'] = (! empty($directory))
+        $this->options['directory'] = ! empty($directory)
             ? implode(',', $directories) : null;
 
         return $this;
@@ -143,31 +147,15 @@ class Exists extends AbstractValidator
      */
     public function isValid($value, $file = null)
     {
-        if (is_string($value) && is_array($file)) {
-            // Legacy Laminas\Transfer API support
-            $filename = $file['name'];
-            $file     = $file['tmp_name'];
-            $this->setValue($filename);
-        } elseif (is_array($value)) {
-            if (! isset($value['tmp_name']) || ! isset($value['name'])) {
-                throw new Exception\InvalidArgumentException(
-                    'Value array must be in $_FILES format'
-                );
-            }
-            $file     = $value['tmp_name'];
-            $filename = basename($file);
-            $this->setValue($value['name']);
-        } else {
-            $file     = $value;
-            $filename = basename($file);
-            $this->setValue($filename);
-        }
+        $fileInfo = $this->getFileInfo($value, $file, false, true);
 
-        $check = false;
+        $this->setValue($fileInfo['filename']);
+
+        $check       = false;
         $directories = $this->getDirectory(true);
         if (! isset($directories)) {
             $check = true;
-            if (! file_exists($file)) {
+            if (! file_exists($fileInfo['file'])) {
                 $this->error(self::DOES_NOT_EXIST);
                 return false;
             }
@@ -178,7 +166,7 @@ class Exists extends AbstractValidator
                 }
 
                 $check = true;
-                if (! file_exists($directory . DIRECTORY_SEPARATOR . $filename)) {
+                if (! file_exists($directory . DIRECTORY_SEPARATOR . $fileInfo['basename'])) {
                     $this->error(self::DOES_NOT_EXIST);
                     return false;
                 }

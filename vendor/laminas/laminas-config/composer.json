@@ -18,30 +18,28 @@
     "config": {
         "sort-packages": true
     },
-    "extra": {
-        "branch-alias": {
-            "dev-master": "2.6-dev",
-            "dev-develop": "2.7-dev"
-        }
-    },
     "require": {
-        "php": "^5.5 || ^7.0",
-        "laminas/laminas-stdlib": "^2.7 || ^3.0",
-        "laminas/laminas-zendframework-bridge": "^1.0"
+        "php": "^7.3 || ~8.0.0",
+        "ext-json": "*",
+        "laminas/laminas-stdlib": "^2.7.7 || ^3.1",
+        "psr/container": "^1.0"
     },
     "require-dev": {
-        "fabpot/php-cs-fixer": "1.7.*",
-        "laminas/laminas-filter": "^2.6",
-        "laminas/laminas-i18n": "^2.5",
-        "laminas/laminas-json": "^2.6.1",
-        "laminas/laminas-servicemanager": "^2.7.5 || ^3.0.3",
-        "phpunit/phpunit": "~4.0"
+        "laminas/laminas-coding-standard": "~1.0.0",
+        "laminas/laminas-filter": "^2.7.2",
+        "laminas/laminas-i18n": "^2.10.3",
+        "laminas/laminas-servicemanager": "^3.4.1",
+        "malukenho/docheader": "^0.1.6",
+        "phpunit/phpunit": "^8.5.8"
+    },
+    "conflict": {
+        "container-interop/container-interop": "<1.2.0",
+        "zendframework/zend-config": "*"
     },
     "suggest": {
-        "laminas/laminas-filter": "Laminas\\Filter component",
-        "laminas/laminas-i18n": "Laminas\\I18n component",
-        "laminas/laminas-json": "Laminas\\Json to use the Json reader or writer classes",
-        "laminas/laminas-servicemanager": "Laminas\\ServiceManager for use with the Config Factory to retrieve reader and writer instances"
+        "laminas/laminas-filter": "^2.7.2; install if you want to use the Filter processor",
+        "laminas/laminas-i18n": "^2.7.4; install if you want to use the Translator processor",
+        "laminas/laminas-servicemanager": "^2.7.8 || ^3.3; if you need an extensible plugin manager for use with the Config Factory"
     },
     "autoload": {
         "psr-4": {
@@ -53,7 +51,16 @@
             "LaminasTest\\Config\\": "test/"
         }
     },
-    "replace": {
-        "zendframework/zend-config": "self.version"
+    "scripts": {
+        "check": [
+            "@license-check",
+            "@cs-check",
+            "@test"
+        ],
+        "cs-check": "phpcs",
+        "cs-fix": "phpcbf",
+        "test": "phpunit --colors=always",
+        "test-coverage": "phpunit --colors=always --coverage-clover clover.xml",
+        "license-check": "docheader check src/"
     }
 }

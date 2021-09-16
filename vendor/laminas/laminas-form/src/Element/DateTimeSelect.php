@@ -1,21 +1,17 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-form for the canonical source repository
- * @copyright https://github.com/laminas/laminas-form/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-form/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Form\Element;
 
 use DateTime as PhpDateTime;
 use Exception;
 use Laminas\Form\Exception\InvalidArgumentException;
 use Laminas\Form\FormInterface;
-use Laminas\Stdlib\ArrayUtils;
 use Laminas\Validator\Date as DateValidator;
 use Laminas\Validator\ValidatorInterface;
 use Traversable;
+
+use function is_string;
+use function sprintf;
 
 class DateTimeSelect extends DateSelect
 {
@@ -73,30 +69,26 @@ class DateTimeSelect extends DateSelect
      * - should_show_seconds: if set to true, the seconds select is shown
      *
      * @param array|Traversable $options
-     * @return self
+     * @return $this
      */
     public function setOptions($options)
     {
         parent::setOptions($options);
 
-        if ($options instanceof Traversable) {
-            $options = ArrayUtils::iteratorToArray($options);
+        if (isset($this->options['hour_attributes'])) {
+            $this->setHourAttributes($this->options['hour_attributes']);
         }
 
-        if (isset($options['hour_attributes'])) {
-            $this->setHourAttributes($options['hour_attributes']);
+        if (isset($this->options['minute_attributes'])) {
+            $this->setMinuteAttributes($this->options['minute_attributes']);
         }
 
-        if (isset($options['minute_attributes'])) {
-            $this->setMinuteAttributes($options['minute_attributes']);
+        if (isset($this->options['second_attributes'])) {
+            $this->setSecondAttributes($this->options['second_attributes']);
         }
 
-        if (isset($options['second_attributes'])) {
-            $this->setSecondAttributes($options['second_attributes']);
-        }
-
-        if (isset($options['should_show_seconds'])) {
-            $this->setShouldShowSeconds($options['should_show_seconds']);
+        if (isset($this->options['should_show_seconds'])) {
+            $this->setShouldShowSeconds($this->options['should_show_seconds']);
         }
 
         return $this;
@@ -130,7 +122,7 @@ class DateTimeSelect extends DateSelect
      * Set the hour attributes
      *
      * @param  array $hourAttributes
-     * @return self
+     * @return $this
      */
     public function setHourAttributes(array $hourAttributes)
     {
@@ -152,7 +144,7 @@ class DateTimeSelect extends DateSelect
      * Set the minute attributes
      *
      * @param  array $minuteAttributes
-     * @return self
+     * @return $this
      */
     public function setMinuteAttributes(array $minuteAttributes)
     {
@@ -174,7 +166,7 @@ class DateTimeSelect extends DateSelect
      * Set the second attributes
      *
      * @param  array $secondAttributes
-     * @return self
+     * @return $this
      */
     public function setSecondAttributes(array $secondAttributes)
     {
@@ -197,7 +189,7 @@ class DateTimeSelect extends DateSelect
      * assumed to always be 00
      *
      * @param  bool $shouldShowSeconds
-     * @return self
+     * @return $this
      */
     public function setShouldShowSeconds($shouldShowSeconds)
     {
@@ -215,7 +207,7 @@ class DateTimeSelect extends DateSelect
 
     /**
      * @param mixed $value
-     * @return self
+     * @return $this
      * @throws InvalidArgumentException
      */
     public function setValue($value)
@@ -239,7 +231,7 @@ class DateTimeSelect extends DateSelect
                 'day'    => $value->format('d'),
                 'hour'   => $value->format('H'),
                 'minute' => $value->format('i'),
-                'second' => $value->format('s')
+                'second' => $value->format('s'),
             ];
         }
 
@@ -315,7 +307,7 @@ class DateTimeSelect extends DateSelect
             'name' => $this->getName(),
             'required' => false,
             'filters' => [
-                ['name' => 'DateTimeSelect']
+                ['name' => 'DateTimeSelect'],
             ],
             'validators' => [
                 $this->getValidator(),

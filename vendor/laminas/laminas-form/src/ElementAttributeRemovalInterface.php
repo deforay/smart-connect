@@ -1,11 +1,5 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-form for the canonical source repository
- * @copyright https://github.com/laminas/laminas-form/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-form/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Form;
 
 interface ElementAttributeRemovalInterface
@@ -14,7 +8,7 @@ interface ElementAttributeRemovalInterface
      * Remove a single element attribute
      *
      * @param  string $key
-     * @return ElementAttributeRemovalInterface
+     * @return $this
      */
     public function removeAttribute($key);
 
@@ -22,14 +16,14 @@ interface ElementAttributeRemovalInterface
      * Remove many attributes at once
      *
      * @param array $keys
-     * @return ElementAttributeRemovalInterface
+     * @return $this
      */
     public function removeAttributes(array $keys);
 
     /**
      * Remove all attributes at once
      *
-     * @return ElementAttributeRemovalInterface
+     * @return $this
      */
     public function clearAttributes();
 }

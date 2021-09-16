@@ -13,17 +13,25 @@ use Laminas\Code\Generator\DocBlock\Tag\TagInterface;
 use Laminas\Code\Generator\DocBlock\TagManager;
 use Laminas\Code\Reflection\DocBlockReflection;
 
+use function explode;
+use function is_array;
+use function sprintf;
+use function str_replace;
+use function strtolower;
+use function trim;
+use function wordwrap;
+
 class DocBlockGenerator extends AbstractGenerator
 {
     /**
      * @var string
      */
-    protected $shortDescription = null;
+    protected $shortDescription;
 
     /**
      * @var string
      */
-    protected $longDescription = null;
+    protected $longDescription;
 
     /**
      * @var array
@@ -40,6 +48,9 @@ class DocBlockGenerator extends AbstractGenerator
      */
     protected $wordwrap = true;
 
+    /**
+     * @var TagManager
+     */
     protected static $tagManager;
 
     /**
@@ -98,9 +109,12 @@ class DocBlockGenerator extends AbstractGenerator
         return $docBlock;
     }
 
+    /**
+     * @return TagManager
+     */
     protected static function getTagManager()
     {
-        if (!isset(static::$tagManager)) {
+        if (! isset(static::$tagManager)) {
             static::$tagManager = new TagManager();
             static::$tagManager->initializeDefaultTags();
         }
@@ -182,11 +196,11 @@ class DocBlockGenerator extends AbstractGenerator
     public function setTag($tag)
     {
         if (is_array($tag)) {
-            // use deprecated Tag class for backward compatiblity to old array-keys
+            // use deprecated Tag class for backward compatibility to old array-keys
             $genericTag = new Tag();
             $genericTag->setOptions($tag);
             $tag = $genericTag;
-        } elseif (!$tag instanceof TagInterface) {
+        } elseif (! $tag instanceof TagInterface) {
             throw new Exception\InvalidArgumentException(sprintf(
                 '%s expects either an array of method options or an instance of %s\DocBlock\Tag\TagInterface',
                 __METHOD__,
@@ -229,7 +243,7 @@ class DocBlockGenerator extends AbstractGenerator
      */
     public function generate()
     {
-        if (!$this->isSourceDirty()) {
+        if (! $this->isSourceDirty()) {
             return $this->docCommentize(trim($this->getSourceContent()));
         }
 
@@ -262,7 +276,7 @@ class DocBlockGenerator extends AbstractGenerator
         foreach ($lines as $line) {
             $output .= $indent . ' *';
             if ($line) {
-                $output .= " $line";
+                $output .= ' ' . $line;
             }
             $output .= self::LINE_FEED;
         }

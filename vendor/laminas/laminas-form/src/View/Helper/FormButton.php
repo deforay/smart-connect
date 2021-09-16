@@ -1,16 +1,17 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-form for the canonical source repository
- * @copyright https://github.com/laminas/laminas-form/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-form/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Form\View\Helper;
 
 use Laminas\Form\ElementInterface;
 use Laminas\Form\Exception;
 use Laminas\Form\LabelAwareInterface;
+
+use function get_class;
+use function gettype;
+use function is_array;
+use function is_object;
+use function sprintf;
+use function strtolower;
 
 class FormButton extends FormInput
 {
@@ -80,8 +81,8 @@ class FormButton extends FormInput
             if (null === $buttonContent) {
                 throw new Exception\DomainException(
                     sprintf(
-                        '%s expects either button content as the second argument, ' .
-                        'or that the element provided has a label value; neither found',
+                        '%s expects either button content as the second argument, '
+                        . 'or that the element provided has a label value; neither found',
                         __METHOD__
                     )
                 );
@@ -94,7 +95,6 @@ class FormButton extends FormInput
                 $this->getTranslatorTextDomain()
             );
         }
-
 
         if (! $element instanceof LabelAwareInterface || ! $element->getLabelOption('disable_html_escape')) {
             $escapeHtmlHelper = $this->getEscapeHtmlHelper();
@@ -127,7 +127,7 @@ class FormButton extends FormInput
             throw new Exception\InvalidArgumentException(sprintf(
                 '%s expects an array or Laminas\Form\ElementInterface instance; received "%s"',
                 __METHOD__,
-                (is_object($attributesOrElement) ? get_class($attributesOrElement) : gettype($attributesOrElement))
+                is_object($attributesOrElement) ? get_class($attributesOrElement) : gettype($attributesOrElement)
             ));
         }
 

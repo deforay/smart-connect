@@ -22,7 +22,7 @@ class ClinicsController extends AbstractActionController
 
     public function indexAction(){
         $this->layout()->setVariable('activeTab', 'eid-clinics');
-        return $this->_redirect()->toUrl('/clinics/dashboard');
+        return $this->redirect()->toUrl('/clinics/dashboard');
     }
 
     public function dashboardAction(){

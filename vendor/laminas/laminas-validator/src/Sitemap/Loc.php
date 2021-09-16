@@ -1,31 +1,25 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-validator for the canonical source repository
- * @copyright https://github.com/laminas/laminas-validator/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-validator/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Validator\Sitemap;
 
 use Laminas\Uri;
 use Laminas\Validator\AbstractValidator;
 
+use function is_string;
+
 /**
  * Validates whether a given value is valid as a sitemap <loc> value
  *
  * @link       http://www.sitemaps.org/protocol.php Sitemaps XML format
- *
  * @see        Laminas\Uri\Uri
  */
 class Loc extends AbstractValidator
 {
     /**
      * Validation key for not valid
-     *
      */
-    const NOT_VALID = 'sitemapLocNotValid';
-    const INVALID   = 'sitemapLocInvalid';
+    public const NOT_VALID = 'sitemapLocNotValid';
+    public const INVALID   = 'sitemapLocInvalid';
 
     /**
      * Validation failure message template definitions
@@ -33,8 +27,8 @@ class Loc extends AbstractValidator
      * @var array
      */
     protected $messageTemplates = [
-        self::NOT_VALID => "The input is not a valid sitemap location",
-        self::INVALID   => "Invalid type given. String expected",
+        self::NOT_VALID => 'The input is not a valid sitemap location',
+        self::INVALID   => 'Invalid type given. String expected',
     ];
 
     /**

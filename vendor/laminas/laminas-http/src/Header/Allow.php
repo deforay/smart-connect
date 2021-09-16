@@ -1,14 +1,17 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-http for the canonical source repository
- * @copyright https://github.com/laminas/laminas-http/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-http/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Http\Header;
 
 use Laminas\Http\Request;
+
+use function array_keys;
+use function explode;
+use function implode;
+use function preg_match;
+use function sprintf;
+use function strtolower;
+use function strtoupper;
+use function trim;
 
 /**
  * Allow Header
@@ -40,12 +43,12 @@ class Allow implements HeaderInterface
      * Create Allow header from header line
      *
      * @param string $headerLine
-     * @return Allow
+     * @return static
      * @throws Exception\InvalidArgumentException
      */
     public static function fromString($headerLine)
     {
-        list($name, $value) = GenericHeader::splitHeaderLine($headerLine);
+        [$name, $value] = GenericHeader::splitHeaderLine($headerLine);
 
         // check to ensure proper header type for this factory
         if (strtolower($name) !== 'allow') {
@@ -103,7 +106,7 @@ class Allow implements HeaderInterface
      * Allow methods or list of methods
      *
      * @param array|string $allowedMethods
-     * @return Allow
+     * @return $this
      */
     public function allowMethods($allowedMethods)
     {
@@ -125,7 +128,7 @@ class Allow implements HeaderInterface
      * Disallow methods or list of methods
      *
      * @param array|string $disallowedMethods
-     * @return Allow
+     * @return $this
      */
     public function disallowMethods($disallowedMethods)
     {
@@ -147,7 +150,7 @@ class Allow implements HeaderInterface
      * Convenience alias for @see disallowMethods()
      *
      * @param array|string $disallowedMethods
-     * @return Allow
+     * @return $this
      */
     public function denyMethods($disallowedMethods)
     {

@@ -9,8 +9,7 @@
 namespace Laminas\Mvc\Service;
 
 use Interop\Container\ContainerInterface;
-use Laminas\ServiceManager\FactoryInterface;
-use Laminas\ServiceManager\ServiceLocatorInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 use Laminas\View\Resolver as ViewResolver;
 
 class ViewTemplateMapResolverFactory implements FactoryInterface
@@ -37,18 +36,5 @@ class ViewTemplateMapResolverFactory implements FactoryInterface
             }
         }
         return new ViewResolver\TemplateMapResolver($map);
-    }
-
-    /**
-     * Create and return ViewResolver\TemplateMapResolver instance
-     *
-     * For use with laminas-servicemanager v2; proxies to __invoke().
-     *
-     * @param ServiceLocatorInterface $container
-     * @return ViewResolver\TemplateMapResolver
-     */
-    public function createService(ServiceLocatorInterface $container)
-    {
-        return $this($container, ViewResolver\TemplateMapResolver::class);
     }
 }

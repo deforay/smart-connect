@@ -40,7 +40,7 @@ class DuplicateDataController extends AbstractActionController{
       if(isset($sample->vl_sample_id)){
         return new ViewModel(array('sample' => $sample));
       }else{
-        return $this->_redirect()->toRoute('duplicate-data');
+        return $this->redirect()->toRoute('duplicate-data');
       }
     }
 

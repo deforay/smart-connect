@@ -10,6 +10,13 @@ namespace Laminas\Code\Scanner;
 
 use Laminas\Code\NameInformation;
 
+use function current;
+use function is_string;
+use function ltrim;
+use function next;
+use function reset;
+use function trim;
+
 class ParameterScanner
 {
     /**
@@ -20,42 +27,42 @@ class ParameterScanner
     /**
      * @var null|ClassScanner
      */
-    protected $declaringScannerClass = null;
+    protected $declaringScannerClass;
 
     /**
      * @var null|string
      */
-    protected $declaringClass = null;
+    protected $declaringClass;
 
     /**
      * @var null|MethodScanner
      */
-    protected $declaringScannerFunction = null;
+    protected $declaringScannerFunction;
 
     /**
      * @var null|string
      */
-    protected $declaringFunction = null;
+    protected $declaringFunction;
 
     /**
      * @var null|string
      */
-    protected $defaultValue = null;
+    protected $defaultValue;
 
     /**
      * @var null|string
      */
-    protected $class = null;
+    protected $class;
 
     /**
      * @var null|string
      */
-    protected $name = null;
+    protected $name;
 
     /**
      * @var null|int
      */
-    protected $position = null;
+    protected $position;
 
     /**
      * @var bool
@@ -80,12 +87,12 @@ class ParameterScanner
     /**
      * @var array|null
      */
-    protected $tokens = null;
+    protected $tokens;
 
     /**
      * @var null|NameInformation
      */
-    protected $nameInformation = null;
+    protected $nameInformation;
 
     /**
      * @param  array $parameterTokens
@@ -183,7 +190,14 @@ class ParameterScanner
                 goto SCANNER_CONTINUE;
             }
         } else {
-            if ($this->name === null && ($token[0] === T_STRING || $token[0] === T_NS_SEPARATOR)) {
+            if ($this->name === null
+                && (
+                    $token[0] === T_STRING
+                    || $token[0] === T_NS_SEPARATOR
+                    || $token[0] === T_NAME_QUALIFIED
+                    || $token[0] === T_NAME_FULLY_QUALIFIED
+                )
+            ) {
                 $this->class .= $token[1];
                 goto SCANNER_CONTINUE;
             }
@@ -194,7 +208,7 @@ class ParameterScanner
         }
 
         if ($this->name !== null) {
-            $this->defaultValue .= trim((is_string($token)) ? $token : $token[1]);
+            $this->defaultValue .= trim(is_string($token) ? $token : $token[1]);
         }
 
         SCANNER_CONTINUE:

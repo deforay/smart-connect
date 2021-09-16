@@ -10,8 +10,7 @@ namespace Laminas\Mvc\Service;
 
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\AbstractPluginManager;
-use Laminas\ServiceManager\FactoryInterface;
-use Laminas\ServiceManager\ServiceLocatorInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 abstract class AbstractPluginManagerFactory implements FactoryInterface
 {
@@ -33,18 +32,5 @@ abstract class AbstractPluginManagerFactory implements FactoryInterface
         $options            = $options ?: [];
         $pluginManagerClass = static::PLUGIN_MANAGER_CLASS;
         return new $pluginManagerClass($container, $options);
-    }
-
-    /**
-     * Create and return AbstractPluginManager instance
-     *
-     * For use with laminas-servicemanager v2; proxies to __invoke().
-     *
-     * @param ServiceLocatorInterface $container
-     * @return AbstractPluginManager
-     */
-    public function createService(ServiceLocatorInterface $container)
-    {
-        return $this($container, AbstractPluginManager::class);
     }
 }

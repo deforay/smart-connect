@@ -9,9 +9,9 @@
 namespace Laminas\Mvc\Service;
 
 use Interop\Container\ContainerInterface;
-use Laminas\ServiceManager\FactoryInterface;
-use Laminas\ServiceManager\ServiceLocatorInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 use Laminas\View\Resolver as ViewResolver;
+use Laminas\View\Resolver\ResolverInterface;
 
 class ViewResolverFactory implements FactoryInterface
 {
@@ -30,11 +30,11 @@ class ViewResolverFactory implements FactoryInterface
     {
         $resolver = new ViewResolver\AggregateResolver();
 
-        /* @var $mapResolver \Laminas\View\Resolver\ResolverInterface */
+        /* @var $mapResolver ResolverInterface */
         $mapResolver             = $container->get('ViewTemplateMapResolver');
-        /* @var $pathResolver \Laminas\View\Resolver\ResolverInterface */
+        /* @var $pathResolver ResolverInterface */
         $pathResolver            = $container->get('ViewTemplatePathStack');
-        /* @var $prefixPathStackResolver \Laminas\View\Resolver\ResolverInterface */
+        /* @var $prefixPathStackResolver ResolverInterface */
         $prefixPathStackResolver = $container->get('ViewPrefixPathStackResolver');
 
         $resolver
@@ -46,18 +46,5 @@ class ViewResolverFactory implements FactoryInterface
             ->attach(new ViewResolver\RelativeFallbackResolver($prefixPathStackResolver));
 
         return $resolver;
-    }
-
-    /**
-     * Create and return ViewResolver\AggregateResolver instance
-     *
-     * For use with laminas-servicemanager v2; proxies to __invoke().
-     *
-     * @param ServiceLocatorInterface $container
-     * @return ViewResolver\AggregateResolver
-     */
-    public function createService(ServiceLocatorInterface $container)
-    {
-        return $this($container, ViewResolver\AggregateResolver::class);
     }
 }

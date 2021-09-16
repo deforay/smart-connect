@@ -1,17 +1,17 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-config for the canonical source repository
- * @copyright https://github.com/laminas/laminas-config/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-config/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Config;
 
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\AbstractPluginManager;
 use Laminas\ServiceManager\Exception\InvalidServiceException;
 use Laminas\ServiceManager\Factory\InvokableFactory;
+
+use function array_merge_recursive;
+use function get_class;
+use function gettype;
+use function is_object;
+use function sprintf;
 
 class ReaderPluginManager extends AbstractPluginManager
 {

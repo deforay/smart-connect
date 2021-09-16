@@ -13,7 +13,7 @@ class BodyGenerator extends AbstractGenerator
     /**
      * @var string
      */
-    protected $content = null;
+    protected $content;
 
     /**
      * @param  string $content

@@ -1,11 +1,5 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-config for the canonical source repository
- * @copyright https://github.com/laminas/laminas-config/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-config/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Config;
 
 use Interop\Container\ContainerInterface;
@@ -13,26 +7,36 @@ use Laminas\ServiceManager\AbstractPluginManager;
 use Laminas\ServiceManager\Exception\InvalidServiceException;
 use Laminas\ServiceManager\Factory\InvokableFactory;
 
+use function array_merge_recursive;
+use function get_class;
+use function gettype;
+use function is_object;
+use function sprintf;
+
 class WriterPluginManager extends AbstractPluginManager
 {
     protected $instanceOf = Writer\AbstractWriter::class;
 
     protected $aliases = [
-        'ini'      => Writer\Ini::class,
-        'Ini'      => Writer\Ini::class,
-        'json'     => Writer\Json::class,
-        'Json'     => Writer\Json::class,
-        'php'      => Writer\PhpArray::class,
-        'phparray' => Writer\PhpArray::class,
-        'phpArray' => Writer\PhpArray::class,
-        'PhpArray' => Writer\PhpArray::class,
-        'yaml'     => Writer\Yaml::class,
-        'Yaml'     => Writer\Yaml::class,
-        'xml'      => Writer\Xml::class,
-        'Xml'      => Writer\Xml::class,
+        'ini'            => Writer\Ini::class,
+        'Ini'            => Writer\Ini::class,
+        'json'           => Writer\Json::class,
+        'Json'           => Writer\Json::class,
+        'php'            => Writer\PhpArray::class,
+        'phparray'       => Writer\PhpArray::class,
+        'phpArray'       => Writer\PhpArray::class,
+        'PhpArray'       => Writer\PhpArray::class,
+        'yaml'           => Writer\Yaml::class,
+        'Yaml'           => Writer\Yaml::class,
+        'xml'            => Writer\Xml::class,
+        'Xml'            => Writer\Xml::class,
+        'javaproperties' => Writer\JavaProperties::class,
+        'javaProperties' => Writer\JavaProperties::class,
+        'JavaProperties' => Writer\JavaProperties::class,
 
         // Legacy Zend Framework aliases
         \Zend\Config\Writer\Ini::class => Writer\Ini::class,
+        \Zend\Config\Writer\JavaProperties::class => Writer\JavaProperties::class,
         \Zend\Config\Writer\Json::class => Writer\Json::class,
         \Zend\Config\Writer\PhpArray::class => Writer\PhpArray::class,
         \Zend\Config\Writer\Yaml::class => Writer\Yaml::class,
@@ -40,6 +44,7 @@ class WriterPluginManager extends AbstractPluginManager
 
         // v2 normalized FQCNs
         'zendconfigwriterini' => Writer\Ini::class,
+        'zendconfigwriterjavaproperties' => Writer\JavaProperties::class,
         'zendconfigwriterjson' => Writer\Json::class,
         'zendconfigwriterphparray' => Writer\PhpArray::class,
         'zendconfigwriteryaml' => Writer\Yaml::class,
@@ -47,19 +52,21 @@ class WriterPluginManager extends AbstractPluginManager
     ];
 
     protected $factories = [
-        Writer\Ini::class      => InvokableFactory::class,
-        Writer\Json::class     => InvokableFactory::class,
-        Writer\PhpArray::class => InvokableFactory::class,
-        Writer\Yaml::class     => InvokableFactory::class,
-        Writer\Xml::class      => InvokableFactory::class,
+        Writer\Ini::class            => InvokableFactory::class,
+        Writer\JavaProperties::class => InvokableFactory::class,
+        Writer\Json::class           => InvokableFactory::class,
+        Writer\PhpArray::class       => InvokableFactory::class,
+        Writer\Yaml::class           => InvokableFactory::class,
+        Writer\Xml::class            => InvokableFactory::class,
         // Legacy (v2) due to alias resolution; canonical form of resolved
         // alias is used to look up the factory, while the non-normalized
         // resolved alias is used as the requested name passed to the factory.
-        'laminasconfigwriterini'      => InvokableFactory::class,
-        'laminasconfigwriterjson'     => InvokableFactory::class,
-        'laminasconfigwriterphparray' => InvokableFactory::class,
-        'laminasconfigwriteryaml'     => InvokableFactory::class,
-        'laminasconfigwriterxml'      => InvokableFactory::class,
+        'laminasconfigwriterini'            => InvokableFactory::class,
+        'laminasconfigwriterjavaproperties' => InvokableFactory::class,
+        'laminasconfigwriterjson'           => InvokableFactory::class,
+        'laminasconfigwriterphparray'       => InvokableFactory::class,
+        'laminasconfigwriteryaml'           => InvokableFactory::class,
+        'laminasconfigwriterxml'            => InvokableFactory::class,
     ];
 
     /**

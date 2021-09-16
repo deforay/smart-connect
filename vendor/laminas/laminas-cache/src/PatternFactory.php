@@ -1,17 +1,16 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-cache for the canonical source repository
- * @copyright https://github.com/laminas/laminas-cache/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-cache/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Cache;
 
 use Laminas\ServiceManager\ServiceManager;
 use Laminas\Stdlib\ArrayUtils;
 use Traversable;
 
+/**
+ * @deprecated Please do not use static factories anymore. Please create your own instances by creating a
+ *             dedicated factory for each of the patterns with your project specific needs or just instantiate
+ *             the pattern manually instead of calling this factory.
+ */
 abstract class PatternFactory
 {
     /**
@@ -19,13 +18,13 @@ abstract class PatternFactory
      *
      * @var null|PatternPluginManager
      */
-    protected static $plugins = null;
+    protected static $plugins;
 
     /**
      * Instantiate a cache pattern
      *
      * @param  string|Pattern\PatternInterface $patternName
-     * @param  array|Traversable|Pattern\PatternOptions $options
+     * @param  array<string,mixed>|Traversable<string,mixed>|Pattern\PatternOptions $options
      * @return Pattern\PatternInterface
      * @throws Exception\InvalidArgumentException
      */
@@ -73,7 +72,6 @@ abstract class PatternFactory
     /**
      * Set the pattern plugin manager
      *
-     * @param  PatternPluginManager $plugins
      * @return void
      */
     public static function setPluginManager(PatternPluginManager $plugins)

@@ -1,14 +1,13 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-eventmanager for the canonical source repository
- * @copyright https://github.com/laminas/laminas-eventmanager/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-eventmanager/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\EventManager;
 
 use ArrayAccess;
+
+use function gettype;
+use function is_array;
+use function is_object;
+use function sprintf;
 
 /**
  * Representation of an event
@@ -18,24 +17,16 @@ use ArrayAccess;
  */
 class Event implements EventInterface
 {
-    /**
-     * @var string Event name
-     */
+    /** @var string Event name */
     protected $name;
 
-    /**
-     * @var string|object The event target
-     */
+    /** @var string|object The event target */
     protected $target;
 
-    /**
-     * @var array|ArrayAccess|object The event parameters
-     */
+    /** @var array|ArrayAccess|object The event parameters */
     protected $params = [];
 
-    /**
-     * @var bool Whether or not to stop propagation
-     */
+    /** @var bool Whether or not to stop propagation */
     protected $stopPropagation = false;
 
     /**
@@ -90,19 +81,17 @@ class Event implements EventInterface
      * Overwrites parameters
      *
      * @param  array|ArrayAccess|object $params
-     * @return Event
      * @throws Exception\InvalidArgumentException
      */
     public function setParams($params)
     {
-        if (!is_array($params) && !is_object($params)) {
+        if (! is_array($params) && ! is_object($params)) {
             throw new Exception\InvalidArgumentException(
                 sprintf('Event parameters must be an array or object; received "%s"', gettype($params))
             );
         }
 
         $this->params = $params;
-        return $this;
     }
 
     /**
@@ -128,7 +117,7 @@ class Event implements EventInterface
     {
         // Check in params that are arrays or implement array access
         if (is_array($this->params) || $this->params instanceof ArrayAccess) {
-            if (!isset($this->params[$name])) {
+            if (! isset($this->params[$name])) {
                 return $default;
             }
 
@@ -136,7 +125,7 @@ class Event implements EventInterface
         }
 
         // Check in normal objects
-        if (!isset($this->params->{$name})) {
+        if (! isset($this->params->{$name})) {
             return $default;
         }
         return $this->params->{$name};
@@ -146,24 +135,20 @@ class Event implements EventInterface
      * Set the event name
      *
      * @param  string $name
-     * @return Event
      */
     public function setName($name)
     {
         $this->name = (string) $name;
-        return $this;
     }
 
     /**
      * Set the event target/context
      *
      * @param  null|string|object $target
-     * @return Event
      */
     public function setTarget($target)
     {
         $this->target = $target;
-        return $this;
     }
 
     /**
@@ -171,25 +156,23 @@ class Event implements EventInterface
      *
      * @param  string|int $name
      * @param  mixed $value
-     * @return Event
      */
     public function setParam($name, $value)
     {
         if (is_array($this->params) || $this->params instanceof ArrayAccess) {
             // Arrays or objects implementing array access
             $this->params[$name] = $value;
-        } else {
-            // Objects
-            $this->params->{$name} = $value;
+            return;
         }
-        return $this;
+
+        // Objects
+        $this->params->{$name} = $value;
     }
 
     /**
      * Stop further event propagation
      *
      * @param  bool $flag
-     * @return void
      */
     public function stopPropagation($flag = true)
     {

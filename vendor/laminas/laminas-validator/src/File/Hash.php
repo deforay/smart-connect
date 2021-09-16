@@ -1,35 +1,46 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-validator for the canonical source repository
- * @copyright https://github.com/laminas/laminas-validator/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-validator/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Validator\File;
 
 use Laminas\Validator\AbstractValidator;
 use Laminas\Validator\Exception;
+
+use function array_key_exists;
+use function array_unique;
+use function array_values;
+use function func_get_arg;
+use function func_num_args;
+use function get_class;
+use function gettype;
+use function hash_algos;
+use function hash_file;
+use function in_array;
+use function is_array;
+use function is_object;
+use function is_readable;
+use function is_scalar;
+use function is_string;
+use function sprintf;
 
 /**
  * Validator for the hash of given files
  */
 class Hash extends AbstractValidator
 {
+    use FileInformationTrait;
+
     /**
      * @const string Error constants
      */
-    const DOES_NOT_MATCH = 'fileHashDoesNotMatch';
-    const NOT_DETECTED   = 'fileHashHashNotDetected';
-    const NOT_FOUND      = 'fileHashNotFound';
+    public const DOES_NOT_MATCH = 'fileHashDoesNotMatch';
+    public const NOT_DETECTED   = 'fileHashHashNotDetected';
+    public const NOT_FOUND      = 'fileHashNotFound';
 
-    /**
-     * @var array Error message templates
-     */
+    /** @var array Error message templates */
     protected $messageTemplates = [
-        self::DOES_NOT_MATCH => "File does not match the given hashes",
-        self::NOT_DETECTED   => "A hash could not be evaluated for the given file",
-        self::NOT_FOUND      => "File is not readable or does not exist"
+        self::DOES_NOT_MATCH => 'File does not match the given hashes',
+        self::NOT_DETECTED   => 'A hash could not be evaluated for the given file',
+        self::NOT_FOUND      => 'File is not readable or does not exist',
     ];
 
     /**
@@ -49,8 +60,10 @@ class Hash extends AbstractValidator
      */
     public function __construct($options = null)
     {
-        if (is_scalar($options) ||
-            (is_array($options) && ! array_key_exists('hash', $options))) {
+        if (
+            is_scalar($options) ||
+            (is_array($options) && ! array_key_exists('hash', $options))
+        ) {
             $options = ['hash' => $options];
         }
 
@@ -75,7 +88,7 @@ class Hash extends AbstractValidator
      * Sets the hash for one or multiple files
      *
      * @param  string|array $options
-     * @return self Provides a fluent interface
+     * @return $this Provides a fluent interface
      */
     public function setHash($options)
     {
@@ -90,14 +103,14 @@ class Hash extends AbstractValidator
      *
      * @param  string|array $options
      * @throws Exception\InvalidArgumentException
-     * @return self Provides a fluent interface
+     * @return $this Provides a fluent interface
      */
     public function addHash($options)
     {
         if (is_string($options)) {
             $options = [$options];
         } elseif (! is_array($options)) {
-            throw new Exception\InvalidArgumentException("False parameter given");
+            throw new Exception\InvalidArgumentException('False parameter given');
         }
 
         $known = hash_algos();
@@ -113,6 +126,12 @@ class Hash extends AbstractValidator
         }
 
         foreach ($options as $value) {
+            if (! is_string($value)) {
+                throw new Exception\InvalidArgumentException(sprintf(
+                    'Hash must be a string, %s received',
+                    is_object($value) ? get_class($value) : gettype($value)
+                ));
+            }
             $this->options['hash'][$value] = $algorithm;
         }
 
@@ -128,43 +147,27 @@ class Hash extends AbstractValidator
      */
     public function isValid($value, $file = null)
     {
-        if (is_string($value) && is_array($file)) {
-            // Legacy Laminas\Transfer API support
-            $filename = $file['name'];
-            $file     = $file['tmp_name'];
-        } elseif (is_array($value)) {
-            if (! isset($value['tmp_name']) || ! isset($value['name'])) {
-                throw new Exception\InvalidArgumentException(
-                    'Value array must be in $_FILES format'
-                );
-            }
-            $file     = $value['tmp_name'];
-            $filename = $value['name'];
-        } else {
-            $file     = $value;
-            $filename = basename($file);
-        }
-        $this->setValue($filename);
+        $fileInfo = $this->getFileInfo($value, $file);
+
+        $this->setValue($fileInfo['filename']);
 
         // Is file readable ?
-        if (empty($file) || false === is_readable($file)) {
+        if (empty($fileInfo['file']) || false === is_readable($fileInfo['file'])) {
             $this->error(self::NOT_FOUND);
             return false;
         }
 
-        $algos  = array_unique(array_values($this->getHash()));
-        $hashes = array_unique(array_keys($this->getHash()));
+        $algos = array_unique(array_values($this->getHash()));
         foreach ($algos as $algorithm) {
-            $filehash = hash_file($algorithm, $file);
+            $filehash = hash_file($algorithm, $fileInfo['file']);
+
             if ($filehash === false) {
                 $this->error(self::NOT_DETECTED);
                 return false;
             }
 
-            foreach ($hashes as $hash) {
-                if ($filehash === $hash) {
-                    return true;
-                }
+            if (isset($this->getHash()[$filehash]) && $this->getHash()[$filehash] === $algorithm) {
+                return true;
             }
         }
 

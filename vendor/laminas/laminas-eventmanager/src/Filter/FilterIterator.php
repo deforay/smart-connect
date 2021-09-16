@@ -1,15 +1,15 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-eventmanager for the canonical source repository
- * @copyright https://github.com/laminas/laminas-eventmanager/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-eventmanager/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\EventManager\Filter;
 
-use Laminas\Stdlib\CallbackHandler;
-use Laminas\Stdlib\SplPriorityQueue;
+use Laminas\EventManager\Exception;
+use Laminas\Stdlib\FastPriorityQueue;
+
+use function get_class;
+use function gettype;
+use function is_callable;
+use function is_object;
+use function sprintf;
 
 /**
  * Specialized priority queue implementation for use with an intercepting
@@ -17,7 +17,7 @@ use Laminas\Stdlib\SplPriorityQueue;
  *
  * Allows removal
  */
-class FilterIterator extends SplPriorityQueue
+class FilterIterator extends FastPriorityQueue
 {
     /**
      * Does the queue contain a given value?
@@ -27,13 +27,34 @@ class FilterIterator extends SplPriorityQueue
      */
     public function contains($datum)
     {
-        $chain = clone $this;
-        foreach ($chain as $item) {
+        foreach ($this as $item) {
             if ($item === $datum) {
                 return true;
             }
         }
         return false;
+    }
+
+    /**
+     * Insert a value into the queue.
+     *
+     * Requires a callable.
+     *
+     * @param callable $value
+     * @param mixed $priority
+     * @return void
+     * @throws Exception\InvalidArgumentException For non-callable $value.
+     */
+    public function insert($value, $priority)
+    {
+        if (! is_callable($value)) {
+            throw new Exception\InvalidArgumentException(sprintf(
+                '%s can only aggregate callables; received %s',
+                self::class,
+                is_object($value) ? get_class($value) : gettype($value)
+            ));
+        }
+        parent::insert($value, $priority);
     }
 
     /**
@@ -53,7 +74,7 @@ class FilterIterator extends SplPriorityQueue
         $removed = false;
         $items   = [];
         $this->rewind();
-        while (!$this->isEmpty()) {
+        while (! $this->isEmpty()) {
             $item = $this->extract();
             if ($item['data'] === $datum) {
                 $removed = true;
@@ -93,11 +114,6 @@ class FilterIterator extends SplPriorityQueue
         }
 
         $next = $this->extract();
-        if (!$next instanceof CallbackHandler) {
-            return;
-        }
-
-        $return = call_user_func($next->getCallback(), $context, $params, $chain);
-        return $return;
+        return $next($context, $params, $chain);
     }
 }

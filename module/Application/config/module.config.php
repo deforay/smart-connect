@@ -14,7 +14,7 @@ return array(
     'router' => array(
         'routes' => array(
             'home' => array(
-                'type' => 'Laminas\Mvc\Router\Http\Literal',
+                'type' => 'Literal',
                 'options' => array(
                     'route'    => '/',
                     'defaults' => array(
@@ -170,7 +170,7 @@ return array(
             'Laminas\Log\LoggerAbstractServiceFactory'
         ),
         'factories' => array(
-            'translator' => 'Laminas\Mvc\Service\TranslatorServiceFactory'
+            'translator' => 'Laminas\Mvc\I18n\TranslatorFactory'
         ),
     ),
     'translator' => array(

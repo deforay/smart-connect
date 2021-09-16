@@ -29,7 +29,7 @@ class OrganizationsController extends AbstractActionController
         if($this->getRequest()->isPost()){
             $params=$this->getRequest()->getPost();
             $result=$orgService->addOrganization($params);
-            return $this->_redirect()->toRoute('organizations');
+            return $this->redirect()->toRoute('organizations');
         }        
         
         $orgTypes = $orgService->fetchOrganizationTypes();
@@ -48,12 +48,12 @@ class OrganizationsController extends AbstractActionController
         if($this->getRequest()->isPost()){
             $params=$this->getRequest()->getPost();
             $result=$orgService->updateOrganization($params);
-            return $this->_redirect()->toRoute('organizations');
+            return $this->redirect()->toRoute('organizations');
         }else{
             $orgId = ($this->params()->fromRoute('id'));
             $org = $orgService->getOrganization($orgId);
             if($org == false){
-                return $this->_redirect()->toRoute('organizations'); 
+                return $this->redirect()->toRoute('organizations'); 
             }else{
                 $orgTypes = $orgService->fetchOrganizationTypes();
                 $countries = $commonService->getAllCountries();
@@ -77,12 +77,12 @@ class OrganizationsController extends AbstractActionController
         if($this->getRequest()->isPost()){
             $params=$this->getRequest()->getPost();
             $result=$orgService->mapOrganizationToUsers($params);
-            return $this->_redirect()->toRoute('organizations');
+            return $this->redirect()->toRoute('organizations');
         }else{
             $orgId = ($this->params()->fromRoute('id'));
             $org = $orgService->getOrganization($orgId);
             if($org == false){
-                return $this->_redirect()->toRoute('organizations'); 
+                return $this->redirect()->toRoute('organizations'); 
             }else{
                 $users = $userService->fetchUsers();
                 $map  = $orgService->fetchOrganizationMap($orgId);

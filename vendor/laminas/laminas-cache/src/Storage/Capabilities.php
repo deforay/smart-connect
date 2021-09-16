@@ -1,11 +1,5 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-cache for the canonical source repository
- * @copyright https://github.com/laminas/laminas-cache/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-cache/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Cache\Storage;
 
 use ArrayObject;
@@ -15,6 +9,9 @@ use stdClass;
 
 class Capabilities
 {
+    public const UNKNOWN_KEY_LENGTH = -1;
+    public const UNLIMITED_KEY_LENGTH = 0;
+
     /**
      * The storage instance
      *
@@ -467,7 +464,7 @@ class Capabilities
      */
     public function getMaxKeyLength()
     {
-        return $this->getCapability('maxKeyLength', -1);
+        return $this->getCapability('maxKeyLength', self::UNKNOWN_KEY_LENGTH);
     }
 
     /**

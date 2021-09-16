@@ -1,12 +1,8 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-http for the canonical source repository
- * @copyright https://github.com/laminas/laminas-http/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-http/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Http\Header;
+
+use function strtolower;
 
 /**
  * @throws Exception\InvalidArgumentException
@@ -14,14 +10,16 @@ namespace Laminas\Http\Header;
  */
 class Refresh implements HeaderInterface
 {
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $value;
 
+    /**
+     * @param string $headerLine
+     * @return static
+     */
     public static function fromString($headerLine)
     {
-        list($name, $value) = GenericHeader::splitHeaderLine($headerLine);
+        [$name, $value] = GenericHeader::splitHeaderLine($headerLine);
 
         // check to ensure proper header type for this factory
         if (strtolower($name) !== 'refresh') {
@@ -29,29 +27,31 @@ class Refresh implements HeaderInterface
         }
 
         // @todo implementation details
-        $header = new static($value);
-
-        return $header;
+        return new static($value);
     }
 
+    /** @param null|string $value */
     public function __construct($value = null)
     {
-        if ($value) {
+        if ($value !== null) {
             HeaderValue::assertValid($value);
             $this->value = $value;
         }
     }
 
+    /** @return string */
     public function getFieldName()
     {
         return 'Refresh';
     }
 
+    /** @return string */
     public function getFieldValue()
     {
-        return $this->value;
+        return (string) $this->value;
     }
 
+    /** @return string */
     public function toString()
     {
         return 'Refresh: ' . $this->getFieldValue();

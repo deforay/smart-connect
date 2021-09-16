@@ -1,14 +1,15 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-form for the canonical source repository
- * @copyright https://github.com/laminas/laminas-form/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-form/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Form;
 
 use Traversable;
+
+use function array_key_exists;
+use function get_class;
+use function gettype;
+use function is_array;
+use function is_object;
+use function sprintf;
 
 trait LabelAwareTrait
 {
@@ -30,7 +31,7 @@ trait LabelAwareTrait
      * Set the attributes to use with the label
      *
      * @param array $labelAttributes
-     * @return LabelAwareInterface
+     * @return $this
      */
     public function setLabelAttributes(array $labelAttributes)
     {
@@ -54,7 +55,7 @@ trait LabelAwareTrait
      * Implementation will decide if this will overwrite or merge.
      *
      * @param  array|Traversable $arrayOrTraversable
-     * @return Element|ElementInterface
+     * @return $this
      * @throws Exception\InvalidArgumentException
      */
     public function setLabelOptions($arrayOrTraversable)
@@ -63,7 +64,7 @@ trait LabelAwareTrait
             throw new Exception\InvalidArgumentException(sprintf(
                 '%s expects an array or Traversable argument; received "%s"',
                 __METHOD__,
-                (is_object($arrayOrTraversable) ? get_class($arrayOrTraversable) : gettype($arrayOrTraversable))
+                is_object($arrayOrTraversable) ? get_class($arrayOrTraversable) : gettype($arrayOrTraversable)
             ));
         }
         foreach ($arrayOrTraversable as $key => $value) {
@@ -85,7 +86,7 @@ trait LabelAwareTrait
     /**
      * Clear all label options
      *
-     * @return Element|ElementInterface
+     * @return $this
      */
     public function clearLabelOptions()
     {
@@ -96,8 +97,8 @@ trait LabelAwareTrait
     /**
      * Remove many attributes at once
      *
-     * @param array $keys
-     * @return ElementInterface
+     * @param  array $keys
+     * @return $this
      */
     public function removeLabelOptions(array $keys)
     {
@@ -113,7 +114,7 @@ trait LabelAwareTrait
      *
      * @param  string $key
      * @param  mixed  $value
-     * @return Element|ElementInterface
+     * @return $this
      */
     public function setLabelOption($key, $value)
     {
@@ -130,7 +131,7 @@ trait LabelAwareTrait
     public function getLabelOption($key)
     {
         if (! array_key_exists($key, $this->labelOptions)) {
-            return;
+            return null;
         }
         return $this->labelOptions[$key];
     }
@@ -139,7 +140,7 @@ trait LabelAwareTrait
      * Remove a single label option
      *
      * @param string $key
-     * @return ElementInterface
+     * @return $this
      */
     public function removeLabelOption($key)
     {

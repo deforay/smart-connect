@@ -13,6 +13,19 @@ use Laminas\Code\Exception;
 use Laminas\EventManager\EventInterface;
 use Traversable;
 
+use function array_search;
+use function class_exists;
+use function get_class;
+use function gettype;
+use function in_array;
+use function is_array;
+use function is_object;
+use function is_string;
+use function sprintf;
+use function str_replace;
+use function strtolower;
+use function trim;
+
 /**
  * Generic annotation parser
  *
@@ -52,7 +65,7 @@ class GenericAnnotationParser implements ParserInterface
     public function onCreateAnnotation(EventInterface $e)
     {
         $class = $e->getParam('class', false);
-        if (!$class || !$this->hasAnnotation($class)) {
+        if (! $class || ! $this->hasAnnotation($class)) {
             return false;
         }
 
@@ -79,7 +92,7 @@ class GenericAnnotationParser implements ParserInterface
      *
      * @param  string|AnnotationInterface $annotation String class name of an
      *         AnnotationInterface implementation, or actual instance
-     * @return GenericAnnotationParser
+     * @return void
      * @throws Exception\InvalidArgumentException
      */
     public function registerAnnotation($annotation)
@@ -90,12 +103,12 @@ class GenericAnnotationParser implements ParserInterface
             $annotation = new $annotation();
         }
 
-        if (!$annotation instanceof AnnotationInterface) {
+        if (! $annotation instanceof AnnotationInterface) {
             throw new Exception\InvalidArgumentException(sprintf(
                 '%s: expects an instance of %s\AnnotationInterface; received "%s"',
                 __METHOD__,
                 __NAMESPACE__,
-                (is_object($annotation) ? get_class($annotation) : gettype($annotation))
+                is_object($annotation) ? get_class($annotation) : gettype($annotation)
             ));
         }
 
@@ -121,11 +134,11 @@ class GenericAnnotationParser implements ParserInterface
      */
     public function registerAnnotations($annotations)
     {
-        if (!is_array($annotations) && !$annotations instanceof Traversable) {
+        if (! is_array($annotations) && ! $annotations instanceof Traversable) {
             throw new Exception\InvalidArgumentException(sprintf(
                 '%s: expects an array or Traversable; received "%s"',
                 __METHOD__,
-                (is_object($annotations) ? get_class($annotations) : gettype($annotations))
+                is_object($annotations) ? get_class($annotations) : gettype($annotations)
             ));
         }
 
@@ -165,7 +178,7 @@ class GenericAnnotationParser implements ParserInterface
      */
     public function setAlias($alias, $class)
     {
-        if (!in_array($class, $this->annotationNames) && !$this->hasAlias($class)) {
+        if (! in_array($class, $this->annotationNames) && ! $this->hasAlias($class)) {
             throw new Exception\InvalidArgumentException(sprintf(
                 '%s: Cannot alias "%s" to "%s", as class "%s" is not currently a registered annotation or alias',
                 __METHOD__,
@@ -202,7 +215,7 @@ class GenericAnnotationParser implements ParserInterface
     {
         $alias = $this->normalizeAlias($alias);
 
-        return (isset($this->aliases[$alias]));
+        return isset($this->aliases[$alias]);
     }
 
     /**

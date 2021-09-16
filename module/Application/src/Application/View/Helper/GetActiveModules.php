@@ -2,32 +2,24 @@
 
 namespace Application\View\Helper;
 
-use Laminas\ServiceManager\ServiceLocatorAwareInterface;
-use Laminas\ServiceManager\ServiceLocatorInterface;
 use Laminas\View\Helper\AbstractHelper;
 
-class GetActiveModules extends AbstractHelper implements ServiceLocatorAwareInterface
+class GetActiveModules extends AbstractHelper
 {
 
-    public function setServiceLocator(ServiceLocatorInterface $serviceLocator)
+    private $config;
+    public function __construct($config)
     {
-        $this->serviceLocator = $serviceLocator;
-        return $this;
-    }
-
-    public function getServiceLocator()
-    {
-        return $this->serviceLocator;
+        $this->config = $config;
     }
 
     public function __invoke()
     {
-        $config = $this->getServiceLocator()->getServiceLocator()->get('Config');
         $dashModules =  array(
-            'vl' => $config['defaults']['vlModule'],
-            'eid' => $config['defaults']['eidModule'],
-            'covid19' => $config['defaults']['covid19Module'],
-            'poc' => $config['defaults']['pocDashboard']
+            'vl' => $this->config['defaults']['vlModule'],
+            'eid' => $this->config['defaults']['eidModule'],
+            'covid19' => $this->config['defaults']['covid19Module'],
+            'poc' => $this->config['defaults']['pocDashboard']
         );
         return $dashModules;
     }

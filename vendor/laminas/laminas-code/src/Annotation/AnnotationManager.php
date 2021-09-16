@@ -14,6 +14,9 @@ use Laminas\EventManager\EventManager;
 use Laminas\EventManager\EventManagerAwareInterface;
 use Laminas\EventManager\EventManagerInterface;
 
+use function get_class;
+use function is_object;
+
 /**
  * Pluggable annotation manager
  *
@@ -98,11 +101,11 @@ class AnnotationManager implements EventManagerAwareInterface
 
         $eventManager = $this->getEventManager();
         $results = $eventManager->triggerEventUntil(function ($r) {
-            return (is_object($r));
+            return is_object($r);
         }, $event);
 
         $annotation = $results->last();
 
-        return (is_object($annotation) ? $annotation : false);
+        return is_object($annotation) ? $annotation : false;
     }
 }

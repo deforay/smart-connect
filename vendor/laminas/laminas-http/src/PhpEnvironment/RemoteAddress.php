@@ -1,12 +1,15 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-http for the canonical source repository
- * @copyright https://github.com/laminas/laminas-http/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-http/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Http\PhpEnvironment;
+
+use function array_diff;
+use function array_map;
+use function array_pop;
+use function explode;
+use function in_array;
+use function str_replace;
+use function strpos;
+use function strtoupper;
 
 /**
  * Functionality for determining client IP address.
@@ -46,7 +49,7 @@ class RemoteAddress
      * at session read, so this is the only way to switch setting.
      *
      * @param  bool  $useProxy Whether to check also proxied IP addresses.
-     * @return RemoteAddress
+     * @return $this
      */
     public function setUseProxy($useProxy = true)
     {
@@ -68,7 +71,7 @@ class RemoteAddress
      * Set list of trusted proxy addresses
      *
      * @param  array $trustedProxies
-     * @return RemoteAddress
+     * @return $this
      */
     public function setTrustedProxies(array $trustedProxies)
     {
@@ -80,7 +83,7 @@ class RemoteAddress
      * Set the header to introspect for proxy IPs
      *
      * @param  string $header
-     * @return RemoteAddress
+     * @return $this
      */
     public function setProxyHeader($header = 'X-Forwarded-For')
     {
@@ -112,11 +115,13 @@ class RemoteAddress
      * Attempt to get the IP address for a proxied client
      *
      * @see http://tools.ietf.org/html/draft-ietf-appsawg-http-forwarded-10#section-5.2
+     *
      * @return false|string
      */
     protected function getIpAddressFromProxy()
     {
-        if (! $this->useProxy
+        if (
+            ! $this->useProxy
             || (isset($_SERVER['REMOTE_ADDR']) && ! in_array($_SERVER['REMOTE_ADDR'], $this->trustedProxies))
         ) {
             return false;
@@ -144,8 +149,7 @@ class RemoteAddress
         // not know if it is a proxy server, or a client. As such, we treat it
         // as the originating IP.
         // @see http://en.wikipedia.org/wiki/X-Forwarded-For
-        $ip = array_pop($ips);
-        return $ip;
+        return array_pop($ips);
     }
 
     /**

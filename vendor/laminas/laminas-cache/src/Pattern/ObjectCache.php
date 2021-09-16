@@ -1,33 +1,22 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-cache for the canonical source repository
- * @copyright https://github.com/laminas/laminas-cache/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-cache/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Cache\Pattern;
 
 use Laminas\Cache\Exception;
 
 class ObjectCache extends CallbackCache
 {
-    /**
-     * Set options
-     *
-     * @param  PatternOptions $options
-     * @return void
-     * @throws Exception\InvalidArgumentException
-     */
     public function setOptions(PatternOptions $options)
     {
         parent::setOptions($options);
 
         if (! $options->getObject()) {
             throw new Exception\InvalidArgumentException("Missing option 'object'");
-        } elseif (! $options->getStorage()) {
+        } elseif (! $this->getStorage()) {
             throw new Exception\InvalidArgumentException("Missing option 'storage'");
         }
+
+        return $this;
     }
 
     /**
@@ -70,7 +59,8 @@ class ObjectCache extends CallbackCache
                     $removeKeys[] = $this->generateKey('__isset', [$property]);
                 }
                 if ($removeKeys) {
-                    $options->getStorage()->removeItems($removeKeys);
+                    $storage = $this->getStorage();
+                    $storage->removeItems($removeKeys);
                 }
                 return;
 
@@ -123,7 +113,8 @@ class ObjectCache extends CallbackCache
                     $removeKeys[] = $this->generateKey('__isset', [$property]);
                 }
                 if ($removeKeys) {
-                    $options->getStorage()->removeItems($removeKeys);
+                    $storage = $this->getStorage();
+                    $storage->removeItems($removeKeys);
                 }
                 return;
         }
@@ -136,10 +127,7 @@ class ObjectCache extends CallbackCache
         }
 
         if (! $cache) {
-            if ($args) {
-                return call_user_func_array([$object, $method], $args);
-            }
-            return $object->{$method}();
+            return $object->{$method}(...$args);
         }
 
         return parent::call([$object, $method], $args);

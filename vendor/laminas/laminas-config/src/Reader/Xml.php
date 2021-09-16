@@ -1,15 +1,24 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-config for the canonical source repository
- * @copyright https://github.com/laminas/laminas-config/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-config/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Config\Reader;
 
 use Laminas\Config\Exception;
 use XMLReader;
+
+use function array_key_exists;
+use function array_merge;
+use function dirname;
+use function in_array;
+use function is_array;
+use function is_file;
+use function is_readable;
+use function is_string;
+use function restore_error_handler;
+use function set_error_handler;
+use function sprintf;
+
+use const E_WARNING;
+use const LIBXML_XINCLUDE;
 
 /**
  * XML config reader.
@@ -52,7 +61,7 @@ class Xml implements ReaderInterface
      */
     public function fromFile($filename)
     {
-        if (!is_file($filename) || !is_readable($filename)) {
+        if (! is_file($filename) || ! is_readable($filename)) {
             throw new Exception\RuntimeException(sprintf(
                 "File '%s' doesn't exist or not readable",
                 $filename
@@ -94,7 +103,7 @@ class Xml implements ReaderInterface
         }
         $this->reader = new XMLReader();
 
-        $this->reader->xml($string, null, LIBXML_XINCLUDE);
+        $this->reader->XML($string, null, LIBXML_XINCLUDE);
 
         $this->directory = null;
 
@@ -162,7 +171,7 @@ class Xml implements ReaderInterface
                 }
 
                 if (isset($children[$name])) {
-                    if (!is_array($children[$name]) || !array_key_exists(0, $children[$name])) {
+                    if (! is_array($children[$name]) || ! array_key_exists(0, $children[$name])) {
                         $children[$name] = [$children[$name]];
                     }
 

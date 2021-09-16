@@ -1,10 +1,6 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-hydrator for the canonical source repository
- * @copyright https://github.com/laminas/laminas-hydrator/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-hydrator/blob/master/LICENSE.md New BSD License
- */
+declare(strict_types=1);
 
 namespace Laminas\Hydrator\Filter;
 
@@ -13,10 +9,14 @@ use ReflectionException;
 use ReflectionMethod;
 use ReflectionParameter;
 
+use function array_filter;
+use function array_key_exists;
+use function sprintf;
+
 /**
  * Filter that includes methods which have no parameters or only optional parameters
  */
-class OptionalParametersFilter implements FilterInterface
+final class OptionalParametersFilter implements FilterInterface
 {
     /**
      * Map of methods already analyzed
@@ -29,17 +29,26 @@ class OptionalParametersFilter implements FilterInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @throws InvalidArgumentException If reflection fails due to the method
+     *     not existing.
      */
-    public function filter($property)
+    public function filter(string $property, ?object $instance = null): bool
     {
-        if (isset(static::$propertiesCache[$property])) {
-            return static::$propertiesCache[$property];
+        $cacheName = $instance !== null
+            ? (new ReflectionMethod($instance, $property))->getName()
+            : $property;
+
+        if (array_key_exists($cacheName, static::$propertiesCache)) {
+            return static::$propertiesCache[$cacheName];
         }
 
         try {
-            $reflectionMethod = new ReflectionMethod($property);
+            $reflectionMethod = $instance !== null
+                ? new ReflectionMethod($instance, $property)
+                : new ReflectionMethod($property);
         } catch (ReflectionException $exception) {
-            throw new InvalidArgumentException(sprintf('Method %s doesn\'t exist', $property));
+            throw new InvalidArgumentException(sprintf('Method %s does not exist', $property));
         }
 
         $mandatoryParameters = array_filter(
@@ -49,6 +58,6 @@ class OptionalParametersFilter implements FilterInterface
             }
         );
 
-        return static::$propertiesCache[$property] = empty($mandatoryParameters);
+        return static::$propertiesCache[$cacheName] = empty($mandatoryParameters);
     }
 }

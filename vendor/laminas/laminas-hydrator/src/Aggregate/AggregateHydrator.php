@@ -1,10 +1,6 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-hydrator for the canonical source repository
- * @copyright https://github.com/laminas/laminas-hydrator/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-hydrator/blob/master/LICENSE.md New BSD License
- */
+declare(strict_types=1);
 
 namespace Laminas\Hydrator\Aggregate;
 
@@ -18,20 +14,15 @@ use Laminas\Hydrator\HydratorInterface;
  */
 class AggregateHydrator implements HydratorInterface, EventManagerAwareInterface
 {
-    const DEFAULT_PRIORITY = 1;
+    public const DEFAULT_PRIORITY = 1;
 
-    /**
-     * @var EventManagerInterface|null
-     */
+    /** @var EventManagerInterface */
     protected $eventManager;
 
     /**
      * Attaches the provided hydrator to the list of hydrators to be used while hydrating/extracting data
-     *
-     * @param HydratorInterface $hydrator
-     * @param int $priority
      */
-    public function add(HydratorInterface $hydrator, $priority = self::DEFAULT_PRIORITY)
+    public function add(HydratorInterface $hydrator, int $priority = self::DEFAULT_PRIORITY): void
     {
         $listener = new HydratorListener($hydrator);
         $listener->attach($this->getEventManager(), $priority);
@@ -40,41 +31,36 @@ class AggregateHydrator implements HydratorInterface, EventManagerAwareInterface
     /**
      * {@inheritDoc}
      */
-    public function extract($object)
+    public function extract(object $object): array
     {
         $event = new ExtractEvent($this, $object);
-
         $this->getEventManager()->triggerEvent($event);
-
         return $event->getExtractedData();
     }
 
     /**
      * {@inheritDoc}
      */
-    public function hydrate(array $data, $object)
+    public function hydrate(array $data, object $object)
     {
         $event = new HydrateEvent($this, $object, $data);
-
         $this->getEventManager()->triggerEvent($event);
-
         return $event->getHydratedObject();
     }
 
     /**
      * {@inheritDoc}
      */
-    public function setEventManager(EventManagerInterface $eventManager)
+    public function setEventManager(EventManagerInterface $eventManager): void
     {
-        $eventManager->setIdentifiers([__CLASS__, get_class($this)]);
-
+        $eventManager->setIdentifiers([self::class, static::class]);
         $this->eventManager = $eventManager;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getEventManager()
+    public function getEventManager(): EventManagerInterface
     {
         if (null === $this->eventManager) {
             $this->setEventManager(new EventManager());

@@ -1,11 +1,5 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-form for the canonical source repository
- * @copyright https://github.com/laminas/laminas-form/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-form/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Form;
 
 use Laminas\InputFilter\InputFilterProviderInterface;
@@ -41,7 +35,7 @@ class InputFilterProviderFieldset extends Fieldset implements InputFilterProvide
      * - input_filter_spec: specification to be returned by getInputFilterSpecification
      *
      * @param  array|Traversable $options
-     * @return Element|ElementInterface
+     * @return $this
      * @throws Exception\InvalidArgumentException
      */
     public function setOptions($options)

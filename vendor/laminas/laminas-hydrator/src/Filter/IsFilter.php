@@ -1,16 +1,14 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-hydrator for the canonical source repository
- * @copyright https://github.com/laminas/laminas-hydrator/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-hydrator/blob/master/LICENSE.md New BSD License
- */
+declare(strict_types=1);
 
 namespace Laminas\Hydrator\Filter;
 
-class IsFilter implements FilterInterface
+use function strpos;
+
+final class IsFilter implements FilterInterface
 {
-    public function filter($property)
+    public function filter(string $property, ?object $instance = null): bool
     {
         $pos = strpos($property, '::');
         if ($pos !== false) {
@@ -19,9 +17,6 @@ class IsFilter implements FilterInterface
             $pos = 0;
         }
 
-        if (substr($property, $pos, 2) === 'is') {
-            return true;
-        }
-        return false;
+        return strpos($property, 'is', $pos) === $pos;
     }
 }

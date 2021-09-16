@@ -1,21 +1,25 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-form for the canonical source repository
- * @copyright https://github.com/laminas/laminas-form/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-form/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Form\Element;
 
-use Laminas\Form\Element;
 use Laminas\Form\ElementInterface;
 use Laminas\Form\Exception;
 use Laminas\Form\Fieldset;
 use Laminas\Form\FieldsetInterface;
 use Laminas\Form\FormInterface;
 use Laminas\Stdlib\ArrayUtils;
+use Laminas\Stdlib\Exception\InvalidArgumentException;
 use Traversable;
+
+use function count;
+use function get_class;
+use function gettype;
+use function is_array;
+use function is_object;
+use function is_string;
+use function iterator_to_array;
+use function max;
+use function sprintf;
 
 class Collection extends Fieldset
 {
@@ -104,38 +108,38 @@ class Collection extends Fieldset
      * - template_placeholder: placeholder used in the data template
      *
      * @param array|Traversable $options
-     * @return Collection
+     * @return $this
      */
     public function setOptions($options)
     {
         parent::setOptions($options);
 
-        if (isset($options['target_element'])) {
-            $this->setTargetElement($options['target_element']);
+        if (isset($this->options['target_element'])) {
+            $this->setTargetElement($this->options['target_element']);
         }
 
-        if (isset($options['count'])) {
-            $this->setCount($options['count']);
+        if (isset($this->options['count'])) {
+            $this->setCount($this->options['count']);
         }
 
-        if (isset($options['allow_add'])) {
-            $this->setAllowAdd($options['allow_add']);
+        if (isset($this->options['allow_add'])) {
+            $this->setAllowAdd($this->options['allow_add']);
         }
 
-        if (isset($options['allow_remove'])) {
-            $this->setAllowRemove($options['allow_remove']);
+        if (isset($this->options['allow_remove'])) {
+            $this->setAllowRemove($this->options['allow_remove']);
         }
 
-        if (isset($options['should_create_template'])) {
-            $this->setShouldCreateTemplate($options['should_create_template']);
+        if (isset($this->options['should_create_template'])) {
+            $this->setShouldCreateTemplate($this->options['should_create_template']);
         }
 
-        if (isset($options['template_placeholder'])) {
-            $this->setTemplatePlaceholder($options['template_placeholder']);
+        if (isset($this->options['template_placeholder'])) {
+            $this->setTemplatePlaceholder($this->options['template_placeholder']);
         }
 
-        if (isset($options['create_new_objects'])) {
-            $this->setCreateNewObjects($options['create_new_objects']);
+        if (isset($this->options['create_new_objects'])) {
+            $this->setCreateNewObjects($this->options['create_new_objects']);
         }
 
         return $this;
@@ -162,11 +166,13 @@ class Collection extends Fieldset
      */
     public function setObject($object)
     {
-        if (! is_array($object) && ! $object instanceof Traversable) {
+        if ($object instanceof Traversable) {
+            $object = iterator_to_array($object);
+        } elseif (! is_array($object)) {
             throw new Exception\InvalidArgumentException(sprintf(
                 '%s expects an array or Traversable object argument; received "%s"',
                 __METHOD__,
-                (is_object($object) ? get_class($object) : gettype($object))
+                is_object($object) ? get_class($object) : gettype($object)
             ));
         }
 
@@ -180,17 +186,19 @@ class Collection extends Fieldset
      * Populate values
      *
      * @param array|Traversable $data
-     * @throws \Laminas\Form\Exception\InvalidArgumentException
-     * @throws \Laminas\Form\Exception\DomainException
+     * @throws Exception\InvalidArgumentException
+     * @throws Exception\DomainException
      * @return void
      */
     public function populateValues($data)
     {
-        if (! is_array($data) && ! $data instanceof Traversable) {
+        if ($data instanceof Traversable) {
+            $data = ArrayUtils::iteratorToArray($data);
+        } elseif (! is_array($data)) {
             throw new Exception\InvalidArgumentException(sprintf(
                 '%s expects an array or Traversable set of data; received "%s"',
                 __METHOD__,
-                (is_object($data) ? get_class($data) : gettype($data))
+                is_object($data) ? get_class($data) : gettype($data)
             ));
         }
 
@@ -224,9 +232,10 @@ class Collection extends Fieldset
         }
 
         foreach ($data as $key => $value) {
+            $elementOrFieldset = null;
             if ($this->has($key)) {
                 $elementOrFieldset = $this->get($key);
-            } else {
+            } elseif ($this->targetElement) {
                 $elementOrFieldset = $this->addNewTargetElementInstance($key);
 
                 if ($key > $this->lastChildIndex) {
@@ -236,7 +245,10 @@ class Collection extends Fieldset
 
             if ($elementOrFieldset instanceof FieldsetInterface) {
                 $elementOrFieldset->populateValues($value);
-            } else {
+                continue;
+            }
+
+            if ($elementOrFieldset !== null) {
                 $elementOrFieldset->setAttribute('value', $value);
             }
         }
@@ -284,7 +296,7 @@ class Collection extends Fieldset
      * Set the initial count of target element
      *
      * @param $count
-     * @return Collection
+     * @return $this
      */
     public function setCount($count)
     {
@@ -306,8 +318,8 @@ class Collection extends Fieldset
      * Set the target element
      *
      * @param ElementInterface|array|Traversable $elementOrFieldset
-     * @return Collection
-     * @throws \Laminas\Form\Exception\InvalidArgumentException
+     * @return $this
+     * @throws Exception\InvalidArgumentException
      */
     public function setTargetElement($elementOrFieldset)
     {
@@ -323,7 +335,7 @@ class Collection extends Fieldset
                 '%s requires that $elementOrFieldset be an object implementing %s; received "%s"',
                 __METHOD__,
                 __NAMESPACE__ . '\ElementInterface',
-                (is_object($elementOrFieldset) ? get_class($elementOrFieldset) : gettype($elementOrFieldset))
+                is_object($elementOrFieldset) ? get_class($elementOrFieldset) : gettype($elementOrFieldset)
             ));
         }
 
@@ -346,7 +358,7 @@ class Collection extends Fieldset
      * Get allow add
      *
      * @param bool $allowAdd
-     * @return Collection
+     * @return $this
      */
     public function setAllowAdd($allowAdd)
     {
@@ -366,7 +378,7 @@ class Collection extends Fieldset
 
     /**
      * @param bool $allowRemove
-     * @return Collection
+     * @return $this
      */
     public function setAllowRemove($allowRemove)
     {
@@ -387,7 +399,7 @@ class Collection extends Fieldset
      * to ease the creation of dynamic elements through JavaScript
      *
      * @param bool $shouldCreateTemplate
-     * @return Collection
+     * @return $this
      */
     public function setShouldCreateTemplate($shouldCreateTemplate)
     {
@@ -410,7 +422,7 @@ class Collection extends Fieldset
      * Set the placeholder used in the template generated to help create new elements in JavaScript
      *
      * @param string $templatePlaceholder
-     * @return Collection
+     * @return $this
      */
     public function setTemplatePlaceholder($templatePlaceholder)
     {
@@ -433,7 +445,7 @@ class Collection extends Fieldset
 
     /**
      * @param bool $createNewObjects
-     * @return Collection
+     * @return $this
      */
     public function setCreateNewObjects($createNewObjects)
     {
@@ -496,18 +508,16 @@ class Collection extends Fieldset
 
     /**
      * @return array
-     * @throws \Laminas\Form\Exception\InvalidArgumentException
-     * @throws \Laminas\Stdlib\Exception\InvalidArgumentException
-     * @throws \Laminas\Form\Exception\DomainException
-     * @throws \Laminas\Form\Exception\InvalidElementException
+     * @throws Exception\InvalidArgumentException
+     * @throws InvalidArgumentException
+     * @throws Exception\DomainException
+     * @throws Exception\InvalidElementException
      */
     public function extract()
     {
         if ($this->object instanceof Traversable) {
             $this->object = ArrayUtils::iteratorToArray($this->object, false);
-        }
-
-        if (! is_array($this->object)) {
+        } elseif (! is_array($this->object)) {
             return [];
         }
 
@@ -576,8 +586,8 @@ class Collection extends Fieldset
 
         if (! $this->allowAdd && $this->count() > $this->count) {
             throw new Exception\DomainException(sprintf(
-                'There are more elements than specified in the collection (%s). Either set the allow_add option ' .
-                'to true, or re-submit the form.',
+                'There are more elements than specified in the collection (%s). Either set the allow_add option '
+                . 'to true, or re-submit the form.',
                 get_class($this)
             ));
         }
@@ -593,7 +603,7 @@ class Collection extends Fieldset
     protected function createTemplateElement()
     {
         if (! $this->shouldCreateTemplate) {
-            return;
+            return null;
         }
 
         if ($this->templateElement) {

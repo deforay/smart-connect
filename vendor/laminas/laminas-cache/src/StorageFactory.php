@@ -1,18 +1,20 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-cache for the canonical source repository
- * @copyright https://github.com/laminas/laminas-cache/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-cache/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Cache;
 
+use Laminas\Cache\Service\StorageAdapterFactoryInterface;
+use Laminas\Cache\Service\StoragePluginFactoryInterface;
+use Laminas\Cache\Storage\PluginAwareInterface;
 use Laminas\EventManager\EventsCapableInterface;
 use Laminas\ServiceManager\ServiceManager;
 use Laminas\Stdlib\ArrayUtils;
 use Traversable;
 
+/**
+ * @deprecated Please do not use static factories anymore.
+ *             Inject {@see StorageAdapterFactoryInterface} if you want to create a storage instance.
+ *             Inject {@see StoragePluginFactoryInterface} if you want to create a plugin instance.
+ */
 abstract class StorageFactory
 {
     /**
@@ -72,12 +74,21 @@ abstract class StorageFactory
 
         // add plugins
         if (isset($cfg['plugins'])) {
-            if (! $adapter instanceof EventsCapableInterface) {
-                throw new Exception\RuntimeException(sprintf(
-                    "The adapter '%s' doesn't implement '%s' and therefore can't handle plugins",
-                    get_class($adapter),
-                    'Laminas\EventManager\EventsCapableInterface'
-                ));
+            if (! $adapter instanceof PluginAwareInterface) {
+                if (! $adapter instanceof EventsCapableInterface) {
+                    throw new Exception\RuntimeException(sprintf(
+                        "The adapter '%s' doesn't implement '%s' and therefore can't handle plugins",
+                        get_class($adapter),
+                        EventsCapableInterface::class
+                    ));
+                }
+
+                trigger_error(sprintf(
+                    'Using "%s" to provide plugin capabilities to storage adapters is deprecated as of '
+                    . 'laminas-cache 2.10; please use "%s" instead',
+                    EventsCapableInterface::class,
+                    PluginAwareInterface::class
+                ), E_USER_DEPRECATED);
             }
 
             if (! is_array($cfg['plugins'])) {

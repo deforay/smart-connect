@@ -1,11 +1,5 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-form for the canonical source repository
- * @copyright https://github.com/laminas/laminas-form/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-form/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Form\View\Helper;
 
 use DateTime;
@@ -15,14 +9,17 @@ use Laminas\Form\ElementInterface;
 use Laminas\Form\Exception;
 use Laminas\Form\View\Helper\FormMonthSelect as FormMonthSelectHelper;
 
+use function is_numeric;
+use function sprintf;
+
 class FormDateSelect extends FormMonthSelectHelper
 {
     /**
      * Render a date element that is composed of three selects
      *
      * @param  ElementInterface $element
-     * @throws \Laminas\Form\Exception\InvalidArgumentException
-     * @throws \Laminas\Form\Exception\DomainException
+     * @throws Exception\InvalidArgumentException
+     * @throws Exception\DomainException
      * @return string
      */
     public function render(ElementInterface $element)

@@ -12,42 +12,51 @@ use Laminas\Code\Annotation\AnnotationManager;
 use Laminas\Code\Exception;
 use Laminas\Code\NameInformation;
 
+use function array_slice;
+use function count;
+use function is_int;
+use function is_string;
+use function ltrim;
+use function strtolower;
+use function substr_count;
+use function var_export;
+
 class MethodScanner implements ScannerInterface
 {
     /**
      * @var bool
      */
-    protected $isScanned    = false;
+    protected $isScanned = false;
 
     /**
      * @var string
      */
-    protected $docComment   = null;
+    protected $docComment;
 
     /**
      * @var ClassScanner
      */
-    protected $scannerClass = null;
+    protected $scannerClass;
 
     /**
      * @var string
      */
-    protected $class        = null;
+    protected $class;
 
     /**
      * @var string
      */
-    protected $name         = null;
+    protected $name;
 
     /**
      * @var int
      */
-    protected $lineStart    = null;
+    protected $lineStart;
 
     /**
      * @var int
      */
-    protected $lineEnd      = null;
+    protected $lineEnd;
 
     /**
      * @var bool
@@ -92,7 +101,7 @@ class MethodScanner implements ScannerInterface
     /**
      * @var NameInformation
      */
-    protected $nameInformation = null;
+    protected $nameInformation;
 
     /**
      * @var array
@@ -130,7 +139,7 @@ class MethodScanner implements ScannerInterface
     }
 
     /**
-     * @return MethodScanner
+     * @return ClassScanner
      */
     public function getClassScanner()
     {
@@ -179,7 +188,7 @@ class MethodScanner implements ScannerInterface
 
     /**
      * @param  AnnotationManager $annotationManager
-     * @return AnnotationScanner
+     * @return AnnotationScanner|false
      */
     public function getAnnotations(AnnotationManager $annotationManager)
     {
@@ -254,7 +263,7 @@ class MethodScanner implements ScannerInterface
      * Override the given name for a method, this is necessary to
      * support traits.
      *
-     * @param $name
+     * @param string $name
      * @return self
      */
     public function setName($name)
@@ -267,13 +276,13 @@ class MethodScanner implements ScannerInterface
      * Visibility must be of T_PUBLIC, T_PRIVATE or T_PROTECTED
      * Needed to support traits
      *
-     * @param $visibility   T_PUBLIC | T_PRIVATE | T_PROTECTED
+     * @param int $visibility   T_PUBLIC | T_PRIVATE | T_PROTECTED
      * @return self
-     * @throws \Laminas\Code\Exception
+     * @throws \Laminas\Code\Exception\InvalidArgumentException
      */
     public function setVisibility($visibility)
     {
-        switch (strtolower($visibility)) {
+        switch ($visibility) {
             case T_PUBLIC:
                 $this->isPublic = true;
                 $this->isPrivate = false;
@@ -293,7 +302,7 @@ class MethodScanner implements ScannerInterface
                 break;
 
             default:
-                throw new Exception("Invalid visibility argument passed to setVisibility.");
+                throw new Exception\InvalidArgumentException('Invalid visibility argument passed to setVisibility.');
         }
 
         return $this;
@@ -322,7 +331,7 @@ class MethodScanner implements ScannerInterface
                 continue;
             }
 
-            if (!$returnScanner) {
+            if (! $returnScanner) {
                 $return[] = $info['name'];
             } else {
                 $return[] = $this->getParameter($info['name']);
@@ -353,7 +362,7 @@ class MethodScanner implements ScannerInterface
                 }
                 unset($info);
             }
-            if (!isset($info)) {
+            if (! isset($info)) {
                 throw new Exception\InvalidArgumentException('Index of info offset is not about a parameter');
             }
         }
@@ -399,14 +408,13 @@ class MethodScanner implements ScannerInterface
             return;
         }
 
-        if (!$this->tokens) {
+        if (! $this->tokens) {
             throw new Exception\RuntimeException('No tokens were provided');
         }
 
         /**
          * Variables & Setup
          */
-
         $tokens       = &$this->tokens; // localize
         $infos        = &$this->infos; // localize
         $tokenIndex   = null;
@@ -429,8 +437,8 @@ class MethodScanner implements ScannerInterface
             &$tokenLine
         ) {
             static $lastTokenArray = null;
-            $tokenIndex = ($tokenIndex === null) ? 0 : $tokenIndex + 1;
-            if (!isset($tokens[$tokenIndex])) {
+            $tokenIndex = $tokenIndex === null ? 0 : $tokenIndex + 1;
+            if (! isset($tokens[$tokenIndex])) {
                 $token        = false;
                 $tokenContent = false;
                 $tokenType    = false;
@@ -442,12 +450,13 @@ class MethodScanner implements ScannerInterface
             if (is_string($token)) {
                 $tokenType    = null;
                 $tokenContent = $token;
-                $tokenLine    = $tokenLine + substr_count(
-                    $lastTokenArray[1],
+                $tokenLine   += substr_count(
+                    $lastTokenArray[1] ?? '',
                     "\n"
                 ); // adjust token line by last known newline count
             } else {
-                list($tokenType, $tokenContent, $tokenLine) = $token;
+                $lastTokenArray = $token;
+                [$tokenType, $tokenContent, $tokenLine] = $token;
             }
 
             return $tokenIndex;
@@ -474,13 +483,12 @@ class MethodScanner implements ScannerInterface
         /**
          * START FINITE STATE MACHINE FOR SCANNING TOKENS
          */
-
         // Initialize token
         $MACRO_TOKEN_ADVANCE();
 
         SCANNER_TOP:
 
-        $this->lineStart = ($this->lineStart) ? : $tokenLine;
+        $this->lineStart = $this->lineStart ? : $tokenLine;
 
         switch ($tokenType) {
             case T_DOC_COMMENT:
@@ -489,47 +497,55 @@ class MethodScanner implements ScannerInterface
                     $this->docComment = $tokenContent;
                 }
                 goto SCANNER_CONTINUE_SIGNATURE;
-                //goto (no break needed);
+                // goto (no break needed);
 
             case T_FINAL:
                 $this->isFinal = true;
                 goto SCANNER_CONTINUE_SIGNATURE;
-                //goto (no break needed);
+                // goto (no break needed);
 
             case T_ABSTRACT:
                 $this->isAbstract = true;
                 goto SCANNER_CONTINUE_SIGNATURE;
-                //goto (no break needed);
+                // goto (no break needed);
 
             case T_PUBLIC:
                 // use defaults
                 goto SCANNER_CONTINUE_SIGNATURE;
-                //goto (no break needed);
+                // goto (no break needed);
 
             case T_PROTECTED:
                 $this->setVisibility(T_PROTECTED);
                 goto SCANNER_CONTINUE_SIGNATURE;
-                //goto (no break needed);
+                // goto (no break needed);
 
             case T_PRIVATE:
                 $this->setVisibility(T_PRIVATE);
                 goto SCANNER_CONTINUE_SIGNATURE;
-                //goto (no break needed);
+                // goto (no break needed);
 
             case T_STATIC:
                 $this->isStatic = true;
                 goto SCANNER_CONTINUE_SIGNATURE;
-                //goto (no break needed);
+                // goto (no break needed);
+
+            case T_NS_SEPARATOR:
+                if (! isset($infos[$infoIndex])) {
+                    $MACRO_INFO_START();
+                }
+                goto SCANNER_CONTINUE_SIGNATURE;
+                // goto (no break needed);
 
             case T_VARIABLE:
             case T_STRING:
-
+            case T_NAME_QUALIFIED:
+            case T_NAME_FULLY_QUALIFIED:
                 if ($tokenType === T_STRING && $parentCount === 0) {
                     $this->name = $tokenContent;
                 }
 
                 if ($parentCount === 1) {
-                    if (!isset($infos[$infoIndex])) {
+                    if (! isset($infos[$infoIndex])) {
                         $MACRO_INFO_START();
                     }
                     if ($tokenType === T_VARIABLE) {
@@ -538,21 +554,20 @@ class MethodScanner implements ScannerInterface
                 }
 
                 goto SCANNER_CONTINUE_SIGNATURE;
-                //goto (no break needed);
+                // goto (no break needed);
 
             case null:
-
                 switch ($tokenContent) {
                     case '&':
-                        if (!isset($infos[$infoIndex])) {
+                        if (! isset($infos[$infoIndex])) {
                             $MACRO_INFO_START();
                         }
                         goto SCANNER_CONTINUE_SIGNATURE;
-                        //goto (no break needed);
+                        // goto (no break needed);
                     case '(':
                         $parentCount++;
                         goto SCANNER_CONTINUE_SIGNATURE;
-                        //goto (no break needed);
+                        // goto (no break needed);
                     case ')':
                         $parentCount--;
                         if ($parentCount > 0) {
@@ -565,7 +580,7 @@ class MethodScanner implements ScannerInterface
                             $context = 'body';
                         }
                         goto SCANNER_CONTINUE_BODY;
-                        //goto (no break needed);
+                        // goto (no break needed);
                     case ',':
                         if ($parentCount === 1) {
                             $MACRO_INFO_ADVANCE();
@@ -600,7 +615,5 @@ class MethodScanner implements ScannerInterface
         SCANNER_END:
 
         $this->isScanned = true;
-
-        return;
     }
 }

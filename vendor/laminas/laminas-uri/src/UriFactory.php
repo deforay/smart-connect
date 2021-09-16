@@ -1,11 +1,5 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-uri for the canonical source repository
- * @copyright https://github.com/laminas/laminas-uri/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-uri/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Uri;
 
 use Laminas\Uri\File;
@@ -107,7 +101,7 @@ abstract class UriFactory
         }
 
         $uri    = new Uri($uriString);
-        $scheme = strtolower($uri->getScheme());
+        $scheme = strtolower($uri->getScheme() ?? '');
         if (! $scheme && $defaultScheme) {
             $scheme = $defaultScheme;
         }

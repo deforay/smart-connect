@@ -10,8 +10,7 @@ namespace Laminas\Mvc\Service;
 
 use Interop\Container\ContainerInterface;
 use Laminas\Mvc\View\Http\ViewManager as HttpViewManager;
-use Laminas\ServiceManager\FactoryInterface;
-use Laminas\ServiceManager\ServiceLocatorInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class HttpViewManagerFactory implements FactoryInterface
 {
@@ -26,18 +25,5 @@ class HttpViewManagerFactory implements FactoryInterface
     public function __invoke(ContainerInterface $container, $name, array $options = null)
     {
         return new HttpViewManager();
-    }
-
-    /**
-     * Create and return HttpViewManager instance
-     *
-     * For use with laminas-servicemanager v2; proxies to __invoke().
-     *
-     * @param ServiceLocatorInterface $container
-     * @return HttpViewManager
-     */
-    public function createService(ServiceLocatorInterface $container)
-    {
-        return $this($container, HttpViewManager::class);
     }
 }

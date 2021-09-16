@@ -1,15 +1,11 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-form for the canonical source repository
- * @copyright https://github.com/laminas/laminas-form/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-form/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Form\View\Helper;
 
 use Laminas\Form\ElementInterface;
 use Laminas\Form\Exception;
+
+use function sprintf;
 
 class FormTextarea extends AbstractHelper
 {
@@ -25,7 +21,9 @@ class FormTextarea extends AbstractHelper
         'dirname'      => true,
         'disabled'     => true,
         'form'         => true,
+        'inputmode'    => true,
         'maxlength'    => true,
+        'minlength'    => true,
         'name'         => true,
         'placeholder'  => true,
         'readonly'     => true,

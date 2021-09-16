@@ -1,15 +1,14 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-form for the canonical source repository
- * @copyright https://github.com/laminas/laminas-form/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-form/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Form\View\Helper;
 
 use Laminas\Form\ElementInterface;
 use Laminas\Form\Exception;
+
+use function array_key_exists;
+use function is_array;
+use function is_string;
+use function sprintf;
 
 class FormFile extends FormInput
 {

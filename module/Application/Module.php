@@ -49,7 +49,9 @@ use Application\Service\SummaryService;
 
 use Laminas\Mvc\ModuleRouteListener;
 use Laminas\Mvc\MvcEvent;
-use Laminas\Cache\PatternFactory;
+
+use Laminas\Cache\Pattern\ObjectCache;
+use Laminas\Cache\Pattern\PatternOptions;
 
 use Laminas\View\Model\ViewModel;
 
@@ -247,14 +249,19 @@ class Module
 				'SampleTable' => function ($sm) {
 					$session = new Container('credo');
 					$mappedFacilities = (isset($session->mappedFacilities) && count($session->mappedFacilities) > 0) ? $session->mappedFacilities : array();
-					$dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');
 					$sampleTable = isset($session->sampleTable) ? $session->sampleTable :  null;
-					$tableObj = new SampleTable($dbAdapter, $sm, $mappedFacilities, $sampleTable);
-					$table = PatternFactory::factory('object', [
-						'storage' => $sm->get('Cache\Persistent'),
-						'object' => $tableObj,
-						'object_key' => $sampleTable // this makes sure we have different caches for both current and archive
-					]);
+					$dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');
+					$commonService = $sm->getServiceLocator()->get('CommonService');
+					$tableObj = new SampleTable($dbAdapter, $sm, $mappedFacilities, $sampleTable,$commonService);
+					$storage = $sm->get('Cache\Persistent');
+					
+					$table = new ObjectCache(
+						$storage,
+						new PatternOptions([
+							'object' => $tableObj,
+							'object_key' => $sampleTable // this makes sure we have different caches for both current and archive
+						])
+					);
 					return $table;
 				},
 				'SampleTableWithoutCache' => function ($sm) {
@@ -262,16 +269,20 @@ class Module
 					$mappedFacilities = (isset($session->mappedFacilities) && count($session->mappedFacilities) > 0) ? $session->mappedFacilities : array();
 					$sampleTable = isset($session->sampleTable) ? $session->sampleTable :  null;
 					$dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');
-					return new SampleTable($dbAdapter, $sm, $mappedFacilities, $sampleTable);
+					$commonService = $sm->getServiceLocator()->get('CommonService');
+					return new SampleTable($dbAdapter, $sm, $mappedFacilities, $sampleTable,$commonService);
 				},
 				'FacilityTable' => function ($sm) {
 					$dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');
 					$tableObj = new FacilityTable($dbAdapter, $sm);
-					$table = PatternFactory::factory('object', [
-						'storage' => $sm->get('Cache\Persistent'),
-						'object' => $tableObj
-					]);
-					return $table;
+					$storage = $sm->get('Cache\Persistent');
+					$table = new ObjectCache(
+						$storage,
+						new PatternOptions([
+							'object' => $tableObj
+						])
+					);
+					return $table;					
 				},
 				'FacilityTableWithoutCache' => function ($sm) {
 					$dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');
@@ -411,7 +422,8 @@ class Module
 				},
 
 				'CommonService' => function ($sm) {
-					return new CommonService($sm);
+					$cache = $sm->get('Cache\Persistent');
+					return new CommonService($sm, $cache);
 				},
 				'UserService' => function ($sm) {
 					return new UserService($sm);
@@ -423,7 +435,10 @@ class Module
 					return new SampleService($sm);
 				},
 				'SummaryService' => function ($sm) {
-					return new SummaryService($sm);
+					$sampleTable = $sm->get('SampleTable');
+					$translator = $sm->get('translator');
+					$dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');
+					return new SummaryService($sampleTable, $translator, $dbAdapter);
 				},
 				'ConfigService' => function ($sm) {
 					return new ConfigService($sm);
@@ -431,7 +446,7 @@ class Module
 				'FacilityService' => function ($sm) {
 					return new FacilityService($sm);
 				},
-				'translator' => 'Laminas\Mvc\Service\TranslatorServiceFactory',
+				'translator' => 'Laminas\Mvc\I18n\TranslatorFactory',
 			),
 			'abstract_factories' => array(
 				'Laminas\Cache\Service\StorageCacheAbstractServiceFactory',
@@ -449,7 +464,7 @@ class Module
 					return new \Application\Controller\LoginController($userService, $configService);
 				},
 				'Application\Controller\Users' => function ($sm) {
-					$commonService = $sm->getServiceLocator()->get('ConfigService');
+					$commonService = $sm->getServiceLocator()->get('CommonService');
 					$orgService = $sm->getServiceLocator()->get('OrganizationService');
 					$userService = $sm->getServiceLocator()->get('UserService');
 					return new \Application\Controller\UsersController($userService, $commonService, $orgService);
@@ -494,10 +509,21 @@ class Module
 	{
 		return array(
 			'invokables' => array(
-				'humanDateFormat' 		=> 'Application\View\Helper\HumanDateFormat',
-				'GetConfigData' 		=> 'Application\View\Helper\GetConfigData',
-				'GetActiveModules' 		=> 'Application\View\Helper\GetActiveModules',
-				'GetLocaleData' 		=> 'Application\View\Helper\GetLocaleData'
+				'humanDateFormat' 		=> 'Application\View\Helper\HumanDateFormat'
+			),
+			'factories' => array(
+				'GetLocaleData' 		 => function ($sm) {
+					$globalTable = $sm->getServiceLocator()->get('GlobalTable');
+					return new \Application\View\Helper\GetLocaleData($globalTable);
+				},
+				'GetConfigData' 		 => function ($sm) {
+					$globalTable = $sm->getServiceLocator()->get('GlobalTable');
+					return new \Application\View\Helper\GetConfigData($globalTable);
+				},
+				'GetActiveModules' 		 => function ($sm) {
+					$config = $sm->getServiceLocator()->get('Config');
+					return new \Application\View\Helper\GetActiveModules($config);
+				},
 			),
 		);
 	}

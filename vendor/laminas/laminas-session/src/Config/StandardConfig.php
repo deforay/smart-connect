@@ -1,21 +1,39 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-session for the canonical source repository
- * @copyright https://github.com/laminas/laminas-session/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-session/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Session\Config;
 
 use Laminas\Session\Exception;
 use Laminas\Validator\Hostname as HostnameValidator;
 use Traversable;
 
+use function array_key_exists;
+use function array_merge;
+use function array_shift;
+use function implode;
+use function is_array;
+use function is_dir;
+use function is_numeric;
+use function is_readable;
+use function is_string;
+use function is_writable;
+use function method_exists;
+use function parse_url;
+use function preg_replace;
+use function sprintf;
+use function str_replace;
+use function strtolower;
+use function substr;
+use function trigger_error;
+use function ucwords;
+
+use const E_USER_DEPRECATED;
+use const PHP_URL_PATH;
+use const PHP_VERSION_ID;
+
 /**
  * Standard session configuration
  */
-class StandardConfig implements ConfigInterface
+class StandardConfig implements ConfigInterface, SameSiteCookieCapableInterface
 {
     /**
      * session.name
@@ -51,6 +69,13 @@ class StandardConfig implements ConfigInterface
      * @var string
      */
     protected $cookieDomain;
+
+    /**
+     * session.cookie_samesite
+     *
+     * @var string
+     */
+    protected $cookieSameSite;
 
     /**
      * session.cookie_secure
@@ -134,7 +159,6 @@ class StandardConfig implements ConfigInterface
      * Keys are normalized to lowercase. After setting internally, calls
      * {@link setStorageOption()} to allow further processing.
      *
-     *
      * @param  string $option
      * @param  mixed $value
      * @return StandardConfig
@@ -172,7 +196,7 @@ class StandardConfig implements ConfigInterface
             return $value;
         }
 
-        return;
+        return null;
     }
 
     /**
@@ -212,7 +236,6 @@ class StandardConfig implements ConfigInterface
      */
     public function getStorageOption($storageOption)
     {
-        return;
     }
 
     /**
@@ -220,7 +243,7 @@ class StandardConfig implements ConfigInterface
      *
      * @param  string $savePath
      * @return StandardConfig
-     * @throws Exception\InvalidArgumentException on invalid path
+     * @throws Exception\InvalidArgumentException On invalid path.
      */
     public function setSavePath($savePath)
     {
@@ -434,7 +457,7 @@ class StandardConfig implements ConfigInterface
         $cookiePath = (string) $cookiePath;
 
         $test = parse_url($cookiePath, PHP_URL_PATH);
-        if ($test != $cookiePath || '/' != $test[0]) {
+        if ($test !== $cookiePath || '/' !== $test[0]) {
             throw new Exception\InvalidArgumentException('Invalid cookie path');
         }
 
@@ -493,6 +516,32 @@ class StandardConfig implements ConfigInterface
             $this->cookieDomain = $this->getStorageOption('cookie_domain');
         }
         return $this->cookieDomain;
+    }
+
+    /**
+     * Set session.cookie_samesite
+     *
+     * @param  string $cookieSameSite
+     * @return StandardConfig
+     */
+    public function setCookieSameSite($cookieSameSite)
+    {
+        $this->cookieSameSite = (string) $cookieSameSite;
+        $this->setStorageOption('cookie_samesite', $this->cookieSameSite);
+        return $this;
+    }
+
+    /**
+     * Get session.cookie_samesite
+     *
+     * @return string
+     */
+    public function getCookieSameSite()
+    {
+        if (null === $this->cookieSameSite) {
+            $this->cookieSameSite = $this->getStorageOption('cookie_samesite');
+        }
+        return $this->cookieSameSite;
     }
 
     /**
@@ -579,6 +628,8 @@ class StandardConfig implements ConfigInterface
     /**
      * Set session.entropy_file
      *
+     * @deprecated removed in PHP 7.1
+     *
      * @param  string $entropyFile
      * @return StandardConfig
      * @throws Exception\InvalidArgumentException
@@ -604,6 +655,8 @@ class StandardConfig implements ConfigInterface
     /**
      * Get session.entropy_file
      *
+     * @deprecated removed in PHP 7.1
+     *
      * @return string
      */
     public function getEntropyFile()
@@ -621,6 +674,8 @@ class StandardConfig implements ConfigInterface
 
     /**
      * set session.entropy_length
+     *
+     * @deprecated removed in PHP 7.1
      *
      * @param  int $entropyLength
      * @return StandardConfig
@@ -646,6 +701,8 @@ class StandardConfig implements ConfigInterface
 
     /**
      * Get session.entropy_length
+     *
+     * @deprecated removed in PHP 7.1
      *
      * @return string
      */
@@ -702,6 +759,8 @@ class StandardConfig implements ConfigInterface
     /**
      * Set session.hash_function
      *
+     * @deprecated removed in PHP 7.1
+     *
      * @param  string $hashFunction
      * @return mixed
      */
@@ -717,6 +776,8 @@ class StandardConfig implements ConfigInterface
     /**
      * Get session.hash_function
      *
+     * @deprecated removed in PHP 7.1
+     *
      * @return string
      */
     public function getHashFunction()
@@ -730,6 +791,8 @@ class StandardConfig implements ConfigInterface
 
     /**
      * Set session.hash_bits_per_character
+     *
+     * @deprecated removed in PHP 7.1
      *
      * @param  int $hashBitsPerCharacter
      * @return StandardConfig
@@ -752,6 +815,8 @@ class StandardConfig implements ConfigInterface
 
     /**
      * Get session.hash_bits_per_character
+     *
+     * @deprecated removed in PHP 7.1
      *
      * @return string
      */
@@ -880,6 +945,7 @@ class StandardConfig implements ConfigInterface
             'cookie_httponly'     => $this->getCookieHttpOnly(),
             'cookie_lifetime'     => $this->getCookieLifetime(),
             'cookie_path'         => $this->getCookiePath(),
+            'cookie_samesite'     => $this->getCookieSameSite(),
             'cookie_secure'       => $this->getCookieSecure(),
             'name'                => $this->getName(),
             'remember_me_seconds' => $this->getRememberMeSeconds(),
@@ -898,7 +964,7 @@ class StandardConfig implements ConfigInterface
      * @param  string $method
      * @param  array $args
      * @return mixed
-     * @throws Exception\BadMethodCallException on non-getter/setter method
+     * @throws Exception\BadMethodCallException On non-getter/setter method.
      */
     public function __call($method, $args)
     {
@@ -907,7 +973,7 @@ class StandardConfig implements ConfigInterface
         $key    = strtolower(preg_replace('#(?<=[a-z])([A-Z])#', '_\1', $option));
 
         if ($prefix === 'set') {
-            $value  = array_shift($args);
+            $value = array_shift($args);
             return $this->setOption($key, $value);
         } elseif ($prefix === 'get') {
             return $this->getOption($key);
@@ -915,7 +981,7 @@ class StandardConfig implements ConfigInterface
             throw new Exception\BadMethodCallException(sprintf(
                 'Method "%s" does not exist in %s',
                 $method,
-                get_class($this)
+                static::class
             ));
         }
     }

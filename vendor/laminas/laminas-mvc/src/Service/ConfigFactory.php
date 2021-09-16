@@ -9,8 +9,8 @@
 namespace Laminas\Mvc\Service;
 
 use Interop\Container\ContainerInterface;
-use Laminas\ServiceManager\FactoryInterface;
-use Laminas\ServiceManager\ServiceLocatorInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
+use Traversable;
 
 class ConfigFactory implements FactoryInterface
 {
@@ -26,7 +26,7 @@ class ConfigFactory implements FactoryInterface
      * @param ContainerInterface $container
      * @param string $name
      * @param null|array $options
-     * @return array|\Traversable
+     * @return array|Traversable
      */
     public function __invoke(ContainerInterface $container, $name, array $options = null)
     {
@@ -34,18 +34,5 @@ class ConfigFactory implements FactoryInterface
         $moduleManager->loadModules();
         $moduleParams = $moduleManager->getEvent()->getParams();
         return $moduleParams['configListener']->getMergedConfig(false);
-    }
-
-    /**
-     * Create and return config instance
-     *
-     * For use with laminas-servicemanager v2; proxies to __invoke().
-     *
-     * @param ServiceLocatorInterface $container
-     * @return array|\Traversable
-     */
-    public function createService(ServiceLocatorInterface $container)
-    {
-        return $this($container, 'config');
     }
 }

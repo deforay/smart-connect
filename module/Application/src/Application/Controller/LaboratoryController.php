@@ -22,7 +22,7 @@ class LaboratoryController extends AbstractActionController
     public function indexAction()
     {
         $this->layout()->setVariable('activeTab', 'labs-dashboard');
-        return $this->_redirect()->toUrl('/labs/dashboard');
+        return $this->redirect()->toUrl('/labs/dashboard');
     }
 
     public function dashboardAction()

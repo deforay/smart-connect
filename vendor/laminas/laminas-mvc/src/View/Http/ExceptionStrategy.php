@@ -126,7 +126,7 @@ class ExceptionStrategy extends AbstractListenerAggregate
                 $e->setResult($model);
 
                 $response = $e->getResponse();
-                if (!$response) {
+                if (! $response) {
                     $response = new HttpResponse();
                     $response->setStatusCode(500);
                     $e->setResponse($response);

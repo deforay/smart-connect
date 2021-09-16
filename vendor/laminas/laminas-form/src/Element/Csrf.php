@@ -1,18 +1,16 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-form for the canonical source repository
- * @copyright https://github.com/laminas/laminas-form/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-form/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Form\Element;
 
+use Laminas\Filter\StringTrim;
 use Laminas\Form\Element;
 use Laminas\Form\ElementPrepareAwareInterface;
 use Laminas\Form\FormInterface;
 use Laminas\InputFilter\InputProviderInterface;
 use Laminas\Validator\Csrf as CsrfValidator;
+use Traversable;
+
+use function array_merge;
 
 class Csrf extends Element implements InputProviderInterface, ElementPrepareAwareInterface
 {
@@ -39,15 +37,15 @@ class Csrf extends Element implements InputProviderInterface, ElementPrepareAwar
      * Accepted options for Csrf:
      * - csrf_options: an array used in the Csrf
      *
-     * @param array|\Traversable $options
-     * @return Csrf
+     * @param array|Traversable $options
+     * @return $this
      */
     public function setOptions($options)
     {
         parent::setOptions($options);
 
-        if (isset($options['csrf_options'])) {
-            $this->setCsrfValidatorOptions($options['csrf_options']);
+        if (isset($this->options['csrf_options'])) {
+            $this->setCsrfValidatorOptions($this->options['csrf_options']);
         }
 
         return $this;
@@ -63,7 +61,7 @@ class Csrf extends Element implements InputProviderInterface, ElementPrepareAwar
 
     /**
      * @param  array $options
-     * @return Csrf
+     * @return $this
      */
     public function setCsrfValidatorOptions(array $options)
     {
@@ -87,8 +85,8 @@ class Csrf extends Element implements InputProviderInterface, ElementPrepareAwar
     }
 
     /**
-     * @param  \Laminas\Validator\Csrf $validator
-     * @return Csrf
+     * @param  CsrfValidator $validator
+     * @return $this
      */
     public function setCsrfValidator(CsrfValidator $validator)
     {
@@ -137,7 +135,7 @@ class Csrf extends Element implements InputProviderInterface, ElementPrepareAwar
             'name' => $this->getName(),
             'required' => true,
             'filters' => [
-                ['name' => 'Laminas\Filter\StringTrim'],
+                ['name' => StringTrim::class],
             ],
             'validators' => [
                 $this->getCsrfValidator(),

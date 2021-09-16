@@ -1,12 +1,12 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-http for the canonical source repository
- * @copyright https://github.com/laminas/laminas-http/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-http/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Http\Header;
+
+use function is_int;
+use function is_numeric;
+use function strtolower;
+
+use const PHP_INT_MAX;
 
 /**
  * Age HTTP Header
@@ -26,26 +26,25 @@ class Age implements HeaderInterface
      * Create Age header from string
      *
      * @param string $headerLine
-     * @return Age
+     * @return static
      * @throws Exception\InvalidArgumentException
      */
     public static function fromString($headerLine)
     {
-        list($name, $value) = GenericHeader::splitHeaderLine($headerLine);
+        [$name, $value] = GenericHeader::splitHeaderLine($headerLine);
 
         // check to ensure proper header type for this factory
         if (strtolower($name) !== 'age') {
             throw new Exception\InvalidArgumentException('Invalid header line for Age string: "' . $name . '"');
         }
 
-        $header = new static($value);
-
-        return $header;
+        return new static($value);
     }
 
+    /** @param null|int $deltaSeconds */
     public function __construct($deltaSeconds = null)
     {
-        if ($deltaSeconds) {
+        if ($deltaSeconds !== null) {
             $this->setDeltaSeconds($deltaSeconds);
         }
     }
@@ -63,18 +62,18 @@ class Age implements HeaderInterface
     /**
      * Get header value (number of seconds)
      *
-     * @return int
+     * @return string
      */
     public function getFieldValue()
     {
-        return $this->getDeltaSeconds();
+        return (string) $this->getDeltaSeconds();
     }
 
     /**
      * Set number of seconds
      *
      * @param int $delta
-     * @return RetryAfter
+     * @return $this
      */
     public function setDeltaSeconds($delta)
     {
@@ -103,6 +102,6 @@ class Age implements HeaderInterface
      */
     public function toString()
     {
-        return 'Age: ' . (($this->deltaSeconds >= PHP_INT_MAX) ? '2147483648' : $this->deltaSeconds);
+        return 'Age: ' . ($this->deltaSeconds >= PHP_INT_MAX ? '2147483648' : $this->deltaSeconds);
     }
 }

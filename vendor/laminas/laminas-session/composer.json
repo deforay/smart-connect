@@ -1,6 +1,6 @@
 {
     "name": "laminas/laminas-session",
-    "description": "manage and preserve session data, a logical complement of cookie data, across multiple page requests by the same client",
+    "description": "Object-oriented interface to PHP sessions and storage",
     "license": "BSD-3-Clause",
     "keywords": [
         "laminas",
@@ -19,32 +19,29 @@
         "sort-packages": true
     },
     "extra": {
-        "branch-alias": {
-            "dev-master": "2.8.x-dev",
-            "dev-develop": "2.9.x-dev"
-        },
         "laminas": {
             "component": "Laminas\\Session",
             "config-provider": "Laminas\\Session\\ConfigProvider"
         }
     },
     "require": {
-        "php": "^5.6 || ^7.0",
-        "laminas/laminas-eventmanager": "^2.6.2 || ^3.0",
-        "laminas/laminas-stdlib": "^2.7 || ^3.0",
+        "php": "^7.3 || ~8.0.0",
+        "laminas/laminas-eventmanager": "^3.0",
+        "laminas/laminas-stdlib": "^3.2.1",
         "laminas/laminas-zendframework-bridge": "^1.0"
     },
     "require-dev": {
         "container-interop/container-interop": "^1.1",
         "laminas/laminas-cache": "^2.6.1",
-        "laminas/laminas-coding-standard": "~1.0.0",
+        "laminas/laminas-coding-standard": "~2.2.1",
         "laminas/laminas-db": "^2.7",
         "laminas/laminas-http": "^2.5.4",
-        "laminas/laminas-servicemanager": "^2.7.5 || ^3.0.3",
+        "laminas/laminas-servicemanager": "^3.0.3",
         "laminas/laminas-validator": "^2.6",
         "mongodb/mongodb": "^1.0.1",
         "php-mock/php-mock-phpunit": "^1.1.2 || ^2.0",
-        "phpunit/phpunit": "^5.7.5 || >=6.0.13 <6.5.0"
+        "phpspec/prophecy-phpunit": "^2.0",
+        "phpunit/phpunit": "^9.3"
     },
     "suggest": {
         "laminas/laminas-cache": "Laminas\\Cache component",
@@ -60,9 +57,6 @@
         }
     },
     "autoload-dev": {
-        "files": [
-            "test/autoload.php"
-        ],
         "psr-4": {
             "LaminasTest\\Session\\": "test/"
         }
@@ -78,6 +72,6 @@
         "test-coverage": "phpunit --colors=always --coverage-clover clover.xml"
     },
     "replace": {
-        "zendframework/zend-session": "self.version"
+        "zendframework/zend-session": "^2.9.1"
     }
 }

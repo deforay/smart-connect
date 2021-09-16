@@ -10,22 +10,25 @@ namespace Laminas\Code\Reflection\DocBlock\Tag;
 
 use Laminas\Code\Generic\Prototype\PrototypeGenericInterface;
 
+use function explode;
+use function trim;
+
 class GenericTag implements TagInterface, PrototypeGenericInterface
 {
     /**
      * @var string
      */
-    protected $name = null;
+    protected $name;
 
     /**
      * @var string
      */
-    protected $content = null;
+    protected $content;
 
     /**
      * @var null|string
      */
-    protected $contentSplitCharacter = null;
+    protected $contentSplitCharacter;
 
     /**
      * @var array
@@ -94,7 +97,7 @@ class GenericTag implements TagInterface, PrototypeGenericInterface
      */
     public function __toString()
     {
-        return 'DocBlock Tag [ * @' . $this->name . ' ]' . PHP_EOL;
+        return 'DocBlock Tag [ * @' . $this->name . ' ]' . "\n";
     }
 
     /**

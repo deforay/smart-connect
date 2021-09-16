@@ -1,11 +1,5 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-form for the canonical source repository
- * @copyright https://github.com/laminas/laminas-form/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-form/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Form;
 
 use Interop\Container\ContainerInterface;
@@ -14,12 +8,17 @@ use Laminas\ServiceManager\Config;
 use Laminas\ServiceManager\FactoryInterface;
 use Laminas\ServiceManager\ServiceLocatorInterface;
 
+use function is_array;
+use function method_exists;
+
 class FormElementManagerFactory implements FactoryInterface
 {
     /**
      * laminas-servicemanager v2 support for invocation options.
      *
      * @param array
+     *
+     * @deprecated Call \Laminas\Form\FormElementManagerFactory::__invoke with 3rd parameter as options instead
      */
     protected $creationOptions;
 
@@ -30,9 +29,7 @@ class FormElementManagerFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $name, array $options = null)
     {
-        $pluginManager = $this->isV3Container()
-            ? new FormElementManager\FormElementManagerV3Polyfill($container, $options ?: [])
-            : new FormElementManager\FormElementManagerV2Polyfill($container, $options ?: []);
+        $pluginManager = new \Laminas\Form\FormElementManager($container, $options ?: []);
 
         // If this is in a laminas-mvc application, the ServiceListener will inject
         // merged configuration during bootstrap.
@@ -77,19 +74,11 @@ class FormElementManagerFactory implements FactoryInterface
      *
      * @param array $options
      * @return void
+     *
+     * @deprecated Call \Laminas\Form\FormElementManagerFactory::__invoke with 3rd parameter as options instead
      */
     public function setCreationOptions(array $options)
     {
         $this->creationOptions = $options;
-    }
-
-    /**
-     * Are we running under laminas-servicemanager v3?
-     *
-     * @return bool
-     */
-    private function isV3Container()
-    {
-        return method_exists(AbstractPluginManager::class, 'configure');
     }
 }

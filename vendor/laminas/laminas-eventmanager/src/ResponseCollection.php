@@ -1,20 +1,17 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-eventmanager for the canonical source repository
- * @copyright https://github.com/laminas/laminas-eventmanager/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-eventmanager/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\EventManager;
 
 use SplStack;
+
+use function count;
 
 /**
  * Collection of signal handler return values
  */
 class ResponseCollection extends SplStack
 {
+    /** @var bool */
     protected $stopped = false;
 
     /**
@@ -31,12 +28,10 @@ class ResponseCollection extends SplStack
      * Mark the collection as stopped (or its opposite)
      *
      * @param  bool $flag
-     * @return ResponseCollection
      */
     public function setStopped($flag)
     {
         $this->stopped = (bool) $flag;
-        return $this;
     }
 
     /**

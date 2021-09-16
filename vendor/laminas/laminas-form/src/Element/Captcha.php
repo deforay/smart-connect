@@ -1,23 +1,24 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-form for the canonical source repository
- * @copyright https://github.com/laminas/laminas-form/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-form/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Form\Element;
 
 use Laminas\Captcha as LaminasCaptcha;
+use Laminas\Filter\StringTrim;
 use Laminas\Form\Element;
 use Laminas\Form\Exception;
 use Laminas\InputFilter\InputProviderInterface;
 use Traversable;
 
+use function get_class;
+use function gettype;
+use function is_array;
+use function is_object;
+use function sprintf;
+
 class Captcha extends Element implements InputProviderInterface
 {
     /**
-     * @var \Laminas\Captcha\AdapterInterface
+     * @var LaminasCaptcha\AdapterInterface
      */
     protected $captcha;
 
@@ -26,7 +27,7 @@ class Captcha extends Element implements InputProviderInterface
      * - captcha: a valid Laminas\Captcha\AdapterInterface
      *
      * @param array|Traversable $options
-     * @return Captcha
+     * @return $this
      */
     public function setOptions($options)
     {
@@ -44,7 +45,7 @@ class Captcha extends Element implements InputProviderInterface
      *
      * @param  array|LaminasCaptcha\AdapterInterface $captcha
      * @throws Exception\InvalidArgumentException
-     * @return Captcha
+     * @return $this
      */
     public function setCaptcha($captcha)
     {
@@ -52,10 +53,10 @@ class Captcha extends Element implements InputProviderInterface
             $captcha = LaminasCaptcha\Factory::factory($captcha);
         } elseif (! $captcha instanceof LaminasCaptcha\AdapterInterface) {
             throw new Exception\InvalidArgumentException(sprintf(
-                '%s expects either a Laminas\Captcha\AdapterInterface or specification to pass to Laminas\Captcha\Factory; '
-                . 'received "%s"',
+                '%s expects either a Laminas\Captcha\AdapterInterface or specification'
+                . ' to pass to Laminas\Captcha\Factory; received "%s"',
                 __METHOD__,
-                (is_object($captcha) ? get_class($captcha) : gettype($captcha))
+                is_object($captcha) ? get_class($captcha) : gettype($captcha)
             ));
         }
         $this->captcha = $captcha;
@@ -86,7 +87,7 @@ class Captcha extends Element implements InputProviderInterface
             'name' => $this->getName(),
             'required' => true,
             'filters' => [
-                ['name' => 'Laminas\Filter\StringTrim'],
+                ['name' => StringTrim::class],
             ],
         ];
 

@@ -1,11 +1,5 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-http for the canonical source repository
- * @copyright https://github.com/laminas/laminas-http/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-http/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Http\Header;
 
 use Laminas\Uri\Http as HttpUri;
@@ -22,7 +16,7 @@ class Referer extends AbstractLocation
      * according to RFC Referer URI should not have fragment
      *
      * @param  string|HttpUri $uri
-     * @return Referer
+     * @return $this
      */
     public function setUri($uri)
     {

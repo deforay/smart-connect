@@ -1,6 +1,6 @@
 {
     "name": "laminas/laminas-code",
-    "description": "provides facilities to generate arbitrary code using an object oriented interface",
+    "description": "Extensions to the PHP Reflection API, static code scanning, and code generation",
     "license": "BSD-3-Clause",
     "keywords": [
         "laminas",
@@ -19,21 +19,21 @@
         "sort-packages": true
     },
     "extra": {
-        "branch-alias": {
-            "dev-master": "2.6-dev",
-            "dev-develop": "2.7-dev"
-        }
     },
     "require": {
-        "php": "^5.5 || 7.0.0 - 7.0.4 || ^7.0.6",
-        "laminas/laminas-eventmanager": "^2.6 || ^3.0",
-        "laminas/laminas-zendframework-bridge": "^1.0"
+        "php": "^7.3 || ~8.0.0",
+        "laminas/laminas-eventmanager": "^3.3",
+        "laminas/laminas-zendframework-bridge": "^1.1"
     },
     "require-dev": {
-        "doctrine/annotations": "~1.0",
-        "fabpot/php-cs-fixer": "1.7.*",
-        "laminas/laminas-stdlib": "^2.7 || ^3.0",
-        "phpunit/phpunit": "^4.8.21"
+        "ext-phar": "*",
+        "doctrine/annotations": "^1.10.4",
+        "laminas/laminas-coding-standard": "^1.0.0",
+        "laminas/laminas-stdlib": "^3.3.0",
+        "phpunit/phpunit": "^9.4.2"
+    },
+    "conflict": {
+        "phpspec/prophecy": "<1.9.0"
     },
     "suggest": {
         "doctrine/annotations": "Doctrine\\Common\\Annotations >=1.0 for annotation features",
@@ -49,7 +49,17 @@
             "LaminasTest\\Code\\": "test/"
         }
     },
+    "scripts": {
+        "check": [
+            "@cs-check",
+            "@test"
+        ],
+        "cs-check": "phpcs",
+        "cs-fix": "phpcbf",
+        "test": "phpunit --colors=always",
+        "test-coverage": "phpunit --colors=always --coverage-clover clover.xml"
+    },
     "replace": {
-        "zendframework/zend-code": "self.version"
+        "zendframework/zend-code": "^3.4.1"
     }
 }

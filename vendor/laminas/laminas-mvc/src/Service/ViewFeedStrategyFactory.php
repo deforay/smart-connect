@@ -9,8 +9,7 @@
 namespace Laminas\Mvc\Service;
 
 use Interop\Container\ContainerInterface;
-use Laminas\ServiceManager\FactoryInterface;
-use Laminas\ServiceManager\ServiceLocatorInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 use Laminas\View\Strategy\FeedStrategy;
 
 class ViewFeedStrategyFactory implements FactoryInterface
@@ -31,18 +30,5 @@ class ViewFeedStrategyFactory implements FactoryInterface
     public function __invoke(ContainerInterface $container, $name, array $options = null)
     {
         return new FeedStrategy($container->get('ViewFeedRenderer'));
-    }
-
-    /**
-     * Create and return FeedStrategy instance
-     *
-     * For use with laminas-servicemanager v2; proxies to __invoke().
-     *
-     * @param ServiceLocatorInterface $container
-     * @return FeedStrategy
-     */
-    public function createService(ServiceLocatorInterface $container)
-    {
-        return $this($container, FeedStrategy::class);
     }
 }

@@ -10,8 +10,7 @@ namespace Laminas\Mvc\Service;
 
 use Interop\Container\ContainerInterface;
 use Laminas\Mvc\View\Http\RouteNotFoundStrategy;
-use Laminas\ServiceManager\FactoryInterface;
-use Laminas\ServiceManager\ServiceLocatorInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class HttpRouteNotFoundStrategyFactory implements FactoryInterface
 {
@@ -33,19 +32,6 @@ class HttpRouteNotFoundStrategyFactory implements FactoryInterface
         $this->injectNotFoundTemplate($strategy, $config);
 
         return $strategy;
-    }
-
-    /**
-     * Create and return RouteNotFoundStrategy instance
-     *
-     * For use with laminas-servicemanager v2; proxies to __invoke().
-     *
-     * @param ServiceLocatorInterface $container
-     * @return RouteNotFoundStrategy
-     */
-    public function createService(ServiceLocatorInterface $container)
-    {
-        return $this($container, RouteNotFoundStrategy::class);
     }
 
     /**

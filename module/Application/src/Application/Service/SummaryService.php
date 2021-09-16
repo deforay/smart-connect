@@ -13,13 +13,15 @@ use \PhpOffice\PhpSpreadsheet\Spreadsheet;
 class SummaryService
 {
 
-    public $sm = null;
+    public $sampleTable = null;
     protected $translator = null;
+    protected $dbAdapter = null;
 
-    public function __construct($sm)
+    public function __construct($sampleTable, $translator, $dbAdapter)
     {
-        $this->sm = $sm;
-        $this->translator = $this->sm->get('translator');
+        $this->sampleTable = $sampleTable;
+        $this->translator = $translator;
+        $this->dbAdapter = $dbAdapter;
     }
 
     public function getServiceManager()
@@ -29,124 +31,121 @@ class SummaryService
 
     public function fetchSummaryTabDetails($params)
     {
-        $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->getSummaryTabDetails($params);
+        return $this->sampleTable->getSummaryTabDetails($params);
     }
 
     public function getKeySummaryIndicatorsDetails($params)
     {
-        $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->fetchKeySummaryIndicatorsDetails($params);
+
+        return $this->sampleTable->fetchKeySummaryIndicatorsDetails($params);
     }
 
     public function getSamplesReceivedBarChartDetails($params)
     {
-        $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->fetchSamplesReceivedBarChartDetails($params);
+
+        return $this->sampleTable->fetchSamplesReceivedBarChartDetails($params);
     }
 
     public function getAllSamplesReceivedByDistrict($parameters)
     {
-        $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->fetchAllSamplesReceivedByDistrict($parameters);
+
+        return $this->sampleTable->fetchAllSamplesReceivedByDistrict($parameters);
     }
     public function getAllSamplesReceivedByProvince($parameters)
     {
-        $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->fetchAllSamplesReceivedByProvince($parameters);
+
+        return $this->sampleTable->fetchAllSamplesReceivedByProvince($parameters);
     }
 
     public function getAllSamplesReceivedByFacility($parameters)
     {
-        $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->fetchAllSamplesReceivedByFacility($parameters);
+
+        return $this->sampleTable->fetchAllSamplesReceivedByFacility($parameters);
     }
 
     public function getSuppressionRateBarChartDetails($params)
     {
-        $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->fetchSuppressionRateBarChartDetails($params);
+
+        return $this->sampleTable->fetchSuppressionRateBarChartDetails($params);
     }
 
     public function getAllSuppressionRateByDistrict($parameters)
     {
-        $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->fetchAllSuppressionRateByDistrict($parameters);
+
+        return $this->sampleTable->fetchAllSuppressionRateByDistrict($parameters);
     }
 
     public function getAllSuppressionRateByProvince($parameters)
     {
-        $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->fetchAllSuppressionRateByProvince($parameters);
+
+        return $this->sampleTable->fetchAllSuppressionRateByProvince($parameters);
     }
 
     public function getAllSuppressionRateByFacility($parameters)
     {
-        $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->fetchAllSuppressionRateByFacility($parameters);
+
+        return $this->sampleTable->fetchAllSuppressionRateByFacility($parameters);
     }
 
     public function getSamplesRejectedBarChartDetails($params)
     {
-        $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->fetchSamplesRejectedBarChartDetails($params);
+
+        return $this->sampleTable->fetchSamplesRejectedBarChartDetails($params);
     }
 
     public function getAllSamplesRejectedByDistrict($parameters)
     {
-        $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->fetchAllSamplesRejectedByDistrict($parameters);
+
+        return $this->sampleTable->fetchAllSamplesRejectedByDistrict($parameters);
     }
 
     public function getAllSamplesRejectedByFacility($parameters)
     {
-        $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->fecthAllSamplesRejectedByFacility($parameters);
+
+        return $this->sampleTable->fecthAllSamplesRejectedByFacility($parameters);
     }
     public function getAllSamplesRejectedByProvince($parameters)
     {
-        $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->fecthAllSamplesRejectedByProvince($parameters);
+
+        return $this->sampleTable->fecthAllSamplesRejectedByProvince($parameters);
     }
 
     public function getRegimenGroupBarChartDetails($params)
     {
-        $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->fetchRegimenGroupBarChartDetails($params);
+
+        return $this->sampleTable->fetchRegimenGroupBarChartDetails($params);
     }
 
     public function getRegimenGroupSamplesDetails($parameters)
     {
-        $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->fetchRegimenGroupSamplesDetails($parameters);
+
+        return $this->sampleTable->fetchRegimenGroupSamplesDetails($parameters);
     }
 
     public function getAllLineOfTreatmentDetails($params)
     {
-        $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->fetchAllLineOfTreatmentDetails($params);
+        return $this->sampleTable->fetchAllLineOfTreatmentDetails($params);
     }
 
     public function getAllCollapsibleLineOfTreatmentDetails($params)
     {
-        $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->fetchAllCollapsibleLineOfTreatmentDetails($params);
+
+        return $this->sampleTable->fetchAllCollapsibleLineOfTreatmentDetails($params);
     }
 
     public function exportIndicatorResultExcel($params)
     {
         $queryContainer = new Container('query');
-        $translator = $this->sm->get('translator');
         $common = new CommonService();
         if (isset($queryContainer->indicatorSummaryQuery)) {
             try {
-                $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
-                $sql = new Sql($dbAdapter);
+
+                $sql = new Sql($this->dbAdapter);
                 $sQueryStr = $sql->buildSqlString($queryContainer->indicatorSummaryQuery);
-                $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+                $sResult = $this->dbAdapter->query($sQueryStr, $this->dbAdapter::QUERY_MODE_EXECUTE)->toArray();
                 if (isset($sResult) && count($sResult) > 0) {
                     $excel = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
-                    
+
                     // $cacheMethod = \PhpOffice\PhpSpreadsheet\Collection\CellsFactory::cache_to_phpTemp;
                     // $cacheSettings = array('memoryCacheSize' => '80MB');
                     // \PhpOffice\PhpSpreadsheet\Settings::setCacheStorageMethod($cacheMethod, $cacheSettings);
@@ -154,15 +153,15 @@ class SummaryService
                     $output = array();
                     $keySummaryIndicators = array();
                     $j = 1;
-                    
+
                     foreach ($sResult as $row) {
                         $keySummaryIndicators['sample'][$this->translator->translate('Samples Received')]['month'][$j] = (isset($row["total_samples_received"])) ? $row["total_samples_received"] : 0;
                         $keySummaryIndicators['sample'][$this->translator->translate('Samples Tested')]['month'][$j] = (isset($row["total_samples_tested"])) ? $row["total_samples_tested"] : 0;
                         $keySummaryIndicators['sample'][$this->translator->translate('Samples Rejected')]['month'][$j] = (isset($row["total_samples_rejected"])) ? $row["total_samples_rejected"] : 0;
                         $keySummaryIndicators['sample'][$this->translator->translate('Valid Tested')]['month'][$j]  = $valid = (isset($row["total_samples_tested"])) ? $row["total_samples_tested"] - $row["total_samples_rejected"] : 0;;
                         $keySummaryIndicators['sample'][$this->translator->translate('Samples Suppressed')]['month'][$j] = (isset($row["total_suppressed_samples"])) ? $row["total_suppressed_samples"] : 0;
-                        $keySummaryIndicators['sample'][$this->translator->translate('Suppression Rate').' (%)']['month'][$j] = ($valid > 0) ? round((($row["total_suppressed_samples"] / $valid) * 100), 2) . '' : '0';
-                        $keySummaryIndicators['sample'][$this->translator->translate('Rejection Rate').' (%)']['month'][$j] = (isset($row["total_samples_rejected"]) && $row["total_samples_rejected"] > 0 && $row["total_samples_received"] > 0) ? round((($row["total_samples_rejected"] / ($row["total_samples_tested"] + $row["total_samples_rejected"])) * 100), 2) . '' : '0';
+                        $keySummaryIndicators['sample'][$this->translator->translate('Suppression Rate') . ' (%)']['month'][$j] = ($valid > 0) ? round((($row["total_suppressed_samples"] / $valid) * 100), 2) . '' : '0';
+                        $keySummaryIndicators['sample'][$this->translator->translate('Rejection Rate') . ' (%)']['month'][$j] = (isset($row["total_samples_rejected"]) && $row["total_samples_rejected"] > 0 && $row["total_samples_received"] > 0) ? round((($row["total_samples_rejected"] / ($row["total_samples_tested"] + $row["total_samples_rejected"])) * 100), 2) . '' : '0';
                         $keySummaryIndicators['month'][$j] = $row['monthyear'];
                         $j++;
                     }
@@ -234,7 +233,7 @@ class SummaryService
                         }
                         $currentRow++;
                     }
-                    
+
                     $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($excel, 'Xlsx');
                     $filename = 'VL-SUMMARY-KEY-INDICATORS-' . date('d-M-Y-H-i-s') . '.xlsx';
                     $writer->save(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . $filename);
@@ -254,20 +253,18 @@ class SummaryService
 
     public function exportSuppressionRateByFacility($params, $dashTable = 'dash_vl_request_form')
     {
-        
+
         $queryContainer = new Container('query');
-        $translator = $this->sm->get('translator');
         // To set te session table
         $logincontainer = new Container('credo');
-        if(isset($logincontainer->sampleTable) && $logincontainer->sampleTable != ""){
-            $dashTable = $logincontainer->sampleTable;
+        if (isset($logincontainer->SampleTableWithoutCache) && $logincontainer->SampleTableWithoutCache != "") {
+            $dashTable = $logincontainer->SampleTableWithoutCache;
         }
-        $common = new CommonService();
 
         if (!isset($queryContainer->fetchAllSuppressionRateByFacility)) {
 
-            $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
-            $sql = new Sql($dbAdapter);
+
+            $sql = new Sql($this->dbAdapter);
             $queryContainer->fetchAllSuppressionRateByFacility = $sql->select()->from(array('vl' => $dashTable))
                 ->columns(
                     array(
@@ -291,13 +288,13 @@ class SummaryService
                 ->group('vl.facility_id');
         }
 
-        
+
 
         try {
-            $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
-            $sql = new Sql($dbAdapter);
+
+            $sql = new Sql($this->dbAdapter);
             $sQueryStr = $sql->buildSqlString($queryContainer->fetchAllSuppressionRateByFacility);
-            $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+            $sResult = $this->dbAdapter->query($sQueryStr, $this->dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             if (isset($sResult) && count($sResult) > 0) {
                 $excel = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
                 //$cacheMethod = \PhpOffice\PhpSpreadsheet\Collection\CellsFactory::cache_to_phpTemp;
@@ -386,7 +383,7 @@ class SummaryService
                     }
                     $currentRow++;
                 }
-                
+
                 $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($excel, 'Xlsx');
                 $filename = 'Facility-Wise-Suppression-Rate-' . date('d-M-Y-H-i-s') . '.xlsx';
                 $writer->save(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . $filename);

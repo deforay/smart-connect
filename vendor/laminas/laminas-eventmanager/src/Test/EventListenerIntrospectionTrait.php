@@ -1,16 +1,19 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-eventmanager for the canonical source repository
- * @copyright https://github.com/laminas/laminas-eventmanager/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-eventmanager/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\EventManager\Test;
 
 use Laminas\EventManager\EventManager;
-use Laminas\Stdlib\PriorityQueue;
-use PHPUnit_Framework_Assert as Assert;
+use PHPUnit\Framework\Assert;
+use ReflectionProperty;
+use Traversable;
+
+use function array_keys;
+use function array_merge;
+use function iterator_to_array;
+use function krsort;
+use function sprintf;
+
+use const SORT_NUMERIC;
 
 /**
  * Trait providing utility methods and assertions for use in PHPUnit test cases.
@@ -32,12 +35,14 @@ trait EventListenerIntrospectionTrait
     /**
      * Retrieve a list of event names from an event manager.
      *
-     * @param EventManager $events
      * @return string[]
      */
     private function getEventsFromEventManager(EventManager $events)
     {
-        return $events->getEvents();
+        $r = new ReflectionProperty($events, 'events');
+        $r->setAccessible(true);
+        $listeners = $r->getValue($events);
+        return array_keys($listeners);
     }
 
     /**
@@ -54,23 +59,30 @@ trait EventListenerIntrospectionTrait
      * will collapse to the last added.
      *
      * @param string $event
-     * @param EventManager $events
      * @param bool $withPriority
-     * @return \Traversable
+     * @return Traversable
      */
     private function getListenersForEvent($event, EventManager $events, $withPriority = false)
     {
-        $listeners = $events->getListeners($event);
+        $r = new ReflectionProperty($events, 'events');
+        $r->setAccessible(true);
+        $internal = $r->getValue($events);
+
+        $listeners = [];
+        foreach ($internal[$event] ?? [] as $p => $listOfListeners) {
+            foreach ($listOfListeners as $l) {
+                $listeners[$p] = isset($listeners[$p]) ? array_merge($listeners[$p], $l) : $l;
+            }
+        }
+
         return $this->traverseListeners($listeners, $withPriority);
     }
 
     /**
      * Assert that a given listener exists at the specified priority.
      *
-     * @param callable $expectedListener
      * @param int $expectedPriority
      * @param string $event
-     * @param EventManager $events
      * @param string $message Failure message to use, if any.
      */
     private function assertListenerAtPriority(
@@ -80,7 +92,7 @@ trait EventListenerIntrospectionTrait
         EventManager $events,
         $message = ''
     ) {
-        $message = $message ?: sprintf(
+        $message   = $message ?: sprintf(
             'Listener not found for event "%s" and priority %d',
             $event,
             $expectedPriority
@@ -88,7 +100,8 @@ trait EventListenerIntrospectionTrait
         $listeners = $this->getListenersForEvent($event, $events, true);
         $found     = false;
         foreach ($listeners as $priority => $listener) {
-            if ($listener === $expectedListener
+            if (
+                $listener === $expectedListener
                 && $priority === $expectedPriority
             ) {
                 $found = true;
@@ -106,7 +119,6 @@ trait EventListenerIntrospectionTrait
      * specific listeners are present, or for a count of listeners.
      *
      * @param string $event
-     * @param EventManager $events
      * @return callable[]
      */
     private function getArrayOfListenersForEvent($event, EventManager $events)
@@ -117,18 +129,22 @@ trait EventListenerIntrospectionTrait
     /**
      * Generator for traversing listeners in priority order.
      *
-     * @param PriorityQueue $listeners
+     * @param array $queue
      * @param bool $withPriority When true, yields priority as key.
+     * @return iterable
      */
-    public function traverseListeners(PriorityQueue $queue, $withPriority = false)
+    public function traverseListeners(array $queue, $withPriority = false)
     {
-        foreach ($queue as $handler) {
-            $listener = $handler->getCallback();
-            if ($withPriority) {
-                $priority = (int) $handler->getMetadatum('priority');
-                yield $priority => $listener;
-            } else {
-                yield $listener;
+        krsort($queue, SORT_NUMERIC);
+
+        foreach ($queue as $priority => $listeners) {
+            $priority = (int) $priority;
+            foreach ($listeners as $listener) {
+                if ($withPriority) {
+                    yield $priority => $listener;
+                } else {
+                    yield $listener;
+                }
             }
         }
     }

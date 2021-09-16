@@ -409,12 +409,12 @@ ALTER TABLE `dash_vl_request_form` ADD `province_id` VARCHAR(255) NULL DEFAULT N
 ALTER TABLE `dash_vl_request_form` ADD `reason_for_vl_testing_other` VARCHAR(255) NULL DEFAULT NULL AFTER `reason_for_vl_testing`;
 ALTER TABLE `province_details` ADD `updated_datetime` DATETIME NULL DEFAULT NULL AFTER `province_code`;
 ALTER TABLE `r_vl_sample_type` ADD `updated_datetime` DATETIME NULL DEFAULT NULL AFTER `status`;
-ALTER TABLE `r_eid_sample_type` ADD `updated_datetime` DATETIME NULL DEFAULT NULL AFTER `status`;
-ALTER TABLE `r_covid19_sample_type` ADD `updated_datetime` DATETIME NULL DEFAULT NULL AFTER `status`;
-ALTER TABLE `r_covid19_comorbidities` ADD `updated_datetime` DATETIME NULL DEFAULT NULL AFTER `comorbidity_status`;
-ALTER TABLE `r_covid19_results` ADD `updated_datetime` DATETIME NULL DEFAULT NULL AFTER `status`;
-ALTER TABLE `r_covid19_symptoms` ADD `updated_datetime` DATETIME NULL DEFAULT NULL AFTER `symptom_status`;
-ALTER TABLE `r_covid19_test_reasons` ADD `updated_datetime` DATETIME NULL DEFAULT NULL AFTER `test_reason_status`;
+-- ALTER TABLE `r_eid_sample_type` ADD `updated_datetime` DATETIME NULL DEFAULT NULL AFTER `status`;
+-- ALTER TABLE `r_covid19_sample_type` ADD `updated_datetime` DATETIME NULL DEFAULT NULL AFTER `status`;
+-- ALTER TABLE `r_covid19_comorbidities` ADD `updated_datetime` DATETIME NULL DEFAULT NULL AFTER `comorbidity_status`;
+-- ALTER TABLE `r_covid19_results` ADD `updated_datetime` DATETIME NULL DEFAULT NULL AFTER `status`;
+-- ALTER TABLE `r_covid19_symptoms` ADD `updated_datetime` DATETIME NULL DEFAULT NULL AFTER `symptom_status`;
+-- ALTER TABLE `r_covid19_test_reasons` ADD `updated_datetime` DATETIME NULL DEFAULT NULL AFTER `test_reason_status`;
 
 
 -- Amit 24 August 2020
@@ -433,7 +433,7 @@ CREATE TABLE `r_covid19_test_reasons` (
  `test_reason_status` varchar(45) DEFAULT NULL,
  `updated_datetime` datetime DEFAULT NULL,
  PRIMARY KEY (`test_reason_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 CREATE TABLE `r_covid19_symptoms` (
  `symptom_id` int NOT NULL AUTO_INCREMENT,
@@ -442,7 +442,7 @@ CREATE TABLE `r_covid19_symptoms` (
  `symptom_status` varchar(45) DEFAULT NULL,
  `updated_datetime` datetime DEFAULT NULL,
  PRIMARY KEY (`symptom_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 CREATE TABLE `r_covid19_sample_type` (
  `sample_id` int NOT NULL AUTO_INCREMENT,
@@ -451,7 +451,7 @@ CREATE TABLE `r_covid19_sample_type` (
  `updated_datetime` datetime DEFAULT NULL,
  `data_sync` int NOT NULL DEFAULT '0',
  PRIMARY KEY (`sample_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 CREATE TABLE `r_covid19_sample_rejection_reasons` (
  `rejection_reason_id` int NOT NULL AUTO_INCREMENT,
@@ -462,7 +462,7 @@ CREATE TABLE `r_covid19_sample_rejection_reasons` (
  `updated_datetime` datetime DEFAULT NULL,
  `data_sync` int NOT NULL DEFAULT '0',
  PRIMARY KEY (`rejection_reason_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=35 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `r_covid19_comorbidities` (
  `comorbidity_id` int NOT NULL AUTO_INCREMENT,
@@ -470,11 +470,13 @@ CREATE TABLE `r_covid19_comorbidities` (
  `comorbidity_status` varchar(45) DEFAULT NULL,
  `updated_datetime` datetime DEFAULT NULL,
  PRIMARY KEY (`comorbidity_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 ALTER TABLE `facility_details` ADD `header_text` VARCHAR(255) NULL DEFAULT NULL AFTER `facility_type`;
 ALTER TABLE `r_art_code_details` ADD `updated_datetime` DATETIME NULL DEFAULT NULL AFTER `nation_identifier`;
 ALTER TABLE `r_art_code_details` ADD `headings` VARCHAR(255) NULL DEFAULT NULL AFTER `updated_datetime`, ADD `art_status` VARCHAR(45) NULL DEFAULT NULL AFTER `headings`;
+
+RENAME TABLE `r_sample_rejection_reasons` TO `r_vl_sample_rejection_reasons`;
 ALTER TABLE `r_vl_sample_rejection_reasons` ADD `rejection_type` VARCHAR(255) NULL DEFAULT NULL AFTER `rejection_reason_id`, ADD `rejection_reason_code` VARCHAR(255) NULL DEFAULT NULL AFTER `rejection_type`;
 
 /* Thana 17 Sep 2020 */
@@ -494,7 +496,7 @@ CREATE TABLE `import_config_machines` (
  PRIMARY KEY (`config_machine_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
 
---Sudarmathi 27 Nov 2020
+-- Sudarmathi 27 Nov 2020
 
 DROP TABLE IF EXISTS r_vl_test_reasons;
 CREATE TABLE `r_vl_test_reasons` (
@@ -549,8 +551,8 @@ CREATE TABLE `r_hepatitis_results` (
  PRIMARY KEY (`result_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-DROP TABLE IF EXISTS r_hepatitis_rick_factors;
-CREATE TABLE `r_hepatitis_rick_factors` (
+DROP TABLE IF EXISTS r_hepatitis_risk_factors;
+CREATE TABLE `r_hepatitis_risk_factors` (
  `riskfactor_id` int(11) NOT NULL AUTO_INCREMENT,
  `riskfactor_name` varchar(255) DEFAULT NULL,
  `riskfactor_status` varchar(45) DEFAULT NULL,

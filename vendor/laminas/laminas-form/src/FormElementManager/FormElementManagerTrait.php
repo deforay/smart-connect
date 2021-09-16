@@ -1,14 +1,13 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-form for the canonical source repository
- * @copyright https://github.com/laminas/laminas-form/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-form/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Form\FormElementManager;
 
 use Laminas\Form\Exception;
+
+use function class_exists;
+use function get_class;
+use function is_string;
+use function sprintf;
 
 /**
  * Trait providing common logic between FormElementManager implementations.
@@ -16,6 +15,8 @@ use Laminas\Form\Exception;
  * Trait does not define properties, as the properties common between the
  * two versions are originally defined in their parent class, causing a
  * resolution conflict.
+ *
+ * @deprecated Unmaintained, use \Laminas\Form\FormElementManager instead
  */
 trait FormElementManagerTrait
 {

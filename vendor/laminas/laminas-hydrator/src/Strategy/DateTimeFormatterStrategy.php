@@ -1,38 +1,73 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-hydrator for the canonical source repository
- * @copyright https://github.com/laminas/laminas-hydrator/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-hydrator/blob/master/LICENSE.md New BSD License
- */
+declare(strict_types=1);
 
 namespace Laminas\Hydrator\Strategy;
 
 use DateTime;
+use DateTimeInterface;
 use DateTimeZone;
 
-class DateTimeFormatterStrategy implements StrategyInterface
+use function get_class;
+use function gettype;
+use function is_object;
+use function is_string;
+use function preg_replace;
+use function sprintf;
+
+final class DateTimeFormatterStrategy implements StrategyInterface
 {
     /**
+     * Format to use during hydration.
+     *
      * @var string
      */
     private $format;
 
-    /**
-     * @var DateTimeZone|null
-     */
+    /** @var DateTimeZone|null */
     private $timezone;
 
     /**
-     * Constructor
+     * Format to use during extraction.
      *
-     * @param string            $format
-     * @param DateTimeZone|null $timezone
+     * Removes any special anchor characters used to ensure that creation of a
+     * `DateTime` instance uses the formatted time string (which is useful
+     * during hydration).  These include `!` at the beginning of the string and
+     * `|` at the end.
+     *
+     * @var string
      */
-    public function __construct($format = DateTime::RFC3339, DateTimeZone $timezone = null)
-    {
-        $this->format   = (string) $format;
-        $this->timezone = $timezone;
+    private $extractionFormat;
+
+    /**
+     * Whether or not to allow hydration of values that do not follow the format exactly.
+     *
+     * @var bool
+     */
+    private $dateTimeFallback;
+
+    /**
+     * @param bool $dateTimeFallback try to parse with DateTime when createFromFormat fails
+     * @throws Exception\InvalidArgumentException For invalid $format values.
+     */
+    public function __construct(
+        string $format = DateTime::RFC3339,
+        ?DateTimeZone $timezone = null,
+        bool $dateTimeFallback = false
+    ) {
+        $this->format           = $format;
+        $this->timezone         = $timezone;
+        $this->dateTimeFallback = $dateTimeFallback;
+
+        $extractionFormat = preg_replace('/(?<![\\\\])[+|!\*]/', '', $this->format);
+        if (null === $extractionFormat) {
+            throw new Exception\InvalidArgumentException(sprintf(
+                'Format provided (%s) contains invalid characters; please verify the format',
+                $format
+            ));
+        }
+
+        $this->extractionFormat = $extractionFormat;
     }
 
     /**
@@ -40,14 +75,15 @@ class DateTimeFormatterStrategy implements StrategyInterface
      *
      * Converts to date time string
      *
-     * @param mixed|DateTime $value
-     *
-     * @return mixed|string
+     * @param mixed|DateTimeInterface $value
+     * @return mixed|string If a non-DateTimeInterface $value is provided, it
+     *     will be returned unmodified; otherwise, it will be extracted to a
+     *     string.
      */
-    public function extract($value)
+    public function extract($value, ?object $object = null)
     {
-        if ($value instanceof DateTime) {
-            return $value->format($this->format);
+        if ($value instanceof DateTimeInterface) {
+            return $value->format($this->extractionFormat);
         }
 
         return $value;
@@ -59,19 +95,31 @@ class DateTimeFormatterStrategy implements StrategyInterface
      * {@inheritDoc}
      *
      * @param mixed|string $value
-     *
-     * @return mixed|DateTime
+     * @return mixed|DateTimeInterface
+     * @throws Exception\InvalidArgumentException If $value is not null, not a
+     *     string, nor a DateTimeInterface.
      */
-    public function hydrate($value)
+    public function hydrate($value, ?array $data = null)
     {
-        if ($value === '' || $value === null) {
-            return;
+        if ($value === '' || $value === null || $value instanceof DateTimeInterface) {
+            return $value;
         }
 
-        if ($this->timezone) {
-            $hydrated = DateTime::createFromFormat($this->format, $value, $this->timezone);
-        } else {
-            $hydrated = DateTime::createFromFormat($this->format, $value);
+        if (! is_string($value)) {
+            throw new Exception\InvalidArgumentException(sprintf(
+                'Unable to hydrate. Expected null, string, or DateTimeInterface; %s was given.',
+                is_object($value) ? get_class($value) : gettype($value)
+            ));
+        }
+
+        $hydrated = $this->timezone
+            ? DateTime::createFromFormat($this->format, $value, $this->timezone)
+            : DateTime::createFromFormat($this->format, $value);
+
+        if ($hydrated === false && $this->dateTimeFallback) {
+            $hydrated = $this->timezone
+                ? new DateTime($value, $this->timezone)
+                : new DateTime($value);
         }
 
         return $hydrated ?: $value;

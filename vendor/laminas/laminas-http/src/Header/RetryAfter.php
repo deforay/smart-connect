@@ -1,12 +1,9 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-http for the canonical source repository
- * @copyright https://github.com/laminas/laminas-http/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-http/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Http\Header;
+
+use function is_numeric;
+use function strtolower;
 
 /**
  * Retry-After HTTP Header
@@ -27,14 +24,14 @@ class RetryAfter extends AbstractDate
      * Create Retry-After header from string
      *
      * @param  string $headerLine
-     * @return RetryAfter
+     * @return static
      * @throws Exception\InvalidArgumentException
      */
     public static function fromString($headerLine)
     {
         $dateHeader = new static();
 
-        list($name, $date) = GenericHeader::splitHeaderLine($headerLine);
+        [$name, $date] = GenericHeader::splitHeaderLine($headerLine);
 
         // check to ensure proper header type for this factory
         if (strtolower($name) !== strtolower($dateHeader->getFieldName())) {
@@ -56,7 +53,7 @@ class RetryAfter extends AbstractDate
      * Set number of seconds
      *
      * @param int $delta
-     * @return RetryAfter
+     * @return $this
      */
     public function setDeltaSeconds($delta)
     {
@@ -91,7 +88,7 @@ class RetryAfter extends AbstractDate
      */
     public function getFieldValue()
     {
-        return ($this->date === null) ? $this->deltaSeconds : $this->getDate();
+        return $this->date === null ? $this->deltaSeconds : $this->getDate();
     }
 
     /**

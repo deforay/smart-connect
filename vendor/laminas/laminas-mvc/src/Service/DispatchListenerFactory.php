@@ -10,8 +10,7 @@ namespace Laminas\Mvc\Service;
 
 use Interop\Container\ContainerInterface;
 use Laminas\Mvc\DispatchListener;
-use Laminas\ServiceManager\FactoryInterface;
-use Laminas\ServiceManager\ServiceLocatorInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class DispatchListenerFactory implements FactoryInterface
 {
@@ -26,18 +25,5 @@ class DispatchListenerFactory implements FactoryInterface
     public function __invoke(ContainerInterface $container, $name, array $options = null)
     {
         return new DispatchListener($container->get('ControllerManager'));
-    }
-
-    /**
-     * Create and return DispatchListener instance
-     *
-     * For use with laminas-servicemanager v2; proxies to __invoke().
-     *
-     * @param ServiceLocatorInterface $container
-     * @return DispatchListener
-     */
-    public function createService(ServiceLocatorInterface $container)
-    {
-        return $this($container, DispatchListener::class);
     }
 }

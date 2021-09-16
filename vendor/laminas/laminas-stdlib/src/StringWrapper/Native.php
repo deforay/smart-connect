@@ -1,21 +1,23 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-stdlib for the canonical source repository
- * @copyright https://github.com/laminas/laminas-stdlib/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-stdlib/blob/master/LICENSE.md New BSD License
- */
+declare(strict_types=1);
 
 namespace Laminas\Stdlib\StringWrapper;
 
 use Laminas\Stdlib\Exception;
 use Laminas\Stdlib\StringUtils;
 
+use function in_array;
+use function strlen;
+use function strpos;
+use function strtoupper;
+use function substr;
+
 class Native extends AbstractStringWrapper
 {
     /**
      * The character encoding working on
-     * (overwritten to change defaut encoding)
+     * (overwritten to change default encoding)
      *
      * @var string
      */
@@ -34,7 +36,7 @@ class Native extends AbstractStringWrapper
         $encodingUpper      = strtoupper($encoding);
         $supportedEncodings = static::getSupportedEncodings();
 
-        if (!in_array($encodingUpper, $supportedEncodings)) {
+        if (! in_array($encodingUpper, $supportedEncodings)) {
             return false;
         }
 
@@ -68,13 +70,13 @@ class Native extends AbstractStringWrapper
         $supportedEncodings = static::getSupportedEncodings();
 
         $encodingUpper = strtoupper($encoding);
-        if (!in_array($encodingUpper, $supportedEncodings)) {
+        if (! in_array($encodingUpper, $supportedEncodings)) {
             throw new Exception\InvalidArgumentException(
                 'Wrapper doesn\'t support character encoding "' . $encoding . '"'
             );
         }
 
-        if ($encodingUpper !== strtoupper($convertEncoding)) {
+        if (null !== $convertEncoding && $encodingUpper !== strtoupper($convertEncoding)) {
             $this->convertEncoding = $encodingUpper;
         }
 

@@ -1,13 +1,8 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-form for the canonical source repository
- * @copyright https://github.com/laminas/laminas-form/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-form/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Form\Annotation;
 
+use Laminas\EventManager\EventInterface;
 use Laminas\EventManager\EventManagerInterface;
 
 /**
@@ -56,7 +51,7 @@ class FormAnnotationsListener extends AbstractAnnotationsListener
      *
      * Sets the attributes key of the form specification.
      *
-     * @param  \Laminas\EventManager\EventInterface $e
+     * @param  EventInterface $e
      * @return void
      */
     public function handleAttributesAnnotation($e)
@@ -75,7 +70,7 @@ class FormAnnotationsListener extends AbstractAnnotationsListener
      *
      * Sets the flags key of the form specification.
      *
-     * @param  \Laminas\EventManager\EventInterface $e
+     * @param  EventInterface $e
      * @return void
      */
     public function handleFlagsAnnotation($e)
@@ -94,7 +89,7 @@ class FormAnnotationsListener extends AbstractAnnotationsListener
      *
      * Sets the hydrator class to use in the form specification.
      *
-     * @param  \Laminas\EventManager\EventInterface $e
+     * @param  EventInterface $e
      * @return void
      */
     public function handleHydratorAnnotation($e)
@@ -113,7 +108,7 @@ class FormAnnotationsListener extends AbstractAnnotationsListener
      *
      * Sets the input filter class to use in the form specification.
      *
-     * @param  \Laminas\EventManager\EventInterface $e
+     * @param  EventInterface $e
      * @return void
      */
     public function handleInputFilterAnnotation($e)
@@ -132,7 +127,7 @@ class FormAnnotationsListener extends AbstractAnnotationsListener
      *
      * Sets the object to bind to the form or fieldset
      *
-     * @param  \Laminas\EventManager\EventInterface $e
+     * @param  EventInterface $e
      * @return void
      */
     public function handleObjectAnnotation($e)
@@ -153,7 +148,7 @@ class FormAnnotationsListener extends AbstractAnnotationsListener
      *
      * Sets the options key of the form specification.
      *
-     * @param  \Laminas\EventManager\EventInterface $e
+     * @param  EventInterface $e
      * @return void
      */
     public function handleOptionsAnnotation($e)
@@ -172,7 +167,7 @@ class FormAnnotationsListener extends AbstractAnnotationsListener
      *
      * Sets the form class to use in the form specification.
      *
-     * @param  \Laminas\EventManager\EventInterface $e
+     * @param  EventInterface $e
      * @return void
      */
     public function handleTypeAnnotation($e)
@@ -191,7 +186,7 @@ class FormAnnotationsListener extends AbstractAnnotationsListener
      *
      * Sets the validation group to use in the form specification.
      *
-     * @param  \Laminas\EventManager\EventInterface $e
+     * @param  EventInterface $e
      * @return void
      */
     public function handleValidationGroupAnnotation($e)

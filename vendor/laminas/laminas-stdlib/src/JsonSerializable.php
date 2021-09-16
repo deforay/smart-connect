@@ -1,13 +1,13 @@
-<?php
+<?php // phpcs:disable WebimpressCodingStandard.NamingConventions.Interface.Suffix
 
-/**
- * @see       https://github.com/laminas/laminas-stdlib for the canonical source repository
- * @copyright https://github.com/laminas/laminas-stdlib/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-stdlib/blob/master/LICENSE.md New BSD License
- */
+
+declare(strict_types=1);
 
 namespace Laminas\Stdlib;
 
+/**
+ * @deprecated Since 3.1.0; use the native JsonSerializable interface
+ */
 interface JsonSerializable extends \JsonSerializable
 {
 }

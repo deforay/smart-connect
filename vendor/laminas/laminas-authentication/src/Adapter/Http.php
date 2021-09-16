@@ -485,7 +485,7 @@ class Http implements AdapterInterface
         $auth = substr($header, strlen('Basic '));
         $auth = base64_decode($auth);
         if (! $auth) {
-            throw new Exception\RuntimeException('Unable to base64_decode Authorization header value');
+            return $this->challengeClient();
         }
 
         // See Laminas-1253. Validate the credentials the same way the digest

@@ -8,12 +8,14 @@
 
 namespace Laminas\Code\Generator\DocBlock\Tag;
 
+use function ltrim;
+
 class PropertyTag extends AbstractTypeableTag implements TagInterface
 {
     /**
      * @var string
      */
-    protected $propertyName = null;
+    protected $propertyName;
 
     /**
      * @param string $propertyName
@@ -22,7 +24,7 @@ class PropertyTag extends AbstractTypeableTag implements TagInterface
      */
     public function __construct($propertyName = null, $types = [], $description = null)
     {
-        if (!empty($propertyName)) {
+        if (! empty($propertyName)) {
             $this->setPropertyName($propertyName);
         }
 
@@ -61,9 +63,9 @@ class PropertyTag extends AbstractTypeableTag implements TagInterface
     public function generate()
     {
         $output = '@property'
-            . ((!empty($this->types)) ? ' ' . $this->getTypesAsString() : '')
-            . ((!empty($this->propertyName)) ? ' $' . $this->propertyName : '')
-            . ((!empty($this->description)) ? ' ' . $this->description : '');
+            . (! empty($this->types) ? ' ' . $this->getTypesAsString() : '')
+            . (! empty($this->propertyName) ? ' $' . $this->propertyName : '')
+            . (! empty($this->description) ? ' ' . $this->description : '');
 
         return $output;
     }

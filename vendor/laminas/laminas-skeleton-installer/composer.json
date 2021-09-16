@@ -1,0 +1,64 @@
+{
+    "name": "laminas/laminas-skeleton-installer",
+    "description": "Installer plugin for Laminas skeleton application",
+    "type": "composer-plugin",
+    "license": "BSD-3-Clause",
+    "keywords": [
+        "laminas",
+        "skeleton-installer"
+    ],
+    "homepage": "https://laminas.dev",
+    "support": {
+        "docs": "https://docs.laminas.dev/laminas-skeleton-installer/",
+        "issues": "https://github.com/laminas/laminas-skeleton-installer/issues",
+        "source": "https://github.com/laminas/laminas-skeleton-installer",
+        "rss": "https://github.com/laminas/laminas-skeleton-installer/releases.atom",
+        "chat": "https://laminas.dev/chat",
+        "forum": "https://discourse.laminas.dev"
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "class": "Laminas\\SkeletonInstaller\\Plugin"
+    },
+    "require": {
+        "php": "^7.3 || ~8.0.0",
+        "composer-plugin-api": "^1.0 || ^2.0",
+        "laminas/laminas-component-installer": "^1.0 || ^2.1.2",
+        "laminas/laminas-zendframework-bridge": "^1.0"
+    },
+    "require-dev": {
+        "composer/composer": "^1.5.2 || ^2.0",
+        "laminas/laminas-coding-standard": "~2.1",
+        "malukenho/docheader": "^0.1.7",
+        "mikey179/vfsstream": "^1.6.7",
+        "phpspec/prophecy-phpunit": "^2.0",
+        "phpunit/phpunit": "^9.3"
+    },
+    "autoload": {
+        "psr-4": {
+            "Laminas\\SkeletonInstaller\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "LaminasTest\\SkeletonInstaller\\": "test/"
+        }
+    },
+    "scripts": {
+        "check": [
+            "@license-check",
+            "@cs-check",
+            "@test"
+        ],
+        "cs-check": "phpcs",
+        "cs-fix": "phpcbf",
+        "test": "phpunit --colors=always",
+        "test-coverage": "phpunit --colors=always --coverage-clover clover.xml",
+        "license-check": "docheader check src/ test/"
+    },
+    "replace": {
+        "zendframework/zend-skeleton-installer": "^0.1.7"
+    }
+}

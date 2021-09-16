@@ -1,16 +1,19 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-config for the canonical source repository
- * @copyright https://github.com/laminas/laminas-config/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-config/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\Config;
 
 use ArrayAccess;
 use Countable;
 use Iterator;
+
+use function array_key_exists;
+use function count;
+use function current;
+use function is_array;
+use function is_int;
+use function key;
+use function next;
+use function reset;
 
 /**
  * Provides a property based interface to an array.
@@ -184,7 +187,7 @@ class Config implements Countable, Iterator, ArrayAccess
      */
     public function __unset($name)
     {
-        if (!$this->allowModifications) {
+        if (! $this->allowModifications) {
             throw new Exception\InvalidArgumentException('Config is read only');
         } elseif (isset($this->data[$name])) {
             unset($this->data[$name]);
@@ -323,7 +326,7 @@ class Config implements Countable, Iterator, ArrayAccess
      * - Items in $merge with STRING keys will overwrite current values.
      *
      * @param  Config $merge
-     * @return Config
+     * @return self
      */
     public function merge(Config $merge)
     {
@@ -380,6 +383,6 @@ class Config implements Countable, Iterator, ArrayAccess
      */
     public function isReadOnly()
     {
-        return !$this->allowModifications;
+        return ! $this->allowModifications;
     }
 }
