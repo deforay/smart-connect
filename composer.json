@@ -28,7 +28,8 @@
         "laminas/laminas-di": "^3.2.2",
         "laminas/laminas-i18n": "^2.11",
         "laminas/laminas-serializer": "^2.10",
-        "phpoffice/phpspreadsheet": "^1.18"
+        "phpoffice/phpspreadsheet": "^1.18",
+        "halaxa/json-machine": "^0.7.0"
     },
     "autoload": {
         "psr-4": {

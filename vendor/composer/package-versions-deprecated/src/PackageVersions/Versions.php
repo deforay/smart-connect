@@ -38,6 +38,7 @@ final class Versions
   'container-interop/container-interop' => '1.2.0@79cbf1341c22ec75643d841642dd5d6acd83bdb8',
   'ezyang/htmlpurifier' => 'v4.13.0@08e27c97e4c6ed02f37c5b2b20488046c8d90d75',
   'fig/http-message-util' => '1.1.5@9d94dc0154230ac39e5bf89398b324a86f63f765',
+  'halaxa/json-machine' => '0.7.0@39ec702c434e72ddae25d3af14c1d0fe60b03ef6',
   'laminas/laminas-authentication' => '2.8.0@0b77d353a3a039d65c15318c98dd055d62f010b6',
   'laminas/laminas-cache' => '2.13.0@566948e32f30881cb903ffbd0e3e20dac00cd83e',
   'laminas/laminas-cache-storage-adapter-apc' => '1.0.1@8b375d994f6e67534f6ae6e995249e706faa30c1',

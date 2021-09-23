@@ -61,6 +61,15 @@
             'reference' => '9d94dc0154230ac39e5bf89398b324a86f63f765',
             'dev_requirement' => false,
         ),
+        'halaxa/json-machine' => array(
+            'pretty_version' => '0.7.0',
+            'version' => '0.7.0.0',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../halaxa/json-machine',
+            'aliases' => array(),
+            'reference' => '39ec702c434e72ddae25d3af14c1d0fe60b03ef6',
+            'dev_requirement' => false,
+        ),
         'laminas/laminas-authentication' => array(
             'pretty_version' => '2.8.0',
             'version' => '2.8.0.0',

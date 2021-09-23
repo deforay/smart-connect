@@ -569,3 +569,18 @@ ALTER TABLE `dash_form_covid19` CHANGE `is_sample_rejected` `is_sample_rejected`
 -- Thana 02-Aug-2021
 ALTER TABLE `location_details` ADD `updated_datetime` DATETIME NULL DEFAULT CURRENT_TIMESTAMP AFTER `longitude`; 
 ALTER TABLE `facility_details` ADD `email` VARCHAR(256) NULL DEFAULT NULL AFTER `facility_code`;
+
+
+-- Amit 24 Sep 2021
+ALTER TABLE `facility_details` ADD `testing_points` JSON NULL DEFAULT NULL AFTER `facility_type`;
+ALTER TABLE `facility_details` ADD `test_type` VARCHAR(256) NULL;
+ALTER TABLE `facility_details` ADD `report_format` TEXT NULL DEFAULT NULL AFTER `test_type`; 
+
+
+ALTER TABLE `dash_vl_request_form` ADD UNIQUE( `sample_code`, `lab_id`);
+ALTER TABLE `dash_vl_request_form` ADD UNIQUE( `sample_code`, `remote_sample_code`);
+ALTER TABLE `dash_eid_form` ADD UNIQUE( `sample_code`, `lab_id`);
+ALTER TABLE `dash_eid_form` ADD UNIQUE( `sample_code`, `remote_sample_code`);
+ALTER TABLE `dash_form_covid19` ADD UNIQUE( `sample_code`, `lab_id`);
+ALTER TABLE `dash_form_covid19` ADD UNIQUE( `sample_code`, `remote_sample_code`);
+

@@ -431,7 +431,10 @@ class Module
 					return new OrganizationService($sm);
 				},
 				'SampleService' => function ($sm) {
-					return new SampleService($sm);
+					$sampleTable = $sm->get('SampleTable');
+					$apiTrackerTable = $sm->get('DashApiReceiverStatsTable');
+					$commonService = $sm->getServiceLocator()->get('CommonService');
+					return new SampleService($sm, $sampleTable, $commonService, $apiTrackerTable);
 				},
 				'SummaryService' => function ($sm) {
 					$sampleTable = $sm->get('SampleTable');

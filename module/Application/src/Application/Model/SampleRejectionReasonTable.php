@@ -26,5 +26,11 @@ class SampleRejectionReasonTable extends AbstractTableGateway {
     public function __construct(Adapter $adapter) {
         $this->adapter = $adapter;
     }
+    public function insertOrUpdate($arrayData)
+    {
+        $query = 'INSERT INTO `' . $this->table . '` (' . implode(',', array_keys($arrayData)) . ') VALUES (' . implode(',', array_fill(1, count($arrayData), '?')) . ') ON DUPLICATE KEY UPDATE ' . implode(' = ?,', array_keys($arrayData)) . ' = ?';
+        $result =  $this->adapter->query($query, array_merge(array_values($arrayData), array_values($arrayData)));
+        return $result->getGeneratedValue();
+    }
     
 }

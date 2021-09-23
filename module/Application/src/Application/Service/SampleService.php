@@ -8,7 +8,6 @@ use Laminas\Db\Sql\Sql;
 use Laminas\Db\Sql\Select;
 use Laminas\Db\TableGateway\AbstractTableGateway;
 use Laminas\Db\Sql\Expression;
-use Application\Service\CommonService;
 use Exception;
 use \PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Zend\Debug\Debug;
@@ -18,10 +17,16 @@ class SampleService
 {
 
     public $sm = null;
+    public $commonService = null;
+    public $sampleTable = null;
+    public $apiTrackerTable = null;
 
-    public function __construct($sm)
+    public function __construct($sm, $sampleTable, $commonService, $apiTrackerTable)
     {
         $this->sm = $sm;
+        $this->commonService = $commonService;
+        $this->sampleTable = $sampleTable;
+        $this->apiTrackerTable = $apiTrackerTable;
     }
 
     public function getServiceManager()
@@ -29,13 +34,19 @@ class SampleService
         return $this->sm;
     }
 
-    public function checkSampleCode($sampleCode, $instanceCode = null, $dashTable = 'dash_vl_request_form')
+    public function checkSampleCode($sampleCode, $remoteSampleCode = null, $instanceCode = null, $dashTable = 'dash_vl_request_form')
     {
         $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
         $sql = new Sql($dbAdapter);
-        $sQuery = $sql->select()->from($dashTable)->where(array('sample_code LIKE "%' . $sampleCode . '%"'));
+        $sQuery = $sql->select()->from($dashTable);
         if (isset($instanceCode) && $instanceCode != "") {
             $sQuery = $sQuery->where(array('vlsm_instance_id' => $instanceCode));
+        }
+        if (isset($instanceCode) && $instanceCode != "") {
+            $sQuery = $sQuery->where(array('sample_code' => $sampleCode));
+        }
+        if (isset($instanceCode) && $instanceCode != "") {
+            $sQuery = $sQuery->where(array('remote_sample_code' => $remoteSampleCode));
         }
         $sQueryStr = $sql->buildSqlString($sQuery);
         $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
@@ -128,122 +139,122 @@ class SampleService
     //get sample status for lab dash
     public function getSampleStatusDataTable($params)
     {
-        $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->getSampleStatusDataTable($params);
+
+        return $this->sampleTable->getSampleStatusDataTable($params);
     }
 
     //lab details start
     //get sample result details
     public function getSampleResultDetails($params)
     {
-        $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->fetchSampleResultDetails($params);
+
+        return $this->sampleTable->fetchSampleResultDetails($params);
     }
     //get sample tested result details
     public function getSampleTestedResultDetails($params)
     {
-        $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->fetchSampleTestedResultDetails($params);
+
+        return $this->sampleTable->fetchSampleTestedResultDetails($params);
     }
 
     //get sample tested result details
     public function getSampleTestedResultBasedVolumeDetails($params)
     {
-        $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->fetchSampleTestedResultBasedVolumeDetails($params);
+
+        return $this->sampleTable->fetchSampleTestedResultBasedVolumeDetails($params);
     }
 
     public function getSampleTestedResultGenderDetails($params)
     {
-        $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->fetchSampleTestedResultGenderDetails($params);
+
+        return $this->sampleTable->fetchSampleTestedResultGenderDetails($params);
     }
 
     public function getLabTurnAroundTime($params)
     {
-        $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->fetchLabTurnAroundTime($params);
+
+        return $this->sampleTable->fetchLabTurnAroundTime($params);
     }
 
     public function getSampleTestedResultAgeGroupDetails($params)
     {
-        $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->fetchSampleTestedResultAgeGroupDetails($params);
+
+        return $this->sampleTable->fetchSampleTestedResultAgeGroupDetails($params);
     }
 
     public function getSampleTestedResultPregnantPatientDetails($params)
     {
-        $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->fetchSampleTestedResultPregnantPatientDetails($params);
+
+        return $this->sampleTable->fetchSampleTestedResultPregnantPatientDetails($params);
     }
 
     public function getSampleTestedResultBreastfeedingPatientDetails($params)
     {
-        $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->fetchSampleTestedResultBreastfeedingPatientDetails($params);
+
+        return $this->sampleTable->fetchSampleTestedResultBreastfeedingPatientDetails($params);
     }
 
     //get Requisition Forms tested
     public function getRequisitionFormsTested($params)
     {
-        $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->getRequisitionFormsTested($params);
+
+        return $this->sampleTable->getRequisitionFormsTested($params);
     }
 
     public function getSampleVolume($params)
     {
-        $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->getSampleVolume($params);
+
+        return $this->sampleTable->getSampleVolume($params);
     }
 
     public function getFemalePatientResult($params)
     {
-        $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->getFemalePatientResult($params);
+
+        return $this->sampleTable->getFemalePatientResult($params);
     }
 
     public function getLineOfTreatment($params)
     {
-        $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->getLineOfTreatment($params);
+
+        return $this->sampleTable->getLineOfTreatment($params);
     }
 
     public function getFacilites($params)
     {
-        $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->fetchFacilites($params);
+
+        return $this->sampleTable->fetchFacilites($params);
     }
 
     public function getVlOutComes($params)
     {
-        $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->getVlOutComes($params);
+
+        return $this->sampleTable->getVlOutComes($params);
     }
     //lab details end
 
     //clinic details start
     public function getOverallViralLoadStatus($params)
     {
-        $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->fetchOverallViralLoadResult($params);
+
+        return $this->sampleTable->fetchOverallViralLoadResult($params);
     }
 
     public function getViralLoadStatusBasedOnGender($params)
     {
-        $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->fetchViralLoadStatusBasedOnGender($params);
+
+        return $this->sampleTable->fetchViralLoadStatusBasedOnGender($params);
     }
 
     public function getSampleTestedResultBasedGenderDetails($params)
     {
-        $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->fetchSampleTestedResultBasedGenderDetails($params);
+
+        return $this->sampleTable->fetchSampleTestedResultBasedGenderDetails($params);
     }
 
     public function fetchSampleTestedReason($params)
     {
-        $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->fetchSampleTestedReason($params);
+
+        return $this->sampleTable->fetchSampleTestedReason($params);
     }
 
     public function getAllTestReasonName()
@@ -253,13 +264,13 @@ class SampleService
     }
     public function getClinicSampleTestedResultAgeGroupDetails($params)
     {
-        $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->fetchClinicSampleTestedResultAgeGroupDetails($params);
+
+        return $this->sampleTable->fetchClinicSampleTestedResultAgeGroupDetails($params);
     }
     public function getClinicRequisitionFormsTested($params)
     {
-        $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->fetchClinicRequisitionFormsTested($params);
+
+        return $this->sampleTable->fetchClinicRequisitionFormsTested($params);
     }
     //clinic details end
 
@@ -267,7 +278,7 @@ class SampleService
     public function getSampleType()
     {
         $sampleDb = $this->sm->get('SampleTypeTable');
-        return $sampleDb->fetchAllSampleType();
+        return $this->sampleTable->fetchAllSampleType();
     }
     //get all Lab Name
     public function getAllLabName()
@@ -320,14 +331,14 @@ class SampleService
 
     public function getAllTestResults($parameters)
     {
-        $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->fetchAllTestResults($parameters);
+
+        return $this->sampleTable->fetchAllTestResults($parameters);
     }
 
     public function getClinicSampleTestedResults($params)
     {
-        $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->fetchClinicSampleTestedResults($params);
+
+        return $this->sampleTable->fetchClinicSampleTestedResults($params);
     }
 
     //get all Hub Name
@@ -346,56 +357,56 @@ class SampleService
 
     public function getSampleDetails($params)
     {
-        $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->fetchSampleDetails($params);
+
+        return $this->sampleTable->fetchSampleDetails($params);
     }
 
     public function getBarSampleDetails($params)
     {
-        $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->fetchBarSampleDetails($params);
+
+        return $this->sampleTable->fetchBarSampleDetails($params);
     }
 
     public function getLabFilterSampleDetails($parameters)
     {
-        $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->fetchLabFilterSampleDetails($parameters);
+
+        return $this->sampleTable->fetchLabFilterSampleDetails($parameters);
     }
 
     public function getFilterSampleDetails($parameters)
     {
-        $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->fetchFilterSampleDetails($parameters);
+
+        return $this->sampleTable->fetchFilterSampleDetails($parameters);
     }
 
     public function getFilterSampleTatDetails($parameters)
     {
-        $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->fetchFilterSampleTatDetails($parameters);
+
+        return $this->sampleTable->fetchFilterSampleTatDetails($parameters);
     }
 
     public function getLabSampleDetails($params)
     {
-        $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->fetchLabSampleDetails($params);
+
+        return $this->sampleTable->fetchLabSampleDetails($params);
     }
 
     public function getLabBarSampleDetails($params)
     {
-        $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->fetchLabBarSampleDetails($params);
+
+        return $this->sampleTable->fetchLabBarSampleDetails($params);
     }
 
     public function getIncompleteSampleDetails($params)
     {
-        $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->fetchIncompleteSampleDetails($params);
+
+        return $this->sampleTable->fetchIncompleteSampleDetails($params);
     }
 
     public function getIncompleteBarSampleDetails($params)
     {
-        $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->fetchIncompleteBarSampleDetails($params);
+
+        return $this->sampleTable->fetchIncompleteBarSampleDetails($params);
     }
 
     public function getSampleInfo($params, $dashTable = 'dash_vl_request_form')
@@ -420,7 +431,7 @@ class SampleService
     {
         $queryContainer = new Container('query');
         $translator = $this->sm->get('translator');
-        $common = new CommonService();
+
         if (isset($queryContainer->resultQuery)) {
             try {
                 $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
@@ -439,10 +450,10 @@ class SampleService
                         $sampleCollectionDate = '';
                         $sampleTestedDate = '';
                         if (isset($aRow['sampleCollectionDate']) && $aRow['sampleCollectionDate'] != NULL && trim($aRow['sampleCollectionDate']) != "" && $aRow['sampleCollectionDate'] != '0000-00-00') {
-                            $sampleCollectionDate = $common->humanDateFormat($aRow['sampleCollectionDate']);
+                            $sampleCollectionDate = $this->commonService->humanDateFormat($aRow['sampleCollectionDate']);
                         }
                         if (isset($aRow['sampleTestingDate']) && $aRow['sampleTestingDate'] != NULL && trim($aRow['sampleTestingDate']) != "" && $aRow['sampleTestingDate'] != '0000-00-00') {
-                            $sampleTestedDate = $common->humanDateFormat($aRow['sampleTestingDate']);
+                            $sampleTestedDate = $this->commonService->humanDateFormat($aRow['sampleTestingDate']);
                         }
                         $row[] = $aRow['sample_code'];
                         $row[] = ucwords($aRow['facility_name']);
@@ -562,7 +573,7 @@ class SampleService
     {
         $queryContainer = new Container('query');
         $translator = $this->sm->get('translator');
-        $common = new CommonService();
+
         if (isset($queryContainer->resultQuery)) {
             try {
                 $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
@@ -581,22 +592,22 @@ class SampleService
                     foreach ($sResult as $aRow) {
                         $row = array();
                         if (isset($aRow['sampleCollectionDate']) && $aRow['sampleCollectionDate'] != NULL && trim($aRow['sampleCollectionDate']) != "" && $aRow['sampleCollectionDate'] != '0000-00-00') {
-                            $sampleCollectionDate = $common->humanDateFormat($aRow['sampleCollectionDate']);
+                            $sampleCollectionDate = $this->commonService->humanDateFormat($aRow['sampleCollectionDate']);
                         }
                         if (isset($aRow['treatmentInitiateDate']) && $aRow['treatmentInitiateDate'] != NULL && trim($aRow['treatmentInitiateDate']) != "" && $aRow['treatmentInitiateDate'] != '0000-00-00') {
-                            $treatmentInitiateDate = $common->humanDateFormat($aRow['treatmentInitiateDate']);
+                            $treatmentInitiateDate = $this->commonService->humanDateFormat($aRow['treatmentInitiateDate']);
                         }
                         if (isset($aRow['patientDOB']) && $aRow['patientDOB'] != NULL && trim($aRow['patientDOB']) != "" && $aRow['patientDOB'] != '0000-00-00') {
-                            $patientDOB = $common->humanDateFormat($aRow['patientDOB']);
+                            $patientDOB = $this->commonService->humanDateFormat($aRow['patientDOB']);
                         }
                         if (isset($aRow['treatmentInitiateCurrentRegimen']) && $aRow['treatmentInitiateCurrentRegimen'] != NULL && trim($aRow['treatmentInitiateCurrentRegimen']) != "" && $aRow['treatmentInitiateCurrentRegimen'] != '0000-00-00') {
-                            $patientDOB = $common->humanDateFormat($aRow['patitreatmentInitiateCurrentRegimenentDOB']);
+                            $patientDOB = $this->commonService->humanDateFormat($aRow['patitreatmentInitiateCurrentRegimenentDOB']);
                         }
                         if (isset($aRow['requestDate']) && $aRow['requestDate'] != NULL && trim($aRow['requestDate']) != "" && $aRow['requestDate'] != '0000-00-00') {
-                            $requestDate = $common->humanDateFormat($aRow['requestDate']);
+                            $requestDate = $this->commonService->humanDateFormat($aRow['requestDate']);
                         }
                         if (isset($aRow['receivedAtLab']) && $aRow['receivedAtLab'] != NULL && trim($aRow['receivedAtLab']) != "" && $aRow['receivedAtLab'] != '0000-00-00') {
-                            $requestDate = $common->humanDateFormat($aRow['receivedAtLab']);
+                            $requestDate = $this->commonService->humanDateFormat($aRow['receivedAtLab']);
                         }
                         $row[] = $i;
                         $row[] = $aRow['sample_code'];
@@ -743,7 +754,7 @@ class SampleService
     {
         $queryContainer = new Container('query');
         $translator = $this->sm->get('translator');
-        $common = new CommonService();
+
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
             if (isset($queryContainer->sampleResultQuery)) {
                 try {
@@ -858,7 +869,7 @@ class SampleService
     {
         $queryContainer = new Container('query');
         $translator = $this->sm->get('translator');
-        $common = new CommonService();
+
         if (isset($queryContainer->labTestedSampleQuery)) {
             try {
                 $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
@@ -876,7 +887,7 @@ class SampleService
                         $row = array();
                         $sampleCollectionDate = '';
                         if (isset($aRow['sampleCollectionDate']) && $aRow['sampleCollectionDate'] != null && trim($aRow['sampleCollectionDate']) != "" && $aRow['sampleCollectionDate'] != '0000-00-00') {
-                            $sampleCollectionDate = $common->humanDateFormat($aRow['sampleCollectionDate']);
+                            $sampleCollectionDate = $this->commonService->humanDateFormat($aRow['sampleCollectionDate']);
                         }
                         $row[] = $sampleCollectionDate;
                         $row[] = $aRow['total_samples_received'];
@@ -978,7 +989,7 @@ class SampleService
     {
         $queryContainer = new Container('query');
         $translator = $this->sm->get('translator');
-        $common = new CommonService();
+
         if (isset($queryContainer->sampleResultTestedTATQuery)) {
             try {
                 $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
@@ -1090,39 +1101,38 @@ class SampleService
 
     public function getProvinceWiseResultAwaitedDrillDown($params)
     {
-        $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->fetchProvinceWiseResultAwaitedDrillDown($params);
+
+        return $this->sampleTable->fetchProvinceWiseResultAwaitedDrillDown($params);
     }
 
     public function getLabWiseResultAwaitedDrillDown($params)
     {
-        $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->fetchLabWiseResultAwaitedDrillDown($params);
+
+        return $this->sampleTable->fetchLabWiseResultAwaitedDrillDown($params);
     }
 
     public function getDistrictWiseResultAwaitedDrillDown($params)
     {
-        $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->fetchDistrictWiseResultAwaitedDrillDown($params);
+
+        return $this->sampleTable->fetchDistrictWiseResultAwaitedDrillDown($params);
     }
 
     public function getClinicWiseResultAwaitedDrillDown($params)
     {
-        $sampleDb = $this->sm->get('SampleTableWithoutCache');
-        return $sampleDb->fetchClinicWiseResultAwaitedDrillDown($params);
+        return $this->sampleTable->fetchClinicWiseResultAwaitedDrillDown($params);
     }
 
     public function getFilterSampleResultAwaitedDetails($parameters)
     {
-        $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->fetchFilterSampleResultAwaitedDetails($parameters);
+
+        return $this->sampleTable->fetchFilterSampleResultAwaitedDetails($parameters);
     }
 
     public function generateResultsAwaitedSampleExcel($params)
     {
         $queryContainer = new Container('query');
         $translator = $this->sm->get('translator');
-        $common = new CommonService();
+
         if (isset($queryContainer->resultsAwaitedQuery)) {
             try {
                 $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
@@ -1137,8 +1147,8 @@ class SampleService
                     $sheet = $excel->getActiveSheet();
                     $output = array();
                     foreach ($sResult as $aRow) {
-                        $displayCollectionDate = $common->humanDateFormat($aRow['collectionDate']);
-                        $displayReceivedDate = $common->humanDateFormat($aRow['receivedDate']);
+                        $displayCollectionDate = $this->commonService->humanDateFormat($aRow['collectionDate']);
+                        $displayReceivedDate = $this->commonService->humanDateFormat($aRow['receivedDate']);
                         $row = array();
                         $row[] = $aRow['sample_code'];
                         $row[] = $displayCollectionDate;
@@ -1230,38 +1240,38 @@ class SampleService
 
     public function getAllSamples($parameters)
     {
-        $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->fetchAllSamples($parameters);
+
+        return $this->sampleTable->fetchAllSamples($parameters);
     }
 
     public function removeDuplicateSampleRows($params)
     {
-        $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->removeDuplicateSampleRows($params);
+
+        return $this->sampleTable->removeDuplicateSampleRows($params);
     }
 
     public function getVLTestReasonBasedOnAgeGroup($params)
     {
-        $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->getVLTestReasonBasedOnAgeGroup($params);
+
+        return $this->sampleTable->getVLTestReasonBasedOnAgeGroup($params);
     }
 
     public function getVLTestReasonBasedOnGender($params)
     {
-        $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->getVLTestReasonBasedOnGender($params);
+
+        return $this->sampleTable->getVLTestReasonBasedOnGender($params);
     }
 
     public function getVLTestReasonBasedOnClinics($params)
     {
-        $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->getVLTestReasonBasedOnClinics($params);
+
+        return $this->sampleTable->getVLTestReasonBasedOnClinics($params);
     }
 
     public function getSample($id)
     {
-        $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->getSample($id);
+
+        return $this->sampleTable->getSample($id);
     }
     ////////////////////////////////////////
     /////////*** Turnaround Time ***///////
@@ -1272,8 +1282,7 @@ class SampleService
         // set_time_limit(10000);
         $result = array();
         $resultSet = array();
-        $sampleDb = $this->sm->get('SampleTableWithoutCache');
-        $resultSet = $sampleDb->getTATbyProvince($labs, $startDate, $endDate);
+        $resultSet = $this->sampleTable->getTATbyProvince($labs, $startDate, $endDate);
         foreach ($resultSet as $key) {
             $result[] = array(
                 "facility"           => $key['location_name'],
@@ -1294,8 +1303,8 @@ class SampleService
     {
         // set_time_limit(10000);
         $result = array();
-        $sampleDb = $this->sm->get('SampleTable');
-        $resultSet = $sampleDb->getTATbyDistrict($labs, $startDate, $endDate);
+
+        $resultSet = $this->sampleTable->getTATbyDistrict($labs, $startDate, $endDate);
         foreach ($resultSet as $key) {
             $result[] = array(
                 "facility"           => $key['location_name'],
@@ -1315,8 +1324,8 @@ class SampleService
     {
         // set_time_limit(10000);
         $result = array();
-        $sampleDb = $this->sm->get('SampleTable');
-        $resultSet = $sampleDb->getTATbyClinic($labs, $startDate, $endDate);
+
+        $resultSet = $this->sampleTable->getTATbyClinic($labs, $startDate, $endDate);
         foreach ($resultSet as $key) {
             $result[] = array(
                 "facility"           => $key['location_name'],
@@ -1336,341 +1345,22 @@ class SampleService
     ////////*** Turnaround Time ***////////
     ///////////////////////////////////////
 
-    public function importSampleResultFile()
-    {
-        $pathname = UPLOAD_PATH . DIRECTORY_SEPARATOR . "not-import-vl";
-        $common = new CommonService();
-        $sampleDb = $this->sm->get('SampleTableWithoutCache');
-        $facilityDb = $this->sm->get('FacilityTableWithoutCache');
-        $facilityTypeDb = $this->sm->get('FacilityTypeTable');
-        $testStatusDb = $this->sm->get('SampleStatusTable');
-        $testReasonDb = $this->sm->get('TestReasonTable');
-        $sampleTypeDb = $this->sm->get('SampleTypeTable');
-        $locationDb = $this->sm->get('LocationDetailsTable');
-        $sampleRjtReasonDb = $this->sm->get('SampleRejectionReasonTable');
-        $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
-        $sql = new Sql($dbAdapter);
-        //$files = scandir($pathname, SCANDIR_SORT_DESCENDING);
-
-        $files = glob($pathname . DIRECTORY_SEPARATOR . '*.{xls,xlsx,csv}', GLOB_BRACE);
-
-        array_multisort(
-            array_map('filemtime', $files),
-            SORT_NUMERIC,
-            SORT_DESC,
-            $files
-        );
-
-        $fileName = $files[0]; // OLDEST FILE
-
-        if (trim($fileName) != "") {
-            try {
-                if (file_exists($pathname . DIRECTORY_SEPARATOR . $fileName)) {
-                    $objPHPExcel = \PhpOffice\PhpSpreadsheet\IOFactory::load($pathname . DIRECTORY_SEPARATOR . $fileName);
-                    $sheetData = $objPHPExcel->getActiveSheet()->toArray(null, true, true, true);
-                    $count = count($sheetData);
-                    for ($i = 2; $i <= $count; $i++) {
-                        if (trim($sheetData[$i]['A']) != '' && trim($sheetData[$i]['B']) != '') {
-
-
-                            $sampleCode = trim($sheetData[$i]['A']);
-                            $instanceCode = trim($sheetData[$i]['B']);
-
-
-                            $VLAnalysisResult = (float) $sheetData[$i]['AN'];
-                            $DashVL_Abs = NULL;
-                            $DashVL_AnalysisResult = NULL;
-
-                            if (
-                                $sheetData[$i]['AM'] == 'Target not Detected' || $sheetData[$i]['AM'] == 'Target Not Detected' || strtolower($sheetData[$i]['AM']) == 'target not detected' || strtolower($sheetData[$i]['AM']) == 'tnd'
-                                || $sheetData[$i]['AO'] == 'Target not Detected' || $sheetData[$i]['AO'] == 'Target Not Detected' || strtolower($sheetData[$i]['AO']) == 'target not detected' || strtolower($sheetData[$i]['AO']) == 'tnd'
-                            ) {
-                                $VLAnalysisResult = 20;
-                            } else if ($sheetData[$i]['AM'] == '< 20' || $sheetData[$i]['AM'] == '<20' || $sheetData[$i]['AO'] == '< 20' || $sheetData[$i]['AO'] == '<20') {
-                                $VLAnalysisResult = 20;
-                            } else if ($sheetData[$i]['AM'] == '< 40' || $sheetData[$i]['AM'] == '<40' || $sheetData[$i]['AO'] == '< 40' || $sheetData[$i]['AO'] == '<40') {
-                                $VLAnalysisResult = 40;
-                            } else if ($sheetData[$i]['AM'] == 'Nivel de detecÁao baixo' || $sheetData[$i]['AM'] == 'NÌvel de detecÁ„o baixo' || $sheetData[$i]['AO'] == 'Nivel de detecÁao baixo' || $sheetData[$i]['AO'] == 'NÌvel de detecÁ„o baixo') {
-                                $VLAnalysisResult = 20;
-                            } else if ($sheetData[$i]['AM'] == 'Suppressed' || $sheetData[$i]['AO'] == 'Suppressed') {
-                                $VLAnalysisResult = 500;
-                            } else if ($sheetData[$i]['AM'] == 'Not Suppressed' || $sheetData[$i]['AO'] == 'Not Suppressed') {
-                                $VLAnalysisResult = 1500;
-                            } else if ($sheetData[$i]['AM'] == 'Negative' || $sheetData[$i]['AM'] == 'NEGAT' || $sheetData[$i]['AO'] == 'Negative' || $sheetData[$i]['AO'] == 'NEGAT') {
-                                $VLAnalysisResult = 20;
-                            } else if ($sheetData[$i]['AM'] == 'Positive' || $sheetData[$i]['AO'] == 'Positive') {
-                                $VLAnalysisResult = 1500;
-                            } else if ($sheetData[$i]['AM'] == 'Indeterminado' || $sheetData[$i]['AO'] == 'Indeterminado') {
-                                $VLAnalysisResult = "";
-                            }
-
-
-                            if ($VLAnalysisResult == 'NULL' || $VLAnalysisResult == '' || $VLAnalysisResult == NULL) {
-                                $DashVL_Abs = NULL;
-                                $DashVL_AnalysisResult = NULL;
-                            } else if ($VLAnalysisResult < 1000) {
-                                $DashVL_AnalysisResult = 'Suppressed';
-                                $DashVL_Abs = $VLAnalysisResult;
-                            } else if ($VLAnalysisResult >= 1000) {
-                                $DashVL_AnalysisResult = 'Not Suppressed';
-                                $DashVL_Abs = $VLAnalysisResult;
-                            }
-
-
-
-
-                            $sampleCollectionDate = (trim($sheetData[$i]['U']) != '' ? trim(date('Y-m-d H:i', strtotime($sheetData[$i]['U']))) : null);
-                            $sampleReceivedAtLab = (trim($sheetData[$i]['AS']) != '' ? trim(date('Y-m-d H:i', strtotime($sheetData[$i]['AS']))) : null);
-                            $dateOfInitiationOfRegimen = (trim($sheetData[$i]['BA']) != '' ? trim(date('Y-m-d H:i', strtotime($sheetData[$i]['BA']))) : null);
-                            $resultApprovedDateTime = (trim($sheetData[$i]['BD']) != '' ? trim(date('Y-m-d H:i', strtotime($sheetData[$i]['BD']))) : null);
-                            $sampleTestedDateTime = (trim($sheetData[$i]['AJ']) != '' ? trim(date('Y-m-d H:i', strtotime($sheetData[$i]['AJ']))) : null);
-                            $sampleRegisteredAtLabDateTime = (trim($sheetData[$i]['BH']) != '' ? trim(date('Y-m-d H:i', strtotime($sheetData[$i]['BH']))) : null);
-
-
-
-
-                            $data = array(
-                                'sample_code' => $sampleCode,
-                                'vlsm_instance_id' => trim($sheetData[$i]['B']),
-                                'source' => '1',
-                                'patient_gender' => (trim($sheetData[$i]['C']) != '' ? trim($sheetData[$i]['C']) : NULL),
-                                'patient_age_in_years' => (trim($sheetData[$i]['D']) != '' ? trim($sheetData[$i]['D']) : NULL),
-                                'sample_collection_date' => $sampleCollectionDate,
-                                'sample_registered_at_lab' => $sampleReceivedAtLab,
-                                'line_of_treatment' => (trim($sheetData[$i]['AT']) != '' ? trim($sheetData[$i]['AT']) : NULL),
-                                'is_sample_rejected' => (trim($sheetData[$i]['AU']) != '' ? trim($sheetData[$i]['AU']) : NULL),
-                                'is_patient_pregnant' => (trim($sheetData[$i]['AX']) != '' ? trim($sheetData[$i]['AX']) : NULL),
-                                'is_patient_breastfeeding' => (trim($sheetData[$i]['AY']) != '' ? trim($sheetData[$i]['AY']) : NULL),
-                                'current_regimen' => (trim($sheetData[$i]['AZ']) != '' ? trim($sheetData[$i]['AZ']) : NULL),
-                                'date_of_initiation_of_current_regimen' => $dateOfInitiationOfRegimen,
-                                'arv_adherance_percentage' => (trim($sheetData[$i]['BB']) != '' ? trim($sheetData[$i]['BB']) : NULL),
-                                'is_adherance_poor' => (trim($sheetData[$i]['BC']) != '' ? trim($sheetData[$i]['BC']) : NULL),
-                                'result_approved_datetime' => $resultApprovedDateTime,
-                                'sample_tested_datetime' => $sampleTestedDateTime,
-                                'result_value_log' => (trim($sheetData[$i]['AK']) != '' ? trim($sheetData[$i]['AK']) : NULL),
-                                'result_value_absolute' => (trim($sheetData[$i]['AL']) != '' ? trim($sheetData[$i]['AL']) : NULL),
-                                'result_value_text' => (trim($sheetData[$i]['AM']) != '' ? trim($sheetData[$i]['AM']) : NULL),
-                                'result_value_absolute_decimal' => (trim($sheetData[$i]['AN']) != '' ? trim($sheetData[$i]['AN']) : NULL),
-                                'result' => (trim($sheetData[$i]['AO']) != '' ? trim($sheetData[$i]['AO']) : NULL),
-                                'DashVL_Abs' =>   $DashVL_Abs,
-                                'DashVL_AnalysisResult' =>   $DashVL_AnalysisResult,
-                                'current_regimen' => (trim($sheetData[$i]['BG']) != '' ? trim($sheetData[$i]['BG']) : NULL),
-                                'sample_registered_at_lab' => $sampleRegisteredAtLabDateTime
-                            );
-
-
-                            $facilityData = array(
-                                'vlsm_instance_id' => trim($sheetData[$i]['B']),
-                                'facility_name' => trim($sheetData[$i]['E']),
-                                'facility_code' => trim($sheetData[$i]['F']),
-                                'facility_mobile_numbers' => trim($sheetData[$i]['I']),
-                                'address' => trim($sheetData[$i]['J']),
-                                'facility_hub_name' => trim($sheetData[$i]['K']),
-                                'contact_person' => trim($sheetData[$i]['L']),
-                                'report_email' => trim($sheetData[$i]['M']),
-                                'country' => trim($sheetData[$i]['N']),
-                                'facility_state' => trim($sheetData[$i]['G']),
-                                'facility_district' => trim($sheetData[$i]['H']),
-                                'longitude' => trim($sheetData[$i]['O']),
-                                'latitude' => trim($sheetData[$i]['P']),
-                                'status' => trim($sheetData[$i]['Q']),
-                            );
-                            if (trim($sheetData[$i]['G']) != '') {
-                                $sQueryResult = $this->checkFacilityStateDistrictDetails(trim($sheetData[$i]['G']), 0);
-                                if ($sQueryResult) {
-                                    $facilityData['facility_state'] = $sQueryResult['location_id'];
-                                } else {
-                                    $locationDb->insert(array('parent_location' => 0, 'location_name' => trim($sheetData[$i]['G'])));
-                                    $facilityData['facility_state'] = $locationDb->lastInsertValue;
-                                }
-                            }
-                            if (trim($sheetData[$i]['H']) != '') {
-                                $sQueryResult = $this->checkFacilityStateDistrictDetails(trim($sheetData[$i]['H']), $facilityData['facility_state']);
-                                if ($sQueryResult) {
-                                    $facilityData['facility_district'] = $sQueryResult['location_id'];
-                                } else {
-                                    $locationDb->insert(array('parent_location' => $facilityData['facility_state'], 'location_name' => trim($sheetData[$i]['H'])));
-                                    $facilityData['facility_district'] = $locationDb->lastInsertValue;
-                                }
-                            }
-                            //check facility type
-                            if (trim($sheetData[$i]['R']) != '') {
-                                $facilityTypeDataResult = $this->checkFacilityTypeDetails(trim($sheetData[$i]['R']));
-                                if ($facilityTypeDataResult) {
-                                    $facilityData['facility_type'] = $facilityTypeDataResult['facility_type_id'];
-                                } else {
-                                    $facilityTypeDb->insert(array('facility_type_name' => trim($sheetData[$i]['R'])));
-                                    $facilityData['facility_type'] = $facilityTypeDb->lastInsertValue;
-                                }
-                            }
-
-                            //check clinic details
-                            if (trim($sheetData[$i]['E']) != '') {
-                                $facilityDataResult = $this->checkFacilityDetails(trim($sheetData[$i]['E']));
-                                if ($facilityDataResult) {
-                                    $facilityDb->update($facilityData, array('facility_id' => $facilityDataResult['facility_id']));
-                                    $data['facility_id'] = $facilityDataResult['facility_id'];
-                                } else {
-                                    $facilityDb->insert($facilityData);
-                                    $data['facility_id'] = $facilityDb->lastInsertValue;
-                                }
-                            } else {
-                                $data['facility_id'] = NULL;
-                            }
-
-                            $labData = array(
-                                'vlsm_instance_id' => trim($sheetData[$i]['B']),
-                                'facility_name' => trim($sheetData[$i]['V']),
-                                'facility_code' => trim($sheetData[$i]['W']),
-                                'facility_state' => trim($sheetData[$i]['X']),
-                                'facility_district' => trim($sheetData[$i]['Y']),
-                                'facility_mobile_numbers' => trim($sheetData[$i]['Z']),
-                                'address' => trim($sheetData[$i]['AA']),
-                                'facility_hub_name' => trim($sheetData[$i]['AB']),
-                                'contact_person' => trim($sheetData[$i]['AC']),
-                                'report_email' => trim($sheetData[$i]['AD']),
-                                'country' => trim($sheetData[$i]['AE']),
-                                'longitude' => trim($sheetData[$i]['AF']),
-                                'latitude' => trim($sheetData[$i]['AG']),
-                                'status' => trim($sheetData[$i]['AH']),
-                            );
-                            if (trim($sheetData[$i]['X']) != '') {
-                                $sQueryResult = $this->checkFacilityStateDistrictDetails(trim($sheetData[$i]['X']), 0);
-                                if ($sQueryResult) {
-                                    $labData['facility_state'] = $sQueryResult['location_id'];
-                                } else {
-                                    $locationDb->insert(array('parent_location' => 0, 'location_name' => trim($sheetData[$i]['X'])));
-                                    $labData['facility_state'] = $locationDb->lastInsertValue;
-                                }
-                            }
-                            if (trim($sheetData[$i]['Y']) != '') {
-                                $sQueryResult = $this->checkFacilityStateDistrictDetails(trim($sheetData[$i]['Y']), $labData['facility_state']);
-                                if ($sQueryResult) {
-                                    $labData['facility_district'] = $sQueryResult['location_id'];
-                                } else {
-                                    $locationDb->insert(array('parent_location' => $labData['facility_state'], 'location_name' => trim($sheetData[$i]['Y'])));
-                                    $labData['facility_district'] = $locationDb->lastInsertValue;
-                                }
-                            }
-                            //check lab type
-                            if (trim($sheetData[$i]['AI']) != '') {
-                                $labTypeDataResult = $this->checkFacilityTypeDetails(trim($sheetData[$i]['AI']));
-                                if ($labTypeDataResult) {
-                                    $labData['facility_type'] = $labTypeDataResult['facility_type_id'];
-                                } else {
-                                    $facilityTypeDb->insert(array('facility_type_name' => trim($sheetData[$i]['AI'])));
-                                    $labData['facility_type'] = $facilityTypeDb->lastInsertValue;
-                                }
-                            }
-
-                            //check lab details
-                            if (trim($sheetData[$i]['V']) != '') {
-                                $labDataResult = $this->checkFacilityDetails(trim($sheetData[$i]['V']));
-                                if ($labDataResult) {
-                                    $facilityDb->update($labData, array('facility_id' => $labDataResult['facility_id']));
-                                    $data['lab_id'] = $labDataResult['facility_id'];
-                                } else {
-                                    $facilityDb->insert($labData);
-                                    $data['lab_id'] = $facilityDb->lastInsertValue;
-                                }
-                            } else {
-                                $data['lab_id'] = 0;
-                            }
-                            //check testing reason
-                            if (trim($sheetData[$i]['AP']) != '') {
-                                $testReasonResult = $this->checkTestingReson(trim($sheetData[$i]['AP']));
-                                if ($testReasonResult) {
-                                    $testReasonDb->update(array('test_reason_name' => trim($sheetData[$i]['AP']), 'test_reason_status' => trim($sheetData[$i]['AQ'])), array('test_reason_id' => $testReasonResult['test_reason_id']));
-                                    $data['reason_for_vl_testing'] = $testReasonResult['test_reason_id'];
-                                } else {
-                                    $testReasonDb->insert(array('test_reason_name' => trim($sheetData[$i]['AP']), 'test_reason_status' => trim($sheetData[$i]['AQ'])));
-                                    $data['reason_for_vl_testing'] = $testReasonDb->lastInsertValue;
-                                }
-                            } else {
-                                $data['reason_for_vl_testing'] = 0;
-                            }
-                            //check testing reason
-                            if (trim($sheetData[$i]['AR']) != '') {
-                                $sampleStatusResult = $this->checkSampleStatus(trim($sheetData[$i]['AR']));
-                                if ($sampleStatusResult) {
-                                    $data['result_status'] = $sampleStatusResult['status_id'];
-                                } else {
-                                    $testStatusDb->insert(array('status_name' => trim($sheetData[$i]['AR'])));
-                                    $data['result_status'] = $testStatusDb->lastInsertValue;
-                                }
-                            } else {
-                                $data['result_status'] = 6;
-                            }
-                            //check sample type
-                            if (trim($sheetData[$i]['S']) != '') {
-                                $sampleType = $this->checkSampleType(trim($sheetData[$i]['S']));
-                                if ($sampleType) {
-                                    $sampleTypeDb->update(array('sample_name' => trim($sheetData[$i]['S']), 'status' => trim($sheetData[$i]['T'])), array('sample_id' => $sampleType['sample_id']));
-                                    $data['sample_type'] = $sampleType['sample_id'];
-                                } else {
-                                    $sampleTypeDb->insert(array('sample_name' => trim($sheetData[$i]['S']), 'status' => trim($sheetData[$i]['T'])));
-                                    $data['sample_type'] = $sampleTypeDb->lastInsertValue;
-                                }
-                            } else {
-                                $data['sample_type'] = NULL;
-                            }
-                            //check sample rejection reason
-                            if (trim($sheetData[$i]['AV']) != '') {
-                                $sampleRejectionReason = $this->checkSampleRejectionReason(trim($sheetData[$i]['AV']));
-                                if ($sampleRejectionReason) {
-                                    $sampleRjtReasonDb->update(array('rejection_reason_name' => trim($sheetData[$i]['AV']), 'rejection_reason_status' => trim($sheetData[$i]['AW'])), array('rejection_reason_id' => $sampleRejectionReason['rejection_reason_id']));
-                                    $data['reason_for_sample_rejection'] = $sampleRejectionReason['rejection_reason_id'];
-                                } else {
-                                    $sampleRjtReasonDb->insert(array('rejection_reason_name' => trim($sheetData[$i]['AV']), 'rejection_reason_status' => trim($sheetData[$i]['AW'])));
-                                    $data['reason_for_sample_rejection'] = $sampleRjtReasonDb->lastInsertValue;
-                                }
-                            } else {
-                                $data['reason_for_sample_rejection'] = NULL;
-                            }
-
-                            //check existing sample code
-                            $sampleCode = $this->checkSampleCode($sampleCode, $instanceCode);
-                            if ($sampleCode) {
-                                //sample data update
-                                $sampleDb->update($data, array('vl_sample_id' => $sampleCode['vl_sample_id']));
-                            } else {
-                                //sample data insert
-                                $sampleDb->insert($data);
-                            }
-                        }
-                    }
-
-                    $destination = UPLOAD_PATH . DIRECTORY_SEPARATOR . "import-vl";
-                    if (!file_exists($destination) && !is_dir($destination)) {
-                        mkdir(UPLOAD_PATH . DIRECTORY_SEPARATOR . "import-vl");
-                    }
-
-                    if (copy($pathname . DIRECTORY_SEPARATOR . $fileName, $destination . DIRECTORY_SEPARATOR . $fileName)) {
-                        unlink($pathname . DIRECTORY_SEPARATOR . $fileName);
-                    }
-                }
-            } catch (Exception $exc) {
-                error_log($exc->getMessage());
-                error_log($exc->getTraceAsString());
-            }
-        }
-    }
     public function getSampleTestReasonBarChartDetails($params)
     {
-        $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->fetchSampleTestReasonBarChartDetails($params);
+
+        return $this->sampleTable->fetchSampleTestReasonBarChartDetails($params);
     }
     //api for fecth samples
     public function getSourceData($params)
     {
-        $sampleDb = $this->sm->get('SampleTable');
-        return $sampleDb->fetchSourceData($params);
+
+        return $this->sampleTable->fetchSourceData($params);
     }
 
     // public function generateSampleStatusResultExcel($params){
     //     $queryContainer = new Container('query');
     //     $translator = $this->sm->get('translator');
-    //     $common = new CommonService();
+    //     
     //     if(isset($queryContainer->sampleStatusResultQuery)){
     //         try{
     //             $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
@@ -1802,7 +1492,6 @@ class SampleService
 
     public function saveFileFromVlsmAPIV2()
     {
-        $apiTrackDb = $this->sm->get('DashApiReceiverStatsTable');
 
         $apiData = array();
         $this->config = $this->sm->get('Config');
@@ -1823,20 +1512,11 @@ class SampleService
             mkdir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-vl", 0777);
         }
 
-        $pathname = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-vl" . DIRECTORY_SEPARATOR . $fileName;
-        if (!file_exists($pathname)) {
-            if (move_uploaded_file($_FILES['vlFile']['tmp_name'], $pathname)) {
-                $apiData = json_decode(file_get_contents($pathname), true);
-                //$apiData = \JsonMachine\JsonMachine::fromFile($pathname);
-            }
-        }
 
-        // ob_start();
-        // var_dump($apiData);
-        // error_log(ob_get_clean());
 
 
         $allColumns = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS where TABLE_SCHEMA = '" . $dbname . "' AND table_name='dash_vl_request_form'";
+
         $sResult = $dbAdapter->query($allColumns, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $columnList = array_map('current', $sResult);
 
@@ -1845,12 +1525,25 @@ class SampleService
         );
 
         $columnList = array_diff($columnList, $removeKeys);
-        $sampleDb = $this->sm->get('SampleTableWithoutCache');
-        // Debug::dump($apiData);die;
+        $sampleDb = $this->sm->get('SampleTableWithoutCache');        
+
+        $pathname = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-vl" . DIRECTORY_SEPARATOR . $fileName;
+        if (!file_exists($pathname)) {
+            if (move_uploaded_file($_FILES['vlFile']['tmp_name'], $pathname)) {
+                //$apiData = json_decode(file_get_contents($pathname), true);
+                $apiData = \JsonMachine\JsonMachine::fromFile($pathname, "/data");
+            }
+        }
 
         $numRows = 0;
-        foreach ($apiData['data'] as $rowData) {
+        $counter = 0;
+        foreach ($apiData as $key => $rowData) {
+            $counter++;
 
+
+            // ob_start();
+            // var_dump($rowData);
+            // error_log(ob_get_clean());
 
             $data = array();
             foreach ($columnList as $colName) {
@@ -1868,40 +1561,51 @@ class SampleService
 
 
 
-            $sampleCode = trim($data['sample_code']);
-            $instanceCode = trim($data['vlsm_instance_id']);
+            // $sampleCode = trim($data['sample_code']);
+            // $remoteSample = trim($data['remote_sample_code']);
+            // $instanceCode = trim($data['vlsm_instance_id']);
 
             try {
+                
                 //check existing sample code
-                $sampleCode = $this->checkSampleCode($sampleCode, $instanceCode);
-                if ($sampleCode) {
-                    //sample data update
-                    $numRows += $sampleDb->update($data, array('vl_sample_id' => $sampleCode['vl_sample_id']));
-                } else {
-                    //sample data insert
-                    $numRows += $sampleDb->insert($data);
-                }
+                // $sampleCode = $this->checkSampleCode($sampleCode, $remoteSample, $instanceCode);
+                // if ($sampleCode) {
+                //     //sample data update
+                //     $numRows += $this->sampleTable->update($data, array('vl_sample_id' => $sampleCode['vl_sample_id']));
+                // } else {
+                //     //sample data insert
+                //     $numRows += $this->sampleTable->insert($data);
+                // }
+                $sampleDb->insertOrUpdate($data);
+                $numRows ++;
+                
             } catch (Exception $e) {
                 error_log($e->getMessage());
             }
         }
-        $common = new CommonService();
-        if (count($apiData['data'])  == $numRows) {
+
+        if ($counter == $numRows) {
             $status = "success";
-        } else if ((count($apiData['data']) - $numRows) != 0) {
+        } else if (($counter - $numRows) != 0) {
             $status = "partial";
         } else if ($numRows == 0) {
             $status = 'failed';
         }
+        
+        $apiData = JsonMachine::fromFile($pathname, '/timestamp');
+        $timestamp = iterator_to_array($apiData)['timestamp'];
+        $timestamp = ($timestamp != false && !empty($timestamp)) ? $timestamp : time();
+        unset($pathname);
+
         $apiTrackData = array(
-            'tracking_id'                   => $apiData['timestamp'],
-            'received_on'                   => $common->getDateTime(),
-            'number_of_records_received'    => count($apiData['data']),
+            'tracking_id'                   => $timestamp,
+            'received_on'                   => $this->commonService->getDateTime(),
+            'number_of_records_received'    => $counter,
             'number_of_records_processed'   => $numRows,
             'source'                        => 'VLSM-VIRAL-LOAD',
             'status'                        => $status
         );
-        $apiTrackDb->insert($apiTrackData);
+        $this->apiTrackerTable->insert($apiTrackData);
 
         return array(
             'status'    => 'success',
@@ -1911,7 +1615,7 @@ class SampleService
     public function saveFileFromVlsmAPIV1()
     {
         $apiData = array();
-        $common = new CommonService();
+
         $sampleDb = $this->sm->get('SampleTableWithoutCache');
         $facilityDb = $this->sm->get('FacilityTable');
         $facilityTypeDb = $this->sm->get('FacilityTypeTable');
@@ -1940,20 +1644,18 @@ class SampleService
                 //$apiData = \JsonMachine\JsonMachine::fromFile($pathname);
             }
         }
-        ob_start();
-        var_dump(file_exists($pathname));
-        error_log(ob_get_clean());
 
 
         if ($apiData !== FALSE) {
             foreach ($apiData['data'] as $rowData) {
-                ob_start();
-                var_dump($rowData);
-                error_log(ob_get_clean());
-                exit(0);
+                // ob_start();
+                // var_dump($rowData);
+                // error_log(ob_get_clean());
+                // exit(0);
                 foreach ($rowData as $row) {
                     if (trim($row['sample_code']) != '' && trim($row['vlsm_instance_id']) != '') {
                         $sampleCode = trim($row['sample_code']);
+                        $remoteSampleCode = trim($row['remote_sample_code']);
                         $instanceCode = trim($row['vlsm_instance_id']);
 
                         $VLAnalysisResult = (float) $row['result_value_absolute_decimal'];
@@ -2010,6 +1712,7 @@ class SampleService
 
                         $data = array(
                             'sample_code'                           => $sampleCode,
+                            'remote_sample_code'                    => $remoteSampleCode,
                             'vlsm_instance_id'                      => trim($row['vlsm_instance_id']),
                             'source'                                => '1',
                             'patient_gender'                        => (trim($row['patient_gender']) != '' ? trim($row['patient_gender']) : NULL),
@@ -2207,7 +1910,7 @@ class SampleService
                         }
 
                         //check existing sample code
-                        $sampleCode = $this->checkSampleCode($sampleCode, $instanceCode);
+                        $sampleCode = $this->checkSampleCode($sampleCode, $remoteSampleCode, $instanceCode);
                         if ($sampleCode) {
                             //sample data update
                             $sampleDb->update($data, array('vl_sample_id' => $sampleCode['vl_sample_id']));
@@ -2219,7 +1922,7 @@ class SampleService
                 }
             }
             //remove directory
-            // $common->removeDirectory($pathname);
+            // $this->commonService->removeDirectory($pathname);
         }
         return array(
             'status'    => 'success',
@@ -2229,7 +1932,7 @@ class SampleService
 
     public function saveWeblimsVLAPI($params)
     {
-        $common = new CommonService();
+
         $sampleDb = $this->sm->get('SampleTableWithoutCache');
         $facilityDb = $this->sm->get('FacilityTable');
         // $facilityTypeDb = $this->sm->get('FacilityTypeTable');
@@ -2261,7 +1964,7 @@ class SampleService
             foreach ($params['data'] as $key => $row) {
                 // Debug::dump($row);die;
                 if (!empty(trim($row['SampleID'])) && trim($row['TestId']) == 'VIRAL_LOAD_2') {
-                    $sampleCode = trim($row['SampleID']);
+                    $remoteSampleCode = $sampleCode = trim($row['SampleID']);
                     $instanceCode = 'nrl-weblims';
 
                     // Check duplicate data
@@ -2269,7 +1972,7 @@ class SampleService
                     if (!$province) {
                         $provinceDb->insert(array(
                             'province_name'     => $row['ProvinceName'],
-                            'updated_datetime'  => $common->getDateTime()
+                            'updated_datetime'  => $this->commonService->getDateTime()
                         ));
                         $province['province_id'] = $provinceDb->lastInsertValue;
                     }
@@ -2318,6 +2021,7 @@ class SampleService
 
                     $data = array(
                         'sample_code'                           => $sampleCode,
+                        'remote_sample_code'                    => $remoteSampleCode,
                         'vlsm_instance_id'                      => 'nrl-weblims',
                         'province_id'                           => (trim($province['province_id']) != '' ? trim($province['province_id']) : NULL),
                         'source'                                => '1',
@@ -2429,7 +2133,7 @@ class SampleService
                     }
 
                     //check existing sample code
-                    $sampleCode = $this->checkSampleCode($sampleCode, $instanceCode);
+                    $sampleCode = $this->checkSampleCode($sampleCode, $remoteSampleCode, $instanceCode);
                     $status = 0;
 
                     if ($sampleCode) {
@@ -2475,7 +2179,7 @@ class SampleService
         // Track API Records
         $apiTrackData = array(
             'tracking_id'                   => $params['timestamp'],
-            'received_on'                   => $common->getDateTime(),
+            'received_on'                   => $this->commonService->getDateTime(),
             'number_of_records_received'    => count($params['data']),
             'number_of_records_processed'   => (count($params['data']) - count($return)),
             'source'                        => 'WEBLIMS-VIRAL-LOAD',
@@ -2488,7 +2192,7 @@ class SampleService
 
     public function saveVLDataFromAPI($params)
     {
-        $common = new CommonService();
+
         $sampleDb = $this->sm->get('SampleTableWithoutCache');
         $facilityDb = $this->sm->get('FacilityTable');
         $testStatusDb = $this->sm->get('SampleStatusTable');
@@ -2519,6 +2223,7 @@ class SampleService
                 // Debug::dump($row);die;
                 if (!empty(trim($row['sample_code'])) && trim($params['api_version']) == $config['defaults']['vl-api-version']) {
                     $sampleCode = trim($row['sample_code']);
+                    $remoteSampleCode = trim($row['remote_sample_code']);
                     $instanceCode = 'api-data';
 
                     // Check dublicate data
@@ -2526,7 +2231,7 @@ class SampleService
                     if (!$province) {
                         $provinceDb->insert(array(
                             'province_name'     => $row['health_centre_province'],
-                            'updated_datetime'  => $common->getDateTime()
+                            'updated_datetime'  => $this->commonService->getDateTime()
                         ));
                         $province['province_id'] = $provinceDb->lastInsertValue;
                     }
@@ -2575,6 +2280,7 @@ class SampleService
 
                     $data = array(
                         'sample_code'                           => $sampleCode,
+                        'remote_sample_code'                    => $remoteSampleCode,
                         'vlsm_instance_id'                      => $instanceCode,
                         'province_id'                           => (trim($province['province_id']) != '' ? trim($province['province_id']) : NULL),
                         'source'                                => '1',
@@ -2692,7 +2398,7 @@ class SampleService
                     }
 
                     //check existing sample code
-                    $sampleCode = $this->checkSampleCode($sampleCode, $instanceCode);
+                    $sampleCode = $this->checkSampleCode($sampleCode, $remoteSampleCode, $instanceCode);
                     $status = 0;
 
                     if ($sampleCode) {
@@ -2738,7 +2444,7 @@ class SampleService
         // Track API Records
         $apiTrackData = array(
             'tracking_id'                   => $params['timestamp'],
-            'received_on'                   => $common->getDateTime(),
+            'received_on'                   => $this->commonService->getDateTime(),
             'number_of_records_received'    => count($params['data']),
             'number_of_records_processed'   => (count($params['data']) - count($return)),
             'source'                        => 'API-VIRAL-LOAD',

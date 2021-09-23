@@ -534,7 +534,7 @@ class CommonService
           $covid19SampleTypeDb = $this->sm->get('Covid19SampleTypeTable');
           $covid19ComorbiditiesDb = $this->sm->get('Covid19ComorbiditiesTable');
           $covid19SymptomsDb = $this->sm->get('Covid19SymptomsTable');
-          $facilityDb = $this->sm->get('FacilityTable');
+          $facilityDb = $this->sm->get('FacilityTableWithoutCache');
           $locationDb = $this->sm->get('LocationDetailsTable');
           $importConfigDb = $this->sm->get('ImportConfigMachineTable');
           $hepatitisSampleTypeDb = $this->sm->get('HepatitisSampleTypeTable');
@@ -643,15 +643,7 @@ class CommonService
                                    }
                               }
 
-                              $rQuery = $sql->select()->from('facility_details')->where(array('facility_code LIKE "%' . $facilityData['facility_code'] . '%" OR facility_id = ' . $facilityData['facility_id']));
-                              $rQueryStr = $sql->buildSqlString($rQuery);
-                              // die($rQueryStr);
-                              $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-                              if ($rowData) {
-                                   $facilityDb->update($facilityData, array('facility_id' => $facilityData['facility_id']));
-                              } else {
-                                   $facilityDb->insert($facilityData);
-                              }
+                              $facilityDb->insertOrUpdate($facilityData);
                          }
                     }
                }
@@ -670,14 +662,7 @@ class CommonService
                     if (empty($notUpdated) || !isset($notUpdated)) {
                          foreach ((array)$apiData->r_vl_test_reasons->tableData as $row) {
                               $testReasonData = (array)$row;
-                              $rQuery = $sql->select()->from('r_vl_test_reasons')->where(array('test_reason_name LIKE "%' . $testReasonData['test_reason_name'] . '%" OR test_reason_id = ' . $testReasonData['test_reason_id']));
-                              $rQueryStr = $sql->buildSqlString($rQuery);
-                              $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-                              if ($rowData) {
-                                   $testReasonDb->update($testReasonData, array('test_reason_id' => $testReasonData['test_reason_id']));
-                              } else {
-                                   $testReasonDb->insert($testReasonData);
-                              }
+                              $testReasonDb->insertOrUpdate($testReasonData);
                          }
                     }
                }
@@ -723,14 +708,7 @@ class CommonService
                          foreach ((array)$apiData->r_vl_art_regimen->tableData as $row) {
                               $artCodeData = (array)$row;
                               unset($artCodeData['data_sync']);
-                              $rQuery = $sql->select()->from('r_vl_art_regimen')->where(array('art_code LIKE "%' . $artCodeData['art_code'] . '%" OR art_id = ' . $artCodeData['art_id']));
-                              $rQueryStr = $sql->buildSqlString($rQuery);
-                              $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-                              if ($rowData) {
-                                   $artCodeDb->update($artCodeData, array('art_id' => $artCodeData['art_id']));
-                              } else {
-                                   $artCodeDb->insert($artCodeData);
-                              }
+                              $artCodeDb->insertOrUpdate($artCodeData);
                          }
                     }
                }
@@ -750,14 +728,7 @@ class CommonService
                          foreach ((array)$apiData->r_vl_sample_rejection_reasons->tableData as $row) {
                               $sampleRejectionReasonData = (array)$row;
                               unset($sampleRejectionReasonData['data_sync']);
-                              $rQuery = $sql->select()->from('r_vl_sample_rejection_reasons')->where(array('rejection_reason_name LIKE "%' . $sampleRejectionReasonData['rejection_reason_name'] . '%" OR rejection_reason_id = ' . $sampleRejectionReasonData['rejection_reason_id']));
-                              $rQueryStr = $sql->buildSqlString($rQuery);
-                              $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-                              if ($rowData) {
-                                   $sampleRejectionReasonDb->update($sampleRejectionReasonData, array('rejection_reason_id' => $sampleRejectionReasonData['rejection_reason_id']));
-                              } else {
-                                   $sampleRejectionReasonDb->insert($sampleRejectionReasonData);
-                              }
+                              $sampleRejectionReasonDb->insertOrUpdate($sampleRejectionReasonData);
                          }
                     }
                }

@@ -18,8 +18,7 @@ class CronController extends AbstractActionController{
     }
     
     public function importVlAction(){
-        //$sampleService = $this->getServiceLocator()->get('SampleService');
-        $this->sampleService->importSampleResultFile();
+        return false;
     }
 
     public function generateBackupAction(){

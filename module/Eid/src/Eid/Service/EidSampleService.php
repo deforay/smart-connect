@@ -124,8 +124,8 @@ class EidSampleService
         $pathname = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-eid" . DIRECTORY_SEPARATOR . $fileName;
         if (!file_exists($pathname)) {
             if (move_uploaded_file($_FILES['eidFile']['tmp_name'], $pathname)) {
-                $apiData = json_decode(file_get_contents($pathname), true);
-                //$apiData = \JsonMachine\JsonMachine::fromFile($pathname);
+                //$apiData = json_decode(file_get_contents($pathname), true);
+                $apiData = \JsonMachine\JsonMachine::fromFile($pathname, "/data");
             }
         }
 
@@ -147,7 +147,9 @@ class EidSampleService
 
 
         $numRows = 0;
-        foreach ($apiData['data'] as $rowData) {
+        $counter = 0;
+        foreach ($apiData as $key => $rowData) {
+            $counter++;
 
 
             $data = array();
@@ -164,31 +166,39 @@ class EidSampleService
             // error_log(ob_get_clean());
             // exit(0);
 
-            $sampleCode = trim($data['sample_code']);
-            $instanceCode = trim($data['vlsm_instance_id']);
+            // $sampleCode = trim($data['sample_code']);
+            // $remoteSample = trim($data['remote_sample_code']);
+            // $instanceCode = trim($data['vlsm_instance_id']);
             //check existing sample code
-            $sampleCode = $this->checkSampleCode($sampleCode, $instanceCode);
-            if ($sampleCode) {
-                //sample data update
-                $numRows += $sampleDb->update($data, array('eid_id' => $sampleCode['eid_id']));
-            } else {
-                //sample data insert
-                $numRows += $sampleDb->insert($data);
-            }
+            // $sampleCode = $this->checkSampleCode($sampleCode, $remoteSample, $instanceCode);
+            // if ($sampleCode) {
+            //     //sample data update
+            //     $numRows += $sampleDb->update($data, array('eid_id' => $sampleCode['eid_id']));
+            // } else {
+            //     //sample data insert
+            //     $numRows += $sampleDb->insert($data);
+            // }
+            $sampleDb->insertOrUpdate($data);
+            $numRows++;
         }
 
         $common = new CommonService();
-        if(count($apiData['data'])  == $numRows){
+        if ($counter  == $numRows) {
             $status = "success";
-        } else if((count($apiData['data']) - $numRows) != 0){
+        } else if (($counter - $numRows) != 0) {
             $status = "partial";
-        } else if($numRows == 0){
+        } else if ($numRows == 0) {
             $status = 'failed';
         }
+        $apiData = \JsonMachine\JsonMachine::fromFile($pathname, '/timestamp');
+        $timestamp = iterator_to_array($apiData)['timestamp'];
+        $timestamp = ($timestamp != false && !empty($timestamp)) ? $timestamp : time();
+
+        unset($pathname);
         $apiTrackData = array(
-            'tracking_id'                   => $apiData['timestamp'],
+            'tracking_id'                   => $timestamp,
             'received_on'                   => $common->getDateTime(),
-            'number_of_records_received'    => count($apiData['data']),
+            'number_of_records_received'    => $counter,
             'number_of_records_processed'   => $numRows,
             'source'                        => 'VLSM-EID',
             'status'                        => $status
@@ -237,6 +247,7 @@ class EidSampleService
                     // Debug::dump($row['vlsm_instance_id']);die;
                     if (trim($row['sample_code']) != '' && trim($row['vlsm_instance_id']) != '') {
                         $sampleCode = trim($row['sample_code']);
+                        $remoteSampleCode = trim($row['remote_sample_code']);
                         $instanceCode = trim($row['vlsm_instance_id']);
 
                         $sampleCollectionDate = (trim($row['sample_collection_date']) != '' ? trim(date('Y-m-d H:i', strtotime($row['sample_collection_date']))) : null);
@@ -257,6 +268,7 @@ class EidSampleService
                             }
                         }
                         $data['sample_code']                = $sampleCode;
+                        $data['remote_sample_code']         = $remoteSampleCode;
                         $data['sample_collection_date']     = $sampleCollectionDate;
                         $data['sample_registered_at_lab']   = $sampleReceivedAtLab;
                         $data['result_approved_datetime']   = $resultApprovedDateTime;
@@ -401,7 +413,7 @@ class EidSampleService
                         }
                         // Debug::dump($data);die;
                         //check existing sample code
-                        $sampleCode = $this->checkSampleCode($sampleCode, $instanceCode);
+                        $sampleCode = $this->checkSampleCode($sampleCode, $remoteSampleCode, $instanceCode);
                         if ($sampleCode) {
                             //sample data update
                             $sampleDb->update($data, array('eid_id' => $sampleCode['eid_id']));
@@ -425,11 +437,21 @@ class EidSampleService
         );
     }
 
-    public function checkSampleCode($sampleCode, $instanceCode, $dashTable = 'dash_eid_form')
+
+    public function checkSampleCode($sampleCode, $remoteSampleCode = null, $instanceCode = null, $dashTable = 'dash_vl_request_form')
     {
         $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
         $sql = new Sql($dbAdapter);
-        $sQuery = $sql->select()->from($dashTable)->where(array('sample_code' => $sampleCode, 'vlsm_instance_id' => $instanceCode));
+        $sQuery = $sql->select()->from($dashTable);
+        if (isset($instanceCode) && $instanceCode != "") {
+            $sQuery = $sQuery->where(array('vlsm_instance_id' => $instanceCode));
+        }
+        if (isset($instanceCode) && $instanceCode != "") {
+            $sQuery = $sQuery->where(array('sample_code' => $sampleCode));
+        }
+        if (isset($instanceCode) && $instanceCode != "") {
+            $sQuery = $sQuery->where(array('remote_sample_code' => $remoteSampleCode));
+        }
         $sQueryStr = $sql->buildSqlString($sQuery);
         $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
         return $sResult;
@@ -503,7 +525,7 @@ class EidSampleService
     {
 
         if (empty(trim($reasonName))) return null;
-        
+
         $testReasonDb = $this->sm->get('TestReasonTable');
         $sResult = $testReasonDb->select(array('test_reason_name' => $reasonName))->toArray();
         if ($sResult) {
@@ -1154,19 +1176,19 @@ class EidSampleService
         return $sampleDb->fetchViralLoadStatusBasedOnGender($params);
     }
 
-    
+
     public function getClinicSampleTestedResultAgeGroupDetails($params)
     {
         $sampleDb = $this->sm->get('EidSampleTableWithoutCache');
         return $sampleDb->fetchClinicSampleTestedResultAgeGroupDetails($params);
     }
-    
+
     public function fetchSampleTestedReason($params)
     {
         $sampleDb = $this->sm->get('EidSampleTableWithoutCache');
         return $sampleDb->fetchSampleTestedReason($params);
     }
-    
+
     public function getClinicSampleTestedResults($params, $sampleType)
     {
         $sampleDb = $this->sm->get('EidSampleTableWithoutCache');
@@ -1214,7 +1236,7 @@ class EidSampleService
                         $row[] = $aRow['facilityDistrict'];
                         $row[] = $aRow['facilityState'];
                         $row[] = ucwords($aRow['first_name'] . " " . $aRow['last_name']);
-                        $row[] = date('d-M-Y',strtotime($aRow['child_dob']));
+                        $row[] = date('d-M-Y', strtotime($aRow['child_dob']));
                         $row[] = $aRow['child_age'];
                         $row[] = $aRow['child_gender'];
                         $row[] = $sampleCollectionDate;
@@ -1467,8 +1489,8 @@ class EidSampleService
             if (!file_exists(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "API-data-vl") && !is_dir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "API-data-vl")) {
                 mkdir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "API-data-vl", 0777);
             }
-    
-            $pathname = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "API-data-vl" . DIRECTORY_SEPARATOR . $params['timestamp'].'.json';
+
+            $pathname = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "API-data-vl" . DIRECTORY_SEPARATOR . $params['timestamp'] . '.json';
             if (!file_exists($pathname)) {
                 $file = file_put_contents($pathname, json_encode($params));
                 if (move_uploaded_file($pathname, $pathname)) {
@@ -1479,21 +1501,22 @@ class EidSampleService
                 // Debug::dump($row);die;
                 if (!empty(trim($row['sample_code'])) && trim($params['api_version']) == $config['defaults']['eid-api-version']) {
                     $sampleCode = trim($row['sample_code']);
+                    $remoteSampleCode = trim($row['remote_sample_code']);
                     $instanceCode = 'api-data';
 
-                     // Check dublicate data
-                     $province = $provinceDb->select(array('province_name' => $row['health_centre_province']))->current();
-                     if(!$province){
-                         $provinceDb->insert(array(
-                             'province_name'     => $row['health_centre_province'],
-                             'updated_datetime'  => $common->getDateTime()
-                         ));
-                         $province['province_id'] = $provinceDb->lastInsertValue;
-                     }
+                    // Check dublicate data
+                    $province = $provinceDb->select(array('province_name' => $row['health_centre_province']))->current();
+                    if (!$province) {
+                        $provinceDb->insert(array(
+                            'province_name'     => $row['health_centre_province'],
+                            'updated_datetime'  => $common->getDateTime()
+                        ));
+                        $province['province_id'] = $provinceDb->lastInsertValue;
+                    }
 
-                    
 
-                    
+
+
                     $sampleReceivedAtLab = ((trim($row['sample_received_date']) != '' && $row['sample_received_date'] != "") ? trim($row['sample_received_date']) : null);
                     $sampleTestedDateTime = ((trim($row['sample_tested_date']) != '' && $row['sample_tested_date'] != "") ? trim($row['sample_tested_date']) : null);
                     $sampleCollectionDate = ((trim($row['sample_collection_date']) != '' && $row['sample_collection_date'] != "") ? trim($row['sample_collection_date']) : null);
@@ -1506,6 +1529,7 @@ class EidSampleService
 
                     $data = array(
                         'sample_code'                           => $sampleCode,
+                        'remote_sample_code'                    => $remoteSampleCode,
                         'vlsm_instance_id'                      => $instanceCode,
                         'province_id'                           => (trim($province['province_id']) != '' ? trim($province['province_id']) : NULL),
                         'mother_id'                             => (trim($row['mother_id']) != '' ? trim($row['mother_id']) : NULL),
@@ -1595,7 +1619,7 @@ class EidSampleService
                     }
 
                     //check existing sample code
-                    $sampleCode = $this->checkSampleCode($sampleCode, $instanceCode);
+                    $sampleCode = $this->checkSampleCode($sampleCode, $remoteSampleCode, $instanceCode);
                     $status = 0;
 
                     if ($sampleCode) {
@@ -1621,21 +1645,21 @@ class EidSampleService
         http_response_code(202);
         $status = 'success';
         if (count($return) > 0) {
-            
+
             $status = 'partial';
-            if((count($params['data']) - count($return)) == 0){
+            if ((count($params['data']) - count($return)) == 0) {
                 $status = 'failed';
-            } else{
+            } else {
                 //remove directory  
                 unlink($pathname);
             }
-        } else{
+        } else {
             //remove directory  
             unlink($pathname);
         }
         $response = array(
             'status'    => 'success',
-            'message'   => 'Received ' . count($params['data']) . ' records. Processed '.(count($params['data']) - count($return)).' records.'
+            'message'   => 'Received ' . count($params['data']) . ' records. Processed ' . (count($params['data']) - count($return)) . ' records.'
         );
 
         // Track API Records
@@ -1648,9 +1672,9 @@ class EidSampleService
             'status'                        => $status
         );
         $trackResult = $apiTrackDb->select(array('tracking_id' => $params['timestamp']))->current();
-        if($trackResult){
+        if ($trackResult) {
             $apiTrackDb->update($apiTrackData, array('api_id' => $trackResult['api_id']));
-        } else{
+        } else {
             $apiTrackDb->insert($apiTrackData);
         }
 

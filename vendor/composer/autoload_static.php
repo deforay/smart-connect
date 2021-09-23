@@ -42,6 +42,7 @@ class ComposerStaticInit6b3507ca92e690d5341f8b5f5bbb0a97
         'b6b991a57620e2fb6b2f66f03fe9ddc2' => __DIR__ . '/..' . '/symfony/string/Resources/functions.php',
         '16e8e4b4e4023165d65e5986362a202c' => __DIR__ . '/..' . '/laminas/laminas-cli/src/autoload.php',
         '78d47739fff607f33066e6259f091845' => __DIR__ . '/..' . '/laminas/laminas-cache/autoload/patternPluginManagerPolyfill.php',
+        '2cffec82183ee1cea088009cef9a6fc3' => __DIR__ . '/..' . '/ezyang/htmlpurifier/library/HTMLPurifier.composer.php',
         'abede361264e2ae69ec1eee813a101af' => __DIR__ . '/..' . '/markbaker/complex/classes/src/functions/abs.php',
         '21a5860fbef5be28db5ddfbc3cca67c4' => __DIR__ . '/..' . '/markbaker/complex/classes/src/functions/acos.php',
         '1546e3f9d127f2a9bb2d1b6c31c26ef1' => __DIR__ . '/..' . '/markbaker/complex/classes/src/functions/acosh.php',
@@ -100,7 +101,7 @@ class ComposerStaticInit6b3507ca92e690d5341f8b5f5bbb0a97
         '8d37dad4703fab45bfec9dd0bbf3278e' => __DIR__ . '/..' . '/markbaker/matrix/classes/src/Operations/multiply.php',
         '4888a6f58c08148ebe17682f9ce9b2a8' => __DIR__ . '/..' . '/markbaker/matrix/classes/src/Operations/divideby.php',
         'eef6fa3879d3efa347cd24d5eb348f85' => __DIR__ . '/..' . '/markbaker/matrix/classes/src/Operations/divideinto.php',
-        '2cffec82183ee1cea088009cef9a6fc3' => __DIR__ . '/..' . '/ezyang/htmlpurifier/library/HTMLPurifier.composer.php',
+        'ace6d88241f812b4accb2d847454aef6' => __DIR__ . '/..' . '/halaxa/json-machine/src/functions.php',
     );
 
     public static $prefixLengthsPsr4 = array (
@@ -190,6 +191,10 @@ class ComposerStaticInit6b3507ca92e690d5341f8b5f5bbb0a97
             'Laminas\\Cache\\Storage\\Adapter\\' => 30,
             'Laminas\\Cache\\' => 14,
             'Laminas\\Authentication\\' => 23,
+        ),
+        'J' => 
+        array (
+            'JsonMachine\\' => 12,
         ),
         'I' => 
         array (
@@ -506,6 +511,10 @@ class ComposerStaticInit6b3507ca92e690d5341f8b5f5bbb0a97
         'Laminas\\Authentication\\' => 
         array (
             0 => __DIR__ . '/..' . '/laminas/laminas-authentication/src',
+        ),
+        'JsonMachine\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/halaxa/json-machine/src',
         ),
         'Interop\\Container\\' => 
         array (

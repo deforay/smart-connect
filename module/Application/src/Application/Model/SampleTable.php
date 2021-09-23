@@ -52,7 +52,7 @@ class SampleTable extends AbstractTableGateway
         $logincontainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        
+
         //        $query = "SELECT count(*) as 'Total', 
         //		SUM(CASE 
         //            WHEN patient_gender IS NULL OR patient_gender ='' THEN 0
@@ -116,7 +116,7 @@ class SampleTable extends AbstractTableGateway
         $quickStats = $this->fetchQuickStats($params);
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        
+
         $waitingTotal = 0;
         $receivedTotal = 0;
         $testedTotal = 0;
@@ -227,7 +227,7 @@ class SampleTable extends AbstractTableGateway
         $result = array();
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        
+
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
@@ -314,7 +314,7 @@ class SampleTable extends AbstractTableGateway
         $result = array();
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        
+
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
@@ -376,7 +376,7 @@ class SampleTable extends AbstractTableGateway
         $result = array();
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        
+
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
@@ -459,7 +459,7 @@ class SampleTable extends AbstractTableGateway
         $result = array();
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        
+
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
@@ -534,7 +534,7 @@ class SampleTable extends AbstractTableGateway
         $sql = new Sql($dbAdapter);
         $result = array();
         $skipDays = isset($this->config['defaults']['tat-skipdays']) ? $this->config['defaults']['tat-skipdays'] : 120;
-        
+
 
         $facilityIdList = null;
 
@@ -646,7 +646,7 @@ class SampleTable extends AbstractTableGateway
         $result = array();
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        
+
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
@@ -751,7 +751,7 @@ class SampleTable extends AbstractTableGateway
         $result = array();
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        
+
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
@@ -803,7 +803,7 @@ class SampleTable extends AbstractTableGateway
         $result = array();
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        
+
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
@@ -855,7 +855,7 @@ class SampleTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = array();
-        
+
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
@@ -930,7 +930,7 @@ class SampleTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = array();
-        
+
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
@@ -978,7 +978,7 @@ class SampleTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $femaleTestResult = array();
-        
+
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
@@ -1020,7 +1020,7 @@ class SampleTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $lineOfTreatmentResult = array();
-        
+
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
@@ -1058,7 +1058,7 @@ class SampleTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $lResult = array();
-        
+
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
@@ -1102,7 +1102,7 @@ class SampleTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = array();
-        
+
         $i = 0;
         $j = 1;
         $k = 2;
@@ -1175,7 +1175,7 @@ class SampleTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = array();
-        
+
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
@@ -1261,7 +1261,7 @@ class SampleTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $vlOutComeResult = array();
-        
+
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
@@ -1378,7 +1378,7 @@ class SampleTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $sResult = array();
-        
+
         if (isset($params['sampleCollectionDate']) && trim($params['sampleCollectionDate']) != '') {
             $s_c_date = explode("to", $params['sampleCollectionDate']);
             if (isset($s_c_date[0]) && trim($s_c_date[0]) != "") {
@@ -1494,7 +1494,7 @@ class SampleTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = array();
-        
+
         if (isset($params['sampleCollectionDate']) && trim($params['sampleCollectionDate']) != '') {
             $s_c_date = explode("to", $params['sampleCollectionDate']);
             if (isset($s_c_date[0]) && trim($s_c_date[0]) != "") {
@@ -1616,7 +1616,7 @@ class SampleTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = array();
-        
+
         if (isset($params['sampleCollectionDate']) && trim($params['sampleCollectionDate']) != '') {
             $s_c_date = explode("to", $params['sampleCollectionDate']);
             if (isset($s_c_date[0]) && trim($s_c_date[0]) != "") {
@@ -1743,7 +1743,7 @@ class SampleTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = array();
-        
+
         if (isset($params['sampleCollectionDate']) && trim($params['sampleCollectionDate']) != '') {
             $s_c_date = explode("to", $params['sampleCollectionDate']);
             if (isset($s_c_date[0]) && trim($s_c_date[0]) != "") {
@@ -1837,7 +1837,7 @@ class SampleTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = array();
-        
+
         if (isset($params['sampleCollectionDate']) && trim($params['sampleCollectionDate']) != '') {
             $s_c_date = explode("to", $params['sampleCollectionDate']);
             if (isset($s_c_date[0]) && trim($s_c_date[0]) != "") {
@@ -1949,7 +1949,7 @@ class SampleTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $rResult = array();
-        
+
         if (isset($params['sampleCollectionDate']) && trim($params['sampleCollectionDate']) != '') {
             $s_c_date = explode("to", $params['sampleCollectionDate']);
             if (isset($s_c_date[0]) && trim($s_c_date[0]) != "") {
@@ -2305,7 +2305,7 @@ class SampleTable extends AbstractTableGateway
             "aaData" => array()
         );
 
-        
+
         $viewText = $this->commonService->translate('View');
         $pdfText = $this->commonService->translate('PDF');
         foreach ($rResult as $aRow) {
@@ -2339,7 +2339,7 @@ class SampleTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = array();
-        
+
 
 
         if (isset($params['sampleCollectionDate']) && trim($params['sampleCollectionDate']) != '') {
@@ -2462,7 +2462,7 @@ class SampleTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = array();
-        
+
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
@@ -2599,7 +2599,7 @@ class SampleTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = array();
-        
+
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
@@ -2744,7 +2744,7 @@ class SampleTable extends AbstractTableGateway
         $result = array();
 
 
-        
+
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
             $startMonth = date("Y-m", strtotime(trim($params['fromDate']))) . "-01";
             $endMonth = date("Y-m", strtotime(trim($params['toDate']))) . "-31";
@@ -2857,7 +2857,7 @@ class SampleTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = array();
-        
+
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
@@ -3076,7 +3076,7 @@ class SampleTable extends AbstractTableGateway
     {
         $logincontainer = new Container('credo');
         $queryContainer = new Container('query');
-        
+
         /* Array of database columns which should be read and sent back to DataTables. Use a space where
          * you want to insert a non-database field (for example a counter or static image)
         */
@@ -3332,7 +3332,7 @@ class SampleTable extends AbstractTableGateway
     {
         $logincontainer = new Container('credo');
         $queryContainer = new Container('query');
-        
+
         /* Array of database columns which should be read and sent back to DataTables. Use a space where
          * you want to insert a non-database field (for example a counter or static image)
         */
@@ -3582,7 +3582,7 @@ class SampleTable extends AbstractTableGateway
     {
         $logincontainer = new Container('credo');
         $queryContainer = new Container('query');
-        
+
         /* Array of database columns which should be read and sent back to DataTables. Use a space where
          * you want to insert a non-database field (for example a counter or static image)
         */
@@ -4264,7 +4264,7 @@ class SampleTable extends AbstractTableGateway
     {
         $logincontainer = new Container('credo');
         $queryContainer = new Container('query');
-        
+
         //$globalDb = new \Application\Model\GlobalTable($this->adapter);
         $globalDb = $this->sm->get('GlobalTable');
         $samplesWaitingFromLastXMonths = $globalDb->getGlobalValue('sample_waiting_month_range');
@@ -4748,7 +4748,7 @@ class SampleTable extends AbstractTableGateway
             "aaData" => array()
         );
 
-        
+
         $buttText = $this->commonService->translate('Edit');
         foreach ($rResult as $aRow) {
             $sampleCollectionDate = '';
@@ -4991,7 +4991,7 @@ class SampleTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = array();
-        
+
 
         $sQuery = $sql->select()->from(array('vl' => $this->table))
             ->columns(
@@ -5617,7 +5617,7 @@ class SampleTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = array();
-        
+
 
         $sQuery = $sql->select()
             ->from(array('vl' => $this->table))
@@ -6253,7 +6253,7 @@ class SampleTable extends AbstractTableGateway
             $mostRejectionReasons[] = 0;
         }
         $result = array();
-        
+
         $start = strtotime($params['fromDate']);
         $end = strtotime($params['toDate']);
 
@@ -6818,7 +6818,7 @@ class SampleTable extends AbstractTableGateway
     {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        
+
 
 
         $validQuery = $sql->select()->from(array('vl' => $this->table))
@@ -7099,7 +7099,7 @@ class SampleTable extends AbstractTableGateway
     {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        
+
         $sQuery = $sql->select()->from(array('vl' => $this->table))
             ->columns(
                 array(
@@ -7128,7 +7128,7 @@ class SampleTable extends AbstractTableGateway
     {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        
+
         $sQuery = $sql->select()->from(array('vl' => $this->table))
             ->columns(
                 array(
@@ -7169,7 +7169,7 @@ class SampleTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $summaryResult = array();
-        
+
 
         $samplesReceivedSummaryQuery = $sql->select()
             ->from(array('vl' => $this->table))
@@ -7233,7 +7233,7 @@ class SampleTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $rResult = array();
-        
+
         if (isset($params['sampleCollectionDate']) && trim($params['sampleCollectionDate']) != '') {
             $s_c_date = explode("to", $params['sampleCollectionDate']);
             if (isset($s_c_date[0]) && trim($s_c_date[0]) != "") {
@@ -7343,7 +7343,7 @@ class SampleTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $rResult = array();
-        
+
         if (isset($params['sampleCollectionDate']) && trim($params['sampleCollectionDate']) != '') {
             $s_c_date = explode("to", $params['sampleCollectionDate']);
             if (isset($s_c_date[0]) && trim($s_c_date[0]) != "") {
@@ -7951,7 +7951,7 @@ class SampleTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $lResult = array();
-        
+
         $lQuery = $sql->select()->from(array('eid' => 'dash_eid_form'))->columns(array(
             'total' => new Expression("SUM(CASE WHEN ( eid.sample_collection_date is not NULL AND eid.sample_collection_date!='0000-00-00 00:00:00') THEN 1 ELSE 0 END)"),
             "samplenottested" => new Expression("SUM(CASE WHEN (eid.sample_collection_date is NULL OR eid.sample_collection_date='0000-00-00 00:00:00') THEN 1 ELSE 0 END)"),
@@ -7972,7 +7972,7 @@ class SampleTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $lResult = array();
-        
+
         // $lQuery = $sql->select()->from(array('eid' => 'dash_eid_form'))->columns(array('child_name','mother_name','caretaker_phone_number','result'))
         //             ->join(array('f' => 'import_config_machines'), 'f.config_machine_id=eid.import_machine_name', array('lat'=>'latitude','lon'=>'longitude'))
         //             ->where("(eid.sample_tested_datetime is not null  AND f.poc_device ='yes' AND f.latitude = '".$params['lat']."' AND f.longitude = '".$params['lon']."')")
@@ -8037,7 +8037,7 @@ class SampleTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $lResult = array();
-        
+
         // $lQuery = $sql->select()->from(array('eid' => 'dash_eid_form'))->columns(array('child_name','mother_name','caretaker_phone_number','result'))
         //             ->join(array('f' => 'import_config_machines'), 'f.config_machine_id=eid.import_machine_name', array('lat'=>'latitude','lon'=>'longitude'))
         //             ->where("(eid.sample_tested_datetime is not null  AND f.poc_device ='yes' AND f.latitude = '".$params['lat']."' AND f.longitude = '".$params['lon']."')")
@@ -8100,5 +8100,12 @@ class SampleTable extends AbstractTableGateway
         $lResult = $dbAdapter->query($lQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
 
         return $lResult;
+    }
+
+    public function insertOrUpdate($arrayData)
+    {
+        $query = 'INSERT INTO `' . $this->table . '` (' . implode(',', array_keys($arrayData)) . ') VALUES (' . implode(',', array_fill(1, count($arrayData), '?')) . ') ON DUPLICATE KEY UPDATE ' . implode(' = ?,', array_keys($arrayData)) . ' = ?';
+        $result =  $this->adapter->query($query, array_merge(array_values($arrayData), array_values($arrayData)));
+        return $result->getGeneratedValue();
     }
 }
