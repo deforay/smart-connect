@@ -31,7 +31,7 @@ class SummaryController extends AbstractActionController
     }
     $this->layout()->setVariable('activeTab', 'eid-summary');
     $summaryTabResult = $this->summaryService->fetchSummaryTabDetails($params);
-
+    
     /* District, Province and Facility */      
     $clinicName = $this->commonService->getAllClinicName();
     $provinceName = $this->commonService->getAllProvinceList();

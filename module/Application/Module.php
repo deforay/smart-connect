@@ -434,7 +434,8 @@ class Module
 					$sampleTable = $sm->get('SampleTable');
 					$apiTrackerTable = $sm->get('DashApiReceiverStatsTable');
 					$commonService = $sm->getServiceLocator()->get('CommonService');
-					return new SampleService($sm, $sampleTable, $commonService, $apiTrackerTable);
+					$dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');
+					return new SampleService($sm, $sampleTable, $commonService, $apiTrackerTable, $dbAdapter);
 				},
 				'SummaryService' => function ($sm) {
 					$sampleTable = $sm->get('SampleTable');

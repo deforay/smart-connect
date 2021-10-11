@@ -33,7 +33,7 @@ die; */
         },
         yAxis: [{
             title: {
-                text: 'Average TAT in Days'
+                text: '<?= $this->translate('Average TAT in Days'); ?>'
             },
             labels: {
                 formatter: function() {
@@ -43,7 +43,7 @@ die; */
         }, { // Secondary yAxis
             gridLineWidth: 0,
             title: {
-                text: 'No. of Tests'
+                text: '<?= $this->translate('No. of Tests'); ?>'
             },
             labels: {
                 format: '{value}'
@@ -73,7 +73,7 @@ die; */
 
         series: [{
                 type: 'column',
-                name: 'No. of Samples Tested',
+                name: '<?= $this->translate('No. of Samples Tested') ?>',
                 data: [<?php echo implode(",", $result['totalSamples']); ?>],
                 color: '#7CB5ED',
                 yAxis: 1
@@ -83,7 +83,7 @@ die; */
             ?> {
                     connectNulls: false,
                     showInLegend: true,
-                    name: 'Collected - Received at Lab',
+                    name: '<?= $this->translate('Collected - Received at Lab') ?>',
                     data: [<?php echo implode(",", $result['sampleReceivedDiff']); ?>],
                     color: '#edb47c',
                 },
@@ -93,17 +93,27 @@ die; */
             ?> {
                     connectNulls: false,
                     showInLegend: true,
-                    name: 'Received - Tested',
+                    name: '<?= $this->translate('Received - Tested') ?>',
                     data: [<?php echo implode(",", $result['sampleReceivedTested']); ?>],
                     color: '#0f3f6e',
                 },
             <?php
             }
+            if (isset($result['sampleReceivedPrinted'])) {
+                ?> {
+                        connectNulls: false,
+                        showInLegend: true,
+                        name: '<?= $this->translate('Received - Printed') ?>',
+                        data: [<?php echo implode(",", $result['sampleReceivedPrinted']); ?>],
+                        color: '#000',
+                    },
+                <?php
+                }
             if (isset($result['sampleTestedDiff'])) {
             ?> {
                     connectNulls: false,
                     showInLegend: true,
-                    name: 'Collected - Tested',
+                    name: '<?= $this->translate('Collected - Tested') ?>',
                     data: [<?php echo implode(",", $result['sampleTestedDiff']); ?>],
                     color: '#ed7c7d',
                 },

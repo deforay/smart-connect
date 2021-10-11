@@ -589,19 +589,20 @@ class SampleTable extends AbstractTableGateway
                         "AvgTestedDiff" => new Expression('CAST(ABS(AVG(TIMESTAMPDIFF(DAY,vl.sample_tested_datetime,vl.sample_collection_date))) AS DECIMAL (10,2))'),
                         "AvgReceivedDiff" => new Expression('CAST(ABS(AVG(TIMESTAMPDIFF(DAY,vl.sample_received_at_vl_lab_datetime,vl.sample_collection_date))) AS DECIMAL (10,2))'),
                         "AvgReceivedTested" => new Expression('CAST(ABS(AVG(TIMESTAMPDIFF(DAY,vl.sample_tested_datetime,vl.sample_received_at_vl_lab_datetime))) AS DECIMAL (10,2))'),
+                        "AvgReceivedPrinted" => new Expression('CAST(ABS(AVG(TIMESTAMPDIFF(DAY,vl.result_printed_datetime,vl.sample_collection_date))) AS DECIMAL (10,2))')
                     )
                 );
             $query = $query->where(
                 "(vl.sample_collection_date is not null AND vl.sample_collection_date not like '' AND DATE(vl.sample_collection_date) not like '1970-01-01' AND DATE(vl.sample_collection_date) not like '0000-00-00')
-                AND (vl.result_approved_datetime is not null AND vl.result_approved_datetime not like '' AND DATE(vl.result_approved_datetime) not like '1970-01-01' AND DATE(vl.result_approved_datetime) not like '0000-00-00')"
+                AND (vl.sample_tested_datetime is not null AND vl.sample_tested_datetime not like '' AND DATE(vl.sample_tested_datetime) not like '1970-01-01' AND DATE(vl.sample_tested_datetime) not like '0000-00-00')"
             );
             $query = $query->where("
-                DATE(vl.result_approved_datetime) >= '" . $startMonth . "'
-                AND DATE(vl.result_approved_datetime) <= '" . $endMonth . "' ");
+                DATE(vl.sample_tested_datetime) >= '" . $startMonth . "'
+                AND DATE(vl.sample_tested_datetime) <= '" . $endMonth . "' ");
             $skipDays = (isset($skipDays) && $skipDays > 0) ? $skipDays : 120;
             $query = $query->where('
-                (DATEDIFF(result_approved_datetime,sample_collection_date) < ' . $skipDays . ' AND 
-                DATEDIFF(result_approved_datetime,sample_collection_date) >= 0)');
+                (DATEDIFF(sample_tested_datetime,sample_collection_date) < ' . $skipDays . ' AND 
+                DATEDIFF(sample_tested_datetime,sample_collection_date) >= 0)');
 
             if ($facilityIdList != null) {
                 $query = $query->where('vl.lab_id IN ("' . implode('", "', $facilityIdList) . '")');
@@ -612,8 +613,7 @@ class SampleTable extends AbstractTableGateway
             // $query = $query->order(array(new Expression('DATE(vl.result_approved_datetime) ASC')));
             $query = $query->order('sample_tested_datetime ASC');
             $queryStr = $sql->buildSqlString($query);
-            /* echo $queryStr;
-            die; */
+            //echo $queryStr;die;
             //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             $sampleResult = $this->commonService->cacheQuery($queryStr, $dbAdapter);
             $j = 0;
@@ -633,6 +633,7 @@ class SampleTable extends AbstractTableGateway
                 $result['sampleTestedDiff'][$j] = (isset($sRow["AvgTestedDiff"]) && $sRow["AvgTestedDiff"] > 0 && $sRow["AvgTestedDiff"] != null) ? round($sRow["AvgTestedDiff"], 2) : 'null';
                 $result['sampleReceivedDiff'][$j] = (isset($sRow["AvgReceivedDiff"]) && $sRow["AvgReceivedDiff"] > 0 && $sRow["AvgReceivedDiff"] != null) ? round($sRow["AvgReceivedDiff"], 2) : 'null';
                 $result['sampleReceivedTested'][$j] = (isset($sRow["AvgReceivedTested"]) && $sRow["AvgReceivedTested"] > 0 && $sRow["AvgReceivedTested"] != null) ? round($sRow["AvgReceivedTested"], 2) : 'null';
+                $result['sampleReceivedPrinted'][$j] = (isset($sRow["AvgReceivedPrinted"]) && $sRow["AvgReceivedPrinted"] > 0 && $sRow["AvgReceivedPrinted"] != null) ? round($sRow["AvgReceivedPrinted"], 2) : 'null';
                 $result['date'][$j] = $sRow["monthDate"];
                 $j++;
             }
@@ -8108,4 +8109,35 @@ class SampleTable extends AbstractTableGateway
         $result =  $this->adapter->query($query, array_merge(array_values($arrayData), array_values($arrayData)));
         return $result->getGeneratedValue();
     }
+
+//     public function insertOrUpdateX($insertData, $updateData = null)
+//     {
+//         $insertDataValuesForQuery = [];
+//         $queryParams = [];
+//         foreach ($insertData as $key => $value) {
+//             if (gettype($value) == "object") {
+//                 array_push($insertDataValuesForQuery, $value->__toString());
+//                 continue;
+//             }
+//             array_push($insertDataValuesForQuery, "?");
+//             array_push($queryParams, $value);
+//         }
+
+//         if(empty($updateData)){
+//             $updateData = $insertData;
+//         }
+//         $updateDataValuesForQuery = [];
+//         foreach ($updateData as $key => $value) {
+//             if (gettype($value) == "object") {
+//                 array_push($updateDataValuesForQuery, $key . " = " . $value->__toString());
+//                 continue;
+//             }
+//             array_push($updateDataValuesForQuery, $key . " = ?");
+//             array_push($queryParams, $value);
+//         }
+
+//         $query = 'INSERT INTO ' . $this->_name . ' (' . implode(',', array_keys($insertData)) . ') VALUES (' . implode(',', $insertDataValuesForQuery) . ') ON DUPLICATE KEY UPDATE ' . implode(' , ', $updateDataValuesForQuery);
+//         $result = $this->adapter->query($query, $queryParams);
+//         return $result->getGeneratedValue();
+//  }
 }
