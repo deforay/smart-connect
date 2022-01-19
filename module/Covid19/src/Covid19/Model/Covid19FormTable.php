@@ -24,6 +24,7 @@ class Covid19FormTable extends AbstractTableGateway
     public $config = null;
     protected $translator = null;
     protected $commonService = null;
+    protected $mappedFacilities = null;
 
     public function __construct(Adapter $adapter, $sm = null, $mappedFacilities = null, $table = null, $commonService = null)
     {

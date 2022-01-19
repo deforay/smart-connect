@@ -456,43 +456,43 @@ class Covid19FormService
 
     public function fetchSummaryTabDetails($params)
     {
-        $covid19SampleDb = $this->sm->get('Covid19FormTableWithoutCache');
+        $covid19SampleDb = $this->sm->get('Covid19FormTable');
         return $covid19SampleDb->getSummaryTabDetails($params);
     }
 
     public function getSamplesReceivedBarChartDetails($params)
     {
-        $sampleDb = $this->sm->get('Covid19FormTableWithoutCache');
+        $sampleDb = $this->sm->get('Covid19FormTable');
         return $sampleDb->fetchSamplesReceivedBarChartDetails($params);
     }
 
     public function getAllSamplesReceivedByFacility($parameters)
     {
-        $sampleDb = $this->sm->get('Covid19FormTableWithoutCache');
+        $sampleDb = $this->sm->get('Covid19FormTable');
         return $sampleDb->fetchAllSamplesReceivedByFacility($parameters);
     }
 
     public function getAllSamplesReceivedByProvince($parameters)
     {
-        $sampleDb = $this->sm->get('Covid19FormTableWithoutCache');
+        $sampleDb = $this->sm->get('Covid19FormTable');
         return $sampleDb->fetchAllSamplesReceivedByProvince($parameters);
     }
 
     public function getAllSamplesReceivedByDistrict($parameters)
     {
-        $sampleDb = $this->sm->get('Covid19FormTableWithoutCache');
+        $sampleDb = $this->sm->get('Covid19FormTable');
         return $sampleDb->fetchAllSamplesReceivedByDistrict($parameters);
     }
 
     public function getPositiveRateBarChartDetails($params)
     {
-        $sampleDb = $this->sm->get('Covid19FormTableWithoutCache');
+        $sampleDb = $this->sm->get('Covid19FormTable');
         return $sampleDb->fetchPositiveRateBarChartDetails($params);
     }
 
     public function getAllPositiveRateByDistrict($parameters)
     {
-        $sampleDb = $this->sm->get('Covid19FormTableWithoutCache');
+        $sampleDb = $this->sm->get('Covid19FormTable');
         return $sampleDb->fetchAllPositiveRateByDistrict($parameters);
     }
 

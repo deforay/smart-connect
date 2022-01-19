@@ -249,7 +249,7 @@ class Module
 				},
 				'SampleTable' => function ($sm) {
 					$session = new Container('credo');
-					$mappedFacilities = (isset($session->mappedFacilities) && count($session->mappedFacilities) > 0) ? $session->mappedFacilities : array();
+					$mappedFacilities = (isset($session->mappedFacilities) && !empty($session->mappedFacilities)) ? $session->mappedFacilities : array();
 					$sampleTable = isset($session->sampleTable) ? $session->sampleTable :  null;
 					$dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');
 					$commonService = $sm->getServiceLocator()->get('CommonService');
