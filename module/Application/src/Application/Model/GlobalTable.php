@@ -23,11 +23,13 @@ class GlobalTable extends AbstractTableGateway
 
     protected $table = 'dash_global_config';
     public $sm = null;
+    public $commonService = null;
 
-    public function __construct(Adapter $adapter, $sm = null)
+    public function __construct(Adapter $adapter, $sm = null, $commonService)
     {
         $this->adapter = $adapter;
         $this->sm = $sm;
+        $this->commonService = $commonService;
     }
 
     public function getGlobalValue($globalName)
@@ -42,7 +44,6 @@ class GlobalTable extends AbstractTableGateway
 
     public function fetchAllConfig($parameters)
     {
-        $common = new CommonService($this->sm);
         /* Array of database columns which should be read and sent back to DataTables. Use a space where
          * you want to insert a non-database field (for example a counter or static image)
          */
@@ -158,7 +159,7 @@ class GlobalTable extends AbstractTableGateway
                 $currentVal = $this->fetchLocaleDetailsById('display_name', $aRow['value']);
             }
             $row = array();
-            $row[] = ucwords($common->translate($aRow['display_name']));
+            $row[] = ucwords($this->commonService->translate($aRow['display_name']));
             $row[] = ucwords($currentVal);
             $output['aaData'][] = $row;
         }
@@ -187,7 +188,6 @@ class GlobalTable extends AbstractTableGateway
     public function updateConfigDetails($params)
     {
         $updateRes = 0;
-        $common = new CommonService();
         //for logo deletion
         if (isset($params['removedLogoImage']) && trim($params['removedLogoImage']) != "" && file_exists(UPLOAD_PATH . DIRECTORY_SEPARATOR . "logo" . DIRECTORY_SEPARATOR . $params['removedLogoImage'])) {
             unlink(UPLOAD_PATH . DIRECTORY_SEPARATOR . "logo" . DIRECTORY_SEPARATOR . $params['removedLogoImage']);
@@ -199,7 +199,7 @@ class GlobalTable extends AbstractTableGateway
                 mkdir(UPLOAD_PATH . DIRECTORY_SEPARATOR . "logo");
             }
             $extension = strtolower(pathinfo(UPLOAD_PATH . DIRECTORY_SEPARATOR . $_FILES['logo']['name'], PATHINFO_EXTENSION));
-            $string = $common->generateRandomString(6) . ".";
+            $string = $this->commonService->generateRandomString(6) . ".";
             $imageName = "logo" . $string . $extension;
             if (move_uploaded_file($_FILES["logo"]["tmp_name"], UPLOAD_PATH . DIRECTORY_SEPARATOR . "logo" . DIRECTORY_SEPARATOR . $imageName)) {
                 $this->update(array('value' => $imageName), array('name' => 'logo'));

@@ -23,20 +23,25 @@ class Covid19FormTable extends AbstractTableGateway
     public $sm = null;
     public $config = null;
     protected $translator = null;
+    protected $commonService = null;
 
-    public function __construct(Adapter $adapter, $sm = null)
+    public function __construct(Adapter $adapter, $sm = null, $mappedFacilities = null, $table = null, $commonService = null)
     {
         $this->adapter = $adapter;
         $this->sm = $sm;
+        if ($table != null && !empty($table)) {
+            $this->table = $table;
+        }
         $this->config = $this->sm->get('Config');
         $this->translator = $this->sm->get('translator');
+        $this->mappedFacilities = $mappedFacilities;
+        $this->commonService = $commonService;
     }
 
     public function getSummaryTabDetails($params)
     {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $common = new CommonService($this->sm);
 
         $queryStr = $sql->select()->from(array('covid19' => $this->table))
             ->columns(array(
@@ -59,7 +64,7 @@ class Covid19FormTable extends AbstractTableGateway
 
         // echo $queryStr;die;
 
-        return $common->cacheQuery($queryStr, $dbAdapter);
+        return $this->commonService->cacheQuery($queryStr, $dbAdapter);
     }
 
     public function fetchSamplesReceivedBarChartDetails($params)
@@ -67,7 +72,6 @@ class Covid19FormTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = array();
-        $common = new CommonService($this->sm);
 
         $sQuery = $sql->select()->from(array('covid19' => $this->table))
             ->columns(
@@ -102,7 +106,7 @@ class Covid19FormTable extends AbstractTableGateway
         $queryStr = $sql->buildSqlString($sQuery);
         // echo $queryStr;die;
         //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-        $sampleResult = $common->cacheQuery($queryStr, $dbAdapter);
+        $sampleResult = $this->commonService->cacheQuery($queryStr, $dbAdapter);
         $j = 0;
         foreach ($sampleResult as $row) {
 
@@ -666,7 +670,6 @@ class Covid19FormTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = array();
-        $common = new CommonService($this->sm);
 
         $sQuery = $sql->select()
             ->from(array('covid19' => $this->table))
@@ -706,7 +709,7 @@ class Covid19FormTable extends AbstractTableGateway
         $queryStr = $sql->buildSqlString($sQuery);
         // echo $queryStr;die;
         //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-        $sampleResult = $common->cacheQuery($queryStr, $dbAdapter);
+        $sampleResult = $this->commonService->cacheQuery($queryStr, $dbAdapter);
         $j = 0;
         foreach ($sampleResult as $row) {
             $result['valid_results'][$j]  = $valid = (!empty($row["total_samples_tested"])) ? $row["total_samples_tested"] - $row["total_samples_rejected"] : 0;
@@ -1303,7 +1306,6 @@ class Covid19FormTable extends AbstractTableGateway
             $mostRejectionReasons[] = 0;
         }
         $result = array();
-        $common = new CommonService($this->sm);
         $start = strtotime($params['fromDate']);
         $end = strtotime($params['toDate']);
 
@@ -1344,7 +1346,7 @@ class Covid19FormTable extends AbstractTableGateway
                     $rejectionQuery = $rejectionQuery->where('covid19.reason_for_sample_rejection = "' . $mostRejectionReasons[$m] . '"');
                 }
                 $rejectionQueryStr = $sql->buildSqlString($rejectionQuery);
-                $rejectionResult = $common->cacheQuery($rejectionQueryStr, $dbAdapter);
+                $rejectionResult = $this->commonService->cacheQuery($rejectionQueryStr, $dbAdapter);
                 $rejectionReasonName = ($mostRejectionReasons[$m] == 0) ? 'Others' : ucwords($rejectionResult[0]['rejection_reason_name']);
                 $result['rejection'][$rejectionReasonName][$j] = (isset($rejectionResult[0]['rejections'])) ? $rejectionResult[0]['rejections'] : 0;
                 $result['date'][$j] = $monthYearFormat;
@@ -1870,7 +1872,6 @@ class Covid19FormTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $summaryResult = array();
-        $common = new CommonService($this->sm);
 
         $samplesReceivedSummaryQuery = $sql->select()
             ->from(array('covid19' => $this->table))
@@ -1910,7 +1911,7 @@ class Covid19FormTable extends AbstractTableGateway
 
         $queryContainer->indicatorSummaryQuery = $samplesReceivedSummaryQuery;
         $samplesReceivedSummaryCacheQuery = $sql->buildSqlString($samplesReceivedSummaryQuery);
-        $samplesReceivedSummaryResult = $common->cacheQuery($samplesReceivedSummaryCacheQuery, $dbAdapter);
+        $samplesReceivedSummaryResult = $this->commonService->cacheQuery($samplesReceivedSummaryCacheQuery, $dbAdapter);
         //var_dump($samplesReceivedSummaryResult);die;
         $j = 0;
         foreach ($samplesReceivedSummaryResult as $row) {
@@ -1932,7 +1933,6 @@ class Covid19FormTable extends AbstractTableGateway
     {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $common = new CommonService($this->sm);
         $covid19OutcomesQuery = $sql->select()
             ->from(array('covid19' => $this->table))
             ->columns(
@@ -1963,7 +1963,7 @@ class Covid19FormTable extends AbstractTableGateway
         }
 
         $covid19OutcomesQueryStr = $sql->buildSqlString($covid19OutcomesQuery);
-        $result = $common->cacheQuery($covid19OutcomesQueryStr, $dbAdapter);
+        $result = $this->commonService->cacheQuery($covid19OutcomesQueryStr, $dbAdapter);
         return $result[0];
     }
 
@@ -1971,7 +1971,6 @@ class Covid19FormTable extends AbstractTableGateway
     {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $common = new CommonService($this->sm);
         /* Dynamic year range */
         $ageGroup = array('2', '2-5', '6-14', '15-49', '50');
 
@@ -2017,7 +2016,7 @@ class Covid19FormTable extends AbstractTableGateway
 
         $covid19OutcomesQueryStr = $sql->buildSqlString($covid19OutcomesQuery);
         // echo $covid19OutcomesQueryStr;die;
-        $result = $common->cacheQuery($covid19OutcomesQueryStr, $dbAdapter);
+        $result = $this->commonService->cacheQuery($covid19OutcomesQueryStr, $dbAdapter);
         return $result[0];
     }
 
@@ -2025,7 +2024,6 @@ class Covid19FormTable extends AbstractTableGateway
     {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $common = new CommonService($this->sm);
         $covid19OutcomesQuery = $sql->select()
             ->from(array('covid19' => $this->table))
             ->columns(
@@ -2050,7 +2048,7 @@ class Covid19FormTable extends AbstractTableGateway
         }
 
         $covid19OutcomesQueryStr = $sql->buildSqlString($covid19OutcomesQuery);
-        $result = $common->cacheQuery($covid19OutcomesQueryStr, $dbAdapter);
+        $result = $this->commonService->cacheQuery($covid19OutcomesQueryStr, $dbAdapter);
         return $result;
     }
 
@@ -2058,7 +2056,6 @@ class Covid19FormTable extends AbstractTableGateway
     {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $common = new CommonService($this->sm);
         $covid19OutcomesQuery = $sql->select()
             ->from(array('covid19' => $this->table))
             ->columns(
@@ -2091,7 +2088,7 @@ class Covid19FormTable extends AbstractTableGateway
         $covid19OutcomesQueryStr = $sql->buildSqlString($covid19OutcomesQuery);
         // echo $covid19OutcomesQueryStr;die;
         $result = $dbAdapter->query($covid19OutcomesQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-        // $result = $common->cacheQuery($covid19OutcomesQueryStr, $dbAdapter);
+        // $result = $this->commonService->cacheQuery($covid19OutcomesQueryStr, $dbAdapter);
         return $result[0];
     }
     // SUMMARY DASHBOARD END
@@ -2103,7 +2100,6 @@ class Covid19FormTable extends AbstractTableGateway
         $quickStats = $this->fetchQuickStats($params);
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $common = new CommonService($this->sm);
         $testedTotal = 0;
         $receivedResult = array();
         $tResult = array();
@@ -2138,12 +2134,12 @@ class Covid19FormTable extends AbstractTableGateway
         $cQueryStr = $sql->buildSqlString($receivedQuery);
         // echo $cQueryStr;die;
         //$rResult = $dbAdapter->query($cQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-        $rResult = $common->cacheQuery($cQueryStr, $dbAdapter);
+        $rResult = $this->commonService->cacheQuery($cQueryStr, $dbAdapter);
 
         //var_dump($receivedResult);die;
         $recTotal = 0;
         foreach ($rResult as $rRow) {
-            $displayDate = $common->humanDateFormat($rRow['receivedDate']);
+            $displayDate = $this->commonService->humanDateFormat($rRow['receivedDate']);
             $receivedResult[] = array(array('total' => $rRow['total']), 'date' => $displayDate, 'receivedDate' => $displayDate, 'receivedTotal' => $recTotal += $rRow['total']);
         }
 
@@ -2166,12 +2162,12 @@ class Covid19FormTable extends AbstractTableGateway
         $cQueryStr = $sql->buildSqlString($testedQuery);
         // echo $cQueryStr;//die;
         //$rResult = $dbAdapter->query($cQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-        $rResult = $common->cacheQuery($cQueryStr, $dbAdapter);
+        $rResult = $this->commonService->cacheQuery($cQueryStr, $dbAdapter);
 
         //var_dump($receivedResult);die;
         $testedTotal = 0;
         foreach ($rResult as $rRow) {
-            $displayDate = $common->humanDateFormat($rRow['testedDate']);
+            $displayDate = $this->commonService->humanDateFormat($rRow['testedDate']);
             $tResult[] = array(array('total' => $rRow['total']), 'date' => $displayDate, 'testedDate' => $displayDate, 'testedTotal' => $testedTotal += $rRow['total']);
         }
 
@@ -2194,10 +2190,10 @@ class Covid19FormTable extends AbstractTableGateway
         $cQueryStr = $sql->buildSqlString($rejectedQuery);
         // echo $cQueryStr;die;
         //$rResult = $dbAdapter->query($cQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-        $rResult = $common->cacheQuery($cQueryStr, $dbAdapter);
+        $rResult = $this->commonService->cacheQuery($cQueryStr, $dbAdapter);
         $rejTotal = 0;
         foreach ($rResult as $rRow) {
-            $displayDate = $common->humanDateFormat($rRow['rejectDate']);
+            $displayDate = $this->commonService->humanDateFormat($rRow['rejectDate']);
             $rejectedResult[] = array(array('total' => $rRow['total']), 'date' => $displayDate, 'rejectDate' => $displayDate, 'rejectTotal' => $rejTotal += $rRow['total']);
         }
         return array('quickStats' => $quickStats, 'scResult' => $receivedResult, 'stResult' => $tResult, 'srResult' => $rejectedResult);
@@ -2208,7 +2204,6 @@ class Covid19FormTable extends AbstractTableGateway
         $logincontainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $common = new CommonService($this->sm);
         $globalDb = $this->sm->get('GlobalTable');
         $samplesWaitingFromLastXMonths = $globalDb->getGlobalValue('sample_waiting_month_range');
 
@@ -2244,7 +2239,7 @@ class Covid19FormTable extends AbstractTableGateway
         $queryStr = $sql->buildSqlString($query);
         //echo $queryStr;die;
         //$result = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-        $result = $common->cacheQuery($queryStr, $dbAdapter);
+        $result = $this->commonService->cacheQuery($queryStr, $dbAdapter);
         return $result[0];
     }
 
@@ -2255,7 +2250,6 @@ class Covid19FormTable extends AbstractTableGateway
         $result = array();
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $common = new CommonService($this->sm);
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
@@ -2303,7 +2297,7 @@ class Covid19FormTable extends AbstractTableGateway
             $queryStr = $sql->buildSqlString($queryStr);
             // echo $queryStr;die;
             //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-            $sampleResult = $common->cacheQuery($queryStr, $dbAdapter);
+            $sampleResult = $this->commonService->cacheQuery($queryStr, $dbAdapter);
             $j = 0;
             foreach ($sampleResult as $sRow) {
                 if ($sRow["monthDate"] == null) continue;
@@ -2318,11 +2312,9 @@ class Covid19FormTable extends AbstractTableGateway
 
     public function getMonthlySampleCountByLabs($params)
     {
-        $logincontainer = new Container('credo');
         $result = array();
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $common = new CommonService($this->sm);
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
@@ -2386,13 +2378,10 @@ class Covid19FormTable extends AbstractTableGateway
 
     public function fetchLabTurnAroundTime($params)
     {
-        $logincontainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = array();
         $skipDays = isset($this->config['defaults']['tat-skipdays']) ? $this->config['defaults']['tat-skipdays'] : 120;
-        $common = new CommonService($this->sm);
-
         $facilityIdList = null;
 
         // FILTER :: Checking if the facility filter is set
@@ -2469,7 +2458,7 @@ class Covid19FormTable extends AbstractTableGateway
             $queryStr = $sql->buildSqlString($query);
             // echo $queryStr;die;
             //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-            $sampleResult = $common->cacheQuery($queryStr, $dbAdapter);
+            $sampleResult = $this->commonService->cacheQuery($queryStr, $dbAdapter);
             $j = 0;
             foreach ($sampleResult as $key => $sRow) {
                 /* $result['all'][$key] = (isset($sRow["AvgDiff"]) && $sRow["AvgDiff"] != NULL && $sRow["AvgDiff"] > 0) ? round($sRow["AvgDiff"], 2) : null;
@@ -2495,11 +2484,9 @@ class Covid19FormTable extends AbstractTableGateway
 
     public function fetchLabPerformance($params)
     {
-        $logincontainer = new Container('credo');
         $result = array();
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $common = new CommonService($this->sm);
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
@@ -2558,7 +2545,6 @@ class Covid19FormTable extends AbstractTableGateway
     {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $common = new CommonService($this->sm);
         $ageGroup = array('2', '2-5', '6-14', '15-49', '50');
 
         $ageGroupArray['noDatan'] = new Expression("SUM(CASE WHEN ((covid19.result like 'negative' OR covid19.result = 'Negative' ) AND (covid19.patient_dob IS NULL OR covid19.patient_dob = '0000-00-00'))THEN 1 ELSE 0 END)");
@@ -2622,7 +2608,7 @@ class Covid19FormTable extends AbstractTableGateway
         }
 
         $covid19OutcomesQueryStr = $sql->buildSqlString($covid19OutcomesQuery);
-        $result = $common->cacheQuery($covid19OutcomesQueryStr, $dbAdapter);
+        $result = $this->commonService->cacheQuery($covid19OutcomesQueryStr, $dbAdapter);
         return $result[0];
     }
 
@@ -2630,14 +2616,14 @@ class Covid19FormTable extends AbstractTableGateway
     {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $common = new CommonService($this->sm);
+        
         $startMonth = "";
         $endMonth = "";
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
             $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $params['fromDate'])));
             $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $params['toDate'])));
 
-            $monthList = $common->getMonthsInRange($startMonth, $endMonth);
+            $monthList = $this->commonService->getMonthsInRange($startMonth, $endMonth);
             $sQuery = $sql->select()->from(array('covid19' => 'dash_form_covid19'))->columns(array(
                 'monthYear' => new Expression("DATE_FORMAT(sample_collection_date, '%b-%Y')"),
                 'positive_rate' => new Expression("ROUND(((SUM(CASE WHEN ((covid19.result like 'positive' OR covid19.result like 'Positive' )) THEN 1 ELSE 0 END))/(SUM(CASE WHEN (((covid19.result IS NOT NULL AND covid19.result != '' AND covid19.result != 'NULL'))) THEN 1 ELSE 0 END)))*100,2)")
@@ -2681,7 +2667,7 @@ class Covid19FormTable extends AbstractTableGateway
 
             $sQueryStr = $sql->buildSqlString($sQuery);
             // echo $sQueryStr;die;
-            $result = $common->cacheQuery($sQueryStr, $dbAdapter);
+            $result = $this->commonService->cacheQuery($sQueryStr, $dbAdapter);
             return array('result' => $result, 'month' => $monthList);
         } else {
             return 0;
@@ -2867,7 +2853,7 @@ class Covid19FormTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = array();
-        //$globalDb = new \Application\Model\GlobalTable($this->adapter);
+        
         $globalDb = $this->sm->get('GlobalTable');
         $samplesWaitingFromLastXMonths = $globalDb->getGlobalValue('sample_waiting_month_range');
         if (isset($params['daterange']) && trim($params['daterange']) != '') {
@@ -2968,7 +2954,7 @@ class Covid19FormTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = array();
-        //$globalDb = new \Application\Model\GlobalTable($this->adapter);
+        
         $globalDb = $this->sm->get('GlobalTable');
         $samplesWaitingFromLastXMonths = $globalDb->getGlobalValue('sample_waiting_month_range');
         if (isset($params['daterange']) && trim($params['daterange']) != '') {
@@ -3071,7 +3057,7 @@ class Covid19FormTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = array();
-        //$globalDb = new \Application\Model\GlobalTable($this->adapter);
+        
         $globalDb = $this->sm->get('GlobalTable');
         $samplesWaitingFromLastXMonths = $globalDb->getGlobalValue('sample_waiting_month_range');
         if (isset($params['daterange']) && trim($params['daterange']) != '') {
@@ -3174,7 +3160,7 @@ class Covid19FormTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = array();
-        //$globalDb = new \Application\Model\GlobalTable($this->adapter);
+        
         $globalDb = $this->sm->get('GlobalTable');
         $samplesWaitingFromLastXMonths = $globalDb->getGlobalValue('sample_waiting_month_range');
         if (isset($params['daterange']) && trim($params['daterange']) != '') {
@@ -3276,8 +3262,8 @@ class Covid19FormTable extends AbstractTableGateway
     {
         $logincontainer = new Container('credo');
         $queryContainer = new Container('query');
-        $common = new CommonService($this->sm);
-        //$globalDb = new \Application\Model\GlobalTable($this->adapter);
+        
+        
         $globalDb = $this->sm->get('GlobalTable');
         $samplesWaitingFromLastXMonths = $globalDb->getGlobalValue('sample_waiting_month_range');
         /* Array of database columns which should be read and sent back to DataTables. Use a space where
@@ -3443,7 +3429,7 @@ class Covid19FormTable extends AbstractTableGateway
         $queryContainer->resultsAwaitedQuery = $sQuery;
         $queryStr = $sql->buildSqlString($sQuery); // Get the string of the Sql, instead of the Select-instance
         //echo $queryStr;die;
-        $rResult = $common->cacheQuery($queryStr, $dbAdapter);
+        $rResult = $this->commonService->cacheQuery($queryStr, $dbAdapter);
 
         /* Data set length after filtering */
         $sQuery->reset('limit');
@@ -3473,8 +3459,8 @@ class Covid19FormTable extends AbstractTableGateway
             "aaData" => array()
         );
         foreach ($rResult as $aRow) {
-            $displayCollectionDate = $common->humanDateFormat($aRow['collectionDate']);
-            $displayReceivedDate = $common->humanDateFormat($aRow['receivedDate']);
+            $displayCollectionDate = $this->commonService->humanDateFormat($aRow['collectionDate']);
+            $displayReceivedDate = $this->commonService->humanDateFormat($aRow['receivedDate']);
             $row = array();
             $row[] = $aRow['sample_code'];
             $row[] = $displayCollectionDate;
@@ -3507,7 +3493,7 @@ class Covid19FormTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = array();
-        $common = new CommonService($this->sm);
+        
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
@@ -3606,7 +3592,7 @@ class Covid19FormTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = array();
-        $common = new CommonService($this->sm);
+        
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
@@ -3710,7 +3696,7 @@ class Covid19FormTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = array();
-        $common = new CommonService($this->sm);
+        
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
@@ -3817,7 +3803,7 @@ class Covid19FormTable extends AbstractTableGateway
     {
         $logincontainer = new Container('credo');
         $queryContainer = new Container('query');
-        $common = new CommonService($this->sm);
+        
         /* Array of database columns which should be read and sent back to DataTables. Use a space where
          * you want to insert a non-database field (for example a counter or static image)
         */
@@ -4027,7 +4013,7 @@ class Covid19FormTable extends AbstractTableGateway
             $row = array();
             $sampleCollectionDate = '';
             if (isset($aRow['sampleCollectionDate']) && $aRow['sampleCollectionDate'] != null && trim($aRow['sampleCollectionDate']) != "" && $aRow['sampleCollectionDate'] != '0000-00-00') {
-                $sampleCollectionDate = $common->humanDateFormat($aRow['sampleCollectionDate']);
+                $sampleCollectionDate = $this->commonService->humanDateFormat($aRow['sampleCollectionDate']);
             }
             $row[] = $sampleCollectionDate;
             $row[] = $aRow['total_samples_received'];
@@ -4045,7 +4031,7 @@ class Covid19FormTable extends AbstractTableGateway
     {
         $logincontainer = new Container('credo');
         $queryContainer = new Container('query');
-        $common = new CommonService($this->sm);
+        
         /* Array of database columns which should be read and sent back to DataTables. Use a space where
          * you want to insert a non-database field (for example a counter or static image)
         */
@@ -4262,7 +4248,7 @@ class Covid19FormTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $vlOutComeResult = array();
-        $common = new CommonService($this->sm);
+        
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
@@ -4334,7 +4320,7 @@ class Covid19FormTable extends AbstractTableGateway
 
             $queryStr = $sql->buildSqlString($sQuery);
             // die($queryStr);
-            $vlOutComeResult = $common->cacheQuery($queryStr, $dbAdapter);
+            $vlOutComeResult = $this->commonService->cacheQuery($queryStr, $dbAdapter);
         }
         return $vlOutComeResult;
     }
@@ -4344,7 +4330,7 @@ class Covid19FormTable extends AbstractTableGateway
     {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $common = new CommonService($this->sm);
+        
         $eidOutcomesQuery = $sql->select()
             ->from(array('covid19' => 'dash_form_covid19'))
             ->columns(
@@ -4415,7 +4401,7 @@ class Covid19FormTable extends AbstractTableGateway
         }
 
         $eidOutcomesQueryStr = $sql->buildSqlString($eidOutcomesQuery);
-        $result = $common->cacheQuery($eidOutcomesQueryStr, $dbAdapter);
+        $result = $this->commonService->cacheQuery($eidOutcomesQueryStr, $dbAdapter);
         return $result[0];
     }
 
@@ -4423,14 +4409,14 @@ class Covid19FormTable extends AbstractTableGateway
     {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $common = new CommonService($this->sm);
+        
         $startMonth = "";
         $endMonth = "";
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
             $startMonth = date('Y-m-01', strtotime(str_replace(' ', '-', $params['fromDate'])));
             $endMonth = date('Y-m-t', strtotime(str_replace(' ', '-', $params['toDate'])));
 
-            $monthList = $common->getMonthsInRange($startMonth, $endMonth);
+            $monthList = $this->commonService->getMonthsInRange($startMonth, $endMonth);
             /* foreach($monthList as $key=>$list){
                 $searchVal[$key] =  new Expression("AVG(CASE WHEN (covid19.result like 'positive%' AND covid19.result not like '' AND sample_collection_date LIKE '%".$list."%') THEN 1 ELSE 0 END)");
             } */
@@ -4477,7 +4463,7 @@ class Covid19FormTable extends AbstractTableGateway
 
             $sQueryStr = $sql->buildSqlString($sQuery);
             // echo $sQueryStr;die;
-            $result = $common->cacheQuery($sQueryStr, $dbAdapter);
+            $result = $this->commonService->cacheQuery($sQueryStr, $dbAdapter);
             return array('result' => $result, 'month' => $monthList);
         } else {
             return 0;

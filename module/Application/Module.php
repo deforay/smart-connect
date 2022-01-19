@@ -274,7 +274,9 @@ class Module
 				},
 				'FacilityTable' => function ($sm) {
 					$dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');
-					$tableObj = new FacilityTable($dbAdapter, $sm);
+					$commonService = $sm->getServiceLocator()->get('CommonService');
+					$tableObj = new FacilityTable($dbAdapter, $sm, $commonService);
+					
 					$storage = $sm->get('Cache\Persistent');
 					return new ObjectCache(
 						$storage,
@@ -285,7 +287,8 @@ class Module
 				},
 				'FacilityTableWithoutCache' => function ($sm) {
 					$dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');
-					return new FacilityTable($dbAdapter, $sm);
+					$commonService = $sm->getServiceLocator()->get('CommonService');
+					return new FacilityTable($dbAdapter, $sm, $commonService);
 				},
 				'FacilityTypeTable' => function ($sm) {
 					$dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');
@@ -308,13 +311,8 @@ class Module
 					return $table;
 				}, 'GlobalTable' => function ($sm) {
 					$dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');
-					return new GlobalTable($dbAdapter, $sm);
-					// $tableObj = new GlobalTable($dbAdapter, $sm);
-					// $table = PatternFactory::factory('object', [
-					// 	'storage' => $sm->get('Cache\Persistent'),
-					// 	'object' => $tableObj
-					// ]);
-					// return $table;					
+					$commonService = $sm->getServiceLocator()->get('CommonService');
+					return new GlobalTable($dbAdapter, $sm, $commonService);				
 				}, 'ArtCodeTable' => function ($sm) {
 					$dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');
 					$table = new ArtCodeTable($dbAdapter);

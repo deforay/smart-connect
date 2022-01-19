@@ -17,11 +17,13 @@ class Covid19FormService
 
     public $sm = null;
     protected $translator = null;
+    protected $commonService = null;
 
-    public function __construct($sm)
+    public function __construct($sm, $commonService)
     {
         $this->sm = $sm;
         $this->translator = $this->sm->get('translator');
+        $this->commonService = $commonService;
     }
 
     public function getServiceManager()
@@ -108,7 +110,7 @@ class Covid19FormService
                 }
             }
 
-            $common = new CommonService();
+            
             if (count($apiData['data'])  == $numRows) {
                 $status = "success";
             } else if ((count($apiData['data']) - $numRows) != 0) {
@@ -118,7 +120,7 @@ class Covid19FormService
             }
             $apiTrackData = array(
                 'tracking_id'                   => $apiData['timestamp'],
-                'received_on'                   => $common->getDateTime(),
+                'received_on'                   => $this->commonService->getDateTime(),
                 'number_of_records_received'    => count($apiData['data']),
                 'number_of_records_processed'   => $numRows,
                 'source'                        => 'VLSM-Covid-19',
@@ -145,7 +147,7 @@ class Covid19FormService
         try {
             // Debug::dump($_FILES['covid19File']);die;
             $apiData = array();
-            $common = new CommonService();
+            
             $sampleDb = $this->sm->get('Covid19FormTableWithoutCache');
             $facilityTypeDb = $this->sm->get('FacilityTypeTable');
             $testStatusDb = $this->sm->get('SampleStatusTable');
@@ -360,7 +362,7 @@ class Covid19FormService
                     }
                 }
                 //remove directory
-                // $common->removeDirectory($pathname);
+                // $this->commonService->removeDirectory($pathname);
                 return array(
                     'status'    => 'success',
                     'message'   => 'Uploaded successfully',
@@ -558,7 +560,7 @@ class Covid19FormService
     {
         $queryContainer = new Container('query');
         $translator = $this->sm->get('translator');
-        $common = new CommonService();
+        
         if (isset($queryContainer->indicatorSummaryQuery)) {
             try {
                 $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
@@ -683,7 +685,7 @@ class Covid19FormService
         if (isset($logincontainer->Covid19SampleTable) && $logincontainer->Covid19SampleTable != "") {
             $dashTable = $logincontainer->Covid19SampleTable;
         }
-        $common = new CommonService();
+        
 
         if (!isset($queryContainer->fetchAllPositiveRateByFacility)) {
 
@@ -1041,7 +1043,7 @@ class Covid19FormService
     {
         $queryContainer = new Container('query');
         $translator = $this->sm->get('translator');
-        $common = new CommonService();
+        
         if (isset($queryContainer->resultsAwaitedQuery)) {
             try {
                 $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
@@ -1056,8 +1058,8 @@ class Covid19FormService
                     $sheet = $excel->getActiveSheet();
                     $output = array();
                     foreach ($sResult as $aRow) {
-                        $displayCollectionDate = $common->humanDateFormat($aRow['collectionDate']);
-                        $displayReceivedDate = $common->humanDateFormat($aRow['receivedDate']);
+                        $displayCollectionDate = $this->commonService->humanDateFormat($aRow['collectionDate']);
+                        $displayReceivedDate = $this->commonService->humanDateFormat($aRow['receivedDate']);
                         $row = array();
                         $row[] = $aRow['sample_code'];
                         $row[] = $displayCollectionDate;
@@ -1219,7 +1221,7 @@ class Covid19FormService
     {
         $queryContainer = new Container('query');
         $translator = $this->sm->get('translator');
-        $common = new CommonService();
+        
         if (isset($queryContainer->resultQuery)) {
             try {
                 $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
@@ -1238,10 +1240,10 @@ class Covid19FormService
                         $sampleCollectionDate = '';
                         $sampleTestedDate = '';
                         if (isset($aRow['sampleCollectionDate']) && $aRow['sampleCollectionDate'] != NULL && trim($aRow['sampleCollectionDate']) != "" && $aRow['sampleCollectionDate'] != '0000-00-00') {
-                            $sampleCollectionDate = $common->humanDateFormat($aRow['sampleCollectionDate']);
+                            $sampleCollectionDate = $this->commonService->humanDateFormat($aRow['sampleCollectionDate']);
                         }
                         if (isset($aRow['sampleTestingDate']) && $aRow['sampleTestingDate'] != NULL && trim($aRow['sampleTestingDate']) != "" && $aRow['sampleTestingDate'] != '0000-00-00') {
-                            $sampleTestedDate = $common->humanDateFormat($aRow['sampleTestingDate']);
+                            $sampleTestedDate = $this->commonService->humanDateFormat($aRow['sampleTestingDate']);
                         }
                         $row[] = $aRow['sample_code'];
                         $row[] = ucwords($aRow['facility_name']);
@@ -1366,7 +1368,7 @@ class Covid19FormService
     {
         $queryContainer = new Container('query');
         $translator = $this->sm->get('translator');
-        $common = new CommonService();
+        
         if (isset($queryContainer->labTestedSampleQuery)) {
             try {
                 $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
@@ -1384,7 +1386,7 @@ class Covid19FormService
                         $row = array();
                         $sampleCollectionDate = '';
                         if (isset($aRow['sampleCollectionDate']) && $aRow['sampleCollectionDate'] != null && trim($aRow['sampleCollectionDate']) != "" && $aRow['sampleCollectionDate'] != '0000-00-00') {
-                            $sampleCollectionDate = $common->humanDateFormat($aRow['sampleCollectionDate']);
+                            $sampleCollectionDate = $this->commonService->humanDateFormat($aRow['sampleCollectionDate']);
                         }
                         $row[] = $sampleCollectionDate;
                         $row[] = $aRow['total_samples_received'];
@@ -1498,7 +1500,7 @@ class Covid19FormService
     public function saveCovid19DataFromAPI($params)
     {
         // print_r("Hloo");die;
-        $common = new CommonService();
+        
         $sampleDb = $this->sm->get('Covid19FormTableWithoutCache');
         $facilityDb = $this->sm->get('FacilityTable');
         $testStatusDb = $this->sm->get('SampleStatusTable');
@@ -1536,7 +1538,7 @@ class Covid19FormService
                     if (!$province) {
                         $provinceDb->insert(array(
                             'province_name'     => $row['health_centre_province'],
-                            'updated_datetime'  => $common->getDateTime()
+                            'updated_datetime'  => $this->commonService->getDateTime()
                         ));
                         $province['province_id'] = $provinceDb->lastInsertValue;
                     }
@@ -1671,7 +1673,7 @@ class Covid19FormService
         // Track API Records
         $apiTrackData = array(
             'tracking_id'                   => $params['timestamp'],
-            'received_on'                   => $common->getDateTime(),
+            'received_on'                   => $this->commonService->getDateTime(),
             'number_of_records_received'    => count($params['data']),
             'number_of_records_processed'   => (count($params['data']) - count($return)),
             'source'                        => 'API-COVID-19',

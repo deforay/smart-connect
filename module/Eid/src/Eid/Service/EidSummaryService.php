@@ -136,8 +136,6 @@ class EidSummaryService
     public function exportIndicatorResultExcel($params)
     {
         $queryContainer = new Container('query');
-        $translator = $this->sm->get('translator');
-        $common = new CommonService();
         if (isset($queryContainer->indicatorSummaryQuery)) {
             try {
                 $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');

@@ -136,7 +136,6 @@ class SummaryService
     public function exportIndicatorResultExcel($params)
     {
         $queryContainer = new Container('query');
-        $common = new CommonService();
         if (isset($queryContainer->indicatorSummaryQuery)) {
             try {
 

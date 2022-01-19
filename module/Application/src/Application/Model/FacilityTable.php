@@ -25,11 +25,13 @@ class FacilityTable extends AbstractTableGateway
 
     protected $table = 'facility_details';
     public $sm = null;
+    public $commonService = null;
 
-    public function __construct(Adapter $adapter, $sm = null)
+    public function __construct(Adapter $adapter, $sm = null, $commonService)
     {
         $this->adapter = $adapter;
         $this->sm = $sm;
+        $this->commonService = $commonService;
     }
 
     public function addFacility($params)
@@ -104,7 +106,6 @@ class FacilityTable extends AbstractTableGateway
 
     public function fetchAllFacility($parameters)
     {
-        $common = new CommonService($this->sm);
         /* Array of database columns which should be read and sent back to DataTables. Use a space where
          * you want to insert a non-database field (for example a counter or static image)
          */
@@ -218,7 +219,7 @@ class FacilityTable extends AbstractTableGateway
             "aaData" => array()
         );
 
-        $buttText = $common->translate('Edit');
+        $buttText = $this->commonService->translate('Edit');
         foreach ($rResult as $aRow) {
             $row = array();
             $row[] = $aRow['facility_code'];

@@ -47,7 +47,12 @@ class Module
                     $mappedFacilities = (isset($session->mappedFacilities) && count($session->mappedFacilities) > 0) ? $session->mappedFacilities : array();
                     $dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');
                     $covid19SampleTable = isset($session->covid19SampleTable) ? $session->covid19SampleTable :  'dash_form_covid19';
-                    $tableObj = new \Covid19\Model\Covid19FormTable($dbAdapter, $sm, $mappedFacilities, $covid19SampleTable);
+
+                    $mappedFacilities = (isset($session->mappedFacilities) && count($session->mappedFacilities) > 0) ? $session->mappedFacilities : array();
+                    $dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');
+                    $commonService = $sm->getServiceLocator()->get('CommonService');
+                    $tableObj = new \Covid19\Model\Covid19FormTable($dbAdapter, $sm, $mappedFacilities, $covid19SampleTable, $commonService);
+
 
                     $storage = $sm->get('Cache\Persistent');
                     return new ObjectCache(
@@ -68,7 +73,8 @@ class Module
                 },
 
                 'Covid19FormService' => function ($sm) {
-                    return new \Covid19\Service\Covid19FormService($sm);
+                    $commonService = $sm->getServiceLocator()->get('CommonService');
+                    return new \Covid19\Service\Covid19FormService($sm, $commonService);
                 },
             ),
         );
