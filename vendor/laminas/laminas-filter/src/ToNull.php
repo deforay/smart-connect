@@ -1,28 +1,32 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-filter for the canonical source repository
- * @copyright https://github.com/laminas/laminas-filter/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-filter/blob/master/LICENSE.md New BSD License
- */
+declare(strict_types=1);
 
 namespace Laminas\Filter;
 
 use Traversable;
 
+use function array_search;
+use function gettype;
+use function is_array;
+use function is_bool;
+use function is_float;
+use function is_int;
+use function is_string;
+use function iterator_to_array;
+use function sprintf;
+
 class ToNull extends AbstractFilter
 {
-    const TYPE_BOOLEAN     = 1;
-    const TYPE_INTEGER     = 2;
-    const TYPE_EMPTY_ARRAY = 4;
-    const TYPE_STRING      = 8;
-    const TYPE_ZERO_STRING = 16;
-    const TYPE_FLOAT       = 32;
-    const TYPE_ALL         = 63;
+    public const TYPE_BOOLEAN     = 1;
+    public const TYPE_INTEGER     = 2;
+    public const TYPE_EMPTY_ARRAY = 4;
+    public const TYPE_STRING      = 8;
+    public const TYPE_ZERO_STRING = 16;
+    public const TYPE_FLOAT       = 32;
+    public const TYPE_ALL         = 63;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $constants = [
         self::TYPE_BOOLEAN     => 'boolean',
         self::TYPE_INTEGER     => 'integer',
@@ -33,9 +37,7 @@ class ToNull extends AbstractFilter
         self::TYPE_ALL         => 'all',
     ];
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $options = [
         'type' => self::TYPE_ALL,
     ];

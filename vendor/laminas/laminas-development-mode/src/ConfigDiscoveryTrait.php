@@ -1,38 +1,33 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-development-mode for the canonical source repository
- * @copyright https://github.com/laminas/laminas-development-mode/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-development-mode/blob/master/LICENSE.md New BSD License
- */
+declare(strict_types=1);
 
 namespace Laminas\DevelopmentMode;
 
 use RuntimeException;
+
+use function file_exists;
+use function is_array;
+use function sprintf;
+use function unlink;
+
+use const PHP_EOL;
 
 /**
  * Shared functionality for the Disable/Enable commands.
  */
 trait ConfigDiscoveryTrait
 {
-    /**
-     * @var null|array
-     */
+    /** @var null|array */
     private $applicationConfig;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $applicationConfigPath = 'config/application.config.php';
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $mezzioConfigPath = 'config/config.php';
 
-    /**
-     * @var string Base name for configuration cache.
-     */
+    /** @var string Base name for configuration cache. */
     private $configCacheBase = 'module-config-cache';
 
     /**
@@ -114,8 +109,8 @@ trait ConfigDiscoveryTrait
      * Raises an exception if retrieved configuration is not an array.
      *
      * @return array
-     * @throws RuntimeException if config/application.config.php does not
-     *     return an array
+     * @throws RuntimeException If config/application.config.php does not
+     *     return an array.
      */
     private function getApplicationConfig()
     {

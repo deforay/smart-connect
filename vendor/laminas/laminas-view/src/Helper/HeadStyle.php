@@ -1,10 +1,6 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-view for the canonical source repository
- * @copyright https://github.com/laminas/laminas-view/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-view/blob/master/LICENSE.md New BSD License
- */
+declare(strict_types=1);
 
 namespace Laminas\View\Helper;
 
@@ -12,10 +8,32 @@ use Laminas\View;
 use Laminas\View\Exception;
 use stdClass;
 
+use function array_shift;
+use function count;
+use function explode;
+use function implode;
+use function in_array;
+use function is_array;
+use function is_string;
+use function method_exists;
+use function ob_get_clean;
+use function ob_start;
+use function preg_match;
+use function preg_replace;
+use function sprintf;
+use function str_replace;
+use function strpos;
+use function strtoupper;
+use function substr;
+use function trim;
+
+use const PHP_EOL;
+
 /**
  * Helper for setting and retrieving stylesheets
  *
  * Allows the following method calls:
+ *
  * @method HeadStyle appendStyle($content, $attributes = array())
  * @method HeadStyle offsetSetStyle($index, $content, $attributes = array())
  * @method HeadStyle prependStyle($content, $attributes = array())
@@ -36,8 +54,15 @@ class HeadStyle extends Placeholder\Container\AbstractStandalone
      * @var array
      */
     protected $mediaTypes = [
-        'all', 'aural', 'braille', 'handheld', 'print',
-        'projection', 'screen', 'tty', 'tv'
+        'all',
+        'aural',
+        'braille',
+        'handheld',
+        'print',
+        'projection',
+        'screen',
+        'tty',
+        'tv',
     ];
 
     /**
@@ -45,7 +70,7 @@ class HeadStyle extends Placeholder\Container\AbstractStandalone
      *
      * @var string
      */
-    protected $captureAttrs = null;
+    protected $captureAttrs;
 
     /**
      * Capture lock
@@ -109,8 +134,8 @@ class HeadStyle extends Placeholder\Container\AbstractStandalone
      *
      * @param  string $method
      * @param  array  $args
-     * @throws Exception\BadMethodCallException When no $content provided or invalid method
-     * @return void
+     * @throws Exception\BadMethodCallException When no $content provided or invalid method.
+     * @return mixed
      */
     public function __call($method, $args)
     {
@@ -119,7 +144,7 @@ class HeadStyle extends Placeholder\Container\AbstractStandalone
             $argc   = count($args);
             $action = $matches['action'];
 
-            if ('offsetSet' == $action) {
+            if ('offsetSet' === $action) {
                 if (0 < $argc) {
                     $index = array_shift($args);
                     --$argc;
@@ -141,7 +166,7 @@ class HeadStyle extends Placeholder\Container\AbstractStandalone
 
             $item = $this->createData($content, $attrs);
 
-            if ('offsetSet' == $action) {
+            if ('offsetSet' === $action) {
                 $this->offsetSet($index, $item);
             } else {
                 $this->$action($item);
@@ -161,7 +186,7 @@ class HeadStyle extends Placeholder\Container\AbstractStandalone
      */
     public function toString($indent = null)
     {
-        $indent = (null !== $indent)
+        $indent = null !== $indent
             ? $this->getWhitespace($indent)
             : $this->getIndent();
 
@@ -194,9 +219,9 @@ class HeadStyle extends Placeholder\Container\AbstractStandalone
             throw new Exception\RuntimeException('Cannot nest headStyle captures');
         }
 
-        $this->captureLock        = true;
-        $this->captureAttrs       = $attrs;
-        $this->captureType        = $type;
+        $this->captureLock  = true;
+        $this->captureAttrs = $attrs;
+        $this->captureType  = $type;
         ob_start();
     }
 
@@ -207,8 +232,8 @@ class HeadStyle extends Placeholder\Container\AbstractStandalone
      */
     public function captureEnd()
     {
-        $content             = ob_get_clean();
-        $attrs               = $this->captureAttrs;
+        $content            = ob_get_clean();
+        $attrs              = $this->captureAttrs;
         $this->captureAttrs = null;
         $this->captureLock  = false;
 
@@ -241,7 +266,7 @@ class HeadStyle extends Placeholder\Container\AbstractStandalone
             $attributes['media'] = implode(',', $attributes['media']);
         }
 
-        $data = new stdClass();
+        $data             = new stdClass();
         $data->content    = $content;
         $data->attributes = $attributes;
 
@@ -256,7 +281,7 @@ class HeadStyle extends Placeholder\Container\AbstractStandalone
      */
     protected function isValid($value)
     {
-        if ((! $value instanceof stdClass) || ! isset($value->content) || ! isset($value->attributes)) {
+        if (! $value instanceof stdClass || ! isset($value->content) || ! isset($value->attributes)) {
             return false;
         }
 
@@ -275,7 +300,8 @@ class HeadStyle extends Placeholder\Container\AbstractStandalone
         $attrString = '';
         if (! empty($item->attributes)) {
             $enc = 'UTF-8';
-            if ($this->view instanceof View\Renderer\RendererInterface
+            if (
+                $this->view instanceof View\Renderer\RendererInterface
                 && method_exists($this->view, 'getEncoding')
             ) {
                 $enc = $this->view->getEncoding();
@@ -285,20 +311,20 @@ class HeadStyle extends Placeholder\Container\AbstractStandalone
                 if (! in_array($key, $this->optionalAttributes)) {
                     continue;
                 }
-                if ('media' == $key) {
+                if ('media' === $key) {
                     if (false === strpos($value, ',')) {
                         if (! in_array($value, $this->mediaTypes)) {
                             continue;
                         }
                     } else {
                         $mediaTypes = explode(',', $value);
-                        $value = '';
+                        $value      = '';
                         foreach ($mediaTypes as $type) {
                             $type = trim($type);
                             if (! in_array($type, $this->mediaTypes)) {
                                 continue;
                             }
-                            $value .= $type .',';
+                            $value .= $type . ',';
                         }
                         $value = substr($value, 0, -1);
                     }
@@ -308,20 +334,21 @@ class HeadStyle extends Placeholder\Container\AbstractStandalone
         }
 
         $escapeStart = $indent . '<!--' . PHP_EOL;
-        $escapeEnd = $indent . '-->' . PHP_EOL;
-        if (isset($item->attributes['conditional'])
+        $escapeEnd   = $indent . '-->' . PHP_EOL;
+        if (
+            isset($item->attributes['conditional'])
             && ! empty($item->attributes['conditional'])
             && is_string($item->attributes['conditional'])
         ) {
             $escapeStart = null;
-            $escapeEnd = null;
+            $escapeEnd   = null;
         }
 
         $html = '<style type="text/css"' . $attrString . '>' . PHP_EOL
             . $escapeStart . $indent . $item->content . PHP_EOL . $escapeEnd
             . '</style>';
 
-        if (null == $escapeStart && null == $escapeEnd) {
+        if (null === $escapeStart && null === $escapeEnd) {
             // inner wrap with comment end and start if !IE
             if (str_replace(' ', '', $item->attributes['conditional']) === '!IE') {
                 $html = '<!-->' . $html . '<!--';
@@ -335,9 +362,9 @@ class HeadStyle extends Placeholder\Container\AbstractStandalone
     /**
      * Override append to enforce style creation
      *
-     * @param  mixed $value
+     * @param mixed $value
      * @throws Exception\InvalidArgumentException
-     * @return void
+     * @return Placeholder\Container\AbstractContainer
      */
     public function append($value)
     {
@@ -366,15 +393,15 @@ class HeadStyle extends Placeholder\Container\AbstractStandalone
             );
         }
 
-        return $this->getContainer()->offsetSet($index, $value);
+        $this->getContainer()->offsetSet($index, $value);
     }
 
     /**
      * Override prepend to enforce style creation
      *
-     * @param  mixed $value
+     * @param mixed $value
      * @throws Exception\InvalidArgumentException
-     * @return void
+     * @return Placeholder\Container\AbstractContainer
      */
     public function prepend($value)
     {
@@ -400,6 +427,6 @@ class HeadStyle extends Placeholder\Container\AbstractStandalone
             throw new Exception\InvalidArgumentException('Invalid value passed to set; please use setStyle()');
         }
 
-        return $this->getContainer()->set($value);
+        $this->getContainer()->set($value);
     }
 }

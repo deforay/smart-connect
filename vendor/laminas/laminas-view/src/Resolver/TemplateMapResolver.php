@@ -1,10 +1,6 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-view for the canonical source repository
- * @copyright https://github.com/laminas/laminas-view/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-view/blob/master/LICENSE.md New BSD License
- */
+declare(strict_types=1);
 
 namespace Laminas\View\Resolver;
 
@@ -13,13 +9,21 @@ use IteratorAggregate;
 use Laminas\Stdlib\ArrayUtils;
 use Laminas\View\Exception;
 use Laminas\View\Renderer\RendererInterface as Renderer;
+use ReturnTypeWillChange; // phpcs:ignore
 use Traversable;
+
+use function array_key_exists;
+use function array_replace_recursive;
+use function get_class;
+use function gettype;
+use function is_array;
+use function is_object;
+use function is_string;
+use function sprintf;
 
 class TemplateMapResolver implements IteratorAggregate, ResolverInterface
 {
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $map = [];
 
     /**
@@ -39,6 +43,7 @@ class TemplateMapResolver implements IteratorAggregate, ResolverInterface
      *
      * @return Traversable
      */
+    #[ReturnTypeWillChange]
     public function getIterator()
     {
         return new ArrayIterator($this->map);
@@ -59,7 +64,7 @@ class TemplateMapResolver implements IteratorAggregate, ResolverInterface
             throw new Exception\InvalidArgumentException(sprintf(
                 '%s: expects an array or Traversable, received "%s"',
                 __METHOD__,
-                (is_object($map) ? get_class($map) : gettype($map))
+                is_object($map) ? get_class($map) : gettype($map)
             ));
         }
 
@@ -90,7 +95,7 @@ class TemplateMapResolver implements IteratorAggregate, ResolverInterface
             throw new Exception\InvalidArgumentException(sprintf(
                 '%s: expects a string, array, or Traversable for the first argument; received "%s"',
                 __METHOD__,
-                (is_object($nameOrMap) ? get_class($nameOrMap) : gettype($nameOrMap))
+                is_object($nameOrMap) ? get_class($nameOrMap) : gettype($nameOrMap)
             ));
         }
 
@@ -118,7 +123,7 @@ class TemplateMapResolver implements IteratorAggregate, ResolverInterface
             throw new Exception\InvalidArgumentException(sprintf(
                 '%s: expects an array or Traversable, received "%s"',
                 __METHOD__,
-                (is_object($map) ? get_class($map) : gettype($map))
+                is_object($map) ? get_class($map) : gettype($map)
             ));
         }
 
@@ -146,7 +151,7 @@ class TemplateMapResolver implements IteratorAggregate, ResolverInterface
      *
      * @param  string $name
      * @return false|string
-     * @throws Exception\DomainException if no entry exists
+     * @throws Exception\DomainException If no entry exists.
      */
     public function get($name)
     {
@@ -169,11 +174,10 @@ class TemplateMapResolver implements IteratorAggregate, ResolverInterface
     /**
      * Resolve a template/pattern name to a resource the renderer can consume
      *
-     * @param  string $name
-     * @param  null|Renderer $renderer
-     * @return string
+     * @param string $name
+     * @return false|string
      */
-    public function resolve($name, Renderer $renderer = null)
+    public function resolve($name, ?Renderer $renderer = null)
     {
         return $this->get($name);
     }

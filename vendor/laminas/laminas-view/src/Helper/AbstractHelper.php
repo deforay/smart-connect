@@ -1,10 +1,6 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-view for the canonical source repository
- * @copyright https://github.com/laminas/laminas-view/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-view/blob/master/LICENSE.md New BSD License
- */
+declare(strict_types=1);
 
 namespace Laminas\View\Helper;
 
@@ -15,15 +11,14 @@ abstract class AbstractHelper implements HelperInterface
     /**
      * View object instance
      *
-     * @var Renderer
+     * @var Renderer|null
      */
-    protected $view = null;
+    protected $view;
 
     /**
      * Set the View object
      *
-     * @param  Renderer $view
-     * @return AbstractHelper
+     * @return $this
      */
     public function setView(Renderer $view)
     {

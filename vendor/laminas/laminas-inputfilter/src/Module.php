@@ -1,17 +1,15 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-inputfilter for the canonical source repository
- * @copyright https://github.com/laminas/laminas-inputfilter/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-inputfilter/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\InputFilter;
+
+use Laminas\ModuleManager\ModuleManager;
 
 class Module
 {
     /**
      * Return default laminas-inputfilter configuration for laminas-mvc applications.
+     *
+     * @return array
      */
     public function getConfig()
     {
@@ -26,13 +24,13 @@ class Module
     /**
      * Register a specification for the InputFilterManager with the ServiceListener.
      *
-     * @param \Laminas\ModuleManager\ModuleManager $moduleManager
+     * @param ModuleManager $moduleManager
      * @return void
      */
     public function init($moduleManager)
     {
-        $event = $moduleManager->getEvent();
-        $container = $event->getParam('ServiceManager');
+        $event           = $moduleManager->getEvent();
+        $container       = $event->getParam('ServiceManager');
         $serviceListener = $container->get('ServiceListener');
 
         $serviceListener->addServiceManager(

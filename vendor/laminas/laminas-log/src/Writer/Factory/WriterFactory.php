@@ -1,10 +1,6 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-log for the canonical source repository
- * @copyright https://github.com/laminas/laminas-log/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-log/blob/master/LICENSE.md New BSD License
- */
+declare(strict_types=1);
 
 namespace Laminas\Log\Writer\Factory;
 
@@ -12,6 +8,11 @@ use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Exception\InvalidServiceException;
 use Laminas\ServiceManager\FactoryInterface;
 use Laminas\ServiceManager\ServiceLocatorInterface;
+
+use function class_exists;
+use function is_array;
+use function is_string;
+use function sprintf;
 
 /**
  * Factory for instantiating classes with no dependencies or which accept a single array.
@@ -37,7 +38,7 @@ final class WriterFactory implements FactoryInterface
     /**
      * @param array $creationOptions
      */
-    public function __construct(array $creationOptions = null)
+    public function __construct(?array $creationOptions = null)
     {
         if (is_array($creationOptions)) {
             $this->setCreationOptions($creationOptions);
@@ -47,14 +48,13 @@ final class WriterFactory implements FactoryInterface
     /**
      * Create an instance of the requested class name.
      *
-     * @param ContainerInterface $container
      * @param string $requestedName
      * @param null|array $options
      * @return object
      */
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
+    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null)
     {
-        $options = (array)$options;
+        $options = (array) $options;
 
         $options = $this->populateOptions($options, $container, 'filter_manager', 'LogFilterManager');
         $options = $this->populateOptions($options, $container, 'formatter_manager', 'LogFormatterManager');
@@ -66,7 +66,6 @@ final class WriterFactory implements FactoryInterface
      * Populates the options array with the correct container value.
      *
      * @param array $options
-     * @param ContainerInterface $container
      * @param string $name
      * @param string $defaultService
      * @return array
@@ -106,7 +105,6 @@ final class WriterFactory implements FactoryInterface
      * - Otherwise, $canonicalName is the normalized name, and $requestedName
      *   is the original service name requested (typically the qualified class name).
      *
-     * @param ServiceLocatorInterface $serviceLocator
      * @param null|string $canonicalName
      * @param null|string $requestedName
      * @return object
@@ -124,8 +122,8 @@ final class WriterFactory implements FactoryInterface
 
         throw new InvalidServiceException(sprintf(
             '%s requires that the requested name is provided on invocation; '
-            .'please update your tests or consuming container',
-            __CLASS__
+            . 'please update your tests or consuming container',
+            self::class
         ));
     }
 

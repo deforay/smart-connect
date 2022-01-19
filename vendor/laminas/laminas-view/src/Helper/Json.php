@@ -1,24 +1,22 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-view for the canonical source repository
- * @copyright https://github.com/laminas/laminas-view/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-view/blob/master/LICENSE.md New BSD License
- */
+declare(strict_types=1);
 
 namespace Laminas\View\Helper;
 
 use Laminas\Http\Response;
 use Laminas\Json\Json as JsonFormatter;
 
+use function trigger_error;
+
+use const E_USER_DEPRECATED;
+
 /**
  * Helper for simplifying JSON responses
  */
 class Json extends AbstractHelper
 {
-    /**
-     * @var Response
-     */
+    /** @var Response */
     protected $response;
 
     /**
@@ -30,6 +28,13 @@ class Json extends AbstractHelper
      */
     public function __invoke($data, array $jsonOptions = [])
     {
+        if (isset($jsonOptions['enableJsonExprFinder']) && $jsonOptions['enableJsonExprFinder'] === true) {
+            trigger_error(
+                'Json Expression functionality is deprecated and will be removed in laminas-view 3.0',
+                E_USER_DEPRECATED
+            );
+        }
+
         $data = JsonFormatter::encode($data, null, $jsonOptions);
 
         if ($this->response instanceof Response) {
@@ -43,7 +48,6 @@ class Json extends AbstractHelper
     /**
      * Set the response object
      *
-     * @param  Response $response
      * @return Json
      */
     public function setResponse(Response $response)

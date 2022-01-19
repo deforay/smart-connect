@@ -1,10 +1,6 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-filter for the canonical source repository
- * @copyright https://github.com/laminas/laminas-filter/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-filter/blob/master/LICENSE.md New BSD License
- */
+declare(strict_types=1);
 
 namespace Laminas\Filter;
 
@@ -12,18 +8,15 @@ use Laminas\ServiceManager\ServiceManager;
 
 class StaticFilter
 {
-    /**
-     * @var FilterPluginManager
-     */
+    /** @var FilterPluginManager */
     protected static $plugins;
 
     /**
      * Set plugin manager for resolving filter classes
      *
-     * @param  FilterPluginManager $manager
      * @return void
      */
-    public static function setPluginManager(FilterPluginManager $manager = null)
+    public static function setPluginManager(?FilterPluginManager $manager = null)
     {
         static::$plugins = $manager;
     }

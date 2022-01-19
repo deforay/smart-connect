@@ -1,10 +1,6 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-log for the canonical source repository
- * @copyright https://github.com/laminas/laminas-log/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-log/blob/master/LICENSE.md New BSD License
- */
+declare(strict_types=1);
 
 namespace Laminas\Log;
 
@@ -31,14 +27,16 @@ class ConfigProvider
     {
         return [
             // Legacy Zend Framework aliases
-            'aliases' => [
+            'aliases'            => [
+                //phpcs:disable SlevomatCodingStandard.Namespaces.ReferenceUsedNamesOnly.ReferenceViaFullyQualifiedName
                 \Zend\Log\Logger::class => Logger::class,
+                //phpcs:enable SlevomatCodingStandard.Namespaces.ReferenceUsedNamesOnly.ReferenceViaFullyQualifiedName
             ],
             'abstract_factories' => [
                 LoggerAbstractServiceFactory::class,
                 PsrLoggerAbstractAdapterFactory::class,
             ],
-            'factories' => [
+            'factories'          => [
                 Logger::class         => LoggerServiceFactory::class,
                 'LogFilterManager'    => FilterPluginManagerFactory::class,
                 'LogFormatterManager' => FormatterPluginManagerFactory::class,

@@ -1,28 +1,35 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-filter for the canonical source repository
- * @copyright https://github.com/laminas/laminas-filter/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-filter/blob/master/LICENSE.md New BSD License
- */
+declare(strict_types=1);
 
 namespace Laminas\Filter;
 
 use Laminas\Stdlib\ErrorHandler;
 use Traversable;
 
+use function array_pop;
+use function explode;
+use function getcwd;
+use function implode;
+use function is_string;
+use function preg_match;
+use function preg_replace;
+use function realpath;
+use function stripos;
+use function strpos;
+use function substr;
+
+use const DIRECTORY_SEPARATOR;
+use const PHP_OS;
+
 class RealPath extends AbstractFilter
 {
-    /**
-     * @var array $options
-     */
+    /** @var array $options */
     protected $options = [
-        'exists' => true
+        'exists' => true,
     ];
 
     /**
-     * Class constructor
-     *
      * @param  bool|Traversable $existsOrOptions Options to set
      */
     public function __construct($existsOrOptions = true)
@@ -92,7 +99,7 @@ class RealPath extends AbstractFilter
         if (stripos(PHP_OS, 'WIN') === 0) {
             $path = preg_replace('/[\\\\\/]/', DIRECTORY_SEPARATOR, $path);
             if (preg_match('/([a-zA-Z]\:)(.*)/', $path, $matches)) {
-                list(, $drive, $path) = $matches;
+                [, $drive, $path] = $matches;
             } else {
                 $cwd   = getcwd();
                 $drive = substr($cwd, 0, 2);

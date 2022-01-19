@@ -1,10 +1,6 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-log for the canonical source repository
- * @copyright https://github.com/laminas/laminas-log/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-log/blob/master/LICENSE.md New BSD License
- */
+declare(strict_types=1);
 
 namespace Laminas\Log\Filter;
 
@@ -13,10 +9,17 @@ use Laminas\Log\Exception;
 use Laminas\Stdlib\ArrayUtils;
 use Traversable;
 
+use function gettype;
+use function idate;
+use function in_array;
+use function is_array;
+use function is_int;
+use function is_string;
+use function sprintf;
+use function version_compare;
+
 /**
  * Filters log events based on the time when they were triggered.
- *
- * @author Nikola Posa <posa.nikola@gmail.com>
  */
 class Timestamp implements FilterInterface
 {
@@ -34,16 +37,13 @@ class Timestamp implements FilterInterface
      */
     protected $dateFormatChar;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $operator;
 
     /**
      * @param int|DateTime|array|Traversable $value DateTime instance or desired value based on $dateFormatChar
      * @param string $dateFormatChar PHP idate()-compliant format character
      * @param string $operator Comparison operator
-     * @return Timestamp
      * @throws Exception\InvalidArgumentException
      */
     public function __construct($value, $dateFormatChar = null, $operator = '<=')
@@ -53,9 +53,9 @@ class Timestamp implements FilterInterface
         }
 
         if (is_array($value)) {
-            $dateFormatChar = isset($value['dateFormatChar']) ? $value['dateFormatChar'] : null;
-            $operator = isset($value['operator']) ? $value['operator'] : null;
-            $value = isset($value['value']) ? $value['value'] : null;
+            $dateFormatChar = $value['dateFormatChar'] ?? null;
+            $operator       = $value['operator'] ?? null;
+            $value          = $value['value'] ?? null;
         }
 
         if ($value instanceof DateTime) {
@@ -74,16 +74,18 @@ class Timestamp implements FilterInterface
                 ));
             }
 
-            $this->value = $value;
+            $this->value          = $value;
             $this->dateFormatChar = $dateFormatChar;
         }
 
         if ($operator === null) {
             $operator = '<=';
-        } elseif (! in_array(
-            $operator,
-            ['<', 'lt', '<=', 'le', '>', 'gt', '>=', 'ge', '==', '=', 'eq', '!=', '<>']
-        )) {
+        } elseif (
+            ! in_array(
+                $operator,
+                ['<', 'lt', '<=', 'le', '>', 'gt', '>=', 'ge', '==', '=', 'eq', '!=', '<>']
+            )
+        ) {
             throw new Exception\InvalidArgumentException(
                 "Unsupported comparison operator: '$operator'"
             );
@@ -113,12 +115,12 @@ class Timestamp implements FilterInterface
         $timestamp = $datetime instanceof DateTime ? $datetime->getTimestamp() : (int) $datetime;
 
         if ($this->value instanceof DateTime) {
-            return version_compare($timestamp, $this->value->getTimestamp(), $this->operator);
+            return version_compare((string) $timestamp, (string) $this->value->getTimestamp(), $this->operator);
         }
 
         return version_compare(
-            idate($this->dateFormatChar, $timestamp),
-            $this->value,
+            (string) idate($this->dateFormatChar, $timestamp),
+            (string) $this->value,
             $this->operator
         );
     }

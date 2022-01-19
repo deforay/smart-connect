@@ -1,11 +1,5 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-inputfilter for the canonical source repository
- * @copyright https://github.com/laminas/laminas-inputfilter/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-inputfilter/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\InputFilter\FileInput;
 
 /**
@@ -20,7 +14,7 @@ interface FileInputDecoratorInterface
     /**
      * Checks if the raw input value is an empty file input eg: no file was uploaded
      *
-     * @param $rawValue
+     * @param mixed $rawValue
      * @return bool
      */
     public static function isEmptyFileDecorator($rawValue);

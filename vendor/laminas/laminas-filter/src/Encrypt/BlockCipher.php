@@ -1,10 +1,6 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-filter for the canonical source repository
- * @copyright https://github.com/laminas/laminas-filter/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-filter/blob/master/LICENSE.md New BSD License
- */
+declare(strict_types=1);
 
 namespace Laminas\Filter\Encrypt;
 
@@ -16,6 +12,11 @@ use Laminas\Filter\Decompress;
 use Laminas\Filter\Exception;
 use Laminas\Stdlib\ArrayUtils;
 use Traversable;
+
+use function array_key_exists;
+use function is_array;
+use function is_string;
+use function sprintf;
 
 /**
  * Encryption adapter for Laminas\Crypt\BlockCipher
@@ -53,8 +54,6 @@ class BlockCipher implements EncryptionAlgorithmInterface
     protected $compression;
 
     /**
-     * Class constructor
-     *
      * @param  string|array|Traversable $options Encryption Options
      * @throws Exception\RuntimeException
      * @throws Exception\InvalidArgumentException
@@ -62,7 +61,7 @@ class BlockCipher implements EncryptionAlgorithmInterface
     public function __construct($options)
     {
         $cipherPluginManager = CryptBlockCipher::getSymmetricPluginManager();
-        $cipherType = $cipherPluginManager->has('openssl') ? 'openssl' : 'mcrypt';
+        $cipherType          = $cipherPluginManager->has('openssl') ? 'openssl' : 'mcrypt';
         try {
             $this->blockCipher = CryptBlockCipher::factory($cipherType, $this->encryption);
         } catch (SymmetricException\RuntimeException $e) {

@@ -1,12 +1,16 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-filter for the canonical source repository
- * @copyright https://github.com/laminas/laminas-filter/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-filter/blob/master/LICENSE.md New BSD License
- */
+declare(strict_types=1);
 
 namespace Laminas\Filter;
+
+use function array_map;
+use function function_exists;
+use function in_array;
+use function mb_internal_encoding;
+use function mb_list_encodings;
+use function sprintf;
+use function strtolower;
 
 abstract class AbstractUnicode extends AbstractFilter
 {
@@ -24,7 +28,7 @@ abstract class AbstractUnicode extends AbstractFilter
             if (! function_exists('mb_strtolower')) {
                 throw new Exception\ExtensionNotLoadedException(sprintf(
                     '%s requires mbstring extension to be loaded',
-                    get_class($this)
+                    static::class
                 ));
             }
 

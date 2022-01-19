@@ -1,12 +1,15 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-development-mode for the canonical source repository
- * @copyright https://github.com/laminas/laminas-development-mode/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-development-mode/blob/master/LICENSE.md New BSD License
- */
+declare(strict_types=1);
 
 namespace Laminas\DevelopmentMode;
+
+use function array_shift;
+use function count;
+use function fwrite;
+
+use const PHP_EOL;
+use const STDERR;
 
 class Command
 {

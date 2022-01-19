@@ -1,11 +1,5 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-inputfilter for the canonical source repository
- * @copyright https://github.com/laminas/laminas-inputfilter/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-inputfilter/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\InputFilter\FileInput;
 
 use Laminas\InputFilter\FileInput;
@@ -14,6 +8,8 @@ use Laminas\Validator\ValidatorChain;
 
 use function count;
 use function is_array;
+
+use const UPLOAD_ERR_NO_FILE;
 
 /**
  * Decorator for filtering standard SAPI file uploads.
@@ -37,7 +33,7 @@ class HttpServerFileInputDecorator extends FileInput implements FileInputDecorat
     /**
      * Checks if the raw input value is an empty file input eg: no file was uploaded
      *
-     * @param $rawValue
+     * @param mixed $rawValue
      * @return bool
      */
     public static function isEmptyFileDecorator($rawValue)
@@ -156,7 +152,8 @@ class HttpServerFileInputDecorator extends FileInput implements FileInputDecorat
 
         // Check if Upload validator is already first in chain
         $validators = $chain->getValidators();
-        if (isset($validators[0]['instance'])
+        if (
+            isset($validators[0]['instance'])
             && $validators[0]['instance'] instanceof UploadValidator
         ) {
             $this->subject->autoPrependUploadValidator = false;

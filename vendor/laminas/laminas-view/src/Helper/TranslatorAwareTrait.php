@@ -1,10 +1,6 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-view for the canonical source repository
- * @copyright https://github.com/laminas/laminas-view/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-view/blob/master/LICENSE.md New BSD License
- */
+declare(strict_types=1);
 
 namespace Laminas\View\Helper;
 
@@ -21,7 +17,7 @@ trait TranslatorAwareTrait
     /**
      * Translator (optional)
      *
-     * @var Translator
+     * @var Translator|null
      */
     protected $translator;
 
@@ -42,13 +38,13 @@ trait TranslatorAwareTrait
     /**
      * Sets translator to use in helper
      *
-     * @param  Translator $translator  [optional] translator.
-     *                                 Default is null, which sets no translator.
-     * @param  string     $textDomain  [optional] text domain
-     *                                 Default is null, which skips setTranslatorTextDomain
-     * @return HeadTitle
+     * @param Translator|null $translator [optional] translator.
+     *                                    Default is null, which sets no translator.
+     * @param string          $textDomain [optional] text domain
+     *                                    Default is null, which skips setTranslatorTextDomain
+     * @return $this
      */
-    public function setTranslator(Translator $translator = null, $textDomain = null)
+    public function setTranslator(?Translator $translator = null, $textDomain = null)
     {
         $this->translator = $translator;
         if (null !== $textDomain) {
@@ -84,9 +80,9 @@ trait TranslatorAwareTrait
     /**
      * Sets whether translator is enabled and should be used
      *
-     * @param  bool $enabled [optional] whether translator should be used.
+     * @param bool $enabled [optional] whether translator should be used.
      *                       Default is true.
-     * @return HeadTitle
+     * @return $this
      */
     public function setTranslatorEnabled($enabled = true)
     {
@@ -107,8 +103,8 @@ trait TranslatorAwareTrait
     /**
      * Set translation text domain
      *
-     * @param  string $textDomain
-     * @return HeadTitle
+     * @param string $textDomain
+     * @return $this
      */
     public function setTranslatorTextDomain($textDomain = 'default')
     {

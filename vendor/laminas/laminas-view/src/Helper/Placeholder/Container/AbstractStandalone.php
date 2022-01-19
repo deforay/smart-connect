@@ -1,20 +1,27 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-view for the canonical source repository
- * @copyright https://github.com/laminas/laminas-view/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-view/blob/master/LICENSE.md New BSD License
- */
+declare(strict_types=1);
 
 namespace Laminas\View\Helper\Placeholder\Container;
 
 use ArrayAccess;
 use Countable;
+use Iterator;
 use IteratorAggregate;
 use Laminas\Escaper\Escaper;
 use Laminas\View\Exception;
 use Laminas\View\Helper\AbstractHelper;
-use Laminas\View\Renderer\RendererInterface;
+use Laminas\View\Helper\Placeholder\Container;
+use ReturnTypeWillChange;
+
+use function call_user_func_array;
+use function class_exists;
+use function class_parents;
+use function count;
+use function in_array;
+use function method_exists;
+use function sprintf;
+use function strtolower;
 
 /**
  * Base class for targeted placeholder helpers
@@ -32,25 +39,21 @@ abstract class AbstractStandalone extends AbstractHelper implements
      */
     protected $autoEscape = true;
 
-    /**
-     * @var AbstractContainer
-     */
+    /** @var AbstractContainer */
     protected $container;
 
     /**
      * Default container class
+     *
      * @var string
      */
-    protected $containerClass = 'Laminas\View\Helper\Placeholder\Container';
+    protected $containerClass = Container::class;
 
-    /**
-     * @var Escaper[]
-     */
+    /** @var Escaper[] */
     protected $escapers = [];
 
     /**
      * Constructor
-     *
      */
     public function __construct()
     {
@@ -65,7 +68,7 @@ abstract class AbstractStandalone extends AbstractHelper implements
      * @param  string $method
      * @param  array $args
      * @throws Exception\BadMethodCallException
-     * @return mixed
+     * @return $this|mixed
      */
     public function __call($method, $args)
     {
@@ -91,7 +94,7 @@ abstract class AbstractStandalone extends AbstractHelper implements
      */
     public function __set($key, $value)
     {
-        $container = $this->getContainer();
+        $container       = $this->getContainer();
         $container[$key] = $value;
     }
 
@@ -107,8 +110,6 @@ abstract class AbstractStandalone extends AbstractHelper implements
         if (isset($container[$key])) {
             return $container[$key];
         }
-
-        return;
     }
 
     /**
@@ -194,7 +195,7 @@ abstract class AbstractStandalone extends AbstractHelper implements
     /**
      * Return whether autoEscaping is enabled or disabled
      *
-     * return bool
+     * @return bool
      */
     public function getAutoEscape()
     {
@@ -204,7 +205,6 @@ abstract class AbstractStandalone extends AbstractHelper implements
     /**
      * Set container on which to operate
      *
-     * @param  AbstractContainer $container
      * @return AbstractStandalone
      */
     public function setContainer(AbstractContainer $container)
@@ -233,7 +233,7 @@ abstract class AbstractStandalone extends AbstractHelper implements
      */
     public function deleteContainer()
     {
-        if (null != $this->container) {
+        if (null !== $this->container) {
             $this->container = null;
             return true;
         }
@@ -247,7 +247,7 @@ abstract class AbstractStandalone extends AbstractHelper implements
      * @param  string $name
      * @throws Exception\InvalidArgumentException
      * @throws Exception\DomainException
-     * @return \Laminas\View\Helper\Placeholder\Container\AbstractStandalone
+     * @return AbstractStandalone
      */
     public function setContainerClass($name)
     {
@@ -261,7 +261,7 @@ abstract class AbstractStandalone extends AbstractHelper implements
             );
         }
 
-        if (! in_array('Laminas\View\Helper\Placeholder\Container\AbstractContainer', class_parents($name))) {
+        if (! in_array(AbstractContainer::class, class_parents($name))) {
             throw new Exception\InvalidArgumentException('Invalid Container class specified');
         }
 
@@ -282,12 +282,11 @@ abstract class AbstractStandalone extends AbstractHelper implements
     /**
      * Set Escaper instance
      *
-     * @param  Escaper $escaper
      * @return AbstractStandalone
      */
     public function setEscaper(Escaper $escaper)
     {
-        $encoding = $escaper->getEncoding();
+        $encoding                  = $escaper->getEncoding();
         $this->escapers[$encoding] = $escaper;
 
         return $this;
@@ -316,6 +315,7 @@ abstract class AbstractStandalone extends AbstractHelper implements
      *
      * @return int
      */
+    #[ReturnTypeWillChange]
     public function count()
     {
         $container = $this->getContainer();
@@ -328,6 +328,7 @@ abstract class AbstractStandalone extends AbstractHelper implements
      * @param  string|int $offset
      * @return bool
      */
+    #[ReturnTypeWillChange]
     public function offsetExists($offset)
     {
         return $this->getContainer()->offsetExists($offset);
@@ -339,6 +340,7 @@ abstract class AbstractStandalone extends AbstractHelper implements
      * @param  string|int $offset
      * @return mixed
      */
+    #[ReturnTypeWillChange]
     public function offsetGet($offset)
     {
         return $this->getContainer()->offsetGet($offset);
@@ -351,9 +353,10 @@ abstract class AbstractStandalone extends AbstractHelper implements
      * @param  mixed $value
      * @return void
      */
+    #[ReturnTypeWillChange]
     public function offsetSet($offset, $value)
     {
-        return $this->getContainer()->offsetSet($offset, $value);
+        $this->getContainer()->offsetSet($offset, $value);
     }
 
     /**
@@ -362,16 +365,18 @@ abstract class AbstractStandalone extends AbstractHelper implements
      * @param  string|int $offset
      * @return void
      */
+    #[ReturnTypeWillChange]
     public function offsetUnset($offset)
     {
-        return $this->getContainer()->offsetUnset($offset);
+        $this->getContainer()->offsetUnset($offset);
     }
 
     /**
      * IteratorAggregate: get Iterator
      *
-     * @return \Iterator
+     * @return Iterator
      */
+    #[ReturnTypeWillChange]
     public function getIterator()
     {
         return $this->getContainer()->getIterator();

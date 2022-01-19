@@ -1,12 +1,17 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-view for the canonical source repository
- * @copyright https://github.com/laminas/laminas-view/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-view/blob/master/LICENSE.md New BSD License
- */
+declare(strict_types=1);
 
 namespace Laminas\View\Helper;
+
+use function assert;
+use function str_replace;
+use function strlen;
+use function strpos;
+use function substr;
+use function trim;
+
+use const PHP_EOL;
 
 abstract class AbstractHtmlElement extends AbstractHelper
 {
@@ -15,14 +20,14 @@ abstract class AbstractHtmlElement extends AbstractHelper
      *
      * @deprecated just use PHP_EOL
      */
-    const EOL = PHP_EOL;
+    public const EOL = PHP_EOL;
 
     /**
      * The tag closing bracket
      *
      * @var string
      */
-    protected $closingBracket = null;
+    protected $closingBracket;
 
     /**
      * Get the tag closing bracket
@@ -49,54 +54,32 @@ abstract class AbstractHtmlElement extends AbstractHelper
      */
     protected function isXhtml()
     {
-        return $this->getView()->plugin('doctype')->isXhtml();
+        $plugin = $this->getView()->plugin('doctype');
+        assert($plugin instanceof Doctype);
+
+        return $plugin->isXhtml();
     }
 
     /**
      * Converts an associative array to a string of tag attributes.
      *
      * @access public
-     *
      * @param array $attribs From this array, each key-value pair is
      * converted to an attribute name and value.
-     *
      * @return string The XHTML for the attributes.
      */
     protected function htmlAttribs($attribs)
     {
-        $xhtml          = '';
-        $escaper        = $this->getView()->plugin('escapehtml');
-        $escapeHtmlAttr = $this->getView()->plugin('escapehtmlattr');
-
         foreach ((array) $attribs as $key => $val) {
-            $key = $escaper($key);
-
-            if (0 === strpos($key, 'on') || ('constraints' == $key)) {
-                // Don't escape event attributes; _do_ substitute double quotes with singles
-                if (! is_scalar($val)) {
-                    // non-scalar data should be cast to JSON first
-                    $val = \Laminas\Json\Json::encode($val);
-                }
-            } else {
-                if (is_array($val)) {
-                    $val = implode(' ', $val);
-                }
-            }
-
-            $val = $escapeHtmlAttr($val);
-
-            if ('id' == $key) {
-                $val = $this->normalizeId($val);
-            }
-
-            if (strpos($val, '"') !== false) {
-                $xhtml .= " $key='$val'";
-            } else {
-                $xhtml .= " $key=\"$val\"";
+            if ('id' === $key) {
+                $attribs[$key] = $this->normalizeId($val);
             }
         }
 
-        return $xhtml;
+        $helper = $this->getView()->plugin(HtmlAttributes::class);
+        assert($helper instanceof HtmlAttributes);
+
+        return (string) $helper($attribs);
     }
 
     /**
@@ -108,7 +91,7 @@ abstract class AbstractHtmlElement extends AbstractHelper
     protected function normalizeId($value)
     {
         if (false !== strpos($value, '[')) {
-            if ('[]' == substr($value, -2)) {
+            if ('[]' === substr($value, -2)) {
                 $value = substr($value, 0, strlen($value) - 2);
             }
             $value = trim($value, ']');

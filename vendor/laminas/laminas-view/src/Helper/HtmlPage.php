@@ -1,24 +1,22 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-view for the canonical source repository
- * @copyright https://github.com/laminas/laminas-view/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-view/blob/master/LICENSE.md New BSD License
- */
+declare(strict_types=1);
 
 namespace Laminas\View\Helper;
+
+use function array_merge;
 
 class HtmlPage extends AbstractHtmlElement
 {
     /**
      * Default file type for html
      */
-    const TYPE = 'text/html';
+    public const TYPE = 'text/html';
 
     /**
      * Object classid
      */
-    const ATTRIB_CLASSID  = 'clsid:25336920-03F9-11CF-8FD0-00AA00686F13';
+    public const ATTRIB_CLASSID = 'clsid:25336920-03F9-11CF-8FD0-00AA00686F13';
 
     /**
      * Default attributes

@@ -1,19 +1,18 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-view for the canonical source repository
- * @copyright https://github.com/laminas/laminas-view/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-view/blob/master/LICENSE.md New BSD License
- */
+declare(strict_types=1);
 
 namespace Laminas\View\Helper;
 
+use function array_merge;
+
+/** @deprecated Adobe Flash is obsolete. This helper will be removed in 3.0 */
 class HtmlFlash extends AbstractHtmlElement
 {
     /**
      * Default file type for a flash applet
      */
-    const TYPE = 'application/x-shockwave-flash';
+    public const TYPE = 'application/x-shockwave-flash';
 
     /**
      * Output a flash movie object tag

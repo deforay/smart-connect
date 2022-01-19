@@ -1,12 +1,16 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-log for the canonical source repository
- * @copyright https://github.com/laminas/laminas-log/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-log/blob/master/LICENSE.md New BSD License
- */
+declare(strict_types=1);
 
 namespace Laminas\Log\Processor;
+
+use function get_class;
+use function gettype;
+use function is_object;
+use function is_scalar;
+use function method_exists;
+use function strpos;
+use function strtr;
 
 /**
  * Processes an event message according to PSR-3 rules.
@@ -27,20 +31,21 @@ class PsrPlaceholder implements ProcessorInterface
 
         $replacements = [];
         foreach ($event['extra'] as $key => $val) {
-            if (is_null($val)
+            if (
+                $val === null
                 || is_scalar($val)
                 || (is_object($val) && method_exists($val, "__toString"))
             ) {
-                $replacements['{'.$key.'}'] = $val;
+                $replacements['{' . $key . '}'] = $val;
                 continue;
             }
 
             if (is_object($val)) {
-                $replacements['{'.$key.'}'] = '[object '.get_class($val).']';
+                $replacements['{' . $key . '}'] = '[object ' . get_class($val) . ']';
                 continue;
             }
 
-            $replacements['{'.$key.'}'] = '['.gettype($val).']';
+            $replacements['{' . $key . '}'] = '[' . gettype($val) . ']';
         }
 
         $event['message'] = strtr($event['message'], $replacements);

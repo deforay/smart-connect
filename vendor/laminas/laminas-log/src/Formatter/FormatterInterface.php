@@ -1,10 +1,6 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-log for the canonical source repository
- * @copyright https://github.com/laminas/laminas-log/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-log/blob/master/LICENSE.md New BSD License
- */
+declare(strict_types=1);
 
 namespace Laminas\Log\Formatter;
 
@@ -15,7 +11,7 @@ interface FormatterInterface
      *
      * @see http://php.net/manual/en/function.date.php
      */
-    const DEFAULT_DATETIME_FORMAT = 'c';
+    public const DEFAULT_DATETIME_FORMAT = 'c';
 
     /**
      * Formats data into a single line to be written by the writer.
@@ -37,6 +33,7 @@ interface FormatterInterface
      * Set the format specifier for DateTime objects
      *
      * @see http://php.net/manual/en/function.date.php
+     *
      * @param string $dateTimeFormat DateTime format
      * @return FormatterInterface
      */

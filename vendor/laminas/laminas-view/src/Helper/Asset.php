@@ -1,23 +1,19 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-view for the canonical source repository
- * @copyright https://github.com/laminas/laminas-view/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-view/blob/master/LICENSE.md New BSD License
- */
+declare(strict_types=1);
 
 namespace Laminas\View\Helper;
 
 use Laminas\View\Exception;
+
+use function array_key_exists;
 
 /**
  * View helper plugin to fetch asset from resource map.
  */
 class Asset extends AbstractHelper
 {
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $resourceMap = [];
 
     /**

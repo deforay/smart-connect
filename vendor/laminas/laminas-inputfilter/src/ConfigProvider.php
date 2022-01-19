@@ -1,11 +1,5 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-inputfilter for the canonical source repository
- * @copyright https://github.com/laminas/laminas-inputfilter/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-inputfilter/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\InputFilter;
 
 class ConfigProvider
@@ -18,7 +12,7 @@ class ConfigProvider
     public function __invoke()
     {
         return [
-            'dependencies' => $this->getDependencyConfig(),
+            'dependencies'  => $this->getDependencyConfig(),
             'input_filters' => $this->getInputFilterConfig(),
         ];
     }
@@ -31,7 +25,7 @@ class ConfigProvider
     public function getDependencyConfig()
     {
         return [
-            'aliases' => [
+            'aliases'   => [
                 'InputFilterManager' => InputFilterPluginManager::class,
 
                 // Legacy Zend Framework aliases

@@ -1,16 +1,20 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-log for the canonical source repository
- * @copyright https://github.com/laminas/laminas-log/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-log/blob/master/LICENSE.md New BSD License
- */
+declare(strict_types=1);
 
 namespace Laminas\Log\Filter;
 
 use Laminas\Log\Exception;
 use Laminas\Stdlib\ErrorHandler;
 use Traversable;
+
+use function is_array;
+use function iterator_to_array;
+use function preg_match;
+use function sprintf;
+use function var_export;
+
+use const E_WARNING;
 
 class Regex implements FilterInterface
 {
@@ -25,7 +29,6 @@ class Regex implements FilterInterface
      * Filter out any log messages not matching the pattern
      *
      * @param string|array|Traversable $regex Regular expression to test the log message
-     * @return Regex
      * @throws Exception\InvalidArgumentException
      */
     public function __construct($regex)
@@ -34,7 +37,7 @@ class Regex implements FilterInterface
             $regex = iterator_to_array($regex);
         }
         if (is_array($regex)) {
-            $regex = isset($regex['regex']) ? $regex['regex'] : null;
+            $regex = $regex['regex'] ?? null;
         }
         ErrorHandler::start(E_WARNING);
         $result = preg_match($regex, '');

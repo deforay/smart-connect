@@ -1,11 +1,5 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-inputfilter for the canonical source repository
- * @copyright https://github.com/laminas/laminas-inputfilter/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-inputfilter/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\InputFilter;
 
 use Psr\Http\Message\UploadedFileInterface;
@@ -29,14 +23,10 @@ use function is_array;
  */
 class FileInput extends Input
 {
-    /**
-     * @var bool
-     */
+    /** @var bool */
     protected $isValid = false;
 
-    /**
-     * @var bool
-     */
+    /** @var bool */
     protected $autoPrependUploadValidator = true;
 
     /** @var FileInput\FileInputDecoratorInterface */
@@ -44,7 +34,6 @@ class FileInput extends Input
 
     /**
      * @param array|UploadedFile $value
-     *
      * @return Input
      */
     public function setValue($value)
@@ -54,6 +43,7 @@ class FileInput extends Input
         return $this;
     }
 
+    /** @return self */
     public function resetValue()
     {
         $this->implementation = null;
@@ -62,7 +52,6 @@ class FileInput extends Input
 
     /**
      * @param  bool $value Enable/Disable automatically prepending an Upload validator
-     *
      * @return FileInput
      */
     public function setAutoPrependUploadValidator($value)
@@ -93,7 +82,7 @@ class FileInput extends Input
     /**
      * Checks if the raw input value is an empty file input eg: no file was uploaded
      *
-     * @param $rawValue
+     * @param mixed $rawValue
      * @return bool
      */
     public function isEmptyFile($rawValue)
@@ -130,7 +119,7 @@ class FileInput extends Input
             return true;
         }
 
-        if (! $hasValue && $required && ! $this->hasFallback()) {
+        if (! $hasValue && ! $this->hasFallback()) { // required, no value, and no fallback
             if ($this->errorMessage === null) {
                 $this->errorMessage = $this->prepareRequiredValidationFailureMessage();
             }
@@ -149,8 +138,6 @@ class FileInput extends Input
     }
 
     /**
-     * @param  InputInterface $input
-     *
      * @return FileInput
      */
     public function merge(InputInterface $input)

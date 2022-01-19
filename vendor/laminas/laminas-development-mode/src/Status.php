@@ -1,20 +1,19 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-development-mode for the canonical source repository
- * @copyright https://github.com/laminas/laminas-development-mode/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-development-mode/blob/master/LICENSE.md New BSD License
- */
+declare(strict_types=1);
 
 namespace Laminas\DevelopmentMode;
 
+use function file_exists;
+use function sprintf;
+
+use const PHP_EOL;
+
 class Status
 {
-    const DEVEL_CONFIG = 'config/development.config.php';
+    public const DEVEL_CONFIG = 'config/development.config.php';
 
-    /**
-     * @param string
-     */
+    /** @var string */
     private $develConfigFile;
 
     /**

@@ -1,11 +1,5 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-i18n for the canonical source repository
- * @copyright https://github.com/laminas/laminas-i18n/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-i18n/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\I18n\Validator;
 
 use Laminas\I18n\Exception as I18nException;
@@ -308,6 +302,9 @@ class PostCode extends AbstractValidator
     /**
      * Returns the actual set service
      *
+     * @deprecated since 2.12.0, this method will be removed in version 3.0.0 of this component.
+     *             Additional validations should be done via a validation chain.
+     *
      * @return mixed|null
      */
     public function getService()
@@ -317,6 +314,9 @@ class PostCode extends AbstractValidator
 
     /**
      * Sets a new callback for service validation
+     *
+     * @deprecated since 2.12.0, this method will be removed in version 3.0.0 of this component.
+     *             Additional validations should be done via a validation chain.
      *
      * @param mixed|null $service
      * @return $this

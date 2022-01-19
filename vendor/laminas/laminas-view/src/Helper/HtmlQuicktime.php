@@ -1,29 +1,28 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-view for the canonical source repository
- * @copyright https://github.com/laminas/laminas-view/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-view/blob/master/LICENSE.md New BSD License
- */
+declare(strict_types=1);
 
 namespace Laminas\View\Helper;
 
+use function array_merge;
+
+/** @deprecated */
 class HtmlQuicktime extends AbstractHtmlElement
 {
     /**
      * Default file type for a movie applet
      */
-    const TYPE = 'video/quicktime';
+    public const TYPE = 'video/quicktime';
 
     /**
      * Object classid
      */
-    const ATTRIB_CLASSID  = 'clsid:02BF25D5-8C17-4B23-BC80-D3488ABDDC6B';
+    public const ATTRIB_CLASSID = 'clsid:02BF25D5-8C17-4B23-BC80-D3488ABDDC6B';
 
     /**
      * Object Codebase
      */
-    const ATTRIB_CODEBASE = 'http://www.apple.com/qtactivex/qtplugin.cab';
+    public const ATTRIB_CODEBASE = 'http://www.apple.com/qtactivex/qtplugin.cab';
 
     /**
      * Default attributes

@@ -1,21 +1,21 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-log for the canonical source repository
- * @copyright https://github.com/laminas/laminas-log/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-log/blob/master/LICENSE.md New BSD License
- */
+declare(strict_types=1);
 
 namespace Laminas\Log\Filter;
 
 use Laminas\Log\Exception;
 use Traversable;
 
+use function gettype;
+use function is_array;
+use function is_bool;
+use function iterator_to_array;
+use function sprintf;
+
 class SuppressFilter implements FilterInterface
 {
-    /**
-     * @var bool
-     */
+    /** @var bool */
     protected $accept = true;
 
     /**
@@ -30,7 +30,7 @@ class SuppressFilter implements FilterInterface
             $suppress = iterator_to_array($suppress);
         }
         if (is_array($suppress)) {
-            $suppress = isset($suppress['suppress']) ? $suppress['suppress'] : false;
+            $suppress = $suppress['suppress'] ?? false;
         }
         if (! is_bool($suppress)) {
             throw new Exception\InvalidArgumentException(

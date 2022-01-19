@@ -1,12 +1,12 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-log for the canonical source repository
- * @copyright https://github.com/laminas/laminas-log/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-log/blob/master/LICENSE.md New BSD License
- */
+declare(strict_types=1);
 
 namespace Laminas\Log\Writer;
+
+use Traversable;
+
+use function function_exists;
 
 class ZendMonitor extends AbstractWriter
 {
@@ -27,8 +27,7 @@ class ZendMonitor extends AbstractWriter
     /**
      * Constructor
      *
-     * @param array|\Traversable|null $options
-     * @return ZendMonitor
+     * @param array|Traversable|null $options
      */
     public function __construct($options = null)
     {
@@ -93,7 +92,7 @@ class ZendMonitor extends AbstractWriter
                 // Severity is either 0 (normal) or 1 (severe); classifying
                 // notice, info, and debug as "normal", and all others as
                 // "severe"
-                monitor_custom_event($priority, $message, ($priority > 4) ? 0 : 1, $event);
+                monitor_custom_event($priority, $message, $priority > 4 ? 0 : 1, $event);
             }
         } else {
             monitor_custom_event($priority, $message);

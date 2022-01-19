@@ -1,23 +1,23 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-filter for the canonical source repository
- * @copyright https://github.com/laminas/laminas-filter/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-filter/blob/master/LICENSE.md New BSD License
- */
+declare(strict_types=1);
 
 namespace Laminas\Filter;
 
 use Traversable;
 
+use function array_unshift;
+use function call_user_func_array;
+use function class_exists;
+use function is_callable;
+use function is_string;
+
 class Callback extends AbstractFilter
 {
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $options = [
         'callback'        => null,
-        'callback_params' => []
+        'callback_params' => [],
     ];
 
     /**

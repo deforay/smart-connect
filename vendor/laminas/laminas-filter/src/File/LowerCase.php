@@ -1,15 +1,18 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-filter for the canonical source repository
- * @copyright https://github.com/laminas/laminas-filter/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-filter/blob/master/LICENSE.md New BSD License
- */
+declare(strict_types=1);
 
 namespace Laminas\Filter\File;
 
 use Laminas\Filter\Exception;
 use Laminas\Filter\StringToLower;
+
+use function file_exists;
+use function file_get_contents;
+use function file_put_contents;
+use function is_array;
+use function is_scalar;
+use function is_writable;
 
 class LowerCase extends StringToLower
 {
@@ -37,8 +40,8 @@ class LowerCase extends StringToLower
             }
 
             $isFileUpload = true;
-            $uploadData = $value;
-            $value      = $value['tmp_name'];
+            $uploadData   = $value;
+            $value        = $value['tmp_name'];
         }
 
         if (! file_exists($value)) {

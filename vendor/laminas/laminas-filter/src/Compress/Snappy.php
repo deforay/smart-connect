@@ -1,14 +1,13 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-filter for the canonical source repository
- * @copyright https://github.com/laminas/laminas-filter/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-filter/blob/master/LICENSE.md New BSD License
- */
+declare(strict_types=1);
 
 namespace Laminas\Filter\Compress;
 
 use Laminas\Filter\Exception;
+use Traversable;
+
+use function extension_loaded;
 
 /**
  * Compression adapter for php snappy (http://code.google.com/p/php-snappy/)
@@ -16,10 +15,8 @@ use Laminas\Filter\Exception;
 class Snappy implements CompressionAlgorithmInterface
 {
     /**
-     * Class constructor
-     *
-     * @param null|array|\Traversable $options (Optional) Options to set
-     * @throws Exception\ExtensionNotLoadedException if snappy extension not loaded
+     * @param null|array|Traversable $options (Optional) Options to set
+     * @throws Exception\ExtensionNotLoadedException If snappy extension not loaded.
      */
     public function __construct($options = null)
     {
@@ -33,7 +30,7 @@ class Snappy implements CompressionAlgorithmInterface
      *
      * @param  string $content
      * @return string
-     * @throws Exception\RuntimeException on memory, output length or data warning
+     * @throws Exception\RuntimeException On memory, output length or data warning.
      */
     public function compress($content)
     {
@@ -51,7 +48,7 @@ class Snappy implements CompressionAlgorithmInterface
      *
      * @param  string $content
      * @return string
-     * @throws Exception\RuntimeException on memory, output length or data warning
+     * @throws Exception\RuntimeException On memory, output length or data warning.
      */
     public function decompress($content)
     {

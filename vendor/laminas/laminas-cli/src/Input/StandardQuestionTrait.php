@@ -35,6 +35,10 @@ use const PHP_EOL;
  * Consumers composing this trait can use this method to generate the initial
  * Question instance, and then further configure it (e.g., to add a normalizer
  * or validator).
+ *
+ * @see InputParamInterface
+ *
+ * @psalm-require-implements InputParamInterface
  */
 trait StandardQuestionTrait
 {
@@ -42,6 +46,7 @@ trait StandardQuestionTrait
     {
         /** @var null|string|string[] $defaultValue */
         $defaultValue  = $this->getDefault();
+        $multiValue    = $this->getMultiLineDefaultValue($defaultValue);
         $defaultPrompt = $this->getDefaultPrompt($defaultValue);
         $multiPrompt   = sprintf(
             "\n(Multiple entries allowed; hit Return after each.%s Hit Return to stop prompting)\n",
@@ -56,8 +61,22 @@ trait StandardQuestionTrait
                 $defaultPrompt,
                 PHP_EOL
             ),
-            $defaultValue
+            $multiValue
         );
+    }
+
+    /**
+     * @param null|string|array $defaultValue
+     * @psalm-param null|string|scalar[] $defaultValue
+     * @return string|bool|int|float|null
+     */
+    private function getMultiLineDefaultValue($defaultValue)
+    {
+        if (! is_array($defaultValue)) {
+            return $defaultValue;
+        }
+
+        return implode(PHP_EOL, $defaultValue);
     }
 
     /**
@@ -71,12 +90,7 @@ trait StandardQuestionTrait
         }
 
         if (is_array($defaultValue)) {
-            $defaultValue = implode(', ', array_map(
-                function ($value): string {
-                    return (string) $value;
-                },
-                $defaultValue
-            ));
+            $defaultValue = implode(', ', array_map('strval', $defaultValue));
         }
 
         return sprintf(' [<comment>%s</comment>]', $defaultValue);

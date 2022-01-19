@@ -1,10 +1,6 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-log for the canonical source repository
- * @copyright https://github.com/laminas/laminas-log/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-log/blob/master/LICENSE.md New BSD License
- */
+declare(strict_types=1);
 
 namespace Laminas\Log\Writer;
 
@@ -13,6 +9,10 @@ use Laminas\Log\Exception;
 use Laminas\Log\Formatter\FirePhp as FirePhpFormatter;
 use Laminas\Log\Logger;
 use Traversable;
+
+use function class_exists;
+use function is_array;
+use function iterator_to_array;
 
 class FirePhp extends AbstractWriter
 {
@@ -37,10 +37,10 @@ class FirePhp extends AbstractWriter
 
         if (is_array($instance)) {
             parent::__construct($instance);
-            $instance = isset($instance['instance']) ? $instance['instance'] : null;
+            $instance = $instance['instance'] ?? null;
         }
 
-        if ($instance !== null && ! ($instance instanceof FirePhp\FirePhpInterface)) {
+        if ($instance !== null && ! $instance instanceof FirePhp\FirePhpInterface) {
             throw new Exception\InvalidArgumentException('You must pass a valid FirePhp\FirePhpInterface');
         }
 
@@ -62,7 +62,7 @@ class FirePhp extends AbstractWriter
             return;
         }
 
-        list($line, $label) = $this->formatter->format($event);
+        [$line, $label] = $this->formatter->format($event);
 
         switch ($event['priority']) {
             case Logger::EMERG:
@@ -95,7 +95,8 @@ class FirePhp extends AbstractWriter
      */
     public function getFirePhp()
     {
-        if (! $this->firephp instanceof FirePhp\FirePhpInterface
+        if (
+            ! $this->firephp instanceof FirePhp\FirePhpInterface
             && ! class_exists('FirePHP')
         ) {
             // No FirePHP instance, and no way to create one
@@ -104,7 +105,8 @@ class FirePhp extends AbstractWriter
 
         // Remember: class names in strings are absolute; thus the class_exists
         // here references the canonical name for the FirePHP class
-        if (! $this->firephp instanceof FirePhp\FirePhpInterface
+        if (
+            ! $this->firephp instanceof FirePhp\FirePhpInterface
             && class_exists('FirePHP')
         ) {
             // FirePHPService is an alias for FirePHP; otherwise the class

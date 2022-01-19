@@ -1,14 +1,17 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-view for the canonical source repository
- * @copyright https://github.com/laminas/laminas-view/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-view/blob/master/LICENSE.md New BSD License
- */
+declare(strict_types=1);
 
 namespace Laminas\View\Helper;
 
 use Laminas\View\Exception;
+
+use function is_array;
+use function sprintf;
+use function strlen;
+use function substr;
+
+use const PHP_EOL;
 
 /**
  * Helper for ordered and unordered lists
@@ -60,7 +63,7 @@ class HtmlList extends AbstractHtmlElement
             $attribs = '';
         }
 
-        $tag = ($ordered) ? 'ol' : 'ul';
+        $tag = $ordered ? 'ol' : 'ul';
 
         return '<' . $tag . $attribs . '>' . PHP_EOL . $list . '</' . $tag . '>' . PHP_EOL;
     }

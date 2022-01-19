@@ -1,10 +1,6 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-view for the canonical source repository
- * @copyright https://github.com/laminas/laminas-view/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-view/blob/master/LICENSE.md New BSD License
- */
+declare(strict_types=1);
 
 namespace Laminas\View\Helper\Service;
 
@@ -18,20 +14,12 @@ use Laminas\View\Helper\Identity;
 class IdentityFactory implements FactoryInterface
 {
     /**
-     * {@inheritDoc}
-     *
-     * @param ContainerInterface $container
      * @param string $name
      * @param null|array $options
-     * @return \Laminas\View\Helper\Identity
+     * @return Identity
      */
-    public function __invoke(ContainerInterface $container, $name, array $options = null)
+    public function __invoke(ContainerInterface $container, $name, ?array $options = null)
     {
-        // test if we are using Laminas\ServiceManager v2 or v3
-        if (! method_exists($container, 'configure')) {
-            $container = $container->getServiceLocator();
-        }
-
         $helper = new Identity();
 
         if (null !== ($authenticationService = $this->discoverAuthenticationService($container))) {
@@ -44,8 +32,9 @@ class IdentityFactory implements FactoryInterface
     /**
      * Create service
      *
-     * @param ServiceLocatorInterface $serviceLocator
-     * @return mixed
+     * @param string|null $rName
+     * @param string|null $cName
+     * @return Identity
      */
     public function createService(ServiceLocatorInterface $serviceLocator, $rName = null, $cName = null)
     {

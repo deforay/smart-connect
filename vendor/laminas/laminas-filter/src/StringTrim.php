@@ -1,20 +1,19 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-filter for the canonical source repository
- * @copyright https://github.com/laminas/laminas-filter/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-filter/blob/master/LICENSE.md New BSD License
- */
+declare(strict_types=1);
 
 namespace Laminas\Filter;
 
 use Traversable;
 
+use function is_array;
+use function is_string;
+use function preg_replace;
+use function strlen;
+
 class StringTrim extends AbstractFilter
 {
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $options = [
         'charlist' => null,
     ];
@@ -27,7 +26,7 @@ class StringTrim extends AbstractFilter
     public function __construct($charlistOrOptions = null)
     {
         if ($charlistOrOptions !== null) {
-            if (! is_array($charlistOrOptions) && ! $charlistOrOptions  instanceof Traversable) {
+            if (! is_array($charlistOrOptions) && ! $charlistOrOptions instanceof Traversable) {
                 $this->setCharList($charlistOrOptions);
             } else {
                 $this->setOptions($charlistOrOptions);

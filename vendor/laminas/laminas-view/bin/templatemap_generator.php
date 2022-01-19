@@ -1,12 +1,6 @@
 #!/usr/bin/env php
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-view for the canonical source repository
- * @copyright https://github.com/laminas/laminas-view/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-view/blob/master/LICENSE.md New BSD License
- */
-
 $help = <<< EOH
 Generate template maps.
 
@@ -103,7 +97,6 @@ if (empty($files)) {
     exit(2);
 }
 
-$map = [];
 $realPath = realpath($basePath);
 
 $entries = array_map(function ($file) use ($basePath, $realPath) {
@@ -132,7 +125,10 @@ echo '<' . "?php\nreturn [\n"
 
 exit(0);
 
-function findTemplateFilesInTemplatePath($templatePath)
+/**
+ * @psalm-return list<mixed>
+ */
+function findTemplateFilesInTemplatePath($templatePath): array
 {
     $rdi = new RecursiveDirectoryIterator(
         $templatePath,

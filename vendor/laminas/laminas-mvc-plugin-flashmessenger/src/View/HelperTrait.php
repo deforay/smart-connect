@@ -1,10 +1,6 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-mvc-plugin-flashmessenger for the canonical source repository
- * @copyright https://github.com/laminas/laminas-mvc-plugin-flashmessenger/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-mvc-plugin-flashmessenger/blob/master/LICENSE.md New BSD License
- */
+declare(strict_types=1);
 
 namespace Laminas\Mvc\Plugin\FlashMessenger\View;
 
@@ -24,7 +20,6 @@ use Laminas\Mvc\Plugin\FlashMessenger\View\Helper\FlashMessenger;
  * from different Laminas components can be chained afterwards.
  *
  * @example @var \Laminas\View\Renderer\PhpRenderer|\Laminas\Mvc\Plugin\FlashMessenger\View\HelperTrait $this
- *
  * @method FlashMessenger|PluginFlashMessenger flashMessenger(string|null $namespace = null)
  */
 trait HelperTrait

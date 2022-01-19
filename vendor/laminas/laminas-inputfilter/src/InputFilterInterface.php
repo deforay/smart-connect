@@ -1,11 +1,5 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-inputfilter for the canonical source repository
- * @copyright https://github.com/laminas/laminas-inputfilter/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-inputfilter/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\InputFilter;
 
 use Countable;
@@ -13,7 +7,7 @@ use Traversable;
 
 interface InputFilterInterface extends Countable
 {
-    const VALIDATE_ALL = 'INPUT_FILTER_ALL';
+    public const VALIDATE_ALL = 'INPUT_FILTER_ALL';
 
     /**
      * Add an input to the input filter
@@ -23,7 +17,7 @@ interface InputFilterInterface extends Countable
      *     raise an exception for any they cannot process.
      * @param  null|string $name Name used to retrieve this input
      * @return InputFilterInterface
-     * @throws Exception\InvalidArgumentException if unable to handle the input type.
+     * @throws Exception\InvalidArgumentException If unable to handle the input type.
      */
     public function add($input, $name = null);
 

@@ -1,10 +1,6 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-filter for the canonical source repository
- * @copyright https://github.com/laminas/laminas-filter/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-filter/blob/master/LICENSE.md New BSD License
- */
+declare(strict_types=1);
 
 namespace Laminas\Filter;
 
@@ -17,8 +13,6 @@ class MonthSelect extends AbstractDateDropdown
      */
     protected $format = '%2$s-%1$s';
 
-    /**
-     * @var int
-     */
+    /** @var int */
     protected $expectedInputs = 2;
 }

@@ -1,18 +1,14 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-inputfilter for the canonical source repository
- * @copyright https://github.com/laminas/laminas-inputfilter/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-inputfilter/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\InputFilter;
+
+use function gettype;
+use function is_array;
+use function sprintf;
 
 class ArrayInput extends Input
 {
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $value = [];
 
     /**
@@ -36,7 +32,7 @@ class ArrayInput extends Input
      */
     public function resetValue()
     {
-        $this->value = [];
+        $this->value    = [];
         $this->hasValue = false;
         return $this;
     }
@@ -60,8 +56,8 @@ class ArrayInput extends Input
      */
     public function isValid($context = null)
     {
-        $hasValue = $this->hasValue();
-        $required = $this->isRequired();
+        $hasValue    = $this->hasValue();
+        $required    = $this->isRequired();
         $hasFallback = $this->hasFallback();
 
         if (! $hasValue && $hasFallback) {
@@ -91,7 +87,7 @@ class ArrayInput extends Input
         }
 
         foreach ($values as $value) {
-            $empty = ($value === null || $value === '' || $value === []);
+            $empty = $value === null || $value === '' || $value === [];
             if ($empty && ! $this->isRequired() && ! $this->continueIfEmpty()) {
                 $result = true;
                 continue;

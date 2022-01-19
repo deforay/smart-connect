@@ -1,10 +1,6 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-view for the canonical source repository
- * @copyright https://github.com/laminas/laminas-view/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-view/blob/master/LICENSE.md New BSD License
- */
+declare(strict_types=1);
 
 namespace Laminas\View\Helper\Service;
 
@@ -14,23 +10,18 @@ use Laminas\ServiceManager\ServiceLocatorInterface;
 use Laminas\View\Exception;
 use Laminas\View\Helper\Asset;
 
+use function is_array;
+
 class AssetFactory implements FactoryInterface
 {
     /**
-     * {@inheritDoc}
-     *
-     * @param ContainerInterface $container
      * @param string $name
      * @param null|array $options
      * @return Asset
      * @throws Exception\RuntimeException
      */
-    public function __invoke(ContainerInterface $container, $name, array $options = null)
+    public function __invoke(ContainerInterface $container, $name, ?array $options = null)
     {
-        // test if we are using Laminas\ServiceManager v2 or v3
-        if (! method_exists($container, 'configure')) {
-            $container = $container->getServiceLocator();
-        }
         $helper = new Asset();
 
         $config = $container->get('config');
@@ -49,7 +40,6 @@ class AssetFactory implements FactoryInterface
     /**
      * Create service
      *
-     * @param ServiceLocatorInterface $serviceLocator
      * @param string|null $rName
      * @param string|null $cName
      * @return Asset

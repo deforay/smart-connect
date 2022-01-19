@@ -1,10 +1,6 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-log for the canonical source repository
- * @copyright https://github.com/laminas/laminas-log/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-log/blob/master/LICENSE.md New BSD License
- */
+declare(strict_types=1);
 
 namespace Laminas\Log\Writer;
 
@@ -15,6 +11,9 @@ use Psr\Log\LoggerInterface as PsrLoggerInterface;
 use Psr\Log\LogLevel;
 use Psr\Log\NullLogger;
 use Traversable;
+
+use function is_array;
+use function iterator_to_array;
 
 /**
  * Proxies log messages to an existing PSR-3 compliant logger.
@@ -75,7 +74,7 @@ class Psr extends AbstractWriter
         parent::__construct($options);
 
         if (null === $this->logger) {
-            $this->setLogger(new NullLogger);
+            $this->setLogger(new NullLogger());
         }
     }
 
@@ -91,9 +90,7 @@ class Psr extends AbstractWriter
         $message  = $event['message'];
         $context  = $event['extra'];
 
-        $level = isset($this->psrPriorityMap[$priority])
-            ? $this->psrPriorityMap[$priority]
-            : $this->defaultLogLevel;
+        $level = $this->psrPriorityMap[$priority] ?? $this->defaultLogLevel;
 
         $this->logger->log($level, $message, $context);
     }

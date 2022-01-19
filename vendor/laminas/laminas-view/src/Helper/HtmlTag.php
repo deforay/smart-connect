@@ -1,18 +1,16 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-view for the canonical source repository
- * @copyright https://github.com/laminas/laminas-view/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-view/blob/master/LICENSE.md New BSD License
- */
+declare(strict_types=1);
 
 namespace Laminas\View\Helper;
+
+use function array_merge;
+use function method_exists;
+use function sprintf;
 
 /**
  * Renders <html> tag (both opening and closing) of a web page, to which some custom
  * attributes can be added dynamically.
- *
- * @author Nikola Posa <posa.nikola@gmail.com>
  */
 class HtmlTag extends AbstractHtmlElement
 {
@@ -31,9 +29,7 @@ class HtmlTag extends AbstractHtmlElement
      */
     protected $useNamespaces = false;
 
-    /**
-     * @var bool
-     */
+    /** @var bool */
     private $handledNamespaces = false;
 
     /**
@@ -116,7 +112,7 @@ class HtmlTag extends AbstractHtmlElement
         return sprintf('<html%s>', $this->htmlAttribs($this->attributes));
     }
 
-    protected function handleNamespaceAttributes()
+    protected function handleNamespaceAttributes(): void
     {
         if ($this->useNamespaces && ! $this->handledNamespaces) {
             if (method_exists($this->view, 'plugin')) {

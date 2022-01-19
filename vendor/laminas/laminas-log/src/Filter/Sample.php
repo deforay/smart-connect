@@ -1,14 +1,16 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-log for the canonical source repository
- * @copyright https://github.com/laminas/laminas-log/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-log/blob/master/LICENSE.md New BSD License
- */
+declare(strict_types=1);
 
 namespace Laminas\Log\Filter;
 
 use Laminas\Log\Exception;
+
+use function gettype;
+use function is_numeric;
+use function mt_getrandmax;
+use function mt_rand;
+use function sprintf;
 
 class Sample implements FilterInterface
 {
@@ -27,7 +29,6 @@ class Sample implements FilterInterface
      * If 0.1 only 1 among 10 values will be logged.
      *
      * @param  float|int $sampleRate Sample rate [0-1].
-     * @return Priority
      * @throws Exception\InvalidArgumentException
      */
     public function __construct($sampleRate = 1)

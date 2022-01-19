@@ -1,10 +1,6 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-mvc-plugin-flashmessenger for the canonical source repository
- * @copyright https://github.com/laminas/laminas-mvc-plugin-flashmessenger/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-mvc-plugin-flashmessenger/blob/master/LICENSE.md New BSD License
- */
+declare(strict_types=1);
 
 namespace Laminas\Mvc\Plugin\FlashMessenger\View\Helper;
 
@@ -12,17 +8,18 @@ use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 use Laminas\ServiceManager\ServiceLocatorInterface;
 
+use function method_exists;
+
 class FlashMessengerFactory implements FactoryInterface
 {
     /**
      * Create service
      *
-     * @param ContainerInterface $container
      * @param string $name
      * @param null|array $options
      * @return FlashMessenger
      */
-    public function __invoke(ContainerInterface $container, $name, array $options = null)
+    public function __invoke(ContainerInterface $container, $name, ?array $options = null)
     {
         // test if we are using Laminas\ServiceManager v2 or v3
         if (! method_exists($container, 'configure')) {
@@ -54,7 +51,6 @@ class FlashMessengerFactory implements FactoryInterface
     /**
      * Create service (v2)
      *
-     * @param ServiceLocatorInterface $container
      * @param string $normalizedName
      * @param string $requestedName
      * @return FlashMessenger

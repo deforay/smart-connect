@@ -1,14 +1,12 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-log for the canonical source repository
- * @copyright https://github.com/laminas/laminas-log/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-log/blob/master/LICENSE.md New BSD License
- */
+declare(strict_types=1);
 
 namespace Laminas\Log\Formatter;
 
 use DateTime;
+
+use function print_r;
 
 class ExceptionHandler implements FormatterInterface
 {
@@ -16,6 +14,7 @@ class ExceptionHandler implements FormatterInterface
      * Format specifier for DateTime objects in event data
      *
      * @see http://php.net/manual/en/function.date.php
+     *
      * @var string
      */
     protected $dateTimeFormat = self::DEFAULT_DATETIME_FORMAT;
@@ -33,7 +32,7 @@ class ExceptionHandler implements FormatterInterface
         }
 
         $output = $event['timestamp'] . ' ' . $event['priorityName'] . ' ('
-                . $event['priority'] . ') ' . $event['message'] .' in '
+                . $event['priority'] . ') ' . $event['message'] . ' in '
                 . $event['extra']['file'] . ' on line ' . $event['extra']['line'];
 
         if (! empty($event['extra']['trace'])) {

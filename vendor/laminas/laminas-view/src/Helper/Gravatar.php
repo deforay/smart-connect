@@ -1,14 +1,23 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-view for the canonical source repository
- * @copyright https://github.com/laminas/laminas-view/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-view/blob/master/LICENSE.md New BSD License
- */
+declare(strict_types=1);
 
 namespace Laminas\View\Helper;
 
 use Laminas\View\Exception;
+
+use function md5;
+use function method_exists;
+use function preg_match;
+use function sprintf;
+use function str_replace;
+use function strtolower;
+use function trigger_error;
+use function trim;
+use function ucwords;
+use function urlencode;
+
+use const E_USER_DEPRECATED;
 
 /**
  * Helper for retrieving avatars from gravatar.com
@@ -18,28 +27,28 @@ class Gravatar extends AbstractHtmlElement
     /**
      * URL to gravatar service
      */
-    const GRAVATAR_URL = 'http://www.gravatar.com/avatar';
+    public const GRAVATAR_URL = 'http://www.gravatar.com/avatar';
     /**
      * Secure URL to gravatar service
      */
-    const GRAVATAR_URL_SECURE = 'https://secure.gravatar.com/avatar';
+    public const GRAVATAR_URL_SECURE = 'https://secure.gravatar.com/avatar';
 
     /**
      * Gravatar rating
      */
-    const RATING_G  = 'g';
-    const RATING_PG = 'pg';
-    const RATING_R  = 'r';
-    const RATING_X  = 'x';
+    public const RATING_G  = 'g';
+    public const RATING_PG = 'pg';
+    public const RATING_R  = 'r';
+    public const RATING_X  = 'x';
 
     /**
      * Default gravatar image value constants
      */
-    const DEFAULT_404       = '404';
-    const DEFAULT_MM        = 'mm';
-    const DEFAULT_IDENTICON = 'identicon';
-    const DEFAULT_MONSTERID = 'monsterid';
-    const DEFAULT_WAVATAR   = 'wavatar';
+    public const DEFAULT_404       = '404';
+    public const DEFAULT_MM        = 'mm';
+    public const DEFAULT_IDENTICON = 'identicon';
+    public const DEFAULT_MONSTERID = 'monsterid';
+    public const DEFAULT_WAVATAR   = 'wavatar';
 
     /**
      * Attributes for HTML image tag
@@ -85,6 +94,7 @@ class Gravatar extends AbstractHtmlElement
      *
      * @see    http://pl.gravatar.com/site/implement/url
      * @see    http://pl.gravatar.com/site/implement/url More information about gravatar's service.
+     *
      * @param  string|null $email      Email address.
      * @param  null|array  $options    Options
      * @param  array       $attributes Attributes for image tag (title, alt etc.)
@@ -140,12 +150,11 @@ class Gravatar extends AbstractHtmlElement
      */
     protected function getAvatarUrl()
     {
-        $src = $this->getGravatarUrl()
-            . '/'   . ($this->emailIsHashed ? $this->getEmail() : md5($this->getEmail()))
+        return $this->getGravatarUrl()
+            . '/' . ($this->emailIsHashed ? $this->getEmail() : md5($this->getEmail() ?: ''))
             . '?s=' . $this->getImgSize()
             . '&d=' . $this->getDefaultImg()
             . '&r=' . $this->getRating();
-        return $src;
     }
 
     /**
@@ -155,7 +164,7 @@ class Gravatar extends AbstractHtmlElement
      */
     protected function getGravatarUrl()
     {
-        return ($this->getSecure() === false) ? self::GRAVATAR_URL : self::GRAVATAR_URL_SECURE;
+        return $this->getSecure() === false ? self::GRAVATAR_URL : self::GRAVATAR_URL_SECURE;
     }
 
     /**
@@ -166,11 +175,9 @@ class Gravatar extends AbstractHtmlElement
     public function getImgTag()
     {
         $this->setSrcAttribForImg();
-        $html = '<img'
+        return '<img'
             . $this->htmlAttribs($this->getAttributes())
             . $this->getClosingBracket();
-
-        return $html;
     }
 
     /**
@@ -192,17 +199,17 @@ class Gravatar extends AbstractHtmlElement
     /**
      * Set attribs for image tag
      *
+     * @deprecated Please use Laminas\View\Helper\Gravatar::setAttributes
+     *
      * @param  array $attribs
      * @return Gravatar
-     *
-     * @deprecated Please use Laminas\View\Helper\Gravatar::setAttributes
      */
     public function setAttribs(array $attribs)
     {
         trigger_error(sprintf(
             '%s is deprecated; please use %s::setAttributes',
             __METHOD__,
-            __CLASS__
+            self::class
         ), E_USER_DEPRECATED);
 
         $this->setAttributes($attribs);
@@ -232,16 +239,16 @@ class Gravatar extends AbstractHtmlElement
      * protected method setSrcAttribForImg(). And finally your get other src
      * value!
      *
-     * @return array
-     *
      * @deprecated Please use Laminas\View\Helper\Gravatar::getAttributes
+     *
+     * @return array
      */
     public function getAttribs()
     {
         trigger_error(sprintf(
             '%s is deprecated; please use %s::getAttributes',
             __METHOD__,
-            __CLASS__
+            self::class
         ), E_USER_DEPRECATED);
 
         return $this->getAttributes();
@@ -253,6 +260,7 @@ class Gravatar extends AbstractHtmlElement
      * Can be either an absolute URL to an image, or one of the DEFAULT_* constants
      *
      * @link   http://pl.gravatar.com/site/implement/url More information about default image.
+     *
      * @param  string $defaultImg
      * @return Gravatar
      */
@@ -281,7 +289,7 @@ class Gravatar extends AbstractHtmlElement
     public function setEmail($email)
     {
         $this->emailIsHashed = (bool) preg_match('/^[A-Za-z0-9]{32}$/', $email);
-        $this->email = strtolower(trim($email));
+        $this->email         = strtolower(trim($email));
         return $this;
     }
 
@@ -323,6 +331,7 @@ class Gravatar extends AbstractHtmlElement
      * Must be one of the RATING_* constants
      *
      * @link   http://pl.gravatar.com/site/implement/url More information about rating.
+     *
      * @param  string $rating Value for rating. Allowed values are: g, px, r,x
      * @return Gravatar
      * @throws Exception\DomainException
@@ -364,7 +373,7 @@ class Gravatar extends AbstractHtmlElement
      */
     public function setSecure($flag)
     {
-        $this->options['secure'] = ($flag === null) ? null : (bool) $flag;
+        $this->options['secure'] = $flag === null ? null : (bool) $flag;
         return $this;
     }
 
@@ -376,7 +385,7 @@ class Gravatar extends AbstractHtmlElement
     public function getSecure()
     {
         if ($this->options['secure'] === null) {
-            return (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off');
+            return isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
         }
 
         return $this->options['secure'];

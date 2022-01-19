@@ -1,10 +1,6 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-view for the canonical source repository
- * @copyright https://github.com/laminas/laminas-view/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-view/blob/master/LICENSE.md New BSD License
- */
+declare(strict_types=1);
 
 namespace Laminas\View\Helper;
 
@@ -47,7 +43,6 @@ class Identity extends AbstractHelper
     /**
      * Set AuthenticationService instance
      *
-     * @param AuthenticationServiceInterface $authenticationService
      * @return Identity
      */
     public function setAuthenticationService(AuthenticationServiceInterface $authenticationService)

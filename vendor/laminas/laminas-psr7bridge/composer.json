@@ -1,6 +1,6 @@
 {
     "name": "laminas/laminas-psr7bridge",
-    "description": "PSR-7 &lt;-&gt; laminas-http message conversions",
+    "description": "Bidirectional conversions between PSR-7 and laminas-http messages",
     "license": "BSD-3-Clause",
     "keywords": [
         "laminas",
@@ -23,18 +23,20 @@
     "extra": {
     },
     "require": {
-        "php": "^7.3 || ~8.0.0",
+        "php": "^7.3 || ~8.0.0 || ~8.1.0",
         "laminas/laminas-diactoros": "^1.7 || ^2.0",
-        "laminas/laminas-http": "^2.11",
-        "laminas/laminas-zendframework-bridge": "^1.0",
+        "laminas/laminas-http": "^2.15",
         "psr/http-message": "^1.0"
     },
     "require-dev": {
         "laminas/laminas-coding-standard": "~1.0.0",
-        "phpunit/phpunit": "^9.4.1"
+        "phpunit/phpunit": "^9.5.10",
+        "psalm/plugin-phpunit": "^0.16.1",
+        "vimeo/psalm": "^4.11"
     },
     "conflict": {
-        "laminas/laminas-stdlib": "< 3.2.1"
+        "laminas/laminas-stdlib": "< 3.2.1",
+        "zendframework/zend-psr7bridge": "*"
     },
     "autoload": {
         "psr-4": {
@@ -54,9 +56,7 @@
         "cs-check": "phpcs",
         "cs-fix": "phpcbf",
         "test": "phpunit --colors=always",
-        "test-coverage": "phpunit --colors=always --coverage-clover clover.xml"
-    },
-    "replace": {
-        "zendframework/zend-psr7bridge": "^1.2.0"
+        "test-coverage": "phpunit --colors=always --coverage-clover clover.xml",
+        "static-analysis": "psalm --shepherd --stats"
     }
 }

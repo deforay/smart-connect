@@ -1,11 +1,5 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-inputfilter for the canonical source repository
- * @copyright https://github.com/laminas/laminas-inputfilter/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-inputfilter/blob/master/LICENSE.md New BSD License
- */
-
 namespace Laminas\InputFilter;
 
 use Laminas\Filter\FilterChain;
@@ -34,7 +28,6 @@ interface InputInterface
     public function setErrorMessage($errorMessage);
 
     /**
-     * @param FilterChain $filterChain
      * @return self
      */
     public function setFilterChain(FilterChain $filterChain);
@@ -52,7 +45,6 @@ interface InputInterface
     public function setRequired($required);
 
     /**
-     * @param ValidatorChain $validatorChain
      * @return self
      */
     public function setValidatorChain(ValidatorChain $validatorChain);
@@ -64,7 +56,6 @@ interface InputInterface
     public function setValue($value);
 
     /**
-     * @param InputInterface $input
      * @return self
      */
     public function merge(InputInterface $input);

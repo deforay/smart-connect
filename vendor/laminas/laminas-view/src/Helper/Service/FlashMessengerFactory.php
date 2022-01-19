@@ -1,10 +1,6 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-view for the canonical source repository
- * @copyright https://github.com/laminas/laminas-view/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-view/blob/master/LICENSE.md New BSD License
- */
+declare(strict_types=1);
 
 namespace Laminas\View\Helper\Service;
 
@@ -18,17 +14,12 @@ class FlashMessengerFactory implements FactoryInterface
     /**
      * Create service
      *
-     * @param ContainerInterface $container
      * @param string $name
      * @param null|array $options
      * @return FlashMessenger
      */
-    public function __invoke(ContainerInterface $container, $name, array $options = null)
+    public function __invoke(ContainerInterface $container, $name, ?array $options = null)
     {
-        // test if we are using Laminas\ServiceManager v2 or v3
-        if (! method_exists($container, 'configure')) {
-            $container = $container->getServiceLocator();
-        }
         $helper                  = new FlashMessenger();
         $controllerPluginManager = $container->get('ControllerPluginManager');
         $flashMessenger          = $controllerPluginManager->get('flashmessenger');
@@ -55,7 +46,6 @@ class FlashMessengerFactory implements FactoryInterface
     /**
      * Create service (v2)
      *
-     * @param ServiceLocatorInterface $container
      * @param string $normalizedName
      * @param string $requestedName
      * @return FlashMessenger

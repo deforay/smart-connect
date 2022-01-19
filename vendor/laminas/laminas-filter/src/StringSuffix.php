@@ -1,20 +1,21 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-filter for the canonical source repository
- * @copyright https://github.com/laminas/laminas-filter/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-filter/blob/master/LICENSE.md New BSD License
- */
+declare(strict_types=1);
 
 namespace Laminas\Filter;
 
 use Traversable;
 
+use function get_class;
+use function gettype;
+use function is_object;
+use function is_scalar;
+use function is_string;
+use function sprintf;
+
 class StringSuffix extends AbstractFilter
 {
-    /**
-     * @var array<string, string|null>
-     */
+    /** @var array<string, string|null> */
     protected $options = [
         'suffix' => null,
     ];
@@ -33,7 +34,6 @@ class StringSuffix extends AbstractFilter
      * Set the suffix string
      *
      * @param string $suffix
-     *
      * @return self
      * @throws Exception\InvalidArgumentException
      */
@@ -63,7 +63,7 @@ class StringSuffix extends AbstractFilter
         if (! isset($this->options['suffix'])) {
             throw new Exception\InvalidArgumentException(sprintf(
                 '%s expects a "suffix" option; none given',
-                __CLASS__
+                self::class
             ));
         }
 

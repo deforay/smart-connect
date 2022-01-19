@@ -1,14 +1,16 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-filter for the canonical source repository
- * @copyright https://github.com/laminas/laminas-filter/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-filter/blob/master/LICENSE.md New BSD License
- */
+declare(strict_types=1);
 
 namespace Laminas\Filter;
 
 use Laminas\Stdlib\StringUtils;
+
+use function extension_loaded;
+use function is_float;
+use function is_int;
+use function is_string;
+use function preg_replace;
 
 class Digits extends AbstractFilter
 {

@@ -1,10 +1,6 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-log for the canonical source repository
- * @copyright https://github.com/laminas/laminas-log/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-log/blob/master/LICENSE.md New BSD License
- */
+declare(strict_types=1);
 
 namespace Laminas\Log\Writer\FirePhp;
 
@@ -21,8 +17,6 @@ class FirePhpBridge implements FirePhpInterface
 
     /**
      * Constructor
-     *
-     * @param  FirePHP $firephp
      */
     public function __construct(FirePHP $firephp)
     {
@@ -52,9 +46,9 @@ class FirePhpBridge implements FirePhpInterface
     /**
      * Log an error message
      *
-     * @param  string      $line
-     * @param  string|null $label
-     * @return void
+     * @param string $line
+     * @param string|null $label
+     * @return bool
      */
     public function error($line, $label = null)
     {
@@ -66,7 +60,7 @@ class FirePhpBridge implements FirePhpInterface
      *
      * @param  string      $line
      * @param  string|null $label
-     * @return void
+     * @return bool
      */
     public function warn($line, $label = null)
     {
@@ -78,7 +72,7 @@ class FirePhpBridge implements FirePhpInterface
      *
      * @param  string      $line
      * @param  string|null $label
-     * @return void
+     * @return bool
      */
     public function info($line, $label = null)
     {
@@ -89,7 +83,7 @@ class FirePhpBridge implements FirePhpInterface
      * Log a trace
      *
      * @param  string $line
-     * @return void
+     * @return bool
      */
     public function trace($line)
     {
@@ -101,7 +95,7 @@ class FirePhpBridge implements FirePhpInterface
      *
      * @param  string      $line
      * @param  string|null $label
-     * @return void
+     * @return bool
      */
     public function log($line, $label = null)
     {

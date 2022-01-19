@@ -1,20 +1,18 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-filter for the canonical source repository
- * @copyright https://github.com/laminas/laminas-filter/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-filter/blob/master/LICENSE.md New BSD License
- */
+declare(strict_types=1);
 
 namespace Laminas\Filter;
 
 use Traversable;
 
+use function is_scalar;
+use function mb_strtoupper;
+use function strtoupper;
+
 class StringToUpper extends AbstractUnicode
 {
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $options = [
         'encoding' => null,
     ];
