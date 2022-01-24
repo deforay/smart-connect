@@ -25,7 +25,7 @@ class DashApiReceiverStatsTable extends AbstractTableGateway
          * you want to insert a non-database field (for example a counter or static image)
          */
 
-        $aColumns = array('Lab Name', 'received_on', 'status');
+        $aColumns = array('facility_name', 'received_on');
 
         /*
          * Paging
@@ -99,7 +99,7 @@ class DashApiReceiverStatsTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->from(array('api' => $this->table))
-            ->join(array('f' => 'dars'), "api.lab_id=f.facility_id", array("labName" => new Expr("CONCAT(facility_name, (, facility_code, ))")), 'left');
+            ->join(array('f' => 'facility_details'), "api.lab_id=f.facility_id", array("labName" => "facility_name"), 'left');
 
         if (isset($sWhere) && $sWhere != "") {
             $sQuery->where($sWhere);
@@ -108,6 +108,10 @@ class DashApiReceiverStatsTable extends AbstractTableGateway
         if (isset($sOrder) && $sOrder != "") {
             $sQuery->order($sOrder);
         }
+        if (isset($parameters['type']) && $parameters['type'] == "status") {
+            $sQuery->order("received_on DESC");
+            $sQuery->group("lab_id");
+        }
 
         if (isset($sLimit) && isset($sOffset)) {
             $sQuery->limit($sLimit);
@@ -115,7 +119,7 @@ class DashApiReceiverStatsTable extends AbstractTableGateway
         }
 
         $sQueryStr = $sql->buildSqlString($sQuery); // Get the string of the Sql, instead of the Select-instance 
-        //echo $sQueryStr;die;
+        // echo $sQueryStr;die;
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
 
         /* Data set length after filtering */
@@ -134,11 +138,15 @@ class DashApiReceiverStatsTable extends AbstractTableGateway
             "aaData" => array()
         );
 
-        $buttText = $this->commonService->translate('Edit');
-        foreach ($rResult as $aRow) {
+        foreach ($rResult as $key => $aRow) {
             $row = array();
+            $row[] = ($key + 1);
             $row[] = $aRow['labName'];
             $row[] = date("d-M-Y (h:i: a)", strtotime($aRow['received_on']));
+            if (isset($parameters['type']) && $parameters['type'] == "sync") {
+                $row[] = $aRow['number_of_records_received'];
+                $row[] = $aRow['number_of_records_processed'];
+            }
             $output['aaData'][] = $row;
         }
         return $output;

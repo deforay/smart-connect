@@ -162,6 +162,16 @@ return array(
                     ),
                 ),
             ),
+            'status' => array(
+                'type'    => 'segment',
+                'options' => array(
+                    'route'    => '/status[/][:action][/:id]',
+                    'defaults' => array(
+                        'controller' => 'Application\Controller\Status',
+                        'action' => 'index',
+                    ),
+                ),
+            ),
         ),
     ),
     'service_manager' => array(
@@ -189,6 +199,7 @@ return array(
             'Application\Controller\Organizations' => 'Application\Controller\OrganizationsController',
             //'Application\Controller\Hubs' => 'Application\Controller\HubsController',
             'Application\Controller\Time' => 'Application\Controller\TimeController'
+            // 'Application\Controller\Status' => 'Application\Controller\StatusController'
         ),
     ),
     'controller_plugins' => array(
