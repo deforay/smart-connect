@@ -17,7 +17,7 @@ class StatusController extends AbstractActionController
 
     public function indexAction()
     {
-        $this->layout()->setVariable('activeTab', 'config');
+        $this->layout()->setVariable('activeTab', 'status');
         $request = $this->getRequest();
         if ($request->isPost()) {
             $parameters = $request->getPost();
