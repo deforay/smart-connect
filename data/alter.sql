@@ -586,4 +586,5 @@ ALTER TABLE `dash_form_covid19` ADD UNIQUE( `sample_code`, `remote_sample_code`)
 ALTER TABLE `dash_vl_request_form` CHANGE `vldash_sync` `vldash_sync` INT(11) NULL DEFAULT '0';
 ALTER TABLE `dash_vl_request_form` CHANGE `vlsm_country_id` `vlsm_country_id` INT(11) NULL DEFAULT NULL;
 
-
+-- Thana 24-Jan-2022
+ALTER TABLE `dash_api_receiver_stats` ADD `lab_id` INT(11) NULL DEFAULT NULL AFTER `source`;

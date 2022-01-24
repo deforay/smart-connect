@@ -1084,4 +1084,10 @@ class CommonService
           }
           return $months;
      }
+
+     public function getAllDashApiReceiverStatsByGrid($parameters)
+     {
+          $statsDb = $this->sm->get('DashApiReceiverStatsTable');
+          return $statsDb->fetchAllDashApiReceiverStatsByGrid($parameters);
+     }
 }

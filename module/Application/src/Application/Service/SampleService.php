@@ -38,7 +38,7 @@ class SampleService
 
     public function checkSampleCode($sampleCode, $remoteSampleCode = null, $instanceCode = null, $dashTable = 'dash_vl_request_form')
     {
-        
+
         $sql = new Sql($this->dbAdapter);
         $sQuery = $sql->select()->from($dashTable);
         if (isset($instanceCode) && $instanceCode != "") {
@@ -57,7 +57,7 @@ class SampleService
 
     public function checkFacilityStateDistrictDetails($location, $parent)
     {
-        
+
         $sql = new Sql($this->dbAdapter);
         $sQuery = $sql->select()->from(array('l' => 'location_details'))
             ->where(array('l.parent_location' => $parent, 'l.location_name' => trim($location)));
@@ -68,7 +68,7 @@ class SampleService
 
     public function checkFacilityDetails($clinicName)
     {
-        
+
         $sql = new Sql($this->dbAdapter);
         $fQuery = $sql->select()->from('facility_details')->where(array('facility_name' => $clinicName));
         $fQueryStr = $sql->buildSqlString($fQuery);
@@ -77,7 +77,7 @@ class SampleService
     }
     public function checkFacilityTypeDetails($facilityTypeName)
     {
-        
+
         $sql = new Sql($this->dbAdapter);
         $fQuery = $sql->select()->from('facility_type')->where(array('facility_type_name' => $facilityTypeName));
         $fQueryStr = $sql->buildSqlString($fQuery);
@@ -86,7 +86,7 @@ class SampleService
     }
     public function checkTestingReson($testingReson)
     {
-        
+
         $sql = new Sql($this->dbAdapter);
         $tQuery = $sql->select()->from('r_vl_test_reasons')->where(array('test_reason_name' => $testingReson));
         $tQueryStr = $sql->buildSqlString($tQuery);
@@ -95,7 +95,7 @@ class SampleService
     }
     public function checkSampleStatus($testingStatus)
     {
-        
+
         $sql = new Sql($this->dbAdapter);
         $sQuery = $sql->select()->from('r_sample_status')->where(array('status_name' => $testingStatus));
         $sQueryStr = $sql->buildSqlString($sQuery);
@@ -104,7 +104,7 @@ class SampleService
     }
     public function checkSampleType($sampleType)
     {
-        
+
         $sql = new Sql($this->dbAdapter);
         $sQuery = $sql->select()->from('r_vl_sample_type')->where(array('sample_name' => $sampleType));
         $sQueryStr = $sql->buildSqlString($sQuery);
@@ -113,7 +113,7 @@ class SampleService
     }
     public function checkSampleRejectionReason($rejectReasonName)
     {
-        
+
         $sql = new Sql($this->dbAdapter);
         $sQuery = $sql->select()->from('r_vl_sample_rejection_reasons')->where(array('rejection_reason_name' => $rejectReasonName));
         $sQueryStr = $sql->buildSqlString($sQuery);
@@ -413,7 +413,7 @@ class SampleService
 
     public function getSampleInfo($params, $dashTable = 'dash_vl_request_form')
     {
-        
+
         $sql = new Sql($this->dbAdapter);
         $sQuery = $sql->select()->from(array('vl' => $dashTable))
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name', 'facility_code', 'facility_logo'), 'left')
@@ -436,7 +436,7 @@ class SampleService
 
         if (isset($queryContainer->resultQuery)) {
             try {
-                
+
                 $sql = new Sql($this->dbAdapter);
                 $sQueryStr = $sql->buildSqlString($queryContainer->resultQuery);
                 $sResult = $this->dbAdapter->query($sQueryStr, $this->dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -578,7 +578,7 @@ class SampleService
 
         if (isset($queryContainer->resultQuery)) {
             try {
-                
+
                 $sql = new Sql($this->dbAdapter);
                 $hQueryStr = $sql->buildSqlString($queryContainer->highVlSampleQuery);
                 //error_log($hQueryStr);die;
@@ -760,7 +760,7 @@ class SampleService
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
             if (isset($queryContainer->sampleResultQuery)) {
                 try {
-                    
+
                     $sql = new Sql($this->dbAdapter);
                     $sQueryStr = $sql->buildSqlString($queryContainer->sampleResultQuery);
                     $sResult = $this->dbAdapter->query($sQueryStr, $this->dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -874,7 +874,7 @@ class SampleService
 
         if (isset($queryContainer->labTestedSampleQuery)) {
             try {
-                
+
                 $sql = new Sql($this->dbAdapter);
                 $sQueryStr = $sql->buildSqlString($queryContainer->labTestedSampleQuery);
                 $sResult = $this->dbAdapter->query($sQueryStr, $this->dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -994,7 +994,7 @@ class SampleService
 
         if (isset($queryContainer->sampleResultTestedTATQuery)) {
             try {
-                
+
                 $sql = new Sql($this->dbAdapter);
                 $sQueryStr = $sql->buildSqlString($queryContainer->sampleResultTestedTATQuery);
                 $sResult = $this->dbAdapter->query($sQueryStr, $this->dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -1137,7 +1137,7 @@ class SampleService
 
         if (isset($queryContainer->resultsAwaitedQuery)) {
             try {
-                
+
                 $sql = new Sql($this->dbAdapter);
                 $sQueryStr = $sql->buildSqlString($queryContainer->resultsAwaitedQuery);
                 $sResult = $this->dbAdapter->query($sQueryStr, $this->dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -1500,7 +1500,7 @@ class SampleService
         $input = $this->config['db']['dsn'];
         preg_match('~=(.*?);~', $input, $output);
         $dbname = $output[1];
-        
+
 
         $fileName = $_FILES['vlFile']['name'];
         $ranNumber = str_pad(rand(0, pow(10, 6) - 1), 6, '0', STR_PAD_LEFT);
@@ -2081,14 +2081,14 @@ class SampleService
                 //check testing reason
                 $data['result_status'] = null;
                 if (trim($row['TestStatus']) != '') {
-                    if($row['TestStatus'] == 'Complete' || $row['TestStatus'] == 'Authorized'){
+                    if ($row['TestStatus'] == 'Complete' || $row['TestStatus'] == 'Authorized') {
                         $row['TestStatus'] = 'Accepted';
                         $data['result_status'] = 7;
-                    }else if($row['TestStatus'] == 'Cancelled'){
+                    } else if ($row['TestStatus'] == 'Cancelled') {
                         $row['TestStatus'] = 'Rejected';
                         $data['result_status'] = 4;
                     }
-                    if(!empty($data['result_status'])){
+                    if (!empty($data['result_status'])) {
                         $sampleStatusResult = $this->checkSampleStatus(trim($row['TestStatus']));
                         if ($sampleStatusResult) {
                             $data['result_status'] = $sampleStatusResult['status_id'];
@@ -2161,13 +2161,14 @@ class SampleService
         // Track API Records
         $apiData = JsonMachine::fromString($params, '/timestamp');
         $timestamp = iterator_to_array($apiData)['timestamp'];
-        $timestamp = ($timestamp != false && !empty($timestamp)) ? $timestamp : time();        
+        $timestamp = ($timestamp != false && !empty($timestamp)) ? $timestamp : time();
         $apiTrackData = array(
             'tracking_id'                   => $timestamp,
             'received_on'                   => $this->commonService->getDateTime(),
             'number_of_records_received'    => $counter,
             'number_of_records_processed'   => ($counter - count($failedImports)),
             'source'                        => 'WEBLIMS-VL',
+            'lab_id'                        => $data['lab_id'],
             'status'                        => $status
         );
         $apiTrackDb->insert($apiTrackData);
@@ -2433,6 +2434,7 @@ class SampleService
             'number_of_records_received'    => count($params['data']),
             'number_of_records_processed'   => (count($params['data']) - count($return)),
             'source'                        => 'API-VIRAL-LOAD',
+            'lab_id'                        => $data['lab_id'],
             'status'                        => $status
         );
         $trackResult = $apiTrackDb->select(array('tracking_id' => $params['timestamp']))->current();

@@ -1669,6 +1669,7 @@ class EidSampleService
             'number_of_records_received'    => count($params['data']),
             'number_of_records_processed'   => (count($params['data']) - count($return)),
             'source'                        => 'API-EID',
+            'lab_id'                        => $data['lab_id'],
             'status'                        => $status
         );
         $trackResult = $apiTrackDb->select(array('tracking_id' => $params['timestamp']))->current();
