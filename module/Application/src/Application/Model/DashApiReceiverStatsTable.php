@@ -98,8 +98,9 @@ class DashApiReceiverStatsTable extends AbstractTableGateway
          */
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $sQuery = $sql->select()->from(array('api' => $this->table))
-            ->join(array('f' => 'facility_details'), "api.lab_id=f.facility_id", array("labName" => "facility_name"), 'left');
+        $sQuery = $sql->select()->from(array('f' => "facility_details"))->columns(array("facility_id", "labName" => "facility_name"))
+            ->join(array('sync' => $this->table), "sync.lab_id=f.facility_id", array("*"), 'left')
+            ->where(array("facility_type" => 2));
 
         if (isset($sWhere) && $sWhere != "") {
             $sQuery->where($sWhere);
@@ -110,7 +111,7 @@ class DashApiReceiverStatsTable extends AbstractTableGateway
         }
         if (isset($parameters['type']) && $parameters['type'] == "status") {
             $sQuery->order("received_on DESC");
-            $sQuery->group("lab_id");
+            $sQuery->group("f.facility_id");
         }
 
         if (isset($sLimit) && isset($sOffset)) {
@@ -137,11 +138,16 @@ class DashApiReceiverStatsTable extends AbstractTableGateway
             "iTotalDisplayRecords" => $iFilteredTotal,
             "aaData" => array()
         );
-
+        $xdays = 10;
         foreach ($rResult as $key => $aRow) {
             $row = array();
-            $row[] = ($key + 1);
-            $row[] = $aRow['labName'];
+            $max = date("y-m-d HH:mi:ss", strtotime($aRow['received_on'] . "+" . $xdays . " days"));
+            if (date("y-m-d HH:mi:ss") >= $max) {
+                $row[] = "<status-indicator negative pulse></status-indicator>";
+            } else {
+                $row[] = "<status-indicator positive pulse></status-indicator>";
+            }
+            $row[] = "<a href='/status/lab/" . base64_encode($aRow['facility_id']) . "'>" . $aRow['labName'] . "</a>";
             $row[] = date("d-M-Y (h:i: a)", strtotime($aRow['received_on']));
             if (isset($parameters['type']) && $parameters['type'] == "sync") {
                 $row[] = $aRow['number_of_records_received'];
@@ -150,5 +156,17 @@ class DashApiReceiverStatsTable extends AbstractTableGateway
             $output['aaData'][] = $row;
         }
         return $output;
+    }
+
+    public function fetchStatusDetails($statusId)
+    {
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $sQuery = $sql->select()->from(array('f' => "facility_details"))->columns(array("facility_id", "labName" => "facility_name"))
+            ->join(array('sync' => $this->table), "sync.lab_id=f.facility_id", array("*"), 'left')
+            ->where(array("facility_type" => 2, "facility_id" => $statusId))
+            ->group(array("received_on", "lab_id"));
+        $sQueryStr = $sql->buildSqlString($sQuery);
+        return $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
     }
 }

@@ -1,0 +1,100 @@
+<?php
+/* echo "<pre>";
+print_r($result);
+die; */
+?>
+<script src="http://code.highcharts.com/highcharts.js"></script>
+<script src="http://code.highcharts.com/modules/drilldown.js"></script>
+<div id="container" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+<script>
+    $(function() {
+        var unplanneddata = [
+            <?php foreach ($result as $row) { ?> {
+                    name: '<?php echo date("d-M-Y (h:i: a)", strtotime($row['received_on'])); ?>',
+                    y: <?php echo $row['number_of_records_received']; ?>,
+                    drilldown: '<?php echo str_replace(" ", "-", strtolower($row['labName'])); ?>',
+                },
+            <?php } ?>
+        ];
+
+        var planneddata = [
+            <?php foreach ($result as $row) { ?> {
+                    name: '<?php echo date("d-M-Y (h:i: a)", strtotime($row['received_on'])); ?>',
+                    y: <?php echo $row['number_of_records_processed']; ?>,
+                    drilldown: '<?php echo str_replace(" ", "-", strtolower($row['labName'])); ?>',
+                },
+            <?php } ?>
+        ];
+
+        $('#container').highcharts({
+            chart: {
+                type: 'column',
+                margin: 75,
+                options3d: {
+                    enabled: true,
+                    alpha: 15,
+                    beta: 15,
+                    depth: 50,
+                    viewDistance: 25
+                }
+            },
+            title: {
+                text: 'Sync Status for <?php echo $result[0]['labName']; ?>'
+            },
+            subtitle: {
+                text: 'Click the bar to view more.'
+            },
+            xAxis: {
+                type: 'category'
+            },
+            yAxis: {
+                title: {
+                    text: 'Total Number'
+                }
+            },
+            legend: {
+                enabled: false
+            },
+            plotOptions: {
+                series: {
+                    borderWidth: 0,
+                    dataLabels: {
+                        enabled: true,
+                        format: '{point.y}'
+                    }
+                }
+            },
+
+            tooltip: {
+                headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
+                pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y}</b> Number of days<br/>'
+            },
+            series: [{
+                    name: 'Number of records received',
+
+                    colorByPoint: true,
+                    data: unplanneddata
+                },
+                {
+                    name: 'Number of records processed',
+                    colorByPoint: true,
+                    data: planneddata
+                }
+            ],
+
+            drilldown: {
+                series: [{
+
+                    id: '<?php echo str_replace(" ", "-", strtolower($result[0]['labName'])); ?>',
+                    name: 'Sync Details',
+                    data: [
+                        <?php foreach ($result as $row) { ?>['Received', <?php echo $row['number_of_records_received']; ?>],
+                            ['Processed', <?php echo $row['number_of_records_processed']; ?>]
+                        <?php } ?>
+                    ]
+                }]
+            }
+        })
+
+    });
+</script>

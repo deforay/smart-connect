@@ -199,7 +199,6 @@ return array(
             'Application\Controller\Organizations' => 'Application\Controller\OrganizationsController',
             //'Application\Controller\Hubs' => 'Application\Controller\HubsController',
             'Application\Controller\Time' => 'Application\Controller\TimeController'
-            // 'Application\Controller\Status' => 'Application\Controller\StatusController'
         ),
     ),
     'controller_plugins' => array(
