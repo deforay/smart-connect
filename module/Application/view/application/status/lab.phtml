@@ -2,12 +2,95 @@
 /* echo "<pre>";
 print_r($result);
 die; */
+$received = array();
+$processed = array();
+foreach ($result as $row) {
+    $received[] = $row['number_of_records_received'];
+    $processed[] = $row['number_of_records_processed'];
+    $dateTime[] = "'" . date("d-M-Y (h:i: a)", strtotime($row['received_on'])) . "'";
+}
 ?>
-<script src="http://code.highcharts.com/highcharts.js"></script>
-<script src="http://code.highcharts.com/modules/drilldown.js"></script>
+
+<style>
+    #container {
+        height: 400px;
+    }
+</style>
+
+<script src="https://code.highcharts.com/highcharts.js"></script>
 <div id="container" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
-<script>
+<div class="portlet box blue">
+    <div class="portlet-title">
+        <div class="caption">
+            <i class="fa fa-cogs"></i><?php echo $this->translate('Synced Details For Lab') . ' (' . $result[0]['labName'] . ')'; ?>
+        </div>
+    </div>
+    <div class="portlet-body">
+        <div class="table-toolbar">
+            <table id="syncTable" class="table table-striped table-bordered table-hover table-checkable order-column">
+                <thead>
+                    <tr>
+                        <th> <?php echo $this->translate('Status'); ?> </th>
+                        <th> <?php echo $this->translate('Received On'); ?> </th>
+                        <th> <?php echo $this->translate('No. of Records received'); ?> </th>
+                        <th> <?php echo $this->translate('No. of records processed'); ?> </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="5" class="dataTables_empty">Loading data from server</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    /* Table initialisation */
+    sTable = null;
     $(function() {
+
+        sTable = $('#syncTable').dataTable({
+            "bAutoWidth": false,
+            "bProcessing": true,
+            "bServerSide": true,
+            "aoColumns": [{
+                    "sClass": "center"
+                },
+                {
+                    "sClass": "center"
+                },
+                {
+                    "sClass": "center"
+                },
+                {
+                    "sClass": "center"
+                }
+            ],
+            "sAjaxSource": "<?php echo $this->url('status', array('action' => 'index')); ?>",
+            "fnServerData": function(sSource, aoData, fnCallback) {
+                aoData.push({
+                    "name": "from",
+                    "value": "lab"
+                });
+                aoData.push({
+                    "name": "type",
+                    "value": "sync"
+                });
+                aoData.push({
+                    "name": "labId",
+                    "value": "<?php echo $result[0]['facility_id']; ?>"
+                });
+                $.ajax({
+                    "dataType": 'json',
+                    "type": "POST",
+                    "url": sSource,
+                    "data": aoData,
+                    "success": fnCallback
+                });
+            }
+        });
+
         var unplanneddata = [
             <?php foreach ($result as $row) { ?> {
                     name: '<?php echo date("d-M-Y (h:i: a)", strtotime($row['received_on'])); ?>',
@@ -26,75 +109,33 @@ die; */
             <?php } ?>
         ];
 
-        $('#container').highcharts({
-            chart: {
-                type: 'column',
-                margin: 75,
-                options3d: {
-                    enabled: true,
-                    alpha: 15,
-                    beta: 15,
-                    depth: 50,
-                    viewDistance: 25
-                }
-            },
+        Highcharts.chart('container', {
             title: {
                 text: 'Sync Status for <?php echo $result[0]['labName']; ?>'
             },
-            subtitle: {
-                text: 'Click the bar to view more.'
-            },
-            xAxis: {
-                type: 'category'
-            },
-            yAxis: {
-                title: {
-                    text: 'Total Number'
-                }
-            },
-            legend: {
+            credits: {
                 enabled: false
             },
-            plotOptions: {
-                series: {
-                    borderWidth: 0,
-                    dataLabels: {
-                        enabled: true,
-                        format: '{point.y}'
-                    }
-                }
-            },
 
-            tooltip: {
-                headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
-                pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y}</b> Number of days<br/>'
-            },
+            xAxis: [{
+                "categories": [<?php echo implode(",", $dateTime); ?>],
+                "labels": {
+                    "style": {
+                        "fontFamily": "Tahoma",
+                        "fontSize": 13
+                    },
+                    "maxStaggerLines": 10
+                }
+            }],
+
             series: [{
-                    name: 'Number of records received',
-
-                    colorByPoint: true,
-                    data: unplanneddata
-                },
-                {
-                    name: 'Number of records processed',
-                    colorByPoint: true,
-                    data: planneddata
-                }
-            ],
-
-            drilldown: {
-                series: [{
-
-                    id: '<?php echo str_replace(" ", "-", strtolower($result[0]['labName'])); ?>',
-                    name: 'Sync Details',
-                    data: [
-                        <?php foreach ($result as $row) { ?>['Received', <?php echo $row['number_of_records_received']; ?>],
-                            ['Processed', <?php echo $row['number_of_records_processed']; ?>]
-                        <?php } ?>
-                    ]
-                }]
-            }
-        })
+                name: 'Recieved Data',
+                data: [<?php echo implode(",", $received); ?>]
+            }, {
+                name: 'Processed Data',
+                data: [<?php echo implode(",", $processed); ?>]
+            }],
+        });
 
     });
 </script>

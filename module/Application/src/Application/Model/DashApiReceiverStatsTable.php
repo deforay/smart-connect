@@ -106,6 +106,10 @@ class DashApiReceiverStatsTable extends AbstractTableGateway
             $sQuery->where($sWhere);
         }
 
+        if (isset($parameters['labId']) && $parameters['labId'] != "") {
+            $sQuery->where(array("facility_id" => $parameters['labId']));
+        }
+
         if (isset($sOrder) && $sOrder != "") {
             $sQuery->order($sOrder);
         }
@@ -147,7 +151,9 @@ class DashApiReceiverStatsTable extends AbstractTableGateway
             } else {
                 $row[] = "<status-indicator positive pulse></status-indicator>";
             }
-            $row[] = "<a href='/status/lab/" . base64_encode($aRow['facility_id']) . "'>" . $aRow['labName'] . "</a>";
+            if (!isset($parameters['from']) && $parameters['from'] != "lab") {
+                $row[] = "<a href='/status/lab/" . base64_encode($aRow['facility_id']) . "'>" . $aRow['labName'] . "</a>";
+            }
             $row[] = date("d-M-Y (h:i: a)", strtotime($aRow['received_on']));
             if (isset($parameters['type']) && $parameters['type'] == "sync") {
                 $row[] = $aRow['number_of_records_received'];
