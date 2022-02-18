@@ -253,9 +253,9 @@ class Module
 					$sampleTable = isset($session->sampleTable) ? $session->sampleTable :  null;
 					$dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');
 					$commonService = $sm->getServiceLocator()->get('CommonService');
-					$tableObj = new SampleTable($dbAdapter, $sm, $mappedFacilities, $sampleTable,$commonService);
+					$tableObj = new SampleTable($dbAdapter, $sm, $mappedFacilities, $sampleTable, $commonService);
 					$storage = $sm->get('Cache\Persistent');
-					
+
 					return new ObjectCache(
 						$storage,
 						new PatternOptions([
@@ -270,20 +270,20 @@ class Module
 					$sampleTable = isset($session->sampleTable) ? $session->sampleTable :  null;
 					$dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');
 					$commonService = $sm->getServiceLocator()->get('CommonService');
-					return new SampleTable($dbAdapter, $sm, $mappedFacilities, $sampleTable,$commonService);
+					return new SampleTable($dbAdapter, $sm, $mappedFacilities, $sampleTable, $commonService);
 				},
 				'FacilityTable' => function ($sm) {
 					$dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');
 					$commonService = $sm->getServiceLocator()->get('CommonService');
 					$tableObj = new FacilityTable($dbAdapter, $sm, $commonService);
-					
+
 					$storage = $sm->get('Cache\Persistent');
 					return new ObjectCache(
 						$storage,
 						new PatternOptions([
 							'object' => $tableObj
 						])
-					);				
+					);
 				},
 				'FacilityTableWithoutCache' => function ($sm) {
 					$dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');
@@ -312,7 +312,7 @@ class Module
 				}, 'GlobalTable' => function ($sm) {
 					$dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');
 					$commonService = $sm->getServiceLocator()->get('CommonService');
-					return new GlobalTable($dbAdapter, $sm, $commonService);				
+					return new GlobalTable($dbAdapter, $sm, $commonService);
 				}, 'ArtCodeTable' => function ($sm) {
 					$dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');
 					$table = new ArtCodeTable($dbAdapter);
@@ -473,6 +473,10 @@ class Module
 				'Application\Controller\Cron' => function ($sm) {
 					$sampleService = $sm->getServiceLocator()->get('SampleService');
 					return new \Application\Controller\CronController($sampleService);
+				},
+				'Application\Controller\Status' => function ($sm) {
+					$commonService = $sm->getServiceLocator()->get('CommonService');
+					return new \Application\Controller\StatusController($commonService);
 				},
 				'Application\Controller\Config' => function ($sm) {
 					$configService = $sm->getServiceLocator()->get('ConfigService');

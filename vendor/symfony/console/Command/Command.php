@@ -319,12 +319,13 @@ class Command
      *
      * @see execute()
      */
-    public function setCode(callable $code): static
+    public function setCode(callable $code)
     {
         if ($code instanceof \Closure) {
             $r = new \ReflectionFunction($code);
             if (null === $r->getClosureThis()) {
-                set_error_handler(static function () {});
+                set_error_handler(static function () {
+                });
                 try {
                     if ($c = \Closure::bind($code, $this)) {
                         $code = $c;
@@ -374,7 +375,7 @@ class Command
      *
      * @return $this
      */
-    public function setDefinition(array|InputDefinition $definition): static
+    public function setDefinition(InputDefinition $definition)
     {
         if ($definition instanceof InputDefinition) {
             $this->definition = $definition;
@@ -405,7 +406,7 @@ class Command
      */
     public function getNativeDefinition(): InputDefinition
     {
-        return $this->definition ?? throw new LogicException(sprintf('Command class "%s" is not correctly initialized. You probably forgot to call the parent constructor.', static::class));
+        return $this->definition;
     }
 
     /**
@@ -418,7 +419,7 @@ class Command
      *
      * @return $this
      */
-    public function addArgument(string $name, int $mode = null, string $description = '', mixed $default = null): static
+    public function addArgument(string $name, int $mode = null, string $description = '', mixed $default = null)
     {
         $this->definition->addArgument(new InputArgument($name, $mode, $description, $default));
         if (null !== $this->fullDefinition) {
@@ -439,7 +440,7 @@ class Command
      *
      * @return $this
      */
-    public function addOption(string $name, string|array $shortcut = null, int $mode = null, string $description = '', mixed $default = null): static
+    public function addOption(string $name, string $shortcut = null, int $mode = null, string $description = '', mixed $default = null)
     {
         $this->definition->addOption(new InputOption($name, $shortcut, $mode, $description, $default));
         if (null !== $this->fullDefinition) {
@@ -461,7 +462,7 @@ class Command
      *
      * @throws InvalidArgumentException When the name is invalid
      */
-    public function setName(string $name): static
+    public function setName(string $name)
     {
         $this->validateName($name);
 
@@ -478,7 +479,7 @@ class Command
      *
      * @return $this
      */
-    public function setProcessTitle(string $title): static
+    public function setProcessTitle(string $title)
     {
         $this->processTitle = $title;
 
@@ -498,7 +499,7 @@ class Command
      *
      * @return $this
      */
-    public function setHidden(bool $hidden = true): static
+    public function setHidden(bool $hidden = true)
     {
         $this->hidden = $hidden;
 
@@ -518,7 +519,7 @@ class Command
      *
      * @return $this
      */
-    public function setDescription(string $description): static
+    public function setDescription(string $description)
     {
         $this->description = $description;
 
@@ -538,7 +539,7 @@ class Command
      *
      * @return $this
      */
-    public function setHelp(string $help): static
+    public function setHelp(string $help)
     {
         $this->help = $help;
 
@@ -568,7 +569,7 @@ class Command
         ];
         $replacements = [
             $name,
-            $isSingleCommand ? $_SERVER['PHP_SELF'] : $_SERVER['PHP_SELF'].' '.$name,
+            $isSingleCommand ? $_SERVER['PHP_SELF'] : $_SERVER['PHP_SELF'] . ' ' . $name,
         ];
 
         return str_replace($placeholders, $replacements, $this->getHelp() ?: $this->getDescription());
@@ -583,7 +584,7 @@ class Command
      *
      * @throws InvalidArgumentException When an alias is invalid
      */
-    public function setAliases(iterable $aliases): static
+    public function setAliases(iterable $aliases)
     {
         $list = [];
 
@@ -626,7 +627,7 @@ class Command
      *
      * @return $this
      */
-    public function addUsage(string $usage): static
+    public function addUsage(string $usage)
     {
         if (!str_starts_with($usage, $this->name)) {
             $usage = sprintf('%s %s', $this->name, $usage);

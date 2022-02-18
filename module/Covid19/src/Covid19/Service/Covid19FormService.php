@@ -110,7 +110,7 @@ class Covid19FormService
                 }
             }
 
-            
+
             if (count($apiData['data'])  == $numRows) {
                 $status = "success";
             } else if ((count($apiData['data']) - $numRows) != 0) {
@@ -124,6 +124,7 @@ class Covid19FormService
                 'number_of_records_received'    => count($apiData['data']),
                 'number_of_records_processed'   => $numRows,
                 'source'                        => 'VLSM-Covid-19',
+                'lab_id'                        => $data['lab_id'],
                 'status'                        => $status
             );
             $apiTrackDb->insert($apiTrackData);
@@ -147,7 +148,7 @@ class Covid19FormService
         try {
             // Debug::dump($_FILES['covid19File']);die;
             $apiData = array();
-            
+
             $sampleDb = $this->sm->get('Covid19FormTableWithoutCache');
             $facilityTypeDb = $this->sm->get('FacilityTypeTable');
             $testStatusDb = $this->sm->get('SampleStatusTable');
@@ -560,7 +561,7 @@ class Covid19FormService
     {
         $queryContainer = new Container('query');
         $translator = $this->sm->get('translator');
-        
+
         if (isset($queryContainer->indicatorSummaryQuery)) {
             try {
                 $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
@@ -685,7 +686,7 @@ class Covid19FormService
         if (isset($logincontainer->Covid19SampleTable) && $logincontainer->Covid19SampleTable != "") {
             $dashTable = $logincontainer->Covid19SampleTable;
         }
-        
+
 
         if (!isset($queryContainer->fetchAllPositiveRateByFacility)) {
 
@@ -1043,7 +1044,7 @@ class Covid19FormService
     {
         $queryContainer = new Container('query');
         $translator = $this->sm->get('translator');
-        
+
         if (isset($queryContainer->resultsAwaitedQuery)) {
             try {
                 $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
@@ -1221,7 +1222,7 @@ class Covid19FormService
     {
         $queryContainer = new Container('query');
         $translator = $this->sm->get('translator');
-        
+
         if (isset($queryContainer->resultQuery)) {
             try {
                 $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
@@ -1368,7 +1369,7 @@ class Covid19FormService
     {
         $queryContainer = new Container('query');
         $translator = $this->sm->get('translator');
-        
+
         if (isset($queryContainer->labTestedSampleQuery)) {
             try {
                 $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
@@ -1500,7 +1501,7 @@ class Covid19FormService
     public function saveCovid19DataFromAPI($params)
     {
         // print_r("Hloo");die;
-        
+
         $sampleDb = $this->sm->get('Covid19FormTableWithoutCache');
         $facilityDb = $this->sm->get('FacilityTable');
         $testStatusDb = $this->sm->get('SampleStatusTable');
@@ -1677,6 +1678,7 @@ class Covid19FormService
             'number_of_records_received'    => count($params['data']),
             'number_of_records_processed'   => (count($params['data']) - count($return)),
             'source'                        => 'API-COVID-19',
+            'lab_id'                        => $data['lab_id'],
             'status'                        => $status
         );
         $trackResult = $apiTrackDb->select(array('tracking_id' => $params['timestamp']))->current();

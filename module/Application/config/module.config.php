@@ -162,6 +162,16 @@ return array(
                     ),
                 ),
             ),
+            'status' => array(
+                'type'    => 'segment',
+                'options' => array(
+                    'route'    => '/status[/][:action][/:id]',
+                    'defaults' => array(
+                        'controller' => 'Application\Controller\Status',
+                        'action' => 'index',
+                    ),
+                ),
+            ),
         ),
     ),
     'service_manager' => array(

@@ -54,11 +54,10 @@ if (!isset($activeTab)) {
     <link href="<?php echo $this->basePath('assets/global/plugins/select2/css/select2.min.css'); ?>" rel="stylesheet" type="text/css" />
     <link href="<?php echo $this->basePath('assets/global/css/highcharts.css'); ?>" rel="stylesheet" type="text/css" />
     <link href="<?php echo $this->basePath('assets/bootstrap-toggle/bootstrap-toggle.min.css'); ?>" rel="stylesheet">
+    <link href="<?php echo $this->basePath('assets/pages/css/status-indicator.css'); ?>" rel="stylesheet">
 
     <style>
-        <?php if ($activeTab != 'duplicate-data') { ?>
-        
-        table.dataTable td.sorting_1,
+        <?php if ($activeTab != 'duplicate-data') { ?>table.dataTable td.sorting_1,
         table.dataTable td.sorting_2,
         table.dataTable td.sorting_3,
         table.dataTable th.sorting_1,
@@ -67,11 +66,9 @@ if (!isset($activeTab)) {
             background: #fbfcfd !important
         }
 
-        <?php } 
-        
-        if (isset($logincontainer->useCurrentTables) && $logincontainer->useCurrentTables == true) { ?>
-        
-        body,
+        <?php }
+
+        if (isset($logincontainer->useCurrentTables) && $logincontainer->useCurrentTables == true) { ?>body,
         .nav-item,
         .page-header.navbar,
         .portlet.blue,
@@ -80,11 +77,7 @@ if (!isset($activeTab)) {
             background-image: url('/assets/img/patterns/blue-pattern.png');
         }
 
-        <?php } ?>
-        
-        
-        
-        .resize-page-logo {
+        <?php } ?>.resize-page-logo {
             width: auto !important;
         }
 
@@ -203,10 +196,10 @@ if (!isset($activeTab)) {
                     </li>
                     <!-- DOC: To remove the search box from the sidebar you just need to completely remove the below "sidebar-search-wrapper" LI element -->
                     <?php $vlRoleCheck = false;
-                    if ($logincontainer->role == 1 || $logincontainer->role == 2 || $logincontainer->role == 3 || $logincontainer->role == 5) { 
+                    if ($logincontainer->role == 1 || $logincontainer->role == 2 || $logincontainer->role == 3 || $logincontainer->role == 5) {
                         $vlRoleCheck = true;
                     }
-                    if($vlRoleCheck && $activeModule['vl']){?>
+                    if ($vlRoleCheck && $activeModule['vl']) { ?>
                         <li class="nav-item <?php echo ($activeTab == 'summary' || $activeTab == 'laboratory' || $activeTab == 'clinics') ? " active open " : ""; ?>">
                             <a href="javascript:;" class="nav-link nav-toggle">
                                 <i class="fa fa-flask"></i>
@@ -215,86 +208,92 @@ if (!isset($activeTab)) {
                             </a>
                             <ul class="sub-menu">
                                 <?php if ($logincontainer->role == 1 || $logincontainer->role == 5) { ?>
-                                <li class="nav-item start <?php echo ($activeTab == 'summary') ? " active open" : ""; ?>">
-                                    <a href="<?php echo $this->url('summary', array('action' => 'dashboard')) ?>" class="nav-link ">
-                                        <i class="fa fa-angle-right"></i> <span class="title"><?php echo $this->translate('Summary'); ?></span>
-                                    </a>
-                                </li>
-                                <?php } if ($logincontainer->role == 1 || $logincontainer->role == 2 || $logincontainer->role == 5) { ?>
-                                <li class="nav-item end <?php echo ($activeTab == 'laboratory') ? " active open" : ""; ?>">
-                                    <a href="<?php echo $this->url('laboratory', array('action' => 'dashboard')) ?>" class="nav-link ">
-                                        <i class="fa fa-angle-right"></i> <span class="title"><?php echo $this->translate('Labs Dashboard'); ?></span>
-                                    </a>
-                                </li>
-                                <?php } if ($logincontainer->role == 1 || $logincontainer->role == 3 || $logincontainer->role == 5) { ?>
-                                <li class="nav-item end <?php echo ($activeTab == 'clinics') ? " active open" : ""; ?>">
-                                    <a href="<?php echo $this->url('clinics', array('action' => 'dashboard')) ?>" class="nav-link ">
-                                        <i class="fa fa-angle-right"></i> <span class="title"><?php echo $this->translate('Clinics Dashboard'); ?></span>
-                                    </a>
-                                </li>
+                                    <li class="nav-item start <?php echo ($activeTab == 'summary') ? " active open" : ""; ?>">
+                                        <a href="<?php echo $this->url('summary', array('action' => 'dashboard')) ?>" class="nav-link ">
+                                            <i class="fa fa-angle-right"></i> <span class="title"><?php echo $this->translate('Summary'); ?></span>
+                                        </a>
+                                    </li>
+                                <?php }
+                                if ($logincontainer->role == 1 || $logincontainer->role == 2 || $logincontainer->role == 5) { ?>
+                                    <li class="nav-item end <?php echo ($activeTab == 'laboratory') ? " active open" : ""; ?>">
+                                        <a href="<?php echo $this->url('laboratory', array('action' => 'dashboard')) ?>" class="nav-link ">
+                                            <i class="fa fa-angle-right"></i> <span class="title"><?php echo $this->translate('Labs Dashboard'); ?></span>
+                                        </a>
+                                    </li>
+                                <?php }
+                                if ($logincontainer->role == 1 || $logincontainer->role == 3 || $logincontainer->role == 5) { ?>
+                                    <li class="nav-item end <?php echo ($activeTab == 'clinics') ? " active open" : ""; ?>">
+                                        <a href="<?php echo $this->url('clinics', array('action' => 'dashboard')) ?>" class="nav-link ">
+                                            <i class="fa fa-angle-right"></i> <span class="title"><?php echo $this->translate('Clinics Dashboard'); ?></span>
+                                        </a>
+                                    </li>
                                 <?php } ?>
                             </ul>
                         </li>
                     <?php } ?>
-                    <?php if($vlRoleCheck && $activeModule['eid']) { ?>
-                    <li class="nav-item <?php echo ($activeTab == 'eid-summary' || $activeTab == 'eid-labs' || $activeTab == 'eid-clinics' || $activeTab == 'eid-poc-labs') ? " active open " : ""; ?>">
-                        <a href="javascript:;" class="nav-link nav-toggle">
-                            <i class="fa fa-child"></i>
-                            <span class="title"><?php echo $this->translate('EID'); ?></span>
-                            <span class="arrow"></span>
-                        </a>
-                        <ul class="sub-menu">
-                            <?php if ($logincontainer->role == 1 || $logincontainer->role == 5) { ?>
-                            <li class="nav-item start <?php echo ($activeTab == 'eid-summary') ? " active open" : ""; ?>">
-                                <a href="<?php echo $this->url('eid-summary', array('action' => 'dashboard')) ?>" class="nav-link ">
-                                    <i class="fa fa-angle-right"></i> <span class="title"><?php echo $this->translate('Summary'); ?></span>
-                                </a>
-                            </li>
-                            <?php } if ($logincontainer->role == 1 || $logincontainer->role == 2 || $logincontainer->role == 5) { ?>
-                            <li class="nav-item end <?php echo ($activeTab == 'eid-labs') ? " active open" : ""; ?>">
-                                <a href="<?php echo $this->url('eid-labs', array('action' => 'dashboard')) ?>" class="nav-link ">
-                                    <i class="fa fa-angle-right"></i> <span class="title"><?php echo $this->translate('Labs Dashboard'); ?></span>
-                                </a>
-                            </li>
-                            <?php if(isset($activeModule['poc']) && $activeModule['poc']  ) { ?>
-                            <li class="nav-item end <?php echo ($activeTab == 'eid-poc-labs') ? " active open" : ""; ?>">
-                                <a href="<?php echo $this->url('eid-labs', array('action' => 'poc-labs-dashboard')) ?>" class="nav-link ">
-                                    <i class="fa fa-angle-right"></i> <span class="title"><?php echo $this->translate('POC Labs Dashboard'); ?></span>
-                                </a>
-                            </li>
-                            <?php } ?>
-                            <li class="nav-item end <?php echo ($activeTab == 'eid-clinics') ? " active open" : ""; ?>">
-                                <a href="<?php echo $this->url('eid-clinics', array('action' => 'dashboard')) ?>" class="nav-link ">
-                                    <i class="fa fa-angle-right"></i> <span class="title"><?php echo $this->translate('Clinics Dashboard'); ?></span>
-                                </a>
-                            </li>
-                            <?php }?>
-                        </ul>
-                    </li>
+                    <?php if ($vlRoleCheck && $activeModule['eid']) { ?>
+                        <li class="nav-item <?php echo ($activeTab == 'eid-summary' || $activeTab == 'eid-labs' || $activeTab == 'eid-clinics' || $activeTab == 'eid-poc-labs') ? " active open " : ""; ?>">
+                            <a href="javascript:;" class="nav-link nav-toggle">
+                                <i class="fa fa-child"></i>
+                                <span class="title"><?php echo $this->translate('EID'); ?></span>
+                                <span class="arrow"></span>
+                            </a>
+                            <ul class="sub-menu">
+                                <?php if ($logincontainer->role == 1 || $logincontainer->role == 5) { ?>
+                                    <li class="nav-item start <?php echo ($activeTab == 'eid-summary') ? " active open" : ""; ?>">
+                                        <a href="<?php echo $this->url('eid-summary', array('action' => 'dashboard')) ?>" class="nav-link ">
+                                            <i class="fa fa-angle-right"></i> <span class="title"><?php echo $this->translate('Summary'); ?></span>
+                                        </a>
+                                    </li>
+                                <?php }
+                                if ($logincontainer->role == 1 || $logincontainer->role == 2 || $logincontainer->role == 5) { ?>
+                                    <li class="nav-item end <?php echo ($activeTab == 'eid-labs') ? " active open" : ""; ?>">
+                                        <a href="<?php echo $this->url('eid-labs', array('action' => 'dashboard')) ?>" class="nav-link ">
+                                            <i class="fa fa-angle-right"></i> <span class="title"><?php echo $this->translate('Labs Dashboard'); ?></span>
+                                        </a>
+                                    </li>
+                                    <?php if (isset($activeModule['poc']) && $activeModule['poc']) { ?>
+                                        <li class="nav-item end <?php echo ($activeTab == 'eid-poc-labs') ? " active open" : ""; ?>">
+                                            <a href="<?php echo $this->url('eid-labs', array('action' => 'poc-labs-dashboard')) ?>" class="nav-link ">
+                                                <i class="fa fa-angle-right"></i> <span class="title"><?php echo $this->translate('POC Labs Dashboard'); ?></span>
+                                            </a>
+                                        </li>
+                                    <?php } ?>
+                                    <li class="nav-item end <?php echo ($activeTab == 'eid-clinics') ? " active open" : ""; ?>">
+                                        <a href="<?php echo $this->url('eid-clinics', array('action' => 'dashboard')) ?>" class="nav-link ">
+                                            <i class="fa fa-angle-right"></i> <span class="title"><?php echo $this->translate('Clinics Dashboard'); ?></span>
+                                        </a>
+                                    </li>
+                                <?php } ?>
+                            </ul>
+                        </li>
                     <?php } ?>
-                    <?php if($vlRoleCheck && $activeModule['covid19']) { ?>
-                    <li class="nav-item <?php echo ($activeTab == 'covid19-summary' || $activeTab == 'covid19-labs') ? " active open " : ""; ?>">
-                        <a href="javascript:;" class="nav-link nav-toggle">
-                            <i><svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="viruses" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" class="svg-inline--fa fa-viruses fa-w-20"><path fill="currentColor" d="M624,352H611.88c-28.51,0-42.79-34.47-22.63-54.63l8.58-8.57a16,16,0,1,0-22.63-22.63l-8.57,8.58C546.47,294.91,512,280.63,512,252.12V240a16,16,0,0,0-32,0v12.12c0,28.51-34.47,42.79-54.63,22.63l-8.57-8.58a16,16,0,0,0-22.63,22.63l8.58,8.57c20.16,20.16,5.88,54.63-22.63,54.63H368a16,16,0,0,0,0,32h12.12c28.51,0,42.79,34.47,22.63,54.63l-8.58,8.57a16,16,0,1,0,22.63,22.63l8.57-8.58c20.16-20.16,54.63-5.88,54.63,22.63V496a16,16,0,0,0,32,0V483.88c0-28.51,34.47-42.79,54.63-22.63l8.57,8.58a16,16,0,1,0,22.63-22.63l-8.58-8.57C569.09,418.47,583.37,384,611.88,384H624a16,16,0,0,0,0-32ZM480,384a32,32,0,1,1,32-32A32,32,0,0,1,480,384ZM346.51,213.33h16.16a21.33,21.33,0,0,0,0-42.66H346.51c-38,0-57.05-46-30.17-72.84l11.43-11.44A21.33,21.33,0,0,0,297.6,56.23L286.17,67.66c-26.88,26.88-72.84,7.85-72.84-30.17V21.33a21.33,21.33,0,0,0-42.66,0V37.49c0,38-46,57.05-72.84,30.17L86.4,56.23A21.33,21.33,0,0,0,56.23,86.39L67.66,97.83c26.88,26.88,7.85,72.84-30.17,72.84H21.33a21.33,21.33,0,0,0,0,42.66H37.49c38,0,57.05,46,30.17,72.84L56.23,297.6A21.33,21.33,0,1,0,86.4,327.77l11.43-11.43c26.88-26.88,72.84-7.85,72.84,30.17v16.16a21.33,21.33,0,0,0,42.66,0V346.51c0-38,46-57.05,72.84-30.17l11.43,11.43a21.33,21.33,0,0,0,30.17-30.17l-11.43-11.43C289.46,259.29,308.49,213.33,346.51,213.33ZM160,192a32,32,0,1,1,32-32A32,32,0,0,1,160,192Zm80,32a16,16,0,1,1,16-16A16,16,0,0,1,240,224Z" class=""></path></svg></i>
-                            <span class="title"><?php echo $this->translate('Covid 19'); ?></span>
-                            <span class="arrow"></span>
-                        </a>
-                        <ul class="sub-menu">
-                            <?php if ($logincontainer->role == 1 || $logincontainer->role == 5) { ?>
-                            <li class="nav-item start <?php echo ($activeTab == 'covid19-summary') ? " active open" : ""; ?>">
-                                <a href="<?php echo $this->url('covid19-summary', array('action' => 'dashboard')) ?>" class="nav-link ">
-                                    <i class="fa fa-angle-right"></i> <span class="title"><?php echo $this->translate('Summary'); ?></span>
-                                </a>
-                            </li>
-                            <?php } if ($logincontainer->role == 1 || $logincontainer->role == 2 || $logincontainer->role == 5) { ?>
-                            <li class="nav-item end <?php echo ($activeTab == 'covid19-labs') ? " active open" : ""; ?>">
-                                <a href="<?php echo $this->url('covid19-labs', array('action' => 'dashboard')) ?>" class="nav-link ">
-                                    <i class="fa fa-angle-right"></i> <span class="title"><?php echo $this->translate('Labs Dashboard'); ?></span>
-                                </a>
-                            </li>
-                            <?php } ?>
-                        </ul>
-                    </li>
+                    <?php if ($vlRoleCheck && $activeModule['covid19']) { ?>
+                        <li class="nav-item <?php echo ($activeTab == 'covid19-summary' || $activeTab == 'covid19-labs') ? " active open " : ""; ?>">
+                            <a href="javascript:;" class="nav-link nav-toggle">
+                                <i><svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="viruses" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" class="svg-inline--fa fa-viruses fa-w-20">
+                                        <path fill="currentColor" d="M624,352H611.88c-28.51,0-42.79-34.47-22.63-54.63l8.58-8.57a16,16,0,1,0-22.63-22.63l-8.57,8.58C546.47,294.91,512,280.63,512,252.12V240a16,16,0,0,0-32,0v12.12c0,28.51-34.47,42.79-54.63,22.63l-8.57-8.58a16,16,0,0,0-22.63,22.63l8.58,8.57c20.16,20.16,5.88,54.63-22.63,54.63H368a16,16,0,0,0,0,32h12.12c28.51,0,42.79,34.47,22.63,54.63l-8.58,8.57a16,16,0,1,0,22.63,22.63l8.57-8.58c20.16-20.16,54.63-5.88,54.63,22.63V496a16,16,0,0,0,32,0V483.88c0-28.51,34.47-42.79,54.63-22.63l8.57,8.58a16,16,0,1,0,22.63-22.63l-8.58-8.57C569.09,418.47,583.37,384,611.88,384H624a16,16,0,0,0,0-32ZM480,384a32,32,0,1,1,32-32A32,32,0,0,1,480,384ZM346.51,213.33h16.16a21.33,21.33,0,0,0,0-42.66H346.51c-38,0-57.05-46-30.17-72.84l11.43-11.44A21.33,21.33,0,0,0,297.6,56.23L286.17,67.66c-26.88,26.88-72.84,7.85-72.84-30.17V21.33a21.33,21.33,0,0,0-42.66,0V37.49c0,38-46,57.05-72.84,30.17L86.4,56.23A21.33,21.33,0,0,0,56.23,86.39L67.66,97.83c26.88,26.88,7.85,72.84-30.17,72.84H21.33a21.33,21.33,0,0,0,0,42.66H37.49c38,0,57.05,46,30.17,72.84L56.23,297.6A21.33,21.33,0,1,0,86.4,327.77l11.43-11.43c26.88-26.88,72.84-7.85,72.84,30.17v16.16a21.33,21.33,0,0,0,42.66,0V346.51c0-38,46-57.05,72.84-30.17l11.43,11.43a21.33,21.33,0,0,0,30.17-30.17l-11.43-11.43C289.46,259.29,308.49,213.33,346.51,213.33ZM160,192a32,32,0,1,1,32-32A32,32,0,0,1,160,192Zm80,32a16,16,0,1,1,16-16A16,16,0,0,1,240,224Z" class=""></path>
+                                    </svg></i>
+                                <span class="title"><?php echo $this->translate('Covid 19'); ?></span>
+                                <span class="arrow"></span>
+                            </a>
+                            <ul class="sub-menu">
+                                <?php if ($logincontainer->role == 1 || $logincontainer->role == 5) { ?>
+                                    <li class="nav-item start <?php echo ($activeTab == 'covid19-summary') ? " active open" : ""; ?>">
+                                        <a href="<?php echo $this->url('covid19-summary', array('action' => 'dashboard')) ?>" class="nav-link ">
+                                            <i class="fa fa-angle-right"></i> <span class="title"><?php echo $this->translate('Summary'); ?></span>
+                                        </a>
+                                    </li>
+                                <?php }
+                                if ($logincontainer->role == 1 || $logincontainer->role == 2 || $logincontainer->role == 5) { ?>
+                                    <li class="nav-item end <?php echo ($activeTab == 'covid19-labs') ? " active open" : ""; ?>">
+                                        <a href="<?php echo $this->url('covid19-labs', array('action' => 'dashboard')) ?>" class="nav-link ">
+                                            <i class="fa fa-angle-right"></i> <span class="title"><?php echo $this->translate('Labs Dashboard'); ?></span>
+                                        </a>
+                                    </li>
+                                <?php } ?>
+                            </ul>
+                        </li>
                     <?php } ?>
                     <?php
                     if ($logincontainer->role == 1 || $logincontainer->role == 4) { ?>
@@ -346,6 +345,11 @@ if (!isset($activeTab)) {
                                 <li class="nav-item end <?php echo ($activeTab == 'facility') ? " active open" : ""; ?>">
                                     <a href="<?php echo $this->url('facility', array('action' => 'index')) ?>" class="nav-link ">
                                         <i class="fa fa-angle-right"></i> <span class="title"><?php echo $this->translate('Facilities'); ?></span>
+                                    </a>
+                                </li>
+                                <li class="nav-item end <?php echo ($activeTab == 'status') ? " active open" : ""; ?>">
+                                    <a href="<?php echo $this->url('status', array('action' => 'index')) ?>" class="nav-link ">
+                                        <i class="fa fa-angle-right"></i> <span class="title"><?php echo $this->translate('Status'); ?></span>
                                     </a>
                                 </li>
                             </ul>
