@@ -154,7 +154,11 @@ class DashApiReceiverStatsTable extends AbstractTableGateway
             if (!isset($parameters['from']) && $parameters['from'] != "lab") {
                 $row[] = "<a href='/status/lab/" . base64_encode($aRow['facility_id']) . "'>" . $aRow['labName'] . "</a>";
             }
-            $row[] = date("d-M-Y (h:i: a)", strtotime($aRow['received_on']));
+            if (isset($aRow['received_on']) && $aRow['received_on'] != "") {
+                $row[] = date("d-M-Y (h:i: a)", strtotime($aRow['received_on']));
+            } else {
+                $row[] = null;
+            }
             if (isset($parameters['type']) && $parameters['type'] == "sync") {
                 $row[] = $aRow['number_of_records_received'];
                 $row[] = $aRow['number_of_records_processed'];
