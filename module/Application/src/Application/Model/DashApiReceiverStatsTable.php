@@ -170,9 +170,10 @@ class DashApiReceiverStatsTable extends AbstractTableGateway
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->from(array('f' => "facility_details"))->columns(array("facility_id", "labName" => "facility_name"))
             ->join(array('sync' => $this->table), "sync.lab_id=f.facility_id", array("*"), 'left')
-            ->where(array("facility_type" => 2, "facility_id" => $statusId))
-            ->group(array("received_on", "lab_id"));
+            ->where(array("facility_type" => 2, "facility_id" => $statusId, "unix_timestamp(received_on) >= now()-interval 3 month"))
+            ->group(array(new Expr("DATE_FORMAT(received_on, '%m-%d')"), "lab_id"));
         $sQueryStr = $sql->buildSqlString($sQuery);
+        die($sQueryStr);
         return $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
     }
 }

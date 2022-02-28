@@ -7,7 +7,7 @@ $processed = array();
 foreach ($result as $row) {
     $received[] = $row['number_of_records_received'];
     $processed[] = $row['number_of_records_processed'];
-    $dateTime[] = "'" . date("d-M-Y (h:i: a)", strtotime($row['received_on'])) . "'";
+    $dateTime[] = "'" . date("d-M", strtotime($row['received_on'])) . "'";
 }
 ?>
 
@@ -93,7 +93,7 @@ foreach ($result as $row) {
 
         var unplanneddata = [
             <?php foreach ($result as $row) { ?> {
-                    name: '<?php echo date("d-M-Y (h:i: a)", strtotime($row['received_on'])); ?>',
+                    name: '<?php echo date("d-M", strtotime($row['received_on'])); ?>',
                     y: <?php echo $row['number_of_records_received']; ?>,
                     drilldown: '<?php echo str_replace(" ", "-", strtolower($row['labName'])); ?>',
                 },
@@ -102,7 +102,7 @@ foreach ($result as $row) {
 
         var planneddata = [
             <?php foreach ($result as $row) { ?> {
-                    name: '<?php echo date("d-M-Y (h:i: a)", strtotime($row['received_on'])); ?>',
+                    name: '<?php echo date("d-M", strtotime($row['received_on'])); ?>',
                     y: <?php echo $row['number_of_records_processed']; ?>,
                     drilldown: '<?php echo str_replace(" ", "-", strtolower($row['labName'])); ?>',
                 },
