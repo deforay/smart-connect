@@ -104,6 +104,9 @@ class Covid19FormTable extends AbstractTableGateway
                                         AND DATE(sample_collection_date) >= '" . $startMonth . "' 
                                         AND DATE(sample_collection_date) <= '" . $endMonth . "'");
         }
+
+
+        $sQuery = $sQuery->order(array(new Expression('DATE(sample_collection_date)')));
         $queryStr = $sql->buildSqlString($sQuery);
         // echo $queryStr;die;
         //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -707,6 +710,7 @@ class Covid19FormTable extends AbstractTableGateway
                                         AND DATE(sample_collection_date) >= '" . $startMonth . "' 
                                         AND DATE(sample_collection_date) <= '" . $endMonth . "'");
         }
+        $sQuery = $sQuery->order(array(new Expression('DATE(sample_collection_date)')));
         $queryStr = $sql->buildSqlString($sQuery);
         // echo $queryStr;die;
         //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -1346,6 +1350,7 @@ class Covid19FormTable extends AbstractTableGateway
                 } else {
                     $rejectionQuery = $rejectionQuery->where('covid19.reason_for_sample_rejection = "' . $mostRejectionReasons[$m] . '"');
                 }
+                $rejectionQuery = $rejectionQuery->order(array(new Expression('DATE(sample_collection_date)')));
                 $rejectionQueryStr = $sql->buildSqlString($rejectionQuery);
                 $rejectionResult = $this->commonService->cacheQuery($rejectionQueryStr, $dbAdapter);
                 $rejectionReasonName = ($mostRejectionReasons[$m] == 0) ? 'Others' : ucwords($rejectionResult[0]['rejection_reason_name']);

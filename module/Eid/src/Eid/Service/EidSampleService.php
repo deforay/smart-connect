@@ -201,6 +201,7 @@ class EidSampleService
             'number_of_records_received'    => $counter,
             'number_of_records_processed'   => $numRows,
             'source'                        => 'VLSM-EID',
+            'lab_id'                        => $data['lab_id'],
             'status'                        => $status
         );
         $apiTrackDb->insert($apiTrackData);

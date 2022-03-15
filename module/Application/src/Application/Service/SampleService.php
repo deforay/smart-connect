@@ -1603,7 +1603,8 @@ class SampleService
             'received_on'                   => $this->commonService->getDateTime(),
             'number_of_records_received'    => $counter,
             'number_of_records_processed'   => $numRows,
-            'source'                        => 'VLSM-VIRAL-LOAD',
+            'source'                        => 'VLSM-VL',
+            'lab_id'                        => $data['lab_id'],
             'status'                        => $status
         );
         $this->apiTrackerTable->insert($apiTrackData);
@@ -1976,19 +1977,22 @@ class SampleService
                 $DashVL_Abs = NULL;
                 $DashVL_AnalysisResult = NULL;
 
-                if ($row['Result']['Copies'] == 'Target not Detected' || $row['Result']['Copies'] == 'Target Not Detected' || strtolower($row['Result']['Copies']) == 'target not detected' || strtolower($row['Result']['Copies']) == 'tnd' || $row['result'] == 'Target not Detected' || $row['result'] == 'Target Not Detected' || strtolower($row['result']) == 'target not detected' || strtolower($row['result']) == 'tnd') {
+                if (strtolower($row['Result']['Raw Data']) == 'target not detected' || strtolower($row['Result']['Copies']) == 'target not detected' || strtolower($row['Result']['Copies']) == 'tnd' || strtolower($row['Result']['Raw Data']) == '< titre min' || strtolower($row['Result']['Copies']) == '< titre min') {
                     $row['result_value_absolute_decimal'] = $VLAnalysisResult = 20;
-                } else if ($row['Result']['Copies'] == '< 20' || $row['Result']['Copies'] == '<20' || $row['result'] == '< 20' || $row['result'] == '<20') {
+                    $row['Result']['Copies'] = "Target Not Detected";
+                } else if ($row['Result']['Copies'] == '< 20' || $row['Result']['Copies'] == '<20') {
                     $row['result_value_absolute_decimal'] = $VLAnalysisResult = 20;
-                } else if ($row['Result']['Copies'] == '< 40' || $row['Result']['Copies'] == '<40' || $row['result'] == '< 40' || $row['result'] == '<40') {
+                } else if ($row['Result']['Copies'] == '< 40' || $row['Result']['Copies'] == '<40') {
                     $row['result_value_absolute_decimal'] = $VLAnalysisResult = 40;
-                } else if ($row['Result']['Copies'] == 'Suppressed' || $row['result'] == 'Suppressed') {
-                    $row['result_value_absolute_decimal'] = $VLAnalysisResult = 500;
-                } else if ($row['Result']['Copies'] == 'Not Suppressed' || $row['result'] == 'Not Suppressed') {
-                    $row['result_value_absolute_decimal'] = $VLAnalysisResult = 1500;
-                } else if ($row['Result']['Copies'] == 'Negative' || $row['Result']['Copies'] == 'NEGAT' || $row['result'] == 'Negative' || $row['result'] == 'NEGAT') {
+                } else if ($row['Result']['Copies'] == '< 839' || $row['Result']['Copies'] == '<839') {
                     $row['result_value_absolute_decimal'] = $VLAnalysisResult = 20;
-                } else if ($row['Result']['Copies'] == 'Positive' || $row['result'] == 'Positive') {
+                } else if (strtolower($row['Result']['Copies']) == 'suppressed') {
+                    $row['result_value_absolute_decimal'] = $VLAnalysisResult = 500;
+                } else if (strtolower($row['Result']['Copies']) == 'not suppressed') {
+                    $row['result_value_absolute_decimal'] = $VLAnalysisResult = 1500;
+                } else if (strtolower($row['Result']['Copies']) == 'negative' || strtolower($row['Result']['Copies']) == 'negat') {
+                    $row['result_value_absolute_decimal'] = $VLAnalysisResult = 20;
+                } else if (strtolower($row['Result']['Copies']) == 'positive') {
                     $row['result_value_absolute_decimal'] = $VLAnalysisResult = 1500;
                 }
 
@@ -2081,22 +2085,29 @@ class SampleService
                 //check testing reason
                 $data['result_status'] = null;
                 if (trim($row['TestStatus']) != '') {
-                    if ($row['TestStatus'] == 'Complete' || $row['TestStatus'] == 'Authorized') {
-                        $row['TestStatus'] = 'Accepted';
+                    $row['TestStatus'] = strtolower($row['TestStatus']);
+                    if ($row['TestStatus'] == 'complete' || $row['TestStatus'] == 'authorized') {
+                        $row['TestStatus'] = 'accepted';
                         $data['result_status'] = 7;
-                    } else if ($row['TestStatus'] == 'Cancelled') {
-                        $row['TestStatus'] = 'Rejected';
+                    } else if ($row['TestStatus'] == 'cancelled' || $row['TestStatus'] == 'rejected') {
+                        $row['TestStatus'] = 'rejected';
                         $data['result_status'] = 4;
+                    } else if ($row['TestStatus'] == 'invalid' || $row['TestStatus'] == 'fail' || $row['TestStatus'] == 'failed' || $row['TestStatus'] == 'fail' || $row['TestStatus'] == 'inconclusive' || strtolower($row['Result']['Copies']) == 'inconclusive') {
+                        $row['TestStatus'] = 'invalid';
+                        $data['result_status'] = 5;
+                    } else if ($row['TestStatus'] == 'registered' || $row['TestStatus'] == 'progress') {
+                        $row['TestStatus'] = 'registered';
+                        $data['result_status'] = 6;
                     }
-                    if (!empty($data['result_status'])) {
-                        $sampleStatusResult = $this->checkSampleStatus(trim($row['TestStatus']));
-                        if ($sampleStatusResult) {
-                            $data['result_status'] = $sampleStatusResult['status_id'];
-                        } else {
-                            $testStatusDb->insert(array('status_name' => trim($row['TestStatus'])));
-                            $data['result_status'] = $testStatusDb->lastInsertValue;
-                        }
-                    }
+                    // if (!empty($data['result_status'])) {
+                    //     $sampleStatusResult = $this->checkSampleStatus(trim($row['TestStatus']));
+                    //     if ($sampleStatusResult) {
+                    //         $data['result_status'] = $sampleStatusResult['status_id'];
+                    //     } else {
+                    //         $testStatusDb->insert(array('status_name' => trim($row['TestStatus'])));
+                    //         $data['result_status'] = $testStatusDb->lastInsertValue;
+                    //     }
+                    // }
                 } else {
                     $data['result_status'] = 6;
                 }
