@@ -1915,6 +1915,8 @@ class Covid19FormTable extends AbstractTableGateway
                                         AND DATE(sample_collection_date) <= '" . $endMonth . "'");
         }
 
+        $samplesReceivedSummaryQuery = $samplesReceivedSummaryQuery->order(array(new Expression('DATE(sample_collection_date)')));
+
         $queryContainer->indicatorSummaryQuery = $samplesReceivedSummaryQuery;
         $samplesReceivedSummaryCacheQuery = $sql->buildSqlString($samplesReceivedSummaryQuery);
         $samplesReceivedSummaryResult = $this->commonService->cacheQuery($samplesReceivedSummaryCacheQuery, $dbAdapter);

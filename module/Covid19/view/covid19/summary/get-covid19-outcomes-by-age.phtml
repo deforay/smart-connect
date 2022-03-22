@@ -21,7 +21,7 @@ foreach($ageGroup as $key=>$age){
                 text: ''
             },
             xAxis: {
-                categories: ["No Data", <?php foreach($ageGroup as $key=>$age){ if($key == 0){ ?> "less <?php echo $age;?> years", <?php } elseif($key == 4){ ?> "Above <?php echo $age;?> years" <?php } else{ ?> "<?php echo $age;?> years", <?php  } }?> ],
+                categories: ["Age Not Recorded", <?php foreach($ageGroup as $key=>$age){ if($key == 0){ ?> "less <?php echo $age;?> years", <?php } elseif($key == 4){ ?> "Above <?php echo $age;?> years" <?php } else{ ?> "<?php echo $age;?> years", <?php  } }?> ],
                 crosshair: true
             },
             yAxis: {

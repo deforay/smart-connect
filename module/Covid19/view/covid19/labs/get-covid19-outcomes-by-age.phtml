@@ -22,7 +22,7 @@ foreach($ageGroup as $key=>$age){
                 text: ''
             },
             xAxis: {
-                categories: ["No Data", 
+                categories: ["Age Not Recorded", 
                     <?php foreach($ageGroup as $key=>$age){
                         if($key == 0){ ?>
                             "less <?php echo $age;?> years",
