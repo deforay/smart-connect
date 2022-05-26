@@ -13,17 +13,16 @@ use function uasort;
 
 class ClassDefinition implements ClassDefinitionInterface
 {
-    /** @var ReflectionClass */
-    private $reflection;
+    private ReflectionClass $reflection;
 
-    /** @var Parameter[] */
-    private $parameters;
+    /** @var array<string, Parameter> */
+    private ?array $parameters = null;
 
-    /** @var string[] */
-    private $supertypes;
+    /** @var list<class-string> */
+    private ?array $supertypes = null;
 
     /**
-     * @param string|ReflectionClass $class
+     * @param class-string|ReflectionClass $class
      */
     public function __construct($class)
     {
@@ -34,7 +33,7 @@ class ClassDefinition implements ClassDefinitionInterface
         $this->reflection = $class;
     }
 
-    private function reflectSupertypes()
+    private function reflectSupertypes(): void
     {
         $this->supertypes = [];
         $class            = $this->reflection;
@@ -50,7 +49,7 @@ class ClassDefinition implements ClassDefinitionInterface
     }
 
     /**
-     * @return string[]
+     * @return list<class-string>
      */
     public function getSupertypes(): array
     {
@@ -69,7 +68,7 @@ class ClassDefinition implements ClassDefinitionInterface
         return $this->reflection->getInterfaceNames();
     }
 
-    private function reflectParameters()
+    private function reflectParameters(): void
     {
         $this->parameters = [];
 
@@ -85,13 +84,14 @@ class ClassDefinition implements ClassDefinitionInterface
             $this->parameters[$parameter->getName()] = $parameter;
         }
 
-        uasort($this->parameters, function (ParameterInterface $a, ParameterInterface $b) {
-            return $a->getPosition() - $b->getPosition();
-        });
+        uasort(
+            $this->parameters,
+            fn(ParameterInterface $a, ParameterInterface $b) => $a->getPosition() - $b->getPosition()
+        );
     }
 
     /**
-     * @return Parameter[]
+     * @return array<string, Parameter>
      */
     public function getParameters(): array
     {

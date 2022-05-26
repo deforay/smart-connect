@@ -13,8 +13,8 @@ use function http_build_query;
 use function is_array;
 use function is_resource;
 use function pg_connect;
-use function pg_errormessage;
 use function pg_fetch_result;
+use function pg_last_error;
 use function pg_query;
 use function pg_set_client_encoding;
 use function restore_error_handler;
@@ -55,7 +55,7 @@ class Connection extends AbstractConnection
      * Set resource
      *
      * @param resource $resource
-     * @return self Provides a fluent interface
+     * @return $this Provides a fluent interface
      */
     public function setResource($resource)
     {
@@ -67,7 +67,7 @@ class Connection extends AbstractConnection
     /**
      * Set driver
      *
-     * @return self Provides a fluent interface
+     * @return $this Provides a fluent interface
      */
     public function setDriver(Pgsql $driver)
     {
@@ -78,7 +78,7 @@ class Connection extends AbstractConnection
 
     /**
      * @param int|null $type
-     * @return self Provides a fluent interface
+     * @return $this Provides a fluent interface
      */
     public function setType($type)
     {
@@ -263,7 +263,7 @@ class Connection extends AbstractConnection
 
         // if the returnValue is something other than a pg result resource, bypass wrapping it
         if ($resultResource === false) {
-            throw new Exception\InvalidQueryException(pg_errormessage());
+            throw new Exception\InvalidQueryException(pg_last_error($this->resource));
         }
 
         return $this->driver->createResult($resultResource === true ? $this->resource : $resultResource);

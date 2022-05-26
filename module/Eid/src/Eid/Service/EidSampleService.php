@@ -414,14 +414,15 @@ class EidSampleService
                         }
                         // Debug::dump($data);die;
                         //check existing sample code
-                        $sampleCode = $this->checkSampleCode($sampleCode, $remoteSampleCode, $instanceCode);
-                        if ($sampleCode) {
-                            //sample data update
-                            $sampleDb->update($data, array('eid_id' => $sampleCode['eid_id']));
-                        } else {
-                            //sample data insert
-                            $sampleDb->insert($data);
-                        }
+                        // $sampleCode = $this->checkSampleCode($sampleCode, $remoteSampleCode, $instanceCode);
+                        // if ($sampleCode) {
+                        //     //sample data update
+                        //     $sampleDb->update($data, array('eid_id' => $sampleCode['eid_id']));
+                        // } else {
+                        //     //sample data insert
+                        //     $sampleDb->insert($data);
+                        // }
+                        $sampleDb->insertOrUpdate($data);
                     }
                 }
             }

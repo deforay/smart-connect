@@ -68,7 +68,7 @@ class SampleTable extends AbstractTableGateway
         //            END) as ResultWaiting
         //           FROM " . $this->table . "  as vl";
 
-        
+
         $globalDb = $this->sm->get('GlobalTable');
         $samplesWaitingFromLastXMonths = $globalDb->getGlobalValue('sample_waiting_month_range');
 
@@ -603,6 +603,9 @@ class SampleTable extends AbstractTableGateway
             $query = $query->where('
                 (DATEDIFF(sample_tested_datetime,sample_collection_date) < ' . $skipDays . ' AND 
                 DATEDIFF(sample_tested_datetime,sample_collection_date) >= 0)');
+            $query = $query->where('
+                 (DATEDIFF(result_printed_datetime,sample_collection_date) < ' . $skipDays . ' AND 
+                 DATEDIFF(result_printed_datetime,sample_collection_date) >= 0)');
 
             if ($facilityIdList != null) {
                 $query = $query->where('vl.lab_id IN ("' . implode('", "', $facilityIdList) . '")');
@@ -613,6 +616,7 @@ class SampleTable extends AbstractTableGateway
             // $query = $query->order(array(new Expression('DATE(vl.result_approved_datetime) ASC')));
             $query = $query->order('sample_tested_datetime ASC');
             $queryStr = $sql->buildSqlString($query);
+            error_log($queryStr);
             //echo $queryStr;die;
             //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             $sampleResult = $this->commonService->cacheQuery($queryStr, $dbAdapter);
@@ -3800,7 +3804,7 @@ class SampleTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = array();
-        
+
         $globalDb = $this->sm->get('GlobalTable');
         $samplesWaitingFromLastXMonths = $globalDb->getGlobalValue('sample_waiting_month_range');
         if (isset($params['daterange']) && trim($params['daterange']) != '') {
@@ -3915,7 +3919,7 @@ class SampleTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = array();
-        
+
         $globalDb = $this->sm->get('GlobalTable');
         $samplesWaitingFromLastXMonths = $globalDb->getGlobalValue('sample_waiting_month_range');
         if (isset($params['daterange']) && trim($params['daterange']) != '') {
@@ -4032,7 +4036,7 @@ class SampleTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = array();
-        
+
         $globalDb = $this->sm->get('GlobalTable');
         $samplesWaitingFromLastXMonths = $globalDb->getGlobalValue('sample_waiting_month_range');
         if (isset($params['daterange']) && trim($params['daterange']) != '') {
@@ -4149,7 +4153,7 @@ class SampleTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = array();
-        
+
         $globalDb = $this->sm->get('GlobalTable');
         $samplesWaitingFromLastXMonths = $globalDb->getGlobalValue('sample_waiting_month_range');
         if (isset($params['daterange']) && trim($params['daterange']) != '') {
@@ -4266,7 +4270,7 @@ class SampleTable extends AbstractTableGateway
         $logincontainer = new Container('credo');
         $queryContainer = new Container('query');
 
-        
+
         $globalDb = $this->sm->get('GlobalTable');
         $samplesWaitingFromLastXMonths = $globalDb->getGlobalValue('sample_waiting_month_range');
         /* Array of database columns which should be read and sent back to DataTables. Use a space where
@@ -8109,34 +8113,34 @@ class SampleTable extends AbstractTableGateway
         return $result->getGeneratedValue();
     }
 
-//     public function insertOrUpdateX($insertData, $updateData = null)
-//     {
-//         $insertDataValuesForQuery = [];
-//         $queryParams = [];
-//         foreach ($insertData as $key => $value) {
-//             if (gettype($value) == "object") {
-//                 array_push($insertDataValuesForQuery, $value->__toString());
-//                 continue;
-//             }
-//             array_push($insertDataValuesForQuery, "?");
-//             array_push($queryParams, $value);
-//         }
+    //     public function insertOrUpdateX($insertData, $updateData = null)
+    //     {
+    //         $insertDataValuesForQuery = [];
+    //         $queryParams = [];
+    //         foreach ($insertData as $key => $value) {
+    //             if (gettype($value) == "object") {
+    //                 array_push($insertDataValuesForQuery, $value->__toString());
+    //                 continue;
+    //             }
+    //             array_push($insertDataValuesForQuery, "?");
+    //             array_push($queryParams, $value);
+    //         }
 
-//         if(empty($updateData)){
-//             $updateData = $insertData;
-//         }
-//         $updateDataValuesForQuery = [];
-//         foreach ($updateData as $key => $value) {
-//             if (gettype($value) == "object") {
-//                 array_push($updateDataValuesForQuery, $key . " = " . $value->__toString());
-//                 continue;
-//             }
-//             array_push($updateDataValuesForQuery, $key . " = ?");
-//             array_push($queryParams, $value);
-//         }
+    //         if(empty($updateData)){
+    //             $updateData = $insertData;
+    //         }
+    //         $updateDataValuesForQuery = [];
+    //         foreach ($updateData as $key => $value) {
+    //             if (gettype($value) == "object") {
+    //                 array_push($updateDataValuesForQuery, $key . " = " . $value->__toString());
+    //                 continue;
+    //             }
+    //             array_push($updateDataValuesForQuery, $key . " = ?");
+    //             array_push($queryParams, $value);
+    //         }
 
-//         $query = 'INSERT INTO ' . $this->_name . ' (' . implode(',', array_keys($insertData)) . ') VALUES (' . implode(',', $insertDataValuesForQuery) . ') ON DUPLICATE KEY UPDATE ' . implode(' , ', $updateDataValuesForQuery);
-//         $result = $this->adapter->query($query, $queryParams);
-//         return $result->getGeneratedValue();
-//  }
+    //         $query = 'INSERT INTO ' . $this->_name . ' (' . implode(',', array_keys($insertData)) . ') VALUES (' . implode(',', $insertDataValuesForQuery) . ') ON DUPLICATE KEY UPDATE ' . implode(' , ', $updateDataValuesForQuery);
+    //         $result = $this->adapter->query($query, $queryParams);
+    //         return $result->getGeneratedValue();
+    //  }
 }

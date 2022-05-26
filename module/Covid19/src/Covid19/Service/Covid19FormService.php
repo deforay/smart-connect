@@ -97,16 +97,25 @@ class Covid19FormService
                 // error_log(ob_get_clean());
                 // exit(0);
 
+                $uniqueId = trim($data['unique_id']);
                 $sampleCode = trim($data['sample_code']);
                 $instanceCode = trim($data['vlsm_instance_id']);
                 //check existing sample code
-                $sampleCode = $this->checkSampleCode($sampleCode, $instanceCode);
-                if ($sampleCode) {
-                    //sample data update
-                    $numRows += $sampleDb->update($data, array('covid19_id' => $sampleCode['covid19_id']));
-                } else {
-                    //sample data insert
-                    $numRows += $sampleDb->insert($data);
+                //$sampleCode = $this->checkSampleCode($uniqueId, $sampleCode, $instanceCode);
+                try {
+                    // if ($sampleCode) {
+                    //     //sample data update
+                    //     $numRows += $sampleDb->update($data, array('covid19_id' => $sampleCode['covid19_id']));
+                    // } else {
+                    //     //sample data insert
+                    //     $numRows += $sampleDb->insert($data);
+                    // }
+                    $sampleDb->insertOrUpdate($data);
+                    $numRows++;
+                } catch (Exception $exc) {
+                    error_log($exc->getMessage());
+                    error_log($exc->getTraceAsString());
+                    continue;
                 }
             }
 
@@ -183,6 +192,7 @@ class Covid19FormService
                         // print_r($apiData);die;
                         if (trim($row['sample_code']) != '' && trim($row['vlsm_instance_id']) != '') {
                             $sampleCode = trim($row['sample_code']);
+                            $uniqueId = trim($row['unique_id']);
                             $instanceCode = trim($row['vlsm_instance_id']);
 
                             $sampleCollectionDate = (trim($row['sample_collection_date']) != '' ? trim(date('Y-m-d H:i', strtotime($row['sample_collection_date']))) : null);
@@ -351,14 +361,16 @@ class Covid19FormService
                             }
                             // Debug::dump($data);die;
                             //check existing sample code
-                            $sampleCode = $this->checkSampleCode($sampleCode, $instanceCode);
-                            if ($sampleCode) {
-                                //sample data update
-                                $sampleDb->update($data, array('covid19_id' => $sampleCode['covid19_id']));
-                            } else {
-                                //sample data insert
-                                $sampleDb->insert($data);
-                            }
+                            // $sampleCode = $this->checkSampleCode($uniqueId, $sampleCode, $instanceCode);
+                            // if ($sampleCode) {
+                            //     //sample data update
+                            //     $sampleDb->update($data, array('covid19_id' => $sampleCode['covid19_id']));
+                            // } else {
+                            //     //sample data insert
+                            //     $sampleDb->insert($data);
+                            // }
+
+                            $sampleDb->insertOrUpdate($data);
                         }
                     }
                 }
@@ -379,11 +391,13 @@ class Covid19FormService
         }
     }
 
-    public function checkSampleCode($sampleCode, $instanceCode, $dashTable = 'dash_form_covid19')
+    public function checkSampleCode($uniqueId, $sampleCode, $instanceCode, $dashTable = 'dash_form_covid19')
     {
         $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
         $sql = new Sql($dbAdapter);
-        $sQuery = $sql->select()->from($dashTable)->where(array('sample_code LIKE "%' . $sampleCode . '%"', 'vlsm_instance_id' => $instanceCode));
+        $sQuery = $sql->select()->from($dashTable)
+            ->where(array('sample_code' => $sampleCode, 'vlsm_instance_id' => $instanceCode))
+            ->where(array('unique_id' => $uniqueId), 'OR');
         $sQueryStr = $sql->buildSqlString($sQuery);
         $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
         return $sResult;
@@ -1531,6 +1545,7 @@ class Covid19FormService
             foreach ($params['data'] as $key => $row) {
                 // Debug::dump($row);die;
                 if (!empty(trim($row['sample_code'])) && trim($params['api_version']) == $config['defaults']['vl-api-version']) {
+                    $uniqueId = trim($row['unique_id']);
                     $sampleCode = trim($row['sample_code']);
                     $instanceCode = 'api-data';
 
@@ -1628,16 +1643,18 @@ class Covid19FormService
                     }
 
                     //check existing sample code
-                    $sampleCode = $this->checkSampleCode($sampleCode, $instanceCode);
-                    $status = 0;
+                    // $sampleCode = $this->checkSampleCode($uniqueId, $sampleCode, $instanceCode);
+                    // $status = 0;
 
-                    if ($sampleCode) {
-                        //sample data update   // $data, array('covid19_id' => $sampleCode['covid19_id'])
-                        $status = $sampleDb->update($data, array('covid19_id' => $sampleCode['covid19_id']));
-                    } else {
-                        //sample data insert
-                        $status = $sampleDb->insert($data);
-                    }
+                    // if ($sampleCode) {
+                    //     //sample data update   // $data, array('covid19_id' => $sampleCode['covid19_id'])
+                    //     $status = $sampleDb->update($data, array('covid19_id' => $sampleCode['covid19_id']));
+                    // } else {
+                    //     //sample data insert
+                    //     $status = $sampleDb->insert($data);
+                    // }
+
+                    $status = $sampleDb->insertOrUpdate($data);
 
                     if ($status == 0) {
                         $return[$key][] = $sampleCode;

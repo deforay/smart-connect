@@ -1,13 +1,13 @@
 {
-    "name": "laminas/laminas-mvc-skeleton",
-    "description": "Laminas MVC Skeleton Application",
+    "name": "deforay/vldashboard",
+    "description": "National Dashboard",
     "type": "project",
     "license": "BSD-3-Clause",
     "keywords": [
-        "laminas",
-        "mvc",
-        "skeleton",
-        "framework"
+        "viral load",
+        "eid",
+        "covid-19",
+        "dashboard"
     ],
     "require": {
         "php": "^7.3 || ~8.0.0",

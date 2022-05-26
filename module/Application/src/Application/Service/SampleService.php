@@ -36,7 +36,7 @@ class SampleService
         return $this->sm;
     }
 
-    public function checkSampleCode($sampleCode, $remoteSampleCode = null, $instanceCode = null, $dashTable = 'dash_vl_request_form')
+    public function checkSampleCode($uniqueId, $sampleCode, $remoteSampleCode = null, $instanceCode = null, $dashTable = 'dash_vl_request_form')
     {
 
         $sql = new Sql($this->dbAdapter);
@@ -49,6 +49,9 @@ class SampleService
         }
         if (isset($instanceCode) && $instanceCode != "") {
             $sQuery = $sQuery->where(array('remote_sample_code' => $remoteSampleCode));
+        }
+        if (isset($uniqueId) && $uniqueId != "") {
+            $sQuery = $sQuery->where(array('unique_id' => $uniqueId), 'OR');
         }
         $sQueryStr = $sql->buildSqlString($sQuery);
         $sResult = $this->dbAdapter->query($sQueryStr, $this->dbAdapter::QUERY_MODE_EXECUTE)->current();
@@ -1556,9 +1559,9 @@ class SampleService
                 }
             }
 
-            ob_start();
-            var_dump($data);
-            error_log(ob_get_clean());
+            // ob_start();
+            // var_dump($data);
+            // error_log(ob_get_clean());
             // exit(0);
 
 
@@ -1568,16 +1571,6 @@ class SampleService
             // $instanceCode = trim($data['vlsm_instance_id']);
 
             try {
-
-                //check existing sample code
-                // $sampleCode = $this->checkSampleCode($sampleCode, $remoteSample, $instanceCode);
-                // if ($sampleCode) {
-                //     //sample data update
-                //     $numRows += $this->sampleTable->update($data, array('vl_sample_id' => $sampleCode['vl_sample_id']));
-                // } else {
-                //     //sample data insert
-                //     $numRows += $this->sampleTable->insert($data);
-                // }
                 $sampleDb->insertOrUpdate($data);
                 $numRows++;
             } catch (Exception $e) {
@@ -1659,6 +1652,7 @@ class SampleService
                         $sampleCode = trim($row['sample_code']);
                         $remoteSampleCode = trim($row['remote_sample_code']);
                         $instanceCode = trim($row['vlsm_instance_id']);
+                        $uniqueId = trim($row['unique_id']);
 
                         $VLAnalysisResult = (float) $row['result_value_absolute_decimal'];
                         $DashVL_Abs = NULL;
@@ -1912,7 +1906,7 @@ class SampleService
                         }
 
                         //check existing sample code
-                        $sampleCode = $this->checkSampleCode($sampleCode, $remoteSampleCode, $instanceCode);
+                        $sampleCode = $this->checkSampleCode($uniqueId, $sampleCode, $remoteSampleCode, $instanceCode);
                         if ($sampleCode) {
                             //sample data update
                             $sampleDb->update($data, array('vl_sample_id' => $sampleCode['vl_sample_id']));
@@ -2220,6 +2214,7 @@ class SampleService
                 // Debug::dump($row);die;
                 if (!empty(trim($row['sample_code'])) && trim($params['api_version']) == $config['defaults']['vl-api-version']) {
                     $sampleCode = trim($row['sample_code']);
+                    $uniqueId = trim($row['unique_id']);
                     $remoteSampleCode = trim($row['remote_sample_code']);
                     $instanceCode = 'api-data';
 
@@ -2395,7 +2390,7 @@ class SampleService
                     }
 
                     //check existing sample code
-                    $sampleCode = $this->checkSampleCode($sampleCode, $remoteSampleCode, $instanceCode);
+                    $sampleCode = $this->checkSampleCode($uniqueId, $sampleCode, $remoteSampleCode, $instanceCode);
                     $status = 0;
 
                     if ($sampleCode) {

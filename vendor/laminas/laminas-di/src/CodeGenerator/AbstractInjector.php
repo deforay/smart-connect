@@ -17,13 +17,11 @@ abstract class AbstractInjector implements InjectorInterface
     protected $factories = [];
 
     /** @var FactoryInterface[] */
-    private $factoryInstances = [];
+    private array $factoryInstances = [];
 
-    /** @var ContainerInterface */
-    private $container;
+    private ContainerInterface $container;
 
-    /** @var InjectorInterface */
-    private $injector;
+    private InjectorInterface $injector;
 
     /**
      * {@inheritDoc}
@@ -62,13 +60,18 @@ abstract class AbstractInjector implements InjectorInterface
 
     public function canCreate(string $name): bool
     {
-        return isset($this->factories[$name]) || $this->injector->canCreate($name);
+        return $this->hasFactory($name) || $this->injector->canCreate($name);
+    }
+
+    private function hasFactory(string $name): bool
+    {
+        return isset($this->factories[$name]);
     }
 
     /** @return mixed */
     public function create(string $name, array $options = [])
     {
-        if (isset($this->factories[$name])) {
+        if ($this->hasFactory($name)) {
             return $this->getFactory($name)->create($this->container, $options);
         }
 
