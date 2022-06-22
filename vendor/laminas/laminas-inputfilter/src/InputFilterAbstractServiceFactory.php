@@ -2,18 +2,20 @@
 
 namespace Laminas\InputFilter;
 
-use Interop\Container\ContainerInterface;
+use Interop\Container\ContainerInterface; // phpcs:ignore
+use Laminas\Filter\FilterChain;
 use Laminas\Filter\FilterPluginManager;
 use Laminas\ServiceManager\AbstractFactoryInterface;
-use Laminas\ServiceManager\AbstractPluginManager;
 use Laminas\ServiceManager\ServiceLocatorInterface;
+use Laminas\Validator\ValidatorChain;
 use Laminas\Validator\ValidatorPluginManager;
 
+use function assert;
 use function is_array;
 
 class InputFilterAbstractServiceFactory implements AbstractFactoryInterface
 {
-    /** @var Factory */
+    /** @var Factory|null */
     protected $factory;
 
     /**
@@ -54,22 +56,23 @@ class InputFilterAbstractServiceFactory implements AbstractFactoryInterface
     /**
      * Determine if we can create a service with name (v2)
      *
+     * @deprecated This library is no longer compatible with Service manager V2 and this method will be dropped in the
+     *             next major release.
+     *
      * @param string $name
      * @param string $requestedName
      * @return bool
      */
     public function canCreateServiceWithName(ServiceLocatorInterface $container, $name, $requestedName)
     {
-        // v2 => may need to get parent service locator
-        if ($container instanceof AbstractPluginManager) {
-            $container = $container->getServiceLocator() ?: $container;
-        }
-
         return $this->canCreate($container, $requestedName);
     }
 
     /**
      * Create the requested service (v2)
+     *
+     * @deprecated This library is no longer compatible with Service manager V2 and this method will be dropped in the
+     *             next major release.
      *
      * @param string                  $cName
      * @param string                  $rName
@@ -77,11 +80,6 @@ class InputFilterAbstractServiceFactory implements AbstractFactoryInterface
      */
     public function createServiceWithName(ServiceLocatorInterface $container, $cName, $rName)
     {
-        // v2 => may need to get parent service locator
-        if ($container instanceof AbstractPluginManager) {
-            $container = $container->getServiceLocator() ?: $container;
-        }
-
         return $this($container, $rName);
     }
 
@@ -94,15 +92,16 @@ class InputFilterAbstractServiceFactory implements AbstractFactoryInterface
             return $this->factory;
         }
 
-        $this->factory = new Factory();
-        $this->factory
-            ->getDefaultFilterChain()
-            ->setPluginManager($this->getFilterPluginManager($container));
-        $this->factory
-            ->getDefaultValidatorChain()
-            ->setPluginManager($this->getValidatorPluginManager($container));
+        $this->factory  = new Factory();
+        $filterChain    = $this->factory->getDefaultFilterChain();
+        $validatorChain = $this->factory->getDefaultValidatorChain();
+        assert($filterChain instanceof FilterChain);
+        assert($validatorChain instanceof ValidatorChain);
 
-        $this->factory->setInputFilterManager($container->get('InputFilterManager'));
+        $filterChain->setPluginManager($this->getFilterPluginManager($container));
+        $validatorChain->setPluginManager($this->getValidatorPluginManager($container));
+
+        $this->factory->setInputFilterManager($container->get(InputFilterPluginManager::class));
 
         return $this->factory;
     }
@@ -112,8 +111,8 @@ class InputFilterAbstractServiceFactory implements AbstractFactoryInterface
      */
     protected function getFilterPluginManager(ContainerInterface $container)
     {
-        if ($container->has('FilterManager')) {
-            return $container->get('FilterManager');
+        if ($container->has(FilterPluginManager::class)) {
+            return $container->get(FilterPluginManager::class);
         }
 
         return new FilterPluginManager($container);
@@ -124,8 +123,8 @@ class InputFilterAbstractServiceFactory implements AbstractFactoryInterface
      */
     protected function getValidatorPluginManager(ContainerInterface $container)
     {
-        if ($container->has('ValidatorManager')) {
-            return $container->get('ValidatorManager');
+        if ($container->has(ValidatorPluginManager::class)) {
+            return $container->get(ValidatorPluginManager::class);
         }
 
         return new ValidatorPluginManager($container);
