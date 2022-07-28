@@ -8,7 +8,8 @@ use ArrayAccess;
 use Laminas\Filter\FilterChain;
 use Laminas\ServiceManager\ServiceManager;
 use Laminas\View\Exception;
-use Laminas\View\Helper\AbstractHelper;
+use Laminas\View\Helper\HelperInterface;
+use Laminas\View\Helper\ViewModel;
 use Laminas\View\HelperPluginManager;
 use Laminas\View\Model\ModelInterface as Model;
 use Laminas\View\Renderer\RendererInterface as Renderer;
@@ -86,6 +87,7 @@ use function sprintf;
  * @method \Laminas\View\Helper\Navigation\Links links($container = null)
  * @method \Laminas\View\Helper\Navigation\Menu menu($container = null)
  * @method \Laminas\View\Helper\Navigation\Sitemap sitemap($container = null)
+ * @method string gravatarImage(string $emailAddress, int $imageSize = 80, array $imageAttributes = [], string $defaultImage = 'mm', string $rating = 'g')
  */
 class PhpRenderer implements Renderer, TreeRendererInterface
 {
@@ -368,18 +370,23 @@ class PhpRenderer implements Renderer, TreeRendererInterface
      */
     public function getHelperPluginManager()
     {
-        if (null === $this->__helpers) {
-            $this->setHelperPluginManager(new HelperPluginManager(new ServiceManager()));
+        $pluginManager = $this->__helpers;
+
+        if (! $pluginManager instanceof HelperPluginManager) {
+            $pluginManager = new HelperPluginManager(new ServiceManager());
+            $this->setHelperPluginManager($pluginManager);
         }
-        return $this->__helpers;
+
+        return $pluginManager;
     }
 
     /**
      * Get plugin instance
      *
-     * @param  string     $name Name of plugin to return
+     * @template T
+     * @param  string|class-string<T> $name Name of plugin to return
      * @param  null|array $options Options to pass to plugin constructor (if not already instantiated)
-     * @return AbstractHelper
+     * @return ($name is class-string ? T : HelperInterface|callable)
      */
     public function plugin($name, ?array $options = null)
     {
@@ -397,10 +404,11 @@ class PhpRenderer implements Renderer, TreeRendererInterface
      *
      * @param  string $method
      * @param  array $argv
-     * @return mixed
+     * @return HelperInterface|callable|mixed
      */
     public function __call($method, $argv)
     {
+        /** @psalm-suppress MixedAssignment $plugin */
         $plugin = $this->plugin($method);
 
         if (is_callable($plugin)) {
@@ -473,7 +481,7 @@ class PhpRenderer implements Renderer, TreeRendererInterface
             unset($options);
 
             // Give view model awareness via ViewModel helper
-            $helper = $this->plugin('view_model');
+            $helper = $this->plugin(ViewModel::class);
             $helper->setCurrent($model);
 
             $values = $model->getVariables();

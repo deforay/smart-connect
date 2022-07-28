@@ -139,15 +139,15 @@ class UsersTable extends AbstractTableGateway
                 $dataInterfaceLogin->email = $rResult[0]["email"];
                 $dataInterfaceLogin->password = $rResult[0]["password"];
 
-                return '/login/otp';
+                return 'login-otp';
             } else if ($otp != null && $logincontainer->role == 7) {
-                return '/data-management/export/';
+                return 'data-management-export';
             } else if ($logincontainer->role == 3) {
-                return '/clinics/dashboard';
+                return 'clinics';
             } else if ($logincontainer->role == 2) {
-                return '/labs/dashboard';
+                return 'laboratory';
             } else {
-                return '/summary/dashboard';
+                return 'summary';
             }
             //die('home');
             
@@ -157,7 +157,7 @@ class UsersTable extends AbstractTableGateway
         } else {
             $container = new Container('alert');
             $container->alertMsg = 'Please check your login credentials';
-            return '/login';
+            return 'login';
         }
     }
 

@@ -1,9 +1,11 @@
 <?php
+
 use Laminas\Session\Container;
+
 $languagecontainer = new Container('language');
 
-$backupDir = TEMP_UPLOAD_PATH.DIRECTORY_SEPARATOR.'backups'.DIRECTORY_SEPARATOR;
-$files = array_diff(glob($backupDir.'*'), array('.DS_Store','.', '..'));
+$backupDir = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . 'backups' . DIRECTORY_SEPARATOR;
+$files = array_diff(glob($backupDir . '*'), array('.DS_Store', '.', '..'));
 $now   = time();
 
 $twoDays = 60 * 60 * 24 * 2;
@@ -12,109 +14,106 @@ $filesList = array();
 //$files = array_diff(scandir($backupDir), array('.DS_Store','.', '..'));
 
 foreach ($files as $file) {
-  if (is_file($file)) {
-    if ($now - filemtime($file) >= $twoDays) { // 2 days
-      unlink($file);
-    }else{
-      $filesList[] = array('name' => basename($file), 'size' => filesize($file), 'modified' => filemtime($file));
+    if (is_file($file)) {
+        if ($now - filemtime($file) >= $twoDays) { // 2 days
+            unlink($file);
+        } else {
+            $filesList[] = array('name' => basename($file), 'size' => filesize($file), 'modified' => filemtime($file));
+        }
     }
-  }
 }
 ?>
-    <style>
-       
-    </style>
-    <!-- BEGIN PAGE BAR -->
-    <div class="page-bar">
-        <h1 class="page-title"><?php echo $this->translate('Export Data'); ?></h1>
-    </div>
-    <!-- END PAGE BAR -->
-    <!-- BEGIN PAGE TITLE-->
-    <!-- END PAGE TITLE-->
-    <!-- END PAGE HEADER-->
-    <br>
-    <div id="" action="#" method="">
-        <div class="row">
-            <div class="col-lg-1">
-                &nbsp;
-            </div>
-            <div class="col-lg-6">
-                <div id="dashboard-range" class="btn btn-sm form-control"
-                    data-container="body"
-                    data-placement="bottom"
-                    data-original-title="Date Range">
-                    <?php echo $this->translate('Date Range'); ?>&nbsp;&nbsp;&nbsp;&nbsp;<i class="icon-calendar"></i>&nbsp;
-                    <span class="thin uppercase hidden-xs"></span>&nbsp;
-                    <i class="fa fa-angle-down"></i>
-                    <input type="hidden" name="sampleCollectionDate" id="sampleCollectionDate"/>
-                </div>
-            </div>
-            <div class="col-lg-1">
-                <button class="btn btn-primary" onclick="javascript:generateBackup();"><span>Generate</span></button>
-            </div>
-        </div>
-    </div>
-    <br>
+<style>
+
+</style>
+<!-- BEGIN PAGE BAR -->
+<div class="page-bar">
+    <h1 class="page-title"><?php echo $this->translate('Export Data'); ?></h1>
+</div>
+<!-- END PAGE BAR -->
+<!-- BEGIN PAGE TITLE-->
+<!-- END PAGE TITLE-->
+<!-- END PAGE HEADER-->
+<br>
+<div id="" action="#" method="">
     <div class="row">
-        <div class="col-md-12 col-sm-12">
-            <div class="portlet box">
-                <div class="portlet-body">
-                        <div class="portlet box blue">
-                            <div class="portlet-title">
-                                <div class="caption">
-                                    <i class="fa fa-cogs"></i><?php echo $this->translate('Generated File(s)'); ?>
-                                </div>
-                            </div>
-                            <div class="portlet-body">
-                                <div class="table-toolbar">
-                                    <table class="table table-bordered table-striped table-hover">
-                                       <?php foreach($filesList as $file){ ?>
-                                        <tr>
-                                            <td>
-                                                <a href="/temporary/backups/<?php echo $file['name'] ?>" target="_blank"><?php echo $file['name'] ?></a>
-                                            </td>
-                                            <td>
-                                                <?php echo number_format($file['size'] / 1048576, 2) . ' MB' ?>
-                                            </td>
-                                            <td>
-                                            <?php echo date('d-M-Y h:i:s A', $file['modified']) ?>
-                                            </td>
-                                        </tr>
-                                       <?php } ?>
-                                    </table>
-                                </div>
-                            </div>
+        <div class="col-lg-1">
+            &nbsp;
+        </div>
+        <div class="col-lg-6">
+            <div id="dashboard-range" class="btn btn-sm form-control" data-container="body" data-placement="bottom" data-original-title="Date Range">
+                <?php echo $this->translate('Date Range'); ?>&nbsp;&nbsp;&nbsp;&nbsp;<i class="icon-calendar"></i>&nbsp;
+                <span class="thin uppercase hidden-xs"></span>&nbsp;
+                <i class="fa fa-angle-down"></i>
+                <input type="hidden" name="sampleCollectionDate" id="sampleCollectionDate" />
+            </div>
+        </div>
+        <div class="col-lg-1">
+            <button class="btn btn-primary" onclick="javascript:generateBackup();"><span>Generate</span></button>
+        </div>
+    </div>
+</div>
+<br>
+<div class="row">
+    <div class="col-md-12 col-sm-12">
+        <div class="portlet box">
+            <div class="portlet-body">
+                <div class="portlet box blue">
+                    <div class="portlet-title">
+                        <div class="caption">
+                            <i class="fa fa-cogs"></i><?php echo $this->translate('Generated File(s)'); ?>
                         </div>
+                    </div>
+                    <div class="portlet-body">
+                        <div class="table-toolbar">
+                            <table class="table table-bordered table-striped table-hover">
+                                <?php foreach ($filesList as $file) { ?>
+                                    <tr>
+                                        <td>
+                                            <a href="/temporary/backups/<?php echo $file['name'] ?>" target="_blank"><?php echo $file['name'] ?></a>
+                                        </td>
+                                        <td>
+                                            <?php echo number_format($file['size'] / 1048576, 2) . ' MB' ?>
+                                        </td>
+                                        <td>
+                                            <?php echo date('d-M-Y h:i:s A', $file['modified']) ?>
+                                        </td>
+                                    </tr>
+                                <?php } ?>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
 <script>
     $(function() {
-        
+
         var start = moment().subtract(7, 'days');
         var end = moment();
-        
+
         function cb(start, end) {
             $('#dashboard-range span').html(start.format('MMM D, YYYY') + ' to ' + end.format('MMM D, YYYY'));
             $('#sampleCollectionDate').val(start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
         }
-        
+
         $('#dashboard-range').daterangepicker({
             format: 'DD-MMM-YYYY',
             separator: ' to ',
             startDate: start,
             endDate: end,
-            maxDate:moment(),
+            maxDate: moment(),
             ranges: {
-               'Today': [moment(), moment()],
-               'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-               'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-               'Last 90 Days': [moment().subtract(89, 'days'), moment()],
-               'Last 180 Days': [moment().subtract(179, 'days'), moment()],
-               'Last 356 Days': [moment().subtract(355, 'days'), moment()],
-               'This Month': [moment().startOf('month'), moment().endOf('month')],
-               'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+                'Today': [moment(), moment()],
+                'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                'Last 90 Days': [moment().subtract(89, 'days'), moment()],
+                'Last 180 Days': [moment().subtract(179, 'days'), moment()],
+                'Last 356 Days': [moment().subtract(355, 'days'), moment()],
+                'This Month': [moment().startOf('month'), moment().endOf('month')],
+                'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
             },
             opens: "left"
         }, cb);
@@ -123,17 +122,19 @@ foreach ($files as $file) {
     });
 
 
-    function generateBackup(){
-        if(!$('#sampleCollectionDate').val() ) {
-          $('#sampleCollectionDate').val(moment().subtract('days', 179).format('YYYY-MM-DD') + ' to ' + moment().format('YYYY-MM-DD'));
+    function generateBackup() {
+        if (!$('#sampleCollectionDate').val()) {
+            $('#sampleCollectionDate').val(moment().subtract('days', 179).format('YYYY-MM-DD') + ' to ' + moment().format('YYYY-MM-DD'));
         }
 
         var sampleCollectionDate = $('#sampleCollectionDate').val();
 
-        $.post("<?php echo $this->url('export-data', array('action' => 'generate')); ?>",{sampleCollectionDate:sampleCollectionDate},
-        function(data) {
-            $("#clinicDashReqFormBar").html(data);
-        });        
+        $.post("<?php echo $this->url('data-management-export', array('action' => 'generate')); ?>", {
+                sampleCollectionDate: sampleCollectionDate
+            },
+            function(data) {
+                $("#clinicDashReqFormBar").html(data);
+            });
 
 
     }

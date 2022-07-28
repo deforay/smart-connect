@@ -75,7 +75,6 @@ return array(
     'Laminas\\Cache\\' => array($vendorDir . '/laminas/laminas-cache/src'),
     'Laminas\\Authentication\\' => array($vendorDir . '/laminas/laminas-authentication/src'),
     'JsonMachine\\' => array($vendorDir . '/halaxa/json-machine/src'),
-    'Interop\\Container\\' => array($vendorDir . '/container-interop/container-interop/src/Interop/Container'),
     'Fig\\Http\\Message\\' => array($vendorDir . '/fig/http-message-util/src'),
     'Complex\\' => array($vendorDir . '/markbaker/complex/classes/src'),
     'Brick\\VarExporter\\' => array($vendorDir . '/brick/varexporter/src'),

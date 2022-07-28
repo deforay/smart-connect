@@ -78,7 +78,7 @@ return array(
                     'route' => '/summary[/][:action][/:id]',
                     'defaults' => array(
                         'controller' => 'Application\Controller\Summary',
-                        'action' => 'index',
+                        'action' => 'dashboard',
                     ),
                 ),
             ),
@@ -109,6 +109,16 @@ return array(
                     'defaults' => array(
                         'controller' => 'Application\Controller\Login',
                         'action' => 'index',
+                    ),
+                ),
+            ),
+            'login-otp' => array(
+                'type' => 'Literal',
+                'options' => array(
+                    'route'    => '/login/otp',
+                    'defaults' => array(
+                        'controller' => 'Application\Controller\Index',
+                        'action'     => 'otp',
                     ),
                 ),
             ),

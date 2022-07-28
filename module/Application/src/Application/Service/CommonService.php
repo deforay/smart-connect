@@ -553,7 +553,7 @@ class CommonService
           $fileName = $ranNumber . "." . $extension;
           // $fileName = 'ref.json';   // Testing
           if (!file_exists(TEMP_UPLOAD_PATH) && !is_dir(TEMP_UPLOAD_PATH)) {
-               mkdir(APPLICATION_PATH . DIRECTORY_SEPARATOR . "uploads", 0777);
+               mkdir(APPLICATION_PATH . DIRECTORY_SEPARATOR . "temporary", 0777);
           }
           if (!file_exists(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-reference") && !is_dir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-reference")) {
                mkdir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-reference", 0777);

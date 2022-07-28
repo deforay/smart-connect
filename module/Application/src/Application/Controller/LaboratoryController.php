@@ -22,7 +22,7 @@ class LaboratoryController extends AbstractActionController
     public function indexAction()
     {
         $this->layout()->setVariable('activeTab', 'labs-dashboard');
-        return $this->redirect()->toUrl('/labs/dashboard');
+        return $this->redirect()->toRoute('labs');
     }
 
     public function dashboardAction()
@@ -683,7 +683,7 @@ class LaboratoryController extends AbstractActionController
         if (trim($fromDate) != '' && trim($toDate) != '') {
             return new ViewModel(array('fromMonth' => date('M-Y', strtotime($fromDate)), 'toMonth' => date('M-Y', strtotime($toDate)), 'labFilter' => $labFilter, 'labName' => $labName));
         } else {
-            return $this->redirect()->toUrl("/labs/dashboard");
+            return $this->redirect()->toRoute("laboratory");
         }
     }
 

@@ -20,7 +20,7 @@ class SummaryController extends AbstractActionController{
 
     public function indexAction(){
         $this->layout()->setVariable('activeTab', 'summary-dashboard');
-        return $this->_redirect()->toUrl('/summary/dashboard'); 
+        return $this->redirect()->toRoute('summary'); 
     }
     
     public function dashboardAction(){

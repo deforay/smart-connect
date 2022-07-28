@@ -34,10 +34,10 @@ class LoginController extends AbstractActionController
                 return '/login';
             }
             $url = $this->userService->login($params);
-            return $this->redirect()->toUrl($url);
+            return $this->redirect()->toRoute($url);
         }
         if (isset($logincontainer->userId) && $logincontainer->userId != "") {
-            return $this->redirect()->toUrl("summary/dashboard");
+            return $this->redirect()->toRoute("summary");
         } else {
             $config = $this->configService->getAllGlobalConfig();
             $vm = new ViewModel();
@@ -53,7 +53,7 @@ class LoginController extends AbstractActionController
         if ($request->isPost()) {
             $params = $request->getPost();
             $url = $this->userService->otp($params);
-            return $this->redirect()->toUrl($url);
+            return $this->redirect()->toRoute($url);
         }
 
         $config = $this->configService->getAllGlobalConfig();

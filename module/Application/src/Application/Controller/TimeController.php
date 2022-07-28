@@ -15,7 +15,7 @@ class TimeController extends AbstractActionController
 	{
 		set_time_limit(10000);
 		$this->layout()->setVariable('activeTab', 'times-dashboard');
-		return $this->redirect()->toUrl('/times/dashboard');
+		return $this->redirect()->toRoute('times');
 	}
 
 	public function dashboardAction()

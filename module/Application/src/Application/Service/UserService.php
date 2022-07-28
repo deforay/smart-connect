@@ -4,97 +4,109 @@ namespace Application\Service;
 
 use Laminas\Session\Container;
 
-class UserService {
+class UserService
+{
 
     public $sm = null;
 
-    public function __construct($sm) {
+    public function __construct($sm)
+    {
         $this->sm = $sm;
     }
 
-    public function getServiceManager() {
+    public function getServiceManager()
+    {
         return $this->sm;
     }
-    
-    public function login($params) {
+
+    public function login($params)
+    {
         $db = $this->sm->get('UsersTable');
         return $db->login($params);
     }
-    public function otp($params) {
+    public function otp($params)
+    {
         $dataInterfaceLogin = new Container('dataInterfaceLogin');
-        $loginParams = array('email' => $dataInterfaceLogin->email,'password' => $dataInterfaceLogin->password);
+        $loginParams = array('email' => $dataInterfaceLogin->email, 'password' => $dataInterfaceLogin->password);
         $db = $this->sm->get('UsersTable');
-        return $db->login($loginParams,$params['otp']);
+        return $db->login($loginParams, $params['otp']);
     }
-    public function fetchUsers() {
+    public function fetchUsers()
+    {
         $db = $this->sm->get('UsersTable');
         return $db->fetchUsers();
     }
-    
-    public function fetchRoles() {
+
+    public function fetchRoles()
+    {
         $db = $this->sm->get('RolesTable');
         return $db->fetchRoles();
     }
-    
-    public function getUser($userId) {
+
+    public function getUser($userId)
+    {
         $db = $this->sm->get('UsersTable');
         return $db->getUser($userId);
     }
-    
-    public function addUser($params) {
+
+    public function addUser($params)
+    {
         $adapter = $this->sm->get('Laminas\Db\Adapter\Adapter')->getDriver()->getConnection();
         $adapter->beginTransaction();
         try {
             $db = $this->sm->get('UsersTable');
             $result = $db->addUser($params);
-            if($result>0){
-             $adapter->commit();
-             $alertContainer = new Container('alert');
-             $alertContainer->alertMsg = 'User details added successfully';
+            if ($result > 0) {
+                $adapter->commit();
+                $alertContainer = new Container('alert');
+                $alertContainer->alertMsg = 'User details added successfully';
             }
-        }
-        catch (Exception $exc) {
+        } catch (Exception $exc) {
             $adapter->rollBack();
             error_log($exc->getMessage());
             error_log($exc->getTraceAsString());
         }
     }
-    
-    public function updateUser($params) {
+
+    public function updateUser($params)
+    {
         $adapter = $this->sm->get('Laminas\Db\Adapter\Adapter')->getDriver()->getConnection();
         $adapter->beginTransaction();
         try {
             $db = $this->sm->get('UsersTable');
             $result = $db->updateUser($params);
-            if($result>0){
-             $adapter->commit();
-             $alertContainer = new Container('alert');
-             $alertContainer->alertMsg = 'User details updated successfully';
+            if ($result > 0) {
+                $adapter->commit();
+                $alertContainer = new Container('alert');
+                $alertContainer->alertMsg = 'User details updated successfully';
             }
-        }
-        catch (Exception $exc) {
+        } catch (Exception $exc) {
             $adapter->rollBack();
             error_log($exc->getMessage());
             error_log($exc->getTraceAsString());
         }
     }
-   
-    public function fetchUserOrganizations($userId) {
+
+    public function fetchUserOrganizations($userId)
+    {
         $db = $this->sm->get('UserOrganizationsMapTable');
         return $db->fetchOrganizations($userId);
     }
-   
-    public function mapUserOrganizations($params) {
+
+    public function mapUserOrganizations($params)
+    {
         $db = $this->sm->get('UserOrganizationsMapTable');
         return $db->mapUserOrganizations($params);
     }
-    
-    public function getAllUsers($parameters){
+
+    public function getAllUsers($parameters)
+    {
         $db = $this->sm->get('UsersTable');
         return $db->fetchAllUsers($parameters);
     }
 
-    public function userLoginApi($params) {
+    public function userLoginApi($params)
+    {
         $db = $this->sm->get('UsersTable');
         return $db->userLoginDetailsApi($params);
     }

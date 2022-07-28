@@ -13,10 +13,10 @@ use function is_string;
 final class MapNamingStrategy implements NamingStrategyInterface
 {
     /** @var array<string, string> */
-    private $extractionMap = [];
+    private array $extractionMap = [];
 
     /** @var array<string, string> */
-    private $hydrationMap = [];
+    private array $hydrationMap = [];
 
     /**
      * @param array<string, string> $extractionMap
@@ -84,10 +84,11 @@ final class MapNamingStrategy implements NamingStrategyInterface
     /**
      * Safely flip mapping array.
      *
-     * @param  array $array Array to flip
-     * @return string[] Flipped array
+     * @param  array<string, string> $array Array to flip
+     * @return array<string, string> Flipped array
      * @throws Exception\InvalidArgumentException If any value of the $array is
      *     a non-string or empty string value or key.
+     * @psalm-suppress MixedReturnTypeCoercion Argument is validated in the routine
      */
     private function flipMapping(array $array): array
     {
@@ -105,7 +106,6 @@ final class MapNamingStrategy implements NamingStrategyInterface
             }
         });
 
-        /** @psalm-suppress PossiblyInvalidArgument Argument is validated in above routine */
         return array_flip($array);
     }
 }

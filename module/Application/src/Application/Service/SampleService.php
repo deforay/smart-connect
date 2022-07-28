@@ -1511,7 +1511,7 @@ class SampleService
         $fileName = $ranNumber . "." . $extension;
 
         if (!file_exists(TEMP_UPLOAD_PATH) && !is_dir(TEMP_UPLOAD_PATH)) {
-            mkdir(APPLICATION_PATH . DIRECTORY_SEPARATOR . "uploads", 0777);
+            mkdir(APPLICATION_PATH . DIRECTORY_SEPARATOR . "temporary", 0777);
         }
         if (!file_exists(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-vl") && !is_dir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-vl")) {
             mkdir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-vl", 0777);
@@ -2199,11 +2199,11 @@ class SampleService
             if (!file_exists(TEMP_UPLOAD_PATH) && !is_dir(TEMP_UPLOAD_PATH)) {
                 mkdir(APPLICATION_PATH . DIRECTORY_SEPARATOR . "temporary", 0777);
             }
-            if (!file_exists(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "API-data-vl") && !is_dir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "API-data-vl")) {
-                mkdir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "API-data-vl", 0777);
+            if (!file_exists(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "api-data-vl") && !is_dir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "api-data-vl")) {
+                mkdir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "api-data-vl", 0777);
             }
 
-            $pathname = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "API-data-vl" . DIRECTORY_SEPARATOR . $params['timestamp'] . '.json';
+            $pathname = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "api-data-vl" . DIRECTORY_SEPARATOR . $params['timestamp'] . '.json';
             if (!file_exists($pathname)) {
                 $file = file_put_contents($pathname, json_encode($params));
                 if (move_uploaded_file($pathname, $pathname)) {

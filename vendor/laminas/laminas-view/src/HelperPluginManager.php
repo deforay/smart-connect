@@ -14,6 +14,7 @@ use Laminas\ServiceManager\Exception\InvalidServiceException;
 use Laminas\ServiceManager\Factory\InvokableFactory;
 use Laminas\ServiceManager\ServiceManager;
 use Laminas\View\Exception\InvalidHelperException;
+use Laminas\View\Helper\HelperInterface;
 use Psr\Container\ContainerInterface;
 
 use function get_class;
@@ -30,6 +31,8 @@ use function sprintf;
  * Helper\HelperInterface. Additionally, it registers a number of default
  * helpers.
  *
+ * @template InstanceType of HelperInterface|callable
+ * @extends AbstractPluginManager<HelperInterface|callable>
  * @psalm-import-type ServiceManagerConfiguration from ServiceManager
  */
 class HelperPluginManager extends AbstractPluginManager
@@ -40,8 +43,8 @@ class HelperPluginManager extends AbstractPluginManager
      * Most of these are present for legacy purposes, as v2 of the service
      * manager normalized names when fetching services.
      *
-     * @psalm-suppress DeprecatedClass
-     * @var array<string, string>
+     * @psalm-suppress DeprecatedClass, NonInvariantDocblockPropertyType
+     * @var non-empty-array<string, class-string>
      */
     protected $aliases = [
         'asset'               => Helper\Asset::class,
@@ -76,6 +79,7 @@ class HelperPluginManager extends AbstractPluginManager
         'FlashMessenger'      => Helper\FlashMessenger::class,
         'Gravatar'            => Helper\Gravatar::class,
         'gravatar'            => Helper\Gravatar::class,
+        'gravatarImage'       => Helper\GravatarImage::class,
         'headLink'            => Helper\HeadLink::class,
         'HeadLink'            => Helper\HeadLink::class,
         'headlink'            => Helper\HeadLink::class,
@@ -245,7 +249,7 @@ class HelperPluginManager extends AbstractPluginManager
      */
     protected $factories = [
         Helper\Asset::class          => Helper\Service\AssetFactory::class,
-        Helper\HtmlAttributes::class => InvokableFactory::class,
+        Helper\HtmlAttributes::class => Helper\Service\HtmlAttributesFactory::class,
         Helper\FlashMessenger::class => Helper\Service\FlashMessengerFactory::class,
         Helper\Identity::class       => Helper\Service\IdentityFactory::class,
         Helper\BasePath::class       => InvokableFactory::class,
@@ -259,6 +263,7 @@ class HelperPluginManager extends AbstractPluginManager
         Helper\EscapeCss::class           => InvokableFactory::class,
         Helper\EscapeUrl::class           => InvokableFactory::class,
         Helper\Gravatar::class            => InvokableFactory::class,
+        Helper\GravatarImage::class       => InvokableFactory::class,
         Helper\HtmlTag::class             => InvokableFactory::class,
         Helper\HeadLink::class            => InvokableFactory::class,
         Helper\HeadMeta::class            => InvokableFactory::class,
@@ -373,9 +378,9 @@ class HelperPluginManager extends AbstractPluginManager
     /**
      * Inject a helper instance with the registered renderer
      *
-     * @param ContainerInterface|Helper\HelperInterface $first helper instance
+     * @param ContainerInterface|HelperInterface $first helper instance
      *     under laminas-servicemanager v2, ContainerInterface under v3.
-     * @param ContainerInterface|Helper\HelperInterface $second
+     * @param ContainerInterface|HelperInterface $second
      *     ContainerInterface under laminas-servicemanager v3, helper instance
      *     under v2. Ignored regardless.
      * @return void
@@ -400,9 +405,9 @@ class HelperPluginManager extends AbstractPluginManager
     /**
      * Inject a helper instance with the registered translator
      *
-     * @param ContainerInterface|Helper\HelperInterface $first helper instance
+     * @param ContainerInterface|HelperInterface $first helper instance
      *     under laminas-servicemanager v2, ContainerInterface under v3.
-     * @param ContainerInterface|Helper\HelperInterface $second
+     * @param ContainerInterface|HelperInterface $second
      *     ContainerInterface under laminas-servicemanager v3, helper instance
      *     under v2. Ignored regardless.
      * @return void
@@ -457,9 +462,9 @@ class HelperPluginManager extends AbstractPluginManager
     /**
      * Inject a helper instance with the registered event manager
      *
-     * @param ContainerInterface|Helper\HelperInterface $first helper instance
+     * @param ContainerInterface|HelperInterface $first helper instance
      *     under laminas-servicemanager v2, ContainerInterface under v3.
-     * @param ContainerInterface|Helper\HelperInterface $second
+     * @param ContainerInterface|HelperInterface $second
      *     ContainerInterface under laminas-servicemanager v3, helper instance
      *     under v2. Ignored regardless.
      * @return void
@@ -505,15 +510,16 @@ class HelperPluginManager extends AbstractPluginManager
      *
      * @param mixed $instance
      * @throws InvalidServiceException
+     * @psalm-assert HelperInterface|callable $instance
      */
     public function validate($instance)
     {
-        if (! is_callable($instance) && ! $instance instanceof Helper\HelperInterface) {
+        if (! is_callable($instance) && ! $instance instanceof HelperInterface) {
             throw new InvalidServiceException(
                 sprintf(
                     '%s can only create instances of %s and/or callables; %s is invalid',
                     static::class,
-                    Helper\HelperInterface::class,
+                    HelperInterface::class,
                     is_object($instance) ? get_class($instance) : gettype($instance)
                 )
             );
@@ -525,9 +531,13 @@ class HelperPluginManager extends AbstractPluginManager
      *
      * Proxies to `validate()`.
      *
+     * @deprecated Since 2.21.0 - This method will be removed in version 3.0. It provides BC with Service Manager v2
+     *             which can no longer be installed with this component.
+     *
      * @param mixed $instance
      * @return void
      * @throws InvalidHelperException
+     * @psalm-assert HelperInterface|callable $instance
      */
     public function validatePlugin($instance)
     {
@@ -536,5 +546,18 @@ class HelperPluginManager extends AbstractPluginManager
         } catch (InvalidServiceException $e) {
             throw new InvalidHelperException($e->getMessage(), $e->getCode(), $e);
         }
+    }
+
+    /**
+     * @inheritDoc
+     * @template T
+     * @param class-string<T>|string $name Service name of plugin to retrieve.
+     * @param null|array<mixed> $options Options to use when creating the instance.
+     * @return HelperInterface|callable
+     * @psalm-return ($name is class-string ? T : HelperInterface|callable)
+     */
+    public function get($name, ?array $options = null)
+    {
+        return parent::get($name, $options);
     }
 }

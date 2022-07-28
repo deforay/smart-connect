@@ -114,7 +114,7 @@ if (!isset($activeTab)) {
         <div class="page-header-inner ">
             <!-- BEGIN LOGO -->
             <div class="page-logo resize-page-logo">
-                <a href="/">
+                <a href="<?= $this->url('home'); ?>">
                     <?php
                     if (isset($config['logo']) && trim($config['logo']) != "" && file_exists(UPLOAD_PATH . DIRECTORY_SEPARATOR . "logo" . DIRECTORY_SEPARATOR . $config['logo'])) { ?>
                         <img src="<?php echo $this->basePath('uploads/logo/' . $config['logo']); ?>" alt="logo" class="logo-default manage-logo-default" style="max-width:32px;max-height:32px;margin-top:-5px;margin-right:5px;" />
@@ -154,7 +154,7 @@ if (!isset($activeTab)) {
                         <ul class="dropdown-menu dropdown-menu-default">
 
                             <li>
-                                <a href="/login/logout"><i class="icon-key"></i> <?php echo $this->translate('Log Out'); ?> </a>
+                                <a href="<?= $this->url('login', array('action' => 'logout')) ?>"><i class="icon-key"></i> <?php echo $this->translate('Log Out'); ?> </a>
                             </li>
                         </ul>
 

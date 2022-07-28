@@ -7,6 +7,7 @@ namespace Composer\Autoload;
 class ComposerStaticInit6b3507ca92e690d5341f8b5f5bbb0a97
 {
     public static $files = array (
+        'c9d07b32a2e02bc0fc582d4f0c1b56cc' => __DIR__ . '/..' . '/laminas/laminas-servicemanager/src/autoload.php',
         '7e9bd612cc444b3eed788ebbe46263a0' => __DIR__ . '/..' . '/laminas/laminas-zendframework-bridge/src/autoload.php',
         'a4a119a56e50fbb293281d9a48007e0e' => __DIR__ . '/..' . '/symfony/polyfill-php80/bootstrap.php',
         '6e3fae29631ef280660b3cdad06f25a8' => __DIR__ . '/..' . '/symfony/deprecation-contracts/function.php',
@@ -135,10 +136,6 @@ class ComposerStaticInit6b3507ca92e690d5341f8b5f5bbb0a97
         'J' => 
         array (
             'JsonMachine\\' => 12,
-        ),
-        'I' => 
-        array (
-            'Interop\\Container\\' => 18,
         ),
         'F' => 
         array (
@@ -451,10 +448,6 @@ class ComposerStaticInit6b3507ca92e690d5341f8b5f5bbb0a97
         'JsonMachine\\' => 
         array (
             0 => __DIR__ . '/..' . '/halaxa/json-machine/src',
-        ),
-        'Interop\\Container\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/container-interop/container-interop/src/Interop/Container',
         ),
         'Fig\\Http\\Message\\' => 
         array (

@@ -39,7 +39,7 @@ final class StandaloneHydratorPluginManager implements HydratorPluginManagerInte
      *
      * @var array<string, string>
      */
-    private $aliases = [
+    private array $aliases = [
         'arrayserializable'         => ArraySerializableHydrator::class,
         ArraySerializable::class    => ArraySerializableHydrator::class,
         'arrayserializablehydrator' => ArraySerializableHydrator::class,
@@ -55,21 +55,19 @@ final class StandaloneHydratorPluginManager implements HydratorPluginManagerInte
         'reflection'                => ReflectionHydrator::class,
 
         // Legacy Zend Framework aliases
-        \Zend\Hydrator\ArraySerializable::class => ArraySerializableHydrator::class,
-        \Zend\Hydrator\ClassMethods::class      => ClassMethodsHydrator::class,
-        \Zend\Hydrator\ObjectProperty::class    => ObjectPropertyHydrator::class,
-        \Zend\Hydrator\Reflection::class        => ReflectionHydrator::class,
+        'Zend\Hydrator\ArraySerializable' => ArraySerializableHydrator::class,
+        'Zend\Hydrator\ClassMethods'      => ClassMethodsHydrator::class,
+        'Zend\Hydrator\ObjectProperty'    => ObjectPropertyHydrator::class,
+        'Zend\Hydrator\Reflection'        => ReflectionHydrator::class,
     ];
 
     /** @var array<string, callable> */
-    private $factories = [];
+    private array $factories = [];
 
     public function __construct()
     {
         /** @psalm-suppress UnusedClosureParam */
-        $invokableFactory = function (ContainerInterface $container, string $class): object {
-            return new $class();
-        };
+        $invokableFactory = static fn(ContainerInterface $container, string $class): object => new $class();
 
         $this->factories = [
             ArraySerializableHydrator::class => $invokableFactory,

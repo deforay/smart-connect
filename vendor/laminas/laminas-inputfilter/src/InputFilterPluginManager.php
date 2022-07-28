@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Laminas\InputFilter;
 
 use Interop\Container\ContainerInterface; // phpcs:ignore
@@ -23,8 +25,10 @@ use function sprintf;
  *
  * @link ServiceManager
  *
- * @method InputFilterInterface|InputInterface get(string $name, ?array $options = null)
  * @psalm-import-type ServiceManagerConfiguration from ServiceManager
+ * @template InstanceType of InputFilterInterface|InputInterface
+ * @extends AbstractPluginManager<InstanceType>
+ * @method InputFilterInterface|InputInterface get(string $name, ?array $options = null)
  */
 class InputFilterPluginManager extends AbstractPluginManager
 {
@@ -141,7 +145,7 @@ class InputFilterPluginManager extends AbstractPluginManager
     /**
      * {@inheritDoc} (v3)
      *
-     * @psalm-assert InputFilterInterface|InputInterface $instance
+     * @psalm-assert InstanceType $instance
      */
     public function validate($instance)
     {

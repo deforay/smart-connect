@@ -14,7 +14,7 @@ return array(
                     ),
                 ),
             ),
-            'export-data' => array(
+            'data-management-export' => array(
                 'type' => 'segment',
                 'options' => array(
                     'route' => '/data-management/export[/:action][/][:id]',
