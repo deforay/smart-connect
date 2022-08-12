@@ -57,8 +57,8 @@ $('#labDashSampleVolumePie').highcharts({
             if(isset($result) && count($result)>0){
               foreach($result as $lab){
                 ?>{
-                  myData:<?php echo "'".$lab[1]."'";?>,
-                  name:<?php echo "'".$lab[1]."'";?>,
+                  myData:<?php echo "'". $this->escapeHtml($lab[1])."'";?>,
+                  name:<?php echo "'".$this->escapeHtml($lab[1])."'";?>,
                   y:<?php echo $lab[0];?>,
                   number:<?php echo $lab[0];?>
                 },

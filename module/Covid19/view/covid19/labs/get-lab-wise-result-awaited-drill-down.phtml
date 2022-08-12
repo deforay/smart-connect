@@ -14,7 +14,7 @@
                 categories: [<?php
                                 if (isset($result['lab']) && count($result['lab']) > 0) {
                                     foreach ($result['lab'] as $lab) {
-                                        echo "'" . $lab . "',";
+                                        echo "'" . $this->escapeHtml($lab) . "',";
                                     }
                                 }
                                 ?>]

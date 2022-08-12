@@ -292,7 +292,7 @@ class SampleTable extends AbstractTableGateway
             $queryStr = $queryStr->group(array(new Expression('MONTH(sample_collection_date)')));
             $queryStr = $queryStr->order('sample_collection_date ASC');
             $queryStr = $sql->buildSqlString($queryStr);
-            // echo $queryStr;die;
+            //error_log($queryStr);
             //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             $sampleResult = $this->commonService->cacheQuery($queryStr, $dbAdapter);
             $j = 0;
@@ -356,6 +356,7 @@ class SampleTable extends AbstractTableGateway
             $queryStr = $queryStr->group(array(new Expression('MONTH(sample_collection_date)')));
             $queryStr = $queryStr->order('sample_collection_date ASC');
             $queryStr = $sql->buildSqlString($queryStr);
+            //error_log($queryStr);
             //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             $sampleResult = $this->commonService->cacheQuery($queryStr, $dbAdapter);
             $j = 0;
@@ -560,13 +561,13 @@ class SampleTable extends AbstractTableGateway
         // FILTER :: Checking if the date range filter is set (which should be always set)
 
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
-            $monthyear = date("Y-m");
+            $monthyear = date("Y-m-d");
             $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
             if (strtotime($startMonth) >= strtotime($monthyear)) {
                 $startMonth = $endMonth = date("Y-m-01", strtotime("-2 months"));
             } else if (strtotime($endMonth) >= strtotime($monthyear)) {
-                $endMonth = date("Y-m-t", strtotime("-2 months"));
+                //$endMonth = date("Y-m-t", strtotime("-2 months"));
             }
 
 
@@ -2752,7 +2753,8 @@ class SampleTable extends AbstractTableGateway
 
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
             $startMonth = date("Y-m", strtotime(trim($params['fromDate']))) . "-01";
-            $endMonth = date("Y-m", strtotime(trim($params['toDate']))) . "-31";
+            //$endMonth = date("Y-m", strtotime(trim($params['toDate']))) . "-31";
+            $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
             $sQuery = $sql->select()->from(array('vl' => $this->table))
                 ->columns(
                     array(
