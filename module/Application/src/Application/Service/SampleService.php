@@ -1577,6 +1577,7 @@ class SampleService
                 error_log($e->getMessage());
             }
         }
+        unlink($pathname);
 
         if ($counter == $numRows) {
             $status = "success";
@@ -1606,6 +1607,7 @@ class SampleService
             'status'    => 'success',
             'message'   => $numRows . ' uploaded successfully',
         );
+
     }
     public function saveFileFromVlsmAPIV1()
     {
