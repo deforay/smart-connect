@@ -586,20 +586,20 @@ class SampleTable extends AbstractTableGateway
 
                         "totalSamples" => new Expression('COUNT(*)'),
                         "monthDate" => new Expression("DATE_FORMAT(DATE(vl.sample_tested_datetime), '%b-%Y')"),
-                        "daydiff" => new Expression('ABS(TIMESTAMPDIFF(DAY,sample_tested_datetime,sample_collection_date))'),
+                        //"daydiff" => new Expression('AVG(ABS(TIMESTAMPDIFF(DAY,sample_tested_datetime,sample_collection_date)))'),
                         "AvgTestedDiff" => new Expression('CAST(ABS(AVG(TIMESTAMPDIFF(DAY,vl.sample_tested_datetime,vl.sample_collection_date))) AS DECIMAL (10,2))'),
                         "AvgReceivedDiff" => new Expression('CAST(ABS(AVG(TIMESTAMPDIFF(DAY,vl.sample_received_at_vl_lab_datetime,vl.sample_collection_date))) AS DECIMAL (10,2))'),
                         "AvgReceivedTested" => new Expression('CAST(ABS(AVG(TIMESTAMPDIFF(DAY,vl.sample_tested_datetime,vl.sample_received_at_vl_lab_datetime))) AS DECIMAL (10,2))'),
                         "AvgReceivedPrinted" => new Expression('CAST(ABS(AVG(TIMESTAMPDIFF(DAY,vl.result_printed_datetime,vl.sample_collection_date))) AS DECIMAL (10,2))')
                     )
                 );
-            $query = $query->where(
-                "(vl.sample_collection_date is not null AND vl.sample_collection_date not like '' AND DATE(vl.sample_collection_date) not like '1970-01-01' AND DATE(vl.sample_collection_date) not like '0000-00-00')
-                AND (vl.sample_tested_datetime is not null AND vl.sample_tested_datetime not like '' AND DATE(vl.sample_tested_datetime) not like '1970-01-01' AND DATE(vl.sample_tested_datetime) not like '0000-00-00')"
-            );
+            // $query = $query->where(
+            //     "(vl.sample_collection_date is not null AND vl.sample_collection_date not like '' AND DATE(vl.sample_collection_date) not like '1970-01-01' AND DATE(vl.sample_collection_date) not like '0000-00-00')
+            //     AND (vl.sample_tested_datetime is not null AND vl.sample_tested_datetime not like '' AND DATE(vl.sample_tested_datetime) not like '1970-01-01' AND DATE(vl.sample_tested_datetime) not like '0000-00-00')"
+            // );
             $query = $query->where("
-                DATE(vl.sample_tested_datetime) >= '" . $startMonth . "'
-                AND DATE(vl.sample_tested_datetime) <= '" . $endMonth . "' ");
+                DATE(vl.sample_tested_datetime) BETWEEN '" . $startMonth . "'
+                AND '" . $endMonth . "' ");
             $skipDays = (isset($skipDays) && $skipDays > 0) ? $skipDays : 120;
             $query = $query->where('
                 (DATEDIFF(sample_tested_datetime,sample_collection_date) < ' . $skipDays . ' AND 
@@ -622,7 +622,7 @@ class SampleTable extends AbstractTableGateway
             //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             $sampleResult = $this->commonService->cacheQuery($queryStr, $dbAdapter);
             $j = 0;
-            $monthDateArray = array();
+            
             foreach ($sampleResult as $sRow) {
                 /* $result['all'][$j] = (isset($sRow["AvgDiff"]) && $sRow["AvgDiff"] != NULL && $sRow["AvgDiff"] > 0) ? round($sRow["AvgDiff"], 2) : null;
                 //$result['lab'][$j] = (isset($labsubQueryResult[0]["labCount"]) && $labsubQueryResult[0]["labCount"] != NULL && $labsubQueryResult[0]["labCount"] > 0) ? round($labsubQueryResult[0]["labCount"],2) : 0;

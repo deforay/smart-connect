@@ -624,3 +624,35 @@ ALTER TABLE `dash_eid_form` CHANGE `is_sample_rejected` `is_sample_rejected` VAR
 ALTER TABLE `dash_vl_request_form` CHANGE `is_sample_rejected` `is_sample_rejected` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL;
 ALTER TABLE `dash_form_covid19` CHANGE `is_sample_rejected` `is_sample_rejected` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL;
 
+-- Amit 18-Aug-2022
+CREATE TABLE `r_vl_test_failure_reasons` (
+ `failure_id` int NOT NULL AUTO_INCREMENT,
+ `failure_reason` varchar(256) COLLATE utf8mb4_general_ci DEFAULT NULL,
+ `status` varchar(256) COLLATE utf8mb4_general_ci DEFAULT NULL,
+ `updated_datetime` datetime DEFAULT CURRENT_TIMESTAMP,
+ PRIMARY KEY (`failure_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+ALTER TABLE `dash_vl_request_form` ADD `reason_for_failure` INT(11) NULL DEFAULT NULL AFTER `failed_vl_result`, ADD `result_value_hiv_detection` INT(11) NULL DEFAULT NULL AFTER `vl_test_platform`;
+
+
+-- Amit 19-Sep-2022
+ALTER TABLE `dash_vl_request_form`  ADD `lab_tech_comments` MEDIUMTEXT NULL DEFAULT NULL AFTER `tested_by`;
+ALTER TABLE `dash_vl_request_form`  ADD `community_sample` VARCHAR(256) NULL DEFAULT NULL AFTER `funding_source`;
+-- ALTER TABLE `dash_vl_request_form` ADD `source_of_request` VARCHAR(50) NULL DEFAULT NULL AFTER `vldash_sync`;
+ALTER TABLE `dash_vl_request_form` ADD `source_data_dump` TEXT NULL DEFAULT NULL AFTER `source_of_request`;
+ALTER TABLE `dash_vl_request_form`  ADD `result_sent_to_source` TEXT NULL DEFAULT NULL AFTER `source_data_dump`;
+ALTER TABLE `dash_vl_request_form`  ADD  `form_attributes` JSON NULL DEFAULT NULL AFTER `result_sent_to_source`;
+
+
+ALTER TABLE `dash_eid_form`  ADD `lab_tech_comments` MEDIUMTEXT NULL DEFAULT NULL AFTER `tested_by`;
+-- ALTER TABLE `dash_vl_request_form` ADD `source_of_request` VARCHAR(50) NULL DEFAULT NULL AFTER `vldash_sync`;
+ALTER TABLE `dash_eid_form` ADD `source_data_dump` TEXT NULL DEFAULT NULL AFTER `source_of_request`;
+ALTER TABLE `dash_eid_form`  ADD `result_sent_to_source` TEXT NULL DEFAULT NULL AFTER `source_data_dump`;
+ALTER TABLE `dash_eid_form`  ADD  `form_attributes` JSON NULL DEFAULT NULL AFTER `result_sent_to_source`;
+
+ALTER TABLE `dash_form_covid19`  ADD `lab_tech_comments` MEDIUMTEXT NULL DEFAULT NULL AFTER `tested_by`;
+-- ALTER TABLE `dash_vl_request_form` ADD `source_of_request` VARCHAR(50) NULL DEFAULT NULL AFTER `vldash_sync`;
+ALTER TABLE `dash_form_covid19` ADD `source_data_dump` TEXT NULL DEFAULT NULL AFTER `source_of_request`;
+ALTER TABLE `dash_form_covid19`  ADD `result_sent_to_source` TEXT NULL DEFAULT NULL AFTER `source_data_dump`;
+ALTER TABLE `dash_form_covid19`  ADD  `form_attributes` JSON NULL DEFAULT NULL AFTER `result_sent_to_source`;
