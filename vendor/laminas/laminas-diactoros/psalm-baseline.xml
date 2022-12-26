@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<files psalm-version="4.24.0@06dd975cb55d36af80f242561738f16c5f58264f">
+<files psalm-version="4.26.0@6998fabb2bf528b65777bf9941920888d23c03ac">
   <file src="src/CallbackStream.php">
     <ImplementedReturnTypeMismatch occurrences="1">
       <code>null|callable</code>
@@ -69,7 +69,6 @@
     </PossiblyNullOperand>
   </file>
   <file src="src/Request/ArraySerializer.php">
-    <LessSpecificReturnStatement occurrences="1"/>
     <MixedArgument occurrences="6">
       <code>$headers</code>
       <code>$method</code>
@@ -85,12 +84,8 @@
       <code>$requestTarget</code>
       <code>$uri</code>
     </MixedAssignment>
-    <MoreSpecificReturnType occurrences="1">
-      <code>Request</code>
-    </MoreSpecificReturnType>
   </file>
   <file src="src/Request/Serializer.php">
-    <LessSpecificReturnStatement occurrences="1"/>
     <MixedArgument occurrences="5">
       <code>$body</code>
       <code>$headers</code>
@@ -101,19 +96,11 @@
     <MixedArgumentTypeCoercion occurrences="1">
       <code>$request-&gt;getHeaders()</code>
     </MixedArgumentTypeCoercion>
-    <MoreSpecificReturnType occurrences="1">
-      <code>Request</code>
-    </MoreSpecificReturnType>
   </file>
   <file src="src/RequestTrait.php">
     <DocblockTypeContradiction occurrences="1">
       <code>is_string($method)</code>
     </DocblockTypeContradiction>
-    <LessSpecificImplementedReturnType occurrences="3">
-      <code>RequestInterface</code>
-      <code>RequestInterface</code>
-      <code>RequestInterface</code>
-    </LessSpecificImplementedReturnType>
     <MoreSpecificImplementedParamType occurrences="1">
       <code>$requestTarget</code>
     </MoreSpecificImplementedParamType>
@@ -327,6 +314,9 @@
     <RedundantConditionGivenDocblockType occurrences="1">
       <code>gettype($port)</code>
     </RedundantConditionGivenDocblockType>
+    <UndefinedAttributeClass occurrences="1">
+      <code>SensitiveParameter</code>
+    </UndefinedAttributeClass>
   </file>
   <file src="src/functions/create_uploaded_file.legacy.php">
     <MixedArgument occurrences="1">
@@ -388,8 +378,8 @@
       <code>$https</code>
     </MissingClosureParamType>
     <MissingClosureReturnType occurrences="2">
-      <code>function ($host) {</code>
-      <code>function (string $name, array $headers, $default = null) {</code>
+      <code>static function ($host) {</code>
+      <code>static function (string $name, array $headers, $default = null) {</code>
     </MissingClosureReturnType>
     <MixedArgument occurrences="8">
       <code>$getHeaderFromArray('x-forwarded-proto', $headers, '')</code>
@@ -480,9 +470,6 @@
     </MoreSpecificReturnType>
   </file>
   <file src="test/CallbackStreamTest.php">
-    <MissingClosureReturnType occurrences="1">
-      <code>function () {</code>
-    </MissingClosureReturnType>
     <MixedAssignment occurrences="2">
       <code>$ret</code>
       <code>$ret</code>
@@ -506,7 +493,7 @@
   </file>
   <file src="test/Request/SerializerTest.php">
     <MissingClosureReturnType occurrences="1">
-      <code>function () use ($payload) {</code>
+      <code>static function () use ($payload) {</code>
     </MissingClosureReturnType>
     <MixedArrayOffset occurrences="1">
       <code>$payload[$i++]</code>

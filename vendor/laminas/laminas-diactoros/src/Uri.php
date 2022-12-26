@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Laminas\Diactoros;
 
 use Psr\Http\Message\UriInterface;
+use SensitiveParameter;
 
 use function array_keys;
 use function explode;
@@ -59,33 +60,25 @@ class Uri implements UriInterface
         'https' => 443,
     ];
 
-    /** @var string */
-    private $scheme = '';
+    private string $scheme = '';
 
-    /** @var string */
-    private $userInfo = '';
+    private string $userInfo = '';
 
-    /** @var string */
-    private $host = '';
+    private string $host = '';
 
     /** @var int|null */
     private $port;
 
-    /** @var string */
-    private $path = '';
+    private string $path = '';
 
-    /** @var string */
-    private $query = '';
+    private string $query = '';
 
-    /** @var string */
-    private $fragment = '';
+    private string $fragment = '';
 
     /**
      * generated uri string cache
-     *
-     * @var string|null
      */
-    private $uriString;
+    private ?string $uriString = null;
 
     public function __construct(string $uri = '')
     {
@@ -236,6 +229,9 @@ class Uri implements UriInterface
         return $new;
     }
 
+    // The following rule is buggy for parameters attributes
+    // phpcs:disable SlevomatCodingStandard.TypeHints.ParameterTypeHintSpacing.NoSpaceBetweenTypeHintAndParameter
+
     /**
      * Create and return a new instance containing the provided user credentials.
      *
@@ -244,8 +240,11 @@ class Uri implements UriInterface
      *
      * {@inheritdoc}
      */
-    public function withUserInfo($user, $password = null): UriInterface
-    {
+    public function withUserInfo(
+        $user,
+        #[SensitiveParameter]
+        $password = null
+    ): UriInterface {
         if (! is_string($user)) {
             throw new Exception\InvalidArgumentException(sprintf(
                 '%s expects a string user argument; received %s',
@@ -276,6 +275,8 @@ class Uri implements UriInterface
 
         return $new;
     }
+
+    // phpcs:enable SlevomatCodingStandard.TypeHints.ParameterTypeHintSpacing.NoSpaceBetweenTypeHintAndParameter
 
     /**
      * {@inheritdoc}

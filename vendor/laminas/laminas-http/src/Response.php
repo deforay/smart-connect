@@ -14,10 +14,12 @@ use function gzinflate;
 use function gzuncompress;
 use function hexdec;
 use function implode;
+use function in_array;
 use function is_array;
 use function is_float;
 use function is_numeric;
 use function is_scalar;
+use function ord;
 use function preg_match;
 use function sprintf;
 use function strlen;
@@ -155,13 +157,13 @@ class Response extends AbstractMessage implements ResponseInterface
         410 => 'Gone',
         411 => 'Length Required',
         412 => 'Precondition Failed',
-        413 => 'Request Entity Too Large',
-        414 => 'Request-URI Too Long',
+        413 => 'Content Too Large',
+        414 => 'URI Too Long',
         415 => 'Unsupported Media Type',
-        416 => 'Requested range not satisfiable',
+        416 => 'Range Not Satisfiable',
         417 => 'Expectation Failed',
         418 => 'I\'m a teapot',
-        422 => 'Unprocessable Entity',
+        422 => 'Unprocessable Content',
         423 => 'Locked',
         424 => 'Failed Dependency',
         425 => 'Too Early',
@@ -177,7 +179,7 @@ class Response extends AbstractMessage implements ResponseInterface
         501 => 'Not Implemented',
         502 => 'Bad Gateway',
         503 => 'Service Unavailable',
-        504 => 'Gateway Time-out',
+        504 => 'Gateway Timeout',
         505 => 'HTTP Version not supported',
         506 => 'Variant Also Negotiates',
         507 => 'Insufficient Storage',
@@ -648,7 +650,7 @@ class Response extends AbstractMessage implements ResponseInterface
          */
         $zlibHeader = unpack('n', substr($body, 0, 2));
 
-        if ($zlibHeader[1] % 31 === 0) {
+        if ($zlibHeader[1] % 31 === 0 && ord($body[0]) === 0x78 && in_array(ord($body[1]), [0x01, 0x5e, 0x9c, 0xda])) {
             return gzuncompress($body);
         }
         return gzinflate($body);
