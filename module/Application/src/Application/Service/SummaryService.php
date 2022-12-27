@@ -250,7 +250,7 @@ class SummaryService
         }
     }
 
-    public function exportSuppressionRateByFacility($params, $dashTable = 'dash_vl_request_form')
+    public function exportSuppressionRateByFacility($params, $dashTable = 'dash_form_vl')
     {
 
         $queryContainer = new Container('query');

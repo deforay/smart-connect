@@ -119,12 +119,12 @@ class UsersTable extends AbstractTableGateway
             if ($this->useCurrentSampleTable == true) {
                 $logincontainer->showCurrentTablesToggle = true;
                 $logincontainer->useCurrentTables = $this->useCurrentSampleTable;
-                $logincontainer->sampleTable = 'dash_vl_request_form_current';
-                $logincontainer->eidSampleTable = 'dash_eid_form_current';
+                $logincontainer->sampleTable = 'dash_form_vl_current';
+                $logincontainer->eidSampleTable = 'dash_form_eid_current';
                 $logincontainer->covid19SampleTable = 'dash_form_covid19_current';
             } else {
-                $logincontainer->sampleTable = 'dash_vl_request_form';
-                $logincontainer->eidSampleTable = 'dash_eid_form';
+                $logincontainer->sampleTable = 'dash_form_vl';
+                $logincontainer->eidSampleTable = 'dash_form_eid';
                 $logincontainer->covid19SampleTable = 'dash_form_covid19';
             }
 

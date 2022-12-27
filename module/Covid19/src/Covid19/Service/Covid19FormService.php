@@ -1214,7 +1214,7 @@ class Covid19FormService
         return $sampleDb->fetchIncompleteBarSampleDetails($params);
     }
 
-    public function getSampleInfo($params, $dashTable = 'dash_vl_request_form')
+    public function getSampleInfo($params, $dashTable = 'dash_form_vl')
     {
         $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
         $sql = new Sql($dbAdapter);

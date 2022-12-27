@@ -250,7 +250,7 @@ class EidSummaryService
         }
     }
 
-    public function exportPositiveRateByFacility($params, $dashTable = 'dash_eid_form')
+    public function exportPositiveRateByFacility($params, $dashTable = 'dash_form_eid')
     {
 
         $queryContainer = new Container('query');

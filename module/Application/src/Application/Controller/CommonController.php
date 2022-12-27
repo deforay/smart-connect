@@ -73,13 +73,13 @@ class CommonController extends AbstractActionController
             $params = $request->getPost();
             if ($params['sessionType'] == "current") {
                 $logincontainer->useCurrentTables = true;
-                $logincontainer->sampleTable = 'dash_vl_request_form_current';
-                $logincontainer->eidSampleTable = 'dash_eid_form_current';
+                $logincontainer->sampleTable = 'dash_form_vl_current';
+                $logincontainer->eidSampleTable = 'dash_form_eid_current';
                 $logincontainer->covid19SampleTable = 'dash_form_covid19_current';
             } else {
                 $logincontainer->useCurrentTables = false;
-                $logincontainer->sampleTable = 'dash_vl_request_form';
-                $logincontainer->eidSampleTable = 'dash_eid_form';
+                $logincontainer->sampleTable = 'dash_form_vl';
+                $logincontainer->eidSampleTable = 'dash_form_eid';
                 $logincontainer->covid19SampleTable = 'dash_form_covid19';
             }
         }

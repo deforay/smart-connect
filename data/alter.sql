@@ -656,3 +656,7 @@ ALTER TABLE `dash_form_covid19`  ADD `lab_tech_comments` MEDIUMTEXT NULL DEFAULT
 ALTER TABLE `dash_form_covid19` ADD `source_data_dump` TEXT NULL DEFAULT NULL AFTER `source_of_request`;
 ALTER TABLE `dash_form_covid19`  ADD `result_sent_to_source` TEXT NULL DEFAULT NULL AFTER `source_data_dump`;
 ALTER TABLE `dash_form_covid19`  ADD  `form_attributes` JSON NULL DEFAULT NULL AFTER `result_sent_to_source`;
+
+-- Thana 27-Dec-2022
+RENAME TABLE `vldashboard`.`dash_vl_request_form` TO `vldashboard`.`dash_form_vl`;
+RENAME TABLE `vldashboard`.`dash_eid_form` TO `vldashboard`.`dash_form_eid`;

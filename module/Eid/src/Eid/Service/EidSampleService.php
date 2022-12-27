@@ -134,7 +134,7 @@ class EidSampleService
         // error_log(ob_get_clean());
 
 
-        $allColumns = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS where TABLE_SCHEMA = '" . $dbname . "' AND table_name='dash_eid_form'";
+        $allColumns = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS where TABLE_SCHEMA = '" . $dbname . "' AND table_name='dash_form_eid'";
         $sResult = $dbAdapter->query($allColumns, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $columnList = array_map('current', $sResult);
 
@@ -440,7 +440,7 @@ class EidSampleService
     }
 
 
-    public function checkSampleCode($sampleCode, $remoteSampleCode = null, $instanceCode = null, $dashTable = 'dash_vl_request_form')
+    public function checkSampleCode($sampleCode, $remoteSampleCode = null, $instanceCode = null, $dashTable = 'dash_form_vl')
     {
         $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
         $sql = new Sql($dbAdapter);
@@ -891,7 +891,7 @@ class EidSampleService
         return $sampleDb->fetchIncompleteBarSampleDetails($params);
     }
 
-    public function getSampleInfo($params, $dashTable = 'dash_eid_form')
+    public function getSampleInfo($params, $dashTable = 'dash_form_eid')
     {
         $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
         $sql = new Sql($dbAdapter);

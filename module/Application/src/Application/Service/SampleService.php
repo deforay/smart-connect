@@ -36,7 +36,7 @@ class SampleService
         return $this->sm;
     }
 
-    public function checkSampleCode($uniqueId, $sampleCode, $remoteSampleCode = null, $instanceCode = null, $dashTable = 'dash_vl_request_form')
+    public function checkSampleCode($uniqueId, $sampleCode, $remoteSampleCode = null, $instanceCode = null, $dashTable = 'dash_form_vl')
     {
 
         $sql = new Sql($this->dbAdapter);
@@ -414,7 +414,7 @@ class SampleService
         return $this->sampleTable->fetchIncompleteBarSampleDetails($params);
     }
 
-    public function getSampleInfo($params, $dashTable = 'dash_vl_request_form')
+    public function getSampleInfo($params, $dashTable = 'dash_form_vl')
     {
 
         $sql = new Sql($this->dbAdapter);
@@ -1520,7 +1520,7 @@ class SampleService
 
 
 
-        $allColumns = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS where TABLE_SCHEMA = '" . $dbname . "' AND table_name='dash_vl_request_form'";
+        $allColumns = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS where TABLE_SCHEMA = '" . $dbname . "' AND table_name='dash_form_vl'";
 
         $sResult = $this->dbAdapter->query($allColumns, $this->dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $columnList = array_map('current', $sResult);

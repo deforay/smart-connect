@@ -25,7 +25,7 @@ use Zend\Debug\Debug;
 class EidSampleTable extends AbstractTableGateway
 {
 
-    protected $table = 'dash_eid_form';
+    protected $table = 'dash_form_eid';
     public $sm = null;
     public $config = null;
     protected $dbsId = null;
@@ -1975,7 +1975,7 @@ class EidSampleTable extends AbstractTableGateway
         $sql = new Sql($dbAdapter);
 
         $eidOutcomesQuery = $sql->select()
-            ->from(array('eid' => 'dash_eid_form'))
+            ->from(array('eid' => 'dash_form_eid'))
             ->columns(
                 array(
                     "total_samples" => new Expression("SUM(CASE WHEN ((eid.result IS NOT NULL AND eid.result != '' AND eid.result != 'NULL')) THEN 1 ELSE 0 END)"),
@@ -2014,7 +2014,7 @@ class EidSampleTable extends AbstractTableGateway
         $sql = new Sql($dbAdapter);
 
         $eidOutcomesQuery = $sql->select()
-            ->from(array('eid' => 'dash_eid_form'))
+            ->from(array('eid' => 'dash_form_eid'))
             ->columns(
                 array(
                     'noDatan' => new Expression("SUM(CASE WHEN ((eid.result like 'negative' OR eid.result = 'Negative' ) AND (eid.child_dob IS NULL OR eid.child_dob = '0000-00-00'))THEN 1 ELSE 0 END)"),
@@ -2073,7 +2073,7 @@ class EidSampleTable extends AbstractTableGateway
         $sql = new Sql($dbAdapter);
 
         $eidOutcomesQuery = $sql->select()
-            ->from(array('eid' => 'dash_eid_form'))
+            ->from(array('eid' => 'dash_form_eid'))
             ->columns(
                 array(
                     "total_samples" => new Expression("SUM(CASE WHEN ((eid.result IS NOT NULL AND eid.result != '' AND eid.result != 'NULL')) THEN 1 ELSE 0 END)"),
@@ -2106,7 +2106,7 @@ class EidSampleTable extends AbstractTableGateway
         $sql = new Sql($dbAdapter);
 
         $eidOutcomesQuery = $sql->select()
-            ->from(array('eid' => 'dash_eid_form'))
+            ->from(array('eid' => 'dash_form_eid'))
             ->columns(
                 array(
                     'sec1' => new Expression("AVG(DATEDIFF(sample_received_at_vl_lab_datetime, sample_collection_date))"),
@@ -4695,7 +4695,7 @@ class EidSampleTable extends AbstractTableGateway
         $sql = new Sql($dbAdapter);
 
         $eidOutcomesQuery = $sql->select()
-            ->from(array('eid' => 'dash_eid_form'))
+            ->from(array('eid' => 'dash_form_eid'))
             ->columns(
                 array(
                     'noDatan' => new Expression("SUM(CASE WHEN ((eid.result like 'negative' OR eid.result = 'Negative' ) AND (eid.child_dob IS NULL OR eid.child_dob = '0000-00-00'))THEN 1 ELSE 0 END)"),
@@ -4785,7 +4785,7 @@ class EidSampleTable extends AbstractTableGateway
             /* foreach($monthList as $key=>$list){
                 $searchVal[$key] =  new Expression("AVG(CASE WHEN (eid.result like 'positive%' AND eid.result not like '' AND sample_collection_date LIKE '%".$list."%') THEN 1 ELSE 0 END)");
             } */
-            $sQuery = $sql->select()->from(array('eid' => 'dash_eid_form'))->columns(array(
+            $sQuery = $sql->select()->from(array('eid' => 'dash_form_eid'))->columns(array(
                 'monthYear' => new Expression("DATE_FORMAT(sample_collection_date, '%b-%Y')"),
                 'positive_rate' => new Expression("ROUND(((SUM(CASE WHEN ((eid.result like 'positive' OR eid.result like 'Positive' )) THEN 1 ELSE 0 END))/(SUM(CASE WHEN (((eid.result IS NOT NULL AND eid.result != '' AND eid.result != 'NULL'))) THEN 1 ELSE 0 END)))*100,2)")
             ))

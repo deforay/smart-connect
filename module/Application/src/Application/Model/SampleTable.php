@@ -23,7 +23,7 @@ use \Application\Service\CommonService;
 class SampleTable extends AbstractTableGateway
 {
 
-    protected $table = 'dash_vl_request_form';
+    protected $table = 'dash_form_vl';
     public $sm = null;
     public $config = null;
     protected $dbsId = null;
@@ -7958,7 +7958,7 @@ class SampleTable extends AbstractTableGateway
         $sql = new Sql($dbAdapter);
         $lResult = array();
 
-        $lQuery = $sql->select()->from(array('eid' => 'dash_eid_form'))->columns(array(
+        $lQuery = $sql->select()->from(array('eid' => 'dash_form_eid'))->columns(array(
             'total' => new Expression("SUM(CASE WHEN ( eid.sample_collection_date is not NULL AND eid.sample_collection_date!='0000-00-00 00:00:00') THEN 1 ELSE 0 END)"),
             "samplenottested" => new Expression("SUM(CASE WHEN (eid.sample_collection_date is NULL OR eid.sample_collection_date='0000-00-00 00:00:00') THEN 1 ELSE 0 END)"),
             'lab_id'
@@ -7979,7 +7979,7 @@ class SampleTable extends AbstractTableGateway
         $sql = new Sql($dbAdapter);
         $lResult = array();
 
-        // $lQuery = $sql->select()->from(array('eid' => 'dash_eid_form'))->columns(array('child_name','mother_name','caretaker_phone_number','result'))
+        // $lQuery = $sql->select()->from(array('eid' => 'dash_form_eid'))->columns(array('child_name','mother_name','caretaker_phone_number','result'))
         //             ->join(array('f' => 'import_config_machines'), 'f.config_machine_id=eid.import_machine_name', array('lat'=>'latitude','lon'=>'longitude'))
         //             ->where("(eid.sample_tested_datetime is not null  AND f.poc_device ='yes' AND f.latitude = '".$params['lat']."' AND f.longitude = '".$params['lon']."')")
         //             ->join(array('lab' => 'facility_details'), 'lab.facility_id=eid.lab_id', array('lab_name' => 'facility_name','contact_person' => 'contact_person' ,'facility_emails','facility_mobile_numbers'))
@@ -7996,7 +7996,7 @@ class SampleTable extends AbstractTableGateway
             }
             $qDates = implode(",", $qDates);
         }
-        $lQuery = $sql->select()->from(array('eid' => 'dash_eid_form'))
+        $lQuery = $sql->select()->from(array('eid' => 'dash_form_eid'))
 
             ->columns(
                 array(
@@ -8044,7 +8044,7 @@ class SampleTable extends AbstractTableGateway
         $sql = new Sql($dbAdapter);
         $lResult = array();
 
-        // $lQuery = $sql->select()->from(array('eid' => 'dash_eid_form'))->columns(array('child_name','mother_name','caretaker_phone_number','result'))
+        // $lQuery = $sql->select()->from(array('eid' => 'dash_form_eid'))->columns(array('child_name','mother_name','caretaker_phone_number','result'))
         //             ->join(array('f' => 'import_config_machines'), 'f.config_machine_id=eid.import_machine_name', array('lat'=>'latitude','lon'=>'longitude'))
         //             ->where("(eid.sample_tested_datetime is not null  AND f.poc_device ='yes' AND f.latitude = '".$params['lat']."' AND f.longitude = '".$params['lon']."')")
         //             ->join(array('lab' => 'facility_details'), 'lab.facility_id=eid.lab_id', array('lab_name' => 'facility_name','contact_person' => 'contact_person' ,'facility_emails','facility_mobile_numbers'))
@@ -8061,7 +8061,7 @@ class SampleTable extends AbstractTableGateway
             }
             $qDates = implode(",", $qDates);
         }
-        $lQuery = $sql->select()->from(array('eid' => 'dash_eid_form'))
+        $lQuery = $sql->select()->from(array('eid' => 'dash_form_eid'))
 
             ->columns(
                 array(
