@@ -1497,116 +1497,124 @@ class SampleService
 
     public function saveFileFromVlsmAPIV2()
     {
-
-        $apiData = array();
-        $this->config = $this->sm->get('Config');
-        $input = $this->config['db']['dsn'];
-        preg_match('~=(.*?);~', $input, $output);
-        $dbname = $output[1];
-
-
-        $fileName = $_FILES['vlFile']['name'];
-        $ranNumber = str_pad(rand(0, pow(10, 6) - 1), 6, '0', STR_PAD_LEFT);
-        $extension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-        $fileName = $ranNumber . "." . $extension;
-
-        if (!file_exists(TEMP_UPLOAD_PATH) && !is_dir(TEMP_UPLOAD_PATH)) {
-            mkdir(APPLICATION_PATH . DIRECTORY_SEPARATOR . "temporary", 0777);
-        }
-        if (!file_exists(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-vl") && !is_dir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-vl")) {
-            mkdir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-vl", 0777);
-        }
-
-
-
-
-        $allColumns = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS where TABLE_SCHEMA = '" . $dbname . "' AND table_name='dash_form_vl'";
-
-        $sResult = $this->dbAdapter->query($allColumns, $this->dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-        $columnList = array_map('current', $sResult);
-
-        $removeKeys = array(
-            'vl_sample_id'
-        );
-
-        $columnList = array_diff($columnList, $removeKeys);
-        $sampleDb = $this->sm->get('SampleTableWithoutCache');
-
-        $pathname = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-vl" . DIRECTORY_SEPARATOR . $fileName;
-        if (!file_exists($pathname)) {
-            if (move_uploaded_file($_FILES['vlFile']['tmp_name'], $pathname)) {
-                //$apiData = json_decode(file_get_contents($pathname), true);
-                $apiData = \JsonMachine\JsonMachine::fromFile($pathname, "/data");
+        ini_set("memory_limit", -1);
+        try {
+            $apiData = array();
+            $this->config = $this->sm->get('Config');
+            $input = $this->config['db']['dsn'];
+            preg_match('~=(.*?);~', $input, $output);
+            $dbname = $output[1];
+    
+            $fileName = $_FILES['vlFile']['name'];
+            $ranNumber = str_pad(rand(0, pow(10, 6) - 1), 6, '0', STR_PAD_LEFT);
+            $extension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+            $fileName = $ranNumber . "." . $extension;
+    
+            if (!file_exists(TEMP_UPLOAD_PATH) && !is_dir(TEMP_UPLOAD_PATH)) {
+                mkdir(APPLICATION_PATH . DIRECTORY_SEPARATOR . "temporary", 0777);
             }
-        }
-
-        $numRows = 0;
-        $counter = 0;
-        foreach ($apiData as $key => $rowData) {
-            $counter++;
-
-
-            // ob_start();
-            // var_dump($rowData);
-            // error_log(ob_get_clean());
-
-            $data = array();
-            foreach ($columnList as $colName) {
-                if (isset($rowData[$colName])) {
-                    $data[$colName] = $rowData[$colName];
-                } else {
-                    $data[$colName] = null;
+            if (!file_exists(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-vl") && !is_dir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-vl")) {
+                mkdir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-vl", 0777);
+            }
+    
+    
+    
+    
+            $allColumns = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS where TABLE_SCHEMA = '" . $dbname . "' AND table_name='dash_form_vl'";
+    
+            $sResult = $this->dbAdapter->query($allColumns, $this->dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+            $columnList = array_map('current', $sResult);
+    
+            $removeKeys = array(
+                'vl_sample_id'
+            );
+    
+            $columnList = array_diff($columnList, $removeKeys);
+            $sampleDb = $this->sm->get('SampleTableWithoutCache');
+    
+            $pathname = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-vl" . DIRECTORY_SEPARATOR . $fileName;
+            if (!file_exists($pathname)) {
+                if (move_uploaded_file($_FILES['vlFile']['tmp_name'], $pathname)) {
+                    //$apiData = json_decode(file_get_contents($pathname), true);
+                    $apiData = \JsonMachine\JsonMachine::fromFile($pathname, "/data");
                 }
             }
-
-            // ob_start();
-            // var_dump($data);
-            // error_log(ob_get_clean());
-            // exit(0);
-
-
-
-            // $sampleCode = trim($data['sample_code']);
-            // $remoteSample = trim($data['remote_sample_code']);
-            // $instanceCode = trim($data['vlsm_instance_id']);
-
-            try {
-                $sampleDb->insertOrUpdate($data);
-                $numRows++;
-            } catch (Exception $e) {
-                error_log($e->getMessage());
+    
+            $numRows = 0;
+            $counter = 0;
+            foreach ($apiData as $key => $rowData) {
+                $counter++;
+    
+    
+                // ob_start();
+                // var_dump($rowData);
+                // error_log(ob_get_clean());
+    
+                $data = array();
+                foreach ($columnList as $colName) {
+                    if (isset($rowData[$colName])) {
+                        $data[$colName] = $rowData[$colName];
+                    } else {
+                        $data[$colName] = null;
+                    }
+                }
+    
+                // ob_start();
+                // var_dump($data);
+                // error_log(ob_get_clean());
+                // exit(0);
+    
+    
+    
+                // $sampleCode = trim($data['sample_code']);
+                // $remoteSample = trim($data['remote_sample_code']);
+                // $instanceCode = trim($data['vlsm_instance_id']);
+    
+                try {
+                    $sampleDb->insertOrUpdate($data);
+                    $numRows++;
+                } catch (Exception $e) {
+                    error_log($e->getMessage());
+                }
             }
+            unlink($pathname);
+    
+            if ($counter == $numRows) {
+                $status = "success";
+            } else if (($counter - $numRows) != 0) {
+                $status = "partial";
+            } else if ($numRows == 0) {
+                $status = 'failed';
+            }
+    
+            $apiData = JsonMachine::fromFile($pathname, '/timestamp');
+            $timestamp = iterator_to_array($apiData)['timestamp'];
+            $timestamp = ($timestamp != false && !empty($timestamp)) ? $timestamp : time();
+            unset($pathname);
+    
+            $apiTrackData = array(
+                'tracking_id'                   => $timestamp,
+                'received_on'                   => $this->commonService->getDateTime(),
+                'number_of_records_received'    => $counter,
+                'number_of_records_processed'   => $numRows,
+                'source'                        => 'VLSM-VL',
+                'lab_id'                        => $data['lab_id'],
+                'status'                        => $status
+            );
+            $this->apiTrackerTable->insert($apiTrackData);
+    
+            return array(
+                'status'    => 'success',
+                'message'   => $numRows . ' uploaded successfully',
+            );
+        } catch (Exception $exc) {
+            error_log("HIGH-VL-SAMPLE-RESULT-REPORT--" . $exc->getMessage());
+            error_log($exc->getTraceAsString());
+            return array(
+                'status'    => 'failed',
+                'message'   => $exc->getMessage(),
+            );
         }
-        unlink($pathname);
-
-        if ($counter == $numRows) {
-            $status = "success";
-        } else if (($counter - $numRows) != 0) {
-            $status = "partial";
-        } else if ($numRows == 0) {
-            $status = 'failed';
-        }
-
-        $apiData = JsonMachine::fromFile($pathname, '/timestamp');
-        $timestamp = iterator_to_array($apiData)['timestamp'];
-        $timestamp = ($timestamp != false && !empty($timestamp)) ? $timestamp : time();
-        unset($pathname);
-
-        $apiTrackData = array(
-            'tracking_id'                   => $timestamp,
-            'received_on'                   => $this->commonService->getDateTime(),
-            'number_of_records_received'    => $counter,
-            'number_of_records_processed'   => $numRows,
-            'source'                        => 'VLSM-VL',
-            'lab_id'                        => $data['lab_id'],
-            'status'                        => $status
-        );
-        $this->apiTrackerTable->insert($apiTrackData);
-
-        return array(
-            'status'    => 'success',
-            'message'   => $numRows . ' uploaded successfully',
-        );
 
     }
     public function saveFileFromVlsmAPIV1()
