@@ -1619,6 +1619,7 @@ class SampleService
     }
     public function saveFileFromVlsmAPIV1()
     {
+        ini_set("memory_limit", -1);
         $apiData = array();
 
         $sampleDb = $this->sm->get('SampleTableWithoutCache');
@@ -1938,6 +1939,7 @@ class SampleService
 
     public function saveWeblimsVLAPI($params)
     {
+        ini_set("memory_limit", -1);
         if (empty(trim($params)) || trim($params) == '[]') {
             http_response_code(400);
             $response = array(
@@ -2193,7 +2195,7 @@ class SampleService
 
     public function saveVLDataFromAPI($params)
     {
-
+        ini_set("memory_limit", -1);
         $sampleDb = $this->sm->get('SampleTableWithoutCache');
         $facilityDb = $this->sm->get('FacilityTable');
         $testStatusDb = $this->sm->get('SampleStatusTable');
