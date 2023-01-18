@@ -1666,8 +1666,8 @@ class SampleService
                         $uniqueId = trim($row['unique_id']);
 
                         $VLAnalysisResult = (float) $row['result_value_absolute_decimal'];
-                        $DashVL_Abs = NULL;
-                        $DashVL_AnalysisResult = NULL;
+                        $result_value_absolute_decimal = NULL;
+                        $vl_result_category = NULL;
 
                         if (
                             $row['result_value_text'] == 'Target not Detected' || $row['result_value_text'] == 'Target Not Detected' || strtolower($row['result_value_text']) == 'target not detected' || strtolower($row['result_value_text']) == 'tnd'
@@ -1694,14 +1694,14 @@ class SampleService
 
 
                         if ($VLAnalysisResult == 'NULL' || $VLAnalysisResult == '' || $VLAnalysisResult == NULL) {
-                            $DashVL_Abs = NULL;
-                            $DashVL_AnalysisResult = NULL;
+                            $result_value_absolute_decimal = NULL;
+                            $vl_result_category = NULL;
                         } else if ($VLAnalysisResult < 1000) {
-                            $DashVL_AnalysisResult = 'Suppressed';
-                            $DashVL_Abs = $VLAnalysisResult;
+                            $vl_result_category = 'Suppressed';
+                            $result_value_absolute_decimal = $VLAnalysisResult;
                         } else if ($VLAnalysisResult >= 1000) {
-                            $DashVL_AnalysisResult = 'Not Suppressed';
-                            $DashVL_Abs = $VLAnalysisResult;
+                            $vl_result_category = 'Not Suppressed';
+                            $result_value_absolute_decimal = $VLAnalysisResult;
                         }
 
 
@@ -1741,8 +1741,8 @@ class SampleService
                             'result_value_text'                     => (trim($row['result_value_text']) != '' ? trim($row['result_value_text']) : NULL),
                             'result_value_absolute_decimal'         => (trim($row['result_value_absolute_decimal']) != '' ? trim($row['result_value_absolute_decimal']) : NULL),
                             'result'                                => (trim($row['result']) != '' ? trim($row['result']) : NULL),
-                            'DashVL_Abs'                            =>   $DashVL_Abs,
-                            'DashVL_AnalysisResult'                 =>   $DashVL_AnalysisResult,
+                            'result_value_absolute_decimal'                            =>   $result_value_absolute_decimal,
+                            'vl_result_category'                 =>   $vl_result_category,
                             'sample_registered_at_lab'              => $sampleRegisteredAtLabDateTime
                         );
 
@@ -1980,8 +1980,8 @@ class SampleService
                 }
 
                 $row['result_value_absolute_decimal'] = $VLAnalysisResult = (float) $row['Result']['Copies'];
-                $DashVL_Abs = NULL;
-                $DashVL_AnalysisResult = NULL;
+                $result_value_absolute_decimal = NULL;
+                $vl_result_category = NULL;
 
                 if (strtolower($row['Result']['Raw Data']) == 'target not detected' || strtolower($row['Result']['Copies']) == 'target not detected' || strtolower($row['Result']['Copies']) == 'tnd' || strtolower($row['Result']['Raw Data']) == '< titre min' || strtolower($row['Result']['Copies']) == '< titre min') {
                     $row['result_value_absolute_decimal'] = $VLAnalysisResult = 20;
@@ -2004,14 +2004,14 @@ class SampleService
 
 
                 if ($VLAnalysisResult == 'NULL' || $VLAnalysisResult == '' || $VLAnalysisResult == NULL) {
-                    $DashVL_Abs = NULL;
-                    $DashVL_AnalysisResult = NULL;
+                    $result_value_absolute_decimal = NULL;
+                    $vl_result_category = NULL;
                 } else if ($VLAnalysisResult < 1000) {
-                    $DashVL_AnalysisResult = 'Suppressed';
-                    $DashVL_Abs = $VLAnalysisResult;
+                    $vl_result_category = 'Suppressed';
+                    $result_value_absolute_decimal = $VLAnalysisResult;
                 } else if ($VLAnalysisResult >= 1000) {
-                    $DashVL_AnalysisResult = 'Not Suppressed';
-                    $DashVL_Abs = $VLAnalysisResult;
+                    $vl_result_category = 'Not Suppressed';
+                    $result_value_absolute_decimal = $VLAnalysisResult;
                 }
 
 
@@ -2055,8 +2055,8 @@ class SampleService
                     'result_value_absolute_decimal'         => (trim($row['result_value_absolute']) != '' ? trim($row['result_value_absolute']) : NULL),
                     'result'                                => (trim($row['Result']['Copies']) != '' ? trim($row['Result']['Copies']) : NULL),
                     'result_approved_by'                    => (trim($row['ApprovedBy']) != '' ? $userDb->checkExistUser($row['ApprovedBy']) : NULL),
-                    'DashVL_Abs'                            => $DashVL_Abs,
-                    'DashVL_AnalysisResult'                 => $DashVL_AnalysisResult,
+                    'result_value_absolute_decimal'                            => $result_value_absolute_decimal,
+                    'vl_result_category'                 => $vl_result_category,
                     'sample_registered_at_lab'              => $sampleRegisteredAtLabDateTime
                 );
 
@@ -2241,8 +2241,8 @@ class SampleService
                     }
 
                     $VLAnalysisResult = (float) $row['result_value_absolute_decimal'];
-                    $DashVL_Abs = NULL;
-                    $DashVL_AnalysisResult = NULL;
+                    $result_value_absolute_decimal = NULL;
+                    $vl_result_category = NULL;
 
                     if ($row['result_value_copies'] == 'Target not Detected' || $row['result_value_copies'] == 'Target Not Detected' || strtolower($row['result_value_copies']) == 'target not detected' || strtolower($row['result_value_copies']) == 'tnd' || $row['result'] == 'Target not Detected' || $row['result'] == 'Target Not Detected' || strtolower($row['result']) == 'target not detected' || strtolower($row['result']) == 'tnd') {
                         $VLAnalysisResult = 20;
@@ -2262,14 +2262,14 @@ class SampleService
 
 
                     if ($VLAnalysisResult == 'NULL' || $VLAnalysisResult == '' || $VLAnalysisResult == NULL) {
-                        $DashVL_Abs = NULL;
-                        $DashVL_AnalysisResult = NULL;
+                        $result_value_absolute_decimal = NULL;
+                        $vl_result_category = NULL;
                     } else if ($VLAnalysisResult < 1000) {
-                        $DashVL_AnalysisResult = 'Suppressed';
-                        $DashVL_Abs = $VLAnalysisResult;
+                        $vl_result_category = 'Suppressed';
+                        $result_value_absolute_decimal = $VLAnalysisResult;
                     } else if ($VLAnalysisResult >= 1000) {
-                        $DashVL_AnalysisResult = 'Not Suppressed';
-                        $DashVL_Abs = $VLAnalysisResult;
+                        $vl_result_category = 'Not Suppressed';
+                        $result_value_absolute_decimal = $VLAnalysisResult;
                     }
 
 
@@ -2314,8 +2314,8 @@ class SampleService
                         'result'                                => (trim($row['result_value']) != '' ? trim($row['result_value']) : NULL),
                         // 'tested_by'                             => (trim($row['tested_by']) != '' ? $userDb->checkExistUser($row['tested_by']) : NULL),
                         'result_approved_by'                    => (trim($row['result_approved_by']) != '' ? $userDb->checkExistUser($row['result_approved_by']) : NULL),
-                        'DashVL_Abs'                            => $DashVL_Abs,
-                        'DashVL_AnalysisResult'                 => $DashVL_AnalysisResult,
+                        'result_value_absolute_decimal'                            => $result_value_absolute_decimal,
+                        'vl_result_category'                 => $vl_result_category,
                         'sample_registered_at_lab'              => $sampleRegisteredAtLabDateTime
                     );
 
