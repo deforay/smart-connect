@@ -180,4 +180,24 @@ class DashApiReceiverStatsTable extends AbstractTableGateway
         die($sQueryStr);
         return $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
     }
+
+    public function fetchLabSyncStatus($params)
+    {
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $sQuery = $sql->select()->from(array('f' => "facility_details"))->columns(array(
+            "facility_id", "labName" => "facility_name", "latest" =>
+            new Expression("GREATEST(
+                COALESCE(facility_attributes->>'$.lastHeartBeat', 0), 
+                COALESCE(facility_attributes->>'$.dashLastResultsSync', 0), 
+                COALESCE(facility_attributes->>'$.dashLastRequestSync', 0),
+                COALESCE(sync.received_on, 0))"), 
+            "dashLastResultsSync" => new Expression("(facility_attributes->>'$.dashLastResultsSync')"), 
+            "dashLastRequestsSync" => new Expression("(facility_attributes->>'$.dashLastRequestsSync')") 
+            ))
+            ->join(array('sync' => $this->table), "sync.lab_id=f.facility_id", array(), 'left')
+            ->order(array("latest DESC"));
+        $sQueryStr = $sql->buildSqlString($sQuery);
+        return $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+    }
 }

@@ -182,6 +182,16 @@ return array(
                     ),
                 ),
             ),
+            'sync-status' => array(
+                'type'    => 'segment',
+                'options' => array(
+                    'route'    => '/sync-status[/][:action][/:id]',
+                    'defaults' => array(
+                        'controller' => 'Application\Controller\SyncStatus',
+                        'action' => 'index',
+                    ),
+                ),
+            ),
         ),
     ),
     'service_manager' => array(

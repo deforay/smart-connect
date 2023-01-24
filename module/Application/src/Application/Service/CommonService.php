@@ -1096,4 +1096,10 @@ class CommonService
           $statsDb = $this->sm->get('DashApiReceiverStatsTable');
           return $statsDb->fetchStatusDetails($statusId);
      }
+
+     public function getLabSyncStatus($params)
+     {
+          $statsDb = $this->sm->get('DashApiReceiverStatsTable');
+          return $statsDb->fetchLabSyncStatus($params);
+     }
 }

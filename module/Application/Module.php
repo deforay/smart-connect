@@ -478,6 +478,10 @@ class Module
 					$commonService = $sm->getServiceLocator()->get('CommonService');
 					return new \Application\Controller\StatusController($commonService);
 				},
+				'Application\Controller\SyncStatus' => function ($sm) {
+					$commonService = $sm->getServiceLocator()->get('CommonService');
+					return new \Application\Controller\SyncStatusController($commonService);
+				},
 				'Application\Controller\Config' => function ($sm) {
 					$configService = $sm->getServiceLocator()->get('ConfigService');
 					return new \Application\Controller\ConfigController($configService);
