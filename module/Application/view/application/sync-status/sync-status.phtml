@@ -22,7 +22,7 @@ foreach ($result as $key => $aRow) {
 <tr class="<?php echo $color; ?>" data-facilityId="<?php echo base64_encode($aRow['facility_id']);?>">
     <td><?= ucwords($aRow['labName']); ?></td>
     <td><?= date("d-M-Y (h:i: a)", strtotime($aRow['latest'])); ?></td>
-    <td><?= date("d-M-Y (h:i: a)", strtotime($aRow['lastResultsSync'])); ?></td>
-    <td><?= date("d-M-Y (h:i: a)", strtotime($aRow['lastRequestsSync'])); ?></td>
+    <td><?= date("d-M-Y (h:i: a)", strtotime($aRow['dashLastResultsSync'])); ?></td>
+    <td><?= date("d-M-Y (h:i: a)", strtotime($aRow['dashLastRequestsSync'])); ?></td>
 </tr>
 <?php } ?>
