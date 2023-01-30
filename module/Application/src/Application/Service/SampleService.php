@@ -1566,9 +1566,9 @@ class SampleService
     
     
     
-                // $sampleCode = trim($data['sample_code']);
-                // $remoteSample = trim($data['remote_sample_code']);
-                // $instanceCode = trim($data['vlsm_instance_id']);
+                /* $sampleCode = trim($data['sample_code']);
+                $remoteSample = trim($data['remote_sample_code']);
+                $instanceCode = trim($data['vlsm_instance_id']); */
     
                 try {
                     $sampleDb->insertOrUpdate($data);
