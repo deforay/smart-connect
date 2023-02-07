@@ -8110,17 +8110,14 @@ class SampleTable extends AbstractTableGateway
 
     public function insertOrUpdate($arrayData)
     {
-        //$currentDateTime = $this->commonService->getDateTime();
+        $currentDateTime = $this->commonService->getDateTime();
         $query = 'INSERT INTO `' . $this->table . '` (' . implode(',', array_keys($arrayData)) . ') VALUES (' . implode(',', array_fill(1, count($arrayData), '?')) . ') ON DUPLICATE KEY UPDATE ' . implode(' = ?,', array_keys($arrayData)) . ' = ?';
         $result =  $this->adapter->query($query, array_merge(array_values($arrayData), array_values($arrayData)));
-        return  $result->getGeneratedValue();
-        // if((isset($arrayData['sample_code']) && !empty($arrayData['sample_code']) || isset($arrayData['remote_sample_code']) && !empty($arrayData['remote_sample_code']))){
-        //     $row =  $this->adapter->rawQueryOne("select vl_sample_id, result, is_sample_rejected from ".$this->table." where (sample_code = '?' OR remote_sample_code = '?') limit 1", array( $arrayData['sample_code'], $arrayData['remote_sample_code']));
-        //     if(isset($row['vl_sample_id']) && !empty($row['vl_sample_id'])){
-        //         $update = $this->adapter->query("UPDATE ".$this->table." SET form_attributes = JSON_SET(COALESCE(form_attributes, '{}'), '$.lastSync', ?) WHERE vl_sample_id IN (?)", array($currentDateTime, $row['vl_sample_id']));
-        //     }
-        // }
-        //return $response;
+        $id =  $result->getGeneratedValue();
+        if(is_numeric($id) && count($id) > 0){
+            $update = $this->adapter->query("UPDATE ".$this->table." SET form_attributes = JSON_SET(COALESCE(form_attributes, '{}'), '$.lastSync', ?) WHERE vl_sample_id IN (?)", array($currentDateTime, $id));
+        }
+        return $id;
     }
 
     //     public function insertOrUpdateX($insertData, $updateData = null)
