@@ -1,6 +1,6 @@
 #!/bin/bash
 
-mysql_path="/Applications/MAMP/Library/bin/mysql"
+mysql_path="/usr/bin/mysql"
 mysql_host="localhost"
 mysql_dbname="vldashboard"
 mysql_username="root"
