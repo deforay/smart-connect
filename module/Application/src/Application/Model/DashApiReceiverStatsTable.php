@@ -7,6 +7,7 @@ use Laminas\Db\Adapter\Adapter;
 use Laminas\Db\Sql\Sql;
 use Laminas\Db\Sql\Expression;
 use Laminas\Db\TableGateway\AbstractTableGateway;
+use \Application\Service\CommonService;
 use Laminas\Json\Expr;
 
 class DashApiReceiverStatsTable extends AbstractTableGateway
@@ -201,4 +202,11 @@ class DashApiReceiverStatsTable extends AbstractTableGateway
         $sQueryStr = $sql->buildSqlString($sQuery);
         return $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
     }
+
+    public function updateAttributes($params){
+        $commonService = new CommonService();
+        $currentDateTime = $commonService->getDateTime();
+        return $this->adapter->query("UPDATE ".$params['table']." SET form_attributes = JSON_SET(COALESCE(form_attributes, '{}'), '$.lastSync', ?) WHERE ".$params['field']." IN (?)", array($currentDateTime, $params['id']));
+    }
 }
+

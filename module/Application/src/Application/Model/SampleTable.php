@@ -8110,14 +8110,9 @@ class SampleTable extends AbstractTableGateway
 
     public function insertOrUpdate($arrayData)
     {
-        $currentDateTime = $this->commonService->getDateTime();
         $query = 'INSERT INTO `' . $this->table . '` (' . implode(',', array_keys($arrayData)) . ') VALUES (' . implode(',', array_fill(1, count($arrayData), '?')) . ') ON DUPLICATE KEY UPDATE ' . implode(' = ?,', array_keys($arrayData)) . ' = ?';
         $result =  $this->adapter->query($query, array_merge(array_values($arrayData), array_values($arrayData)));
-        $id =  $result->getGeneratedValue();
-        if(is_numeric($id) && count($id) > 0){
-            $update = $this->adapter->query("UPDATE ".$this->table." SET form_attributes = JSON_SET(COALESCE(form_attributes, '{}'), '$.lastSync', ?) WHERE vl_sample_id IN (?)", array($currentDateTime, $id));
-        }
-        return $id;
+        return  $result->getGeneratedValue();
     }
 
     //     public function insertOrUpdateX($insertData, $updateData = null)

@@ -1572,7 +1572,16 @@ class SampleService
                 $remoteSample = trim($data['remote_sample_code']);
                 $instanceCode = trim($data['vlsm_instance_id']); */
                 try {
-                    $sampleDb->insertOrUpdate($data);
+                    $dashDb = $this->sm->get('DashApiReceiverStatsTable');
+                    $id = $sampleDb->insertOrUpdate($data);
+                    if(isset($id) && is_numeric($id) && count($id) > 0){
+                        $params = array(
+                            "table" => "dash_form_vl", 
+                            "field" => "vl_sample_id", 
+                            "id" => $id
+                        );
+                        $dashDb->updateAttributes($params);
+                    }
                     $numRows++;
                 } catch (Exception $e) {
                     error_log($e->getMessage());
