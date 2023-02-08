@@ -196,6 +196,7 @@ class DashApiReceiverStatsTable extends AbstractTableGateway
             "dashLastRequestsSync" => new Expression("(facility_attributes->>'$.dashLastRequestsSync')") 
             ))
             ->join(array('sync' => $this->table), "sync.lab_id=f.facility_id", array(), 'left')
+            ->group("facility_id")
             ->order(array("latest DESC"));
         $sQueryStr = $sql->buildSqlString($sQuery);
         return $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();

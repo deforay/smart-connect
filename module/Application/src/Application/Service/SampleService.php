@@ -1539,7 +1539,9 @@ class SampleService
                     $apiData = \JsonMachine\JsonMachine::fromFile($pathname, "/data");
                 }
             }
-    
+            
+           /*  echo "<pre>";
+            print_r($apiData);die; */
             $numRows = 0;
             $counter = 0;
             foreach ($apiData as $key => $rowData) {
@@ -1558,7 +1560,7 @@ class SampleService
                         $data[$colName] = null;
                     }
                 }
-    
+                unset($data['vl_sample_id']);
                 // ob_start();
                 // var_dump($data);
                 // error_log(ob_get_clean());
@@ -1569,7 +1571,6 @@ class SampleService
                 /* $sampleCode = trim($data['sample_code']);
                 $remoteSample = trim($data['remote_sample_code']);
                 $instanceCode = trim($data['vlsm_instance_id']); */
-    
                 try {
                     $sampleDb->insertOrUpdate($data);
                     $numRows++;
@@ -1577,7 +1578,7 @@ class SampleService
                     error_log($e->getMessage());
                 }
             }
-            unlink($pathname);
+            // unlink($pathname);
     
             if ($counter == $numRows) {
                 $status = "success";
