@@ -178,7 +178,16 @@ class EidSampleService
             //     //sample data insert
             //     $numRows += $sampleDb->insert($data);
             // }
-            $sampleDb->insertOrUpdate($data);
+            $id = $sampleDb->insertOrUpdate($data);
+            if(isset($id) && is_numeric($id) && count($id) > 0){
+                $dashDb = $this->sm->get('DashApiReceiverStatsTable');
+                $params = array(
+                    "table" => "dash_form_eid", 
+                    "field" => "eid_id", 
+                    "id" => $id
+                );
+                $dashDb->updateAttributes($params);
+            }
             $numRows++;
         }
 

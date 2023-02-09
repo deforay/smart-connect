@@ -64,11 +64,6 @@ class Covid19FormService
                 }
             }
 
-            // ob_start();
-            // var_dump($apiData);
-            // error_log(ob_get_clean());
-
-
             $allColumns = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS where TABLE_SCHEMA = '" . $dbname . "' AND table_name='dash_form_covid19'";
             $sResult = $dbAdapter->query($allColumns, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             $columnList = array_map('current', $sResult);
@@ -92,25 +87,17 @@ class Covid19FormService
                     }
                 }
 
-                // ob_start();
-                // var_dump($data);
-                // error_log(ob_get_clean());
-                // exit(0);
-
-                $uniqueId = trim($data['unique_id']);
-                $sampleCode = trim($data['sample_code']);
-                $instanceCode = trim($data['vlsm_instance_id']);
-                //check existing sample code
-                //$sampleCode = $this->checkSampleCode($uniqueId, $sampleCode, $instanceCode);
                 try {
-                    // if ($sampleCode) {
-                    //     //sample data update
-                    //     $numRows += $sampleDb->update($data, array('covid19_id' => $sampleCode['covid19_id']));
-                    // } else {
-                    //     //sample data insert
-                    //     $numRows += $sampleDb->insert($data);
-                    // }
-                    $sampleDb->insertOrUpdate($data);
+                    $id = $sampleDb->insertOrUpdate($data);
+                    if(isset($id) && is_numeric($id) && count($id) > 0){
+                        $dashDb = $this->sm->get('DashApiReceiverStatsTable');
+                        $params = array(
+                            "table" => "dash_form_covid19", 
+                            "field" => "covid19_id", 
+                            "id" => $id
+                        );
+                        $dashDb->updateAttributes($params);
+                    }
                     $numRows++;
                 } catch (Exception $exc) {
                     error_log($exc->getMessage());
