@@ -532,7 +532,6 @@ class LaboratoryController extends AbstractActionController
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            // $sampleService = $this->getServiceLocator()->get('SampleService');
             $file = $this->sampleService->generateSampleResultExcel($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('file' => $file))

@@ -40,4 +40,17 @@ class SyncStatusController extends AbstractActionController
             return $viewModel;
         }
     }
+
+    public function exportSyncStatusExcelAction()
+    {
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+            $file = $this->commonService->generateSyncStatusExcel($params);
+            $viewModel = new ViewModel();
+            $viewModel->setVariables(array('file' => $file))
+                ->setTerminal(true);
+            return $viewModel;
+        }
+    }
 }

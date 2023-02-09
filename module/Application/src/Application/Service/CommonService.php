@@ -7,6 +7,7 @@ use Exception;
 use Laminas\Db\Sql\Sql;
 use Laminas\Mail\Transport\Smtp as SmtpTransport;
 use Laminas\Mail\Transport\SmtpOptions;
+use \PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Laminas\Mail;
 use Laminas\Mime\Message as MimeMessage;
 use Laminas\Mime\Part as MimePart;
@@ -1101,5 +1102,123 @@ class CommonService
      {
           $statsDb = $this->sm->get('DashApiReceiverStatsTable');
           return $statsDb->fetchLabSyncStatus($params);
+     }
+
+     public function generateSyncStatusExcel($params)
+     {
+          $queryContainer = new Container('query');
+          $translator = $this->sm->get('translator');
+          if (isset($queryContainer->syncStatus)) {
+               try {
+                    $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
+                    $sql = new Sql($dbAdapter);
+                    $sQueryStr = $sql->buildSqlString($queryContainer->syncStatus);
+                    $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+                    if (isset($sResult) && count($sResult) > 0) {
+                         $excel = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+                         $sheet = $excel->getActiveSheet();
+                         $output = array();
+
+                         $today = new \DateTimeImmutable();
+                         $twoWeekExpiry = $today->sub(\DateInterval::createFromDateString('2 weeks'));
+                         //$twoWeekExpiry = date("Y-m-d", strtotime(date("Y-m-d") . '-2 weeks'));
+                         $threeWeekExpiry = $today->sub(\DateInterval::createFromDateString('4 weeks'));
+
+                         foreach ($sResult as $aRow) {
+                              $row = array();
+
+                              $_color = "f08080";
+
+                              $aRow['latest'] = $aRow['latest'] ?: $aRow['requested_on'];
+                              $latest = new \DateTimeImmutable($aRow['latest']);
+
+                              $latest = (!empty($aRow['latest'])) ? new \DateTimeImmutable($aRow['latest']) : null;
+                              // $twoWeekExpiry = new DateTimeImmutable($twoWeekExpiry);
+                              // $threeWeekExpiry = new DateTimeImmutable($threeWeekExpiry);
+
+                              if (empty($latest)) {
+                                   $_color = "f08080";
+                              } elseif ($latest >= $twoWeekExpiry) {
+                                   $_color = "90ee90";
+                              } elseif ($latest > $threeWeekExpiry && $latest < $twoWeekExpiry) {
+                                   $_color = "ffff00";
+                              } elseif ($latest >= $threeWeekExpiry) {
+                                   $_color = "f08080";
+                              }
+                              $color[]['color'] = $_color;
+                              
+                              $row[] = (isset($aRow['labName']) && !empty($aRow['labName'])) ? ucwords($aRow['labName']) : "";
+                              $row[] = (isset($aRow['latest']) && !empty($aRow['latest'])) ? $this->humanDateFormat($aRow['latest']) : "";
+                              $row[] = (isset($aRow['dashLastResultsSync']) && !empty($aRow['dashLastResultsSync'])) ? $this->humanDateFormat($aRow['dashLastResultsSync']) : "";
+                              $row[] = (isset($aRow['dashLastRequestsSync']) && !empty($aRow['dashLastRequestsSync'])) ? $this->humanDateFormat($aRow['dashLastRequestsSync']) : "";
+                              $output[] = $row;
+                         }
+                         $styleArray = array(
+                              'font' => array(
+                                   'bold' => true,
+                              ),
+                              'alignment' => array(
+                                   'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                                   'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+                              ),
+                              'borders' => array(
+                                   'outline' => array(
+                                        'style' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                                   ),
+                              )
+                         );
+                         $borderStyle = array(
+                              'alignment' => array(
+                                   'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT,
+                              ),
+                              'borders' => array(
+                                   'outline' => array(
+                                        'style' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                                   ),
+                              )
+                         );
+
+                         $sheet->setCellValue('A1', html_entity_decode($translator->translate('Lab Name'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+                         $sheet->setCellValue('B1', html_entity_decode($translator->translate('Last Synced on'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+                         $sheet->setCellValue('C1', html_entity_decode($translator->translate('Last Results Sync from Lab'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+                         $sheet->setCellValue('D1', html_entity_decode($translator->translate('Last Requests Sync from VLSTS'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+
+                         $sheet->getStyle('A1')->applyFromArray($styleArray);
+                         $sheet->getStyle('B1')->applyFromArray($styleArray);
+                         $sheet->getStyle('C1')->applyFromArray($styleArray);
+                         $sheet->getStyle('D1')->applyFromArray($styleArray);
+
+                         $colorNo = 0;
+                         foreach ($output as $rowNo => $rowData) {
+                              $colNo = 1;
+                              foreach ($rowData as $field => $value) {
+                                   $rRowCount = ($rowNo + 2);
+                                   $sheet->getCellByColumnAndRow($colNo, $rRowCount)->setValueExplicit(html_entity_decode($value), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+                                   // echo "Col : ".$colNo ." => Row : " . $rRowCount . " => Color : " .$color[$colorNo]['color'];
+                                   // echo "<br>";
+                                   $cellName = $sheet->getCellByColumnAndRow($colNo, $rRowCount)->getColumn();
+                                   $sheet->getStyle($cellName . $rRowCount)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB($color[$colorNo]['color']);
+                                   $sheet->getStyle($cellName . $rRowCount)->applyFromArray($borderStyle);
+                                   $sheet->getDefaultRowDimension($colNo)->setRowHeight(18);
+                                   $sheet->getColumnDimensionByColumn($colNo)->setWidth(30);
+                                   $colNo++;
+                              }
+                              $colorNo++;
+                         }
+                         $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($excel, 'Xlsx');
+                         $filename = 'SAMPLE-SYNC-STATUS-REPORT--' . date('d-M-Y-H-i-s') . '.xlsx';
+                         $writer->save(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . $filename);
+                         return $filename;
+                    } else {
+                         return "";
+                    }
+               } catch (Exception $exc) {
+                    error_log("SAMPLE-SYNC-STATUS-REPORT--" . $exc->getMessage());
+                    error_log($exc->getTraceAsString());
+                    return "";
+               }
+          } else {
+               return "";
+          }
      }
 }

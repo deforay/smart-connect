@@ -56,6 +56,9 @@
                 <div class="caption">
                     <i class="fa fa-cogs"></i><?php echo $this->translate('Lab Status Overview'); ?>
                 </div>
+                <div class="tools">
+                    <button class="btn btn-default" onclick="exportSyncStatus();"><span><i class="fa fa-file-excel-o" aria-hidden="true"></i> <?php echo $this->translate('Excel'); ?></span></button>
+                </div>
             </div>
             <div class="portlet-body">
                 <div class="table-toolbar">
@@ -85,41 +88,6 @@
     oTable = null;
     sTable = null;
     $(document).ready(function() {
-        /* oTable = $('#labStatusTable').dataTable({
-            "bAutoWidth": false,
-            "bProcessing": true,
-            "bServerSide": true,
-            "aoColumns": [{
-                    "sClass": "center"
-                },
-                {
-                    "sClass": "center"
-                },
-                {
-                    "sClass": "center"
-                },
-                {
-                    "sClass": "center"
-                }
-            ],
-            "aaSorting": [
-                [1, "desc"]
-            ],
-            "sAjaxSource": "<?php echo $this->url('sync-status', array('action' => 'sync-status')); ?>",
-            "fnServerData": function(sSource, aoData, fnCallback) {
-                aoData.push({
-                    "name": "type",
-                    "value": "status"
-                });
-                $.ajax({
-                    "dataType": 'json',
-                    "type": "POST",
-                    "url": sSource,
-                    "data": aoData,
-                    "success": fnCallback
-                });
-            }
-        }); */
         initData();
     });
 
@@ -131,5 +99,18 @@
                 //$('#labStatusTable').dataTable();
                 $.unblockUI();
             });
+    }
+
+    function exportSyncStatus(){
+        $.blockUI.defaults.css.border = '1px solid grey';
+        $(document).ajaxStart($.blockUI({ message: '<h2><?php echo $this->translate('Processing...'); ?></h2>' })).ajaxStop($.unblockUI);
+        $.post("<?php echo $this->url('sync-status', array('action' => 'export-sync-status-excel')); ?>", {fromDate:$('#mrp-lowerDate').val(),toDate:$('#mrp-upperDate').val()},
+         function(data){
+            if(data == "" || data == null || data == undefined){
+                alert('<?php echo $this->translate('Unable to export excel'); ?>');
+            }else{
+                window.open('../temporary/'+data,'_blank');
+            }
+         }); 
     }
 </script>
