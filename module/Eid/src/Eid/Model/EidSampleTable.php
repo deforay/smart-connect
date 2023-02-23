@@ -2567,7 +2567,8 @@ class EidSampleTable extends AbstractTableGateway
                         "positive" => new Expression("SUM(CASE WHEN ((eid.result like 'positive%' OR eid.result like 'Positive%' )) THEN 1 ELSE 0 END)"),
                         "total_samples_valid" => new Expression("(SUM(CASE WHEN (((eid.result IS NOT NULL AND eid.result != '' AND eid.result != 'NULL'))) THEN 1 ELSE 0 END))")
                     )
-                );
+                )
+                ->order("total DESC");
 
             if ($facilityIdList != null) {
                 $queryStr = $queryStr->where('eid.lab_id IN ("' . implode('", "', $facilityIdList) . '")');
@@ -4766,6 +4767,7 @@ class EidSampleTable extends AbstractTableGateway
             $eidOutcomesQuery = $eidOutcomesQuery->join(array('icm' => 'import_config_machines'), 'icm.config_machine_id = eid.import_machine_name', array('poc_device'))->where(array('icm.poc_device' => 'yes'));
         }
         $eidOutcomesQueryStr = $sql->buildSqlString($eidOutcomesQuery);
+        // die($eidOutcomesQueryStr);
         $result = $this->commonService->cacheQuery($eidOutcomesQueryStr, $dbAdapter);
         return $result[0];
     }
