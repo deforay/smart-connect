@@ -429,6 +429,7 @@ class SampleTable extends AbstractTableGateway
                 ->join(array('f' => 'facility_details'), 'f.facility_id=vl.lab_id', array('facility_name'))
                 ->where(array("vl.sample_collection_date <='" . $endMonth . " 23:59:59" . "'", "vl.sample_collection_date >='" . $startMonth . " 00:00:00" . "'"))
 
+                ->order('total DESC')
                 ->group('vl.lab_id');
 
             if ($specimenTypes != null) {
@@ -439,7 +440,7 @@ class SampleTable extends AbstractTableGateway
             }
 
             $queryStr = $sql->buildSqlString($query);
-            //echo $queryStr;die;
+            // echo $queryStr;die;
             $testResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
 
             $j = 0;
