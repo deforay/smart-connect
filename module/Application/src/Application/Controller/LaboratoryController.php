@@ -186,7 +186,6 @@ class LaboratoryController extends AbstractActionController
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            // $sampleService = $this->getServiceLocator()->get('SampleService');
             $result = $this->sampleService->getSamplesTestedPerLab($params);
             $sampleType = $this->sampleService->getSampleType();
             $viewModel = new ViewModel();

@@ -11,6 +11,16 @@ class TimeController extends AbstractActionController
 	const PROVINCE = 0;
 	const DISTRICT = 1;
 	const CLINIC   = 2;
+
+	private $facilityService = null;
+	private $sampleService   = null;
+
+	public function __construct($facilityService, $sampleService)
+	{
+		$this->facilityService = $facilityService;
+		$this->sampleService   = $sampleService;
+	}
+
 	public function indexAction()
 	{
 		set_time_limit(10000);
@@ -44,12 +54,11 @@ class TimeController extends AbstractActionController
 			$labFilter = $this->params()->fromQuery('lab');
 			$params['labs'] = explode(',', $labFilter);
 		}
-		$facilityService = $this->getServiceLocator()->get('FacilityService');
-		$sampleService   = $this->getServiceLocator()->get('SampleService');
-		$provinces       = $facilityService->fetchLocationDetails();
-		$districts       = $facilityService->getAllDistrictsList();
-		$clinics         = $sampleService->getAllClinicName();
-		$labs            = $sampleService->getAllLabName();
+
+		$provinces       = $this->facilityService->fetchLocationDetails();
+		$districts       = $this->facilityService->getAllDistrictsList();
+		$clinics         = $this->sampleService->getAllClinicName();
+		$labs            = $this->sampleService->getAllLabName();
 
 		return new ViewModel(
 			array(
@@ -69,17 +78,16 @@ class TimeController extends AbstractActionController
 
 	public function getTATDefaultAction()
 	{
-
+		/** @var \Laminas\Http\Request $request */
 		$request = $this->getRequest();
 		if ($request->isPost()) {
 			$params = $request->getPost();
-			$sampleService = $this->getServiceLocator()->get('SampleService');
-			// $facilityService = $this->getServiceLocator()->get('FacilityService');
+
 			$dates = explode(" to ", $params['sampleCollectionDate']);
 			$category = $params['category'];
 			$labs = (isset($params['lab']) && !empty($params['lab'])) ? $params['lab'] : array();
 
-			$result = $sampleService->getTATbyProvince($labs, $dates[0], $dates[1]);
+			$result = $this->sampleService->getTATbyProvince($labs, $dates[0], $dates[1]);
 			$viewModel = new ViewModel();
 			$viewModel->setVariables(array('results' => $result, 'daterange' => $params['sampleCollectionDate'], 'labs' => implode(',', $labs), 'categoryChecked' => $category))
 				->setTerminal(true);
@@ -89,32 +97,33 @@ class TimeController extends AbstractActionController
 
 	public function getTATfromURLAction()
 	{
+		/** @var \Laminas\Http\Request $request */
 		$request = $this->getRequest();
 		if ($request->isPost()) {
 			$params = $request->getPost();
-			$sampleService = $this->getServiceLocator()->get('SampleService');
-			// $facilityService = $this->getServiceLocator()->get('FacilityService');
+
 			$labs = (isset($params['lab']) && !empty($params['lab'])) ? $params['lab'] : array();
 			$dates = explode(" to ", $params['sampleCollectionDate']);
 			$category = $params['category'];
 			$place = $params['place'];
+			$facilities = null;
 
 			if ($params['category'] == self::PROVINCE) { // If it is a Province: It brings the respective Districts TATs
 				// $facilities = $facilityService->getDistrictList($params['province']);
-				$result = $sampleService->getTATbyDistrict($labs, $dates[0], $dates[1]);
+				$result = $this->sampleService->getTATbyDistrict($labs, $dates[0], $dates[1]);
 			} else if ($params['category'] == self::DISTRICT) { // If it is a District: It brings the respective Clinics TATs
 				// $facilities   = $facilityService->getFacilityByDistrict($params['district']);
-				$result       = $sampleService->getTATbyClinic($labs, $dates[0], $dates[1]);
+				$result       = $this->sampleService->getTATbyClinic($labs, $dates[0], $dates[1]);
 			} else { // Brings the TAT ordered by Province
 				// $facilities = $facilityService->fetchLocationDetails();
-				$result = $sampleService->getTATbyProvince($labs, $dates[0], $dates[1]);
+				$result = $this->sampleService->getTATbyProvince($labs, $dates[0], $dates[1]);
 			}
 			$viewModel = new ViewModel();
 			$viewModel->setVariables(
 				array(
 					'results'    => $result,
 					'daterange'  => $params['sampleCollectionDate'],
-					'labs'       => (count($labs) > 0) ? implode(',', $labs) : '',
+					'labs'       => (!empty($labs)) ? implode(',', $labs) : '',
 					'facilities' => $facilities,
 					'category'   => $params['category'],
 					'place'      => $place
@@ -127,11 +136,10 @@ class TimeController extends AbstractActionController
 
 	public function getTATfromSearchFieldAction()
 	{
+		/** @var \Laminas\Http\Request $request */
 		$request = $this->getRequest();
 		if ($request->isPost()) {
 			$params           = $request->getPost();
-			$sampleService    = $this->getServiceLocator()->get('SampleService');
-			$facilityService  = $this->getServiceLocator()->get('FacilityService');
 			$category         = $params['category'];
 			$provinces        = $params['provinces'];
 			$districts        = $params['districts'];
@@ -154,7 +162,7 @@ class TimeController extends AbstractActionController
 					);
 				}
 			} else {
-				$provinceArray = $facilityService->fetchLocationDetails();
+				$provinceArray = $this->facilityService->fetchLocationDetails();
 			}
 
 			if (isset($districts) && !empty($districts)) {
@@ -167,7 +175,7 @@ class TimeController extends AbstractActionController
 			} else {
 				if (isset($provinces) && !empty($provinces)) {
 					for ($i = 0; $i < sizeOf($provinces); $i++) {
-						$districtArray = array_merge($districtArray, $facilityService->getDistrictList($provinces[$i]));
+						$districtArray = array_merge($districtArray, $this->facilityService->getDistrictList($provinces[$i]));
 					}
 				}
 			}
@@ -181,7 +189,7 @@ class TimeController extends AbstractActionController
 			} else {
 				if (isset($districts) && !empty($districts)) {
 					for ($i = 0; $i < sizeOf($districts); $i++) {
-						$clinicArray = array_merge($clinicArray, $facilityService->getFacilityByDistrict($districts[$i]));
+						$clinicArray = array_merge($clinicArray, $this->facilityService->getFacilityByDistrict($districts[$i]));
 					}
 				}
 			}
@@ -191,9 +199,9 @@ class TimeController extends AbstractActionController
 				array(
 					'daterange'       => $params['sampleCollectionDate'],
 					'labs'            => (isset($labs) && !empty($labs)) ? implode(',', $labs) : '',
-					'resultProvinces' => $sampleService->getTATbyProvince($labs, $dates[0], $dates[1]),
-					'resultDistricts' => $sampleService->getTATbyDistrict($labs, $dates[0], $dates[1]),
-					'resultClinics'   => $sampleService->getTATbyClinic($labs, $dates[0], $dates[1]),
+					'resultProvinces' => $this->sampleService->getTATbyProvince($labs, $dates[0], $dates[1]),
+					'resultDistricts' => $this->sampleService->getTATbyDistrict($labs, $dates[0], $dates[1]),
+					'resultClinics'   => $this->sampleService->getTATbyClinic($labs, $dates[0], $dates[1]),
 					'provinceNames'   => $provinceNames,
 					'districtNames'   => $districtNames,
 					'clinicNames'     => $clinicNames,
@@ -204,7 +212,6 @@ class TimeController extends AbstractActionController
 				)
 			)
 				->setTerminal(true);
-			//echo "<script type='text/javascript'>alert('".json_encode($sampleService -> getTATbyProvince($labs,$dates[0],$dates[1]))."');</script>";
 			return $viewModel;
 		}
 	}

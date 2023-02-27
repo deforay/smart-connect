@@ -510,6 +510,11 @@ class Module
 					$configService = $sm->getServiceLocator()->get('ConfigService');
 					return new \Application\Controller\CommonController($commonService, $configService);
 				},
+				'Application\Controller\Time' => function ($sm) {
+					$sampleService = $sm->getServiceLocator()->get('SampleService');
+					$facilityService = $sm->getServiceLocator()->get('FacilityService');
+					return new \Application\Controller\TimeController($facilityService, $sampleService);
+				},
 			),
 		);
 	}

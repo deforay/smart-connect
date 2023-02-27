@@ -218,7 +218,7 @@ return array(
             'Application\Controller\Index' => 'Application\Controller\IndexController',
             'Application\Controller\Organizations' => 'Application\Controller\OrganizationsController',
             //'Application\Controller\Hubs' => 'Application\Controller\HubsController',
-            'Application\Controller\Time' => 'Application\Controller\TimeController'
+            //'Application\Controller\Time' => 'Application\Controller\TimeController'
         ),
     ),
     'controller_plugins' => array(
