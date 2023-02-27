@@ -166,13 +166,13 @@ class LaboratoryController extends AbstractActionController
         }
     }
 
-    public function getSampleTestResultAction()
+    public function getSamplesTestedAction()
     {
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
             // $sampleService = $this->getServiceLocator()->get('SampleService');
-            $result = $this->sampleService->getSampleTestedResultDetails($params);
+            $result = $this->sampleService->getSamplesTested($params);
             $sampleType = $this->sampleService->getSampleType();
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('result' => $result, 'sampleType' => $sampleType))
@@ -181,13 +181,13 @@ class LaboratoryController extends AbstractActionController
         }
     }
 
-    public function getSampleTestResultVolumeAction()
+    public function getSamplesTestedPerLabAction()
     {
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
             // $sampleService = $this->getServiceLocator()->get('SampleService');
-            $result = $this->sampleService->getSampleTestedResultBasedVolumeDetails($params);
+            $result = $this->sampleService->getSamplesTestedPerLab($params);
             $sampleType = $this->sampleService->getSampleType();
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('result' => $result, 'sampleType' => $sampleType))

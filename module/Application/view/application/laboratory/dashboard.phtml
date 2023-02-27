@@ -309,7 +309,7 @@ foreach ($sampleType as $samples) {
                 <div class="actions">
                     <!-- <a class="btn btn-danger" onclick="expandChart('stb');"><span><i class="fa fa-angle-double-right" aria-hidden="true"></i> <?php echo $this->translate('Expand'); ?></span></a> -->
                     <div class="btn-group">
-                        <select id="sampleType" class="btn white btn-outline btn-circle btn-sm dropdown-toggle" onchange="getTestedSampleResult()">
+                        <select id="sampleType" class="btn white btn-outline btn-circle btn-sm dropdown-toggle" onchange="getSamplesTestedChart()">
                             <option value=""><?php echo $this->translate('All Sample Types'); ?></option>
                             <?php echo $sType; ?>
                         </select>
@@ -318,7 +318,7 @@ foreach ($sampleType as $samples) {
                 </div>
             </div>
             <div class="portlet-body" style="cursor:pointer;">
-                <div id="samplesTestedResult"></div>
+                <div id="samplesTestedChart"></div>
             </div>
         </div>
     </div>
@@ -331,7 +331,7 @@ foreach ($sampleType as $samples) {
                 </div>
                 <div class="actions">
                     <div class="btn-group">
-                        <select id="sampleTypeVolume" class="btn white btn-outline btn-circle btn-sm dropdown-toggle" onchange="getTestedSampleResultBasedLab();">
+                        <select id="sampleTypeVolume" class="btn white btn-outline btn-circle btn-sm dropdown-toggle" onchange="getSamplesTestedPerLabChart();">
                             <option value=""><?php echo $this->translate('All Sample Types'); ?></option>
                             <?php echo $sType; ?>
                         </select>
@@ -339,7 +339,7 @@ foreach ($sampleType as $samples) {
                 </div>
             </div>
             <div class="portlet-body" style="cursor:pointer;">
-                <div id="samplesTestedLabResult"></div>
+                <div id="samplesTestedPerLabChart"></div>
             </div>
         </div>
     </div>
@@ -735,35 +735,35 @@ foreach ($sampleType as $samples) {
 
     }
 
-    function getTestedSampleResult() {
+    function getSamplesTestedChart() {
         var fromDate = formatDate($('#mrp-lowerDate').val());
         var toDate = formatDate($('#mrp-upperDate').val());
         var sampleType = ($("#sampleType").val() == null) ? '' : $("#sampleType").val();
         var facilityId = ($("#labName").val() == null) ? '' : $("#labName").val().join(',');
-        return $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-test-result')); ?>", {
+        return $.post("<?php echo $this->url('laboratory', array('action' => 'get-samples-tested')); ?>", {
                 fromDate: fromDate,
                 toDate: toDate,
                 sampleType: sampleType,
                 facilityId: facilityId
             },
             function(data) {
-                $("#samplesTestedResult").html(data);
+                $("#samplesTestedChart").html(data);
             });
     }
 
-    function getTestedSampleResultBasedLab() {
+    function getSamplesTestedPerLabChart() {
         var fromDate = formatDate($('#mrp-lowerDate').val());
         var toDate = formatDate($('#mrp-upperDate').val());
         var sampleType = ($("#sampleTypeVolume").val() == null) ? '' : $("#sampleTypeVolume").val();
         var facilityId = ($("#labName").val() == null) ? '' : $("#labName").val().join(',');
-        return $.post("<?php echo $this->url('laboratory', array('action' => 'get-sample-test-result-volume')); ?>", {
+        return $.post("<?php echo $this->url('laboratory', array('action' => 'get-samples-tested-per-lab')); ?>", {
                 fromDate: fromDate,
                 toDate: toDate,
                 sampleType: sampleType,
                 facilityId: facilityId
             },
             function(data) {
-                $("#samplesTestedLabResult").html(data);
+                $("#samplesTestedPerLabChart").html(data);
             });
     }
 
@@ -1112,7 +1112,7 @@ foreach ($sampleType as $samples) {
 
 
 
-        $.when(getTestedSampleResult(), getTestedSampleResultBasedLab())
+        $.when(getSamplesTestedChart(), getSamplesTestedPerLabChart())
             .done(function() {
                 getTestedSampleResultBasedGender();
                 getAverageLabTAT();

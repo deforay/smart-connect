@@ -156,17 +156,17 @@ class SampleService
         return $this->sampleTable->fetchSampleResultDetails($params);
     }
     //get sample tested result details
-    public function getSampleTestedResultDetails($params)
+    public function getSamplesTested($params)
     {
 
-        return $this->sampleTable->fetchSampleTestedResultDetails($params);
+        return $this->sampleTable->fetchSamplesTested($params);
     }
 
     //get sample tested result details
-    public function getSampleTestedResultBasedVolumeDetails($params)
+    public function getSamplesTestedPerLab($params)
     {
 
-        return $this->sampleTable->fetchSampleTestedResultBasedVolumeDetails($params);
+        return $this->sampleTable->getSamplesTestedPerLab($params);
     }
 
     public function getSampleTestedResultGenderDetails($params)

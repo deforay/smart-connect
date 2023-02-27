@@ -221,7 +221,7 @@ class SampleTable extends AbstractTableGateway
     }
 
     //get sample tested result details
-    public function fetchSampleTestedResultDetails($params)
+    public function fetchSamplesTested($params)
     {
         $logincontainer = new Container('credo');
         $result = array();
@@ -371,7 +371,7 @@ class SampleTable extends AbstractTableGateway
         return $result;
     }
 
-    public function fetchSampleTestedResultBasedVolumeDetails($params)
+    public function getSamplesTestedPerLab($params)
     {
         $logincontainer = new Container('credo');
         $result = array();
@@ -8098,35 +8098,4 @@ class SampleTable extends AbstractTableGateway
         $result =  $this->adapter->query($query, array_merge(array_values($arrayData), array_values($arrayData)));
         return  $result->getGeneratedValue();
     }
-
-    //     public function insertOrUpdateX($insertData, $updateData = null)
-    //     {
-    //         $insertDataValuesForQuery = [];
-    //         $queryParams = [];
-    //         foreach ($insertData as $key => $value) {
-    //             if (gettype($value) == "object") {
-    //                 array_push($insertDataValuesForQuery, $value->__toString());
-    //                 continue;
-    //             }
-    //             array_push($insertDataValuesForQuery, "?");
-    //             array_push($queryParams, $value);
-    //         }
-
-    //         if(empty($updateData)){
-    //             $updateData = $insertData;
-    //         }
-    //         $updateDataValuesForQuery = [];
-    //         foreach ($updateData as $key => $value) {
-    //             if (gettype($value) == "object") {
-    //                 array_push($updateDataValuesForQuery, $key . " = " . $value->__toString());
-    //                 continue;
-    //             }
-    //             array_push($updateDataValuesForQuery, $key . " = ?");
-    //             array_push($queryParams, $value);
-    //         }
-
-    //         $query = 'INSERT INTO ' . $this->_name . ' (' . implode(',', array_keys($insertData)) . ') VALUES (' . implode(',', $insertDataValuesForQuery) . ') ON DUPLICATE KEY UPDATE ' . implode(' , ', $updateDataValuesForQuery);
-    //         $result = $this->adapter->query($query, $queryParams);
-    //         return $result->getGeneratedValue();
-    //  }
 }
