@@ -1,0 +1,11 @@
+services:
+  app:
+    # replace :master with docker image version
+    image: ghcr.io/deforay/smart-connect:master
+
+  app-server:
+    # use same version as for app container
+    image: ghcr.io/deforay/smart-connect:master
+    ports:
+      # replace port with unique port to expose on host for reverse proxy
+      - "8080:80"

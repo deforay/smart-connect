@@ -1,0 +1,30 @@
+services:
+  app:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+      target: app
+
+  app-server:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+      target: app
+    ports:
+      - "8080:80"
+
+  app-db:
+    image: mysql
+    ports:
+      - "3306"
+    volumes:
+      - mysqldata:/var/lib/mysql:rw
+      # - local/path/to/seed/mysql_seed.sql:/docker-entrypoint-initdb.d/seed.sql:ro,z
+    environment:
+      # provide values in .env file
+      - MYSQL_ROOT_PASSWORD
+      - MYSQL_DATABASE
+
+
+volumes:
+  mysqldata:
