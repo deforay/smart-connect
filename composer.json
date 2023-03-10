@@ -11,9 +11,8 @@
     ],
     "require": {
         "php": "^7.3 || ~8.0.0",
-        "laminas/laminas-component-installer": "^2.4",
+        "laminas/laminas-component-installer": "^3.0.0",
         "laminas/laminas-development-mode": "^3.2",
-        "laminas/laminas-skeleton-installer": "^0.3",
         "laminas/laminas-mvc": "^3.1.1",
         "laminas/laminas-cache": "^2.11.1",
         "laminas/laminas-db": "^2.12.0",
@@ -30,6 +29,9 @@
         "laminas/laminas-serializer": "^2.10",
         "phpoffice/phpspreadsheet": "^1.18",
         "halaxa/json-machine": "^0.7.0"
+    },
+    "replace": {
+        "laminas/laminas-zendframework-bridge": "*"
     },
     "autoload": {
         "psr-4": {
