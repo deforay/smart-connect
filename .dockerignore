@@ -1,6 +1,10 @@
 .git
 .github
 .idea
+.env
+.env.dist
+compose.yaml
+compose.override.yaml*
 .phpunit.result.cache
 .phpunit.cache
 .phpcs-cache
@@ -12,3 +16,4 @@ data/cache/*
 vendor
 phpcs.xml.dist
 phpunit.xml
+Vagrantfile
