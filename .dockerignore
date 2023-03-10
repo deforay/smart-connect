@@ -1,0 +1,14 @@
+.git
+.github
+.idea
+.phpunit.result.cache
+.phpunit.cache
+.phpcs-cache
+config/autoload/local.php
+config/autoload/*.local.php
+config/development.config.php
+data/cache/*
+!data/cache/.gitkeep
+vendor
+phpcs.xml.dist
+phpunit.xml
