@@ -4,7 +4,7 @@ $labs = '';
 $clinics = '';
 if(isset($result['provinceDistricts']) && count($result['provinceDistricts']) >0){
     foreach($result['provinceDistricts'] as $district){
-        $districts.='<option value="'.$district['location_id'].'">'.ucwords($district['location_name']).'</option>';
+        $districts.='<option value="'.$district['geo_id'].'">'.ucwords($district['geo_name']).'</option>';
     }
 }
 if(isset($result['labs']) && count($result['labs']) >0){

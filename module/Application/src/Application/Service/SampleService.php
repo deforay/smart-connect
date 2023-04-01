@@ -59,8 +59,8 @@ class SampleService
     {
 
         $sql = new Sql($this->dbAdapter);
-        $sQuery = $sql->select()->from(array('l' => 'location_details'))
-            ->where(array('l.parent_location' => $parent, 'l.location_name' => trim($location)));
+        $sQuery = $sql->select()->from(array('l' => 'geographical_divisions'))
+            ->where(array('l.geo_parent' => $parent, 'l.geo_name' => trim($location)));
         $sQuery = $sql->buildSqlString($sQuery);
         $sQueryResult = $this->dbAdapter->query($sQuery, $this->dbAdapter::QUERY_MODE_EXECUTE)->current();
         return $sQueryResult;
@@ -417,8 +417,8 @@ class SampleService
         $sql = new Sql($this->dbAdapter);
         $sQuery = $sql->select()->from(array('vl' => $dashTable))
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name', 'facility_code', 'facility_logo'), 'left')
-            ->join(array('l_s' => 'location_details'), 'l_s.location_id=f.facility_state', array('provinceName' => 'location_name'), 'left')
-            ->join(array('l_d' => 'location_details'), 'l_d.location_id=f.facility_district', array('districtName' => 'location_name'), 'left')
+            ->join(array('l_s' => 'geographical_divisions'), 'l_s.geo_id=f.facility_state', array('provinceName' => 'geo_name'), 'left')
+            ->join(array('l_d' => 'geographical_divisions'), 'l_d.geo_id=f.facility_district', array('districtName' => 'geo_name'), 'left')
             ->join(array('rs' => 'r_vl_sample_type'), 'rs.sample_id=vl.sample_type', array('sample_name'), 'left')
             ->join(array('l' => 'facility_details'), 'l.facility_id=vl.lab_id', array('labName' => 'facility_name'), 'left')
             ->join(array('u' => 'user_details'), 'u.user_id=vl.result_approved_by', array('approvedBy' => 'user_name'), 'left')
@@ -1287,8 +1287,8 @@ class SampleService
         $resultSet = $this->sampleTable->getTATbyProvince($labs, $startDate, $endDate);
         foreach ($resultSet as $key) {
             $result[] = array(
-                "facility"           => $key['location_name'],
-                "facility_id"        => $key['location_id'],
+                "facility"           => $key['geo_name'],
+                "facility_id"        => $key['geo_id'],
                 "category"           => 0,
                 "collect_receive"    => $key['Collection_Receive'],
                 "receive_register"   => $key['Receive_Register'],
@@ -1309,8 +1309,8 @@ class SampleService
         $resultSet = $this->sampleTable->getTATbyDistrict($labs, $startDate, $endDate);
         foreach ($resultSet as $key) {
             $result[] = array(
-                "facility"           => $key['location_name'],
-                "facility_id"        => $key['location_id'],
+                "facility"           => $key['geo_name'],
+                "facility_id"        => $key['geo_id'],
                 "category"           => 0,
                 "collect_receive"    => $key['Collection_Receive'],
                 "receive_register"   => $key['Receive_Register'],
@@ -1330,8 +1330,8 @@ class SampleService
         $resultSet = $this->sampleTable->getTATbyClinic($labs, $startDate, $endDate);
         foreach ($resultSet as $key) {
             $result[] = array(
-                "facility"           => $key['location_name'],
-                "facility_id"        => $key['location_id'],
+                "facility"           => $key['geo_name'],
+                "facility_id"        => $key['geo_id'],
                 "category"           => 0,
                 "collect_receive"    => $key['Collection_Receive'],
                 "receive_register"   => $key['Receive_Register'],
@@ -1773,18 +1773,18 @@ class SampleService
                         if (trim($row['facility_state']) != '') {
                             $sQueryResult = $this->checkFacilityStateDistrictDetails(trim($row['facility_state']), 0);
                             if ($sQueryResult) {
-                                $facilityData['facility_state'] = $sQueryResult['location_id'];
+                                $facilityData['facility_state'] = $sQueryResult['geo_id'];
                             } else {
-                                $locationDb->insert(array('parent_location' => 0, 'location_name' => trim($row['facility_state'])));
+                                $locationDb->insert(array('geo_parent' => 0, 'geo_name' => trim($row['facility_state'])));
                                 $facilityData['facility_state'] = $locationDb->lastInsertValue;
                             }
                         }
                         if (trim($row['facility_district']) != '') {
                             $sQueryResult = $this->checkFacilityStateDistrictDetails(trim($row['facility_district']), $facilityData['facility_state']);
                             if ($sQueryResult) {
-                                $facilityData['facility_district'] = $sQueryResult['location_id'];
+                                $facilityData['facility_district'] = $sQueryResult['geo_id'];
                             } else {
-                                $locationDb->insert(array('parent_location' => $facilityData['facility_state'], 'location_name' => trim($row['facility_district'])));
+                                $locationDb->insert(array('geo_parent' => $facilityData['facility_state'], 'geo_name' => trim($row['facility_district'])));
                                 $facilityData['facility_district'] = $locationDb->lastInsertValue;
                             }
                         }
@@ -1832,18 +1832,18 @@ class SampleService
                         if (trim($row['labState']) != '') {
                             $sQueryResult = $this->checkFacilityStateDistrictDetails(trim($row['labState']), 0);
                             if ($sQueryResult) {
-                                $labData['facility_state'] = $sQueryResult['location_id'];
+                                $labData['facility_state'] = $sQueryResult['geo_id'];
                             } else {
-                                $locationDb->insert(array('parent_location' => 0, 'location_name' => trim($row['labState'])));
+                                $locationDb->insert(array('geo_parent' => 0, 'geo_name' => trim($row['labState'])));
                                 $labData['facility_state'] = $locationDb->lastInsertValue;
                             }
                         }
                         if (trim($row['labDistrict']) != '') {
                             $sQueryResult = $this->checkFacilityStateDistrictDetails(trim($row['labDistrict']), $labData['facility_state']);
                             if ($sQueryResult) {
-                                $labData['facility_district'] = $sQueryResult['location_id'];
+                                $labData['facility_district'] = $sQueryResult['geo_id'];
                             } else {
-                                $locationDb->insert(array('parent_location' => $labData['facility_state'], 'location_name' => trim($row['labDistrict'])));
+                                $locationDb->insert(array('geo_parent' => $labData['facility_state'], 'geo_name' => trim($row['labDistrict'])));
                                 $labData['facility_district'] = $locationDb->lastInsertValue;
                             }
                         }

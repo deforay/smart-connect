@@ -180,7 +180,7 @@ if (isset($labFilter) && trim($labFilter) != '') {
           if (isset($provinces) && count($provinces) > 0) {
             foreach ($provinces as $province) {
           ?>
-              <option value="<?php echo $province['location_id']; ?>" <?php echo (in_array($province['location_id'], $selectedProvinces)) ? 'selected="selected"' : ''; ?>><?php echo ucwords($province['location_name']); ?></option>
+              <option value="<?php echo $province['geo_id']; ?>" <?php echo (in_array($province['geo_id'], $selectedProvinces)) ? 'selected="selected"' : ''; ?>><?php echo ucwords($province['geo_name']); ?></option>
           <?php }
           } ?>
         </select>
@@ -192,7 +192,7 @@ if (isset($labFilter) && trim($labFilter) != '') {
           if (isset($districts) && count($districts) > 0) {
             foreach ($districts as $district) {
           ?>
-              <option value="<?php echo $district['location_id']; ?>" <?php echo (in_array($district['location_id'], $selectedDistricts)) ? 'selected="selected"' : ''; ?>><?php echo ucwords($district['location_name']); ?></option>
+              <option value="<?php echo $district['geo_id']; ?>" <?php echo (in_array($district['geo_id'], $selectedDistricts)) ? 'selected="selected"' : ''; ?>><?php echo ucwords($district['geo_name']); ?></option>
           <?php }
           } ?>
         </select>

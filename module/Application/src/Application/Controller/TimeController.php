@@ -160,8 +160,8 @@ class TimeController extends AbstractActionController
 			if (isset($provinces) && !empty($provinces)) {
 				for ($i = 0; $i < sizeOf($provinces); $i++) {
 					$provinceArray[]  = array(
-						'location_id'   => $provinces[$i],
-						'location_name' => $provinceNames[$i]
+						'geo_id'   => $provinces[$i],
+						'geo_name' => $provinceNames[$i]
 					);
 				}
 			} else {
@@ -171,8 +171,8 @@ class TimeController extends AbstractActionController
 			if (isset($districts) && !empty($districts)) {
 				for ($i = 0; $i < sizeOf($districts); $i++) {
 					$districtArray[] = array(
-						'location_id'   => $districts[$i],
-						'location_name' => $districtNames[$i]
+						'geo_id'   => $districts[$i],
+						'geo_name' => $districtNames[$i]
 					);
 				}
 			} else {

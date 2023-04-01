@@ -658,5 +658,11 @@ ALTER TABLE `dash_form_covid19`  ADD `result_sent_to_source` TEXT NULL DEFAULT N
 ALTER TABLE `dash_form_covid19`  ADD  `form_attributes` JSON NULL DEFAULT NULL AFTER `result_sent_to_source`;
 
 -- Thana 27-Dec-2022
-RENAME TABLE `vldashboard`.`dash_vl_request_form` TO `vldashboard`.`dash_form_vl`;
-RENAME TABLE `vldashboard`.`dash_eid_form` TO `vldashboard`.`dash_form_eid`;
+RENAME TABLE `dash_vl_request_form` TO `dash_form_vl`;
+RENAME TABLE `dash_eid_form` TO `dash_form_eid`;
+
+-- Amit 01-Apr-2023
+RENAME TABLE `location_details` TO `geographical_divisions`;
+ALTER TABLE `geographical_divisions` CHANGE `location_id` `geo_id` INT NOT NULL AUTO_INCREMENT, CHANGE `parent_location` `geo_parent` INT NULL DEFAULT NULL, CHANGE `location_name` `geo_name` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL, CHANGE `location_code` `geo_code` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL, CHANGE `updated_datetime` `updated_datetime` DATETIME NULL DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE `geographical_divisions` ADD `geo_status` VARCHAR(256) NULL DEFAULT 'active' AFTER `updated_datetime`;
+

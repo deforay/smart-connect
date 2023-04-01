@@ -2,7 +2,7 @@
 
 $html = '<option value="">--Select--</option>';
 foreach($result as $district){
-    $html.= '<option value="'.$district['location_id'].'">'.ucwords($district['location_name']).'</option>';
+    $html.= '<option value="'.$district['geo_id'].'">'.ucwords($district['geo_name']).'</option>';
 }
 
 echo $html;

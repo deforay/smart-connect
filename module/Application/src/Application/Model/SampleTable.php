@@ -2267,8 +2267,8 @@ class SampleTable extends AbstractTableGateway
             $hQuery = clone $sQuery;
             $hQuery->join(array('pat' => 'patients'), 'pat.patient_art_no=vl.patient_art_no', array('first_name', 'middle_name', 'last_name'), 'left')
                 ->join(array('st' => 'r_vl_sample_type'), 'st.sample_id=vl.sample_type', array('sample_name'), 'left')
-                ->join(array('lds' => 'location_details'), 'lds.location_id=f.facility_state', array('facilityState' => 'location_name'), 'left')
-                ->join(array('ldd' => 'location_details'), 'ldd.location_id=f.facility_district', array('facilityDistrict' => 'location_name'), 'left')
+                ->join(array('lds' => 'geographical_divisions'), 'lds.geo_id=f.facility_state', array('facilityState' => 'geo_name'), 'left')
+                ->join(array('ldd' => 'geographical_divisions'), 'ldd.geo_id=f.facility_district', array('facilityDistrict' => 'geo_name'), 'left')
                 ->where('vl_result_category="Not Suppressed"');
             $queryContainer->highVlSampleQuery = $hQuery;
         }
@@ -3825,8 +3825,8 @@ class SampleTable extends AbstractTableGateway
                                                         END)"))
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.lab_id', array())
-            ->join(array('p' => 'location_details'), 'p.location_id=f.facility_state', array('province_name' => 'location_name', 'location_id'), 'left')
-            ->group('p.location_id');
+            ->join(array('p' => 'geographical_divisions'), 'p.geo_id=f.facility_state', array('province_name' => 'geo_name', 'geo_id'), 'left')
+            ->group('p.geo_id');
         if (isset($params['lab']) && trim($params['lab']) != '') {
             $countQuery = $countQuery->where('vl.lab_id IN (' . $params['lab'] . ')');
         } else {
@@ -3836,7 +3836,7 @@ class SampleTable extends AbstractTableGateway
             }
         }
         if (isset($params['provinces']) && trim($params['provinces']) != '') {
-            $countQuery = $countQuery->where('p.location_id IN (' . $params['provinces'] . ')');
+            $countQuery = $countQuery->where('p.geo_id IN (' . $params['provinces'] . ')');
         }
         if (isset($params['districts']) && trim($params['districts']) != '') {
             $countQuery = $countQuery->where('f.facility_district IN (' . $params['districts'] . ')');
@@ -3940,9 +3940,9 @@ class SampleTable extends AbstractTableGateway
                                                         END)"))
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.lab_id', array())
-            ->join(array('d' => 'location_details'), 'd.location_id=f.facility_district', array('district_name' => 'location_name', 'location_id'), 'left')
+            ->join(array('d' => 'geographical_divisions'), 'd.geo_id=f.facility_district', array('district_name' => 'geo_name', 'geo_id'), 'left')
             ->order('total DESC')
-            ->group('d.location_id');
+            ->group('d.geo_id');
         if (isset($params['lab']) && trim($params['lab']) != '') {
             $countQuery = $countQuery->where('vl.lab_id IN (' . $params['lab'] . ')');
         } else {
@@ -3952,7 +3952,7 @@ class SampleTable extends AbstractTableGateway
             }
         }
         if (isset($params['provinces']) && trim($params['provinces']) != '') {
-            $countQuery = $countQuery->where('p.location_id IN (' . $params['provinces'] . ')');
+            $countQuery = $countQuery->where('p.geo_id IN (' . $params['provinces'] . ')');
         }
         if (isset($params['districts']) && trim($params['districts']) != '') {
             $countQuery = $countQuery->where('f.facility_district IN (' . $params['districts'] . ')');
@@ -4555,8 +4555,8 @@ class SampleTable extends AbstractTableGateway
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'), 'left')
             ->join(array('l' => 'facility_details'), 'l.facility_id=vl.lab_id', array('lab_name' => 'facility_name'), 'left')
-            ->join(array('f_p_l_d' => 'location_details'), 'f_p_l_d.location_id=f.facility_state', array('province' => 'location_name'), 'left')
-            ->join(array('f_d_l_d' => 'location_details'), 'f_d_l_d.location_id=f.facility_district', array('district' => 'location_name'), 'left')
+            ->join(array('f_p_l_d' => 'geographical_divisions'), 'f_p_l_d.geo_id=f.facility_state', array('province' => 'geo_name'), 'left')
+            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district', array('district' => 'geo_name'), 'left')
             //->join(array('rs'=>'r_vl_sample_type'),'rs.sample_id=vl.sample_type',array('sample_name'),'left')
             ->where(array(
                 "MONTH(vl.sample_collection_date) in ($quarters)",
@@ -4612,8 +4612,8 @@ class SampleTable extends AbstractTableGateway
         /* Array of database columns which should be read and sent back to DataTables. Use a space where
          * you want to insert a non-database field (for example a counter or static image)
         */
-        $aColumns = array('sample_code', 'DATE_FORMAT(sample_collection_date,"%d-%b-%Y")', 'batch_code', 'patient_art_no', 'patient_first_name', 'patient_last_name', 'facility_name', 'f_p_l_d.location_name', 'f_d_l_d.location_name', 'sample_name', 'result', 'status_name');
-        $orderColumns = array('vl_sample_id', 'sample_code', 'sample_collection_date', 'batch_code', 'patient_art_no', 'patient_first_name', 'facility_name', 'f_p_l_d.location_name', 'f_d_l_d.location_name', 'sample_name', 'result', 'status_name');
+        $aColumns = array('sample_code', 'DATE_FORMAT(sample_collection_date,"%d-%b-%Y")', 'batch_code', 'patient_art_no', 'patient_first_name', 'patient_last_name', 'facility_name', 'f_p_l_d.geo_name', 'f_d_l_d.geo_name', 'sample_name', 'result', 'status_name');
+        $orderColumns = array('vl_sample_id', 'sample_code', 'sample_collection_date', 'batch_code', 'patient_art_no', 'patient_first_name', 'facility_name', 'f_p_l_d.geo_name', 'f_d_l_d.geo_name', 'sample_name', 'result', 'status_name');
 
         /*
          * Paging
@@ -4702,8 +4702,8 @@ class SampleTable extends AbstractTableGateway
             ->join(array('rss' => 'r_sample_status'), 'rss.status_id=vl.result_status', array('status_name'))
             ->join(array('b' => 'batch_details'), 'b.batch_id=vl.sample_batch_id', array('batch_code'), 'left')
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'), 'left')
-            ->join(array('f_p_l_d' => 'location_details'), 'f_p_l_d.location_id=f.facility_state', array('province' => 'location_name'), 'left')
-            ->join(array('f_d_l_d' => 'location_details'), 'f_d_l_d.location_id=f.facility_district', array('district' => 'location_name'), 'left')
+            ->join(array('f_p_l_d' => 'geographical_divisions'), 'f_p_l_d.geo_id=f.facility_state', array('province' => 'geo_name'), 'left')
+            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district', array('district' => 'geo_name'), 'left')
             ->join(array('rs' => 'r_vl_sample_type'), 'rs.sample_id=vl.sample_type', array('sample_name'), 'left')
             //->group('sample_code')
             //->group('facility_id')
@@ -4739,8 +4739,8 @@ class SampleTable extends AbstractTableGateway
             ->join(array('rss' => 'r_sample_status'), 'rss.status_id=vl.result_status', array('status_name'))
             ->join(array('b' => 'batch_details'), 'b.batch_id=vl.sample_batch_id', array('batch_code'), 'left')
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'), 'left')
-            ->join(array('f_p_l_d' => 'location_details'), 'f_p_l_d.location_id=f.facility_state', array('province' => 'location_name'), 'left')
-            ->join(array('f_d_l_d' => 'location_details'), 'f_d_l_d.location_id=f.facility_district', array('district' => 'location_name'), 'left')
+            ->join(array('f_p_l_d' => 'geographical_divisions'), 'f_p_l_d.geo_id=f.facility_state', array('province' => 'geo_name'), 'left')
+            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district', array('district' => 'geo_name'), 'left')
             ->join(array('rs' => 'r_vl_sample_type'), 'rs.sample_id=vl.sample_type', array('sample_name'), 'left')
             //->group('sample_code')
             //->group('facility_id')
@@ -5046,8 +5046,8 @@ class SampleTable extends AbstractTableGateway
         /* Array of database columns which should be read and sent back to DataTables. Use a space where
          * you want to insert a non-database field (for example a counter or static image)
         */
-        $aColumns = array('f_d_l_d.location_name');
-        $orderColumns = array('f_d_l_d.location_name', 'total_samples_received', 'total_samples_tested', 'total_samples_pending', 'total_samples_rejected', 'total_dbs_percentage', 'total_plasma_percentage', 'total_others_percentage');
+        $aColumns = array('f_d_l_d.geo_name');
+        $orderColumns = array('f_d_l_d.geo_name', 'total_samples_received', 'total_samples_tested', 'total_samples_pending', 'total_samples_rejected', 'total_dbs_percentage', 'total_plasma_percentage', 'total_others_percentage');
 
         /*
          * Paging
@@ -5139,7 +5139,7 @@ class SampleTable extends AbstractTableGateway
                 )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'))
-            ->join(array('f_d_l_d' => 'location_details'), 'f_d_l_d.location_id=f.facility_state', array('province' => 'location_name'))
+            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_state', array('province' => 'geo_name'))
             ->join(array('rs' => 'r_vl_sample_type'), 'rs.sample_id=vl.sample_type', array('sample_name'))
             ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')")
             ->group('f.facility_state');
@@ -5185,7 +5185,7 @@ class SampleTable extends AbstractTableGateway
                 )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'))
-            ->join(array('f_d_l_d' => 'location_details'), 'f_d_l_d.location_id=f.facility_state', array('province' => 'location_name'))
+            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_state', array('province' => 'geo_name'))
             ->join(array('rs' => 'r_vl_sample_type'), 'rs.sample_id=vl.sample_type', array('sample_name'))
             ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')")
             ->group('f.facility_state');
@@ -5232,8 +5232,8 @@ class SampleTable extends AbstractTableGateway
         /* Array of database columns which should be read and sent back to DataTables. Use a space where
          * you want to insert a non-database field (for example a counter or static image)
         */
-        $aColumns = array('f_d_l_d.location_name');
-        $orderColumns = array('f_d_l_d.location_name', 'total_samples_received', 'total_samples_tested', 'total_samples_pending', 'total_samples_rejected', 'total_dbs_percentage', 'total_plasma_percentage', 'total_others_percentage');
+        $aColumns = array('f_d_l_d.geo_name');
+        $orderColumns = array('f_d_l_d.geo_name', 'total_samples_received', 'total_samples_tested', 'total_samples_pending', 'total_samples_rejected', 'total_dbs_percentage', 'total_plasma_percentage', 'total_others_percentage');
 
         /*
          * Paging
@@ -5325,7 +5325,7 @@ class SampleTable extends AbstractTableGateway
                 )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'))
-            ->join(array('f_d_l_d' => 'location_details'), 'f_d_l_d.location_id=f.facility_district', array('district' => 'location_name'))
+            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district', array('district' => 'geo_name'))
             ->join(array('rs' => 'r_vl_sample_type'), 'rs.sample_id=vl.sample_type', array('sample_name'))
             ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')")
             ->group('f.facility_district');
@@ -5371,7 +5371,7 @@ class SampleTable extends AbstractTableGateway
                 )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'))
-            ->join(array('f_d_l_d' => 'location_details'), 'f_d_l_d.location_id=f.facility_district', array('district' => 'location_name'))
+            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district', array('district' => 'geo_name'))
             ->join(array('rs' => 'r_vl_sample_type'), 'rs.sample_id=vl.sample_type', array('sample_name'))
             ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')")
             ->group('f.facility_district');
@@ -5419,8 +5419,8 @@ class SampleTable extends AbstractTableGateway
         /* Array of database columns which should be read and sent back to DataTables. Use a space where
          * you want to insert a non-database field (for example a counter or static image)
         */
-        $aColumns = array('facility_name', 'f_d_l_dp.location_name', 'f_d_l_d.location_name');
-        $orderColumns = array('facility_name', 'f_d_l_dp.location_name', 'f_d_l_d.location_name', 'total_samples_received', 'total_samples_tested', 'total_samples_pending', 'total_samples_rejected', 'total_dbs_percentage', 'total_plasma_percentage', 'total_others_percentage');
+        $aColumns = array('facility_name', 'f_d_l_dp.geo_name', 'f_d_l_d.geo_name');
+        $orderColumns = array('facility_name', 'f_d_l_dp.geo_name', 'f_d_l_d.geo_name', 'total_samples_received', 'total_samples_tested', 'total_samples_pending', 'total_samples_rejected', 'total_dbs_percentage', 'total_plasma_percentage', 'total_others_percentage');
 
         /*
          * Paging
@@ -5512,8 +5512,8 @@ class SampleTable extends AbstractTableGateway
                 )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'))
-            ->join(array('f_d_l_d' => 'location_details'), 'f_d_l_d.location_id=f.facility_district', array('district' => 'location_name'))
-            ->join(array('f_d_l_dp' => 'location_details'), 'f_d_l_dp.location_id=f.facility_state', array('province' => 'location_name'))
+            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district', array('district' => 'geo_name'))
+            ->join(array('f_d_l_dp' => 'geographical_divisions'), 'f_d_l_dp.geo_id=f.facility_state', array('province' => 'geo_name'))
             ->join(array('rs' => 'r_vl_sample_type'), 'rs.sample_id=vl.sample_type', array('sample_name'))
             ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '' AND DATE(vl.sample_collection_date) not like '1970-01-01' AND DATE(vl.sample_collection_date) not like '0000-00-00')")
             ->group('vl.facility_id');
@@ -5556,8 +5556,8 @@ class SampleTable extends AbstractTableGateway
         $iQuery = $sql->select()->from(array('vl' => $this->table))
             ->columns(array('vl_sample_id'))
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array())
-            ->join(array('f_d_l_d' => 'location_details'), 'f_d_l_d.location_id=f.facility_district', array())
-            ->join(array('f_d_l_dp' => 'location_details'), 'f_d_l_dp.location_id=f.facility_state', array())
+            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district', array())
+            ->join(array('f_d_l_dp' => 'geographical_divisions'), 'f_d_l_dp.geo_id=f.facility_state', array())
             ->join(array('rs' => 'r_vl_sample_type'), 'rs.sample_id=vl.sample_type', array())
             ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '' AND DATE(vl.sample_collection_date) not like '1970-01-01' AND DATE(vl.sample_collection_date) not like '0000-00-00')")
             ->group('vl.facility_id');
@@ -5665,8 +5665,8 @@ class SampleTable extends AbstractTableGateway
         /* Array of database columns which should be read and sent back to DataTables. Use a space where
          * you want to insert a non-database field (for example a counter or static image)
         */
-        $aColumns = array('f_d_l_d.location_name');
-        $orderColumns = array('f_d_l_d.location_name', 'total_samples_valid', 'total_suppressed_samples', 'total_not_suppressed_samples', 'total_samples_rejected', 'suppression_rate');
+        $aColumns = array('f_d_l_d.geo_name');
+        $orderColumns = array('f_d_l_d.geo_name', 'total_samples_valid', 'total_suppressed_samples', 'total_not_suppressed_samples', 'total_samples_rejected', 'suppression_rate');
 
         /*
          * Paging
@@ -5759,7 +5759,7 @@ class SampleTable extends AbstractTableGateway
                 )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'))
-            ->join(array('f_d_l_d' => 'location_details'), 'f_d_l_d.location_id=f.facility_state', array('province' => 'location_name'))
+            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_state', array('province' => 'geo_name'))
             ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')")
             ->group('f.facility_state');
 
@@ -5805,7 +5805,7 @@ class SampleTable extends AbstractTableGateway
                 )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'))
-            ->join(array('f_d_l_d' => 'location_details'), 'f_d_l_d.location_id=f.facility_state', array('province' => 'location_name'))
+            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_state', array('province' => 'geo_name'))
             ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')")
             ->group('f.facility_state');
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
@@ -5844,8 +5844,8 @@ class SampleTable extends AbstractTableGateway
         /* Array of database columns which should be read and sent back to DataTables. Use a space where
          * you want to insert a non-database field (for example a counter or static image)
         */
-        $aColumns = array('f_d_l_d.location_name');
-        $orderColumns = array('f_d_l_d.location_name', 'total_samples_valid', 'total_suppressed_samples', 'total_not_suppressed_samples', 'total_samples_rejected', 'suppression_rate');
+        $aColumns = array('f_d_l_d.geo_name');
+        $orderColumns = array('f_d_l_d.geo_name', 'total_samples_valid', 'total_suppressed_samples', 'total_not_suppressed_samples', 'total_samples_rejected', 'suppression_rate');
 
         /*
          * Paging
@@ -5938,7 +5938,7 @@ class SampleTable extends AbstractTableGateway
                 )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'))
-            ->join(array('f_d_l_d' => 'location_details'), 'f_d_l_d.location_id=f.facility_district', array('district' => 'location_name'))
+            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district', array('district' => 'geo_name'))
             ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')")
             ->group('f.facility_district');
 
@@ -5982,7 +5982,7 @@ class SampleTable extends AbstractTableGateway
                 )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'))
-            ->join(array('f_d_l_d' => 'location_details'), 'f_d_l_d.location_id=f.facility_district', array('district' => 'location_name'))
+            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district', array('district' => 'geo_name'))
             ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')")
             ->group('f.facility_district');
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
@@ -6025,8 +6025,8 @@ class SampleTable extends AbstractTableGateway
 
         $queryContainer = new Container('query');
 
-        $aColumns = array('facility_name', 'f_d_l_dp.location_name', 'f_d_l_d.location_name');
-        $orderColumns = array('f_d_l_d.location_name', 'f_d_l_dp.location_name', 'f_d_l_d.location_name', 'total_samples_valid', 'total_suppressed_samples', 'total_not_suppressed_samples', 'total_samples_rejected', 'suppression_rate');
+        $aColumns = array('facility_name', 'f_d_l_dp.geo_name', 'f_d_l_d.geo_name');
+        $orderColumns = array('f_d_l_d.geo_name', 'f_d_l_dp.geo_name', 'f_d_l_d.geo_name', 'total_samples_valid', 'total_suppressed_samples', 'total_not_suppressed_samples', 'total_samples_rejected', 'suppression_rate');
 
         /*
          * Paging
@@ -6119,8 +6119,8 @@ class SampleTable extends AbstractTableGateway
                 )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'))
-            ->join(array('f_d_l_dp' => 'location_details'), 'f_d_l_dp.location_id=f.facility_state', array('province' => 'location_name'))
-            ->join(array('f_d_l_d' => 'location_details'), 'f_d_l_d.location_id=f.facility_district', array('district' => 'location_name'))
+            ->join(array('f_d_l_dp' => 'geographical_divisions'), 'f_d_l_dp.geo_id=f.facility_state', array('province' => 'geo_name'))
+            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district', array('district' => 'geo_name'))
             ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')")
             ->group('vl.facility_id');
 
@@ -6167,8 +6167,8 @@ class SampleTable extends AbstractTableGateway
                 )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'))
-            ->join(array('f_d_l_dp' => 'location_details'), 'f_d_l_dp.location_id=f.facility_state', array('province' => 'location_name'))
-            ->join(array('f_d_l_d' => 'location_details'), 'f_d_l_d.location_id=f.facility_district', array('district' => 'location_name'))
+            ->join(array('f_d_l_dp' => 'geographical_divisions'), 'f_d_l_dp.geo_id=f.facility_state', array('province' => 'geo_name'))
+            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district', array('district' => 'geo_name'))
             ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')")
             ->group('vl.facility_id');
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
@@ -6302,8 +6302,8 @@ class SampleTable extends AbstractTableGateway
         /* Array of database columns which should be read and sent back to DataTables. Use a space where
          * you want to insert a non-database field (for example a counter or static image)
         */
-        $aColumns = array('f_d_l_d.location_name');
-        $orderColumns = array('f_d_l_d.location_name', 'total_samples_received', 'total_samples_rejected', 'rejection_rate');
+        $aColumns = array('f_d_l_d.geo_name');
+        $orderColumns = array('f_d_l_d.geo_name', 'total_samples_received', 'total_samples_rejected', 'rejection_rate');
 
         /*
          * Paging
@@ -6388,7 +6388,7 @@ class SampleTable extends AbstractTableGateway
                 )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'))
-            ->join(array('f_d_l_d' => 'location_details'), 'f_d_l_d.location_id=f.facility_district', array('district' => 'location_name'))
+            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district', array('district' => 'geo_name'))
             ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')")
             ->group('f.facility_district');
 
@@ -6433,7 +6433,7 @@ class SampleTable extends AbstractTableGateway
                 )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'))
-            ->join(array('f_d_l_d' => 'location_details'), 'f_d_l_d.location_id=f.facility_district', array('district' => 'location_name'))
+            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district', array('district' => 'geo_name'))
             ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')")
             ->group('f.facility_district');
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
@@ -6470,8 +6470,8 @@ class SampleTable extends AbstractTableGateway
         /* Array of database columns which should be read and sent back to DataTables. Use a space where
          * you want to insert a non-database field (for example a counter or static image)
         */
-        $aColumns = array('f_d_l_d.location_name');
-        $orderColumns = array('f_d_l_d.location_name', 'total_samples_received', 'total_samples_rejected', 'rejection_rate');
+        $aColumns = array('f_d_l_d.geo_name');
+        $orderColumns = array('f_d_l_d.geo_name', 'total_samples_received', 'total_samples_rejected', 'rejection_rate');
 
         /*
          * Paging
@@ -6556,7 +6556,7 @@ class SampleTable extends AbstractTableGateway
                 )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'))
-            ->join(array('f_d_l_d' => 'location_details'), 'f_d_l_d.location_id=f.facility_state', array('province' => 'location_name'))
+            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_state', array('province' => 'geo_name'))
             ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')")
             ->group('f.facility_district');
 
@@ -6601,7 +6601,7 @@ class SampleTable extends AbstractTableGateway
                 )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'))
-            ->join(array('f_d_l_d' => 'location_details'), 'f_d_l_d.location_id=f.facility_state', array('province' => 'location_name'))
+            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_state', array('province' => 'geo_name'))
             ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')")
             ->group('f.facility_district');
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
@@ -6639,8 +6639,8 @@ class SampleTable extends AbstractTableGateway
         /* Array of database columns which should be read and sent back to DataTables. Use a space where
          * you want to insert a non-database field (for example a counter or static image)
         */
-        $aColumns = array('f.facility_name', 'f_d_l_dp.location_name', 'f_d_l_d.location_name');
-        $orderColumns = array('f_d_l_dp.location_name', 'f_d_l_d.location_name', 'total_samples_received', 'total_samples_rejected', 'rejection_rate');
+        $aColumns = array('f.facility_name', 'f_d_l_dp.geo_name', 'f_d_l_d.geo_name');
+        $orderColumns = array('f_d_l_dp.geo_name', 'f_d_l_d.geo_name', 'total_samples_received', 'total_samples_rejected', 'rejection_rate');
 
         /*
          * Paging
@@ -6725,8 +6725,8 @@ class SampleTable extends AbstractTableGateway
                 )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'))
-            ->join(array('f_d_l_dp' => 'location_details'), 'f_d_l_dp.location_id=f.facility_state', array('province' => 'location_name'))
-            ->join(array('f_d_l_d' => 'location_details'), 'f_d_l_d.location_id=f.facility_district', array('district' => 'location_name'))
+            ->join(array('f_d_l_dp' => 'geographical_divisions'), 'f_d_l_dp.geo_id=f.facility_state', array('province' => 'geo_name'))
+            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district', array('district' => 'geo_name'))
             ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')")
             ->group('f.facility_id');
 
@@ -6771,8 +6771,8 @@ class SampleTable extends AbstractTableGateway
                 )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'))
-            ->join(array('f_d_l_dp' => 'location_details'), 'f_d_l_dp.location_id=f.facility_state', array('province' => 'location_name'))
-            ->join(array('f_d_l_d' => 'location_details'), 'f_d_l_d.location_id=f.facility_district', array('district' => 'location_name'))
+            ->join(array('f_d_l_dp' => 'geographical_divisions'), 'f_d_l_dp.geo_id=f.facility_state', array('province' => 'geo_name'))
+            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district', array('district' => 'geo_name'))
             ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')")
             ->group('f.facility_id');
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
@@ -7568,7 +7568,7 @@ class SampleTable extends AbstractTableGateway
                 )
             )
             ->join('facility_details', 'facility_details.facility_id = vl.facility_id', array())
-            ->join('location_details', 'facility_details.facility_state = location_details.location_id')
+            ->join('geographical_divisions', 'facility_details.facility_state = geographical_divisions.geo_id')
             ->where(
                 array(
                     "(sample_tested_datetime BETWEEN '$startDate' AND '$endDate')",
@@ -7606,7 +7606,7 @@ class SampleTable extends AbstractTableGateway
                 $squery = $squery->where('vl.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
             }
         }
-        $squery = $squery->group(array('location_id'));
+        $squery = $squery->group(array('geo_id'));
         $sQueryStr = $sql->buildSqlString($squery);
         //echo $sQueryStr;die;
         $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -7630,7 +7630,7 @@ class SampleTable extends AbstractTableGateway
                 )
             )
             ->join('facility_details', 'facility_details.facility_id = vl.facility_id')
-            ->join('location_details', 'facility_details.facility_state = location_details.location_id')
+            ->join('geographical_divisions', 'facility_details.facility_state = geographical_divisions.geo_id')
             ->where(
                 array(
                     "(sample_tested_datetime BETWEEN '$startDate' AND '$endDate')",
@@ -7661,7 +7661,7 @@ class SampleTable extends AbstractTableGateway
                 $squery = $squery->where('vl.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
             }
         }
-        $squery = $squery->group(array('location_id'));
+        $squery = $squery->group(array('geo_id'));
         $sQueryStr = $sql->buildSqlString($squery);
         $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         return $sResult;
@@ -7684,7 +7684,7 @@ class SampleTable extends AbstractTableGateway
                 )
             )
             ->join('facility_details', 'facility_details.facility_id = vl.facility_id')
-            ->join('location_details', 'facility_details.facility_state = location_details.location_id')
+            ->join('geographical_divisions', 'facility_details.facility_state = geographical_divisions.geo_id')
             ->where(
                 array(
                     "(sample_tested_datetime BETWEEN '$startDate' AND '$endDate')",
@@ -7715,7 +7715,7 @@ class SampleTable extends AbstractTableGateway
                 $squery = $squery->where('vl.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
             }
         }
-        $squery = $squery->group(array('location_id'));
+        $squery = $squery->group(array('geo_id'));
         $sQueryStr = $sql->buildSqlString($squery);
         $sResult   = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         return $sResult;

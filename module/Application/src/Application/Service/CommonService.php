@@ -590,19 +590,19 @@ class CommonService
                     if (isset($apiData->geographical_divisions->lastModifiedTime) && !empty($apiData->geographical_divisions->lastModifiedTime)) {
                          $condition = "updated_datetime > '" . $apiData->geographical_divisions->lastModifiedTime . "'";
                     }
-                    $notUpdated = $this->getLastModifiedDateTime('location_details', 'updated_datetime', $condition);
+                    $notUpdated = $this->getLastModifiedDateTime('geographical_divisions', 'updated_datetime', $condition);
                     if (empty($notUpdated) || !isset($notUpdated)) {
-                         $rQueryStr = 'SET FOREIGN_KEY_CHECKS=0; ALTER TABLE `location_details` DISABLE KEYS';
+                         $rQueryStr = 'SET FOREIGN_KEY_CHECKS=0; ALTER TABLE `geographical_divisions` DISABLE KEYS';
                          $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
-                         $dbAdapter->query('TRUNCATE TABLE `location_details`', $dbAdapter::QUERY_MODE_EXECUTE);
+                         $dbAdapter->query('TRUNCATE TABLE `geographical_divisions`', $dbAdapter::QUERY_MODE_EXECUTE);
 
                          foreach ((array)$apiData->geographical_divisions->tableData as $row) {
                               $lData = (array)$row;
                               $locationData = array(
-                                   'location_id'       => $lData['geo_id'],
-                                   'parent_location'   => $lData['geo_parent'],
-                                   'location_name'     => $lData['geo_name'],
-                                   'location_code'     => $lData['geo_code'],
+                                   'geo_id'       => $lData['geo_id'],
+                                   'geo_parent'   => $lData['geo_parent'],
+                                   'geo_name'     => $lData['geo_name'],
+                                   'geo_code'     => $lData['geo_code'],
                                    'updated_datetime'  => $lData['updated_datetime']
                               );
                               $locationDb->insert($locationData);
@@ -633,9 +633,9 @@ class CommonService
                                    }
                                    $sQueryResult = $this->checkFacilityStateDistrictDetails(trim($facilityData['facility_state']), 0);
                                    if ($sQueryResult) {
-                                        $facilityData['facility_state'] = $sQueryResult['location_id'];
+                                        $facilityData['facility_state'] = $sQueryResult['geo_id'];
                                    } else {
-                                        $locationDb->insert(array('parent_location' => 0, 'location_name' => trim($facilityData['facility_state'])));
+                                        $locationDb->insert(array('geo_parent' => 0, 'geo_name' => trim($facilityData['facility_state'])));
                                         $facilityData['facility_state'] = $locationDb->lastInsertValue;
                                    }
                               }
@@ -645,9 +645,9 @@ class CommonService
                                    }
                                    $sQueryResult = $this->checkFacilityStateDistrictDetails(trim($facilityData['facility_district']), $facilityData['facility_state']);
                                    if ($sQueryResult) {
-                                        $facilityData['facility_district'] = $sQueryResult['location_id'];
+                                        $facilityData['facility_district'] = $sQueryResult['geo_id'];
                                    } else {
-                                        $locationDb->insert(array('parent_location' => $facilityData['facility_state'], 'location_name' => trim($facilityData['facility_district'])));
+                                        $locationDb->insert(array('geo_parent' => $facilityData['facility_state'], 'geo_name' => trim($facilityData['facility_district'])));
                                         $facilityData['facility_district'] = $locationDb->lastInsertValue;
                                    }
                               }
@@ -1071,11 +1071,11 @@ class CommonService
           $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
           $sql = new Sql($dbAdapter);
           if (is_numeric($location)) {
-               $where = array('l.parent_location' => $parent, 'l.location_id' => trim($location));
+               $where = array('l.geo_parent' => $parent, 'l.geo_id' => trim($location));
           } else {
-               $where = array('l.parent_location' => $parent, 'l.location_name' => trim($location));
+               $where = array('l.geo_parent' => $parent, 'l.geo_name' => trim($location));
           }
-          $sQuery = $sql->select()->from(array('l' => 'location_details'))
+          $sQuery = $sql->select()->from(array('l' => 'geographical_divisions'))
                ->where($where);
           $sQuery = $sql->buildSqlString($sQuery);
           $sQueryResult = $dbAdapter->query($sQuery, $dbAdapter::QUERY_MODE_EXECUTE)->current();

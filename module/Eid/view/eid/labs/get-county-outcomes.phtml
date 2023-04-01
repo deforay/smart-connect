@@ -18,7 +18,7 @@ $('#countyOutcomes').highcharts({
     categories: [<?php
             if(isset($result) && count($result)>0){
               foreach($result as $date){
-                  echo "'".$date['location_name']."',";
+                  echo "'".$date['geo_name']."',";
               }
             }
             ?>],

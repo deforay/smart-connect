@@ -8,7 +8,7 @@ $postive = array();
 $negative = array();
 $posRate = array();
 foreach ($result as $row) {
-    $countries[] = '"' . $row['location_name'] . '"';
+    $countries[] = '"' . $row['geo_name'] . '"';
     $postive[] = $row['total_positive_samples'];
     $negative[] = $row['total_negative_samples'];
     $posRate[] = (float) number_format((($row['total_positive_samples'] / $row['total_samples']) * 100),2);
