@@ -545,7 +545,6 @@ class Module
 				{
 					public function __invoke($diContainer)
 					{
-
 						$cache = $diContainer->get('Cache\Persistent');
 						return new CommonService($diContainer, $cache);
 					}
