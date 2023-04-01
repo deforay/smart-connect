@@ -296,7 +296,9 @@ class SampleTable extends AbstractTableGateway
             $sampleResult = $this->commonService->cacheQuery($queryStr, $dbAdapter);
             $j = 0;
             foreach ($sampleResult as $sRow) {
-                if ($sRow["monthDate"] == null) continue;
+                if ($sRow["monthDate"] === null) {
+                    continue;
+                }
                 $result['sampleName']['VL (>= 1000 cp/ml)'][$j] = (isset($sRow["GreaterThan1000"])) ? $sRow["GreaterThan1000"] : 0;
                 //$result['sampleName']['VL Not Detected'][$j] = $sRow["TND"];
                 $result['sampleName']['VL (< 1000 cp/ml)'][$j] = (isset($sRow["LesserThan1000"])) ? $sRow["LesserThan1000"] : 0;
@@ -622,7 +624,7 @@ class SampleTable extends AbstractTableGateway
             //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             $sampleResult = $this->commonService->cacheQuery($queryStr, $dbAdapter);
             $j = 0;
-            
+
             foreach ($sampleResult as $sRow) {
                 /* $result['all'][$j] = (isset($sRow["AvgDiff"]) && $sRow["AvgDiff"] != NULL && $sRow["AvgDiff"] > 0) ? round($sRow["AvgDiff"], 2) : null;
                 //$result['lab'][$j] = (isset($labsubQueryResult[0]["labCount"]) && $labsubQueryResult[0]["labCount"] != NULL && $labsubQueryResult[0]["labCount"] > 0) ? round($labsubQueryResult[0]["labCount"],2) : 0;
@@ -4950,7 +4952,7 @@ class SampleTable extends AbstractTableGateway
     {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        
+
 
         $queryStr = $sql->select()->from(array('vl' => $this->table))
             ->columns(array(

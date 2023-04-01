@@ -318,7 +318,7 @@ foreach ($sampleType as $samples) {
                 </div>
             </div>
             <div class="portlet-body" style="cursor:pointer;">
-                <div id="samplesTestedChart"></div>
+                <div id="samplesTestedChartDiv"></div>
             </div>
         </div>
     </div>
@@ -339,7 +339,7 @@ foreach ($sampleType as $samples) {
                 </div>
             </div>
             <div class="portlet-body" style="cursor:pointer;">
-                <div id="samplesTestedPerLabChart"></div>
+                <div id="samplesTestedPerLabChartDiv"></div>
             </div>
         </div>
     </div>
@@ -747,7 +747,7 @@ foreach ($sampleType as $samples) {
                 facilityId: facilityId
             },
             function(data) {
-                $("#samplesTestedChart").html(data);
+                $("#samplesTestedChartDiv").html(data);
             });
     }
 
@@ -763,7 +763,7 @@ foreach ($sampleType as $samples) {
                 facilityId: facilityId
             },
             function(data) {
-                $("#samplesTestedPerLabChart").html(data);
+                $("#samplesTestedPerLabChartDiv").html(data);
             });
     }
 

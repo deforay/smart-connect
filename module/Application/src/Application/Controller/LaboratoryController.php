@@ -10,8 +10,8 @@ class LaboratoryController extends AbstractActionController
 {
 
 
-    private $sampleService = null;
-    private \Application\Service\CommonService $commonService;
+    public \Application\Service\SampleService $sampleService;
+    public \Application\Service\CommonService $commonService;
 
     public function __construct($sampleService, $commonService)
     {
