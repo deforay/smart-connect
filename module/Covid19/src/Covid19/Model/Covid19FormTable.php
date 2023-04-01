@@ -23,7 +23,7 @@ class Covid19FormTable extends AbstractTableGateway
     public $sm = null;
     public $config = null;
     protected $translator = null;
-    protected $commonService = null;
+    protected \Application\Service\CommonService $commonService;
     protected $mappedFacilities = null;
 
     public function __construct(Adapter $adapter, $sm = null, $mappedFacilities = null, $table = null, $commonService = null)
@@ -3714,8 +3714,8 @@ class Covid19FormTable extends AbstractTableGateway
                     array(
                         'samples' => new Expression('COUNT(*)'),
                         "monthDate" => new Expression("DATE_FORMAT(DATE(sample_collection_date), '%b-%Y')"),
-                        "positive" => new Expression("SUM(CASE WHEN (((covid19.result = 'positive' or covid19.result = 'Positive' or covid19.result not like '') AND covid19.result IS NOT NULL AND covid19.result!= '' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) THEN 1 ELSE 0 END)"),
-                        "negative" => new Expression("SUM(CASE WHEN (( covid19.result IS NOT NULL AND covid19.result!= '' AND covid19.result ='negative' AND covid19.result ='Negative' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) THEN 1 ELSE 0 END)"),
+                        "positive" => new Expression("SUM(CASE WHEN (((covid19.result = 'positive' or covid19.result = 'Positive' or covid19.result not like '') AND covid19.result IS NOT NULL AND covid19.result!= '' AND sample_tested_datetime is not null AND sample_tested_datetime not like '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) THEN 1 ELSE 0 END)"),
+                        "negative" => new Expression("SUM(CASE WHEN (( covid19.result IS NOT NULL AND covid19.result!= '' AND covid19.result ='negative' AND covid19.result ='Negative' AND sample_tested_datetime is not null AND sample_tested_datetime not like '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) THEN 1 ELSE 0 END)"),
                     )
                 )
                 ->join(array('f' => 'facility_details'), 'f.facility_id=covid19.lab_id', array(), 'left')
@@ -3774,9 +3774,9 @@ class Covid19FormTable extends AbstractTableGateway
                 $sQuery = $sQuery->where($where);
             }
             if (isset($params['testResult']) && $params['testResult'] == '<1000') {
-                $sQuery = $sQuery->where("(covid19.result < 1000 or covid19.result = 'Target Not Detected' or covid19.result = 'TND' or covid19.result = 'tnd' or covid19.result= 'Below Detection Level' or covid19.result='BDL' or covid19.result='bdl' or covid19.result= 'Low Detection Level' or covid19.result='LDL' or covid19.result='ldl') AND covid19.result IS NOT NULL AND covid19.result!= '' AND covid19.result!='Failed' AND covid19.result!='failed' AND covid19.result!='Fail' AND covid19.result!='fail' AND covid19.result!='No Sample' AND covid19.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00'");
+                $sQuery = $sQuery->where("(covid19.result < 1000 or covid19.result = 'Target Not Detected' or covid19.result = 'TND' or covid19.result = 'tnd' or covid19.result= 'Below Detection Level' or covid19.result='BDL' or covid19.result='bdl' or covid19.result= 'Low Detection Level' or covid19.result='LDL' or covid19.result='ldl') AND covid19.result IS NOT NULL AND covid19.result!= '' AND covid19.result!='Failed' AND covid19.result!='failed' AND covid19.result!='Fail' AND covid19.result!='fail' AND covid19.result!='No Sample' AND covid19.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime not like '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00'");
             } else if (isset($params['testResult']) && $params['testResult'] == '>=1000') {
-                $sQuery = $sQuery->where("covid19.result IS NOT NULL AND covid19.result!= '' AND covid19.result >= 1000 AND covid19.result!='Failed' AND covid19.result!='failed' AND covid19.result!='Fail' AND covid19.result!='fail' AND covid19.result!='No Sample' AND covid19.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00'");
+                $sQuery = $sQuery->where("covid19.result IS NOT NULL AND covid19.result!= '' AND covid19.result >= 1000 AND covid19.result!='Failed' AND covid19.result!='failed' AND covid19.result!='Fail' AND covid19.result!='fail' AND covid19.result!='No Sample' AND covid19.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime not like '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00'");
             }
             if (isset($params['sampleType']) && trim($params['sampleType']) != '') {
                 $sQuery = $sQuery->where('covid19.specimen_type="' . base64_decode(trim($params['sampleType'])) . '"');
@@ -3897,8 +3897,8 @@ class Covid19FormTable extends AbstractTableGateway
             ->columns(array(
                 'sampleCollectionDate' => new Expression('DATE(sample_collection_date)'),
                 "total_samples_received" => new Expression("(COUNT(*))"),
-                "total_samples_tested" => new Expression("(SUM(CASE WHEN (((covid19.result IS NOT NULL AND covid19.result != '' AND covid19.result != 'NULL') AND (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) OR (covid19.reason_for_sample_rejection IS NOT NULL AND covid19.reason_for_sample_rejection != '' AND covid19.reason_for_sample_rejection != 0)) THEN 1 ELSE 0 END))"),
-                "total_samples_pending" => new Expression("(SUM(CASE WHEN ((covid19.result IS NULL OR covid19.result = '' OR covid19.result = 'NULL' OR sample_tested_datetime is null OR sample_tested_datetime = '' OR DATE(sample_tested_datetime) ='1970-01-01' OR DATE(sample_tested_datetime) ='0000-00-00') AND (covid19.reason_for_sample_rejection IS NULL OR covid19.reason_for_sample_rejection = '' OR covid19.reason_for_sample_rejection = 0)) THEN 1 ELSE 0 END))"),
+                "total_samples_tested" => new Expression("(SUM(CASE WHEN (((covid19.result IS NOT NULL AND covid19.result != '' AND covid19.result != 'NULL') AND (sample_tested_datetime is not null AND sample_tested_datetime not like '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) OR (covid19.reason_for_sample_rejection IS NOT NULL AND covid19.reason_for_sample_rejection != '' AND covid19.reason_for_sample_rejection != 0)) THEN 1 ELSE 0 END))"),
+                "total_samples_pending" => new Expression("(SUM(CASE WHEN ((covid19.result IS NULL OR covid19.result = '' OR covid19.result = 'NULL' OR sample_tested_datetime is null OR sample_tested_datetime like '' OR DATE(sample_tested_datetime) ='1970-01-01' OR DATE(sample_tested_datetime) ='0000-00-00') AND (covid19.reason_for_sample_rejection IS NULL OR covid19.reason_for_sample_rejection = '' OR covid19.reason_for_sample_rejection = 0)) THEN 1 ELSE 0 END))"),
                 "rejected_samples" => new Expression("SUM(CASE WHEN (covid19.reason_for_sample_rejection !='' AND covid19.reason_for_sample_rejection !='0' AND covid19.reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END)")
             ))
             ->join(array('f' => 'facility_details'), 'f.facility_id=covid19.facility_id', array('facility_name'))
@@ -4122,8 +4122,8 @@ class Covid19FormTable extends AbstractTableGateway
         $sQuery = $sql->select()->from(array('f' => 'facility_details'))
             ->join(array('covid19' => $this->table), 'covid19.lab_id=f.facility_id', array(
                 "total_samples_received" => new Expression("(COUNT(*))"),
-                "total_samples_tested" => new Expression("(SUM(CASE WHEN (((covid19.result IS NOT NULL AND covid19.result != '' AND covid19.result != 'NULL') AND (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) OR (covid19.reason_for_sample_rejection IS NOT NULL AND covid19.reason_for_sample_rejection != '' AND covid19.reason_for_sample_rejection != 0)) THEN 1 ELSE 0 END))"),
-                "total_samples_pending" => new Expression("(SUM(CASE WHEN ((covid19.result IS NULL OR covid19.result = '' OR covid19.result = 'NULL' OR sample_tested_datetime is null OR sample_tested_datetime = '' OR DATE(sample_tested_datetime) ='1970-01-01' OR DATE(sample_tested_datetime) ='0000-00-00') AND (covid19.reason_for_sample_rejection IS NULL OR covid19.reason_for_sample_rejection = '' OR covid19.reason_for_sample_rejection = 0)) THEN 1 ELSE 0 END))"),
+                "total_samples_tested" => new Expression("(SUM(CASE WHEN (((covid19.result IS NOT NULL AND covid19.result != '' AND covid19.result != 'NULL') AND (sample_tested_datetime is not null AND sample_tested_datetime not like '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) OR (covid19.reason_for_sample_rejection IS NOT NULL AND covid19.reason_for_sample_rejection != '' AND covid19.reason_for_sample_rejection != 0)) THEN 1 ELSE 0 END))"),
+                "total_samples_pending" => new Expression("(SUM(CASE WHEN ((covid19.result IS NULL OR covid19.result = '' OR covid19.result = 'NULL' OR sample_tested_datetime is null OR sample_tested_datetime like '' OR DATE(sample_tested_datetime) ='1970-01-01' OR DATE(sample_tested_datetime) ='0000-00-00') AND (covid19.reason_for_sample_rejection IS NULL OR covid19.reason_for_sample_rejection = '' OR covid19.reason_for_sample_rejection = 0)) THEN 1 ELSE 0 END))"),
                 "rejected_samples" => new Expression("SUM(CASE WHEN (covid19.reason_for_sample_rejection !='' AND covid19.reason_for_sample_rejection !='0' AND covid19.reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END)")
             ))
             ->where("sample_collection_date is not null AND sample_collection_date not like '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00' AND covid19.lab_id !=0")
@@ -4177,9 +4177,9 @@ class Covid19FormTable extends AbstractTableGateway
 
 
         if (isset($parameters['sampleStatus']) && $parameters['sampleStatus'] == 'sample_tested') {
-            $sQuery = $sQuery->where("((covid19.result IS NOT NULL AND covid19.result != '' AND covid19.result != 'NULL' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') OR (covid19.reason_for_sample_rejection IS NOT NULL AND covid19.reason_for_sample_rejection != '' AND covid19.reason_for_sample_rejection != 0))");
+            $sQuery = $sQuery->where("((covid19.result IS NOT NULL AND covid19.result != '' AND covid19.result != 'NULL' AND sample_tested_datetime is not null AND sample_tested_datetime not like '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') OR (covid19.reason_for_sample_rejection IS NOT NULL AND covid19.reason_for_sample_rejection != '' AND covid19.reason_for_sample_rejection != 0))");
         } else if (isset($parameters['sampleStatus']) && $parameters['sampleStatus'] == 'samples_not_tested') {
-            $sQuery = $sQuery->where("(covid19.result IS NULL OR covid19.result = '' OR covid19.result = 'NULL' OR sample_tested_datetime is null OR sample_tested_datetime = '' OR DATE(sample_tested_datetime) ='1970-01-01' OR DATE(sample_tested_datetime) ='0000-00-00') AND (covid19.reason_for_sample_rejection IS NULL OR covid19.reason_for_sample_rejection = '' OR covid19.reason_for_sample_rejection = 0)");
+            $sQuery = $sQuery->where("(covid19.result IS NULL OR covid19.result = '' OR covid19.result = 'NULL' OR sample_tested_datetime is null OR sample_tested_datetime like '' OR DATE(sample_tested_datetime) ='1970-01-01' OR DATE(sample_tested_datetime) ='0000-00-00') AND (covid19.reason_for_sample_rejection IS NULL OR covid19.reason_for_sample_rejection = '' OR covid19.reason_for_sample_rejection = 0)");
         } else if (isset($parameters['sampleStatus']) && $parameters['sampleStatus'] == 'sample_rejected') {
             $sQuery = $sQuery->where("covid19.reason_for_sample_rejection IS NOT NULL AND covid19.reason_for_sample_rejection != '' AND covid19.reason_for_sample_rejection != 0");
         }

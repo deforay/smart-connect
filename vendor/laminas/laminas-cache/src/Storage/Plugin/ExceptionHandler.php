@@ -5,6 +5,8 @@ namespace Laminas\Cache\Storage\Plugin;
 use Laminas\Cache\Storage\ExceptionEvent;
 use Laminas\EventManager\EventManagerInterface;
 
+use function call_user_func;
+
 class ExceptionHandler extends AbstractPlugin
 {
     /**
@@ -56,7 +58,6 @@ class ExceptionHandler extends AbstractPlugin
     /**
      * On exception
      *
-     * @param  ExceptionEvent $event
      * @return void
      */
     public function onException(ExceptionEvent $event)

@@ -11,6 +11,7 @@ use Laminas\Cache\Service\StoragePluginFactory;
 use Laminas\Cache\Service\StoragePluginFactoryFactory;
 use Laminas\Cache\Service\StoragePluginFactoryInterface;
 use Symfony\Component\Console\Command\Command;
+
 use function class_exists;
 
 class ConfigProvider
@@ -24,7 +25,7 @@ class ConfigProvider
     {
         return [
             'dependencies' => $this->getDependencyConfig(),
-            'laminas-cli' => $this->getCliConfig(),
+            'laminas-cli'  => $this->getCliConfig(),
         ];
     }
 
@@ -36,30 +37,23 @@ class ConfigProvider
     public function getDependencyConfig()
     {
         $dependencies = [
-            // Legacy Zend Framework aliases
-            'aliases' => [
-                \Zend\Cache\PatternPluginManager::class => PatternPluginManager::class,
-                \Zend\Cache\Storage\AdapterPluginManager::class => Storage\AdapterPluginManager::class,
-                \Zend\Cache\Storage\PluginManager::class => Storage\PluginManager::class,
-                StoragePluginFactoryInterface::class  => StoragePluginFactory::class,
-                StorageAdapterFactoryInterface::class => StorageAdapterFactory::class,
-            ],
             'abstract_factories' => [
                 Service\StorageCacheAbstractServiceFactory::class,
             ],
-            'factories' => [
-                PatternPluginManager::class => Service\PatternPluginManagerFactory::class,
-                Storage\AdapterPluginManager::class => Service\StorageAdapterPluginManagerFactory::class,
-                Storage\PluginManager::class => Service\StoragePluginManagerFactory::class,
-                StoragePluginFactory::class  => StoragePluginFactoryFactory::class,
-                StorageAdapterFactory::class => StorageAdapterFactoryFactory::class,
+            'factories'          => [
+                Storage\AdapterPluginManager::class   => Service\StorageAdapterPluginManagerFactory::class,
+                Storage\PluginManager::class          => Service\StoragePluginManagerFactory::class,
+                StoragePluginFactory::class           => StoragePluginFactoryFactory::class,
+                StoragePluginFactoryInterface::class  => StoragePluginFactoryFactory::class,
+                StorageAdapterFactory::class          => StorageAdapterFactoryFactory::class,
+                StorageAdapterFactoryInterface::class => StorageAdapterFactoryFactory::class,
             ],
         ];
 
         if (class_exists(Command::class)) {
             $dependencies['factories'] += [
-                DeprecatedStorageFactoryConfigurationCheckCommand::class =>
-                    DeprecatedStorageFactoryConfigurationCheckCommandFactory::class,
+                DeprecatedStorageFactoryConfigurationCheckCommand::class
+                    => DeprecatedStorageFactoryConfigurationCheckCommandFactory::class,
             ];
         }
 
@@ -77,8 +71,8 @@ class ConfigProvider
 
         return [
             'commands' => [
-                DeprecatedStorageFactoryConfigurationCheckCommand::NAME =>
-                    DeprecatedStorageFactoryConfigurationCheckCommand::class,
+                DeprecatedStorageFactoryConfigurationCheckCommand::NAME
+                    => DeprecatedStorageFactoryConfigurationCheckCommand::class,
             ],
         ];
     }

@@ -17,9 +17,10 @@ class SampleService
 {
 
     public $sm = null;
-    public $commonService = null;
-    public $sampleTable = null;
-    public $apiTrackerTable = null;
+    public \Application\Service\CommonService $commonService;
+    public $sampleTable;
+    public \Laminas\Cache\Pattern\ObjectCache $sampleTableCached;
+    public \Application\Model\DashApiReceiverStatsTable $apiTrackerTable;
     public $dbAdapter = null;
 
     public function __construct($sm, $sampleTable, $commonService, $apiTrackerTable, $dbAdapter)
@@ -31,10 +32,6 @@ class SampleService
         $this->dbAdapter = $dbAdapter;
     }
 
-    public function getServiceManager()
-    {
-        return $this->sm;
-    }
 
     public function checkSampleCode($uniqueId, $sampleCode, $remoteSampleCode = null, $instanceCode = null, $dashTable = 'dash_form_vl')
     {

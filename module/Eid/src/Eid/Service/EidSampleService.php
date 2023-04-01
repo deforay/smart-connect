@@ -17,10 +17,6 @@ class EidSampleService
         $this->sm = $sm;
     }
 
-    public function getServiceManager()
-    {
-        return $this->sm;
-    }
 
     //get all sample types
     public function getSampleType()
@@ -61,38 +57,38 @@ class EidSampleService
 
     public function getMonthlySampleCountByLabs($params)
     {
-        $sampleDb = $this->sm->get('EidSampleTableWithoutCache');
+        $sampleDb = $this->sm->get('EidSampleTable');
         return $sampleDb->getMonthlySampleCountByLabs($params);
     }
 
 
     public function getLabTurnAroundTime($params)
     {
-        $sampleDb = $this->sm->get('EidSampleTableWithoutCache');
+        $sampleDb = $this->sm->get('EidSampleTable');
         return $sampleDb->fetchLabTurnAroundTime($params);
     }
 
     public function getCountyOutcomes($params)
     {
-        $sampleDb = $this->sm->get('EidSampleTableWithoutCache');
+        $sampleDb = $this->sm->get('EidSampleTable');
         return $sampleDb->fetchCountyOutcomes($params);
     }
 
     public function fetchLabPerformance($params)
     {
-        $sampleDb = $this->sm->get('EidSampleTableWithoutCache');
+        $sampleDb = $this->sm->get('EidSampleTable');
         return $sampleDb->fetchLabPerformance($params);
     }
 
     public function fetchLatLonMap($params)
     {
-        $sampleDb = $this->sm->get('SampleTableWithoutCache');
+        $sampleDb = $this->sm->get('EidSampleTable');
         return $sampleDb->fetchLatLonMap($params);
     }
 
     public function fetchLatLonMapPosNeg($params)
     {
-        $sampleDb = $this->sm->get('SampleTableWithoutCache');
+        $sampleDb = $this->sm->get('EidSampleTable');
         return $sampleDb->fetchLatLonMapPosNeg($params);
     }
 
@@ -585,7 +581,7 @@ class EidSampleService
 
     public function getEidFormDetail()
     {
-        $sampleDb = $this->sm->get('SampleTableWithoutCache');
+        $sampleDb = $this->sm->get('EidSampleTable');
         return $sampleDb->fetchEidFormDetail();
     }
     // Get all test reason name for eid

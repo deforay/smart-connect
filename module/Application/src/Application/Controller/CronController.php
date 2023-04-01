@@ -1,10 +1,12 @@
 <?php
+
 namespace Application\Controller;
 
 use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\ViewModel;
 
-class CronController extends AbstractActionController{
+class CronController extends AbstractActionController
+{
 
     private $sampleService = null;
 
@@ -13,19 +15,18 @@ class CronController extends AbstractActionController{
         $this->sampleService = $sampleService;
     }
 
-    public function indexAction(){
-       
+    public function indexAction()
+    {
     }
-    
-    public function importVlAction(){
+
+    public function importVlAction()
+    {
         return false;
     }
 
-    public function generateBackupAction(){
-        //$sampleService = $this->getServiceLocator()->get('SampleService');
+    public function generateBackupAction()
+    {
+        
         $this->sampleService->generateBackup();
-    }    
-    
-    
+    }
 }
-

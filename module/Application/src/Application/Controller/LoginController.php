@@ -9,8 +9,8 @@ use Laminas\View\Model\ViewModel;
 class LoginController extends AbstractActionController
 {
 
-    private $userService = null;
-    private $configService = null;
+    private \Application\Service\UserService $userService;
+    private \Application\Service\ConfigService $configService;
 
     public function __construct($userService, $configService)
     {
@@ -23,6 +23,7 @@ class LoginController extends AbstractActionController
     {
         $logincontainer = new Container('credo');
 
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
@@ -49,6 +50,7 @@ class LoginController extends AbstractActionController
 
     public function otpAction()
     {
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();

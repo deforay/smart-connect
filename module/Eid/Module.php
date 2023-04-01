@@ -18,21 +18,33 @@ class Module
     {
         return array(
             'factories' => array(
-                'Eid\Controller\Summary' => function ($sm) {
-                    $commonService = $sm->getServiceLocator()->get('CommonService');
-                    $summaryService = $sm->getServiceLocator()->get('EidSummaryService');
-                    return new \Eid\Controller\SummaryController($summaryService, $commonService);
+                'Eid\Controller\SummaryController' => new class
+                {
+                    public function __invoke($diContainer)
+                    {
+                        $commonService = $diContainer->get('CommonService');
+                        $summaryService = $diContainer->get('EidSummaryService');
+                        return new \Eid\Controller\SummaryController($summaryService, $commonService);
+                    }
                 },
-                'Eid\Controller\Labs' => function ($sm) {
-                    $facilityService = $sm->getServiceLocator()->get('FacilityService');
-                    $sampleService = $sm->getServiceLocator()->get('EidSampleService');
-                    $commonService = $sm->getServiceLocator()->get('CommonService');
-                    return new \Eid\Controller\LabsController($sampleService, $facilityService, $commonService);
+                'Eid\Controller\LabsController' => new class
+                {
+                    public function __invoke($diContainer)
+                    {
+                        $facilityService = $diContainer->get('FacilityService');
+                        $sampleService = $diContainer->get('EidSampleService');
+                        $commonService = $diContainer->get('CommonService');
+                        return new \Eid\Controller\LabsController($sampleService, $facilityService, $commonService);
+                    }
                 },
-                'Eid\Controller\Clinics' => function ($sm) {
-                    $commonService = $sm->getServiceLocator()->get('CommonService');
-                    $sampleService = $sm->getServiceLocator()->get('EidSampleService');
-                    return new \Eid\Controller\ClinicsController($sampleService, $commonService);
+                'Eid\Controller\ClinicsController' => new class
+                {
+                    public function __invoke($diContainer)
+                    {
+                        $commonService = $diContainer->get('CommonService');
+                        $sampleService = $diContainer->get('EidSampleService');
+                        return new \Eid\Controller\ClinicsController($sampleService, $commonService);
+                    }
                 },
             )
         );
@@ -43,39 +55,55 @@ class Module
         return array(
             'factories' => array(
 
-                'EidSampleTable' => function ($sm) {
-                    $session = new Container('credo');
-                    $mappedFacilities = (isset($session->mappedFacilities) && count($session->mappedFacilities) > 0) ? $session->mappedFacilities : array();
-                    $dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');
-                    $eidSampleTable = isset($session->eidSampleTable) ? $session->eidSampleTable :  null;
-                    $commonService = $sm->getServiceLocator()->get('CommonService');
-                    $tableObj = new \Eid\Model\EidSampleTable($dbAdapter, $sm, $mappedFacilities, $eidSampleTable, $commonService);
+                'EidSampleTable' => new class
+                {
+                    public function __invoke($diContainer)
+                    {
+                        $session = new Container('credo');
+                        $mappedFacilities = (isset($session->mappedFacilities) && count($session->mappedFacilities) > 0) ? $session->mappedFacilities : array();
+                        $dbAdapter = $diContainer->get('Laminas\Db\Adapter\Adapter');
+                        $eidSampleTable = isset($session->eidSampleTable) ? $session->eidSampleTable :  null;
+                        $commonService = $diContainer->get('CommonService');
+                        $tableObj = new \Eid\Model\EidSampleTable($dbAdapter, $diContainer, $mappedFacilities, $eidSampleTable, $commonService);
 
 
-                    $storage = $sm->get('Cache\Persistent');
-                    return new ObjectCache(
-                        $storage,
-                        new PatternOptions([
-                            'object' => $tableObj,
-                            'object_key' => $eidSampleTable // this makes sure we have different caches for both current and archive
-                        ])
-                    );
+                        $storage = $diContainer->get('Cache\Persistent');
+                        return new ObjectCache(
+                            $storage,
+                            new PatternOptions([
+                                'object' => $tableObj,
+                                'object_key' => $eidSampleTable // this makes sure we have different caches for both current and archive
+                            ])
+                        );
+                    }
                 },
-                'EidSampleTableWithoutCache' => function ($sm) {
-                    $session = new Container('credo');
-                    $mappedFacilities = (isset($session->mappedFacilities) && count($session->mappedFacilities) > 0) ? $session->mappedFacilities : array();
-                    $eidSampleTable = isset($session->eidSampleTable) ? $session->eidSampleTable :  null;
-                    $dbAdapter = $sm->get('Laminas\Db\Adapter\Adapter');
-                    $commonService = $sm->getServiceLocator()->get('CommonService');
-                    return new \Eid\Model\EidSampleTable($dbAdapter, $sm, $mappedFacilities, $eidSampleTable, $commonService);
+                'EidSampleTableWithoutCache' => new class
+                {
+                    public function __invoke($diContainer)
+                    {
+                        $session = new Container('credo');
+                        $mappedFacilities = (isset($session->mappedFacilities) && count($session->mappedFacilities) > 0) ? $session->mappedFacilities : array();
+                        $eidSampleTable = isset($session->eidSampleTable) ? $session->eidSampleTable :  null;
+                        $dbAdapter = $diContainer->get('Laminas\Db\Adapter\Adapter');
+                        $commonService = $diContainer->get('CommonService');
+                        return new \Eid\Model\EidSampleTable($dbAdapter, $diContainer, $mappedFacilities, $eidSampleTable, $commonService);
+                    }
                 },
 
 
-                'EidSampleService' => function ($sm) {
-                    return new \Eid\Service\EidSampleService($sm);
+                'EidSampleService' => new class
+                {
+                    public function __invoke($diContainer)
+                    {
+                        return new \Eid\Service\EidSampleService($diContainer);
+                    }
                 },
-                'EidSummaryService' => function ($sm) {
-                    return new \Eid\Service\EidSummaryService($sm);
+                'EidSummaryService' => new class
+                {
+                    public function __invoke($diContainer)
+                    {
+                        return new \Eid\Service\EidSummaryService($diContainer);
+                    }
                 },
             ),
         );

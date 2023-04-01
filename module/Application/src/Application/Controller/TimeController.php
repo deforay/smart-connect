@@ -79,7 +79,8 @@ class TimeController extends AbstractActionController
 	public function getTATDefaultAction()
 	{
 		/** @var \Laminas\Http\Request $request */
-		$request = $this->getRequest();
+		/** @var \Laminas\Http\Request $request */
+        $request = $this->getRequest();
 		if ($request->isPost()) {
 			$params = $request->getPost();
 
@@ -98,7 +99,8 @@ class TimeController extends AbstractActionController
 	public function getTATfromURLAction()
 	{
 		/** @var \Laminas\Http\Request $request */
-		$request = $this->getRequest();
+		/** @var \Laminas\Http\Request $request */
+        $request = $this->getRequest();
 		if ($request->isPost()) {
 			$params = $request->getPost();
 
@@ -137,7 +139,8 @@ class TimeController extends AbstractActionController
 	public function getTATfromSearchFieldAction()
 	{
 		/** @var \Laminas\Http\Request $request */
-		$request = $this->getRequest();
+		/** @var \Laminas\Http\Request $request */
+        $request = $this->getRequest();
 		if ($request->isPost()) {
 			$params           = $request->getPost();
 			$category         = $params['category'];

@@ -25,7 +25,7 @@ class FacilityTable extends AbstractTableGateway
 
     protected $table = 'facility_details';
     public $sm = null;
-    public $commonService = null;
+    public \Application\Service\CommonService $commonService;
 
     public function __construct(Adapter $adapter, $sm = null, $commonService)
     {

@@ -2,6 +2,7 @@
 
 namespace Laminas\Cache\Storage;
 
+use Laminas\Cache\Exception\ExceptionInterface;
 use Traversable;
 
 interface StorageInterface
@@ -30,16 +31,16 @@ interface StorageInterface
      * @param  bool $success
      * @param  mixed   $casToken
      * @return mixed Data on success, null on failure
-     * @throws \Laminas\Cache\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      */
-    public function getItem($key, & $success = null, & $casToken = null);
+    public function getItem($key, &$success = null, &$casToken = null);
 
     /**
      * Get multiple items.
      *
      * @param  array $keys
      * @return array Associative array of keys and values
-     * @throws \Laminas\Cache\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      */
     public function getItems(array $keys);
 
@@ -48,7 +49,7 @@ interface StorageInterface
      *
      * @param  string $key
      * @return bool
-     * @throws \Laminas\Cache\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      */
     public function hasItem($key);
 
@@ -57,7 +58,7 @@ interface StorageInterface
      *
      * @param  array $keys
      * @return array Array of found keys
-     * @throws \Laminas\Cache\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      */
     public function hasItems(array $keys);
 
@@ -66,7 +67,7 @@ interface StorageInterface
      *
      * @param  string $key
      * @return array|bool Metadata on success, false on failure
-     * @throws \Laminas\Cache\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      */
     public function getMetadata($key);
 
@@ -75,7 +76,7 @@ interface StorageInterface
      *
      * @param  array $keys
      * @return array Associative array of keys and metadata
-     * @throws \Laminas\Cache\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      */
     public function getMetadatas(array $keys);
 
@@ -87,7 +88,7 @@ interface StorageInterface
      * @param  string $key
      * @param  mixed  $value
      * @return bool
-     * @throws \Laminas\Cache\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      */
     public function setItem($key, $value);
 
@@ -96,7 +97,7 @@ interface StorageInterface
      *
      * @param  array $keyValuePairs
      * @return array Array of not stored keys
-     * @throws \Laminas\Cache\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      */
     public function setItems(array $keyValuePairs);
 
@@ -106,7 +107,7 @@ interface StorageInterface
      * @param  string $key
      * @param  mixed  $value
      * @return bool
-     * @throws \Laminas\Cache\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      */
     public function addItem($key, $value);
 
@@ -115,7 +116,7 @@ interface StorageInterface
      *
      * @param  array $keyValuePairs
      * @return array Array of not stored keys
-     * @throws \Laminas\Cache\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      */
     public function addItems(array $keyValuePairs);
 
@@ -125,7 +126,7 @@ interface StorageInterface
      * @param  string $key
      * @param  mixed  $value
      * @return bool
-     * @throws \Laminas\Cache\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      */
     public function replaceItem($key, $value);
 
@@ -134,7 +135,7 @@ interface StorageInterface
      *
      * @param  array $keyValuePairs
      * @return array Array of not stored keys
-     * @throws \Laminas\Cache\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      */
     public function replaceItems(array $keyValuePairs);
 
@@ -144,13 +145,14 @@ interface StorageInterface
      * It uses the token received from getItem() to check if the item has
      * changed before overwriting it.
      *
+     * @see    getItem()
+     * @see    setItem()
+     *
      * @param  mixed  $token
      * @param  string $key
      * @param  mixed  $value
      * @return bool
-     * @throws \Laminas\Cache\Exception\ExceptionInterface
-     * @see    getItem()
-     * @see    setItem()
+     * @throws ExceptionInterface
      */
     public function checkAndSetItem($token, $key, $value);
 
@@ -159,7 +161,7 @@ interface StorageInterface
      *
      * @param  string $key
      * @return bool
-     * @throws \Laminas\Cache\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      */
     public function touchItem($key);
 
@@ -168,7 +170,7 @@ interface StorageInterface
      *
      * @param  array $keys
      * @return array Array of not updated keys
-     * @throws \Laminas\Cache\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      */
     public function touchItems(array $keys);
 
@@ -177,7 +179,7 @@ interface StorageInterface
      *
      * @param  string $key
      * @return bool
-     * @throws \Laminas\Cache\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      */
     public function removeItem($key);
 
@@ -186,7 +188,7 @@ interface StorageInterface
      *
      * @param  array $keys
      * @return array Array of not removed keys
-     * @throws \Laminas\Cache\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      */
     public function removeItems(array $keys);
 
@@ -196,7 +198,7 @@ interface StorageInterface
      * @param  string $key
      * @param  int    $value
      * @return int|bool The new value on success, false on failure
-     * @throws \Laminas\Cache\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      */
     public function incrementItem($key, $value);
 
@@ -205,7 +207,7 @@ interface StorageInterface
      *
      * @param  array $keyValuePairs
      * @return array Associative array of keys and new values
-     * @throws \Laminas\Cache\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      */
     public function incrementItems(array $keyValuePairs);
 
@@ -215,7 +217,7 @@ interface StorageInterface
      * @param  string $key
      * @param  int    $value
      * @return int|bool The new value on success, false on failure
-     * @throws \Laminas\Cache\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      */
     public function decrementItem($key, $value);
 
@@ -224,7 +226,7 @@ interface StorageInterface
      *
      * @param  array $keyValuePairs
      * @return array Associative array of keys and new values
-     * @throws \Laminas\Cache\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      */
     public function decrementItems(array $keyValuePairs);
 

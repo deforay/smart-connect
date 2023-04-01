@@ -10,7 +10,6 @@ interface PluginCapableInterface extends EventsCapableInterface
     /**
      * Check if a plugin is registered
      *
-     * @param  Plugin\PluginInterface $plugin
      * @return bool
      */
     public function hasPlugin(Plugin\PluginInterface $plugin);

@@ -13,7 +13,7 @@ use \PhpOffice\PhpSpreadsheet\Spreadsheet;
 class SummaryService
 {
 
-    public $sampleTable = null;
+    public $sampleTable;
     protected $translator = null;
     protected $dbAdapter = null;
 
@@ -24,10 +24,6 @@ class SummaryService
         $this->dbAdapter = $dbAdapter;
     }
 
-    public function getServiceManager()
-    {
-        return $this->sm;
-    }
 
     public function fetchSummaryTabDetails($params)
     {

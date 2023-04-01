@@ -8,7 +8,7 @@ use Laminas\View\Model\JsonModel;
 class VlsmReferenceTablesController extends AbstractRestfulController
 {
 
-    private $commonService = null;
+    private \Application\Service\CommonService $commonService;
 
     public function __construct($commonService)
     {

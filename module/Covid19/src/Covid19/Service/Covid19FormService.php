@@ -17,7 +17,7 @@ class Covid19FormService
 
     public $sm = null;
     protected $translator = null;
-    protected $commonService = null;
+    protected \Application\Service\CommonService $commonService;
 
     public function __construct($sm, $commonService)
     {
@@ -26,10 +26,6 @@ class Covid19FormService
         $this->commonService = $commonService;
     }
 
-    public function getServiceManager()
-    {
-        return $this->sm;
-    }
 
     public function saveFileFromVlsmAPIV2()
     {

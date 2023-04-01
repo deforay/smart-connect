@@ -32,7 +32,7 @@ class EidSampleTable extends AbstractTableGateway
     protected $plasmaId = null;
     protected $mappedFacilities = null;
     protected $translator = null;
-    protected $commonService = null;
+    protected \Application\Service\CommonService $commonService;
 
     public function __construct(Adapter $adapter, $sm = null, $mappedFacilities = null, $table = null, $commonService = null)
     {
@@ -1975,7 +1975,7 @@ class EidSampleTable extends AbstractTableGateway
         $sql = new Sql($dbAdapter);
 
         $eidOutcomesQuery = $sql->select()
-            ->from(array('eid' => 'dash_form_eid'))
+            ->from(array('eid' => $this->table))
             ->columns(
                 array(
                     "total_samples" => new Expression("SUM(CASE WHEN ((eid.result IS NOT NULL AND eid.result != '' AND eid.result != 'NULL')) THEN 1 ELSE 0 END)"),
@@ -2014,7 +2014,7 @@ class EidSampleTable extends AbstractTableGateway
         $sql = new Sql($dbAdapter);
 
         $eidOutcomesQuery = $sql->select()
-            ->from(array('eid' => 'dash_form_eid'))
+            ->from(array('eid' =>  $this->table))
             ->columns(
                 array(
                     'noDatan' => new Expression("SUM(CASE WHEN ((eid.result like 'negative' OR eid.result = 'Negative' ) AND (eid.child_dob IS NULL OR eid.child_dob = '0000-00-00'))THEN 1 ELSE 0 END)"),
@@ -2073,7 +2073,7 @@ class EidSampleTable extends AbstractTableGateway
         $sql = new Sql($dbAdapter);
 
         $eidOutcomesQuery = $sql->select()
-            ->from(array('eid' => 'dash_form_eid'))
+            ->from(array('eid' =>  $this->table))
             ->columns(
                 array(
                     "total_samples" => new Expression("SUM(CASE WHEN ((eid.result IS NOT NULL AND eid.result != '' AND eid.result != 'NULL')) THEN 1 ELSE 0 END)"),
@@ -2106,7 +2106,7 @@ class EidSampleTable extends AbstractTableGateway
         $sql = new Sql($dbAdapter);
 
         $eidOutcomesQuery = $sql->select()
-            ->from(array('eid' => 'dash_form_eid'))
+            ->from(array('eid' =>  $this->table))
             ->columns(
                 array(
                     'sec1' => new Expression("AVG(DATEDIFF(sample_received_at_vl_lab_datetime, sample_collection_date))"),
@@ -3093,7 +3093,7 @@ class EidSampleTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = array();
-        
+
         $globalDb = $this->sm->get('GlobalTable');
         $samplesWaitingFromLastXMonths = $globalDb->getGlobalValue('sample_waiting_month_range');
         if (isset($params['daterange']) && trim($params['daterange']) != '') {
@@ -3198,7 +3198,7 @@ class EidSampleTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = array();
-        
+
         $globalDb = $this->sm->get('GlobalTable');
         $samplesWaitingFromLastXMonths = $globalDb->getGlobalValue('sample_waiting_month_range');
         if (isset($params['daterange']) && trim($params['daterange']) != '') {
@@ -3303,7 +3303,7 @@ class EidSampleTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = array();
-        
+
         $globalDb = $this->sm->get('GlobalTable');
         $samplesWaitingFromLastXMonths = $globalDb->getGlobalValue('sample_waiting_month_range');
         if (isset($params['daterange']) && trim($params['daterange']) != '') {
@@ -3408,7 +3408,7 @@ class EidSampleTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = array();
-        
+
         $globalDb = $this->sm->get('GlobalTable');
         $samplesWaitingFromLastXMonths = $globalDb->getGlobalValue('sample_waiting_month_range');
         if (isset($params['daterange']) && trim($params['daterange']) != '') {
@@ -3513,7 +3513,7 @@ class EidSampleTable extends AbstractTableGateway
         $logincontainer = new Container('credo');
         $queryContainer = new Container('query');
 
-        
+
         $globalDb = $this->sm->get('GlobalTable');
         $samplesWaitingFromLastXMonths = $globalDb->getGlobalValue('sample_waiting_month_range');
         /* Array of database columns which should be read and sent back to DataTables. Use a space where
@@ -4009,9 +4009,9 @@ class EidSampleTable extends AbstractTableGateway
                 $sQuery = $sQuery->where($where);
             }
             if (isset($params['testResult']) && $params['testResult'] == '<1000') {
-                $sQuery = $sQuery->where("(vl.result < 1000 or vl.result = 'Target Not Detected' or vl.result = 'TND' or vl.result = 'tnd' or vl.result= 'Below Detection Level' or vl.result='BDL' or vl.result='bdl' or vl.result= 'Low Detection Level' or vl.result='LDL' or vl.result='ldl') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00'");
+                $sQuery = $sQuery->where("(vl.result < 1000 or vl.result = 'Target Not Detected' or vl.result = 'TND' or vl.result = 'tnd' or vl.result= 'Below Detection Level' or vl.result='BDL' or vl.result='bdl' or vl.result= 'Low Detection Level' or vl.result='LDL' or vl.result='ldl') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime not like '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00'");
             } else if (isset($params['testResult']) && $params['testResult'] == '>=1000') {
-                $sQuery = $sQuery->where("vl.result IS NOT NULL AND vl.result!= '' AND vl.result >= 1000 AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00'");
+                $sQuery = $sQuery->where("vl.result IS NOT NULL AND vl.result!= '' AND vl.result >= 1000 AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime not like '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00'");
             }
             if (isset($params['sampleType']) && trim($params['sampleType']) != '') {
                 $sQuery = $sQuery->where('vl.specimen_type="' . base64_decode(trim($params['sampleType'])) . '"');
@@ -4059,8 +4059,8 @@ class EidSampleTable extends AbstractTableGateway
                     array(
                         'samples' => new Expression('COUNT(*)'),
                         "monthDate" => new Expression("DATE_FORMAT(DATE(sample_collection_date), '%b-%Y')"),
-                        "positive" => new Expression("SUM(CASE WHEN (((vl.result = 'positive' or vl.result = 'Positive' or vl.result not like '') AND vl.result IS NOT NULL AND vl.result!= '' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) THEN 1 ELSE 0 END)"),
-                        "negative" => new Expression("SUM(CASE WHEN (( vl.result IS NOT NULL AND vl.result!= '' AND vl.result ='negative' AND vl.result ='Negative' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) THEN 1 ELSE 0 END)"),
+                        "positive" => new Expression("SUM(CASE WHEN (((vl.result = 'positive' or vl.result = 'Positive' or vl.result not like '') AND vl.result IS NOT NULL AND vl.result!= '' AND sample_tested_datetime is not null AND sample_tested_datetime not like '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) THEN 1 ELSE 0 END)"),
+                        "negative" => new Expression("SUM(CASE WHEN (( vl.result IS NOT NULL AND vl.result!= '' AND vl.result ='negative' AND vl.result ='Negative' AND sample_tested_datetime is not null AND sample_tested_datetime not like '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) THEN 1 ELSE 0 END)"),
                     )
                 )
                 ->join(array('f' => 'facility_details'), 'f.facility_id=vl.lab_id', array(), 'left')
@@ -4119,9 +4119,9 @@ class EidSampleTable extends AbstractTableGateway
                 $sQuery = $sQuery->where($where);
             }
             if (isset($params['testResult']) && $params['testResult'] == '<1000') {
-                $sQuery = $sQuery->where("(vl.result < 1000 or vl.result = 'Target Not Detected' or vl.result = 'TND' or vl.result = 'tnd' or vl.result= 'Below Detection Level' or vl.result='BDL' or vl.result='bdl' or vl.result= 'Low Detection Level' or vl.result='LDL' or vl.result='ldl') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00'");
+                $sQuery = $sQuery->where("(vl.result < 1000 or vl.result = 'Target Not Detected' or vl.result = 'TND' or vl.result = 'tnd' or vl.result= 'Below Detection Level' or vl.result='BDL' or vl.result='bdl' or vl.result= 'Low Detection Level' or vl.result='LDL' or vl.result='ldl') AND vl.result IS NOT NULL AND vl.result!= '' AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime not like '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00'");
             } else if (isset($params['testResult']) && $params['testResult'] == '>=1000') {
-                $sQuery = $sQuery->where("vl.result IS NOT NULL AND vl.result!= '' AND vl.result >= 1000 AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00'");
+                $sQuery = $sQuery->where("vl.result IS NOT NULL AND vl.result!= '' AND vl.result >= 1000 AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime not like '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00'");
             }
             if (isset($params['sampleType']) && trim($params['sampleType']) != '') {
                 $sQuery = $sQuery->where('vl.specimen_type="' . base64_decode(trim($params['sampleType'])) . '"');
@@ -4244,8 +4244,8 @@ class EidSampleTable extends AbstractTableGateway
             ->columns(array(
                 'sampleCollectionDate' => new Expression('DATE(sample_collection_date)'),
                 "total_samples_received" => new Expression("(COUNT(*))"),
-                "total_samples_tested" => new Expression("(SUM(CASE WHEN (((vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL') AND (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) OR (vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0)) THEN 1 ELSE 0 END))"),
-                "total_samples_pending" => new Expression("(SUM(CASE WHEN ((vl.result IS NULL OR vl.result = '' OR vl.result = 'NULL' OR sample_tested_datetime is null OR sample_tested_datetime = '' OR DATE(sample_tested_datetime) ='1970-01-01' OR DATE(sample_tested_datetime) ='0000-00-00') AND (vl.reason_for_sample_rejection IS NULL OR vl.reason_for_sample_rejection = '' OR vl.reason_for_sample_rejection = 0)) THEN 1 ELSE 0 END))"),
+                "total_samples_tested" => new Expression("(SUM(CASE WHEN (((vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL') AND (sample_tested_datetime is not null AND sample_tested_datetime not like '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) OR (vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0)) THEN 1 ELSE 0 END))"),
+                "total_samples_pending" => new Expression("(SUM(CASE WHEN ((vl.result IS NULL OR vl.result = '' OR vl.result = 'NULL' OR sample_tested_datetime is null OR sample_tested_datetime like'' OR DATE(sample_tested_datetime) ='1970-01-01' OR DATE(sample_tested_datetime) ='0000-00-00') AND (vl.reason_for_sample_rejection IS NULL OR vl.reason_for_sample_rejection = '' OR vl.reason_for_sample_rejection = 0)) THEN 1 ELSE 0 END))"),
                 "rejected_samples" => new Expression("SUM(CASE WHEN (vl.reason_for_sample_rejection !='' AND vl.reason_for_sample_rejection !='0' AND vl.reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END)")
             ))
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'))
@@ -4472,10 +4472,10 @@ class EidSampleTable extends AbstractTableGateway
         $sQuery = $sql->select()->from(array('f' => 'facility_details'))
             ->join(array('vl' => $this->table), 'vl.lab_id=f.facility_id', array(
                 "total_samples_received" => new Expression("(COUNT(*))"),
-                "total_samples_positive" => new Expression("(SUM(CASE WHEN ((((vl.result ='positive%' OR vl.result = 'Positive%') AND vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL') AND (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) OR (vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0)) THEN 1 ELSE 0 END))"),
-                "total_samples_negative" => new Expression("(SUM(CASE WHEN ((((vl.result ='negative%' OR vl.result = 'Negative%') AND vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL') AND (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) OR (vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0)) THEN 1 ELSE 0 END))"),
-                "total_samples_tested" => new Expression("(SUM(CASE WHEN (((vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL') AND (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) OR (vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0)) THEN 1 ELSE 0 END))"),
-                "total_samples_pending" => new Expression("(SUM(CASE WHEN ((vl.result IS NULL OR vl.result = '' OR vl.result = 'NULL' OR sample_tested_datetime is null OR sample_tested_datetime = '' OR DATE(sample_tested_datetime) ='1970-01-01' OR DATE(sample_tested_datetime) ='0000-00-00') AND (vl.reason_for_sample_rejection IS NULL OR vl.reason_for_sample_rejection = '' OR vl.reason_for_sample_rejection = 0)) THEN 1 ELSE 0 END))"),
+                "total_samples_positive" => new Expression("(SUM(CASE WHEN ((((vl.result ='positive%' OR vl.result = 'Positive%') AND vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL') AND (sample_tested_datetime is not null AND sample_tested_datetime not like '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) OR (vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0)) THEN 1 ELSE 0 END))"),
+                "total_samples_negative" => new Expression("(SUM(CASE WHEN ((((vl.result ='negative%' OR vl.result = 'Negative%') AND vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL') AND (sample_tested_datetime is not null AND sample_tested_datetime not like '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) OR (vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0)) THEN 1 ELSE 0 END))"),
+                "total_samples_tested" => new Expression("(SUM(CASE WHEN (((vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL') AND (sample_tested_datetime is not null AND sample_tested_datetime not like '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) OR (vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0)) THEN 1 ELSE 0 END))"),
+                "total_samples_pending" => new Expression("(SUM(CASE WHEN ((vl.result IS NULL OR vl.result = '' OR vl.result = 'NULL' OR sample_tested_datetime is null OR sample_tested_datetime like '' OR DATE(sample_tested_datetime) ='1970-01-01' OR DATE(sample_tested_datetime) ='0000-00-00') AND (vl.reason_for_sample_rejection IS NULL OR vl.reason_for_sample_rejection = '' OR vl.reason_for_sample_rejection = 0)) THEN 1 ELSE 0 END))"),
                 "rejected_samples" => new Expression("SUM(CASE WHEN (vl.reason_for_sample_rejection !='' AND vl.reason_for_sample_rejection !='0' AND vl.reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END)")
             ))
             ->where("sample_collection_date is not null AND sample_collection_date not like '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00' AND vl.lab_id !=0")
@@ -4529,9 +4529,9 @@ class EidSampleTable extends AbstractTableGateway
 
 
         if (isset($parameters['sampleStatus']) && $parameters['sampleStatus'] == 'sample_tested') {
-            $sQuery = $sQuery->where("((vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') OR (vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0))");
+            $sQuery = $sQuery->where("((vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL' AND sample_tested_datetime is not null AND sample_tested_datetime not like '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') OR (vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0))");
         } else if (isset($parameters['sampleStatus']) && $parameters['sampleStatus'] == 'samples_not_tested') {
-            $sQuery = $sQuery->where("(vl.result IS NULL OR vl.result = '' OR vl.result = 'NULL' OR sample_tested_datetime is null OR sample_tested_datetime = '' OR DATE(sample_tested_datetime) ='1970-01-01' OR DATE(sample_tested_datetime) ='0000-00-00') AND (vl.reason_for_sample_rejection IS NULL OR vl.reason_for_sample_rejection = '' OR vl.reason_for_sample_rejection = 0)");
+            $sQuery = $sQuery->where("(vl.result IS NULL OR vl.result = '' OR vl.result = 'NULL' OR sample_tested_datetime is null OR sample_tested_datetime like '' OR DATE(sample_tested_datetime) ='1970-01-01' OR DATE(sample_tested_datetime) ='0000-00-00') AND (vl.reason_for_sample_rejection IS NULL OR vl.reason_for_sample_rejection = '' OR vl.reason_for_sample_rejection = 0)");
         } else if (isset($parameters['sampleStatus']) && $parameters['sampleStatus'] == 'sample_rejected') {
             $sQuery = $sQuery->where("vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0");
         }
@@ -4696,7 +4696,7 @@ class EidSampleTable extends AbstractTableGateway
         $sql = new Sql($dbAdapter);
 
         $eidOutcomesQuery = $sql->select()
-            ->from(array('eid' => 'dash_form_eid'))
+            ->from(array('eid' =>  $this->table))
             ->columns(
                 array(
                     'noDatan' => new Expression("SUM(CASE WHEN ((eid.result like 'negative' OR eid.result = 'Negative' ) AND (eid.child_dob IS NULL OR eid.child_dob = '0000-00-00'))THEN 1 ELSE 0 END)"),
@@ -4787,7 +4787,7 @@ class EidSampleTable extends AbstractTableGateway
             /* foreach($monthList as $key=>$list){
                 $searchVal[$key] =  new Expression("AVG(CASE WHEN (eid.result like 'positive%' AND eid.result not like '' AND sample_collection_date LIKE '%".$list."%') THEN 1 ELSE 0 END)");
             } */
-            $sQuery = $sql->select()->from(array('eid' => 'dash_form_eid'))->columns(array(
+            $sQuery = $sql->select()->from(array('eid' =>  $this->table))->columns(array(
                 'monthYear' => new Expression("DATE_FORMAT(sample_collection_date, '%b-%Y')"),
                 'positive_rate' => new Expression("ROUND(((SUM(CASE WHEN ((eid.result like 'positive' OR eid.result like 'Positive' )) THEN 1 ELSE 0 END))/(SUM(CASE WHEN (((eid.result IS NOT NULL AND eid.result != '' AND eid.result != 'NULL'))) THEN 1 ELSE 0 END)))*100,2)")
             ))
@@ -5529,6 +5529,165 @@ class EidSampleTable extends AbstractTableGateway
 
         return $output;
     }
+
+    public function fetchLatLonMapPosNeg($params)
+    {
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $lResult = array();
+
+        // $lQuery = $sql->select()->from(array('eid' => 'dash_form_eid'))->columns(array('child_name','mother_name','caretaker_phone_number','result'))
+        //             ->join(array('f' => 'import_config_machines'), 'f.config_machine_id=eid.import_machine_name', array('lat'=>'latitude','lon'=>'longitude'))
+        //             ->where("(eid.sample_tested_datetime is not null  AND f.poc_device ='yes' AND f.latitude = '".$params['lat']."' AND f.longitude = '".$params['lon']."')")
+        //             ->join(array('lab' => 'facility_details'), 'lab.facility_id=eid.lab_id', array('lab_name' => 'facility_name','contact_person' => 'contact_person' ,'facility_emails','facility_mobile_numbers'))
+        // ->group(array("f.latitude","f.longitude"))
+        // ;
+        if (trim($params['daterange']) != '') {
+            $splitDate = explode('to', $params['daterange']);
+        } else {
+            $timestamp = time();
+            $qDates = array();
+            for ($i = 0; $i < 28; $i++) {
+                $qDates[] = "'" . date('Y-m-d', $timestamp) . "'";
+                $timestamp -= 24 * 3600;
+            }
+            $qDates = implode(",", $qDates);
+        }
+        $lQuery = $sql->select()->from(array('eid' => 'dash_form_eid'))
+
+            ->columns(
+                array(
+                    "total" => new Expression("COUNT(*)"),
+                    "initial_pcr" => new Expression("SUM(CASE WHEN (pcr_test_performed_before like 'no' OR pcr_test_performed_before is NULL OR pcr_test_performed_before like '') THEN 1 ELSE 0 END)"),
+                    "initial_pcr_positives" => new Expression("SUM(CASE WHEN ((eid.result like 'positive' OR eid.result like 'Positive' ) AND (pcr_test_performed_before like 'no' OR pcr_test_performed_before is NULL OR pcr_test_performed_before like '')) THEN 1 ELSE 0 END)"),
+                    "second_third_pcr" => new Expression("SUM(CASE WHEN (pcr_test_performed_before is not null AND pcr_test_performed_before like 'yes') THEN 1 ELSE 0 END)"),
+                    "second_third_pcr_positives" => new Expression("SUM(CASE WHEN ((eid.result like 'positive' OR eid.result like 'Positive' ) AND (pcr_test_performed_before is not null AND pcr_test_performed_before like 'yes')) THEN 1 ELSE 0 END)"),
+                    "rejected" => new Expression("SUM(CASE WHEN ((eid.is_sample_rejected like 'yes')) THEN 1 ELSE 0 END)"),
+                    "total_valid_tests" => new Expression("SUM(CASE WHEN ((eid.result like 'negative' OR eid.result like 'Negative') OR (eid.result like 'positive' OR eid.result like 'Positive' )) THEN 1 ELSE 0 END)"),
+                    "negative" => new Expression("SUM(CASE WHEN ((eid.result like 'negative' OR eid.result like 'Negative')) THEN 1 ELSE 0 END)"),
+                    "positive" => new Expression("SUM(CASE WHEN ((eid.result like 'positive' OR eid.result like 'Positive' )) THEN 1 ELSE 0 END)"),
+                    "infant_2" => new Expression("SUM(CASE WHEN ((eid.child_age <=2)) THEN 1 ELSE 0 END)"),
+                    "infant_2_positives" => new Expression("SUM(CASE WHEN ((eid.result like 'positive' OR eid.result like 'Positive' AND eid.child_age <=2)) THEN 1 ELSE 0 END)"),
+                    "above_2" => new Expression("SUM(CASE WHEN ((eid.child_age >2)) THEN 1 ELSE 0 END)"),
+                    "above_2_positives" => new Expression("SUM(CASE WHEN ((eid.result like 'positive' OR eid.result like 'Positive' AND eid.child_age >2)) THEN 1 ELSE 0 END)"),
+                    "failed" => new Expression("SUM(CASE WHEN ((eid.result like 'failed' OR eid.result like 'Failed' )) THEN 1 ELSE 0 END)"),
+                    "rej_sample" => new Expression("SUM(CASE WHEN ((eid.is_sample_rejected = 'yes' )) THEN 1 ELSE 0 END)"),
+                    "valid_outcomes" => new Expression("SUM(CASE WHEN ((eid.result is not null  AND eid.result not like '' )) THEN 1 ELSE 0 END)"),
+                )
+            )
+            ->join(array('if' => 'import_config_machines'), 'if.config_machine_id=eid.import_machine_name', array('lat' => 'latitude', 'lon' => 'longitude'))
+            // ->join(array('f' => 'facility_details'), 'f.facility_id=eid.facility_id', array('total_facilities' => new Expression("COUNT(f.facility_id)")))
+            // ->join(array('loc' => 'location_details'), 'loc.location_id=f.facility_district', array('location_name' => 'location_name'))
+            // ->join(array('lab' => 'facility_details'), 'lab.facility_id=eid.lab_id', array('lab_name' => 'facility_name','lab_code' => 'facility_code','contact_person' => 'contact_person' ,'facility_emails','facility_mobile_numbers'))
+            ->where("(eid.sample_tested_datetime is not null  AND if.poc_device ='yes')")
+
+            // ->group('eid.lab_id')
+            ->order('total DESC');
+        if (trim($params['daterange']) != '') {
+            if (trim($splitDate[0]) != '' && trim($splitDate[1]) != '') {
+                $lQuery = $lQuery->where(array("DATE(eid.sample_collection_date) <='$splitDate[1]'", "DATE(eid.sample_collection_date) >='$splitDate[0]'"));
+            }
+        } else {
+            $lQuery = $lQuery->where("DATE(sample_collection_date) IN ($qDates)");
+        }
+        if (trim($params['lab']) != '') {
+            $lQuery = $lQuery->where("eid.lab_id = '" . $params['lab'] . "'");
+        }
+        $lQueryStr = $sql->buildSqlString($lQuery);
+        // print_r($lQueryStr);die;
+        $lResult = $dbAdapter->query($lQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+
+        return $lResult;
+    }
+
+
+    public function fetchLatLonMap($params)
+    {
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $lResult = array();
+
+        // $lQuery = $sql->select()->from(array('eid' => 'dash_form_eid'))->columns(array('child_name','mother_name','caretaker_phone_number','result'))
+        //             ->join(array('f' => 'import_config_machines'), 'f.config_machine_id=eid.import_machine_name', array('lat'=>'latitude','lon'=>'longitude'))
+        //             ->where("(eid.sample_tested_datetime is not null  AND f.poc_device ='yes' AND f.latitude = '".$params['lat']."' AND f.longitude = '".$params['lon']."')")
+        //             ->join(array('lab' => 'facility_details'), 'lab.facility_id=eid.lab_id', array('lab_name' => 'facility_name','contact_person' => 'contact_person' ,'facility_emails','facility_mobile_numbers'))
+        // ->group(array("f.latitude","f.longitude"))
+        // ;
+        if (trim($params['daterange']) != '') {
+            $splitDate = explode('to', $params['daterange']);
+        } else {
+            $timestamp = time();
+            $qDates = array();
+            for ($i = 0; $i < 28; $i++) {
+                $qDates[] = "'" . date('Y-m-d', $timestamp) . "'";
+                $timestamp -= 24 * 3600;
+            }
+            $qDates = implode(",", $qDates);
+        }
+        $lQuery = $sql->select()->from(array('eid' => 'dash_form_eid'))
+
+            ->columns(
+                array(
+                    "total" => new Expression("COUNT(*)"),
+                    "initial_pcr" => new Expression("SUM(CASE WHEN (pcr_test_performed_before like 'no' OR pcr_test_performed_before is NULL OR pcr_test_performed_before like '') THEN 1 ELSE 0 END)"),
+                    "initial_pcr_positives" => new Expression("SUM(CASE WHEN ((eid.result like 'positive' OR eid.result like 'Positive' ) AND (pcr_test_performed_before like 'no' OR pcr_test_performed_before is NULL OR pcr_test_performed_before like '')) THEN 1 ELSE 0 END)"),
+                    "second_third_pcr" => new Expression("SUM(CASE WHEN (pcr_test_performed_before is not null AND pcr_test_performed_before like 'yes') THEN 1 ELSE 0 END)"),
+                    "second_third_pcr_positives" => new Expression("SUM(CASE WHEN ((eid.result like 'positive' OR eid.result like 'Positive' ) AND (pcr_test_performed_before is not null AND pcr_test_performed_before like 'yes')) THEN 1 ELSE 0 END)"),
+                    "rejected" => new Expression("SUM(CASE WHEN ((eid.is_sample_rejected like 'yes')) THEN 1 ELSE 0 END)"),
+                    "total_valid_tests" => new Expression("SUM(CASE WHEN ((eid.result like 'negative' OR eid.result like 'Negative') OR (eid.result like 'positive' OR eid.result like 'Positive' )) THEN 1 ELSE 0 END)"),
+                    "negative" => new Expression("SUM(CASE WHEN ((eid.result like 'negative' OR eid.result like 'Negative')) THEN 1 ELSE 0 END)"),
+                    "positive" => new Expression("SUM(CASE WHEN ((eid.result like 'positive' OR eid.result like 'Positive' )) THEN 1 ELSE 0 END)"),
+                    "valid_outcomes" => new Expression("SUM(CASE WHEN ((eid.result is not null  AND eid.result not like '' )) THEN 1 ELSE 0 END)"),
+                )
+            )
+            ->join(array('if' => 'import_config_machines'), 'if.config_machine_id=eid.import_machine_name', array('lat' => 'latitude', 'lon' => 'longitude'))
+            // ->join(array('f' => 'facility_details'), 'f.facility_id=eid.facility_id', array('total_facilities' => new Expression("COUNT(f.facility_id)")))
+            ->join(array('lab' => 'facility_details'), 'lab.facility_id=eid.lab_id', array('lab_name' => 'facility_name', 'lab_code' => 'facility_code', 'contact_person' => 'contact_person', 'facility_emails', 'facility_mobile_numbers'))
+            ->join(array('loc' => 'location_details'), 'loc.location_id=lab.facility_district', array('location_name' => 'location_name'))
+            ->where("(eid.sample_tested_datetime is not null  AND if.poc_device ='yes')")
+
+            ->group('eid.lab_id')
+            ->order('total DESC');
+
+        if (trim($params['daterange']) != '') {
+            if (trim($splitDate[0]) != '' && trim($splitDate[1]) != '') {
+                $lQuery = $lQuery->where(array("DATE(eid.sample_collection_date) <='$splitDate[1]'", "DATE(eid.sample_collection_date) >='$splitDate[0]'"));
+            }
+        } else {
+            $lQuery = $lQuery->where("DATE(sample_collection_date) IN ($qDates)");
+        }
+        if (trim($params['lab']) != '') {
+            $lQuery = $lQuery->where("eid.lab_id = '" . $params['lab'] . "'");
+        }
+        $lQueryStr = $sql->buildSqlString($lQuery);
+        // print_r($lQueryStr);die;
+        $lResult = $dbAdapter->query($lQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+
+        return $lResult;
+    }
+
+    public function fetchEidFormDetail()
+    {
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $lResult = array();
+
+        $lQuery = $sql->select()->from(array('eid' => 'dash_form_eid'))->columns(array(
+            'total' => new Expression("SUM(CASE WHEN ( eid.sample_collection_date is not NULL AND eid.sample_collection_date!='0000-00-00 00:00:00') THEN 1 ELSE 0 END)"),
+            "samplenottested" => new Expression("SUM(CASE WHEN (eid.sample_collection_date is NULL OR eid.sample_collection_date='0000-00-00 00:00:00') THEN 1 ELSE 0 END)"),
+            'lab_id'
+        ))
+            ->join(array('f' => 'import_config_machines'), 'f.config_machine_id=eid.import_machine_name', array('lat' => 'latitude', 'lon' => 'longitude'))
+            ->where("( f.poc_device ='yes')")
+            ->group(array("f.latitude", "f.longitude"));
+        $lQueryStr = $sql->buildSqlString($lQuery);
+        // print_r($lQueryStr);die;
+        $lResult = $dbAdapter->query($lQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+
+        return $lResult;
+    }
+
+
     //end clinic details
     public function insertOrUpdate($arrayData)
     {

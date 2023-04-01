@@ -11,14 +11,20 @@ use Laminas\Cache\Service\StorageCacheFactory;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+
+use function assert;
 use function implode;
+use function is_string;
+use function sprintf;
 
 /**
  * @internal
+ *
+ * phpcs:disable Generic.Formatting.MultipleStatementAlignment.NotSame
  */
 final class DeprecatedStorageFactoryConfigurationCheckCommand extends Command
 {
-    public const NAME = 'laminas-cache:deprecation:check-storage-factory-config';
+    public const NAME         = 'laminas-cache:deprecation:check-storage-factory-config';
     private const DESCRIPTION = <<<EOT
         Helps to detect deprecated cache configurations which are used to create the storage adapter.
     EOT;
@@ -34,27 +40,20 @@ final class DeprecatedStorageFactoryConfigurationCheckCommand extends Command
         . ' Please normalize the `%s` configuration, it contains deprecated configuration(s)';
     private const MESSAGE_PROJECT_CONFIGURATION_CONTAINS_INVALID_CACHE_CONFIGURATION
         = 'Please normalize the `%s` configuration as it contains deprecated configuration.';
-    private const MESSAGE_SCHEMA_DOCUMENTATION_MESSAGE
-        = 'The normalized schema can be found at https://docs.laminas.dev/laminas-cache/storage/adapter/#quick-start';
+    private const MESSAGE_SCHEMA_DOCUMENTATION_MESSAGE = 'The normalized schema can be found at'
+    . ' https://docs.laminas.dev/laminas-cache/storage/adapter/#quick-start';
 
-    protected static $defaultName = self::NAME;
+    /** @var ArrayAccess<string,mixed> */
+    private ArrayAccess $projectConfiguration;
 
-    /**
-     * @var ArrayAccess<string,mixed>
-     */
-    private $projectConfiguration;
-
-    /**
-     * @var DeprecatedSchemaDetectorInterface
-     */
-    private $deprecatedSchemaDetector;
+    private DeprecatedSchemaDetectorInterface $deprecatedSchemaDetector;
 
     public function __construct(
         ArrayAccess $projectConfiguration,
         DeprecatedSchemaDetectorInterface $deprecatedSchemaDetector
     ) {
         parent::__construct(self::NAME);
-        $this->projectConfiguration = $projectConfiguration;
+        $this->projectConfiguration     = $projectConfiguration;
         $this->deprecatedSchemaDetector = $deprecatedSchemaDetector;
     }
 
@@ -89,7 +88,7 @@ final class DeprecatedStorageFactoryConfigurationCheckCommand extends Command
             $invalidCaches[] = $cacheIdentifier;
         }
 
-        $cacheConfiguration = $this->projectConfiguration[self::CACHE_CONFIGURATION_KEY] ?? [];
+        $cacheConfiguration             = $this->projectConfiguration[self::CACHE_CONFIGURATION_KEY] ?? [];
         $cacheConfigurationIsDeprecated = false;
         if ($cacheConfiguration !== []) {
             $cacheConfigurationIsDeprecated = $this->deprecatedSchemaDetector->isDeprecatedStorageFactorySchema(
@@ -134,7 +133,7 @@ final class DeprecatedStorageFactoryConfigurationCheckCommand extends Command
 
     private function projectConfigurationContainsAnyCacheConfiguration(): bool
     {
-        $cache = $this->projectConfiguration[self::CACHE_CONFIGURATION_KEY] ?? [];
+        $cache  = $this->projectConfiguration[self::CACHE_CONFIGURATION_KEY] ?? [];
         $caches = $this->projectConfiguration[self::CACHES_CONFIGURATION_KEY] ?? [];
 
         return $cache !== [] || $caches !== [];

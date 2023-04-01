@@ -6,45 +6,45 @@ use DateInterval;
 use DateTimeImmutable;
 use DateTimeZone;
 use Laminas\Cache\Exception\InvalidArgumentException as LaminasCacheInvalidArgumentException;
+use Laminas\Cache\Psr\MaximumKeyLengthTrait;
 use Laminas\Cache\Psr\SerializationTrait;
 use Laminas\Cache\Storage\Capabilities;
 use Laminas\Cache\Storage\ClearByNamespaceInterface;
 use Laminas\Cache\Storage\FlushableInterface;
 use Laminas\Cache\Storage\StorageInterface;
-use Psr\SimpleCache\CacheException as PsrCacheExceptionInterface;
+use Psr\SimpleCache\CacheException as PsrCacheException;
 use Psr\SimpleCache\CacheInterface as SimpleCacheInterface;
 use Throwable;
 use Traversable;
+
+use function array_keys;
 use function get_class;
+use function gettype;
+use function is_array;
+use function is_int;
+use function is_object;
+use function is_string;
+use function preg_match;
+use function preg_quote;
 use function sprintf;
+use function var_export;
 
 /**
  * Decorate a laminas-cache storage adapter for usage as a PSR-16 implementation.
  */
 class SimpleCacheDecorator implements SimpleCacheInterface
 {
+    use MaximumKeyLengthTrait;
     use SerializationTrait;
 
     /**
      * Characters reserved by PSR-16 that are not valid in cache keys.
      */
-    const INVALID_KEY_CHARS = ':@{}()/\\';
+    public const INVALID_KEY_CHARS = ':@{}()/\\';
 
-    /**
-     * PCRE runs into a compilation error if the quantifier exceeds this limit
-     * @internal
-     */
-    public const PCRE_MAXIMUM_QUANTIFIER_LENGTH = 65535;
+    private bool $providesPerItemTtl = true;
 
-    /**
-     * @var bool
-     */
-    private $providesPerItemTtl = true;
-
-    /**
-     * @var StorageInterface
-     */
-    private $storage;
+    private StorageInterface $storage;
 
     /**
      * Reference used by storage when calling getItem() to indicate status of
@@ -54,16 +54,7 @@ class SimpleCacheDecorator implements SimpleCacheInterface
      */
     private $success;
 
-    /**
-     * @var DateTimeZone
-     */
-    private $utc;
-
-    /**
-     * @var int
-     * @psalm-var 0|positive-int
-     */
-    private $maximumKeyLength;
+    private DateTimeZone $utc;
 
     public function __construct(StorageInterface $storage)
     {
@@ -81,7 +72,7 @@ class SimpleCacheDecorator implements SimpleCacheInterface
         $this->memoizeMaximumKeyLengthCapability($storage, $capabilities);
 
         $this->storage = $storage;
-        $this->utc = new DateTimeZone('UTC');
+        $this->utc     = new DateTimeZone('UTC');
     }
 
     /**
@@ -94,11 +85,11 @@ class SimpleCacheDecorator implements SimpleCacheInterface
         $this->success = null;
         try {
             $result = $this->storage->getItem($key, $this->success);
-        } catch (Throwable $throwable) {
-            throw static::translateThrowable($throwable);
+        } catch (Throwable $e) {
+            throw static::translateThrowable($e);
         }
 
-        $result = $result === null ? $default : $result;
+        $result ??= $default;
         return $this->success ? $result : $default;
     }
 
@@ -122,7 +113,7 @@ class SimpleCacheDecorator implements SimpleCacheInterface
             return false;
         }
 
-        $options = $this->storage->getOptions();
+        $options     = $this->storage->getOptions();
         $previousTtl = $options->getTtl();
 
         if ($ttl !== null) {
@@ -131,8 +122,8 @@ class SimpleCacheDecorator implements SimpleCacheInterface
 
         try {
             $result = $this->storage->setItem($key, $value);
-        } catch (Throwable $throwable) {
-            throw static::translateThrowable($throwable);
+        } catch (Throwable $e) {
+            throw static::translateThrowable($e);
         } finally {
             $options->setTtl($previousTtl);
         }
@@ -149,7 +140,7 @@ class SimpleCacheDecorator implements SimpleCacheInterface
 
         try {
             return null !== $this->storage->removeItem($key);
-        } catch (Throwable $throwable) {
+        } catch (Throwable $e) {
             return false;
         }
     }
@@ -177,20 +168,26 @@ class SimpleCacheDecorator implements SimpleCacheInterface
      */
     public function getMultiple($keys, $default = null)
     {
-        $keys = $this->convertIterableToArray($keys, false, __FUNCTION__);
-        array_walk($keys, [$this, 'validateKey']);
+        if (! is_array($keys) && ! $keys instanceof Traversable) {
+            throw new SimpleCacheInvalidArgumentException(sprintf(
+                'Invalid value provided to %s; must be iterable',
+                __METHOD__
+            ));
+        }
+
+        $keys = $this->convertIterableKeysToList($keys);
 
         try {
             $results = $this->storage->getItems($keys);
-        } catch (Throwable $throwable) {
-            throw static::translateThrowable($throwable);
+        } catch (Throwable $e) {
+            throw static::translateThrowable($e);
         }
 
         foreach ($keys as $key) {
-            if (! isset($results[$key])) {
-                $results[$key] = $default;
+            if (isset($results[$key])) {
                 continue;
             }
+            $results[$key] = $default;
         }
 
         return $results;
@@ -201,9 +198,16 @@ class SimpleCacheDecorator implements SimpleCacheInterface
      */
     public function setMultiple($values, $ttl = null)
     {
-        $values = $this->convertIterableToArray($values, true, __FUNCTION__);
-        $keys = array_keys($values);
-        $ttl = $this->convertTtlToInteger($ttl);
+        if (! is_array($values) && ! $values instanceof Traversable) {
+            throw new SimpleCacheInvalidArgumentException(sprintf(
+                'Invalid value provided to %s; must be iterable',
+                __METHOD__
+            ));
+        }
+
+        $values = $this->convertIterableToKeyValueMap($values);
+        $keys   = array_keys($values);
+        $ttl    = $this->convertTtlToInteger($ttl);
 
         // PSR-16 states that 0 or negative TTL values should result in cache
         // invalidation for the items.
@@ -211,15 +215,13 @@ class SimpleCacheDecorator implements SimpleCacheInterface
             return $this->deleteMultiple($keys);
         }
 
-        array_walk($keys, [$this, 'validateKey']);
-
         // If a positive TTL is set, but the adapter does not support per-item
         // TTL, we return false -- but not until after we validate keys.
         if (null !== $ttl && ! $this->providesPerItemTtl) {
             return false;
         }
 
-        $options = $this->storage->getOptions();
+        $options     = $this->storage->getOptions();
         $previousTtl = $options->getTtl();
 
         if ($ttl !== null) {
@@ -228,8 +230,8 @@ class SimpleCacheDecorator implements SimpleCacheInterface
 
         try {
             $result = $this->storage->setItems($values);
-        } catch (Throwable $throwable) {
-            throw static::translateThrowable($throwable);
+        } catch (Throwable $e) {
+            throw static::translateThrowable($e);
         } finally {
             $options->setTtl($previousTtl);
         }
@@ -252,16 +254,21 @@ class SimpleCacheDecorator implements SimpleCacheInterface
      */
     public function deleteMultiple($keys)
     {
-        $keys = $this->convertIterableToArray($keys, false, __FUNCTION__);
+        if (! is_array($keys) && ! $keys instanceof Traversable) {
+            throw new SimpleCacheInvalidArgumentException(sprintf(
+                'Invalid value provided to %s; must be iterable',
+                __METHOD__
+            ));
+        }
+
+        $keys = $this->convertIterableKeysToList($keys);
         if (empty($keys)) {
             return true;
         }
 
-        array_walk($keys, [$this, 'validateKey']);
-
         try {
             $result = $this->storage->removeItems($keys);
-        } catch (Throwable $throwable) {
+        } catch (Throwable $e) {
             return false;
         }
 
@@ -287,12 +294,15 @@ class SimpleCacheDecorator implements SimpleCacheInterface
 
         try {
             return $this->storage->hasItem($key);
-        } catch (Throwable $throwable) {
-            throw static::translateThrowable($throwable);
+        } catch (Throwable $e) {
+            throw static::translateThrowable($e);
         }
     }
 
-    private static function translateThrowable(Throwable $throwable): PsrCacheExceptionInterface
+    /**
+     * @return SimpleCacheInvalidArgumentException|SimpleCacheException
+     */
+    private static function translateThrowable(Throwable $throwable): PsrCacheException
     {
         $exceptionClass = $throwable instanceof LaminasCacheInvalidArgumentException
             ? SimpleCacheInvalidArgumentException::class
@@ -302,11 +312,10 @@ class SimpleCacheDecorator implements SimpleCacheInterface
     }
 
     /**
-     * @param string $key
-     * @return void
-     * @throws SimpleCacheInvalidArgumentException if key is invalid
+     * @param string|int $key
+     * @throws SimpleCacheInvalidArgumentException If key is invalid.
      */
-    private function validateKey($key)
+    private function validateKey($key): void
     {
         if ('' === $key) {
             throw new SimpleCacheInvalidArgumentException(
@@ -321,14 +330,14 @@ class SimpleCacheDecorator implements SimpleCacheInterface
             // we need to catch just this single value so tests pass.
             // I have filed an issue to correct the test:
             // https://github.com/php-cache/integration-tests/issues/92
-            return $key;
+            return;
         }
 
         if (! is_string($key)) {
             throw new SimpleCacheInvalidArgumentException(sprintf(
                 'Invalid key provided of type "%s"%s; must be a string',
-                is_object($key) ? get_class($key) : gettype($key),
-                is_scalar($key) ? sprintf(' (%s)', var_export($key, true)) : ''
+                gettype($key),
+                sprintf(' (%s)', var_export($key, true))
             ));
         }
 
@@ -341,14 +350,8 @@ class SimpleCacheDecorator implements SimpleCacheInterface
             ));
         }
 
-        if ($this->maximumKeyLength !== Capabilities::UNLIMITED_KEY_LENGTH
-            && preg_match('/^.{'.($this->maximumKeyLength + 1).',}/u', $key)
-        ) {
-            throw new SimpleCacheInvalidArgumentException(sprintf(
-                'Invalid key "%s" provided; key is too long. Must be no more than %d characters',
-                $key,
-                $this->maximumKeyLength
-            ));
+        if ($this->exceedsMaximumKeyLength($key)) {
+            throw SimpleCacheInvalidArgumentException::maximumKeyLengthExceeded($key, $this->maximumKeyLength);
         }
     }
 
@@ -361,9 +364,9 @@ class SimpleCacheDecorator implements SimpleCacheInterface
     }
 
     /**
-     * @param int|DateInterval
+     * @param int|DateInterval|string $ttl
      * @return null|int
-     * @throws SimpleCacheInvalidArgumentException for invalid arguments
+     * @throws SimpleCacheInvalidArgumentException For invalid arguments.
      */
     private function convertTtlToInteger($ttl)
     {
@@ -378,7 +381,8 @@ class SimpleCacheDecorator implements SimpleCacheInterface
         }
 
         // Numeric strings evaluating to integers can be cast
-        if (is_string($ttl)
+        if (
+            is_string($ttl)
             && ('0' === $ttl
                 || preg_match('/^[1-9][0-9]+$/', $ttl)
             )
@@ -402,67 +406,49 @@ class SimpleCacheDecorator implements SimpleCacheInterface
     }
 
     /**
-     * @param array|iterable $iterable
-     * @param bool $useKeys Whether or not to preserve keys during conversion
-     * @param string $forMethod Method that called this one; used for reporting
-     *     invalid values.
-     * @return array
-     * @throws SimpleCacheInvalidArgumentException for invalid $iterable values
+     * @param iterable $keys
+     * @psalm-return list<string|int>
+     * @throws SimpleCacheInvalidArgumentException For invalid $iterable values.
      */
-    private function convertIterableToArray($iterable, $useKeys, $forMethod)
+    private function convertIterableKeysToList(iterable $keys): array
     {
-        if (is_array($iterable)) {
-            return $iterable;
-        }
-
-        if (! $iterable instanceof Traversable) {
-            throw new SimpleCacheInvalidArgumentException(sprintf(
-                'Invalid value provided to %s::%s; must be an array or Traversable',
-                __CLASS__,
-                $forMethod
-            ));
-        }
-
         $array = [];
-        foreach ($iterable as $key => $value) {
-            if (! $useKeys) {
-                $array[] = $value;
-                continue;
-            }
-
-            if (! is_string($key) && ! is_int($key) && ! is_float($key)) {
+        foreach ($keys as $key) {
+            if (! is_string($key) && ! is_int($key)) {
                 throw new SimpleCacheInvalidArgumentException(sprintf(
                     'Invalid key detected of type "%s"; must be a scalar',
                     is_object($key) ? get_class($key) : gettype($key)
                 ));
             }
-            $array[$key] = $value;
+
+            $this->validateKey($key);
+            $array[] = $key;
         }
+
         return $array;
     }
 
-    private function memoizeMaximumKeyLengthCapability(StorageInterface $storage, Capabilities $capabilities): void
+    /**
+     * @param iterable $values
+     * @psalm-return array<int|string,mixed>
+     */
+    private function convertIterableToKeyValueMap(iterable $values): array
     {
-        $maximumKeyLength = $capabilities->getMaxKeyLength();
+        $keyValueMap = [];
+        foreach ($values as $key => $value) {
+            if (! is_string($key) && ! is_int($key)) {
+                throw new SimpleCacheInvalidArgumentException(sprintf(
+                    'Invalid key detected of type "%s"; must be a scalar',
+                    is_object($key) ? get_class($key) : gettype($key)
+                ));
+            }
 
-        if ($maximumKeyLength === Capabilities::UNLIMITED_KEY_LENGTH) {
-            $this->maximumKeyLength = Capabilities::UNLIMITED_KEY_LENGTH;
-            return;
+            $this->validateKey($key);
+
+            /** @psalm-suppress MixedAssignment */
+            $keyValueMap[$key] = $value;
         }
 
-        if ($maximumKeyLength === Capabilities::UNKNOWN_KEY_LENGTH) {
-            // For backward compatibility, assume adapters which do not provide a maximum key length do support 64 chars
-            $maximumKeyLength = 64;
-        }
-
-        if ($maximumKeyLength < 64) {
-            throw new SimpleCacheInvalidArgumentException(sprintf(
-                'The storage adapter "%s" does not fulfill the minimum requirements for PSR-16:'
-                .' The maximum key length capability must allow at least 64 characters.',
-                get_class($storage)
-            ));
-        }
-
-        $this->maximumKeyLength = min($maximumKeyLength, self::PCRE_MAXIMUM_QUANTIFIER_LENGTH - 1);
+        return $keyValueMap;
     }
 }

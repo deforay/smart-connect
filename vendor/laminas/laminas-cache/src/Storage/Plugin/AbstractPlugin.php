@@ -6,15 +6,12 @@ use Laminas\EventManager\AbstractListenerAggregate;
 
 abstract class AbstractPlugin extends AbstractListenerAggregate implements PluginInterface
 {
-    /**
-     * @var PluginOptions
-     */
+    /** @var PluginOptions */
     protected $options;
 
     /**
      * Set pattern options
      *
-     * @param  PluginOptions $options
      * @return AbstractPlugin Provides a fluent interface
      */
     public function setOptions(PluginOptions $options)

@@ -4,6 +4,13 @@ namespace Laminas\Cache\Pattern;
 
 use Laminas\Cache\Exception;
 
+use function array_pop;
+use function ob_get_flush;
+use function ob_implicit_flush;
+use function ob_start;
+
+use const PHP_MAJOR_VERSION;
+
 class OutputCache extends AbstractStorageCapablePattern
 {
     /**
@@ -13,24 +20,12 @@ class OutputCache extends AbstractStorageCapablePattern
      */
     protected $keyStack = [];
 
-
-    public function setOptions(PatternOptions $options)
-    {
-        parent::setOptions($options);
-
-        if (! $this->getStorage()) {
-            throw new Exception\InvalidArgumentException("Missing option 'storage'");
-        }
-
-        return $this;
-    }
-
     /**
      * if there is a cached item with the given key display it's data and return true
      * else start buffering output until end() is called or the script ends.
      *
      * @param  string  $key Key
-     * @throws Exception\MissingKeyException if key is missing
+     * @throws Exception\MissingKeyException If key is missing.
      * @return bool
      */
     public function start($key)
@@ -48,7 +43,12 @@ class OutputCache extends AbstractStorageCapablePattern
         }
 
         ob_start();
-        ob_implicit_flush(0);
+        /**
+         * TODO: remove when PHP 7.4 support is dropped
+         *
+         * @psalm-suppress PossiblyFalseArgument
+         */
+        ob_implicit_flush(PHP_MAJOR_VERSION >= 8 ? false : 0);
         $this->keyStack[] = $key;
         return false;
     }
@@ -57,7 +57,7 @@ class OutputCache extends AbstractStorageCapablePattern
      * Stops buffering output, write buffered data to cache using the given key on start()
      * and displays the buffer.
      *
-     * @throws Exception\RuntimeException if output cache not started or buffering not active
+     * @throws Exception\RuntimeException If output cache not started or buffering not active.
      * @return bool TRUE on success, FALSE on failure writing to cache
      */
     public function end()

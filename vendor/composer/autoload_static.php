@@ -9,7 +9,12 @@ class ComposerStaticInit6b3507ca92e690d5341f8b5f5bbb0a97
     public static $files = array (
         'c9d07b32a2e02bc0fc582d4f0c1b56cc' => __DIR__ . '/..' . '/laminas/laminas-servicemanager/src/autoload.php',
         '7e9bd612cc444b3eed788ebbe46263a0' => __DIR__ . '/..' . '/laminas/laminas-zendframework-bridge/src/autoload.php',
-        '78d47739fff607f33066e6259f091845' => __DIR__ . '/..' . '/laminas/laminas-cache/autoload/patternPluginManagerPolyfill.php',
+        'a4a119a56e50fbb293281d9a48007e0e' => __DIR__ . '/..' . '/symfony/polyfill-php80/bootstrap.php',
+        '6e3fae29631ef280660b3cdad06f25a8' => __DIR__ . '/..' . '/symfony/deprecation-contracts/function.php',
+        '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
+        '320cde22f66dd4f5d3fd621d3e88b98f' => __DIR__ . '/..' . '/symfony/polyfill-ctype/bootstrap.php',
+        '8825ede83f2f289127722d4e842cf7e8' => __DIR__ . '/..' . '/symfony/polyfill-intl-grapheme/bootstrap.php',
+        'e69f7f6ee287b969198c3c9d6777bd38' => __DIR__ . '/..' . '/symfony/polyfill-intl-normalizer/bootstrap.php',
         '07d7f1a47144818725fd8d91a907ac57' => __DIR__ . '/..' . '/laminas/laminas-diactoros/src/functions/create_uploaded_file.php',
         'da94ac5d3ca7d2dbab84ce561ce72bfd' => __DIR__ . '/..' . '/laminas/laminas-diactoros/src/functions/marshal_headers_from_sapi.php',
         '3d97c8dcdfba8cb85d3b34f116bb248b' => __DIR__ . '/..' . '/laminas/laminas-diactoros/src/functions/marshal_method_from_sapi.php',
@@ -26,7 +31,9 @@ class ComposerStaticInit6b3507ca92e690d5341f8b5f5bbb0a97
         'cc8e14526dc240491e17a838cb78508c' => __DIR__ . '/..' . '/laminas/laminas-diactoros/src/functions/normalize_server.legacy.php',
         '786bf90caabc9e09b6ad4cc5ca8f0e30' => __DIR__ . '/..' . '/laminas/laminas-diactoros/src/functions/normalize_uploaded_files.legacy.php',
         '751a5a3f463e4be759be31748b61737c' => __DIR__ . '/..' . '/laminas/laminas-diactoros/src/functions/parse_cookie_header.legacy.php',
-        '6e3fae29631ef280660b3cdad06f25a8' => __DIR__ . '/..' . '/symfony/deprecation-contracts/function.php',
+        '0d59ee240a4cd96ddbb4ff164fccea4d' => __DIR__ . '/..' . '/symfony/polyfill-php73/bootstrap.php',
+        'b6b991a57620e2fb6b2f66f03fe9ddc2' => __DIR__ . '/..' . '/symfony/string/Resources/functions.php',
+        '2cffec82183ee1cea088009cef9a6fc3' => __DIR__ . '/..' . '/ezyang/htmlpurifier/library/HTMLPurifier.composer.php',
         '3f8ee9969da604d0f15c841b77b11450' => __DIR__ . '/..' . '/laminas/laminas-stratigility/src/functions/double-pass-middleware.php',
         'ee5523a5d51d6d51030227439db1ef74' => __DIR__ . '/..' . '/laminas/laminas-stratigility/src/functions/host.php',
         '5f6e29ca023a0bdefa2476adb465d527' => __DIR__ . '/..' . '/laminas/laminas-stratigility/src/functions/middleware.php',
@@ -35,14 +42,6 @@ class ComposerStaticInit6b3507ca92e690d5341f8b5f5bbb0a97
         '9ad95be8d1f1c62e52cb995973bf5246' => __DIR__ . '/..' . '/laminas/laminas-stratigility/src/functions/host.legacy.php',
         '44f5a19d6d262baf7ab55c8a8bb56f5a' => __DIR__ . '/..' . '/laminas/laminas-stratigility/src/functions/middleware.legacy.php',
         'dd89a2771fc24829c6aade9a7786bd8f' => __DIR__ . '/..' . '/laminas/laminas-stratigility/src/functions/path.legacy.php',
-        'a4a119a56e50fbb293281d9a48007e0e' => __DIR__ . '/..' . '/symfony/polyfill-php80/bootstrap.php',
-        '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
-        '320cde22f66dd4f5d3fd621d3e88b98f' => __DIR__ . '/..' . '/symfony/polyfill-ctype/bootstrap.php',
-        'e69f7f6ee287b969198c3c9d6777bd38' => __DIR__ . '/..' . '/symfony/polyfill-intl-normalizer/bootstrap.php',
-        '8825ede83f2f289127722d4e842cf7e8' => __DIR__ . '/..' . '/symfony/polyfill-intl-grapheme/bootstrap.php',
-        'b6b991a57620e2fb6b2f66f03fe9ddc2' => __DIR__ . '/..' . '/symfony/string/Resources/functions.php',
-        '0d59ee240a4cd96ddbb4ff164fccea4d' => __DIR__ . '/..' . '/symfony/polyfill-php73/bootstrap.php',
-        '2cffec82183ee1cea088009cef9a6fc3' => __DIR__ . '/..' . '/ezyang/htmlpurifier/library/HTMLPurifier.composer.php',
         'ace6d88241f812b4accb2d847454aef6' => __DIR__ . '/..' . '/halaxa/json-machine/src/functions.php',
     );
 
@@ -69,6 +68,7 @@ class ComposerStaticInit6b3507ca92e690d5341f8b5f5bbb0a97
             'Symfony\\Component\\String\\' => 25,
             'Symfony\\Component\\EventDispatcher\\' => 34,
             'Symfony\\Component\\Console\\' => 26,
+            'StellaMaris\\Clock\\' => 18,
         ),
         'P' => 
         array (
@@ -79,6 +79,7 @@ class ComposerStaticInit6b3507ca92e690d5341f8b5f5bbb0a97
             'Psr\\Http\\Client\\' => 16,
             'Psr\\EventDispatcher\\' => 20,
             'Psr\\Container\\' => 14,
+            'Psr\\Clock\\' => 10,
             'Psr\\Cache\\' => 10,
             'PhpParser\\' => 10,
             'PhpOffice\\PhpSpreadsheet\\' => 25,
@@ -213,6 +214,10 @@ class ComposerStaticInit6b3507ca92e690d5341f8b5f5bbb0a97
         array (
             0 => __DIR__ . '/..' . '/symfony/console',
         ),
+        'StellaMaris\\Clock\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/stella-maris/clock/src',
+        ),
         'Psr\\SimpleCache\\' => 
         array (
             0 => __DIR__ . '/..' . '/psr/simple-cache/src',
@@ -242,6 +247,10 @@ class ComposerStaticInit6b3507ca92e690d5341f8b5f5bbb0a97
         'Psr\\Container\\' => 
         array (
             0 => __DIR__ . '/..' . '/psr/container/src',
+        ),
+        'Psr\\Clock\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/psr/clock/src',
         ),
         'Psr\\Cache\\' => 
         array (
@@ -421,21 +430,7 @@ class ComposerStaticInit6b3507ca92e690d5341f8b5f5bbb0a97
         ),
         'Laminas\\Cache\\Storage\\Adapter\\' => 
         array (
-            0 => __DIR__ . '/..' . '/laminas/laminas-cache-storage-adapter-apc/src',
-            1 => __DIR__ . '/..' . '/laminas/laminas-cache-storage-adapter-apcu/src',
-            2 => __DIR__ . '/..' . '/laminas/laminas-cache-storage-adapter-blackhole/src',
-            3 => __DIR__ . '/..' . '/laminas/laminas-cache-storage-adapter-dba/src',
-            4 => __DIR__ . '/..' . '/laminas/laminas-cache-storage-adapter-ext-mongodb/src',
-            5 => __DIR__ . '/..' . '/laminas/laminas-cache-storage-adapter-filesystem/src',
-            6 => __DIR__ . '/..' . '/laminas/laminas-cache-storage-adapter-memcache/src',
-            7 => __DIR__ . '/..' . '/laminas/laminas-cache-storage-adapter-memcached/src',
-            8 => __DIR__ . '/..' . '/laminas/laminas-cache-storage-adapter-memory/src',
-            9 => __DIR__ . '/..' . '/laminas/laminas-cache-storage-adapter-mongodb/src',
-            10 => __DIR__ . '/..' . '/laminas/laminas-cache-storage-adapter-redis/src',
-            11 => __DIR__ . '/..' . '/laminas/laminas-cache-storage-adapter-session/src',
-            12 => __DIR__ . '/..' . '/laminas/laminas-cache-storage-adapter-wincache/src',
-            13 => __DIR__ . '/..' . '/laminas/laminas-cache-storage-adapter-xcache/src',
-            14 => __DIR__ . '/..' . '/laminas/laminas-cache-storage-adapter-zend-server/src',
+            0 => __DIR__ . '/..' . '/laminas/laminas-cache-storage-adapter-filesystem/src',
         ),
         'Laminas\\Cache\\' => 
         array (

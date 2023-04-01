@@ -9,8 +9,8 @@ use ArrayObject;
 use Laminas\Cache\Service\DeprecatedSchemaDetector;
 use Psr\Container\ContainerInterface;
 use RuntimeException;
+
 use function is_array;
-use function var_dump;
 
 /**
  * @internal

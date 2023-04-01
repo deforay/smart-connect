@@ -12,7 +12,7 @@ class LabsController extends AbstractActionController
 
     private $sampleService = null;
     private $facilityService = null;
-    private $commonService = null;
+    private \Application\Service\CommonService $commonService;
     const PROVINCE = 0;
     const DISTRICT = 1;
     const CLINIC   = 2;
@@ -80,6 +80,7 @@ class LabsController extends AbstractActionController
 
     public function statsAction()
     {
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
@@ -92,6 +93,7 @@ class LabsController extends AbstractActionController
     }
     public function pocStatsAction()
     {
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
@@ -104,6 +106,7 @@ class LabsController extends AbstractActionController
     }
     public function getMonthlySampleCountAction()
     {
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
 
         if ($request->isPost()) {
@@ -118,6 +121,7 @@ class LabsController extends AbstractActionController
     }
     public function getMonthlySampleCountByLabsAction()
     {
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
 
         if ($request->isPost()) {
@@ -133,6 +137,7 @@ class LabsController extends AbstractActionController
 
     public function getTestFailedByTestingPlatformAction()
     {
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
@@ -147,6 +152,7 @@ class LabsController extends AbstractActionController
 
     public function getInstrumentWiseTestAction()
     {
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
@@ -161,6 +167,7 @@ class LabsController extends AbstractActionController
 
     public function getLabTurnAroundTimeAction()
     {
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
@@ -174,6 +181,7 @@ class LabsController extends AbstractActionController
 
     public function getCountyOutcomesAction()
     {
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
@@ -186,6 +194,7 @@ class LabsController extends AbstractActionController
     }
     public function getLabPerformanceAction()
     {
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
@@ -199,6 +208,7 @@ class LabsController extends AbstractActionController
 
     public function getLatLonMapAction()
     {
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
@@ -212,6 +222,7 @@ class LabsController extends AbstractActionController
 
     public function getLatLonMapPosNegAction()
     {
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
@@ -273,6 +284,7 @@ class LabsController extends AbstractActionController
     public function getTATDefaultAction()
     {
 
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
@@ -290,6 +302,7 @@ class LabsController extends AbstractActionController
 
     public function getTATfromURLAction()
     {
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
@@ -326,6 +339,7 @@ class LabsController extends AbstractActionController
 
     public function getTATfromSearchFieldAction()
     {
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params           = $request->getPost();
@@ -436,6 +450,7 @@ class LabsController extends AbstractActionController
 
     public function getProvinceWiseResultAwaitedDrillDownAction()
     {
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
@@ -450,6 +465,7 @@ class LabsController extends AbstractActionController
 
     public function getLabWiseResultAwaitedDrillDownAction()
     {
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
@@ -464,6 +480,7 @@ class LabsController extends AbstractActionController
 
     public function getDistrictWiseResultAwaitedDrillDownAction()
     {
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
@@ -478,6 +495,7 @@ class LabsController extends AbstractActionController
 
     public function getClinicWiseResultAwaitedDrillDownAction()
     {
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
@@ -492,6 +510,7 @@ class LabsController extends AbstractActionController
 
     public function getFilterSampleResultAwaitedDetailsAction()
     {
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $parameters = $request->getPost();
@@ -534,6 +553,7 @@ class LabsController extends AbstractActionController
 
     public function getSampleDetailsAction()
     {
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
@@ -547,6 +567,7 @@ class LabsController extends AbstractActionController
 
     public function getVlOutComesAction()
     {
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
@@ -560,6 +581,7 @@ class LabsController extends AbstractActionController
 
     public function getBarSampleDetailsAction()
     {
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
@@ -573,6 +595,7 @@ class LabsController extends AbstractActionController
 
     public function getFilterSampleDetailsAction()
     {
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $parameters = $request->getPost();
@@ -583,6 +606,7 @@ class LabsController extends AbstractActionController
 
     public function getLabFilterSampleDetailsAction()
     {
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $parameters = $request->getPost();
@@ -626,8 +650,8 @@ class LabsController extends AbstractActionController
             $params['labNames'] = explode(',', $labFilter);
         }
 
-        // $sampleService = $this->getServiceLocator()->get('SampleService');
-        // $commonService = $this->getServiceLocator()->get('CommonService');
+        
+        
         $hubName = $this->sampleService->getAllHubName();
         $sampleType = $this->sampleService->getSampleType();
         $currentRegimen = $this->sampleService->getAllCurrentRegimen();
@@ -649,6 +673,7 @@ class LabsController extends AbstractActionController
 
     public function getLabSampleDetailsAction()
     {
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
@@ -662,6 +687,7 @@ class LabsController extends AbstractActionController
 
     public function getLabBarSampleDetailsAction()
     {
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
@@ -695,8 +721,8 @@ class LabsController extends AbstractActionController
         if ($this->params()->fromQuery('result')) {
             $sampleStatus = $this->params()->fromQuery('result');
         }
-        // $sampleService = $this->getServiceLocator()->get('SampleService');
-        // $commonService = $this->getServiceLocator()->get('CommonService');
+        
+        
         $hubName = $this->sampleService->getAllHubName();
         $sampleType = $this->sampleService->getSampleType();
         $currentRegimen = $this->sampleService->getAllCurrentRegimen();
@@ -715,10 +741,11 @@ class LabsController extends AbstractActionController
 
     public function exportSampleResultExcelAction()
     {
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            // $sampleService = $this->getServiceLocator()->get('SampleService');
+            
             $file = $this->sampleService->generateSampleResultExcel($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('file' => $file))
@@ -729,6 +756,7 @@ class LabsController extends AbstractActionController
 
     public function exportLabTestedSampleExcelAction()
     {
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
@@ -742,6 +770,7 @@ class LabsController extends AbstractActionController
 
     public function getEidOutcomesByAgeAction()
     {
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
@@ -756,6 +785,7 @@ class LabsController extends AbstractActionController
 
     public function getEidPositivityRateAction()
     {
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();

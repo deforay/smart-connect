@@ -478,6 +478,14 @@ class CommonService
           $locationDb = $this->sm->get('LocationDetailsTable');
           return $locationDb->fetchLocationDetails($mappedFacilities);
      }
+
+
+     public function getAllCountries()
+     {
+          $countriesDb = $this->sm->get('CountriesTable');
+          return $countriesDb->fetchAllCountries();
+     }
+
      public function getAllDistrictList()
      {
 
@@ -1146,7 +1154,7 @@ class CommonService
                                    $_color = "f08080";
                               }
                               $color[]['color'] = $_color;
-                              
+
                               $row[] = (isset($aRow['labName']) && !empty($aRow['labName'])) ? ucwords($aRow['labName']) : "";
                               $row[] = (isset($aRow['latest']) && !empty($aRow['latest'])) ? $this->humanDateFormat($aRow['latest']) : "";
                               $row[] = (isset($aRow['dashLastResultsSync']) && !empty($aRow['dashLastResultsSync'])) ? $this->humanDateFormat($aRow['dashLastResultsSync']) : "";

@@ -8,33 +8,27 @@ class UserService
 {
 
     public $sm = null;
+    private \Application\Model\UsersTable $usersTable;
 
-    public function __construct($sm)
+    public function __construct($sm, $usersTable)
     {
         $this->sm = $sm;
-    }
-
-    public function getServiceManager()
-    {
-        return $this->sm;
+        $this->usersTable = $usersTable;
     }
 
     public function login($params)
     {
-        $db = $this->sm->get('UsersTable');
-        return $db->login($params);
+        return $this->usersTable->login($params);
     }
     public function otp($params)
     {
         $dataInterfaceLogin = new Container('dataInterfaceLogin');
         $loginParams = array('email' => $dataInterfaceLogin->email, 'password' => $dataInterfaceLogin->password);
-        $db = $this->sm->get('UsersTable');
-        return $db->login($loginParams, $params['otp']);
+        return $this->usersTable->login($loginParams, $params['otp']);
     }
     public function fetchUsers()
     {
-        $db = $this->sm->get('UsersTable');
-        return $db->fetchUsers();
+        return $this->usersTable->fetchUsers();
     }
 
     public function fetchRoles()
@@ -45,8 +39,7 @@ class UserService
 
     public function getUser($userId)
     {
-        $db = $this->sm->get('UsersTable');
-        return $db->getUser($userId);
+        return $this->usersTable->getUser($userId);
     }
 
     public function addUser($params)
@@ -54,14 +47,13 @@ class UserService
         $adapter = $this->sm->get('Laminas\Db\Adapter\Adapter')->getDriver()->getConnection();
         $adapter->beginTransaction();
         try {
-            $db = $this->sm->get('UsersTable');
-            $result = $db->addUser($params);
+            $result = $this->usersTable->addUser($params);
             if ($result > 0) {
                 $adapter->commit();
                 $alertContainer = new Container('alert');
                 $alertContainer->alertMsg = 'User details added successfully';
             }
-        } catch (Exception $exc) {
+        } catch (\Exception $exc) {
             $adapter->rollBack();
             error_log($exc->getMessage());
             error_log($exc->getTraceAsString());
@@ -73,14 +65,13 @@ class UserService
         $adapter = $this->sm->get('Laminas\Db\Adapter\Adapter')->getDriver()->getConnection();
         $adapter->beginTransaction();
         try {
-            $db = $this->sm->get('UsersTable');
-            $result = $db->updateUser($params);
+            $result = $this->usersTable->updateUser($params);
             if ($result > 0) {
                 $adapter->commit();
                 $alertContainer = new Container('alert');
                 $alertContainer->alertMsg = 'User details updated successfully';
             }
-        } catch (Exception $exc) {
+        } catch (\Exception $exc) {
             $adapter->rollBack();
             error_log($exc->getMessage());
             error_log($exc->getTraceAsString());
@@ -101,13 +92,11 @@ class UserService
 
     public function getAllUsers($parameters)
     {
-        $db = $this->sm->get('UsersTable');
-        return $db->fetchAllUsers($parameters);
+        return $this->usersTable->fetchAllUsers($parameters);
     }
 
     public function userLoginApi($params)
     {
-        $db = $this->sm->get('UsersTable');
-        return $db->userLoginDetailsApi($params);
+        return $this->usersTable->userLoginDetailsApi($params);
     }
 }

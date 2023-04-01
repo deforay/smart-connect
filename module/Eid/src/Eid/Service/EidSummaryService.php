@@ -22,10 +22,6 @@ class EidSummaryService
         $this->translator = $this->sm->get('translator');
     }
 
-    public function getServiceManager()
-    {
-        return $this->sm;
-    }
 
     public function fetchSummaryTabDetails($params)
     {

@@ -19,7 +19,13 @@
     },
     "config": {
         "process-timeout": 600,
-        "sort-packages": true
+        "sort-packages": true,
+        "platform": {
+            "php": "7.4.99"
+        },
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
     },
     "extra": {
         "laminas": {
@@ -28,38 +34,31 @@
         }
     },
     "require": {
-        "php": "^7.3 || ~8.0.0",
-        "laminas/laminas-cache-storage-adapter-apc": "^1.0",
-        "laminas/laminas-cache-storage-adapter-apcu": "^1.0",
-        "laminas/laminas-cache-storage-adapter-blackhole": "^1.0",
-        "laminas/laminas-cache-storage-adapter-dba": "^1.0",
-        "laminas/laminas-cache-storage-adapter-ext-mongodb": "^1.0",
-        "laminas/laminas-cache-storage-adapter-filesystem": "^1.0",
-        "laminas/laminas-cache-storage-adapter-memcache": "^1.0",
-        "laminas/laminas-cache-storage-adapter-memcached": "^1.0",
-        "laminas/laminas-cache-storage-adapter-memory": "^1.0",
-        "laminas/laminas-cache-storage-adapter-mongodb": "^1.0",
-        "laminas/laminas-cache-storage-adapter-redis": "^1.0",
-        "laminas/laminas-cache-storage-adapter-session": "^1.0",
-        "laminas/laminas-cache-storage-adapter-wincache": "^1.0",
-        "laminas/laminas-cache-storage-adapter-xcache": "^1.0",
-        "laminas/laminas-cache-storage-adapter-zend-server": "^1.0",
-        "laminas/laminas-eventmanager": "^3.3",
-        "laminas/laminas-servicemanager": "^3.6",
-        "laminas/laminas-stdlib": "^3.3",
-        "laminas/laminas-zendframework-bridge": "^1.0",
+        "php": "~7.4.0 || ~8.0.0 || ~8.1.0",
+        "laminas/laminas-cache-storage-implementation": "1.0",
+        "laminas/laminas-eventmanager": "^3.4",
+        "laminas/laminas-servicemanager": "^3.11.1",
+        "laminas/laminas-stdlib": "^3.6",
         "psr/cache": "^1.0",
-        "psr/simple-cache": "^1.0"
+        "psr/simple-cache": "^1.0",
+        "stella-maris/clock": "^0.1.5",
+        "webmozart/assert": "^1.9"
     },
     "require-dev": {
+        "laminas/laminas-cache-storage-adapter-apcu": "^2.0",
+        "laminas/laminas-cache-storage-adapter-blackhole": "^2.0",
+        "laminas/laminas-cache-storage-adapter-filesystem": "^2.0",
+        "laminas/laminas-cache-storage-adapter-memory": "^2.0",
+        "laminas/laminas-cache-storage-adapter-test": "^2.3",
         "laminas/laminas-cli": "^1.0",
-        "laminas/laminas-coding-standard": "~1.0.0",
+        "laminas/laminas-coding-standard": "~2.4.0",
         "laminas/laminas-config-aggregator": "^1.5",
         "laminas/laminas-feed": "^2.14",
-        "laminas/laminas-serializer": "^2.6",
-        "phpbench/phpbench": "^1.0.0-beta2",
-        "phpspec/prophecy-phpunit": "^2.0",
-        "phpunit/phpunit": "^9.5"
+        "laminas/laminas-serializer": "^2.6.1",
+        "phpbench/phpbench": "^1.0",
+        "phpunit/phpunit": "^9.5.23",
+        "psalm/plugin-phpunit": "^0.17.0",
+        "vimeo/psalm": "^4.24"
     },
     "conflict": {
         "symfony/console": "<5.1"
@@ -69,13 +68,18 @@
         "psr/simple-cache-implementation": "1.0"
     },
     "suggest": {
+        "laminas/laminas-cache-storage-adapter-apcu": "APCu implementation",
+        "laminas/laminas-cache-storage-adapter-blackhole": "Blackhole/Void implementation",
+        "laminas/laminas-cache-storage-adapter-ext-mongodb": "MongoDB implementation",
+        "laminas/laminas-cache-storage-adapter-filesystem": "Filesystem implementation",
+        "laminas/laminas-cache-storage-adapter-memcached": "Memcached implementation",
+        "laminas/laminas-cache-storage-adapter-memory": "Memory implementation",
+        "laminas/laminas-cache-storage-adapter-redis": "Redis implementation",
+        "laminas/laminas-cache-storage-adapter-session": "Session implementation",
         "laminas/laminas-cli": "The laminas-cli binary can be used to consume commands provided by this component",
         "laminas/laminas-serializer": "Laminas\\Serializer component"
     },
     "autoload": {
-        "files": [
-            "autoload/patternPluginManagerPolyfill.php"
-        ],
         "psr-4": {
             "Laminas\\Cache\\": "src/"
         }
@@ -84,22 +88,19 @@
         "psr-4": {
             "LaminasTest\\Cache\\": "test/",
             "LaminasBench\\Cache\\": "benchmark/"
-        },
-        "files": [
-            "test/autoload.php"
-        ]
+        }
     },
     "scripts": {
+        "benchmark": "phpbench run --revs=2 --iterations=2 --report=aggregate",
         "check": [
             "@cs-check",
+            "@static-analysis",
             "@test"
         ],
         "cs-check": "phpcs",
         "cs-fix": "phpcbf",
+        "static-analysis": "psalm --shepherd --stats",
         "test": "phpunit --colors=always",
         "test-coverage": "phpunit --colors=always --coverage-clover clover.xml"
-    },
-    "replace": {
-        "zendframework/zend-cache": "^2.9.0"
     }
 }

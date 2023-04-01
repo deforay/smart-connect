@@ -1,57 +1,47 @@
 <?php
 
-/**
- * @see       https://github.com/laminas/laminas-cache for the canonical source repository
- * @copyright https://github.com/laminas/laminas-cache/blob/master/COPYRIGHT.md
- * @license   https://github.com/laminas/laminas-cache/blob/master/LICENSE.md New BSD License
- */
+declare(strict_types=1);
 
 namespace Laminas\Cache\Storage\Adapter;
 
 use GlobIterator;
+use Laminas\Cache\Storage\Adapter\Filesystem;
 use Laminas\Cache\Storage\IteratorInterface;
+use ReturnTypeWillChange;
 
-class FilesystemIterator implements IteratorInterface
+use function strlen;
+use function substr;
+
+final class FilesystemIterator implements IteratorInterface
 {
     /**
      * The Filesystem storage instance
-     *
-     * @var Filesystem
      */
-    protected $storage;
+    private Filesystem $storage;
 
     /**
      * The iterator mode
-     *
-     * @var int
      */
-    protected $mode = IteratorInterface::CURRENT_AS_KEY;
+    private int $mode = IteratorInterface::CURRENT_AS_KEY;
 
     /**
      * The GlobIterator instance
-     *
-     * @var GlobIterator
      */
-    protected $globIterator;
+    private GlobIterator $globIterator;
 
     /**
      * The namespace sprefix
-     *
-     * @var string
      */
-    protected $prefix;
+    private string $prefix;
 
     /**
      * String length of namespace prefix
-     *
-     * @var int
      */
-    protected $prefixLength;
+    private int $prefixLength;
 
     /**
      * Constructor
      *
-     * @param Filesystem  $storage
      * @param string      $path
      * @param string      $prefix
      */
@@ -102,17 +92,18 @@ class FilesystemIterator implements IteratorInterface
      *
      * @return mixed
      */
+    #[ReturnTypeWillChange]
     public function current()
     {
-        if ($this->mode == IteratorInterface::CURRENT_AS_SELF) {
+        if ($this->mode === IteratorInterface::CURRENT_AS_SELF) {
             return $this;
         }
 
         $key = $this->key();
 
-        if ($this->mode == IteratorInterface::CURRENT_AS_VALUE) {
+        if ($this->mode === IteratorInterface::CURRENT_AS_VALUE) {
             return $this->storage->getItem($key);
-        } elseif ($this->mode == IteratorInterface::CURRENT_AS_METADATA) {
+        } elseif ($this->mode === IteratorInterface::CURRENT_AS_METADATA) {
             return $this->storage->getMetadata($key);
         }
 
@@ -121,10 +112,8 @@ class FilesystemIterator implements IteratorInterface
 
     /**
      * Get current key
-     *
-     * @return string
      */
-    public function key()
+    public function key(): string
     {
         $filename = $this->globIterator->key();
 
@@ -134,45 +123,25 @@ class FilesystemIterator implements IteratorInterface
 
     /**
      * Move forward to next element
-     *
-     * @return void
      */
-    public function next()
+    public function next(): void
     {
         $this->globIterator->next();
     }
 
     /**
      * Checks if current position is valid
-     *
-     * @return bool
      */
-    public function valid()
+    public function valid(): bool
     {
-        try {
-            return $this->globIterator->valid();
-        } catch (\LogicException $e) {
-            // @link https://bugs.php.net/bug.php?id=55701
-            // GlobIterator throws LogicException with message
-            // 'The parent constructor was not called: the object is in an invalid state'
-            return false;
-        }
+        return $this->globIterator->valid();
     }
 
     /**
      * Rewind the Iterator to the first element.
-     *
-     * @return bool false if the operation failed.
      */
-    public function rewind()
+    public function rewind(): void
     {
-        try {
-            return $this->globIterator->rewind();
-        } catch (\LogicException $e) {
-            // @link https://bugs.php.net/bug.php?id=55701
-            // GlobIterator throws LogicException with message
-            // 'The parent constructor was not called: the object is in an invalid state'
-            return false;
-        }
+        $this->globIterator->rewind();
     }
 }

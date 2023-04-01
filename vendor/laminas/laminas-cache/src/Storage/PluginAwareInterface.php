@@ -9,7 +9,6 @@ interface PluginAwareInterface extends PluginCapableInterface
     /**
      * Register a plugin
      *
-     * @param  Plugin\PluginInterface $plugin
      * @param  int $priority
      * @return StorageInterface
      * @throws Exception\LogicException
@@ -19,7 +18,6 @@ interface PluginAwareInterface extends PluginCapableInterface
     /**
      * Unregister an already registered plugin
      *
-     * @param  Plugin\PluginInterface $plugin
      * @return StorageInterface
      * @throws Exception\LogicException
      */

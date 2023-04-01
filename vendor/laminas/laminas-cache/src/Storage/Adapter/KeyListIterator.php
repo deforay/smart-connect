@@ -5,7 +5,13 @@ namespace Laminas\Cache\Storage\Adapter;
 use Countable;
 use Laminas\Cache\Storage\IteratorInterface;
 use Laminas\Cache\Storage\StorageInterface;
+use ReturnTypeWillChange;
 
+use function count;
+
+/**
+ * @see ReturnTypeWillChange
+ */
 class KeyListIterator implements IteratorInterface, Countable
 {
     /**
@@ -46,7 +52,6 @@ class KeyListIterator implements IteratorInterface, Countable
     /**
      * Constructor
      *
-     * @param StorageInterface $storage
      * @param array            $keys
      */
     public function __construct(StorageInterface $storage, array $keys)
@@ -93,17 +98,20 @@ class KeyListIterator implements IteratorInterface, Countable
      *
      * @return mixed
      */
+    #[ReturnTypeWillChange]
     public function current()
     {
-        if ($this->mode == IteratorInterface::CURRENT_AS_SELF) {
+        if ($this->mode === IteratorInterface::CURRENT_AS_SELF) {
             return $this;
         }
 
         $key = $this->key();
 
-        if ($this->mode == IteratorInterface::CURRENT_AS_METADATA) {
+        if ($this->mode === IteratorInterface::CURRENT_AS_METADATA) {
             return $this->storage->getMetadata($key);
-        } elseif ($this->mode == IteratorInterface::CURRENT_AS_VALUE) {
+        }
+
+        if ($this->mode === IteratorInterface::CURRENT_AS_VALUE) {
             return $this->storage->getItem($key);
         }
 
@@ -115,6 +123,7 @@ class KeyListIterator implements IteratorInterface, Countable
      *
      * @return string
      */
+    #[ReturnTypeWillChange]
     public function key()
     {
         return $this->keys[$this->position];
@@ -125,6 +134,7 @@ class KeyListIterator implements IteratorInterface, Countable
      *
      * @return bool
      */
+    #[ReturnTypeWillChange]
     public function valid()
     {
         return $this->position < $this->count;
@@ -135,6 +145,7 @@ class KeyListIterator implements IteratorInterface, Countable
      *
      * @return void
      */
+    #[ReturnTypeWillChange]
     public function next()
     {
         $this->position++;
@@ -145,6 +156,7 @@ class KeyListIterator implements IteratorInterface, Countable
      *
      * @return void
      */
+    #[ReturnTypeWillChange]
     public function rewind()
     {
         $this->position = 0;
@@ -155,6 +167,7 @@ class KeyListIterator implements IteratorInterface, Countable
      *
      * @return int
      */
+    #[ReturnTypeWillChange]
     public function count()
     {
         return $this->count;

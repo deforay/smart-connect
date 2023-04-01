@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace Laminas\Cache\Service;
 
+use function is_array;
+use function is_string;
+
 /**
  * @internal
  */
 final class DeprecatedSchemaDetector implements DeprecatedSchemaDetectorInterface
 {
-
     public function isDeprecatedStorageFactorySchema(array $configuration): bool
     {
         if (! is_string($configuration['adapter'])) {

@@ -6,13 +6,15 @@ namespace Laminas\Cache\Service;
 
 use InvalidArgumentException;
 use Laminas\Cache\Exception;
-use Laminas\Cache\Storage\AdapterPluginManager;
+use Laminas\Cache\Service\StoragePluginFactoryInterface;
 use Laminas\Cache\Storage\PluginAwareInterface;
 use Laminas\Cache\Storage\StorageInterface;
+use Laminas\ServiceManager\PluginManagerInterface;
 use Webmozart\Assert\Assert;
 
 use function assert;
 use function get_class;
+use function is_string;
 use function sprintf;
 
 /**
@@ -22,13 +24,11 @@ final class StorageAdapterFactory implements StorageAdapterFactoryInterface
 {
     public const DEFAULT_PLUGIN_PRIORITY = 1;
 
-    /** @var AdapterPluginManager */
-    private $adapters;
+    private PluginManagerInterface $adapters;
 
-    /** @var StoragePluginFactoryInterface */
-    private $pluginFactory;
+    private StoragePluginFactoryInterface $pluginFactory;
 
-    public function __construct(AdapterPluginManager $adapters, StoragePluginFactoryInterface $pluginFactory)
+    public function __construct(PluginManagerInterface $adapters, StoragePluginFactoryInterface $pluginFactory)
     {
         $this->adapters      = $adapters;
         $this->pluginFactory = $pluginFactory;
@@ -36,7 +36,8 @@ final class StorageAdapterFactory implements StorageAdapterFactoryInterface
 
     public function createFromArrayConfiguration(array $configuration): StorageInterface
     {
-        $adapterName    = $configuration['name'];
+        $adapterName = $configuration['adapter'] ?? $configuration['name'] ?? null;
+        Assert::stringNotEmpty($adapterName, 'Configuration must contain a "adapter" key.');
         $adapterOptions = $configuration['options'] ?? [];
         $plugins        = $configuration['plugins'] ?? [];
 
@@ -76,15 +77,21 @@ final class StorageAdapterFactory implements StorageAdapterFactoryInterface
     {
         try {
             Assert::isNonEmptyMap($configuration, 'Configuration must be a non-empty array.');
-            Assert::keyExists($configuration, 'name', 'Configuration must contain a "name" key.');
-            Assert::stringNotEmpty($configuration['name'], 'Storage "name" has to be a non-empty string.');
+
+            $adapter = $configuration['adapter'] ?? $configuration['name'] ?? null;
+
+            if (! is_string($adapter)) {
+                throw new InvalidArgumentException('Configuration must contain a "adapter" key.');
+            }
+
+            Assert::stringNotEmpty($adapter, 'Storage "adapter" has to be a non-empty string.');
             Assert::nullOrIsMap(
                 $configuration['options'] ?? null,
                 'Storage "options" must be an array with string keys.'
             );
             if (isset($configuration['plugins'])) {
                 Assert::isList($configuration['plugins'], 'Storage "plugins" must be a list of plugin configurations.');
-                $this->assertValidPluginConfigurationStructure($configuration['name'], $configuration['plugins']);
+                $this->assertValidPluginConfigurationStructure($adapter, $configuration['plugins']);
             }
         } catch (InvalidArgumentException $exception) {
             throw new Exception\InvalidArgumentException($exception->getMessage(), 0, $exception);

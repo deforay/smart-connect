@@ -18,6 +18,7 @@ class FacilityController extends AbstractActionController
     public function indexAction()
     {
         $this->layout()->setVariable('activeTab', 'facility');
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
@@ -61,6 +62,7 @@ class FacilityController extends AbstractActionController
     }
     public function getDistrictListAction()
     {
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();

@@ -15,7 +15,6 @@
         "laminas/laminas-development-mode": "^3.2",
         "laminas/laminas-skeleton-installer": "^0.3",
         "laminas/laminas-mvc": "^3.1.1",
-        "laminas/laminas-cache": "^2.11.1",
         "laminas/laminas-db": "^2.12.0",
         "laminas/laminas-mvc-form": "^1.1.0",
         "laminas/laminas-json": "^3.2",
@@ -29,7 +28,9 @@
         "laminas/laminas-i18n": "^2.11",
         "laminas/laminas-serializer": "^2.10",
         "phpoffice/phpspreadsheet": "^1.18",
-        "halaxa/json-machine": "^0.7.0"
+        "halaxa/json-machine": "^0.7.0",
+        "laminas/laminas-cache": "^3.6",
+        "laminas/laminas-cache-storage-adapter-filesystem": "^2.2"
     },
     "autoload": {
         "psr-4": {

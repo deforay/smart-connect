@@ -22,6 +22,7 @@ class CommonController extends AbstractActionController
     public function indexAction()
     {
         $result = "";
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
@@ -36,6 +37,7 @@ class CommonController extends AbstractActionController
     public function multipleFieldValidationAction()
     {
         $result = "";
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
@@ -50,6 +52,7 @@ class CommonController extends AbstractActionController
     public function clearCacheAction()
     {
         $result = "";
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
@@ -68,6 +71,7 @@ class CommonController extends AbstractActionController
         unset($logincontainer->sampleTable);
         unset($logincontainer->eidSampleTable);
         unset($logincontainer->covid19SampleTable);
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
@@ -90,6 +94,7 @@ class CommonController extends AbstractActionController
 
     public function getDistrictListAction()
     {
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
@@ -101,6 +106,7 @@ class CommonController extends AbstractActionController
 
     public function getFacilityListAction()
     {
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             
