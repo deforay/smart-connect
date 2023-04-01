@@ -1287,8 +1287,8 @@ class SampleService
         $resultSet = $this->sampleTable->getTATbyProvince($labs, $startDate, $endDate);
         foreach ($resultSet as $key) {
             $result[] = array(
-                "facility"           => $key['geo_name'],
-                "facility_id"        => $key['geo_id'],
+                "facility"           => $key['facility_name'],
+                "facility_id"        => $key['facility_id'],
                 "category"           => 0,
                 "collect_receive"    => $key['Collection_Receive'],
                 "receive_register"   => $key['Receive_Register'],
@@ -1330,8 +1330,8 @@ class SampleService
         $resultSet = $this->sampleTable->getTATbyClinic($labs, $startDate, $endDate);
         foreach ($resultSet as $key) {
             $result[] = array(
-                "facility"           => $key['geo_name'],
-                "facility_id"        => $key['geo_id'],
+                "facility"           => $key['facility_name'],
+                "facility_id"        => $key['facility_id'],
                 "category"           => 0,
                 "collect_receive"    => $key['Collection_Receive'],
                 "receive_register"   => $key['Receive_Register'],

@@ -603,6 +603,7 @@ class CommonService
                                    'geo_parent'   => $lData['geo_parent'],
                                    'geo_name'     => $lData['geo_name'],
                                    'geo_code'     => $lData['geo_code'],
+                                   'geo_status'     => $lData['geo_status'],
                                    'updated_datetime'  => $lData['updated_datetime']
                               );
                               $locationDb->insert($locationData);
