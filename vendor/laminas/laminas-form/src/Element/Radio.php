@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Laminas\Form\Element;
 
 use Laminas\Validator\InArray as InArrayValidator;
@@ -18,15 +20,13 @@ class Radio extends MultiCheckbox
 
     /**
      * Get validator
-     *
-     * @return ValidatorInterface
      */
-    protected function getValidator()
+    protected function getValidator(): ?ValidatorInterface
     {
         if (null === $this->validator && ! $this->disableInArrayValidator()) {
             $this->validator = new InArrayValidator([
-                'haystack'  => $this->getValueOptionsValues(),
-                'strict'    => false,
+                'haystack' => $this->getValueOptionsValues(),
+                'strict'   => false,
             ]);
         }
         return $this->validator;

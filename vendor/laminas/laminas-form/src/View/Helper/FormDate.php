@@ -1,18 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Laminas\Form\View\Helper;
 
 use Laminas\Form\ElementInterface;
 
-class FormDate extends FormDateTime
+class FormDate extends AbstractFormDateTime
 {
     /**
      * Determine input type to use
-     *
-     * @param  ElementInterface $element
-     * @return string
      */
-    protected function getType(ElementInterface $element)
+    protected function getType(ElementInterface $element): string
     {
         return 'date';
     }

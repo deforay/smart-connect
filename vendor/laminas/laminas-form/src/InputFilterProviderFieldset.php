@@ -1,32 +1,31 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Laminas\Form;
 
 use Laminas\InputFilter\InputFilterProviderInterface;
+use Laminas\Stdlib\ArrayUtils;
 use Traversable;
 
-class InputFilterProviderFieldset extends Fieldset implements InputFilterProviderInterface
+final class InputFilterProviderFieldset extends Fieldset implements InputFilterProviderInterface
 {
     /**
      * Holds the specification which will be returned by getInputFilterSpecification
-     *
-     * @var array|Traversable
      */
-    protected $filterSpec = [];
+    protected array $filterSpec = [];
 
-    /**
-     * @return array|Traversable
-     */
-    public function getInputFilterSpecification()
+    public function getInputFilterSpecification(): array
     {
         return $this->filterSpec;
     }
 
-    /**
-     * @param array|Traversable $filterSpec
-     */
-    public function setInputFilterSpecification($filterSpec)
+    public function setInputFilterSpecification(iterable $filterSpec): void
     {
+        if ($filterSpec instanceof Traversable) {
+            $filterSpec = ArrayUtils::iteratorToArray($filterSpec);
+        }
+
         $this->filterSpec = $filterSpec;
     }
 
@@ -34,16 +33,15 @@ class InputFilterProviderFieldset extends Fieldset implements InputFilterProvide
      * Set options for a fieldset. Accepted options are:
      * - input_filter_spec: specification to be returned by getInputFilterSpecification
      *
-     * @param  array|Traversable $options
      * @return $this
      * @throws Exception\InvalidArgumentException
      */
-    public function setOptions($options)
+    public function setOptions(iterable $options)
     {
         parent::setOptions($options);
 
-        if (isset($options['input_filter_spec'])) {
-            $this->setInputFilterSpecification($options['input_filter_spec']);
+        if (isset($this->options['input_filter_spec'])) {
+            $this->setInputFilterSpecification($this->options['input_filter_spec']);
         }
 
         return $this;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Laminas\Form;
 
 use ArrayAccess;
@@ -10,36 +12,28 @@ use Laminas\ServiceManager\ServiceManager;
 use Laminas\Stdlib\ArrayUtils;
 use Traversable;
 
+use function assert;
 use function class_exists;
 use function get_class;
 use function gettype;
 use function is_array;
+use function is_iterable;
 use function is_object;
 use function is_string;
 use function method_exists;
 use function sprintf;
-use function trigger_error;
-
-use const E_USER_DEPRECATED;
 
 class Factory
 {
-    /**
-     * @var InputFilterFactory
-     */
+    /** @var null|InputFilterFactory */
     protected $inputFilterFactory;
 
-    /**
-     * @var FormElementManager
-     */
+    /** @var null|FormElementManager */
     protected $formElementManager;
 
-    /**
-     * @param FormElementManager $formElementManager
-     */
     public function __construct(
-        FormElementManager $formElementManager = null,
-        InputFilterFactory $inputFilterFactory = null
+        ?FormElementManager $formElementManager = null,
+        ?InputFilterFactory $inputFilterFactory = null
     ) {
         if ($formElementManager) {
             $this->setFormElementManager($formElementManager);
@@ -53,7 +47,6 @@ class Factory
     /**
      * Set input filter factory to use when creating forms
      *
-     * @param  InputFilterFactory $inputFilterFactory
      * @return $this
      */
     public function setInputFilterFactory(InputFilterFactory $inputFilterFactory)
@@ -66,13 +59,12 @@ class Factory
      * Get current input filter factory
      *
      * If none provided, uses an unconfigured instance.
-     *
-     * @return InputFilterFactory
      */
-    public function getInputFilterFactory()
+    public function getInputFilterFactory(): InputFilterFactory
     {
         if (null === $this->inputFilterFactory) {
             $this->setInputFilterFactory(new InputFilterFactory());
+            assert(null !== $this->inputFilterFactory);
         }
         return $this->inputFilterFactory;
     }
@@ -80,7 +72,6 @@ class Factory
     /**
      * Set the form element manager
      *
-     * @param  FormElementManager $formElementManager
      * @return $this
      */
     public function setFormElementManager(FormElementManager $formElementManager)
@@ -91,13 +82,12 @@ class Factory
 
     /**
      * Get form element manager
-     *
-     * @return FormElementManager
      */
-    public function getFormElementManager()
+    public function getFormElementManager(): FormElementManager
     {
         if ($this->formElementManager === null) {
             $this->setFormElementManager(new FormElementManager(new ServiceManager()));
+            assert(null !== $this->formElementManager);
         }
 
         return $this->formElementManager;
@@ -110,14 +100,13 @@ class Factory
      * type is being requested; if none is provided, assumes the spec
      * represents simply an element.
      *
-     * @param  array|Traversable $spec
-     * @return ElementInterface
+     * @param  array|Traversable|ArrayAccess $spec
      * @throws Exception\DomainException
      */
-    public function create($spec)
+    public function create($spec): ElementInterface
     {
         $spec = $this->validateSpecification($spec, __METHOD__);
-        $type = isset($spec['type']) ? $spec['type'] : Element::class;
+        $type = $spec['type'] ?? Element::class;
 
         $element = $this->getFormElementManager()->get($type);
 
@@ -147,9 +136,8 @@ class Factory
      * Create an element
      *
      * @param  array $spec
-     * @return ElementInterface
      */
-    public function createElement($spec)
+    public function createElement(array $spec): ElementInterface
     {
         if (! isset($spec['type'])) {
             $spec['type'] = Element::class;
@@ -162,9 +150,8 @@ class Factory
      * Create a fieldset
      *
      * @param  array $spec
-     * @return FieldsetInterface
      */
-    public function createFieldset($spec)
+    public function createFieldset(array $spec): FieldsetInterface
     {
         if (! isset($spec['type'])) {
             $spec['type'] = Fieldset::class;
@@ -177,9 +164,8 @@ class Factory
      * Create a form
      *
      * @param  array $spec
-     * @return FormInterface
      */
-    public function createForm($spec)
+    public function createForm(array $spec): FormInterface
     {
         if (! isset($spec['type'])) {
             $spec['type'] = Form::class;
@@ -197,28 +183,26 @@ class Factory
      * - options: an array or Traversable object of element options
      * - attributes: an array or Traversable object of element attributes to assign
      *
-     * @param  ElementInterface              $element
      * @param  array|Traversable|ArrayAccess $spec
-     * @return ElementInterface
      * @throws Exception\DomainException
      */
-    public function configureElement(ElementInterface $element, $spec)
+    public function configureElement(ElementInterface $element, $spec): ElementInterface
     {
         $spec = $this->validateSpecification($spec, __METHOD__);
 
-        $name       = isset($spec['name']) ? $spec['name'] : null;
-        $options    = isset($spec['options']) ? $spec['options'] : null;
-        $attributes = isset($spec['attributes']) ? $spec['attributes'] : null;
+        $name       = $spec['name'] ?? null;
+        $options    = $spec['options'] ?? null;
+        $attributes = $spec['attributes'] ?? null;
 
         if ($name !== null && $name !== '') {
             $element->setName($name);
         }
 
-        if (is_array($options) || $options instanceof Traversable) {
+        if (is_iterable($options)) {
             $element->setOptions($options);
         }
 
-        if (is_array($attributes) || $attributes instanceof Traversable) {
+        if (is_iterable($attributes)) {
             $element->setAttributes($attributes);
         }
 
@@ -239,15 +223,14 @@ class Factory
      *   - flags: (optional) array of flags to pass to FieldsetInterface::add()
      *   - spec: the actual element specification, per {@link configureElement()}
      *
-     * @param  FieldsetInterface             $fieldset
      * @param  array|Traversable|ArrayAccess $spec
-     * @return FieldsetInterface
      * @throws Exception\DomainException
      */
-    public function configureFieldset(FieldsetInterface $fieldset, $spec)
+    public function configureFieldset(FieldsetInterface $fieldset, $spec): FieldsetInterface
     {
         $spec     = $this->validateSpecification($spec, __METHOD__);
         $fieldset = $this->configureElement($fieldset, $spec);
+        assert($fieldset instanceof FieldsetInterface);
 
         if (isset($spec['object'])) {
             $this->prepareAndInjectObject($spec['object'], $fieldset, __METHOD__);
@@ -265,7 +248,7 @@ class Factory
             $this->prepareAndInjectFieldsets($spec['fieldsets'], $fieldset, __METHOD__);
         }
 
-        $factory = isset($spec['factory']) ? $spec['factory'] : $this;
+        $factory = $spec['factory'] ?? $this;
         $this->prepareAndInjectFactory($factory, $fieldset, __METHOD__);
 
         return $fieldset;
@@ -281,21 +264,20 @@ class Factory
      *   array specification for the input filter factory
      * - hydrator: hydrator instance or named hydrator class
      *
-     * @param  FormInterface                  $form
      * @param  array|Traversable|ArrayAccess  $spec
-     * @return FormInterface
      */
-    public function configureForm(FormInterface $form, $spec)
+    public function configureForm(FormInterface $form, $spec): FormInterface
     {
         $spec = $this->validateSpecification($spec, __METHOD__);
         $form = $this->configureFieldset($form, $spec);
+        assert($form instanceof FormInterface);
 
         if (isset($spec['input_filter'])) {
             $this->prepareAndInjectInputFilter($spec['input_filter'], $form, __METHOD__);
         }
 
         if (isset($spec['validation_group'])) {
-            $this->prepareAndInjectValidationGroup($spec['validation_group'], $form, __METHOD__);
+            $form->setValidationGroup($spec['validation_group']);
         }
 
         return $form;
@@ -309,9 +291,9 @@ class Factory
      * @param  array|Traversable|ArrayAccess $spec
      * @param  string $method Method invoking the validator
      * @return array|ArrayAccess
-     * @throws Exception\InvalidArgumentException for invalid $spec
+     * @throws Exception\InvalidArgumentException For invalid $spec.
      */
-    protected function validateSpecification($spec, $method)
+    protected function validateSpecification($spec, string $method)
     {
         if (is_array($spec)) {
             return $spec;
@@ -337,11 +319,9 @@ class Factory
      * Takes a list of element specifications, creates the elements, and injects them into the provided fieldset
      *
      * @param  array|Traversable|ArrayAccess $elements
-     * @param  FieldsetInterface $fieldset
      * @param  string $method Method invoking this one (for exception messages)
-     * @return void
      */
-    protected function prepareAndInjectElements($elements, FieldsetInterface $fieldset, $method)
+    protected function prepareAndInjectElements($elements, FieldsetInterface $fieldset, string $method): void
     {
         $elements = $this->validateSpecification($elements, $method);
 
@@ -350,8 +330,8 @@ class Factory
                 continue;
             }
 
-            $flags = isset($elementSpecification['flags']) ? $elementSpecification['flags'] : [];
-            $spec  = isset($elementSpecification['spec']) ? $elementSpecification['spec'] : [];
+            $flags = $elementSpecification['flags'] ?? [];
+            $spec  = $elementSpecification['spec'] ?? [];
 
             if (! isset($spec['type'])) {
                 $spec['type'] = Element::class;
@@ -366,17 +346,15 @@ class Factory
      * Takes a list of fieldset specifications, creates the fieldsets, and injects them into the master fieldset
      *
      * @param  array|Traversable|ArrayAccess $fieldsets
-     * @param  FieldsetInterface $masterFieldset
      * @param  string $method Method invoking this one (for exception messages)
-     * @return void
      */
-    public function prepareAndInjectFieldsets($fieldsets, FieldsetInterface $masterFieldset, $method)
+    public function prepareAndInjectFieldsets($fieldsets, FieldsetInterface $masterFieldset, string $method): void
     {
         $fieldsets = $this->validateSpecification($fieldsets, $method);
 
         foreach ($fieldsets as $fieldsetSpecification) {
-            $flags = isset($fieldsetSpecification['flags']) ? $fieldsetSpecification['flags'] : [];
-            $spec  = isset($fieldsetSpecification['spec']) ? $fieldsetSpecification['spec'] : [];
+            $flags = $fieldsetSpecification['flags'] ?? [];
+            $spec  = $fieldsetSpecification['spec'] ?? [];
 
             $fieldset = $this->createFieldset($spec);
             $masterFieldset->add($fieldset, $flags);
@@ -389,22 +367,10 @@ class Factory
      * Takes a string indicating a class name, instantiates the class
      * by that name, and injects the class instance as the bound object.
      *
-     * @param  string            $objectName
-     * @param  FieldsetInterface $fieldset
-     * @param  string            $method
      * @throws Exception\DomainException
-     * @return void
      */
-    protected function prepareAndInjectObject($objectName, FieldsetInterface $fieldset, $method)
+    protected function prepareAndInjectObject(string $objectName, FieldsetInterface $fieldset, string $method): void
     {
-        if (! is_string($objectName)) {
-            throw new Exception\DomainException(sprintf(
-                '%s expects string class name; received "%s"',
-                $method,
-                is_object($objectName) ? get_class($objectName) : gettype($objectName)
-            ));
-        }
-
         if (! class_exists($objectName)) {
             throw new Exception\DomainException(sprintf(
                 '%s expects string class name to be a valid class name; received "%s"',
@@ -413,7 +379,7 @@ class Factory
             ));
         }
 
-        $fieldset->setObject(new $objectName);
+        $fieldset->setObject(new $objectName());
     }
 
     /**
@@ -423,13 +389,10 @@ class Factory
      * by pulling it from service manager, and injects the hydrator instance into the form.
      *
      * @param  string|array|Hydrator\HydratorInterface $hydratorOrName
-     * @param  FieldsetInterface                       $fieldset
-     * @param  string                                  $method
-     * @return void
      * @throws Exception\DomainException If $hydratorOrName is not a string, does not resolve to a known class, or
-     *                                   the class does not implement Hydrator\HydratorInterface
+     *                                   the class does not implement Hydrator\HydratorInterface.
      */
-    protected function prepareAndInjectHydrator($hydratorOrName, FieldsetInterface $fieldset, $method)
+    protected function prepareAndInjectHydrator($hydratorOrName, FieldsetInterface $fieldset, string $method): void
     {
         if ($hydratorOrName instanceof Hydrator\HydratorInterface) {
             $fieldset->setHydrator($hydratorOrName);
@@ -443,8 +406,8 @@ class Factory
                     $method
                 ));
             }
-            $hydratorOptions = isset($hydratorOrName['options']) ? $hydratorOrName['options'] : [];
-            $hydratorOrName = $hydratorOrName['type'];
+            $hydratorOptions = $hydratorOrName['options'] ?? [];
+            $hydratorOrName  = $hydratorOrName['type'];
         } else {
             $hydratorOptions = [];
         }
@@ -475,13 +438,10 @@ class Factory
      * by pulling it from service manager, and injects the factory instance into the fieldset.
      *
      * @param  string|array|Factory      $factoryOrName
-     * @param  FieldsetInterface         $fieldset
-     * @param  string                    $method
-     * @return void
      * @throws Exception\DomainException If $factoryOrName is not a string, does not resolve to a known class, or
-     *                                   the class does not extend Form\Factory
+     *                                   the class does not extend Form\Factory.
      */
-    protected function prepareAndInjectFactory($factoryOrName, FieldsetInterface $fieldset, $method)
+    protected function prepareAndInjectFactory($factoryOrName, FieldsetInterface $fieldset, string $method): void
     {
         if (is_array($factoryOrName)) {
             if (! isset($factoryOrName['type'])) {
@@ -519,12 +479,9 @@ class Factory
      * instance in order to create the input filter.
      *
      * @param  string|array|Traversable $spec
-     * @param  FormInterface $form
-     * @param  string $method
-     * @return void
-     * @throws Exception\DomainException for unknown InputFilter class or invalid InputFilter instance
+     * @throws Exception\DomainException For unknown InputFilter class or invalid InputFilter instance.
      */
-    protected function prepareAndInjectInputFilter($spec, FormInterface $form, $method)
+    protected function prepareAndInjectInputFilter($spec, FormInterface $form, string $method): void
     {
         if ($spec instanceof InputFilterInterface) {
             $form->setInputFilter($spec);
@@ -539,7 +496,7 @@ class Factory
                     $spec
                 ));
             }
-            $filter = new $spec;
+            $filter = new $spec();
             if (! $filter instanceof InputFilterInterface) {
                 throw new Exception\DomainException(sprintf(
                     '%s expects a valid implementation of Laminas\InputFilter\InputFilterInterface; received "%s"',
@@ -557,65 +514,5 @@ class Factory
             $filter->setFactory($factory);
         }
         $form->setInputFilter($filter);
-    }
-
-    /**
-     * Prepare a validation group and inject in the provided form
-     *
-     * Takes an array of elements names
-     *
-     * @param  string|array|Traversable $spec
-     * @param  FormInterface $form
-     * @param  string $method
-     * @return void
-     * @throws Exception\DomainException if validation group given is not an array
-     */
-    protected function prepareAndInjectValidationGroup($spec, FormInterface $form, $method)
-    {
-        if (! is_array($spec)) {
-            if (! class_exists($spec)) {
-                throw new Exception\DomainException(sprintf(
-                    '%s expects an array for validation group; received "%s"',
-                    $method,
-                    $spec
-                ));
-            }
-        }
-
-        $form->setValidationGroup($spec);
-    }
-
-    /**
-     * Try to pull hydrator from service manager, or instantiates it from its name
-     *
-     * @param  string $hydratorName
-     * @return mixed
-     * @throws Exception\DomainException
-     */
-    protected function getHydratorFromName($hydratorName)
-    {
-        trigger_error(sprintf(
-            'Usage of %s is deprecated since v3.0.0; please use FormElementManager::getHydratorFromName() instead',
-            __METHOD__
-        ), E_USER_DEPRECATED);
-
-        return $this->getFormElementManager()->getHydratorFromName($hydratorName);
-    }
-
-    /**
-     * Try to pull factory from service manager, or instantiates it from its name
-     *
-     * @param  string $factoryName
-     * @return mixed
-     * @throws Exception\DomainException
-     */
-    protected function getFactoryFromName($factoryName)
-    {
-        trigger_error(sprintf(
-            'Usage of %s is deprecated since v3.0.0; please use FormElementManager::getFactoryFromName() instead',
-            __METHOD__
-        ), E_USER_DEPRECATED);
-
-        return $this->getFormElementManager()->getFactoryFromName($factoryName);
     }
 }

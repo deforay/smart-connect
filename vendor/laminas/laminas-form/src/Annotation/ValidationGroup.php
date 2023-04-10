@@ -1,6 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Laminas\Form\Annotation;
+
+use Attribute;
+use Doctrine\Common\Annotations\Annotation;
+use Doctrine\Common\Annotations\Annotation\NamedArgumentConstructor;
 
 /**
  * ValidationGroup annotation
@@ -10,18 +16,30 @@ namespace Laminas\Form\Annotation;
  * The value should be an associative array.
  *
  * @Annotation
- * @copyright  Copyright (c) 2005-2015 Laminas (https://www.zend.com)
- * @license    https://getlaminas.org/license/new-bsd     New BSD License
+ * @NamedArgumentConstructor
  */
-class ValidationGroup extends AbstractArrayAnnotation
+#[Attribute]
+final class ValidationGroup
 {
+    protected array $validationGroup;
+
+    /**
+     * Receive and process the contents of an annotation
+     *
+     * @param array $validationGroup
+     */
+    public function __construct(array $validationGroup)
+    {
+        $this->validationGroup = $validationGroup;
+    }
+
     /**
      * Retrieve the options
      *
-     * @return null|array
+     * @return array
      */
-    public function getValidationGroup()
+    public function getValidationGroup(): array
     {
-        return $this->value;
+        return $this->validationGroup;
     }
 }

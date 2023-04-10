@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Laminas\Form;
 
 use Laminas\Stdlib\ArrayUtils;
@@ -7,12 +9,7 @@ use Laminas\Stdlib\InitializableInterface;
 use Traversable;
 
 use function array_key_exists;
-use function get_class;
-use function gettype;
-use function is_array;
-use function is_object;
 use function is_string;
-use function sprintf;
 
 class Element implements
     ElementAttributeRemovalInterface,
@@ -20,19 +17,13 @@ class Element implements
     InitializableInterface,
     LabelAwareInterface
 {
-    /**
-     * @var array
-     */
+    /** @var array  */
     protected $attributes = [];
 
-    /**
-     * @var null|string
-     */
+    /** @var null|string */
     protected $label;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $labelAttributes = [];
 
     /**
@@ -42,35 +33,27 @@ class Element implements
      */
     protected $labelOptions = [];
 
-    /**
-     * @var array|Traversable Validation error messages
-     */
+    /** @var array Validation error messages */
     protected $messages = [];
 
-    /**
-     * @var array custom options
-     */
+    /** @var array custom options */
     protected $options = [];
 
-    /**
-     * @var mixed
-     */
+    /** @var mixed */
     protected $value;
 
-    /**
-     * @var boolean
-     */
+    /** @var boolean */
     protected $hasValue = false;
 
     /**
      * @param  null|int|string   $name    Optional name for the element
-     * @param  array|Traversable $options Optional options for the element
+     * @param  iterable $options Optional options for the element
      * @throws Exception\InvalidArgumentException
      */
-    public function __construct($name = null, $options = [])
+    public function __construct($name = null, iterable $options = [])
     {
         if (null !== $name) {
-            $this->setName($name);
+            $this->setName((string) $name);
         }
 
         if (! empty($options)) {
@@ -91,10 +74,9 @@ class Element implements
     /**
      * Set value for name
      *
-     * @param  string $name
      * @return $this
      */
-    public function setName($name)
+    public function setName(string $name)
     {
         $this->setAttribute('name', $name);
         return $this;
@@ -102,10 +84,8 @@ class Element implements
 
     /**
      * Get value for name
-     *
-     * @return string|int
      */
-    public function getName()
+    public function getName(): ?string
     {
         return $this->getAttribute('name');
     }
@@ -116,18 +96,13 @@ class Element implements
      * - label_attributes: attributes to use when the label is rendered
      * - label_options: label specific options
      *
-     * @param  array|Traversable $options
      * @return $this
      * @throws Exception\InvalidArgumentException
      */
-    public function setOptions($options)
+    public function setOptions(iterable $options)
     {
         if ($options instanceof Traversable) {
             $options = ArrayUtils::iteratorToArray($options);
-        } elseif (! is_array($options)) {
-            throw new Exception\InvalidArgumentException(
-                'The options parameter must be an array or a Traversable'
-            );
         }
 
         if (isset($options['label'])) {
@@ -152,7 +127,7 @@ class Element implements
      *
      * @return array
      */
-    public function getOptions()
+    public function getOptions(): array
     {
         return $this->options;
     }
@@ -160,10 +135,9 @@ class Element implements
     /**
      * Return the specified option
      *
-     * @param string $option
      * @return null|mixed
      */
-    public function getOption($option)
+    public function getOption(string $option)
     {
         if (! isset($this->options[$option])) {
             return null;
@@ -175,11 +149,10 @@ class Element implements
     /**
      * Set a single option for an element
      *
-     * @param  string $key
      * @param  mixed $value
      * @return $this
      */
-    public function setOption($key, $value)
+    public function setOption(string $key, $value)
     {
         $this->options[$key] = $value;
         return $this;
@@ -188,11 +161,10 @@ class Element implements
     /**
      * Set a single element attribute
      *
-     * @param  string $key
      * @param  mixed  $value
      * @return $this
      */
-    public function setAttribute($key, $value)
+    public function setAttribute(string $key, $value)
     {
         // Do not include the value in the list of attributes
         if ($key === 'value') {
@@ -206,13 +178,12 @@ class Element implements
     /**
      * Retrieve a single element attribute
      *
-     * @param  $key
      * @return mixed|null
      */
-    public function getAttribute($key)
+    public function getAttribute(string $key)
     {
         if (! isset($this->attributes[$key])) {
-            return;
+            return null;
         }
 
         return $this->attributes[$key];
@@ -221,10 +192,9 @@ class Element implements
     /**
      * Remove a single attribute
      *
-     * @param  string $key
      * @return $this
      */
-    public function removeAttribute($key)
+    public function removeAttribute(string $key)
     {
         unset($this->attributes[$key]);
         return $this;
@@ -232,11 +202,8 @@ class Element implements
 
     /**
      * Does the element has a specific attribute ?
-     *
-     * @param  string $key
-     * @return bool
      */
-    public function hasAttribute($key)
+    public function hasAttribute(string $key): bool
     {
         return array_key_exists($key, $this->attributes);
     }
@@ -246,19 +213,11 @@ class Element implements
      *
      * Implementation will decide if this will overwrite or merge.
      *
-     * @param  array|Traversable $arrayOrTraversable
      * @return $this
      * @throws Exception\InvalidArgumentException
      */
-    public function setAttributes($arrayOrTraversable)
+    public function setAttributes(iterable $arrayOrTraversable)
     {
-        if (! is_array($arrayOrTraversable) && ! $arrayOrTraversable instanceof Traversable) {
-            throw new Exception\InvalidArgumentException(sprintf(
-                '%s expects an array or Traversable argument; received "%s"',
-                __METHOD__,
-                is_object($arrayOrTraversable) ? get_class($arrayOrTraversable) : gettype($arrayOrTraversable)
-            ));
-        }
         foreach ($arrayOrTraversable as $key => $value) {
             $this->setAttribute($key, $value);
         }
@@ -267,10 +226,8 @@ class Element implements
 
     /**
      * Retrieve all attributes at once
-     *
-     * @return array|Traversable
      */
-    public function getAttributes()
+    public function getAttributes(): array
     {
         return $this->attributes;
     }
@@ -309,7 +266,7 @@ class Element implements
      */
     public function setValue($value)
     {
-        $this->value = $value;
+        $this->value    = $value;
         $this->hasValue = true;
 
         return $this;
@@ -328,10 +285,9 @@ class Element implements
     /**
      * Set the label used for this element
      *
-     * @param $label
      * @return $this
      */
-    public function setLabel($label)
+    public function setLabel(?string $label)
     {
         if (is_string($label)) {
             $this->label = $label;
@@ -342,10 +298,8 @@ class Element implements
 
     /**
      * Retrieve the label used for this element
-     *
-     * @return null|string
      */
-    public function getLabel()
+    public function getLabel(): ?string
     {
         return $this->label;
     }
@@ -367,7 +321,7 @@ class Element implements
      *
      * @return array
      */
-    public function getLabelAttributes()
+    public function getLabelAttributes(): array
     {
         return $this->labelAttributes;
     }
@@ -377,19 +331,11 @@ class Element implements
      *
      * Implementation will decide if this will overwrite or merge.
      *
-     * @param  array|Traversable $arrayOrTraversable
      * @return $this
      * @throws Exception\InvalidArgumentException
      */
-    public function setLabelOptions($arrayOrTraversable)
+    public function setLabelOptions(iterable $arrayOrTraversable)
     {
-        if (! is_array($arrayOrTraversable) && ! $arrayOrTraversable instanceof Traversable) {
-            throw new Exception\InvalidArgumentException(sprintf(
-                '%s expects an array or Traversable argument; received "%s"',
-                __METHOD__,
-                is_object($arrayOrTraversable) ? get_class($arrayOrTraversable) : gettype($arrayOrTraversable)
-            ));
-        }
         foreach ($arrayOrTraversable as $key => $value) {
             $this->setLabelOption($key, $value);
         }
@@ -401,7 +347,7 @@ class Element implements
      *
      * @return array
      */
-    public function getLabelOptions()
+    public function getLabelOptions(): array
     {
         return $this->labelOptions;
     }
@@ -435,11 +381,10 @@ class Element implements
     /**
      * Set a single label optionn
      *
-     * @param  string $key
      * @param  mixed  $value
      * @return $this
      */
-    public function setLabelOption($key, $value)
+    public function setLabelOption(string $key, $value)
     {
         $this->labelOptions[$key] = $value;
         return $this;
@@ -448,7 +393,7 @@ class Element implements
     /**
      * Retrieve a single label option
      *
-     * @param  $key
+     * @param  int|string $key
      * @return mixed|null
      */
     public function getLabelOption($key)
@@ -463,10 +408,9 @@ class Element implements
     /**
      * Remove a single label option
      *
-     * @param string $key
      * @return $this
      */
-    public function removeLabelOption($key)
+    public function removeLabelOption(string $key)
     {
         unset($this->labelOptions[$key]);
         return $this;
@@ -474,11 +418,8 @@ class Element implements
 
     /**
      * Does the element has a specific label option ?
-     *
-     * @param  string $key
-     * @return bool
      */
-    public function hasLabelOption($key)
+    public function hasLabelOption(string $key): bool
     {
         return array_key_exists($key, $this->labelOptions);
     }
@@ -486,20 +427,14 @@ class Element implements
     /**
      * Set a list of messages to report when validation fails
      *
-     * @param  array|Traversable $messages
      * @return $this
      * @throws Exception\InvalidArgumentException
      */
-    public function setMessages($messages)
+    public function setMessages(iterable $messages)
     {
-        if (! is_array($messages) && ! $messages instanceof Traversable) {
-            throw new Exception\InvalidArgumentException(sprintf(
-                '%s expects an array or Traversable object of validation error messages; received "%s"',
-                __METHOD__,
-                is_object($messages) ? get_class($messages) : gettype($messages)
-            ));
+        if ($messages instanceof Traversable) {
+            $messages = ArrayUtils::iteratorToArray($messages);
         }
-
         $this->messages = $messages;
         return $this;
     }
@@ -508,18 +443,13 @@ class Element implements
      * Get validation error messages, if any.
      *
      * Returns a list of validation failure messages, if any.
-     *
-     * @return array|Traversable
      */
-    public function getMessages()
+    public function getMessages(): array
     {
         return $this->messages;
     }
 
-    /**
-     * @return boolean
-     */
-    public function hasValue()
+    public function hasValue(): bool
     {
         return $this->hasValue;
     }

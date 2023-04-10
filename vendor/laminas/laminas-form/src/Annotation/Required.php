@@ -1,7 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Laminas\Form\Annotation;
 
+use Attribute;
+use Doctrine\Common\Annotations\Annotation;
+use Doctrine\Common\Annotations\Annotation\NamedArgumentConstructor;
 use Laminas\Filter\Boolean as BooleanFilter;
 
 use function is_bool;
@@ -15,27 +20,20 @@ use function is_bool;
  * understood by \Laminas\Filter\Boolean is allowed as the content.
  *
  * @Annotation
+ * @NamedArgumentConstructor
  */
-class Required
+#[Attribute]
+final class Required
 {
-    /**
-     * @var bool
-     */
-    protected $required = true;
+    protected bool $required;
 
     /**
      * Receive and process the contents of an annotation
      *
-     * @param  array $data
+     * @param bool|string $required
      */
-    public function __construct(array $data)
+    public function __construct($required = true)
     {
-        if (! isset($data['value'])) {
-            $data['value'] = false;
-        }
-
-        $required = $data['value'];
-
         if (! is_bool($required)) {
             $filter   = new BooleanFilter();
             $required = $filter->filter($required);
@@ -46,10 +44,8 @@ class Required
 
     /**
      * Get value of required flag
-     *
-     * @return bool
      */
-    public function getRequired()
+    public function getRequired(): bool
     {
         return $this->required;
     }

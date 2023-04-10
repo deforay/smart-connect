@@ -1,6 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Laminas\Form\Annotation;
+
+use Attribute;
+use Doctrine\Common\Annotations\Annotation;
+use Doctrine\Common\Annotations\Annotation\NamedArgumentConstructor;
 
 /**
  * Type annotation
@@ -10,16 +16,26 @@ namespace Laminas\Form\Annotation;
  * representing a fully qualified classname.
  *
  * @Annotation
+ * @NamedArgumentConstructor
  */
-class Type extends AbstractStringAnnotation
+#[Attribute]
+final class Type
 {
+    protected string $type;
+
+    /**
+     * Receive and process the contents of an annotation
+     */
+    public function __construct(string $type)
+    {
+        $this->type = $type;
+    }
+
     /**
      * Retrieve the class type
-     *
-     * @return null|string
      */
-    public function getType()
+    public function getType(): string
     {
-        return $this->value;
+        return $this->type;
     }
 }

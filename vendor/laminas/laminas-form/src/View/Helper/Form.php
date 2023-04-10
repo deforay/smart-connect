@@ -1,13 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Laminas\Form\View\Helper;
 
 use Laminas\Form\FieldsetInterface;
 use Laminas\Form\FormInterface;
 use Laminas\View\Helper\Doctype;
+use Laminas\View\Renderer\PhpRenderer;
 
 use function array_key_exists;
 use function array_merge;
+use function assert;
 use function method_exists;
 use function sprintf;
 
@@ -35,10 +39,12 @@ class Form extends AbstractHelper
     /**
      * Invoke as function
      *
-     * @param  null|FormInterface $form
+     * @template T as null|FormInterface
+     * @psalm-param T $form
+     * @psalm-return (T is null ? self : string)
      * @return Form|string
      */
-    public function __invoke(FormInterface $form = null)
+    public function __invoke(?FormInterface $form = null)
     {
         if (! $form) {
             return $this;
@@ -49,11 +55,8 @@ class Form extends AbstractHelper
 
     /**
      * Render a form from the provided $form,
-     *
-     * @param  FormInterface $form
-     * @return string
      */
-    public function render(FormInterface $form)
+    public function render(FormInterface $form): string
     {
         if (method_exists($form, 'prepare')) {
             $form->prepare();
@@ -61,11 +64,13 @@ class Form extends AbstractHelper
 
         $formContent = '';
 
+        $renderer = $this->getView();
+        assert($renderer instanceof PhpRenderer);
         foreach ($form as $element) {
             if ($element instanceof FieldsetInterface) {
-                $formContent .= $this->getView()->formCollection($element);
+                $formContent .= $renderer->formCollection($element);
             } else {
-                $formContent .= $this->getView()->formRow($element);
+                $formContent .= $renderer->formRow($element);
             }
         }
 
@@ -74,11 +79,8 @@ class Form extends AbstractHelper
 
     /**
      * Generate an opening form tag
-     *
-     * @param  null|FormInterface $form
-     * @return string
      */
-    public function openTag(FormInterface $form = null)
+    public function openTag(?FormInterface $form = null): string
     {
         $doctype    = $this->getDoctype();
         $attributes = [];
@@ -107,10 +109,8 @@ class Form extends AbstractHelper
 
     /**
      * Generate a closing form tag
-     *
-     * @return string
      */
-    public function closeTag()
+    public function closeTag(): string
     {
         return '</form>';
     }

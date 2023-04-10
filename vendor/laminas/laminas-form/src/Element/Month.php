@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Laminas\Form\Element;
 
 use DateInterval;
@@ -7,16 +9,14 @@ use Laminas\Validator\DateStep as DateStepValidator;
 use Laminas\Validator\Regex as RegexValidator;
 use Laminas\Validator\ValidatorInterface;
 
-class Month extends DateTime
+class Month extends AbstractDateTime
 {
-    const DATETIME_FORMAT = 'Y-m';
-
     /**
      * A valid format string accepted by date()
      *
      * @var string
      */
-    protected $format = self::DATETIME_FORMAT;
+    protected $format = 'Y-m';
 
     /**
      * Seed attributes
@@ -29,24 +29,20 @@ class Month extends DateTime
 
     /**
      * Retrieves a Date Validator configured for a Month Input type
-     *
-     * @return ValidatorInterface
      */
-    protected function getDateValidator()
+    protected function getDateValidator(): ValidatorInterface
     {
         return new RegexValidator('/^[0-9]{4}\-(0[1-9]|1[012])$/');
     }
 
     /**
      * Retrieves a DateStep Validator configured for a Month Input type
-     *
-     * @return ValidatorInterface
      */
-    protected function getStepValidator()
+    protected function getStepValidator(): ValidatorInterface
     {
-        $stepValue = isset($this->attributes['step']) ? $this->attributes['step'] : 1; // Months
+        $stepValue = $this->attributes['step'] ?? 1; // Months
 
-        $baseValue = isset($this->attributes['min']) ? $this->attributes['min'] : '1970-01';
+        $baseValue = $this->attributes['min'] ?? '1970-01';
 
         return new DateStepValidator([
             'format'    => 'Y-m',

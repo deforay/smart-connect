@@ -736,7 +736,7 @@ class Module
 	{
 		return array(
 			'invokables' => array(
-				'humanDateFormat' 		=> 'Application\View\Helper\HumanDateFormat'
+				'humanReadableDateFormat' 		=> 'Application\View\Helper\HumanReadableDateFormat'
 			),
 			'factories' => array(
 				'GetLocaleData'  => new class

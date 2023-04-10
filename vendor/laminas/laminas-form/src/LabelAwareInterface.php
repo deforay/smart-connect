@@ -1,25 +1,22 @@
 <?php
 
-namespace Laminas\Form;
+declare(strict_types=1);
 
-use Traversable;
+namespace Laminas\Form;
 
 interface LabelAwareInterface
 {
     /**
      * Set the label (if any) used for this element
      *
-     * @param  $label
      * @return $this
      */
-    public function setLabel($label);
+    public function setLabel(?string $label);
 
     /**
      * Retrieve the label (if any) used for this element
-     *
-     * @return string
      */
-    public function getLabel();
+    public function getLabel(): ?string;
 
     /**
      * Set the attributes to use with the label
@@ -34,38 +31,36 @@ interface LabelAwareInterface
      *
      * @return array
      */
-    public function getLabelAttributes();
+    public function getLabelAttributes(): array;
 
     /**
      * Set many label options at once
      *
      * Implementation will decide if this will overwrite or merge.
      *
-     * @param  array|Traversable $arrayOrTraversable
      * @return $this
      */
-    public function setLabelOptions($arrayOrTraversable);
+    public function setLabelOptions(iterable $arrayOrTraversable);
 
     /**
      * Get label specific options
      *
      * @return array
      */
-    public function getLabelOptions();
+    public function getLabelOptions(): array;
 
     /**
      * Set a single label optionn
      *
-     * @param  string $key
      * @param  mixed  $value
      * @return $this
      */
-    public function setLabelOption($key, $value);
+    public function setLabelOption(string $key, $value);
 
     /**
      * Retrieve a single label option
      *
-     * @param  $key
+     * @param  int|string $key
      * @return mixed|null
      */
     public function getLabelOption($key);
@@ -73,18 +68,14 @@ interface LabelAwareInterface
     /**
      * Remove a single label option
      *
-     * @param  string $key
      * @return $this
      */
-    public function removeLabelOption($key);
+    public function removeLabelOption(string $key);
 
     /**
      * Does the element has a specific label option ?
-     *
-     * @param  string $key
-     * @return bool
      */
-    public function hasLabelOption($key);
+    public function hasLabelOption(string $key): bool;
 
     /**
      * Remove many attributes at once

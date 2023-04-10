@@ -1,8 +1,8 @@
 <?php
 
-namespace Laminas\Form;
+declare(strict_types=1);
 
-use Traversable;
+namespace Laminas\Form;
 
 interface ElementInterface
 {
@@ -12,91 +12,77 @@ interface ElementInterface
      * In most cases, this will proxy to the attributes for storage, but is
      * present to indicate that elements are generally named.
      *
-     * @param  string $name
      * @return $this
      */
-    public function setName($name);
+    public function setName(string $name);
 
     /**
      * Retrieve the element name
-     *
-     * @return string
      */
-    public function getName();
+    public function getName(): ?string;
 
     /**
      * Set options for an element
      *
-     * @param  array|Traversable $options
      * @return $this
      */
-    public function setOptions($options);
+    public function setOptions(iterable $options);
 
     /**
      * Set a single option for an element
      *
-     * @param  string $key
      * @param  mixed $value
      * @return $this
      */
-    public function setOption($key, $value);
+    public function setOption(string $key, $value);
 
     /**
      * get the defined options
      *
      * @return array
      */
-    public function getOptions();
+    public function getOptions(): array;
 
     /**
      * return the specified option
      *
-     * @param string $option
      * @return null|mixed
      */
-    public function getOption($option);
+    public function getOption(string $option);
 
     /**
      * Set a single element attribute
      *
-     * @param  string $key
      * @param  mixed $value
      * @return $this
      */
-    public function setAttribute($key, $value);
+    public function setAttribute(string $key, $value);
 
     /**
      * Retrieve a single element attribute
      *
-     * @param  string $key
      * @return mixed
      */
-    public function getAttribute($key);
+    public function getAttribute(string $key);
 
     /**
      * Return true if a specific attribute is set
-     *
-     * @param  string $key
-     * @return bool
      */
-    public function hasAttribute($key);
+    public function hasAttribute(string $key): bool;
 
     /**
      * Set many attributes at once
      *
      * Implementation will decide if this will overwrite or merge.
      *
-     * @param  array|Traversable $arrayOrTraversable
      * @return $this
      */
-    public function setAttributes($arrayOrTraversable);
+    public function setAttributes(iterable $arrayOrTraversable);
 
     /**
      * Retrieve all attributes at once
-     *
-     * @return array|Traversable
      */
-    public function getAttributes();
+    public function getAttributes(): array;
 
     /**
      * Set the value of the element
@@ -116,32 +102,26 @@ interface ElementInterface
     /**
      * Set the label (if any) used for this element
      *
-     * @param  $label
      * @return $this
      */
-    public function setLabel($label);
+    public function setLabel(?string $label);
 
     /**
      * Retrieve the label (if any) used for this element
-     *
-     * @return string
      */
-    public function getLabel();
+    public function getLabel(): ?string;
 
     /**
      * Set a list of messages to report when validation fails
      *
-     * @param  array|Traversable $messages
      * @return $this
      */
-    public function setMessages($messages);
+    public function setMessages(iterable $messages);
 
     /**
      * Get validation error messages, if any
      *
      * Returns a list of validation failure messages, if any.
-     *
-     * @return array|Traversable
      */
-    public function getMessages();
+    public function getMessages(): array;
 }

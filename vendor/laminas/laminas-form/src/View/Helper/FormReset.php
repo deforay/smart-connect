@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Laminas\Form\View\Helper;
 
 use Laminas\Form\ElementInterface;
@@ -13,18 +15,18 @@ class FormReset extends FormInput
      * @var array
      */
     protected $validTagAttributes = [
-        'name'           => true,
-        'autofocus'      => true,
-        'disabled'       => true,
-        'form'           => true,
-        'type'           => true,
-        'value'          => true,
+        'name'      => true,
+        'autofocus' => true,
+        'disabled'  => true,
+        'form'      => true,
+        'type'      => true,
+        'value'     => true,
     ];
 
     /**
      * Translatable attributes
      *
-     * @var array
+     * @var array<string, bool>
      */
     protected $translatableAttributes = [
         'value' => true,
@@ -33,11 +35,9 @@ class FormReset extends FormInput
     /**
      * Determine input type to use
      *
-     * @param  ElementInterface $element
      * @throws Exception\DomainException
-     * @return string
      */
-    protected function getType(ElementInterface $element)
+    protected function getType(ElementInterface $element): string
     {
         return 'reset';
     }

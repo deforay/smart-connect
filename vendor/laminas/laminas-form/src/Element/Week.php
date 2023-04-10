@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Laminas\Form\Element;
 
 use DateInterval;
@@ -9,7 +11,7 @@ use Laminas\Validator\LessThan as LessThanValidator;
 use Laminas\Validator\Regex as RegexValidator;
 use Laminas\Validator\ValidatorInterface;
 
-class Week extends DateTime
+class Week extends AbstractDateTime
 {
     /**
      * Seed attributes
@@ -22,24 +24,20 @@ class Week extends DateTime
 
     /**
      * Retrieves a Date Validator configured for a Week Input type
-     *
-     * @return ValidatorInterface
      */
-    protected function getDateValidator()
+    protected function getDateValidator(): ValidatorInterface
     {
         return new RegexValidator('/^[0-9]{4}\-W[0-9]{2}$/');
     }
 
     /**
      * Retrieves a DateStep Validator configured for a Week Input type
-     *
-     * @return ValidatorInterface
      */
-    protected function getStepValidator()
+    protected function getStepValidator(): ValidatorInterface
     {
-        $stepValue = isset($this->attributes['step']) ? $this->attributes['step'] : 1; // Weeks
+        $stepValue = $this->attributes['step'] ?? 1; // Weeks
 
-        $baseValue = isset($this->attributes['min']) ? $this->attributes['min'] : '1970-W01';
+        $baseValue = $this->attributes['min'] ?? '1970-W01';
 
         return new DateStepValidator([
             'format'    => 'Y-\WW',
@@ -50,14 +48,15 @@ class Week extends DateTime
 
     /**
      * @see https://bugs.php.net/bug.php?id=74511
+     *
      * @return array
      */
-    protected function getValidators()
+    protected function getValidators(): array
     {
         if ($this->validators) {
             return $this->validators;
         }
-        $validators = [];
+        $validators   = [];
         $validators[] = $this->getDateValidator();
         if (isset($this->attributes['min'])) {
             $validators[] = new GreaterThanValidator([
@@ -71,7 +70,8 @@ class Week extends DateTime
                 'inclusive' => true,
             ]);
         }
-        if (! isset($this->attributes['step'])
+        if (
+            ! isset($this->attributes['step'])
             || 'any' !== $this->attributes['step']
         ) {
             $validators[] = $this->getStepValidator();

@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Laminas\Form\Element;
 
 use DateInterval;
 use DateTimeZone;
-use Laminas\Form\Element\DateTime as DateTimeElement;
+use Laminas\Form\Element\AbstractDateTime as DateTimeElement;
 use Laminas\Validator\DateStep as DateStepValidator;
 use Laminas\Validator\ValidatorInterface;
 
@@ -12,8 +14,6 @@ use function date;
 
 class Date extends DateTimeElement
 {
-    const DATETIME_FORMAT = 'Y-m-d';
-
     /**
      * Seed attributes
      *
@@ -33,15 +33,13 @@ class Date extends DateTimeElement
 
     /**
      * Retrieves a DateStep Validator configured for a Date Input type
-     *
-     * @return ValidatorInterface
      */
-    protected function getStepValidator()
+    protected function getStepValidator(): ValidatorInterface
     {
         $format    = $this->getFormat();
-        $stepValue = isset($this->attributes['step']) ? $this->attributes['step'] : 1; // Days
+        $stepValue = $this->attributes['step'] ?? 1; // Days
 
-        $baseValue = isset($this->attributes['min']) ? $this->attributes['min'] : date($format, 0);
+        $baseValue = $this->attributes['min'] ?? date($format, 0);
 
         return new DateStepValidator([
             'format'    => $format,

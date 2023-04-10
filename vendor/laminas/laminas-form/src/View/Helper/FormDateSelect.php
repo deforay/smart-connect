@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Laminas\Form\View\Helper;
 
 use DateTime;
@@ -7,22 +9,47 @@ use IntlDateFormatter;
 use Laminas\Form\Element\DateSelect as DateSelectElement;
 use Laminas\Form\ElementInterface;
 use Laminas\Form\Exception;
-use Laminas\Form\View\Helper\FormMonthSelect as FormMonthSelectHelper;
 
 use function is_numeric;
 use function sprintf;
 
-class FormDateSelect extends FormMonthSelectHelper
+class FormDateSelect extends AbstractFormDateSelect
 {
+    /**
+     * Invoke helper as function
+     *
+     * Proxies to {@link render()}.
+     *
+     * @template T as null|ElementInterface
+     * @psalm-param T $element
+     * @psalm-return (T is null ? self : string)
+     * @return string|self
+     */
+    public function __invoke(
+        ?ElementInterface $element = null,
+        int $dateType = IntlDateFormatter::LONG,
+        ?string $locale = null
+    ) {
+        if (! $element) {
+            return $this;
+        }
+
+        $this->setDateType($dateType);
+
+        if ($locale !== null) {
+            $this->setLocale($locale);
+        }
+
+        return $this->render($element);
+    }
+
     /**
      * Render a date element that is composed of three selects
      *
-     * @param  ElementInterface $element
      * @throws Exception\InvalidArgumentException
      * @throws Exception\DomainException
-     * @return string
      */
-    public function render(ElementInterface $element)
+    public function render(ElementInterface $element): string
     {
         if (! $element instanceof DateSelectElement) {
             throw new Exception\InvalidArgumentException(sprintf(
@@ -56,7 +83,7 @@ class FormDateSelect extends FormMonthSelectHelper
             $monthElement->setEmptyOption('');
         }
 
-        $data = [];
+        $data                    = [];
         $data[$pattern['day']]   = $selectHelper->render($dayElement);
         $data[$pattern['month']] = $selectHelper->render($monthElement);
         $data[$pattern['year']]  = $selectHelper->render($yearElement);
@@ -80,16 +107,30 @@ class FormDateSelect extends FormMonthSelectHelper
      * @param  string $pattern Pattern to use for days
      * @return array
      */
-    protected function getDaysOptions($pattern)
+    protected function getDaysOptions(string $pattern): array
     {
-        $keyFormatter   = new IntlDateFormatter($this->getLocale(), null, null, null, null, 'dd');
-        $valueFormatter = new IntlDateFormatter($this->getLocale(), null, null, null, null, $pattern);
+        $keyFormatter   = new IntlDateFormatter(
+            $this->getLocale(),
+            IntlDateFormatter::NONE,
+            IntlDateFormatter::NONE,
+            null,
+            null,
+            'dd'
+        );
+        $valueFormatter = new IntlDateFormatter(
+            $this->getLocale(),
+            IntlDateFormatter::NONE,
+            IntlDateFormatter::NONE,
+            null,
+            null,
+            $pattern
+        );
         $date           = new DateTime('1970-01-01');
 
         $result = [];
         for ($day = 1; $day <= 31; $day++) {
-            $key   = $keyFormatter->format($date->getTimestamp());
-            $value = $valueFormatter->format($date->getTimestamp());
+            $key          = $keyFormatter->format($date->getTimestamp());
+            $value        = $valueFormatter->format($date->getTimestamp());
             $result[$key] = $value;
 
             $date->modify('+1 day');

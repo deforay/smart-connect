@@ -85,11 +85,11 @@ class Covid19FormService
 
                 try {
                     $id = $sampleDb->insertOrUpdate($data);
-                    if(isset($id) && is_numeric($id) && count($id) > 0){
+                    if (isset($id) && !empty($id) && is_numeric($id)) {
                         $dashDb = $this->sm->get('DashApiReceiverStatsTable');
                         $params = array(
-                            "table" => "dash_form_covid19", 
-                            "field" => "covid19_id", 
+                            "table" => "dash_form_covid19",
+                            "field" => "covid19_id",
                             "id" => $id
                         );
                         $dashDb->updateAttributes($params);
@@ -112,7 +112,7 @@ class Covid19FormService
             }
             $apiTrackData = array(
                 'tracking_id'                   => $apiData['timestamp'],
-                'received_on'                   => $this->commonService->getDateTime(),
+                'received_on'                   => \Application\Service\CommonService::getDateTime(),
                 'number_of_records_received'    => count($apiData['data']),
                 'number_of_records_processed'   => $numRows,
                 'source'                        => 'VLSM-Covid-19',
@@ -648,8 +648,6 @@ class Covid19FormService
                             }
                             $cellName = $sheet->getCellByColumnAndRow($colNo, $currentRow)->getColumn();
                             $sheet->getStyle($cellName . $currentRow)->applyFromArray($borderStyle);
-                            $sheet->getDefaultRowDimension()->setRowHeight(20);
-                            $sheet->getColumnDimensionByColumn($colNo)->setWidth(20);
                             $sheet->getStyleByColumnAndRow($colNo, $currentRow)->getAlignment()->setWrapText(true);
                             $colNo++;
                         }
@@ -1056,8 +1054,8 @@ class Covid19FormService
                     $sheet = $excel->getActiveSheet();
                     $output = array();
                     foreach ($sResult as $aRow) {
-                        $displayCollectionDate = $this->commonService->humanDateFormat($aRow['collectionDate']);
-                        $displayReceivedDate = $this->commonService->humanDateFormat($aRow['receivedDate']);
+                        $displayCollectionDate = \Application\Service\CommonService::humanReadableDateFormat($aRow['collectionDate']);
+                        $displayReceivedDate = \Application\Service\CommonService::humanReadableDateFormat($aRow['receivedDate']);
                         $row = array();
                         $row[] = $aRow['sample_code'];
                         $row[] = $displayCollectionDate;
@@ -1123,8 +1121,6 @@ class Covid19FormService
                             }
                             $cellName = $sheet->getCellByColumnAndRow($colNo, $currentRow)->getColumn();
                             $sheet->getStyle($cellName . $currentRow)->applyFromArray($borderStyle);
-                            $sheet->getDefaultRowDimension()->setRowHeight(20);
-                            $sheet->getColumnDimensionByColumn($colNo)->setWidth(20);
                             $sheet->getStyleByColumnAndRow($colNo, $currentRow)->getAlignment()->setWrapText(true);
                             $colNo++;
                         }
@@ -1238,10 +1234,10 @@ class Covid19FormService
                         $sampleCollectionDate = '';
                         $sampleTestedDate = '';
                         if (isset($aRow['sampleCollectionDate']) && $aRow['sampleCollectionDate'] != NULL && trim($aRow['sampleCollectionDate']) != "" && $aRow['sampleCollectionDate'] != '0000-00-00') {
-                            $sampleCollectionDate = $this->commonService->humanDateFormat($aRow['sampleCollectionDate']);
+                            $sampleCollectionDate = \Application\Service\CommonService::humanReadableDateFormat($aRow['sampleCollectionDate']);
                         }
                         if (isset($aRow['sampleTestingDate']) && $aRow['sampleTestingDate'] != NULL && trim($aRow['sampleTestingDate']) != "" && $aRow['sampleTestingDate'] != '0000-00-00') {
-                            $sampleTestedDate = $this->commonService->humanDateFormat($aRow['sampleTestingDate']);
+                            $sampleTestedDate = \Application\Service\CommonService::humanReadableDateFormat($aRow['sampleTestingDate']);
                         }
                         $row[] = $aRow['sample_code'];
                         $row[] = ucwords($aRow['facility_name']);
@@ -1332,8 +1328,6 @@ class Covid19FormService
                             }
                             $cellName = $sheet->getCellByColumnAndRow($colNo, $currentRow)->getColumn();
                             $sheet->getStyle($cellName . $currentRow)->applyFromArray($borderStyle);
-                            $sheet->getDefaultRowDimension()->setRowHeight(20);
-                            $sheet->getColumnDimensionByColumn($colNo)->setWidth(20);
                             $sheet->getStyleByColumnAndRow($colNo, $currentRow)->getAlignment()->setWrapText(true);
                             $colNo++;
                         }
@@ -1384,7 +1378,7 @@ class Covid19FormService
                         $row = array();
                         $sampleCollectionDate = '';
                         if (isset($aRow['sampleCollectionDate']) && $aRow['sampleCollectionDate'] != null && trim($aRow['sampleCollectionDate']) != "" && $aRow['sampleCollectionDate'] != '0000-00-00') {
-                            $sampleCollectionDate = $this->commonService->humanDateFormat($aRow['sampleCollectionDate']);
+                            $sampleCollectionDate = \Application\Service\CommonService::humanReadableDateFormat($aRow['sampleCollectionDate']);
                         }
                         $row[] = $sampleCollectionDate;
                         $row[] = $aRow['total_samples_received'];
@@ -1459,8 +1453,6 @@ class Covid19FormService
                             }
                             $cellName = $sheet->getCellByColumnAndRow($colNo, $currentRow)->getColumn();
                             $sheet->getStyle($cellName . $currentRow)->applyFromArray($borderStyle);
-                            $sheet->getDefaultRowDimension()->setRowHeight(20);
-                            $sheet->getColumnDimensionByColumn($colNo)->setWidth(20);
                             $sheet->getStyleByColumnAndRow($colNo, $currentRow)->getAlignment()->setWrapText(true);
                             $colNo++;
                         }
@@ -1527,7 +1519,7 @@ class Covid19FormService
             }
             foreach ($params['data'] as $key => $row) {
                 // Debug::dump($row);die;
-                if (!empty(trim($row['sample_code'])) && trim($params['api_version']) == $config['defaults']['vl-api-version']) {
+                if (!empty(trim($row['sample_code']))) {
                     $uniqueId = trim($row['unique_id']);
                     $sampleCode = trim($row['sample_code']);
                     $instanceCode = 'api-data';
@@ -1537,7 +1529,7 @@ class Covid19FormService
                     if (!$province) {
                         $provinceDb->insert(array(
                             'province_name'     => $row['health_centre_province'],
-                            'updated_datetime'  => $this->commonService->getDateTime()
+                            'updated_datetime'  => \Application\Service\CommonService::getDateTime()
                         ));
                         $province['province_id'] = $provinceDb->lastInsertValue;
                     }
@@ -1674,7 +1666,7 @@ class Covid19FormService
         // Track API Records
         $apiTrackData = array(
             'tracking_id'                   => $params['timestamp'],
-            'received_on'                   => $this->commonService->getDateTime(),
+            'received_on'                   => \Application\Service\CommonService::getDateTime(),
             'number_of_records_received'    => count($params['data']),
             'number_of_records_processed'   => (count($params['data']) - count($return)),
             'source'                        => 'API-COVID-19',

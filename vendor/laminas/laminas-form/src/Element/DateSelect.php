@@ -1,17 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Laminas\Form\Element;
 
-use ArrayAccess;
 use DateTime as PhpDateTime;
 use Exception;
 use Laminas\Form\Exception\InvalidArgumentException;
 use Laminas\Form\FormInterface;
 use Laminas\Validator\Date as DateValidator;
 use Laminas\Validator\ValidatorInterface;
-use Traversable;
 
 use function array_merge;
+use function is_array;
 use function is_string;
 use function sprintf;
 
@@ -27,10 +28,10 @@ class DateSelect extends MonthSelect
     /**
      * Constructor. Add the day select element
      *
-     * @param  null|int|string  $name    Optional name for the element
-     * @param  array            $options Optional options for the element
+     * @param  null|int|string $name    Optional name for the element
+     * @param  iterable        $options Optional options for the element
      */
-    public function __construct($name = null, $options = [])
+    public function __construct($name = null, iterable $options = [])
     {
         $this->dayElement = new Select('day');
 
@@ -41,10 +42,9 @@ class DateSelect extends MonthSelect
      * Accepted options for DateSelect (plus the ones from MonthSelect) :
      * - day_attributes: HTML attributes to be rendered with the day element
      *
-     * @param array|Traversable $options
      * @return $this
      */
-    public function setOptions($options)
+    public function setOptions(iterable $options)
     {
         parent::setOptions($options);
 
@@ -55,10 +55,7 @@ class DateSelect extends MonthSelect
         return $this;
     }
 
-    /**
-     * @return Select
-     */
-    public function getDayElement()
+    public function getDayElement(): Select
     {
         return $this->dayElement;
     }
@@ -68,7 +65,7 @@ class DateSelect extends MonthSelect
      *
      * @return array
      */
-    public function getElements()
+    public function getElements(): array
     {
         return array_merge([$this->dayElement], parent::getElements());
     }
@@ -90,14 +87,14 @@ class DateSelect extends MonthSelect
      *
      * @return array
      */
-    public function getDayAttributes()
+    public function getDayAttributes(): array
     {
         return $this->dayElement->getAttributes();
     }
 
     /**
-     * @param  string|array|ArrayAccess|PhpDateTime $value
-     * @return $this Provides a fluent interface
+     * @param  PhpDateTime|iterable|string|null|mixed $value
+     * @return $this
      * @throws InvalidArgumentException
      */
     public function setValue($value)
@@ -110,6 +107,10 @@ class DateSelect extends MonthSelect
             }
         }
 
+        if (null === $value && ! $this->shouldCreateEmptyOption()) {
+            $value = new PhpDateTime();
+        }
+
         if ($value instanceof PhpDateTime) {
             $value = [
                 'year'  => $value->format('Y'),
@@ -118,33 +119,36 @@ class DateSelect extends MonthSelect
             ];
         }
 
-        $this->yearElement->setValue($value['year']);
-        $this->monthElement->setValue($value['month']);
-        $this->dayElement->setValue($value['day']);
+        if (is_array($value)) {
+            $this->yearElement->setValue($value['year']);
+            $this->monthElement->setValue($value['month']);
+            $this->dayElement->setValue($value['day']);
+        } else {
+            $this->yearElement->setValue(null);
+            $this->monthElement->setValue(null);
+            $this->dayElement->setValue(null);
+        }
 
         return $this;
     }
 
-    /**
-     * @return String
-     */
-    public function getValue()
+    public function getValue(): ?string
     {
-        return sprintf(
-            '%s-%s-%s',
-            $this->getYearElement()->getValue(),
-            $this->getMonthElement()->getValue(),
-            $this->getDayElement()->getValue()
-        );
+        $year  = $this->getYearElement()->getValue();
+        $month = $this->getMonthElement()->getValue();
+        $day   = $this->getDayElement()->getValue();
+
+        if ($this->shouldCreateEmptyOption() && null === $year && null === $month && null === $day) {
+            return null;
+        }
+
+        return sprintf('%04d-%02d-%02d', $year, $month, $day);
     }
 
     /**
      * Prepare the form element (mostly used for rendering purposes)
-     *
-     * @param  FormInterface $form
-     * @return mixed
      */
-    public function prepareElement(FormInterface $form)
+    public function prepareElement(FormInterface $form): void
     {
         parent::prepareElement($form);
 
@@ -154,10 +158,8 @@ class DateSelect extends MonthSelect
 
     /**
      * Get validator
-     *
-     * @return ValidatorInterface
      */
-    protected function getValidator()
+    protected function getValidator(): ValidatorInterface
     {
         if (null === $this->validator) {
             $this->validator = new DateValidator(['format' => 'Y-m-d']);
@@ -172,12 +174,12 @@ class DateSelect extends MonthSelect
      *
      * @return array
      */
-    public function getInputSpecification()
+    public function getInputSpecification(): array
     {
         return [
-            'name' => $this->getName(),
-            'required' => false,
-            'filters' => [
+            'name'       => $this->getName(),
+            'required'   => false,
+            'filters'    => [
                 ['name' => 'DateSelect'],
             ],
             'validators' => [

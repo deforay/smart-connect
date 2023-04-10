@@ -1,15 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Laminas\Form;
 
-use Traversable;
-
 use function array_key_exists;
-use function get_class;
-use function gettype;
-use function is_array;
-use function is_object;
-use function sprintf;
 
 trait LabelAwareTrait
 {
@@ -18,7 +13,7 @@ trait LabelAwareTrait
      *
      * @var array
      */
-    protected $labelAttributes;
+    protected $labelAttributes = [];
 
     /**
      * Label specific options
@@ -44,7 +39,7 @@ trait LabelAwareTrait
      *
      * @return array
      */
-    public function getLabelAttributes()
+    public function getLabelAttributes(): array
     {
         return $this->labelAttributes;
     }
@@ -54,19 +49,11 @@ trait LabelAwareTrait
      *
      * Implementation will decide if this will overwrite or merge.
      *
-     * @param  array|Traversable $arrayOrTraversable
      * @return $this
      * @throws Exception\InvalidArgumentException
      */
-    public function setLabelOptions($arrayOrTraversable)
+    public function setLabelOptions(iterable $arrayOrTraversable)
     {
-        if (! is_array($arrayOrTraversable) && ! $arrayOrTraversable instanceof Traversable) {
-            throw new Exception\InvalidArgumentException(sprintf(
-                '%s expects an array or Traversable argument; received "%s"',
-                __METHOD__,
-                is_object($arrayOrTraversable) ? get_class($arrayOrTraversable) : gettype($arrayOrTraversable)
-            ));
-        }
         foreach ($arrayOrTraversable as $key => $value) {
             $this->setLabelOption($key, $value);
         }
@@ -78,7 +65,7 @@ trait LabelAwareTrait
      *
      * @return array
      */
-    public function getLabelOptions()
+    public function getLabelOptions(): array
     {
         return $this->labelOptions;
     }
@@ -112,11 +99,10 @@ trait LabelAwareTrait
     /**
      * Set a single label optionn
      *
-     * @param  string $key
      * @param  mixed  $value
      * @return $this
      */
-    public function setLabelOption($key, $value)
+    public function setLabelOption(string $key, $value)
     {
         $this->labelOptions[$key] = $value;
         return $this;
@@ -125,10 +111,9 @@ trait LabelAwareTrait
     /**
      * Retrieve a single label option
      *
-     * @param  $key
      * @return mixed|null
      */
-    public function getLabelOption($key)
+    public function getLabelOption(string $key)
     {
         if (! array_key_exists($key, $this->labelOptions)) {
             return null;
@@ -139,10 +124,9 @@ trait LabelAwareTrait
     /**
      * Remove a single label option
      *
-     * @param string $key
      * @return $this
      */
-    public function removeLabelOption($key)
+    public function removeLabelOption(string $key)
     {
         unset($this->labelOptions[$key]);
         return $this;
@@ -150,11 +134,8 @@ trait LabelAwareTrait
 
     /**
      * Does the element has a specific label option ?
-     *
-     * @param  string $key
-     * @return bool
      */
-    public function hasLabelOption($key)
+    public function hasLabelOption(string $key): bool
     {
         return array_key_exists($key, $this->labelOptions);
     }

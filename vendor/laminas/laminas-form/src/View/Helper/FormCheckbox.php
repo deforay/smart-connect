@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Laminas\Form\View\Helper;
 
 use Laminas\Form\Element\Checkbox as CheckboxElement;
@@ -13,12 +15,10 @@ class FormCheckbox extends FormInput
     /**
      * Render a form <input> element from the provided $element
      *
-     * @param  ElementInterface $element
      * @throws Exception\InvalidArgumentException
      * @throws Exception\DomainException
-     * @return string
      */
-    public function render(ElementInterface $element)
+    public function render(ElementInterface $element): string
     {
         if (! $element instanceof CheckboxElement) {
             throw new Exception\InvalidArgumentException(sprintf(
@@ -28,18 +28,18 @@ class FormCheckbox extends FormInput
         }
 
         $name = $element->getName();
-        if (empty($name) && $name !== 0) {
+        if ($name === null || $name === '') {
             throw new Exception\DomainException(sprintf(
                 '%s requires that the element has an assigned name; none discovered',
                 __METHOD__
             ));
         }
 
-        $attributes            = $element->getAttributes();
-        $attributes['name']    = $name;
-        $attributes['type']    = $this->getInputType();
-        $attributes['value']   = $element->getCheckedValue();
-        $closingBracket        = $this->getInlineClosingBracket();
+        $attributes          = $element->getAttributes();
+        $attributes['name']  = $name;
+        $attributes['type']  = $this->getInputType();
+        $attributes['value'] = $element->getCheckedValue();
+        $closingBracket      = $this->getInlineClosingBracket();
 
         if ($element->isChecked()) {
             $attributes['checked'] = 'checked';
@@ -53,7 +53,7 @@ class FormCheckbox extends FormInput
 
         if ($element->useHiddenElement()) {
             $hiddenAttributes = [
-                'disabled' => isset($attributes['disabled']) ? $attributes['disabled'] : false,
+                'disabled' => $attributes['disabled'] ?? false,
                 'name'     => $attributes['name'],
                 'value'    => $element->getUncheckedValue(),
             ];
@@ -70,10 +70,8 @@ class FormCheckbox extends FormInput
 
     /**
      * Return input type
-     *
-     * @return string
      */
-    protected function getInputType()
+    protected function getInputType(): string
     {
         return 'checkbox';
     }

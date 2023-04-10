@@ -1,18 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Laminas\Form;
 
-use Laminas\Code\Reflection\ClassReflection;
 use Laminas\Form\Element\Collection;
 use Laminas\Hydrator;
 use Laminas\Hydrator\HydratorAwareInterface;
 use Laminas\Hydrator\HydratorInterface;
 use Laminas\Stdlib\ArrayUtils;
 use Laminas\Stdlib\PriorityList;
+use ReflectionClass;
 use Traversable;
 
 use function array_key_exists;
-use function class_exists;
+use function assert;
 use function get_class;
 use function gettype;
 use function in_array;
@@ -23,35 +25,25 @@ use function sprintf;
 
 class Fieldset extends Element implements FieldsetInterface
 {
-    /**
-     * @var Factory
-     */
+    /** @var null|Factory */
     protected $factory;
 
-    /**
-     * @var array
-     */
-    protected $elements  = [];
+    /** @var array */
+    protected $elements = [];
 
-    /**
-     * @var array
-     */
+    /** @var FieldsetInterface[] */
     protected $fieldsets = [];
 
-    /**
-     * @var array
-     */
-    protected $messages  = [];
+    /** @var array */
+    protected $messages = [];
 
-    /**
-     * @var PriorityList
-     */
+    /** @var PriorityList */
     protected $iterator;
 
     /**
      * Hydrator to use with bound object
      *
-     * @var Hydrator\HydratorInterface
+     * @var null|Hydrator\HydratorInterface
      */
     protected $hydrator;
 
@@ -72,7 +64,7 @@ class Fieldset extends Element implements FieldsetInterface
     /**
      * The class or interface of objects that can be bound to this fieldset.
      *
-     * @var string
+     * @var null|class-string
      */
     protected $allowedObjectBindingClass;
 
@@ -80,7 +72,7 @@ class Fieldset extends Element implements FieldsetInterface
      * @param  null|int|string  $name    Optional name for the element
      * @param  array            $options Optional options for the element
      */
-    public function __construct($name = null, $options = [])
+    public function __construct($name = null, array $options = [])
     {
         $this->iterator = new PriorityList();
         $this->iterator->isLIFO(false);
@@ -91,11 +83,10 @@ class Fieldset extends Element implements FieldsetInterface
      * Set options for a fieldset. Accepted options are:
      * - use_as_base_fieldset: is this fieldset use as the base fieldset?
      *
-     * @param  array|Traversable $options
      * @return $this
      * @throws Exception\InvalidArgumentException
      */
-    public function setOptions($options)
+    public function setOptions(iterable $options)
     {
         parent::setOptions($options);
 
@@ -113,12 +104,11 @@ class Fieldset extends Element implements FieldsetInterface
     /**
      * Compose a form factory to use when calling add() with a non-element/fieldset
      *
-     * @param  Factory $factory
      * @return $this
      */
-    public function setFormFactory(Factory $factory)
+    public function setFormFactory(Factory $formFactory)
     {
-        $this->factory = $factory;
+        $this->factory = $formFactory;
         return $this;
     }
 
@@ -126,13 +116,12 @@ class Fieldset extends Element implements FieldsetInterface
      * Retrieve composed form factory
      *
      * Lazy-loads one if none present.
-     *
-     * @return Factory
      */
-    public function getFormFactory()
+    public function getFormFactory(): Factory
     {
         if (null === $this->factory) {
             $this->setFormFactory(new Factory());
+            assert(null !== $this->factory);
         }
 
         return $this->factory;
@@ -152,10 +141,11 @@ class Fieldset extends Element implements FieldsetInterface
      */
     public function add($elementOrFieldset, array $flags = [])
     {
-        if (is_array($elementOrFieldset)
+        if (
+            is_array($elementOrFieldset)
             || ($elementOrFieldset instanceof Traversable && ! $elementOrFieldset instanceof ElementInterface)
         ) {
-            $factory = $this->getFormFactory();
+            $factory           = $this->getFormFactory();
             $elementOrFieldset = $factory->create($elementOrFieldset);
         }
 
@@ -169,20 +159,18 @@ class Fieldset extends Element implements FieldsetInterface
         }
 
         $name = $elementOrFieldset->getName();
-        if ((null === $name || '' === $name)
-            && (! array_key_exists('name', $flags) || $flags['name'] === '')
-        ) {
-            throw new Exception\InvalidArgumentException(sprintf(
-                '%s: element or fieldset provided is not named, and no name provided in flags',
-                __METHOD__
-            ));
-        }
-
         if (array_key_exists('name', $flags) && $flags['name'] !== '') {
             $name = $flags['name'];
 
             // Rename the element or fieldset to the specified alias
             $elementOrFieldset->setName($name);
+        }
+
+        if (null === $name || '' === $name) {
+            throw new Exception\InvalidArgumentException(sprintf(
+                '%s: element or fieldset provided is not named, and no name provided in flags',
+                __METHOD__
+            ));
         }
         $order = 0;
         if (array_key_exists('priority', $flags)) {
@@ -202,11 +190,8 @@ class Fieldset extends Element implements FieldsetInterface
 
     /**
      * Does the fieldset have an element/fieldset by the given name?
-     *
-     * @param  string $elementOrFieldset
-     * @return bool
      */
-    public function has($elementOrFieldset)
+    public function has(string $elementOrFieldset): bool
     {
         return $this->iterator->get($elementOrFieldset) !== null;
     }
@@ -214,10 +199,9 @@ class Fieldset extends Element implements FieldsetInterface
     /**
      * Retrieve a named element or fieldset
      *
-     * @param  string $elementOrFieldset
-     * @return ElementInterface|FieldsetInterface
+     * @return FieldsetInterface|ElementInterface
      */
-    public function get($elementOrFieldset)
+    public function get(string $elementOrFieldset): ElementInterface
     {
         if (! $this->has($elementOrFieldset)) {
             throw new Exception\InvalidElementException(sprintf(
@@ -231,10 +215,9 @@ class Fieldset extends Element implements FieldsetInterface
     /**
      * Remove a named element or fieldset
      *
-     * @param  string $elementOrFieldset
      * @return $this
      */
-    public function remove($elementOrFieldset)
+    public function remove(string $elementOrFieldset)
     {
         if (! $this->has($elementOrFieldset)) {
             return $this;
@@ -254,11 +237,9 @@ class Fieldset extends Element implements FieldsetInterface
     /**
      * Set/change the priority of an element or fieldset
      *
-     * @param  string $elementOrFieldset
-     * @param  int    $priority
      * @return $this
      */
-    public function setPriority($elementOrFieldset, $priority)
+    public function setPriority(string $elementOrFieldset, int $priority)
     {
         $this->iterator->setPriority($elementOrFieldset, $priority);
         return $this;
@@ -268,10 +249,8 @@ class Fieldset extends Element implements FieldsetInterface
      * Retrieve all attached elements
      *
      * Storage is an implementation detail of the concrete class.
-     *
-     * @return array|Traversable
      */
-    public function getElements()
+    public function getElements(): array
     {
         return $this->elements;
     }
@@ -280,10 +259,8 @@ class Fieldset extends Element implements FieldsetInterface
      * Retrieve all attached fieldsets
      *
      * Storage is an implementation detail of the concrete class.
-     *
-     * @return array|Traversable
      */
-    public function getFieldsets()
+    public function getFieldsets(): array
     {
         return $this->fieldsets;
     }
@@ -291,27 +268,18 @@ class Fieldset extends Element implements FieldsetInterface
     /**
      * Set a hash of element names/messages to use when validation fails
      *
-     * @param  array|Traversable $messages
      * @return $this
      * @throws Exception\InvalidArgumentException
      */
-    public function setMessages($messages)
+    public function setMessages(iterable $messages)
     {
-        if (! is_array($messages) && ! $messages instanceof Traversable) {
-            throw new Exception\InvalidArgumentException(sprintf(
-                '%s expects an array or Traversable object of messages; received "%s"',
-                __METHOD__,
-                is_object($messages) ? get_class($messages) : gettype($messages)
-            ));
-        }
-
         foreach ($messages as $key => $messageSet) {
-            if (! $this->has($key)) {
+            if (! $this->has((string) $key)) {
                 $this->messages[$key] = $messageSet;
                 continue;
             }
 
-            $element = $this->get($key);
+            $element = $this->get((string) $key);
             $element->setMessages($messageSet);
         }
 
@@ -325,17 +293,16 @@ class Fieldset extends Element implements FieldsetInterface
      * validation, or, if $elementName is provided, messages for that element
      * only.
      *
-     * @param  null|string $elementName
-     * @return array|Traversable
      * @throws Exception\InvalidArgumentException
      */
-    public function getMessages($elementName = null)
+    public function getMessages(?string $elementName = null): array
     {
         if (null === $elementName) {
             $messages = $this->messages;
             foreach ($this->iterator as $name => $element) {
                 $messageSet = $element->getMessages();
-                if (empty($messageSet)
+                if (
+                    empty($messageSet)
                     || (! is_array($messageSet) && ! $messageSet instanceof Traversable)
                 ) {
                     continue;
@@ -360,11 +327,8 @@ class Fieldset extends Element implements FieldsetInterface
     /**
      * Ensures state is ready for use. Here, we append the name of the fieldsets to every elements in order to avoid
      * name clashes if the same fieldset is used multiple times
-     *
-     * @param  FormInterface $form
-     * @return void
      */
-    public function prepareElement(FormInterface $form)
+    public function prepareElement(FormInterface $form): void
     {
         $name = $this->getName();
 
@@ -381,20 +345,13 @@ class Fieldset extends Element implements FieldsetInterface
     /**
      * Recursively populate values of attached elements and fieldsets
      *
-     * @param  array|Traversable $data
-     * @return void
+     * @param  iterable $data
      * @throws Exception\InvalidArgumentException
      */
-    public function populateValues($data)
+    public function populateValues(iterable $data): void
     {
         if ($data instanceof Traversable) {
             $data = ArrayUtils::iteratorToArray($data);
-        } elseif (! is_array($data)) {
-            throw new Exception\InvalidArgumentException(sprintf(
-                '%s expects an array or Traversable set of data; received "%s"',
-                __METHOD__,
-                is_object($data) ? get_class($data) : gettype($data)
-            ));
         }
 
         foreach ($this->iterator as $name => $elementOrFieldset) {
@@ -427,20 +384,16 @@ class Fieldset extends Element implements FieldsetInterface
 
     /**
      * Countable: return count of attached elements/fieldsets
-     *
-     * @return int
      */
-    public function count()
+    public function count(): int
     {
         return $this->iterator->count();
     }
 
     /**
      * IteratorAggregate: return internal iterator
-     *
-     * @return PriorityList
      */
-    public function getIterator()
+    public function getIterator(): PriorityList
     {
         return $this->iterator;
     }
@@ -479,9 +432,9 @@ class Fieldset extends Element implements FieldsetInterface
     /**
      * Set the class or interface of objects that can be bound to this fieldset.
      *
-     * @param string $allowObjectBindingClass
+     * @param null|class-string $allowObjectBindingClass
      */
-    public function setAllowedObjectBindingClass($allowObjectBindingClass)
+    public function setAllowedObjectBindingClass(?string $allowObjectBindingClass): void
     {
         $this->allowedObjectBindingClass = $allowObjectBindingClass;
     }
@@ -489,9 +442,9 @@ class Fieldset extends Element implements FieldsetInterface
     /**
      * Get The class or interface of objects that can be bound to this fieldset.
      *
-     * @return string
+     * @return null|class-string
      */
-    public function allowedObjectBindingClass()
+    public function allowedObjectBindingClass(): ?string
     {
         return $this->allowedObjectBindingClass;
     }
@@ -499,17 +452,17 @@ class Fieldset extends Element implements FieldsetInterface
     /**
      * Checks if the object can be set in this fieldset
      *
-     * @param object $object
-     * @return bool
+     * @param object|array $object
      */
-    public function allowObjectBinding($object)
+    public function allowObjectBinding($object): bool
     {
-        $validBindingClass = false;
-        if (is_object($object) && $this->allowedObjectBindingClass()) {
-            $objectClass = ltrim($this->allowedObjectBindingClass(), '\\');
-            $reflection = new ClassReflection($object);
-            $validBindingClass = $reflection->getName() == $objectClass
-                || $reflection->isSubclassOf($this->allowedObjectBindingClass());
+        $validBindingClass         = false;
+        $allowedObjectBindingClass = $this->allowedObjectBindingClass();
+        if (is_object($object) && $allowedObjectBindingClass !== null) {
+            $objectClass       = ltrim($allowedObjectBindingClass, '\\');
+            $reflection        = new ReflectionClass($object);
+            $validBindingClass = $reflection->getName() === $objectClass
+                || $reflection->isSubclassOf($allowedObjectBindingClass);
         }
 
         return $validBindingClass || ($this->object && $object instanceof $this->object);
@@ -518,7 +471,6 @@ class Fieldset extends Element implements FieldsetInterface
     /**
      * Set the hydrator to use when binding an object to the element
      *
-     * @param  HydratorInterface $hydrator
      * @return $this
      */
     public function setHydrator(HydratorInterface $hydrator)
@@ -528,37 +480,50 @@ class Fieldset extends Element implements FieldsetInterface
     }
 
     /**
+     * Set the hydrator by name to use when binding an object to the element.
+     *
+     * The form element manager {@see FormElementManager} is used via the
+     * form factory {@see Factory} to fetch the hydrator.
+     *
+     * @throws Exception\DomainException If hydrator is not found in hydrator
+     *                                   manager or service manager.
+     */
+    public function setHydratorByName(string $hydratorName): void
+    {
+        $this->setHydrator(
+            $this->getFormFactory()
+                ->getFormElementManager()
+                ->getHydratorFromName($hydratorName)
+        );
+    }
+
+    /**
      * Get the hydrator used when binding an object to the fieldset
      *
      * If no hydrator is present and object implements HydratorAwareInterface,
      * hydrator will be retrieved from the object.
      *
      * Will lazy-load Hydrator\ArraySerializable if none is present.
-     *
-     * @return HydratorInterface
      */
-    public function getHydrator()
+    public function getHydrator(): HydratorInterface
     {
         if (! $this->hydrator instanceof HydratorInterface) {
             if ($this->object instanceof HydratorAwareInterface) {
-                $this->setHydrator($this->object->getHydrator());
+                $hydrator = $this->object->getHydrator();
+                assert($hydrator !== null);
+                $this->setHydrator($hydrator);
             } else {
-                $this->setHydrator(
-                    class_exists(Hydrator\ArraySerializableHydrator::class)
-                        ? new Hydrator\ArraySerializableHydrator()
-                        : new Hydrator\ArraySerializable()
-                );
+                $this->setHydrator(new Hydrator\ArraySerializableHydrator());
             }
+            assert(null !== $this->hydrator);
         }
         return $this->hydrator;
     }
 
     /**
      * Checks if this fieldset can bind data
-     *
-     * @return bool
      */
-    public function allowValueBinding()
+    public function allowValueBinding(): bool
     {
         return is_object($this->object);
     }
@@ -570,14 +535,15 @@ class Fieldset extends Element implements FieldsetInterface
      * @param  array|null $validationGroup
      * @return mixed
      */
-    public function bindValues(array $values = [], array $validationGroup = null)
+    public function bindValues(array $values = [], ?array $validationGroup = null)
     {
-        $objectData = $this->extract();
-        $hydrator = $this->getHydrator();
+        $objectData     = $this->extract();
+        $hydrator       = $this->getHydrator();
         $hydratableData = [];
 
         foreach ($this->iterator as $name => $element) {
-            if ($validationGroup
+            if (
+                $validationGroup
                 && (! array_key_exists($name, $validationGroup) && ! in_array($name, $validationGroup))
             ) {
                 continue;
@@ -615,21 +581,18 @@ class Fieldset extends Element implements FieldsetInterface
     /**
      * Set if this fieldset is used as a base fieldset
      *
-     * @param  bool $useAsBaseFieldset
      * @return $this
      */
-    public function setUseAsBaseFieldset($useAsBaseFieldset)
+    public function setUseAsBaseFieldset(bool $useAsBaseFieldset)
     {
-        $this->useAsBaseFieldset = (bool) $useAsBaseFieldset;
+        $this->useAsBaseFieldset = $useAsBaseFieldset;
         return $this;
     }
 
     /**
      * Is this fieldset use as a base fieldset for a form ?
-     *
-     * @return bool
      */
-    public function useAsBaseFieldset()
+    public function useAsBaseFieldset(): bool
     {
         return $this->useAsBaseFieldset;
     }
@@ -639,32 +602,22 @@ class Fieldset extends Element implements FieldsetInterface
      *
      * @return array
      */
-    protected function extract()
+    protected function extract(): array
     {
         if (! is_object($this->object)) {
             return [];
         }
 
-        $hydrator = $this->getHydrator();
-        if (! $hydrator instanceof Hydrator\HydratorInterface) {
-            return [];
-        }
-
-        $values = $hydrator->extract($this->object);
-
-        if (! is_array($values)) {
-            // Do nothing if the hydrator returned a non-array
-            return [];
-        }
+        $values = $this->getHydrator()->extract($this->object);
 
         // Recursively extract and populate values for nested fieldsets
         foreach ($this->fieldsets as $fieldset) {
-            $name = $fieldset->getName();
+            $name = (string) $fieldset->getName();
 
             if (isset($values[$name])) {
                 $object = $values[$name];
 
-                if ($fieldset->allowObjectBinding($object)) {
+                if ($fieldset instanceof Fieldset && $fieldset->allowObjectBinding($object)) {
                     $fieldset->setObject($object);
                     $values[$name] = $fieldset->extract();
                 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Laminas\Form\Annotation;
 
 use ArrayAccess;
@@ -12,6 +14,7 @@ use Laminas\InputFilter\InputFilter;
 use Laminas\Stdlib\ArrayObject;
 
 use function array_merge;
+use function assert;
 use function is_array;
 
 /**
@@ -36,7 +39,7 @@ use function is_array;
  * work with the annotation values, as well as the element and input specification
  * passed in the event object.
  */
-class ElementAnnotationsListener extends AbstractAnnotationsListener
+final class ElementAnnotationsListener extends AbstractAnnotationsListener
 {
     /**
      * {@inheritDoc}
@@ -52,7 +55,7 @@ class ElementAnnotationsListener extends AbstractAnnotationsListener
         $this->listeners[] = $events->attach('configureElement', [$this, 'handleFlagsAnnotation'], $priority);
         $this->listeners[] = $events->attach('configureElement', [$this, 'handleHydratorAnnotation'], $priority);
         $this->listeners[] = $events->attach('configureElement', [$this, 'handleInputAnnotation'], $priority);
-        $this->listeners[] = $events->attach('configureElement', [$this, 'handleObjectAnnotation'], $priority);
+        $this->listeners[] = $events->attach('configureElement', [$this, 'handleInstanceAnnotation'], $priority);
         $this->listeners[] = $events->attach('configureElement', [$this, 'handleOptionsAnnotation'], $priority);
         $this->listeners[] = $events->attach('configureElement', [$this, 'handleRequiredAnnotation'], $priority);
         $this->listeners[] = $events->attach('configureElement', [$this, 'handleTypeAnnotation'], $priority);
@@ -68,18 +71,15 @@ class ElementAnnotationsListener extends AbstractAnnotationsListener
      * Handle the AllowEmpty annotation
      *
      * Sets the allow_empty flag on the input specification array.
-     *
-     * @param  EventInterface $e
-     * @return void
      */
-    public function handleAllowEmptyAnnotation($e)
+    public function handleAllowEmptyAnnotation(EventInterface $e): void
     {
         $annotation = $e->getParam('annotation');
         if (! $annotation instanceof AllowEmpty) {
             return;
         }
 
-        $inputSpec = $e->getParam('inputSpec');
+        $inputSpec                = $e->getParam('inputSpec');
         $inputSpec['allow_empty'] = true;
     }
 
@@ -87,11 +87,8 @@ class ElementAnnotationsListener extends AbstractAnnotationsListener
      * Handle the Attributes annotation
      *
      * Sets the attributes array of the element specification.
-     *
-     * @param  EventInterface $e
-     * @return void
      */
-    public function handleAttributesAnnotation($e)
+    public function handleAttributesAnnotation(EventInterface $e): void
     {
         $annotation = $e->getParam('annotation');
         if (! $annotation instanceof Attributes) {
@@ -112,11 +109,8 @@ class ElementAnnotationsListener extends AbstractAnnotationsListener
 
     /**
      * Allow creating fieldsets from composed entity properties
-     *
-     * @param  EventInterface $e
-     * @return void
      */
-    public function handleComposedObjectAnnotation($e)
+    public function handleComposedObjectAnnotation(EventInterface $e): void
     {
         $annotation = $e->getParam('annotation');
         if (! $annotation instanceof ComposedObject) {
@@ -147,8 +141,10 @@ class ElementAnnotationsListener extends AbstractAnnotationsListener
 
             $elementSpec['spec']['type'] = Collection::class;
             $elementSpec['spec']['name'] = $name;
+
             $elementSpec['spec']['options'] = new ArrayObject($this->mergeOptions($elementSpec, $annotation));
-            $elementSpec['spec']['options']['target_element'] = $specification;
+
+            $elementSpec['spec']['options']['target_element']                                 = $specification;
             $elementSpec['spec']['options']['target_element']['options']['input_filter_spec'] = $inputFilter;
 
             if (isset($specification['hydrator'])) {
@@ -169,13 +165,13 @@ class ElementAnnotationsListener extends AbstractAnnotationsListener
             }
 
             if (isset($elementSpec['spec']['options'])) {
-                $specification['options'] = isset($specification['options']) ? $specification['options'] : [];
-                $specification['options'] = array_merge($elementSpec['spec']['options'], $specification['options']);
+                $specification['options'] ??= [];
+                $specification['options']   = array_merge($elementSpec['spec']['options'], $specification['options']);
             }
 
             // Add element spec:
-            $elementSpec['spec'] = $specification;
-            $elementSpec['spec']['name'] = $name;
+            $elementSpec['spec']            = $specification;
+            $elementSpec['spec']['name']    = $name;
             $elementSpec['spec']['options'] = new ArrayObject($this->mergeOptions($elementSpec, $annotation));
         }
     }
@@ -184,18 +180,15 @@ class ElementAnnotationsListener extends AbstractAnnotationsListener
      * Handle the ContinueIfEmpty annotation
      *
      * Sets the continue_if_empty flag on the input specification array.
-     *
-     * @param  EventInterface $e
-     * @return void
      */
-    public function handleContinueIfEmptyAnnotation($e)
+    public function handleContinueIfEmptyAnnotation(EventInterface $e): void
     {
         $annotation = $e->getParam('annotation');
         if (! $annotation instanceof ContinueIfEmpty) {
             return;
         }
 
-        $inputSpec = $e->getParam('inputSpec');
+        $inputSpec                      = $e->getParam('inputSpec');
         $inputSpec['continue_if_empty'] = true;
     }
 
@@ -203,30 +196,26 @@ class ElementAnnotationsListener extends AbstractAnnotationsListener
      * Handle the ErrorMessage annotation
      *
      * Sets the error_message of the input specification.
-     *
-     * @param  EventInterface $e
-     * @return void
      */
-    public function handleErrorMessageAnnotation($e)
+    public function handleErrorMessageAnnotation(EventInterface $e): void
     {
         $annotation = $e->getParam('annotation');
         if (! $annotation instanceof ErrorMessage) {
             return;
         }
 
-        $inputSpec = $e->getParam('inputSpec');
+        $inputSpec                  = $e->getParam('inputSpec');
         $inputSpec['error_message'] = $annotation->getMessage();
     }
 
     /**
      * Determine if the element has been marked to exclude from the definition
-     *
-     * @param  EventInterface $e
-     * @return bool
      */
-    public function handleExcludeAnnotation($e)
+    public function handleExcludeAnnotation(EventInterface $e): bool
     {
         $annotations = $e->getParam('annotations');
+        assert($annotations instanceof AnnotationCollection);
+
         if ($annotations->hasAnnotation(Exclude::class)) {
             return true;
         }
@@ -237,11 +226,8 @@ class ElementAnnotationsListener extends AbstractAnnotationsListener
      * Handle the Filter annotation
      *
      * Adds a filter to the filter chain specification for the input.
-     *
-     * @param  EventInterface $e
-     * @return void
      */
-    public function handleFilterAnnotation($e)
+    public function handleFilterAnnotation(EventInterface $e): void
     {
         $annotation = $e->getParam('annotation');
         if (! $annotation instanceof Filter) {
@@ -252,7 +238,7 @@ class ElementAnnotationsListener extends AbstractAnnotationsListener
         if (! isset($inputSpec['filters'])) {
             $inputSpec['filters'] = [];
         }
-        $inputSpec['filters'][] = $annotation->getFilter();
+        $inputSpec['filters'][] = $annotation->getFilterSpecification();
     }
 
     /**
@@ -260,18 +246,15 @@ class ElementAnnotationsListener extends AbstractAnnotationsListener
      *
      * Sets the element flags in the specification (used typically for setting
      * priority).
-     *
-     * @param  EventInterface $e
-     * @return void
      */
-    public function handleFlagsAnnotation($e)
+    public function handleFlagsAnnotation(EventInterface $e): void
     {
         $annotation = $e->getParam('annotation');
         if (! $annotation instanceof Flags) {
             return;
         }
 
-        $elementSpec = $e->getParam('elementSpec');
+        $elementSpec          = $e->getParam('elementSpec');
         $elementSpec['flags'] = $annotation->getFlags();
     }
 
@@ -279,19 +262,16 @@ class ElementAnnotationsListener extends AbstractAnnotationsListener
      * Handle the Hydrator annotation
      *
      * Sets the hydrator class to use in the fieldset specification.
-     *
-     * @param  EventInterface $e
-     * @return void
      */
-    public function handleHydratorAnnotation($e)
+    public function handleHydratorAnnotation(EventInterface $e): void
     {
         $annotation = $e->getParam('annotation');
         if (! $annotation instanceof Hydrator) {
             return;
         }
 
-        $elementSpec = $e->getParam('elementSpec');
-        $elementSpec['spec']['hydrator'] = $annotation->getHydrator();
+        $elementSpec                     = $e->getParam('elementSpec');
+        $elementSpec['spec']['hydrator'] = $annotation->getHydratorSpecification();
     }
 
     /**
@@ -299,58 +279,47 @@ class ElementAnnotationsListener extends AbstractAnnotationsListener
      *
      * Sets the filter specification for the current element to the specified
      * input class name.
-     *
-     * @param  EventInterface $e
-     * @return void
      */
-    public function handleInputAnnotation($e)
+    public function handleInputAnnotation(EventInterface $e): void
     {
         $annotation = $e->getParam('annotation');
         if (! $annotation instanceof Input) {
             return;
         }
 
-        $inputSpec = $e->getParam('inputSpec');
+        $inputSpec         = $e->getParam('inputSpec');
         $inputSpec['type'] = $annotation->getInput();
     }
 
     /**
-     * Handle the Object and Instance annotations
+     * Handle the Instance annotations
      *
      * Sets the object to bind to the form or fieldset
-     *
-     * @param  EventInterface $e
-     * @return void
      */
-    public function handleObjectAnnotation($e)
+    public function handleInstanceAnnotation(EventInterface $e): void
     {
         $annotation = $e->getParam('annotation');
-
-        // Only need to typehint on Instance, as Object extends it
         if (! $annotation instanceof Instance) {
             return;
         }
 
-        $elementSpec = $e->getParam('elementSpec');
-        $elementSpec['spec']['object'] = $annotation->getObject();
+        $elementSpec                   = $e->getParam('elementSpec');
+        $elementSpec['spec']['object'] = $annotation->getInstance();
     }
 
     /**
      * Handle the Options annotation
      *
      * Sets the element options in the specification.
-     *
-     * @param  EventInterface $e
-     * @return void
      */
-    public function handleOptionsAnnotation($e)
+    public function handleOptionsAnnotation(EventInterface $e): void
     {
         $annotation = $e->getParam('annotation');
         if (! $annotation instanceof Options) {
             return;
         }
 
-        $elementSpec = $e->getParam('elementSpec');
+        $elementSpec                    = $e->getParam('elementSpec');
         $elementSpec['spec']['options'] = $this->mergeOptions($elementSpec, $annotation);
     }
 
@@ -358,19 +327,16 @@ class ElementAnnotationsListener extends AbstractAnnotationsListener
      * Handle the Required annotation
      *
      * Sets the required flag on the input based on the annotation value.
-     *
-     * @param  EventInterface $e
-     * @return void
      */
-    public function handleRequiredAnnotation($e)
+    public function handleRequiredAnnotation(EventInterface $e): void
     {
         $annotation = $e->getParam('annotation');
         if (! $annotation instanceof Required) {
             return;
         }
 
-        $required  = (bool) $annotation->getRequired();
-        $inputSpec = $e->getParam('inputSpec');
+        $required              = $annotation->getRequired();
+        $inputSpec             = $e->getParam('inputSpec');
         $inputSpec['required'] = $required;
 
         if ($required) {
@@ -387,18 +353,15 @@ class ElementAnnotationsListener extends AbstractAnnotationsListener
      * Handle the Type annotation
      *
      * Sets the element class type to use in the element specification.
-     *
-     * @param  EventInterface $e
-     * @return void
      */
-    public function handleTypeAnnotation($e)
+    public function handleTypeAnnotation(EventInterface $e): void
     {
         $annotation = $e->getParam('annotation');
         if (! $annotation instanceof Type) {
             return;
         }
 
-        $elementSpec = $e->getParam('elementSpec');
+        $elementSpec                 = $e->getParam('elementSpec');
         $elementSpec['spec']['type'] = $annotation->getType();
     }
 
@@ -406,11 +369,8 @@ class ElementAnnotationsListener extends AbstractAnnotationsListener
      * Handle the Validator annotation
      *
      * Adds a validator to the validator chain of the input specification.
-     *
-     * @param  EventInterface $e
-     * @return void
      */
-    public function handleValidatorAnnotation($e)
+    public function handleValidatorAnnotation(EventInterface $e): void
     {
         $annotation = $e->getParam('annotation');
         if (! $annotation instanceof Validator) {
@@ -421,16 +381,15 @@ class ElementAnnotationsListener extends AbstractAnnotationsListener
         if (! isset($inputSpec['validators'])) {
             $inputSpec['validators'] = [];
         }
-        $inputSpec['validators'][] = $annotation->getValidator();
+        $inputSpec['validators'][] = $annotation->getValidatorSpecification();
     }
 
     /**
      * @param array|ArrayAccess      $elementSpec
      * @param ComposedObject|Options $annotation
-     *
      * @return array
      */
-    private function mergeOptions($elementSpec, $annotation)
+    private function mergeOptions($elementSpec, $annotation): array
     {
         if (isset($elementSpec['spec']['options'])) {
             if (is_array($elementSpec['spec']['options'])) {

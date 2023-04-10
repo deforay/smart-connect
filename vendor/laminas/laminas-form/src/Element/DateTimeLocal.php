@@ -1,17 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Laminas\Form\Element;
 
 use DateInterval;
 use Laminas\Validator\DateStep as DateStepValidator;
 use Laminas\Validator\ValidatorInterface;
 
-class DateTimeLocal extends DateTime
+class DateTimeLocal extends AbstractDateTime
 {
-    const DATETIME_LOCAL_FORMAT = 'Y-m-d\TH:i';
-
-    const DATETIME_FORMAT = self::DATETIME_LOCAL_FORMAT;
-
     /**
      * Seed attributes
      *
@@ -24,18 +22,16 @@ class DateTimeLocal extends DateTime
     /**
      * {@inheritDoc}
      */
-    protected $format = self::DATETIME_LOCAL_FORMAT;
+    protected $format = 'Y-m-d\TH:i';
 
     /**
      * Retrieves a DateStepValidator configured for a Date Input type
-     *
-     * @return ValidatorInterface
      */
-    protected function getStepValidator()
+    protected function getStepValidator(): ValidatorInterface
     {
-        $stepValue = isset($this->attributes['step']) ? $this->attributes['step'] : 1; // Minutes
+        $stepValue = $this->attributes['step'] ?? 1; // Minutes
 
-        $baseValue = isset($this->attributes['min']) ? $this->attributes['min'] : '1970-01-01T00:00';
+        $baseValue = $this->attributes['min'] ?? '1970-01-01T00:00';
 
         return new DateStepValidator([
             'format'    => $this->format,

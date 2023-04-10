@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Laminas\Form\Element;
 
 use DateInterval;
@@ -8,10 +10,8 @@ use Laminas\Validator\ValidatorInterface;
 
 use function date;
 
-class Time extends DateTime
+class Time extends AbstractDateTime
 {
-    const DATETIME_FORMAT = 'H:i:s';
-
     /**
      * Seed attributes
      *
@@ -23,21 +23,20 @@ class Time extends DateTime
 
     /**
      * Default date format
+     *
      * @var string
      */
     protected $format = 'H:i:s';
 
     /**
      * Retrieves a DateStepValidator configured for a Date Input type
-     *
-     * @return ValidatorInterface
      */
-    protected function getStepValidator()
+    protected function getStepValidator(): ValidatorInterface
     {
         $format    = $this->getFormat();
-        $stepValue = isset($this->attributes['step']) ? $this->attributes['step'] : 60; // Seconds
+        $stepValue = $this->attributes['step'] ?? 60; // Seconds
 
-        $baseValue = isset($this->attributes['min']) ? $this->attributes['min'] : date($format, 0);
+        $baseValue = $this->attributes['min'] ?? date($format, 0);
 
         return new DateStepValidator([
             'format'    => $format,

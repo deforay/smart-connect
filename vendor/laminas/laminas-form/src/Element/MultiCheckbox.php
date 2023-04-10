@@ -1,14 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Laminas\Form\Element;
 
-use Laminas\Form\ElementInterface;
 use Laminas\Form\Exception\InvalidArgumentException;
 use Laminas\Validator\Explode as ExplodeValidator;
 use Laminas\Validator\InArray as InArrayValidator;
 use Laminas\Validator\ValidatorInterface;
-use Traversable;
 
+use function assert;
 use function is_array;
 
 class MultiCheckbox extends Checkbox
@@ -22,30 +23,22 @@ class MultiCheckbox extends Checkbox
         'type' => 'multi_checkbox',
     ];
 
-    /**
-     * @var bool
-     */
+    /** @var bool */
     protected $disableInArrayValidator = false;
 
-    /**
-     * @var bool
-     */
+    /** @var bool */
     protected $useHiddenElement = false;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $uncheckedValue = '';
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $valueOptions = [];
 
     /**
      * @return array
      */
-    public function getValueOptions()
+    public function getValueOptions(): array
     {
         return $this->valueOptions;
     }
@@ -61,6 +54,7 @@ class MultiCheckbox extends Checkbox
         // Update Explode validator haystack
         if ($this->validator instanceof ExplodeValidator) {
             $validator = $this->validator->getValidator();
+            assert($validator instanceof InArrayValidator);
             $validator->setHaystack($this->getValueOptionsValues());
         }
 
@@ -68,10 +62,9 @@ class MultiCheckbox extends Checkbox
     }
 
     /**
-     * @param string $key
      * @return $this
      */
-    public function unsetValueOption($key)
+    public function unsetValueOption(string $key)
     {
         if (isset($this->valueOptions[$key])) {
             unset($this->valueOptions[$key]);
@@ -86,11 +79,10 @@ class MultiCheckbox extends Checkbox
      * - label_attributes: attributes to use when the label is rendered
      * - value_options: list of values and labels for the select options
      *
-     * @param  array|Traversable $options
-     * @return MultiCheckbox|ElementInterface
+     * @return $this
      * @throws InvalidArgumentException
      */
-    public function setOptions($options)
+    public function setOptions(iterable $options)
     {
         parent::setOptions($options);
 
@@ -111,11 +103,10 @@ class MultiCheckbox extends Checkbox
     /**
      * Set a single element attribute
      *
-     * @param  string $key
      * @param  mixed  $value
      * @return $this
      */
-    public function setAttribute($key, $value)
+    public function setAttribute(string $key, $value)
     {
         // Do not include the options in the list of attributes
         // TODO: Deprecate this
@@ -129,38 +120,33 @@ class MultiCheckbox extends Checkbox
     /**
      * Set the flag to allow for disabling the automatic addition of an InArray validator.
      *
-     * @param  bool $disableOption
      * @return $this
      */
-    public function setDisableInArrayValidator($disableOption)
+    public function setDisableInArrayValidator(bool $disableOption)
     {
-        $this->disableInArrayValidator = (bool) $disableOption;
+        $this->disableInArrayValidator = $disableOption;
         return $this;
     }
 
     /**
      * Get the disable in array validator flag.
-     *
-     * @return bool
      */
-    public function disableInArrayValidator()
+    public function disableInArrayValidator(): bool
     {
         return $this->disableInArrayValidator;
     }
 
     /**
      * Get validator
-     *
-     * @return ValidatorInterface
      */
-    protected function getValidator()
+    protected function getValidator(): ?ValidatorInterface
     {
         if (null === $this->validator && ! $this->disableInArrayValidator()) {
             $inArrayValidator = new InArrayValidator([
-                'haystack'  => $this->getValueOptionsValues(),
-                'strict'    => false,
+                'haystack' => $this->getValueOptionsValues(),
+                'strict'   => false,
             ]);
-            $this->validator = new ExplodeValidator([
+            $this->validator  = new ExplodeValidator([
                 'validator'      => $inArrayValidator,
                 'valueDelimiter' => null, // skip explode if only one value
             ]);
@@ -173,12 +159,12 @@ class MultiCheckbox extends Checkbox
      *
      * @return array
      */
-    protected function getValueOptionsValues()
+    protected function getValueOptionsValues(): array
     {
-        $values = [];
+        $values  = [];
         $options = $this->getValueOptions();
         foreach ($options as $key => $optionSpec) {
-            $value = is_array($optionSpec) ? $optionSpec['value'] : $key;
+            $value    = is_array($optionSpec) ? $optionSpec['value'] : $key;
             $values[] = $value;
         }
         if ($this->useHiddenElement()) {

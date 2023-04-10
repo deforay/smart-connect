@@ -6,6 +6,7 @@
  * This should be an array of module namespaces used in the application.
  */
 return [
+    'Laminas\Mail',
     'Laminas\Cache',
     'Laminas\Serializer',
     'Laminas\Mvc\Plugin\FilePrg',
@@ -15,7 +16,6 @@ return [
     'Laminas\Session',
     'Laminas\Mvc\Middleware',
     'Laminas\Mvc\I18n',
-    'Laminas\Form',
     'Laminas\I18n',
     'Laminas\Log',
     'Laminas\InputFilter',

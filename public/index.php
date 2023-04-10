@@ -13,18 +13,6 @@ if (php_sapi_name() === 'cli-server') {
     }
     unset($path);
 }
-defined('APPLICATION_PATH')
-    || define('APPLICATION_PATH', realpath(dirname(__FILE__)));
-
-defined('UPLOAD_PATH')
-    || define('UPLOAD_PATH', realpath(dirname(__FILE__) . '/uploads'));
-    
-defined('TEMP_UPLOAD_PATH')
-    || define('TEMP_UPLOAD_PATH', realpath(dirname(__FILE__) . '/temporary'));
-
-defined('CRON_PATH')
-    || define('CRON_PATH', realpath(dirname(__FILE__) . '/cron')); 
-
 
 // Setup autoloading
 require 'init_autoloader.php';

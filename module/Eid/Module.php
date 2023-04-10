@@ -95,7 +95,8 @@ class Module
                 {
                     public function __invoke($diContainer)
                     {
-                        return new \Eid\Service\EidSampleService($diContainer);
+                        $eidSampleTable = $diContainer->get('EidSampleTable');
+                        return new \Eid\Service\EidSampleService($diContainer, $eidSampleTable);
                     }
                 },
                 'EidSummaryService' => new class

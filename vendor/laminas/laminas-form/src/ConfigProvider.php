@@ -1,17 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Laminas\Form;
 
+use Laminas\Form\View\Helper\Factory\FormElementErrorsFactory;
 use Laminas\ServiceManager\Factory\InvokableFactory;
 
-class ConfigProvider
+final class ConfigProvider
 {
     /**
      * Return general-purpose laminas-i18n configuration.
      *
      * @return array
      */
-    public function __invoke()
+    public function __invoke(): array
     {
         return [
             'dependencies' => $this->getDependencyConfig(),
@@ -24,25 +27,21 @@ class ConfigProvider
      *
      * @return array
      */
-    public function getDependencyConfig()
+    public function getDependencyConfig(): array
     {
         return [
             'abstract_factories' => [
                 FormAbstractServiceFactory::class,
             ],
-            'aliases' => [
-                'Laminas\Form\Annotation\FormAnnotationBuilder' => 'FormAnnotationBuilder',
+            'aliases'            => [
                 Annotation\AnnotationBuilder::class => 'FormAnnotationBuilder',
-                FormElementManager::class => 'FormElementManager',
-
-                // Legacy Zend Framework aliases
-                'Zend\Form\Annotation\FormAnnotationBuilder' => 'Laminas\Form\Annotation\FormAnnotationBuilder',
-                \Zend\Form\Annotation\AnnotationBuilder::class => Annotation\AnnotationBuilder::class,
-                \Zend\Form\FormElementManager::class => FormElementManager::class,
+                Annotation\AttributeBuilder::class  => 'FormAttributeBuilder',
+                FormElementManager::class           => 'FormElementManager',
             ],
-            'factories' => [
-                'FormAnnotationBuilder' => Annotation\AnnotationBuilderFactory::class,
-                'FormElementManager' => FormElementManagerFactory::class,
+            'factories'          => [
+                'FormAnnotationBuilder' => Annotation\BuilderAbstractFactory::class,
+                'FormAttributeBuilder'  => Annotation\BuilderAbstractFactory::class,
+                'FormElementManager'    => FormElementManagerFactory::class,
             ],
         ];
     }
@@ -54,51 +53,51 @@ class ConfigProvider
      *
      * @return array
      */
-    public function getViewHelperConfig()
+    public function getViewHelperConfig(): array
     {
         return [
-            'aliases' => [
-                'form'                       => View\Helper\Form::class,
-                'Form'                       => View\Helper\Form::class,
-                'formbutton'                 => View\Helper\FormButton::class,
-                'form_button'                => View\Helper\FormButton::class,
-                'formButton'                 => View\Helper\FormButton::class,
-                'FormButton'                 => View\Helper\FormButton::class,
-                'formcaptcha'                => View\Helper\FormCaptcha::class,
-                'form_captcha'               => View\Helper\FormCaptcha::class,
-                'formCaptcha'                => View\Helper\FormCaptcha::class,
-                'FormCaptcha'                => View\Helper\FormCaptcha::class,
-                'captchadumb'                => View\Helper\Captcha\Dumb::class,
-                'captcha_dumb'               => View\Helper\Captcha\Dumb::class,
+            'aliases'   => [
+                'form'         => View\Helper\Form::class,
+                'Form'         => View\Helper\Form::class,
+                'formbutton'   => View\Helper\FormButton::class,
+                'form_button'  => View\Helper\FormButton::class,
+                'formButton'   => View\Helper\FormButton::class,
+                'FormButton'   => View\Helper\FormButton::class,
+                'formcaptcha'  => View\Helper\FormCaptcha::class,
+                'form_captcha' => View\Helper\FormCaptcha::class,
+                'formCaptcha'  => View\Helper\FormCaptcha::class,
+                'FormCaptcha'  => View\Helper\FormCaptcha::class,
+                'captchadumb'  => View\Helper\Captcha\Dumb::class,
+                'captcha_dumb' => View\Helper\Captcha\Dumb::class,
                 // weird alias used by Laminas\Captcha
-                'captcha/dumb'               => View\Helper\Captcha\Dumb::class,
-                'CaptchaDumb'                => View\Helper\Captcha\Dumb::class,
-                'captchaDumb'                => View\Helper\Captcha\Dumb::class,
-                'formcaptchadumb'            => View\Helper\Captcha\Dumb::class,
-                'form_captcha_dumb'          => View\Helper\Captcha\Dumb::class,
-                'formCaptchaDumb'            => View\Helper\Captcha\Dumb::class,
-                'FormCaptchaDumb'            => View\Helper\Captcha\Dumb::class,
-                'captchafiglet'              => View\Helper\Captcha\Figlet::class,
+                'captcha/dumb'      => View\Helper\Captcha\Dumb::class,
+                'CaptchaDumb'       => View\Helper\Captcha\Dumb::class,
+                'captchaDumb'       => View\Helper\Captcha\Dumb::class,
+                'formcaptchadumb'   => View\Helper\Captcha\Dumb::class,
+                'form_captcha_dumb' => View\Helper\Captcha\Dumb::class,
+                'formCaptchaDumb'   => View\Helper\Captcha\Dumb::class,
+                'FormCaptchaDumb'   => View\Helper\Captcha\Dumb::class,
+                'captchafiglet'     => View\Helper\Captcha\Figlet::class,
                 // weird alias used by Laminas\Captcha
-                'captcha/figlet'             => View\Helper\Captcha\Figlet::class,
-                'captcha_figlet'             => View\Helper\Captcha\Figlet::class,
-                'captchaFiglet'              => View\Helper\Captcha\Figlet::class,
-                'CaptchaFiglet'              => View\Helper\Captcha\Figlet::class,
-                'formcaptchafiglet'          => View\Helper\Captcha\Figlet::class,
-                'form_captcha_figlet'        => View\Helper\Captcha\Figlet::class,
-                'formCaptchaFiglet'          => View\Helper\Captcha\Figlet::class,
-                'FormCaptchaFiglet'          => View\Helper\Captcha\Figlet::class,
-                'captchaimage'               => View\Helper\Captcha\Image::class,
+                'captcha/figlet'      => View\Helper\Captcha\Figlet::class,
+                'captcha_figlet'      => View\Helper\Captcha\Figlet::class,
+                'captchaFiglet'       => View\Helper\Captcha\Figlet::class,
+                'CaptchaFiglet'       => View\Helper\Captcha\Figlet::class,
+                'formcaptchafiglet'   => View\Helper\Captcha\Figlet::class,
+                'form_captcha_figlet' => View\Helper\Captcha\Figlet::class,
+                'formCaptchaFiglet'   => View\Helper\Captcha\Figlet::class,
+                'FormCaptchaFiglet'   => View\Helper\Captcha\Figlet::class,
+                'captchaimage'        => View\Helper\Captcha\Image::class,
                 // weird alias used by Laminas\Captcha
-                'captcha/image'              => View\Helper\Captcha\Image::class,
-                'captcha_image'              => View\Helper\Captcha\Image::class,
-                'captchaImage'               => View\Helper\Captcha\Image::class,
-                'CaptchaImage'               => View\Helper\Captcha\Image::class,
-                'formcaptchaimage'           => View\Helper\Captcha\Image::class,
-                'form_captcha_image'         => View\Helper\Captcha\Image::class,
-                'formCaptchaImage'           => View\Helper\Captcha\Image::class,
-                'FormCaptchaImage'           => View\Helper\Captcha\Image::class,
-                'captcharecaptcha'           => View\Helper\Captcha\ReCaptcha::class,
+                'captcha/image'      => View\Helper\Captcha\Image::class,
+                'captcha_image'      => View\Helper\Captcha\Image::class,
+                'captchaImage'       => View\Helper\Captcha\Image::class,
+                'CaptchaImage'       => View\Helper\Captcha\Image::class,
+                'formcaptchaimage'   => View\Helper\Captcha\Image::class,
+                'form_captcha_image' => View\Helper\Captcha\Image::class,
+                'formCaptchaImage'   => View\Helper\Captcha\Image::class,
+                'FormCaptchaImage'   => View\Helper\Captcha\Image::class,
+                'captcharecaptcha'   => View\Helper\Captcha\ReCaptcha::class,
                 // weird alias used by Laminas\Captcha
                 'captcha/recaptcha'          => View\Helper\Captcha\ReCaptcha::class,
                 'captcha_recaptcha'          => View\Helper\Captcha\ReCaptcha::class,
@@ -257,100 +256,52 @@ class ConfigProvider
                 'form_week'                  => View\Helper\FormWeek::class,
                 'formWeek'                   => View\Helper\FormWeek::class,
                 'FormWeek'                   => View\Helper\FormWeek::class,
-
-                // Legacy Zend Framework aliases
-                // @codingStandardsIgnoreStart
-                \Zend\Form\View\Helper\Form::class                         => View\Helper\Form::class,
-                \Zend\Form\View\Helper\FormButton::class                   => View\Helper\FormButton::class,
-                \Zend\Form\View\Helper\FormCaptcha::class                  => View\Helper\FormCaptcha::class,
-                \Zend\Form\View\Helper\Captcha\Dumb::class                 => View\Helper\Captcha\Dumb::class,
-                \Zend\Form\View\Helper\Captcha\Figlet::class               => View\Helper\Captcha\Figlet::class,
-                \Zend\Form\View\Helper\Captcha\Image::class                => View\Helper\Captcha\Image::class,
-                \Zend\Form\View\Helper\Captcha\ReCaptcha::class            => View\Helper\Captcha\ReCaptcha::class,
-                \Zend\Form\View\Helper\FormCheckbox::class                 => View\Helper\FormCheckbox::class,
-                \Zend\Form\View\Helper\FormCollection::class               => View\Helper\FormCollection::class,
-                \Zend\Form\View\Helper\FormColor::class                    => View\Helper\FormColor::class,
-                \Zend\Form\View\Helper\FormDate::class                     => View\Helper\FormDate::class,
-                \Zend\Form\View\Helper\FormDateTime::class                 => View\Helper\FormDateTime::class,
-                \Zend\Form\View\Helper\FormDateTimeLocal::class            => View\Helper\FormDateTimeLocal::class,
-                \Zend\Form\View\Helper\FormDateTimeSelect::class           => View\Helper\FormDateTimeSelect::class,
-                \Zend\Form\View\Helper\FormDateSelect::class               => View\Helper\FormDateSelect::class,
-                \Zend\Form\View\Helper\FormElement::class                  => View\Helper\FormElement::class,
-                \Zend\Form\View\Helper\FormElementErrors::class            => View\Helper\FormElementErrors::class,
-                \Zend\Form\View\Helper\FormEmail::class                    => View\Helper\FormEmail::class,
-                \Zend\Form\View\Helper\FormFile::class                     => View\Helper\FormFile::class,
-                \Zend\Form\View\Helper\File\FormFileApcProgress::class     => View\Helper\File\FormFileApcProgress::class,
-                \Zend\Form\View\Helper\File\FormFileSessionProgress::class => View\Helper\File\FormFileSessionProgress::class,
-                \Zend\Form\View\Helper\File\FormFileUploadProgress::class  => View\Helper\File\FormFileUploadProgress::class,
-                \Zend\Form\View\Helper\FormHidden::class                   => View\Helper\FormHidden::class,
-                \Zend\Form\View\Helper\FormImage::class                    => View\Helper\FormImage::class,
-                \Zend\Form\View\Helper\FormInput::class                    => View\Helper\FormInput::class,
-                \Zend\Form\View\Helper\FormLabel::class                    => View\Helper\FormLabel::class,
-                \Zend\Form\View\Helper\FormMonth::class                    => View\Helper\FormMonth::class,
-                \Zend\Form\View\Helper\FormMonthSelect::class              => View\Helper\FormMonthSelect::class,
-                \Zend\Form\View\Helper\FormMultiCheckbox::class            => View\Helper\FormMultiCheckbox::class,
-                \Zend\Form\View\Helper\FormNumber::class                   => View\Helper\FormNumber::class,
-                \Zend\Form\View\Helper\FormPassword::class                 => View\Helper\FormPassword::class,
-                \Zend\Form\View\Helper\FormRadio::class                    => View\Helper\FormRadio::class,
-                \Zend\Form\View\Helper\FormRange::class                    => View\Helper\FormRange::class,
-                \Zend\Form\View\Helper\FormReset::class                    => View\Helper\FormReset::class,
-                \Zend\Form\View\Helper\FormRow::class                      => View\Helper\FormRow::class,
-                \Zend\Form\View\Helper\FormSearch::class                   => View\Helper\FormSearch::class,
-                \Zend\Form\View\Helper\FormSelect::class                   => View\Helper\FormSelect::class,
-                \Zend\Form\View\Helper\FormSubmit::class                   => View\Helper\FormSubmit::class,
-                \Zend\Form\View\Helper\FormTel::class                      => View\Helper\FormTel::class,
-                \Zend\Form\View\Helper\FormText::class                     => View\Helper\FormText::class,
-                \Zend\Form\View\Helper\FormTextarea::class                 => View\Helper\FormTextarea::class,
-                \Zend\Form\View\Helper\FormTime::class                     => View\Helper\FormTime::class,
-                \Zend\Form\View\Helper\FormUrl::class                      => View\Helper\FormUrl::class,
-                \Zend\Form\View\Helper\FormWeek::class                     => View\Helper\FormWeek::class,
-                // @codingStandardsIgnoreEnd
             ],
             'factories' => [
-                View\Helper\Form::class                          => InvokableFactory::class,
-                View\Helper\FormButton::class                    => InvokableFactory::class,
-                View\Helper\FormCaptcha::class                   => InvokableFactory::class,
-                View\Helper\Captcha\Dumb::class                  => InvokableFactory::class,
-                View\Helper\Captcha\Figlet::class                => InvokableFactory::class,
-                View\Helper\Captcha\Image::class                 => InvokableFactory::class,
-                View\Helper\Captcha\ReCaptcha::class             => InvokableFactory::class,
-                View\Helper\FormCheckbox::class                  => InvokableFactory::class,
-                View\Helper\FormCollection::class                => InvokableFactory::class,
-                View\Helper\FormColor::class                     => InvokableFactory::class,
-                View\Helper\FormDate::class                      => InvokableFactory::class,
-                View\Helper\FormDateTime::class                  => InvokableFactory::class,
-                View\Helper\FormDateTimeLocal::class             => InvokableFactory::class,
-                View\Helper\FormDateTimeSelect::class            => InvokableFactory::class,
-                View\Helper\FormDateSelect::class                => InvokableFactory::class,
-                View\Helper\FormElement::class                   => InvokableFactory::class,
-                View\Helper\FormElementErrors::class             => InvokableFactory::class,
-                View\Helper\FormEmail::class                     => InvokableFactory::class,
-                View\Helper\FormFile::class                      => InvokableFactory::class,
-                View\Helper\File\FormFileApcProgress::class      => InvokableFactory::class,
-                View\Helper\File\FormFileSessionProgress::class  => InvokableFactory::class,
-                View\Helper\File\FormFileUploadProgress::class   => InvokableFactory::class,
-                View\Helper\FormHidden::class                    => InvokableFactory::class,
-                View\Helper\FormImage::class                     => InvokableFactory::class,
-                View\Helper\FormInput::class                     => InvokableFactory::class,
-                View\Helper\FormLabel::class                     => InvokableFactory::class,
-                View\Helper\FormMonth::class                     => InvokableFactory::class,
-                View\Helper\FormMonthSelect::class               => InvokableFactory::class,
-                View\Helper\FormMultiCheckbox::class             => InvokableFactory::class,
-                View\Helper\FormNumber::class                    => InvokableFactory::class,
-                View\Helper\FormPassword::class                  => InvokableFactory::class,
-                View\Helper\FormRadio::class                     => InvokableFactory::class,
-                View\Helper\FormRange::class                     => InvokableFactory::class,
-                View\Helper\FormReset::class                     => InvokableFactory::class,
-                View\Helper\FormRow::class                       => InvokableFactory::class,
-                View\Helper\FormSearch::class                    => InvokableFactory::class,
-                View\Helper\FormSelect::class                    => InvokableFactory::class,
-                View\Helper\FormSubmit::class                    => InvokableFactory::class,
-                View\Helper\FormTel::class                       => InvokableFactory::class,
-                View\Helper\FormText::class                      => InvokableFactory::class,
-                View\Helper\FormTextarea::class                  => InvokableFactory::class,
-                View\Helper\FormTime::class                      => InvokableFactory::class,
-                View\Helper\FormUrl::class                       => InvokableFactory::class,
-                View\Helper\FormWeek::class                      => InvokableFactory::class,
+                View\Helper\Form::class                         => InvokableFactory::class,
+                View\Helper\FormButton::class                   => InvokableFactory::class,
+                View\Helper\FormCaptcha::class                  => InvokableFactory::class,
+                View\Helper\Captcha\Dumb::class                 => InvokableFactory::class,
+                View\Helper\Captcha\Figlet::class               => InvokableFactory::class,
+                View\Helper\Captcha\Image::class                => InvokableFactory::class,
+                View\Helper\Captcha\ReCaptcha::class            => InvokableFactory::class,
+                View\Helper\FormCheckbox::class                 => InvokableFactory::class,
+                View\Helper\FormCollection::class               => InvokableFactory::class,
+                View\Helper\FormColor::class                    => InvokableFactory::class,
+                View\Helper\FormDate::class                     => InvokableFactory::class,
+                View\Helper\FormDateTime::class                 => InvokableFactory::class,
+                View\Helper\FormDateTimeLocal::class            => InvokableFactory::class,
+                View\Helper\FormDateTimeSelect::class           => InvokableFactory::class,
+                View\Helper\FormDateSelect::class               => InvokableFactory::class,
+                View\Helper\FormElement::class                  => InvokableFactory::class,
+                View\Helper\FormElementErrors::class            => FormElementErrorsFactory::class,
+                View\Helper\FormEmail::class                    => InvokableFactory::class,
+                View\Helper\FormFile::class                     => InvokableFactory::class,
+                View\Helper\File\FormFileApcProgress::class     => InvokableFactory::class,
+                View\Helper\File\FormFileSessionProgress::class => InvokableFactory::class,
+                View\Helper\File\FormFileUploadProgress::class  => InvokableFactory::class,
+                View\Helper\FormHidden::class                   => InvokableFactory::class,
+                View\Helper\FormImage::class                    => InvokableFactory::class,
+                View\Helper\FormInput::class                    => InvokableFactory::class,
+                View\Helper\FormLabel::class                    => InvokableFactory::class,
+                View\Helper\FormMonth::class                    => InvokableFactory::class,
+                View\Helper\FormMonthSelect::class              => InvokableFactory::class,
+                View\Helper\FormMultiCheckbox::class            => InvokableFactory::class,
+                View\Helper\FormNumber::class                   => InvokableFactory::class,
+                View\Helper\FormPassword::class                 => InvokableFactory::class,
+                View\Helper\FormRadio::class                    => InvokableFactory::class,
+                View\Helper\FormRange::class                    => InvokableFactory::class,
+                View\Helper\FormReset::class                    => InvokableFactory::class,
+                View\Helper\FormRow::class                      => InvokableFactory::class,
+                View\Helper\FormSearch::class                   => InvokableFactory::class,
+                View\Helper\FormSelect::class                   => InvokableFactory::class,
+                View\Helper\FormSubmit::class                   => InvokableFactory::class,
+                View\Helper\FormTel::class                      => InvokableFactory::class,
+                View\Helper\FormText::class                     => InvokableFactory::class,
+                View\Helper\FormTextarea::class                 => InvokableFactory::class,
+                View\Helper\FormTime::class                     => InvokableFactory::class,
+                View\Helper\FormUrl::class                      => InvokableFactory::class,
+                View\Helper\FormWeek::class                     => InvokableFactory::class,
             ],
         ];
     }

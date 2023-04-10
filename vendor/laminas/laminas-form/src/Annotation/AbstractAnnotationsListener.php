@@ -1,10 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Laminas\Form\Annotation;
 
 use Laminas\EventManager\AbstractListenerAggregate;
 use Laminas\EventManager\EventInterface;
 use ReflectionClass;
+
+use function assert;
 
 /**
  * Base annotations listener.
@@ -21,12 +25,12 @@ abstract class AbstractAnnotationsListener extends AbstractListenerAggregate
     /**
      * Attempt to discover a name set via annotation
      *
-     * @param  EventInterface $e
      * @return false|string
      */
-    public function handleNameAnnotation($e)
+    public function handleNameAnnotation(EventInterface $e)
     {
         $annotations = $e->getParam('annotations');
+        assert($annotations instanceof AnnotationCollection);
 
         if (! $annotations->hasAnnotation(Name::class)) {
             return false;
@@ -44,11 +48,8 @@ abstract class AbstractAnnotationsListener extends AbstractListenerAggregate
 
     /**
      * Discover the fallback name via reflection
-     *
-     * @param  EventInterface $e
-     * @return string
      */
-    public function discoverFallbackName($e)
+    public function discoverFallbackName(EventInterface $e): string
     {
         $reflection = $e->getParam('reflection');
         if ($reflection instanceof ReflectionClass) {

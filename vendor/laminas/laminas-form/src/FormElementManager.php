@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Laminas\Form;
 
-use Interop\Container\ContainerInterface;
+use Interop\Container\ContainerInterface; // phpcs:disable WebimpressCodingStandard.PHP.CorrectClassNameCase
 use Laminas\Form\Exception;
 use Laminas\ServiceManager\AbstractPluginManager;
 use Laminas\ServiceManager\Exception\InvalidServiceException;
@@ -15,7 +17,6 @@ use function class_exists;
 use function get_class;
 use function gettype;
 use function is_object;
-use function is_string;
 use function sprintf;
 
 /**
@@ -107,78 +108,6 @@ class FormElementManager extends AbstractPluginManager
         'Url'            => Element\Url::class,
         'week'           => Element\Week::class,
         'Week'           => Element\Week::class,
-
-        // Legacy Zend Framework aliases
-        \Zend\Form\Element\Button::class => Element\Button::class,
-        \Zend\Form\Element\Captcha::class => Element\Captcha::class,
-        \Zend\Form\Element\Checkbox::class => Element\Checkbox::class,
-        \Zend\Form\Element\Collection::class => Element\Collection::class,
-        \Zend\Form\Element\Color::class => Element\Color::class,
-        \Zend\Form\Element\Csrf::class => Element\Csrf::class,
-        \Zend\Form\Element\Date::class => Element\Date::class,
-        \Zend\Form\Element\DateSelect::class => Element\DateSelect::class,
-        \Zend\Form\Element\DateTime::class => Element\DateTime::class,
-        \Zend\Form\Element\DateTimeLocal::class => Element\DateTimeLocal::class,
-        \Zend\Form\Element\DateTimeSelect::class => Element\DateTimeSelect::class,
-        \Zend\Form\Element::class => Element::class,
-        \Zend\Form\Element\Email::class => Element\Email::class,
-        \Zend\Form\Fieldset::class => Fieldset::class,
-        \Zend\Form\Element\File::class => Element\File::class,
-        \Zend\Form\Form::class => Form::class,
-        \Zend\Form\Element\Hidden::class => Element\Hidden::class,
-        \Zend\Form\Element\Image::class => Element\Image::class,
-        \Zend\Form\Element\Month::class => Element\Month::class,
-        \Zend\Form\Element\MonthSelect::class => Element\MonthSelect::class,
-        \Zend\Form\Element\MultiCheckbox::class => Element\MultiCheckbox::class,
-        \Zend\Form\Element\Number::class => Element\Number::class,
-        \Zend\Form\Element\Password::class => Element\Password::class,
-        \Zend\Form\Element\Radio::class => Element\Radio::class,
-        \Zend\Form\Element\Range::class => Element\Range::class,
-        \Zend\Form\Element\Search::class => Element\Search::class,
-        \Zend\Form\Element\Select::class => Element\Select::class,
-        \Zend\Form\Element\Submit::class => Element\Submit::class,
-        \Zend\Form\Element\Tel::class => Element\Tel::class,
-        \Zend\Form\Element\Text::class => Element\Text::class,
-        \Zend\Form\Element\Textarea::class => Element\Textarea::class,
-        \Zend\Form\Element\Time::class => Element\Time::class,
-        \Zend\Form\Element\Url::class => Element\Url::class,
-        \Zend\Form\Element\Week::class => Element\Week::class,
-
-        // v2 normalized FQCNs
-        'zendformelementbutton' => Element\Button::class,
-        'zendformelementcaptcha' => Element\Captcha::class,
-        'zendformelementcheckbox' => Element\Checkbox::class,
-        'zendformelementcollection' => Element\Collection::class,
-        'zendformelementcolor' => Element\Color::class,
-        'zendformelementcsrf' => Element\Csrf::class,
-        'zendformelementdate' => Element\Date::class,
-        'zendformelementdateselect' => Element\DateSelect::class,
-        'zendformelementdatetime' => Element\DateTime::class,
-        'zendformelementdatetimelocal' => Element\DateTimeLocal::class,
-        'zendformelementdatetimeselect' => Element\DateTimeSelect::class,
-        'zendformelement' => Element::class,
-        'zendformelementemail' => Element\Email::class,
-        'zendformfieldset' => Fieldset::class,
-        'zendformelementfile' => Element\File::class,
-        'zendformform' => Form::class,
-        'zendformelementhidden' => Element\Hidden::class,
-        'zendformelementimage' => Element\Image::class,
-        'zendformelementmonth' => Element\Month::class,
-        'zendformelementmonthselect' => Element\MonthSelect::class,
-        'zendformelementmulticheckbox' => Element\MultiCheckbox::class,
-        'zendformelementnumber' => Element\Number::class,
-        'zendformelementpassword' => Element\Password::class,
-        'zendformelementradio' => Element\Radio::class,
-        'zendformelementrange' => Element\Range::class,
-        'zendformelementsearch' => Element\Search::class,
-        'zendformelementselect' => Element\Select::class,
-        'zendformelementsubmit' => Element\Submit::class,
-        'zendformelementtel' => Element\Tel::class,
-        'zendformelementtext' => Element\Text::class,
-        'zendformelementtextarea' => Element\Textarea::class,
-        'zendformelementtime' => Element\Time::class,
-        'zendformelementurl' => Element\Url::class,
-        'zendformelementweek' => Element\Week::class,
     ];
 
     /**
@@ -268,26 +197,26 @@ class FormElementManager extends AbstractPluginManager
 
     /**
      * Interface all plugins managed by this class must implement.
-     * @var string
+     *
+     * @var class-string
      */
     protected $instanceOf = ElementInterface::class;
 
     /**
      * Inject the factory to any element that implements FormFactoryAwareInterface
      *
-     * @param ContainerInterface $container
      * @param mixed $instance Instance to inspect and optionally inject.
      */
-    public function injectFactory(ContainerInterface $container, $instance)
+    public function injectFactory(ContainerInterface $container, $instance): void
     {
-        if (! $instance instanceof FormFactoryAwareInterface) {
+        if (! $instance instanceof Fieldset) {
             return;
         }
 
         $factory = $instance->getFormFactory();
         $factory->setFormElementManager($this);
 
-        if ($container && $container->has('InputFilterManager')) {
+        if ($container->has('InputFilterManager')) {
             $inputFilters = $container->get('InputFilterManager');
             $factory->getInputFilterFactory()->setInputFilterManager($inputFilters);
         }
@@ -296,10 +225,9 @@ class FormElementManager extends AbstractPluginManager
     /**
      * Call init() on any element that implements InitializableInterface
      *
-     * @param ContainerInterface $container
      * @param mixed $instance Instance to inspect and optionally initialize.
      */
-    public function callElementInit(ContainerInterface $container, $instance)
+    public function callElementInit(ContainerInterface $container, $instance): void
     {
         if ($instance instanceof InitializableInterface) {
             $instance->init();
@@ -316,9 +244,8 @@ class FormElementManager extends AbstractPluginManager
      *
      * @param string $name
      * @param null|string $class
-     * @return void
      */
-    public function setInvokableClass($name, $class = null)
+    public function setInvokableClass($name, $class = null): void
     {
         $class = $class ?: $name;
 
@@ -338,18 +265,17 @@ class FormElementManager extends AbstractPluginManager
      *
      * Validates against `$instanceOf`.
      *
-     * @param  mixed $plugin
+     * @param  mixed $instance
      * @throws InvalidServiceException
-     * @return void
      */
-    public function validate($plugin)
+    public function validate($instance): void
     {
-        if (! $plugin instanceof $this->instanceOf) {
+        if (! $instance instanceof $this->instanceOf) {
             throw new InvalidServiceException(sprintf(
                 '%s can only create instances of %s; %s is invalid',
-                get_class($this),
+                static::class,
                 $this->instanceOf,
-                is_object($plugin) ? get_class($plugin) : gettype($plugin)
+                is_object($instance) ? get_class($instance) : gettype($instance)
             ));
         }
     }
@@ -390,22 +316,17 @@ class FormElementManager extends AbstractPluginManager
      * constructor if not null and a non-empty array.
      *
      * @param  string $name
-     * @param  string|array<string, mixed> $options
      * @return mixed
      */
-    public function get($name, $options = [])
+    public function get($name, ?array $options = null)
     {
-        if (is_string($options)) {
-            $options = ['name' => $options];
-        }
-
         if (! $this->has($name)) {
             if (! $this->autoAddInvokableClass || ! class_exists($name)) {
                 throw new Exception\InvalidElementException(
                     sprintf(
                         'A plugin by the name "%s" was not found in the plugin manager %s',
                         $name,
-                        get_class($this)
+                        static::class
                     )
                 );
             }
@@ -418,11 +339,10 @@ class FormElementManager extends AbstractPluginManager
     /**
      * Try to pull hydrator from the creation context, or instantiates it from its name
      *
-     * @param  string $hydratorName
      * @return mixed
      * @throws Exception\DomainException
      */
-    public function getHydratorFromName($hydratorName)
+    public function getHydratorFromName(string $hydratorName)
     {
         $services = $this->creationContext;
 
@@ -444,18 +364,16 @@ class FormElementManager extends AbstractPluginManager
             ));
         }
 
-        $hydrator = new $hydratorName;
-        return $hydrator;
+        return new $hydratorName();
     }
 
     /**
      * Try to pull factory from the creation context, or instantiates it from its name
      *
-     * @param  string $factoryName
      * @return mixed
      * @throws Exception\DomainException
      */
-    public function getFactoryFromName($factoryName)
+    public function getFactoryFromName(string $factoryName)
     {
         $services = $this->creationContext;
 
@@ -470,7 +388,6 @@ class FormElementManager extends AbstractPluginManager
             ));
         }
 
-        $factory = new $factoryName;
-        return $factory;
+        return new $factoryName();
     }
 }
