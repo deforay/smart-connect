@@ -175,14 +175,14 @@ if(sizeof($sampleResult)> 0){
           $sampleCollectionTime='';
           if(isset($result['sample_collection_date']) && $result['sample_collection_date']!= NULL && trim($result['sample_collection_date'])!='' && $result['sample_collection_date']!='0000-00-00 00:00:00' && $result['sample_collection_date']!='1970-01-01 00:00:00'){
                $expStr = explode(" ",$result['sample_collection_date']);
-               $sampleCollectionDate = $this->humanDateFormat($expStr[0]);
+               $sampleCollectionDate = $this->humanReadableDateFormat($expStr[0]);
                $sampleCollectionTime = $expStr[1];
           }
           $sampleTestDate='Not Reported';
           $sampleTestTime='';
           if(isset($result['sample_tested_datetime']) && $result['sample_tested_datetime']!= NULL && trim($result['sample_tested_datetime'])!='' && $result['sample_tested_datetime']!='0000-00-00 00:00:00' && $result['sample_tested_datetime']!='1970-01-01 00:00:00'){
                $expStr = explode(" ",$result['sample_tested_datetime']);
-               $sampleTestDate = $this->humanDateFormat($expStr[0]);
+               $sampleTestDate = $this->humanReadableDateFormat($expStr[0]);
                $sampleTestTime = $expStr[1];
           }
 
@@ -190,7 +190,7 @@ if(sizeof($sampleResult)> 0){
           $approvedTime='';
           if(isset($result['result_approved_datetime']) && $result['result_approved_datetime']!= NULL && trim($result['result_approved_datetime'])!='' && $result['result_approved_datetime']!='0000-00-00 00:00:00' && $result['result_approved_datetime']!='1970-01-01 00:00:00'){
                $expStr = explode(" ",$result['result_approved_datetime']);
-               $approvedDate = $this->humanDateFormat($expStr[0]);
+               $approvedDate = $this->humanReadableDateFormat($expStr[0]);
                $approvedTime = $expStr[1];
           }
 
@@ -198,7 +198,7 @@ if(sizeof($sampleResult)> 0){
           //last viral load test date
           $lastViralLoadDate = '';
           if(isset($result['last_viral_load_date']) && $result['last_viral_load_date']!= NULL && trim($result['last_viral_load_date'])!='' && $result['last_viral_load_date']!='0000-00-00' && $result['last_viral_load_date']!='1970-01-01'){
-               $lastViralLoadDate=$this->humanDateFormat($result['last_viral_load_date']);
+               $lastViralLoadDate=$this->humanReadableDateFormat($result['last_viral_load_date']);
           }
           $resultApprovedBy  = '';
           if(isset($result['approvedBy']) && trim($result['approvedBy'])!=''){

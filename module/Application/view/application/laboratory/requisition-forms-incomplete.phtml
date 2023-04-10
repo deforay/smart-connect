@@ -24,7 +24,7 @@ if(isset($labFilter) && trim($labFilter)!= ''){
 $selectedProvinces = array();
 if(isset($facilityInfo['selectedProvinces']) && count($facilityInfo['selectedProvinces']) >0){
     foreach($facilityInfo['selectedProvinces'] as $province){
-        $selectedProvinces[] = $province['location_id'];
+        $selectedProvinces[] = $province['geo_id'];
     }
 }
 //set selected districts
@@ -82,7 +82,7 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
                         if(isset($facilityInfo['provinces']) && count($facilityInfo['provinces']) > 0){
                             foreach($facilityInfo['provinces'] as $province){
                         ?>
-                            <option value="<?php echo $province['location_id']; ?>" <?php echo(in_array($province['location_id'],$selectedProvinces))?'selected="selected"':''; ?>><?php echo ucwords($province['location_name']); ?></option>
+                            <option value="<?php echo $province['geo_id']; ?>" <?php echo(in_array($province['geo_id'],$selectedProvinces))?'selected="selected"':''; ?>><?php echo ucwords($province['geo_name']); ?></option>
                         <?php } } ?>
                     </select>
                 </div>
@@ -93,7 +93,7 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
                         if(isset($facilityInfo['provinceDistricts']) && count($facilityInfo['provinceDistricts']) > 0){
                             foreach($facilityInfo['provinceDistricts'] as $provinceDistrict){
                         ?>
-                            <option value="<?php echo $provinceDistrict['location_id']; ?>" <?php echo(in_array($provinceDistrict['location_id'],$selectedDistricts))?'selected="selected"':''; ?>><?php echo ucwords($provinceDistrict['location_name']); ?></option>
+                            <option value="<?php echo $provinceDistrict['geo_id']; ?>" <?php echo(in_array($provinceDistrict['geo_id'],$selectedDistricts))?'selected="selected"':''; ?>><?php echo ucwords($provinceDistrict['geo_name']); ?></option>
                         <?php } } ?>
                     </select>
                 </div>

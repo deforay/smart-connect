@@ -23,7 +23,7 @@ class Covid19FormTable extends AbstractTableGateway
     public $sm = null;
     public $config = null;
     protected $translator = null;
-    protected $commonService = null;
+    protected \Application\Service\CommonService $commonService;
     protected $mappedFacilities = null;
 
     public function __construct(Adapter $adapter, $sm = null, $mappedFacilities = null, $table = null, $commonService = null)
@@ -130,8 +130,8 @@ class Covid19FormTable extends AbstractTableGateway
         /* Array of database columns which should be read and sent back to DataTables. Use a space where
          * you want to insert a non-database field (for example a counter or static image)
         */
-        $aColumns = array('facility_name', 'f_d_l_dp.location_name', 'f_d_l_d.location_name');
-        $orderColumns = array('facility_name', 'f_d_l_dp.location_name', 'f_d_l_d.location_name', 'total_samples_received', 'total_samples_tested', 'total_samples_pending', 'total_samples_rejected', 'initial_pcr_percentage', 'second_third_pcr_percentage');
+        $aColumns = array('facility_name', 'f_d_l_dp.geo_name', 'f_d_l_d.geo_name');
+        $orderColumns = array('facility_name', 'f_d_l_dp.geo_name', 'f_d_l_d.geo_name', 'total_samples_received', 'total_samples_tested', 'total_samples_pending', 'total_samples_rejected', 'initial_pcr_percentage', 'second_third_pcr_percentage');
 
         /*
          * Paging
@@ -221,8 +221,8 @@ class Covid19FormTable extends AbstractTableGateway
                 )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=covid19.facility_id', array('facility_name'))
-            ->join(array('f_d_l_d' => 'location_details'), 'f_d_l_d.location_id=f.facility_district', array('district' => 'location_name'))
-            ->join(array('f_d_l_dp' => 'location_details'), 'f_d_l_dp.location_id=f.facility_state', array('province' => 'location_name'))
+            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district', array('district' => 'geo_name'))
+            ->join(array('f_d_l_dp' => 'geographical_divisions'), 'f_d_l_dp.geo_id=f.facility_state', array('province' => 'geo_name'))
             ->where("(covid19.sample_collection_date is not null AND DATE(covid19.sample_collection_date) !='1970-01-01' AND DATE(covid19.sample_collection_date) !='0000-00-00')")
             ->group('covid19.facility_id');
 
@@ -264,8 +264,8 @@ class Covid19FormTable extends AbstractTableGateway
         $iQuery = $sql->select()->from(array('covid19' => $this->table))
             ->columns(array('covid19_id'))
             ->join(array('f' => 'facility_details'), 'f.facility_id=covid19.facility_id', array())
-            ->join(array('f_d_l_d' => 'location_details'), 'f_d_l_d.location_id=f.facility_district', array())
-            ->join(array('f_d_l_dp' => 'location_details'), 'f_d_l_dp.location_id=f.facility_state', array())
+            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district', array())
+            ->join(array('f_d_l_dp' => 'geographical_divisions'), 'f_d_l_dp.geo_id=f.facility_state', array())
             ->where("(covid19.sample_collection_date is not null AND DATE(covid19.sample_collection_date) !='1970-01-01' AND DATE(covid19.sample_collection_date) !='0000-00-00')")
             ->group('covid19.facility_id');
 
@@ -315,8 +315,8 @@ class Covid19FormTable extends AbstractTableGateway
         /* Array of database columns which should be read and sent back to DataTables. Use a space where
          * you want to insert a non-database field (for example a counter or static image)
         */
-        $aColumns = array('f_d_l_d.location_name');
-        $orderColumns = array('f_d_l_d.location_name', 'total_samples_received', 'total_samples_tested', 'total_samples_pending', 'total_samples_rejected', 'initial_pcr_percentage', 'second_third_pcr_percentage');
+        $aColumns = array('f_d_l_d.geo_name');
+        $orderColumns = array('f_d_l_d.geo_name', 'total_samples_received', 'total_samples_tested', 'total_samples_pending', 'total_samples_rejected', 'initial_pcr_percentage', 'second_third_pcr_percentage');
 
         /*
          * Paging
@@ -406,7 +406,7 @@ class Covid19FormTable extends AbstractTableGateway
                 )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=covid19.facility_id', array('facility_name'))
-            ->join(array('f_d_l_d' => 'location_details'), 'f_d_l_d.location_id=f.facility_state', array('province' => 'location_name'))
+            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_state', array('province' => 'geo_name'))
             ->where("(covid19.sample_collection_date is not null AND DATE(covid19.sample_collection_date) !='1970-01-01' AND DATE(covid19.sample_collection_date) !='0000-00-00')")
             ->group('f.facility_state');
         if (isset($sWhere) && $sWhere != "") {
@@ -451,7 +451,7 @@ class Covid19FormTable extends AbstractTableGateway
                 )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=covid19.facility_id', array('facility_name'))
-            ->join(array('f_d_l_d' => 'location_details'), 'f_d_l_d.location_id=f.facility_state', array('province' => 'location_name'))
+            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_state', array('province' => 'geo_name'))
             ->where("(covid19.sample_collection_date is not null AND covid19.sample_collection_date != '1970-01-01' AND DATE(covid19.sample_collection_date) !='1970-01-01' AND DATE(covid19.sample_collection_date) !='0000-00-00')")
             ->group('f.facility_state');
 
@@ -494,8 +494,8 @@ class Covid19FormTable extends AbstractTableGateway
         /* Array of database columns which should be read and sent back to DataTables. Use a space where
          * you want to insert a non-database field (for example a counter or static image)
         */
-        $aColumns = array('f_d_l_d.location_name');
-        $orderColumns = array('f_d_l_d.location_name', 'total_samples_received', 'total_samples_tested', 'total_samples_pending', 'total_samples_rejected', 'initial_pcr_percentage', 'second_third_pcr_percentage');
+        $aColumns = array('f_d_l_d.geo_name');
+        $orderColumns = array('f_d_l_d.geo_name', 'total_samples_received', 'total_samples_tested', 'total_samples_pending', 'total_samples_rejected', 'initial_pcr_percentage', 'second_third_pcr_percentage');
 
         /*
          * Paging
@@ -585,7 +585,7 @@ class Covid19FormTable extends AbstractTableGateway
                 )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=covid19.facility_id', array('facility_name'))
-            ->join(array('f_d_l_d' => 'location_details'), 'f_d_l_d.location_id=f.facility_district', array('district' => 'location_name'))
+            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district', array('district' => 'geo_name'))
 
             ->where("(covid19.sample_collection_date is not null AND DATE(covid19.sample_collection_date) !='1970-01-01' AND DATE(covid19.sample_collection_date) !='0000-00-00')")
             ->group('f.facility_district');
@@ -631,7 +631,7 @@ class Covid19FormTable extends AbstractTableGateway
                 )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=covid19.facility_id', array('facility_name'))
-            ->join(array('f_d_l_d' => 'location_details'), 'f_d_l_d.location_id=f.facility_district', array('district' => 'location_name'))
+            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district', array('district' => 'geo_name'))
 
             ->where("(covid19.sample_collection_date is not null AND DATE(covid19.sample_collection_date) !='1970-01-01' AND DATE(covid19.sample_collection_date) !='0000-00-00')")
             ->group('f.facility_district');
@@ -730,8 +730,8 @@ class Covid19FormTable extends AbstractTableGateway
         /* Array of database columns which should be read and sent back to DataTables. Use a space where
          * you want to insert a non-database field (for example a counter or static image)
         */
-        $aColumns = array('f_d_l_d.location_name');
-        $orderColumns = array('f_d_l_d.location_name', 'total_samples_valid', 'total_positive_samples', 'total_negative_samples', 'total_samples_rejected', 'positive_rate');
+        $aColumns = array('f_d_l_d.geo_name');
+        $orderColumns = array('f_d_l_d.geo_name', 'total_samples_valid', 'total_positive_samples', 'total_negative_samples', 'total_samples_rejected', 'positive_rate');
 
         /*
          * Paging
@@ -824,7 +824,7 @@ class Covid19FormTable extends AbstractTableGateway
                 )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=covid19.facility_id', array('facility_name'))
-            ->join(array('f_d_l_d' => 'location_details'), 'f_d_l_d.location_id=f.facility_state', array('province' => 'location_name'))
+            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_state', array('province' => 'geo_name'))
             ->where("(covid19.sample_collection_date is not null AND DATE(covid19.sample_collection_date) !='1970-01-01' AND DATE(covid19.sample_collection_date) !='0000-00-00')")
             ->group('f.facility_state');
 
@@ -870,7 +870,7 @@ class Covid19FormTable extends AbstractTableGateway
                 )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=covid19.facility_id', array('facility_name'))
-            ->join(array('f_d_l_d' => 'location_details'), 'f_d_l_d.location_id=f.facility_state', array('province' => 'location_name'))
+            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_state', array('province' => 'geo_name'))
             ->where("(covid19.sample_collection_date is not null AND DATE(covid19.sample_collection_date) !='1970-01-01' AND DATE(covid19.sample_collection_date) !='0000-00-00')")
             ->group('f.facility_state');
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
@@ -910,8 +910,8 @@ class Covid19FormTable extends AbstractTableGateway
         /* Array of database columns which should be read and sent back to DataTables. Use a space where
          * you want to insert a non-database field (for example a counter or static image)
         */
-        $aColumns = array('f_d_l_d.location_name');
-        $orderColumns = array('f_d_l_d.location_name', 'total_samples_valid', 'total_positive_samples', 'total_negative_samples', 'total_samples_rejected', 'positive_rate');
+        $aColumns = array('f_d_l_d.geo_name');
+        $orderColumns = array('f_d_l_d.geo_name', 'total_samples_valid', 'total_positive_samples', 'total_negative_samples', 'total_samples_rejected', 'positive_rate');
 
         /*
          * Paging
@@ -1004,7 +1004,7 @@ class Covid19FormTable extends AbstractTableGateway
                 )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=covid19.facility_id', array('facility_name'))
-            ->join(array('f_d_l_d' => 'location_details'), 'f_d_l_d.location_id=f.facility_district', array('district' => 'location_name'))
+            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district', array('district' => 'geo_name'))
             ->where("(covid19.sample_collection_date is not null AND DATE(covid19.sample_collection_date) !='1970-01-01' AND DATE(covid19.sample_collection_date) !='0000-00-00')")
             ->group('f.facility_district');
 
@@ -1048,7 +1048,7 @@ class Covid19FormTable extends AbstractTableGateway
                 )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=covid19.facility_id', array('facility_name'))
-            ->join(array('f_d_l_d' => 'location_details'), 'f_d_l_d.location_id=f.facility_district', array('district' => 'location_name'))
+            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district', array('district' => 'geo_name'))
             ->where("(covid19.sample_collection_date is not null AND DATE(covid19.sample_collection_date) !='1970-01-01' AND DATE(covid19.sample_collection_date) !='0000-00-00')")
             ->group('f.facility_district');
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
@@ -1091,8 +1091,8 @@ class Covid19FormTable extends AbstractTableGateway
 
         $queryContainer = new Container('query');
 
-        $aColumns = array('facility_name', 'f_d_l_dp.location_name', 'f_d_l_d.location_name');
-        $orderColumns = array('f_d_l_d.location_name', 'f_d_l_dp.location_name', 'f_d_l_d.location_name', 'total_samples_valid', 'total_positive_samples', 'total_negative_samples', 'total_samples_rejected', 'positive_rate');
+        $aColumns = array('facility_name', 'f_d_l_dp.geo_name', 'f_d_l_d.geo_name');
+        $orderColumns = array('f_d_l_d.geo_name', 'f_d_l_dp.geo_name', 'f_d_l_d.geo_name', 'total_samples_valid', 'total_positive_samples', 'total_negative_samples', 'total_samples_rejected', 'positive_rate');
 
         /*
          * Paging
@@ -1185,8 +1185,8 @@ class Covid19FormTable extends AbstractTableGateway
                 )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=covid19.facility_id', array('facility_name'))
-            ->join(array('f_d_l_dp' => 'location_details'), 'f_d_l_dp.location_id=f.facility_state', array('province' => 'location_name'))
-            ->join(array('f_d_l_d' => 'location_details'), 'f_d_l_d.location_id=f.facility_district', array('district' => 'location_name'))
+            ->join(array('f_d_l_dp' => 'geographical_divisions'), 'f_d_l_dp.geo_id=f.facility_state', array('province' => 'geo_name'))
+            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district', array('district' => 'geo_name'))
             ->where("(covid19.sample_collection_date is not null AND DATE(covid19.sample_collection_date) !='1970-01-01' AND DATE(covid19.sample_collection_date) !='0000-00-00')")
             ->group('covid19.facility_id');
 
@@ -1233,8 +1233,8 @@ class Covid19FormTable extends AbstractTableGateway
                 )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=covid19.facility_id', array('facility_name'))
-            ->join(array('f_d_l_dp' => 'location_details'), 'f_d_l_dp.location_id=f.facility_state', array('province' => 'location_name'))
-            ->join(array('f_d_l_d' => 'location_details'), 'f_d_l_d.location_id=f.facility_district', array('district' => 'location_name'))
+            ->join(array('f_d_l_dp' => 'geographical_divisions'), 'f_d_l_dp.geo_id=f.facility_state', array('province' => 'geo_name'))
+            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district', array('district' => 'geo_name'))
             ->where("(covid19.sample_collection_date is not null AND DATE(covid19.sample_collection_date) !='1970-01-01' AND DATE(covid19.sample_collection_date) !='0000-00-00')")
             ->group('covid19.facility_id');
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
@@ -1368,8 +1368,8 @@ class Covid19FormTable extends AbstractTableGateway
         /* Array of database columns which should be read and sent back to DataTables. Use a space where
          * you want to insert a non-database field (for example a counter or static image)
         */
-        $aColumns = array('f_d_l_d.location_name');
-        $orderColumns = array('f_d_l_d.location_name', 'total_samples_received', 'total_samples_rejected', 'rejection_rate');
+        $aColumns = array('f_d_l_d.geo_name');
+        $orderColumns = array('f_d_l_d.geo_name', 'total_samples_received', 'total_samples_rejected', 'rejection_rate');
 
         /*
          * Paging
@@ -1454,7 +1454,7 @@ class Covid19FormTable extends AbstractTableGateway
                 )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=covid19.facility_id', array('facility_name'))
-            ->join(array('f_d_l_d' => 'location_details'), 'f_d_l_d.location_id=f.facility_district', array('district' => 'location_name'))
+            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district', array('district' => 'geo_name'))
             ->where("(covid19.sample_collection_date is not null AND DATE(covid19.sample_collection_date) !='1970-01-01' AND DATE(covid19.sample_collection_date) !='0000-00-00')")
             ->group('f.facility_district');
 
@@ -1499,7 +1499,7 @@ class Covid19FormTable extends AbstractTableGateway
                 )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=covid19.facility_id', array('facility_name'))
-            ->join(array('f_d_l_d' => 'location_details'), 'f_d_l_d.location_id=f.facility_district', array('district' => 'location_name'))
+            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district', array('district' => 'geo_name'))
             ->where("(covid19.sample_collection_date is not null AND DATE(covid19.sample_collection_date) !='1970-01-01' AND DATE(covid19.sample_collection_date) !='0000-00-00')")
             ->group('f.facility_district');
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
@@ -1536,8 +1536,8 @@ class Covid19FormTable extends AbstractTableGateway
         /* Array of database columns which should be read and sent back to DataTables. Use a space where
          * you want to insert a non-database field (for example a counter or static image)
         */
-        $aColumns = array('f_d_l_d.location_name');
-        $orderColumns = array('f_d_l_d.location_name', 'total_samples_received', 'total_samples_rejected', 'rejection_rate');
+        $aColumns = array('f_d_l_d.geo_name');
+        $orderColumns = array('f_d_l_d.geo_name', 'total_samples_received', 'total_samples_rejected', 'rejection_rate');
 
         /*
          * Paging
@@ -1622,7 +1622,7 @@ class Covid19FormTable extends AbstractTableGateway
                 )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=covid19.facility_id', array('facility_name'))
-            ->join(array('f_d_l_d' => 'location_details'), 'f_d_l_d.location_id=f.facility_state', array('province' => 'location_name'))
+            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_state', array('province' => 'geo_name'))
             ->where("(covid19.sample_collection_date is not null AND covid19.sample_collection_date not like '' AND DATE(covid19.sample_collection_date) !='1970-01-01' AND DATE(covid19.sample_collection_date) !='0000-00-00')")
             ->group('f.facility_district');
 
@@ -1667,7 +1667,7 @@ class Covid19FormTable extends AbstractTableGateway
                 )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=covid19.facility_id', array('facility_name'))
-            ->join(array('f_d_l_d' => 'location_details'), 'f_d_l_d.location_id=f.facility_state', array('province' => 'location_name'))
+            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_state', array('province' => 'geo_name'))
             ->where("(covid19.sample_collection_date is not null AND covid19.sample_collection_date not like '' AND DATE(covid19.sample_collection_date) !='1970-01-01' AND DATE(covid19.sample_collection_date) !='0000-00-00')")
             ->group('f.facility_district');
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
@@ -1705,8 +1705,8 @@ class Covid19FormTable extends AbstractTableGateway
         /* Array of database columns which should be read and sent back to DataTables. Use a space where
          * you want to insert a non-database field (for example a counter or static image)
         */
-        $aColumns = array('f.facility_name', 'f_d_l_dp.location_name', 'f_d_l_d.location_name');
-        $orderColumns = array('f_d_l_dp.location_name', 'f_d_l_d.location_name', 'total_samples_received', 'total_samples_rejected', 'rejection_rate');
+        $aColumns = array('f.facility_name', 'f_d_l_dp.geo_name', 'f_d_l_d.geo_name');
+        $orderColumns = array('f_d_l_dp.geo_name', 'f_d_l_d.geo_name', 'total_samples_received', 'total_samples_rejected', 'rejection_rate');
 
         /*
          * Paging
@@ -1791,8 +1791,8 @@ class Covid19FormTable extends AbstractTableGateway
                 )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=covid19.facility_id', array('facility_name'))
-            ->join(array('f_d_l_dp' => 'location_details'), 'f_d_l_dp.location_id=f.facility_state', array('province' => 'location_name'))
-            ->join(array('f_d_l_d' => 'location_details'), 'f_d_l_d.location_id=f.facility_district', array('district' => 'location_name'))
+            ->join(array('f_d_l_dp' => 'geographical_divisions'), 'f_d_l_dp.geo_id=f.facility_state', array('province' => 'geo_name'))
+            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district', array('district' => 'geo_name'))
             ->where("(covid19.sample_collection_date is not null AND covid19.sample_collection_date not like '' AND DATE(covid19.sample_collection_date) !='1970-01-01' AND DATE(covid19.sample_collection_date) !='0000-00-00')")
             ->group('f.facility_id');
 
@@ -1837,8 +1837,8 @@ class Covid19FormTable extends AbstractTableGateway
                 )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=covid19.facility_id', array('facility_name'))
-            ->join(array('f_d_l_dp' => 'location_details'), 'f_d_l_dp.location_id=f.facility_state', array('province' => 'location_name'))
-            ->join(array('f_d_l_d' => 'location_details'), 'f_d_l_d.location_id=f.facility_district', array('district' => 'location_name'))
+            ->join(array('f_d_l_dp' => 'geographical_divisions'), 'f_d_l_dp.geo_id=f.facility_state', array('province' => 'geo_name'))
+            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district', array('district' => 'geo_name'))
             ->where("(covid19.sample_collection_date is not null AND covid19.sample_collection_date not like '' AND DATE(covid19.sample_collection_date) !='1970-01-01' AND DATE(covid19.sample_collection_date) !='0000-00-00')")
             ->group('f.facility_id');
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
@@ -2042,7 +2042,7 @@ class Covid19FormTable extends AbstractTableGateway
                 )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id = covid19.facility_id', array())
-            ->join(array('l' => 'location_details'), 'l.location_id = f.facility_state', array('location_name'))
+            ->join(array('l' => 'geographical_divisions'), 'l.geo_id = f.facility_state', array('geo_name'))
             ->group('f.facility_state');
 
         if (isset($params['provinces']) && trim($params['provinces']) != '') {
@@ -2147,7 +2147,7 @@ class Covid19FormTable extends AbstractTableGateway
         //var_dump($receivedResult);die;
         $recTotal = 0;
         foreach ($rResult as $rRow) {
-            $displayDate = $this->commonService->humanDateFormat($rRow['receivedDate']);
+            $displayDate = \Application\Service\CommonService::humanReadableDateFormat($rRow['receivedDate']);
             $receivedResult[] = array(array('total' => $rRow['total']), 'date' => $displayDate, 'receivedDate' => $displayDate, 'receivedTotal' => $recTotal += $rRow['total']);
         }
 
@@ -2175,7 +2175,7 @@ class Covid19FormTable extends AbstractTableGateway
         //var_dump($receivedResult);die;
         $testedTotal = 0;
         foreach ($rResult as $rRow) {
-            $displayDate = $this->commonService->humanDateFormat($rRow['testedDate']);
+            $displayDate = \Application\Service\CommonService::humanReadableDateFormat($rRow['testedDate']);
             $tResult[] = array(array('total' => $rRow['total']), 'date' => $displayDate, 'testedDate' => $displayDate, 'testedTotal' => $testedTotal += $rRow['total']);
         }
 
@@ -2201,7 +2201,7 @@ class Covid19FormTable extends AbstractTableGateway
         $rResult = $this->commonService->cacheQuery($cQueryStr, $dbAdapter);
         $rejTotal = 0;
         foreach ($rResult as $rRow) {
-            $displayDate = $this->commonService->humanDateFormat($rRow['rejectDate']);
+            $displayDate = \Application\Service\CommonService::humanReadableDateFormat($rRow['rejectDate']);
             $rejectedResult[] = array(array('total' => $rRow['total']), 'date' => $displayDate, 'rejectDate' => $displayDate, 'rejectTotal' => $rejTotal += $rRow['total']);
         }
         return array('quickStats' => $quickStats, 'scResult' => $receivedResult, 'stResult' => $tResult, 'srResult' => $rejectedResult);
@@ -2704,7 +2704,7 @@ class Covid19FormTable extends AbstractTableGateway
                 )
             )
             ->join('facility_details', 'facility_details.facility_id = covid19.facility_id')
-            ->join('location_details', 'facility_details.facility_state = location_details.location_id')
+            ->join('geographical_divisions', 'facility_details.facility_state = geographical_divisions.geo_id')
             ->where(
                 array(
                     "sample_tested_datetime >= '$startDate' AND sample_tested_datetime <= '$endDate'",
@@ -2735,7 +2735,7 @@ class Covid19FormTable extends AbstractTableGateway
                 $squery = $squery->where('covid19.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
             }
         }
-        $squery = $squery->group(array('location_id'));
+        $squery = $squery->group(array('geo_id'));
         $sQueryStr = $sql->buildSqlString($squery);
         // die($sQueryStr);
         $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -2759,7 +2759,7 @@ class Covid19FormTable extends AbstractTableGateway
                 )
             )
             ->join('facility_details', 'facility_details.facility_id = covid19.facility_id')
-            ->join('location_details', 'facility_details.facility_state = location_details.location_id')
+            ->join('geographical_divisions', 'facility_details.facility_state = geographical_divisions.geo_id')
             ->where(
                 array(
                     "sample_tested_datetime >= '$startDate' AND sample_tested_datetime <= '$endDate'",
@@ -2790,7 +2790,7 @@ class Covid19FormTable extends AbstractTableGateway
                 $squery = $squery->where('covid19.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
             }
         }
-        $squery = $squery->group(array('location_id'));
+        $squery = $squery->group(array('geo_id'));
         $sQueryStr = $sql->buildSqlString($squery);
         $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         return $sResult;
@@ -2813,7 +2813,7 @@ class Covid19FormTable extends AbstractTableGateway
                 )
             )
             ->join('facility_details', 'facility_details.facility_id = covid19.facility_id')
-            ->join('location_details', 'facility_details.facility_state = location_details.location_id')
+            ->join('geographical_divisions', 'facility_details.facility_state = geographical_divisions.geo_id')
             ->where(
                 array(
                     "sample_tested_datetime >= '$startDate' AND sample_tested_datetime <= '$endDate'",
@@ -2844,7 +2844,7 @@ class Covid19FormTable extends AbstractTableGateway
                 $squery = $squery->where('covid19.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
             }
         }
-        $squery = $squery->group(array('location_id'));
+        $squery = $squery->group(array('geo_id'));
         $sQueryStr = $sql->buildSqlString($squery);
         die($sQueryStr);
         $sResult   = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -2878,8 +2878,8 @@ class Covid19FormTable extends AbstractTableGateway
                                                         END)"))
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=covid19.lab_id', array())
-            ->join(array('p' => 'location_details'), 'p.location_id=f.facility_state', array('province_name' => 'location_name', 'location_id'), 'left')
-            ->group('p.location_id');
+            ->join(array('p' => 'geographical_divisions'), 'p.geo_id=f.facility_state', array('province_name' => 'geo_name', 'geo_id'), 'left')
+            ->group('p.geo_id');
         if (isset($params['lab']) && trim($params['lab']) != '') {
             $countQuery = $countQuery->where('covid19.lab_id IN (' . $params['lab'] . ')');
         } else {
@@ -2889,7 +2889,7 @@ class Covid19FormTable extends AbstractTableGateway
             }
         }
         if (isset($params['provinces']) && trim($params['provinces']) != '') {
-            $countQuery = $countQuery->where('p.location_id IN (' . $params['provinces'] . ')');
+            $countQuery = $countQuery->where('p.geo_id IN (' . $params['provinces'] . ')');
         }
         if (isset($params['districts']) && trim($params['districts']) != '') {
             $countQuery = $countQuery->where('f.facility_district IN (' . $params['districts'] . ')');
@@ -2979,9 +2979,9 @@ class Covid19FormTable extends AbstractTableGateway
                                                         END)"))
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=covid19.lab_id', array())
-            ->join(array('d' => 'location_details'), 'd.location_id=f.facility_district', array('district_name' => 'location_name', 'location_id'), 'left')
+            ->join(array('d' => 'geographical_divisions'), 'd.geo_id=f.facility_district', array('district_name' => 'geo_name', 'geo_id'), 'left')
             ->order('total DESC')
-            ->group('d.location_id');
+            ->group('d.geo_id');
         if (isset($params['lab']) && trim($params['lab']) != '') {
             $countQuery = $countQuery->where('covid19.lab_id IN (' . $params['lab'] . ')');
         } else {
@@ -2991,7 +2991,7 @@ class Covid19FormTable extends AbstractTableGateway
             }
         }
         if (isset($params['provinces']) && trim($params['provinces']) != '') {
-            $countQuery = $countQuery->where('p.location_id IN (' . $params['provinces'] . ')');
+            $countQuery = $countQuery->where('p.geo_id IN (' . $params['provinces'] . ')');
         }
         if (isset($params['districts']) && trim($params['districts']) != '') {
             $countQuery = $countQuery->where('f.facility_district IN (' . $params['districts'] . ')');
@@ -3467,8 +3467,8 @@ class Covid19FormTable extends AbstractTableGateway
             "aaData" => array()
         );
         foreach ($rResult as $aRow) {
-            $displayCollectionDate = $this->commonService->humanDateFormat($aRow['collectionDate']);
-            $displayReceivedDate = $this->commonService->humanDateFormat($aRow['receivedDate']);
+            $displayCollectionDate = \Application\Service\CommonService::humanReadableDateFormat($aRow['collectionDate']);
+            $displayReceivedDate = \Application\Service\CommonService::humanReadableDateFormat($aRow['receivedDate']);
             $row = array();
             $row[] = $aRow['sample_code'];
             $row[] = $displayCollectionDate;
@@ -3714,8 +3714,8 @@ class Covid19FormTable extends AbstractTableGateway
                     array(
                         'samples' => new Expression('COUNT(*)'),
                         "monthDate" => new Expression("DATE_FORMAT(DATE(sample_collection_date), '%b-%Y')"),
-                        "positive" => new Expression("SUM(CASE WHEN (((covid19.result = 'positive' or covid19.result = 'Positive' or covid19.result not like '') AND covid19.result IS NOT NULL AND covid19.result!= '' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) THEN 1 ELSE 0 END)"),
-                        "negative" => new Expression("SUM(CASE WHEN (( covid19.result IS NOT NULL AND covid19.result!= '' AND covid19.result ='negative' AND covid19.result ='Negative' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) THEN 1 ELSE 0 END)"),
+                        "positive" => new Expression("SUM(CASE WHEN (((covid19.result = 'positive' or covid19.result = 'Positive' or covid19.result not like '') AND covid19.result IS NOT NULL AND covid19.result!= '' AND sample_tested_datetime is not null AND sample_tested_datetime not like '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) THEN 1 ELSE 0 END)"),
+                        "negative" => new Expression("SUM(CASE WHEN (( covid19.result IS NOT NULL AND covid19.result!= '' AND covid19.result ='negative' AND covid19.result ='Negative' AND sample_tested_datetime is not null AND sample_tested_datetime not like '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) THEN 1 ELSE 0 END)"),
                     )
                 )
                 ->join(array('f' => 'facility_details'), 'f.facility_id=covid19.lab_id', array(), 'left')
@@ -3774,9 +3774,9 @@ class Covid19FormTable extends AbstractTableGateway
                 $sQuery = $sQuery->where($where);
             }
             if (isset($params['testResult']) && $params['testResult'] == '<1000') {
-                $sQuery = $sQuery->where("(covid19.result < 1000 or covid19.result = 'Target Not Detected' or covid19.result = 'TND' or covid19.result = 'tnd' or covid19.result= 'Below Detection Level' or covid19.result='BDL' or covid19.result='bdl' or covid19.result= 'Low Detection Level' or covid19.result='LDL' or covid19.result='ldl') AND covid19.result IS NOT NULL AND covid19.result!= '' AND covid19.result!='Failed' AND covid19.result!='failed' AND covid19.result!='Fail' AND covid19.result!='fail' AND covid19.result!='No Sample' AND covid19.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00'");
+                $sQuery = $sQuery->where("(covid19.result < 1000 or covid19.result = 'Target Not Detected' or covid19.result = 'TND' or covid19.result = 'tnd' or covid19.result= 'Below Detection Level' or covid19.result='BDL' or covid19.result='bdl' or covid19.result= 'Low Detection Level' or covid19.result='LDL' or covid19.result='ldl') AND covid19.result IS NOT NULL AND covid19.result!= '' AND covid19.result!='Failed' AND covid19.result!='failed' AND covid19.result!='Fail' AND covid19.result!='fail' AND covid19.result!='No Sample' AND covid19.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime not like '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00'");
             } else if (isset($params['testResult']) && $params['testResult'] == '>=1000') {
-                $sQuery = $sQuery->where("covid19.result IS NOT NULL AND covid19.result!= '' AND covid19.result >= 1000 AND covid19.result!='Failed' AND covid19.result!='failed' AND covid19.result!='Fail' AND covid19.result!='fail' AND covid19.result!='No Sample' AND covid19.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00'");
+                $sQuery = $sQuery->where("covid19.result IS NOT NULL AND covid19.result!= '' AND covid19.result >= 1000 AND covid19.result!='Failed' AND covid19.result!='failed' AND covid19.result!='Fail' AND covid19.result!='fail' AND covid19.result!='No Sample' AND covid19.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime not like '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00'");
             }
             if (isset($params['sampleType']) && trim($params['sampleType']) != '') {
                 $sQuery = $sQuery->where('covid19.specimen_type="' . base64_decode(trim($params['sampleType'])) . '"');
@@ -3897,8 +3897,8 @@ class Covid19FormTable extends AbstractTableGateway
             ->columns(array(
                 'sampleCollectionDate' => new Expression('DATE(sample_collection_date)'),
                 "total_samples_received" => new Expression("(COUNT(*))"),
-                "total_samples_tested" => new Expression("(SUM(CASE WHEN (((covid19.result IS NOT NULL AND covid19.result != '' AND covid19.result != 'NULL') AND (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) OR (covid19.reason_for_sample_rejection IS NOT NULL AND covid19.reason_for_sample_rejection != '' AND covid19.reason_for_sample_rejection != 0)) THEN 1 ELSE 0 END))"),
-                "total_samples_pending" => new Expression("(SUM(CASE WHEN ((covid19.result IS NULL OR covid19.result = '' OR covid19.result = 'NULL' OR sample_tested_datetime is null OR sample_tested_datetime = '' OR DATE(sample_tested_datetime) ='1970-01-01' OR DATE(sample_tested_datetime) ='0000-00-00') AND (covid19.reason_for_sample_rejection IS NULL OR covid19.reason_for_sample_rejection = '' OR covid19.reason_for_sample_rejection = 0)) THEN 1 ELSE 0 END))"),
+                "total_samples_tested" => new Expression("(SUM(CASE WHEN (((covid19.result IS NOT NULL AND covid19.result != '' AND covid19.result != 'NULL') AND (sample_tested_datetime is not null AND sample_tested_datetime not like '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) OR (covid19.reason_for_sample_rejection IS NOT NULL AND covid19.reason_for_sample_rejection != '' AND covid19.reason_for_sample_rejection != 0)) THEN 1 ELSE 0 END))"),
+                "total_samples_pending" => new Expression("(SUM(CASE WHEN ((covid19.result IS NULL OR covid19.result = '' OR covid19.result = 'NULL' OR sample_tested_datetime is null OR sample_tested_datetime like '' OR DATE(sample_tested_datetime) ='1970-01-01' OR DATE(sample_tested_datetime) ='0000-00-00') AND (covid19.reason_for_sample_rejection IS NULL OR covid19.reason_for_sample_rejection = '' OR covid19.reason_for_sample_rejection = 0)) THEN 1 ELSE 0 END))"),
                 "rejected_samples" => new Expression("SUM(CASE WHEN (covid19.reason_for_sample_rejection !='' AND covid19.reason_for_sample_rejection !='0' AND covid19.reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END)")
             ))
             ->join(array('f' => 'facility_details'), 'f.facility_id=covid19.facility_id', array('facility_name'))
@@ -4021,7 +4021,7 @@ class Covid19FormTable extends AbstractTableGateway
             $row = array();
             $sampleCollectionDate = '';
             if (isset($aRow['sampleCollectionDate']) && $aRow['sampleCollectionDate'] != null && trim($aRow['sampleCollectionDate']) != "" && $aRow['sampleCollectionDate'] != '0000-00-00') {
-                $sampleCollectionDate = $this->commonService->humanDateFormat($aRow['sampleCollectionDate']);
+                $sampleCollectionDate = \Application\Service\CommonService::humanReadableDateFormat($aRow['sampleCollectionDate']);
             }
             $row[] = $sampleCollectionDate;
             $row[] = $aRow['total_samples_received'];
@@ -4122,8 +4122,8 @@ class Covid19FormTable extends AbstractTableGateway
         $sQuery = $sql->select()->from(array('f' => 'facility_details'))
             ->join(array('covid19' => $this->table), 'covid19.lab_id=f.facility_id', array(
                 "total_samples_received" => new Expression("(COUNT(*))"),
-                "total_samples_tested" => new Expression("(SUM(CASE WHEN (((covid19.result IS NOT NULL AND covid19.result != '' AND covid19.result != 'NULL') AND (sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) OR (covid19.reason_for_sample_rejection IS NOT NULL AND covid19.reason_for_sample_rejection != '' AND covid19.reason_for_sample_rejection != 0)) THEN 1 ELSE 0 END))"),
-                "total_samples_pending" => new Expression("(SUM(CASE WHEN ((covid19.result IS NULL OR covid19.result = '' OR covid19.result = 'NULL' OR sample_tested_datetime is null OR sample_tested_datetime = '' OR DATE(sample_tested_datetime) ='1970-01-01' OR DATE(sample_tested_datetime) ='0000-00-00') AND (covid19.reason_for_sample_rejection IS NULL OR covid19.reason_for_sample_rejection = '' OR covid19.reason_for_sample_rejection = 0)) THEN 1 ELSE 0 END))"),
+                "total_samples_tested" => new Expression("(SUM(CASE WHEN (((covid19.result IS NOT NULL AND covid19.result != '' AND covid19.result != 'NULL') AND (sample_tested_datetime is not null AND sample_tested_datetime not like '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')) OR (covid19.reason_for_sample_rejection IS NOT NULL AND covid19.reason_for_sample_rejection != '' AND covid19.reason_for_sample_rejection != 0)) THEN 1 ELSE 0 END))"),
+                "total_samples_pending" => new Expression("(SUM(CASE WHEN ((covid19.result IS NULL OR covid19.result = '' OR covid19.result = 'NULL' OR sample_tested_datetime is null OR sample_tested_datetime like '' OR DATE(sample_tested_datetime) ='1970-01-01' OR DATE(sample_tested_datetime) ='0000-00-00') AND (covid19.reason_for_sample_rejection IS NULL OR covid19.reason_for_sample_rejection = '' OR covid19.reason_for_sample_rejection = 0)) THEN 1 ELSE 0 END))"),
                 "rejected_samples" => new Expression("SUM(CASE WHEN (covid19.reason_for_sample_rejection !='' AND covid19.reason_for_sample_rejection !='0' AND covid19.reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END)")
             ))
             ->where("sample_collection_date is not null AND sample_collection_date not like '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00' AND covid19.lab_id !=0")
@@ -4177,9 +4177,9 @@ class Covid19FormTable extends AbstractTableGateway
 
 
         if (isset($parameters['sampleStatus']) && $parameters['sampleStatus'] == 'sample_tested') {
-            $sQuery = $sQuery->where("((covid19.result IS NOT NULL AND covid19.result != '' AND covid19.result != 'NULL' AND sample_tested_datetime is not null AND sample_tested_datetime != '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') OR (covid19.reason_for_sample_rejection IS NOT NULL AND covid19.reason_for_sample_rejection != '' AND covid19.reason_for_sample_rejection != 0))");
+            $sQuery = $sQuery->where("((covid19.result IS NOT NULL AND covid19.result != '' AND covid19.result != 'NULL' AND sample_tested_datetime is not null AND sample_tested_datetime not like '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') OR (covid19.reason_for_sample_rejection IS NOT NULL AND covid19.reason_for_sample_rejection != '' AND covid19.reason_for_sample_rejection != 0))");
         } else if (isset($parameters['sampleStatus']) && $parameters['sampleStatus'] == 'samples_not_tested') {
-            $sQuery = $sQuery->where("(covid19.result IS NULL OR covid19.result = '' OR covid19.result = 'NULL' OR sample_tested_datetime is null OR sample_tested_datetime = '' OR DATE(sample_tested_datetime) ='1970-01-01' OR DATE(sample_tested_datetime) ='0000-00-00') AND (covid19.reason_for_sample_rejection IS NULL OR covid19.reason_for_sample_rejection = '' OR covid19.reason_for_sample_rejection = 0)");
+            $sQuery = $sQuery->where("(covid19.result IS NULL OR covid19.result = '' OR covid19.result = 'NULL' OR sample_tested_datetime is null OR sample_tested_datetime like '' OR DATE(sample_tested_datetime) ='1970-01-01' OR DATE(sample_tested_datetime) ='0000-00-00') AND (covid19.reason_for_sample_rejection IS NULL OR covid19.reason_for_sample_rejection = '' OR covid19.reason_for_sample_rejection = 0)");
         } else if (isset($parameters['sampleStatus']) && $parameters['sampleStatus'] == 'sample_rejected') {
             $sQuery = $sQuery->where("covid19.reason_for_sample_rejection IS NOT NULL AND covid19.reason_for_sample_rejection != '' AND covid19.reason_for_sample_rejection != 0");
         }

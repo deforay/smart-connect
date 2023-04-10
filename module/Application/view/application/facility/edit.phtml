@@ -125,7 +125,7 @@
                                                       <?php
                                                        foreach($facilityLocation as $location){
                                                         ?>
-                                                            <option value="<?php echo $location['location_id'];?>"<?php echo($facility->facility_state==$location['location_id'])?"selected='selected'":'';?>><?php echo ucwords($location['location_name']);?></option>
+                                                            <option value="<?php echo $location['geo_id'];?>"<?php echo($facility->facility_state==$location['geo_id'])?"selected='selected'":'';?>><?php echo ucwords($location['geo_name']);?></option>
                                                         <?php
                                                        }
                                                        ?>

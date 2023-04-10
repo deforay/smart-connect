@@ -63,6 +63,7 @@ class SummaryController extends AbstractActionController
     public function getSamplesReceivedBarChartAction()
     {
         /** @var \Laminas\Http\Request $request */
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
@@ -79,6 +80,7 @@ class SummaryController extends AbstractActionController
     public function samplesReceivedDistrictAction()
     {
         /** @var \Laminas\Http\Request $request */
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $parameters = $request->getPost();
@@ -89,6 +91,7 @@ class SummaryController extends AbstractActionController
     }
     public function samplesReceivedProvinceAction()
     {
+        /** @var \Laminas\Http\Request $request */
         /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
@@ -102,6 +105,7 @@ class SummaryController extends AbstractActionController
     public function samplesReceivedFacilityAction()
     {
         /** @var \Laminas\Http\Request $request */
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $parameters = $request->getPost();
@@ -113,6 +117,7 @@ class SummaryController extends AbstractActionController
 
     public function getSuppressionRateBarChartAction()
     {
+        /** @var \Laminas\Http\Request $request */
         /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
@@ -130,6 +135,7 @@ class SummaryController extends AbstractActionController
     public function suppressionRateDistrictAction()
     {
         /** @var \Laminas\Http\Request $request */
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $parameters = $request->getPost();
@@ -140,6 +146,7 @@ class SummaryController extends AbstractActionController
     }
     public function suppressionRateProvinceAction()
     {
+        /** @var \Laminas\Http\Request $request */
         /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
@@ -153,6 +160,7 @@ class SummaryController extends AbstractActionController
     public function suppressionRateFacilityAction()
     {
         /** @var \Laminas\Http\Request $request */
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $parameters = $request->getPost();
@@ -164,6 +172,7 @@ class SummaryController extends AbstractActionController
 
     public function getSamplesRejectedBarChartAction()
     {
+        /** @var \Laminas\Http\Request $request */
         /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
@@ -181,6 +190,7 @@ class SummaryController extends AbstractActionController
     public function samplesRejectedDistrictAction()
     {
         /** @var \Laminas\Http\Request $request */
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $parameters = $request->getPost();
@@ -193,6 +203,7 @@ class SummaryController extends AbstractActionController
     public function samplesRejectedFacilityAction()
     {
         /** @var \Laminas\Http\Request $request */
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $parameters = $request->getPost();
@@ -203,6 +214,7 @@ class SummaryController extends AbstractActionController
     }
     public function samplesRejectedProvinceAction()
     {
+        /** @var \Laminas\Http\Request $request */
         /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
@@ -215,6 +227,7 @@ class SummaryController extends AbstractActionController
 
     public function getRegimenGroupBarChartAction()
     {
+        /** @var \Laminas\Http\Request $request */
         /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
@@ -232,6 +245,7 @@ class SummaryController extends AbstractActionController
     public function getRegimenGroupDetailsAction()
     {
         /** @var \Laminas\Http\Request $request */
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $parameters = $request->getPost();
@@ -243,6 +257,7 @@ class SummaryController extends AbstractActionController
 
     public function getIndicatorsAction()
     {
+        /** @var \Laminas\Http\Request $request */
         /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
@@ -260,6 +275,7 @@ class SummaryController extends AbstractActionController
     public function exportIndicatorResultExcelAction()
     {
         /** @var \Laminas\Http\Request $request */
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
@@ -274,6 +290,7 @@ class SummaryController extends AbstractActionController
 
     public function exportSuppressionRateByFacilityAction()
     {
+        /** @var \Laminas\Http\Request $request */
         /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {

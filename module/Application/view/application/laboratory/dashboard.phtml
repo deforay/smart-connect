@@ -245,7 +245,7 @@ foreach ($sampleType as $samples) {
                 <?php
                 foreach ($provinceName as $province) {
                 ?>
-                    <option value="<?php echo $province['location_id']; ?>"><?php echo $province['location_name']; ?></option>
+                    <option value="<?php echo $province['geo_id']; ?>"><?php echo $province['geo_name']; ?></option>
                 <?php
                 }
                 ?>
@@ -254,7 +254,7 @@ foreach ($sampleType as $samples) {
         <div class="col-lg-6" id="districtHeight">
             <select name="districtName[]" id="districtName" class="form-control" multiple title="<?php echo $this->translate('Please select one or more district. Leave blank for All'); ?>" onchange="selectLabName();">
                 <?php foreach ($districtName as $district) { ?>
-                    <option data-parent-location="<?php echo $district['parent_location']; ?>" value="<?php echo $district['location_id']; ?>"><?php echo $district['location_name']; ?></option>
+                    <option data-parent-location="<?php echo $district['geo_parent']; ?>" value="<?php echo $district['geo_id']; ?>"><?php echo $district['geo_name']; ?></option>
                 <?php } ?>
             </select>
         </div>
@@ -318,7 +318,7 @@ foreach ($sampleType as $samples) {
                 </div>
             </div>
             <div class="portlet-body" style="cursor:pointer;">
-                <div id="samplesTestedChart"></div>
+                <div id="samplesTestedChartDiv"></div>
             </div>
         </div>
     </div>
@@ -339,7 +339,7 @@ foreach ($sampleType as $samples) {
                 </div>
             </div>
             <div class="portlet-body" style="cursor:pointer;">
-                <div id="samplesTestedPerLabChart"></div>
+                <div id="samplesTestedPerLabChartDiv"></div>
             </div>
         </div>
     </div>
@@ -747,7 +747,7 @@ foreach ($sampleType as $samples) {
                 facilityId: facilityId
             },
             function(data) {
-                $("#samplesTestedChart").html(data);
+                $("#samplesTestedChartDiv").html(data);
             });
     }
 
@@ -763,7 +763,7 @@ foreach ($sampleType as $samples) {
                 facilityId: facilityId
             },
             function(data) {
-                $("#samplesTestedPerLabChart").html(data);
+                $("#samplesTestedPerLabChartDiv").html(data);
             });
     }
 

@@ -19,25 +19,25 @@ use Laminas\Db\TableGateway\AbstractTableGateway;
  *
  * @author amit
  */
-class CountriesTable extends AbstractTableGateway {
+class CountriesTable extends AbstractTableGateway
+{
 
     protected $table = 'countries';
 
-    public function __construct(Adapter $adapter) {
+    public function __construct(Adapter $adapter)
+    {
         $this->adapter = $adapter;
     }
-    
-    
-    public function getAllCountries() {
+
+
+    public function getAllCountries()
+    {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->from(array('c' => 'countries'));
-        
+
         $sQueryStr = $sql->buildSqlString($sQuery);
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-        return $rResult;        
+        return $rResult;
     }
-    
-    
-    
 }

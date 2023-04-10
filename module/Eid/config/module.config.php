@@ -9,7 +9,7 @@ return array(
                 'options' => array(
                     'route' => '/eid[/]',
                     'defaults' => array(
-                        'controller' => 'Eid\Controller\Summary',
+                        'controller' => 'Eid\Controller\SummaryController',
                         'action' => 'dashboard'
                     ),
                 ),
@@ -19,7 +19,7 @@ return array(
                 'options' => array(
                     'route' => '/eid/summary[/][:action][/:id]',
                     'defaults' => array(
-                        'controller' => 'Eid\Controller\Summary',
+                        'controller' => 'Eid\Controller\SummaryController',
                         'action' => 'dashboard',
                     ),
                 ),
@@ -29,7 +29,7 @@ return array(
                 'options' => array(
                     'route' => '/eid/labs[/][:action][/:id]',
                     'defaults' => array(
-                        'controller' => 'Eid\Controller\Labs',
+                        'controller' => 'Eid\Controller\LabsController',
                         'action' => 'index',
                     ),
                 ),
@@ -39,7 +39,7 @@ return array(
                 'options' => array(
                     'route' => '/eid/clinics[/][:action][/:id]',
                     'defaults' => array(
-                        'controller' => 'Eid\Controller\Clinics',
+                        'controller' => 'Eid\Controller\ClinicsController',
                         'action' => 'index',
                     ),
                 ),

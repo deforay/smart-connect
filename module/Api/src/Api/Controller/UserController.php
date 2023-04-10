@@ -26,7 +26,6 @@ class UserController extends AbstractRestfulController
             isset($params['userName']) && $params['userName'] != '' &&
             isset($params['password']) && $params['password'] != ''
         ) {
-            //$userService = $this->getServiceLocator()->get('UserService');
             $response = $this->userService->userLoginApi($params);
         } else {
             $response['status'] = '403';

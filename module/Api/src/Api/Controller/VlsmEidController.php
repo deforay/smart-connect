@@ -7,7 +7,7 @@ use Laminas\View\Model\JsonModel;
 
 class VlsmEidController extends AbstractRestfulController
 {
-    private $eidSampleService = null;
+    public \Eid\Service\EidSampleService $eidSampleService;
 
     public function __construct($eidSampleService)
     {
@@ -27,7 +27,7 @@ class VlsmEidController extends AbstractRestfulController
         }
         if ($params['api-version'] == 'v1') {
             $response = $this->eidSampleService->saveFileFromVlsmAPIV1();
-        } else if ($params['api-version'] == 'v2') {
+        } elseif ($params['api-version'] == 'v2') {
             $response = $this->eidSampleService->saveFileFromVlsmAPIV2();
         }
 

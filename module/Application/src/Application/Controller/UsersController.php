@@ -10,7 +10,7 @@ class UsersController extends AbstractActionController
 {
 
     private $userService = null;
-    private $commonService = null;
+    private \Application\Service\CommonService $commonService;
     private $orgService = null;
 
     public function __construct($userService, $commonService, $orgService)
@@ -23,6 +23,7 @@ class UsersController extends AbstractActionController
     public function indexAction()
     {
         $this->layout()->setVariable('activeTab', 'users');
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
@@ -100,6 +101,7 @@ class UsersController extends AbstractActionController
 
     public function getRoleFacilitiesAction()
     {
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();

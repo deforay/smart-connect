@@ -10,8 +10,8 @@ class LaboratoryController extends AbstractActionController
 {
 
 
-    private $sampleService = null;
-    private $commonService = null;
+    public \Application\Service\SampleService $sampleService;
+    public \Application\Service\CommonService $commonService;
 
     public function __construct($sampleService, $commonService)
     {
@@ -29,7 +29,7 @@ class LaboratoryController extends AbstractActionController
     {
         
         $this->layout()->setVariable('activeTab', 'laboratory');
-        // $sampleService = $this->getServiceLocator()->get('SampleService');
+        
         $sampleType = $this->sampleService->getSampleType();
         $labName = $this->sampleService->getAllLabName();
         $provinceName = $this->sampleService->getAllProvinceList();
@@ -76,8 +76,8 @@ class LaboratoryController extends AbstractActionController
         $labFilter = $this->params()->fromQuery('lab');
         $params['labs'] = explode(',', $labFilter);
 
-        // $sampleService = $this->getServiceLocator()->get('SampleService');
-        // $commonService = $this->getServiceLocator()->get('CommonService');
+        
+        
         $hubName = $this->sampleService->getAllHubName();
         $sampleType = $this->sampleService->getSampleType();
         $currentRegimen = $this->sampleService->getAllCurrentRegimen();
@@ -114,8 +114,8 @@ class LaboratoryController extends AbstractActionController
             $labFilter = $this->params()->fromQuery('lab');
             $params['labs'] = $labFilter;
         }
-        // $sampleService = $this->getServiceLocator()->get('SampleService');
-        // $commonService = $this->getServiceLocator()->get('CommonService');
+        
+        
         $facilityInfo = $this->commonService->getSampleTestedFacilityInfo($params);
         return new ViewModel(array(
             'searchMonth' => $month,
@@ -126,10 +126,11 @@ class LaboratoryController extends AbstractActionController
 
     public function getIncompleteSampleDetailsAction()
     {
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            // $sampleService = $this->getServiceLocator()->get('SampleService');
+            
             $result = $this->sampleService->getIncompleteSampleDetails($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('result' => $result))
@@ -140,10 +141,11 @@ class LaboratoryController extends AbstractActionController
 
     public function getIncompleteBarSampleDetailsAction()
     {
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            // $sampleService = $this->getServiceLocator()->get('SampleService');
+            
             $result = $this->sampleService->getIncompleteBarSampleDetails($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('result' => $result))
@@ -154,10 +156,11 @@ class LaboratoryController extends AbstractActionController
 
     public function getSampleResultAction()
     {
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            // $sampleService = $this->getServiceLocator()->get('SampleService');
+            
             $result = $this->sampleService->getSampleResultDetails($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('params' => $params, 'result' => $result))
@@ -168,10 +171,11 @@ class LaboratoryController extends AbstractActionController
 
     public function getSamplesTestedAction()
     {
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            // $sampleService = $this->getServiceLocator()->get('SampleService');
+            
             $result = $this->sampleService->getSamplesTested($params);
             $sampleType = $this->sampleService->getSampleType();
             $viewModel = new ViewModel();
@@ -183,6 +187,7 @@ class LaboratoryController extends AbstractActionController
 
     public function getSamplesTestedPerLabAction()
     {
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
@@ -197,10 +202,11 @@ class LaboratoryController extends AbstractActionController
 
     public function getSampleTestResultGenderAction()
     {
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            // $sampleService = $this->getServiceLocator()->get('SampleService');
+            
             $params['gender'] = 'yes';
             $result = $this->sampleService->getSampleTestedResultGenderDetails($params);
             $viewModel = new ViewModel();
@@ -212,10 +218,11 @@ class LaboratoryController extends AbstractActionController
 
     public function getLabTurnAroundTimeAction()
     {
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            // $sampleService = $this->getServiceLocator()->get('SampleService');
+            
             $sampleType = $this->sampleService->getSampleType();
             $result = $this->sampleService->getLabTurnAroundTime($params);
             $viewModel = new ViewModel();
@@ -227,10 +234,11 @@ class LaboratoryController extends AbstractActionController
 
     public function getSampleTestResultAgeGroupAction()
     {
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            // $sampleService = $this->getServiceLocator()->get('SampleService');
+            
             $result = $this->sampleService->getSampleTestedResultAgeGroupDetails($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('result' => $result))
@@ -241,10 +249,11 @@ class LaboratoryController extends AbstractActionController
 
     public function getSampleTestResultPregnantAction()
     {
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            // $sampleService = $this->getServiceLocator()->get('SampleService');
+            
             $result = $this->sampleService->getSampleTestedResultPregnantPatientDetails($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('result' => $result))
@@ -255,10 +264,11 @@ class LaboratoryController extends AbstractActionController
 
     public function getSampleTestResultBreastfeedingAction()
     {
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            // $sampleService = $this->getServiceLocator()->get('SampleService');
+            
             $result = $this->sampleService->getSampleTestedResultBreastfeedingPatientDetails($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('result' => $result))
@@ -269,10 +279,11 @@ class LaboratoryController extends AbstractActionController
 
     public function getRequisitionFormsAction()
     {
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            // $sampleService = $this->getServiceLocator()->get('SampleService');
+            
             $result = $this->sampleService->getRequisitionFormsTested($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('result' => $result))
@@ -283,10 +294,11 @@ class LaboratoryController extends AbstractActionController
 
     public function getSampleVolumeAction()
     {
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            // $sampleService = $this->getServiceLocator()->get('SampleService');
+            
             $result = $this->sampleService->getSampleVolume($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('result' => $result))
@@ -297,10 +309,11 @@ class LaboratoryController extends AbstractActionController
 
     public function getFemalePatientResultAction()
     {
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            // $sampleService = $this->getServiceLocator()->get('SampleService');
+            
             $result = $this->sampleService->getFemalePatientResult($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('result' => $result))
@@ -311,10 +324,11 @@ class LaboratoryController extends AbstractActionController
 
     public function getLineOfTreatmentAction()
     {
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            // $sampleService = $this->getServiceLocator()->get('SampleService');
+            
             $result = $this->sampleService->getLineOfTreatment($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('result' => $result))
@@ -325,10 +339,11 @@ class LaboratoryController extends AbstractActionController
 
     public function getLabFacilitiesAction()
     {
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            // $sampleService = $this->getServiceLocator()->get('SampleService');
+            
             $sampleType = $this->sampleService->getSampleType();
             $result = $this->sampleService->getFacilites($params);
             $viewModel = new ViewModel();
@@ -340,10 +355,11 @@ class LaboratoryController extends AbstractActionController
 
     public function getSampleDetailsAction()
     {
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            // $sampleService = $this->getServiceLocator()->get('SampleService');
+            
             $result = $this->sampleService->getSampleDetails($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('params' => $params, 'result' => $result))
@@ -354,10 +370,11 @@ class LaboratoryController extends AbstractActionController
 
     public function getVlOutComesAction()
     {
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            // $sampleService = $this->getServiceLocator()->get('SampleService');
+            
             $result = $this->sampleService->getVlOutComes($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('result' => $result))
@@ -368,10 +385,11 @@ class LaboratoryController extends AbstractActionController
 
     public function getBarSampleDetailsAction()
     {
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            // $sampleService = $this->getServiceLocator()->get('SampleService');
+            
             $result = $this->sampleService->getBarSampleDetails($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('params' => $params, 'result' => $result))
@@ -382,10 +400,11 @@ class LaboratoryController extends AbstractActionController
 
     public function getLabFilterSampleDetailsAction()
     {
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $parameters = $request->getPost();
-            // $sampleService = $this->getServiceLocator()->get('SampleService');
+            
             $result = $this->sampleService->getLabFilterSampleDetails($parameters);
             return $this->getResponse()->setContent(Json::encode($result));
         }
@@ -393,10 +412,11 @@ class LaboratoryController extends AbstractActionController
 
     public function getFilterSampleDetailsAction()
     {
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $parameters = $request->getPost();
-            // $sampleService = $this->getServiceLocator()->get('SampleService');
+            
             $result = $this->sampleService->getFilterSampleDetails($parameters);
             return $this->getResponse()->setContent(Json::encode($result));
         }
@@ -437,8 +457,8 @@ class LaboratoryController extends AbstractActionController
             $params['labNames'] = explode(',', $labFilter);
         }
 
-        // $sampleService = $this->getServiceLocator()->get('SampleService');
-        // $commonService = $this->getServiceLocator()->get('CommonService');
+        
+        
         $hubName = $this->sampleService->getAllHubName();
         $sampleType = $this->sampleService->getSampleType();
         $currentRegimen = $this->sampleService->getAllCurrentRegimen();
@@ -460,10 +480,11 @@ class LaboratoryController extends AbstractActionController
 
     public function getLabSampleDetailsAction()
     {
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            // $sampleService = $this->getServiceLocator()->get('SampleService');
+            
             $result = $this->sampleService->getLabSampleDetails($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('result' => $result))
@@ -474,10 +495,11 @@ class LaboratoryController extends AbstractActionController
 
     public function getLabBarSampleDetailsAction()
     {
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            // $sampleService = $this->getServiceLocator()->get('SampleService');
+            
             $result = $this->sampleService->getLabBarSampleDetails($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('result' => $result))
@@ -508,8 +530,8 @@ class LaboratoryController extends AbstractActionController
         if ($this->params()->fromQuery('result')) {
             $sampleStatus = $this->params()->fromQuery('result');
         }
-        // $sampleService = $this->getServiceLocator()->get('SampleService');
-        // $commonService = $this->getServiceLocator()->get('CommonService');
+        
+        
         $hubName = $this->sampleService->getAllHubName();
         $sampleType = $this->sampleService->getSampleType();
         $currentRegimen = $this->sampleService->getAllCurrentRegimen();
@@ -528,6 +550,7 @@ class LaboratoryController extends AbstractActionController
 
     public function exportSampleResultExcelAction()
     {
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
@@ -541,10 +564,11 @@ class LaboratoryController extends AbstractActionController
 
     public function exportLabTestedSampleExcelAction()
     {
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            // $sampleService = $this->getServiceLocator()->get('SampleService');
+            
             $file = $this->sampleService->generateLabTestedSampleExcel($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('file' => $file))
@@ -587,8 +611,8 @@ class LaboratoryController extends AbstractActionController
             $params['labs'] = explode(',', $labFilter);
         }
 
-        // $sampleService = $this->getServiceLocator()->get('SampleService');
-        // $commonService = $this->getServiceLocator()->get('CommonService');
+        
+        
         $hubName = $this->sampleService->getAllHubName();
         $sampleType = $this->sampleService->getSampleType();
         $currentRegimen = $this->sampleService->getAllCurrentRegimen();
@@ -610,10 +634,11 @@ class LaboratoryController extends AbstractActionController
 
     public function getBarSampleTatAction()
     {
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            // $sampleService = $this->getServiceLocator()->get('SampleService');
+            
             $result = $this->sampleService->getBarSampleDetails($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('params' => $params, 'result' => $result))
@@ -624,10 +649,11 @@ class LaboratoryController extends AbstractActionController
 
     public function getPieSampleTatAction()
     {
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            // $sampleService = $this->getServiceLocator()->get('SampleService');
+            
             $result = $this->sampleService->getSampleDetails($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('params' => $params, 'result' => $result))
@@ -638,10 +664,11 @@ class LaboratoryController extends AbstractActionController
 
     public function getFilterSampleTatAction()
     {
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $parameters = $request->getPost();
-            // $sampleService = $this->getServiceLocator()->get('SampleService');
+            
             $result = $this->sampleService->getFilterSampleTatDetails($parameters);
             return $this->getResponse()->setContent(Json::encode($result));
         }
@@ -649,10 +676,11 @@ class LaboratoryController extends AbstractActionController
 
     public function exportSampleTestedResultTatExcelAction()
     {
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            // $sampleService = $this->getServiceLocator()->get('SampleService');
+            
             $file = $this->sampleService->generateLabTestedSampleTatExcel($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('file' => $file))
@@ -676,7 +704,7 @@ class LaboratoryController extends AbstractActionController
         if ($this->params()->fromQuery('lab')) {
             $labFilter = $this->params()->fromQuery('lab');
         }
-        // $sampleService = $this->getServiceLocator()->get('SampleService');
+        
         $labName = $this->sampleService->getAllLabName();
         if (trim($fromDate) != '' && trim($toDate) != '') {
             return new ViewModel(array('fromMonth' => date('M-Y', strtotime($fromDate)), 'toMonth' => date('M-Y', strtotime($toDate)), 'labFilter' => $labFilter, 'labName' => $labName));
@@ -687,10 +715,11 @@ class LaboratoryController extends AbstractActionController
 
     public function getLocationInfoAction()
     {
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            // $commonService = $this->getServiceLocator()->get('CommonService');
+            
             $result = $this->commonService->getSampleTestedLocationInfo($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('result' => $result))
@@ -712,8 +741,8 @@ class LaboratoryController extends AbstractActionController
             $labFilter = $this->params()->fromQuery('lab');
             $params['labs'] = explode(',', $labFilter);
         }
-        // $sampleService = $this->getServiceLocator()->get('SampleService');
-        // $commonService = $this->getServiceLocator()->get('CommonService');
+        
+        
         $hubName = $this->sampleService->getAllHubName();
         $sampleType = $this->sampleService->getSampleType();
         $currentRegimen = $this->sampleService->getAllCurrentRegimen();
@@ -730,10 +759,11 @@ class LaboratoryController extends AbstractActionController
 
     public function getProvinceWiseResultAwaitedDrillDownAction()
     {
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            // $sampleService = $this->getServiceLocator()->get('SampleService');
+            
             $result = $this->sampleService->getProvinceWiseResultAwaitedDrillDown($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('result' => $result))
@@ -744,10 +774,11 @@ class LaboratoryController extends AbstractActionController
 
     public function getLabWiseResultAwaitedDrillDownAction()
     {
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            // $sampleService = $this->getServiceLocator()->get('SampleService');
+            
             $result = $this->sampleService->getLabWiseResultAwaitedDrillDown($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('result' => $result))
@@ -758,10 +789,11 @@ class LaboratoryController extends AbstractActionController
 
     public function getDistrictWiseResultAwaitedDrillDownAction()
     {
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            // $sampleService = $this->getServiceLocator()->get('SampleService');
+            
             $result = $this->sampleService->getDistrictWiseResultAwaitedDrillDown($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('result' => $result))
@@ -772,10 +804,11 @@ class LaboratoryController extends AbstractActionController
 
     public function getClinicWiseResultAwaitedDrillDownAction()
     {
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            // $sampleService = $this->getServiceLocator()->get('SampleService');
+            
             $result = $this->sampleService->getClinicWiseResultAwaitedDrillDown($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('result' => $result))
@@ -786,10 +819,11 @@ class LaboratoryController extends AbstractActionController
 
     public function getFilterSampleResultAwaitedDetailsAction()
     {
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $parameters = $request->getPost();
-            // $sampleService = $this->getServiceLocator()->get('SampleService');
+            
             $result = $this->sampleService->getFilterSampleResultAwaitedDetails($parameters);
             return $this->getResponse()->setContent(Json::encode($result));
         }
@@ -797,10 +831,11 @@ class LaboratoryController extends AbstractActionController
 
     public function exportResultsAwaitedSampleAction()
     {
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            // $sampleService = $this->getServiceLocator()->get('SampleService');
+            
             $file = $this->sampleService->generateResultsAwaitedSampleExcel($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('file' => $file))
@@ -813,6 +848,7 @@ class LaboratoryController extends AbstractActionController
         echo "came";
         die;
         $this->layout('layout/modal.phtml');
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         $params = $request->getQuery();
         return new ViewModel(array(
@@ -821,10 +857,11 @@ class LaboratoryController extends AbstractActionController
     }
     public function getSampleTestReasonBarChartAction()
     {
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            // $sampleService = $this->getServiceLocator()->get('SampleService');
+            
             $result = $this->sampleService->getSampleTestReasonBarChartDetails($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array(
@@ -835,10 +872,11 @@ class LaboratoryController extends AbstractActionController
     }
     public function getSampleTestResultAgeGroupTwoToFiveAction()
     {
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            // $sampleService = $this->getServiceLocator()->get('SampleService');
+            
             $result = $this->sampleService->getSampleTestedResultAgeGroupDetails($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('result' => $result))
@@ -848,10 +886,11 @@ class LaboratoryController extends AbstractActionController
     }
     public function getSampleTestResultAgeGroupSixToFourteenAction()
     {
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            // $sampleService = $this->getServiceLocator()->get('SampleService');
+            
             $result = $this->sampleService->getSampleTestedResultAgeGroupDetails($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('result' => $result))
@@ -861,10 +900,11 @@ class LaboratoryController extends AbstractActionController
     }
     public function getSampleTestResultAgeGroupFifteenToFourtynineAction()
     {
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            // $sampleService = $this->getServiceLocator()->get('SampleService');
+            
             $result = $this->sampleService->getSampleTestedResultAgeGroupDetails($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('result' => $result))
@@ -874,10 +914,11 @@ class LaboratoryController extends AbstractActionController
     }
     public function getSampleTestResultAgeGroupGreaterFiftyAction()
     {
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            // $sampleService = $this->getServiceLocator()->get('SampleService');
+            
             $result = $this->sampleService->getSampleTestedResultAgeGroupDetails($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('result' => $result))
@@ -887,10 +928,11 @@ class LaboratoryController extends AbstractActionController
     }
     public function getSampleTestResultAgeGroupUnknownAction()
     {
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            // $sampleService = $this->getServiceLocator()->get('SampleService');
+            
             $result = $this->sampleService->getSampleTestedResultAgeGroupDetails($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('result' => $result))
@@ -901,10 +943,11 @@ class LaboratoryController extends AbstractActionController
     public function getSampleStatusDataTableAction()
     {
 
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $parameters = $request->getPost();
-            // $sampleService = $this->getServiceLocator()->get('SampleService');
+            
             $result = $this->sampleService->getSampleStatusDataTable($parameters);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('result' => $result))
@@ -912,19 +955,6 @@ class LaboratoryController extends AbstractActionController
             return $viewModel;
         }
     }
-
-    // public function exportSampleStatusResultExcelAction() {
-    //     $request = $this->getRequest();
-    //     if ($request->isPost()) {
-    //         $params = $request->getPost();
-    //         // $sampleService = $this->getServiceLocator()->get('SampleService');
-    //         $file=$this->sampleService->generateSampleStatusResultExcel($params);
-    //         $viewModel = new ViewModel();
-    //         $viewModel->setVariables(array('file' =>$file))
-    //                   ->setTerminal(true);
-    //         return $viewModel;
-    //     }
-    // }
 
 
 }

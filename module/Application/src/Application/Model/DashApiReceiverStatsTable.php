@@ -193,10 +193,10 @@ class DashApiReceiverStatsTable extends AbstractTableGateway
                 COALESCE(facility_attributes->>'$.lastHeartBeat', 0), 
                 COALESCE(facility_attributes->>'$.dashLastResultsSync', 0), 
                 COALESCE(facility_attributes->>'$.dashLastRequestSync', 0),
-                COALESCE(sync.received_on, 0))"), 
-            "dashLastResultsSync" => new Expression("(facility_attributes->>'$.dashLastResultsSync')"), 
-            "dashLastRequestsSync" => new Expression("(facility_attributes->>'$.dashLastRequestsSync')") 
-            ))
+                COALESCE(sync.received_on, 0))"),
+            "dashLastResultsSync" => new Expression("(facility_attributes->>'$.dashLastResultsSync')"),
+            "dashLastRequestsSync" => new Expression("(facility_attributes->>'$.dashLastRequestsSync')")
+        ))
             ->join(array('sync' => $this->table), "sync.lab_id=f.facility_id", array(), 'left')
             ->group("facility_id")
             ->order(array("latest DESC"));
@@ -205,10 +205,12 @@ class DashApiReceiverStatsTable extends AbstractTableGateway
         return $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
     }
 
-    public function updateAttributes($params){
-        $commonService = new CommonService();
-        $currentDateTime = $commonService->getDateTime();
-        return $this->adapter->query("UPDATE ".$params['table']." SET form_attributes = JSON_SET(COALESCE(form_attributes, '{}'), '$.lastSync', ?) WHERE ".$params['field']." IN (?)", array($currentDateTime, $params['id']));
+    public function updateAttributes($params)
+    {
+        $currentDateTime = \Application\Service\CommonService::getDateTime();
+        return $this->adapter->query(
+            "UPDATE " . $params['table'] . " SET form_attributes = JSON_SET(COALESCE(form_attributes, '{}'), '$.lastSync', ?) WHERE " . $params['field'] . " IN (?)",
+            array($currentDateTime, $params['id'])
+        );
     }
 }
-

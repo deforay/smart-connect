@@ -2,13 +2,15 @@
 
 namespace Application\Service;
 
+use DateTimeImmutable;
+use DateTimeZone;
 use Laminas\Session\Container;
 use Exception;
 use Laminas\Db\Sql\Sql;
+use Laminas\Mail;
 use Laminas\Mail\Transport\Smtp as SmtpTransport;
 use Laminas\Mail\Transport\SmtpOptions;
-use \PhpOffice\PhpSpreadsheet\Spreadsheet;
-use Laminas\Mail;
+
 use Laminas\Mime\Message as MimeMessage;
 use Laminas\Mime\Part as MimePart;
 
@@ -36,33 +38,16 @@ class CommonService
           return (substr($string, 0, $len) === $startString);
      }
 
-     public static function generateRandomString($length = 8, $seeds = 'alphanum')
+     public static function generateRandomString($length = 32)
      {
           // Possible seeds
-          $seedings['alpha'] = 'abcdefghijklmnopqrstuvwqyz';
-          $seedings['numeric'] = '0123456789';
-          $seedings['alphanum'] = 'abcdefghijklmnopqrstuvwqyz0123456789';
-          $seedings['hexidec'] = '0123456789abcdef';
-
-          // Choose seed
-          if (isset($seedings[$seeds])) {
-               $seeds = $seedings[$seeds];
+          $randomString = '';
+          for ($i = 0; $i < $length; $i++) {
+               $number = random_int(0, 36);
+               $character = base_convert($number, 10, 36);
+               $randomString .= $character;
           }
-
-          // Seed generator
-          list($usec, $sec) = explode(' ', microtime());
-          $seed = (float) $sec + ((float) $usec * 100000);
-          mt_srand($seed);
-
-          // Generate
-          $str = '';
-          $seeds_count = strlen($seeds);
-
-          for ($i = 0; $length > $i; $i++) {
-               $str .= $seeds[mt_rand(0, $seeds_count - 1)];
-          }
-
-          return $str;
+          return $randomString;
      }
 
      public function checkMultipleFieldValidations($params)
@@ -100,8 +85,9 @@ class CommonService
           try {
                $sql = new Sql($adapter);
                if ($fnct == '' || $fnct == 'null') {
-                    $select = $sql->select()->from($tableName)->where(array($fieldName => $value));
-                    //$statement=$adapter->query('SELECT * FROM '.$tableName.' WHERE '.$fieldName." = '".$value."'");
+                    $select = $sql->select()
+                         ->from($tableName)
+                         ->where(array($fieldName => $value));
                     $statement = $sql->prepareStatementForSqlObject($select);
                     $result = $statement->execute();
                     $data = count($result);
@@ -109,18 +95,19 @@ class CommonService
                     $table = explode("##", $fnct);
                     if ($fieldName == 'password') {
                          //Password encrypted
-                         $config = new \Laminas\Config\Reader\Ini();
-                         $configResult = $config->fromFile(CONFIG_PATH . '/custom.config.ini');
+                         $configResult = $this->sm->get('Config');
                          $password = sha1($value . $configResult["password"]["salt"]);
                          //$password = $value;
-                         $select = $sql->select()->from($tableName)->where(array($fieldName => $password, $table[0] => $table[1]));
+                         $select = $sql->select()
+                              ->from($tableName)
+                              ->where(array($fieldName => $password, $table[0] => $table[1]));
                          $statement = $sql->prepareStatementForSqlObject($select);
                          $result = $statement->execute();
                          $data = count($result);
                     } else {
-                         // first trying $table[1] without quotes. If this does not work, then in catch we try with single quotes
-                         //$statement=$adapter->query('SELECT * FROM '.$tableName.' WHERE '.$fieldName." = '".$value."' and ".$table[0]."!=".$table[1] );
-                         $select = $sql->select()->from($tableName)->where(array("$fieldName='$value'", $table[0] . "!=" . "'$table[1]'"));
+                         $select = $sql->select()
+                              ->from($tableName)
+                              ->where(array("$fieldName='$value'", $table[0] . "!=" . "'$table[1]'"));
                          $statement = $sql->prepareStatementForSqlObject($select);
                          $result = $statement->execute();
                          $data = count($result);
@@ -133,54 +120,64 @@ class CommonService
           }
      }
 
-     public function dateFormat($date)
+     public static function verifyIfDateValid($date): bool
      {
-          if (!isset($date) || $date == null || $date == "" || $date == "0000-00-00") {
-               return "0000-00-00";
+          $date = trim($date);
+          $response = false;
+
+          if (empty($date) || 'undefined' === $date || 'null' === $date) {
+               $response = false;
           } else {
-               $dateArray = explode('-', $date);
-               if (sizeof($dateArray) == 0) {
-                    return;
+               try {
+                    $dateTime = new DateTimeImmutable($date);
+                    $errors = DateTimeImmutable::getLastErrors();
+                    if (
+                         empty($dateTime) || $dateTime === false ||
+                         !empty($errors['warning_count']) ||
+                         !empty($errors['error_count'])
+                    ) {
+                         $response = false;
+                    } else {
+                         $response = true;
+                    }
+               } catch (Exception $e) {
+                    $response = false;
                }
-               $newDate = $dateArray[2] . "-";
+          }
 
-               $monthsArray = array('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec');
-               $mon = 1;
-               $mon += array_search(ucfirst($dateArray[1]), $monthsArray);
+          return $response;
+     }
 
-               if (strlen($mon) == 1) {
-                    $mon = "0" . $mon;
+     // Returns the given date in Y-m-d format
+     public static function isoDateFormat($date, $includeTime = false)
+     {
+          $date = trim($date);
+          if (false === self::verifyIfDateValid($date)) {
+               return null;
+          } else {
+               $format = "Y-m-d";
+               if ($includeTime === true) {
+                    $format = $format . " H:i:s";
                }
-               return $newDate .= $mon . "-" . $dateArray[0];
+               return (new DateTimeImmutable($date))->format($format);
           }
      }
 
-     public function humanDateFormat($date)
+
+     // Returns the given date in d-M-Y format
+     // (with or without time depending on the $includeTime parameter)
+     public static function humanReadableDateFormat($date, $includeTime = false, $format = "d-M-Y")
      {
-          if ($date == null || $date == "" || $date == "0000-00-00" || $date == "0000-00-00 00:00:00") {
-               return "";
+          $date = trim($date);
+          if (false === self::verifyIfDateValid($date)) {
+               return null;
           } else {
-               $dateArray = explode('-', $date);
-               $newDate = $dateArray[2] . "-";
 
-               $monthsArray = array('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec');
-               $mon = $monthsArray[$dateArray[1] - 1];
-               return $newDate .= $mon . "-" . $dateArray[0];
-          }
-     }
+               if ($includeTime === true) {
+                    $format = $format . " H:i";
+               }
 
-     public function viewDateFormat($date)
-     {
-          if ($date == null || $date == "" || $date == "0000-00-00") {
-               return "";
-          } else {
-               $dateArray = explode('-', $date);
-               $newDate = $dateArray[2] . "-";
-
-               $monthsArray = array('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec');
-               $mon = $monthsArray[$dateArray[1] - 1];
-
-               return $newDate .= $mon . "-" . $dateArray[0];
+               return (new DateTimeImmutable($date))->format($format);
           }
      }
 
@@ -194,14 +191,13 @@ class CommonService
      {
           try {
                $tempDb = $this->sm->get('TempMailTable');
-               $config = new \Laminas\Config\Reader\Ini();
-               $configResult = $config->fromFile(CONFIG_PATH . '/custom.config.ini');
+               $configResult = $this->sm->get('Config');
                $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
                $sql = new Sql($dbAdapter);
 
                // Setup SMTP transport using LOGIN authentication
                $transport = new SmtpTransport();
-               $options = new SmtpOptions(array(
+               $options = new SmtpOptions([
                     'host' => $configResult["email"]["host"],
                     'port' => $configResult["email"]["config"]["port"],
                     'connection_class' => $configResult["email"]["config"]["auth"],
@@ -210,7 +206,7 @@ class CommonService
                          'password' => $configResult["email"]["config"]["password"],
                          'ssl' => $configResult["email"]["config"]["ssl"],
                     ),
-               ));
+               ]);
                $transport->setOptions($options);
                $limit = '10';
                $mailQuery = $sql->select()->from(array('tm' => 'temp_mail'))
@@ -274,7 +270,7 @@ class CommonService
           }
      }
 
-     function removeDirectory($dirname)
+     public function removeDirectory($dirname)
      {
           // Sanity check
           if (!file_exists($dirname)) {
@@ -315,16 +311,20 @@ class CommonService
           return strtolower($url);
      }
 
-     public static function getDateTime($timezone = 'Asia/Calcutta')
+     public static function getDateTime($format = 'Y-m-d H:i:s', $timezone = null)
      {
-          $date = new \DateTime(date('Y-m-d H:i:s'), new \DateTimeZone($timezone));
-          return $date->format('Y-m-d H:i:s');
+          $timezone = $timezone ?? date_default_timezone_get();
+          return (new DateTimeImmutable("now", new DateTimeZone($timezone)))->format($format);
      }
 
-     public static function getDate($timezone = 'Asia/Calcutta')
+     public static function getDate($timezone = null)
      {
-          $date = new \DateTime(date('Y-m-d'), new \DateTimeZone($timezone));
-          return $date->format('Y-m-d');
+          return self::getDateTime('Y-m-d', $timezone);
+     }
+
+     public static function getCurrentTime($timezone = null)
+     {
+          return self::getDateTime('H:i', $timezone);
      }
 
      public function humanMonthlyDateFormat($date)
@@ -478,6 +478,14 @@ class CommonService
           $locationDb = $this->sm->get('LocationDetailsTable');
           return $locationDb->fetchLocationDetails($mappedFacilities);
      }
+
+
+     public function getAllCountries()
+     {
+          $countriesDb = $this->sm->get('CountriesTable');
+          return $countriesDb->fetchAllCountries();
+     }
+
      public function getAllDistrictList()
      {
 
@@ -582,19 +590,20 @@ class CommonService
                     if (isset($apiData->geographical_divisions->lastModifiedTime) && !empty($apiData->geographical_divisions->lastModifiedTime)) {
                          $condition = "updated_datetime > '" . $apiData->geographical_divisions->lastModifiedTime . "'";
                     }
-                    $notUpdated = $this->getLastModifiedDateTime('location_details', 'updated_datetime', $condition);
+                    $notUpdated = $this->getLastModifiedDateTime('geographical_divisions', 'updated_datetime', $condition);
                     if (empty($notUpdated) || !isset($notUpdated)) {
-                         $rQueryStr = 'SET FOREIGN_KEY_CHECKS=0; ALTER TABLE `location_details` DISABLE KEYS';
+                         $rQueryStr = 'SET FOREIGN_KEY_CHECKS=0; ALTER TABLE `geographical_divisions` DISABLE KEYS';
                          $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
-                         $dbAdapter->query('TRUNCATE TABLE `location_details`', $dbAdapter::QUERY_MODE_EXECUTE);
+                         $dbAdapter->query('TRUNCATE TABLE `geographical_divisions`', $dbAdapter::QUERY_MODE_EXECUTE);
 
                          foreach ((array)$apiData->geographical_divisions->tableData as $row) {
                               $lData = (array)$row;
                               $locationData = array(
-                                   'location_id'       => $lData['geo_id'],
-                                   'parent_location'   => $lData['geo_parent'],
-                                   'location_name'     => $lData['geo_name'],
-                                   'location_code'     => $lData['geo_code'],
+                                   'geo_id'       => $lData['geo_id'],
+                                   'geo_parent'   => $lData['geo_parent'],
+                                   'geo_name'     => $lData['geo_name'],
+                                   'geo_code'     => $lData['geo_code'],
+                                   'geo_status'     => $lData['geo_status'],
                                    'updated_datetime'  => $lData['updated_datetime']
                               );
                               $locationDb->insert($locationData);
@@ -625,9 +634,9 @@ class CommonService
                                    }
                                    $sQueryResult = $this->checkFacilityStateDistrictDetails(trim($facilityData['facility_state']), 0);
                                    if ($sQueryResult) {
-                                        $facilityData['facility_state'] = $sQueryResult['location_id'];
+                                        $facilityData['facility_state'] = $sQueryResult['geo_id'];
                                    } else {
-                                        $locationDb->insert(array('parent_location' => 0, 'location_name' => trim($facilityData['facility_state'])));
+                                        $locationDb->insert(array('geo_parent' => 0, 'geo_name' => trim($facilityData['facility_state'])));
                                         $facilityData['facility_state'] = $locationDb->lastInsertValue;
                                    }
                               }
@@ -637,9 +646,9 @@ class CommonService
                                    }
                                    $sQueryResult = $this->checkFacilityStateDistrictDetails(trim($facilityData['facility_district']), $facilityData['facility_state']);
                                    if ($sQueryResult) {
-                                        $facilityData['facility_district'] = $sQueryResult['location_id'];
+                                        $facilityData['facility_district'] = $sQueryResult['geo_id'];
                                    } else {
-                                        $locationDb->insert(array('parent_location' => $facilityData['facility_state'], 'location_name' => trim($facilityData['facility_district'])));
+                                        $locationDb->insert(array('geo_parent' => $facilityData['facility_state'], 'geo_name' => trim($facilityData['facility_district'])));
                                         $facilityData['facility_district'] = $locationDb->lastInsertValue;
                                    }
                               }
@@ -1063,11 +1072,11 @@ class CommonService
           $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
           $sql = new Sql($dbAdapter);
           if (is_numeric($location)) {
-               $where = array('l.parent_location' => $parent, 'l.location_id' => trim($location));
+               $where = array('l.geo_parent' => $parent, 'l.geo_id' => trim($location));
           } else {
-               $where = array('l.parent_location' => $parent, 'l.location_name' => trim($location));
+               $where = array('l.geo_parent' => $parent, 'l.geo_name' => trim($location));
           }
-          $sQuery = $sql->select()->from(array('l' => 'location_details'))
+          $sQuery = $sql->select()->from(array('l' => 'geographical_divisions'))
                ->where($where);
           $sQuery = $sql->buildSqlString($sQuery);
           $sQueryResult = $dbAdapter->query($sQuery, $dbAdapter::QUERY_MODE_EXECUTE)->current();
@@ -1146,11 +1155,11 @@ class CommonService
                                    $_color = "f08080";
                               }
                               $color[]['color'] = $_color;
-                              
+
                               $row[] = (isset($aRow['labName']) && !empty($aRow['labName'])) ? ucwords($aRow['labName']) : "";
-                              $row[] = (isset($aRow['latest']) && !empty($aRow['latest'])) ? $this->humanDateFormat($aRow['latest']) : "";
-                              $row[] = (isset($aRow['dashLastResultsSync']) && !empty($aRow['dashLastResultsSync'])) ? $this->humanDateFormat($aRow['dashLastResultsSync']) : "";
-                              $row[] = (isset($aRow['dashLastRequestsSync']) && !empty($aRow['dashLastRequestsSync'])) ? $this->humanDateFormat($aRow['dashLastRequestsSync']) : "";
+                              $row[] = (isset($aRow['latest']) && !empty($aRow['latest'])) ? $this->humanReadableDateFormat($aRow['latest']) : "";
+                              $row[] = (isset($aRow['dashLastResultsSync']) && !empty($aRow['dashLastResultsSync'])) ? $this->humanReadableDateFormat($aRow['dashLastResultsSync']) : "";
+                              $row[] = (isset($aRow['dashLastRequestsSync']) && !empty($aRow['dashLastRequestsSync'])) ? $this->humanReadableDateFormat($aRow['dashLastRequestsSync']) : "";
                               $output[] = $row;
                          }
                          $styleArray = array(

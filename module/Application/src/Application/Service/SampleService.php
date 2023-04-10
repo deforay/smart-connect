@@ -17,9 +17,10 @@ class SampleService
 {
 
     public $sm = null;
-    public $commonService = null;
-    public $sampleTable = null;
-    public $apiTrackerTable = null;
+    public \Application\Service\CommonService $commonService;
+    public $sampleTable;
+    public \Laminas\Cache\Pattern\ObjectCache $sampleTableCached;
+    public \Application\Model\DashApiReceiverStatsTable $apiTrackerTable;
     public $dbAdapter = null;
 
     public function __construct($sm, $sampleTable, $commonService, $apiTrackerTable, $dbAdapter)
@@ -31,10 +32,6 @@ class SampleService
         $this->dbAdapter = $dbAdapter;
     }
 
-    public function getServiceManager()
-    {
-        return $this->sm;
-    }
 
     public function checkSampleCode($uniqueId, $sampleCode, $remoteSampleCode = null, $instanceCode = null, $dashTable = 'dash_form_vl')
     {
@@ -62,8 +59,8 @@ class SampleService
     {
 
         $sql = new Sql($this->dbAdapter);
-        $sQuery = $sql->select()->from(array('l' => 'location_details'))
-            ->where(array('l.parent_location' => $parent, 'l.location_name' => trim($location)));
+        $sQuery = $sql->select()->from(array('l' => 'geographical_divisions'))
+            ->where(array('l.geo_parent' => $parent, 'l.geo_name' => trim($location)));
         $sQuery = $sql->buildSqlString($sQuery);
         $sQueryResult = $this->dbAdapter->query($sQuery, $this->dbAdapter::QUERY_MODE_EXECUTE)->current();
         return $sQueryResult;
@@ -420,8 +417,8 @@ class SampleService
         $sql = new Sql($this->dbAdapter);
         $sQuery = $sql->select()->from(array('vl' => $dashTable))
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name', 'facility_code', 'facility_logo'), 'left')
-            ->join(array('l_s' => 'location_details'), 'l_s.location_id=f.facility_state', array('provinceName' => 'location_name'), 'left')
-            ->join(array('l_d' => 'location_details'), 'l_d.location_id=f.facility_district', array('districtName' => 'location_name'), 'left')
+            ->join(array('l_s' => 'geographical_divisions'), 'l_s.geo_id=f.facility_state', array('provinceName' => 'geo_name'), 'left')
+            ->join(array('l_d' => 'geographical_divisions'), 'l_d.geo_id=f.facility_district', array('districtName' => 'geo_name'), 'left')
             ->join(array('rs' => 'r_vl_sample_type'), 'rs.sample_id=vl.sample_type', array('sample_name'), 'left')
             ->join(array('l' => 'facility_details'), 'l.facility_id=vl.lab_id', array('labName' => 'facility_name'), 'left')
             ->join(array('u' => 'user_details'), 'u.user_id=vl.result_approved_by', array('approvedBy' => 'user_name'), 'left')
@@ -455,10 +452,10 @@ class SampleService
                         $sampleCollectionDate = '';
                         $sampleTestedDate = '';
                         if (isset($aRow['sampleCollectionDate']) && $aRow['sampleCollectionDate'] != NULL && trim($aRow['sampleCollectionDate']) != "" && $aRow['sampleCollectionDate'] != '0000-00-00') {
-                            $sampleCollectionDate = $this->commonService->humanDateFormat($aRow['sampleCollectionDate']);
+                            $sampleCollectionDate = \Application\Service\CommonService::humanReadableDateFormat($aRow['sampleCollectionDate']);
                         }
                         if (isset($aRow['sampleTestingDate']) && $aRow['sampleTestingDate'] != NULL && trim($aRow['sampleTestingDate']) != "" && $aRow['sampleTestingDate'] != '0000-00-00') {
-                            $sampleTestedDate = $this->commonService->humanDateFormat($aRow['sampleTestingDate']);
+                            $sampleTestedDate = \Application\Service\CommonService::humanReadableDateFormat($aRow['sampleTestingDate']);
                         }
                         $row[] = $aRow['sample_code'];
                         $row[] = ucwords($aRow['facility_name']);
@@ -549,8 +546,6 @@ class SampleService
                             }
                             $cellName = $sheet->getCellByColumnAndRow($colNo, $currentRow)->getColumn();
                             $sheet->getStyle($cellName . $currentRow)->applyFromArray($borderStyle);
-                            $sheet->getDefaultRowDimension()->setRowHeight(20);
-                            $sheet->getColumnDimensionByColumn($colNo)->setWidth(20);
                             $sheet->getStyleByColumnAndRow($colNo, $currentRow)->getAlignment()->setWrapText(true);
                             $colNo++;
                         }
@@ -597,22 +592,22 @@ class SampleService
                     foreach ($sResult as $aRow) {
                         $row = array();
                         if (isset($aRow['sampleCollectionDate']) && $aRow['sampleCollectionDate'] != NULL && trim($aRow['sampleCollectionDate']) != "" && $aRow['sampleCollectionDate'] != '0000-00-00') {
-                            $sampleCollectionDate = $this->commonService->humanDateFormat($aRow['sampleCollectionDate']);
+                            $sampleCollectionDate = \Application\Service\CommonService::humanReadableDateFormat($aRow['sampleCollectionDate']);
                         }
                         if (isset($aRow['treatmentInitiateDate']) && $aRow['treatmentInitiateDate'] != NULL && trim($aRow['treatmentInitiateDate']) != "" && $aRow['treatmentInitiateDate'] != '0000-00-00') {
-                            $treatmentInitiateDate = $this->commonService->humanDateFormat($aRow['treatmentInitiateDate']);
+                            $treatmentInitiateDate = \Application\Service\CommonService::humanReadableDateFormat($aRow['treatmentInitiateDate']);
                         }
                         if (isset($aRow['patientDOB']) && $aRow['patientDOB'] != NULL && trim($aRow['patientDOB']) != "" && $aRow['patientDOB'] != '0000-00-00') {
-                            $patientDOB = $this->commonService->humanDateFormat($aRow['patientDOB']);
+                            $patientDOB = \Application\Service\CommonService::humanReadableDateFormat($aRow['patientDOB']);
                         }
                         if (isset($aRow['treatmentInitiateCurrentRegimen']) && $aRow['treatmentInitiateCurrentRegimen'] != NULL && trim($aRow['treatmentInitiateCurrentRegimen']) != "" && $aRow['treatmentInitiateCurrentRegimen'] != '0000-00-00') {
-                            $patientDOB = $this->commonService->humanDateFormat($aRow['patitreatmentInitiateCurrentRegimenentDOB']);
+                            $patientDOB = \Application\Service\CommonService::humanReadableDateFormat($aRow['patitreatmentInitiateCurrentRegimenentDOB']);
                         }
                         if (isset($aRow['requestDate']) && $aRow['requestDate'] != NULL && trim($aRow['requestDate']) != "" && $aRow['requestDate'] != '0000-00-00') {
-                            $requestDate = $this->commonService->humanDateFormat($aRow['requestDate']);
+                            $requestDate = \Application\Service\CommonService::humanReadableDateFormat($aRow['requestDate']);
                         }
                         if (isset($aRow['receivedAtLab']) && $aRow['receivedAtLab'] != NULL && trim($aRow['receivedAtLab']) != "" && $aRow['receivedAtLab'] != '0000-00-00') {
-                            $requestDate = $this->commonService->humanDateFormat($aRow['receivedAtLab']);
+                            $requestDate = \Application\Service\CommonService::humanReadableDateFormat($aRow['receivedAtLab']);
                         }
                         $row[] = $i;
                         $row[] = $aRow['sample_code'];
@@ -731,8 +726,6 @@ class SampleService
                             }
                             $cellName = $sheet->getCellByColumnAndRow($colNo, $currentRow)->getColumn();
                             $sheet->getStyle($cellName . $currentRow)->applyFromArray($borderStyle);
-                            $sheet->getDefaultRowDimension()->setRowHeight(20);
-                            $sheet->getColumnDimensionByColumn($colNo)->setWidth(20);
                             $sheet->getStyleByColumnAndRow($colNo, $currentRow)->getAlignment()->setWrapText(true);
                             $colNo++;
                         }
@@ -892,7 +885,7 @@ class SampleService
                         $row = array();
                         $sampleCollectionDate = '';
                         if (isset($aRow['sampleCollectionDate']) && $aRow['sampleCollectionDate'] != null && trim($aRow['sampleCollectionDate']) != "" && $aRow['sampleCollectionDate'] != '0000-00-00') {
-                            $sampleCollectionDate = $this->commonService->humanDateFormat($aRow['sampleCollectionDate']);
+                            $sampleCollectionDate = \Application\Service\CommonService::humanReadableDateFormat($aRow['sampleCollectionDate']);
                         }
                         $row[] = $sampleCollectionDate;
                         $row[] = $aRow['total_samples_received'];
@@ -967,8 +960,6 @@ class SampleService
                             }
                             $cellName = $sheet->getCellByColumnAndRow($colNo, $currentRow)->getColumn();
                             $sheet->getStyle($cellName . $currentRow)->applyFromArray($borderStyle);
-                            $sheet->getDefaultRowDimension()->setRowHeight(20);
-                            $sheet->getColumnDimensionByColumn($colNo)->setWidth(20);
                             $sheet->getStyleByColumnAndRow($colNo, $currentRow)->getAlignment()->setWrapText(true);
                             $colNo++;
                         }
@@ -1080,8 +1071,6 @@ class SampleService
                             }
                             $cellName = $sheet->getCellByColumnAndRow($colNo, $currentRow)->getColumn();
                             $sheet->getStyle($cellName . $currentRow)->applyFromArray($borderStyle);
-                            $sheet->getDefaultRowDimension()->setRowHeight(20);
-                            $sheet->getColumnDimensionByColumn($colNo)->setWidth(20);
                             $sheet->getStyleByColumnAndRow($colNo, $currentRow)->getAlignment()->setWrapText(true);
                             $colNo++;
                         }
@@ -1152,8 +1141,8 @@ class SampleService
                     $sheet = $excel->getActiveSheet();
                     $output = array();
                     foreach ($sResult as $aRow) {
-                        $displayCollectionDate = $this->commonService->humanDateFormat($aRow['collectionDate']);
-                        $displayReceivedDate = $this->commonService->humanDateFormat($aRow['receivedDate']);
+                        $displayCollectionDate = \Application\Service\CommonService::humanReadableDateFormat($aRow['collectionDate']);
+                        $displayReceivedDate = \Application\Service\CommonService::humanReadableDateFormat($aRow['receivedDate']);
                         $row = array();
                         $row[] = $aRow['sample_code'];
                         $row[] = $displayCollectionDate;
@@ -1219,8 +1208,6 @@ class SampleService
                             }
                             $cellName = $sheet->getCellByColumnAndRow($colNo, $currentRow)->getColumn();
                             $sheet->getStyle($cellName . $currentRow)->applyFromArray($borderStyle);
-                            $sheet->getDefaultRowDimension()->setRowHeight(20);
-                            $sheet->getColumnDimensionByColumn($colNo)->setWidth(20);
                             $sheet->getStyleByColumnAndRow($colNo, $currentRow)->getAlignment()->setWrapText(true);
                             $colNo++;
                         }
@@ -1290,8 +1277,8 @@ class SampleService
         $resultSet = $this->sampleTable->getTATbyProvince($labs, $startDate, $endDate);
         foreach ($resultSet as $key) {
             $result[] = array(
-                "facility"           => $key['location_name'],
-                "facility_id"        => $key['location_id'],
+                "facility"           => $key['facility_name'],
+                "facility_id"        => $key['facility_id'],
                 "category"           => 0,
                 "collect_receive"    => $key['Collection_Receive'],
                 "receive_register"   => $key['Receive_Register'],
@@ -1312,8 +1299,8 @@ class SampleService
         $resultSet = $this->sampleTable->getTATbyDistrict($labs, $startDate, $endDate);
         foreach ($resultSet as $key) {
             $result[] = array(
-                "facility"           => $key['location_name'],
-                "facility_id"        => $key['location_id'],
+                "facility"           => $key['geo_name'],
+                "facility_id"        => $key['geo_id'],
                 "category"           => 0,
                 "collect_receive"    => $key['Collection_Receive'],
                 "receive_register"   => $key['Receive_Register'],
@@ -1333,8 +1320,8 @@ class SampleService
         $resultSet = $this->sampleTable->getTATbyClinic($labs, $startDate, $endDate);
         foreach ($resultSet as $key) {
             $result[] = array(
-                "facility"           => $key['location_name'],
-                "facility_id"        => $key['location_id'],
+                "facility"           => $key['facility_name'],
+                "facility_id"        => $key['facility_id'],
                 "category"           => 0,
                 "collect_receive"    => $key['Collection_Receive'],
                 "receive_register"   => $key['Receive_Register'],
@@ -1504,34 +1491,34 @@ class SampleService
             $input = $this->config['db']['dsn'];
             preg_match('~=(.*?);~', $input, $output);
             $dbname = $output[1];
-    
+
             $fileName = $_FILES['vlFile']['name'];
             $ranNumber = str_pad(rand(0, pow(10, 6) - 1), 6, '0', STR_PAD_LEFT);
             $extension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
             $fileName = $ranNumber . "." . $extension;
-    
+
             if (!file_exists(TEMP_UPLOAD_PATH) && !is_dir(TEMP_UPLOAD_PATH)) {
                 mkdir(APPLICATION_PATH . DIRECTORY_SEPARATOR . "temporary", 0777);
             }
             if (!file_exists(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-vl") && !is_dir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-vl")) {
                 mkdir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-vl", 0777);
             }
-    
-    
-    
-    
+
+
+
+
             $allColumns = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS where TABLE_SCHEMA = '" . $dbname . "' AND table_name='dash_form_vl'";
-    
+
             $sResult = $this->dbAdapter->query($allColumns, $this->dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             $columnList = array_map('current', $sResult);
-    
+
             $removeKeys = array(
                 'vl_sample_id'
             );
-    
+
             $columnList = array_diff($columnList, $removeKeys);
             $sampleDb = $this->sm->get('SampleTableWithoutCache');
-    
+
             $pathname = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-vl" . DIRECTORY_SEPARATOR . $fileName;
             if (!file_exists($pathname)) {
                 if (move_uploaded_file($_FILES['vlFile']['tmp_name'], $pathname)) {
@@ -1539,19 +1526,19 @@ class SampleService
                     $apiData = \JsonMachine\JsonMachine::fromFile($pathname, "/data");
                 }
             }
-            
-           /*  echo "<pre>";
+
+            /*  echo "<pre>";
             print_r($apiData);die; */
             $numRows = 0;
             $counter = 0;
             foreach ($apiData as $key => $rowData) {
                 $counter++;
-    
-    
+
+
                 // ob_start();
                 // var_dump($rowData);
                 // error_log(ob_get_clean());
-    
+
                 $data = array();
                 foreach ($columnList as $colName) {
                     if (isset($rowData[$colName])) {
@@ -1565,19 +1552,19 @@ class SampleService
                 // var_dump($data);
                 // error_log(ob_get_clean());
                 // exit(0);
-    
-    
-    
+
+
+
                 /* $sampleCode = trim($data['sample_code']);
                 $remoteSample = trim($data['remote_sample_code']);
                 $instanceCode = trim($data['vlsm_instance_id']); */
                 try {
                     $id = $sampleDb->insertOrUpdate($data);
-                    if(isset($id) && is_numeric($id) && count($id) > 0){
+                    if (isset($id) && !empty($id) && is_numeric($id)) {
                         $dashDb = $this->sm->get('DashApiReceiverStatsTable');
                         $params = array(
-                            "table" => "dash_form_vl", 
-                            "field" => "vl_sample_id", 
+                            "table" => "dash_form_vl",
+                            "field" => "vl_sample_id",
                             "id" => $id
                         );
                         $dashDb->updateAttributes($params);
@@ -1588,23 +1575,23 @@ class SampleService
                 }
             }
             // unlink($pathname);
-    
+
             if ($counter == $numRows) {
                 $status = "success";
-            } else if (($counter - $numRows) != 0) {
+            } elseif (($counter - $numRows) != 0) {
                 $status = "partial";
-            } else if ($numRows == 0) {
+            } elseif ($numRows == 0) {
                 $status = 'failed';
             }
-    
+
             $apiData = JsonMachine::fromFile($pathname, '/timestamp');
             $timestamp = iterator_to_array($apiData)['timestamp'];
-            $timestamp = ($timestamp != false && !empty($timestamp)) ? $timestamp : time();
+            $timestamp = ($timestamp !== false && !empty($timestamp)) ? $timestamp : time();
             unset($pathname);
-    
+
             $apiTrackData = array(
                 'tracking_id'                   => $timestamp,
-                'received_on'                   => $this->commonService->getDateTime(),
+                'received_on'                   => \Application\Service\CommonService::getDateTime(),
                 'number_of_records_received'    => $counter,
                 'number_of_records_processed'   => $numRows,
                 'source'                        => 'VLSM-VL',
@@ -1612,7 +1599,7 @@ class SampleService
                 'status'                        => $status
             );
             $this->apiTrackerTable->insert($apiTrackData);
-    
+
             return array(
                 'status'    => 'success',
                 'message'   => $numRows . ' uploaded successfully',
@@ -1625,7 +1612,6 @@ class SampleService
                 'message'   => $exc->getMessage(),
             );
         }
-
     }
     public function saveFileFromVlsmAPIV1()
     {
@@ -1776,18 +1762,18 @@ class SampleService
                         if (trim($row['facility_state']) != '') {
                             $sQueryResult = $this->checkFacilityStateDistrictDetails(trim($row['facility_state']), 0);
                             if ($sQueryResult) {
-                                $facilityData['facility_state'] = $sQueryResult['location_id'];
+                                $facilityData['facility_state'] = $sQueryResult['geo_id'];
                             } else {
-                                $locationDb->insert(array('parent_location' => 0, 'location_name' => trim($row['facility_state'])));
+                                $locationDb->insert(array('geo_parent' => 0, 'geo_name' => trim($row['facility_state'])));
                                 $facilityData['facility_state'] = $locationDb->lastInsertValue;
                             }
                         }
                         if (trim($row['facility_district']) != '') {
                             $sQueryResult = $this->checkFacilityStateDistrictDetails(trim($row['facility_district']), $facilityData['facility_state']);
                             if ($sQueryResult) {
-                                $facilityData['facility_district'] = $sQueryResult['location_id'];
+                                $facilityData['facility_district'] = $sQueryResult['geo_id'];
                             } else {
-                                $locationDb->insert(array('parent_location' => $facilityData['facility_state'], 'location_name' => trim($row['facility_district'])));
+                                $locationDb->insert(array('geo_parent' => $facilityData['facility_state'], 'geo_name' => trim($row['facility_district'])));
                                 $facilityData['facility_district'] = $locationDb->lastInsertValue;
                             }
                         }
@@ -1835,18 +1821,18 @@ class SampleService
                         if (trim($row['labState']) != '') {
                             $sQueryResult = $this->checkFacilityStateDistrictDetails(trim($row['labState']), 0);
                             if ($sQueryResult) {
-                                $labData['facility_state'] = $sQueryResult['location_id'];
+                                $labData['facility_state'] = $sQueryResult['geo_id'];
                             } else {
-                                $locationDb->insert(array('parent_location' => 0, 'location_name' => trim($row['labState'])));
+                                $locationDb->insert(array('geo_parent' => 0, 'geo_name' => trim($row['labState'])));
                                 $labData['facility_state'] = $locationDb->lastInsertValue;
                             }
                         }
                         if (trim($row['labDistrict']) != '') {
                             $sQueryResult = $this->checkFacilityStateDistrictDetails(trim($row['labDistrict']), $labData['facility_state']);
                             if ($sQueryResult) {
-                                $labData['facility_district'] = $sQueryResult['location_id'];
+                                $labData['facility_district'] = $sQueryResult['geo_id'];
                             } else {
-                                $locationDb->insert(array('parent_location' => $labData['facility_state'], 'location_name' => trim($row['labDistrict'])));
+                                $locationDb->insert(array('geo_parent' => $labData['facility_state'], 'geo_name' => trim($row['labDistrict'])));
                                 $labData['facility_district'] = $locationDb->lastInsertValue;
                             }
                         }
@@ -1984,7 +1970,7 @@ class SampleService
                 if (!$province) {
                     $provinceDb->insert(array(
                         'province_name'     => $row['ProvinceName'],
-                        'updated_datetime'  => $this->commonService->getDateTime()
+                        'updated_datetime'  => \Application\Service\CommonService::getDateTime()
                     ));
                     $province['province_id'] = $provinceDb->lastInsertValue;
                 }
@@ -2191,7 +2177,7 @@ class SampleService
         $timestamp = ($timestamp != false && !empty($timestamp)) ? $timestamp : time();
         $apiTrackData = array(
             'tracking_id'                   => $timestamp,
-            'received_on'                   => $this->commonService->getDateTime(),
+            'received_on'                   => \Application\Service\CommonService::getDateTime(),
             'number_of_records_received'    => $counter,
             'number_of_records_processed'   => ($counter - count($failedImports)),
             'source'                        => 'WEBLIMS-VL',
@@ -2234,7 +2220,7 @@ class SampleService
             }
             foreach ($params['data'] as $key => $row) {
                 // Debug::dump($row);die;
-                if (!empty(trim($row['sample_code'])) && trim($params['api_version']) == $config['defaults']['vl-api-version']) {
+                if (!empty(trim($row['sample_code']))) {
                     $sampleCode = trim($row['sample_code']);
                     $uniqueId = trim($row['unique_id']);
                     $remoteSampleCode = trim($row['remote_sample_code']);
@@ -2245,7 +2231,7 @@ class SampleService
                     if (!$province) {
                         $provinceDb->insert(array(
                             'province_name'     => $row['health_centre_province'],
-                            'updated_datetime'  => $this->commonService->getDateTime()
+                            'updated_datetime'  => \Application\Service\CommonService::getDateTime()
                         ));
                         $province['province_id'] = $provinceDb->lastInsertValue;
                     }
@@ -2458,7 +2444,7 @@ class SampleService
         // Track API Records
         $apiTrackData = array(
             'tracking_id'                   => $params['timestamp'],
-            'received_on'                   => $this->commonService->getDateTime(),
+            'received_on'                   => \Application\Service\CommonService::getDateTime(),
             'number_of_records_received'    => count($params['data']),
             'number_of_records_processed'   => (count($params['data']) - count($return)),
             'source'                        => 'API-VIRAL-LOAD',

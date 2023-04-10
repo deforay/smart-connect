@@ -6,25 +6,32 @@ use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\ViewModel;
 use Laminas\Json\Json;
 
-class ExportController extends AbstractActionController{
+class ExportController extends AbstractActionController
+{
 
-    public function indexAction(){
-        $this->layout()->setVariable('activeTab', 'export-data');
-        
+    private \Application\Service\CommonService $commonService;
+
+    public function __construct($commonService)
+    {
+        $this->commonService = $commonService;
     }
-    
-    public function generateAction(){
+
+    public function indexAction()
+    {
+        $this->layout()->setVariable('activeTab', 'export-data');
+    }
+
+    public function generateAction()
+    {
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
-        if ($request->isPost()){
+        if ($request->isPost()) {
             $parameters = $request->getPost();
-            $commonService = $this->getServiceLocator()->get('CommonService');
-            $result = $commonService->addBackupGeneration($parameters);
+            $result = $this->commonService->addBackupGeneration($parameters);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('result' => $result))
-                    ->setTerminal(true);
-            return $viewModel;            
+                ->setTerminal(true);
+            return $viewModel;
         }
     }
-
 }
-

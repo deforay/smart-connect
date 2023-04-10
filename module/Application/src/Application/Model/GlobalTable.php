@@ -23,7 +23,7 @@ class GlobalTable extends AbstractTableGateway
 
     protected $table = 'dash_global_config';
     public $sm = null;
-    public $commonService = null;
+    public \Application\Service\CommonService $commonService;
 
     public function __construct(Adapter $adapter, $sm = null, $commonService)
     {
@@ -199,7 +199,7 @@ class GlobalTable extends AbstractTableGateway
                 mkdir(UPLOAD_PATH . DIRECTORY_SEPARATOR . "logo");
             }
             $extension = strtolower(pathinfo(UPLOAD_PATH . DIRECTORY_SEPARATOR . $_FILES['logo']['name'], PATHINFO_EXTENSION));
-            $string = $this->commonService->generateRandomString(6) . ".";
+            $string = \Application\Service\CommonService::generateRandomString(6) . ".";
             $imageName = "logo" . $string . $extension;
             if (move_uploaded_file($_FILES["logo"]["tmp_name"], UPLOAD_PATH . DIRECTORY_SEPARATOR . "logo" . DIRECTORY_SEPARATOR . $imageName)) {
                 $this->update(array('value' => $imageName), array('name' => 'logo'));
@@ -218,7 +218,7 @@ class GlobalTable extends AbstractTableGateway
     {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $localeQuery = $sql->select()->from(array('locale' => 'locale_details'));
+        $localeQuery = $sql->select()->from(array('locale' => 'dash_locale_details'));
         $loclaeQueryStr = $sql->buildSqlString($localeQuery);
         return $dbAdapter->query($loclaeQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
     }
@@ -227,7 +227,7 @@ class GlobalTable extends AbstractTableGateway
     {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $localeQuery = $sql->select()->from(array('locale' => 'locale_details'))
+        $localeQuery = $sql->select()->from(array('locale' => 'dash_locale_details'))
             ->columns(array($column))
             ->where(array('locale.locale_id' => $localeId));
         $loclaeQueryStr = $sql->buildSqlString($localeQuery);

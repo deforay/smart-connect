@@ -9,7 +9,7 @@ use Laminas\Json\Json;
 class SyncStatusController extends AbstractActionController
 {
 
-    private $commonService = null;
+    private \Application\Service\CommonService $commonService;
 
     public function __construct($commonService)
     {
@@ -19,6 +19,7 @@ class SyncStatusController extends AbstractActionController
     public function indexAction()
     {
         $this->layout()->setVariable('activeTab', 'sync-status');
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
@@ -29,6 +30,7 @@ class SyncStatusController extends AbstractActionController
 
     public function syncStatusAction()
     {
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
@@ -43,6 +45,7 @@ class SyncStatusController extends AbstractActionController
 
     public function exportSyncStatusExcelAction()
     {
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();

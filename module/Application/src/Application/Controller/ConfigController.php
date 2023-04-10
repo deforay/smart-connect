@@ -19,6 +19,7 @@ class ConfigController extends AbstractActionController
     public function indexAction()
     {
         $this->layout()->setVariable('activeTab', 'config');
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
@@ -30,6 +31,7 @@ class ConfigController extends AbstractActionController
     public function editAction()
     {
         $this->layout()->setVariable('activeTab', 'config');
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();

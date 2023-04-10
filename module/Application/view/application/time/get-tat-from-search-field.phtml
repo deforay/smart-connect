@@ -1,263 +1,271 @@
 <?php
-  $cont = 0;
-  $tableHeader = '';
-  $tableBody = '';
-  $tableFooter = '';
-  $categoryNext = 0;
-  $places = $this->translate('Places');
-  $collectReceive = $this->translate('Collect-Receive');
-  $receiveRegister = $this->translate('Receive-Register');
-  $registerAnalysis = $this->translate('Register-Analysis');
-  $analysisAuthorise = $this->translate('Analysis-Authorise');
-  $total = $this->translate('Total');
- ?>
+$cont = 0;
+$tableHeader = '';
+$tableBody = '';
+$tableFooter = '';
+$categoryNext = 0;
+$places = $this->translate('Places');
+$collectReceive = $this->translate('Collect-Receive');
+$receiveRegister = $this->translate('Receive-Register');
+$registerAnalysis = $this->translate('Register-Analysis');
+$analysisAuthorise = $this->translate('Analysis-Authorise');
+$total = $this->translate('Total');
+?>
 <script type="text/javascript">
-    $(function(){
-      $('#page-data-viewer').html(
-        '<div class="">'+
-        <?php
-          if(!empty($resultProvinces)){  ?>
-            getRow('<?php generateTable($resultProvinces,'provinceTable',0,$labs,$daterange,$places,$collectReceive,$receiveRegister,$registerAnalysis,$analysisAuthorise,$total); ?>','provinceTable','provinceChart','<?php echo $this->translate('TAT by Province'); ?>','<?php echo $this->translate('Provinces Chart'); ?>')+
-        <?php
-          }if(!empty($resultDistricts)){  ?>
-            getRow('<?php generateTable($resultDistricts,'districtTable',1,$labs,$daterange,$places,$collectReceive,$receiveRegister,$registerAnalysis,$analysisAuthorise,$total); ?>','districtTable','districtChart','<?php echo $this->translate('TAT by District'); ?>','<?php echo $this->translate('Districts Chart'); ?>')+
-        <?php
-          }if(!empty($resultClinics)){   ?>
-            getRow('<?php generateTable($resultClinics,'clinicTable',2,$labs,$daterange,$places,$collectReceive,$receiveRegister,$registerAnalysis,$analysisAuthorise,$total); ?>','clinicTable','clinicChart','<?php echo $this->translate('TAT by Clinic'); ?>','<?php echo $this->translate('Clinics Chart'); ?>')+
-        <?php
-          }
-        ?>
-        '</div>'
-      );
-      generateChart('provinceTable','provinceChart','Provinces Chart',<?php getSeries($resultProvinces,$collectReceive,$receiveRegister,$registerAnalysis,$analysisAuthorise)?>,'PROVINCES');
-      generateChart('districtTable','districtChart','Districts chart',<?php getSeries($resultDistricts,$collectReceive,$receiveRegister,$registerAnalysis,$analysisAuthorise)?>,'DISTRICTS');
-      <?php if(!empty($resultClinics) || !is_null($resultClinics)){?>
-      generateChart('clinicTable','clinicChart','Clinics chart',<?php getSeries($resultClinics,$collectReceive,$receiveRegister,$registerAnalysis,$analysisAuthorise)?>,'CLINICS');
-      <?php }?>
+  $(function() {
+    $('#page-data-viewer').html(
+      '<div class="">' +
+      <?php
+      if (!empty($resultProvinces)) {  ?> getRow('<?php generateTable($resultProvinces, 'provinceTable', 0, $labs, $daterange, $places, $collectReceive, $receiveRegister, $registerAnalysis, $analysisAuthorise, $total); ?>', 'provinceTable', 'provinceChart', '<?php echo $this->translate('TAT by Province'); ?>', '<?php echo $this->translate('Provinces Chart'); ?>') +
+      <?php
+      }
+      if (!empty($resultDistricts)) {  ?> getRow('<?php generateTable($resultDistricts, 'districtTable', 1, $labs, $daterange, $places, $collectReceive, $receiveRegister, $registerAnalysis, $analysisAuthorise, $total); ?>', 'districtTable', 'districtChart', '<?php echo $this->translate('TAT by District'); ?>', '<?php echo $this->translate('Districts Chart'); ?>') +
+      <?php
+      }
+      if (!empty($resultClinics)) {   ?> getRow('<?php generateTable($resultClinics, 'clinicTable', 2, $labs, $daterange, $places, $collectReceive, $receiveRegister, $registerAnalysis, $analysisAuthorise, $total); ?>', 'clinicTable', 'clinicChart', '<?php echo $this->translate('TAT by Clinic'); ?>', '<?php echo $this->translate('Clinics Chart'); ?>') +
+      <?php
+      }
+      ?> '</div>'
+    );
+    generateChart('provinceTable', 'provinceChart', 'Provinces Chart', <?php getSeries($resultProvinces, $collectReceive, $receiveRegister, $registerAnalysis, $analysisAuthorise) ?>, 'PROVINCES');
+    generateChart('districtTable', 'districtChart', 'Districts chart', <?php getSeries($resultDistricts, $collectReceive, $receiveRegister, $registerAnalysis, $analysisAuthorise) ?>, 'DISTRICTS');
+    <?php if (!empty($resultClinics) || !is_null($resultClinics)) { ?>
+      generateChart('clinicTable', 'clinicChart', 'Clinics chart', <?php getSeries($resultClinics, $collectReceive, $receiveRegister, $registerAnalysis, $analysisAuthorise) ?>, 'CLINICS');
+    <?php } ?>
 
-      $('.clickable').click(function(){
-        if($(this).attr('data-category') != 2){
-          window.location.href='/times/dashboard?district='+$(this).attr('id')+'&lab=<?php echo $labs; ?>&range=<?php echo $daterange; ?>&category='+$(this).attr('data-category')+'&place='+$(this).attr('data-place');
-        }
-      });
+    $('.clickable').click(function() {
+      if ($(this).attr('data-category') != 2) {
+        window.location.href = '/times/dashboard?district=' + $(this).attr('id') + '&lab=<?php echo $labs; ?>&range=<?php echo $daterange; ?>&category=' + $(this).attr('data-category') + '&place=' + $(this).attr('data-place');
+      }
     });
+  });
 
-    function generateChart(idTable,idChart,chartTitle,series,category){
-      $('#'+idChart).highcharts({
-          chart: {
-              type: 'column'
-          },
-          title: {
-              text: ''
-          },
-          exporting:{
-            chartOptions:{
-                subtitle: {
-                    text:chartTitle,
-                }
-            },
-            width: 2000
-          },
-          credits: {
-              enabled: false
-          },
-          xAxis: {
-              categories: getTATChartData(idTable)
-          },
-          yAxis: {
-              min: 0,
-              title: {
-                  text: '<?php echo $this->translate('TAT in days'); ?>'
-              },
-              stackLabels: {
-                  enabled: true,
-                  style: {
-                      fontWeight: 'bold',
-                      color: (Highcharts.theme && Highcharts.theme.textColor) || 'gray'
-                  }
-              }
-          },
-          legend: {
-              align: 'center',
-              x: 0,
-              verticalAlign: 'top',
-              y: 0,
-              floating: true,
-              backgroundColor: (Highcharts.theme && Highcharts.theme.background2) || 'white',
-              borderColor: '#CCC',
-              borderWidth: 1,
-              shadow: false
-          },
-          tooltip: {
-              headerFormat: '<b>{point.x}</b><br/>',
-              pointFormat: '{series.name}: {point.y}<br/><?php echo $this->translate('Total'); ?>: {point.stackTotal}'
+  function generateChart(idTable, idChart, chartTitle, series, category) {
+    $('#' + idChart).highcharts({
+      chart: {
+        type: 'column'
+      },
+      title: {
+        text: ''
+      },
+      exporting: {
+        chartOptions: {
+          subtitle: {
+            text: chartTitle,
           }
-          ,
-          plotOptions: {
-              column: {
-                  stacking: 'normal',
-                  dataLabels: {
-                      enabled: true,
-                      color: (Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'white'
-                  },
-                  cursor: (category == 'PROVINCES' || category == 'DISTRICTS')?'pointer':'default',
-                  point: {
-                      events: {
-                        <?php
-                          if ($categoryNext == 0 || $categoryNext == 1) {
-                        ?>
-                          click: function () {
-                              if(category == 'PROVINCES'){
-                                window.location.href='/times/dashboard?province='+this.id+'&lab=<?php echo $labs; ?>&range=<?php echo $daterange; ?>&category=0&place='+this.category;
-                              }
-                              else if(category == 'DISTRICTS'){
-                                window.location.href='/times/dashboard?district='+this.id+'&lab=<?php echo $labs; ?>&range=<?php echo $daterange; ?>&category=1&place='+this.category;
-                              }
-                            }
-                        <?php
-                          }
-                        ?>
-                      }
-                  }
-              }
+        },
+        width: 2000
+      },
+      credits: {
+        enabled: false
+      },
+      xAxis: {
+        categories: getTATChartData(idTable)
+      },
+      yAxis: {
+        min: 0,
+        title: {
+          text: '<?php echo $this->translate('TAT in days'); ?>'
+        },
+        stackLabels: {
+          enabled: true,
+          style: {
+            fontWeight: 'bold',
+            color: (Highcharts.theme && Highcharts.theme.textColor) || 'gray'
+          }
+        }
+      },
+      legend: {
+        align: 'center',
+        x: 0,
+        verticalAlign: 'top',
+        y: 0,
+        floating: true,
+        backgroundColor: (Highcharts.theme && Highcharts.theme.background2) || 'white',
+        borderColor: '#CCC',
+        borderWidth: 1,
+        shadow: false
+      },
+      tooltip: {
+        headerFormat: '<b>{point.x}</b><br/>',
+        pointFormat: '{series.name}: {point.y}<br/><?php echo $this->translate('Total'); ?>: {point.stackTotal}'
+      },
+      plotOptions: {
+        column: {
+          stacking: 'normal',
+          dataLabels: {
+            enabled: true,
+            color: (Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'white'
           },
-          series: series
-      });
-    }
-
+          cursor: (category == 'PROVINCES' || category == 'DISTRICTS') ? 'pointer' : 'default',
+          point: {
+            events: {
+              <?php
+              if ($categoryNext == 0 || $categoryNext == 1) {
+              ?>
+                click: function() {
+                  if (category == 'PROVINCES') {
+                    window.location.href = '/times/dashboard?province=' + this.id + '&lab=<?php echo $labs; ?>&range=<?php echo $daterange; ?>&category=0&place=' + this.category;
+                  } else if (category == 'DISTRICTS') {
+                    window.location.href = '/times/dashboard?district=' + this.id + '&lab=<?php echo $labs; ?>&range=<?php echo $daterange; ?>&category=1&place=' + this.category;
+                  }
+                }
+              <?php
+              }
+              ?>
+            }
+          }
+        }
+      },
+      series: series
+    });
+  }
 </script>
 
 <?php
-  function getSeries($results,$collectReceive,$receiveRegister,$registerAnalysis,$analysisAuthorise){
-    echo "[
+function getSeries($results, $collectReceive, $receiveRegister, $registerAnalysis, $analysisAuthorise)
+{
+  echo "[
       {
           name: '$collectReceive',
           data:[";
-    foreach ($results as $key) {
-        echo"          {
+  foreach ($results as $key) {
+    echo "          {
                     y: ";
-                          if(!is_null($key['collect_receive'])){
-                            echo $key['collect_receive'];
-                          }else{
-                            echo 0;
-                          }
-                       echo ",
+    if (!is_null($key['collect_receive'])) {
+      echo $key['collect_receive'];
+    } else {
+      echo 0;
+    }
+    echo ",
                     id: '";
-                          if(!is_null($key['facility_id'])){
-                            echo $key['facility_id'];
-                          }else{echo 0;}
-                        echo "'
+    if (!is_null($key['facility_id'])) {
+      echo $key['facility_id'];
+    } else {
+      echo 0;
+    }
+    echo "'
                   },";
-      }
-      echo "
+  }
+  echo "
              ]
       },
       {
           name: '$receiveRegister',
           data:[";
-                foreach ($results as $key) {
-                echo "  {
+  foreach ($results as $key) {
+    echo "  {
                     y: ";
-                          if(!is_null($key['receive_register'])){
-                            echo $key['receive_register'];
-                          }else{echo 0;}
-                        echo ",
+    if (!is_null($key['receive_register'])) {
+      echo $key['receive_register'];
+    } else {
+      echo 0;
+    }
+    echo ",
                     id: '";
-                          if(!is_null($key['facility_id'])){
-                            echo $key['facility_id'];
-                          }else{echo 0;}
-                        echo "'
+    if (!is_null($key['facility_id'])) {
+      echo $key['facility_id'];
+    } else {
+      echo 0;
+    }
+    echo "'
                   },";
-
-                }
-        echo "
+  }
+  echo "
              ]
       },
       {
           name: '$registerAnalysis',
           data:[";
-                foreach ($results as $key) {
-                  echo "{
+  foreach ($results as $key) {
+    echo "{
                     y: ";
-                          if(!is_null($key['register_analysis'])){
-                            echo $key['register_analysis'];
-                          }
-                          else{echo 0;}
-                        echo ",
+    if (!is_null($key['register_analysis'])) {
+      echo $key['register_analysis'];
+    } else {
+      echo 0;
+    }
+    echo ",
                     id: '";
-                          if(!is_null($key['facility_id'])){
-                            echo $key['facility_id'];
-                          }else{echo 0;}
-                        echo "'
+    if (!is_null($key['facility_id'])) {
+      echo $key['facility_id'];
+    } else {
+      echo 0;
+    }
+    echo "'
                   },";
-                }
-               echo "
+  }
+  echo "
              ]
       },
       {
           name: '$analysisAuthorise',
           data:[";
-                foreach ($results as $key) {
-                echo "  {
+  foreach ($results as $key) {
+    echo "  {
                     y: ";
-                        if(!is_null($key['register_analysis'])){
-                          echo $key['analysis_authorise'];
-                        }
-                        else{echo 0;}
-                      echo ",
+    if (!is_null($key['register_analysis'])) {
+      echo $key['analysis_authorise'];
+    } else {
+      echo 0;
+    }
+    echo ",
                     id: '";
-                          if(!is_null($key['facility_id'])){
-                            echo $key['facility_id'];
-                          }else{echo 0;}
-                        echo "'
+    if (!is_null($key['facility_id'])) {
+      echo $key['facility_id'];
+    } else {
+      echo 0;
+    }
+    echo "'
                   },
               ";
-                }
-              echo "
+  }
+  echo "
              ]
       }
     ] ";
-  }
+}
 
-  function generateTable($result,$idTable,$facilityCategory,$labs,$daterange,$places,$collectReceive,$receiveRegister,$registerAnalysis,$analysisAuthorise,$total){
-    $cont = 0;
-    $tableHeader = '';
-    $tableBody = '';
-    $tableFooter = '';
-    $category = '';
-    $categoryNext = 0;
-    $clickable = ($idTable == "clinicTable")?'':'clickable';
-    $tableHeader = '<table class="'.$idTable.' header">'
-                      .'<thead>'
-                        .'<th>'.$places.'</th>'
-                        .'<th>'.$collectReceive.'</th>'
-                        .'<th>'.$receiveRegister.'</th>'
-                        .'<th>'.$receiveRegister.'</th>'
-                        .'<th>'.$analysisAuthorise.'</th>'
-                        .'<th>'.$total.'</th>'
-                      .'</thead>'
-                    .'</table>';
-    foreach ($result as $key) {
-      $tableBody .= '<tr class="'.$clickable.'" id="'.$key['facility_id'].'" data-labs="'.$labs.'" data-date-range="'.$daterange.'" data-category="'.$facilityCategory.'"  data-place="'.$key['facility'].'">'
-                      .'<td id="td-'.$cont.'-0">'.$key['facility'].'</td>'
-                      .'<td id="td-'.$cont.'-1">'.$key['collect_receive'].'</td>'
-                      .'<td id="td-'.$cont.'-2">'.$key['receive_register'].'</td>'
-                      .'<td id="td-'.$cont.'-3">'.$key['register_analysis'].'</td>'
-                      .'<td id="td-'.$cont.'-4">'.$key['analysis_authorise'].'</td>'
-                      .'<td id="td-'.$cont.'-5">'.($key['collect_receive']+$key['receive_register']+$key['register_analysis']+$key['analysis_authorise']).'</td>'
-                    .'</tr>';
-      $cont ++;
-      $category = $key['category'];
-    }
-    echo '<div class="scrolltable">'
-            .$tableHeader
-            .'<div class="body scrollbar style-3">'
-                .'<table id="'.$idTable.'">'
-                  .'<tbody>'
-                    .$tableBody
-                  .'</tbody>'
-                .'</table>'
-            .'</div>'
-         .'</div>';
+function generateTable($result, $idTable, $facilityCategory, $labs, $daterange, $places, $collectReceive, $receiveRegister, $registerAnalysis, $analysisAuthorise, $total)
+{
+  $cont = 0;
+  $tableHeader = '';
+  $tableBody = '';
+  $tableFooter = '';
+  $category = '';
+  $categoryNext = 0;
+  $clickable = ($idTable == "clinicTable") ? '' : 'clickable';
+  $tableHeader = '<table class="' . $idTable . ' header">'
+    . '<thead>'
+    . '<th>' . $places . '</th>'
+    . '<th>' . $collectReceive . '</th>'
+    . '<th>' . $receiveRegister . '</th>'
+    . '<th>' . $receiveRegister . '</th>'
+    . '<th>' . $analysisAuthorise . '</th>'
+    . '<th>' . $total . '</th>'
+    . '</thead>'
+    . '</table>';
+  foreach ($result as $key) {
+    $tableBody .= '<tr class="' . $clickable . '" id="' . $key['facility_id'] . '" data-labs="' . $labs . '" data-date-range="' . $daterange . '" data-category="' . $facilityCategory . '"  data-place="' . $key['facility'] . '">'
+      . '<td id="td-' . $cont . '-0">' . $key['facility'] . '</td>'
+      . '<td id="td-' . $cont . '-1">' . $key['collect_receive'] . '</td>'
+      . '<td id="td-' . $cont . '-2">' . $key['receive_register'] . '</td>'
+      . '<td id="td-' . $cont . '-3">' . $key['register_analysis'] . '</td>'
+      . '<td id="td-' . $cont . '-4">' . $key['analysis_authorise'] . '</td>'
+      . '<td id="td-' . $cont . '-5">' . ($key['collect_receive'] + $key['receive_register'] + $key['register_analysis'] + $key['analysis_authorise']) . '</td>'
+      . '</tr>';
+    $cont++;
+    $category = $key['category'];
   }
+  echo '<div class="scrolltable">'
+    . $tableHeader
+    . '<div class="body scrollbar style-3">'
+    . '<table id="' . $idTable . '">'
+    . '<tbody>'
+    . $tableBody
+    . '</tbody>'
+    . '</table>'
+    . '</div>'
+    . '</div>';
+}
 ?>

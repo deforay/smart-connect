@@ -9,15 +9,15 @@ return [
         'eidModule'     => true,
         'covid19Module' => true,
         'pocDashboard'     => true,
-        'time-zone' => 'Asia/Kolkata',
+        'time-zone' => 'UTC',
         'cache-expiry' => 1440, // in minutes
     ],
     'email' => [
-        'host' => 'smtp.gmail.com',
+        'host' => '',
         'config' => [
-            'port' => 587,
-            'username' => 'caribbeanept@gmail.com',
-            'password' => 'iybymjnrstjzmobg',
+            'port' => '',
+            'username' => '',
+            'password' => '',
             'ssl' => 'tls',
             'auth' => 'login',
         ],

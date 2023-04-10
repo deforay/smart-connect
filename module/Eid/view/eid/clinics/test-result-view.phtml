@@ -1,5 +1,7 @@
 <?php
+
 use Application\Service\CommonService;
+
 $common = new CommonService();
 
 $patientFirstName = '';
@@ -9,75 +11,84 @@ $patientMobileNumber = '';
 
 //set patient details
 
-if(isset($result[0]['child_name']) && $result[0]['child_name']!= NULL && trim($result[0]['child_name'])!= ''){
+if (isset($result[0]['child_name']) && $result[0]['child_name'] != NULL && trim($result[0]['child_name']) != '') {
 
-     $patientFirstName =ucwords($common->crypto('decrypt',$result[0]['child_name'],$result[0]['sample_code']));
+     $patientFirstName = ucwords($common->crypto('decrypt', $result[0]['child_name'], $result[0]['sample_code']));
 }
-if(isset($result[0]['child_surname']) && $result[0]['child_surname']!= NULL && trim($result[0]['child_surname'])!= ''){
+if (isset($result[0]['child_surname']) && $result[0]['child_surname'] != NULL && trim($result[0]['child_surname']) != '') {
 
-     $patientLastName =ucwords($common->crypto('decrypt',$result[0]['child_surname'],$result[0]['sample_code']));
+     $patientLastName = ucwords($common->crypto('decrypt', $result[0]['child_surname'], $result[0]['sample_code']));
 }
-if(isset($result[0]['caretaker_phone_number']) && $result[0]['caretaker_phone_number']!= NULL && trim($result[0]['caretaker_phone_number'])!= ''){
+if (isset($result[0]['caretaker_phone_number']) && $result[0]['caretaker_phone_number'] != NULL && trim($result[0]['caretaker_phone_number']) != '') {
      $patientMobileNumber = $result[0]['caretaker_phone_number'];
 }
 
 
 //set facility details
-if(!isset($result[0]['facility_name']) || $result[0]['facility_name'] == NULL || trim($result[0]['facility_name']) == ''){
+if (!isset($result[0]['facility_name']) || $result[0]['facility_name'] == NULL || trim($result[0]['facility_name']) == '') {
      $result[0]['facility_name'] = '';
 }
-if(!isset($result[0]['facility_code']) || $result[0]['facility_code'] == NULL || trim($result[0]['facility_code']) == ''){
+if (!isset($result[0]['facility_code']) || $result[0]['facility_code'] == NULL || trim($result[0]['facility_code']) == '') {
      $result[0]['facility_code'] = '';
 }
-if(!isset($result[0]['provinceName']) || $result[0]['provinceName'] == NULL || trim($result[0]['provinceName']) == ''){
+if (!isset($result[0]['provinceName']) || $result[0]['provinceName'] == NULL || trim($result[0]['provinceName']) == '') {
      $result[0]['provinceName'] = '';
 }
-if(!isset($result[0]['districtName']) || $result[0]['districtName'] == NULL || trim($result[0]['districtName']) == ''){
+if (!isset($result[0]['districtName']) || $result[0]['districtName'] == NULL || trim($result[0]['districtName']) == '') {
      $result[0]['districtName'] = '';
 }
 //set gender
-if(!isset($result[0]['child_gender']) || $result[0]['child_gender'] == NULL || trim($result[0]['child_gender'])== ''){
+if (!isset($result[0]['child_gender']) || $result[0]['child_gender'] == NULL || trim($result[0]['child_gender']) == '') {
      $result[0]['child_gender'] = 'not reported';
 }
 //set Age
 $age = 'Unknown';
-if(isset($result[0]['child_dob']) && $result[0]['child_dob']!= NULL && trim($result[0]['child_dob'])!='' && $result[0]['child_dob']!='0000-00-00'){
+if (isset($result[0]['child_dob']) && $result[0]['child_dob'] != NULL && trim($result[0]['child_dob']) != '' && $result[0]['child_dob'] != '0000-00-00') {
      $todayDate = strtotime(date('Y-m-d'));
      $dob = strtotime($result[0]['child_dob']);
      $difference = $todayDate - $dob;
-     $seconds_per_year = 60*60*24*365;
+     $seconds_per_year = 60 * 60 * 24 * 365;
      $age = round($difference / $seconds_per_year);
-}elseif(isset($result[0]['child_age']) && $result[0]['child_age']!= NULL && trim($result[0]['child_age'])!='' && trim($result[0]['child_age']) >0){
+} elseif (isset($result[0]['child_age']) && $result[0]['child_age'] != NULL && trim($result[0]['child_age']) != '' && trim($result[0]['child_age']) > 0) {
      $age = $result[0]['child_age'];
 }
 
 //sample collection date
 $sampleCollectionDate = '';
-if(isset($result[0]['sample_collection_date']) && $result[0]['sample_collection_date']!= NULL && trim($result[0]['sample_collection_date'])!='' && $result[0]['sample_collection_date']!='0000-00-00 00:00:00'){
-     $expStr=explode(" ",$result[0]['sample_collection_date']);
-     $sampleCollectionDate=$this->humanDateFormat($expStr[0]).' '.$expStr[1];
+if (isset($result[0]['sample_collection_date']) && $result[0]['sample_collection_date'] != NULL && trim($result[0]['sample_collection_date']) != '' && $result[0]['sample_collection_date'] != '0000-00-00 00:00:00') {
+     $expStr = explode(" ", $result[0]['sample_collection_date']);
+     $sampleCollectionDate = $this->humanReadableDateFormat($expStr[0]) . ' ' . $expStr[1];
 }
 //sample recieved date
-$sampleReceivedDate='';
-if(isset($result[0]['sample_received_at_vl_lab_datetime']) && $result[0]['sample_received_at_vl_lab_datetime']!= NULL && trim($result[0]['sample_received_at_vl_lab_datetime'])!='' && $result[0]['sample_received_at_vl_lab_datetime']!='0000-00-00 00:00:00'){
-     $expStr=explode(" ",$result[0]['sample_received_at_vl_lab_datetime']);
-     $sampleReceivedDate=$this->humanDateFormat($expStr[0]).' '.$expStr[1];
+$sampleReceivedDate = '';
+if (isset($result[0]['sample_received_at_vl_lab_datetime']) && $result[0]['sample_received_at_vl_lab_datetime'] != NULL && trim($result[0]['sample_received_at_vl_lab_datetime']) != '' && $result[0]['sample_received_at_vl_lab_datetime'] != '0000-00-00 00:00:00') {
+     $expStr = explode(" ", $result[0]['sample_received_at_vl_lab_datetime']);
+     $sampleReceivedDate = $this->humanReadableDateFormat($expStr[0]) . ' ' . $expStr[1];
 }
 //sample tested date
 $sampleTestedDate = '';
-if(isset($result[0]['sample_tested_datetime']) && $result[0]['sample_tested_datetime']!= NULL && trim($result[0]['sample_tested_datetime'])!='' && $result[0]['sample_tested_datetime']!='0000-00-00 00:00:00'){
-     $expStr=explode(" ",$result[0]['sample_tested_datetime']);
-     $sampleTestedDate=$this->humanDateFormat($expStr[0])." ".$expStr[1];
+if (isset($result[0]['sample_tested_datetime']) && $result[0]['sample_tested_datetime'] != NULL && trim($result[0]['sample_tested_datetime']) != '' && $result[0]['sample_tested_datetime'] != '0000-00-00 00:00:00') {
+     $expStr = explode(" ", $result[0]['sample_tested_datetime']);
+     $sampleTestedDate = $this->humanReadableDateFormat($expStr[0]) . " " . $expStr[1];
 }
 $resultApprovedBy = '';
-if(isset($result[0]['approvedBy']) && trim($result[0]['approvedBy'])!=''){
+if (isset($result[0]['approvedBy']) && trim($result[0]['approvedBy']) != '') {
      $resultApprovedBy = ucwords($result[0]['approvedBy']);
 }
 ?>
 <style>
-.form-control{border:none;}
-.labelTxt{font-size:11.5px;font-weight:bold}
-p{padding:4px;}
+     .form-control {
+          border: none;
+     }
+
+     .labelTxt {
+          font-size: 11.5px;
+          font-weight: bold
+     }
+
+     p {
+          padding: 4px;
+     }
 </style>
 <div class="page-bar">
      <h1 class="page-title"><?php echo $this->translate('Sample Overview'); ?>
@@ -103,7 +114,7 @@ p{padding:4px;}
                               <div class="row">
                                    <div class="col-md-4">
                                         <span class="labelTxt"><?php echo $this->translate('Sample No'); ?>.</span>
-                                        <p><?php echo $result[0]['sample_code'];?></p>
+                                        <p><?php echo $result[0]['sample_code']; ?></p>
                                    </div>
                                    <div class="col-md-4">
                                         <span class="labelTxt"><?php echo $this->translate('Sample Collection Date'); ?></span>
@@ -115,23 +126,23 @@ p{padding:4px;}
 
                                    <div class="col-md-4">
                                         <span class="labelTxt"><?php echo $this->translate('Patient First Name & Last Name'); ?></span>
-                                        <p><?php echo $patientFirstName." ".$patientLastName;?></p>
+                                        <p><?php echo $patientFirstName . " " . $patientLastName; ?></p>
                                    </div>
 
                                    <div class="col-md-4">
                                         <span class="labelTxt"><?php echo $this->translate('Mobile No'); ?>.</span>
-                                        <p><?php echo $patientMobileNumber;?></p>
+                                        <p><?php echo $patientMobileNumber; ?></p>
                                    </div>
                                    <div class="col-md-4">
                                         <span class="labelTxt"><?php echo $this->translate('Age'); ?></span>
-                                        <p><?php echo $age;?></p>
+                                        <p><?php echo $age; ?></p>
                                    </div>
                               </div>
 
                               <div class="row">
                                    <div class="col-md-4">
                                         <span class="labelTxt"><?php echo $this->translate('Gender'); ?></span>
-                                        <p><?php echo ucwords(str_replace("_"," ",$result[0]['child_gender']));?></p>
+                                        <p><?php echo ucwords(str_replace("_", " ", $result[0]['child_gender'])); ?></p>
                                    </div>
                               </div>
 
@@ -140,26 +151,26 @@ p{padding:4px;}
                                    <h6></h6>
                                    <div class="col-md-4">
                                         <span class="labelTxt"><?php echo $this->translate('Clinic/Health Center Code'); ?></span>
-                                        <p><?php echo $result[0]['facility_code'];?></p>
+                                        <p><?php echo $result[0]['facility_code']; ?></p>
                                    </div>
                                    <div class="col-md-4">
                                         <span class="labelTxt"><?php echo $this->translate('Province/State'); ?></span>
-                                        <p><?php echo ucwords($result[0]['provinceName']);?></p>
+                                        <p><?php echo ucwords($result[0]['provinceName']); ?></p>
                                    </div>
                                    <div class="col-md-4">
                                         <span class="labelTxt"><?php echo $this->translate('District/County'); ?></span>
-                                        <p><?php echo ucwords($result[0]['districtName']);?></p>
+                                        <p><?php echo ucwords($result[0]['districtName']); ?></p>
                                    </div>
                               </div>
 
                               <div class="row">
                                    <div class="col-md-4">
                                         <span class="labelTxt"><?php echo $this->translate('Clinic/Health Center Name'); ?></span>
-                                        <p><?php echo ucwords($result[0]['facility_name']);?></p>
+                                        <p><?php echo ucwords($result[0]['facility_name']); ?></p>
                                    </div>
                                    <div class="col-md-4">
                                         <span class="labelTxt"><?php echo $this->translate('Clinician Name'); ?></span>
-                                        <p><?php echo ucwords($result[0]['request_clinician_name']);?></p>
+                                        <p><?php echo ucwords($result[0]['request_clinician_name']); ?></p>
                                    </div>
                               </div>
                               <div class="row">
@@ -173,40 +184,40 @@ p{padding:4px;}
                                    </div>
                                    <div class="col-md-4">
                                         <span class="labelTxt"><?php echo $this->translate('Specimen Type'); ?></span>
-                                        <p><?php echo ucwords($result[0]['sample_name']);?></p>
+                                        <p><?php echo ucwords($result[0]['sample_name']); ?></p>
                                    </div>
                               </div>
                               <div class="row">
-                                   <?php if($result[0]['reason_for_sample_rejection']!= null && trim($result[0]['reason_for_sample_rejection'])!= '' && (int)$result[0]['reason_for_sample_rejection'] > 0){ ?>
+                                   <?php if ($result[0]['reason_for_sample_rejection'] != null && trim($result[0]['reason_for_sample_rejection']) != '' && (int)$result[0]['reason_for_sample_rejection'] > 0) { ?>
                                         <div class="col-md-4">
                                              <span class="labelTxt"><?php echo $this->translate('Sample Rejection'); ?></span>
-                                             <p><?php echo ucwords($result[0]['rejection_reason_name']);?></p>
+                                             <p><?php echo ucwords($result[0]['rejection_reason_name']); ?></p>
                                         </div>
-                                        <?php if(isset($result[0]['rejectionFacilityName']) && $result[0]['rejectionFacilityName']!= null && trim($result[0]['rejectionFacilityName'])!= ''){ ?>
+                                        <?php if (isset($result[0]['rejectionFacilityName']) && $result[0]['rejectionFacilityName'] != null && trim($result[0]['rejectionFacilityName']) != '') { ?>
                                              <div class="col-md-4">
                                                   <span class="labelTxt"><?php echo $this->translate('Rejection Facility'); ?></span>
-                                                  <p><?php echo ucwords($result[0]['rejectionFacilityName']);?></p>
+                                                  <p><?php echo ucwords($result[0]['rejectionFacilityName']); ?></p>
                                              </div>
                                         <?php } ?>
                                    <?php } else { ?>
                                         <div class="col-md-4">
                                              <span class="labelTxt"><?php echo $this->translate('Platform'); ?></span>
-                                             <p><?php echo ucwords($result[0]['vl_test_platform']);?></p>
+                                             <p><?php echo ucwords($result[0]['vl_test_platform']); ?></p>
                                         </div>
                                         <div class="col-md-4">
                                              <span class="labelTxt"><?php echo $this->translate('RESULT'); ?></span>
-                                             <p><?php echo ucwords($result[0]['result']);?></p>
+                                             <p><?php echo ucwords($result[0]['result']); ?></p>
                                         </div>
                                         <div class="col-md-4">
                                              <span class="labelTxt"><?php echo $this->translate('Approved By'); ?></span>
-                                             <p><?php echo $resultApprovedBy;?></p>
+                                             <p><?php echo $resultApprovedBy; ?></p>
                                         </div>
                                    <?php } ?>
                               </div>
                               <div class="row">
                                    <div class="col-md-10">
                                         <span class="labelTxt"><?php echo $this->translate('Lab Comments'); ?></span>
-                                        <p><?php echo ucfirst($result[0]['approver_comments']);?></p>
+                                        <p><?php echo ucfirst($result[0]['approver_comments']); ?></p>
                                    </div>
                               </div>
                          </form>

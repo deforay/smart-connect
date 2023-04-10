@@ -9,7 +9,7 @@ use Laminas\Json\Json;
 class StatusController extends AbstractActionController
 {
 
-    private $commonService = null;
+    private \Application\Service\CommonService $commonService;
 
     public function __construct($commonService)
     {
@@ -19,6 +19,7 @@ class StatusController extends AbstractActionController
     public function indexAction()
     {
         $this->layout()->setVariable('activeTab', 'status');
+        /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $parameters = $request->getPost();

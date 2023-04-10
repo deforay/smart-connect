@@ -244,7 +244,7 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
                             <?php
                             foreach ($provinceName as $province) {
                             ?>
-                                <option value="<?php echo $province['location_id']; ?>"><?php echo $province['location_name']; ?></option>
+                                <option value="<?php echo $province['geo_id']; ?>"><?php echo $province['geo_name']; ?></option>
                             <?php
                             }
                             ?>
@@ -255,7 +255,7 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
                            <!--  <?php
                             foreach ($districtName as $district) {
                             ?>
-                                <option data-parent-location="<?php echo $district['parent_location']; ?>" value="<?php echo $district['location_id']; ?>"><?php echo $district['location_name']; ?></option>
+                                <option data-parent-location="<?php echo $district['geo_parent']; ?>" value="<?php echo $district['geo_id']; ?>"><?php echo $district['geo_name']; ?></option>
                             <?php
                             }
                             ?> -->
@@ -398,7 +398,7 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
                             <?php
                             foreach ($provinceName as $province) {
                             ?>
-                                <option value="<?php echo $province['location_id']; ?>"><?php echo $province['location_name']; ?></option>
+                                <option value="<?php echo $province['geo_id']; ?>"><?php echo $province['geo_name']; ?></option>
                             <?php
                             }
                             ?>
@@ -409,7 +409,7 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
                             <?php
                             foreach ($districtName as $district) {
                             ?>
-                                <option data-parent-location="<?php echo $district['parent_location']; ?>" value="<?php echo $district['location_id']; ?>"><?php echo $district['location_name']; ?></option>
+                                <option data-parent-location="<?php echo $district['geo_parent']; ?>" value="<?php echo $district['geo_id']; ?>"><?php echo $district['geo_name']; ?></option>
                             <?php
                             }
                             ?>
@@ -549,7 +549,7 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
                             <?php
                             foreach ($provinceName as $province) {
                             ?>
-                                <option value="<?php echo $province['location_id']; ?>"><?php echo $province['location_name']; ?></option>
+                                <option value="<?php echo $province['geo_id']; ?>"><?php echo $province['geo_name']; ?></option>
                             <?php
                             }
                             ?>
@@ -560,7 +560,7 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
                             <?php
                             foreach ($districtName as $district) {
                             ?>
-                                <option data-parent-location="<?php echo $district['parent_location']; ?>" value="<?php echo $district['location_id']; ?>"><?php echo $district['location_name']; ?></option>
+                                <option data-parent-location="<?php echo $district['geo_parent']; ?>" value="<?php echo $district['geo_id']; ?>"><?php echo $district['geo_name']; ?></option>
                             <?php
                             }
                             ?>
@@ -697,7 +697,7 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
                             <?php
                             foreach ($provinceName as $province) {
                             ?>
-                                <option value="<?php echo $province['location_id']; ?>"><?php echo $province['location_name']; ?></option>
+                                <option value="<?php echo $province['geo_id']; ?>"><?php echo $province['geo_name']; ?></option>
                             <?php
                             }
                             ?>
@@ -708,7 +708,7 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
                             <?php
                             foreach ($districtName as $district) {
                             ?>
-                                <option data-parent-location="<?php echo $district['parent_location']; ?>" value="<?php echo $district['location_id']; ?>"><?php echo $district['location_name']; ?></option>
+                                <option data-parent-location="<?php echo $district['geo_parent']; ?>" value="<?php echo $district['geo_id']; ?>"><?php echo $district['geo_name']; ?></option>
                             <?php
                             }
                             ?>
@@ -1251,7 +1251,7 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
                                         <?php
                                         foreach ($provinceName as $province) {
                                         ?>
-                                            <option value="<?php echo $province['location_id']; ?>"><?php echo $province['location_name']; ?></option>
+                                            <option value="<?php echo $province['geo_id']; ?>"><?php echo $province['geo_name']; ?></option>
                                         <?php
                                         }
                                         ?>
@@ -1262,7 +1262,7 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
                                         <?php
                                         foreach ($districtName as $district) {
                                         ?>
-                                            <option data-parent-location="<?php echo $district['parent_location']; ?>" value="<?php echo $district['location_id']; ?>"><?php echo $district['location_name']; ?></option>
+                                            <option data-parent-location="<?php echo $district['geo_parent']; ?>" value="<?php echo $district['geo_id']; ?>"><?php echo $district['geo_name']; ?></option>
                                         <?php
                                         }
                                         ?>

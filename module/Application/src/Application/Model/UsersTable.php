@@ -27,7 +27,7 @@ class UsersTable extends AbstractTableGateway
     public $sm = null;
     public $config = null;
     public $useCurrentSampleTable = null;
-    public $commonService = null;
+    public \Application\Service\CommonService $commonService;
     public function __construct(Adapter $adapter, $sm = null, $commonService = null)
     {
         $this->adapter = $adapter;
@@ -57,7 +57,7 @@ class UsersTable extends AbstractTableGateway
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $container = new Container('alert');
         $logincontainer = new Container('credo');
-        if (count($rResult) > 0) {
+        if (!empty($rResult)) {
 
             date_default_timezone_set(isset($this->config['defaults']['time-zone']) ? $this->config['defaults']['time-zone'] : 'UTC');
             // Let us flush the file cache
@@ -66,8 +66,8 @@ class UsersTable extends AbstractTableGateway
 
             $cacheDirLastModified = filemtime(realpath(APPLICATION_PATH . "/../data/cache"));
             $cacheExpiryInMins = strtotime("-$cacheExpiryInMins mins");
-            
-            if($cacheDirLastModified > strtotime("-$cacheExpiryInMins mins")){
+
+            if ($cacheDirLastModified > strtotime("-$cacheExpiryInMins mins")) {
                 $this->commonService->clearAllCache();
             }
 
@@ -150,7 +150,7 @@ class UsersTable extends AbstractTableGateway
                 return 'summary';
             }
             //die('home');
-            
+
 
 
 
@@ -264,7 +264,7 @@ class UsersTable extends AbstractTableGateway
 
     public function fetchAllUsers($parameters)
     {
-        
+
         /* Array of database columns which should be read and sent back to DataTables. Use a space where
          * you want to insert a non-database field (for example a counter or static image)
          */

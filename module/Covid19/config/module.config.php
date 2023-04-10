@@ -9,7 +9,7 @@ return array(
                 'options' => array(
                     'route' => '/covid19[/]',
                     'defaults' => array(
-                        'controller' => 'Covid19\Controller\Summary',
+                        'controller' => 'Covid19\Controller\SummaryController',
                         'action' => 'dashboard'
                     ),
                 ),
@@ -19,7 +19,7 @@ return array(
                 'options' => array(
                     'route' => '/covid19/summary[/][:action][/:id]',
                     'defaults' => array(
-                        'controller' => 'Covid19\Controller\Summary',
+                        'controller' => 'Covid19\Controller\SummaryController',
                         'action' => 'dashboard',
                     ),
                 ),
@@ -29,7 +29,7 @@ return array(
                 'options' => array(
                     'route' => '/covid19/labs[/][:action][/:id]',
                     'defaults' => array(
-                        'controller' => 'Covid19\Controller\Labs',
+                        'controller' => 'Covid19\Controller\LabsController',
                         'action' => 'dashboard',
                     ),
                 ),

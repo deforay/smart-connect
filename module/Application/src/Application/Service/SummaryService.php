@@ -13,7 +13,7 @@ use \PhpOffice\PhpSpreadsheet\Spreadsheet;
 class SummaryService
 {
 
-    public $sampleTable = null;
+    public $sampleTable;
     protected $translator = null;
     protected $dbAdapter = null;
 
@@ -24,10 +24,6 @@ class SummaryService
         $this->dbAdapter = $dbAdapter;
     }
 
-    public function getServiceManager()
-    {
-        return $this->sm;
-    }
 
     public function fetchSummaryTabDetails($params)
     {
@@ -225,8 +221,6 @@ class SummaryService
                             }
                             $cellName = $sheet->getCellByColumnAndRow($colNo, $currentRow)->getColumn();
                             $sheet->getStyle($cellName . $currentRow)->applyFromArray($borderStyle);
-                            $sheet->getDefaultRowDimension()->setRowHeight(20);
-                            $sheet->getColumnDimensionByColumn($colNo)->setWidth(20);
                             $sheet->getStyleByColumnAndRow($colNo, $currentRow)->getAlignment()->setWrapText(true);
                             $colNo++;
                         }
@@ -281,8 +275,8 @@ class SummaryService
                     )
                 )
                 ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'))
-                ->join(array('f_d_l_dp' => 'location_details'), 'f_d_l_dp.location_id=f.facility_state', array('province' => 'location_name'))
-                ->join(array('f_d_l_d' => 'location_details'), 'f_d_l_d.location_id=f.facility_district', array('district' => 'location_name'))
+                ->join(array('f_d_l_dp' => 'geographical_divisions'), 'f_d_l_dp.geo_id=f.facility_state', array('province' => 'geo_name'))
+                ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district', array('district' => 'geo_name'))
                 ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')")
                 ->group('vl.facility_id');
         }

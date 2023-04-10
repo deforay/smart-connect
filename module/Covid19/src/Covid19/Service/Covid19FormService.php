@@ -17,7 +17,7 @@ class Covid19FormService
 
     public $sm = null;
     protected $translator = null;
-    protected $commonService = null;
+    protected \Application\Service\CommonService $commonService;
 
     public function __construct($sm, $commonService)
     {
@@ -26,10 +26,6 @@ class Covid19FormService
         $this->commonService = $commonService;
     }
 
-    public function getServiceManager()
-    {
-        return $this->sm;
-    }
 
     public function saveFileFromVlsmAPIV2()
     {
@@ -89,11 +85,11 @@ class Covid19FormService
 
                 try {
                     $id = $sampleDb->insertOrUpdate($data);
-                    if(isset($id) && is_numeric($id) && count($id) > 0){
+                    if (isset($id) && !empty($id) && is_numeric($id)) {
                         $dashDb = $this->sm->get('DashApiReceiverStatsTable');
                         $params = array(
-                            "table" => "dash_form_covid19", 
-                            "field" => "covid19_id", 
+                            "table" => "dash_form_covid19",
+                            "field" => "covid19_id",
                             "id" => $id
                         );
                         $dashDb->updateAttributes($params);
@@ -116,7 +112,7 @@ class Covid19FormService
             }
             $apiTrackData = array(
                 'tracking_id'                   => $apiData['timestamp'],
-                'received_on'                   => $this->commonService->getDateTime(),
+                'received_on'                   => \Application\Service\CommonService::getDateTime(),
                 'number_of_records_received'    => count($apiData['data']),
                 'number_of_records_processed'   => $numRows,
                 'source'                        => 'VLSM-Covid-19',
@@ -222,18 +218,18 @@ class Covid19FormService
                             if (trim($row['facility_state']) != '') {
                                 $sQueryResult = $this->checkFacilityStateDistrictDetails(trim($row['facility_state']), 0);
                                 if ($sQueryResult) {
-                                    $facilityData['facility_state'] = $sQueryResult['location_id'];
+                                    $facilityData['facility_state'] = $sQueryResult['geo_id'];
                                 } else {
-                                    $locationDb->insert(array('parent_location' => 0, 'location_name' => trim($row['facility_state'])));
+                                    $locationDb->insert(array('geo_parent' => 0, 'geo_name' => trim($row['facility_state'])));
                                     $facilityData['facility_state'] = $locationDb->lastInsertValue;
                                 }
                             }
                             if (trim($row['facility_district']) != '') {
                                 $sQueryResult = $this->checkFacilityStateDistrictDetails(trim($row['facility_district']), $facilityData['facility_state']);
                                 if ($sQueryResult) {
-                                    $facilityData['facility_district'] = $sQueryResult['location_id'];
+                                    $facilityData['facility_district'] = $sQueryResult['geo_id'];
                                 } else {
-                                    $locationDb->insert(array('parent_location' => $facilityData['facility_state'], 'location_name' => trim($row['facility_district'])));
+                                    $locationDb->insert(array('geo_parent' => $facilityData['facility_state'], 'geo_name' => trim($row['facility_district'])));
                                     $facilityData['facility_district'] = $locationDb->lastInsertValue;
                                 }
                             }
@@ -281,18 +277,18 @@ class Covid19FormService
                             if (trim($row['labState']) != '') {
                                 $sQueryResult = $this->checkFacilityStateDistrictDetails(trim($row['labState']), 0);
                                 if ($sQueryResult) {
-                                    $labData['facility_state'] = $sQueryResult['location_id'];
+                                    $labData['facility_state'] = $sQueryResult['geo_id'];
                                 } else {
-                                    $locationDb->insert(array('parent_location' => 0, 'location_name' => trim($row['labState'])));
+                                    $locationDb->insert(array('geo_parent' => 0, 'geo_name' => trim($row['labState'])));
                                     $labData['facility_state'] = $locationDb->lastInsertValue;
                                 }
                             }
                             if (trim($row['labDistrict']) != '') {
                                 $sQueryResult = $this->checkFacilityStateDistrictDetails(trim($row['labDistrict']), $labData['facility_state']);
                                 if ($sQueryResult) {
-                                    $labData['facility_district'] = $sQueryResult['location_id'];
+                                    $labData['facility_district'] = $sQueryResult['geo_id'];
                                 } else {
-                                    $locationDb->insert(array('parent_location' => $labData['facility_state'], 'location_name' => trim($row['labDistrict'])));
+                                    $locationDb->insert(array('geo_parent' => $labData['facility_state'], 'geo_name' => trim($row['labDistrict'])));
                                     $labData['facility_district'] = $locationDb->lastInsertValue;
                                 }
                             }
@@ -394,8 +390,8 @@ class Covid19FormService
     {
         $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
         $sql = new Sql($dbAdapter);
-        $sQuery = $sql->select()->from(array('l' => 'location_details'))
-            ->where(array('l.parent_location' => $parent, 'l.location_name' => trim($location)));
+        $sQuery = $sql->select()->from(array('l' => 'geographical_divisions'))
+            ->where(array('l.geo_parent' => $parent, 'l.geo_name' => trim($location)));
         $sQuery = $sql->buildSqlString($sQuery);
         $sQueryResult = $dbAdapter->query($sQuery, $dbAdapter::QUERY_MODE_EXECUTE)->current();
         return $sQueryResult;
@@ -652,8 +648,6 @@ class Covid19FormService
                             }
                             $cellName = $sheet->getCellByColumnAndRow($colNo, $currentRow)->getColumn();
                             $sheet->getStyle($cellName . $currentRow)->applyFromArray($borderStyle);
-                            $sheet->getDefaultRowDimension()->setRowHeight(20);
-                            $sheet->getColumnDimensionByColumn($colNo)->setWidth(20);
                             $sheet->getStyleByColumnAndRow($colNo, $currentRow)->getAlignment()->setWrapText(true);
                             $colNo++;
                         }
@@ -709,8 +703,8 @@ class Covid19FormService
                     )
                 )
                 ->join(array('f' => 'facility_details'), 'f.facility_id=covid19.facility_id', array('facility_name'))
-                ->join(array('f_d_l_dp' => 'location_details'), 'f_d_l_dp.location_id=f.facility_state', array('province' => 'location_name'))
-                ->join(array('f_d_l_d' => 'location_details'), 'f_d_l_d.location_id=f.facility_district', array('district' => 'location_name'))
+                ->join(array('f_d_l_dp' => 'geographical_divisions'), 'f_d_l_dp.geo_id=f.facility_state', array('province' => 'geo_name'))
+                ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district', array('district' => 'geo_name'))
                 ->where("(covid19.sample_collection_date is not null AND covid19.sample_collection_date not like '' AND DATE(covid19.sample_collection_date) !='1970-01-01' AND DATE(covid19.sample_collection_date) !='0000-00-00')")
                 ->group('covid19.facility_id');
         }
@@ -944,8 +938,8 @@ class Covid19FormService
         $resultSet = $sampleDb->getTATbyProvince($labs, $startDate, $endDate);
         foreach ($resultSet as $key) {
             $result[] = array(
-                "facility"           => $key['location_name'],
-                "facility_id"        => $key['location_id'],
+                "facility"           => $key['geo_name'],
+                "facility_id"        => $key['geo_id'],
                 "category"           => 0,
                 "collect_receive"    => $key['Collection_Receive'],
                 "receive_register"   => $key['Receive_Register'],
@@ -965,8 +959,8 @@ class Covid19FormService
         $resultSet = $sampleDb->getTATbyDistrict($labs, $startDate, $endDate);
         foreach ($resultSet as $key) {
             $result[] = array(
-                "facility"           => $key['location_name'],
-                "facility_id"        => $key['location_id'],
+                "facility"           => $key['geo_name'],
+                "facility_id"        => $key['geo_id'],
                 "category"           => 0,
                 "collect_receive"    => $key['Collection_Receive'],
                 "receive_register"   => $key['Receive_Register'],
@@ -987,8 +981,8 @@ class Covid19FormService
         $time = $sampleDb->getTATbyClinic($labs, $startDate, $endDate);
         foreach ($resultSet as $key) {
             $result[] = array(
-                "facility"           => $key['location_name'],
-                "facility_id"        => $key['location_id'],
+                "facility"           => $key['geo_name'],
+                "facility_id"        => $key['geo_id'],
                 "category"           => 0,
                 "collect_receive"    => $key['Collection_Receive'],
                 "receive_register"   => $key['Receive_Register'],
@@ -1060,8 +1054,8 @@ class Covid19FormService
                     $sheet = $excel->getActiveSheet();
                     $output = array();
                     foreach ($sResult as $aRow) {
-                        $displayCollectionDate = $this->commonService->humanDateFormat($aRow['collectionDate']);
-                        $displayReceivedDate = $this->commonService->humanDateFormat($aRow['receivedDate']);
+                        $displayCollectionDate = \Application\Service\CommonService::humanReadableDateFormat($aRow['collectionDate']);
+                        $displayReceivedDate = \Application\Service\CommonService::humanReadableDateFormat($aRow['receivedDate']);
                         $row = array();
                         $row[] = $aRow['sample_code'];
                         $row[] = $displayCollectionDate;
@@ -1127,8 +1121,6 @@ class Covid19FormService
                             }
                             $cellName = $sheet->getCellByColumnAndRow($colNo, $currentRow)->getColumn();
                             $sheet->getStyle($cellName . $currentRow)->applyFromArray($borderStyle);
-                            $sheet->getDefaultRowDimension()->setRowHeight(20);
-                            $sheet->getColumnDimensionByColumn($colNo)->setWidth(20);
                             $sheet->getStyleByColumnAndRow($colNo, $currentRow)->getAlignment()->setWrapText(true);
                             $colNo++;
                         }
@@ -1207,8 +1199,8 @@ class Covid19FormService
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->from(array('vl' => $dashTable))
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name', 'facility_code', 'facility_logo'), 'left')
-            ->join(array('l_s' => 'location_details'), 'l_s.location_id=f.facility_state', array('provinceName' => 'location_name'), 'left')
-            ->join(array('l_d' => 'location_details'), 'l_d.location_id=f.facility_district', array('districtName' => 'location_name'), 'left')
+            ->join(array('l_s' => 'geographical_divisions'), 'l_s.geo_id=f.facility_state', array('provinceName' => 'geo_name'), 'left')
+            ->join(array('l_d' => 'geographical_divisions'), 'l_d.geo_id=f.facility_district', array('districtName' => 'geo_name'), 'left')
             ->join(array('rs' => 'r_eid_sample_type'), 'rs.sample_id=vl.sample_type', array('sample_name'), 'left')
             ->join(array('l' => 'facility_details'), 'l.facility_id=vl.lab_id', array('labName' => 'facility_name'), 'left')
             ->join(array('u' => 'user_details'), 'u.user_id=vl.result_approved_by', array('approvedBy' => 'user_name'), 'left')
@@ -1242,10 +1234,10 @@ class Covid19FormService
                         $sampleCollectionDate = '';
                         $sampleTestedDate = '';
                         if (isset($aRow['sampleCollectionDate']) && $aRow['sampleCollectionDate'] != NULL && trim($aRow['sampleCollectionDate']) != "" && $aRow['sampleCollectionDate'] != '0000-00-00') {
-                            $sampleCollectionDate = $this->commonService->humanDateFormat($aRow['sampleCollectionDate']);
+                            $sampleCollectionDate = \Application\Service\CommonService::humanReadableDateFormat($aRow['sampleCollectionDate']);
                         }
                         if (isset($aRow['sampleTestingDate']) && $aRow['sampleTestingDate'] != NULL && trim($aRow['sampleTestingDate']) != "" && $aRow['sampleTestingDate'] != '0000-00-00') {
-                            $sampleTestedDate = $this->commonService->humanDateFormat($aRow['sampleTestingDate']);
+                            $sampleTestedDate = \Application\Service\CommonService::humanReadableDateFormat($aRow['sampleTestingDate']);
                         }
                         $row[] = $aRow['sample_code'];
                         $row[] = ucwords($aRow['facility_name']);
@@ -1336,8 +1328,6 @@ class Covid19FormService
                             }
                             $cellName = $sheet->getCellByColumnAndRow($colNo, $currentRow)->getColumn();
                             $sheet->getStyle($cellName . $currentRow)->applyFromArray($borderStyle);
-                            $sheet->getDefaultRowDimension()->setRowHeight(20);
-                            $sheet->getColumnDimensionByColumn($colNo)->setWidth(20);
                             $sheet->getStyleByColumnAndRow($colNo, $currentRow)->getAlignment()->setWrapText(true);
                             $colNo++;
                         }
@@ -1388,7 +1378,7 @@ class Covid19FormService
                         $row = array();
                         $sampleCollectionDate = '';
                         if (isset($aRow['sampleCollectionDate']) && $aRow['sampleCollectionDate'] != null && trim($aRow['sampleCollectionDate']) != "" && $aRow['sampleCollectionDate'] != '0000-00-00') {
-                            $sampleCollectionDate = $this->commonService->humanDateFormat($aRow['sampleCollectionDate']);
+                            $sampleCollectionDate = \Application\Service\CommonService::humanReadableDateFormat($aRow['sampleCollectionDate']);
                         }
                         $row[] = $sampleCollectionDate;
                         $row[] = $aRow['total_samples_received'];
@@ -1463,8 +1453,6 @@ class Covid19FormService
                             }
                             $cellName = $sheet->getCellByColumnAndRow($colNo, $currentRow)->getColumn();
                             $sheet->getStyle($cellName . $currentRow)->applyFromArray($borderStyle);
-                            $sheet->getDefaultRowDimension()->setRowHeight(20);
-                            $sheet->getColumnDimensionByColumn($colNo)->setWidth(20);
                             $sheet->getStyleByColumnAndRow($colNo, $currentRow)->getAlignment()->setWrapText(true);
                             $colNo++;
                         }
@@ -1531,7 +1519,7 @@ class Covid19FormService
             }
             foreach ($params['data'] as $key => $row) {
                 // Debug::dump($row);die;
-                if (!empty(trim($row['sample_code'])) && trim($params['api_version']) == $config['defaults']['vl-api-version']) {
+                if (!empty(trim($row['sample_code']))) {
                     $uniqueId = trim($row['unique_id']);
                     $sampleCode = trim($row['sample_code']);
                     $instanceCode = 'api-data';
@@ -1541,7 +1529,7 @@ class Covid19FormService
                     if (!$province) {
                         $provinceDb->insert(array(
                             'province_name'     => $row['health_centre_province'],
-                            'updated_datetime'  => $this->commonService->getDateTime()
+                            'updated_datetime'  => \Application\Service\CommonService::getDateTime()
                         ));
                         $province['province_id'] = $provinceDb->lastInsertValue;
                     }
@@ -1678,7 +1666,7 @@ class Covid19FormService
         // Track API Records
         $apiTrackData = array(
             'tracking_id'                   => $params['timestamp'],
-            'received_on'                   => $this->commonService->getDateTime(),
+            'received_on'                   => \Application\Service\CommonService::getDateTime(),
             'number_of_records_received'    => count($params['data']),
             'number_of_records_processed'   => (count($params['data']) - count($return)),
             'source'                        => 'API-COVID-19',

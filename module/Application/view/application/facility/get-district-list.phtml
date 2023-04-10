@@ -3,7 +3,7 @@ $option = '';
 if(count($result)>0){
     $option.= '<option value"">-- '.$this->translate("Select").' --</option>';
     foreach($result as $district){
-        $option.='<option value="'.$district['location_id'].'">'.$district['location_name'].'</option>';
+        $option.='<option value="'.$district['geo_id'].'">'.$district['geo_name'].'</option>';
     }
     $option.= '<option value="other">'.$this->translate("Other").'</option>';
 }else{
