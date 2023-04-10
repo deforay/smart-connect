@@ -1,0 +1,18 @@
+services:
+  app:
+    expose:
+      - "9000"
+    environment:
+      - DB_HOST
+      - DB_PORT
+      - DB_NAME
+      - DB_USERNAME
+      - DB_PASSWORD
+
+
+  app-server:
+    depends_on:
+      - app
+    command: run-caddy
+    environment:
+      PHP_FPM_UPSTREAM: "app:9000"
