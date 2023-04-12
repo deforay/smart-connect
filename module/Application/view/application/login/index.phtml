@@ -1,25 +1,17 @@
 <?php
 
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+
 use Laminas\Session\Container;
 
 $languagecontainer = new Container('language');
 $config = $this->GetConfigData();
 $languagecontainer->locale = $this->GetLocaleData('locale', $config['language']);
-session_start();
-function generate_token()
-{
-    // Check if a token is present for the current session
-    if (!isset($_SESSION["csrf_token"])) {
-        // No token present, generate a new one
-        $token = bin2hex(random_bytes(64));
-        $_SESSION["csrf_token"] = $token;
-    } else {
-        // Reuse the token
-        $token = $_SESSION["csrf_token"];
-    }
-    // print_r($token);die;
-    return $token;
-}
+
+$csrfToken = \Application\Service\CommonService::generateCSRF();
+
 ?>
 <!DOCTYPE html>
 <!--[if IE 8]> <html lang="en" class="ie8 no-js"> <![endif]-->
@@ -83,7 +75,7 @@ function generate_token()
     <div class="content" style="margin-top:0;">
         <!-- BEGIN LOGIN FORM -->
         <form class="login-form" action="" method="post">
-            <input type="hidden" name="csrf_token" value="<?php echo generate_token(); ?>" />
+            <input type="hidden" name="CSRF_TOKEN" value="<?= $csrfToken; ?>" />
             <div class="form-title">
                 <span class="form-title"><?php echo $this->translate('Welcome'); ?>.</span>
                 <span class="form-subtitle"><?php echo $this->translate('Please login to continue'); ?>.</span>

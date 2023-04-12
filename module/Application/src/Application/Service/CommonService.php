@@ -50,6 +50,23 @@ class CommonService
           return $randomString;
      }
 
+     public static function generateCSRF($resetToken = false)
+     {
+
+          if (session_status() == PHP_SESSION_NONE) {
+               session_start();
+          }
+          if ($resetToken || !isset($_SESSION["CSRF_TOKEN"])) {
+               // Generate a new one
+               $token = $_SESSION["CSRF_TOKEN"] = bin2hex(random_bytes(64));
+          } else {
+               // Reuse the existing token
+               $token = $_SESSION["CSRF_TOKEN"];
+          }
+          return $token;
+     }
+
+
      public function checkMultipleFieldValidations($params)
      {
           $adapter = $this->sm->get('Laminas\Db\Adapter\Adapter');

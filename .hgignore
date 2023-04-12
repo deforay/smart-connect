@@ -3,7 +3,7 @@ syntax: regexp
 ^backup/(?!index.php)
 ^public/uploads/(?!index.php)
 ^public/temporary/(?!index.php)
-^vendor/(?!autoload.php)
+^vendor
 error_log
 Thumbs.db
 Thumbs.db.orig

@@ -27,9 +27,9 @@ class LoginController extends AbstractActionController
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            if ($params["csrf_token"] != $_SESSION["csrf_token"]) {
-                // Reset token
-                unset($_SESSION["csrf_token"]);
+            if ($params["CSRF_TOKEN"] != $_SESSION["CSRF_TOKEN"]) {
+                // Reset token and create a new one
+                \Application\Service\CommonService::generateCSRF(true);
                 $container = new Container('alert');
                 $container->alertMsg = 'Could not process your login request. Please try again.';
                 return '/login';

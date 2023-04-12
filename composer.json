@@ -21,7 +21,7 @@
         "laminas/laminas-mvc-i18n": "^1.2.0",
         "laminas/laminas-mvc-plugins": "^1.1.0",
         "laminas/laminas-mvc-middleware": "^2.0.0",
-        "laminas/laminas-session": "^2.10.0",
+        "laminas/laminas-session": "^2.13",
         "laminas/laminas-di": "^3.2.2",
         "laminas/laminas-i18n": "^2.11",
         "laminas/laminas-serializer": "^2.10",
