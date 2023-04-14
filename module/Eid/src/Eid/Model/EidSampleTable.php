@@ -2147,7 +2147,7 @@ class EidSampleTable extends AbstractTableGateway
 
     public function fetchQuickStats($params)
     {
-        $logincontainer = new Container('credo');
+        $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
 
@@ -2181,7 +2181,7 @@ class EidSampleTable extends AbstractTableGateway
                 )
             );
         //$query = $query->where("(eid.sample_collection_date is not null AND eid.sample_collection_date not like '' AND DATE(eid.sample_collection_date) !='1970-01-01' AND DATE(eid.sample_collection_date) !='0000-00-00')");
-        if ($logincontainer->role != 1) {
+        if ($loginContainer->role != 1) {
             $query = $query->where('eid.lab_id IN ("' . implode('", "', $this->mappedFacilities) . '")');
         }
         if (isset($params['flag']) && $params['flag'] == 'poc') {
@@ -2197,7 +2197,7 @@ class EidSampleTable extends AbstractTableGateway
 
     public function getStats($params)
     {
-        $logincontainer = new Container('credo');
+        $loginContainer = new Container('credo');
         $quickStats = $this->fetchQuickStats($params);
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
@@ -2223,7 +2223,7 @@ class EidSampleTable extends AbstractTableGateway
             ->columns(array('total' => new Expression('COUNT(*)'), 'receivedDate' => new Expression('DATE(sample_collection_date)')))
             ->where("sample_collection_date is not null AND sample_collection_date not like '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00'")
             ->group(array("receivedDate"));
-        if ($logincontainer->role != 1) {
+        if ($loginContainer->role != 1) {
             $receivedQuery = $receivedQuery->where('eid.lab_id IN ("' . implode('", "', $this->mappedFacilities) . '")');
         }
         if (trim($params['daterange']) != '') {
@@ -2255,7 +2255,7 @@ class EidSampleTable extends AbstractTableGateway
             ->where("((eid.result IS NOT NULL AND eid.result != '' AND eid.result != 'NULL') OR (eid.reason_for_sample_rejection IS NOT NULL AND eid.reason_for_sample_rejection != '' AND eid.reason_for_sample_rejection != 0))")
             ->where("sample_collection_date is not null AND sample_collection_date not like '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00'")
             ->group(array("testedDate"));
-        if ($logincontainer->role != 1) {
+        if ($loginContainer->role != 1) {
             $testedQuery = $testedQuery->where('eid.lab_id IN ("' . implode('", "', $this->mappedFacilities) . '")');
         }
         if (trim($params['daterange']) != '') {
@@ -2286,7 +2286,7 @@ class EidSampleTable extends AbstractTableGateway
             ->where("eid.reason_for_sample_rejection IS NOT NULL AND eid.reason_for_sample_rejection !='' AND eid.reason_for_sample_rejection!= 0")
             ->where("sample_collection_date is not null AND sample_collection_date not like '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00'")
             ->group(array("rejectDate"));
-        if ($logincontainer->role != 1) {
+        if ($loginContainer->role != 1) {
             $rejectedQuery = $rejectedQuery->where('eid.lab_id IN ("' . implode('", "', $this->mappedFacilities) . '")');
         }
         if (trim($params['daterange']) != '') {
@@ -2313,7 +2313,7 @@ class EidSampleTable extends AbstractTableGateway
 
     public function fetchPocQuickStats($params)
     {
-        $logincontainer = new Container('credo');
+        $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
 
@@ -2356,7 +2356,7 @@ class EidSampleTable extends AbstractTableGateway
             )
             ->join(array('icm' => 'import_config_machines'), 'icm.config_machine_id=eid.import_machine_name', array(), 'left');
         //$query = $query->where("(eid.sample_collection_date is not null AND eid.sample_collection_date not like '' AND DATE(eid.sample_collection_date) !='1970-01-01' AND DATE(eid.sample_collection_date) !='0000-00-00')");
-        if ($logincontainer->role != 1) {
+        if ($loginContainer->role != 1) {
             $query = $query->where('eid.lab_id IN ("' . implode('", "', $this->mappedFacilities) . '")');
         }
         $queryStr = $sql->buildSqlString($query);
@@ -2367,7 +2367,7 @@ class EidSampleTable extends AbstractTableGateway
     }
     public function getPocStats($params)
     {
-        $logincontainer = new Container('credo');
+        $loginContainer = new Container('credo');
         $quickStats = $this->fetchPocQuickStats($params);
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
@@ -2393,7 +2393,7 @@ class EidSampleTable extends AbstractTableGateway
             ->columns(array('total' => new Expression('COUNT(*)'), 'receivedDate' => new Expression('DATE(sample_collection_date)')))
             ->where("sample_collection_date is not null AND sample_collection_date not like '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00'")
             ->group(array("receivedDate"));
-        if ($logincontainer->role != 1) {
+        if ($loginContainer->role != 1) {
             $receivedQuery = $receivedQuery->where('eid.lab_id IN ("' . implode('", "', $this->mappedFacilities) . '")');
         }
         if (trim($params['daterange']) != '') {
@@ -2425,7 +2425,7 @@ class EidSampleTable extends AbstractTableGateway
             ->where("((eid.result IS NOT NULL AND eid.result != '' AND eid.result != 'NULL') OR (eid.reason_for_sample_rejection IS NOT NULL AND eid.reason_for_sample_rejection != '' AND eid.reason_for_sample_rejection != 0))")
             ->where("sample_collection_date is not null AND sample_collection_date not like '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00'")
             ->group(array("testedDate"));
-        if ($logincontainer->role != 1) {
+        if ($loginContainer->role != 1) {
             $testedQuery = $testedQuery->where('eid.lab_id IN ("' . implode('", "', $this->mappedFacilities) . '")');
         }
         if (trim($params['daterange']) != '') {
@@ -2456,7 +2456,7 @@ class EidSampleTable extends AbstractTableGateway
             ->where("eid.reason_for_sample_rejection IS NOT NULL AND eid.reason_for_sample_rejection !='' AND eid.reason_for_sample_rejection!= 0")
             ->where("sample_collection_date is not null AND sample_collection_date not like '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00'")
             ->group(array("rejectDate"));
-        if ($logincontainer->role != 1) {
+        if ($loginContainer->role != 1) {
             $rejectedQuery = $rejectedQuery->where('eid.lab_id IN ("' . implode('", "', $this->mappedFacilities) . '")');
         }
         if (trim($params['daterange']) != '') {
@@ -2484,7 +2484,7 @@ class EidSampleTable extends AbstractTableGateway
     public function getTestFailedByTestingPlatform($params)
     {
 
-        $logincontainer = new Container('credo');
+        $loginContainer = new Container('credo');
         $result = array();
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
@@ -2508,7 +2508,7 @@ class EidSampleTable extends AbstractTableGateway
     public function getInstrumentWiseTest($params)
     {
 
-        $logincontainer = new Container('credo');
+        $loginContainer = new Container('credo');
         $result = array();
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
@@ -2531,7 +2531,7 @@ class EidSampleTable extends AbstractTableGateway
     public function getMonthlySampleCount($params)
     {
 
-        $logincontainer = new Container('credo');
+        $loginContainer = new Container('credo');
         $result = array();
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
@@ -2601,7 +2601,7 @@ class EidSampleTable extends AbstractTableGateway
 
     public function getMonthlySampleCountByLabs($params)
     {
-        $logincontainer = new Container('credo');
+        $loginContainer = new Container('credo');
         $result = array();
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
@@ -2671,7 +2671,7 @@ class EidSampleTable extends AbstractTableGateway
 
     public function fetchLabTurnAroundTime($params)
     {
-        $logincontainer = new Container('credo');
+        $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = array();
@@ -2777,7 +2777,7 @@ class EidSampleTable extends AbstractTableGateway
 
     public function fetchCountyOutcomes($params)
     {
-        $logincontainer = new Container('credo');
+        $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = array();
@@ -2838,7 +2838,7 @@ class EidSampleTable extends AbstractTableGateway
 
     public function fetchLabPerformance($params)
     {
-        $logincontainer = new Container('credo');
+        $loginContainer = new Container('credo');
         $result = array();
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
@@ -2914,7 +2914,7 @@ class EidSampleTable extends AbstractTableGateway
 
     public function getTATbyProvince($labs, $startDate, $endDate)
     {
-        $logincontainer = new Container('credo');
+        $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $skipDays = isset($this->config['defaults']['tat-skipdays']) ? $this->config['defaults']['tat-skipdays'] : 120;
@@ -2955,8 +2955,8 @@ class EidSampleTable extends AbstractTableGateway
         if (isset($labs) && !empty($labs)) {
             $squery = $squery->where('vl.lab_id IN (' . implode(',', $labs) . ')');
         } else {
-            if ($logincontainer->role != 1) {
-                $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : array(0);
+            if ($loginContainer->role != 1) {
+                $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : array(0);
                 $squery = $squery->where('vl.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
             }
         }
@@ -2971,7 +2971,7 @@ class EidSampleTable extends AbstractTableGateway
 
     public function getTATbyDistrict($labs, $startDate, $endDate)
     {
-        $logincontainer = new Container('credo');
+        $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $skipDays = isset($this->config['defaults']['tat-skipdays']) ? $this->config['defaults']['tat-skipdays'] : 120;
@@ -3012,8 +3012,8 @@ class EidSampleTable extends AbstractTableGateway
         if (isset($labs) && !empty($labs)) {
             $squery = $squery->where('vl.lab_id IN (' . implode(',', $labs) . ')');
         } else {
-            if ($logincontainer->role != 1) {
-                $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : array(0);
+            if ($loginContainer->role != 1) {
+                $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : array(0);
                 $squery = $squery->where('vl.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
             }
         }
@@ -3028,7 +3028,7 @@ class EidSampleTable extends AbstractTableGateway
 
     public function getTATbyClinic($labs, $startDate, $endDate)
     {
-        $logincontainer = new Container('credo');
+        $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $skipDays = isset($this->config['defaults']['tat-skipdays']) ? $this->config['defaults']['tat-skipdays'] : 120;
@@ -3069,8 +3069,8 @@ class EidSampleTable extends AbstractTableGateway
         if (isset($labs) && !empty($labs)) {
             $squery = $squery->where('vl.lab_id IN (' . implode(',', $labs) . ')');
         } else {
-            if ($logincontainer->role != 1) {
-                $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : array(0);
+            if ($loginContainer->role != 1) {
+                $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : array(0);
                 $squery = $squery->where('vl.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
             }
         }
@@ -3089,7 +3089,7 @@ class EidSampleTable extends AbstractTableGateway
 
     public function fetchProvinceWiseResultAwaitedDrillDown($params)
     {
-        $logincontainer = new Container('credo');
+        $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = array();
@@ -3115,8 +3115,8 @@ class EidSampleTable extends AbstractTableGateway
         if (isset($params['lab']) && trim($params['lab']) != '') {
             $countQuery = $countQuery->where('vl.lab_id IN (' . $params['lab'] . ')');
         } else {
-            if ($logincontainer->role != 1) {
-                $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : array(0);
+            if ($loginContainer->role != 1) {
+                $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : array(0);
                 $countQuery = $countQuery->where('vl.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
             }
         }
@@ -3194,7 +3194,7 @@ class EidSampleTable extends AbstractTableGateway
     }
     public function fetchDistrictWiseResultAwaitedDrillDown($params)
     {
-        $logincontainer = new Container('credo');
+        $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = array();
@@ -3221,8 +3221,8 @@ class EidSampleTable extends AbstractTableGateway
         if (isset($params['lab']) && trim($params['lab']) != '') {
             $countQuery = $countQuery->where('vl.lab_id IN (' . $params['lab'] . ')');
         } else {
-            if ($logincontainer->role != 1) {
-                $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : array(0);
+            if ($loginContainer->role != 1) {
+                $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : array(0);
                 $countQuery = $countQuery->where('vl.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
             }
         }
@@ -3299,7 +3299,7 @@ class EidSampleTable extends AbstractTableGateway
 
     public function fetchLabWiseResultAwaitedDrillDown($params)
     {
-        $logincontainer = new Container('credo');
+        $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = array();
@@ -3325,8 +3325,8 @@ class EidSampleTable extends AbstractTableGateway
         if (isset($params['lab']) && trim($params['lab']) != '') {
             $countQuery = $countQuery->where('f.facility_id IN (' . $params['lab'] . ')');
         } else {
-            if ($logincontainer->role != 1) {
-                $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : array(0);
+            if ($loginContainer->role != 1) {
+                $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : array(0);
                 $countQuery = $countQuery->where('f.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
             }
         }
@@ -3404,7 +3404,7 @@ class EidSampleTable extends AbstractTableGateway
 
     public function fetchClinicWiseResultAwaitedDrillDown($params)
     {
-        $logincontainer = new Container('credo');
+        $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = array();
@@ -3430,8 +3430,8 @@ class EidSampleTable extends AbstractTableGateway
         if (isset($params['lab']) && trim($params['lab']) != '') {
             $countQuery = $countQuery->where('f.facility_id IN (' . $params['lab'] . ')');
         } else {
-            if ($logincontainer->role != 1) {
-                $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : array(0);
+            if ($loginContainer->role != 1) {
+                $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : array(0);
                 $countQuery = $countQuery->where('f.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
             }
         }
@@ -3510,7 +3510,7 @@ class EidSampleTable extends AbstractTableGateway
 
     public function fetchFilterSampleResultAwaitedDetails($parameters)
     {
-        $logincontainer = new Container('credo');
+        $loginContainer = new Container('credo');
         $queryContainer = new Container('query');
 
 
@@ -3618,8 +3618,8 @@ class EidSampleTable extends AbstractTableGateway
         if (isset($parameters['lab']) && trim($parameters['lab']) != '') {
             $sQuery = $sQuery->where('vl.lab_id IN (' . $parameters['lab'] . ')');
         } else {
-            if ($logincontainer->role != 1) {
-                $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : array(0);
+            if ($loginContainer->role != 1) {
+                $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : array(0);
                 $sQuery = $sQuery->where('vl.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
             }
         }
@@ -3696,8 +3696,8 @@ class EidSampleTable extends AbstractTableGateway
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facilityName' => 'facility_name', 'facilityCode' => 'facility_code'))
             ->join(array('l' => 'facility_details'), 'l.facility_id=vl.lab_id', array('labName' => 'facility_name'), 'left')
             ->where("(vl.is_sample_rejected is NULL OR vl.is_sample_rejected = '' OR vl.is_sample_rejected = 'no') AND (reason_for_sample_rejection is NULL or reason_for_sample_rejection ='' or vl.reason_for_sample_rejection = 0)");
-        if ($logincontainer->role != 1) {
-            $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : array(0);
+        if ($loginContainer->role != 1) {
+            $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : array(0);
             $iQuery = $iQuery->where('vl.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
         }
         $iQueryStr = $sql->buildSqlString($iQuery);
@@ -3741,7 +3741,7 @@ class EidSampleTable extends AbstractTableGateway
 
     public function fetchSampleDetails($params)
     {
-        $logincontainer = new Container('credo');
+        $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = array();
@@ -3754,8 +3754,8 @@ class EidSampleTable extends AbstractTableGateway
             if (isset($params['lab']) && trim($params['lab']) != '') {
                 $facilityQuery = $facilityQuery->where('f.facility_id IN (' . $params['lab'] . ')');
             } else {
-                if ($logincontainer->role != 1) {
-                    $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : array(0);
+                if ($loginContainer->role != 1) {
+                    $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : array(0);
                     $facilityQuery = $facilityQuery->where('f.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
                 }
             }
@@ -3842,7 +3842,7 @@ class EidSampleTable extends AbstractTableGateway
 
     public function fetchBarSampleDetails($params)
     {
-        $logincontainer = new Container('credo');
+        $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = array();
@@ -3855,8 +3855,8 @@ class EidSampleTable extends AbstractTableGateway
             if (isset($params['lab']) && trim($params['lab']) != '') {
                 $fQuery = $fQuery->where('f.facility_id IN (' . $params['lab'] . ')');
             } else {
-                if ($logincontainer->role != 1) {
-                    $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : array(0);
+                if ($loginContainer->role != 1) {
+                    $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : array(0);
                     $fQuery = $fQuery->where('f.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
                 }
             }
@@ -3948,7 +3948,7 @@ class EidSampleTable extends AbstractTableGateway
 
     public function fetchLabSampleDetails($params)
     {
-        $logincontainer = new Container('credo');
+        $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = array();
@@ -3969,8 +3969,8 @@ class EidSampleTable extends AbstractTableGateway
             if (isset($params['lab']) && trim($params['lab']) != '') {
                 $sQuery = $sQuery->where('vl.lab_id IN (' . $params['lab'] . ')');
             } else {
-                if ($logincontainer->role != 1) {
-                    $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : array(0);
+                if ($loginContainer->role != 1) {
+                    $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : array(0);
                     $sQuery = $sQuery->where('vl.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
                 }
             }
@@ -4045,7 +4045,7 @@ class EidSampleTable extends AbstractTableGateway
 
     public function fetchLabBarSampleDetails($params)
     {
-        $logincontainer = new Container('credo');
+        $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = array();
@@ -4077,8 +4077,8 @@ class EidSampleTable extends AbstractTableGateway
             if (isset($params['lab']) && trim($params['lab']) != '') {
                 $sQuery = $sQuery->where('vl.lab_id IN (' . $params['lab'] . ')');
             } else {
-                if ($logincontainer->role != 1) {
-                    $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : array(0);
+                if ($loginContainer->role != 1) {
+                    $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : array(0);
                     $sQuery = $sQuery->where('vl.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
                 }
             }
@@ -4156,7 +4156,7 @@ class EidSampleTable extends AbstractTableGateway
 
     public function fetchLabFilterSampleDetails($parameters)
     {
-        $logincontainer = new Container('credo');
+        $loginContainer = new Container('credo');
         $queryContainer = new Container('query');
 
         /* Array of database columns which should be read and sent back to DataTables. Use a space where
@@ -4261,8 +4261,8 @@ class EidSampleTable extends AbstractTableGateway
         if (isset($parameters['lab']) && trim($parameters['lab']) != '') {
             $sQuery = $sQuery->where('vl.lab_id IN (' . $parameters['lab'] . ')');
         } else {
-            if ($logincontainer->role != 1) {
-                $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : array(0);
+            if ($loginContainer->role != 1) {
+                $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : array(0);
                 $sQuery = $sQuery->where('vl.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
             }
         }
@@ -4352,8 +4352,8 @@ class EidSampleTable extends AbstractTableGateway
             ->group(new Expression('DATE(sample_collection_date)'))
             ->group('vl.specimen_type')
             ->group('vl.facility_id');
-        if ($logincontainer->role != 1) {
-            $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : array(0);
+        if ($loginContainer->role != 1) {
+            $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : array(0);
             $iQuery = $iQuery->where('vl.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
         }
         $iQueryStr = $sql->buildSqlString($iQuery);
@@ -4387,7 +4387,7 @@ class EidSampleTable extends AbstractTableGateway
 
     public function fetchFilterSampleDetails($parameters)
     {
-        $logincontainer = new Container('credo');
+        $loginContainer = new Container('credo');
         $queryContainer = new Container('query');
 
         /* Array of database columns which should be read and sent back to DataTables. Use a space where
@@ -4489,8 +4489,8 @@ class EidSampleTable extends AbstractTableGateway
         if (isset($parameters['lab']) && trim($parameters['lab']) != '') {
             $sQuery = $sQuery->where('vl.lab_id IN (' . $parameters['lab'] . ')');
         } else {
-            if ($logincontainer->role != 1) {
-                $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : array(0);
+            if ($loginContainer->role != 1) {
+                $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : array(0);
                 $sQuery = $sQuery->where('vl.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
             }
         }
@@ -4577,8 +4577,8 @@ class EidSampleTable extends AbstractTableGateway
             ))
             ->where("sample_collection_date is not null AND sample_collection_date not like '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00' AND vl.lab_id !=0")
             ->group('vl.lab_id');
-        if ($logincontainer->role != 1) {
-            $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : array(0);
+        if ($loginContainer->role != 1) {
+            $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : array(0);
             $iQuery = $iQuery->where('vl.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
         }
         $iQueryStr = $sql->buildSqlString($iQuery);
@@ -4607,7 +4607,7 @@ class EidSampleTable extends AbstractTableGateway
     //get eid out comes result
     public function getVlOutComes($params)
     {
-        $logincontainer = new Container('credo');
+        $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $vlOutComeResult = array();
@@ -4632,8 +4632,8 @@ class EidSampleTable extends AbstractTableGateway
             if (isset($params['lab']) && trim($params['lab']) != '') {
                 $sQuery = $sQuery->where('vl.lab_id IN (' . $params['lab'] . ')');
             } else {
-                if ($logincontainer->role != 1) {
-                    $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : array(0);
+                if ($loginContainer->role != 1) {
+                    $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : array(0);
                     $sQuery = $sQuery->where('vl.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
                 }
             }
@@ -4842,7 +4842,7 @@ class EidSampleTable extends AbstractTableGateway
     // CLINIC DASHBOARD STUFF
     public function fetchOverallEidResult($params)
     {
-        $logincontainer = new Container('credo');
+        $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $sResult = array();
@@ -4870,8 +4870,8 @@ class EidSampleTable extends AbstractTableGateway
             if (isset($params['clinicId']) && trim($params['clinicId']) != '') {
                 $squery = $squery->where('vl.facility_id IN (' . $params['clinicId'] . ')');
             } else {
-                if ($logincontainer->role != 1) {
-                    $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : array(0);
+                if ($loginContainer->role != 1) {
+                    $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : array(0);
                     $squery = $squery->where('vl.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
                 }
             }
@@ -4924,7 +4924,7 @@ class EidSampleTable extends AbstractTableGateway
 
     public function fetchViralLoadStatusBasedOnGender($params)
     {
-        $logincontainer = new Container('credo');
+        $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = array();
@@ -4958,8 +4958,8 @@ class EidSampleTable extends AbstractTableGateway
             if (isset($params['clinicId']) && trim($params['clinicId']) != '') {
                 $query = $query->where('vl.facility_id IN (' . $params['clinicId'] . ')');
             } else {
-                if ($logincontainer->role != 1) {
-                    $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : array(0);
+                if ($loginContainer->role != 1) {
+                    $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : array(0);
                     $query = $query->where('vl.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
                 }
             }
@@ -5026,7 +5026,7 @@ class EidSampleTable extends AbstractTableGateway
 
     public function fetchClinicSampleTestedResultAgeGroupDetails($params)
     {
-        $logincontainer = new Container('credo');
+        $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = array();
@@ -5060,8 +5060,8 @@ class EidSampleTable extends AbstractTableGateway
             if (isset($params['clinicId']) && trim($params['clinicId']) != '') {
                 $query = $query->where('vl.facility_id IN (' . $params['clinicId'] . ')');
             } else {
-                if ($logincontainer->role != 1) {
-                    $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : array(0);
+                if ($loginContainer->role != 1) {
+                    $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : array(0);
                     $query = $query->where('vl.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
                 }
             }
@@ -5103,7 +5103,7 @@ class EidSampleTable extends AbstractTableGateway
 
     public function fetchSampleTestedReason($params)
     {
-        $logincontainer = new Container('credo');
+        $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $rResult = array();
@@ -5126,8 +5126,8 @@ class EidSampleTable extends AbstractTableGateway
             if (isset($params['clinicId']) && trim($params['clinicId']) != '') {
                 $rQuery = $rQuery->where('vl.facility_id IN (' . $params['clinicId'] . ')');
             } else {
-                if ($logincontainer->role != 1) {
-                    $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : array(0);
+                if ($loginContainer->role != 1) {
+                    $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : array(0);
                     $rQuery = $rQuery->where('vl.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
                 }
             }
@@ -5191,7 +5191,7 @@ class EidSampleTable extends AbstractTableGateway
     //get sample tested result details
     public function fetchClinicSampleTestedResults($params, $sampleType)
     {
-        $logincontainer = new Container('credo');
+        $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = array();
@@ -5229,8 +5229,8 @@ class EidSampleTable extends AbstractTableGateway
             if (isset($params['clinicId']) && trim($params['clinicId']) != '') {
                 $queryStr = $queryStr->where('vl.facility_id IN (' . $params['clinicId'] . ')');
             } else {
-                if ($logincontainer->role != 1) {
-                    $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : array(0);
+                if ($loginContainer->role != 1) {
+                    $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : array(0);
                     $queryStr = $queryStr->where('vl.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
                 }
             }
@@ -5293,7 +5293,7 @@ class EidSampleTable extends AbstractTableGateway
 
     public function fetchAllTestResults($parameters)
     {
-        $logincontainer = new Container('credo');
+        $loginContainer = new Container('credo');
         $queryContainer = new Container('query');
         /* Array of database columns which should be read and sent back to DataTables. Use a space where
          * you want to insert a non-database field (for example a counter or static image)
@@ -5396,8 +5396,8 @@ class EidSampleTable extends AbstractTableGateway
         if (isset($parameters['clinicId']) && trim($parameters['clinicId']) != '') {
             $sQuery = $sQuery->where('vl.facility_id IN (' . $parameters['clinicId'] . ')');
         } else {
-            if ($logincontainer->role != 1) {
-                $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : array(0);
+            if ($loginContainer->role != 1) {
+                $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : array(0);
                 $sQuery = $sQuery->where('vl.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
             }
         }
@@ -5485,8 +5485,8 @@ class EidSampleTable extends AbstractTableGateway
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'))
             ->join(array('r_r_r' => 'r_eid_sample_rejection_reasons'), 'r_r_r.rejection_reason_id=vl.reason_for_sample_rejection', array('rejection_reason_name'), 'left');
         //->where(array('f.facility_type'=>'1'));
-        if ($logincontainer->role != 1) {
-            $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : array(0);
+        if ($loginContainer->role != 1) {
+            $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : array(0);
             $iQuery = $iQuery->where('vl.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
         }
         if (isset($parameters['sampleCollectionDate']) && trim($parameters['sampleCollectionDate']) != '') {

@@ -12,10 +12,6 @@ class OrganizationService {
         $this->sm = $sm;
     }
 
-    public function getServiceManager() {
-        return $this->sm;
-    }
-
     
     public function fetchOrganizations() {
         $db = $this->sm->get('OrganizationsTable');

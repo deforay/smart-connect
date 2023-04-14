@@ -2,7 +2,7 @@
 
 use Laminas\Session\Container;
 
-$logincontainer = new Container('credo');
+$loginContainer = new Container('credo');
 $languagecontainer = new Container('language');
 $startYear = date("Y", strtotime("-1 year"));
 $startMonth = date('m', strtotime('+1 month', strtotime('-1 year')));
@@ -535,7 +535,7 @@ $endDate = date('Y-m');
             separator: ' to ',
             startDate: start,
             endDate: end,
-            <?php if (isset($logincontainer->useCurrentTables) && $logincontainer->useCurrentTables == true) { ?>
+            <?php if (isset($loginContainer->useCurrentTables) && $loginContainer->useCurrentTables == true) { ?>
                 minDate: moment().subtract(12, 'months'),
             <?php } ?>
             maxDate: moment(),
@@ -667,7 +667,7 @@ $endDate = date('Y-m');
             format: 'M-yyyy',
             viewMode: "months",
             minViewMode: "months",
-            <?php if (isset($logincontainer->useCurrentTables) && $logincontainer->useCurrentTables == true) { ?>
+            <?php if (isset($loginContainer->useCurrentTables) && $loginContainer->useCurrentTables == true) { ?>
                 startDate: end,
             <?php } ?>
             endDate: "0m"
@@ -683,7 +683,7 @@ $endDate = date('Y-m');
             format: 'M-yyyy',
             viewMode: "months",
             minViewMode: "months",
-            <?php if (isset($logincontainer->useCurrentTables) && $logincontainer->useCurrentTables == true) { ?>
+            <?php if (isset($loginContainer->useCurrentTables) && $loginContainer->useCurrentTables == true) { ?>
                 startDate: end,
             <?php } ?>
             endDate: "0m"

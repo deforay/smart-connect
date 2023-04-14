@@ -2,25 +2,26 @@
 
 namespace Application\Controller;
 
-use Laminas\Mvc\Controller\AbstractActionController;
-use Laminas\View\Model\ViewModel;
 use Laminas\Json\Json;
+use Laminas\View\Model\ViewModel;
+use Application\Controller\AbstractAppController;
 
-class SummaryController extends AbstractActionController
+class SummaryController extends AbstractAppController
 {
 
-
-    private $sampleService = null;
-    private $summaryService = null;
+    public \Application\Service\SampleService $sampleService;
+    public \Application\Service\SummaryService $summaryService;
 
     public function __construct($summaryService, $sampleService)
     {
+        parent::__construct();
         $this->summaryService = $summaryService;
         $this->sampleService = $sampleService;
     }
 
     public function indexAction()
     {
+
         $this->layout()->setVariable('activeTab', 'summary-dashboard');
         return $this->redirect()->toRoute('summary');
     }
@@ -62,24 +63,23 @@ class SummaryController extends AbstractActionController
 
     public function getSamplesReceivedBarChartAction()
     {
-        /** @var \Laminas\Http\Request $request */
+        $this->ajaxAction();
         /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
 
             $result = $this->summaryService->getSamplesReceivedBarChartDetails($params);
-            $viewModel = new ViewModel();
-            $viewModel->setVariables(array(
+            $this->view->setVariables(array(
                 'result' => $result
-            ))->setTerminal(true);
-            return $viewModel;
+            ));
+            return $this->view;
         }
     }
 
     public function samplesReceivedDistrictAction()
     {
-        /** @var \Laminas\Http\Request $request */
+        $this->ajaxAction();
         /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
@@ -91,7 +91,7 @@ class SummaryController extends AbstractActionController
     }
     public function samplesReceivedProvinceAction()
     {
-        /** @var \Laminas\Http\Request $request */
+        $this->ajaxAction();
         /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
@@ -104,7 +104,7 @@ class SummaryController extends AbstractActionController
 
     public function samplesReceivedFacilityAction()
     {
-        /** @var \Laminas\Http\Request $request */
+        $this->ajaxAction();
         /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
@@ -117,24 +117,23 @@ class SummaryController extends AbstractActionController
 
     public function getSuppressionRateBarChartAction()
     {
-        /** @var \Laminas\Http\Request $request */
+        $this->ajaxAction();
         /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
 
             $result = $this->summaryService->getSuppressionRateBarChartDetails($params);
-            $viewModel = new ViewModel();
-            $viewModel->setVariables(array(
+            $this->view->setVariables(array(
                 'result' => $result
-            ))->setTerminal(true);
-            return $viewModel;
+            ));
+            return $this->view;
         }
     }
 
     public function suppressionRateDistrictAction()
     {
-        /** @var \Laminas\Http\Request $request */
+        $this->ajaxAction();
         /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
@@ -146,7 +145,7 @@ class SummaryController extends AbstractActionController
     }
     public function suppressionRateProvinceAction()
     {
-        /** @var \Laminas\Http\Request $request */
+        $this->ajaxAction();
         /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
@@ -159,7 +158,7 @@ class SummaryController extends AbstractActionController
 
     public function suppressionRateFacilityAction()
     {
-        /** @var \Laminas\Http\Request $request */
+        $this->ajaxAction();
         /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
@@ -172,24 +171,24 @@ class SummaryController extends AbstractActionController
 
     public function getSamplesRejectedBarChartAction()
     {
-        /** @var \Laminas\Http\Request $request */
+        $this->ajaxAction();
         /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
 
             $result = $this->summaryService->getSamplesRejectedBarChartDetails($params);
-            $viewModel = new ViewModel();
-            $viewModel->setVariables(array(
+
+            $this->view->setVariables(array(
                 'result' => $result
-            ))->setTerminal(true);
-            return $viewModel;
+            ));
+            return $this->view;
         }
     }
 
     public function samplesRejectedDistrictAction()
     {
-        /** @var \Laminas\Http\Request $request */
+        $this->ajaxAction();
         /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
@@ -202,7 +201,7 @@ class SummaryController extends AbstractActionController
 
     public function samplesRejectedFacilityAction()
     {
-        /** @var \Laminas\Http\Request $request */
+        $this->ajaxAction();
         /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
@@ -214,7 +213,7 @@ class SummaryController extends AbstractActionController
     }
     public function samplesRejectedProvinceAction()
     {
-        /** @var \Laminas\Http\Request $request */
+        $this->ajaxAction();
         /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
@@ -227,24 +226,24 @@ class SummaryController extends AbstractActionController
 
     public function getRegimenGroupBarChartAction()
     {
-        /** @var \Laminas\Http\Request $request */
+        $this->ajaxAction();
         /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
 
             $result = $this->summaryService->getRegimenGroupBarChartDetails($params);
-            $viewModel = new ViewModel();
-            $viewModel->setVariables(array(
+
+            $this->view->setVariables(array(
                 'result' => $result
-            ))->setTerminal(true);
-            return $viewModel;
+            ));
+            return $this->view;
         }
     }
 
     public function getRegimenGroupDetailsAction()
     {
-        /** @var \Laminas\Http\Request $request */
+        $this->ajaxAction();
         /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
@@ -257,50 +256,49 @@ class SummaryController extends AbstractActionController
 
     public function getIndicatorsAction()
     {
-        /** @var \Laminas\Http\Request $request */
+        $this->ajaxAction();
         /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
 
             $keySummaryIndicatorsResult = $this->summaryService->getKeySummaryIndicatorsDetails($params);
-            $viewModel = new ViewModel();
-            $viewModel->setVariables(array(
+
+            $this->view->setVariables(array(
                 'keySummaryIndicators' => $keySummaryIndicatorsResult,
-            ))->setTerminal(true);
-            return $viewModel;
+            ));
+            return $this->view;
         }
     }
 
     public function exportIndicatorResultExcelAction()
     {
-        /** @var \Laminas\Http\Request $request */
+        $this->ajaxAction();
         /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
 
             $file = $this->summaryService->exportIndicatorResultExcel($params);
-            $viewModel = new ViewModel();
-            $viewModel->setVariables(array('file' => $file))
+
+            $this->view->setVariables(array('file' => $file))
                 ->setTerminal(true);
-            return $viewModel;
+            return $this->view;
         }
     }
 
     public function exportSuppressionRateByFacilityAction()
     {
-        /** @var \Laminas\Http\Request $request */
+        $this->ajaxAction();
         /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
 
             $file = $this->summaryService->exportSuppressionRateByFacility($params);
-            $viewModel = new ViewModel();
-            $viewModel->setVariables(array('file' => $file))
-                ->setTerminal(true);
-            return $viewModel;
+
+            $this->view->setVariables(array('file' => $file));
+            return $this->view;
         }
     }
 }

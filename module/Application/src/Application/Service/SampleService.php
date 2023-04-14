@@ -3,25 +3,22 @@
 namespace Application\Service;
 
 use Laminas\Session\Container;
-use Laminas\Db\Adapter\Adapter;
 use Laminas\Db\Sql\Sql;
-use Laminas\Db\Sql\Select;
-use Laminas\Db\TableGateway\AbstractTableGateway;
 use Laminas\Db\Sql\Expression;
 use Exception;
-use \PhpOffice\PhpSpreadsheet\Spreadsheet;
-use Zend\Debug\Debug;
 use JsonMachine\JsonMachine;
 
 class SampleService
 {
 
     public $sm = null;
-    public \Application\Service\CommonService $commonService;
     public $sampleTable;
+    public $config;
+
+    public \Application\Service\CommonService $commonService;
     public \Laminas\Cache\Pattern\ObjectCache $sampleTableCached;
     public \Application\Model\DashApiReceiverStatsTable $apiTrackerTable;
-    public $dbAdapter = null;
+    public \Laminas\Db\Adapter\Adapter $dbAdapter;
 
     public function __construct($sm, $sampleTable, $commonService, $apiTrackerTable, $dbAdapter)
     {
@@ -30,6 +27,7 @@ class SampleService
         $this->sampleTable = $sampleTable;
         $this->apiTrackerTable = $apiTrackerTable;
         $this->dbAdapter = $dbAdapter;
+        $this->config = $this->sm->get('Config');
     }
 
 
@@ -51,8 +49,7 @@ class SampleService
             $sQuery = $sQuery->where(array('unique_id' => $uniqueId), 'OR');
         }
         $sQueryStr = $sql->buildSqlString($sQuery);
-        $sResult = $this->dbAdapter->query($sQueryStr, $this->dbAdapter::QUERY_MODE_EXECUTE)->current();
-        return $sResult;
+        return $this->dbAdapter->query($sQueryStr, $this->dbAdapter::QUERY_MODE_EXECUTE)->current();
     }
 
     public function checkFacilityStateDistrictDetails($location, $parent)
@@ -62,8 +59,7 @@ class SampleService
         $sQuery = $sql->select()->from(array('l' => 'geographical_divisions'))
             ->where(array('l.geo_parent' => $parent, 'l.geo_name' => trim($location)));
         $sQuery = $sql->buildSqlString($sQuery);
-        $sQueryResult = $this->dbAdapter->query($sQuery, $this->dbAdapter::QUERY_MODE_EXECUTE)->current();
-        return $sQueryResult;
+        return $this->dbAdapter->query($sQuery, $this->dbAdapter::QUERY_MODE_EXECUTE)->current();
     }
 
     public function checkFacilityDetails($clinicName)
@@ -72,8 +68,7 @@ class SampleService
         $sql = new Sql($this->dbAdapter);
         $fQuery = $sql->select()->from('facility_details')->where(array('facility_name' => $clinicName));
         $fQueryStr = $sql->buildSqlString($fQuery);
-        $fResult = $this->dbAdapter->query($fQueryStr, $this->dbAdapter::QUERY_MODE_EXECUTE)->current();
-        return $fResult;
+        return $this->dbAdapter->query($fQueryStr, $this->dbAdapter::QUERY_MODE_EXECUTE)->current();
     }
     public function checkFacilityTypeDetails($facilityTypeName)
     {
@@ -81,8 +76,7 @@ class SampleService
         $sql = new Sql($this->dbAdapter);
         $fQuery = $sql->select()->from('facility_type')->where(array('facility_type_name' => $facilityTypeName));
         $fQueryStr = $sql->buildSqlString($fQuery);
-        $fResult = $this->dbAdapter->query($fQueryStr, $this->dbAdapter::QUERY_MODE_EXECUTE)->current();
-        return $fResult;
+        return $this->dbAdapter->query($fQueryStr, $this->dbAdapter::QUERY_MODE_EXECUTE)->current();
     }
     public function checkTestingReson($testingReson)
     {
@@ -90,35 +84,28 @@ class SampleService
         $sql = new Sql($this->dbAdapter);
         $tQuery = $sql->select()->from('r_vl_test_reasons')->where(array('test_reason_name' => $testingReson));
         $tQueryStr = $sql->buildSqlString($tQuery);
-        $tResult = $this->dbAdapter->query($tQueryStr, $this->dbAdapter::QUERY_MODE_EXECUTE)->current();
-        return $tResult;
+        return $this->dbAdapter->query($tQueryStr, $this->dbAdapter::QUERY_MODE_EXECUTE)->current();
     }
     public function checkSampleStatus($testingStatus)
     {
-
         $sql = new Sql($this->dbAdapter);
         $sQuery = $sql->select()->from('r_sample_status')->where(array('status_name' => $testingStatus));
         $sQueryStr = $sql->buildSqlString($sQuery);
-        $sResult = $this->dbAdapter->query($sQueryStr, $this->dbAdapter::QUERY_MODE_EXECUTE)->current();
-        return $sResult;
+        return $this->dbAdapter->query($sQueryStr, $this->dbAdapter::QUERY_MODE_EXECUTE)->current();
     }
     public function checkSampleType($sampleType)
     {
-
         $sql = new Sql($this->dbAdapter);
         $sQuery = $sql->select()->from('r_vl_sample_type')->where(array('sample_name' => $sampleType));
         $sQueryStr = $sql->buildSqlString($sQuery);
-        $sResult = $this->dbAdapter->query($sQueryStr, $this->dbAdapter::QUERY_MODE_EXECUTE)->current();
-        return $sResult;
+        return $this->dbAdapter->query($sQueryStr, $this->dbAdapter::QUERY_MODE_EXECUTE)->current();
     }
     public function checkSampleRejectionReason($rejectReasonName)
     {
-
         $sql = new Sql($this->dbAdapter);
         $sQuery = $sql->select()->from('r_vl_sample_rejection_reasons')->where(array('rejection_reason_name' => $rejectReasonName));
         $sQueryStr = $sql->buildSqlString($sQuery);
-        $sResult = $this->dbAdapter->query($sQueryStr, $this->dbAdapter::QUERY_MODE_EXECUTE)->current();
-        return $sResult;
+        return $this->dbAdapter->query($sQueryStr, $this->dbAdapter::QUERY_MODE_EXECUTE)->current();
     }
 
     public function checkTestReason($reasonName)
@@ -141,7 +128,6 @@ class SampleService
     //get sample status for lab dash
     public function getSampleStatusDataTable($params)
     {
-
         return $this->sampleTable->getSampleStatusDataTable($params);
     }
 
@@ -149,87 +135,73 @@ class SampleService
     //get sample result details
     public function getSampleResultDetails($params)
     {
-
         return $this->sampleTable->fetchSampleResultDetails($params);
     }
     //get sample tested result details
     public function getSamplesTested($params)
     {
-
         return $this->sampleTable->fetchSamplesTested($params);
     }
 
     //get sample tested result details
     public function getSamplesTestedPerLab($params)
     {
-
         return $this->sampleTable->getSamplesTestedPerLab($params);
     }
 
     public function getSampleTestedResultGenderDetails($params)
     {
-
         return $this->sampleTable->fetchSampleTestedResultGenderDetails($params);
     }
 
     public function getLabTurnAroundTime($params)
     {
-
         return $this->sampleTable->fetchLabTurnAroundTime($params);
     }
 
     public function getSampleTestedResultAgeGroupDetails($params)
     {
-
         return $this->sampleTable->fetchSampleTestedResultAgeGroupDetails($params);
     }
 
     public function getSampleTestedResultPregnantPatientDetails($params)
     {
-
         return $this->sampleTable->fetchSampleTestedResultPregnantPatientDetails($params);
     }
 
     public function getSampleTestedResultBreastfeedingPatientDetails($params)
     {
-
         return $this->sampleTable->fetchSampleTestedResultBreastfeedingPatientDetails($params);
     }
 
     //get Requisition Forms tested
     public function getRequisitionFormsTested($params)
     {
-
         return $this->sampleTable->getRequisitionFormsTested($params);
     }
 
     public function getSampleVolume($params)
     {
-
         return $this->sampleTable->getSampleVolume($params);
     }
 
     public function getFemalePatientResult($params)
     {
-
         return $this->sampleTable->getFemalePatientResult($params);
     }
 
     public function getLineOfTreatment($params)
     {
-
         return $this->sampleTable->getLineOfTreatment($params);
     }
 
     public function getFacilites($params)
     {
-
         return $this->sampleTable->fetchFacilites($params);
     }
 
     public function getVlOutComes($params)
     {
-
         return $this->sampleTable->getVlOutComes($params);
     }
     //lab details end
@@ -237,25 +209,21 @@ class SampleService
     //clinic details start
     public function getOverallViralLoadStatus($params)
     {
-
         return $this->sampleTable->fetchOverallViralLoadResult($params);
     }
 
     public function getViralLoadStatusBasedOnGender($params)
     {
-
         return $this->sampleTable->fetchViralLoadStatusBasedOnGender($params);
     }
 
     public function getSampleTestedResultBasedGenderDetails($params)
     {
-
         return $this->sampleTable->fetchSampleTestedResultBasedGenderDetails($params);
     }
 
     public function fetchSampleTestedReason($params)
     {
-
         return $this->sampleTable->fetchSampleTestedReason($params);
     }
 
@@ -266,12 +234,10 @@ class SampleService
     }
     public function getClinicSampleTestedResultAgeGroupDetails($params)
     {
-
         return $this->sampleTable->fetchClinicSampleTestedResultAgeGroupDetails($params);
     }
     public function getClinicRequisitionFormsTested($params)
     {
-
         return $this->sampleTable->fetchClinicRequisitionFormsTested($params);
     }
     //clinic details end
@@ -285,10 +251,10 @@ class SampleService
     //get all Lab Name
     public function getAllLabName()
     {
-        $logincontainer = new Container('credo');
+        $loginContainer = new Container('credo');
         $mappedFacilities = null;
-        if ($logincontainer->role != 1) {
-            $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : null;
+        if ($loginContainer->role != 1) {
+            $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : null;
         }
         $facilityDb = $this->sm->get('FacilityTable');
         return $facilityDb->fetchAllLabName($mappedFacilities);
@@ -296,24 +262,21 @@ class SampleService
     //get all Lab Name
     public function getAllClinicName()
     {
-
-        $logincontainer = new Container('credo');
+        $loginContainer = new Container('credo');
         $mappedFacilities = null;
-        if ($logincontainer->role != 1) {
-            $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : null;
+        if ($loginContainer->role != 1) {
+            $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : null;
         }
-
         $facilityDb = $this->sm->get('FacilityTable');
         return $facilityDb->fetchAllClinicName($mappedFacilities);
     }
     //get all province name
     public function getAllProvinceList()
     {
-
-        $logincontainer = new Container('credo');
+        $loginContainer = new Container('credo');
         $mappedFacilities = null;
-        if ($logincontainer->role != 1) {
-            $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : null;
+        if ($loginContainer->role != 1) {
+            $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : null;
         }
 
         $locationDb = $this->sm->get('LocationDetailsTable');
@@ -322,10 +285,10 @@ class SampleService
     public function getAllDistrictList()
     {
 
-        $logincontainer = new Container('credo');
+        $loginContainer = new Container('credo');
         $mappedFacilities = null;
-        if ($logincontainer->role != 1) {
-            $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : null;
+        if ($loginContainer->role != 1) {
+            $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : null;
         }
         $locationDb = $this->sm->get('LocationDetailsTable');
         return $locationDb->fetchAllDistrictsList();
@@ -333,13 +296,11 @@ class SampleService
 
     public function getAllTestResults($parameters)
     {
-
         return $this->sampleTable->fetchAllTestResults($parameters);
     }
 
     public function getClinicSampleTestedResults($params)
     {
-
         return $this->sampleTable->fetchClinicSampleTestedResults($params);
     }
 
@@ -365,31 +326,26 @@ class SampleService
 
     public function getBarSampleDetails($params)
     {
-
         return $this->sampleTable->fetchBarSampleDetails($params);
     }
 
     public function getLabFilterSampleDetails($parameters)
     {
-
         return $this->sampleTable->fetchLabFilterSampleDetails($parameters);
     }
 
     public function getFilterSampleDetails($parameters)
     {
-
         return $this->sampleTable->fetchFilterSampleDetails($parameters);
     }
 
     public function getFilterSampleTatDetails($parameters)
     {
-
         return $this->sampleTable->fetchFilterSampleTatDetails($parameters);
     }
 
     public function getLabSampleDetails($params)
     {
-
         return $this->sampleTable->fetchLabSampleDetails($params);
     }
 
@@ -494,18 +450,18 @@ class SampleService
                         )
                     );
 
-                    $sheet->setCellValue('A1', html_entity_decode($translator->translate('Sample ID'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('B1', html_entity_decode($translator->translate('Facility Name'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('C1', html_entity_decode($translator->translate('Date Collected'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+                    $sheet->setCellValue('A1', html_entity_decode($translator->translate('Sample ID'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->setCellValue('B1', html_entity_decode($translator->translate('Facility Name'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->setCellValue('C1', html_entity_decode($translator->translate('Date Collected'), ENT_QUOTES, 'UTF-8'));
                     if (trim($params['result']) == '') {
-                        $sheet->setCellValue('D1', html_entity_decode($translator->translate('Rejection Reason'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                        $sheet->setCellValue('E1', html_entity_decode($translator->translate('Date Tested'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                        $sheet->setCellValue('F1', html_entity_decode($translator->translate('Viral Load(cp/ml)'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+                        $sheet->setCellValue('D1', html_entity_decode($translator->translate('Rejection Reason'), ENT_QUOTES, 'UTF-8'));
+                        $sheet->setCellValue('E1', html_entity_decode($translator->translate('Date Tested'), ENT_QUOTES, 'UTF-8'));
+                        $sheet->setCellValue('F1', html_entity_decode($translator->translate('Viral Load(cp/ml)'), ENT_QUOTES, 'UTF-8'));
                     } else if (trim($params['result']) == 'result') {
-                        $sheet->setCellValue('D1', html_entity_decode($translator->translate('Date Tested'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                        $sheet->setCellValue('E1', html_entity_decode($translator->translate('Viral Load(cp/ml)'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+                        $sheet->setCellValue('D1', html_entity_decode($translator->translate('Date Tested'), ENT_QUOTES, 'UTF-8'));
+                        $sheet->setCellValue('E1', html_entity_decode($translator->translate('Viral Load(cp/ml)'), ENT_QUOTES, 'UTF-8'));
                     } else if (trim($params['result']) == 'rejected') {
-                        $sheet->setCellValue('D1', html_entity_decode($translator->translate('Rejection Reason'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+                        $sheet->setCellValue('D1', html_entity_decode($translator->translate('Rejection Reason'), ENT_QUOTES, 'UTF-8'));
                     }
 
                     $sheet->getStyle('A1')->applyFromArray($styleArray);
@@ -661,30 +617,30 @@ class SampleService
                         )
                     );
 
-                    $sheet->setCellValue('A1', html_entity_decode($translator->translate('No.'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('B1', html_entity_decode($translator->translate('Sample Code'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('C1', html_entity_decode($translator->translate('Health Facility Name'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('D1', html_entity_decode($translator->translate('Health Facility Code'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('E1', html_entity_decode($translator->translate('District/County'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('F1', html_entity_decode($translator->translate('Province/State'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('G1', html_entity_decode($translator->translate('Unique ART No.'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('I1', html_entity_decode($translator->translate('Date of Birth'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('J1', html_entity_decode($translator->translate('Age'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('K1', html_entity_decode($translator->translate('Gender'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('L1', html_entity_decode($translator->translate('Date of Sample Collection'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('M1', html_entity_decode($translator->translate('Sample Type'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('N1', html_entity_decode($translator->translate('Date of Treatment Initiation'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('O1', html_entity_decode($translator->translate('Current Regimen'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('P1', html_entity_decode($translator->translate('Date of Initiation of Current Regimen'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('Q1', html_entity_decode($translator->translate('Is Patient Pregnant'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('R1', html_entity_decode($translator->translate('Is Patient Breastfeeding'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('S1', html_entity_decode($translator->translate('ARV Adherence'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('T1', html_entity_decode($translator->translate('Requesting Clinican'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('U1', html_entity_decode($translator->translate('Request Date'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('V1', html_entity_decode($translator->translate('Date Sample Received at Lab'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('W1', html_entity_decode($translator->translate('VL Result (cp/ml)'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('X1', html_entity_decode($translator->translate('Vl Result (log)'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('Y1', html_entity_decode($translator->translate('Rejection Reason (if Rejected)'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+                    $sheet->setCellValue('A1', html_entity_decode($translator->translate('No.'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->setCellValue('B1', html_entity_decode($translator->translate('Sample Code'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->setCellValue('C1', html_entity_decode($translator->translate('Health Facility Name'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->setCellValue('D1', html_entity_decode($translator->translate('Health Facility Code'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->setCellValue('E1', html_entity_decode($translator->translate('District/County'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->setCellValue('F1', html_entity_decode($translator->translate('Province/State'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->setCellValue('G1', html_entity_decode($translator->translate('Unique ART No.'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->setCellValue('I1', html_entity_decode($translator->translate('Date of Birth'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->setCellValue('J1', html_entity_decode($translator->translate('Age'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->setCellValue('K1', html_entity_decode($translator->translate('Gender'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->setCellValue('L1', html_entity_decode($translator->translate('Date of Sample Collection'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->setCellValue('M1', html_entity_decode($translator->translate('Sample Type'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->setCellValue('N1', html_entity_decode($translator->translate('Date of Treatment Initiation'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->setCellValue('O1', html_entity_decode($translator->translate('Current Regimen'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->setCellValue('P1', html_entity_decode($translator->translate('Date of Initiation of Current Regimen'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->setCellValue('Q1', html_entity_decode($translator->translate('Is Patient Pregnant'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->setCellValue('R1', html_entity_decode($translator->translate('Is Patient Breastfeeding'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->setCellValue('S1', html_entity_decode($translator->translate('ARV Adherence'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->setCellValue('T1', html_entity_decode($translator->translate('Requesting Clinican'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->setCellValue('U1', html_entity_decode($translator->translate('Request Date'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->setCellValue('V1', html_entity_decode($translator->translate('Date Sample Received at Lab'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->setCellValue('W1', html_entity_decode($translator->translate('VL Result (cp/ml)'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->setCellValue('X1', html_entity_decode($translator->translate('Vl Result (log)'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->setCellValue('Y1', html_entity_decode($translator->translate('Rejection Reason (if Rejected)'), ENT_QUOTES, 'UTF-8'));
 
                     $sheet->getStyle('A1')->applyFromArray($styleArray);
                     $sheet->getStyle('B1')->applyFromArray($styleArray);
@@ -803,13 +759,13 @@ class SampleService
                             )
                         );
 
-                        $sheet->setCellValue('A1', html_entity_decode($translator->translate('Lab'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                        $sheet->setCellValue('B1', html_entity_decode($translator->translate('Samples Collected'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                        $sheet->setCellValue('C1', html_entity_decode($translator->translate('Samples Tested'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                        $sheet->setCellValue('D1', html_entity_decode($translator->translate('Samples Pending'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                        $sheet->setCellValue('E1', html_entity_decode($translator->translate('Samples Suppressed'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                        $sheet->setCellValue('F1', html_entity_decode($translator->translate('Samples Not Suppressed'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                        $sheet->setCellValue('G1', html_entity_decode($translator->translate('Samples Rejected'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+                        $sheet->setCellValue('A1', html_entity_decode($translator->translate('Lab'), ENT_QUOTES, 'UTF-8'));
+                        $sheet->setCellValue('B1', html_entity_decode($translator->translate('Samples Collected'), ENT_QUOTES, 'UTF-8'));
+                        $sheet->setCellValue('C1', html_entity_decode($translator->translate('Samples Tested'), ENT_QUOTES, 'UTF-8'));
+                        $sheet->setCellValue('D1', html_entity_decode($translator->translate('Samples Pending'), ENT_QUOTES, 'UTF-8'));
+                        $sheet->setCellValue('E1', html_entity_decode($translator->translate('Samples Suppressed'), ENT_QUOTES, 'UTF-8'));
+                        $sheet->setCellValue('F1', html_entity_decode($translator->translate('Samples Not Suppressed'), ENT_QUOTES, 'UTF-8'));
+                        $sheet->setCellValue('G1', html_entity_decode($translator->translate('Samples Rejected'), ENT_QUOTES, 'UTF-8'));
 
                         $sheet->getStyle('A1')->applyFromArray($styleArray);
                         $sheet->getStyle('B1')->applyFromArray($styleArray);
@@ -923,25 +879,17 @@ class SampleService
                         )
                     );
 
-                    $sheet->setCellValue('A1', html_entity_decode($translator->translate('Date'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('B1', html_entity_decode($translator->translate('Samples Collected'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('C1', html_entity_decode($translator->translate('Samples Tested'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('D1', html_entity_decode($translator->translate('Samples Pending'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('E1', html_entity_decode($translator->translate('Samples Suppressed'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('F1', html_entity_decode($translator->translate('Samples Not Suppressed'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('G1', html_entity_decode($translator->translate('Samples Rejected'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('H1', html_entity_decode($translator->translate('Sample Type'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('I1', html_entity_decode($translator->translate('Clinics'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+                    $sheet->setCellValue('A1', html_entity_decode($translator->translate('Date'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->setCellValue('B1', html_entity_decode($translator->translate('Samples Collected'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->setCellValue('C1', html_entity_decode($translator->translate('Samples Tested'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->setCellValue('D1', html_entity_decode($translator->translate('Samples Pending'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->setCellValue('E1', html_entity_decode($translator->translate('Samples Suppressed'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->setCellValue('F1', html_entity_decode($translator->translate('Samples Not Suppressed'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->setCellValue('G1', html_entity_decode($translator->translate('Samples Rejected'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->setCellValue('H1', html_entity_decode($translator->translate('Sample Type'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->setCellValue('I1', html_entity_decode($translator->translate('Clinics'), ENT_QUOTES, 'UTF-8'));
 
-                    $sheet->getStyle('A1')->applyFromArray($styleArray);
-                    $sheet->getStyle('B1')->applyFromArray($styleArray);
-                    $sheet->getStyle('C1')->applyFromArray($styleArray);
-                    $sheet->getStyle('D1')->applyFromArray($styleArray);
-                    $sheet->getStyle('E1')->applyFromArray($styleArray);
-                    $sheet->getStyle('F1')->applyFromArray($styleArray);
-                    $sheet->getStyle('G1')->applyFromArray($styleArray);
-                    $sheet->getStyle('H1')->applyFromArray($styleArray);
-                    $sheet->getStyle('I1')->applyFromArray($styleArray);
+                    $sheet->getStyle('A1:I1')->applyFromArray($styleArray);
 
                     $currentRow = 2;
                     foreach ($output as $rowData) {
@@ -994,9 +942,6 @@ class SampleService
                 $sResult = $this->dbAdapter->query($sQueryStr, $this->dbAdapter::QUERY_MODE_EXECUTE)->toArray();
                 if (isset($sResult) && count($sResult) > 0) {
                     $excel = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
-                    // $cacheMethod = \PhpOffice\PhpSpreadsheet\Collection\CellsFactory::cache_to_phpTemp;
-                    // $cacheSettings = array('memoryCacheSize' => '80MB');
-                    // \PhpOffice\PhpSpreadsheet\Settings::setCacheStorageMethod($cacheMethod, $cacheSettings);
                     $sheet = $excel->getActiveSheet();
                     $output = array();
                     foreach ($sResult as $aRow) {
@@ -1036,14 +981,14 @@ class SampleService
                         )
                     );
 
-                    $sheet->setCellValue('A1', html_entity_decode($translator->translate('Month and Year'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('B1', html_entity_decode($translator->translate('Samples Collected'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('C1', html_entity_decode($translator->translate('Samples Tested'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('D1', html_entity_decode($translator->translate('Samples Pending'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('E1', html_entity_decode($translator->translate('Samples Suppressed'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('F1', html_entity_decode($translator->translate('Samples Not Suppressed'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('G1', html_entity_decode($translator->translate('Samples Rejected'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('H1', html_entity_decode($translator->translate('Average TAT in Days'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+                    $sheet->setCellValue('A1', html_entity_decode($translator->translate('Month and Year'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->setCellValue('B1', html_entity_decode($translator->translate('Samples Collected'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->setCellValue('C1', html_entity_decode($translator->translate('Samples Tested'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->setCellValue('D1', html_entity_decode($translator->translate('Samples Pending'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->setCellValue('E1', html_entity_decode($translator->translate('Samples Suppressed'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->setCellValue('F1', html_entity_decode($translator->translate('Samples Not Suppressed'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->setCellValue('G1', html_entity_decode($translator->translate('Samples Rejected'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->setCellValue('H1', html_entity_decode($translator->translate('Average TAT in Days'), ENT_QUOTES, 'UTF-8'));
 
                     $sheet->getStyle('A1')->applyFromArray($styleArray);
                     $sheet->getStyle('B1')->applyFromArray($styleArray);
@@ -1177,12 +1122,12 @@ class SampleService
                         )
                     );
 
-                    $sheet->setCellValue('A1', html_entity_decode($translator->translate('Sample ID'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('B1', html_entity_decode($translator->translate('Collection Date'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('C1', html_entity_decode($translator->translate('Facility'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('D1', html_entity_decode($translator->translate('Sample Type'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('E1', html_entity_decode($translator->translate('Lab'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('F1', html_entity_decode($translator->translate('Sample Received at Lab'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+                    $sheet->setCellValue('A1', html_entity_decode($translator->translate('Sample ID'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->setCellValue('B1', html_entity_decode($translator->translate('Collection Date'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->setCellValue('C1', html_entity_decode($translator->translate('Facility'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->setCellValue('D1', html_entity_decode($translator->translate('Sample Type'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->setCellValue('E1', html_entity_decode($translator->translate('Lab'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->setCellValue('F1', html_entity_decode($translator->translate('Sample Received at Lab'), ENT_QUOTES, 'UTF-8'));
 
                     $sheet->getStyle('A1')->applyFromArray($styleArray);
                     $sheet->getStyle('B1')->applyFromArray($styleArray);
@@ -1407,15 +1352,15 @@ class SampleService
     //                     )
     //                 );
 
-    //                 $sheet->setCellValue('A1', html_entity_decode($translator->translate('Month and Year'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-    //                 $sheet->setCellValue('B1', html_entity_decode($translator->translate('Facility Name'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-    //                 $sheet->setCellValue('C1', html_entity_decode($translator->translate('District'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-    //                 $sheet->setCellValue('D1', html_entity_decode($translator->translate('Lab Name'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-    //                 $sheet->setCellValue('E1', html_entity_decode($translator->translate('Samples Registered'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-    //                 $sheet->setCellValue('F1', html_entity_decode($translator->translate('Samples Tested'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-    //                 $sheet->setCellValue('G1', html_entity_decode($translator->translate('Samples Rejected'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-    //                 $sheet->setCellValue('H1', html_entity_decode($translator->translate('No.Of High VL'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-    //                 $sheet->setCellValue('I1', html_entity_decode($translator->translate('No.Of Low VL'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+    //                 $sheet->setCellValue('A1', html_entity_decode($translator->translate('Month and Year'), ENT_QUOTES, 'UTF-8'));
+    //                 $sheet->setCellValue('B1', html_entity_decode($translator->translate('Facility Name'), ENT_QUOTES, 'UTF-8'));
+    //                 $sheet->setCellValue('C1', html_entity_decode($translator->translate('District'), ENT_QUOTES, 'UTF-8'));
+    //                 $sheet->setCellValue('D1', html_entity_decode($translator->translate('Lab Name'), ENT_QUOTES, 'UTF-8'));
+    //                 $sheet->setCellValue('E1', html_entity_decode($translator->translate('Samples Registered'), ENT_QUOTES, 'UTF-8'));
+    //                 $sheet->setCellValue('F1', html_entity_decode($translator->translate('Samples Tested'), ENT_QUOTES, 'UTF-8'));
+    //                 $sheet->setCellValue('G1', html_entity_decode($translator->translate('Samples Rejected'), ENT_QUOTES, 'UTF-8'));
+    //                 $sheet->setCellValue('H1', html_entity_decode($translator->translate('No.Of High VL'), ENT_QUOTES, 'UTF-8'));
+    //                 $sheet->setCellValue('I1', html_entity_decode($translator->translate('No.Of Low VL'), ENT_QUOTES, 'UTF-8'));
 
 
     //                 $sheet->getStyle('A1')->applyFromArray($styleArray);
@@ -1487,7 +1432,6 @@ class SampleService
         ini_set("memory_limit", -1);
         try {
             $apiData = array();
-            $this->config = $this->sm->get('Config');
             $input = $this->config['db']['dsn'];
             preg_match('~=(.*?);~', $input, $output);
             $dbname = $output[1];
@@ -2202,7 +2146,6 @@ class SampleService
         $userDb = $this->sm->get('UsersTable');
         $return = array();
         $params = json_decode($params, true);
-        $config = $this->sm->get('Config');
         if (!empty($params)) {
             if (!file_exists(TEMP_UPLOAD_PATH) && !is_dir(TEMP_UPLOAD_PATH)) {
                 mkdir(APPLICATION_PATH . DIRECTORY_SEPARATOR . "temporary", 0777);

@@ -21,7 +21,7 @@ class LoginController extends AbstractActionController
 
     public function indexAction()
     {
-        $logincontainer = new Container('credo');
+        $loginContainer = new Container('credo');
 
         /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
@@ -37,7 +37,7 @@ class LoginController extends AbstractActionController
             $url = $this->userService->login($params);
             return $this->redirect()->toRoute($url);
         }
-        if (isset($logincontainer->userId) && $logincontainer->userId != "") {
+        if (isset($loginContainer->userId) && $loginContainer->userId != "") {
             return $this->redirect()->toRoute("summary");
         } else {
             $config = $this->configService->getAllGlobalConfig();

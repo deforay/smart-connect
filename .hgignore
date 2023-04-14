@@ -5,10 +5,8 @@ syntax: regexp
 ^public/temporary/(?!index.php)
 ^vendor
 error_log
-Thumbs.db
-Thumbs.db.orig
-.DS_Store
-.DS_Store.orig
+\.DS_Store$
+[Tt]humbs\.db$
 
 syntax: glob
 error_log
@@ -26,3 +24,4 @@ Thumbs.db.orig
 .gitattributes
 .gitignore
 config/autoload/custom.global.php
+config/development.config.php

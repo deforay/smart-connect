@@ -8,7 +8,7 @@ use Laminas\View\Model\JsonModel;
 class VlsmController extends AbstractRestfulController
 {
 
-    private $sampleService = null;
+    public \Application\Service\SampleService $sampleService;
 
     public function __construct($sampleService)
     {
@@ -23,15 +23,15 @@ class VlsmController extends AbstractRestfulController
     public function create($params)
     {
 
-        if(!isset($params['api-version'])){
+        if (!isset($params['api-version'])) {
             $params['api-version'] = 'v1';
         }
-        if( $params['api-version'] == 'v1'){
+        if ($params['api-version'] == 'v1') {
             $response = $this->sampleService->saveFileFromVlsmAPIV1();
-        }else if( $params['api-version'] == 'v2'){
+        } else if ($params['api-version'] == 'v2') {
             $response = $this->sampleService->saveFileFromVlsmAPIV2();
         }
-        
+
         return new JsonModel($response);
     }
 }

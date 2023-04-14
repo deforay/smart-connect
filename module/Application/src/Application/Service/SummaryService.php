@@ -249,9 +249,9 @@ class SummaryService
 
         $queryContainer = new Container('query');
         // To set te session table
-        $logincontainer = new Container('credo');
-        if (isset($logincontainer->SampleTableWithoutCache) && $logincontainer->SampleTableWithoutCache != "") {
-            $dashTable = $logincontainer->SampleTableWithoutCache;
+        $loginContainer = new Container('credo');
+        if (isset($loginContainer->SampleTableWithoutCache) && $loginContainer->SampleTableWithoutCache != "") {
+            $dashTable = $loginContainer->SampleTableWithoutCache;
         }
 
         if (!isset($queryContainer->fetchAllSuppressionRateByFacility)) {

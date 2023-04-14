@@ -66,25 +66,25 @@ class CommonController extends AbstractActionController
 
     public function setSessionAction()
     {
-        $logincontainer = new Container('credo');
-        //$logincontainer->sampleTable = "";
-        unset($logincontainer->sampleTable);
-        unset($logincontainer->eidSampleTable);
-        unset($logincontainer->covid19SampleTable);
+        $loginContainer = new Container('credo');
+        //$loginContainer->sampleTable = "";
+        unset($loginContainer->sampleTable);
+        unset($loginContainer->eidSampleTable);
+        unset($loginContainer->covid19SampleTable);
         /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
             if ($params['sessionType'] == "current") {
-                $logincontainer->useCurrentTables = true;
-                $logincontainer->sampleTable = 'dash_form_vl_current';
-                $logincontainer->eidSampleTable = 'dash_form_eid_current';
-                $logincontainer->covid19SampleTable = 'dash_form_covid19_current';
+                $loginContainer->useCurrentTables = true;
+                $loginContainer->sampleTable = 'dash_form_vl_current';
+                $loginContainer->eidSampleTable = 'dash_form_eid_current';
+                $loginContainer->covid19SampleTable = 'dash_form_covid19_current';
             } else {
-                $logincontainer->useCurrentTables = false;
-                $logincontainer->sampleTable = 'dash_form_vl';
-                $logincontainer->eidSampleTable = 'dash_form_eid';
-                $logincontainer->covid19SampleTable = 'dash_form_covid19';
+                $loginContainer->useCurrentTables = false;
+                $loginContainer->sampleTable = 'dash_form_vl';
+                $loginContainer->eidSampleTable = 'dash_form_eid';
+                $loginContainer->covid19SampleTable = 'dash_form_covid19';
             }
         }
         $viewModel = new ViewModel();

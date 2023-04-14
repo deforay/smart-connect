@@ -250,9 +250,9 @@ class EidSummaryService
         $queryContainer = new Container('query');
         $translator = $this->sm->get('translator');
         // To set te session table
-        $logincontainer = new Container('credo');
-        if (isset($logincontainer->EidSampleTable) && $logincontainer->EidSampleTable != "") {
-            $dashTable = $logincontainer->EidSampleTable;
+        $loginContainer = new Container('credo');
+        if (isset($loginContainer->EidSampleTable) && $loginContainer->EidSampleTable != "") {
+            $dashTable = $loginContainer->EidSampleTable;
         }
         $common = new CommonService();
 

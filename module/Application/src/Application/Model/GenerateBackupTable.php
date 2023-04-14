@@ -32,7 +32,7 @@ class GenerateBackupTable extends AbstractTableGateway {
 
     public function addBackupGeneration($params){
 
-        $logincontainer = new Container('credo');
+        $loginContainer = new Container('credo');
 
         if (isset($params['sampleCollectionDate']) && trim($params['sampleCollectionDate']) != '') {
             $s_c_date = explode("to", $params['sampleCollectionDate']);
@@ -46,7 +46,7 @@ class GenerateBackupTable extends AbstractTableGateway {
             $data = array(
                             'start_date' => $startDate,
                             'end_date' => $endDate,
-                            'requested_by' => $logincontainer->userId,
+                            'requested_by' => $loginContainer->userId,
                             'requested_on' => new Expression('NOW()'),                        
                             'status' => 'pending',
                         );

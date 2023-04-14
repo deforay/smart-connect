@@ -15,7 +15,16 @@ if (php_sapi_name() === 'cli-server') {
 }
 
 // Setup autoloading
-require 'init_autoloader.php';
+include __DIR__ . '/../vendor/autoload.php';
 
 // Run the application!
-Laminas\Mvc\Application::init(require 'config/application.config.php')->run();
+//Laminas\Mvc\Application::init(require 'config/application.config.php')->run();
+
+// Config
+$appConfig = include 'config/application.config.php';
+if (file_exists('config/development.config.php')) {
+    $appConfig = Laminas\Stdlib\ArrayUtils::merge($appConfig, include 'config/development.config.php');
+}
+
+// Run the application!
+Laminas\Mvc\Application::init($appConfig)->run();

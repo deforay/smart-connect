@@ -677,9 +677,9 @@ class Covid19FormService
         $queryContainer = new Container('query');
         $translator = $this->sm->get('translator');
         // To set te session table
-        $logincontainer = new Container('credo');
-        if (isset($logincontainer->Covid19SampleTable) && $logincontainer->Covid19SampleTable != "") {
-            $dashTable = $logincontainer->Covid19SampleTable;
+        $loginContainer = new Container('credo');
+        if (isset($loginContainer->Covid19SampleTable) && $loginContainer->Covid19SampleTable != "") {
+            $dashTable = $loginContainer->Covid19SampleTable;
         }
 
 
@@ -828,10 +828,10 @@ class Covid19FormService
     /* Lab Dashboard Start */
     public function getAllLabName()
     {
-        $logincontainer = new Container('credo');
+        $loginContainer = new Container('credo');
         $mappedFacilities = null;
-        if ($logincontainer->role != 1) {
-            $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : null;
+        if ($loginContainer->role != 1) {
+            $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : null;
         }
         $facilityDb = $this->sm->get('FacilityTable');
         return $facilityDb->fetchAllLabName($mappedFacilities);
@@ -841,10 +841,10 @@ class Covid19FormService
     public function getAllClinicName()
     {
 
-        $logincontainer = new Container('credo');
+        $loginContainer = new Container('credo');
         $mappedFacilities = null;
-        if ($logincontainer->role != 1) {
-            $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : null;
+        if ($loginContainer->role != 1) {
+            $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : null;
         }
 
         $facilityDb = $this->sm->get('FacilityTable');
@@ -854,10 +854,10 @@ class Covid19FormService
     public function getAllProvinceList()
     {
 
-        $logincontainer = new Container('credo');
+        $loginContainer = new Container('credo');
         $mappedFacilities = null;
-        if ($logincontainer->role != 1) {
-            $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : null;
+        if ($loginContainer->role != 1) {
+            $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : null;
         }
 
         $locationDb = $this->sm->get('LocationDetailsTable');
@@ -867,10 +867,10 @@ class Covid19FormService
     public function getAllDistrictList()
     {
 
-        $logincontainer = new Container('credo');
+        $loginContainer = new Container('credo');
         $mappedFacilities = null;
-        if ($logincontainer->role != 1) {
-            $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : null;
+        if ($loginContainer->role != 1) {
+            $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : null;
         }
         $locationDb = $this->sm->get('LocationDetailsTable');
         return $locationDb->fetchAllDistrictsList();

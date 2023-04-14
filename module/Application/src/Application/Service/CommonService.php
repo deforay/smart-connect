@@ -27,11 +27,6 @@ class CommonService
           $this->cache = $cache;
      }
 
-     public function getServiceManager()
-     {
-          return $this->sm;
-     }
-
      public function startsWith($string, $startString)
      {
           $len = strlen($startString);
@@ -461,10 +456,10 @@ class CommonService
      //get all Lab Name
      public function getAllLabName()
      {
-          $logincontainer = new Container('credo');
+          $loginContainer = new Container('credo');
           $mappedFacilities = null;
-          if ($logincontainer->role != 1) {
-               $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : null;
+          if ($loginContainer->role != 1) {
+               $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : null;
           }
           $facilityDb = $this->sm->get('FacilityTable');
           return $facilityDb->fetchAllLabName($mappedFacilities);
@@ -473,10 +468,10 @@ class CommonService
      public function getAllClinicName()
      {
 
-          $logincontainer = new Container('credo');
+          $loginContainer = new Container('credo');
           $mappedFacilities = null;
-          if ($logincontainer->role != 1) {
-               $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : null;
+          if ($loginContainer->role != 1) {
+               $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : null;
           }
 
           $facilityDb = $this->sm->get('FacilityTable');
@@ -486,10 +481,10 @@ class CommonService
      public function getAllProvinceList()
      {
 
-          $logincontainer = new Container('credo');
+          $loginContainer = new Container('credo');
           $mappedFacilities = null;
-          if ($logincontainer->role != 1) {
-               $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : null;
+          if ($loginContainer->role != 1) {
+               $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : null;
           }
 
           $locationDb = $this->sm->get('LocationDetailsTable');
@@ -506,10 +501,10 @@ class CommonService
      public function getAllDistrictList()
      {
 
-          $logincontainer = new Container('credo');
+          $loginContainer = new Container('credo');
           $mappedFacilities = null;
-          if ($logincontainer->role != 1) {
-               $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : null;
+          if ($loginContainer->role != 1) {
+               $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : null;
           }
           $locationDb = $this->sm->get('LocationDetailsTable');
           return $locationDb->fetchAllDistrictsList();

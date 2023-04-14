@@ -528,10 +528,10 @@ class EidSampleService
 
     public function getAllLabName()
     {
-        $logincontainer = new Container('credo');
+        $loginContainer = new Container('credo');
         $mappedFacilities = null;
-        if ($logincontainer->role != 1) {
-            $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : null;
+        if ($loginContainer->role != 1) {
+            $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : null;
         }
         $facilityDb = $this->sm->get('FacilityTable');
         return $facilityDb->fetchAllLabName($mappedFacilities);
@@ -541,10 +541,10 @@ class EidSampleService
     public function getAllClinicName()
     {
 
-        $logincontainer = new Container('credo');
+        $loginContainer = new Container('credo');
         $mappedFacilities = null;
-        if ($logincontainer->role != 1) {
-            $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : null;
+        if ($loginContainer->role != 1) {
+            $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : null;
         }
 
         $facilityDb = $this->sm->get('FacilityTable');
@@ -570,10 +570,10 @@ class EidSampleService
     public function getAllProvinceList()
     {
 
-        $logincontainer = new Container('credo');
+        $loginContainer = new Container('credo');
         $mappedFacilities = null;
-        if ($logincontainer->role != 1) {
-            $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : null;
+        if ($loginContainer->role != 1) {
+            $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : null;
         }
 
         $locationDb = $this->sm->get('LocationDetailsTable');

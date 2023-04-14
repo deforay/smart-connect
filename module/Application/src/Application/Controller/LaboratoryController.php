@@ -2,19 +2,20 @@
 
 namespace Application\Controller;
 
-use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\ViewModel;
 use Laminas\Json\Json;
 
-class LaboratoryController extends AbstractActionController
-{
+use Application\Controller\AbstractAppController;
 
+class LaboratoryController extends AbstractAppController
+{
 
     public \Application\Service\SampleService $sampleService;
     public \Application\Service\CommonService $commonService;
 
     public function __construct($sampleService, $commonService)
     {
+        parent::__construct();
         $this->commonService = $commonService;
         $this->sampleService = $sampleService;
     }
@@ -27,17 +28,17 @@ class LaboratoryController extends AbstractActionController
 
     public function dashboardAction()
     {
-        
+
         $this->layout()->setVariable('activeTab', 'laboratory');
-        
+
         $sampleType = $this->sampleService->getSampleType();
         $labName = $this->sampleService->getAllLabName();
         $provinceName = $this->sampleService->getAllProvinceList();
         $districtName = $this->sampleService->getAllDistrictList();
         $testReasonName = $this->sampleService->getAllTestReasonName();
         $clinicName = $this->sampleService->getAllClinicName();
-        
-        return new ViewModel(array(
+
+        return $this->view->setVariables(array(
             'sampleType' => $sampleType,
             'labName' => $labName,
             'provinceName' => $provinceName,
@@ -51,20 +52,20 @@ class LaboratoryController extends AbstractActionController
     public function samplesAccessionAction()
     {
         $this->layout()->setVariable('activeTab', 'labs-dashboard');
-        return new ViewModel();
+        return $this->view;
     }
 
     public function samplesWaitingAction()
     {
         $this->layout()->setVariable('activeTab', 'labs-dashboard');
-        return new ViewModel();
+        return $this->view;
     }
 
 
     public function samplesRejectedAction()
     {
         $this->layout()->setVariable('activeTab', 'labs-dashboard');
-        return new ViewModel();
+        return $this->view;
     }
 
     public function drillDownAction()
@@ -76,14 +77,12 @@ class LaboratoryController extends AbstractActionController
         $labFilter = $this->params()->fromQuery('lab');
         $params['labs'] = explode(',', $labFilter);
 
-        
-        
         $hubName = $this->sampleService->getAllHubName();
         $sampleType = $this->sampleService->getSampleType();
         $currentRegimen = $this->sampleService->getAllCurrentRegimen();
         $facilityInfo = $this->commonService->getSampleTestedFacilityInfo($params);
         //print_r($facilityInfo);die;
-        return new ViewModel(array(
+        return $this->view->setVariables(array(
             'sampleType' => $sampleType,
             'hubName' => $hubName,
             'currentRegimen' => $currentRegimen,
@@ -114,10 +113,10 @@ class LaboratoryController extends AbstractActionController
             $labFilter = $this->params()->fromQuery('lab');
             $params['labs'] = $labFilter;
         }
-        
-        
+
+
         $facilityInfo = $this->commonService->getSampleTestedFacilityInfo($params);
-        return new ViewModel(array(
+        return $this->view->setVariables(array(
             'searchMonth' => $month,
             'labFilter' => $labFilter,
             'facilityInfo' => $facilityInfo
@@ -130,12 +129,11 @@ class LaboratoryController extends AbstractActionController
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            
+
             $result = $this->sampleService->getIncompleteSampleDetails($params);
-            $viewModel = new ViewModel();
-            $viewModel->setVariables(array('result' => $result))
+            $this->view->setVariables(array('result' => $result))
                 ->setTerminal(true);
-            return $viewModel;
+            return $this->view;
         }
     }
 
@@ -145,12 +143,12 @@ class LaboratoryController extends AbstractActionController
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            
+
             $result = $this->sampleService->getIncompleteBarSampleDetails($params);
-            $viewModel = new ViewModel();
-            $viewModel->setVariables(array('result' => $result))
+
+            $this->view->setVariables(array('result' => $result))
                 ->setTerminal(true);
-            return $viewModel;
+            return $this->view;
         }
     }
 
@@ -160,12 +158,11 @@ class LaboratoryController extends AbstractActionController
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            
+
             $result = $this->sampleService->getSampleResultDetails($params);
-            $viewModel = new ViewModel();
-            $viewModel->setVariables(array('params' => $params, 'result' => $result))
+            $this->view->setVariables(array('params' => $params, 'result' => $result))
                 ->setTerminal(true);
-            return $viewModel;
+            return $this->view;
         }
     }
 
@@ -175,13 +172,13 @@ class LaboratoryController extends AbstractActionController
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            
+
             $result = $this->sampleService->getSamplesTested($params);
             $sampleType = $this->sampleService->getSampleType();
-            $viewModel = new ViewModel();
-            $viewModel->setVariables(array('result' => $result, 'sampleType' => $sampleType))
+
+            $this->view->setVariables(array('result' => $result, 'sampleType' => $sampleType))
                 ->setTerminal(true);
-            return $viewModel;
+            return $this->view;
         }
     }
 
@@ -193,10 +190,12 @@ class LaboratoryController extends AbstractActionController
             $params = $request->getPost();
             $result = $this->sampleService->getSamplesTestedPerLab($params);
             $sampleType = $this->sampleService->getSampleType();
-            $viewModel = new ViewModel();
-            $viewModel->setVariables(array('result' => $result, 'sampleType' => $sampleType))
-                ->setTerminal(true);
-            return $viewModel;
+
+            $this->view->setVariables(array(
+                'result' => $result,
+                'sampleType' => $sampleType
+            ))->setTerminal(true);
+            return $this->view;
         }
     }
 
@@ -206,13 +205,12 @@ class LaboratoryController extends AbstractActionController
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            
+
             $params['gender'] = 'yes';
             $result = $this->sampleService->getSampleTestedResultGenderDetails($params);
-            $viewModel = new ViewModel();
-            $viewModel->setVariables(array('result' => $result))
+            $this->view->setVariables(array('result' => $result))
                 ->setTerminal(true);
-            return $viewModel;
+            return $this->view;
         }
     }
 
@@ -222,13 +220,14 @@ class LaboratoryController extends AbstractActionController
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            
+
             $sampleType = $this->sampleService->getSampleType();
             $result = $this->sampleService->getLabTurnAroundTime($params);
-            $viewModel = new ViewModel();
-            $viewModel->setVariables(array('result' => $result, 'sampleType' => $sampleType))
-                ->setTerminal(true);
-            return $viewModel;
+            $this->view->setVariables(array(
+                'result' => $result,
+                'sampleType' => $sampleType
+            ))->setTerminal(true);
+            return $this->view;
         }
     }
 
@@ -238,12 +237,11 @@ class LaboratoryController extends AbstractActionController
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            
+
             $result = $this->sampleService->getSampleTestedResultAgeGroupDetails($params);
-            $viewModel = new ViewModel();
-            $viewModel->setVariables(array('result' => $result))
+            $this->view->setVariables(array('result' => $result))
                 ->setTerminal(true);
-            return $viewModel;
+            return $this->view;
         }
     }
 
@@ -253,12 +251,12 @@ class LaboratoryController extends AbstractActionController
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            
+
             $result = $this->sampleService->getSampleTestedResultPregnantPatientDetails($params);
-            $viewModel = new ViewModel();
-            $viewModel->setVariables(array('result' => $result))
+
+            $this->view->setVariables(array('result' => $result))
                 ->setTerminal(true);
-            return $viewModel;
+            return $this->view;
         }
     }
 
@@ -268,12 +266,11 @@ class LaboratoryController extends AbstractActionController
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            
+
             $result = $this->sampleService->getSampleTestedResultBreastfeedingPatientDetails($params);
-            $viewModel = new ViewModel();
-            $viewModel->setVariables(array('result' => $result))
+            $this->view->setVariables(array('result' => $result))
                 ->setTerminal(true);
-            return $viewModel;
+            return $this->view;
         }
     }
 
@@ -283,12 +280,11 @@ class LaboratoryController extends AbstractActionController
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            
+
             $result = $this->sampleService->getRequisitionFormsTested($params);
-            $viewModel = new ViewModel();
-            $viewModel->setVariables(array('result' => $result))
+            $this->view->setVariables(array('result' => $result))
                 ->setTerminal(true);
-            return $viewModel;
+            return $this->view;
         }
     }
 
@@ -298,12 +294,12 @@ class LaboratoryController extends AbstractActionController
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            
+
             $result = $this->sampleService->getSampleVolume($params);
-            $viewModel = new ViewModel();
-            $viewModel->setVariables(array('result' => $result))
+            
+            $this->view->setVariables(array('result' => $result))
                 ->setTerminal(true);
-            return $viewModel;
+            return $this->view;
         }
     }
 
@@ -313,12 +309,12 @@ class LaboratoryController extends AbstractActionController
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            
+
             $result = $this->sampleService->getFemalePatientResult($params);
-            $viewModel = new ViewModel();
-            $viewModel->setVariables(array('result' => $result))
+            
+            $this->view->setVariables(array('result' => $result))
                 ->setTerminal(true);
-            return $viewModel;
+            return $this->view;
         }
     }
 
@@ -328,12 +324,12 @@ class LaboratoryController extends AbstractActionController
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            
+
             $result = $this->sampleService->getLineOfTreatment($params);
-            $viewModel = new ViewModel();
-            $viewModel->setVariables(array('result' => $result))
+            
+            $this->view->setVariables(array('result' => $result))
                 ->setTerminal(true);
-            return $viewModel;
+            return $this->view;
         }
     }
 
@@ -343,13 +339,13 @@ class LaboratoryController extends AbstractActionController
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            
+
             $sampleType = $this->sampleService->getSampleType();
             $result = $this->sampleService->getFacilites($params);
-            $viewModel = new ViewModel();
-            $viewModel->setVariables(array('result' => $result, 'height' => $params['height']))
+            
+            $this->view->setVariables(array('result' => $result, 'height' => $params['height']))
                 ->setTerminal(true);
-            return $viewModel;
+            return $this->view;
         }
     }
 
@@ -359,12 +355,12 @@ class LaboratoryController extends AbstractActionController
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            
+
             $result = $this->sampleService->getSampleDetails($params);
-            $viewModel = new ViewModel();
-            $viewModel->setVariables(array('params' => $params, 'result' => $result))
+            
+            $this->view->setVariables(array('params' => $params, 'result' => $result))
                 ->setTerminal(true);
-            return $viewModel;
+            return $this->view;
         }
     }
 
@@ -374,12 +370,12 @@ class LaboratoryController extends AbstractActionController
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            
+
             $result = $this->sampleService->getVlOutComes($params);
-            $viewModel = new ViewModel();
-            $viewModel->setVariables(array('result' => $result))
+            
+            $this->view->setVariables(array('result' => $result))
                 ->setTerminal(true);
-            return $viewModel;
+            return $this->view;
         }
     }
 
@@ -389,12 +385,12 @@ class LaboratoryController extends AbstractActionController
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            
+
             $result = $this->sampleService->getBarSampleDetails($params);
-            $viewModel = new ViewModel();
-            $viewModel->setVariables(array('params' => $params, 'result' => $result))
+            
+            $this->view->setVariables(array('params' => $params, 'result' => $result))
                 ->setTerminal(true);
-            return $viewModel;
+            return $this->view;
         }
     }
 
@@ -404,7 +400,7 @@ class LaboratoryController extends AbstractActionController
         $request = $this->getRequest();
         if ($request->isPost()) {
             $parameters = $request->getPost();
-            
+
             $result = $this->sampleService->getLabFilterSampleDetails($parameters);
             return $this->getResponse()->setContent(Json::encode($result));
         }
@@ -416,7 +412,7 @@ class LaboratoryController extends AbstractActionController
         $request = $this->getRequest();
         if ($request->isPost()) {
             $parameters = $request->getPost();
-            
+
             $result = $this->sampleService->getFilterSampleDetails($parameters);
             return $this->getResponse()->setContent(Json::encode($result));
         }
@@ -457,13 +453,13 @@ class LaboratoryController extends AbstractActionController
             $params['labNames'] = explode(',', $labFilter);
         }
 
-        
-        
+
+
         $hubName = $this->sampleService->getAllHubName();
         $sampleType = $this->sampleService->getSampleType();
         $currentRegimen = $this->sampleService->getAllCurrentRegimen();
         $facilityInfo = $this->commonService->getSampleTestedFacilityInfo($params);
-        return new ViewModel(array(
+        return $this->view->setVariables(array(
             'sampleType' => $sampleType,
             'hubName' => $hubName,
             'currentRegimen' => $currentRegimen,
@@ -484,12 +480,12 @@ class LaboratoryController extends AbstractActionController
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            
+
             $result = $this->sampleService->getLabSampleDetails($params);
-            $viewModel = new ViewModel();
-            $viewModel->setVariables(array('result' => $result))
+            
+            $this->view->setVariables(array('result' => $result))
                 ->setTerminal(true);
-            return $viewModel;
+            return $this->view;
         }
     }
 
@@ -499,12 +495,12 @@ class LaboratoryController extends AbstractActionController
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            
+
             $result = $this->sampleService->getLabBarSampleDetails($params);
-            $viewModel = new ViewModel();
-            $viewModel->setVariables(array('result' => $result))
+            
+            $this->view->setVariables(array('result' => $result))
                 ->setTerminal(true);
-            return $viewModel;
+            return $this->view;
         }
     }
 
@@ -530,13 +526,13 @@ class LaboratoryController extends AbstractActionController
         if ($this->params()->fromQuery('result')) {
             $sampleStatus = $this->params()->fromQuery('result');
         }
-        
-        
+
+
         $hubName = $this->sampleService->getAllHubName();
         $sampleType = $this->sampleService->getSampleType();
         $currentRegimen = $this->sampleService->getAllCurrentRegimen();
         $facilityInfo = $this->commonService->getSampleTestedFacilityInfo($params);
-        return new ViewModel(array(
+        return $this->view->setVariables(array(
             'sampleType' => $sampleType,
             'hubName' => $hubName,
             'currentRegimen' => $currentRegimen,
@@ -555,10 +551,10 @@ class LaboratoryController extends AbstractActionController
         if ($request->isPost()) {
             $params = $request->getPost();
             $file = $this->sampleService->generateSampleResultExcel($params);
-            $viewModel = new ViewModel();
-            $viewModel->setVariables(array('file' => $file))
+            
+            $this->view->setVariables(array('file' => $file))
                 ->setTerminal(true);
-            return $viewModel;
+            return $this->view;
         }
     }
 
@@ -568,12 +564,12 @@ class LaboratoryController extends AbstractActionController
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            
+
             $file = $this->sampleService->generateLabTestedSampleExcel($params);
-            $viewModel = new ViewModel();
-            $viewModel->setVariables(array('file' => $file))
+            
+            $this->view->setVariables(array('file' => $file))
                 ->setTerminal(true);
-            return $viewModel;
+            return $this->view;
         }
     }
 
@@ -611,13 +607,13 @@ class LaboratoryController extends AbstractActionController
             $params['labs'] = explode(',', $labFilter);
         }
 
-        
-        
+
+
         $hubName = $this->sampleService->getAllHubName();
         $sampleType = $this->sampleService->getSampleType();
         $currentRegimen = $this->sampleService->getAllCurrentRegimen();
         $facilityInfo = $this->commonService->getSampleTestedFacilityInfo($params);
-        return new ViewModel(array(
+        return $this->view->setVariables(array(
             'sampleType' => $sampleType,
             'hubName' => $hubName,
             'currentRegimen' => $currentRegimen,
@@ -638,12 +634,12 @@ class LaboratoryController extends AbstractActionController
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            
+
             $result = $this->sampleService->getBarSampleDetails($params);
-            $viewModel = new ViewModel();
-            $viewModel->setVariables(array('params' => $params, 'result' => $result))
+            
+            $this->view->setVariables(array('params' => $params, 'result' => $result))
                 ->setTerminal(true);
-            return $viewModel;
+            return $this->view;
         }
     }
 
@@ -653,12 +649,12 @@ class LaboratoryController extends AbstractActionController
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            
+
             $result = $this->sampleService->getSampleDetails($params);
-            $viewModel = new ViewModel();
-            $viewModel->setVariables(array('params' => $params, 'result' => $result))
+            
+            $this->view->setVariables(array('params' => $params, 'result' => $result))
                 ->setTerminal(true);
-            return $viewModel;
+            return $this->view;
         }
     }
 
@@ -668,7 +664,7 @@ class LaboratoryController extends AbstractActionController
         $request = $this->getRequest();
         if ($request->isPost()) {
             $parameters = $request->getPost();
-            
+
             $result = $this->sampleService->getFilterSampleTatDetails($parameters);
             return $this->getResponse()->setContent(Json::encode($result));
         }
@@ -680,12 +676,12 @@ class LaboratoryController extends AbstractActionController
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            
+
             $file = $this->sampleService->generateLabTestedSampleTatExcel($params);
-            $viewModel = new ViewModel();
-            $viewModel->setVariables(array('file' => $file))
+            
+            $this->view->setVariables(array('file' => $file))
                 ->setTerminal(true);
-            return $viewModel;
+            return $this->view;
         }
     }
 
@@ -704,10 +700,10 @@ class LaboratoryController extends AbstractActionController
         if ($this->params()->fromQuery('lab')) {
             $labFilter = $this->params()->fromQuery('lab');
         }
-        
+
         $labName = $this->sampleService->getAllLabName();
         if (trim($fromDate) != '' && trim($toDate) != '') {
-            return new ViewModel(array('fromMonth' => date('M-Y', strtotime($fromDate)), 'toMonth' => date('M-Y', strtotime($toDate)), 'labFilter' => $labFilter, 'labName' => $labName));
+            return $this->view->setVariables(array('fromMonth' => date('M-Y', strtotime($fromDate)), 'toMonth' => date('M-Y', strtotime($toDate)), 'labFilter' => $labFilter, 'labName' => $labName));
         } else {
             return $this->redirect()->toRoute("laboratory");
         }
@@ -719,12 +715,12 @@ class LaboratoryController extends AbstractActionController
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            
+
             $result = $this->commonService->getSampleTestedLocationInfo($params);
-            $viewModel = new ViewModel();
-            $viewModel->setVariables(array('result' => $result))
+            
+            $this->view->setVariables(array('result' => $result))
                 ->setTerminal(true);
-            return $viewModel;
+            return $this->view;
         }
     }
 
@@ -741,13 +737,13 @@ class LaboratoryController extends AbstractActionController
             $labFilter = $this->params()->fromQuery('lab');
             $params['labs'] = explode(',', $labFilter);
         }
-        
-        
+
+
         $hubName = $this->sampleService->getAllHubName();
         $sampleType = $this->sampleService->getSampleType();
         $currentRegimen = $this->sampleService->getAllCurrentRegimen();
         $facilityInfo = $this->commonService->getSampleTestedFacilityInfo($params);
-        return new ViewModel(array(
+        return $this->view->setVariables(array(
             'frmSource' => $frmSource,
             'labFilter' => $labFilter,
             'sampleType' => $sampleType,
@@ -763,12 +759,12 @@ class LaboratoryController extends AbstractActionController
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            
+
             $result = $this->sampleService->getProvinceWiseResultAwaitedDrillDown($params);
-            $viewModel = new ViewModel();
-            $viewModel->setVariables(array('result' => $result))
+            
+            $this->view->setVariables(array('result' => $result))
                 ->setTerminal(true);
-            return $viewModel;
+            return $this->view;
         }
     }
 
@@ -778,12 +774,12 @@ class LaboratoryController extends AbstractActionController
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            
+
             $result = $this->sampleService->getLabWiseResultAwaitedDrillDown($params);
-            $viewModel = new ViewModel();
-            $viewModel->setVariables(array('result' => $result))
+            
+            $this->view->setVariables(array('result' => $result))
                 ->setTerminal(true);
-            return $viewModel;
+            return $this->view;
         }
     }
 
@@ -793,12 +789,12 @@ class LaboratoryController extends AbstractActionController
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            
+
             $result = $this->sampleService->getDistrictWiseResultAwaitedDrillDown($params);
-            $viewModel = new ViewModel();
-            $viewModel->setVariables(array('result' => $result))
+            
+            $this->view->setVariables(array('result' => $result))
                 ->setTerminal(true);
-            return $viewModel;
+            return $this->view;
         }
     }
 
@@ -808,12 +804,12 @@ class LaboratoryController extends AbstractActionController
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            
+
             $result = $this->sampleService->getClinicWiseResultAwaitedDrillDown($params);
-            $viewModel = new ViewModel();
-            $viewModel->setVariables(array('result' => $result))
+            
+            $this->view->setVariables(array('result' => $result))
                 ->setTerminal(true);
-            return $viewModel;
+            return $this->view;
         }
     }
 
@@ -823,7 +819,7 @@ class LaboratoryController extends AbstractActionController
         $request = $this->getRequest();
         if ($request->isPost()) {
             $parameters = $request->getPost();
-            
+
             $result = $this->sampleService->getFilterSampleResultAwaitedDetails($parameters);
             return $this->getResponse()->setContent(Json::encode($result));
         }
@@ -835,12 +831,12 @@ class LaboratoryController extends AbstractActionController
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            
+
             $file = $this->sampleService->generateResultsAwaitedSampleExcel($params);
-            $viewModel = new ViewModel();
-            $viewModel->setVariables(array('file' => $file))
+            
+            $this->view->setVariables(array('file' => $file))
                 ->setTerminal(true);
-            return $viewModel;
+            return $this->view;
         }
     }
     public function expandBarChartAction()
@@ -851,7 +847,7 @@ class LaboratoryController extends AbstractActionController
         /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         $params = $request->getQuery();
-        return new ViewModel(array(
+        return $this->view->setVariables(array(
             'params' => $params
         ));
     }
@@ -861,13 +857,13 @@ class LaboratoryController extends AbstractActionController
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            
+
             $result = $this->sampleService->getSampleTestReasonBarChartDetails($params);
-            $viewModel = new ViewModel();
-            $viewModel->setVariables(array(
+            
+            $this->view->setVariables(array(
                 'result' => $result
             ))->setTerminal(true);
-            return $viewModel;
+            return $this->view;
         }
     }
     public function getSampleTestResultAgeGroupTwoToFiveAction()
@@ -876,12 +872,12 @@ class LaboratoryController extends AbstractActionController
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            
+
             $result = $this->sampleService->getSampleTestedResultAgeGroupDetails($params);
-            $viewModel = new ViewModel();
-            $viewModel->setVariables(array('result' => $result))
+            
+            $this->view->setVariables(array('result' => $result))
                 ->setTerminal(true);
-            return $viewModel;
+            return $this->view;
         }
     }
     public function getSampleTestResultAgeGroupSixToFourteenAction()
@@ -890,12 +886,12 @@ class LaboratoryController extends AbstractActionController
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            
+
             $result = $this->sampleService->getSampleTestedResultAgeGroupDetails($params);
-            $viewModel = new ViewModel();
-            $viewModel->setVariables(array('result' => $result))
+            
+            $this->view->setVariables(array('result' => $result))
                 ->setTerminal(true);
-            return $viewModel;
+            return $this->view;
         }
     }
     public function getSampleTestResultAgeGroupFifteenToFourtynineAction()
@@ -904,12 +900,12 @@ class LaboratoryController extends AbstractActionController
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            
+
             $result = $this->sampleService->getSampleTestedResultAgeGroupDetails($params);
-            $viewModel = new ViewModel();
-            $viewModel->setVariables(array('result' => $result))
+            
+            $this->view->setVariables(array('result' => $result))
                 ->setTerminal(true);
-            return $viewModel;
+            return $this->view;
         }
     }
     public function getSampleTestResultAgeGroupGreaterFiftyAction()
@@ -918,12 +914,12 @@ class LaboratoryController extends AbstractActionController
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            
+
             $result = $this->sampleService->getSampleTestedResultAgeGroupDetails($params);
-            $viewModel = new ViewModel();
-            $viewModel->setVariables(array('result' => $result))
+            
+            $this->view->setVariables(array('result' => $result))
                 ->setTerminal(true);
-            return $viewModel;
+            return $this->view;
         }
     }
     public function getSampleTestResultAgeGroupUnknownAction()
@@ -932,12 +928,12 @@ class LaboratoryController extends AbstractActionController
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            
+
             $result = $this->sampleService->getSampleTestedResultAgeGroupDetails($params);
-            $viewModel = new ViewModel();
-            $viewModel->setVariables(array('result' => $result))
+            
+            $this->view->setVariables(array('result' => $result))
                 ->setTerminal(true);
-            return $viewModel;
+            return $this->view;
         }
     }
     public function getSampleStatusDataTableAction()
@@ -947,14 +943,12 @@ class LaboratoryController extends AbstractActionController
         $request = $this->getRequest();
         if ($request->isPost()) {
             $parameters = $request->getPost();
-            
+
             $result = $this->sampleService->getSampleStatusDataTable($parameters);
-            $viewModel = new ViewModel();
-            $viewModel->setVariables(array('result' => $result))
+            
+            $this->view->setVariables(array('result' => $result))
                 ->setTerminal(true);
-            return $viewModel;
+            return $this->view;
         }
     }
-
-
 }

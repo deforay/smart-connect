@@ -1,6 +1,6 @@
 <?php
 use Laminas\Session\Container;
-$logincontainer = new Container('credo');
+$loginContainer = new Container('credo');
 $languagecontainer = new Container('language');
 $sType = '';
 foreach ($sampleType as $samples) {
@@ -467,7 +467,7 @@ foreach ($sampleType as $samples) {
             separator: ' to ',
             startDate: start,
             endDate: end,
-            <?php if(isset($logincontainer->useCurrentTables) && $logincontainer->useCurrentTables == true){?>
+            <?php if(isset($loginContainer->useCurrentTables) && $loginContainer->useCurrentTables == true){?>
             minDate:moment().subtract(12, 'months'),
             maxDate: moment(),
             <?php }?>

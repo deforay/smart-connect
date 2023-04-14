@@ -3,7 +3,7 @@
 use Laminas\Session\Container;
 
 $container = new Container('alert');
-$logincontainer = new Container('credo');
+$loginContainer = new Container('credo');
 $languagecontainer = new Container('language');
 $config = $this->GetConfigData();
 $activeModule = $this->GetActiveModules();
@@ -68,7 +68,7 @@ if (!isset($activeTab)) {
 
         <?php }
 
-        if (isset($logincontainer->useCurrentTables) && $logincontainer->useCurrentTables == true) { ?>body,
+        if (isset($loginContainer->useCurrentTables) && $loginContainer->useCurrentTables == true) { ?>body,
         .nav-item,
         .page-header.navbar,
         .portlet.blue,
@@ -137,18 +137,18 @@ if (!isset($activeTab)) {
 
                     <!-- BEGIN USER LOGIN DROPDOWN -->
                     <!-- DOC: Apply "dropdown-dark" class after below "dropdown-extended" to change the dropdown styte -->
-                    <?php if (isset($logincontainer->showCurrentTablesToggle) && $logincontainer->showCurrentTablesToggle) { ?>
+                    <?php if (isset($loginContainer->showCurrentTablesToggle) && $loginContainer->showCurrentTablesToggle) { ?>
                         <li style="width:200px;margin-top:6px;">
                             <select class="form-control" onchange="changeTable(this);" id="change-table">
-                                <option value='current' <?php echo (isset($logincontainer->useCurrentTables) && $logincontainer->useCurrentTables == true) ? "selected" : ""; ?>><?php echo $this->translate("LAST ONE YEAR"); ?></option>
-                                <option value='archive' <?php echo (isset($logincontainer->useCurrentTables) && $logincontainer->useCurrentTables == false) ? "selected" : ""; ?>><?php echo $this->translate("FULL DATA"); ?></option>
+                                <option value='current' <?php echo (isset($loginContainer->useCurrentTables) && $loginContainer->useCurrentTables == true) ? "selected" : ""; ?>><?php echo $this->translate("LAST ONE YEAR"); ?></option>
+                                <option value='archive' <?php echo (isset($loginContainer->useCurrentTables) && $loginContainer->useCurrentTables == false) ? "selected" : ""; ?>><?php echo $this->translate("FULL DATA"); ?></option>
                             </select>
                         </li>
                     <?php } ?>
                     <li class="dropdown dropdown-user">
                         <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-close-others="true">
                             <img alt="" class="img-circle" src="<?php echo $this->basePath('assets/img/default-avatar.png'); ?>" />
-                            <span class="username username-hide-on-mobile"> <?php echo $logincontainer->name ?> </span>
+                            <span class="username username-hide-on-mobile"> <?php echo $loginContainer->name ?> </span>
                             <i class="fa fa-angle-down"></i>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-default">
@@ -196,7 +196,7 @@ if (!isset($activeTab)) {
                     </li>
                     <!-- DOC: To remove the search box from the sidebar you just need to completely remove the below "sidebar-search-wrapper" LI element -->
                     <?php $vlRoleCheck = false;
-                    if ($logincontainer->role == 1 || $logincontainer->role == 2 || $logincontainer->role == 3 || $logincontainer->role == 5) {
+                    if ($loginContainer->role == 1 || $loginContainer->role == 2 || $loginContainer->role == 3 || $loginContainer->role == 5) {
                         $vlRoleCheck = true;
                     }
                     if ($vlRoleCheck && $activeModule['vl']) { ?>
@@ -207,21 +207,21 @@ if (!isset($activeTab)) {
                                 <span class="arrow"></span>
                             </a>
                             <ul class="sub-menu">
-                                <?php if ($logincontainer->role == 1 || $logincontainer->role == 5) { ?>
+                                <?php if ($loginContainer->role == 1 || $loginContainer->role == 5) { ?>
                                     <li class="nav-item start <?php echo ($activeTab == 'summary') ? " active open" : ""; ?>">
                                         <a href="<?php echo $this->url('summary', array('action' => 'dashboard')) ?>" class="nav-link ">
                                             <i class="fa fa-angle-right"></i> <span class="title"><?php echo $this->translate('Summary'); ?></span>
                                         </a>
                                     </li>
                                 <?php }
-                                if ($logincontainer->role == 1 || $logincontainer->role == 2 || $logincontainer->role == 5) { ?>
+                                if ($loginContainer->role == 1 || $loginContainer->role == 2 || $loginContainer->role == 5) { ?>
                                     <li class="nav-item end <?php echo ($activeTab == 'laboratory') ? " active open" : ""; ?>">
                                         <a href="<?php echo $this->url('laboratory', array('action' => 'dashboard')) ?>" class="nav-link ">
                                             <i class="fa fa-angle-right"></i> <span class="title"><?php echo $this->translate('Labs Dashboard'); ?></span>
                                         </a>
                                     </li>
                                 <?php }
-                                if ($logincontainer->role == 1 || $logincontainer->role == 3 || $logincontainer->role == 5) { ?>
+                                if ($loginContainer->role == 1 || $loginContainer->role == 3 || $loginContainer->role == 5) { ?>
                                     <li class="nav-item end <?php echo ($activeTab == 'clinics') ? " active open" : ""; ?>">
                                         <a href="<?php echo $this->url('clinics', array('action' => 'dashboard')) ?>" class="nav-link ">
                                             <i class="fa fa-angle-right"></i> <span class="title"><?php echo $this->translate('Clinics Dashboard'); ?></span>
@@ -239,14 +239,14 @@ if (!isset($activeTab)) {
                                 <span class="arrow"></span>
                             </a>
                             <ul class="sub-menu">
-                                <?php if ($logincontainer->role == 1 || $logincontainer->role == 5) { ?>
+                                <?php if ($loginContainer->role == 1 || $loginContainer->role == 5) { ?>
                                     <li class="nav-item start <?php echo ($activeTab == 'eid-summary') ? " active open" : ""; ?>">
                                         <a href="<?php echo $this->url('eid-summary', array('action' => 'dashboard')) ?>" class="nav-link ">
                                             <i class="fa fa-angle-right"></i> <span class="title"><?php echo $this->translate('Summary'); ?></span>
                                         </a>
                                     </li>
                                 <?php }
-                                if ($logincontainer->role == 1 || $logincontainer->role == 2 || $logincontainer->role == 5) { ?>
+                                if ($loginContainer->role == 1 || $loginContainer->role == 2 || $loginContainer->role == 5) { ?>
                                     <li class="nav-item end <?php echo ($activeTab == 'eid-labs') ? " active open" : ""; ?>">
                                         <a href="<?php echo $this->url('eid-labs', array('action' => 'dashboard')) ?>" class="nav-link ">
                                             <i class="fa fa-angle-right"></i> <span class="title"><?php echo $this->translate('Labs Dashboard'); ?></span>
@@ -278,14 +278,14 @@ if (!isset($activeTab)) {
                                 <span class="arrow"></span>
                             </a>
                             <ul class="sub-menu">
-                                <?php if ($logincontainer->role == 1 || $logincontainer->role == 5) { ?>
+                                <?php if ($loginContainer->role == 1 || $loginContainer->role == 5) { ?>
                                     <li class="nav-item start <?php echo ($activeTab == 'covid19-summary') ? " active open" : ""; ?>">
                                         <a href="<?php echo $this->url('covid19-summary', array('action' => 'dashboard')) ?>" class="nav-link ">
                                             <i class="fa fa-angle-right"></i> <span class="title"><?php echo $this->translate('Summary'); ?></span>
                                         </a>
                                     </li>
                                 <?php }
-                                if ($logincontainer->role == 1 || $logincontainer->role == 2 || $logincontainer->role == 5) { ?>
+                                if ($loginContainer->role == 1 || $loginContainer->role == 2 || $loginContainer->role == 5) { ?>
                                     <li class="nav-item end <?php echo ($activeTab == 'covid19-labs') ? " active open" : ""; ?>">
                                         <a href="<?php echo $this->url('covid19-labs', array('action' => 'dashboard')) ?>" class="nav-link ">
                                             <i class="fa fa-angle-right"></i> <span class="title"><?php echo $this->translate('Labs Dashboard'); ?></span>
@@ -296,7 +296,7 @@ if (!isset($activeTab)) {
                         </li>
                     <?php } ?>
                     <?php
-                    if ($logincontainer->role == 1 || $logincontainer->role == 4) { ?>
+                    if ($loginContainer->role == 1 || $loginContainer->role == 4) { ?>
                         <!--<li class="nav-item < ?php echo ($activeTab == 'hubs-dashboard' ? " active open " : ""); ?>">
                                  <a href="/hubs/dashboard" class="nav-link nav-toggle">
                                      <i class="icon-home"></i>
@@ -306,7 +306,7 @@ if (!isset($activeTab)) {
                                  
                             </li>-->
                     <?php } ?>
-                    <?php if ($logincontainer->role == 1 || $logincontainer->role == 5) { ?>
+                    <?php if ($loginContainer->role == 1 || $loginContainer->role == 5) { ?>
                         <li class="nav-item <?php echo ($activeTab == 'duplicate-data') ? " active open " : ""; ?>">
                             <a href="javascript:;" class="nav-link nav-toggle">
                                 <i class="icon-briefcase"></i>
@@ -324,7 +324,7 @@ if (!isset($activeTab)) {
                     <?php } ?>
 
                     <?php
-                    if ($logincontainer->role == 1) { ?>
+                    if ($loginContainer->role == 1) { ?>
                         <li class="nav-item <?php echo ($activeTab == 'config' || $activeTab == 'users' || $activeTab == 'facility' || $activeTab == 'import') ? " active open " : ""; ?>">
                             <a href="javascript:;" class="nav-link nav-toggle">
                                 <i class="icon-equalizer"></i>
@@ -376,7 +376,7 @@ if (!isset($activeTab)) {
                             </ul>
                         </li>
                         -->
-                    <?php if (isset($logincontainer->accessType) && $logincontainer->accessType == '4') { ?>
+                    <?php if (isset($loginContainer->accessType) && $loginContainer->accessType == '4') { ?>
 
                         <li class="nav-item <?php echo ($activeTab == 'admin' ? " active open " : ""); ?> ">
                             <a href="javascript:;" class="nav-link nav-toggle">
@@ -420,7 +420,7 @@ if (!isset($activeTab)) {
                         </li>
 
                     <?php } ?>
-                    <?php if (isset($logincontainer->accessType) && ($logincontainer->accessType == '1' || $logincontainer->accessType == '4')) { ?>
+                    <?php if (isset($loginContainer->accessType) && ($loginContainer->accessType == '1' || $loginContainer->accessType == '4')) { ?>
                         <li class="nav-item <?php echo ($activeTab == 'clinic' ? " active open " : ""); ?> ">
                             <a href="javascript:;" class="nav-link nav-toggle">
                                 <i class="icon-settings"></i>
@@ -467,7 +467,7 @@ if (!isset($activeTab)) {
                             </ul>
                         </li>
                     <?php } ?>
-                    <?php if (isset($logincontainer->accessType) && ($logincontainer->accessType == '2' || $logincontainer->accessType == '4')) { ?>
+                    <?php if (isset($loginContainer->accessType) && ($loginContainer->accessType == '2' || $loginContainer->accessType == '4')) { ?>
                         <li class="nav-item <?php echo ($activeTab == 'clinic' ? " active open " : ""); ?> ">
                             <a href="javascript:;" class="nav-link nav-toggle">
                                 <i class="icon-settings"></i>
@@ -509,7 +509,7 @@ if (!isset($activeTab)) {
                             </ul>
                         </li>
                     <?php } ?>
-                    <?php if (isset($logincontainer->accessType) && ($logincontainer->accessType == '3' || $logincontainer->accessType == '4')) { ?>
+                    <?php if (isset($loginContainer->accessType) && ($loginContainer->accessType == '3' || $loginContainer->accessType == '4')) { ?>
                         <li class="nav-item <?php echo ($activeTab == 'laboratory' ? " active open " : ""); ?> ">
                             <a href="javascript:;" class="nav-link nav-toggle">
                                 <i class="icon-settings"></i>

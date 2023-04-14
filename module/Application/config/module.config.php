@@ -1,14 +1,7 @@
 <?php
 
-/**
- * Zend Framework (http://framework.zend.com/)
- *
- * @link      http://github.com/zendframework/ZendSkeletonApplication for the canonical source repository
- * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
- * @license   http://framework.zend.com/license/new-bsd New BSD License
- */
-
 namespace Application;
+
 
 return array(
     'router' => array(
@@ -18,7 +11,7 @@ return array(
                 'options' => array(
                     'route'    => '/',
                     'defaults' => array(
-                        'controller' => 'Application\Controller\IndexController',
+                        'controller' => Controller\IndexController::class,
                         'action'     => 'index',
                     ),
                 ),
@@ -57,7 +50,7 @@ return array(
                 'options' => array(
                     'route' => '/organizations[/][:action][/:id]',
                     'defaults' => array(
-                        'controller' => 'Application\Controller\Organizations',
+                        'controller' => Controller\Organizations::class,
                         'action' => 'index',
                     ),
                 ),
@@ -67,7 +60,7 @@ return array(
                 'options' => array(
                     'route' => '/labs[/][:action][/:id]',
                     'defaults' => array(
-                        'controller' => 'Application\Controller\LaboratoryController',
+                        'controller' => Controller\LaboratoryController::class,
                         'action' => 'index',
                     ),
                 ),
@@ -77,7 +70,7 @@ return array(
                 'options' => array(
                     'route' => '/summary[/][:action][/:id]',
                     'defaults' => array(
-                        'controller' => 'Application\Controller\SummaryController',
+                        'controller' => Controller\SummaryController::class,
                         'action' => 'dashboard',
                     ),
                 ),
@@ -87,7 +80,7 @@ return array(
                 'options' => array(
                     'route' => '/clinics[/][:action][/:id]',
                     'defaults' => array(
-                        'controller' => 'Application\Controller\ClinicController',
+                        'controller' => Controller\ClinicController::class,
                         'action' => 'index',
                     ),
                 ),
@@ -97,7 +90,7 @@ return array(
                 'options' => array(
                     'route' => '/hubs[/][:action][/:id]',
                     'defaults' => array(
-                        'controller' => 'Application\Controller\Hubs',
+                        'controller' => Controller\HubsController::class,
                         'action' => 'index',
                     ),
                 ),
@@ -107,7 +100,7 @@ return array(
                 'options' => array(
                     'route'    => '/login[/:action]',
                     'defaults' => array(
-                        'controller' => \Application\Controller\LoginController::class,
+                        'controller' => Controller\LoginController::class,
                         'action' => 'index',
                     ),
                 ),
@@ -117,7 +110,7 @@ return array(
                 'options' => array(
                     'route'    => '/login/otp',
                     'defaults' => array(
-                        'controller' => 'Application\Controller\IndexController',
+                        'controller' => Controller\IndexController::class,
                         'action'     => 'otp',
                     ),
                 ),
@@ -127,7 +120,7 @@ return array(
                 'options' => array(
                     'route'    => '/users[/][:action][/:id]',
                     'defaults' => array(
-                        'controller' => \Application\Controller\UsersController::class,
+                        'controller' => Controller\UsersController::class,
                         'action' => 'index',
                     ),
                 ),
@@ -137,7 +130,7 @@ return array(
                 'options' => array(
                     'route'    => '/common[/][:action][/:id]',
                     'defaults' => array(
-                        'controller' => 'Application\Controller\CommonController',
+                        'controller' => Controller\CommonController::class,
                         'action' => 'index',
                     ),
                 ),
@@ -147,7 +140,7 @@ return array(
                 'options' => array(
                     'route'    => '/config[/][:action][/:id]',
                     'defaults' => array(
-                        'controller' => 'Application\Controller\ConfigController',
+                        'controller' => Controller\ConfigController::class,
                         'action' => 'index',
                     ),
                 ),
@@ -157,7 +150,7 @@ return array(
                 'options' => array(
                     'route'    => '/facility[/][:action][/:id]',
                     'defaults' => array(
-                        'controller' => 'Application\Controller\FacilityController',
+                        'controller' => Controller\FacilityController::class,
                         'action' => 'index',
                     ),
                 ),
@@ -167,7 +160,7 @@ return array(
                 'options' => array(
                     'route' => '/times[/][:action][/:id]',
                     'defaults' => array(
-                        'controller' => 'Application\Controller\TimeController',
+                        'controller' => Controller\TimeController::class,
                         'action' => 'index',
                     ),
                 ),
@@ -177,7 +170,7 @@ return array(
                 'options' => array(
                     'route'    => '/status[/][:action][/:id]',
                     'defaults' => array(
-                        'controller' => 'Application\Controller\StatusController',
+                        'controller' => Controller\StatusController::class,
                         'action' => 'index',
                     ),
                 ),
@@ -187,83 +180,51 @@ return array(
                 'options' => array(
                     'route'    => '/sync-status[/][:action][/:id]',
                     'defaults' => array(
-                        'controller' => 'Application\Controller\SyncStatusController',
+                        'controller' => Controller\SyncStatusController::class,
                         'action' => 'index',
                     ),
                 ),
             ),
         ),
     ),
-    'service_manager' => array(
-        'abstract_factories' => array(
+    'service_manager' => [
+        'abstract_factories' => [
             'Laminas\Cache\Service\StorageCacheAbstractServiceFactory',
             'Laminas\Log\LoggerAbstractServiceFactory'
-        ),
-        'factories' => array(
+        ],
+        'factories' => [
             'translator' => 'Laminas\Mvc\I18n\TranslatorFactory'
-        ),
-    ),
-    'translator' => array(
+        ],
+    ],
+    'translator' => [
         'locale' => 'en_US',
-        'translation_file_patterns' => array(
-            array(
+        'translation_file_patterns' => [
+            [
                 'type' => 'gettext',
                 'base_dir' => __DIR__ . '/../language',
                 'pattern' => '%s.mo'
-            ),
-        )
-    ),
-    'controllers' => array(
-        'invokables' => array(
-            'Application\Controller\IndexController' => 'Application\Controller\IndexController'
-        ),
-    ),
-    'controller_plugins' => array(
-        'invokables' => array(
-            'HasParams' => 'Application\Controller\Plugin\HasParams'
-        )
-    ),
-    'view_manager' => array(
+            ],
+        ],
+    ],
+    'controllers' => [
+        'invokables' => [
+            'Application\Controller\IndexController' => Controller\IndexController::class
+        ]
+    ],
+    'view_manager' => [
         'display_not_found_reason' => true,
         'display_exceptions'       => true,
         'doctype'                  => 'HTML5',
         'not_found_template'       => 'error/404',
         'exception_template'       => 'error/index',
-        'template_map' => array(
+        'template_map' => [
             'layout/layout'           => __DIR__ . '/../view/layout/layout.phtml',
             'application/index/index' => __DIR__ . '/../view/application/index/index.phtml',
             'error/404'               => __DIR__ . '/../view/error/404.phtml',
             'error/index'             => __DIR__ . '/../view/error/index.phtml',
-        ),
-        'template_path_stack' => array(
+        ],
+        'template_path_stack' => [
             __DIR__ . '/../view',
-        ),
-    ),
-    // Placeholder for console routes
-    'console' => array(
-        'router' => array(
-            'routes' => array(
-                'import-vl' => array(
-                    'type' => 'simple',
-                    'options' => array(
-                        'route' => 'import-vl',
-                        'defaults' => array(
-                            'controller' => 'Application\Controller\CronController',
-                            'action' => 'import-vl',
-                        ),
-                    ),
-                ),
-                'generate-backup' => array(
-                    'type' => 'simple',
-                    'options' => array(
-                        'route' => 'generate-backup',
-                        'defaults' => array(
-                            'controller' => 'Application\Controller\CronController',
-                            'action' => 'generate-backup',
-                        ),
-                    ),
-                ),
-            ),
-        ),
-    ),
+        ],
+    ],
 );

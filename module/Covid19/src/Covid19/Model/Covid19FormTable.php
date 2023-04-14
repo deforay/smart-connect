@@ -2104,7 +2104,7 @@ class Covid19FormTable extends AbstractTableGateway
     // LAB DASHBOARD START
     public function getStats($params)
     {
-        $logincontainer = new Container('credo');
+        $loginContainer = new Container('credo');
         $quickStats = $this->fetchQuickStats($params);
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
@@ -2129,7 +2129,7 @@ class Covid19FormTable extends AbstractTableGateway
             ->columns(array('total' => new Expression('COUNT(*)'), 'receivedDate' => new Expression('DATE(sample_collection_date)')))
             ->where("sample_collection_date is not null AND sample_collection_date not like '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00'")
             ->group(array("receivedDate"));
-        if ($logincontainer->role != 1) {
+        if ($loginContainer->role != 1) {
             $receivedQuery = $receivedQuery->where('covid19.lab_id IN ("' . implode('", "', $this->mappedFacilities) . '")');
         }
         if (trim($params['daterange']) != '') {
@@ -2157,7 +2157,7 @@ class Covid19FormTable extends AbstractTableGateway
             ->where("((covid19.result IS NOT NULL AND covid19.result != '' AND covid19.result != 'NULL') OR (covid19.reason_for_sample_rejection IS NOT NULL AND covid19.reason_for_sample_rejection != '' AND covid19.reason_for_sample_rejection != 0))")
             ->where("sample_collection_date is not null AND sample_collection_date not like '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00'")
             ->group(array("testedDate"));
-        if ($logincontainer->role != 1) {
+        if ($loginContainer->role != 1) {
             $testedQuery = $testedQuery->where('covid19.lab_id IN ("' . implode('", "', $this->mappedFacilities) . '")');
         }
         if (trim($params['daterange']) != '') {
@@ -2185,7 +2185,7 @@ class Covid19FormTable extends AbstractTableGateway
             ->where("covid19.reason_for_sample_rejection IS NOT NULL AND covid19.reason_for_sample_rejection !='' AND covid19.reason_for_sample_rejection!= 0")
             ->where("sample_collection_date is not null AND sample_collection_date not like '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00'")
             ->group(array("rejectDate"));
-        if ($logincontainer->role != 1) {
+        if ($loginContainer->role != 1) {
             $rejectedQuery = $rejectedQuery->where('covid19.lab_id IN ("' . implode('", "', $this->mappedFacilities) . '")');
         }
         if (trim($params['daterange']) != '') {
@@ -2209,7 +2209,7 @@ class Covid19FormTable extends AbstractTableGateway
 
     public function fetchQuickStats($params)
     {
-        $logincontainer = new Container('credo');
+        $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $globalDb = $this->sm->get('GlobalTable');
@@ -2241,7 +2241,7 @@ class Covid19FormTable extends AbstractTableGateway
                                                                                                                                 END)")
                 )
             );
-        if ($logincontainer->role != 1) {
+        if ($loginContainer->role != 1) {
             $query = $query->where('covid19.lab_id IN ("' . implode('", "', $this->mappedFacilities) . '")');
         }
         $queryStr = $sql->buildSqlString($query);
@@ -2254,7 +2254,7 @@ class Covid19FormTable extends AbstractTableGateway
     public function getMonthlySampleCount($params)
     {
 
-        $logincontainer = new Container('credo');
+        $loginContainer = new Container('credo');
         $result = array();
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
@@ -2689,7 +2689,7 @@ class Covid19FormTable extends AbstractTableGateway
 
     public function getTATbyProvince($labs, $startDate, $endDate)
     {
-        $logincontainer = new Container('credo');
+        $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $skipDays = isset($this->config['defaults']['tat-skipdays']) ? $this->config['defaults']['tat-skipdays'] : 120;
@@ -2730,8 +2730,8 @@ class Covid19FormTable extends AbstractTableGateway
         if (isset($labs) && !empty($labs)) {
             $squery = $squery->where('covid19.lab_id IN (' . implode(',', $labs) . ')');
         } else {
-            if ($logincontainer->role != 1) {
-                $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : array(0);
+            if ($loginContainer->role != 1) {
+                $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : array(0);
                 $squery = $squery->where('covid19.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
             }
         }
@@ -2744,7 +2744,7 @@ class Covid19FormTable extends AbstractTableGateway
 
     public function getTATbyDistrict($labs, $startDate, $endDate)
     {
-        $logincontainer = new Container('credo');
+        $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $skipDays = isset($this->config['defaults']['tat-skipdays']) ? $this->config['defaults']['tat-skipdays'] : 120;
@@ -2785,8 +2785,8 @@ class Covid19FormTable extends AbstractTableGateway
         if (isset($labs) && !empty($labs)) {
             $squery = $squery->where('covid19.lab_id IN (' . implode(',', $labs) . ')');
         } else {
-            if ($logincontainer->role != 1) {
-                $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : array(0);
+            if ($loginContainer->role != 1) {
+                $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : array(0);
                 $squery = $squery->where('covid19.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
             }
         }
@@ -2798,7 +2798,7 @@ class Covid19FormTable extends AbstractTableGateway
 
     public function getTATbyClinic($labs, $startDate, $endDate)
     {
-        $logincontainer = new Container('credo');
+        $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $skipDays = isset($this->config['defaults']['tat-skipdays']) ? $this->config['defaults']['tat-skipdays'] : 120;
@@ -2839,8 +2839,8 @@ class Covid19FormTable extends AbstractTableGateway
         if (isset($labs) && !empty($labs)) {
             $squery = $squery->where('covid19.lab_id IN (' . implode(',', $labs) . ')');
         } else {
-            if ($logincontainer->role != 1) {
-                $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : array(0);
+            if ($loginContainer->role != 1) {
+                $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : array(0);
                 $squery = $squery->where('covid19.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
             }
         }
@@ -2857,7 +2857,7 @@ class Covid19FormTable extends AbstractTableGateway
 
     public function fetchProvinceWiseResultAwaitedDrillDown($params)
     {
-        $logincontainer = new Container('credo');
+        $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = array();
@@ -2883,8 +2883,8 @@ class Covid19FormTable extends AbstractTableGateway
         if (isset($params['lab']) && trim($params['lab']) != '') {
             $countQuery = $countQuery->where('covid19.lab_id IN (' . $params['lab'] . ')');
         } else {
-            if ($logincontainer->role != 1) {
-                $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : array(0);
+            if ($loginContainer->role != 1) {
+                $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : array(0);
                 $countQuery = $countQuery->where('covid19.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
             }
         }
@@ -2958,7 +2958,7 @@ class Covid19FormTable extends AbstractTableGateway
     }
     public function fetchDistrictWiseResultAwaitedDrillDown($params)
     {
-        $logincontainer = new Container('credo');
+        $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = array();
@@ -2985,8 +2985,8 @@ class Covid19FormTable extends AbstractTableGateway
         if (isset($params['lab']) && trim($params['lab']) != '') {
             $countQuery = $countQuery->where('covid19.lab_id IN (' . $params['lab'] . ')');
         } else {
-            if ($logincontainer->role != 1) {
-                $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : array(0);
+            if ($loginContainer->role != 1) {
+                $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : array(0);
                 $countQuery = $countQuery->where('covid19.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
             }
         }
@@ -3061,7 +3061,7 @@ class Covid19FormTable extends AbstractTableGateway
 
     public function fetchLabWiseResultAwaitedDrillDown($params)
     {
-        $logincontainer = new Container('credo');
+        $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = array();
@@ -3087,8 +3087,8 @@ class Covid19FormTable extends AbstractTableGateway
         if (isset($params['lab']) && trim($params['lab']) != '') {
             $countQuery = $countQuery->where('f.facility_id IN (' . $params['lab'] . ')');
         } else {
-            if ($logincontainer->role != 1) {
-                $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : array(0);
+            if ($loginContainer->role != 1) {
+                $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : array(0);
                 $countQuery = $countQuery->where('f.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
             }
         }
@@ -3164,7 +3164,7 @@ class Covid19FormTable extends AbstractTableGateway
 
     public function fetchClinicWiseResultAwaitedDrillDown($params)
     {
-        $logincontainer = new Container('credo');
+        $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = array();
@@ -3190,8 +3190,8 @@ class Covid19FormTable extends AbstractTableGateway
         if (isset($params['lab']) && trim($params['lab']) != '') {
             $countQuery = $countQuery->where('f.facility_id IN (' . $params['lab'] . ')');
         } else {
-            if ($logincontainer->role != 1) {
-                $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : array(0);
+            if ($loginContainer->role != 1) {
+                $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : array(0);
                 $countQuery = $countQuery->where('f.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
             }
         }
@@ -3268,7 +3268,7 @@ class Covid19FormTable extends AbstractTableGateway
 
     public function fetchFilterSampleResultAwaitedDetails($parameters)
     {
-        $logincontainer = new Container('credo');
+        $loginContainer = new Container('credo');
         $queryContainer = new Container('query');
         
         
@@ -3376,8 +3376,8 @@ class Covid19FormTable extends AbstractTableGateway
         if (isset($parameters['lab']) && trim($parameters['lab']) != '') {
             $sQuery = $sQuery->where('covid19.lab_id IN (' . $parameters['lab'] . ')');
         } else {
-            if ($logincontainer->role != 1) {
-                $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : array(0);
+            if ($loginContainer->role != 1) {
+                $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : array(0);
                 $sQuery = $sQuery->where('covid19.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
             }
         }
@@ -3452,8 +3452,8 @@ class Covid19FormTable extends AbstractTableGateway
             ->join(array('f' => 'facility_details'), 'f.facility_id=covid19.facility_id', array('facilityName' => 'facility_name', 'facilityCode' => 'facility_code'))
             ->join(array('l' => 'facility_details'), 'l.facility_id=covid19.lab_id', array('labName' => 'facility_name'), 'left')
             ->where("(covid19.is_sample_rejected is NULL OR covid19.is_sample_rejected = '' OR covid19.is_sample_rejected = 'no') AND (reason_for_sample_rejection is NULL or reason_for_sample_rejection ='' or covid19.reason_for_sample_rejection = 0)");
-        if ($logincontainer->role != 1) {
-            $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : array(0);
+        if ($loginContainer->role != 1) {
+            $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : array(0);
             $iQuery = $iQuery->where('covid19.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
         }
         $iQueryStr = $sql->buildSqlString($iQuery);
@@ -3497,7 +3497,7 @@ class Covid19FormTable extends AbstractTableGateway
 
     public function fetchSampleDetails($params)
     {
-        $logincontainer = new Container('credo');
+        $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = array();
@@ -3510,8 +3510,8 @@ class Covid19FormTable extends AbstractTableGateway
             if (isset($params['lab']) && trim($params['lab']) != '') {
                 $facilityQuery = $facilityQuery->where('f.facility_id IN (' . $params['lab'] . ')');
             } else {
-                if ($logincontainer->role != 1) {
-                    $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : array(0);
+                if ($loginContainer->role != 1) {
+                    $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : array(0);
                     $facilityQuery = $facilityQuery->where('f.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
                 }
             }
@@ -3596,7 +3596,7 @@ class Covid19FormTable extends AbstractTableGateway
 
     public function fetchBarSampleDetails($params)
     {
-        $logincontainer = new Container('credo');
+        $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = array();
@@ -3609,8 +3609,8 @@ class Covid19FormTable extends AbstractTableGateway
             if (isset($params['lab']) && trim($params['lab']) != '') {
                 $fQuery = $fQuery->where('f.facility_id IN (' . $params['lab'] . ')');
             } else {
-                if ($logincontainer->role != 1) {
-                    $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : array(0);
+                if ($loginContainer->role != 1) {
+                    $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : array(0);
                     $fQuery = $fQuery->where('f.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
                 }
             }
@@ -3700,7 +3700,7 @@ class Covid19FormTable extends AbstractTableGateway
 
     public function fetchLabBarSampleDetails($params)
     {
-        $logincontainer = new Container('credo');
+        $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = array();
@@ -3732,8 +3732,8 @@ class Covid19FormTable extends AbstractTableGateway
             if (isset($params['lab']) && trim($params['lab']) != '') {
                 $sQuery = $sQuery->where('covid19.lab_id IN (' . $params['lab'] . ')');
             } else {
-                if ($logincontainer->role != 1) {
-                    $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : array(0);
+                if ($loginContainer->role != 1) {
+                    $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : array(0);
                     $sQuery = $sQuery->where('covid19.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
                 }
             }
@@ -3809,7 +3809,7 @@ class Covid19FormTable extends AbstractTableGateway
 
     public function fetchLabFilterSampleDetails($parameters)
     {
-        $logincontainer = new Container('credo');
+        $loginContainer = new Container('credo');
         $queryContainer = new Container('query');
         
         /* Array of database columns which should be read and sent back to DataTables. Use a space where
@@ -3914,8 +3914,8 @@ class Covid19FormTable extends AbstractTableGateway
         if (isset($parameters['lab']) && trim($parameters['lab']) != '') {
             $sQuery = $sQuery->where('covid19.lab_id IN (' . $parameters['lab'] . ')');
         } else {
-            if ($logincontainer->role != 1) {
-                $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : array(0);
+            if ($loginContainer->role != 1) {
+                $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : array(0);
                 $sQuery = $sQuery->where('covid19.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
             }
         }
@@ -4002,8 +4002,8 @@ class Covid19FormTable extends AbstractTableGateway
             ->group(new Expression('DATE(sample_collection_date)'))
             ->group('covid19.specimen_type')
             ->group('covid19.facility_id');
-        if ($logincontainer->role != 1) {
-            $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : array(0);
+        if ($loginContainer->role != 1) {
+            $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : array(0);
             $iQuery = $iQuery->where('covid19.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
         }
         $iQueryStr = $sql->buildSqlString($iQuery);
@@ -4037,7 +4037,7 @@ class Covid19FormTable extends AbstractTableGateway
 
     public function fetchFilterSampleDetails($parameters)
     {
-        $logincontainer = new Container('credo');
+        $loginContainer = new Container('credo');
         $queryContainer = new Container('query');
         
         /* Array of database columns which should be read and sent back to DataTables. Use a space where
@@ -4137,8 +4137,8 @@ class Covid19FormTable extends AbstractTableGateway
         if (isset($parameters['lab']) && trim($parameters['lab']) != '') {
             $sQuery = $sQuery->where('covid19.lab_id IN (' . $parameters['lab'] . ')');
         } else {
-            if ($logincontainer->role != 1) {
-                $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : array(0);
+            if ($loginContainer->role != 1) {
+                $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : array(0);
                 $sQuery = $sQuery->where('covid19.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
             }
         }
@@ -4222,8 +4222,8 @@ class Covid19FormTable extends AbstractTableGateway
             ))
             ->where("sample_collection_date is not null AND sample_collection_date not like '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00' AND covid19.lab_id !=0")
             ->group('covid19.lab_id');
-        if ($logincontainer->role != 1) {
-            $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : array(0);
+        if ($loginContainer->role != 1) {
+            $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : array(0);
             $iQuery = $iQuery->where('covid19.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
         }
         $iQueryStr = $sql->buildSqlString($iQuery);
@@ -4252,7 +4252,7 @@ class Covid19FormTable extends AbstractTableGateway
     //get eid out comes result
     public function fetchCovid19OutComes($params)
     {
-        $logincontainer = new Container('credo');
+        $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $vlOutComeResult = array();
@@ -4277,8 +4277,8 @@ class Covid19FormTable extends AbstractTableGateway
             if (isset($params['lab']) && trim($params['lab']) != '') {
                 $sQuery = $sQuery->where('covid19.lab_id IN (' . $params['lab'] . ')');
             } else {
-                if ($logincontainer->role != 1) {
-                    $mappedFacilities = (isset($logincontainer->mappedFacilities) && count($logincontainer->mappedFacilities) > 0) ? $logincontainer->mappedFacilities : array(0);
+                if ($loginContainer->role != 1) {
+                    $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : array(0);
                     $sQuery = $sQuery->where('covid19.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
                 }
             }

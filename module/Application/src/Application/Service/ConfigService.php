@@ -12,10 +12,6 @@ class ConfigService {
     public function __construct($sm) {
         $this->sm = $sm;
     }
-
-    public function getServiceManager() {
-        return $this->sm;
-    }
     
     public function getAllConfig($params){
         $configDb = $this->sm->get('GlobalTable');

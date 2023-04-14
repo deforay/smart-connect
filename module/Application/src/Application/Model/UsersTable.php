@@ -56,7 +56,7 @@ class UsersTable extends AbstractTableGateway
         $sQueryStr = $sql->buildSqlString($sQuery);
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $container = new Container('alert');
-        $logincontainer = new Container('credo');
+        $loginContainer = new Container('credo');
         if (!empty($rResult)) {
 
             date_default_timezone_set(isset($this->config['defaults']['time-zone']) ? $this->config['defaults']['time-zone'] : 'UTC');
@@ -104,47 +104,47 @@ class UsersTable extends AbstractTableGateway
                 $provinces = array(0);
                 $districts = array(0);
             }
-            $logincontainer->userId = $rResult[0]["user_id"];
-            $logincontainer->name = $rResult[0]["user_name"];
-            $logincontainer->mobile = $rResult[0]["mobile"];
-            $logincontainer->role = $rResult[0]["role"];
-            $logincontainer->email = $rResult[0]["email"];
-            //$logincontainer->accessType = $rResult[0]["access_type"];
-            $logincontainer->mappedFacilities = $facilities_id;
-            $logincontainer->mappedFacilitiesName = $facilities_name;
-            $logincontainer->mappedFacilitiesCode = $facilities_code;
-            $logincontainer->provinces = $provinces;
-            $logincontainer->districts = $districts;
+            $loginContainer->userId = $rResult[0]["user_id"];
+            $loginContainer->name = $rResult[0]["user_name"];
+            $loginContainer->mobile = $rResult[0]["mobile"];
+            $loginContainer->role = $rResult[0]["role"];
+            $loginContainer->email = $rResult[0]["email"];
+            //$loginContainer->accessType = $rResult[0]["access_type"];
+            $loginContainer->mappedFacilities = $facilities_id;
+            $loginContainer->mappedFacilitiesName = $facilities_name;
+            $loginContainer->mappedFacilitiesCode = $facilities_code;
+            $loginContainer->provinces = $provinces;
+            $loginContainer->districts = $districts;
             $container->alertMsg = '';
             if ($this->useCurrentSampleTable == true) {
-                $logincontainer->showCurrentTablesToggle = true;
-                $logincontainer->useCurrentTables = $this->useCurrentSampleTable;
-                $logincontainer->sampleTable = 'dash_form_vl_current';
-                $logincontainer->eidSampleTable = 'dash_form_eid_current';
-                $logincontainer->covid19SampleTable = 'dash_form_covid19_current';
+                $loginContainer->showCurrentTablesToggle = true;
+                $loginContainer->useCurrentTables = $this->useCurrentSampleTable;
+                $loginContainer->sampleTable = 'dash_form_vl_current';
+                $loginContainer->eidSampleTable = 'dash_form_eid_current';
+                $loginContainer->covid19SampleTable = 'dash_form_covid19_current';
             } else {
-                $logincontainer->sampleTable = 'dash_form_vl';
-                $logincontainer->eidSampleTable = 'dash_form_eid';
-                $logincontainer->covid19SampleTable = 'dash_form_covid19';
+                $loginContainer->sampleTable = 'dash_form_vl';
+                $loginContainer->eidSampleTable = 'dash_form_eid';
+                $loginContainer->covid19SampleTable = 'dash_form_covid19';
             }
 
 
-            if ($otp == null && $logincontainer->role == 7) {
+            if ($otp == null && $loginContainer->role == 7) {
 
                 // Let us ensure this person cannot login till they enter OTP.
                 // so we will clear the login session                
-                $logincontainer->getManager()->getStorage()->clear('credo');
+                $loginContainer->getManager()->getStorage()->clear('credo');
 
                 $dataInterfaceLogin = new Container('dataInterfaceLogin');
                 $dataInterfaceLogin->email = $rResult[0]["email"];
                 $dataInterfaceLogin->password = $rResult[0]["password"];
 
                 return 'login-otp';
-            } else if ($otp != null && $logincontainer->role == 7) {
+            } else if ($otp != null && $loginContainer->role == 7) {
                 return 'data-management-export';
-            } else if ($logincontainer->role == 3) {
+            } else if ($loginContainer->role == 3) {
                 return 'clinics';
-            } else if ($logincontainer->role == 2) {
+            } else if ($loginContainer->role == 2) {
                 return 'laboratory';
             } else {
                 return 'summary';

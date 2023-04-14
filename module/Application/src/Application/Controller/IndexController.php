@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Zend Framework (http://framework.zend.com/)
  *
@@ -20,35 +21,35 @@ class IndexController extends AbstractActionController
         return $this->redirect()->toRoute('summary');
         return new ViewModel();
     }
-    
+
     public function samplesAccessionAction()
     {
-        $this->layout()->setVariable('activeTab', 'dashboard');          
+        $this->layout()->setVariable('activeTab', 'dashboard');
         return new ViewModel();
     }
-    
+
     public function samplesWaitingAction()
     {
-        $this->layout()->setVariable('activeTab', 'dashboard');          
+        $this->layout()->setVariable('activeTab', 'dashboard');
         return new ViewModel();
     }
-    
-    
+
+
     public function samplesRejectedAction()
     {
-        $this->layout()->setVariable('activeTab', 'dashboard');          
+        $this->layout()->setVariable('activeTab', 'dashboard');
         return new ViewModel();
     }
-    
+
     public function samplesTestedAction()
     {
         $this->layout()->setVariable('activeTab', 'dashboard');
         return new ViewModel();
     }
-    
+
     public function requisitionFormsIncompleteAction()
     {
-        $this->layout()->setVariable('activeTab', 'dashboard');          
+        $this->layout()->setVariable('activeTab', 'dashboard');
         return new ViewModel();
     }
 }
