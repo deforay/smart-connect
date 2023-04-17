@@ -25,7 +25,7 @@ class UsersTable extends AbstractTableGateway
 
     protected $table = 'dash_users';
     public $sm = null;
-    public $config = null;
+    public array $config;
     public $useCurrentSampleTable = null;
     public \Application\Service\CommonService $commonService;
     public function __construct(Adapter $adapter, $sm = null, $commonService = null)

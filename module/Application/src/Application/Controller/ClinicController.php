@@ -9,9 +9,8 @@ use Laminas\Json\Json;
 class ClinicController extends AbstractActionController
 {
 
-
-    private $sampleService = null;
-    private $configService = null;
+    public \Application\Service\SampleService $sampleService;
+    public \Application\Service\ConfigService $configService;
 
     public function __construct($sampleService, $configService)
     {

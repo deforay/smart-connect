@@ -21,7 +21,7 @@ class Covid19FormTable extends AbstractTableGateway
 
     protected $table = 'dash_form_covid19';
     public $sm = null;
-    public $config = null;
+    public array $config;
     protected $translator = null;
     protected \Application\Service\CommonService $commonService;
     protected $mappedFacilities = null;

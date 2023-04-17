@@ -5,7 +5,6 @@ namespace Eid\Service;
 use Laminas\Session\Container;
 use Laminas\Db\Sql\Sql;
 use Laminas\Db\Sql\Expression;
-use Application\Service\CommonService;
 use Exception;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 
@@ -13,7 +12,8 @@ class EidSampleService
 {
 
     public $sm = null;
-    public $config = null;
+    public array $config;
+    /** @var \Application\Model\EidSampleTable $eidSampleTable */
     public $eidSampleTable;
 
     public function __construct($sm, $eidSampleTable)
@@ -26,8 +26,10 @@ class EidSampleService
     //get all sample types
     public function getSampleType()
     {
-        $sampleDb = $this->sm->get('EidSampleTypeTable');
-        return $sampleDb->fetchAllSampleType();
+        /** @var \Application\Model\EidSampleTypeTable $eidSampleTypeDb */
+
+        $eidSampleTypeDb = $this->sm->get('EidSampleTypeTable');
+        return $eidSampleTypeDb->fetchAllSampleType();
     }
 
     public function getStats($params)
@@ -91,6 +93,9 @@ class EidSampleService
     public function saveFileFromVlsmAPIV2()
     {
         $apiData = array();
+
+        /** @var \Application\Model\DashApiReceiverStatsTable $apiTrackDb */
+
         $apiTrackDb = $this->sm->get('DashApiReceiverStatsTable');
 
         $this->config = $this->sm->get('Config');
@@ -132,6 +137,8 @@ class EidSampleService
         );
 
         $columnList = array_diff($columnList, $removeKeys);
+
+        /** @var \Application\Model\EidSampleTable $sampleDb */
         $sampleDb = $this->sm->get('EidSampleTableWithoutCache');
 
 
@@ -193,6 +200,7 @@ class EidSampleService
     public function saveFileFromVlsmAPIV1()
     {
         $apiData = [];
+        /** @var \Application\Model\EidSampleTable $sampleDb */
         $sampleDb = $this->sm->get('EidSampleTableWithoutCache');
         $facilityDb = $this->sm->get('FacilityTable');
         $facilityTypeDb = $this->sm->get('FacilityTypeTable');
@@ -553,8 +561,7 @@ class EidSampleService
 
     public function getEidFormDetail()
     {
-        $sampleDb = $this->sm->get('EidSampleTable');
-        return $sampleDb->fetchEidFormDetail();
+        return $this->eidSampleTable->fetchEidFormDetail();
     }
     // Get all test reason name for eid
     public function getAllTestReasonName()
@@ -563,13 +570,11 @@ class EidSampleService
         $sql = new Sql($dbAdapter);
         $tQuery = $sql->select()->from('r_eid_test_reasons');
         $tQueryStr = $sql->buildSqlString($tQuery);
-        $tResult = $dbAdapter->query($tQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-        return $tResult;
+        return $dbAdapter->query($tQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
     }
     //get all province name
     public function getAllProvinceList()
     {
-
         $loginContainer = new Container('credo');
         $mappedFacilities = null;
         if ($loginContainer->role != 1) {
@@ -594,8 +599,7 @@ class EidSampleService
     {
         // set_time_limit(10000);
         $result = array();
-        $sampleDb = $this->sm->get('EidSampleTable');
-        $resultSet = $sampleDb->getTATbyProvince($labs, $startDate, $endDate);
+        $resultSet = $this->eidSampleTable->getTATbyProvince($labs, $startDate, $endDate);
         foreach ($resultSet as $key) {
             $result[] = array(
                 "facility"           => $key['geo_name'],
@@ -615,8 +619,7 @@ class EidSampleService
     {
         // set_time_limit(10000);
         $result = array();
-        $sampleDb = $this->sm->get('EidSampleTable');
-        $resultSet = $sampleDb->getTATbyDistrict($labs, $startDate, $endDate);
+        $resultSet = $this->eidSampleTable->getTATbyDistrict($labs, $startDate, $endDate);
         foreach ($resultSet as $key) {
             $result[] = array(
                 "facility"           => $key['geo_name'],
@@ -637,8 +640,7 @@ class EidSampleService
         // set_time_limit(10000);
         $result = array();
         $time = array();
-        $sampleDb = $this->sm->get('EidSampleTable');
-        $time = $sampleDb->getTATbyClinic($labs, $startDate, $endDate);
+        $resultSet = $this->eidSampleTable->getTATbyClinic($labs, $startDate, $endDate);
         foreach ($resultSet as $key) {
             $result[] = array(
                 "facility"           => $key['geo_name'],
@@ -674,32 +676,27 @@ class EidSampleService
 
     public function getProvinceWiseResultAwaitedDrillDown($params)
     {
-        $sampleDb = $this->sm->get('EidSampleTable');
-        return $sampleDb->fetchProvinceWiseResultAwaitedDrillDown($params);
+        return $this->eidSampleTable->fetchProvinceWiseResultAwaitedDrillDown($params);
     }
 
     public function getLabWiseResultAwaitedDrillDown($params)
     {
-        $sampleDb = $this->sm->get('EidSampleTable');
-        return $sampleDb->fetchLabWiseResultAwaitedDrillDown($params);
+        return $this->eidSampleTable->fetchLabWiseResultAwaitedDrillDown($params);
     }
 
     public function getDistrictWiseResultAwaitedDrillDown($params)
     {
-        $sampleDb = $this->sm->get('EidSampleTable');
-        return $sampleDb->fetchDistrictWiseResultAwaitedDrillDown($params);
+        return $this->eidSampleTable->fetchDistrictWiseResultAwaitedDrillDown($params);
     }
 
     public function getClinicWiseResultAwaitedDrillDown($params)
     {
-        $sampleDb = $this->sm->get('EidSampleTableWithoutCache');
-        return $sampleDb->fetchClinicWiseResultAwaitedDrillDown($params);
+        return $this->eidSampleTable->fetchClinicWiseResultAwaitedDrillDown($params);
     }
 
     public function getFilterSampleResultAwaitedDetails($parameters)
     {
-        $sampleDb = $this->sm->get('EidSampleTable');
-        return $sampleDb->fetchFilterSampleResultAwaitedDetails($parameters);
+        return $this->eidSampleTable->fetchFilterSampleResultAwaitedDetails($parameters);
     }
 
     public function generateResultsAwaitedSampleExcel($params)
@@ -806,56 +803,47 @@ class EidSampleService
 
     public function getSampleDetails($params)
     {
-        $sampleDb = $this->sm->get('EidSampleTable');
-        return $sampleDb->fetchSampleDetails($params);
+        return $this->eidSampleTable->fetchSampleDetails($params);
     }
 
     public function getBarSampleDetails($params)
     {
-        $sampleDb = $this->sm->get('EidSampleTable');
-        return $sampleDb->fetchBarSampleDetails($params);
+        return $this->eidSampleTable->fetchBarSampleDetails($params);
     }
 
     public function getLabFilterSampleDetails($parameters)
     {
-        $sampleDb = $this->sm->get('EidSampleTable');
-        return $sampleDb->fetchLabFilterSampleDetails($parameters);
+        return $this->eidSampleTable->fetchLabFilterSampleDetails($parameters);
     }
 
     public function getFilterSampleDetails($parameters)
     {
-        $sampleDb = $this->sm->get('EidSampleTable');
-        return $sampleDb->fetchFilterSampleDetails($parameters);
+        return $this->eidSampleTable->fetchFilterSampleDetails($parameters);
     }
 
     public function getFilterSampleTatDetails($parameters)
     {
-        $sampleDb = $this->sm->get('EidSampleTable');
-        return $sampleDb->fetchFilterSampleTatDetails($parameters);
+        return $this->eidSampleTable->fetchFilterSampleTatDetails($parameters);
     }
 
     public function getLabSampleDetails($params)
     {
-        $sampleDb = $this->sm->get('EidSampleTable');
-        return $sampleDb->fetchLabSampleDetails($params);
+        return $this->eidSampleTable->fetchLabSampleDetails($params);
     }
 
     public function getLabBarSampleDetails($params)
     {
-        $sampleDb = $this->sm->get('EidSampleTable');
-        return $sampleDb->fetchLabBarSampleDetails($params);
+        return $this->eidSampleTable->fetchLabBarSampleDetails($params);
     }
 
     public function getIncompleteSampleDetails($params)
     {
-        $sampleDb = $this->sm->get('EidSampleTable');
-        return $sampleDb->fetchIncompleteSampleDetails($params);
+        return $this->eidSampleTable->fetchIncompleteSampleDetails($params);
     }
 
     public function getIncompleteBarSampleDetails($params)
     {
-        $sampleDb = $this->sm->get('EidSampleTable');
-        return $sampleDb->fetchIncompleteBarSampleDetails($params);
+        return $this->eidSampleTable->fetchIncompleteBarSampleDetails($params);
     }
 
     public function getSampleInfo($params, $dashTable = 'dash_form_eid')
@@ -889,9 +877,6 @@ class EidSampleService
                 $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
                 if (isset($sResult) && count($sResult) > 0) {
                     $excel = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
-                    // $cacheMethod = \PhpOffice\PhpSpreadsheet\Collection\CellsFactory::cache_to_phpTemp;
-                    // $cacheSettings = array('memoryCacheSize' => '80MB');
-                    // \PhpOffice\PhpSpreadsheet\Settings::setCacheStorageMethod($cacheMethod, $cacheSettings);
                     $sheet = $excel->getActiveSheet();
                     $output = array();
                     foreach ($sResult as $aRow) {
@@ -944,12 +929,7 @@ class EidSampleService
                     $sheet->setCellValue('E1', html_entity_decode($translator->translate('Date Tested'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
                     $sheet->setCellValue('F1', html_entity_decode($translator->translate('Result'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
 
-                    $sheet->getStyle('A1')->applyFromArray($styleArray);
-                    $sheet->getStyle('B1')->applyFromArray($styleArray);
-                    $sheet->getStyle('C1')->applyFromArray($styleArray);
-                    $sheet->getStyle('D1')->applyFromArray($styleArray);
-                    $sheet->getStyle('E1')->applyFromArray($styleArray);
-                    $sheet->getStyle('F1')->applyFromArray($styleArray);
+                    $sheet->getStyle('A1:F1')->applyFromArray($styleArray);
                     $currentRow = 2;
                     $endColumn = 5;
                     foreach ($output as $rowData) {
@@ -992,8 +972,7 @@ class EidSampleService
 
     public function getVlOutComes($params)
     {
-        $sampleDb = $this->sm->get('EidSampleTable');
-        return $sampleDb->getVlOutComes($params);
+        return $this->eidSampleTable->getVlOutComes($params);
     }
 
     public function generateLabTestedSampleExcel($params)
@@ -1116,52 +1095,44 @@ class EidSampleService
 
     public function getEidOutcomesByAgeInLabsDetails($params)
     {
-        $eidSampleDb = $this->sm->get('EidSampleTableWithoutCache');
-        return $eidSampleDb->fetchEidOutcomesByAgeInLabsDetails($params);
+        return $this->eidSampleTable->fetchEidOutcomesByAgeInLabsDetails($params);
     }
 
     public function getEidPositivityRateDetails($params)
     {
-        $eidSampleDb = $this->sm->get('EidSampleTableWithoutCache');
-        return $eidSampleDb->fetchEidPositivityRateDetails($params);
+        return $this->eidSampleTable->fetchEidPositivityRateDetails($params);
     }
 
     //clinic details start
     public function getOverallEidResult($params)
     {
-        $sampleDb = $this->sm->get('EidSampleTableWithoutCache');
-        return $sampleDb->fetchOverallEidResult($params);
+        return $this->eidSampleTable->fetchOverallEidResult($params);
     }
 
     public function getViralLoadStatusBasedOnGender($params)
     {
-        $sampleDb = $this->sm->get('EidSampleTableWithoutCache');
-        return $sampleDb->fetchViralLoadStatusBasedOnGender($params);
+        return $this->eidSampleTable->fetchViralLoadStatusBasedOnGender($params);
     }
 
 
     public function getClinicSampleTestedResultAgeGroupDetails($params)
     {
-        $sampleDb = $this->sm->get('EidSampleTableWithoutCache');
-        return $sampleDb->fetchClinicSampleTestedResultAgeGroupDetails($params);
+        return $this->eidSampleTable->fetchClinicSampleTestedResultAgeGroupDetails($params);
     }
 
     public function fetchSampleTestedReason($params)
     {
-        $sampleDb = $this->sm->get('EidSampleTableWithoutCache');
-        return $sampleDb->fetchSampleTestedReason($params);
+        return $this->eidSampleTable->fetchSampleTestedReason($params);
     }
 
     public function getClinicSampleTestedResults($params, $sampleType)
     {
-        $sampleDb = $this->sm->get('EidSampleTableWithoutCache');
-        return $sampleDb->fetchClinicSampleTestedResults($params, $sampleType);
+        return $this->eidSampleTable->fetchClinicSampleTestedResults($params, $sampleType);
     }
 
     public function getAllTestResults($parameters)
     {
-        $sampleDb = $this->sm->get('EidSampleTableWithoutCache');
-        return $sampleDb->fetchAllTestResults($parameters);
+        return $this->eidSampleTable->fetchAllTestResults($parameters);
     }
 
     public function generateHighVlSampleResultExcel($params)
@@ -1177,9 +1148,6 @@ class EidSampleService
                 $sResult = $dbAdapter->query($hQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
                 if (isset($sResult) && count($sResult) > 0) {
                     $excel = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
-                    // $cacheMethod = \PhpOffice\PhpSpreadsheet\Collection\CellsFactory::cache_to_phpTemp;
-                    // $cacheSettings = array('memoryCacheSize' => '80MB');
-                    // \PhpOffice\PhpSpreadsheet\Settings::setCacheStorageMethod($cacheMethod, $cacheSettings);
                     $sheet = $excel->getActiveSheet();
                     $output = array();
                     $i = 1;
@@ -1422,7 +1390,7 @@ class EidSampleService
             }
             foreach ($params['data'] as $key => $row) {
                 // Debug::dump($row);die;
-                if (!empty(trim($row['sample_code'])) && trim($params['api_version']) == $config['defaults']['eid-api-version']) {
+                if (!empty(trim($row['sample_code'])) && trim($params['api_version']) == $this->config['defaults']['eid-api-version']) {
                     $sampleCode = trim($row['sample_code']);
                     $remoteSampleCode = trim($row['remote_sample_code']);
                     $instanceCode = 'api-data';

@@ -1169,9 +1169,9 @@ class CommonService
                               $color[]['color'] = $_color;
 
                               $row[] = (isset($aRow['labName']) && !empty($aRow['labName'])) ? ucwords($aRow['labName']) : "";
-                              $row[] = (isset($aRow['latest']) && !empty($aRow['latest'])) ? $this->humanReadableDateFormat($aRow['latest']) : "";
-                              $row[] = (isset($aRow['dashLastResultsSync']) && !empty($aRow['dashLastResultsSync'])) ? $this->humanReadableDateFormat($aRow['dashLastResultsSync']) : "";
-                              $row[] = (isset($aRow['dashLastRequestsSync']) && !empty($aRow['dashLastRequestsSync'])) ? $this->humanReadableDateFormat($aRow['dashLastRequestsSync']) : "";
+                              $row[] = (isset($aRow['latest']) && !empty($aRow['latest'])) ? self::humanReadableDateFormat($aRow['latest']) : "";
+                              $row[] = (isset($aRow['dashLastResultsSync']) && !empty($aRow['dashLastResultsSync'])) ? self::humanReadableDateFormat($aRow['dashLastResultsSync']) : "";
+                              $row[] = (isset($aRow['dashLastRequestsSync']) && !empty($aRow['dashLastRequestsSync'])) ? self::humanReadableDateFormat($aRow['dashLastRequestsSync']) : "";
                               $output[] = $row;
                          }
                          $styleArray = array(

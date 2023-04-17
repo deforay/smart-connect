@@ -25,7 +25,7 @@ class SampleTable extends AbstractTableGateway
 
     protected $table = 'dash_form_vl';
     public $sm = null;
-    public $config = null;
+    public array $config;
     protected $dbsId = null;
     protected $plasmaId = null;
     protected $mappedFacilities = null;

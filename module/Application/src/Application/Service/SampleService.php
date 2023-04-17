@@ -11,7 +11,8 @@ use JsonMachine\JsonMachine;
 class SampleService
 {
 
-    public $sm = null;
+    public $sm;
+    /** @var \Application\Model\SampleTable $sampleTable */
     public $sampleTable;
     public $config;
 
@@ -103,7 +104,8 @@ class SampleService
     public function checkSampleRejectionReason($rejectReasonName)
     {
         $sql = new Sql($this->dbAdapter);
-        $sQuery = $sql->select()->from('r_vl_sample_rejection_reasons')->where(array('rejection_reason_name' => $rejectReasonName));
+        $sQuery = $sql->select()->from('r_vl_sample_rejection_reasons')
+            ->where(array('rejection_reason_name' => $rejectReasonName));
         $sQueryStr = $sql->buildSqlString($sQuery);
         return $this->dbAdapter->query($sQueryStr, $this->dbAdapter::QUERY_MODE_EXECUTE)->current();
     }
@@ -111,15 +113,25 @@ class SampleService
     public function checkTestReason($reasonName)
     {
 
-        if (empty(trim($reasonName))) return null;
+        if (empty(trim($reasonName))) {
+            return null;
+        }
 
         $testReasonDb = $this->sm->get('TestReasonTable');
         $sResult = $testReasonDb->select(array('test_reason_name' => $reasonName))->toArray();
         if ($sResult) {
-            $testReasonDb->update(array('test_reason_name' => trim($reasonName)), array('test_reason_id' => $sResult['test_reason_id']));
+            $testReasonDb->update(
+                array('test_reason_name' => trim($reasonName)),
+                array('test_reason_id' => $sResult['test_reason_id'])
+            );
             return $sResult['test_reason_id'];
         } else {
-            $testReasonDb->insert(array('test_reason_name' => trim($reasonName), 'test_reason_status' => 'active', 'updated_datetime' => new Expression('NOW()')));
+            $data = array(
+                'test_reason_name' => trim($reasonName),
+                'test_reason_status' => 'active',
+                'updated_datetime' => new Expression('NOW()')
+            );
+            $testReasonDb->insert($data);
             return $testReasonDb->lastInsertValue;
         }
     }
@@ -174,7 +186,6 @@ class SampleService
         return $this->sampleTable->fetchSampleTestedResultBreastfeedingPatientDetails($params);
     }
 
-    //get Requisition Forms tested
     public function getRequisitionFormsTested($params)
     {
         return $this->sampleTable->getRequisitionFormsTested($params);
