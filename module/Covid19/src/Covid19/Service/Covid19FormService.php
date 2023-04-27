@@ -11,11 +11,13 @@ use Laminas\Db\Sql\Expression;
 use Application\Service\CommonService;
 use \PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Exception;
+use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 
 class Covid19FormService
 {
 
     public $sm = null;
+    public $config = null;
     protected $translator = null;
     protected \Application\Service\CommonService $commonService;
 
@@ -32,6 +34,8 @@ class Covid19FormService
         ini_set('memory_limit', -1);
         try {
             $apiData = array();
+
+            $dashDb = $this->sm->get('DashApiReceiverStatsTable');
             $apiTrackDb = $this->sm->get('DashApiReceiverStatsTable');
 
             $this->config = $this->sm->get('Config');
@@ -82,17 +86,20 @@ class Covid19FormService
                         $data[$colName] = null;
                     }
                 }
+                $currentDateTime = CommonService::getDateTime();
+                $data['last_modified_datetime'] = $currentDateTime;
 
                 try {
+                    
                     $id = $sampleDb->insertOrUpdate($data);
                     if (isset($id) && !empty($id) && is_numeric($id)) {
-                        $dashDb = $this->sm->get('DashApiReceiverStatsTable');
                         $params = array(
                             "table" => "dash_form_covid19",
                             "field" => "covid19_id",
                             "id" => $id
                         );
-                        $dashDb->updateAttributes($params);
+                        //$dashDb->updateFormAttributes($params, $currentDateTime);
+                        $dashDb->updateFacilityAttributes($data['facility_id'], $currentDateTime);
                     }
                     $numRows++;
                 } catch (Exception $exc) {
@@ -255,7 +262,7 @@ class Covid19FormService
                                     $data['facility_id'] = $facilityDb->lastInsertValue;
                                 }
                             } else {
-                                $data['facility_id'] = NULL;
+                                $data['facility_id'] = null;
                             }
 
                             $labData = array(
@@ -340,7 +347,7 @@ class Covid19FormService
                                     $data['reason_for_sample_rejection'] = $sampleRjtReasonDb->lastInsertValue;
                                 }
                             } else {
-                                $data['reason_for_sample_rejection'] = NULL;
+                                $data['reason_for_sample_rejection'] = null;
                             }
                             // Debug::dump($data);die;
                             //check existing sample code
@@ -613,11 +620,11 @@ class Covid19FormService
                         )
                     );
                     $eRow = 0;
-                    $sheet->setCellValue('A1', html_entity_decode($this->translator->translate('Months'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+                    $sheet->setCellValue('A1', html_entity_decode($this->translator->translate('Months'), ENT_QUOTES, 'UTF-8'));
                     foreach ($keySummaryIndicators['month'] as $key => $month) {
                         $colNo = $key + 1;
                         $currentRow = 1;
-                        $sheet->getCellByColumnAndRow($colNo, $currentRow)->setValueExplicit(html_entity_decode($month, ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+                        $sheet->getCellByColumnAndRow($colNo, $currentRow)->setValueExplicit(html_entity_decode($month, ENT_QUOTES, 'UTF-8'));
                         $cellName = $sheet->getCellByColumnAndRow($colNo, $currentRow)->getColumn();
                         $sheet->getStyle($cellName . $currentRow)->applyFromArray($styleArray);
                     }
@@ -641,14 +648,10 @@ class Covid19FormService
                                 $value = "";
                             }
 
-                            if (is_numeric($value)) {
-                                $sheet->getCellByColumnAndRow($colNo, $currentRow)->setValueExplicit(html_entity_decode($value, ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_NUMERIC);
-                            } else {
-                                $sheet->getCellByColumnAndRow($colNo, $currentRow)->setValueExplicit(html_entity_decode($value, ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                            }
-                            $cellName = $sheet->getCellByColumnAndRow($colNo, $currentRow)->getColumn();
-                            $sheet->getStyle($cellName . $currentRow)->applyFromArray($borderStyle);
-                            $sheet->getStyleByColumnAndRow($colNo, $currentRow)->getAlignment()->setWrapText(true);
+                            $sheet->setCellValue(Coordinate::stringFromColumnIndex($colNo) . $currentRow, html_entity_decode($value, ENT_QUOTES, 'UTF-8'));
+                            // $cellName = $sheet->getCellByColumnAndRow($colNo, $currentRow)->getColumn();
+                            // $sheet->getStyle($cellName . $currentRow)->applyFromArray($borderStyle);
+                            // $sheet->getStyleByColumnAndRow($colNo, $currentRow)->getAlignment()->setWrapText(true);
                             $colNo++;
                         }
                         $currentRow++;
@@ -762,14 +765,14 @@ class Covid19FormService
                     )
                 );
 
-                $sheet->setCellValue('A1', html_entity_decode($this->translator->translate('Facility'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                $sheet->setCellValue('B1', html_entity_decode($this->translator->translate('Province'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                $sheet->setCellValue('C1', html_entity_decode($this->translator->translate('District/County'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                $sheet->setCellValue('D1', html_entity_decode($this->translator->translate('Valid Results'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                $sheet->setCellValue('E1', html_entity_decode($this->translator->translate('Positive Results'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                $sheet->setCellValue('F1', html_entity_decode($this->translator->translate('Negative Results'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                $sheet->setCellValue('G1', html_entity_decode($this->translator->translate('Samples Rejected in %'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                $sheet->setCellValue('H1', html_entity_decode($this->translator->translate('Positive Rate in %'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+                $sheet->setCellValue('A1', html_entity_decode($this->translator->translate('Facility'), ENT_QUOTES, 'UTF-8'));
+                $sheet->setCellValue('B1', html_entity_decode($this->translator->translate('Province'), ENT_QUOTES, 'UTF-8'));
+                $sheet->setCellValue('C1', html_entity_decode($this->translator->translate('District/County'), ENT_QUOTES, 'UTF-8'));
+                $sheet->setCellValue('D1', html_entity_decode($this->translator->translate('Valid Results'), ENT_QUOTES, 'UTF-8'));
+                $sheet->setCellValue('E1', html_entity_decode($this->translator->translate('Positive Results'), ENT_QUOTES, 'UTF-8'));
+                $sheet->setCellValue('F1', html_entity_decode($this->translator->translate('Negative Results'), ENT_QUOTES, 'UTF-8'));
+                $sheet->setCellValue('G1', html_entity_decode($this->translator->translate('Samples Rejected in %'), ENT_QUOTES, 'UTF-8'));
+                $sheet->setCellValue('H1', html_entity_decode($this->translator->translate('Positive Rate in %'), ENT_QUOTES, 'UTF-8'));
 
                 $sheet->getStyle('A1')->applyFromArray($styleArray);
                 $sheet->getStyle('B1')->applyFromArray($styleArray);
@@ -790,16 +793,12 @@ class Covid19FormService
                         // if ($colNo > 5) {
                         //     break;
                         // }
-                        if (is_numeric($value)) {
-                            $sheet->getCellByColumnAndRow($colNo, $currentRow)->setValueExplicit(html_entity_decode($value, ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_NUMERIC);
-                        } else {
-                            $sheet->getCellByColumnAndRow($colNo, $currentRow)->setValueExplicit(html_entity_decode($value, ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                        }
-                        $cellName = $sheet->getCellByColumnAndRow($colNo, $currentRow)->getColumn();
-                        $sheet->getStyle($cellName . $currentRow)->applyFromArray($borderStyle);
-                        $sheet->getDefaultRowDimension()->setRowHeight(20);
-                        $sheet->getColumnDimensionByColumn($colNo)->setWidth(20);
-                        $sheet->getStyleByColumnAndRow($colNo, $currentRow)->getAlignment()->setWrapText(true);
+                        $sheet->setCellValue(Coordinate::stringFromColumnIndex($colNo) . $currentRow, html_entity_decode($value, ENT_QUOTES, 'UTF-8'));
+                        // $cellName = $sheet->getCellByColumnAndRow($colNo, $currentRow)->getColumn();
+                        // $sheet->getStyle($cellName . $currentRow)->applyFromArray($borderStyle);
+                        // $sheet->getDefaultRowDimension()->setRowHeight(20);
+                        // $sheet->getColumnDimensionByColumn($colNo)->setWidth(20);
+                        // $sheet->getStyleByColumnAndRow($colNo, $currentRow)->getAlignment()->setWrapText(true);
                         $colNo++;
                     }
                     $currentRow++;
@@ -1090,12 +1089,12 @@ class Covid19FormService
                         )
                     );
 
-                    $sheet->setCellValue('A1', html_entity_decode($translator->translate('Sample ID'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('B1', html_entity_decode($translator->translate('Collection Date'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('C1', html_entity_decode($translator->translate('Facility'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('D1', html_entity_decode($translator->translate('Sample Type'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('E1', html_entity_decode($translator->translate('Lab'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('F1', html_entity_decode($translator->translate('Sample Received at Lab'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+                    $sheet->setCellValue('A1', html_entity_decode($translator->translate('Sample ID'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->setCellValue('B1', html_entity_decode($translator->translate('Collection Date'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->setCellValue('C1', html_entity_decode($translator->translate('Facility'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->setCellValue('D1', html_entity_decode($translator->translate('Sample Type'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->setCellValue('E1', html_entity_decode($translator->translate('Lab'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->setCellValue('F1', html_entity_decode($translator->translate('Sample Received at Lab'), ENT_QUOTES, 'UTF-8'));
 
                     $sheet->getStyle('A1')->applyFromArray($styleArray);
                     $sheet->getStyle('B1')->applyFromArray($styleArray);
@@ -1114,14 +1113,10 @@ class Covid19FormService
                             if ($colNo > 5) {
                                 break;
                             }
-                            if (is_numeric($value)) {
-                                $sheet->getCellByColumnAndRow($colNo, $currentRow)->setValueExplicit(html_entity_decode($value, ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_NUMERIC);
-                            } else {
-                                $sheet->getCellByColumnAndRow($colNo, $currentRow)->setValueExplicit(html_entity_decode($value, ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                            }
-                            $cellName = $sheet->getCellByColumnAndRow($colNo, $currentRow)->getColumn();
-                            $sheet->getStyle($cellName . $currentRow)->applyFromArray($borderStyle);
-                            $sheet->getStyleByColumnAndRow($colNo, $currentRow)->getAlignment()->setWrapText(true);
+                            $sheet->setCellValue(Coordinate::stringFromColumnIndex($colNo) . $currentRow, html_entity_decode($value, ENT_QUOTES, 'UTF-8'));
+                            // $cellName = $sheet->getCellByColumnAndRow($colNo, $currentRow)->getColumn();
+                            // $sheet->getStyle($cellName . $currentRow)->applyFromArray($borderStyle);
+                            // $sheet->getStyleByColumnAndRow($colNo, $currentRow)->getAlignment()->setWrapText(true);
                             $colNo++;
                         }
                         $currentRow++;
@@ -1276,18 +1271,18 @@ class Covid19FormService
                         )
                     );
 
-                    $sheet->setCellValue('A1', html_entity_decode($translator->translate('Sample ID'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('B1', html_entity_decode($translator->translate('Facility Name'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('C1', html_entity_decode($translator->translate('Date Collected'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+                    $sheet->setCellValue('A1', html_entity_decode($translator->translate('Sample ID'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->setCellValue('B1', html_entity_decode($translator->translate('Facility Name'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->setCellValue('C1', html_entity_decode($translator->translate('Date Collected'), ENT_QUOTES, 'UTF-8'));
                     if (trim($params['result']) == '') {
-                        $sheet->setCellValue('D1', html_entity_decode($translator->translate('Rejection Reason'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                        $sheet->setCellValue('E1', html_entity_decode($translator->translate('Date Tested'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                        $sheet->setCellValue('F1', html_entity_decode($translator->translate('Viral Load(cp/ml)'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+                        $sheet->setCellValue('D1', html_entity_decode($translator->translate('Rejection Reason'), ENT_QUOTES, 'UTF-8'));
+                        $sheet->setCellValue('E1', html_entity_decode($translator->translate('Date Tested'), ENT_QUOTES, 'UTF-8'));
+                        $sheet->setCellValue('F1', html_entity_decode($translator->translate('Viral Load(cp/ml)'), ENT_QUOTES, 'UTF-8'));
                     } else if (trim($params['result']) == 'result') {
-                        $sheet->setCellValue('D1', html_entity_decode($translator->translate('Date Tested'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                        $sheet->setCellValue('E1', html_entity_decode($translator->translate('Viral Load(cp/ml)'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+                        $sheet->setCellValue('D1', html_entity_decode($translator->translate('Date Tested'), ENT_QUOTES, 'UTF-8'));
+                        $sheet->setCellValue('E1', html_entity_decode($translator->translate('Viral Load(cp/ml)'), ENT_QUOTES, 'UTF-8'));
                     } else if (trim($params['result']) == 'rejected') {
-                        $sheet->setCellValue('D1', html_entity_decode($translator->translate('Rejection Reason'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+                        $sheet->setCellValue('D1', html_entity_decode($translator->translate('Rejection Reason'), ENT_QUOTES, 'UTF-8'));
                     }
 
                     $sheet->getStyle('A1')->applyFromArray($styleArray);
@@ -1321,14 +1316,10 @@ class Covid19FormService
                             if ($colNo > $endColumn) {
                                 break;
                             }
-                            if (is_numeric($value)) {
-                                $sheet->getCellByColumnAndRow($colNo, $currentRow)->setValueExplicit(html_entity_decode($value, ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_NUMERIC);
-                            } else {
-                                $sheet->getCellByColumnAndRow($colNo, $currentRow)->setValueExplicit(html_entity_decode($value, ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                            }
-                            $cellName = $sheet->getCellByColumnAndRow($colNo, $currentRow)->getColumn();
-                            $sheet->getStyle($cellName . $currentRow)->applyFromArray($borderStyle);
-                            $sheet->getStyleByColumnAndRow($colNo, $currentRow)->getAlignment()->setWrapText(true);
+                            $sheet->setCellValue(Coordinate::stringFromColumnIndex($colNo) . $currentRow, html_entity_decode($value, ENT_QUOTES, 'UTF-8'));
+                            // $cellName = $sheet->getCellByColumnAndRow($colNo, $currentRow)->getColumn();
+                            // $sheet->getStyle($cellName . $currentRow)->applyFromArray($borderStyle);
+                            // $sheet->getStyleByColumnAndRow($colNo, $currentRow)->getAlignment()->setWrapText(true);
                             $colNo++;
                         }
                         $currentRow++;
@@ -1416,15 +1407,15 @@ class Covid19FormService
                         )
                     );
 
-                    $sheet->setCellValue('A1', html_entity_decode($translator->translate('Date'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('B1', html_entity_decode($translator->translate('Samples Collected'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('C1', html_entity_decode($translator->translate('Samples Tested'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('D1', html_entity_decode($translator->translate('Samples Pending'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('E1', html_entity_decode($translator->translate('Samples Suppressed'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('F1', html_entity_decode($translator->translate('Samples Not Suppressed'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('G1', html_entity_decode($translator->translate('Samples Rejected'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('H1', html_entity_decode($translator->translate('Sample Type'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('I1', html_entity_decode($translator->translate('Clinics'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+                    $sheet->setCellValue('A1', html_entity_decode($translator->translate('Date'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->setCellValue('B1', html_entity_decode($translator->translate('Samples Collected'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->setCellValue('C1', html_entity_decode($translator->translate('Samples Tested'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->setCellValue('D1', html_entity_decode($translator->translate('Samples Pending'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->setCellValue('E1', html_entity_decode($translator->translate('Samples Suppressed'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->setCellValue('F1', html_entity_decode($translator->translate('Samples Not Suppressed'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->setCellValue('G1', html_entity_decode($translator->translate('Samples Rejected'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->setCellValue('H1', html_entity_decode($translator->translate('Sample Type'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->setCellValue('I1', html_entity_decode($translator->translate('Clinics'), ENT_QUOTES, 'UTF-8'));
 
                     $sheet->getStyle('A1')->applyFromArray($styleArray);
                     $sheet->getStyle('B1')->applyFromArray($styleArray);
@@ -1446,14 +1437,10 @@ class Covid19FormService
                             if ($colNo > 8) {
                                 break;
                             }
-                            if (is_numeric($value)) {
-                                $sheet->getCellByColumnAndRow($colNo, $currentRow)->setValueExplicit(html_entity_decode($value, ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_NUMERIC);
-                            } else {
-                                $sheet->getCellByColumnAndRow($colNo, $currentRow)->setValueExplicit(html_entity_decode($value, ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                            }
-                            $cellName = $sheet->getCellByColumnAndRow($colNo, $currentRow)->getColumn();
-                            $sheet->getStyle($cellName . $currentRow)->applyFromArray($borderStyle);
-                            $sheet->getStyleByColumnAndRow($colNo, $currentRow)->getAlignment()->setWrapText(true);
+                            $sheet->setCellValue(Coordinate::stringFromColumnIndex($colNo) . $currentRow, html_entity_decode($value, ENT_QUOTES, 'UTF-8'));
+                            // $cellName = $sheet->getCellByColumnAndRow($colNo, $currentRow)->getColumn();
+                            // $sheet->getStyle($cellName . $currentRow)->applyFromArray($borderStyle);
+                            // $sheet->getStyleByColumnAndRow($colNo, $currentRow)->getAlignment()->setWrapText(true);
                             $colNo++;
                         }
                         $currentRow++;
@@ -1582,7 +1569,7 @@ class Covid19FormService
                             $data['facility_id'] = $facilityDb->lastInsertValue;
                         }
                     } else {
-                        $data['facility_id'] = NULL;
+                        $data['facility_id'] = null;
                     }
 
                     //check lab details
@@ -1614,7 +1601,7 @@ class Covid19FormService
                             $data['reason_for_sample_rejection'] = $covid19SampleRejectionDb->lastInsertValue;
                         }
                     } else {
-                        $data['reason_for_sample_rejection'] = NULL;
+                        $data['reason_for_sample_rejection'] = null;
                     }
 
                     //check existing sample code
@@ -1673,12 +1660,7 @@ class Covid19FormService
             'lab_id'                        => $data['lab_id'],
             'status'                        => $status
         );
-        $trackResult = $apiTrackDb->select(array('tracking_id' => $params['timestamp']))->current();
-        if ($trackResult) {
-            $apiTrackDb->update($apiTrackData, array('api_id' => $trackResult['api_id']));
-        } else {
-            $apiTrackDb->insert($apiTrackData);
-        }
+        $apiTrackDb->insert($apiTrackData);
 
         return $response;
     }

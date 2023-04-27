@@ -16,8 +16,8 @@ return [
         'host' => 'smtp.gmail.com',
         'config' => [
             'port' => 587,
-            'username' => 'caribbeanept@gmail.com',
-            'password' => 'iybymjnrstjzmobg',
+            'username' => '',
+            'password' => '',
             'ssl' => 'tls',
             'auth' => 'login',
         ],

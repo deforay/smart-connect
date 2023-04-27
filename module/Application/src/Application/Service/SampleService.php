@@ -7,6 +7,7 @@ use Laminas\Db\Sql\Sql;
 use Laminas\Db\Sql\Expression;
 use Exception;
 use JsonMachine\JsonMachine;
+use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 
 class SampleService
 {
@@ -506,14 +507,9 @@ class SampleService
                             if ($colNo > $endColumn) {
                                 break;
                             }
-                            if (is_numeric($value)) {
-                                $sheet->getCellByColumnAndRow($colNo, $currentRow)->setValueExplicit(html_entity_decode($value, ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_NUMERIC);
-                            } else {
-                                $sheet->getCellByColumnAndRow($colNo, $currentRow)->setValueExplicit(html_entity_decode($value, ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                            }
-                            $cellName = $sheet->getCellByColumnAndRow($colNo, $currentRow)->getColumn();
-                            $sheet->getStyle($cellName . $currentRow)->applyFromArray($borderStyle);
-                            $sheet->getStyleByColumnAndRow($colNo, $currentRow)->getAlignment()->setWrapText(true);
+                            $sheet->setCellValue(Coordinate::stringFromColumnIndex($colNo) . $currentRow, html_entity_decode($value, ENT_QUOTES, 'UTF-8'));
+                            // $sheet->getStyle(Coordinate::stringFromColumnIndex($colNo) . $currentRow)->applyFromArray($borderStyle);
+                            // $sheet->getStyle(Coordinate::stringFromColumnIndex($colNo) . $currentRow)->getAlignment()->setWrapText(true);
                             $colNo++;
                         }
                         $currentRow++;
@@ -686,14 +682,9 @@ class SampleService
                             if (!isset($value)) {
                                 $value = "";
                             }
-                            if (is_numeric($value)) {
-                                $sheet->getCellByColumnAndRow($colNo, $currentRow)->setValueExplicit(html_entity_decode($value, ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_NUMERIC);
-                            } else {
-                                $sheet->getCellByColumnAndRow($colNo, $currentRow)->setValueExplicit(html_entity_decode($value, ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                            }
-                            $cellName = $sheet->getCellByColumnAndRow($colNo, $currentRow)->getColumn();
-                            $sheet->getStyle($cellName . $currentRow)->applyFromArray($borderStyle);
-                            $sheet->getStyleByColumnAndRow($colNo, $currentRow)->getAlignment()->setWrapText(true);
+                            $sheet->setCellValue(Coordinate::stringFromColumnIndex($colNo) . $currentRow, html_entity_decode($value, ENT_QUOTES, 'UTF-8'));
+                            $sheet->getStyle(Coordinate::stringFromColumnIndex($colNo) . $currentRow)->applyFromArray($borderStyle);
+                            $sheet->getStyle(Coordinate::stringFromColumnIndex($colNo) . $currentRow)->getAlignment()->setWrapText(true);
                             $colNo++;
                         }
                         $currentRow++;
@@ -796,16 +787,11 @@ class SampleService
                                 if ($colNo > 6) {
                                     break;
                                 }
-                                if (is_numeric($value)) {
-                                    $sheet->getCellByColumnAndRow($colNo, $currentRow)->setValueExplicit(html_entity_decode($value, ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_NUMERIC);
-                                } else {
-                                    $sheet->getCellByColumnAndRow($colNo, $currentRow)->setValueExplicit(html_entity_decode($value, ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                                }
-                                $cellName = $sheet->getCellByColumnAndRow($colNo, $currentRow)->getColumn();
-                                $sheet->getStyle($cellName . $currentRow)->applyFromArray($borderStyle);
-                                $sheet->getDefaultRowDimension()->setRowHeight(20);
-                                $sheet->getColumnDimensionByColumn($colNo)->setWidth(20);
-                                $sheet->getStyleByColumnAndRow($colNo, $currentRow)->getAlignment()->setWrapText(true);
+                                $sheet->setCellValue(Coordinate::stringFromColumnIndex($colNo) . $currentRow, html_entity_decode($value, ENT_QUOTES, 'UTF-8'));
+                                $sheet->getStyle(Coordinate::stringFromColumnIndex($colNo) . $currentRow)->applyFromArray($borderStyle);
+                                // $sheet->getDefaultRowDimension()->setRowHeight(20);
+                                // $sheet->getColumnDimensionByColumn($colNo)->setWidth(20);
+                                // $sheet->getStyleByColumnAndRow($colNo, $currentRow)->getAlignment()->setWrapText(true);
                                 $colNo++;
                             }
                             $currentRow++;
@@ -912,14 +898,10 @@ class SampleService
                             if ($colNo > 8) {
                                 break;
                             }
-                            if (is_numeric($value)) {
-                                $sheet->getCellByColumnAndRow($colNo, $currentRow)->setValueExplicit(html_entity_decode($value, ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_NUMERIC);
-                            } else {
-                                $sheet->getCellByColumnAndRow($colNo, $currentRow)->setValueExplicit(html_entity_decode($value, ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                            }
-                            $cellName = $sheet->getCellByColumnAndRow($colNo, $currentRow)->getColumn();
-                            $sheet->getStyle($cellName . $currentRow)->applyFromArray($borderStyle);
-                            $sheet->getStyleByColumnAndRow($colNo, $currentRow)->getAlignment()->setWrapText(true);
+                            $sheet->setCellValue(Coordinate::stringFromColumnIndex($colNo) . $currentRow, html_entity_decode($value, ENT_QUOTES, 'UTF-8'));
+                            // $cellName = $sheet->getCellByColumnAndRow($colNo, $currentRow)->getColumn();
+                            // $sheet->getStyle($cellName . $currentRow)->applyFromArray($borderStyle);
+                            // $sheet->getStyleByColumnAndRow($colNo, $currentRow)->getAlignment()->setWrapText(true);
                             $colNo++;
                         }
                         $currentRow++;
@@ -1020,14 +1002,10 @@ class SampleService
                             if ($colNo > 7) {
                                 break;
                             }
-                            if (is_numeric($value)) {
-                                $sheet->getCellByColumnAndRow($colNo, $currentRow)->setValueExplicit(html_entity_decode($value, ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_NUMERIC);
-                            } else {
-                                $sheet->getCellByColumnAndRow($colNo, $currentRow)->setValueExplicit(html_entity_decode($value, ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                            }
-                            $cellName = $sheet->getCellByColumnAndRow($colNo, $currentRow)->getColumn();
-                            $sheet->getStyle($cellName . $currentRow)->applyFromArray($borderStyle);
-                            $sheet->getStyleByColumnAndRow($colNo, $currentRow)->getAlignment()->setWrapText(true);
+                            $sheet->setCellValue(Coordinate::stringFromColumnIndex($colNo) . $currentRow, html_entity_decode($value, ENT_QUOTES, 'UTF-8'));
+                            // $cellName = $sheet->getCellByColumnAndRow($colNo, $currentRow)->getColumn();
+                            // $sheet->getStyle($cellName . $currentRow)->applyFromArray($borderStyle);
+                            // $sheet->getStyleByColumnAndRow($colNo, $currentRow)->getAlignment()->setWrapText(true);
                             $colNo++;
                         }
                         $currentRow++;
@@ -1157,14 +1135,10 @@ class SampleService
                             if ($colNo > 5) {
                                 break;
                             }
-                            if (is_numeric($value)) {
-                                $sheet->getCellByColumnAndRow($colNo, $currentRow)->setValueExplicit(html_entity_decode($value, ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_NUMERIC);
-                            } else {
-                                $sheet->getCellByColumnAndRow($colNo, $currentRow)->setValueExplicit(html_entity_decode($value, ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                            }
-                            $cellName = $sheet->getCellByColumnAndRow($colNo, $currentRow)->getColumn();
-                            $sheet->getStyle($cellName . $currentRow)->applyFromArray($borderStyle);
-                            $sheet->getStyleByColumnAndRow($colNo, $currentRow)->getAlignment()->setWrapText(true);
+                            $sheet->setCellValue(Coordinate::stringFromColumnIndex($colNo) . $currentRow, html_entity_decode($value, ENT_QUOTES, 'UTF-8'));
+                            // $cellName = $sheet->getCellByColumnAndRow($colNo, $currentRow)->getColumn();
+                            // $sheet->getStyle($cellName . $currentRow)->applyFromArray($borderStyle);
+                            // $sheet->getStyleByColumnAndRow($colNo, $currentRow)->getAlignment()->setWrapText(true);
                             $colNo++;
                         }
                         $currentRow++;
@@ -1394,11 +1368,7 @@ class SampleService
     //                         if($colNo > 8){
     //                             break;
     //                         }
-    //                         if (is_numeric($value)) {
-    //                             $sheet->getCellByColumnAndRow($colNo, $currentRow)->setValueExplicit(html_entity_decode($value, ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_NUMERIC);
-    //                         }else{
-    //                             $sheet->getCellByColumnAndRow($colNo, $currentRow)->setValueExplicit(html_entity_decode($value, ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-    //                         }
+    //                          $sheet->setCellValue(Coordinate::stringFromColumnIndex($colNo) . $currentRow, html_entity_decode($value, ENT_QUOTES, 'UTF-8'));
     //                         $cellName = $sheet->getCellByColumnAndRow($colNo, $currentRow)->getColumn();
     //                         $sheet->getStyle($cellName . $currentRow)->applyFromArray($borderStyle);
     //                         $sheet->getDefaultRowDimension()->setRowHeight(20);
@@ -1440,6 +1410,8 @@ class SampleService
 
     public function saveFileFromVlsmAPIV2()
     {
+        //error_log('INSIDE FUNCTION');
+
         ini_set("memory_limit", -1);
         try {
             $apiData = array();
@@ -1460,9 +1432,9 @@ class SampleService
             }
 
 
-
-
             $allColumns = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS where TABLE_SCHEMA = '" . $dbname . "' AND table_name='dash_form_vl'";
+
+            //error_log($allColumns);
 
             $sResult = $this->dbAdapter->query($allColumns, $this->dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             $columnList = array_map('current', $sResult);
@@ -1484,6 +1456,11 @@ class SampleService
 
             /*  echo "<pre>";
             print_r($apiData);die; */
+
+            // ob_start();
+            // var_dump($apiData);
+            // error_log(ob_get_clean());
+
             $numRows = 0;
             $counter = 0;
             foreach ($apiData as $key => $rowData) {
@@ -1503,26 +1480,26 @@ class SampleService
                     }
                 }
                 unset($data['vl_sample_id']);
+
+                $currentDateTime = CommonService::getDateTime();
+                $data['last_modified_datetime'] = $currentDateTime;
+
                 // ob_start();
                 // var_dump($data);
                 // error_log(ob_get_clean());
                 // exit(0);
 
-
-
-                /* $sampleCode = trim($data['sample_code']);
-                $remoteSample = trim($data['remote_sample_code']);
-                $instanceCode = trim($data['vlsm_instance_id']); */
                 try {
+
                     $id = $sampleDb->insertOrUpdate($data);
                     if (isset($id) && !empty($id) && is_numeric($id)) {
-                        $dashDb = $this->sm->get('DashApiReceiverStatsTable');
                         $params = array(
                             "table" => "dash_form_vl",
                             "field" => "vl_sample_id",
                             "id" => $id
                         );
-                        $dashDb->updateAttributes($params);
+                        //$this->apiTrackerTable->updateFormAttributes($params, $currentDateTime);
+                        $this->apiTrackerTable->updateFacilityAttributes($data['facility_id'], $currentDateTime);
                     }
                     $numRows++;
                 } catch (Exception $e) {
@@ -1546,14 +1523,20 @@ class SampleService
 
             $apiTrackData = array(
                 'tracking_id'                   => $timestamp,
-                'received_on'                   => \Application\Service\CommonService::getDateTime(),
+                'received_on'                   => CommonService::getDateTime(),
                 'number_of_records_received'    => $counter,
                 'number_of_records_processed'   => $numRows,
                 'source'                        => 'VLSM-VL',
                 'lab_id'                        => $data['lab_id'],
                 'status'                        => $status
             );
+
+
+
             $this->apiTrackerTable->insert($apiTrackData);
+
+
+            //error_log($numRows . ' uploaded successfully');
 
             return array(
                 'status'    => 'success',
@@ -1617,8 +1600,8 @@ class SampleService
                         $uniqueId = trim($row['unique_id']);
 
                         $VLAnalysisResult = (float) $row['result_value_absolute_decimal'];
-                        $result_value_absolute_decimal = NULL;
-                        $vl_result_category = NULL;
+                        $result_value_absolute_decimal = null;
+                        $vl_result_category = null;
 
                         if (
                             $row['result_value_text'] == 'Target not Detected' || $row['result_value_text'] == 'Target Not Detected' || strtolower($row['result_value_text']) == 'target not detected' || strtolower($row['result_value_text']) == 'tnd'
@@ -1645,8 +1628,8 @@ class SampleService
 
 
                         if ($VLAnalysisResult == 'NULL' || $VLAnalysisResult == '' || $VLAnalysisResult == NULL) {
-                            $result_value_absolute_decimal = NULL;
-                            $vl_result_category = NULL;
+                            $result_value_absolute_decimal = null;
+                            $vl_result_category = null;
                         } else if ($VLAnalysisResult < 1000) {
                             $vl_result_category = 'Suppressed';
                             $result_value_absolute_decimal = $VLAnalysisResult;
@@ -1754,7 +1737,7 @@ class SampleService
                                 $data['facility_id'] = $facilityDb->lastInsertValue;
                             }
                         } else {
-                            $data['facility_id'] = NULL;
+                            $data['facility_id'] = null;
                         }
 
                         $labData = array(
@@ -1851,7 +1834,7 @@ class SampleService
                                 $data['sample_type'] = $sampleTypeDb->lastInsertValue;
                             }
                         } else {
-                            $data['sample_type'] = NULL;
+                            $data['sample_type'] = null;
                         }
                         //check sample rejection reason
                         if (trim($row['rejection_reason_name']) != '') {
@@ -1864,7 +1847,7 @@ class SampleService
                                 $data['reason_for_sample_rejection'] = $sampleRjtReasonDb->lastInsertValue;
                             }
                         } else {
-                            $data['reason_for_sample_rejection'] = NULL;
+                            $data['reason_for_sample_rejection'] = null;
                         }
 
                         //check existing sample code
@@ -1931,8 +1914,8 @@ class SampleService
                 }
 
                 $row['result_value_absolute_decimal'] = $VLAnalysisResult = (float) $row['Result']['Copies'];
-                $result_value_absolute_decimal = NULL;
-                $vl_result_category = NULL;
+                $result_value_absolute_decimal = null;
+                $vl_result_category = null;
 
                 if (strtolower($row['Result']['Raw Data']) == 'target not detected' || strtolower($row['Result']['Copies']) == 'target not detected' || strtolower($row['Result']['Copies']) == 'tnd' || strtolower($row['Result']['Raw Data']) == '< titre min' || strtolower($row['Result']['Copies']) == '< titre min') {
                     $row['result_value_absolute_decimal'] = $VLAnalysisResult = 20;
@@ -1955,8 +1938,8 @@ class SampleService
 
 
                 if ($VLAnalysisResult == 'NULL' || $VLAnalysisResult == '' || $VLAnalysisResult == NULL) {
-                    $result_value_absolute_decimal = NULL;
-                    $vl_result_category = NULL;
+                    $result_value_absolute_decimal = null;
+                    $vl_result_category = null;
                 } else if ($VLAnalysisResult < 1000) {
                     $vl_result_category = 'Suppressed';
                     $result_value_absolute_decimal = $VLAnalysisResult;
@@ -2028,7 +2011,7 @@ class SampleService
                         $data['facility_id'] = $facilityDb->lastInsertValue;
                     }
                 } else {
-                    $data['facility_id'] = NULL;
+                    $data['facility_id'] = null;
                 }
 
                 //check lab details
@@ -2036,7 +2019,7 @@ class SampleService
                 if ($labDataResult) {
                     $data['lab_id'] = $labDataResult['facility_id'];
                 } else {
-                    $data['lab_id'] = NULL;
+                    $data['lab_id'] = null;
                 }
 
                 //check testing reason
@@ -2046,13 +2029,13 @@ class SampleService
                     if ($row['TestStatus'] == 'complete' || $row['TestStatus'] == 'authorized') {
                         $row['TestStatus'] = 'accepted';
                         $data['result_status'] = 7;
-                    } else if ($row['TestStatus'] == 'cancelled' || $row['TestStatus'] == 'rejected') {
+                    } elseif ($row['TestStatus'] == 'cancelled' || $row['TestStatus'] == 'rejected') {
                         $row['TestStatus'] = 'rejected';
                         $data['result_status'] = 4;
-                    } else if ($row['TestStatus'] == 'invalid' || $row['TestStatus'] == 'fail' || $row['TestStatus'] == 'failed' || $row['TestStatus'] == 'fail' || $row['TestStatus'] == 'inconclusive' || strtolower($row['Result']['Copies']) == 'inconclusive') {
+                    } elseif ($row['TestStatus'] == 'invalid' || $row['TestStatus'] == 'fail' || $row['TestStatus'] == 'failed' || $row['TestStatus'] == 'fail' || $row['TestStatus'] == 'inconclusive' || strtolower($row['Result']['Copies']) == 'inconclusive') {
                         $row['TestStatus'] = 'invalid';
                         $data['result_status'] = 5;
-                    } else if ($row['TestStatus'] == 'registered' || $row['TestStatus'] == 'progress') {
+                    } elseif ($row['TestStatus'] == 'registered' || $row['TestStatus'] == 'progress') {
                         $row['TestStatus'] = 'registered';
                         $data['result_status'] = 6;
                     }
@@ -2079,30 +2062,34 @@ class SampleService
                         $data['sample_type'] = $sampleTypeDb->lastInsertValue;
                     }
                 } else {
-                    $data['sample_type'] = NULL;
+                    $data['sample_type'] = null;
                 }
 
                 //check sample test reason
                 if (!empty(trim($row['ReasonForTesting']))) {
                     $data['reason_for_vl_testing'] =  $this->checkTestReason(trim($row['ReasonForTesting']));
                 } else {
-                    $data['reason_for_vl_testing'] = NULL;
+                    $data['reason_for_vl_testing'] = null;
                 }
-
-
 
                 //check sample rejection reason
                 if (trim($row['SampleRejectionReason']) != '') {
                     $sampleRejectionReason = $this->checkSampleRejectionReason(trim($row['SampleRejectionReason']));
                     if ($sampleRejectionReason) {
-                        $sampleRjtReasonDb->update(array('rejection_reason_name' => trim($row['SampleRejectionReason'])), array('rejection_reason_id' => $sampleRejectionReason['rejection_reason_id']));
+                        $sampleRjtReasonDb->update(
+                            array('rejection_reason_name' => trim($row['SampleRejectionReason'])),
+                            array('rejection_reason_id' => $sampleRejectionReason['rejection_reason_id'])
+                        );
                         $data['reason_for_sample_rejection'] = $sampleRejectionReason['rejection_reason_id'];
                     } else {
-                        $sampleRjtReasonDb->insert(array('rejection_reason_name' => trim($row['SampleRejectionReason']), 'rejection_reason_status' => 'active'));
+                        $sampleRjtReasonDb->insert(array(
+                            'rejection_reason_name' => trim($row['SampleRejectionReason']),
+                            'rejection_reason_status' => 'active'
+                        ));
                         $data['reason_for_sample_rejection'] = $sampleRjtReasonDb->lastInsertValue;
                     }
                 } else {
-                    $data['reason_for_sample_rejection'] = NULL;
+                    $data['reason_for_sample_rejection'] = null;
                 }
 
                 $status = $sampleDb->insertOrUpdate($data);
@@ -2115,7 +2102,7 @@ class SampleService
 
         http_response_code(202);
         $status = 'success';
-        if (count($failedImports) > 0) {
+        if (!empty($failedImports)) {
             $status = 'partial';
             if (($counter - count($failedImports)) == 0) {
                 $status = 'failed';
@@ -2129,7 +2116,7 @@ class SampleService
         // Track API Records
         $apiData = JsonMachine::fromString($params, '/timestamp');
         $timestamp = iterator_to_array($apiData)['timestamp'];
-        $timestamp = ($timestamp != false && !empty($timestamp)) ? $timestamp : time();
+        $timestamp = ($timestamp !== false && !empty($timestamp)) ? $timestamp : time();
         $apiTrackData = array(
             'tracking_id'                   => $timestamp,
             'received_on'                   => \Application\Service\CommonService::getDateTime(),
@@ -2191,8 +2178,8 @@ class SampleService
                     }
 
                     $VLAnalysisResult = (float) $row['result_value_absolute_decimal'];
-                    $result_value_absolute_decimal = NULL;
-                    $vl_result_category = NULL;
+                    $result_value_absolute_decimal = null;
+                    $vl_result_category = null;
 
                     if ($row['result_value_copies'] == 'Target not Detected' || $row['result_value_copies'] == 'Target Not Detected' || strtolower($row['result_value_copies']) == 'target not detected' || strtolower($row['result_value_copies']) == 'tnd' || $row['result'] == 'Target not Detected' || $row['result'] == 'Target Not Detected' || strtolower($row['result']) == 'target not detected' || strtolower($row['result']) == 'tnd') {
                         $VLAnalysisResult = 20;
@@ -2212,8 +2199,8 @@ class SampleService
 
 
                     if ($VLAnalysisResult == 'NULL' || $VLAnalysisResult == '' || $VLAnalysisResult == NULL) {
-                        $result_value_absolute_decimal = NULL;
-                        $vl_result_category = NULL;
+                        $result_value_absolute_decimal = null;
+                        $vl_result_category = null;
                     } else if ($VLAnalysisResult < 1000) {
                         $vl_result_category = 'Suppressed';
                         $result_value_absolute_decimal = $VLAnalysisResult;
@@ -2286,7 +2273,7 @@ class SampleService
                             $data['facility_id'] = $facilityDb->lastInsertValue;
                         }
                     } else {
-                        $data['facility_id'] = NULL;
+                        $data['facility_id'] = null;
                     }
 
                     //check lab details
@@ -2327,14 +2314,14 @@ class SampleService
                             $data['sample_type'] = $sampleTypeDb->lastInsertValue;
                         }
                     } else {
-                        $data['sample_type'] = NULL;
+                        $data['sample_type'] = null;
                     }
 
                     //check sample test reason
                     if (!empty(trim($row['reason_for_vl_testing']))) {
                         $data['reason_for_vl_testing'] =  $this->checkTestReason(trim($row['reason_for_vl_testing']));
                     } else {
-                        $data['reason_for_vl_testing'] = NULL;
+                        $data['reason_for_vl_testing'] = null;
                     }
 
                     //check sample rejection reason
@@ -2348,7 +2335,7 @@ class SampleService
                             $data['reason_for_sample_rejection'] = $sampleRjtReasonDb->lastInsertValue;
                         }
                     } else {
-                        $data['reason_for_sample_rejection'] = NULL;
+                        $data['reason_for_sample_rejection'] = null;
                     }
 
                     //check existing sample code
@@ -2398,19 +2385,15 @@ class SampleService
         // Track API Records
         $apiTrackData = array(
             'tracking_id'                   => $params['timestamp'],
-            'received_on'                   => \Application\Service\CommonService::getDateTime(),
+            'received_on'                   => CommonService::getDateTime(),
             'number_of_records_received'    => count($params['data']),
             'number_of_records_processed'   => (count($params['data']) - count($return)),
             'source'                        => 'API-VIRAL-LOAD',
             'lab_id'                        => $data['lab_id'],
             'status'                        => $status
         );
-        $trackResult = $apiTrackDb->select(array('tracking_id' => $params['timestamp']))->current();
-        if ($trackResult) {
-            $apiTrackDb->update($apiTrackData, array('api_id' => $trackResult['api_id']));
-        } else {
-            $apiTrackDb->insert($apiTrackData);
-        }
+
+        $apiTrackDb->insert($apiTrackData);
 
         return $response;
     }

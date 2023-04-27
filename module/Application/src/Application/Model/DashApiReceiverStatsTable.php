@@ -13,7 +13,8 @@ use Laminas\Json\Expr;
 class DashApiReceiverStatsTable extends AbstractTableGateway
 {
 
-    protected $table = 'dash_api_receiver_stats';
+    public $table = 'dash_api_receiver_stats';
+    public $adapter;
 
     public function __construct(Adapter $adapter)
     {
@@ -187,30 +188,44 @@ class DashApiReceiverStatsTable extends AbstractTableGateway
         $queryContainer = new Container('query');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $sQuery = $sql->select()->from(array('f' => "facility_details"))->columns(array(
-            "facility_id", "labName" => "facility_name", "latest" =>
-            new Expression("GREATEST(
-                COALESCE(facility_attributes->>'$.lastHeartBeat', 0), 
-                COALESCE(facility_attributes->>'$.dashLastResultsSync', 0), 
-                COALESCE(facility_attributes->>'$.dashLastRequestSync', 0),
-                COALESCE(sync.received_on, 0))"),
-            "dashLastResultsSync" => new Expression("(facility_attributes->>'$.dashLastResultsSync')"),
-            "dashLastRequestsSync" => new Expression("(facility_attributes->>'$.dashLastRequestsSync')")
-        ))
-            ->join(array('sync' => $this->table), "sync.lab_id=f.facility_id", array(), 'left')
-            ->group("facility_id")
-            ->order(array("latest DESC"));
+        $sQuery = $sql->select()->from(array('f' => "facility_details"))
+            ->columns(array(
+                "facility_id",
+                "labName" => "facility_name",
+                "latest" =>
+                new Expression("TIMESTAMP(GREATEST(
+                COALESCE(facility_attributes->>'$.lastDashboardHeartBeat', 0),
+                COALESCE(sync.received_on, 0)))")
+            ))
+            ->join(['sync' => $this->table], "sync.lab_id=f.facility_id", [], 'left')
+            ->group("f.facility_id")
+            ->where(["f.facility_type = 2"])
+            ->where(["f.status = 'active'"])
+            ->order(["latest DESC"]);
         $sQueryStr = $sql->buildSqlString($sQuery);
         $queryContainer->syncStatus = $sQuery;
         return $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
     }
 
-    public function updateAttributes($params)
+    public function updateFormAttributes($params, $currentDateTime = null)
     {
-        $currentDateTime = \Application\Service\CommonService::getDateTime();
+        $currentDateTime = $currentDateTime ?? CommonService::getDateTime();
         return $this->adapter->query(
-            "UPDATE " . $params['table'] . " SET form_attributes = JSON_SET(COALESCE(form_attributes, '{}'), '$.lastSync', ?) WHERE " . $params['field'] . " IN (?)",
+            "UPDATE " . $params['table'] .
+                " SET form_attributes = JSON_SET(COALESCE(form_attributes, '{}'), '$.lastDashboardHeartBeat', ?) " .
+                " WHERE " . $params['field'] . " IN (?)",
             array($currentDateTime, $params['id'])
+        );
+    }
+
+    public function updateFacilityAttributes($facilityId, $currentDateTime = null)
+    {
+        $currentDateTime = $currentDateTime ?? CommonService::getDateTime();
+        return $this->adapter->query(
+            "UPDATE facility_details
+                SET facility_attributes = JSON_SET(COALESCE(facility_attributes, '{}'), '$.lastDashboardHeartBeat', ?)
+                WHERE facility_id IN (?)",
+            array($currentDateTime, $facilityId)
         );
     }
 }

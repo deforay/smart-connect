@@ -28,6 +28,7 @@ return [
     'Laminas\Validator',
     'Laminas\Diactoros',
     'Laminas\Cache\Storage\Adapter\Filesystem',
+    'Laminas\ZendFrameworkBridge',
     'Application',
     'Api',
     'Eid',

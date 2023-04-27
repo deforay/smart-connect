@@ -667,3 +667,31 @@ RENAME TABLE `location_details` TO `geographical_divisions`;
 ALTER TABLE `geographical_divisions` CHANGE `location_id` `geo_id` INT NOT NULL AUTO_INCREMENT, CHANGE `parent_location` `geo_parent` INT NULL DEFAULT NULL, CHANGE `location_name` `geo_name` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL, CHANGE `location_code` `geo_code` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL, CHANGE `updated_datetime` `updated_datetime` DATETIME NULL DEFAULT CURRENT_TIMESTAMP;
 ALTER TABLE `geographical_divisions` ADD `geo_status` VARCHAR(256) NULL DEFAULT 'active' AFTER `updated_datetime`;
 
+-- Amit 27-Apr-2023
+ALTER TABLE `facility_details` ADD `facility_attributes` JSON NULL DEFAULT NULL AFTER `facility_type`;
+ALTER TABLE `dash_form_vl` ADD UNIQUE( `sample_code`, `lab_id`);
+ALTER TABLE `dash_form_eid` ADD UNIQUE( `sample_code`, `lab_id`);
+ALTER TABLE `dash_form_covid19` ADD UNIQUE( `sample_code`, `lab_id`);
+-- ALTER TABLE `dash_form_hepatitis` ADD UNIQUE( `sample_code`, `lab_id`);
+-- ALTER TABLE `dash_form_tb` ADD UNIQUE( `sample_code`, `lab_id`);
+ALTER TABLE `dash_form_vl` ADD UNIQUE(`remote_sample_code`);
+ALTER TABLE `dash_form_eid` ADD UNIQUE(`remote_sample_code`);
+ALTER TABLE `dash_form_covid19` ADD UNIQUE(`remote_sample_code`);
+-- ALTER TABLE `dash_form_hepatitis` ADD UNIQUE(`remote_sample_code`);
+-- ALTER TABLE `dash_form_tb` ADD UNIQUE(`remote_sample_code`);
+ALTER TABLE `dash_form_vl` ADD UNIQUE(`unique_id`);
+ALTER TABLE `dash_form_eid` ADD UNIQUE(`unique_id`);
+ALTER TABLE `dash_form_covid19` ADD UNIQUE(`unique_id`);
+-- ALTER TABLE `dash_form_hepatitis` ADD UNIQUE(`unique_id`);
+-- ALTER TABLE `dash_form_tb` ADD UNIQUE(`unique_id`);
+
+-- TRUNCATE TABLE dash_form_vl;
+-- TRUNCATE TABLE dash_form_eid;
+-- TRUNCATE TABLE dash_form_covid19;
+-- TRUNCATE TABLE dash_form_hepatitis;
+-- TRUNCATE TABLE dash_form_tb;
+
+-- INSERT IGNORE INTO dash_form_vl SELECT * FROM vlsm.form_vl;
+-- INSERT IGNORE INTO dash_form_eid SELECT * FROM vlsm.form_eid;
+-- INSERT IGNORE INTO dash_form_covid19 SELECT * FROM vlsm.form_covid19;
+

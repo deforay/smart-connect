@@ -2,6 +2,7 @@
 
 namespace Eid\Service;
 
+use Application\Service\CommonService;
 use Laminas\Session\Container;
 use Laminas\Db\Sql\Sql;
 use Laminas\Db\Sql\Expression;
@@ -94,6 +95,8 @@ class EidSampleService
     {
         $apiData = array();
 
+        $dashDb = $this->sm->get('DashApiReceiverStatsTable');
+
         /** @var \Application\Model\DashApiReceiverStatsTable $apiTrackDb */
 
         $apiTrackDb = $this->sm->get('DashApiReceiverStatsTable');
@@ -155,15 +158,18 @@ class EidSampleService
                 }
             }
 
+            $currentDateTime = CommonService::getDateTime();
+            $data['last_modified_datetime'] = $currentDateTime;
+
             $id = $sampleDb->insertOrUpdate($data);
             if (isset($id) && !empty($id) && is_numeric($id)) {
-                $dashDb = $this->sm->get('DashApiReceiverStatsTable');
                 $params = array(
                     "table" => "dash_form_eid",
                     "field" => "eid_id",
                     "id" => $id
                 );
-                $dashDb->updateAttributes($params);
+                //$dashDb->updateFormAttributes($params, $currentDateTime);
+                $dashDb->updateFacilityAttributes($data['facility_id'], $currentDateTime);
             }
             $numRows++;
         }
@@ -316,7 +322,7 @@ class EidSampleService
                                 $data['facility_id'] = $facilityDb->lastInsertValue;
                             }
                         } else {
-                            $data['facility_id'] = NULL;
+                            $data['facility_id'] = null;
                         }
 
                         $labData = array(
@@ -395,7 +401,7 @@ class EidSampleService
                                 $data['reason_for_sample_rejection'] = $sampleRjtReasonDb->lastInsertValue;
                             }
                         } else {
-                            $data['reason_for_sample_rejection'] = NULL;
+                            $data['reason_for_sample_rejection'] = null;
                         }
                         // Debug::dump($data);die;
                         //check existing sample code
@@ -753,12 +759,12 @@ class EidSampleService
                         )
                     );
 
-                    $sheet->setCellValue('A1', html_entity_decode($translator->translate('Sample ID'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('B1', html_entity_decode($translator->translate('Collection Date'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('C1', html_entity_decode($translator->translate('Facility'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('D1', html_entity_decode($translator->translate('Sample Type'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('E1', html_entity_decode($translator->translate('Lab'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('F1', html_entity_decode($translator->translate('Sample Received at Lab'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+                    $sheet->setCellValue('A1', html_entity_decode($translator->translate('Sample ID'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->setCellValue('B1', html_entity_decode($translator->translate('Collection Date'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->setCellValue('C1', html_entity_decode($translator->translate('Facility'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->setCellValue('D1', html_entity_decode($translator->translate('Sample Type'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->setCellValue('E1', html_entity_decode($translator->translate('Lab'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->setCellValue('F1', html_entity_decode($translator->translate('Sample Received at Lab'), ENT_QUOTES, 'UTF-8'));
 
                     $sheet->getStyle('A1:F1')->applyFromArray($styleArray);
 
@@ -922,12 +928,12 @@ class EidSampleService
                         )
                     );
 
-                    $sheet->setCellValue('A1', html_entity_decode($translator->translate('Sample ID'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('B1', html_entity_decode($translator->translate('Facility Name'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('C1', html_entity_decode($translator->translate('Date Collected'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('D1', html_entity_decode($translator->translate('Rejection Reason'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('E1', html_entity_decode($translator->translate('Date Tested'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('F1', html_entity_decode($translator->translate('Result'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+                    $sheet->setCellValue('A1', html_entity_decode($translator->translate('Sample ID'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->setCellValue('B1', html_entity_decode($translator->translate('Facility Name'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->setCellValue('C1', html_entity_decode($translator->translate('Date Collected'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->setCellValue('D1', html_entity_decode($translator->translate('Rejection Reason'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->setCellValue('E1', html_entity_decode($translator->translate('Date Tested'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->setCellValue('F1', html_entity_decode($translator->translate('Result'), ENT_QUOTES, 'UTF-8'));
 
                     $sheet->getStyle('A1:F1')->applyFromArray($styleArray);
                     $currentRow = 2;
@@ -941,14 +947,10 @@ class EidSampleService
                             if ($colNo > $endColumn) {
                                 break;
                             }
-                            if (is_numeric($value)) {
-                                $sheet->getCellByColumnAndRow($colNo, $currentRow)->setValueExplicit(html_entity_decode($value, ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_NUMERIC);
-                            } else {
-                                $sheet->getCellByColumnAndRow($colNo, $currentRow)->setValueExplicit(html_entity_decode($value, ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                            }
-                            $cellName = $sheet->getCellByColumnAndRow($colNo, $currentRow)->getColumn();
-                            $sheet->getStyle($cellName . $currentRow)->applyFromArray($borderStyle);
-                            $sheet->getStyleByColumnAndRow($colNo, $currentRow)->getAlignment()->setWrapText(true);
+                            $sheet->setCellValue(Coordinate::stringFromColumnIndex($colNo) . $currentRow, html_entity_decode($value, ENT_QUOTES, 'UTF-8'));
+                            // $cellName = $sheet->getCellByColumnAndRow($colNo, $currentRow)->getColumn();
+                            // $sheet->getStyle($cellName . $currentRow)->applyFromArray($borderStyle);
+                            // $sheet->getStyleByColumnAndRow($colNo, $currentRow)->getAlignment()->setWrapText(true);
                             $colNo++;
                         }
                         $currentRow++;
@@ -1034,15 +1036,15 @@ class EidSampleService
                         )
                     );
 
-                    $sheet->setCellValue('A1', html_entity_decode($translator->translate('Date'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('B1', html_entity_decode($translator->translate('Samples Collected'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('C1', html_entity_decode($translator->translate('Samples Tested'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('D1', html_entity_decode($translator->translate('Samples Pending'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('E1', html_entity_decode($translator->translate('Samples Suppressed'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('F1', html_entity_decode($translator->translate('Samples Not Suppressed'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('G1', html_entity_decode($translator->translate('Samples Rejected'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('H1', html_entity_decode($translator->translate('Sample Type'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                    $sheet->setCellValue('I1', html_entity_decode($translator->translate('Clinics'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+                    $sheet->setCellValue('A1', html_entity_decode($translator->translate('Date'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->setCellValue('B1', html_entity_decode($translator->translate('Samples Collected'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->setCellValue('C1', html_entity_decode($translator->translate('Samples Tested'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->setCellValue('D1', html_entity_decode($translator->translate('Samples Pending'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->setCellValue('E1', html_entity_decode($translator->translate('Samples Suppressed'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->setCellValue('F1', html_entity_decode($translator->translate('Samples Not Suppressed'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->setCellValue('G1', html_entity_decode($translator->translate('Samples Rejected'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->setCellValue('H1', html_entity_decode($translator->translate('Sample Type'), ENT_QUOTES, 'UTF-8'));
+                    $sheet->setCellValue('I1', html_entity_decode($translator->translate('Clinics'), ENT_QUOTES, 'UTF-8'));
 
                     $sheet->getStyle('A1')->applyFromArray($styleArray);
                     $sheet->getStyle('B1')->applyFromArray($styleArray);
@@ -1064,14 +1066,10 @@ class EidSampleService
                             if ($colNo > 8) {
                                 break;
                             }
-                            if (is_numeric($value)) {
-                                $sheet->getCellByColumnAndRow($colNo, $currentRow)->setValueExplicit(html_entity_decode($value, ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_NUMERIC);
-                            } else {
-                                $sheet->getCellByColumnAndRow($colNo, $currentRow)->setValueExplicit(html_entity_decode($value, ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                            }
-                            $cellName = $sheet->getCellByColumnAndRow($colNo, $currentRow)->getColumn();
-                            $sheet->getStyle($cellName . $currentRow)->applyFromArray($borderStyle);
-                            $sheet->getStyleByColumnAndRow($colNo, $currentRow)->getAlignment()->setWrapText(true);
+                            $sheet->setCellValue(Coordinate::stringFromColumnIndex($colNo) . $currentRow, html_entity_decode($value, ENT_QUOTES, 'UTF-8'));
+                            // $cellName = $sheet->getCellByColumnAndRow($colNo, $currentRow)->getColumn();
+                            // $sheet->getStyle($cellName . $currentRow)->applyFromArray($borderStyle);
+                            // $sheet->getStyleByColumnAndRow($colNo, $currentRow)->getAlignment()->setWrapText(true);
                             $colNo++;
                         }
                         $currentRow++;
@@ -1325,16 +1323,10 @@ class EidSampleService
                                 if ($colNo > 6) {
                                     break;
                                 }
-                                $columnName = Coordinate::stringFromColumnIndex($colNo);
-                                if (is_numeric($value)) {
-                                    $sheet->getCell($columnName . $currentRow)
-                                        ->setValueExplicit(html_entity_decode($value, ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_NUMERIC);
-                                } else {
-                                    $sheet->getCell($columnName . $currentRow)
-                                        ->setValueExplicit(html_entity_decode($value, ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                                }
-                                $sheet->getStyle($columnName . $currentRow)->applyFromArray($borderStyle);
-                                $sheet->getStyle($columnName . $currentRow)->getAlignment()->setWrapText(true);
+                                //$columnName = Coordinate::stringFromColumnIndex($colNo);
+                                $sheet->setCellValue(Coordinate::stringFromColumnIndex($colNo) . $currentRow, html_entity_decode($value, ENT_QUOTES, 'UTF-8'));
+                                // $sheet->getStyle($columnName . $currentRow)->applyFromArray($borderStyle);
+                                // $sheet->getStyle($columnName . $currentRow)->getAlignment()->setWrapText(true);
                                 $colNo++;
                             }
                             $currentRow++;
@@ -1477,7 +1469,7 @@ class EidSampleService
                             $data['facility_id'] = $facilityDb->lastInsertValue;
                         }
                     } else {
-                        $data['facility_id'] = NULL;
+                        $data['facility_id'] = null;
                     }
 
                     //check lab details
@@ -1506,7 +1498,7 @@ class EidSampleService
                             $data['reason_for_sample_rejection'] = $sampleRjtReasonDb->lastInsertValue;
                         }
                     } else {
-                        $data['reason_for_sample_rejection'] = NULL;
+                        $data['reason_for_sample_rejection'] = null;
                     }
 
                     //check existing sample code
@@ -1563,12 +1555,7 @@ class EidSampleService
             'lab_id'                        => $data['lab_id'],
             'status'                        => $status
         );
-        $trackResult = $apiTrackDb->select(array('tracking_id' => $params['timestamp']))->current();
-        if ($trackResult) {
-            $apiTrackDb->update($apiTrackData, array('api_id' => $trackResult['api_id']));
-        } else {
-            $apiTrackDb->insert($apiTrackData);
-        }
+        $apiTrackDb->insert($apiTrackData);
 
         return $response;
     }

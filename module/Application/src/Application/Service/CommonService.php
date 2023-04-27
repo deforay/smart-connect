@@ -1095,7 +1095,7 @@ class CommonService
           return $sQueryResult;
      }
 
-     function getMonthsInRange($startDate, $endDate)
+     public function getMonthsInRange($startDate, $endDate)
      {
           $months = array();
           while (strtotime($startDate) <= strtotime($endDate)) {
@@ -1170,8 +1170,6 @@ class CommonService
 
                               $row[] = (isset($aRow['labName']) && !empty($aRow['labName'])) ? ucwords($aRow['labName']) : "";
                               $row[] = (isset($aRow['latest']) && !empty($aRow['latest'])) ? self::humanReadableDateFormat($aRow['latest']) : "";
-                              $row[] = (isset($aRow['dashLastResultsSync']) && !empty($aRow['dashLastResultsSync'])) ? self::humanReadableDateFormat($aRow['dashLastResultsSync']) : "";
-                              $row[] = (isset($aRow['dashLastRequestsSync']) && !empty($aRow['dashLastRequestsSync'])) ? self::humanReadableDateFormat($aRow['dashLastRequestsSync']) : "";
                               $output[] = $row;
                          }
                          $styleArray = array(
@@ -1199,22 +1197,19 @@ class CommonService
                               )
                          );
 
-                         $sheet->setCellValue('A1', html_entity_decode($translator->translate('Lab Name'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                         $sheet->setCellValue('B1', html_entity_decode($translator->translate('Last Synced on'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                         $sheet->setCellValue('C1', html_entity_decode($translator->translate('Last Results Sync from Lab'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-                         $sheet->setCellValue('D1', html_entity_decode($translator->translate('Last Requests Sync from VLSTS'), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+                         $sheet->setCellValue('A1', html_entity_decode($translator->translate('Lab Name'), ENT_QUOTES, 'UTF-8'));
+                         $sheet->setCellValue('B1', html_entity_decode($translator->translate('Last Synced on'), ENT_QUOTES, 'UTF-8'));
+                         $sheet->setCellValue('C1', html_entity_decode($translator->translate('Last Results Sync from Lab'), ENT_QUOTES, 'UTF-8'));
+                         $sheet->setCellValue('D1', html_entity_decode($translator->translate('Last Requests Sync from VLSTS'), ENT_QUOTES, 'UTF-8'));
 
-                         $sheet->getStyle('A1')->applyFromArray($styleArray);
-                         $sheet->getStyle('B1')->applyFromArray($styleArray);
-                         $sheet->getStyle('C1')->applyFromArray($styleArray);
-                         $sheet->getStyle('D1')->applyFromArray($styleArray);
+                         $sheet->getStyle('A1:D1')->applyFromArray($styleArray);
 
                          $colorNo = 0;
                          foreach ($output as $rowNo => $rowData) {
                               $colNo = 1;
                               foreach ($rowData as $field => $value) {
                                    $rRowCount = ($rowNo + 2);
-                                   $sheet->getCellByColumnAndRow($colNo, $rRowCount)->setValueExplicit(html_entity_decode($value), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+                                   $sheet->getCellByColumnAndRow($colNo, $rRowCount)->setValueExplicit(html_entity_decode($value));
                                    // echo "Col : ".$colNo ." => Row : " . $rRowCount . " => Color : " .$color[$colorNo]['color'];
                                    // echo "<br>";
                                    $cellName = $sheet->getCellByColumnAndRow($colNo, $rRowCount)->getColumn();

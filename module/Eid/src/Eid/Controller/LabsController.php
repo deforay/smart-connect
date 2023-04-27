@@ -2,17 +2,22 @@
 
 namespace Eid\Controller;
 
+use Application\Service\CommonService;
+use Application\Service\FacilityService;
+use Eid\Service\EidSampleService;
 use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\ViewModel;
 use Laminas\Json\Json;
+use Laminas\Mvc\Application;
 use Zend\Debug\Debug;
 
 class LabsController extends AbstractActionController
 {
 
-    private $sampleService = null;
-    private $facilityService = null;
-    private \Application\Service\CommonService $commonService;
+    public EidSampleService $sampleService;
+    public FacilityService $facilityService;
+    public CommonService $commonService;
+    
     const PROVINCE = 0;
     const DISTRICT = 1;
     const CLINIC   = 2;
