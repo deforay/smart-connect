@@ -547,7 +547,7 @@ $endDate = date('Y-m');
                 flag : 'poc'
             },
             function(data) {
-                console.log(data);
+                // console.log(data);
                 $("#failedTestByMachine").html(data);
 
 
@@ -569,7 +569,7 @@ $endDate = date('Y-m');
                 flag : 'poc'
             },
             function(data) {
-                console.log(data);
+                // console.log(data);
                 $("#instrumentWiseTest").html(data);
 
 
@@ -731,7 +731,7 @@ $endDate = date('Y-m');
                 facilityId: facilityId,
             },
             function(data) {
-                console.log(data)
+                // console.log(data)
                 $("#countyOutcomes").html(data);
             });
     }
@@ -755,8 +755,8 @@ $endDate = date('Y-m');
             p.z = parseInt(p.samplenottested);
             samplenottested.push(p)
         });
-        console.log(samplenottested)
-        console.log(data)
+        // console.log(samplenottested)
+        // console.log(data)
         chart = Highcharts.mapChart('container', {
             title: {
             text: 'Samples tested based on latitude and longitude'
@@ -792,7 +792,7 @@ $endDate = date('Y-m');
                     cursor: 'pointer',
                     events: {
                         click: function (event) {
-                            console.log(event.point)
+                            // console.log(event.point)
                             lat = event.point.lat;
                             lon = event.point.lon;
                             lab = event.point.lab_id;
