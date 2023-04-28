@@ -589,7 +589,7 @@ class CommonService
           }
 
           /* echo "<pre>";
-          print_r($apiData->geographical_divisions);
+          print_r($apiData->instrument_machines);
           die; */
           if ($apiData !== FALSE) {
                /* For update the location details */
@@ -808,21 +808,23 @@ class CommonService
                }
 
                /* For update the  Import Config Machine */
-               if (isset($apiData->import_config_machines) && !empty($apiData->import_config_machines)) {
+               if (isset($apiData->instrument_machines) && !empty($apiData->instrument_machines)) {
                     /* if($apiData->forceSync){
                          $rQueryStr = $apiData->r_covid19_symptoms->tableStructure;
                          $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
                     } */
                     $condition = "";
-                    if (isset($apiData->import_config_machines->lastModifiedTime) && !empty($apiData->import_config_machines->lastModifiedTime)) {
-                         $condition = "updated_datetime > '" . $apiData->import_config_machines->lastModifiedTime . "'";
+                    if (isset($apiData->instrument_machines->lastModifiedTime) && !empty($apiData->instrument_machines->lastModifiedTime)) {
+                         $condition = "updated_datetime > '" . $apiData->instrument_machines->lastModifiedTime . "'";
                     }
-                    $notUpdated = $this->getLastModifiedDateTime('import_config_machines', 'updated_datetime', $condition);
+                    $notUpdated = $this->getLastModifiedDateTime('instrument_machines', 'updated_datetime', $condition);
+                    
+                    // print_r($notUpdated);die;
                     if (empty($notUpdated) || !isset($notUpdated)) {
-                         foreach ((array)$apiData->import_config_machines->tableData as $row) {
+                         foreach ((array)$apiData->instrument_machines->tableData as $row) {
                               $importConfigMachData = (array)$row;
-                              // \Zend\Debug\Debug::dump($importConfigMachData);die;
-                              $rQuery = $sql->select()->from('import_config_machines')->where(array('config_machine_name LIKE "%' . $importConfigMachData['config_machine_name'] . '%" OR config_machine_id = ' . $importConfigMachData['config_machine_id']));
+                              // print_r($importConfigMachData);die;
+                              $rQuery = $sql->select()->from('instrument_machines')->where(array('config_machine_name LIKE "%' . $importConfigMachData['config_machine_name'] . '%" OR config_machine_id = ' . $importConfigMachData['config_machine_id']));
                               $rQueryStr = $sql->buildSqlString($rQuery);
                               $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
                               if ($rowData) {

@@ -21,7 +21,7 @@ use Laminas\Db\TableGateway\AbstractTableGateway;
  */
 class ImportConfigMachineTable extends AbstractTableGateway {
 
-    protected $table = 'import_config_machines';
+    protected $table = 'instrument_machines';
 
     public function __construct(Adapter $adapter) {
         $this->adapter = $adapter;

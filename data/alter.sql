@@ -485,7 +485,7 @@ ALTER TABLE `dash_form_covid19` ADD `patient_city` VARCHAR(255) NULL DEFAULT NUL
 /* Thana 05 Nov 2020 */
 ALTER TABLE `r_vl_test_reasons` ADD `updated_datetime` DATETIME NULL DEFAULT NULL AFTER `test_reason_status`;
 /* Thana 06 Nov 2020 */
-CREATE TABLE `import_config_machines` (
+CREATE TABLE `instrument_machines` (
  `config_machine_id` int(11) NOT NULL AUTO_INCREMENT,
  `config_id` int(11) NOT NULL,
  `config_machine_name` varchar(255) NOT NULL,
@@ -695,3 +695,16 @@ ALTER TABLE `dash_form_covid19` ADD UNIQUE(`unique_id`);
 -- INSERT IGNORE INTO dash_form_eid SELECT * FROM vlsm.form_eid;
 -- INSERT IGNORE INTO dash_form_covid19 SELECT * FROM vlsm.form_covid19;
 
+
+-- Thana 28-Apr-2023
+RENAME TABLE `import_config` TO `instruments`;
+RENAME TABLE `import_config_machines` TO `instrument_machines`; 
+RENAME TABLE `import_config_controls` TO `instrument_controls`;
+
+ALTER TABLE `instrument_machines` ADD `date_format` TEXT NULL DEFAULT NULL AFTER `config_machine_name`, ADD `file_name` VARCHAR(256) NULL DEFAULT NULL AFTER `date_format`; 
+
+UPDATE `instrument_machines` INNER JOIN `instruments`
+    ON `instrument_machines`.`config_id` = `instruments`.`config_id`
+SET `instrument_machines`.`file_name` = `instruments`.`import_machine_file_name`;
+ALTER TABLE `instruments` ADD `updated_datetime` DATETIME NULL DEFAULT NULL AFTER `status`;
+ALTER TABLE `instruments` ADD `lab_id` INT NULL DEFAULT NULL AFTER `machine_name`;
