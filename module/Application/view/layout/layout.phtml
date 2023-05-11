@@ -347,11 +347,11 @@ if (!isset($activeTab)) {
                                         <i class="fa fa-angle-right"></i> <span class="title"><?php echo $this->translate('Facilities'); ?></span>
                                     </a>
                                 </li>
-                                <li class="nav-item end <?php echo ($activeTab == 'status') ? " active open" : ""; ?>">
+                                <!-- <li class="nav-item end <?php echo ($activeTab == 'status') ? " active open" : ""; ?>">
                                     <a href="<?php echo $this->url('status', array('action' => 'index')) ?>" class="nav-link ">
                                         <i class="fa fa-angle-right"></i> <span class="title"><?php echo $this->translate('Status'); ?></span>
                                     </a>
-                                </li>
+                                </li> -->
                                 <li class="nav-item end <?php echo ($activeTab == 'status') ? " active open" : ""; ?>">
                                     <a href="<?php echo $this->url('sync-status', array('action' => 'index')) ?>" class="nav-link ">
                                         <i class="fa fa-angle-right"></i> <span class="title"><?php echo $this->translate('Sync Status'); ?></span>

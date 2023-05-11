@@ -14,6 +14,8 @@ use Laminas\Mail\Transport\SmtpOptions;
 use Laminas\Mime\Message as MimeMessage;
 use Laminas\Mime\Part as MimePart;
 
+use Application\Model\DashApiReceiverStatsTable;
+
 
 class CommonService
 {
@@ -403,6 +405,14 @@ class CommonService
           return $facilityDb->fetchSampleTestedLocationInfo($params);
      }
 
+     //dump the contents of a variable to the error log in a readable format
+     public static function errorLog($object = null): void
+     {
+          ob_start();
+          var_dump($object);
+          error_log(ob_get_clean());
+     }
+
      public function addBackupGeneration($params)
      {
           $facilityDb = $this->sm->get('GenerateBackupTable');
@@ -419,7 +429,9 @@ class CommonService
      {
 
           // return $inputString;
-          if (empty($inputString)) return "";
+          if (empty($inputString)) {
+               return "";
+          }
 
           $output = false;
           $encrypt_method = "AES-256-CBC";
@@ -818,7 +830,7 @@ class CommonService
                          $condition = "updated_datetime > '" . $apiData->instrument_machines->lastModifiedTime . "'";
                     }
                     $notUpdated = $this->getLastModifiedDateTime('instrument_machines', 'updated_datetime', $condition);
-                    
+
                     // print_r($notUpdated);die;
                     if (empty($notUpdated) || !isset($notUpdated)) {
                          foreach ((array)$apiData->instrument_machines->tableData as $row) {
@@ -1111,18 +1123,21 @@ class CommonService
 
      public function getAllDashApiReceiverStatsByGrid($parameters)
      {
+          /** @var DashApiReceiverStatsTable $statsDb */
           $statsDb = $this->sm->get('DashApiReceiverStatsTable');
           return $statsDb->fetchAllDashApiReceiverStatsByGrid($parameters);
      }
 
      public function getStatusDetails($statusId)
      {
+          /** @var DashApiReceiverStatsTable $statsDb */
           $statsDb = $this->sm->get('DashApiReceiverStatsTable');
           return $statsDb->fetchStatusDetails($statusId);
      }
 
      public function getLabSyncStatus($params)
      {
+          /** @var DashApiReceiverStatsTable $statsDb */
           $statsDb = $this->sm->get('DashApiReceiverStatsTable');
           return $statsDb->fetchLabSyncStatus($params);
      }
@@ -1137,7 +1152,7 @@ class CommonService
                     $sql = new Sql($dbAdapter);
                     $sQueryStr = $sql->buildSqlString($queryContainer->syncStatus);
                     $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-                    if (isset($sResult) && count($sResult) > 0) {
+                    if (isset($sResult) && !empty($sResult)) {
                          $excel = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
                          $sheet = $excel->getActiveSheet();
                          $output = array();

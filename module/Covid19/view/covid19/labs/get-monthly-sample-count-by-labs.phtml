@@ -137,7 +137,7 @@ if (isset($result['sampleName']) && count($result['sampleName']) > 0) {
                     <?php
                     }
                 }
-                if (count($supAvg) > 0) {
+                if (!empty($supAvg)) {
                     ?> {
                         name: '<?php echo $this->translate('Positivity %'); ?>',
                         type: 'scatter',

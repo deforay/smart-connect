@@ -139,7 +139,7 @@ class SummaryService
                 $sql = new Sql($this->dbAdapter);
                 $sQueryStr = $sql->buildSqlString($queryContainer->indicatorSummaryQuery);
                 $sResult = $this->dbAdapter->query($sQueryStr, $this->dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-                if (isset($sResult) && count($sResult) > 0) {
+                if (isset($sResult) && !empty($sResult)) {
                     $excel = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
 
                     // $cacheMethod = \PhpOffice\PhpSpreadsheet\Collection\CellsFactory::cache_to_phpTemp;
@@ -285,7 +285,7 @@ class SummaryService
             $sql = new Sql($this->dbAdapter);
             $sQueryStr = $sql->buildSqlString($queryContainer->fetchAllSuppressionRateByFacility);
             $sResult = $this->dbAdapter->query($sQueryStr, $this->dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-            if (isset($sResult) && count($sResult) > 0) {
+            if (isset($sResult) && !empty($sResult)) {
                 $excel = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
                 //$cacheMethod = \PhpOffice\PhpSpreadsheet\Collection\CellsFactory::cache_to_phpTemp;
                 //$cacheSettings = array('memoryCacheSize' => '80MB');

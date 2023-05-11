@@ -141,7 +141,7 @@ if (isset($result[$params['age']['ageName']]) && count($result[$params['age']['a
                     <?php
                             }
                         }
-                        if (count($supAvg) > 0) {
+                        if (!empty($supAvg)) {
                     ?> {
                         name: '<?php echo $this->translate('Percentage %'); ?>',
                         type: 'spline',

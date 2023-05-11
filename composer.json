@@ -30,7 +30,8 @@
         "halaxa/json-machine": "^0.7.0",
         "laminas/laminas-cache": "^3.6",
         "laminas/laminas-cache-storage-adapter-filesystem": "^2.2",
-        "laminas/laminas-mail": "^2.16"
+        "laminas/laminas-mail": "^2.16",
+        "laminas/laminas-diactoros": "^2.17"
     },
     "autoload": {
         "psr-4": {

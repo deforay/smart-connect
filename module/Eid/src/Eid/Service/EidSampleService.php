@@ -715,7 +715,7 @@ class EidSampleService
                 $sql = new Sql($dbAdapter);
                 $sQueryStr = $sql->buildSqlString($queryContainer->resultsAwaitedQuery);
                 $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-                if (isset($sResult) && count($sResult) > 0) {
+                if (isset($sResult) && !empty($sResult)) {
                     $excel = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
                     // $cacheMethod = \PhpOffice\PhpSpreadsheet\Collection\CellsFactory::cache_to_phpTemp;
                     // $cacheSettings = array('memoryCacheSize' => '80MB');
@@ -881,7 +881,7 @@ class EidSampleService
                 $sql = new Sql($dbAdapter);
                 $sQueryStr = $sql->buildSqlString($queryContainer->resultQuery);
                 $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-                if (isset($sResult) && count($sResult) > 0) {
+                if (isset($sResult) && !empty($sResult)) {
                     $excel = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
                     $sheet = $excel->getActiveSheet();
                     $output = array();
@@ -987,7 +987,7 @@ class EidSampleService
                 $sql = new Sql($dbAdapter);
                 $sQueryStr = $sql->buildSqlString($queryContainer->labTestedSampleQuery);
                 $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-                if (isset($sResult) && count($sResult) > 0) {
+                if (isset($sResult) && !empty($sResult)) {
                     $excel = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
                     // $cacheMethod = \PhpOffice\PhpSpreadsheet\Collection\CellsFactory::cache_to_phpTemp;
                     // $cacheSettings = array('memoryCacheSize' => '80MB');
@@ -1144,7 +1144,7 @@ class EidSampleService
                 $hQueryStr = $sql->buildSqlString($queryContainer->highVlSampleQuery);
                 // echo ($hQueryStr);die;
                 $sResult = $dbAdapter->query($hQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-                if (isset($sResult) && count($sResult) > 0) {
+                if (isset($sResult) && !empty($sResult)) {
                     $excel = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
                     $sheet = $excel->getActiveSheet();
                     $output = array();

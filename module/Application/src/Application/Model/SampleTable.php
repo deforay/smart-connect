@@ -24,12 +24,13 @@ class SampleTable extends AbstractTableGateway
 {
 
     protected $table = 'dash_form_vl';
-    public $sm = null;
-    public array $config;
+    protected $sm = null;
+    protected array $config;
     protected $dbsId = null;
     protected $plasmaId = null;
     protected $mappedFacilities = null;
     protected $translator = null;
+    protected $adapter;
     protected \Application\Service\CommonService $commonService;
 
     public function __construct(Adapter $adapter, $sm = null, $mappedFacilities = null, $table = null, $commonService = null)
@@ -529,6 +530,7 @@ class SampleTable extends AbstractTableGateway
         return $result;
     }
 
+    // TAT FUNCTION
     public function fetchLabTurnAroundTime($params)
     {
 
@@ -7757,7 +7759,7 @@ class SampleTable extends AbstractTableGateway
             }
             $sQueryStr = $sql->buildSqlString($sQuery);
             $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-            if (count($rResult) > 0) {
+            if (!empty($rResult)) {
                 $result['status'] = '200';
                 $result['result'] = $rResult;
             } else {
@@ -7782,7 +7784,7 @@ class SampleTable extends AbstractTableGateway
 
         $generateResult = $dbAdapter->query($generateSql, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
 
-        if (count($generateResult) > 0) {
+        if (!empty($generateResult)) {
 
             $startDate = $generateResult[0]['start_date'];
             $endDate = $generateResult[0]['end_date'];

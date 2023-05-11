@@ -9,7 +9,7 @@ return [
         'eidModule'     => true,
         'covid19Module' => true,
         'pocDashboard'     => true,
-        'time-zone' => 'Asia/Kolkata',
+        'time-zone' => 'Africa/Kinshasa',
         'cache-expiry' => 1440, // in minutes
     ],
     'email' => [

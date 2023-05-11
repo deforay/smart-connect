@@ -151,9 +151,9 @@ class Module
 					}
 					//clinic/lab dashboard re-direction, in-case of passing invalid url params
 					if ($session->role != 1) {
-						$mappedFacilities = (isset($session->mappedFacilities) && count($session->mappedFacilities) > 0) ? $session->mappedFacilities : array();
-						$mappedFacilitiesName = (isset($session->mappedFacilitiesName) && count($session->mappedFacilitiesName) > 0) ? $session->mappedFacilitiesName : array();
-						$mappedFacilitiesCode = (isset($session->mappedFacilitiesCode) && count($session->mappedFacilitiesCode) > 0) ? $session->mappedFacilitiesCode : array();
+						$mappedFacilities = (isset($session->mappedFacilities) && !empty($session->mappedFacilities)) ? $session->mappedFacilities : array();
+						$mappedFacilitiesName = (isset($session->mappedFacilitiesName) && !empty($session->mappedFacilitiesName)) ? $session->mappedFacilitiesName : array();
+						$mappedFacilitiesCode = (isset($session->mappedFacilitiesCode) && !empty($session->mappedFacilitiesCode)) ? $session->mappedFacilitiesCode : array();
 						$lab = array();
 						if (isset($_GET['lab']) && trim($_GET['lab']) != '') {
 							$lab = array_values(array_filter(explode(',', $_GET['lab'])));

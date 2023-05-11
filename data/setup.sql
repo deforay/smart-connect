@@ -17,17 +17,27 @@ CREATE TABLE `dash_form_tb` SELECT * FROM vlsm.form_tb WHERE 1=0;
 
 ALTER TABLE `dash_form_vl` CHANGE `vl_sample_id` `vl_sample_id` INT NOT NULL;
 ALTER TABLE `dash_form_vl` ADD PRIMARY KEY(`vl_sample_id`);
+ALTER TABLE `dash_form_vl` CHANGE `vl_sample_id` `vl_sample_id` INT NOT NULL AUTO_INCREMENT;
+
 ALTER TABLE `dash_form_eid` CHANGE `eid_id` `eid_id` INT NOT NULL;
 ALTER TABLE `dash_form_eid` ADD PRIMARY KEY(`eid_id`);
+ALTER TABLE `dash_form_eid` CHANGE `eid_id` `eid_id` INT NOT NULL AUTO_INCREMENT;
+
 ALTER TABLE `covid19_tests` CHANGE `test_id` `test_id` INT NOT NULL;
 ALTER TABLE `covid19_tests` ADD PRIMARY KEY(`test_id`);
+ALTER TABLE `covid19_tests` CHANGE `test_id` `test_id` INT NOT NULL AUTO_INCREMENT;
+
 ALTER TABLE `dash_form_covid19` CHANGE `covid19_id` `covid19_id` INT NOT NULL;
 ALTER TABLE `dash_form_covid19` ADD PRIMARY KEY(`covid19_id`);
+ALTER TABLE `dash_form_covid19` CHANGE `covid19_id` `covid19_id` INT NOT NULL AUTO_INCREMENT;
+
 ALTER TABLE `dash_form_hepatitis` CHANGE `hepatitis_id` `hepatitis_id` INT NOT NULL;
 ALTER TABLE `dash_form_hepatitis` ADD PRIMARY KEY(`hepatitis_id`);
+ALTER TABLE `dash_form_hepatitis` CHANGE `hepatitis_id` `hepatitis_id` INT NOT NULL AUTO_INCREMENT;
+
 ALTER TABLE `dash_form_tb` CHANGE `tb_id` `tb_id` INT NOT NULL;
 ALTER TABLE `dash_form_tb` ADD PRIMARY KEY(`tb_id`);
-
+ALTER TABLE `dash_form_tb` CHANGE `tb_id` `tb_id` INT NOT NULL AUTO_INCREMENT;
 
 ALTER TABLE `dash_form_vl` ADD UNIQUE( `sample_code`, `lab_id`);
 ALTER TABLE `dash_form_eid` ADD UNIQUE( `sample_code`, `lab_id`);

@@ -408,7 +408,7 @@ class SampleService
                 $sql = new Sql($this->dbAdapter);
                 $sQueryStr = $sql->buildSqlString($queryContainer->resultQuery);
                 $sResult = $this->dbAdapter->query($sQueryStr, $this->dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-                if (isset($sResult) && count($sResult) > 0) {
+                if (isset($sResult) && !empty($sResult)) {
                     $excel = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
                     // $cacheMethod = \PhpOffice\PhpSpreadsheet\Collection\CellsFactory::cache_to_phpTemp;
                     // $cacheSettings = array('memoryCacheSize' => '80MB');
@@ -544,7 +544,7 @@ class SampleService
                 $hQueryStr = $sql->buildSqlString($queryContainer->highVlSampleQuery);
                 //error_log($hQueryStr);die;
                 $sResult = $this->dbAdapter->query($hQueryStr, $this->dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-                if (isset($sResult) && count($sResult) > 0) {
+                if (isset($sResult) && !empty($sResult)) {
                     $excel = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
                     // $cacheMethod = \PhpOffice\PhpSpreadsheet\Collection\CellsFactory::cache_to_phpTemp;
                     // $cacheSettings = array('memoryCacheSize' => '80MB');
@@ -718,7 +718,7 @@ class SampleService
                     $sql = new Sql($this->dbAdapter);
                     $sQueryStr = $sql->buildSqlString($queryContainer->sampleResultQuery);
                     $sResult = $this->dbAdapter->query($sQueryStr, $this->dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-                    if (isset($sResult) && count($sResult) > 0) {
+                    if (isset($sResult) && !empty($sResult)) {
                         $excel = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
                         // $cacheMethod = \PhpOffice\PhpSpreadsheet\Collection\CellsFactory::cache_to_phpTemp;
                         // $cacheSettings = array('memoryCacheSize' => '80MB');
@@ -827,7 +827,7 @@ class SampleService
                 $sql = new Sql($this->dbAdapter);
                 $sQueryStr = $sql->buildSqlString($queryContainer->labTestedSampleQuery);
                 $sResult = $this->dbAdapter->query($sQueryStr, $this->dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-                if (isset($sResult) && count($sResult) > 0) {
+                if (isset($sResult) && !empty($sResult)) {
                     $excel = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
                     // $cacheMethod = \PhpOffice\PhpSpreadsheet\Collection\CellsFactory::cache_to_phpTemp;
                     // $cacheSettings = array('memoryCacheSize' => '80MB');
@@ -933,7 +933,7 @@ class SampleService
                 $sql = new Sql($this->dbAdapter);
                 $sQueryStr = $sql->buildSqlString($queryContainer->sampleResultTestedTATQuery);
                 $sResult = $this->dbAdapter->query($sQueryStr, $this->dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-                if (isset($sResult) && count($sResult) > 0) {
+                if (isset($sResult) && !empty($sResult)) {
                     $excel = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
                     $sheet = $excel->getActiveSheet();
                     $output = array();
@@ -1067,7 +1067,7 @@ class SampleService
                 $sql = new Sql($this->dbAdapter);
                 $sQueryStr = $sql->buildSqlString($queryContainer->resultsAwaitedQuery);
                 $sResult = $this->dbAdapter->query($sQueryStr, $this->dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-                if (isset($sResult) && count($sResult) > 0) {
+                if (isset($sResult) && !empty($sResult)) {
                     $excel = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
                     // $cacheMethod = \PhpOffice\PhpSpreadsheet\Collection\CellsFactory::cache_to_phpTemp;
                     // $cacheSettings = array('memoryCacheSize' => '80MB');
@@ -1290,7 +1290,7 @@ class SampleService
     //             $sQueryStr = $sql->buildSqlString($queryContainer->sampleStatusResultQuery);
 
     //             $sResult = $this->dbAdapter->query($sQueryStr, $this->dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-    //             if(isset($sResult) && count($sResult)>0){
+    //             if(isset($sResult) && !empty($sResult)){
     //                 $excel = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
     //                 $cacheMethod = \PhpOffice\PhpSpreadsheet\Collection\CellsFactory::cache_to_phpTemp;
     //                 $cacheSettings = array('memoryCacheSize' => '80MB');

@@ -13,13 +13,7 @@ $startDate = date('Y-m', strtotime('+1 month', strtotime('-1 year')));
 $endDate = date('Y-m');
 ?>
 <link rel="stylesheet" href="<?php echo $this->basePath('assets/plugins/datepicker/datepicker3.css') ?>">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.3.6/proj4.js"></script>
-<script src="https://code.highcharts.com/maps/highmaps.js"></script>
-<script src="https://code.highcharts.com/maps/modules/data.js"></script>
-<script src="https://code.highcharts.com/maps/modules/exporting.js"></script>
-<script src="https://code.highcharts.com/maps/modules/offline-exporting.js"></script>
-<script src="https://code.highcharts.com/mapdata/countries/us/us-all.js"></script>
-<script src="https://code.highcharts.com/mapdata/custom/world.js"></script>
+
 
 
 <style>
@@ -202,9 +196,13 @@ $endDate = date('Y-m');
         max-width: 800px;
         margin: 0 auto;
     }
+
+    .highcharts-axis-labels, .highcharts-legend-item{
+        font-size: 16px !important;
+    }
 </style>
 
-<link href="https://cdn.datatables.net/buttons/1.1.0/css/buttons.dataTables.min.css" rel="stylesheet">
+<!-- <link href="https://cdn.datatables.net/buttons/1.1.0/css/buttons.dataTables.min.css" rel="stylesheet"> -->
 
 <?php
 //$sType = '';
@@ -411,7 +409,7 @@ $endDate = date('Y-m');
             </div>
         </div>
     </div>
-    
+
 </div>
 <div class="row">
     <div class="col-md-6 col-sm-6">
@@ -448,15 +446,23 @@ $endDate = date('Y-m');
                 </div>
             </div>
             <div class="portlet-body" style="cursor:pointer;">
-                <div id="countyOutcomes" style="height: 500px; min-width: 310px; max-width: 800px; margin: 0 auto">
+                <div id="countyOutcomes" style="margin: 0 auto">
                 </div>
             </div>
         </div>
     </div>
-    
+
 </div>
 
 
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.3.6/proj4.js"></script>
+<script src="https://code.highcharts.com/maps/highmaps.js"></script>
+<script src="https://code.highcharts.com/maps/modules/data.js"></script>
+<script src="https://code.highcharts.com/maps/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/maps/modules/offline-exporting.js"></script>
+<script src="https://code.highcharts.com/mapdata/countries/us/us-all.js"></script>
+<script src="https://code.highcharts.com/mapdata/custom/world.js"></script>
 
 <script src="<?php echo $this->basePath('assets/plugins/datepicker/bootstrap-datepicker.js') ?>"></script>
 <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAFpbfAKFJZ8Ps7yAGIDZtD4EeBlsb_ANA"></script>
@@ -485,7 +491,7 @@ $endDate = date('Y-m');
         //if(frmSource !='load'){$.blockUI.defaults.css.border = '1px solid grey'; $(document).ajaxStart($.blockUI({ message: '<h2><?php echo $this->translate('Processing...'); ?></h2>' })).ajaxStop($.unblockUI);}
         return $.post("<?php echo $this->url('eid-labs', array('action' => 'poc-stats')); ?>", {
                 daterange: daterange,
-                flag : 'poc'
+                flag: 'poc'
             },
             function(data) {
                 $("#sampleResultDetails").html(data);
@@ -504,7 +510,7 @@ $endDate = date('Y-m');
                 toDate: toDate,
                 sampleType: sampleType,
                 facilityId: facilityId,
-                flag : 'poc'
+                flag: 'poc'
             },
             function(data) {
                 $("#monthlyCounts").html(data);
@@ -523,7 +529,7 @@ $endDate = date('Y-m');
                 toDate: toDate,
                 sampleType: sampleType,
                 facilityId: facilityId,
-                flag : 'poc'
+                flag: 'poc'
             },
             function(data) {
                 $("#monthlyCountsByLab").html(data);
@@ -544,7 +550,7 @@ $endDate = date('Y-m');
                 toDate: toDate,
                 sampleType: sampleType,
                 facilityId: facilityId,
-                flag : 'poc'
+                flag: 'poc'
             },
             function(data) {
                 // console.log(data);
@@ -566,7 +572,7 @@ $endDate = date('Y-m');
                 toDate: toDate,
                 sampleType: sampleType,
                 facilityId: facilityId,
-                flag : 'poc'
+                flag: 'poc'
             },
             function(data) {
                 // console.log(data);
@@ -584,7 +590,7 @@ $endDate = date('Y-m');
                 fromDate: fromDate,
                 toDate: toDate,
                 facilityId: facilityId,
-                flag : 'poc'
+                flag: 'poc'
             },
             function(data) {
                 $("#labAverageTat").html(data);
@@ -599,7 +605,7 @@ $endDate = date('Y-m');
                 fromDate: fromDate,
                 toDate: toDate,
                 facilityId: facilityId,
-                flag : 'poc'
+                flag: 'poc'
             },
             function(data) {
                 $("#labPerformance").html(data);
@@ -709,12 +715,12 @@ $endDate = date('Y-m');
         }
 
         $.when(getMonthlySampleCount(), getMonthlySampleCountbyLab())
-        .done(function() {
-            geteidOutcomesByAge();
-            positivityRate();
-            getAverageLabTAT();
-            getLabPerformance();
-        });
+            .done(function() {
+                geteidOutcomesByAge();
+                positivityRate();
+                getAverageLabTAT();
+                getLabPerformance();
+            });
         getTestFailedByTestingPlatform();
         getMapBubble();
         getInstrumentWiseTest();
@@ -736,12 +742,11 @@ $endDate = date('Y-m');
             });
     }
 
-    function getMapBubble()
-    {
+    function getMapBubble() {
 
         var H = Highcharts,
-        map = H.maps['custom/world'],
-        chart;
+            map = H.maps['custom/world'],
+            chart;
         // url = 'https://cdn.jsdelivr.net/gh/highcharts/highcharts@v7.0.0/samples/data/us-capitals.json'
         json = '<?php echo json_encode($chartDetail); ?>'
         json = JSON.parse(json)
@@ -749,7 +754,7 @@ $endDate = date('Y-m');
         // Highcharts.getJSON(url, function (json) {
         var data = [];
         var samplenottested = [];
-        json.forEach(function (p) {
+        json.forEach(function(p) {
             p.z = parseInt(p.total);
             data.push(p);
             p.z = parseInt(p.samplenottested);
@@ -759,39 +764,38 @@ $endDate = date('Y-m');
         // console.log(data)
         chart = Highcharts.mapChart('container', {
             title: {
-            text: 'Samples tested based on latitude and longitude'
+                text: 'Samples tested based on latitude and longitude'
             },
 
             tooltip: {
-            pointFormat: 
-                'Lat: {point.lat}<br>' +
-                'Lon: {point.lon}<br>' +
-                'Sample Not Tested: {point.samplenottested}<br>' +
-                'Total: {point.total}'
+                pointFormat: 'Lat: {point.lat}<br>' +
+                    'Lon: {point.lon}<br>' +
+                    'Sample Not Tested: {point.samplenottested}<br>' +
+                    'Total: {point.total}'
             },
 
             xAxis: {
-            crosshair: {
-                zIndex: 5,
-                dashStyle: 'dot',
-                snap: false,
-                color: 'gray'
-            }
+                crosshair: {
+                    zIndex: 5,
+                    dashStyle: 'dot',
+                    snap: false,
+                    color: 'gray'
+                }
             },
 
             yAxis: {
-            crosshair: {
-                zIndex: 5,
-                dashStyle: 'dot',
-                snap: false,
-                color: 'gray'
-            }
+                crosshair: {
+                    zIndex: 5,
+                    dashStyle: 'dot',
+                    snap: false,
+                    color: 'gray'
+                }
             },
             plotOptions: {
                 series: {
                     cursor: 'pointer',
                     events: {
-                        click: function (event) {
+                        click: function(event) {
                             // console.log(event.point)
                             lat = event.point.lat;
                             lon = event.point.lon;
@@ -803,77 +807,77 @@ $endDate = date('Y-m');
                 }
             },
             series: [{
-            name: 'Basemap',
-            mapData: map,
-            borderColor: '#606060',
-            nullColor: 'rgba(200, 200, 200, 0.2)',
-            showInLegend: false
+                name: 'Basemap',
+                mapData: map,
+                borderColor: '#606060',
+                nullColor: 'rgba(200, 200, 200, 0.2)',
+                showInLegend: false
             }, {
-            name: 'Separators',
-            type: 'mapline',
-            data: H.geojson(map, 'mapline'),
-            color: '#101010',
-            enableMouseTracking: false,
-            showInLegend: false
+                name: 'Separators',
+                type: 'mapline',
+                data: H.geojson(map, 'mapline'),
+                color: '#101010',
+                enableMouseTracking: false,
+                showInLegend: false
             }, {
-            type: 'mapbubble',
-            dataLabels: {
-                enabled: true,
-                format: '{point.total}'
-            },
-            name: 'Number of Samples Tested',
-            data: data,
-            maxSize: '20%',
-            color: H.getOptions().colors[0]
-            },{
-            type: 'mapbubble',
-            dataLabels: {
-                enabled: true,
-                format: '{point.samplenottested}'
-            },
-            name: 'Number of Samples Not Tested',
-            data: samplenottested,
-            maxSize: '12%',
-            color: 'red'
+                type: 'mapbubble',
+                dataLabels: {
+                    enabled: true,
+                    format: '{point.total}'
+                },
+                name: 'Number of Samples Tested',
+                data: data,
+                maxSize: '20%',
+                color: H.getOptions().colors[0]
+            }, {
+                type: 'mapbubble',
+                dataLabels: {
+                    enabled: true,
+                    format: '{point.samplenottested}'
+                },
+                name: 'Number of Samples Not Tested',
+                data: samplenottested,
+                maxSize: '12%',
+                color: 'red'
             }]
         });
         // });
 
-        document.getElementById('container').addEventListener('mousemove', function (e) {
-        var position;
-        if (chart) {
-            if (!chart.lab) {
-            chart.lab = chart.renderer.text('', 0, 0)
-                .attr({
-                zIndex: 5
-                })
-                .css({
-                color: '#505050'
-                })
-                .add();
+        document.getElementById('container').addEventListener('mousemove', function(e) {
+            var position;
+            if (chart) {
+                if (!chart.lab) {
+                    chart.lab = chart.renderer.text('', 0, 0)
+                        .attr({
+                            zIndex: 5
+                        })
+                        .css({
+                            color: '#505050'
+                        })
+                        .add();
+                }
+
+                e = chart.pointer.normalize(e);
+                position = chart.fromPointToLatLon({
+                    x: chart.xAxis[0].toValue(e.chartX),
+                    y: chart.yAxis[0].toValue(e.chartY)
+                });
+
+                chart.lab.attr({
+                    x: e.chartX + 5,
+                    y: e.chartY - 22,
+                    text: 'Lat: ' + position.lat.toFixed(2) + '<br>Lon: ' + position.lon.toFixed(2)
+                });
             }
-
-            e = chart.pointer.normalize(e);
-            position = chart.fromPointToLatLon({
-            x: chart.xAxis[0].toValue(e.chartX),
-            y: chart.yAxis[0].toValue(e.chartY)
-            });
-
-            chart.lab.attr({
-            x: e.chartX + 5,
-            y: e.chartY - 22,
-            text: 'Lat: ' + position.lat.toFixed(2) + '<br>Lon: ' + position.lon.toFixed(2)
-            });
-        }
         });
 
-        document.getElementById('container').addEventListener('mouseout', function () {
-        if (chart && chart.lab) {
-            chart.lab.destroy();
-            chart.lab = null;
-        }
+        document.getElementById('container').addEventListener('mouseout', function() {
+            if (chart && chart.lab) {
+                chart.lab.destroy();
+                chart.lab = null;
+            }
         });
-  
+
 
     }
 
@@ -910,7 +914,7 @@ $endDate = date('Y-m');
         if (pName != null && pName.length > 0) {
             $.post("<?php echo $this->url('common', array('action' => 'get-district-list')); ?>", {
                     provinceName: pName,
-                    flag : 'poc'
+                    flag: 'poc'
                 },
                 function(data) {
                     if (data != "" || data != null || data != undefined) {
@@ -928,7 +932,7 @@ $endDate = date('Y-m');
             $.post("<?php echo $this->url('common', array('action' => 'get-facility-list')); ?>", {
                     districtName: dName,
                     facilityType: 2,
-                    flag : 'poc'
+                    flag: 'poc'
                 },
                 function(data) {
                     if (data != "" || data != null || data != undefined) {
@@ -984,7 +988,7 @@ $endDate = date('Y-m');
     function formatDate(date) {
         // We are formatting Mon-Year date as 01/Mon/Year 
         // because firefox was not able to parse Mon-Year format
-        var d = new Date('01/'+date.replace("-" , "/")),
+        var d = new Date('01/' + date.replace("-", "/")),
             month = '' + (d.getMonth() + 1),
             year = d.getFullYear();
         if (month.length < 2) month = '0' + month;
@@ -1029,41 +1033,41 @@ $endDate = date('Y-m');
         $(document).ajaxStart($.blockUI({
             message: '<h4> <?php echo ($this->translate('Processing EID Outcomes By Age')); ?> ... </h4>'
         })).ajaxStop($.unblockUI);
-        
+
         var fromDate = formatDate($('#mrp-lowerDate').val());
         var toDate = formatDate($('#mrp-upperDate').val());
         var facilityId = ($("#labName").val() == null) ? '' : $("#labName").val().join(',');
 
         $.post("<?php echo $this->url('eid-labs', array('action' => 'get-eid-outcomes-by-age')); ?>", {
-            fromDate: fromDate,
-            toDate: toDate,
-            facilityId: facilityId,
-            flag : 'poc'
-        },
-        function(data) {
-            $("#eidOutcomesByAge").html(data);
-            $.unblockUI();
-        });
+                fromDate: fromDate,
+                toDate: toDate,
+                facilityId: facilityId,
+                flag: 'poc'
+            },
+            function(data) {
+                $("#eidOutcomesByAge").html(data);
+                $.unblockUI();
+            });
     }
-    
+
     function positivityRate() {
         $(document).ajaxStart($.blockUI({
             message: '<h4> <?php echo ($this->translate('Processing Positivity Rate')); ?> ... </h4>'
         })).ajaxStop($.unblockUI);
-        
+
         var fromDate = formatDate($('#mrp-lowerDate').val());
         var toDate = formatDate($('#mrp-upperDate').val());
         var facilityId = ($("#labName").val() == null) ? '' : $("#labName").val().join(',');
 
         $.post("<?php echo $this->url('eid-labs', array('action' => 'get-eid-positivity-rate')); ?>", {
-            fromDate: fromDate,
-            toDate: toDate,
-            facilityId: facilityId,
-            flag : 'poc'
-        },
-        function(data) {
-            $("#positivityRate").html(data);
-            $.unblockUI();
-        });
+                fromDate: fromDate,
+                toDate: toDate,
+                facilityId: facilityId,
+                flag: 'poc'
+            },
+            function(data) {
+                $("#positivityRate").html(data);
+                $.unblockUI();
+            });
     }
 </script>

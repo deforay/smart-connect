@@ -19,94 +19,97 @@ use Laminas\Db\TableGateway\AbstractTableGateway;
  *
  * @author amit
  */
-class OrganizationsTable extends AbstractTableGateway {
+class OrganizationsTable extends AbstractTableGateway
+{
 
     protected $table = 'organizations';
+    protected $adapter;
 
-    public function __construct(Adapter $adapter) {
+    public function __construct(Adapter $adapter)
+    {
         $this->adapter = $adapter;
     }
-    
-    
-    public function fetchOrganizations(){
+
+
+    public function fetchOrganizations()
+    {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->from(array('o' => 'organizations'))
-                ->join(array('ot' => 'organization_type'), 'o.org_type=ot.id', array('type'));
-        
+            ->join(array('ot' => 'organization_type'), 'o.org_type=ot.id', array('type'));
+
         $sQueryStr = $sql->buildSqlString($sQuery);
-        $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-        return $rResult;
+        return $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
     }
-    
-    
-    public function addOrganization($params){
+
+
+    public function addOrganization($params)
+    {
         $credoContainer = new Container('credo');
-        $newData=array('name'=>$params['name'],
-                       'org_type'=>$params['type'],
-                       'facility_id'=>$params['facilityId'],
-                       'contact_person'=>$params['contactPerson'],
-                       'email'=>$params['email'],
-                       'secondary_email'=>$params['secondaryEmail'],
-                       'phone'=>$params['phone'],
-                       'secondary_phone'=>$params['secondaryPhone'],
-                       'address'=>$params['address'],
-                       'country'=>$params['country'],
-                       'sub_level'=>$params['subLevel'],
-                       'longitude'=>$params['longitude'],
-                       'latitude'=>$params['latitude'],
-                       'created_by'=>$credoContainer->userId,
-                       'created_on'=> new Expression('NOW()'),
-                       'status'=>'active'
-                       );
-        
+        $newData = array(
+            'name' => $params['name'],
+            'org_type' => $params['type'],
+            'facility_id' => $params['facilityId'],
+            'contact_person' => $params['contactPerson'],
+            'email' => $params['email'],
+            'secondary_email' => $params['secondaryEmail'],
+            'phone' => $params['phone'],
+            'secondary_phone' => $params['secondaryPhone'],
+            'address' => $params['address'],
+            'country' => $params['country'],
+            'sub_level' => $params['subLevel'],
+            'longitude' => $params['longitude'],
+            'latitude' => $params['latitude'],
+            'created_by' => $credoContainer->userId,
+            'created_on' => new Expression('NOW()'),
+            'status' => 'active'
+        );
+
         //var_dump($newData);die;
-        
+
         $this->insert($newData);
         return $this->lastInsertValue;
-    }    
-    
-    
-    public function getOrganization($orgId){
+    }
+
+
+    public function getOrganization($orgId)
+    {
         $dbAdapter = $this->adapter;
 
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->from(array('o' => 'organizations'))
-                      ->where("org_id= $orgId");
-        
+            ->where("org_id= $orgId");
+
         $sQueryStr = $sql->buildSqlString($sQuery);
 
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-        if(count($rResult) > 0){
+        if (!empty($rResult)) {
             return $rResult[0];
-        }else{
-            return false;    
+        } else {
+            return false;
         }
-        
-    }    
-    
-    public function updateOrganization($params){
+    }
+
+    public function updateOrganization($params)
+    {
         $credoContainer = new Container('credo');
-        $userId = $credoContainer->userId;        
-        $data=array('name'=>$params['name'],
-                       'org_type'=>$params['type'],
-                       'facility_id'=>$params['facilityId'],
-                       'contact_person'=>$params['contactPerson'],
-                       'email'=>$params['email'],
-                       'secondary_email'=>$params['secondaryEmail'],
-                       'phone'=>$params['phone'],
-                       'secondary_phone'=>$params['secondaryPhone'],
-                       'address'=>$params['address'],
-                       'country'=>$params['country'],
-                       'sub_level'=>$params['subLevel'],
-                       'longitude'=>$params['longitude'],
-                       'latitude'=>$params['latitude'],
-                       'status'=>$params['status']
-                       );
-        return $this->update($data,array('org_id' => $params['orgId']));
-    }    
-    
-    
-    
-    
+        $userId = $credoContainer->userId;
+        $data = array(
+            'name' => $params['name'],
+            'org_type' => $params['type'],
+            'facility_id' => $params['facilityId'],
+            'contact_person' => $params['contactPerson'],
+            'email' => $params['email'],
+            'secondary_email' => $params['secondaryEmail'],
+            'phone' => $params['phone'],
+            'secondary_phone' => $params['secondaryPhone'],
+            'address' => $params['address'],
+            'country' => $params['country'],
+            'sub_level' => $params['subLevel'],
+            'longitude' => $params['longitude'],
+            'latitude' => $params['latitude'],
+            'status' => $params['status']
+        );
+        return $this->update($data, array('org_id' => $params['orgId']));
+    }
 }

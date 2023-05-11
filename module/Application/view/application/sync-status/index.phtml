@@ -29,7 +29,17 @@
 
     #syncStatusTable tr:hover {
         cursor: pointer;
-        background: #eee !important;
+        background: #777 !important;
+        color:#fff;
+    }
+
+    #syncStatusTable tr td{
+        text-align: left;
+        padding-left: 10px;
+    }
+    #syncStatusTable tr td status-indicator{
+    
+        margin-right: 5px;
     }
 </style>
 <div class="page-bar">
@@ -89,7 +99,7 @@
         initData();
     });
 
-    function initData(){
+    function initData() {
         $.blockUI();
         $.post("<?php echo $this->url('sync-status', array('action' => 'sync-status')); ?>", {},
             function(data) {
@@ -99,16 +109,21 @@
             });
     }
 
-    function exportSyncStatus(){
+    function exportSyncStatus() {
         $.blockUI.defaults.css.border = '1px solid grey';
-        $(document).ajaxStart($.blockUI({ message: '<h2><?php echo $this->translate('Processing...'); ?></h2>' })).ajaxStop($.unblockUI);
-        $.post("<?php echo $this->url('sync-status', array('action' => 'export-sync-status-excel')); ?>", {fromDate:$('#mrp-lowerDate').val(),toDate:$('#mrp-upperDate').val()},
-         function(data){
-            if(data == "" || data == null || data == undefined){
-                alert('<?php echo $this->translate('Unable to export excel'); ?>');
-            }else{
-                window.open('../temporary/'+data,'_blank');
-            }
-         }); 
+        $(document).ajaxStart($.blockUI({
+            message: '<h2><?php echo $this->translate('Processing...'); ?></h2>'
+        })).ajaxStop($.unblockUI);
+        $.post("<?php echo $this->url('sync-status', array('action' => 'export-sync-status-excel')); ?>", {
+                fromDate: $('#mrp-lowerDate').val(),
+                toDate: $('#mrp-upperDate').val()
+            },
+            function(data) {
+                if (data == "" || data == null || data == undefined) {
+                    alert('<?php echo $this->translate('Unable to export excel'); ?>');
+                } else {
+                    window.open('/temporary/' + data, '_blank');
+                }
+            });
     }
 </script>

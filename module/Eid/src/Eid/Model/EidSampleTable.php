@@ -2522,10 +2522,17 @@ class EidSampleTable extends AbstractTableGateway
             )
             ->group('eid.eid_test_platform');
 
+        if (isset($params['flag']) && $params['flag'] == 'poc') {
+            $queryStr = $queryStr
+                ->join(array('icm' => 'instrument_machines'), 'icm.config_machine_id = eid.import_machine_name', array('poc_device'))
+                ->where(array('icm.poc_device IS NOT NULL'))
+                ->where(array('eid.eid_test_platform IS NOT NULL'))
+                ->where(array('icm.poc_device' => 'yes'));
+        }
+
         $queryStr = $sql->buildSqlString($queryStr);
         // echo $queryStr;die;
-        $sampleResult = $this->commonService->cacheQuery($queryStr, $dbAdapter);
-        return $sampleResult;
+        return $this->commonService->cacheQuery($queryStr, $dbAdapter);
     }
 
     public function getMonthlySampleCount($params)

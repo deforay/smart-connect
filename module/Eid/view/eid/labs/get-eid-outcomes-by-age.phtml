@@ -1,9 +1,5 @@
 <?php
 
-use Zend\Debug\Debug;
-
-// Debug::dump($result);die;
-
 $neg[] = $result['noDatan'];
 $pos[] = $result['noDatap'];
 $neg[] = $result['less2n'];
@@ -27,8 +23,15 @@ $pos[] = $result['above24p'];
                 text: ''
             },
             xAxis: {
-                categories: ["Age Not Recorded", "less 2 months", "2-9 months", "9-12 months", "12-24 months", "Above 24 months"],
-                crosshair: true
+                categories: [
+                    "Age Not Recorded",
+                    "less 2 months",
+                    "2-9 months",
+                    "9-12 months",
+                    "12-24 months",
+                    "Above 24 months"
+                ],
+                crosshair: true,
             },
             yAxis: {
                 min: 0,
@@ -81,13 +84,13 @@ $pos[] = $result['above24p'];
             ],
             series: [{
                 "name": "Positive",
-                "data": [<?php echo implode(",",$pos);?>],
+                "data": [<?php echo implode(",", $pos); ?>],
                 "drilldown": {
                     "color": "#913D88"
                 }
             }, {
                 "name": "Negative",
-                "data": [<?php echo implode(",",$neg);?>],
+                "data": [<?php echo implode(",", $neg); ?>],
                 "drilldown": {
                     "color": "#96281B"
                 }

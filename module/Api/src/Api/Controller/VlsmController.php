@@ -2,6 +2,7 @@
 
 namespace Api\Controller;
 
+use Application\Service\CommonService;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\View\Model\JsonModel;
 
