@@ -180,7 +180,7 @@ class CommonService
 
      // Returns the given date in d-M-Y format
      // (with or without time depending on the $includeTime parameter)
-     public static function humanReadableDateFormat($date, $includeTime = false, $format = "d-M-Y")
+     public static function humanReadableDateFormat($date, $includeTime = false, $dateFormat = "d-M-Y", $timeFormat = "H:i:s")
      {
           $date = trim($date);
           if (false === self::verifyIfDateValid($date)) {
@@ -188,7 +188,7 @@ class CommonService
           } else {
 
                if ($includeTime === true) {
-                    $format = $format . " H:i";
+                    $format = $dateFormat . " " . $timeFormat;
                }
 
                return (new DateTimeImmutable($date))->format($format);
