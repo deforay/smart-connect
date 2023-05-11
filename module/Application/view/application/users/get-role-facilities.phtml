@@ -1,6 +1,6 @@
 <?php
 $facilities ='';
-if(isset($result) && count($result) >0){
+if(isset($result) && !empty($result)){
     foreach($result as $row){
       $facilities.='<option value="'.$row['facility_id'].'">'.ucwords($row['facility_name'] ." - ".$row['facility_name']).'</option>';
     }

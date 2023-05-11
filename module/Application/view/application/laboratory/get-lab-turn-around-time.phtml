@@ -190,7 +190,7 @@ die; */
             }
         },
         series: [<?php
-                    if (isset($result['sample']) && count($result['sample']) > 0) {
+                    if (isset($result['sample']) && !empty($result['sample'])) {
                         foreach ($result['sample'] as $key => $condition) {
                     ?> {
                         name: '<?php echo $this->translate($key); ?>',

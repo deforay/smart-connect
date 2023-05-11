@@ -2,13 +2,12 @@
 
 namespace Application\Model;
 
+use Laminas\Db\Sql\Sql;
+use Laminas\Db\Sql\Expression;
 use Laminas\Session\Container;
 use Laminas\Db\Adapter\Adapter;
-use Laminas\Db\Sql\Sql;
+use Application\Service\CommonService;
 use Laminas\Db\TableGateway\AbstractTableGateway;
-use Laminas\Db\Sql\Expression;
-//use Laminas\Db\Sql\Where;
-use \Application\Service\CommonService;
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -31,7 +30,7 @@ class SampleTable extends AbstractTableGateway
     protected $mappedFacilities = null;
     protected $translator = null;
     protected $adapter;
-    protected \Application\Service\CommonService $commonService;
+    protected CommonService $commonService;
 
     public function __construct(Adapter $adapter, $sm = null, $mappedFacilities = null, $table = null, $commonService = null)
     {
@@ -609,8 +608,8 @@ class SampleTable extends AbstractTableGateway
                 (DATEDIFF(sample_tested_datetime,sample_collection_date) < ' . $skipDays . ' AND 
                 DATEDIFF(sample_tested_datetime,sample_collection_date) >= 0)');
             $query = $query->where('
-                 (DATEDIFF(result_printed_datetime,sample_collection_date) < ' . $skipDays . ' AND 
-                 DATEDIFF(result_printed_datetime,sample_collection_date) >= 0)');
+                    (DATEDIFF(result_printed_datetime,sample_collection_date) < ' . $skipDays . ' AND 
+                    DATEDIFF(result_printed_datetime,sample_collection_date) >= 0)');
 
             if ($facilityIdList != null) {
                 $query = $query->where('vl.lab_id IN ("' . implode('", "', $facilityIdList) . '")');

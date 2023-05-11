@@ -12,7 +12,7 @@
             },
             xAxis: {
                 categories: [<?php
-                                if (isset($result['lab']) && count($result['lab']) > 0) {
+                                if (isset($result['lab']) && !empty($result['lab'])) {
                                     foreach ($result['lab'] as $lab) {
                                         echo "'" . $this->escapeHtml($lab) . "',";
                                     }
@@ -67,7 +67,7 @@
                 }
             },
             series: [<?php
-                        if (isset($result['sample']) && count($result['sample']) > 0) {
+                        if (isset($result['sample']) && !empty($result['sample'])) {
                             foreach ($result['sample'] as $key => $condition) {
                         ?> {
                             showInLegend: false,

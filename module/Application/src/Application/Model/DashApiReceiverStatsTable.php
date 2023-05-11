@@ -188,20 +188,45 @@ class DashApiReceiverStatsTable extends AbstractTableGateway
         $queryContainer = new Container('query');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $sQuery = $sql->select()->from(array('f' => "facility_details"))
-            ->columns(array(
-                "facility_id",
-                "labName" => "facility_name",
-                "latest" =>
-                new Expression("TIMESTAMP(GREATEST(
-                COALESCE(facility_attributes->>'$.lastDashboardHeartBeat', 0),
-                COALESCE(sync.received_on, 0)))")
-            ))
-            ->join(['sync' => $this->table], "sync.lab_id=f.facility_id", [], 'left')
-            ->group("f.facility_id")
-            ->where(["f.facility_type = 2"])
-            ->where(["f.status = 'active'"])
-            ->order(["latest DESC"]);
+        $innerQuery = $sql->select()
+            ->from('dash_api_receiver_stats')
+            ->columns([
+                'lab_id',
+                'last_5_syncs' => new Expression('JSON_OBJECT(
+                    "number_of_records_processed", number_of_records_processed,
+                    "received_on", received_on
+                )'),
+                'received_on'
+            ])
+            ->where(['lab_id IS NOT NULL'])
+            ->order(['received_on DESC'])
+            ->limit(5);
+
+        $subQuery = $sql->select()
+            ->from(['subquery' => $innerQuery])
+            ->columns([
+                'lab_id',
+                'last_5_syncs' => new Expression('JSON_ARRAYAGG(last_5_syncs)'),
+                'received_on'
+            ])
+            ->group('lab_id');
+
+        $sQuery = $sql->select()
+            ->from(['f' => 'facility_details'])
+            ->columns([
+                'facility_id',
+                'labName' => 'facility_name',
+                'latest' => new Expression("TIMESTAMP(GREATEST(
+            COALESCE(facility_attributes->>'$.lastDashboardHeartBeat', 0),
+            COALESCE(api.received_on, 0)
+        ))")
+            ])
+            ->join(['sync' => $this->table], 'sync.lab_id=f.facility_id', ['received_on'], 'left')
+            ->join(['api' => $subQuery], 'sync.lab_id=api.lab_id', ['last_5_syncs'], 'left')
+            ->group('f.facility_id')
+            ->where(['f.facility_type = 2'])
+            ->where(['f.status = "active"'])
+            ->order(['latest DESC']);
         $sQueryStr = $sql->buildSqlString($sQuery);
         $queryContainer->syncStatus = $sQuery;
         return $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();

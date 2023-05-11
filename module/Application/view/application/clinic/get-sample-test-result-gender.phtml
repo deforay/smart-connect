@@ -125,12 +125,11 @@ if (isset($result) && !empty($result)) {
                         }
                     }
                 }
-
             },
             series: [<?php
 
                         for ($i = 0; $i < 3; $i++) {
-                            if (isset($result[$gender[$i]]) && count($result[$gender[$i]]) > 0) {
+                            if (isset($result[$gender[$i]]) && !empty($result[$gender[$i]])) {
                                 foreach ($result[$gender[$i]] as $key => $condition) {
                                     if ($key != 'VL Not Detected') {
                                         $range = substr($key, 4, 6);

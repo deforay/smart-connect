@@ -19,7 +19,7 @@
             },
             xAxis: {
                 categories: [<?php
-                                if (isset($result['clinic']) && count($result['clinic']) > 0) {
+                                if (isset($result['clinic']) && !empty($result['clinic'])) {
                                     foreach ($result['clinic'] as $clinic) {
                                         echo "'" . $clinic . "',";
                                     }
@@ -55,7 +55,7 @@
                 }
             },
             series: [<?php
-                        if (isset($result['sample']) && count($result['sample']) > 0) {
+                        if (isset($result['sample']) && !empty($result['sample'])) {
                             foreach ($result['sample'] as $key => $condition) {
                         ?> {
                             showInLegend: false,

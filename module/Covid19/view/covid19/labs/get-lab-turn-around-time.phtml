@@ -137,7 +137,7 @@
         },
         xAxis: [{
             categories: [<?php
-                            if (isset($result['dates']) && count($result['dates']) > 0) {
+                            if (isset($result['dates']) && !empty($result['dates'])) {
                                 foreach ($result['dates'] as $date) {
                                     echo "'" . $date . "',";
                                 }
@@ -176,7 +176,7 @@
             }
         },
         series: [<?php
-                    if (isset($result['data']) && count($result['data']) > 0) {
+                    if (isset($result['data']) && !empty($result['data'])) {
                         foreach ($result['data'] as $key => $condition) {
                     ?> {
                         name: '<?php echo $this->translate($key); ?>',

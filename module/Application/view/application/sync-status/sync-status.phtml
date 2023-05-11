@@ -7,8 +7,10 @@ $twoWeekExpiry = $today->sub(DateInterval::createFromDateString('2 weeks'));
 $threeWeekExpiry = $today->sub(DateInterval::createFromDateString('4 weeks'));
 
 foreach ($result as $key => $aRow) {
+
+
     $color = "<status-indicator negative pulse></status-indicator>";
-    $aRow['latest'] = $aRow['latest'] ?? $aRow['requested_on'] ?? null  ;
+    $aRow['latest'] = $aRow['latest'] ?? $aRow['requested_on'] ?? null;
     $latest = CommonService::verifyIfDateValid($aRow['latest']) ? new DateTimeImmutable($aRow['latest']) : null;
 
     if (is_null($latest)) {
@@ -20,10 +22,26 @@ foreach ($result as $key => $aRow) {
     } elseif ($latest >= $threeWeekExpiry) {
         $color = "<status-indicator negative pulse></status-indicator>";
     }
-    /* Assign data table variables */ ?>
+?>
     <tr class="" data-facilityId="<?php echo base64_encode($aRow['facility_id']); ?>">
-        <td><?= $color. " " . htmlspecialchars($aRow['labName']) ?></td>
+        <td><?= $color . " " . $this->escapeHtml($aRow['labName']) ?></td>
         <td><?= $this->humanReadableDateFormat($aRow['latest'], true); ?></td>
+        <?php if (!empty($aRow['last_5_syncs'])) : ?>
+            <?php
+            $syncs = json_decode($aRow['last_5_syncs'], true);
+            for ($i = 0; $i < 5; $i++) : ?>
+                <?php if (isset($syncs[$i])) : ?>
+                    <td>
+                        <?= $this->humanReadableDateFormat($syncs[$i]['received_on'], true); ?>
+                        <?= (isset($syncs[$i]['number_of_records_processed']) && $syncs[$i]['number_of_records_processed'] > 0) ? "<br> (" . $this->translate('No. of records') . " : " . $syncs[$i]['number_of_records_processed'] . ')' : ''; ?>
+                    </td>
+                <?php else : ?>
+                    <td></td>
+                <?php endif; ?>
+            <?php endfor; ?>
+        <?php else : ?>
+            <td colspan="5"><?= $this->translate('Not enough data'); ?></td>
+        <?php endif; ?>
     </tr>
 <?php
 }

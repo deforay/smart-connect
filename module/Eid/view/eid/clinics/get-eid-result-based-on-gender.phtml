@@ -55,7 +55,7 @@ $(function () {
             }
         },
         series: [<?php
-              if(isset($result) && count($result) >0){
+              if(isset($result) && !empty($result)){
                  for($t=0;$t<count($type);$t++){
                      $typeColor = '#6e6e9e';
                      if($type[$t] == 'Positive'){

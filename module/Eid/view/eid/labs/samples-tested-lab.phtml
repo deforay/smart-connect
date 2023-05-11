@@ -116,7 +116,7 @@ if (isset($facilityInfo['labDistricts']) && !empty($facilityInfo['labDistricts']
                     <label class="control-label"><?php echo $this->translate('Labs'); ?>&nbsp;</label>
                     <select name="labName[]" id="labName" class="form-control" multiple title="<?php echo $this->translate('Please choose labs'); ?>">
                         <?php
-                        if (isset($facilityInfo['labs']) && count($facilityInfo['labs']) > 0) {
+                        if (isset($facilityInfo['labs']) && !empty($facilityInfo['labs'])) {
                             foreach ($facilityInfo['labs'] as $labs) {
                         ?>
                                 <option value="<?php echo $labs['facility_id']; ?>" <?php echo (in_array($labs['facility_name'], $selectedLabs)) ? 'selected="selected"' : ''; ?>><?php echo ucwords($labs['facility_name']); ?></option>
@@ -142,7 +142,7 @@ if (isset($facilityInfo['labDistricts']) && !empty($facilityInfo['labDistricts']
                     <label class="control-label"><?php echo $this->translate('Clinics'); ?>&nbsp;</label>
                     <select class="form-control" id="clinicId" name="clinicId[]" multiple title="<?php echo $this->translate('Please choose clinics'); ?>">
                         <?php
-                        if (isset($facilityInfo['clinics']) && count($facilityInfo['clinics']) > 0) {
+                        if (isset($facilityInfo['clinics']) && !empty($facilityInfo['clinics'])) {
                             foreach ($facilityInfo['clinics'] as $clinics) {
                         ?>
                                 <option value="<?php echo $clinics['facility_id']; ?>"><?php echo ucwords($clinics['facility_name']); ?></option>

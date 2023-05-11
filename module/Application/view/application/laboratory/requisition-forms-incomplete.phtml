@@ -79,7 +79,7 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
                     <label class="control-label"><?php echo $this->translate('Provinces'); ?>&nbsp;</label>
                     <select name="provinces[]" id="provinces" class="form-control" multiple title="<?php echo $this->translate('Please choose provinces'); ?>" onchange="getLocationInfo('provinces');">
                         <?php
-                        if(isset($facilityInfo['provinces']) && count($facilityInfo['provinces']) > 0){
+                        if(isset($facilityInfo['provinces']) && !empty($facilityInfo['provinces'])){
                             foreach($facilityInfo['provinces'] as $province){
                         ?>
                             <option value="<?php echo $province['geo_id']; ?>" <?php echo(in_array($province['geo_id'],$selectedProvinces))?'selected="selected"':''; ?>><?php echo ucwords($province['geo_name']); ?></option>
@@ -90,7 +90,7 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
                     <label class="control-label"><?php echo $this->translate('Districts'); ?>&nbsp;</label>
                     <select name="districts[]" id="districts" class="form-control" multiple title="<?php echo $this->translate('Please choose districts'); ?>" onchange="getLocationInfo('districts');">
                         <?php
-                        if(isset($facilityInfo['provinceDistricts']) && count($facilityInfo['provinceDistricts']) > 0){
+                        if(isset($facilityInfo['provinceDistricts']) && !empty($facilityInfo['provinceDistricts'])){
                             foreach($facilityInfo['provinceDistricts'] as $provinceDistrict){
                         ?>
                             <option value="<?php echo $provinceDistrict['geo_id']; ?>" <?php echo(in_array($provinceDistrict['geo_id'],$selectedDistricts))?'selected="selected"':''; ?>><?php echo ucwords($provinceDistrict['geo_name']); ?></option>

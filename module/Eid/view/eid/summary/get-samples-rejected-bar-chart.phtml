@@ -1,93 +1,92 @@
 <?php
-if(isset($result) && !empty($result)){
+if (isset($result) && !empty($result)) {
 ?>
-<div id="samplesRejectedBarChartData" style="min-height:400px;"></div>
-<script>
-       $(function () {
-              $('#samplesRejectedBarChartData').highcharts({
-              chart: {
-                  type: 'column',
-                  marginTop: 120
-              },
-              legend: {
-                  align: 'center',
-                  verticalAlign: 'top',
-                  floating: true,
-                  x: 0,
-                  y: 30
-              },
-              title: {
-                  text: ''
-              },
-              exporting:{
-                  chartOptions:{
-                      subtitle: {
-                          text:'<?php echo $this->translate('Samples Rejected'); ?>',
-                      }
-                  }
-              },
-             credits: {
-                    enabled: false
-             },
-              xAxis: {
-                  categories: [<?php
-                  if (isset($result['date']) && !empty($result['date'])) {
-                    foreach($result['date'] as $date){
-                        echo "'".$date."',";
-                    }
-                  }
-                  ?>]
-              },
-              yAxis: {
-                  allowDecimals: false,
-                  min: 0,
-                  title: {
-                      text: '<?php echo $this->translate('No. of Samples'); ?>'
-                  }
-              },
-              tooltip: {
-                  formatter: function () {
-                      return '<b>' + this.x + '</b><br/>' +
-                          this.series.name + ': ' + this.y + '<br/>' +
-                          '<?php echo $this->translate('Total'); ?>: ' + this.point.stackTotal;
-                  }
-              },
-              plotOptions: {
-                  column: {
-                      stacking: 'normal',
-                      pointPadding: 0.2,
-                      borderWidth: 0,
-                      cursor: 'pointer',
-                      point: {
-                          events: {
-                              click: function (e) {
-                                  
-                              }
-                          }
-                      }
-                  }
-              },
-              series: [<?php
-              if(isset($result['rejection']) && count($result['rejection']) >0){
-                    foreach($result['rejection'] as $key=>$condition){                     
-                    ?>
-                    {
-                    name:'<?php echo $this->translate(strtoupper($key)); ?>',
-                    data:[<?php
-                        foreach($condition as $count){
-                           echo '{y:'.$count.'},';
+    <div id="samplesRejectedBarChartData" style="min-height:400px;"></div>
+    <script>
+        $(function() {
+            $('#samplesRejectedBarChartData').highcharts({
+                chart: {
+                    type: 'column',
+                    marginTop: 120
+                },
+                legend: {
+                    align: 'center',
+                    verticalAlign: 'top',
+                    floating: true,
+                    x: 0,
+                    y: 30
+                },
+                title: {
+                    text: ''
+                },
+                exporting: {
+                    chartOptions: {
+                        subtitle: {
+                            text: '<?php echo $this->translate('Samples Rejected'); ?>',
                         }
-                    ?>],
-                    },
-                    <?php
                     }
-              }
-                  ?>
-              ],
-              //colors: ['#7cb5ec','#e4d354','#8085e9','#869EA7','#434348']
-          });
-       });
-</script>
-<?php }else{ ?>
-<h3 style="text-align:center;">No data available</h3>
+                },
+                credits: {
+                    enabled: false
+                },
+                xAxis: {
+                    categories: [<?php
+                                    if (isset($result['date']) && !empty($result['date'])) {
+                                        foreach ($result['date'] as $date) {
+                                            echo "'" . $date . "',";
+                                        }
+                                    }
+                                    ?>]
+                },
+                yAxis: {
+                    allowDecimals: false,
+                    min: 0,
+                    title: {
+                        text: '<?php echo $this->translate('No. of Samples'); ?>'
+                    }
+                },
+                tooltip: {
+                    formatter: function() {
+                        return '<b>' + this.x + '</b><br/>' +
+                            this.series.name + ': ' + this.y + '<br/>' +
+                            '<?php echo $this->translate('Total'); ?>: ' + this.point.stackTotal;
+                    }
+                },
+                plotOptions: {
+                    column: {
+                        stacking: 'normal',
+                        pointPadding: 0.2,
+                        borderWidth: 0,
+                        cursor: 'pointer',
+                        point: {
+                            events: {
+                                click: function(e) {
+
+                                }
+                            }
+                        }
+                    }
+                },
+                series: [<?php
+                            if (isset($result['rejection']) && !empty($result['rejection'])) {
+                                foreach ($result['rejection'] as $key => $condition) {
+                            ?> {
+                                name: '<?php echo $this->translate(strtoupper($key)); ?>',
+                                data: [<?php
+                                        foreach ($condition as $count) {
+                                            echo '{y:' . $count . '},';
+                                        }
+                                        ?>],
+                            },
+                    <?php
+                                }
+                            }
+                    ?>
+                ],
+                //colors: ['#7cb5ec','#e4d354','#8085e9','#869EA7','#434348']
+            });
+        });
+    </script>
+<?php } else { ?>
+    <h3 style="text-align:center;">No data available</h3>
 <?php } ?>

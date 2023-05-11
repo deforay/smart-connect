@@ -1,24 +1,24 @@
 <?php
 $available = 0;
-if(isset($result) && count($result) > 0){
-    foreach($result as $lab){
-        if($lab['latitude'] != null && trim($lab['latitude']) != '' && $lab['longitude'] != null && trim($lab['longitude']) != ''){
-            $available+=1;
+if (isset($result) && !empty($result)) {
+    foreach ($result as $lab) {
+        if ($lab['latitude'] != null && trim($lab['latitude']) != '' && $lab['longitude'] != null && trim($lab['longitude']) != '') {
+            $available += 1;
         }
     }
 }
 
-if(isset($result['clinic']) && count($result['clinic']) > 0){
-    foreach($result['clinic'] as $clinic){
-        if($clinic['latitude'] != null && trim($clinic['latitude']) != '' && $clinic['longitude'] != null && trim($clinic['longitude']) != ''){
-           $available+=1; 
+if (isset($result['clinic']) && !empty($result['clinic'])) {
+    foreach ($result['clinic'] as $clinic) {
+        if ($clinic['latitude'] != null && trim($clinic['latitude']) != '' && $clinic['longitude'] != null && trim($clinic['longitude']) != '') {
+            $available += 1;
         }
     }
 }
-if($available > 0) { ?>
+if ($available > 0) { ?>
     <div id="gmap-polyline" class="mapChart" style="height:<?php echo $height; ?> !important;"></div>
     <script>
-        $(document).ready(function(){
+        $(document).ready(function() {
             var map;
             var bounds = new google.maps.LatLngBounds();
             var prev_infowindow = false;
@@ -26,65 +26,69 @@ if($available > 0) { ?>
                 mapTypeId: 'roadmap',
                 scrollwheel: false,
                 center: {
-                  lat: -18.665700,
-                  lng: 35.535093
+                    lat: -18.665700,
+                    lng: 35.535093
                 }
-            };  
-           // Display a map on the page
-           map = new google.maps.Map(document.getElementById("gmap-polyline"),mapOptions);
+            };
+            // Display a map on the page
+            map = new google.maps.Map(document.getElementById("gmap-polyline"), mapOptions);
             // Multiple Markers
             var markers = [
                 //labs
                 <?php
-                if(isset($result) && count($result) > 0){
-                    foreach($result as $labInfo){
-                        if($labInfo['latitude'] != null && trim($labInfo['latitude']) != '' && $labInfo['longitude'] != null && trim($labInfo['longitude']) != ''){
-                ?>
-                {
-                 lat: "<?php echo $labInfo['latitude']; ?>",
-                 lon: "<?php echo $labInfo['longitude']; ?>",
-                 title: "<?php echo ucwords($labInfo['facility_name']);?>",
-                 icon : "<?php echo $this->basePath('assets/img/lab0.png') ?>",
-                 label : "<h5><?php echo ucwords($labInfo['facility_name']);?></h5><span><?php echo $this->translate('No. of Samples'); ?> : <?php echo $labInfo['labCount']; ?></span>"
-                },
-                <?php } } } ?>
+                if (isset($result) && !empty($result)) {
+                    foreach ($result as $labInfo) {
+                        if ($labInfo['latitude'] != null && trim($labInfo['latitude']) != '' && $labInfo['longitude'] != null && trim($labInfo['longitude']) != '') {
+                ?> {
+                                lat: "<?php echo $labInfo['latitude']; ?>",
+                                lon: "<?php echo $labInfo['longitude']; ?>",
+                                title: "<?php echo ucwords($labInfo['facility_name']); ?>",
+                                icon: "<?php echo $this->basePath('assets/img/lab0.png') ?>",
+                                label: "<h5><?php echo ucwords($labInfo['facility_name']); ?></h5><span><?php echo $this->translate('No. of Samples'); ?> : <?php echo $labInfo['labCount']; ?></span>"
+                            },
+                <?php }
+                    }
+                } ?>
                 //clinics
                 <?php
-                if(isset($result['clinic']) && count($result['clinic']) > 0){
-                    foreach($result['clinic'] as $clinicInfo){
-                        if($clinicInfo['latitude'] != null && trim($clinicInfo['latitude']) != '' && $clinicInfo['longitude'] != null && trim($clinicInfo['longitude']) != ''){
-                ?>
-                {
-                 lat: "<?php echo $clinicInfo['latitude']; ?>",
-                 lon: "<?php echo $clinicInfo['longitude']; ?>",
-                 title: "<?php echo ucwords($clinicInfo['facility_name']);?>",
-                 icon : "<?php echo $this->basePath('assets/img/clinic.png') ?>",
-                 label : "<h5><?php echo ucwords($clinicInfo['facility_name']);?></h5><span><?php echo $this->translate('No. of Samples'); ?> : <?php echo $clinicInfo['clinicCount']; ?></span>"
-                },
-                <?php } } } ?>
+                if (isset($result['clinic']) && !empty($result['clinic'])) {
+                    foreach ($result['clinic'] as $clinicInfo) {
+                        if ($clinicInfo['latitude'] != null && trim($clinicInfo['latitude']) != '' && $clinicInfo['longitude'] != null && trim($clinicInfo['longitude']) != '') {
+                ?> {
+                                lat: "<?php echo $clinicInfo['latitude']; ?>",
+                                lon: "<?php echo $clinicInfo['longitude']; ?>",
+                                title: "<?php echo ucwords($clinicInfo['facility_name']); ?>",
+                                icon: "<?php echo $this->basePath('assets/img/clinic.png') ?>",
+                                label: "<h5><?php echo ucwords($clinicInfo['facility_name']); ?></h5><span><?php echo $this->translate('No. of Samples'); ?> : <?php echo $clinicInfo['clinicCount']; ?></span>"
+                            },
+                <?php }
+                    }
+                } ?>
             ];
-            
+
             // Loop through our array of markers & place each one on the map
-            for( i = 0; i < markers.length; i++ ) {
+            for (i = 0; i < markers.length; i++) {
                 var position = new google.maps.LatLng(markers[i]['lat'], markers[i]['lon']);
                 bounds.extend(position);
                 marker = new google.maps.Marker({
                     position: position,
                     map: map,
                     //title: markers[i]['title'],
-                    icon : markers[i]['icon']
+                    icon: markers[i]['icon']
                 });
                 marker['infowindow'] = new google.maps.InfoWindow({
-                    content: markers[i]['label']    
+                    content: markers[i]['label']
                 });
                 google.maps.event.addListener(marker, 'mouseover', function() {
-                    if( prev_infowindow ) {
-                       prev_infowindow.close();
+                    if (prev_infowindow) {
+                        prev_infowindow.close();
                     }
-            
+
                     prev_infowindow = this['infowindow'];
                     prev_infowindow.open(map, this);
-                    setTimeout(function() { prev_infowindow.close(); }, 3000);
+                    setTimeout(function() {
+                        prev_infowindow.close();
+                    }, 3000);
                 });
                 // Automatically center the map fitting all markers on the screen
                 map.fitBounds(bounds);
@@ -94,9 +98,11 @@ if($available > 0) { ?>
                 this.setZoom(6);
                 google.maps.event.removeListener(boundsListener);
             });
-            
-         });
+
+        });
     </script>
 <?php } else { ?>
-    <div style="text-align:center;"><h5><strong><?php echo $this->translate('Sorry..Location not available'); ?>.</strong></h5></div>
+    <div style="text-align:center;">
+        <h5><strong><?php echo $this->translate('Sorry..Location not available'); ?>.</strong></h5>
+    </div>
 <?php } ?>

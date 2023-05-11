@@ -32,7 +32,7 @@ if (isset($result['sampleName']) && !empty($result['sampleName'])) {
             },
             xAxis: {
                 categories: [<?php
-                                if (isset($result['lab']) && count($result['lab']) > 0) {
+                                if (isset($result['lab']) && !empty($result['lab'])) {
                                     foreach ($result['lab'] as $lab) {
                                         echo "'" . $this->escapeHtml($lab) . "',";
                                     }

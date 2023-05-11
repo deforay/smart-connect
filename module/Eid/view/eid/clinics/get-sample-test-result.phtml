@@ -69,7 +69,7 @@ foreach($result as $sample=>$result){
                 $sampleType[0]['sample_name'] = 'DBS';
                 $sampleType[1]['sample_name'] = 'Others';
                 foreach ($sampleType as $sample) {
-                    if (isset($result[$sample['sample_name']]) && count($result[$sample['sample_name']]) > 0) {
+                    if (isset($result[$sample['sample_name']]) && !empty($result[$sample['sample_name']])) {
                         foreach ($result[$sample['sample_name']] as $key => $condition) {
                 ?> {
                                 name: '<?php echo $this->translate(sprintf($sample['sample_name'] . " - " . $key)); ?>',

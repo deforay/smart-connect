@@ -1,6 +1,6 @@
 <div id="regimenGroupBarChartData"></div>
 <script>
-    $(function () {
+    $(function() {
         $('#regimenGroupBarChartData').highcharts({
             chart: {
                 zoomType: 'xy',
@@ -19,24 +19,24 @@
             subtitle: {
                 text: ''
             },
-            exporting:{
-                    chartOptions:{
-                        subtitle: {
-                            text:'<?php echo $this->translate('Regimen Groups'); ?>',
-                        }
+            exporting: {
+                chartOptions: {
+                    subtitle: {
+                        text: '<?php echo $this->translate('Regimen Groups'); ?>',
                     }
-                },
+                }
+            },
             credits: {
-                      enabled: false
-               },
+                enabled: false
+            },
             xAxis: [{
                 categories: [<?php
-                    if(isset($result['current_regimen']) && count($result['current_regimen'])>0){
-                      foreach($result['current_regimen'] as $currentRegimen){
-                          echo "'".$currentRegimen."',";
-                      }
-                    }
-                    ?>],
+                                if (isset($result['current_regimen']) && !empty($result['current_regimen'])) {
+                                    foreach ($result['current_regimen'] as $currentRegimen) {
+                                        echo "'" . $currentRegimen . "',";
+                                    }
+                                }
+                                ?>],
                 tickInterval: 1,
                 //minorTicks: true,
                 //tickPosition: 'inside',
@@ -78,38 +78,38 @@
             tooltip: {
                 shared: true
             },
-            
+
             series: [{
                 name: '<?php echo $this->translate('Valid Results'); ?> (R)',
                 type: 'column',
                 yAxis: 1,
                 data: [
-                <?php if(isset($result['valid_results']) && count($result['valid_results']) >0){
-                      foreach($result['valid_results'] as $validResult){                     
-                        echo $validResult.',';
-                      }
-                      ?>
-               <?php  } ?>
+                    <?php if (isset($result['valid_results']) && !empty($result['valid_results'])) {
+                        foreach ($result['valid_results'] as $validResult) {
+                            echo $validResult . ',';
+                        }
+                    ?>
+                    <?php  } ?>
                 ],
                 tooltip: {
                     valueSuffix: ' '
                 }
-        
+
             }, {
                 name: '<?php echo $this->translate('Suppression Rate'); ?>(L)',
                 type: 'spline',
-                lineWidth : 0,
+                lineWidth: 0,
                 data: [
-                <?php if(isset($result['suppression_rate']) && count($result['suppression_rate']) >0){
-                      foreach($result['suppression_rate'] as $suppressionRate){                     
-                        echo ($suppressionRate>0) ? $suppressionRate.',' : null;
-                      }
-                      ?>
-               <?php  } ?>
+                    <?php if (isset($result['suppression_rate']) && !empty($result['suppression_rate'])) {
+                        foreach ($result['suppression_rate'] as $suppressionRate) {
+                            echo ($suppressionRate > 0) ? $suppressionRate . ',' : null;
+                        }
+                    ?>
+                    <?php  } ?>
                 ],
                 marker: {
                     symbol: 'diamond'
-                },                
+                },
                 tooltip: {
                     valueSuffix: '%'
                 },

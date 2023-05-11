@@ -1,8 +1,8 @@
                     <?php
                     $mappedFacilities = array();
-                    if(isset($user['facilities']) && count($user['facilities']) >0){
-                        foreach($user['facilities'] as $row){
-                           $mappedFacilities[] = $row['facility_id'];
+                    if (isset($user['facilities']) && !empty($user['facilities'])) {
+                        foreach ($user['facilities'] as $row) {
+                            $mappedFacilities[] = $row['facility_id'];
                         }
                     }
                     ?>
@@ -36,131 +36,136 @@
                             <!-- BEGIN EXAMPLE TABLE PORTLET-->
                             <div class="portlet light bordered">
                                 <div class="portlet-body">
-                                <div class="portlet-body form">
-                                    <form class="form-horizontal" name="editUserInformation" id="editUserInformation" method="post" action="/users/edit" role="form" autocomplete="off">
-                                        <div class="form-body">
-                                            <div class="form-group">
-                                                <label class="col-md-3 control-label"><?php echo $this->translate('Name'); ?> <span class="font-red-mint">*</span></label>
-                                                <div class="col-md-6">
-                                                    <input type="text" id="username" name="username" class="form-control isRequired" placeholder="" value="<?php echo $user->user_name; ?>" title="<?php echo $this->translate('Please enter the name'); ?>">
-                                                    <input type="hidden" id="userId" name="userId" class="form-control isRequired" placeholder="" value="<?php echo base64_encode($user->user_id); ?>">
+                                    <div class="portlet-body form">
+                                        <form class="form-horizontal" name="editUserInformation" id="editUserInformation" method="post" action="/users/edit" role="form" autocomplete="off">
+                                            <div class="form-body">
+                                                <div class="form-group">
+                                                    <label class="col-md-3 control-label"><?php echo $this->translate('Name'); ?> <span class="font-red-mint">*</span></label>
+                                                    <div class="col-md-6">
+                                                        <input type="text" id="username" name="username" class="form-control isRequired" placeholder="" value="<?php echo $user->user_name; ?>" title="<?php echo $this->translate('Please enter the name'); ?>">
+                                                        <input type="hidden" id="userId" name="userId" class="form-control isRequired" placeholder="" value="<?php echo base64_encode($user->user_id); ?>">
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label class="col-md-3 control-label"><?php echo $this->translate('User Type'); ?> <span class="font-red-mint">*</span></label>
-                                                <div class="col-md-6">
-                                                    <select class="form-control isRequired" name="role" id="role" title="<?php echo $this->translate('Please select the role'); ?>">
-                                                        <option value="">--<?php echo $this->translate('Select'); ?>--</option>
-                                                        <?php
+                                                <div class="form-group">
+                                                    <label class="col-md-3 control-label"><?php echo $this->translate('User Type'); ?> <span class="font-red-mint">*</span></label>
+                                                    <div class="col-md-6">
+                                                        <select class="form-control isRequired" name="role" id="role" title="<?php echo $this->translate('Please select the role'); ?>">
+                                                            <option value="">--<?php echo $this->translate('Select'); ?>--</option>
+                                                            <?php
                                                             //$options = [];
-                                                            foreach($roles as $r) {
-                                                            // $options[$r['access_type_name']][$r['id']] = $r['role_name'];
-                                                        ?>
-                                                          <option value="<?php echo $r['role_id']; ?>" <?php echo ($user->role == $r['role_id'] ? " selected='selected' " : ""); ?> ><?php echo ucwords($r['role_name']); ?></option>
-                                                        <?php
-                                                       }
-                                                       ?>                                                        
-                                                        
-                                                    </select>
+                                                            foreach ($roles as $r) {
+                                                                // $options[$r['access_type_name']][$r['id']] = $r['role_name'];
+                                                            ?>
+                                                                <option value="<?php echo $r['role_id']; ?>" <?php echo ($user->role == $r['role_id'] ? " selected='selected' " : ""); ?>><?php echo ucwords($r['role_name']); ?></option>
+                                                            <?php
+                                                            }
+                                                            ?>
+
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="col-md-3 control-label"><?php echo $this->translate('Facility'); ?> </label>
+                                                    <div class="col-md-6">
+                                                        <select class="form-control" id="facility" name="facility[]" multiple title="<?php echo $this->translate('Please select facility'); ?>">
+                                                            <?php
+                                                            foreach ($facilities as $row) {
+                                                            ?>
+                                                                <option value="<?php echo $row['facility_id']; ?>" <?php echo (in_array($row['facility_id'], array_values(array_filter($mappedFacilities)))) ? 'selected="selected"' : ''; ?>><?php echo ucwords($row['facility_name']); ?></option>
+                                                            <?php } ?>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="col-md-3 control-label"><?php echo $this->translate('Email'); ?> <span class="font-red-mint">*</span></label>
+                                                    <div class="col-md-6">
+                                                        <input type="email" id="email" name="email" class="form-control isEmail isRequired" placeholder="" value="<?php echo $user->email; ?>" title="<?php echo $this->translate('Please enter valid email'); ?>">
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="col-md-3 control-label"><?php echo $this->translate('Mobile'); ?> </label>
+                                                    <div class="col-md-6">
+                                                        <input type="tel" id="mobile" name="mobile" class="form-control " placeholder="" value="<?php echo $user->mobile; ?>">
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="col-md-3 control-label"><?php echo $this->translate('Password'); ?> </label>
+                                                    <div class="col-md-6">
+                                                        <input type="password" id="password" name="password" class="form-control" placeholder="">
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label class="col-md-3 control-label"><?php echo $this->translate('Status'); ?> <span class="font-red-mint">*</span></label>
+                                                    <div class="col-md-6">
+                                                        <select class="form-control isRequired" name="status" id="status" title="<?php echo $this->translate('Please select the status'); ?>">
+                                                            <option value="">--<?php echo $this->translate('Select'); ?>--</option>
+                                                            <option value="active" "<?php echo ($user->status == 'active' ? " selected='selected' " : ""); ?>"><?php echo $this->translate('Active'); ?></option>
+                                                            <option value="inactive" "<?php echo ($user->status == 'inactive' ? " selected='selected' " : ""); ?>"><?php echo $this->translate('Inactive'); ?></option>
+                                                        </select>
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div class="form-group">
-                                                <label class="col-md-3 control-label"><?php echo $this->translate('Facility'); ?> </label>
-                                                <div class="col-md-6">
-                                                    <select class="form-control" id="facility" name="facility[]" multiple title="<?php echo $this->translate('Please select facility'); ?>">
-                                                      <?php
-                                                      foreach($facilities as $row){
-                                                      ?>
-                                                        <option value="<?php echo $row['facility_id']; ?>" <?php echo (in_array($row['facility_id'],array_values(array_filter($mappedFacilities))))?'selected="selected"':''; ?>><?php echo ucwords($row['facility_name']); ?></option>
-                                                      <?php } ?>
-                                                    </select>
+                                            <div class="form-actions">
+                                                <div class="row">
+                                                    <div class="col-md-offset-3 col-md-9">
+                                                        <input type="button" class="btn green" value="<?php echo $this->translate('Submit'); ?>" onclick="validateNow();return false;">
+                                                        <a href="<?php echo $this->url('users', array('action' => 'index')); ?>" class="btn default"><?php echo $this->translate('Cancel'); ?></a>
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div class="form-group">
-                                                <label class="col-md-3 control-label"><?php echo $this->translate('Email'); ?> <span class="font-red-mint">*</span></label>
-                                                <div class="col-md-6">
-                                                    <input type="email" id="email" name="email" class="form-control isEmail isRequired" placeholder="" value="<?php echo $user->email; ?>" title="<?php echo $this->translate('Please enter valid email'); ?>">
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label class="col-md-3 control-label"><?php echo $this->translate('Mobile'); ?> </label>
-                                                <div class="col-md-6">
-                                                    <input type="tel" id="mobile" name="mobile" class="form-control " placeholder="" value="<?php echo $user->mobile; ?>" >
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label class="col-md-3 control-label"><?php echo $this->translate('Password'); ?> </label>
-                                                <div class="col-md-6">
-                                                    <input type="password" id="password" name="password" class="form-control" placeholder="">
-                                                </div>
-                                            </div>
-                                            
-                                            <div class="form-group">
-                                                <label class="col-md-3 control-label"><?php echo $this->translate('Status'); ?> <span class="font-red-mint">*</span></label>
-                                                <div class="col-md-6">
-                                                    <select class="form-control isRequired" name="status" id="status" title="<?php echo $this->translate('Please select the status'); ?>">
-                                                        <option value="">--<?php echo $this->translate('Select'); ?>--</option>
-                                                        <option value="active" "<?php echo ($user->status == 'active' ? " selected='selected' " : ""); ?>"><?php echo $this->translate('Active'); ?></option>
-                                                        <option value="inactive" "<?php echo ($user->status == 'inactive' ? " selected='selected' " : ""); ?>"><?php echo $this->translate('Inactive'); ?></option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="form-actions">
-                                            <div class="row">
-                                                <div class="col-md-offset-3 col-md-9">
-                                                    <input type="button" class="btn green" value="<?php echo $this->translate('Submit'); ?>" onclick="validateNow();return false;">
-                                                    <a href="<?php echo $this->url('users', array('action' => 'index')); ?>" class="btn default"><?php echo $this->translate('Cancel'); ?></a>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </form>
-                                </div>
+                                        </form>
+                                    </div>
                                 </div>
                             </div>
                             <!-- END EXAMPLE TABLE PORTLET-->
                         </div>
                     </div>
-<script type="text/javascript">
-    $(function () {
-        $('#facility').select2({
-            placeholder: "<?php echo $this->translate('All Facilities'); ?>",
-            allowClear: true
-        });
-        <?php
-        if($user->role == NULL || trim($user->role) == '' || $user->role <= 1){
-        ?>
-          $('#facility').prop('disabled', true);
-        <?php } ?>
-    });
-    
-    $('#role').on('change',function(){
-        if(this.value!= '' && this.value!= 1){
-            $.blockUI.defaults.css.border = '1px solid grey'; 
-            $(document).ajaxStart($.blockUI({ message: '<h2><?php echo $this->translate('Processing...'); ?></h2>' })).ajaxStop($.unblockUI);
-            $('#facility').val('').change();
-            $.post("<?php echo $this->url('users', array('action' => 'get-role-facilities')); ?>", {role : this.value},
-            function(data){
-                $('#facility').html(data);
-                $('#facility').prop('disabled', false);
-                $('#facility').select2('open');
-            });
-        }else{
-           $('#facility').val('').change();
-           $('#facility').prop('disabled', true);
-        }
-    });
-    
-    duplicateName = true;
-    function validateNow() {
-        flag = deforayValidator.init({
-            formId: 'editUserInformation'
-        });
-        if (flag) {
-            if (duplicateName) {
-                $.blockUI();
-                document.getElementById('editUserInformation').submit();
-            }
-        }
-    }
-</script>
+                    <script type="text/javascript">
+                        $(function() {
+                            $('#facility').select2({
+                                placeholder: "<?php echo $this->translate('All Facilities'); ?>",
+                                allowClear: true
+                            });
+                            <?php
+                            if ($user->role == NULL || trim($user->role) == '' || $user->role <= 1) {
+                            ?>
+                                $('#facility').prop('disabled', true);
+                            <?php } ?>
+                        });
+
+                        $('#role').on('change', function() {
+                            if (this.value != '' && this.value != 1) {
+                                $.blockUI.defaults.css.border = '1px solid grey';
+                                $(document).ajaxStart($.blockUI({
+                                    message: '<h2><?php echo $this->translate('Processing...'); ?></h2>'
+                                })).ajaxStop($.unblockUI);
+                                $('#facility').val('').change();
+                                $.post("<?php echo $this->url('users', array('action' => 'get-role-facilities')); ?>", {
+                                        role: this.value
+                                    },
+                                    function(data) {
+                                        $('#facility').html(data);
+                                        $('#facility').prop('disabled', false);
+                                        $('#facility').select2('open');
+                                    });
+                            } else {
+                                $('#facility').val('').change();
+                                $('#facility').prop('disabled', true);
+                            }
+                        });
+
+                        duplicateName = true;
+
+                        function validateNow() {
+                            flag = deforayValidator.init({
+                                formId: 'editUserInformation'
+                            });
+                            if (flag) {
+                                if (duplicateName) {
+                                    $.blockUI();
+                                    document.getElementById('editUserInformation').submit();
+                                }
+                            }
+                        }
+                    </script>

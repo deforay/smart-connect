@@ -1,7 +1,7 @@
 <?php
 $positivityAvg = array();
 
-if (isset($result['covid19Result']) && count($result['covid19Result']) > 0) {
+if (isset($result['covid19Result']) && !empty($result['covid19Result'])) {
     $arrayKey = array_keys($result['covid19Result']);
     $sumArray = array_map(function () {
         return array_sum(func_get_args());
@@ -105,7 +105,7 @@ if (isset($result['covid19Result']) && count($result['covid19Result']) > 0) {
                 }
             },
             series: [<?php
-                        if (isset($result['covid19Result']) && count($result['covid19Result']) > 0) {
+                        if (isset($result['covid19Result']) && !empty($result['covid19Result'])) {
                             foreach ($result['covid19Result'] as $key => $condition) {
                                 if ($key != 'No Result') {
                                     $range = substr($key, 4, 6);

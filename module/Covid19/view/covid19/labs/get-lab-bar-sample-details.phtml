@@ -1,65 +1,68 @@
 <div id="labSampleTested"></div>
 <script>
-       $(function () {
+    $(function() {
         $('#labSampleTested').highcharts({
-        chart: {
-            type: 'column'
-        },
-        title: {
-            text: '<?php echo $this->translate('Covid-19 Samples Tested'); ?>'
-        },
-       credits: {
-              enabled: false
-       },
-        xAxis: {
-            categories: [<?php
-            if (isset($result['date']) && !empty($result['date'])) {
-              foreach($result['date'] as $date){
-                  echo "'".$date."',";
-              }
-            }
-            ?>]
-        },
-        yAxis: {
-            allowDecimals: false,
-            min: 0,
-            title: {
-                text: '<?php echo $this->translate('No. of Samples'); ?>'
+            chart: {
+                type: 'column'
             },
-            labels: { formatter: function() { return this.value; } },
-        },
-        tooltip: {
-            formatter: function () {
-                return '<b>' + this.x + '</b><br/>' +
-                    this.series.name + ': ' + this.y + '<br/>' +
-                    '<?php echo $this->translate('Total'); ?>: ' + this.point.stackTotal;
-            }
-        },
-        plotOptions: {
-            column: {
-                stacking: 'normal',
-                pointPadding: 0.2,
-                borderWidth: 0
-            }
-        },
-        series: [<?php
-            if(isset($result['rslt']) && count($result['rslt']) >0){
-              foreach($result['rslt'] as $key=>$condition){
-              ?>
-              {
-              name:'<?php echo $this->translate($key);?>',
-              data:[<?php
-                  foreach($condition as $count){
-                     echo '{y:'.$count.'},';
-                  }
-              ?>],
-              },
-              <?php
-              }
-            }
-            ?>
-        ],
-        colors: ['#60d18f','#ff1900'],
-    });
+            title: {
+                text: '<?php echo $this->translate('Covid-19 Samples Tested'); ?>'
+            },
+            credits: {
+                enabled: false
+            },
+            xAxis: {
+                categories: [<?php
+                                if (isset($result['date']) && !empty($result['date'])) {
+                                    foreach ($result['date'] as $date) {
+                                        echo "'" . $date . "',";
+                                    }
+                                }
+                                ?>]
+            },
+            yAxis: {
+                allowDecimals: false,
+                min: 0,
+                title: {
+                    text: '<?php echo $this->translate('No. of Samples'); ?>'
+                },
+                labels: {
+                    formatter: function() {
+                        return this.value;
+                    }
+                },
+            },
+            tooltip: {
+                formatter: function() {
+                    return '<b>' + this.x + '</b><br/>' +
+                        this.series.name + ': ' + this.y + '<br/>' +
+                        '<?php echo $this->translate('Total'); ?>: ' + this.point.stackTotal;
+                }
+            },
+            plotOptions: {
+                column: {
+                    stacking: 'normal',
+                    pointPadding: 0.2,
+                    borderWidth: 0
+                }
+            },
+            series: [<?php
+                        if (isset($result['rslt']) && !empty($result['rslt'])) {
+                            foreach ($result['rslt'] as $key => $condition) {
+                        ?> {
+                            name: '<?php echo $this->translate($key); ?>',
+                            data: [<?php
+                                    foreach ($condition as $count) {
+                                        echo '{y:' . $count . '},';
+                                    }
+                                    ?>],
+                        },
+                <?php
+                            }
+                        }
+                ?>
+            ],
+            colors: ['#60d18f', '#ff1900'],
+        });
     });
 </script>

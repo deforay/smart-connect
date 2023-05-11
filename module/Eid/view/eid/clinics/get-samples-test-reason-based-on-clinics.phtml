@@ -1,76 +1,80 @@
 <div id="vl-test-reason-clinics" style="width:100%; height: 400px; margin: 0 auto"></div>
 <script>
-       $(function () {
-              $('#vl-test-reason-clinics').highcharts({
-              chart: {
-                   type: 'column'
-              },
-              title: {
-                   text: ''
-              },
-              exporting:{
-                     sourceWidth: 1200,
-                     sourceHeight: 400,
-                     chartOptions:{
-                        subtitle: {
-                            text:'<?php echo $this->translate('VL Ordered based on Clinics'); ?>',
+    $(function() {
+        $('#vl-test-reason-clinics').highcharts({
+            chart: {
+                type: 'column'
+            },
+            title: {
+                text: ''
+            },
+            exporting: {
+                sourceWidth: 1200,
+                sourceHeight: 400,
+                chartOptions: {
+                    subtitle: {
+                        text: '<?php echo $this->translate('VL Ordered based on Clinics'); ?>',
+                    }
+                }
+            },
+            credits: {
+                enabled: false
+            },
+            xAxis: {
+                categories: [<?php
+                                if (isset($result['clinic']) && !empty($result['clinic'])) {
+                                    foreach ($result['clinic'] as $clinic) {
+                                        echo "'" . $clinic . "',";
+                                    }
+                                }
+                                ?>]
+            },
+            yAxis: {
+                allowDecimals: false,
+                min: 0,
+                title: {
+                    text: '<?php echo $this->translate('No. of Samples'); ?>'
+                },
+                labels: {
+                    formatter: function() {
+                        return this.value;
+                    }
+                },
+            },
+            legend: {
+                enabled: true
+            },
+            tooltip: {
+                formatter: function() {
+                    return '<b>' + this.x + '</b><br/>' +
+                        this.series.name + ': ' + this.y
+                }
+            },
+            plotOptions: {
+                column: {
+                    stacking: 'normal',
+                    pointPadding: 0.2,
+                    borderWidth: 0
+                }
+            },
+            series: [<?php
+                        if (isset($result['sample']) && !empty($result['sample'])) {
+                            foreach ($result['sample'] as $key => $condition) {
+                        ?> {
+                            turboThreshold: 3000,
+                            showInLegend: false,
+                            name: '<?php echo $this->translate('Samples'); ?>',
+                            data: [<?php
+                                    foreach ($condition as $count) {
+                                        echo '{y:' . $count . '},';
+                                    }
+                                    ?>],
+                        },
+                <?php
+                            }
                         }
-                     }
-              },
-              credits: {
-                     enabled: false
-              },
-               xAxis: {
-                   categories: [<?php
-                   if(isset($result['clinic']) && count($result['clinic'])>0){
-                     foreach($result['clinic'] as $clinic){
-                         echo "'".$clinic."',";
-                     }
-                   }
-                   ?>]
-               },
-               yAxis: {
-                   allowDecimals: false,
-                   min: 0,
-                   title: {
-                       text: '<?php echo $this->translate('No. of Samples');?>'
-                   },
-                   labels: { formatter: function() { return this.value; } },
-               },
-               legend: {
-                     enabled: true
-               },
-               tooltip: {
-                   formatter: function () {
-                       return '<b>' + this.x + '</b><br/>' +
-                           this.series.name + ': ' + this.y
-                   }
-               },
-               plotOptions: {
-                   column: {
-                       stacking: 'normal',
-                       pointPadding: 0.2,
-                       borderWidth: 0
-                   }
-               },
-               series: [<?php
-                  if(isset($result['sample']) && count($result['sample']) >0){
-                     foreach($result['sample'] as $key=>$condition){
-                     ?>
-                     {
-                     turboThreshold: 3000,
-                     showInLegend: false,
-                     name:'<?php echo $this->translate('Samples');?>',
-                     data:[<?php
-                         foreach($condition as $count){
-                            echo '{y:'.$count.'},';
-                         }
-                     ?>],
-                     },
-                     <?php
-                     }
-                  }
-                   ?>]
-           });
-      });
+                ?>
+            ]
+        });
+    });
 </script>

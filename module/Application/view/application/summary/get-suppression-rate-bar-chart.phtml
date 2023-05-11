@@ -1,144 +1,143 @@
 <?php
-if(isset($result) && !empty($result)){
+if (isset($result) && !empty($result)) {
 ?>
-<div id="suppressionRateBarChartData" style="min-height:400px;"></div>
+    <div id="suppressionRateBarChartData" style="min-height:400px;"></div>
 
-<script>
-       $(function () {
-             $('#suppressionRateBarChartData').highcharts({
-                     chart: {
-                         zoomType: 'xy',
-                         marginTop: 100
-                     },
-                     legend: {
-                          align: 'center',
-                          verticalAlign: 'top',
-                          floating: true,
-                          x: 0,
-                          y: 30
-                        },
-                     title: {
-                         text: ''
-                     },
-                     subtitle: {
-                         text: ''
-                     },
-                     exporting:{
-                             chartOptions:{
-                                 subtitle: {
-                                     text:'<?php echo $this->translate('Suppression Rate Data'); ?>',
-                                 }
-                             }
-                         },
-                     credits: {
-                               enabled: false
-                        },
-                     xAxis: [{
-                         categories: [<?php
-                             if (isset($result['date']) && !empty($result['date'])) {
-                               foreach($result['date'] as $date){
-                                   echo "'".$date."',";
-                               }
-                             }
-                             ?>],
-                         crosshair: true
-                     }],
-                     yAxis: [{ // Primary yAxis
-                         allowDecimals: true,
-                         min: 0,
-                         max: 100,
-                         labels: {
-                             format: '{value}%',
-                             style: {
-                                 color: Highcharts.getOptions().colors[1]
-                             }
-                         },
-                         title: {
-                             text: '<?php echo $this->translate('Suppression Rate'); ?>',
-                             style: {
-                                 color: Highcharts.getOptions().colors[1]
-                             }
-                         },
-                         opposite: true
-                     }, { // Secondary yAxis
-                         allowDecimals: false,
-                         min: 0,
-                         title: {
-                             text: '<?php echo $this->translate('Valid Results'); ?>',
-                             style: {
-                                 color: Highcharts.getOptions().colors[1]
-                             }
-                         },
-                         labels: {
-                             format: '{value}',
-                             style: {
-                                 color: Highcharts.getOptions().colors[1]
-                             }
-                         }
-                     }],
-                     tooltip: {
-                         shared: true
-                     },
-                     plotOptions: {
-                            column: {
-                                stacking: 'normal',
-                                pointPadding: 0.2,
-                                borderWidth: 0,
-                                cursor: 'default',
-                                point: {
-                                    events: {
-                                        click: function (e) {
-                                            
+    <script>
+        $(function() {
+            $('#suppressionRateBarChartData').highcharts({
+                chart: {
+                    zoomType: 'xy',
+                    marginTop: 100
+                },
+                legend: {
+                    align: 'center',
+                    verticalAlign: 'top',
+                    floating: true,
+                    x: 0,
+                    y: 30
+                },
+                title: {
+                    text: ''
+                },
+                subtitle: {
+                    text: ''
+                },
+                exporting: {
+                    chartOptions: {
+                        subtitle: {
+                            text: '<?php echo $this->translate('Suppression Rate Data'); ?>',
+                        }
+                    }
+                },
+                credits: {
+                    enabled: false
+                },
+                xAxis: [{
+                    categories: [<?php
+                                    if (isset($result['date']) && !empty($result['date'])) {
+                                        foreach ($result['date'] as $date) {
+                                            echo "'" . $date . "',";
                                         }
                                     }
+                                    ?>],
+                    crosshair: true
+                }],
+                yAxis: [{ // Primary yAxis
+                    allowDecimals: true,
+                    min: 0,
+                    max: 100,
+                    labels: {
+                        format: '{value}%',
+                        style: {
+                            color: Highcharts.getOptions().colors[1]
+                        }
+                    },
+                    title: {
+                        text: '<?php echo $this->translate('Suppression Rate'); ?>',
+                        style: {
+                            color: Highcharts.getOptions().colors[1]
+                        }
+                    },
+                    opposite: true
+                }, { // Secondary yAxis
+                    allowDecimals: false,
+                    min: 0,
+                    title: {
+                        text: '<?php echo $this->translate('Valid Results'); ?>',
+                        style: {
+                            color: Highcharts.getOptions().colors[1]
+                        }
+                    },
+                    labels: {
+                        format: '{value}',
+                        style: {
+                            color: Highcharts.getOptions().colors[1]
+                        }
+                    }
+                }],
+                tooltip: {
+                    shared: true
+                },
+                plotOptions: {
+                    column: {
+                        stacking: 'normal',
+                        pointPadding: 0.2,
+                        borderWidth: 0,
+                        cursor: 'default',
+                        point: {
+                            events: {
+                                click: function(e) {
+
                                 }
                             }
-                     },
-                     series: [{
-                         name: '<?php echo $this->translate('Valid Results'); ?> (R)',
-                         type: 'column',
-                         yAxis: 1,
-                         data: [
-                            <?php if(isset($result['valid_results']) && count($result['valid_results']) >0){
-                               foreach($result['valid_results'] as $validResult){                     
-                                 echo ((isset($validResult) && trim($validResult)!='')?$validResult:'null').',';
-                               }
-                               
-                          } ?>
-                         ],
-                         tooltip: {
-                             valueSuffix: ' '
-                         }
-                 
-                     }, {
-                         name: '<?php echo $this->translate('Suppression Rate'); ?> (L)',
-                         type: 'spline',
-                         lineWidth : 0,
-                         states: {
-                            hover: {
-                                lineWidthPlus: 0
+                        }
+                    }
+                },
+                series: [{
+                    name: '<?php echo $this->translate('Valid Results'); ?> (R)',
+                    type: 'column',
+                    yAxis: 1,
+                    data: [
+                        <?php if (isset($result['valid_results']) && !empty($result['valid_results'])) {
+                            foreach ($result['valid_results'] as $validResult) {
+                                echo ((isset($validResult) && trim($validResult) != '') ? $validResult : 'null') . ',';
                             }
-                        },    
-                        marker: {
-                            symbol: 'diamond'
-                        },                                             
-                         data: [
-                            <?php if(isset($result['suppression_rate']) && count($result['suppression_rate']) >0){
-                               foreach($result['suppression_rate'] as $suppressionRate){                     
-                                 echo ((isset($suppressionRate) && trim($suppressionRate)!='')?$suppressionRate:'null').',';
-                               }                               
-                           } ?>
-                         ],
-                         tooltip: {
-                             valueSuffix: '%'
-                         }
-                     }]
-              });
-       });
-</script>
+                        } ?>
+                    ],
+                    tooltip: {
+                        valueSuffix: ' '
+                    }
 
-<?php }else{
+                }, {
+                    name: '<?php echo $this->translate('Suppression Rate'); ?> (L)',
+                    type: 'spline',
+                    lineWidth: 0,
+                    states: {
+                        hover: {
+                            lineWidthPlus: 0
+                        }
+                    },
+                    marker: {
+                        symbol: 'diamond'
+                    },
+                    data: [
+                        <?php if (isset($result['suppression_rate']) && !empty($result['suppression_rate'])) {
+                            foreach ($result['suppression_rate'] as $suppressionRate) {
+                                echo ((isset($suppressionRate) && trim($suppressionRate) != '') ? $suppressionRate : 'null') . ',';
+                            }
+                        } ?>
+                    ],
+                    tooltip: {
+                        valueSuffix: '%'
+                    }
+                }]
+            });
+        });
+    </script>
+
+<?php } else {
 ?>
-<h3 style="text-align:center;">No data available</h3>
+    <h3 style="text-align:center;">No data available</h3>
 <?php
 } ?>

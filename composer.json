@@ -76,6 +76,7 @@
         }
     },
     "require-dev": {
-        "laminas/laminas-developer-tools": "^2.5"
+        "laminas/laminas-developer-tools": "^2.5",
+        "symfony/var-dumper": "^5.4"
     }
 }

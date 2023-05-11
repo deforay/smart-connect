@@ -177,7 +177,7 @@ if (isset($labFilter) && trim($labFilter) != '') {
         <label class="control-label"><?php echo $this->translate('Provinces'); ?>&nbsp;</label>
         <select name="provinces[]" id="provinces" class="form-control" multiple title="<?php echo $this->translate('Please choose provinces'); ?>" onchange="getLocationInfo('provinces');">
           <?php
-          if (isset($provinces) && count($provinces) > 0) {
+          if (isset($provinces) && !empty($provinces)) {
             foreach ($provinces as $province) {
           ?>
               <option value="<?php echo $province['geo_id']; ?>" <?php echo (in_array($province['geo_id'], $selectedProvinces)) ? 'selected="selected"' : ''; ?>><?php echo ucwords($province['geo_name']); ?></option>
@@ -189,7 +189,7 @@ if (isset($labFilter) && trim($labFilter) != '') {
         <label class="control-label"><?php echo $this->translate('Districts'); ?>&nbsp;</label>
         <select name="districts[]" id="districts" class="form-control" multiple title="<?php echo $this->translate('Please choose districts'); ?>" onchange="getLocationInfo('districts');">
           <?php
-          if (isset($districts) && count($districts) > 0) {
+          if (isset($districts) && !empty($districts)) {
             foreach ($districts as $district) {
           ?>
               <option value="<?php echo $district['geo_id']; ?>" <?php echo (in_array($district['geo_id'], $selectedDistricts)) ? 'selected="selected"' : ''; ?>><?php echo ucwords($district['geo_name']); ?></option>
@@ -212,7 +212,7 @@ if (isset($labFilter) && trim($labFilter) != '') {
         <label class="control-label"><?php echo $this->translate('Clinics'); ?>&nbsp;</label>
         <select class="form-control" id="clinics" name="clinics[]" multiple title="<?php echo $this->translate('Please choose clinics'); ?>">
           <?php
-          if (isset($clinics) && count($clinics) > 0) {
+          if (isset($clinics) && !empty($clinics)) {
             foreach ($clinics as $clinic) {
           ?>
               <option value="<?php echo $clinic['facility_id']; ?>"><?php echo ucwords($clinic['facility_name']); ?></option>
@@ -225,7 +225,7 @@ if (isset($labFilter) && trim($labFilter) != '') {
         <label class="control-label"><?php echo $this->translate('Labs'); ?>&nbsp;</label>
         <select name="labs[]" id="labs" class="form-control" multiple title="<?php echo $this->translate('Please choose labs'); ?>">
           <?php
-          if (isset($labs) && count($labs) > 0) {
+          if (isset($labs) && !empty($labs)) {
             foreach ($labs as $lab) {
           ?>
               <option value="<?php echo $lab['facility_id']; ?>" <?php echo (in_array($lab['facility_id'], $selectedLabs)) ? 'selected="selected"' : ''; ?>><?php echo ucwords($lab['facility_name']); ?></option>

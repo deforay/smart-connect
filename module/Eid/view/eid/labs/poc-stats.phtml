@@ -6,17 +6,17 @@ $receivedTotal = 0;
 $testedTotal = 0;
 $rejectedTotal = 0;
 $quickStats = (isset($result['quickStats']) & count($result['quickStats']) > 0) ? $result['quickStats'] : array();
-if (isset($result['scResult']) && count($result['scResult']) > 0) {
+if (isset($result['scResult']) && !empty($result['scResult'])) {
     $received = end($result['scResult']);
     $receivedTotal = $received['receivedTotal'];
     $receivedDate = $received['receivedDate'];
 }
-if (isset($result['stResult']) && count($result['stResult']) > 0) {
+if (isset($result['stResult']) && !empty($result['stResult'])) {
     $tested = end($result['stResult']);
     $testedTotal = $tested['testedTotal'];
     $testedDate = $tested['testedDate'];
 }
-if (isset($result['srResult']) && count($result['srResult']) > 0) {
+if (isset($result['srResult']) && !empty($result['srResult'])) {
     $reject = end($result['srResult']);
     $rejectedTotal = $reject['rejectTotal'];
     $rejectedDate = $reject['rejectDate'];
@@ -113,7 +113,7 @@ if (isset($result['srResult']) && count($result['srResult']) > 0) {
 </div>
 <script>
     <?php
-    if (isset($result['scResult']) && count($result['scResult']) > 0) {
+    if (isset($result['scResult']) && !empty($result['scResult'])) {
         if ($receivedTotal > 0) { ?>
             $('#samplesReceivedChart').highcharts({
                 chart: {
