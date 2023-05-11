@@ -1,6 +1,6 @@
 <?php
 $option = '';
-if(count($result)>0){
+if(isset($result) && !empty($result)){
     $option.= '<option value"">-- '.$this->translate("Select").' --</option>';
     foreach($result as $district){
         $option.='<option value="'.$district['geo_id'].'">'.$district['geo_name'].'</option>';

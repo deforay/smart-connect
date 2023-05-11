@@ -1,79 +1,80 @@
 <div id="vlOrderedContainer" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
 <script>
-    $(function () {
+    $(function() {
         $('#vlOrderedContainer').highcharts({
-        chart: {
-            plotBackgroundColor: null,
-            plotBorderWidth: null,
-            plotShadow: false,
-            type: 'pie'
-        },
-        title: {
-            text: ''
-        },
-        exporting:{
-            chartOptions:{
-                subtitle: {
-                    text:'<?php echo $this->translate('VL Ordered'); ?>',
+            chart: {
+                plotBackgroundColor: null,
+                plotBorderWidth: null,
+                plotShadow: false,
+                type: 'pie'
+            },
+            title: {
+                text: ''
+            },
+            exporting: {
+                chartOptions: {
+                    subtitle: {
+                        text: '<?php echo $this->translate('VL Ordered'); ?>',
+                    }
                 }
-            }
-        },
-        credits: {
-            enabled: false
-       },
-        tooltip: {
-            pointFormat: '{series.name}: <b>{point.percentage:.1f}% ({point.number})</b>'
-        },
-        legend: {
-            itemMarginBottom: 5,
-            labelFormatter: function () {
-                return '<div ><span style="float:left;font-size:10px;">' + this.myData + ' -  </span><span style="font-size:10px; ">'+ this.percentage.toFixed(1)+'% ('+Highcharts.numberFormat(this.y, 0)+')</span></div>';
-            }
-        },
-        plotOptions: {
-            pie: {
-                allowPointSelect: true,
-                cursor: 'pointer',
-                dataLabels: {
-                    distance:-30,
-                    style: {
-                        color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'white'
+            },
+            credits: {
+                enabled: false
+            },
+            tooltip: {
+                pointFormat: '{series.name}: <b>{point.percentage:.1f}% ({point.number})</b>'
+            },
+            legend: {
+                itemMarginBottom: 5,
+                labelFormatter: function() {
+                    return '<div ><span style="float:left;font-size:10px;">' + this.myData + ' -  </span><span style="font-size:10px; ">' + this.percentage.toFixed(1) + '% (' + Highcharts.numberFormat(this.y, 0) + ')</span></div>';
+                }
+            },
+            plotOptions: {
+                pie: {
+                    allowPointSelect: true,
+                    cursor: 'pointer',
+                    dataLabels: {
+                        distance: -30,
+                        style: {
+                            color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'white'
+                        }
+                    },
+                    showInLegend: true
+                }
+            },
+            series: [{
+                name: '<?php echo $this->translate('Samples'); ?>',
+                point: {
+                    events: {
+                        click: function(e) {
+                            doSamplesTestReasonRedirect(this.name);
+                            e.preventDefault();
+                        }
                     }
                 },
-                showInLegend: true
-            }
-        },
-        series: [{
-            name: '<?php echo $this->translate('Samples'); ?>',
-            point: {
-              events: {
-                  click: function(e) {
-                     doSamplesTestReasonRedirect(this.name);
-                     e.preventDefault();
-                  }
-              }
-            },
-            colorByPoint: true,
-            data: [<?php
-            if(isset($result) && count($result)>0){
-                foreach($testReason as $reason){
-                    if(isset($result[$reason['test_reason_name']])){
-                    foreach($result[$reason['test_reason_name']] as $resultTotal){
-                        ?>
-                        {
-                            name:'<?php echo ucwords(($reason['test_reason_code']));?>',
-                            <?php if($resultTotal['total'] == 0){ ?> visible:false,<?php } ?>
-                            y:<?php echo $resultTotal['total'];?>,
-                            number:<?php echo $resultTotal['total'];?>,
-                            myData:'<?php echo ucwords(($reason['test_reason_name']));?>'
-                        },
-                        <?php
-                    }
-                    }
-                }
-            }
-            ?>]
-        }]
-    });
+                colorByPoint: true,
+                data: [<?php
+                        if (isset($result) && !empty($result)) {
+                            foreach ($testReason as $reason) {
+                                if (isset($result[$reason['test_reason_name']])) {
+                                    foreach ($result[$reason['test_reason_name']] as $resultTotal) {
+                        ?> {
+                                        name: '<?php echo ucwords(($reason['test_reason_code'])); ?>',
+                                        <?php if ($resultTotal['total'] == 0) { ?> visible: false,
+                                        <?php } ?>
+                                        y: <?php echo $resultTotal['total']; ?>,
+                                        number: <?php echo $resultTotal['total']; ?>,
+                                        myData: '<?php echo ucwords(($reason['test_reason_name'])); ?>'
+                                    },
+                    <?php
+                                    }
+                                }
+                            }
+                        }
+                    ?>
+                ]
+            }]
+        });
     });
 </script>

@@ -1,5 +1,5 @@
 <?php
-if(count($result)>0){
+if(isset($result) && !empty($result)){
 $colors = array('DBS' => '#FFD55A','PLASMA' => '#869EA7', 'OTHERS' =>'black' );
 ?>
 <div id="samplesReceivedBarChartData" style="min-height:400px;"></div>
@@ -32,7 +32,7 @@ $colors = array('DBS' => '#FFD55A','PLASMA' => '#869EA7', 'OTHERS' =>'black' );
              },
               xAxis: {
                   categories: [<?php
-                  if(isset($result['date']) && count($result['date'])>0){
+                  if (isset($result['date']) && !empty($result['date'])) {
                     foreach($result['date'] as $date){
                         echo "'".$date."',";
                     }
@@ -69,7 +69,7 @@ $colors = array('DBS' => '#FFD55A','PLASMA' => '#869EA7', 'OTHERS' =>'black' );
                   }
               },
               series: [<?php
-              if(isset($result['sampleName']) && count($result['sampleName']) >0){
+              if(isset($result['sampleName']) && !empty($result['sampleName'])){
                     foreach($result['sampleName'] as $key=>$condition){                     
                     ?>
                     {

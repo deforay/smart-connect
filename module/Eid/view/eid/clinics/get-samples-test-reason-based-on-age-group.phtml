@@ -42,7 +42,7 @@
             name: '<?php echo $this->translate('Samples'); ?>',
             colorByPoint: true,
             data: [<?php
-            if(isset($result['total']) && count($result['total'])>0){
+            if(isset($result['total']) && !empty($result['total'])){
                 foreach($result['total'] as $key=>$reason){
                     ?>
                     {

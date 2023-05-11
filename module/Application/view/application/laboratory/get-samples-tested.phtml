@@ -1,6 +1,6 @@
 <?php
 $supAvg = array();
-if (isset($result['sampleName']) && count($result['sampleName']) > 0) {
+if (isset($result['sampleName']) && !empty($result['sampleName'])) {
     $arrayKey = array_keys($result['sampleName']);
     $sumArray = array_map(function () {
         return array_sum(func_get_args());
@@ -32,7 +32,7 @@ if (isset($result['sampleName']) && count($result['sampleName']) > 0) {
             },
             xAxis: {
                 categories: [<?php
-                                if (isset($result['date']) && count($result['date']) > 0) {
+                                if (isset($result['date']) && !empty($result['date'])) {
                                     foreach ($result['date'] as $date) {
                                         echo "'" . $date . "',";
                                     }
@@ -103,7 +103,7 @@ if (isset($result['sampleName']) && count($result['sampleName']) > 0) {
                 }
             },
             series: [<?php
-                        if (isset($result['sampleName']) && count($result['sampleName']) > 0) {
+                        if (isset($result['sampleName']) && !empty($result['sampleName'])) {
                             foreach ($result['sampleName'] as $key => $condition) {
                                 if ($key != 'VL Not Detected') {
                                     $range = substr($key, 4, 6);

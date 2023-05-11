@@ -37,7 +37,7 @@ $heading = (isset($params['fromSrc']) && $params['fromSrc'] == 'sampleVolume')?'
                   name: '<?php echo $this->translate('Samples'); ?>',
                   colorByPoint: true,
                   data: [<?php
-                  if(isset($result) && count($result)>0){
+                  if(isset($result) && !empty($result)){
                     foreach($result as $lab){
                         ?>
                         {

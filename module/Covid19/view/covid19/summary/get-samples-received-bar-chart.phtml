@@ -33,7 +33,7 @@ if (!empty($result)) {
                 },
                 xAxis: {
                     categories: [<?php
-                                    if (isset($result['date']) && count($result['date']) > 0) {
+                                    if (isset($result['date']) && !empty($result['date'])) {
                                         foreach ($result['date'] as $date) {
                                             echo "'" . $date . "',";
                                         }
@@ -70,7 +70,7 @@ if (!empty($result)) {
                     }
                 },
                 series: [<?php
-                            if (isset($result['sampleName']) && count($result['sampleName']) > 0) {
+                            if (isset($result['sampleName']) && !empty($result['sampleName'])) {
                                 foreach ($result['sampleName'] as $key => $condition) {
                             ?> {
 

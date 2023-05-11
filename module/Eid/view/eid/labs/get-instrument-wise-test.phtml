@@ -1,6 +1,5 @@
 <div id="instrumentWiseTest"></div>
 <script>
-
     $(function() {
         $('#instrumentWiseTest').highcharts({
             chart: {
@@ -11,18 +10,18 @@
             },
             xAxis: {
                 categories: [
-                    <?php 
-                    $data ='';
-                                if (isset($result) && count($result) > 0) {
-                                    foreach ($result as $res) {
-                                            echo "'" . $res['eid_test_platform'] . "',";
-                                        // array_push($data, $res['total']);
-                                        if($data)
-                                            $data = $data.','.$res['total'];
-                                        else
-                                            $data = $res['total'];
-                                    }
-                                }
+                    <?php
+                    $data = '';
+                    if (isset($result) && !empty($result)) {
+                        foreach ($result as $res) {
+                            echo "'" . $res['eid_test_platform'] . "',";
+                            // array_push($data, $res['total']);
+                            if ($data)
+                                $data = $data . ',' . $res['total'];
+                            else
+                                $data = $res['total'];
+                        }
+                    }
                     ?>
                 ],
                 crosshair: true
@@ -82,8 +81,7 @@
                 "drilldown": {
                     "color": "#913D88"
                 }
-            }
-            ]
+            }]
         });
     });
 </script>

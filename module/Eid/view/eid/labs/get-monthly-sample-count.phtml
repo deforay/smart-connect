@@ -33,7 +33,7 @@ if (isset($result['eidResult']) && count($result['eidResult']) > 0) {
             },
             xAxis: {
                 categories: [<?php
-                                if (isset($result['date']) && count($result['date']) > 0) {
+                                if (isset($result['date']) && !empty($result['date'])) {
                                     foreach ($result['date'] as $date) {
                                         echo "'" . $date . "',";
                                     }

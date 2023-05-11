@@ -14,7 +14,7 @@
                 categories: [
                     <?php 
                     $data ='';
-                                if (isset($result) && count($result) > 0) {
+                                if (isset($result) && !empty($result)) {
                                     foreach ($result as $res) {
                                         echo "'" . $res['config_machine_name'] . "',";
                                         // array_push($data, $res['total']);

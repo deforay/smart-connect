@@ -55,7 +55,7 @@
             },
             colorByPoint: true,
             data: [<?php
-            if(isset($result) && count($result)>0){
+            if(isset($result) && !empty($result)){
                 foreach($testReason as $reason){
                     if(isset($result[$reason['test_reason_name']])){
                     foreach($result[$reason['test_reason_name']] as $resultTotal){

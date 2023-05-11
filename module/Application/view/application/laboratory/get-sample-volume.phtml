@@ -54,7 +54,7 @@ $('#labDashSampleVolumePie').highcharts({
             },
             colorByPoint: true,
             data: [<?php
-            if(isset($result) && count($result)>0){
+            if(isset($result) && !empty($result)){
               foreach($result as $lab){
                 ?>{
                   myData:<?php echo "'". $this->escapeHtml($lab[1])."'";?>,

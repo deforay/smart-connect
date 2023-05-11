@@ -24,7 +24,7 @@ $more1000 = array('DBS' => '#ff1900', 'Others' => '#F2786D');
             },
             xAxis: {
                 categories: [<?php
-                                if (isset($result['date']) && count($result['date']) > 0) {
+                                if (isset($result['date']) && !empty($result['date'])) {
                                     foreach ($result['date'] as $date) {
                                         echo "'" . $this->translate('Week of') . ' ' . $date . "',";
                                     }

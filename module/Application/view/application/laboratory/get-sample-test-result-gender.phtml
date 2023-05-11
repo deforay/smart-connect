@@ -6,7 +6,7 @@ $more1000 = array('M'=>'#039BE6', 'F' => '#f185b3', 'Not Specified' => '#ff1900'
 //$supColor = array('M'=>'#252424', 'F' => '#826c6c', 'Not Specified' => '#cd6969');
 //var_dump($result);die;
 $maleSuppressionSpline = $femaleSuppressionSpline = $unspecifedSuppressionSpline = array();
-if(count($result)>0){
+if(isset($result) && !empty($result)){
 foreach($gender as $gen){
     $arrayKey = array_keys($result[$gen]);
     $sumArray = array_map(function () {
@@ -75,7 +75,7 @@ foreach($supAvg as $gen => $subRow){
        },
         xAxis: [{
             categories: [<?php
-            if(isset($result['date']) && count($result['date'])>0){
+            if (isset($result['date']) && !empty($result['date'])) {
               foreach($result['date'] as $date){
                   echo "'".$date."',";
               }

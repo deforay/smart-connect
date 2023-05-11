@@ -2,173 +2,172 @@
 $lt1000 = array($params['age']['ageName'] => '#60d18f');
 $gt1000 = array($params['age']['ageName'] => '#ff1900');
 $supAvg = array();
-if(isset($result[$params['age']['ageName']]) && count($result[$params['age']['ageName']]) >0){
-$arrayKey = array_keys($result[$params['age']['ageName']]);
-$sumArray = array_map(function () {
-    return array_sum(func_get_args());
-}, $result[$params['age']['ageName']][$arrayKey[0]], $result[$params['age']['ageName']][$arrayKey[1]]);
-foreach($result[$params['age']['ageName']][$arrayKey[1]] as $key=>$suppression){
-    $supAvg[] = (($suppression==0) ? 0 : round(100 * ($suppression / $sumArray[$key]),2));
-}
+if (isset($result[$params['age']['ageName']]) && !empty($result[$params['age']['ageName']])) {
+    $arrayKey = array_keys($result[$params['age']['ageName']]);
+    $sumArray = array_map(function () {
+        return array_sum(func_get_args());
+    }, $result[$params['age']['ageName']][$arrayKey[0]], $result[$params['age']['ageName']][$arrayKey[1]]);
+    foreach ($result[$params['age']['ageName']][$arrayKey[1]] as $key => $suppression) {
+        $supAvg[] = (($suppression == 0) ? 0 : round(100 * ($suppression / $sumArray[$key]), 2));
+    }
 }
 ?>
 <div id="samplesTestedVsAgeGroupGreaterThanFifty"></div>
 <script>
-$(function () {
-       $('#samplesTestedVsAgeGroupGreaterThanFifty').highcharts({
-        chart: {
-            type: 'column'
-        },
-        title: {
-            text: ''
-        },
-        exporting:{
-            chartOptions:{
-                subtitle: {
-                    text:'<?php echo $this->translate('Samples Tested based on '.$params['age']['ageName']); ?>',
-                }
-            }
-        },
-        credits: {
-              enabled: false
-        },
-        xAxis: {
-            categories: [<?php
-            if(isset($result['date']) && count($result['date'])>0){
-              foreach($result['date'] as $date){
-                  echo "'".$this->translate('Week of') . ' ' .$date."',";
-              }
-            }
-            ?>]
-        },
-        yAxis: [{
-            min: 0,
-            title: {
-                text: '<?php echo $this->translate('No. of Samples'); ?>'
+    $(function() {
+        $('#samplesTestedVsAgeGroupGreaterThanFifty').highcharts({
+            chart: {
+                type: 'column'
             },
-            labels: { formatter: function() { return this.value; } },
-            stackLabels: {
-                style: {
+            title: {
+                text: ''
+            },
+            exporting: {
+                chartOptions: {
+                    subtitle: {
+                        text: '<?php echo $this->translate('Samples Tested based on ' . $params['age']['ageName']); ?>',
+                    }
                 }
-            }
-        },{ // Secondary yAxis
-                         allowDecimals: true,
-                         min: 0,
-                         max: 100,
-                         title: {
-                            text: '<?php echo $this->translate('Suppression %'); ?>',
-                             style: {
-                             }
-                         },
-                         labels: {
-                             format: '{value}%',
-                             style: {
-                             }
-                         },
-                         opposite: true
-                     }
-        ],
-        
-        tooltip: {
-            shared: true
-            // formatter: function () {
-            //     return '<b>' + this.x + '</b><br/>' +
-            //         this.series.name + ': ' + this.y + '<br/>' +
-            //         '< ?php echo $this->translate('Total'); ?>: ' + this.point.stackTotal;
-            // }
-        },
-        plotOptions: {
-            column: {
-                stacking: 'normal',
-                pointPadding: 0.2,
-                borderWidth: 0,
-                cursor: 'pointer',
-                point: {
-                    events: {
-                        click: function (e) {
-                           //doSampleTestedBasedonAgeRedirect(e.point.category,e.point.age.replace('Age ', ''));
+            },
+            credits: {
+                enabled: false
+            },
+            xAxis: {
+                categories: [<?php
+                                if (isset($result['date']) && !empty($result['date'])) {
+                                    foreach ($result['date'] as $date) {
+                                        echo "'" . $this->translate('Week of') . ' ' . $date . "',";
+                                    }
+                                }
+                                ?>]
+            },
+            yAxis: [{
+                min: 0,
+                title: {
+                    text: '<?php echo $this->translate('No. of Samples'); ?>'
+                },
+                labels: {
+                    formatter: function() {
+                        return this.value;
+                    }
+                },
+                stackLabels: {
+                    style: {}
+                }
+            }, { // Secondary yAxis
+                allowDecimals: true,
+                min: 0,
+                max: 100,
+                title: {
+                    text: '<?php echo $this->translate('Suppression %'); ?>',
+                    style: {}
+                },
+                labels: {
+                    format: '{value}%',
+                    style: {}
+                },
+                opposite: true
+            }],
+
+            tooltip: {
+                shared: true
+                // formatter: function () {
+                //     return '<b>' + this.x + '</b><br/>' +
+                //         this.series.name + ': ' + this.y + '<br/>' +
+                //         '< ?php echo $this->translate('Total'); ?>: ' + this.point.stackTotal;
+                // }
+            },
+            plotOptions: {
+                column: {
+                    stacking: 'normal',
+                    pointPadding: 0.2,
+                    borderWidth: 0,
+                    cursor: 'pointer',
+                    point: {
+                        events: {
+                            click: function(e) {
+                                //doSampleTestedBasedonAgeRedirect(e.point.category,e.point.age.replace('Age ', ''));
+                            }
+                        }
+                    },
+                    dataLabels: {
+                        style: {
+                            textShadow: 'none'
                         }
                     }
                 },
-                dataLabels: {
-                    style: {
-                        textShadow: 'none'
-                    }
-                }
-            },
-            spline: {
-                stacking: 'normal',
-                yAxis: 1,                    
+                spline: {
+                    stacking: 'normal',
+                    yAxis: 1,
                     type: 'spline',
-                    lineWidth : 0,
+                    lineWidth: 0,
                     states: {
                         hover: {
                             lineWidthPlus: 0
                         }
-                    },    
+                    },
                     marker: {
                         symbol: 'diamond'
-                    },   
-                color : '#1B325F',
-                point: {
-                    events: {
-                        click: function (e) {
-                            //doSampleTestedBasedonAgeRedirect(e.point.category,e.point.age.replace('Age ', ''));
+                    },
+                    color: '#1B325F',
+                    point: {
+                        events: {
+                            click: function(e) {
+                                //doSampleTestedBasedonAgeRedirect(e.point.category,e.point.age.replace('Age ', ''));
+                            }
                         }
                     }
                 }
-            }
-        },
-        series: [<?php
-        $age = array($params['age']['ageName']);
-        for($i=0;$i<count($age);$i++){
-              if(!isset($result[$age[$i]])) continue;
-              foreach($result[$age[$i]] as $key=>$condition){
-              if($key!='VL Not Detected'){
-                 $range = substr($key,4,6);
-                 $range = preg_replace('/\s+/', '', $range);
-              }else{
-                $range = 'nd';
-              }
-              $translatedKey = $this->translate($key);
-              ?>
-              {
-              name:'<?php echo $translatedKey."(".htmlspecialchars($age[$i]).")"; ?>',
-              <?php if(array_sum($condition) == 0){ ?> visible: false, <?php } ?>
-              data:[<?php
-                  foreach($condition as $count){
-                    echo '{y:'.$count.',age:"'.$age[$i].'"},';
-                  }
-              ?>],
-              stack:'<?php echo $age[$i];?>',
-              <?php
-              if($key == "VL (< 1000 cp/ml)"){
-              
-                     if(isset($lt1000[$age[$i]])) { ?>
-                     
-                            color: '<?php echo $lt1000[$age[$i]]; ?>'
-                     
-                     <?php } else{ ?>
-                            color: '<?php echo $gt1000[$age[$i]]; ?>'
-              <?php }
-              } else { ?>
-                 color: '#ff1900'
-              <?php
-              }
-              ?>
-              },
-              <?php
-              }
-        }
-        if(count($supAvg)>0){
-            ?>
-            {
-            name: '<?php echo $this->translate('Suppression %'); ?>',
-            type: 'spline',
-            data: [<?php echo implode(",",$supAvg);?>],
-        }
-        <?php } ?>
-        ]
-       });
-});
+            },
+            series: [<?php
+                        $age = array($params['age']['ageName']);
+                        for ($i = 0; $i < count($age); $i++) {
+                            if (!isset($result[$age[$i]])) continue;
+                            foreach ($result[$age[$i]] as $key => $condition) {
+                                if ($key != 'VL Not Detected') {
+                                    $range = substr($key, 4, 6);
+                                    $range = preg_replace('/\s+/', '', $range);
+                                } else {
+                                    $range = 'nd';
+                                }
+                                $translatedKey = $this->translate($key);
+                        ?> {
+                            name: '<?php echo $translatedKey . "(" . htmlspecialchars($age[$i]) . ")"; ?>',
+                            <?php if (array_sum($condition) == 0) { ?> visible: false,
+                            <?php } ?>
+                            data: [<?php
+                                    foreach ($condition as $count) {
+                                        echo '{y:' . $count . ',age:"' . $age[$i] . '"},';
+                                    }
+                                    ?>],
+                            stack: '<?php echo $age[$i]; ?>',
+                            <?php
+                                if ($key == "VL (< 1000 cp/ml)") {
+
+                                    if (isset($lt1000[$age[$i]])) { ?>
+
+                                    color: '<?php echo $lt1000[$age[$i]]; ?>'
+
+                                <?php } else { ?>
+                                    color: '<?php echo $gt1000[$age[$i]]; ?>'
+                                <?php }
+                                } else { ?>
+                                color: '#ff1900'
+                            <?php
+                                }
+                            ?>
+                        },
+                    <?php
+                            }
+                        }
+                        if (count($supAvg) > 0) {
+                    ?> {
+                        name: '<?php echo $this->translate('Suppression %'); ?>',
+                        type: 'spline',
+                        data: [<?php echo implode(",", $supAvg); ?>],
+                    }
+                <?php } ?>
+            ]
+        });
+    });
 </script>

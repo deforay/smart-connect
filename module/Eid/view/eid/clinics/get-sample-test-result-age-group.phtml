@@ -1,7 +1,7 @@
 <?php
 // \Zend\Debug\Debug::dump($result);die;
 $supAvg = array();
-if (isset($result[$params['age']['ageName']]) && count($result[$params['age']['ageName']]) > 0) {
+if (isset($result[$params['age']['ageName']]) && !empty($result[$params['age']['ageName']])) {
     $arrayKey = array_keys($result[$params['age']['ageName']]);
     $sumArray = array_map(function () {
         return array_sum(func_get_args());
@@ -33,7 +33,7 @@ if (isset($result[$params['age']['ageName']]) && count($result[$params['age']['a
             },
             xAxis: {
                 categories: [<?php
-                                if (isset($result['date']) && count($result['date']) > 0) {
+                                if (isset($result['date']) && !empty($result['date'])) {
                                     foreach ($result['date'] as $date) {
                                         echo "'" . $this->translate('Week of') . ' ' . $date . "',";
                                     }

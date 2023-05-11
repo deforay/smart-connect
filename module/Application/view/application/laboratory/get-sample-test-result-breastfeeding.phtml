@@ -1,7 +1,7 @@
 
 <?php
 $supAvg = array();
-if(isset($result['sampleName']) && count($result['sampleName']) >0){
+if(isset($result['sampleName']) && !empty($result['sampleName'])){
 $arrayKey = array_keys($result['sampleName']);
 $sumArray = array_map(function () {
     return array_sum(func_get_args());
@@ -33,7 +33,7 @@ foreach($result['sampleName'][$arrayKey[1]] as $key=>$suppression){
              },
               xAxis: {
                   categories: [<?php
-                  if(isset($result['date']) && count($result['date'])>0){
+                  if (isset($result['date']) && !empty($result['date'])) {
                     foreach($result['date'] as $date){
                         echo "'".$date."',";
                     }
@@ -103,7 +103,7 @@ foreach($result['sampleName'][$arrayKey[1]] as $key=>$suppression){
                   }
               },
               series: [<?php
-              if(isset($result['sampleName']) && count($result['sampleName']) >0){
+              if(isset($result['sampleName']) && !empty($result['sampleName'])){
                     foreach($result['sampleName'] as $key=>$condition){
                     ?>
                     {

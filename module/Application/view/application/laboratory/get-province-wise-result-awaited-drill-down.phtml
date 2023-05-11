@@ -12,7 +12,7 @@
             },
             xAxis: {
                 categories: [<?php
-                                if (isset($result['province']) && count($result['province']) > 0) {
+                                if (isset($result['province']) && !empty($result['province'])) {
                                     foreach ($result['province'] as $province) {
                                         echo "'" . $this->translate($province) . "',";
                                     }
@@ -67,7 +67,7 @@
                 }
             },
             series: [<?php
-                        if (isset($result['sample']) && count($result['sample']) > 0) {
+                        if (isset($result['sample']) && !empty($result['sample'])) {
                             foreach ($result['sample'] as $key => $condition) {
                         ?> {
                             showInLegend: false,

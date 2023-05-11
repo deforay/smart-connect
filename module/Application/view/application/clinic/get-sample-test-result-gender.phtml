@@ -1,212 +1,203 @@
 <?php
-$gender = array('M','F','Not Specified');
+$gender = array('M', 'F', 'Not Specified');
 $supAvg = array();
-$less1000 = array('M'=>'#65c6c4', 'F' => '#ffcece', 'Not Specified' => '#60d18f');
-$more1000 = array('M'=>'#039BE6', 'F' => '#f185b3', 'Not Specified' => '#ff1900');
+$less1000 = array('M' => '#65c6c4', 'F' => '#ffcece', 'Not Specified' => '#60d18f');
+$more1000 = array('M' => '#039BE6', 'F' => '#f185b3', 'Not Specified' => '#ff1900');
 //$supColor = array('M'=>'#252424', 'F' => '#826c6c', 'Not Specified' => '#cd6969');
 //var_dump($result);die;
 
 $maleSuppressionSpline = $femaleSuppressionSpline = $unspecifedSuppressionSpline = array();
 
-if(count($result)>0){
-foreach($gender as $gen){
-    $arrayKey = array_keys($result[$gen]);
-    $sumArray = array_map(function () {
-        return array_sum(func_get_args());
-    }, $result[$gen][$arrayKey[0]], $result[$gen][$arrayKey[1]]);
-    
-    foreach($result[$gen][$arrayKey[1]] as $key=>$suppression){
-        $supAvg[$gen][] = (($suppression==0) ? 'null' : round(100 * ($suppression / $sumArray[$key]),2));
+if (isset($result) && !empty($result)) {
+    foreach ($gender as $gen) {
+        $arrayKey = array_keys($result[$gen]);
+        $sumArray = array_map(function () {
+            return array_sum(func_get_args());
+        }, $result[$gen][$arrayKey[0]], $result[$gen][$arrayKey[1]]);
+
+        foreach ($result[$gen][$arrayKey[1]] as $key => $suppression) {
+            $supAvg[$gen][] = (($suppression == 0) ? 'null' : round(100 * ($suppression / $sumArray[$key]), 2));
+        }
     }
-}
 
 
 
-$genderResult = array();
-$genderSupName = array();
-// for($i=0;$i<=count($supAvg['M']);$i++){
-//     foreach($gender as $gen){
-//         if($supAvg[$gen][$i]!=NULL){
-//             $genderResult[] = $supAvg[$gen][$i];
-//             $genderSupName[] = "'".$gen."'";
-//         }
-//     }
-// }
+    $genderResult = array();
+    $genderSupName = array();
+    // for($i=0;$i<=count($supAvg['M']);$i++){
+    //     foreach($gender as $gen){
+    //         if($supAvg[$gen][$i]!=NULL){
+    //             $genderResult[] = $supAvg[$gen][$i];
+    //             $genderSupName[] = "'".$gen."'";
+    //         }
+    //     }
+    // }
 
 
 
-foreach($supAvg as $gen => $subRow){
-    if($gen == 'M'){
-        $maleSuppressionSpline = $subRow;
-    } else if($gen == 'F'){
-        $femaleSuppressionSpline = $subRow;
-    } else{
-        $unspecifedSuppressionSpline = $subRow;
+    foreach ($supAvg as $gen => $subRow) {
+        if ($gen == 'M') {
+            $maleSuppressionSpline = $subRow;
+        } else if ($gen == 'F') {
+            $femaleSuppressionSpline = $subRow;
+        } else {
+            $unspecifedSuppressionSpline = $subRow;
+        }
     }
-    
-}
-
-
-
-
 }
 ?>
 <div id="samplesTestedVsGender" style="height:520px;"></div>
 <script>
-       $(function () {
+    $(function() {
         $('#samplesTestedVsGender').highcharts({
             chart: {
-            type: 'column',
+                type: 'column',
             },
-        title: {
-            text: ''
-        },
-        exporting:{
-            chartOptions:{
-                subtitle: {
-                    text:'<?php echo $this->translate('Samples Tested based on Gender'); ?>',
-                }
+            title: {
+                text: ''
             },
-            filename : '<?php echo $this->translate('Samples Tested based on Gender'); ?>',
-        },
-       credits: {
-              enabled: false
-       },
-       legend : {
-        itemMarginTop  : 8
-       },
-        xAxis: [{
-            categories: [<?php
-            if(isset($result['date']) && count($result['date'])>0){
-              foreach($result['date'] as $date){
-                  echo "'".$this->translate('Week of') . ' ' .$date."',";
-              }
-            }
-            ?>],
-            gridLineWidth: 0
-        }],
+            exporting: {
+                chartOptions: {
+                    subtitle: {
+                        text: '<?php echo $this->translate('Samples Tested based on Gender'); ?>',
+                    }
+                },
+                filename: '<?php echo $this->translate('Samples Tested based on Gender'); ?>',
+            },
+            credits: {
+                enabled: false
+            },
+            legend: {
+                itemMarginTop: 8
+            },
+            xAxis: [{
+                categories: [<?php
+                                if (isset($result['date']) && !empty($result['date'])) {
+                                    foreach ($result['date'] as $date) {
+                                        echo "'" . $this->translate('Week of') . ' ' . $date . "',";
+                                    }
+                                }
+                                ?>],
+                gridLineWidth: 0
+            }],
 
-        yAxis: [{
+            yAxis: [{
                 gridLineWidth: 0,
                 allowDecimals: false,
                 title: {
                     text: '<?php echo $this->translate('No. of Samples'); ?>'
                 }
-            },{ // Secondary yAxis
-                         allowDecimals: true,
-                         min: 0,
-                         max: 100,
-                         title: {
-                            text: '<?php echo $this->translate('Suppression %'); ?>',
-                             style: {
-                             }
-                         },
-                         labels: {
-                             format: '{value}%',
-                             style: {
-                             }
-                         },
-                         opposite: true
-                     }
-        ],
-       
+            }, { // Secondary yAxis
+                allowDecimals: true,
+                min: 0,
+                max: 100,
+                title: {
+                    text: '<?php echo $this->translate('Suppression %'); ?>',
+                    style: {}
+                },
+                labels: {
+                    format: '{value}%',
+                    style: {}
+                },
+                opposite: true
+            }],
 
 
-        tooltip: {
-            formatter: function () {
-                return '<b>' + this.x + '</b><br/>' +
-                    this.series.name + ': ' + this.y + '<br/>'
+
+            tooltip: {
+                formatter: function() {
+                    return '<b>' + this.x + '</b><br/>' +
+                        this.series.name + ': ' + this.y + '<br/>'
                     //'< ?php echo $this->translate('Total'); ?>: ' + this.point.stackTotal;
-            }
-        },
-        plotOptions: {
-            column: {
-                stacking: 'normal',
-                pointPadding: 0.2,
-                borderWidth: 0,
-                cursor: 'pointer',
-                point: {
-                    events: {
-                        click: function (e) {
-                            doSampleTestedBasedonGenderRedirect(e.point.category,e.point.gender);
+                }
+            },
+            plotOptions: {
+                column: {
+                    stacking: 'normal',
+                    pointPadding: 0.2,
+                    borderWidth: 0,
+                    cursor: 'pointer',
+                    point: {
+                        events: {
+                            click: function(e) {
+                                doSampleTestedBasedonGenderRedirect(e.point.category, e.point.gender);
+                            }
                         }
                     }
                 }
-            }
-           
-        },
-        series: [<?php
-        
-        for($i=0;$i<3;$i++){
-            if(isset($result[$gender[$i]]) && count($result[$gender[$i]])>0){
-              foreach($result[$gender[$i]] as $key=>$condition){
-                     if($key!='VL Not Detected'){
-                            $range = substr($key,4,6);
-                            $range = preg_replace('/\s+/', '', $range);
-                     }else{
-                            $range = 'nd';
-                     }
-              ?>
-              {
-              name:'<?php echo $this->translate(sprintf($key."( $gender[$i] )")); ?>',
-              data:[<?php
-                  foreach($condition as $count){
-                    echo $count.",";
-                  }
-              ?>],
-              stack:'<?php echo $gender[$i];?>',
-        <?php if(strpos($key, '< 1000') !== false){ ?>
-              color: '<?php echo $less1000[$gender[$i]]; ?>'
-        <?php    
-              } else if(strpos($key, '>= 1000') !== false) { 
-        ?>
-              color: '<?php echo $more1000[$gender[$i]]; ?>' 
-        <?php } else { ?>
-              color: 'red'     
-        <?php } ?>
-              },
-        <?php
-              }
-        }
-    }
-   
-    ?>
-          
-          
-        {
-            type: 'spline',
-            lineWidth : 0,
-            color : '#0080ff',
-            marker: {
-                symbol: 'diamond'
+
             },
-            states: {
-                hover: {
-                    lineWidthPlus: 0
-                }
-            },
-            name: 'Suppression % (Male)',
-            yAxis: 1,
-            data: [<?php echo implode(",",$maleSuppressionSpline);?>],
-        },
-        {
-            type: 'spline',
-            lineWidth : 0,
-            color : '#ff00a9',
-            name: 'Suppression % (Female)',
-            marker: {
-                symbol: 'diamond'
-            },  
-            states: {
-                hover: {
-                    lineWidthPlus: 0
-                }
-            },                                
-            yAxis: 1,
-            data: [<?php echo implode(",",$femaleSuppressionSpline);?>],
-        }
+            series: [<?php
+
+                        for ($i = 0; $i < 3; $i++) {
+                            if (isset($result[$gender[$i]]) && count($result[$gender[$i]]) > 0) {
+                                foreach ($result[$gender[$i]] as $key => $condition) {
+                                    if ($key != 'VL Not Detected') {
+                                        $range = substr($key, 4, 6);
+                                        $range = preg_replace('/\s+/', '', $range);
+                                    } else {
+                                        $range = 'nd';
+                                    }
+                        ?> {
+                                name: '<?php echo $this->translate(sprintf($key . "( $gender[$i] )")); ?>',
+                                data: [<?php
+                                        foreach ($condition as $count) {
+                                            echo $count . ",";
+                                        }
+                                        ?>],
+                                stack: '<?php echo $gender[$i]; ?>',
+                                <?php if (strpos($key, '< 1000') !== false) { ?>
+                                    color: '<?php echo $less1000[$gender[$i]]; ?>'
+                                <?php
+                                    } else if (strpos($key, '>= 1000') !== false) {
+                                ?>
+                                    color: '<?php echo $more1000[$gender[$i]]; ?>'
+                                <?php } else { ?>
+                                    color: 'red'
+                                <?php } ?>
+                            },
+                <?php
+                                }
+                            }
+                        }
+
+                ?>
 
 
-        ]
+                {
+                    type: 'spline',
+                    lineWidth: 0,
+                    color: '#0080ff',
+                    marker: {
+                        symbol: 'diamond'
+                    },
+                    states: {
+                        hover: {
+                            lineWidthPlus: 0
+                        }
+                    },
+                    name: 'Suppression % (Male)',
+                    yAxis: 1,
+                    data: [<?php echo implode(",", $maleSuppressionSpline); ?>],
+                },
+                {
+                    type: 'spline',
+                    lineWidth: 0,
+                    color: '#ff00a9',
+                    name: 'Suppression % (Female)',
+                    marker: {
+                        symbol: 'diamond'
+                    },
+                    states: {
+                        hover: {
+                            lineWidthPlus: 0
+                        }
+                    },
+                    yAxis: 1,
+                    data: [<?php echo implode(",", $femaleSuppressionSpline); ?>],
+                }
+
+
+            ]
+        });
     });
-});

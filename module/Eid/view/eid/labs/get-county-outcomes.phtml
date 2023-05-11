@@ -16,7 +16,7 @@ $('#countyOutcomes').highcharts({
     // categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
     //   'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
     categories: [<?php
-            if(isset($result) && count($result)>0){
+            if(isset($result) && !empty($result)){
               foreach($result as $date){
                   echo "'".$date['geo_name']."',";
               }
@@ -91,7 +91,7 @@ legend: {
     yAxis: 1,
     // data: [49.9, 71.5, 106.4, 129.2, 144.0, 176.0, 135.6, 148.5, 216.4, 194.1, 95.6, 54.4],
     data: [<?php
-            if(isset($result) && count($result)>0){
+            if(isset($result) && !empty($result)){
               foreach($result as $date){
                   echo "".$date['positive'].",";
               }
@@ -108,7 +108,7 @@ legend: {
     yAxis: 1,
     // data: [49.9, 71.5, 52.4, 45.2, 45.0, 24.0, 5.6, 98.5, 54.4, 45.1, 95.6, 54.4],
     data: [<?php
-            if(isset($result) && count($result)>0){
+            if(isset($result) && !empty($result)){
               foreach($result as $date){
                   echo "".$date['negative'].",";
               }
@@ -123,7 +123,7 @@ legend: {
     name: 'Positivity',
     type: 'spline',
     data: [<?php
-            if(isset($result) && count($result)>0){
+            if(isset($result) && !empty($result)){
               foreach($result as $date){
                   $positiity = round($date['positive']/$date['total_samples_collected'],2);
                   echo "".$positiity.",";
