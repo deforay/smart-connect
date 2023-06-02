@@ -95,11 +95,11 @@ class EidSampleService
     {
         $apiData = array();
 
-        $dashDb = $this->sm->get('DashApiReceiverStatsTable');
-
         /** @var \Application\Model\DashApiReceiverStatsTable $apiTrackDb */
-
         $apiTrackDb = $this->sm->get('DashApiReceiverStatsTable');
+
+        $source = $_POST['source'] ?? 'LIS';
+        $labId = $_POST['labId'] ?? null;
 
         $this->config = $this->sm->get('Config');
         $input = $this->config['db']['dsn'];
@@ -168,8 +168,8 @@ class EidSampleService
                     "field" => "eid_id",
                     "id" => $id
                 );
-                //$dashDb->updateFormAttributes($params, $currentDateTime);
-                $dashDb->updateFacilityAttributes($data['facility_id'], $currentDateTime);
+                //$apiTrackDb->updateFormAttributes($params, $currentDateTime);
+                $apiTrackDb->updateFacilityAttributes($data['facility_id'], $currentDateTime);
             }
             $numRows++;
         }
@@ -191,8 +191,9 @@ class EidSampleService
             'received_on'                   => \Application\Service\CommonService::getDateTime(),
             'number_of_records_received'    => $counter,
             'number_of_records_processed'   => $numRows,
-            'source'                        => 'VLSM-EID',
-            'lab_id'                        => $data['lab_id'],
+            'source'                        => $source,
+            'test_type'                     => "eid",
+            'lab_id'                        => $labId ?? $data['lab_id'],
             'status'                        => $status
         );
         $apiTrackDb->insert($apiTrackData);

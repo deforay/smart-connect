@@ -35,7 +35,6 @@ class Covid19FormService
         try {
             $apiData = array();
 
-            $dashDb = $this->sm->get('DashApiReceiverStatsTable');
             $apiTrackDb = $this->sm->get('DashApiReceiverStatsTable');
 
             $this->config = $this->sm->get('Config');
@@ -43,6 +42,9 @@ class Covid19FormService
             preg_match('~=(.*?);~', $input, $output);
             $dbname = $output[1];
             $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
+
+            $source = $_POST['source'] ?? 'LIS';
+            $labId = $_POST['labId'] ?? null;
 
             $fileName = $_FILES['covid19File']['name'];
             $ranNumber = str_pad(rand(0, pow(10, 6) - 1), 6, '0', STR_PAD_LEFT);
@@ -90,7 +92,7 @@ class Covid19FormService
                 $data['last_modified_datetime'] = $currentDateTime;
 
                 try {
-                    
+
                     $id = $sampleDb->insertOrUpdate($data);
                     if (isset($id) && !empty($id) && is_numeric($id)) {
                         $params = array(
@@ -98,8 +100,8 @@ class Covid19FormService
                             "field" => "covid19_id",
                             "id" => $id
                         );
-                        //$dashDb->updateFormAttributes($params, $currentDateTime);
-                        $dashDb->updateFacilityAttributes($data['facility_id'], $currentDateTime);
+                        //$apiTrackDb->updateFormAttributes($params, $currentDateTime);
+                        $apiTrackDb->updateFacilityAttributes($data['facility_id'], $currentDateTime);
                     }
                     $numRows++;
                 } catch (Exception $exc) {
@@ -122,8 +124,9 @@ class Covid19FormService
                 'received_on'                   => \Application\Service\CommonService::getDateTime(),
                 'number_of_records_received'    => count($apiData['data']),
                 'number_of_records_processed'   => $numRows,
-                'source'                        => 'VLSM-Covid-19',
-                'lab_id'                        => $data['lab_id'],
+                'source'                        => $source,
+                'test_type'                     => "covid-19",
+                'lab_id'                        => $labId ?? $data['lab_id'],
                 'status'                        => $status
             );
             $apiTrackDb->insert($apiTrackData);
@@ -1638,11 +1641,11 @@ class Covid19FormService
             if ((count($params['data']) - count($return)) == 0) {
                 $status = 'failed';
             } else {
-                //remove directory  
+                //remove directory
                 unlink($pathname);
             }
         } else {
-            //remove directory  
+            //remove directory
             unlink($pathname);
         }
         $response = array(

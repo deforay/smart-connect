@@ -42,7 +42,7 @@ CREATE TABLE `generate_backups` (
  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
--- 
+--
 
 
 -- Amit 16 June 2020
@@ -567,14 +567,14 @@ RENAME TABLE  `dash_covid19_form` TO `dash_form_covid19`;
 ALTER TABLE `dash_form_covid19` CHANGE `is_sample_rejected` `is_sample_rejected` VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT 'no', CHANGE `data_sync` `data_sync` INT NULL DEFAULT '0';
 
 -- Thana 02-Aug-2021
-ALTER TABLE `location_details` ADD `updated_datetime` DATETIME NULL DEFAULT CURRENT_TIMESTAMP AFTER `longitude`; 
+ALTER TABLE `location_details` ADD `updated_datetime` DATETIME NULL DEFAULT CURRENT_TIMESTAMP AFTER `longitude`;
 ALTER TABLE `facility_details` ADD `email` VARCHAR(256) NULL DEFAULT NULL AFTER `facility_code`;
 
 
 -- Amit 24 Sep 2021
 ALTER TABLE `facility_details` ADD `testing_points` JSON NULL DEFAULT NULL AFTER `facility_type`;
 ALTER TABLE `facility_details` ADD `test_type` VARCHAR(256) NULL;
-ALTER TABLE `facility_details` ADD `report_format` TEXT NULL DEFAULT NULL AFTER `test_type`; 
+ALTER TABLE `facility_details` ADD `report_format` TEXT NULL DEFAULT NULL AFTER `test_type`;
 
 
 ALTER TABLE `dash_vl_request_form` ADD UNIQUE( `sample_code`, `lab_id`);
@@ -604,7 +604,7 @@ ALTER TABLE `dash_eid_form` ADD `revised_by` VARCHAR(500) NULL DEFAULT NULL AFTE
 ALTER TABLE `dash_eid_form` ADD `tested_by` VARCHAR(500) NULL DEFAULT NULL AFTER `result_approved_datetime`, ADD `revised_on` DATETIME NULL DEFAULT NULL AFTER `revised_by`;
 ALTER TABLE `dash_form_covid19` ADD `revised_by` VARCHAR(500) NULL DEFAULT NULL AFTER `authorized_on`, ADD `revised_on` DATETIME NULL DEFAULT NULL AFTER `revised_by`;
 ALTER TABLE `dash_form_covid19` ADD `tested_by` VARCHAR(500) NULL DEFAULT NULL AFTER `authorized_on`;
-ALTER TABLE `dash_form_covid19` ADD `investigator_name` TEXT NULL DEFAULT NULL AFTER `lab_technician`, ADD `investigator_phone` TEXT NULL DEFAULT NULL AFTER `investigator_name`, ADD `investigator_email` TEXT NULL DEFAULT NULL AFTER `investigator_phone`, ADD `clinician_name` TEXT NULL DEFAULT NULL AFTER `investigator_email`, ADD `clinician_phone` TEXT NULL DEFAULT NULL AFTER `clinician_name`, ADD `clinician_email` TEXT NULL DEFAULT NULL AFTER `clinician_phone`, ADD `health_outcome` TEXT NULL DEFAULT NULL AFTER `clinician_email`, ADD `health_outcome_date` DATE NULL DEFAULT NULL AFTER `health_outcome`; 
+ALTER TABLE `dash_form_covid19` ADD `investigator_name` TEXT NULL DEFAULT NULL AFTER `lab_technician`, ADD `investigator_phone` TEXT NULL DEFAULT NULL AFTER `investigator_name`, ADD `investigator_email` TEXT NULL DEFAULT NULL AFTER `investigator_phone`, ADD `clinician_name` TEXT NULL DEFAULT NULL AFTER `investigator_email`, ADD `clinician_phone` TEXT NULL DEFAULT NULL AFTER `clinician_name`, ADD `clinician_email` TEXT NULL DEFAULT NULL AFTER `clinician_phone`, ADD `health_outcome` TEXT NULL DEFAULT NULL AFTER `clinician_email`, ADD `health_outcome_date` DATE NULL DEFAULT NULL AFTER `health_outcome`;
 ALTER TABLE `dash_form_covid19` ADD `patient_zone` TEXT NULL DEFAULT NULL AFTER `patient_district`;
 ALTER TABLE `dash_form_covid19` ADD `source_of_alert` VARCHAR(255) NULL DEFAULT NULL AFTER `implementing_partner`, ADD `source_of_alert_other` VARCHAR(255) NULL DEFAULT NULL AFTER `source_of_alert`;
 ALTER TABLE `dash_form_covid19` ADD `patient_passport_number` VARCHAR(255) NULL DEFAULT NULL AFTER `patient_nationality`;
@@ -698,13 +698,21 @@ ALTER TABLE `dash_form_covid19` ADD UNIQUE(`unique_id`);
 
 -- Thana 28-Apr-2023
 RENAME TABLE `import_config` TO `instruments`;
-RENAME TABLE `import_config_machines` TO `instrument_machines`; 
+RENAME TABLE `import_config_machines` TO `instrument_machines`;
 RENAME TABLE `import_config_controls` TO `instrument_controls`;
 
-ALTER TABLE `instrument_machines` ADD `date_format` TEXT NULL DEFAULT NULL AFTER `config_machine_name`, ADD `file_name` VARCHAR(256) NULL DEFAULT NULL AFTER `date_format`; 
+ALTER TABLE `instrument_machines` ADD `date_format` TEXT NULL DEFAULT NULL AFTER `config_machine_name`, ADD `file_name` VARCHAR(256) NULL DEFAULT NULL AFTER `date_format`;
 
 UPDATE `instrument_machines` INNER JOIN `instruments`
     ON `instrument_machines`.`config_id` = `instruments`.`config_id`
 SET `instrument_machines`.`file_name` = `instruments`.`import_machine_file_name`;
 ALTER TABLE `instruments` ADD `updated_datetime` DATETIME NULL DEFAULT NULL AFTER `status`;
 ALTER TABLE `instruments` ADD `lab_id` INT NULL DEFAULT NULL AFTER `machine_name`;
+
+
+
+-- Amit 26-May-2023
+-- UPDATE `dash_api_receiver_stats` set `source` = '{"from": "STS","type": "VL"}';
+-- ALTER TABLE `dash_api_receiver_stats` CHANGE `source` `source` JSON NULL DEFAULT NULL;
+ALTER TABLE `dash_api_receiver_stats` CHANGE `source` `source` VARCHAR(256) NULL DEFAULT NULL;
+ALTER TABLE `dash_api_receiver_stats` ADD `test_type` VARCHAR(256) NULL DEFAULT NULL AFTER `source`;

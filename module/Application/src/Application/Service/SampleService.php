@@ -2,12 +2,15 @@
 
 namespace Application\Service;
 
-use Laminas\Session\Container;
-use Laminas\Db\Sql\Sql;
-use Laminas\Db\Sql\Expression;
 use Exception;
+use Laminas\Db\Sql\Sql;
 use JsonMachine\JsonMachine;
+use Laminas\Db\Sql\Expression;
+use Laminas\Session\Container;
+use Laminas\Db\Adapter\Adapter;
+use Application\Service\CommonService;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
+use PhpOffice\PhpSpreadsheet\Collection\CellsFactory;
 
 class SampleService
 {
@@ -17,7 +20,7 @@ class SampleService
     public $sampleTable;
     public $config;
 
-    public \Application\Service\CommonService $commonService;
+    public CommonService $commonService;
     public \Laminas\Cache\Pattern\ObjectCache $sampleTableCached;
     public \Application\Model\DashApiReceiverStatsTable $apiTrackerTable;
     public \Laminas\Db\Adapter\Adapter $dbAdapter;
@@ -1282,10 +1285,10 @@ class SampleService
     // public function generateSampleStatusResultExcel($params){
     //     $queryContainer = new Container('query');
     //     $translator = $this->sm->get('translator');
-    //     
+    //
     //     if(isset($queryContainer->sampleStatusResultQuery)){
     //         try{
-    //             
+    //
     //             $sql = new Sql($this->dbAdapter);
     //             $sQueryStr = $sql->buildSqlString($queryContainer->sampleStatusResultQuery);
 
@@ -1389,7 +1392,7 @@ class SampleService
     //             error_log("SAMPLE-STATUS-RESULT-REPORT--" . $exc->getMessage());
     //             error_log($exc->getTraceAsString());
     //             return "";
-    //          }  
+    //          }
     //     }else{
     //         return "";
     //     }
@@ -1410,14 +1413,17 @@ class SampleService
 
     public function saveFileFromVlsmAPIV2()
     {
-        //error_log('INSIDE FUNCTION');
-
         ini_set("memory_limit", -1);
         try {
             $apiData = array();
             $input = $this->config['db']['dsn'];
             preg_match('~=(.*?);~', $input, $output);
             $dbname = $output[1];
+
+            $this->commonService->errorLog($_POST);
+
+            $source = $_POST['source'] ?? 'LIS';
+            $labId = $_POST['labId'] ?? null;
 
             $fileName = $_FILES['vlFile']['name'];
             $ranNumber = str_pad(rand(0, pow(10, 6) - 1), 6, '0', STR_PAD_LEFT);
@@ -1432,9 +1438,9 @@ class SampleService
             }
 
 
-            $allColumns = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS where TABLE_SCHEMA = '" . $dbname . "' AND table_name='dash_form_vl'";
-
-            //error_log($allColumns);
+            $allColumns = "SELECT COLUMN_NAME
+                            FROM INFORMATION_SCHEMA.COLUMNS
+                            WHERE TABLE_SCHEMA = '" . $dbname . "' AND table_name='dash_form_vl'";
 
             $sResult = $this->dbAdapter->query($allColumns, $this->dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             $columnList = array_map('current', $sResult);
@@ -1499,7 +1505,10 @@ class SampleService
                             "id" => $id
                         );
                         //$this->apiTrackerTable->updateFormAttributes($params, $currentDateTime);
-                        $this->apiTrackerTable->updateFacilityAttributes($data['facility_id'], $currentDateTime);
+                        $this->apiTrackerTable->updateFacilityAttributes(
+                            $data['facility_id'],
+                            $currentDateTime
+                        );
                     }
                     $numRows++;
                 } catch (Exception $e) {
@@ -1526,17 +1535,13 @@ class SampleService
                 'received_on'                   => CommonService::getDateTime(),
                 'number_of_records_received'    => $counter,
                 'number_of_records_processed'   => $numRows,
-                'source'                        => 'VLSM-VL',
-                'lab_id'                        => $data['lab_id'],
+                'source'                        => $source,
+                'test_type'                     => "vl",
+                'lab_id'                        => $labId ?? $data['lab_id'],
                 'status'                        => $status
             );
 
-
-
             $this->apiTrackerTable->insert($apiTrackData);
-
-
-            //error_log($numRows . ' uploaded successfully');
 
             return array(
                 'status'    => 'success',
@@ -2119,10 +2124,10 @@ class SampleService
         $timestamp = ($timestamp !== false && !empty($timestamp)) ? $timestamp : time();
         $apiTrackData = array(
             'tracking_id'                   => $timestamp,
-            'received_on'                   => \Application\Service\CommonService::getDateTime(),
+            'received_on'                   => CommonService::getDateTime(),
             'number_of_records_received'    => $counter,
             'number_of_records_processed'   => ($counter - count($failedImports)),
-            'source'                        => 'WEBLIMS-VL',
+            'source'                        => json_encode(["from" => 'weblims', "type" => "vl"]),
             'lab_id'                        => $data['lab_id'],
             'status'                        => $status
         );
@@ -2370,11 +2375,11 @@ class SampleService
             if ((count($params['data']) - count($return)) == 0) {
                 $status = 'failed';
             } else {
-                //remove directory  
+                //remove directory
                 unlink($pathname);
             }
         } else {
-            //remove directory  
+            //remove directory
             unlink($pathname);
         }
         $response = array(
