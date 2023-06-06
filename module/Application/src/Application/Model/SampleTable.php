@@ -7188,12 +7188,6 @@ class SampleTable extends AbstractTableGateway
         if (isset($params['clinics']) && trim($params['clinics']) != '') {
             $samplesReceivedSummaryQuery = $samplesReceivedSummaryQuery->where('vl.facility_id IN (' . $params['clinics'] . ')');
         }
-        if (isset($params['dateRange']) && trim($params['dateRange']) != '') {
-            $splitDate = explode('to', $params['dateRange']);
-            if (trim($splitDate[0]) != '' && trim($splitDate[1]) != '') {
-                $samplesReceivedSummaryQuery = $samplesReceivedSummaryQuery->where(array("DATE(vl.sample_collection_date) <='$splitDate[1]'", "DATE(vl.sample_collection_date) >='$splitDate[0]'"));
-            }
-        }
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));

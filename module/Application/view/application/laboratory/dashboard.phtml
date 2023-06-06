@@ -683,30 +683,6 @@ foreach ($sampleType as $samples) {
                     </div>
                 </div>
                 <div class="portlet-body">
-                    <div class="row">
-                        <div class="col-lg-4">
-                            <select style="width:100%" class="form-control" id="indClinicId" name="indClinicId[]" multiple title="<?php echo $this->translate('Please select one or more clinics. Leave blank for All'); ?>">
-                                <?php foreach ($clinicName as $clinic) { ?>
-                                    <option value="<?php echo $clinic['facility_id']; ?>" data-district="<?php echo $clinic['facility_district']; ?>"><?php echo $clinic['facility_code'] . " - " . $clinic['facility_name']; ?></option>
-                                <?php } ?>
-                            </select>
-                        </div>
-                        <div class="col-lg-4">
-                            <div id="daterange-container-key-indicator" class="btn btn-sm form-control" data-container="body" data-placement="bottom" data-original-title="Change date range" style="text-align:center;width:100%;border: 1px solid #a5a2a2;border-radius: 5px 5px;">
-                                <i class="icon-calendar"></i>&nbsp;
-                                <span class="thin uppercase hidden-xs"></span>&nbsp;
-                                <i class="fa fa-angle-down"></i>
-                                <input type="hidden" name="daterangeKeyIndicator" id="daterangeKeyIndicator" />
-                            </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="getSummaryIndicators();"><?php echo $this->translate('Search'); ?></a>
-                                <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="resetIndicators();"><?php echo $this->translate('Reset'); ?></a>
-                            </div>
-                        </div>
-                    </div>
-
                     <div class="table-toolbar" id="keyIndicatorsSummary" style="overflow-x:scroll;">
 
                     </div>
@@ -1215,6 +1191,7 @@ foreach ($sampleType as $samples) {
                         femalePatient();
                         lineOfTreatment();
                         sampleStatusDataTable();
+                        getSummaryIndicators();
                     });
             });
     }
@@ -1409,24 +1386,18 @@ foreach ($sampleType as $samples) {
         $(document).ajaxStart($.blockUI({
             message: '<h4> <?php echo ($this->translate('Processing Summary of Key Indicators')); ?> ... </h4>'
         })).ajaxStop($.unblockUI);
-        var indClinicIdList = ($("#indClinicId").val() == null) ? '' : $('#indClinicId').val().join(',');
-        var dateRange = $('#daterangeKeyIndicator').val();
+        var indClinicIdList = ($("#labName").val() == null) ? '' : $('#labName').val().join(',');
+        var fromDate = formatDate($('#mrp-lowerDate').val());
+        var toDate = formatDate($('#mrp-upperDate').val());
         $.post("<?php echo $this->url('summary', array('action' => 'get-indicators')); ?>", {
                 clinics: indClinicIdList,
-                dateRange: dateRange
+                fromDate: fromDate,
+                toDate: toDate
             },
             function(data) {
                 $("#keyIndicatorsSummary").html(data);
                 $.unblockUI();
             });
-    }
-
-    function resetIndicators() {
-        $('#indClinicId').select2('val', '');
-        $('#dateFilter')[0].reset();
-        $('#daterange-container-key-indicator span').html('<?php echo $this->translate('Choose Date Range'); ?>');
-        $('input[name="daterangeKeyIndicator"]').val('');
-        getSummaryIndicators();
     }
 
     function exportSummaryIndicatorResult() {
