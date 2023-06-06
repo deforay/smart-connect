@@ -165,7 +165,7 @@ die; */
     }
 
     @media screen and (min-width:320px) and (max-width: 760px) {
-        #daterange-container {
+        #daterange-container, #daterange-container-key-indicator {
             width: 100% !important;
         }
 
@@ -176,7 +176,7 @@ die; */
     }
 
     @media screen and (min-width:761px) and (max-width: 970px) {
-        #daterange-container {
+        #daterange-container, #daterange-container-key-indicator {
             width: 100% !important;
         }
 
@@ -668,9 +668,56 @@ foreach ($sampleType as $samples) {
         </div>
     </div>
 </div>
-<script src="<?php echo $this->basePath('assets/plugins/datepicker/bootstrap-datepicker.js') ?>"></script>
+<div class="row" id="summaryOfKeyIndicatorsDiv">
+    <div class="col-md-12 col-sm-12">
+        <div class="portlet box">
+            <div class="portlet box blue">
+                <div class="portlet-title">
+                    <div class="caption" id="blockTitle">
+                        <i class="fa fa-cogs"></i><?php echo $this->translate('SUMMARY OF KEY INDICATORS'); ?>
+                    </div>
+                    <div class="actions" style="width:<?php echo (isset($languagecontainer->locale) &&  $languagecontainer->locale == 'pt_BR') ? '36%' : '44%'; ?>;">
+                        <div class="tools" id="exportHighVlSample" style="float:right;text-align:right;">
+                            <button class="btn btn-default" onclick="exportSummaryIndicatorResult();"><span><i class="fa fa-file-excel-o" aria-hidden="true"></i> <?php echo $this->translate('Export Excel'); ?></span></button>
+                        </div>&nbsp;&nbsp;
+                    </div>
+                </div>
+                <div class="portlet-body">
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <select style="width:100%" class="form-control" id="indClinicId" name="indClinicId[]" multiple title="<?php echo $this->translate('Please select one or more clinics. Leave blank for All'); ?>">
+                                <?php foreach ($clinicName as $clinic) { ?>
+                                    <option value="<?php echo $clinic['facility_id']; ?>" data-district="<?php echo $clinic['facility_district']; ?>"><?php echo $clinic['facility_code'] . " - " . $clinic['facility_name']; ?></option>
+                                <?php } ?>
+                            </select>
+                        </div>
+                        <div class="col-lg-4">
+                            <div id="daterange-container-key-indicator" class="btn btn-sm form-control" data-container="body" data-placement="bottom" data-original-title="Change date range" style="text-align:center;width:100%;border: 1px solid #a5a2a2;border-radius: 5px 5px;">
+                                <i class="icon-calendar"></i>&nbsp;
+                                <span class="thin uppercase hidden-xs"></span>&nbsp;
+                                <i class="fa fa-angle-down"></i>
+                                <input type="hidden" name="daterangeKeyIndicator" id="daterangeKeyIndicator" />
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="getSummaryIndicators();"><?php echo $this->translate('Search'); ?></a>
+                                <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="resetIndicators();"><?php echo $this->translate('Reset'); ?></a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-toolbar" id="keyIndicatorsSummary" style="overflow-x:scroll;">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAFpbfAKFJZ8Ps7yAGIDZtD4EeBlsb_ANA"></script>
 <script src="<?php echo $this->basePath('assets/pages/scripts/dashboard.js'); ?>" type="text/javascript"></script>
+<script src="<?php echo $this->basePath('assets/plugins/datepicker/bootstrap-datepicker.js') ?>"></script>
 <script src="https://cdn.datatables.net/1.10.10/js/jquery.dataTables.min.js"></script>
 
 <script src="https://cdn.datatables.net/buttons/1.1.0/js/dataTables.buttons.min.js"></script>
@@ -1010,8 +1057,38 @@ foreach ($sampleType as $samples) {
                 $("#gmap-polyline-data").html(data);
             });
     }
+    function isOnScreen(elem) {
+        // if the element doesn't exist, abort
+        if (elem.length == 0) {
+            return;
+        }
+        var $window = jQuery(window)
+        var viewport_top = $window.scrollTop()
+        var viewport_height = $window.height()
+        var viewport_bottom = viewport_top + viewport_height
+        var $elem = jQuery(elem)
+        //console.log($elem.offset().top);
+        var top = $elem.offset().top
+        var height = $elem.height()
+        var bottom = top + height
 
+        return (top >= viewport_top && top < viewport_bottom) ||
+            (bottom > viewport_top && bottom <= viewport_bottom) ||
+            (height > viewport_height && top <= viewport_top && bottom >= viewport_bottom)
+    }
+
+    var scrollCounter = 0;
     $(function() {
+        window.addEventListener('scroll', function(e) {
+            // we dont want to call it each time there is a scroll event
+            if (scrollCounter == 0) {
+                if (isOnScreen(jQuery('#summaryOfKeyIndicatorsDiv'))) {
+                    scrollCounter++;
+                    getSummaryIndicators();
+                }
+            }
+
+        });
         $('#provinceName').select2({
             placeholder: "<?php echo $this->translate('Provinces'); ?>",
             allowClear: true
@@ -1062,8 +1139,10 @@ foreach ($sampleType as $samples) {
         function cb(start, end) {
             $('#daterange-container span').html(start.format('MMM D, YYYY') + ' to ' + end.format('MMM D, YYYY'));
             $('#daterange').val(start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
+            $('#daterange-container-key-indicator span').html(start.format('MMM D, YYYY') + ' to ' + end.format('MMM D, YYYY'));
+            $('#daterangeKeyIndicator').val(start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
         }
-        $('#daterange-container').daterangepicker({
+        $('#daterange-container, #daterange-container-key-indicator').daterangepicker({
             format: 'DD-MMM-YYYY',
             separator: ' to ',
             startDate: start,
@@ -1083,7 +1162,7 @@ foreach ($sampleType as $samples) {
         }, cb);
         cb(start, end);
         $('#dashboard-range').show();
-        $('#daterange-container span').html('<?php echo $this->translate('Choose Date Range'); ?>');
+        $('#daterange-container span, #daterange-container-key-indicator span').html('<?php echo $this->translate('Choose Date Range'); ?>');
         $('input[name="daterange"]').val('');
 
         // The reason why getSampleResult is a separate call is because it does not follow
@@ -1216,7 +1295,7 @@ foreach ($sampleType as $samples) {
 
     function resetDateFilter() {
         $('#dateFilter')[0].reset();
-        $('#daterange-container span').html('<?php echo $this->translate('Choose Date Range'); ?>');
+        $('#daterange-container span, #daterange-container-key-indicator span').html('<?php echo $this->translate('Choose Date Range'); ?>');
         $('input[name="daterange"]').val('');
         getSampleResult('reset');
     }
@@ -1308,7 +1387,12 @@ foreach ($sampleType as $samples) {
                 startDate: end,
             <?php } ?>
             endDate: "0m"
-        })
+        });
+
+        $('#indClinicId').select2({
+            placeholder: "<?php echo $this->translate('All Facilities'); ?>",
+            allowClear: true
+        });
     });
 
     function formatDate(date) {
@@ -1319,5 +1403,46 @@ foreach ($sampleType as $samples) {
             year = d.getFullYear();
         if (month.length < 2) month = '0' + month;
         return [year, month].join('-');
+    }
+
+    function getSummaryIndicators() {
+        $(document).ajaxStart($.blockUI({
+            message: '<h4> <?php echo ($this->translate('Processing Summary of Key Indicators')); ?> ... </h4>'
+        })).ajaxStop($.unblockUI);
+        var indClinicIdList = ($("#indClinicId").val() == null) ? '' : $('#indClinicId').val().join(',');
+        var dateRange = $('#daterangeKeyIndicator').val();
+        $.post("<?php echo $this->url('summary', array('action' => 'get-indicators')); ?>", {
+                clinics: indClinicIdList,
+                dateRange: dateRange
+            },
+            function(data) {
+                $("#keyIndicatorsSummary").html(data);
+                $.unblockUI();
+            });
+    }
+
+    function resetIndicators() {
+        $('#indClinicId').select2('val', '');
+        $('#dateFilter')[0].reset();
+        $('#daterange-container-key-indicator span').html('<?php echo $this->translate('Choose Date Range'); ?>');
+        $('input[name="daterangeKeyIndicator"]').val('');
+        getSummaryIndicators();
+    }
+
+    function exportSummaryIndicatorResult() {
+        $.blockUI.defaults.css.border = '1px solid grey';
+        $(document).ajaxStart($.blockUI({
+            message: '<h2><?php echo $this->translate('Processing...'); ?></h2>'
+        })).ajaxStop($.unblockUI);
+        $.post("<?php echo $this->url('summary', array('action' => 'export-indicator-result-excel')); ?>", {
+                result: $("#sampleStatus").val()
+            },
+            function(data) {
+                if (data == "" || data == null || data == undefined) {
+                    alert('<?php echo $this->translate('Unable to export excel') ?>');
+                } else {
+                    window.open('/temporary/' + data, '_blank');
+                }
+            });
     }
 </script>

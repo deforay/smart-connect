@@ -7163,7 +7163,6 @@ class SampleTable extends AbstractTableGateway
         $sql = new Sql($dbAdapter);
         $summaryResult = array();
 
-
         $samplesReceivedSummaryQuery = $sql->select()
             ->from(array('vl' => $this->table))
             ->columns(
@@ -7189,7 +7188,12 @@ class SampleTable extends AbstractTableGateway
         if (isset($params['clinics']) && trim($params['clinics']) != '') {
             $samplesReceivedSummaryQuery = $samplesReceivedSummaryQuery->where('vl.facility_id IN (' . $params['clinics'] . ')');
         }
-
+        if (isset($params['dateRange']) && trim($params['dateRange']) != '') {
+            $splitDate = explode('to', $params['dateRange']);
+            if (trim($splitDate[0]) != '' && trim($splitDate[1]) != '') {
+                $samplesReceivedSummaryQuery = $samplesReceivedSummaryQuery->where(array("DATE(vl.sample_collection_date) <='$splitDate[1]'", "DATE(vl.sample_collection_date) >='$splitDate[0]'"));
+            }
+        }
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
@@ -7199,12 +7203,11 @@ class SampleTable extends AbstractTableGateway
                                         AND DATE(sample_collection_date) <= '" . $endMonth . "'");
         }
 
-
         $samplesReceivedSummaryQuery = $samplesReceivedSummaryQuery->order('sample_collection_date ASC');
         $queryContainer->indicatorSummaryQuery = $samplesReceivedSummaryQuery;
         $samplesReceivedSummaryCacheQuery = $sql->buildSqlString($samplesReceivedSummaryQuery);
+        // die($samplesReceivedSummaryCacheQuery);
         $samplesReceivedSummaryResult = $this->commonService->cacheQuery($samplesReceivedSummaryCacheQuery, $dbAdapter);
-        //var_dump($samplesReceivedSummaryResult);die;
         $j = 0;
         foreach ($samplesReceivedSummaryResult as $row) {
             $summaryResult['sample'][$this->translator->translate('Samples Received')]['month'][$j] = (isset($row["total_samples_received"])) ? $row["total_samples_received"] : 0;
