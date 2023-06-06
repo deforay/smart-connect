@@ -636,6 +636,23 @@ $endDate = date('Y-m');
             });
     }
 
+    function exportSummaryIndicatorResult() {
+        $.blockUI.defaults.css.border = '1px solid grey';
+        $(document).ajaxStart($.blockUI({
+            message: '<h2><?php echo $this->translate('Processing...'); ?></h2>'
+        })).ajaxStop($.unblockUI);
+        $.post("<?php echo $this->url('eid-summary', array('action' => 'export-indicator-result-excel')); ?>", {
+                result: $("#sampleStatus").val()
+            },
+            function(data) {
+                if (data == "" || data == null || data == undefined) {
+                    alert('<?php echo $this->translate('Unable to export excel') ?>');
+                } else {
+                    window.open('/temporary/' + data, '_blank');
+                }
+            });
+    }
+
 
     $("#showDateRange").click(function() {
         $("#showDateRange").hide();
