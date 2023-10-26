@@ -36,7 +36,7 @@ class Covid19FormService
             $apiData = array();
 
             $apiTrackDb = $this->sm->get('DashApiReceiverStatsTable');
-
+            $trackApiDb = $this->sm->get('DashTrackApiRequestsTable');
             $this->config = $this->sm->get('Config');
             $input = $this->config['db']['dsn'];
             preg_match('~=(.*?);~', $input, $output);
@@ -119,9 +119,10 @@ class Covid19FormService
             } else if ($numRows == 0) {
                 $status = 'failed';
             }
+            $common = new CommonService();
             $apiTrackData = array(
                 'tracking_id'                   => $apiData['timestamp'],
-                'received_on'                   => \Application\Service\CommonService::getDateTime(),
+                'received_on'                   => $common->getDateTime(),
                 'number_of_records_received'    => count($apiData['data']),
                 'number_of_records_processed'   => $numRows,
                 'source'                        => $source,
@@ -129,13 +130,15 @@ class Covid19FormService
                 'lab_id'                        => $labId ?? $data['lab_id'],
                 'status'                        => $status
             );
+            
             $apiTrackDb->insert($apiTrackData);
-
-
-            return array(
+            $response = array(
                 'status'    => 'success',
                 'message'   => $numRows . ' uploaded successfully',
             );
+            
+            $trackApiDb->addApiTracking($common->generateUUID(), 1, $numRows, 'weblims-covid19', 'covid19', $_SERVER['REQUEST_URI'], $apiData, $response, 'json', $labId ?? $data['lab_id']);
+
         } catch (Exception $exc) {
             error_log($exc->getMessage());
             error_log($exc->getTraceAsString());
@@ -143,6 +146,7 @@ class Covid19FormService
                 'status'    => 'error'
             );
         }
+        return $response;
     }
 
     public function saveFileFromVlsmAPIV1()
@@ -1488,6 +1492,7 @@ class Covid19FormService
         $covid19SampleRejectionDb = $this->sm->get('Covid19SampleRejectionReasonsTable');
         $provinceDb = $this->sm->get('ProvinceTable');
         $apiTrackDb = $this->sm->get('DashApiReceiverStatsTable');
+        $trackApiDb = $this->sm->get('DashTrackApiRequestsTable');
         $userDb = $this->sm->get('UsersTable');
         $return = array();
         $params = json_decode($params, true);
@@ -1541,10 +1546,10 @@ class Covid19FormService
                         'vlsm_instance_id'                      => $instanceCode,
                         'province_id'                           => (trim($province['province_id']) != '' ? trim($province['province_id']) : NULL),
                         'patient_gender'                        => (trim($row['patient_gender']) != '' ? trim($row['patient_gender']) : NULL),
-                        'patient_phone_number'                 => (trim($row['patient_phone_number']) != '' ? trim($row['patient_phone_number']) : NULL),
+                        'patient_phone_number'                  => (trim($row['patient_phone_number']) != '' ? trim($row['patient_phone_number']) : NULL),
                         'patient_dob'                           => $dob,
                         'sample_collection_date'                => $sampleCollectionDate,
-                        'sample_registered_at_lab'              => $sampleReceivedAtLab,
+                        'sample_received_at_vl_lab_datetime'    => $sampleReceivedAtLab,
                         'result_printed_datetime'               => $resultPrinterDateTime,
                         'is_sample_rejected'                    => (trim($row['is_sample_rejected']) != '' ? strtolower($row['is_sample_rejected']) : NULL),
                         'is_patient_pregnant'                   => (trim($row['is_patient_pregnant']) != '' ? trim($row['is_patient_pregnant']) : NULL),
@@ -1664,7 +1669,8 @@ class Covid19FormService
             'status'                        => $status
         );
         $apiTrackDb->insert($apiTrackData);
-
+        $common = new CommonService();
+        $trackApiDb->addApiTracking($common->generateUUID(), 1, count($params['data']), 'weblims-covid19', 'covid19', $_SERVER['REQUEST_URI'], $params['data'], $response, 'json', $data['lab_id']);
         return $response;
     }
 }

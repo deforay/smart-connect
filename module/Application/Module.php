@@ -32,6 +32,7 @@ use Application\Model\Covid19SymptomsTable;
 use Application\Model\Covid19TestReasonsTable;
 use Application\Model\ProvinceTable;
 use Application\Model\DashApiReceiverStatsTable;
+use Application\Model\DashTrackApiRequestsTable;
 use Application\Model\ImportConfigMachineTable;
 use Application\Model\HepatitisSampleTypeTable;
 use Application\Model\HepatitisSampleRejectionReasonTable;
@@ -485,6 +486,14 @@ class Module
 					{
 						$dbAdapter = $diContainer->get('Laminas\Db\Adapter\Adapter');
 						return new DashApiReceiverStatsTable($dbAdapter);
+					}
+				},
+				'DashTrackApiRequestsTable'  => new class
+				{
+					public function __invoke($diContainer)
+					{
+						$dbAdapter = $diContainer->get('Laminas\Db\Adapter\Adapter');
+						return new DashTrackApiRequestsTable($dbAdapter);
 					}
 				},
 				'ImportConfigMachineTable'  => new class

@@ -97,7 +97,8 @@ class EidSampleService
 
         /** @var \Application\Model\DashApiReceiverStatsTable $apiTrackDb */
         $apiTrackDb = $this->sm->get('DashApiReceiverStatsTable');
-
+        /** @var \Application\Model\DashTrackApiRequestsTable $trackApiDb */
+        $trackApiDb = $this->sm->get('DashTrackApiRequestsTable');
         $source = $_POST['source'] ?? 'LIS';
         $labId = $_POST['labId'] ?? null;
 
@@ -181,14 +182,15 @@ class EidSampleService
         } elseif ($numRows == 0) {
             $status = 'failed';
         }
-        $apiData = \JsonMachine\JsonMachine::fromFile($pathname, '/timestamp');
-        $timestamp = iterator_to_array($apiData)['timestamp'];
+        $timesTampData = \JsonMachine\JsonMachine::fromFile($pathname, '/timestamp');
+        $timestamp = iterator_to_array($timesTampData)['timestamp'];
         $timestamp = ($timestamp !== false && !empty($timestamp)) ? $timestamp : time();
 
         unset($pathname);
+        $common = new CommonService();
         $apiTrackData = array(
             'tracking_id'                   => $timestamp,
-            'received_on'                   => \Application\Service\CommonService::getDateTime(),
+            'received_on'                   => $common->getDateTime(),
             'number_of_records_received'    => $counter,
             'number_of_records_processed'   => $numRows,
             'source'                        => $source,
@@ -196,12 +198,13 @@ class EidSampleService
             'lab_id'                        => $labId ?? $data['lab_id'],
             'status'                        => $status
         );
-        $apiTrackDb->insert($apiTrackData);
-
-        return array(
+        $response =  array(
             'status'    => 'success',
             'message'   => $numRows . ' uploaded successfully',
         );
+        $apiTrackDb->insert($apiTrackData);
+        $trackApiDb->addApiTracking($common->generateUUID(), 1, $numRows, 'weblims-eid', 'eid', $_SERVER['REQUEST_URI'], $apiData, $response, 'json', $labId ?? $data['lab_id']);
+        return $response;
     }
 
     public function saveFileFromVlsmAPIV1()
@@ -1362,6 +1365,7 @@ class EidSampleService
         $sampleRjtReasonDb = $this->sm->get('EidSampleRejectionReasonTable');
         $provinceDb = $this->sm->get('ProvinceTable');
         $apiTrackDb = $this->sm->get('DashApiReceiverStatsTable');
+        $trackApiDb = $this->sm->get('DashTrackApiRequestsTable');
         $userDb = $this->sm->get('UsersTable');
         $return = array();
         $params = json_decode($params, true);
@@ -1546,10 +1550,11 @@ class EidSampleService
             'message'   => 'Received ' . count($params['data']) . ' records. Processed ' . (count($params['data']) - count($return)) . ' records.'
         );
 
+        $common = new CommonService();
         // Track API Records
         $apiTrackData = array(
             'tracking_id'                   => $params['timestamp'],
-            'received_on'                   => \Application\Service\CommonService::getDateTime(),
+            'received_on'                   => $common->getDateTime(),
             'number_of_records_received'    => count($params['data']),
             'number_of_records_processed'   => (count($params['data']) - count($return)),
             'source'                        => 'API-EID',
@@ -1557,7 +1562,7 @@ class EidSampleService
             'status'                        => $status
         );
         $apiTrackDb->insert($apiTrackData);
-
+        $trackApiDb->addApiTracking($common->generateUUID(), 1, count($params['data']), 'weblims-eid', 'eid', $_SERVER['REQUEST_URI'], $params['data'], $response, 'json', $data['lab_id']);
         return $response;
     }
 }

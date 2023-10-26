@@ -716,3 +716,22 @@ ALTER TABLE `instruments` ADD `lab_id` INT NULL DEFAULT NULL AFTER `machine_name
 -- ALTER TABLE `dash_api_receiver_stats` CHANGE `source` `source` JSON NULL DEFAULT NULL;
 ALTER TABLE `dash_api_receiver_stats` CHANGE `source` `source` VARCHAR(256) NULL DEFAULT NULL;
 ALTER TABLE `dash_api_receiver_stats` ADD `test_type` VARCHAR(256) NULL DEFAULT NULL AFTER `source`;
+
+-- Thana 25-Oct-2023
+CREATE TABLE `dash_track_api_requests` (
+  `api_track_id` int NOT NULL AUTO_INCREMENT,
+  `transaction_id` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `requested_by` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
+  `requested_on` datetime DEFAULT NULL,
+  `number_of_records` varchar(50) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
+  `request_type` varchar(50) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
+  `test_type` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
+  `api_url` text CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci,
+  `api_params` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `request_data` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `response_data` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `facility_id` varchar(256) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
+  `data_format` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
+  PRIMARY KEY (`api_track_id`),
+  KEY `requested_on` (`requested_on`)
+) ENGINE=InnoDB AUTO_INCREMENT=94 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

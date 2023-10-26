@@ -4,13 +4,15 @@ namespace Application\Service;
 
 use DateTimeImmutable;
 use DateTimeZone;
-use Laminas\Session\Container;
 use Exception;
+use ZipArchive;
+
+use Ramsey\Uuid\Uuid;
+use Laminas\Session\Container;
 use Laminas\Db\Sql\Sql;
 use Laminas\Mail;
 use Laminas\Mail\Transport\Smtp as SmtpTransport;
 use Laminas\Mail\Transport\SmtpOptions;
-
 use Laminas\Mime\Message as MimeMessage;
 use Laminas\Mime\Part as MimePart;
 
@@ -1254,4 +1256,79 @@ class CommonService
                return "";
           }
      }
+
+     public static function convertDateRange(?string $dateRange): array{
+        if (empty($dateRange)) {
+            return ['', ''];
+        }
+
+        $dates = explode("to", $dateRange ?? '');
+        $dates = array_map('trim', $dates);
+
+        $startDate = !empty($dates[0]) ? self::isoDateFormat($dates[0]) : '';
+        $endDate = !empty($dates[1]) ? self::isoDateFormat($dates[1]) : '';
+
+        return [$startDate, $endDate];
+    }
+
+    public static function isJSON($string): bool
+    {
+        if (empty($string) || !is_string($string)) {
+            return false;
+        }
+
+        json_decode($string);
+        return json_last_error() === JSON_ERROR_NONE;
+    }
+    public static function toJSON($data): ?string
+    {
+        if (!empty($data)) {
+            if (self::isJSON($data)) {
+                return $data;
+            } else {
+                $json = json_encode($data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+                if ($json !== false) {
+                    return $json;
+                } else {
+                    error_log('Data could not be encoded as JSON: ' . json_last_error_msg());
+                }
+            }
+        }
+        return null;
+    }
+
+    public static function makeDirectory($path, $mode = 0777, $recursive = true): bool
+    {
+        if (is_dir($path)) {
+            return true;
+        }
+
+        return mkdir($path, $mode, $recursive);
+    }
+
+    public static function zipJson($json, $fileName)
+    {
+        $result = false;
+        if (!empty($json) && !empty($fileName)) {
+            $zip = new ZipArchive();
+            $zipPath = $fileName . '.zip';
+
+            if ($zip->open($zipPath, ZipArchive::CREATE) === true) {
+                $zip->addFromString(basename($fileName), $json);
+
+                if ($zip->status == ZIPARCHIVE::ER_OK) {
+                    $result = true;
+                }
+                $zip->close();
+            }
+        }
+        return $result;
+    }
+
+    public function generateUUID($attachExtraString = true): string
+    {
+        $uuid = (Uuid::uuid4())->toString();
+        $uuid .= $attachExtraString ? '-' . $this->generateRandomString(6) : '';
+        return $uuid;
+    }
 }

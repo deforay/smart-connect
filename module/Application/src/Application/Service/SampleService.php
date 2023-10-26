@@ -1896,6 +1896,7 @@ class SampleService
         $sampleRjtReasonDb = $this->sm->get('SampleRejectionReasonTable');
         $provinceDb = $this->sm->get('ProvinceTable');
         $apiTrackDb = $this->sm->get('DashApiReceiverStatsTable');
+        $trackApiDb = $this->sm->get('DashTrackApiRequestsTable');
         $userDb = $this->sm->get('UsersTable');
         $failedImports = array();
         //$params = json_decode($params, true);
@@ -1974,7 +1975,7 @@ class SampleService
                     'patient_age_in_years'                  => (trim($row['PatientAge']) != '' ? trim($row['PatientAge']) : NULL),
                     'patient_dob'                           => $dob,
                     'sample_collection_date'                => $sampleCollectionDate,
-                    'sample_registered_at_lab'              => $sampleReceivedAtLab,
+                    'sample_received_at_vl_lab_datetime'    => $sampleReceivedAtLab,
                     'result_printed_datetime'               => $resultPrinterDateTime,
                     'line_of_treatment'                     => (trim($row['CurrentTreatment']) != '' ? trim($row['CurrentTreatment']) : NULL),
                     'is_sample_rejected'                    => (trim($row['IsSampleRejected']) != '' ? strtolower($row['IsSampleRejected']) : NULL),
@@ -1991,11 +1992,10 @@ class SampleService
                     'result_value_log'                      => (trim($row['Result']['log']) != '' ? (float)($row['Result']['log']) : NULL),
                     'result_value_absolute'                 => (trim($row['result_value_absolute']) != '' ? trim($row['result_value_absolute']) : NULL),
                     'result_value_text'                     => (trim($row['Result']['Copies']) != '' ? trim($row['Result']['Copies']) : NULL),
-                    'result_value_absolute_decimal'         => (trim($row['result_value_absolute']) != '' ? trim($row['result_value_absolute']) : NULL),
                     'result'                                => (trim($row['Result']['Copies']) != '' ? trim($row['Result']['Copies']) : NULL),
                     'result_approved_by'                    => (trim($row['ApprovedBy']) != '' ? $userDb->checkExistUser($row['ApprovedBy']) : NULL),
-                    'result_value_absolute_decimal'                            => $result_value_absolute_decimal,
-                    'vl_result_category'                 => $vl_result_category,
+                    'result_value_absolute_decimal'         => $result_value_absolute_decimal,
+                    'vl_result_category'                    => $vl_result_category,
                     'sample_registered_at_lab'              => $sampleRegisteredAtLabDateTime
                 );
 
@@ -2030,6 +2030,9 @@ class SampleService
                 //check testing reason
                 $data['result_status'] = null;
                 if (trim($row['TestStatus']) != '') {
+                    $resultStatusText = [
+                        "invalid", "fail", "failed", "inconclusive", "f", "i"
+                    ];
                     $row['TestStatus'] = strtolower($row['TestStatus']);
                     if ($row['TestStatus'] == 'complete' || $row['TestStatus'] == 'authorized') {
                         $row['TestStatus'] = 'accepted';
@@ -2037,7 +2040,7 @@ class SampleService
                     } elseif ($row['TestStatus'] == 'cancelled' || $row['TestStatus'] == 'rejected') {
                         $row['TestStatus'] = 'rejected';
                         $data['result_status'] = 4;
-                    } elseif ($row['TestStatus'] == 'invalid' || $row['TestStatus'] == 'fail' || $row['TestStatus'] == 'failed' || $row['TestStatus'] == 'fail' || $row['TestStatus'] == 'inconclusive' || strtolower($row['Result']['Copies']) == 'inconclusive') {
+                    } elseif (in_array($row['TestStatus'], $resultStatusText) || strtolower($row['Result']['Copies']) == 'inconclusive') {
                         $row['TestStatus'] = 'invalid';
                         $data['result_status'] = 5;
                     } elseif ($row['TestStatus'] == 'registered' || $row['TestStatus'] == 'progress') {
@@ -2119,8 +2122,8 @@ class SampleService
         );
 
         // Track API Records
-        $apiData = JsonMachine::fromString($params, '/timestamp');
-        $timestamp = iterator_to_array($apiData)['timestamp'];
+        $timeStampData= JsonMachine::fromString($params, '/timestamp');
+        $timestamp = iterator_to_array($timeStampData)['timestamp'];
         $timestamp = ($timestamp !== false && !empty($timestamp)) ? $timestamp : time();
         $apiTrackData = array(
             'tracking_id'                   => $timestamp,
@@ -2132,6 +2135,8 @@ class SampleService
             'status'                        => $status
         );
         $apiTrackDb->insert($apiTrackData);
+        $common = new CommonService();
+        $trackApiDb->addApiTracking($common->generateUUID(), 1, $counter, 'weblims-vl', 'vl', $_SERVER['REQUEST_URI'], $apiData, $response, 'json', $data['lab_id']);
 
         return $response;
     }
