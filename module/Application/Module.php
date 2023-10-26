@@ -46,6 +46,7 @@ use Application\Service\OrganizationService;
 use Application\Service\SampleService;
 use Application\Service\ConfigService;
 use Application\Service\FacilityService;
+use Application\Service\ApiSyncHistoryService;
 use Application\Service\SummaryService;
 
 use Laminas\Mvc\ModuleRouteListener;
@@ -611,6 +612,14 @@ class Module
 						return new FacilityService($diContainer);
 					}
 				},
+				'ApiSyncHistoryService' => new class
+				{
+					public function __invoke($diContainer)
+					{
+
+						return new ApiSyncHistoryService($diContainer);
+					}
+				},
 				'translator' => 'Laminas\Mvc\I18n\TranslatorFactory',
 			),
 			'abstract_factories' => array(
@@ -680,6 +689,14 @@ class Module
 					{
 						$facilityService = $diContainer->get('FacilityService');
 						return new \Application\Controller\FacilityController($facilityService);
+					}
+				},
+				'Application\Controller\ApiSyncHistoryController' => new class
+				{
+					public function __invoke($diContainer)
+					{
+						$apiSyncHistoryService = $diContainer->get('ApiSyncHistoryService');
+						return new \Application\Controller\ApiSyncHistoryController($apiSyncHistoryService);
 					}
 				},
 				'Application\Controller\SummaryController' => new class

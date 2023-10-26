@@ -357,6 +357,11 @@ if (!isset($activeTab)) {
                                         <i class="fa fa-angle-right"></i> <span class="title"><?php echo $this->translate('Sync Status'); ?></span>
                                     </a>
                                 </li>
+                                <li class="nav-item end <?php echo ($activeTab == 'sync-history') ? " active open" : ""; ?>">
+                                    <a href="<?php echo $this->url('api-sync-history', array('action' => 'index')) ?>" class="nav-link ">
+                                        <i class="fa fa-angle-right"></i> <span class="title"><?php echo $this->translate('API History'); ?></span>
+                                    </a>
+                                </li>
                             </ul>
                         </li>
                     <?php } ?>

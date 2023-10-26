@@ -20,11 +20,14 @@ class DashTrackApiRequestsTable extends AbstractTableGateway
         $this->adapter = $adapter;
     }
 
-    public function add($params)
-    {
-        return $this->insert($params);
-    }
+    public function fetchSyncHistoryType(){
+        $dbAdapter = $this->adapter;
+        $sql = new Sql($dbAdapter);
+        $sQuery = $sql->select()->from(array('a' => "dash_track_api_requests"))->columns(array('request_type'))->group('request_type');
+        $sQueryStr = $sql->buildSqlString($sQuery);
+        return $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
 
+    }
     public function fetchAllDashTrackApiRequestsByGrid($parameters)
     {
         /* Array of database columns which should be read and sent back to DataTables. Use a space where
@@ -103,32 +106,36 @@ class DashTrackApiRequestsTable extends AbstractTableGateway
          * SQL queries
          * Get data to display
          */
+        $common = new CommonService();
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->from(array('a' => "dash_track_api_requests"));
 
+        [$startDate, $endDate] = $common->convertDateRange($parameters['daterange'] ?? '');
+
+        if (isset($parameters['daterange']) && trim($parameters['daterange']) != '') {
+            $sQuery->where('DATE(a.requested_on) >= "' . $startDate . '" AND DATE(a.requested_on) <= "' . $endDate . '"');
+        }
+
+        if (isset($parameters['syncedType']) && trim($parameters['syncedType']) != '') {
+            $sQuery->where('a.request_type like "' . $parameters['syncedType'] . '"');
+        }
+        if (isset($parameters['testType']) && trim($parameters['testType']) != '') {
+            $sQuery->where('a.test_type like "' . $parameters['testType'] . '"');
+        }
         if (isset($sWhere) && $sWhere != "") {
             $sQuery->where($sWhere);
         }
-        $common = new CommonService();
-        [$startDate, $endDate] = $common->convertDateRange($_POST['dateRange'] ?? '');
 
-        if (isset($_POST['dateRange']) && trim($_POST['dateRange']) != '') {
-            $sWhere[] = ' DATE(a.requested_on) >= "' . $startDate . '" AND DATE(a.requested_on) <= "' . $endDate . '"';
-        }
-
-        if (isset($_POST['syncedType']) && trim($_POST['syncedType']) != '') {
-            $sWhere[] = ' a.request_type like "' . $_POST['syncedType'] . '"';
-        }
-        if (isset($_POST['testType']) && trim($_POST['testType']) != '') {
-            $sWhere[] = ' a.test_type like "' . $_POST['testType'] . '"';
+        if (isset($sOrder) && $sOrder != "") {
+            $sQuery->order($sOrder);
         }
 
         if (isset($sLimit) && isset($sOffset)) {
             $sQuery->limit($sLimit);
             $sQuery->offset($sOffset);
         }
-
+        
         // Get the string of the Sql, instead of the Select-instance
         $sQueryStr = $sql->buildSqlString($sQuery);
         // echo $sQueryStr;die;
@@ -158,7 +165,7 @@ class DashTrackApiRequestsTable extends AbstractTableGateway
             $row[] = strtoupper($aRow['test_type']);
             $row[] = $aRow['api_url'];
             $row[] = $common->humanReadableDateFormat($aRow['requested_on'], true);
-            $row[] = '<a href="javascript:void(0);" class="btn btn-success btn-xs" style="margin-right: 2px;" title="Result" onclick="showModal(\'show-params.php?id=' . base64_encode($aRow['api_track_id']) . '\',1200,720);"> Show Params</a>';
+            $row[] = '<a href="javascript:void(0);" class="btn btn-success btn-xs" style="margin-right: 2px;" title="Result" onclick="showModal(\'/api-sync-history/show-params/id/' . base64_encode($aRow['api_track_id']) . '\',1200,720);"> Show Params</a>';
             
             $output['aaData'][] = $row;
         }

@@ -7,6 +7,7 @@ use DateTimeZone;
 use Exception;
 use ZipArchive;
 
+use Spatie\Once;
 use Ramsey\Uuid\Uuid;
 use Laminas\Session\Container;
 use Laminas\Db\Sql\Sql;
@@ -1330,5 +1331,31 @@ class CommonService
         $uuid = (Uuid::uuid4())->toString();
         $uuid .= $attachExtraString ? '-' . $this->generateRandomString(6) : '';
         return $uuid;
+    }
+
+    public function generateSelectOptions($optionList, $selectedOptions = [], $emptySelectText = false)
+    {
+        return once(function () use ($optionList, $selectedOptions, $emptySelectText) {
+            if (empty($optionList)) {
+                return '';
+            }
+            $response = '';
+            if ($emptySelectText !== false) {
+                $response .= "<option value=''>$emptySelectText</option>";
+            }
+
+            foreach ($optionList as $optId => $optName) {
+                $selectedText = '';
+                if (!empty($selectedOptions)) {
+                    if (is_array($selectedOptions) && in_array($optId, $selectedOptions)) {
+                        $selectedText = "selected='selected'";
+                    } elseif ($optId == $selectedOptions) {
+                        $selectedText = "selected='selected'";
+                    }
+                }
+                $response .= "<option value='" . addslashes($optId) . "' $selectedText>" . addslashes($optName) . "</option>";
+            }
+            return $response;
+        });
     }
 }

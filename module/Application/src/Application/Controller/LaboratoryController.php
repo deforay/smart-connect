@@ -841,8 +841,6 @@ class LaboratoryController extends AbstractAppController
     }
     public function expandBarChartAction()
     {
-        echo "came";
-        die;
         $this->layout('layout/modal.phtml');
         /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();

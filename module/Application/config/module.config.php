@@ -185,6 +185,16 @@ return array(
                     ),
                 ),
             ),
+            'api-sync-history' => array(
+                'type'    => 'segment',
+                'options' => array(
+                    'route'    => '/api-sync-history[/][:action][/:id]',
+                    'defaults' => array(
+                        'controller' => Controller\ApiSyncHistoryController::class,
+                        'action' => 'index',
+                    ),
+                ),
+            ),
         ),
     ),
     'service_manager' => [

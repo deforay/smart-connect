@@ -31,7 +31,9 @@
         "laminas/laminas-cache": "^3.6",
         "laminas/laminas-cache-storage-adapter-filesystem": "^2.2",
         "laminas/laminas-mail": "^2.16",
-        "laminas/laminas-diactoros": "^2.17"
+        "laminas/laminas-diactoros": "^2.17",
+        "ramsey/uuid": "^4.2",
+        "spatie/once": "^2.2"
     },
     "autoload": {
         "psr-4": {
