@@ -165,7 +165,7 @@ class DashTrackApiRequestsTable extends AbstractTableGateway
             $row[] = strtoupper($aRow['test_type']);
             $row[] = $aRow['api_url'];
             $row[] = $common->humanReadableDateFormat($aRow['requested_on'], true);
-            $row[] = '<a href="javascript:void(0);" class="btn btn-success btn-xs" style="margin-right: 2px;" title="Result" onclick="showModal(\'/api-sync-history/show-params/id/' . base64_encode($aRow['api_track_id']) . '\',1200,720);"> Show Params</a>';
+            $row[] = '<a href="javascript:void(0);" class="btn btn-success btn-xs" style="margin-right: 2px;" title="Result" onclick="showModal(\'/api-sync-history/show-params/' . base64_encode($aRow['api_track_id']) . '\',1200,720);"> Show Params</a>';
             
             $output['aaData'][] = $row;
         }
@@ -201,11 +201,11 @@ class DashTrackApiRequestsTable extends AbstractTableGateway
                 'data_format' => $format ?? null
             ];
             if (!empty($requestData) && $requestData != '[]') {
-                $data['api_params'] = '/uploads/requests/' . $transactionId . '.json';
-                $data['request_data'] = '/uploads/requests/' . $transactionId . '.json';
+                // $data['api_params'] = '/uploads/requests/' . $transactionId . '.json';
+                $data['request_data'] = '/uploads/track-api/requests/' . $transactionId . '.json';
             }
             if (!empty($responseData) && $responseData != '[]') {
-                $data['response_data'] = '/uploads/responses/' . $transactionId . '.json';
+                $data['response_data'] = '/uploads/track-api/responses/' . $transactionId . '.json';
             }
             return $this->insert($data);
         } catch (Exception $exc) {
@@ -214,5 +214,9 @@ class DashTrackApiRequestsTable extends AbstractTableGateway
             error_log($exc->getTraceAsString());
             return 0;
         }
+    }
+
+    public function fetchSyncHistoryById($id){
+        return $this->select(array('api_track_id' => $id))->current();
     }
 }

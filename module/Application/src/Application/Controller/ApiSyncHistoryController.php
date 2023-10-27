@@ -17,7 +17,7 @@ class ApiSyncHistoryController extends AbstractActionController
     }
     public function indexAction()
     {
-        $this->layout()->setVariable('activeTab', 'facility');
+        $this->layout()->setVariable('activeTab', 'sync-history');
         /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
@@ -28,5 +28,13 @@ class ApiSyncHistoryController extends AbstractActionController
         $requestType = $this->apiSyncHistoryService->getSyncHistoryType();
         return new ViewModel(array('requestType' => $requestType));
     }
-    
+
+    public function showParamsAction()
+    {
+        $id = base64_decode($this->params()->fromRoute('id'));
+        $result = $this->apiSyncHistoryService->getSyncHistoryById($id);
+        $viewModel = new ViewModel();
+        $viewModel->setVariables(array('result' => $result));
+        return $viewModel;
+    }
 }

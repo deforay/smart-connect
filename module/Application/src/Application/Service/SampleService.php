@@ -1902,6 +1902,7 @@ class SampleService
         //$params = json_decode($params, true);
         $apiData = \JsonMachine\JsonMachine::fromString($params, "/data");
         $counter = 0;
+        // print_r($params);die;
         foreach ($apiData as $key => $row) {
             $counter++;
             // Debug::dump($row);die;
@@ -2136,7 +2137,7 @@ class SampleService
         );
         $apiTrackDb->insert($apiTrackData);
         $common = new CommonService();
-        $trackApiDb->addApiTracking($common->generateUUID(), 1, $counter, 'weblims-vl', 'vl', $_SERVER['REQUEST_URI'], $apiData, $response, 'json', $data['lab_id']);
+        $trackApiDb->addApiTracking($common->generateUUID(), 1, $counter, 'weblims-vl', 'vl', $_SERVER['REQUEST_URI'], $params, $response, 'json', $data['lab_id']);
 
         return $response;
     }

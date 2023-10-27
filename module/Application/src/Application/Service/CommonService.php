@@ -1358,4 +1358,30 @@ class CommonService
             return $response;
         });
     }
+
+    public static function getJsonFromZip($zipFile, $jsonFile): string
+    {
+        if (!file_exists($zipFile)) {
+            return "{}";
+        }
+        $zip = new ZipArchive;
+        if ($zip->open($zipFile) === true) {
+            $json = $zip->getFromName($jsonFile);
+            $zip->close();
+
+            return $json;
+        } else {
+            return "{}";
+        }
+    }
+
+    public static function prettyJson($json): string
+    {
+        if (is_array($json)) {
+            $json = json_encode($json, JSON_PRETTY_PRINT);
+        } else {
+            $json = json_encode(json_decode($json), JSON_PRETTY_PRINT);
+        }
+        return htmlspecialchars($json, ENT_QUOTES, 'UTF-8');
+    }
 }

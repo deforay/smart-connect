@@ -25,4 +25,10 @@ class ApiSyncHistoryService
         $db = $this->sm->get('DashTrackApiRequestsTable');
         return $db->fetchSyncHistoryType();
     }
+    
+    public function getSyncHistoryById($id)
+    {
+        $db = $this->sm->get('DashTrackApiRequestsTable');
+        return $db->fetchSyncHistoryById($id);
+    }
 }
