@@ -35,15 +35,14 @@ class LocationDetailsTable extends AbstractTableGateway
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->quantifier(\Laminas\Db\Sql\Select::QUANTIFIER_DISTINCT)
             ->from(array('l' => 'geographical_divisions'))
-            ->join(array('f' => 'facility_details'), 'f.facility_state=l.geo_id', array(), 'left')
-            // ->join(array('ft' => 'facility_type'), 'ft.facility_type_id=f.facility_type')
-            // ->where('ft.facility_type_name="clinic"')
+            ->join(array('f' => 'facility_details'), 'f.facility_state_id=l.geo_id', array())
+            ->join(array('ft' => 'facility_type'), 'ft.facility_type_id=f.facility_type')
+            ->where('ft.facility_type_name="clinic"')
             ->where(array('geo_parent' => 0));
         if ($mappedFacilities != null) {
             $sQuery = $sQuery->where('f.facility_id IN ("' . implode('", "', array_values(array_filter($mappedFacilities))) . '")');
         }
         $sQueryStr = $sql->buildSqlString($sQuery);
-        // die($sQueryStr);
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         return $rResult;
     }
