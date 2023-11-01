@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Global Configuration Override
  *
@@ -11,18 +12,18 @@
  * file.
  */
 
-return array(
-    'db' => array(
+return [
+    'db' => [
         'driver'         => 'Pdo',
         'dsn'            => 'mysql:dbname=vldashboard;host=localhost',
-        'driver_options' => array(
+        'driver_options' => [
             PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES \'UTF8\''
-        ),
-    ),
-    'service_manager' => array(
-        'factories' => array(
+        ],
+    ],
+    'service_manager' => [
+        'factories' => [
             'Laminas\Db\Adapter\Adapter'
-                    => 'Laminas\Db\Adapter\AdapterServiceFactory',
-        ),
-    ),
-);
+            => 'Laminas\Db\Adapter\AdapterServiceFactory',
+        ],
+    ],
+];

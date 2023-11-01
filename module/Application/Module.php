@@ -2,60 +2,59 @@
 
 namespace Application;
 
-use Laminas\Session\Container;
-
-use Application\Model\UsersTable;
-use Application\Model\OrganizationsTable;
-use Application\Model\OrganizationTypesTable;
-use Application\Model\CountriesTable;
-use Application\Model\RolesTable;
-use Application\Model\UserOrganizationsMapTable;
-use Application\Model\SampleTable;
-use Application\Model\FacilityTable;
-use Application\Model\FacilityTypeTable;
-use Application\Model\SampleStatusTable;
-use Application\Model\TestReasonTable;
-use Application\Model\SampleTypeTable;
-use Application\Model\GlobalTable;
-use Application\Model\ArtCodeTable;
-use Application\Model\UserFacilityMapTable;
-use Application\Model\LocationDetailsTable;
-use Application\Model\RemovedSamplesTable;
-use Application\Model\GenerateBackupTable;
-use Application\Model\SampleRejectionReasonTable;
-use Application\Model\EidSampleRejectionReasonTable;
-use Application\Model\Covid19SampleRejectionReasonsTable;
-use Application\Model\EidSampleTypeTable;
-use Application\Model\Covid19SampleTypeTable;
-use Application\Model\Covid19ComorbiditiesTable;
-use Application\Model\Covid19SymptomsTable;
-use Application\Model\Covid19TestReasonsTable;
-use Application\Model\ProvinceTable;
-use Application\Model\DashApiReceiverStatsTable;
-use Application\Model\DashTrackApiRequestsTable;
-use Application\Model\ImportConfigMachineTable;
-use Application\Model\HepatitisSampleTypeTable;
-use Application\Model\HepatitisSampleRejectionReasonTable;
-use Application\Model\HepatitisResultsTable;
-use Application\Model\HepatitisRiskFactorTable;
-use Application\Model\HepatitisTestReasonsTable;
-
-use Application\Service\CommonService;
-use Application\Service\UserService;
-use Application\Service\OrganizationService;
-use Application\Service\SampleService;
-use Application\Service\ConfigService;
-use Application\Service\FacilityService;
-use Application\Service\ApiSyncHistoryService;
-use Application\Service\SummaryService;
-
-use Laminas\Mvc\ModuleRouteListener;
 use Laminas\Mvc\MvcEvent;
 
-use Laminas\Cache\Pattern\ObjectCache;
-use Laminas\Cache\Pattern\PatternOptions;
-
+use Laminas\Session\Container;
+use Application\Model\RolesTable;
+use Application\Model\UsersTable;
 use Laminas\View\Model\ViewModel;
+use Application\Model\GlobalTable;
+use Application\Model\SampleTable;
+use Application\Model\ArtCodeTable;
+use Application\Model\FacilityTable;
+use Application\Model\ProvinceTable;
+use Application\Service\UserService;
+use Laminas\Mvc\ModuleRouteListener;
+use Application\Model\CountriesTable;
+use Application\Model\SampleTypeTable;
+use Application\Model\TestReasonTable;
+use Application\Service\CommonService;
+use Application\Service\ConfigService;
+use Application\Service\SampleService;
+use Laminas\Cache\Pattern\ObjectCache;
+use Application\Service\SummaryService;
+use Application\Model\FacilityTypeTable;
+use Application\Model\SampleStatusTable;
+use Application\Service\FacilityService;
+use Application\Model\EidSampleTypeTable;
+use Application\Model\OrganizationsTable;
+use Laminas\Cache\Pattern\PatternOptions;
+use Application\Model\GenerateBackupTable;
+use Application\Model\RemovedSamplesTable;
+use Application\View\Helper\GetLocaleData;
+use Application\Model\Covid19SymptomsTable;
+use Application\Model\LocationDetailsTable;
+use Application\Model\UserFacilityMapTable;
+use Application\Model\HepatitisResultsTable;
+use Application\Service\OrganizationService;
+use Application\Model\Covid19SampleTypeTable;
+
+use Application\Model\OrganizationTypesTable;
+use Application\Model\Covid19TestReasonsTable;
+use Application\Model\HepatitisRiskFactorTable;
+use Application\Model\HepatitisSampleTypeTable;
+use Application\Model\ImportConfigMachineTable;
+use Application\Model\Covid19ComorbiditiesTable;
+use Application\Model\DashApiReceiverStatsTable;
+
+use Application\Model\HepatitisTestReasonsTable;
+use Application\Model\UserOrganizationsMapTable;
+
+use Application\Model\SampleRejectionReasonTable;
+use Application\Model\EidSampleRejectionReasonTable;
+
+use Application\Model\Covid19SampleRejectionReasonsTable;
+use Application\Model\HepatitisSampleRejectionReasonTable;
 
 class Module
 {
@@ -770,7 +769,7 @@ class Module
 					public function __invoke($diContainer)
 					{
 						$globalTable = $diContainer->get('GlobalTable');
-						return new \Application\View\Helper\GetLocaleData($globalTable);
+						return new GetLocaleData($globalTable);
 					}
 				},
 				'GetConfigData' => new class
