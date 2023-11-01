@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Local Configuration Override
  *
@@ -11,9 +12,9 @@
  * credentials from accidentally being committed into version control.
  */
 
-return array(
-        'db' => array(
+return [
+    'db' => [
         'username' => 'root',
         'password' => 'zaq12345'
-    )
-);
+    ]
+];
