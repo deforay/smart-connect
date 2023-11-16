@@ -2,14 +2,14 @@
 
 namespace Api\Controller;
 
-use Application\Service\CommonService;
-use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\View\Model\JsonModel;
+use Application\Service\SampleService;
+use Laminas\Mvc\Controller\AbstractRestfulController;
 
 class VlsmController extends AbstractRestfulController
 {
 
-    public \Application\Service\SampleService $sampleService;
+    public SampleService $sampleService;
 
     public function __construct($sampleService)
     {

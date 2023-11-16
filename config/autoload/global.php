@@ -15,7 +15,7 @@
 return [
     'db' => [
         'driver'         => 'Pdo',
-        'dsn'            => 'mysql:dbname=dash-cm;host=localhost',
+        'dsn'            => 'mysql:dbname=vldashboard;host=localhost',
         'driver_options' => [
             PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES \'UTF8\''
         ],

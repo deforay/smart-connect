@@ -2,22 +2,23 @@
 
 namespace Application\Service;
 
-use DateTimeImmutable;
-use DateTimeZone;
 use Exception;
 use ZipArchive;
-
 use Spatie\Once;
-use Ramsey\Uuid\Uuid;
-use Laminas\Session\Container;
-use Laminas\Db\Sql\Sql;
+use DateTimeZone;
+
 use Laminas\Mail;
-use Laminas\Mail\Transport\Smtp as SmtpTransport;
+use Ramsey\Uuid\Uuid;
+use DateTimeImmutable;
+use Laminas\Db\Sql\Sql;
+use JsonMachine\JsonMachine;
+use Laminas\Session\Container;
+use Laminas\Mime\Part as MimePart;
 use Laminas\Mail\Transport\SmtpOptions;
 use Laminas\Mime\Message as MimeMessage;
-use Laminas\Mime\Part as MimePart;
 
 use Application\Model\DashApiReceiverStatsTable;
+use Laminas\Mail\Transport\Smtp as SmtpTransport;
 
 
 class CommonService
@@ -599,7 +600,7 @@ class CommonService
           if (!file_exists($pathname)) {
                if (move_uploaded_file($_FILES['referenceFile']['tmp_name'], $pathname)) {
                     // $apiData = \JsonMachine\JsonMachine::fromFile($pathname);
-                    $apiData = json_decode(file_get_contents($pathname));
+                    $apiData = Self::processJsonFile($pathname);
                }
           }
 
@@ -1160,7 +1161,7 @@ class CommonService
                          $sheet = $excel->getActiveSheet();
                          $output = array();
 
-                         $today = new \DateTimeImmutable();
+                         $today = new DateTimeImmutable();
                          $twoWeekExpiry = $today->sub(\DateInterval::createFromDateString('2 weeks'));
                          //$twoWeekExpiry = date("Y-m-d", strtotime(date("Y-m-d") . '-2 weeks'));
                          $threeWeekExpiry = $today->sub(\DateInterval::createFromDateString('4 weeks'));
@@ -1258,130 +1259,173 @@ class CommonService
           }
      }
 
-     public static function convertDateRange(?string $dateRange): array{
-        if (empty($dateRange)) {
-            return ['', ''];
-        }
+     public static function convertDateRange(?string $dateRange): array
+     {
+          if (empty($dateRange)) {
+               return ['', ''];
+          }
 
-        $dates = explode("to", $dateRange ?? '');
-        $dates = array_map('trim', $dates);
+          $dates = explode("to", $dateRange ?? '');
+          $dates = array_map('trim', $dates);
 
-        $startDate = !empty($dates[0]) ? self::isoDateFormat($dates[0]) : '';
-        $endDate = !empty($dates[1]) ? self::isoDateFormat($dates[1]) : '';
+          $startDate = !empty($dates[0]) ? self::isoDateFormat($dates[0]) : '';
+          $endDate = !empty($dates[1]) ? self::isoDateFormat($dates[1]) : '';
 
-        return [$startDate, $endDate];
-    }
+          return [$startDate, $endDate];
+     }
 
-    public static function isJSON($string): bool
-    {
-        if (empty($string) || !is_string($string)) {
-            return false;
-        }
+     public static function isJSON($string): bool
+     {
+          if (empty($string) || !is_string($string)) {
+               return false;
+          }
 
-        json_decode($string);
-        return json_last_error() === JSON_ERROR_NONE;
-    }
-    public static function toJSON($data): ?string
-    {
-        if (!empty($data)) {
-            if (self::isJSON($data)) {
-                return $data;
-            } else {
-                $json = json_encode($data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-                if ($json !== false) {
-                    return $json;
-                } else {
-                    error_log('Data could not be encoded as JSON: ' . json_last_error_msg());
-                }
-            }
-        }
-        return null;
-    }
-
-    public static function makeDirectory($path, $mode = 0777, $recursive = true): bool
-    {
-        if (is_dir($path)) {
-            return true;
-        }
-
-        return mkdir($path, $mode, $recursive);
-    }
-
-    public static function zipJson($json, $fileName)
-    {
-        $result = false;
-        if (!empty($json) && !empty($fileName)) {
-            $zip = new ZipArchive();
-            $zipPath = $fileName . '.zip';
-
-            if ($zip->open($zipPath, ZipArchive::CREATE) === true) {
-                $zip->addFromString(basename($fileName), $json);
-
-                if ($zip->status == ZIPARCHIVE::ER_OK) {
-                    $result = true;
-                }
-                $zip->close();
-            }
-        }
-        return $result;
-    }
-
-    public function generateUUID($attachExtraString = true): string
-    {
-        $uuid = (Uuid::uuid4())->toString();
-        $uuid .= $attachExtraString ? '-' . $this->generateRandomString(6) : '';
-        return $uuid;
-    }
-
-    public function generateSelectOptions($optionList, $selectedOptions = [], $emptySelectText = false)
-    {
-        return once(function () use ($optionList, $selectedOptions, $emptySelectText) {
-            if (empty($optionList)) {
-                return '';
-            }
-            $response = '';
-            if ($emptySelectText !== false) {
-                $response .= "<option value=''>$emptySelectText</option>";
-            }
-
-            foreach ($optionList as $optId => $optName) {
-                $selectedText = '';
-                if (!empty($selectedOptions)) {
-                    if (is_array($selectedOptions) && in_array($optId, $selectedOptions)) {
-                        $selectedText = "selected='selected'";
-                    } elseif ($optId == $selectedOptions) {
-                        $selectedText = "selected='selected'";
+          json_decode($string);
+          return json_last_error() === JSON_ERROR_NONE;
+     }
+     public static function toJSON($data): ?string
+     {
+          if (!empty($data)) {
+               if (self::isJSON($data)) {
+                    return $data;
+               } else {
+                    $json = json_encode($data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+                    if ($json !== false) {
+                         return $json;
+                    } else {
+                         error_log('Data could not be encoded as JSON: ' . json_last_error_msg());
                     }
-                }
-                $response .= "<option value='" . addslashes($optId) . "' $selectedText>" . addslashes($optName) . "</option>";
-            }
-            return $response;
-        });
-    }
+               }
+          }
+          return null;
+     }
 
-    public static function getJsonFromZip($zipFile, $jsonFile): string
-    {
-        if (!file_exists($zipFile)) {
-            return "{}";
-        }
-        $zip = new ZipArchive;
-        if ($zip->open($zipFile) === true) {
-            $json = $zip->getFromName($jsonFile);
-            $zip->close();
+     public static function makeDirectory($path, $mode = 0777, $recursive = true): bool
+     {
+          if (is_dir($path)) {
+               return true;
+          }
 
-            return $json;
-        } else {
-            return "{}";
-        }
-    }
+          return mkdir($path, $mode, $recursive);
+     }
 
-    public static function prettyJson($json): string
-    {
-        if (is_array($json)) {
-            $json = json_encode($json, JSON_PRETTY_PRINT);
-        } else {
-            $json = json_encode(json_decode($json), JSON_PRETTY_PRINT);
-        }
-        return htmlspecialchars($json, ENT_QUOTES, 'UTF-8');
-    }
+     public static function zipJson($json, $fileName)
+     {
+          $result = false;
+          if (!empty($json) && !empty($fileName)) {
+               $zip = new ZipArchive();
+               $zipPath = $fileName . '.zip';
+
+               if ($zip->open($zipPath, ZipArchive::CREATE) === true) {
+                    $zip->addFromString(basename($fileName), $json);
+
+                    if ($zip->status == ZIPARCHIVE::ER_OK) {
+                         $result = true;
+                    }
+                    $zip->close();
+               }
+          }
+          return $result;
+     }
+
+     public function generateUUID($attachExtraString = true): string
+     {
+          $uuid = (Uuid::uuid4())->toString();
+          $uuid .= $attachExtraString ? '-' . $this->generateRandomString(6) : '';
+          return $uuid;
+     }
+
+     public function generateSelectOptions($optionList, $selectedOptions = [], $emptySelectText = false)
+     {
+          return once(function () use ($optionList, $selectedOptions, $emptySelectText) {
+               if (empty($optionList)) {
+                    return '';
+               }
+               $response = '';
+               if ($emptySelectText !== false) {
+                    $response .= "<option value=''>$emptySelectText</option>";
+               }
+
+               foreach ($optionList as $optId => $optName) {
+                    $selectedText = '';
+                    if (!empty($selectedOptions)) {
+                         if (is_array($selectedOptions) && in_array($optId, $selectedOptions)) {
+                              $selectedText = "selected='selected'";
+                         } elseif ($optId == $selectedOptions) {
+                              $selectedText = "selected='selected'";
+                         }
+                    }
+                    $response .= "<option value='" . addslashes($optId) . "' $selectedText>" . addslashes($optName) . "</option>";
+               }
+               return $response;
+          });
+     }
+
+     public static function getJsonFromZip($zipFile, $jsonFile): string
+     {
+          if (!file_exists($zipFile)) {
+               return "{}";
+          }
+          $zip = new ZipArchive;
+          if ($zip->open($zipFile) === true) {
+               $json = $zip->getFromName($jsonFile);
+               $zip->close();
+
+               return $json;
+          } else {
+               return "{}";
+          }
+     }
+
+     public static function prettyJson($json): string
+     {
+          if (is_array($json)) {
+               $json = json_encode($json, JSON_PRETTY_PRINT);
+          } else {
+               $json = json_encode(json_decode($json), JSON_PRETTY_PRINT);
+          }
+          return htmlspecialchars($json, ENT_QUOTES, 'UTF-8');
+     }
+
+     public static function processJsonFile($filePath)
+     {
+          if (!file_exists($filePath)) {
+               return null; // File does not exist
+          }
+
+          $fileContent = file_get_contents($filePath);
+
+          // Check if the file is gzipped
+          $isGzipped = substr($fileContent, 0, 2) === "\x1f\x8b";
+
+          if ($isGzipped) {
+               // Open the gzipped file
+               $resource = gzopen($filePath, 'r');
+               $decompressedContent = '';
+
+               // Read and concatenate the contents
+               if ($resource) {
+                    while (!gzeof($resource)) {
+                         $decompressedContent .= gzread($resource, 4096);
+                    }
+                    gzclose($resource);
+               }
+
+               // Use the decompressed content as a stream for JsonMachine
+               $stream = fopen('php://memory', 'r+');
+               fwrite($stream, $decompressedContent);
+               rewind($stream);
+          } else {
+               // If the file is not gzipped, simply open it as a stream
+               $stream = fopen($filePath, 'r');
+          }
+
+          // Process the JSON data
+          $apiData = JsonMachine::fromStream($stream, "/data");
+
+          // Close and clean up the stream
+          fclose($stream);
+
+          return $apiData;
+     }
 }
