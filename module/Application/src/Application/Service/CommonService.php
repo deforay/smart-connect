@@ -1393,37 +1393,40 @@ class CommonService
                return null; // File does not exist
           }
 
-          $fileContent = file_get_contents($filePath);
+          // Efficiently check if the file is gzipped
+          $file = fopen($filePath, 'rb');
+          $bytes = fread($file, 2);
+          fclose($file);
 
-          // Check if the file is gzipped
-          $isGzipped = substr($fileContent, 0, 2) === "\x1f\x8b";
+          $isGzipped = $bytes === "\x1f\x8b";
 
           if ($isGzipped) {
-               // Open the gzipped file
                $resource = gzopen($filePath, 'r');
-               $decompressedContent = '';
-
-               // Read and concatenate the contents
-               if ($resource) {
-                    while (!gzeof($resource)) {
-                         $decompressedContent .= gzread($resource, 4096);
-                    }
-                    gzclose($resource);
+               if (!$resource) {
+                    return null; // Unable to open gzipped file
                }
 
-               // Use the decompressed content as a stream for JsonMachine
+               $decompressedContent = '';
+               while (!gzeof($resource)) {
+                    $decompressedContent .= gzread($resource, 4096);
+               }
+               gzclose($resource);
+
+               // Use the decompressed content
                $stream = fopen('php://memory', 'r+');
                fwrite($stream, $decompressedContent);
                rewind($stream);
           } else {
-               // If the file is not gzipped, simply open it as a stream
                $stream = fopen($filePath, 'r');
+               if (!$stream) {
+                    return null; // Unable to open file
+               }
           }
 
           // Process the JSON data
           $apiData = JsonMachine::fromStream($stream, "/data");
 
-          // Close and clean up the stream
+          // Close the stream
           fclose($stream);
 
           return $apiData;
