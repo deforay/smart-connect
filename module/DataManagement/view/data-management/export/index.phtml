@@ -124,7 +124,7 @@ foreach ($files as $file) {
 
     function generateBackup() {
         if (!$('#sampleCollectionDate').val()) {
-            $('#sampleCollectionDate').val(moment().subtract('days', 179).format('YYYY-MM-DD') + ' to ' + moment().format('YYYY-MM-DD'));
+            $('#sampleCollectionDate').val(moment().subtract(179, 'days').format('YYYY-MM-DD') + ' to ' + moment().format('YYYY-MM-DD'));
         }
 
         var sampleCollectionDate = $('#sampleCollectionDate').val();

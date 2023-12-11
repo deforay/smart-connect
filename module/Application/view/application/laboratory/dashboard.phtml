@@ -1,14 +1,13 @@
 <?php
 
 use Laminas\Session\Container;
-use Zend\Debug\Debug;
 
 $loginContainer = new Container('credo');
 $languagecontainer = new Container('language');
-$startYear = date("Y", strtotime("-1 year"));
-$startMonth = date('m', strtotime('+1 month', strtotime('-1 year')));
-$endYear = date('Y');
-$endMonth = date('m');
+// $startYear = date("Y", strtotime("-1 year"));
+// $startMonth = date('m', strtotime('+1 month', strtotime('-1 year')));
+// $endYear = date('Y');
+// $endMonth = date('m');
 
 $startDate = date('Y-m', strtotime('+1 month', strtotime('-1 year')));
 $endDate = date('Y-m');
@@ -69,7 +68,7 @@ die; */
         font-size: 18px
     }
 
-    .mpr-selected {}
+    /* .mpr-selected {} */
 
     .mpr-month:hover {
         border-radius: 5px;
@@ -165,7 +164,9 @@ die; */
     }
 
     @media screen and (min-width:320px) and (max-width: 760px) {
-        #daterange-container, #daterange-container-key-indicator {
+
+        #daterange-container,
+        #daterange-container-key-indicator {
             width: 100% !important;
         }
 
@@ -176,7 +177,9 @@ die; */
     }
 
     @media screen and (min-width:761px) and (max-width: 970px) {
-        #daterange-container, #daterange-container-key-indicator {
+
+        #daterange-container,
+        #daterange-container-key-indicator {
             width: 100% !important;
         }
 
@@ -1033,6 +1036,7 @@ foreach ($sampleType as $samples) {
                 $("#gmap-polyline-data").html(data);
             });
     }
+
     function isOnScreen(elem) {
         // if the element doesn't exist, abort
         if (elem.length == 0) {
@@ -1085,6 +1089,11 @@ foreach ($sampleType as $samples) {
             allowClear: true
         });
 
+        $('#indClinicId').select2({
+            placeholder: "<?php echo $this->translate('All Facilities'); ?>",
+            allowClear: true
+        });
+
         $('#age').on('select2:close', function(evt) {
             var uldiv = $(this).siblings('span.select2').find('ul');
             var count = uldiv.find('li').length - 1;
@@ -1118,16 +1127,18 @@ foreach ($sampleType as $samples) {
             $('#daterange-container-key-indicator span').html(start.format('MMM D, YYYY') + ' to ' + end.format('MMM D, YYYY'));
             $('#daterangeKeyIndicator').val(start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
         }
+        <?php
+        $minDate = (isset($loginContainer->useCurrentTables) && $loginContainer->useCurrentTables == true) ? "moment().subtract(12, 'months')" : "moment().subtract(12, 'years')";
+        ?>
+
         $('#daterange-container, #daterange-container-key-indicator').daterangepicker({
-            format: 'DD-MMM-YYYY',
-            separator: ' to ',
-            startDate: start,
-            endDate: end,
-            <?php if (isset($loginContainer->useCurrentTables) && $loginContainer->useCurrentTables == true) { ?>
-                minDate: moment().subtract(12, 'months'),
-            <?php } ?>
-            maxDate: moment(),
-            ranges: {
+            'format': 'DD-MMM-YYYY',
+            'separator': ' to ',
+            'startDate': start,
+            'endDate': end,
+            'minDate': <?php echo $minDate; ?>,
+            'maxDate': moment(),
+            'ranges': {
                 'Today': [moment(), moment()],
                 'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
                 'Last 7 Days': [moment().subtract(6, 'days'), moment()],
@@ -1162,7 +1173,7 @@ foreach ($sampleType as $samples) {
         $.blockUI.defaults.css.border = '1px solid grey';
         //$(document).ajaxStart($.blockUI({ message: '<h2><?php echo $this->translate('Processing...'); ?></h2>' })).ajaxStop($.unblockUI);
         if (!$('#sampleCollectionDate').val()) {
-            $('#sampleCollectionDate').val(moment().subtract('days', 179).format('YYYY-MM-DD') + ' to ' + moment().format('YYYY-MM-DD'));
+            $('#sampleCollectionDate').val(moment().subtract(179, 'days').format('YYYY-MM-DD') + ' to ' + moment().format('YYYY-MM-DD'));
         }
 
 
@@ -1320,7 +1331,7 @@ foreach ($sampleType as $samples) {
 
     // function exportSampleResult(){
     //    $.blockUI.defaults.css.border = '1px solid grey';
-    //    $(document).ajaxStart($.blockUI({ message: '<h2><?php echo $this->translate('Processing...'); ?></h2>' })).ajaxStop($.unblockUI); 
+    //    $(document).ajaxStart($.blockUI({ message: '<h2><?php echo $this->translate('Processing...'); ?></h2>' })).ajaxStop($.unblockUI);
     //    $.post("<?php echo $this->url('laboratory', array('action' => 'export-sample-status-result-excel')); ?>", {result : $("#sampleStatus").val()},
     //     function(data){
     //         if(data == "" || data == null || data == undefined){
@@ -1328,54 +1339,50 @@ foreach ($sampleType as $samples) {
     //         }else{
     //             window.open('../temporary/'+data,'_blank');
     //         }
-    //     }); 
+    //     });
     // }
-
+    <?php
+    $startDate = (isset($loginContainer->useCurrentTables) && $loginContainer->useCurrentTables == true) ? 'end' : null;
+    ?>
     jQuery(function() {
-        // set default dates
         var start = new Date();
-        // set end date to max one year period:
         var end = new Date(new Date().setYear(start.getFullYear() - 1));
 
-        $('#dpMonthsStart').datepicker({
-            clearBtn: true,
-            autoclose: true,
-            todayHighlight: true,
-            format: 'M-yyyy',
-            viewMode: "months",
-            minViewMode: "months",
-            <?php if (isset($loginContainer->useCurrentTables) && $loginContainer->useCurrentTables == true) { ?>
-                startDate: end,
-            <?php } ?>
-            endDate: "0m"
-        }).on('changeDate', function(e) {
+        function initializeDatepicker(id, startDate) {
+            var options = {
+                clearBtn: true,
+                autoclose: true,
+                todayHighlight: true,
+                format: 'M-yyyy',
+                viewMode: "months",
+                minViewMode: "months",
+                endDate: "0m"
+            };
+
+            if (startDate) {
+                options.startDate = startDate;
+            }
+
+            $(id).datepicker(options);
+        }
+
+        initializeDatepicker('#dpMonthsStart', <?php echo $startDate ? "'$startDate'" : 'null'; ?>);
+        initializeDatepicker('#dpMonthsEnd', <?php echo $startDate ? "'$startDate'" : 'null'; ?>);
+
+        $('#dpMonthsStart').on('changeDate', function(e) {
             $('#dpMonthsEnd').val('');
-            var _satrt = new Date(e.date.valueOf());
-            $('#dpMonthsEnd').datepicker('setStartDate', _satrt);
-        });
-        $('#dpMonthsEnd').datepicker({
-            clearBtn: true,
-            autoclose: true,
-            todayHighlight: true,
-            format: 'M-yyyy',
-            viewMode: "months",
-            minViewMode: "months",
-            <?php if (isset($loginContainer->useCurrentTables) && $loginContainer->useCurrentTables == true) { ?>
-                startDate: end,
-            <?php } ?>
-            endDate: "0m"
+            var _start = new Date(e.date.valueOf());
+            $('#dpMonthsEnd').datepicker('setStartDate', _start);
         });
 
-        $('#indClinicId').select2({
-            placeholder: "<?php echo $this->translate('All Facilities'); ?>",
-            allowClear: true
-        });
+
+
     });
 
     function formatDate(date) {
-        // We are formatting Mon-Year date as 01/Mon/Year 
+        // We are formatting Mon-Year date as 01/Mon/Year
         // because firefox was not able to parse Mon-Year format
-        var d = new Date('01/'+date.replace("-" , "/")),
+        var d = new Date('01/' + date.replace("-", "/")),
             month = '' + (d.getMonth() + 1),
             year = d.getFullYear();
         if (month.length < 2) month = '0' + month;
@@ -1390,14 +1397,13 @@ foreach ($sampleType as $samples) {
         var fromDate = formatDate($('#mrp-lowerDate').val());
         var toDate = formatDate($('#mrp-upperDate').val());
         $.post("<?php echo $this->url('summary', array('action' => 'get-indicators')); ?>", {
-                clinics: indClinicIdList,
-                fromDate: fromDate,
-                toDate: toDate
-            },
-            function(data) {
-                $("#keyIndicatorsSummary").html(data);
-                $.unblockUI();
-            });
+            clinics: indClinicIdList,
+            fromDate: fromDate,
+            toDate: toDate
+        }, function(data) {
+            $("#keyIndicatorsSummary").html(data);
+            $.unblockUI();
+        });
     }
 
     function exportSummaryIndicatorResult() {
@@ -1406,14 +1412,13 @@ foreach ($sampleType as $samples) {
             message: '<h2><?php echo $this->translate('Processing...'); ?></h2>'
         })).ajaxStop($.unblockUI);
         $.post("<?php echo $this->url('summary', array('action' => 'export-indicator-result-excel')); ?>", {
-                result: $("#sampleStatus").val()
-            },
-            function(data) {
-                if (data == "" || data == null || data == undefined) {
-                    alert('<?php echo $this->translate('Unable to export excel') ?>');
-                } else {
-                    window.open('/temporary/' + data, '_blank');
-                }
-            });
+            result: $("#sampleStatus").val()
+        }, function(data) {
+            if (data == "" || data == null || data == undefined) {
+                alert('<?php echo $this->translate('Unable to export excel') ?>');
+            } else {
+                window.open('/temporary/' + data, '_blank');
+            }
+        });
     }
 </script>

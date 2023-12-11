@@ -117,19 +117,19 @@ class EidSummaryService
         $eidSampleDb = $this->sm->get('EidSampleTableWithoutCache');
         return $eidSampleDb->fetchEidOutcomesByAgeDetails($params);
     }
-   
+
     public function getTATDetails($params)
     {
         $eidSampleDb = $this->sm->get('EidSampleTableWithoutCache');
         return $eidSampleDb->fetchTATDetails($params);
     }
-    
+
     public function getEidOutcomesByProvinceDetails($params)
     {
         $eidSampleDb = $this->sm->get('EidSampleTableWithoutCache');
         return $eidSampleDb->fetchEidOutcomesByProvinceDetails($params);
     }
-    
+
     public function exportIndicatorResultExcel($params)
     {
         $queryContainer = new Container('query');
@@ -273,8 +273,8 @@ class EidSummaryService
                     )
                 )
                 ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'))
-                ->join(array('f_d_l_dp' => 'geographical_divisions'), 'f_d_l_dp.geo_id=f.facility_state', array('province' => 'geo_name'))
-                ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district', array('district' => 'geo_name'))
+                ->join(array('f_d_l_dp' => 'geographical_divisions'), 'f_d_l_dp.geo_id=f.facility_state_id', array('province' => 'geo_name'))
+                ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district_id', array('district' => 'geo_name'))
                 ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')")
                 ->group('vl.facility_id');
         }

@@ -4,15 +4,17 @@ namespace Application\Controller;
 
 use Laminas\Json\Json;
 use Laminas\View\Model\ViewModel;
+use Application\Service\SampleService;
+use Application\Service\SummaryService;
 use Application\Controller\AbstractAppController;
 
 class SummaryController extends AbstractAppController
 {
 
-    public \Application\Service\SampleService $sampleService;
-    public \Application\Service\SummaryService $summaryService;
+    public SampleService $sampleService;
+    public SummaryService $summaryService;
 
-    public function __construct($summaryService, $sampleService)
+    public function __construct(SummaryService $summaryService, SampleService $sampleService)
     {
         parent::__construct();
         $this->summaryService = $summaryService;

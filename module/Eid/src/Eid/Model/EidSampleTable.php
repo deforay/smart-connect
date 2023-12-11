@@ -104,10 +104,10 @@ class EidSampleTable extends AbstractTableGateway
             $sQuery = $sQuery->join(array('f' => 'facility_details'), 'f.facility_id=eid.facility_id', array('facility_name'));
         }
         if (isset($params['provinces']) && trim($params['provinces']) != '') {
-            $sQuery = $sQuery->where('f.facility_state IN (' . $params['provinces'] . ')');
+            $sQuery = $sQuery->where('f.facility_state_id IN (' . $params['provinces'] . ')');
         }
         if (isset($params['districts']) && trim($params['districts']) != '') {
-            $sQuery = $sQuery->where('f.facility_district IN (' . $params['districts'] . ')');
+            $sQuery = $sQuery->where('f.facility_district_id IN (' . $params['districts'] . ')');
         }
         if (isset($params['clinics']) && trim($params['clinics']) != '') {
             $sQuery = $sQuery->where('eid.facility_id IN (' . $params['clinics'] . ')');
@@ -247,9 +247,9 @@ class EidSampleTable extends AbstractTableGateway
                 )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=eid.facility_id', array('facility_name'))
-            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_state', array('province' => 'geo_name'))
+            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_state_id', array('province' => 'geo_name'))
             ->where("(eid.sample_collection_date is not null AND DATE(eid.sample_collection_date) !='1970-01-01' AND DATE(eid.sample_collection_date) !='0000-00-00')")
-            ->group('f.facility_state');
+            ->group('f.facility_state_id');
         if (isset($sWhere) && $sWhere != "") {
             $sQuery->where($sWhere);
         }
@@ -292,9 +292,9 @@ class EidSampleTable extends AbstractTableGateway
                 )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=eid.facility_id', array('facility_name'))
-            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_state', array('province' => 'geo_name'))
+            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_state_id', array('province' => 'geo_name'))
             ->where("(eid.sample_collection_date is not null AND eid.sample_collection_date not like '' AND DATE(eid.sample_collection_date) !='1970-01-01' AND DATE(eid.sample_collection_date) !='0000-00-00')")
-            ->group('f.facility_state');
+            ->group('f.facility_state_id');
 
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
@@ -432,10 +432,10 @@ class EidSampleTable extends AbstractTableGateway
                 )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=eid.facility_id', array('facility_name'))
-            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district', array('district' => 'geo_name'))
+            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district_id', array('district' => 'geo_name'))
 
             ->where("(eid.sample_collection_date is not null AND DATE(eid.sample_collection_date) !='1970-01-01' AND DATE(eid.sample_collection_date) !='0000-00-00')")
-            ->group('f.facility_district');
+            ->group('f.facility_district_id');
         if (isset($sWhere) && $sWhere != "") {
             $sQuery->where($sWhere);
         }
@@ -478,10 +478,10 @@ class EidSampleTable extends AbstractTableGateway
                 )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=eid.facility_id', array('facility_name'))
-            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district', array('district' => 'geo_name'))
+            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district_id', array('district' => 'geo_name'))
 
             ->where("(eid.sample_collection_date is not null AND DATE(eid.sample_collection_date) !='1970-01-01' AND DATE(eid.sample_collection_date) !='0000-00-00')")
-            ->group('f.facility_district');
+            ->group('f.facility_district_id');
 
 
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
@@ -621,8 +621,8 @@ class EidSampleTable extends AbstractTableGateway
                 )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=eid.facility_id', array('facility_name'))
-            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district', array('district' => 'geo_name'))
-            ->join(array('f_d_l_dp' => 'geographical_divisions'), 'f_d_l_dp.geo_id=f.facility_state', array('province' => 'geo_name'))
+            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district_id', array('district' => 'geo_name'))
+            ->join(array('f_d_l_dp' => 'geographical_divisions'), 'f_d_l_dp.geo_id=f.facility_state_id', array('province' => 'geo_name'))
             ->where("(eid.sample_collection_date is not null AND DATE(eid.sample_collection_date) !='1970-01-01' AND DATE(eid.sample_collection_date) !='0000-00-00')")
             ->group('eid.facility_id');
 
@@ -664,8 +664,8 @@ class EidSampleTable extends AbstractTableGateway
         $iQuery = $sql->select()->from(array('eid' => $this->table))
             ->columns(array('eid_id'))
             ->join(array('f' => 'facility_details'), 'f.facility_id=eid.facility_id', array())
-            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district', array())
-            ->join(array('f_d_l_dp' => 'geographical_divisions'), 'f_d_l_dp.geo_id=f.facility_state', array())
+            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district_id', array())
+            ->join(array('f_d_l_dp' => 'geographical_divisions'), 'f_d_l_dp.geo_id=f.facility_state_id', array())
             ->where("(eid.sample_collection_date is not null AND DATE(eid.sample_collection_date) !='1970-01-01' AND DATE(eid.sample_collection_date) !='0000-00-00')")
             ->group('eid.facility_id');
 
@@ -735,10 +735,10 @@ class EidSampleTable extends AbstractTableGateway
         }
 
         if (isset($params['provinces']) && trim($params['provinces']) != '') {
-            $sQuery = $sQuery->where('f.facility_state IN (' . $params['provinces'] . ')');
+            $sQuery = $sQuery->where('f.facility_state_id IN (' . $params['provinces'] . ')');
         }
         if (isset($params['districts']) && trim($params['districts']) != '') {
-            $sQuery = $sQuery->where('f.facility_district IN (' . $params['districts'] . ')');
+            $sQuery = $sQuery->where('f.facility_district_id IN (' . $params['districts'] . ')');
         }
 
         if (isset($params['clinics']) && trim($params['clinics']) != '') {
@@ -866,9 +866,9 @@ class EidSampleTable extends AbstractTableGateway
                 )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=eid.facility_id', array('facility_name'))
-            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_state', array('province' => 'geo_name'))
+            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_state_id', array('province' => 'geo_name'))
             ->where("(eid.sample_collection_date is not null AND DATE(eid.sample_collection_date) !='1970-01-01' AND DATE(eid.sample_collection_date) !='0000-00-00')")
-            ->group('f.facility_state');
+            ->group('f.facility_state_id');
 
         if (isset($sWhere) && $sWhere != "") {
             $sQuery->where($sWhere);
@@ -912,9 +912,9 @@ class EidSampleTable extends AbstractTableGateway
                 )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=eid.facility_id', array('facility_name'))
-            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_state', array('province' => 'geo_name'))
+            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_state_id', array('province' => 'geo_name'))
             ->where("(eid.sample_collection_date is not null AND DATE(eid.sample_collection_date) !='1970-01-01' AND DATE(eid.sample_collection_date) !='0000-00-00')")
-            ->group('f.facility_state');
+            ->group('f.facility_state_id');
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
             $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
@@ -1048,9 +1048,9 @@ class EidSampleTable extends AbstractTableGateway
                 )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=eid.facility_id', array('facility_name'))
-            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district', array('district' => 'geo_name'))
+            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district_id', array('district' => 'geo_name'))
             ->where("(eid.sample_collection_date is not null AND DATE(eid.sample_collection_date) !='1970-01-01' AND DATE(eid.sample_collection_date) !='0000-00-00')")
-            ->group('f.facility_district');
+            ->group('f.facility_district_id');
 
         if (isset($sWhere) && $sWhere != "") {
             $sQuery->where($sWhere);
@@ -1092,9 +1092,9 @@ class EidSampleTable extends AbstractTableGateway
                 )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=eid.facility_id', array('facility_name'))
-            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district', array('district' => 'geo_name'))
+            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district_id', array('district' => 'geo_name'))
             ->where("(eid.sample_collection_date is not null AND DATE(eid.sample_collection_date) !='1970-01-01' AND DATE(eid.sample_collection_date) !='0000-00-00')")
-            ->group('f.facility_district');
+            ->group('f.facility_district_id');
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
             $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
@@ -1231,8 +1231,8 @@ class EidSampleTable extends AbstractTableGateway
                 )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=eid.facility_id', array('facility_name'))
-            ->join(array('f_d_l_dp' => 'geographical_divisions'), 'f_d_l_dp.geo_id=f.facility_state', array('province' => 'geo_name'))
-            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district', array('district' => 'geo_name'))
+            ->join(array('f_d_l_dp' => 'geographical_divisions'), 'f_d_l_dp.geo_id=f.facility_state_id', array('province' => 'geo_name'))
+            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district_id', array('district' => 'geo_name'))
             ->where("(eid.sample_collection_date is not null AND DATE(eid.sample_collection_date) !='1970-01-01' AND DATE(eid.sample_collection_date) !='0000-00-00')")
             ->group('eid.facility_id');
 
@@ -1279,8 +1279,8 @@ class EidSampleTable extends AbstractTableGateway
                 )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=eid.facility_id', array('facility_name'))
-            ->join(array('f_d_l_dp' => 'geographical_divisions'), 'f_d_l_dp.geo_id=f.facility_state', array('province' => 'geo_name'))
-            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district', array('district' => 'geo_name'))
+            ->join(array('f_d_l_dp' => 'geographical_divisions'), 'f_d_l_dp.geo_id=f.facility_state_id', array('province' => 'geo_name'))
+            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district_id', array('district' => 'geo_name'))
             ->where("(eid.sample_collection_date is not null AND DATE(eid.sample_collection_date) !='1970-01-01' AND DATE(eid.sample_collection_date) !='0000-00-00')")
             ->group('eid.facility_id');
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
@@ -1333,10 +1333,10 @@ class EidSampleTable extends AbstractTableGateway
             $mostRejectionQuery = $mostRejectionQuery->join(array('f' => 'facility_details'), 'f.facility_id=eid.facility_id', array('facility_name'));
         }
         if (isset($params['provinces']) && trim($params['provinces']) != '') {
-            $mostRejectionQuery = $mostRejectionQuery->where('f.facility_state IN (' . $params['provinces'] . ')');
+            $mostRejectionQuery = $mostRejectionQuery->where('f.facility_state_id IN (' . $params['provinces'] . ')');
         }
         if (isset($params['districts']) && trim($params['districts']) != '') {
-            $mostRejectionQuery = $mostRejectionQuery->where('f.facility_district IN (' . $params['districts'] . ')');
+            $mostRejectionQuery = $mostRejectionQuery->where('f.facility_district_id IN (' . $params['districts'] . ')');
         }
         if (isset($params['clinics']) && trim($params['clinics']) != '') {
             $mostRejectionQuery = $mostRejectionQuery->where('eid.facility_id IN (' . $params['clinics'] . ')');
@@ -1378,10 +1378,10 @@ class EidSampleTable extends AbstractTableGateway
                     $rejectionQuery = $rejectionQuery->join(array('f' => 'facility_details'), 'f.facility_id=eid.facility_id', array('facility_name'));
                 }
                 if (isset($params['provinces']) && trim($params['provinces']) != '') {
-                    $rejectionQuery = $rejectionQuery->where('f.facility_state IN (' . $params['provinces'] . ')');
+                    $rejectionQuery = $rejectionQuery->where('f.facility_state_id IN (' . $params['provinces'] . ')');
                 }
                 if (isset($params['districts']) && trim($params['districts']) != '') {
-                    $rejectionQuery = $rejectionQuery->where('f.facility_district IN (' . $params['districts'] . ')');
+                    $rejectionQuery = $rejectionQuery->where('f.facility_district_id IN (' . $params['districts'] . ')');
                 }
                 if (isset($params['clinics']) && trim($params['clinics']) != '') {
                     $rejectionQuery = $rejectionQuery->where('eid.facility_id IN (' . $params['clinics'] . ')');
@@ -1503,9 +1503,9 @@ class EidSampleTable extends AbstractTableGateway
                 )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=eid.facility_id', array('facility_name'))
-            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district', array('district' => 'geo_name'))
+            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district_id', array('district' => 'geo_name'))
             ->where("(eid.sample_collection_date is not null AND DATE(eid.sample_collection_date) !='1970-01-01' AND DATE(eid.sample_collection_date) !='0000-00-00')")
-            ->group('f.facility_district');
+            ->group('f.facility_district_id');
 
         if (isset($sWhere) && $sWhere != "") {
             $sQuery->where($sWhere);
@@ -1548,9 +1548,9 @@ class EidSampleTable extends AbstractTableGateway
                 )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=eid.facility_id', array('facility_name'))
-            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district', array('district' => 'geo_name'))
+            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district_id', array('district' => 'geo_name'))
             ->where("(eid.sample_collection_date is not null AND DATE(eid.sample_collection_date) !='1970-01-01' AND DATE(eid.sample_collection_date) !='0000-00-00')")
-            ->group('f.facility_district');
+            ->group('f.facility_district_id');
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
             $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
@@ -1673,9 +1673,9 @@ class EidSampleTable extends AbstractTableGateway
                 )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=eid.facility_id', array('facility_name'))
-            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_state', array('province' => 'geo_name'))
+            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_state_id', array('province' => 'geo_name'))
             ->where("(eid.sample_collection_date is not null AND eid.sample_collection_date not like '' AND DATE(eid.sample_collection_date) !='1970-01-01' AND DATE(eid.sample_collection_date) !='0000-00-00')")
-            ->group('f.facility_district');
+            ->group('f.facility_district_id');
 
         if (isset($sWhere) && $sWhere != "") {
             $sQuery->where($sWhere);
@@ -1718,9 +1718,9 @@ class EidSampleTable extends AbstractTableGateway
                 )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=eid.facility_id', array('facility_name'))
-            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_state', array('province' => 'geo_name'))
+            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_state_id', array('province' => 'geo_name'))
             ->where("(eid.sample_collection_date is not null AND eid.sample_collection_date not like '' AND DATE(eid.sample_collection_date) !='1970-01-01' AND DATE(eid.sample_collection_date) !='0000-00-00')")
-            ->group('f.facility_district');
+            ->group('f.facility_district_id');
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $parameters['fromDate']) . "-01";
             $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
@@ -1844,8 +1844,8 @@ class EidSampleTable extends AbstractTableGateway
                 )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=eid.facility_id', array('facility_name'))
-            ->join(array('f_d_l_dp' => 'geographical_divisions'), 'f_d_l_dp.geo_id=f.facility_state', array('province' => 'geo_name'))
-            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district', array('district' => 'geo_name'))
+            ->join(array('f_d_l_dp' => 'geographical_divisions'), 'f_d_l_dp.geo_id=f.facility_state_id', array('province' => 'geo_name'))
+            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district_id', array('district' => 'geo_name'))
             ->where("(eid.sample_collection_date is not null AND eid.sample_collection_date not like '' AND DATE(eid.sample_collection_date) !='1970-01-01' AND DATE(eid.sample_collection_date) !='0000-00-00')")
             ->group('f.facility_id');
 
@@ -1890,8 +1890,8 @@ class EidSampleTable extends AbstractTableGateway
                 )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=eid.facility_id', array('facility_name'))
-            ->join(array('f_d_l_dp' => 'geographical_divisions'), 'f_d_l_dp.geo_id=f.facility_state', array('province' => 'geo_name'))
-            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district', array('district' => 'geo_name'))
+            ->join(array('f_d_l_dp' => 'geographical_divisions'), 'f_d_l_dp.geo_id=f.facility_state_id', array('province' => 'geo_name'))
+            ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district_id', array('district' => 'geo_name'))
             ->where("(eid.sample_collection_date is not null AND eid.sample_collection_date not like '' AND DATE(eid.sample_collection_date) !='1970-01-01' AND DATE(eid.sample_collection_date) !='0000-00-00')")
             ->group('f.facility_id');
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
@@ -1951,10 +1951,10 @@ class EidSampleTable extends AbstractTableGateway
             ->group(array(new Expression('YEAR(sample_collection_date)'), new Expression('MONTH(sample_collection_date)')));
 
         if (isset($params['provinces']) && trim($params['provinces']) != '') {
-            $samplesReceivedSummaryQuery = $samplesReceivedSummaryQuery->where('f.facility_state IN (' . $params['provinces'] . ')');
+            $samplesReceivedSummaryQuery = $samplesReceivedSummaryQuery->where('f.facility_state_id IN (' . $params['provinces'] . ')');
         }
         if (isset($params['districts']) && trim($params['districts']) != '') {
-            $samplesReceivedSummaryQuery = $samplesReceivedSummaryQuery->where('f.facility_district IN (' . $params['districts'] . ')');
+            $samplesReceivedSummaryQuery = $samplesReceivedSummaryQuery->where('f.facility_district_id IN (' . $params['districts'] . ')');
         }
         if (isset($params['clinics']) && trim($params['clinics']) != '') {
             $samplesReceivedSummaryQuery = $samplesReceivedSummaryQuery->where('eid.facility_id IN (' . $params['clinics'] . ')');
@@ -2006,10 +2006,10 @@ class EidSampleTable extends AbstractTableGateway
             ->join(array('f' => 'facility_details'), 'f.facility_id = eid.facility_id', array());
 
         if (isset($params['provinces']) && trim($params['provinces']) != '') {
-            $eidOutcomesQuery = $eidOutcomesQuery->where('f.facility_state IN (' . $params['provinces'] . ')');
+            $eidOutcomesQuery = $eidOutcomesQuery->where('f.facility_state_id IN (' . $params['provinces'] . ')');
         }
         if (isset($params['districts']) && trim($params['districts']) != '') {
-            $eidOutcomesQuery = $eidOutcomesQuery->where('f.facility_district IN (' . $params['districts'] . ')');
+            $eidOutcomesQuery = $eidOutcomesQuery->where('f.facility_district_id IN (' . $params['districts'] . ')');
         }
         if (isset($params['clinics']) && trim($params['clinics']) != '') {
             $eidOutcomesQuery = $eidOutcomesQuery->where('eid.facility_id IN (' . $params['clinics'] . ')');
@@ -2065,10 +2065,10 @@ class EidSampleTable extends AbstractTableGateway
             ->join(array('f' => 'facility_details'), 'f.facility_id = eid.facility_id', array());
 
         if (isset($params['provinces']) && trim($params['provinces']) != '') {
-            $eidOutcomesQuery = $eidOutcomesQuery->where('f.facility_state IN (' . $params['provinces'] . ')');
+            $eidOutcomesQuery = $eidOutcomesQuery->where('f.facility_state_id IN (' . $params['provinces'] . ')');
         }
         if (isset($params['districts']) && trim($params['districts']) != '') {
-            $eidOutcomesQuery = $eidOutcomesQuery->where('f.facility_district IN (' . $params['districts'] . ')');
+            $eidOutcomesQuery = $eidOutcomesQuery->where('f.facility_district_id IN (' . $params['districts'] . ')');
         }
         if (isset($params['clinics']) && trim($params['clinics']) != '') {
             $eidOutcomesQuery = $eidOutcomesQuery->where('eid.facility_id IN (' . $params['clinics'] . ')');
@@ -2102,14 +2102,14 @@ class EidSampleTable extends AbstractTableGateway
                 )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id = eid.facility_id', array())
-            ->join(array('l' => 'geographical_divisions'), 'l.geo_id = f.facility_state', array('geo_name'))
-            ->group('f.facility_state');
+            ->join(array('l' => 'geographical_divisions'), 'l.geo_id = f.facility_state_id', array('geo_name'))
+            ->group('f.facility_state_id');
 
         if (isset($params['provinces']) && trim($params['provinces']) != '') {
-            $eidOutcomesQuery = $eidOutcomesQuery->where('f.facility_state IN (' . $params['provinces'] . ')');
+            $eidOutcomesQuery = $eidOutcomesQuery->where('f.facility_state_id IN (' . $params['provinces'] . ')');
         }
         if (isset($params['districts']) && trim($params['districts']) != '') {
-            $eidOutcomesQuery = $eidOutcomesQuery->where('f.facility_district IN (' . $params['districts'] . ')');
+            $eidOutcomesQuery = $eidOutcomesQuery->where('f.facility_district_id IN (' . $params['districts'] . ')');
         }
         if (isset($params['clinics']) && trim($params['clinics']) != '') {
             $eidOutcomesQuery = $eidOutcomesQuery->where('eid.facility_id IN (' . $params['clinics'] . ')');
@@ -2128,8 +2128,8 @@ class EidSampleTable extends AbstractTableGateway
             ->from(array('eid' =>  $this->table))
             ->columns(
                 array(
-                    'sec1' => new Expression("AVG(DATEDIFF(sample_received_at_vl_lab_datetime, sample_collection_date))"),
-                    'sec2' => new Expression("AVG(DATEDIFF(sample_tested_datetime, sample_received_at_vl_lab_datetime))"),
+                    'sec1' => new Expression("AVG(DATEDIFF(sample_received_at_lab_datetime, sample_collection_date))"),
+                    'sec2' => new Expression("AVG(DATEDIFF(sample_tested_datetime, sample_received_at_lab_datetime))"),
                     'sec3' => new Expression("AVG(DATEDIFF(result_printed_datetime, sample_tested_datetime))"),
                     'total' => new Expression("AVG(DATEDIFF(result_printed_datetime, sample_collection_date))"),
                 )
@@ -2137,10 +2137,10 @@ class EidSampleTable extends AbstractTableGateway
             ->join(array('f' => 'facility_details'), 'f.facility_id = eid.facility_id', array());
 
         if (isset($params['provinces']) && trim($params['provinces']) != '') {
-            $eidOutcomesQuery = $eidOutcomesQuery->where('f.facility_state IN (' . $params['provinces'] . ')');
+            $eidOutcomesQuery = $eidOutcomesQuery->where('f.facility_state_id IN (' . $params['provinces'] . ')');
         }
         if (isset($params['districts']) && trim($params['districts']) != '') {
-            $eidOutcomesQuery = $eidOutcomesQuery->where('f.facility_district IN (' . $params['districts'] . ')');
+            $eidOutcomesQuery = $eidOutcomesQuery->where('f.facility_district_id IN (' . $params['districts'] . ')');
         }
         if (isset($params['clinics']) && trim($params['clinics']) != '') {
             $eidOutcomesQuery = $eidOutcomesQuery->where('eid.facility_id IN (' . $params['clinics'] . ')');
@@ -2747,8 +2747,8 @@ class EidSampleTable extends AbstractTableGateway
                         "monthDate" => new Expression("DATE_FORMAT(DATE(vl.sample_tested_datetime), '%b-%Y')"),
                         "daydiff" => new Expression('ABS(TIMESTAMPDIFF(DAY,sample_tested_datetime,sample_collection_date))'),
                         "AvgTestedDiff" => new Expression('CAST(ABS(AVG(TIMESTAMPDIFF(DAY,vl.sample_tested_datetime,vl.sample_collection_date))) AS DECIMAL (10,2))'),
-                        "AvgReceivedDiff" => new Expression('CAST(ABS(AVG(TIMESTAMPDIFF(DAY,vl.sample_received_at_vl_lab_datetime,vl.sample_collection_date))) AS DECIMAL (10,2))'),
-                        "AvgReceivedTested" => new Expression('CAST(ABS(AVG(TIMESTAMPDIFF(DAY,vl.sample_tested_datetime,vl.sample_received_at_vl_lab_datetime))) AS DECIMAL (10,2))'),
+                        "AvgReceivedDiff" => new Expression('CAST(ABS(AVG(TIMESTAMPDIFF(DAY,vl.sample_received_at_lab_datetime,vl.sample_collection_date))) AS DECIMAL (10,2))'),
+                        "AvgReceivedTested" => new Expression('CAST(ABS(AVG(TIMESTAMPDIFF(DAY,vl.sample_tested_datetime,vl.sample_received_at_lab_datetime))) AS DECIMAL (10,2))'),
                         "AvgReceivedPrinted" => new Expression('CAST(ABS(AVG(TIMESTAMPDIFF(DAY,vl.result_printed_datetime,vl.sample_collection_date))) AS DECIMAL (10,2))'),
                     )
                 );
@@ -2949,8 +2949,8 @@ class EidSampleTable extends AbstractTableGateway
         $squery = $sql->select()->from(array('vl' => $this->table))
             ->columns(
                 array(
-                    "Collection_Receive"  => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,sample_received_at_vl_lab_datetime,sample_collection_date))) AS DECIMAL (10,2))"),
-                    "Receive_Register"    => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,sample_registered_at_lab,sample_received_at_vl_lab_datetime))) AS DECIMAL (10,2))"),
+                    "Collection_Receive"  => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,sample_received_at_lab_datetime,sample_collection_date))) AS DECIMAL (10,2))"),
+                    "Receive_Register"    => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,sample_registered_at_lab,sample_received_at_lab_datetime))) AS DECIMAL (10,2))"),
                     "Register_Analysis"   => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,sample_registered_at_lab,sample_tested_datetime))) AS DECIMAL (10,2))"),
                     "Analysis_Authorise"  => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,result_approved_datetime,sample_tested_datetime))) AS DECIMAL (10,2))"),
                     "total"               => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,result_approved_datetime,sample_collection_date))) AS DECIMAL (10,2))")
@@ -2967,13 +2967,13 @@ class EidSampleTable extends AbstractTableGateway
             );
         if ($skipDays > 0) {
             $squery = $squery->where('
-                DATEDIFF(sample_received_at_vl_lab_datetime,sample_collection_date) < ' . $skipDays . ' AND
-                DATEDIFF(sample_received_at_vl_lab_datetime,sample_collection_date) >= 0 AND
+                DATEDIFF(sample_received_at_lab_datetime,sample_collection_date) < ' . $skipDays . ' AND
+                DATEDIFF(sample_received_at_lab_datetime,sample_collection_date) >= 0 AND
 
-                DATEDIFF(sample_registered_at_lab,sample_received_at_vl_lab_datetime) < ' . $skipDays . ' AND
-                DATEDIFF(sample_registered_at_lab,sample_received_at_vl_lab_datetime) >= 0 AND
+                DATEDIFF(sample_registered_at_lab,sample_received_at_lab_datetime) < ' . $skipDays . ' AND
+                DATEDIFF(sample_registered_at_lab,sample_received_at_lab_datetime) >= 0 AND
 
-                DATEDIFF(sample_tested_datetime,sample_received_at_vl_lab_datetime) < ' . $skipDays . ' AND
+                DATEDIFF(sample_tested_datetime,sample_received_at_lab_datetime) < ' . $skipDays . ' AND
                 DATEDIFF(sample_tested_datetime,sample_registered_at_lab)>=0 AND
 
                 DATEDIFF(result_approved_datetime,sample_tested_datetime) < ' . $skipDays . ' AND
@@ -3003,8 +3003,8 @@ class EidSampleTable extends AbstractTableGateway
         $squery = $sql->select()->from(array('vl' => $this->table))
             ->columns(
                 array(
-                    "Collection_Receive"  => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,sample_received_at_vl_lab_datetime,sample_collection_date))) AS DECIMAL (10,2))"),
-                    "Receive_Register"    => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,sample_registered_at_lab,sample_received_at_vl_lab_datetime))) AS DECIMAL (10,2))"),
+                    "Collection_Receive"  => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,sample_received_at_lab_datetime,sample_collection_date))) AS DECIMAL (10,2))"),
+                    "Receive_Register"    => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,sample_registered_at_lab,sample_received_at_lab_datetime))) AS DECIMAL (10,2))"),
                     "Register_Analysis"   => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,sample_registered_at_lab,sample_tested_datetime))) AS DECIMAL (10,2))"),
                     "Analysis_Authorise"  => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,result_approved_datetime,sample_tested_datetime))) AS DECIMAL (10,2))"),
                     "total"               => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,result_approved_datetime,sample_collection_date))) AS DECIMAL (10,2))")
@@ -3021,13 +3021,13 @@ class EidSampleTable extends AbstractTableGateway
             );
         if ($skipDays > 0) {
             $squery = $squery->where('
-                DATEDIFF(sample_received_at_vl_lab_datetime,sample_collection_date)<120 AND
-                DATEDIFF(sample_received_at_vl_lab_datetime,sample_collection_date)>=0 AND
+                DATEDIFF(sample_received_at_lab_datetime,sample_collection_date)<120 AND
+                DATEDIFF(sample_received_at_lab_datetime,sample_collection_date)>=0 AND
 
-                DATEDIFF(sample_registered_at_lab,sample_received_at_vl_lab_datetime)<120 AND
-                DATEDIFF(sample_registered_at_lab,sample_received_at_vl_lab_datetime)>=0 AND
+                DATEDIFF(sample_registered_at_lab,sample_received_at_lab_datetime)<120 AND
+                DATEDIFF(sample_registered_at_lab,sample_received_at_lab_datetime)>=0 AND
 
-                DATEDIFF(sample_tested_datetime,sample_received_at_vl_lab_datetime)<120 AND
+                DATEDIFF(sample_tested_datetime,sample_received_at_lab_datetime)<120 AND
                 DATEDIFF(sample_tested_datetime,sample_registered_at_lab)>=0 AND
 
                 DATEDIFF(result_approved_datetime,sample_tested_datetime)<120 AND
@@ -3057,8 +3057,8 @@ class EidSampleTable extends AbstractTableGateway
         $squery = $sql->select()->from(array('vl' => $this->table))
             ->columns(
                 array(
-                    "Collection_Receive"  => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,sample_received_at_vl_lab_datetime,sample_collection_date))) AS DECIMAL (10,2))"),
-                    "Receive_Register"    => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,sample_registered_at_lab,sample_received_at_vl_lab_datetime))) AS DECIMAL (10,2))"),
+                    "Collection_Receive"  => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,sample_received_at_lab_datetime,sample_collection_date))) AS DECIMAL (10,2))"),
+                    "Receive_Register"    => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,sample_registered_at_lab,sample_received_at_lab_datetime))) AS DECIMAL (10,2))"),
                     "Register_Analysis"   => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,sample_registered_at_lab,sample_tested_datetime))) AS DECIMAL (10,2))"),
                     "Analysis_Authorise"  => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,result_approved_datetime,sample_tested_datetime))) AS DECIMAL (10,2))"),
                     "total"               => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,result_approved_datetime,sample_collection_date))) AS DECIMAL (10,2))")
@@ -3075,13 +3075,13 @@ class EidSampleTable extends AbstractTableGateway
             );
         if ($skipDays > 0) {
             $squery = $squery->where('
-                DATEDIFF(sample_received_at_vl_lab_datetime,sample_collection_date)<120 AND
-                DATEDIFF(sample_received_at_vl_lab_datetime,sample_collection_date)>=0 AND
+                DATEDIFF(sample_received_at_lab_datetime,sample_collection_date)<120 AND
+                DATEDIFF(sample_received_at_lab_datetime,sample_collection_date)>=0 AND
 
-                DATEDIFF(sample_registered_at_lab,sample_received_at_vl_lab_datetime)<120 AND
-                DATEDIFF(sample_registered_at_lab,sample_received_at_vl_lab_datetime)>=0 AND
+                DATEDIFF(sample_registered_at_lab,sample_received_at_lab_datetime)<120 AND
+                DATEDIFF(sample_registered_at_lab,sample_received_at_lab_datetime)>=0 AND
 
-                DATEDIFF(sample_tested_datetime,sample_received_at_vl_lab_datetime)<120 AND
+                DATEDIFF(sample_tested_datetime,sample_received_at_lab_datetime)<120 AND
                 DATEDIFF(sample_tested_datetime,sample_registered_at_lab)>=0 AND
 
                 DATEDIFF(result_approved_datetime,sample_tested_datetime)<120 AND
@@ -3129,7 +3129,7 @@ class EidSampleTable extends AbstractTableGateway
                                                         END)"))
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.lab_id', array())
-            ->join(array('p' => 'geographical_divisions'), 'p.geo_id=f.facility_state', array('province_name' => 'geo_name', 'geo_id'), 'left')
+            ->join(array('p' => 'geographical_divisions'), 'p.geo_id=f.facility_state_id', array('province_name' => 'geo_name', 'geo_id'), 'left')
             ->group('p.geo_id');
         if (isset($params['lab']) && trim($params['lab']) != '') {
             $countQuery = $countQuery->where('vl.lab_id IN (' . $params['lab'] . ')');
@@ -3141,7 +3141,7 @@ class EidSampleTable extends AbstractTableGateway
             $countQuery = $countQuery->where('p.geo_id IN (' . $params['provinces'] . ')');
         }
         if (isset($params['districts']) && trim($params['districts']) != '') {
-            $countQuery = $countQuery->where('f.facility_district IN (' . $params['districts'] . ')');
+            $countQuery = $countQuery->where('f.facility_district_id IN (' . $params['districts'] . ')');
         }
         if (isset($params['clinicId']) && trim($params['clinicId']) != '') {
             $countQuery = $countQuery->where('vl.facility_id IN (' . $params['clinicId'] . ')');
@@ -3231,7 +3231,7 @@ class EidSampleTable extends AbstractTableGateway
                                                         END)"))
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.lab_id', array())
-            ->join(array('d' => 'geographical_divisions'), 'd.geo_id=f.facility_district', array('district_name' => 'geo_name', 'geo_id'), 'left')
+            ->join(array('d' => 'geographical_divisions'), 'd.geo_id=f.facility_district_id', array('district_name' => 'geo_name', 'geo_id'), 'left')
             ->order('total DESC')
             ->group('d.geo_id');
         if (isset($params['lab']) && trim($params['lab']) != '') {
@@ -3244,7 +3244,7 @@ class EidSampleTable extends AbstractTableGateway
             $countQuery = $countQuery->where('p.geo_id IN (' . $params['provinces'] . ')');
         }
         if (isset($params['districts']) && trim($params['districts']) != '') {
-            $countQuery = $countQuery->where('f.facility_district IN (' . $params['districts'] . ')');
+            $countQuery = $countQuery->where('f.facility_district_id IN (' . $params['districts'] . ')');
         }
         if (isset($params['clinicId']) && trim($params['clinicId']) != '') {
             $countQuery = $countQuery->where('vl.facility_id IN (' . $params['clinicId'] . ')');
@@ -3342,10 +3342,10 @@ class EidSampleTable extends AbstractTableGateway
             $countQuery = $countQuery->where('f.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
         }
         if (isset($params['provinces']) && trim($params['provinces']) != '') {
-            $countQuery = $countQuery->where('f.facility_state IN (' . $params['provinces'] . ')');
+            $countQuery = $countQuery->where('f.facility_state_id IN (' . $params['provinces'] . ')');
         }
         if (isset($params['districts']) && trim($params['districts']) != '') {
-            $countQuery = $countQuery->where('f.facility_district IN (' . $params['districts'] . ')');
+            $countQuery = $countQuery->where('f.facility_district_id IN (' . $params['districts'] . ')');
         }
         if (isset($params['clinicId']) && trim($params['clinicId']) != '') {
             $countQuery = $countQuery->where('vl.facility_id IN (' . $params['clinicId'] . ')');
@@ -3444,10 +3444,10 @@ class EidSampleTable extends AbstractTableGateway
             $countQuery = $countQuery->where('f.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
         }
         if (isset($params['provinces']) && trim($params['provinces']) != '') {
-            $countQuery = $countQuery->where('f.facility_state IN (' . $params['provinces'] . ')');
+            $countQuery = $countQuery->where('f.facility_state_id IN (' . $params['provinces'] . ')');
         }
         if (isset($params['districts']) && trim($params['districts']) != '') {
-            $countQuery = $countQuery->where('f.facility_district IN (' . $params['districts'] . ')');
+            $countQuery = $countQuery->where('f.facility_district_id IN (' . $params['districts'] . ')');
         }
         if (isset($params['clinicId']) && trim($params['clinicId']) != '') {
             $countQuery = $countQuery->where('vl.facility_id IN (' . $params['clinicId'] . ')');
@@ -3526,8 +3526,8 @@ class EidSampleTable extends AbstractTableGateway
         /* Array of database columns which should be read and sent back to DataTables. Use a space where
          * you want to insert a non-database field (for example a counter or static image)
         */
-        $aColumns = array('sample_code', "DATE_FORMAT(sample_collection_date,'%d-%b-%Y')", 'f.facility_code', 'f.facility_name', 'specimen_type', 'l.facility_code', 'l.facility_name', "DATE_FORMAT(sample_received_at_vl_lab_datetime,'%d-%b-%Y')");
-        $orderColumns = array('sample_code', 'sample_collection_date', 'f.facility_code', 'specimen_type', 'l.facility_name', 'sample_received_at_vl_lab_datetime');
+        $aColumns = array('sample_code', "DATE_FORMAT(sample_collection_date,'%d-%b-%Y')", 'f.facility_code', 'f.facility_name', 'specimen_type', 'l.facility_code', 'l.facility_name', "DATE_FORMAT(sample_received_at_lab_datetime,'%d-%b-%Y')");
+        $orderColumns = array('sample_code', 'sample_collection_date', 'f.facility_code', 'specimen_type', 'l.facility_name', 'sample_received_at_lab_datetime');
         /*
          * Paging
          */
@@ -3605,7 +3605,7 @@ class EidSampleTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->from(array('vl' => $this->table))
-            ->columns(array('sample_code', 'collectionDate' => new Expression('DATE(sample_collection_date)'), 'receivedDate' => new Expression('DATE(sample_received_at_vl_lab_datetime)')))
+            ->columns(array('sample_code', 'collectionDate' => new Expression('DATE(sample_collection_date)'), 'receivedDate' => new Expression('DATE(sample_received_at_lab_datetime)')))
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facilityName' => 'facility_name', 'facilityCode' => 'facility_code'))
             ->join(array('l' => 'facility_details'), 'l.facility_id=vl.lab_id', array('labName' => 'facility_name'), 'left')
             ->where("(vl.is_sample_rejected is NULL OR vl.is_sample_rejected = '' OR vl.is_sample_rejected = 'no') AND (reason_for_sample_rejection is NULL or reason_for_sample_rejection ='' or vl.reason_for_sample_rejection = 0)");
@@ -3698,7 +3698,7 @@ class EidSampleTable extends AbstractTableGateway
 
         /* Total data set length */
         $iQuery = $sql->select()->from(array('vl' => $this->table))
-            ->columns(array('sample_code', 'collectionDate' => new Expression('DATE(sample_collection_date)'), 'receivedDate' => new Expression('DATE(sample_received_at_vl_lab_datetime)')))
+            ->columns(array('sample_code', 'collectionDate' => new Expression('DATE(sample_collection_date)'), 'receivedDate' => new Expression('DATE(sample_received_at_lab_datetime)')))
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facilityName' => 'facility_name', 'facilityCode' => 'facility_code'))
             ->join(array('l' => 'facility_details'), 'l.facility_id=vl.lab_id', array('labName' => 'facility_name'), 'left')
             ->where("(vl.is_sample_rejected is NULL OR vl.is_sample_rejected = '' OR vl.is_sample_rejected = 'no') AND (reason_for_sample_rejection is NULL or reason_for_sample_rejection ='' or vl.reason_for_sample_rejection = 0)");
@@ -3781,10 +3781,10 @@ class EidSampleTable extends AbstractTableGateway
                     $countQuery = $countQuery->where(array("vl.sample_collection_date >='" . $startMonth . " 00:00:00" . "'", "vl.sample_collection_date <='" . $endMonth . " 23:59:59" . "'"));
                 }
                 if (isset($params['provinces']) && trim($params['provinces']) != '') {
-                    $countQuery = $countQuery->where('f.facility_state IN (' . $params['provinces'] . ')');
+                    $countQuery = $countQuery->where('f.facility_state_id IN (' . $params['provinces'] . ')');
                 }
                 if (isset($params['districts']) && trim($params['districts']) != '') {
-                    $countQuery = $countQuery->where('f.facility_district IN (' . $params['districts'] . ')');
+                    $countQuery = $countQuery->where('f.facility_district_id IN (' . $params['districts'] . ')');
                 }
                 if (isset($params['clinicId']) && trim($params['clinicId']) != '') {
                     $countQuery = $countQuery->where('vl.facility_id IN (' . $params['clinicId'] . ')');
@@ -3886,10 +3886,10 @@ class EidSampleTable extends AbstractTableGateway
                     $countQuery = $countQuery->where(array("vl.sample_collection_date >='" . $startMonth . " 00:00:00" . "'", "vl.sample_collection_date <='" . $endMonth . " 23:59:59" . "'"));
                 }
                 if (isset($params['provinces']) && trim($params['provinces']) != '') {
-                    $countQuery = $countQuery->where('f.facility_state IN (' . $params['provinces'] . ')');
+                    $countQuery = $countQuery->where('f.facility_state_id IN (' . $params['provinces'] . ')');
                 }
                 if (isset($params['districts']) && trim($params['districts']) != '') {
-                    $countQuery = $countQuery->where('f.facility_district IN (' . $params['districts'] . ')');
+                    $countQuery = $countQuery->where('f.facility_district_id IN (' . $params['districts'] . ')');
                 }
                 if (isset($params['clinicId']) && trim($params['clinicId']) != '') {
                     $countQuery = $countQuery->where('vl.facility_id IN (' . $params['clinicId'] . ')');
@@ -3977,10 +3977,10 @@ class EidSampleTable extends AbstractTableGateway
                 $sQuery = $sQuery->where('vl.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
             }
             if (isset($params['provinces']) && trim($params['provinces']) != '') {
-                $sQuery = $sQuery->where('f.facility_state IN (' . $params['provinces'] . ')');
+                $sQuery = $sQuery->where('f.facility_state_id IN (' . $params['provinces'] . ')');
             }
             if (isset($params['districts']) && trim($params['districts']) != '') {
-                $sQuery = $sQuery->where('f.facility_district IN (' . $params['districts'] . ')');
+                $sQuery = $sQuery->where('f.facility_district_id IN (' . $params['districts'] . ')');
             }
             if (isset($params['clinicId']) && trim($params['clinicId']) != '') {
                 $sQuery = $sQuery->where('vl.facility_id IN (' . $params['clinicId'] . ')');
@@ -4084,10 +4084,10 @@ class EidSampleTable extends AbstractTableGateway
                 $sQuery = $sQuery->where('vl.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
             }
             if (isset($params['provinces']) && trim($params['provinces']) != '') {
-                $sQuery = $sQuery->where('f.facility_state IN (' . $params['provinces'] . ')');
+                $sQuery = $sQuery->where('f.facility_state_id IN (' . $params['provinces'] . ')');
             }
             if (isset($params['districts']) && trim($params['districts']) != '') {
-                $sQuery = $sQuery->where('f.facility_district IN (' . $params['districts'] . ')');
+                $sQuery = $sQuery->where('f.facility_district_id IN (' . $params['districts'] . ')');
             }
             if (isset($params['clinicId']) && trim($params['clinicId']) != '') {
                 $sQuery = $sQuery->where('vl.facility_id IN (' . $params['clinicId'] . ')');
@@ -4486,10 +4486,10 @@ class EidSampleTable extends AbstractTableGateway
             ->where("sample_collection_date is not null AND sample_collection_date not like '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00' AND vl.lab_id !=0")
             ->group('vl.lab_id');
         if (isset($parameters['provinces']) && trim($parameters['provinces']) != '') {
-            $sQuery = $sQuery->where('f.facility_state IN (' . $parameters['provinces'] . ')');
+            $sQuery = $sQuery->where('f.facility_state_id IN (' . $parameters['provinces'] . ')');
         }
         if (isset($parameters['districts']) && trim($parameters['districts']) != '') {
-            $sQuery = $sQuery->where('f.facility_district IN (' . $parameters['districts'] . ')');
+            $sQuery = $sQuery->where('f.facility_district_id IN (' . $parameters['districts'] . ')');
         }
         if (isset($parameters['lab']) && trim($parameters['lab']) != '') {
             $sQuery = $sQuery->where('vl.lab_id IN (' . $parameters['lab'] . ')');
@@ -4628,10 +4628,10 @@ class EidSampleTable extends AbstractTableGateway
                 )
                 ->join(array('f' => 'facility_details'), 'f.facility_id=vl.lab_id', array());
             if (isset($params['provinces']) && trim($params['provinces']) != '') {
-                $sQuery = $sQuery->where('f.facility_state IN (' . $params['provinces'] . ')');
+                $sQuery = $sQuery->where('f.facility_state_id IN (' . $params['provinces'] . ')');
             }
             if (isset($params['districts']) && trim($params['districts']) != '') {
-                $sQuery = $sQuery->where('f.facility_district IN (' . $params['districts'] . ')');
+                $sQuery = $sQuery->where('f.facility_district_id IN (' . $params['districts'] . ')');
             }
             if (isset($params['lab']) && trim($params['lab']) != '') {
                 $sQuery = $sQuery->where('vl.lab_id IN (' . $params['lab'] . ')');
@@ -4730,10 +4730,10 @@ class EidSampleTable extends AbstractTableGateway
             ->join(array('f' => 'facility_details'), 'f.facility_id = eid.facility_id', array());
 
         if (isset($params['provinces']) && trim($params['provinces']) != '') {
-            $eidOutcomesQuery = $eidOutcomesQuery->where('f.facility_state IN (' . $params['provinces'] . ')');
+            $eidOutcomesQuery = $eidOutcomesQuery->where('f.facility_state_id IN (' . $params['provinces'] . ')');
         }
         if (isset($params['districts']) && trim($params['districts']) != '') {
-            $eidOutcomesQuery = $eidOutcomesQuery->where('f.facility_district IN (' . $params['districts'] . ')');
+            $eidOutcomesQuery = $eidOutcomesQuery->where('f.facility_district_id IN (' . $params['districts'] . ')');
         }
         if (isset($params['clinics']) && trim($params['clinics']) != '') {
             $eidOutcomesQuery = $eidOutcomesQuery->where('eid.facility_id IN (' . $params['clinics'] . ')');
@@ -4802,10 +4802,10 @@ class EidSampleTable extends AbstractTableGateway
                 ->order(array("lab_id", new Expression("DATE_FORMAT(sample_collection_date, '%m-%Y')")));
 
             if (isset($params['provinces']) && trim($params['provinces']) != '') {
-                $sQuery = $sQuery->where('f.facility_state IN (' . $params['provinces'] . ')');
+                $sQuery = $sQuery->where('f.facility_state_id IN (' . $params['provinces'] . ')');
             }
             if (isset($params['districts']) && trim($params['districts']) != '') {
-                $sQuery = $sQuery->where('f.facility_district IN (' . $params['districts'] . ')');
+                $sQuery = $sQuery->where('f.facility_district_id IN (' . $params['districts'] . ')');
             }
             if (isset($params['clinics']) && trim($params['clinics']) != '') {
                 $sQuery = $sQuery->where('eid.facility_id IN (' . $params['clinics'] . ')');
@@ -5388,7 +5388,7 @@ class EidSampleTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->from(array('vl' => $this->table))
-            ->columns(array('eid_id', 'sample_code', 'sampleCollectionDate' => new Expression('DATE(sample_collection_date)'), 'specimen_type', 'sampleTestingDate' => new Expression('DATE(sample_tested_datetime)'), 'result', 'sample_received_at_vl_lab_datetime'))
+            ->columns(array('eid_id', 'sample_code', 'sampleCollectionDate' => new Expression('DATE(sample_collection_date)'), 'specimen_type', 'sampleTestingDate' => new Expression('DATE(sample_tested_datetime)'), 'result', 'sample_received_at_lab_datetime'))
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'), 'left')
             ->join(array('r_r_r' => 'r_eid_sample_rejection_reasons'), 'r_r_r.rejection_reason_id=vl.reason_for_sample_rejection', array('rejection_reason_name'), 'left');
         //->where(array('f.facility_type'=>'1'));
@@ -5459,8 +5459,8 @@ class EidSampleTable extends AbstractTableGateway
             $hQuery = '';
             $hQuery = clone $sQuery;
             $hQuery->join(array('st' => 'r_eid_sample_type'), 'st.sample_id=vl.specimen_type', array('sample_name'), 'left')
-                ->join(array('lds' => 'geographical_divisions'), 'lds.geo_id=f.facility_state', array('facilityState' => 'geo_name'), 'left')
-                ->join(array('ldd' => 'geographical_divisions'), 'ldd.geo_id=f.facility_district', array('facilityDistrict' => 'geo_name'), 'left')
+                ->join(array('lds' => 'geographical_divisions'), 'lds.geo_id=f.facility_state_id', array('facilityState' => 'geo_name'), 'left')
+                ->join(array('ldd' => 'geographical_divisions'), 'ldd.geo_id=f.facility_district_id', array('facilityDistrict' => 'geo_name'), 'left')
                 ->where('result="Not Suppressed"');
             $queryContainer->highVlSampleQuery = $hQuery;
         }
@@ -5579,7 +5579,7 @@ class EidSampleTable extends AbstractTableGateway
             )
             ->join(array('if' => 'instrument_machines'), 'if.config_machine_id=eid.import_machine_name', array('lat' => 'latitude', 'lon' => 'longitude'))
             // ->join(array('f' => 'facility_details'), 'f.facility_id=eid.facility_id', array('total_facilities' => new Expression("COUNT(f.facility_id)")))
-            // ->join(array('loc' => 'geographical_divisions'), 'loc.geo_id=f.facility_district', array('geo_name' => 'geo_name'))
+            // ->join(array('loc' => 'geographical_divisions'), 'loc.geo_id=f.facility_district_id', array('geo_name' => 'geo_name'))
             // ->join(array('lab' => 'facility_details'), 'lab.facility_id=eid.lab_id', array('lab_name' => 'facility_name','lab_code' => 'facility_code','contact_person' => 'contact_person' ,'facility_emails','facility_mobile_numbers'))
             ->where("(eid.sample_tested_datetime is not null  AND if.poc_device ='yes')")
 

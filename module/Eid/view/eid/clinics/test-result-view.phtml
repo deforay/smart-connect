@@ -61,8 +61,8 @@ if (isset($result[0]['sample_collection_date']) && $result[0]['sample_collection
 }
 //sample recieved date
 $sampleReceivedDate = '';
-if (isset($result[0]['sample_received_at_vl_lab_datetime']) && $result[0]['sample_received_at_vl_lab_datetime'] != NULL && trim($result[0]['sample_received_at_vl_lab_datetime']) != '' && $result[0]['sample_received_at_vl_lab_datetime'] != '0000-00-00 00:00:00') {
-     $expStr = explode(" ", $result[0]['sample_received_at_vl_lab_datetime']);
+if (isset($result[0]['sample_received_at_lab_datetime']) && $result[0]['sample_received_at_lab_datetime'] != NULL && trim($result[0]['sample_received_at_lab_datetime']) != '' && $result[0]['sample_received_at_lab_datetime'] != '0000-00-00 00:00:00') {
+     $expStr = explode(" ", $result[0]['sample_received_at_lab_datetime']);
      $sampleReceivedDate = $this->humanReadableDateFormat($expStr[0]) . ' ' . $expStr[1];
 }
 //sample tested date

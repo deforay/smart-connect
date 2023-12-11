@@ -8,22 +8,25 @@ use Laminas\Db\Sql\Sql;
 use Laminas\Db\Sql\Expression;
 use Laminas\Session\Container;
 use Laminas\Db\Adapter\Adapter;
+use Application\Model\SampleTable;
 use Application\Service\CommonService;
+use Laminas\Cache\Pattern\ObjectCache;
+use Application\Model\LocationDetailsTable;
 use JsonMachine\JsonDecoder\ExtJsonDecoder;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
+use Application\Model\DashApiReceiverStatsTable;
 
 class SampleService
 {
 
     public $sm;
-    /** @var \Application\Model\SampleTable $sampleTable */
-    public $sampleTable;
+    /** @var SampleTable $sampleTable */
+    public SampleTable|ObjectCache $sampleTable;
     public $config;
-
     public CommonService $commonService;
-    public \Laminas\Cache\Pattern\ObjectCache $sampleTableCached;
-    public \Application\Model\DashApiReceiverStatsTable $apiTrackerTable;
-    public \Laminas\Db\Adapter\Adapter $dbAdapter;
+    //public ObjectCache $sampleTableCached;
+    public DashApiReceiverStatsTable $apiTrackerTable;
+    public Adapter $dbAdapter;
 
     public function __construct($sm, $sampleTable, $commonService, $apiTrackerTable, $dbAdapter)
     {
@@ -294,19 +297,20 @@ class SampleService
             $mappedFacilities = (!empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : null;
         }
 
+        /** @var LocationDetailsTable $locationDb  */
         $locationDb = $this->sm->get('LocationDetailsTable');
         return $locationDb->fetchLocationDetails($mappedFacilities);
     }
     public function getAllDistrictList()
     {
-
         $loginContainer = new Container('credo');
         $mappedFacilities = null;
         if ($loginContainer->role != 1) {
             $mappedFacilities = (!empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : null;
         }
+        /** @var LocationDetailsTable $locationDb  */
         $locationDb = $this->sm->get('LocationDetailsTable');
-        return $locationDb->fetchAllDistrictsList();
+        return $locationDb->fetchAllDistrictsList($mappedFacilities);
     }
 
     public function getAllTestResults($parameters)
@@ -388,8 +392,8 @@ class SampleService
         $sql = new Sql($this->dbAdapter);
         $sQuery = $sql->select()->from(array('vl' => $dashTable))
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name', 'facility_code', 'facility_logo'), 'left')
-            ->join(array('l_s' => 'geographical_divisions'), 'l_s.geo_id=f.facility_state', array('provinceName' => 'geo_name'), 'left')
-            ->join(array('l_d' => 'geographical_divisions'), 'l_d.geo_id=f.facility_district', array('districtName' => 'geo_name'), 'left')
+            ->join(array('l_s' => 'geographical_divisions'), 'l_s.geo_id=f.facility_state_id', array('provinceName' => 'geo_name'), 'left')
+            ->join(array('l_d' => 'geographical_divisions'), 'l_d.geo_id=f.facility_district_id', array('districtName' => 'geo_name'), 'left')
             ->join(array('rs' => 'r_vl_sample_type'), 'rs.sample_id=vl.sample_type', array('sample_name'), 'left')
             ->join(array('l' => 'facility_details'), 'l.facility_id=vl.lab_id', array('labName' => 'facility_name'), 'left')
             ->join(array('u' => 'user_details'), 'u.user_id=vl.result_approved_by', array('approvedBy' => 'user_name'), 'left')
@@ -1632,17 +1636,12 @@ class SampleService
                         }
 
 
-
-
                         $sampleCollectionDate = (trim($row['sample_collection_date']) != '' ? trim(date('Y-m-d H:i', strtotime($row['sample_collection_date']))) : null);
                         $sampleReceivedAtLab = (trim($row['sample_registered_at_lab']) != '' ? trim(date('Y-m-d H:i', strtotime($row['sample_registered_at_lab']))) : null);
                         $dateOfInitiationOfRegimen = (trim($row['date_of_initiation_of_current_regimen']) != '' ? trim(date('Y-m-d H:i', strtotime($row['date_of_initiation_of_current_regimen']))) : null);
                         $resultApprovedDateTime = (trim($row['result_approved_datetime']) != '' ? trim(date('Y-m-d H:i', strtotime($row['result_approved_datetime']))) : null);
                         $sampleTestedDateTime = (trim($row['sample_tested_datetime']) != '' ? trim(date('Y-m-d H:i', strtotime($row['sample_tested_datetime']))) : null);
                         $sampleRegisteredAtLabDateTime = (trim($row['sample_registered_at_lab']) != '' ? trim(date('Y-m-d H:i', strtotime($row['sample_registered_at_lab']))) : null);
-
-
-
 
                         $data = array(
                             'sample_code'                           => $sampleCode,
@@ -1652,7 +1651,7 @@ class SampleService
                             'patient_gender'                        => (trim($row['patient_gender']) != '' ? trim($row['patient_gender']) : NULL),
                             'patient_age_in_years'                  => (trim($row['patient_age_in_years']) != '' ? trim($row['patient_age_in_years']) : NULL),
                             'sample_collection_date'                => $sampleCollectionDate,
-                            'sample_registered_at_lab'              => $sampleReceivedAtLab,
+                            //'sample_registered_at_lab'              => $sampleReceivedAtLab,
                             'line_of_treatment'                     => (trim($row['line_of_treatment']) != '' ? trim($row['line_of_treatment']) : NULL),
                             'is_sample_rejected'                    => (trim($row['is_sample_rejected']) != '' ? trim($row['is_sample_rejected']) : NULL),
                             'is_patient_pregnant'                   => (trim($row['is_patient_pregnant']) != '' ? trim($row['is_patient_pregnant']) : NULL),
@@ -1666,7 +1665,7 @@ class SampleService
                             'result_value_log'                      => (trim($row['result_value_log']) != '' ? trim($row['result_value_log']) : NULL),
                             'result_value_absolute'                 => (trim($row['result_value_absolute']) != '' ? trim($row['result_value_absolute']) : NULL),
                             'result_value_text'                     => (trim($row['result_value_text']) != '' ? trim($row['result_value_text']) : NULL),
-                            'result_value_absolute_decimal'         => (trim($row['result_value_absolute_decimal']) != '' ? trim($row['result_value_absolute_decimal']) : NULL),
+                            //'result_value_absolute_decimal'         => (trim($row['result_value_absolute_decimal']) != '' ? trim($row['result_value_absolute_decimal']) : NULL),
                             'result'                                => (trim($row['result']) != '' ? trim($row['result']) : NULL),
                             'result_value_absolute_decimal'                            =>   $result_value_absolute_decimal,
                             'vl_result_category'                 =>   $vl_result_category,
@@ -1968,7 +1967,7 @@ class SampleService
                     'patient_age_in_years'                  => (trim($row['PatientAge']) != '' ? trim($row['PatientAge']) : NULL),
                     'patient_dob'                           => $dob,
                     'sample_collection_date'                => $sampleCollectionDate,
-                    'sample_received_at_vl_lab_datetime'    => $sampleReceivedAtLab,
+                    'sample_received_at_lab_datetime'    => $sampleReceivedAtLab,
                     'result_printed_datetime'               => $resultPrinterDateTime,
                     'line_of_treatment'                     => (trim($row['CurrentTreatment']) != '' ? trim($row['CurrentTreatment']) : NULL),
                     'is_sample_rejected'                    => (trim($row['IsSampleRejected']) != '' ? strtolower($row['IsSampleRejected']) : NULL),

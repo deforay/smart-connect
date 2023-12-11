@@ -1,4 +1,5 @@
 <?php
+
 use Laminas\Session\Container;
 
 $languagecontainer = new Container('language');
@@ -7,12 +8,12 @@ $loginContainer = new Container('credo');
 $startArray = explode("-", $startDate);
 $endArray = explode("-", $endDate);
 // var_dump($loginContainer->sampleTable);die;
-if(isset($loginContainer->useCurrentTables) && $loginContainer->useCurrentTables == true){
-    $startYear = (int) date('Y',strtotime('-12 MONTH '.date('Y-m-d')));
-    $startMonth = (int) date('M',strtotime('-12 MONTH '.date('Y-m-d')));
+if (isset($loginContainer->useCurrentTables) && $loginContainer->useCurrentTables == true) {
+    $startYear = (int) date('Y', strtotime('-12 MONTH ' . date('Y-m-d')));
+    $startMonth = (int) date('M', strtotime('-12 MONTH ' . date('Y-m-d')));
     $endYear = (int) date('y');
     $endMonth = (int) date('M');
-}else{
+} else {
     $startYear = (int) $startArray[0];
     $startMonth = (int) $startArray[1] - 1;
     $endYear = (int) $endArray[0];
@@ -47,7 +48,7 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
 <style>
     /* .portlet-title{
     background: #fd5454 !important
-    
+
 }
 
 .portlet.box.blue{
@@ -80,8 +81,9 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
     }
 
 
-    .datepicker table tr td span.disabled, .datepicker table tr td span.disabled:hover{
-        color : #ddd;
+    .datepicker table tr td span.disabled,
+    .datepicker table tr td span.disabled:hover {
+        color: #ddd;
     }
 
     .popover {
@@ -182,7 +184,7 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
                 <input type="hidden" value="<?php echo $endDate; ?>" id="mrp-upperDate" />
             </div> -->
             <div class="input-append date" id="dpMonthsStart" data-date-format="M/yyyy" data-date-viewmode="years" data-date-minviewmode="months">
-                <input type="text" class="form-control isRequired readonly" id="mrp-lowerDate" name="mrp-lowerDate" placeholder="Select month & year" title="Please select month and year" readonly="readonly" value="<?php echo date('M-Y',strtotime($startDate)); ?>" />
+                <input type="text" class="form-control isRequired readonly" id="mrp-lowerDate" name="mrp-lowerDate" placeholder="Select month & year" title="Please select month and year" readonly="readonly" value="<?php echo date('M-Y', strtotime($startDate)); ?>" />
                 <span class="add-on" style="display:none;"><i class="icon-calendar"></i></span>
             </div>
             <div class="input-group-prepend input-group-append">
@@ -191,7 +193,7 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
                 </span>
             </div>
             <div class="input-append date" id="dpMonthsEnd" data-date-format="M/yyyy" data-date-viewmode="years" data-date-minviewmode="months">
-                <input type="text" class="form-control isRequired readonly" id="mrp-upperDate" name="mrp-upperDate" placeholder="Select month & year" title="Please select month and year" readonly="readonly" value="<?php echo date('M-Y',strtotime($endDate)); ?>" />
+                <input type="text" class="form-control isRequired readonly" id="mrp-upperDate" name="mrp-upperDate" placeholder="Select month & year" title="Please select month and year" readonly="readonly" value="<?php echo date('M-Y', strtotime($endDate)); ?>" />
                 <span class="add-on" style="display:none;"><i class="icon-calendar"></i></span>
             </div>
         </div>
@@ -252,12 +254,12 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
                     </div>
                     <div class="col-md-3">
                         <select style="width:100%" name="sampleDistrictName[]" id="sampleDistrictName" class="form-control" multiple title="<?php echo $this->translate('Please select one or more district. Leave blank for All'); ?>" onchange="selectLabName();">
-                           <!--  <?php
-                            foreach ($districtName as $district) {
-                            ?>
+                            <!--  <?php
+                                    foreach ($districtName as $district) {
+                                    ?>
                                 <option data-parent-location="<?php echo $district['geo_parent']; ?>" value="<?php echo $district['geo_id']; ?>"><?php echo $district['geo_name']; ?></option>
                             <?php
-                            }
+                                    }
                             ?> -->
                             <!-- <option value="0">Empty</option> -->
                         </select>
@@ -266,16 +268,16 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
                     <div class="col-lg-4">
                         <select style="width:100%" class="form-control" id="sampleClinicId" name="sampleClinicId[]" multiple title="<?php echo $this->translate('Please select one or more clinics. Leave blank for All'); ?>">
                             <!-- <?php
-                            foreach ($clinicName as $clinic) {
-                            ?>
+                                    foreach ($clinicName as $clinic) {
+                                    ?>
                                 <option value="<?php echo $clinic['facility_id']; ?>" data-district="<?php echo $clinic['facility_district']; ?>"><?php echo $clinic['facility_code'] . " - " . $clinic['facility_name']; ?></option>
                             <?php
-                            }
+                                    }
                             ?> -->
                         </select>
                     </div>
                     <div class="col-lg-2">
-                        <div class="form-group" style="">
+                        <div class="form-group">
                             <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="getSamplesReceivedBarChartInfo();"><?php echo $this->translate('Search'); ?></a>
                             <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="resetSampleEverything();"><?php echo $this->translate('Reset'); ?></a>
                         </div>
@@ -429,7 +431,7 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
                         </select>
                     </div>
                     <div class="col-lg-2">
-                        <div class="form-group" style="">
+                        <div class="form-group">
                             <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="getSuppressionRateBarChartInfo();"><?php echo $this->translate('Search'); ?></a>
                             <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="resetSuppressionEverything();"><?php echo $this->translate('Reset'); ?></a>
                         </div>
@@ -580,7 +582,7 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
                         </select>
                     </div>
                     <div class="col-lg-2">
-                        <div class="form-group" style="">
+                        <div class="form-group">
                             <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="getSamplesRejectedBarChartInfo();"><?php echo $this->translate('Search'); ?></a>
                             <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="resetRejectionEverything();"><?php echo $this->translate('Reset'); ?></a>
                         </div>
@@ -728,7 +730,7 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
                         </select>
                     </div>
                     <div class="col-lg-2">
-                        <div class="form-group" style="">
+                        <div class="form-group">
                             <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="getRegimenGroupBarChartInfo();"><?php echo $this->translate('Search'); ?></a>
                             <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="resetEverything();"><?php echo $this->translate('Reset'); ?></a>
                         </div>
@@ -1281,7 +1283,7 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
                                     </select>
                                 </div>
                                 <div class="col-lg-2">
-                                    <div class="form-group" style="">
+                                    <div class="form-group">
                                         <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="getSummaryIndicators();"><?php echo $this->translate('Search'); ?></a>
                                         <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="resetIndicators();"><?php echo $this->translate('Reset'); ?></a>
                                     </div>
@@ -1463,7 +1465,7 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
             let select = $(this)
             $(this).next('span.select2').find('ul').html(function() {
                 let count = select.select2('data').length
-                if(count > 1){
+                if (count > 1) {
                     return "<li>" + count + " items selected</li>"
                 }
             })
@@ -2276,7 +2278,7 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
 
     jQuery(function() {
         var start = new Date();
-        var end = new Date(new Date().setYear(start.getFullYear()-1));
+        var end = new Date(new Date().setYear(start.getFullYear() - 1));
 
         $('#dpMonthsStart').datepicker({
             clearBtn: true,
@@ -2285,14 +2287,14 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
             format: 'M-yyyy',
             viewMode: "months",
             minViewMode: "months",
-            <?php if(isset($loginContainer->useCurrentTables) && $loginContainer->useCurrentTables == true){?>
-            startDate : end,
-            <?php }?>
+            <?php if (isset($loginContainer->useCurrentTables) && $loginContainer->useCurrentTables == true) { ?>
+                startDate: end,
+            <?php } ?>
             endDate: "0m"
         }).on('changeDate', function(e) {
             $('#dpMonthsEnd').val('');
-			var _satrt = new Date(e.date.valueOf());
-			$('#dpMonthsEnd').datepicker('setStartDate', _satrt);
+            var _satrt = new Date(e.date.valueOf());
+            $('#dpMonthsEnd').datepicker('setStartDate', _satrt);
         });
         $('#dpMonthsEnd').datepicker({
             clearBtn: true,
@@ -2301,17 +2303,17 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
             format: 'M-yyyy',
             viewMode: "months",
             minViewMode: "months",
-            <?php if(isset($loginContainer->useCurrentTables) && $loginContainer->useCurrentTables == true){?>
-            startDate : end,
-            <?php }?>
+            <?php if (isset($loginContainer->useCurrentTables) && $loginContainer->useCurrentTables == true) { ?>
+                startDate: end,
+            <?php } ?>
             endDate: "0m"
         })
     });
 
     function formatDate(date) {
-        // We are formatting Mon-Year date as 01/Mon/Year 
+        // We are formatting Mon-Year date as 01/Mon/Year
         // because firefox was not able to parse Mon-Year format
-        var d = new Date('01/'+date.replace("-" , "/")),
+        var d = new Date('01/' + date.replace("-", "/")),
             month = '' + (d.getMonth() + 1),
             year = d.getFullYear();
         if (month.length < 2) month = '0' + month;
@@ -2323,15 +2325,15 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
         $('#sampleDistrictName,#sampleClinicId').select2('val', '');
 
         var pName = $("#sampleProvinceName").val();
-        if(pName != null && pName.length > 0){
+        if (pName != null && pName.length > 0) {
             $.post("<?php echo $this->url('common', array('action' => 'get-district-list')); ?>", {
-                provinceName : pName
-            },
-            function(data) {
-                if (data != "" || data != null || data != undefined) {
-                    $('#sampleDistrictName').html(data);
-                }
-            });
+                    provinceName: pName
+                },
+                function(data) {
+                    if (data != "" || data != null || data != undefined) {
+                        $('#sampleDistrictName').html(data);
+                    }
+                });
         }
     }
 
@@ -2340,15 +2342,15 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
         $('#sampleClinicId').select2('val', '');
 
         var dName = $("#sampleDistrictName").val();
-        if(dName != null && dName.length > 0){
+        if (dName != null && dName.length > 0) {
             $.post("<?php echo $this->url('common', array('action' => 'get-facility-list')); ?>", {
-                districtName : dName
-            },
-            function(data) {
-                if (data != "" || data != null || data != undefined) {
-                    $('#sampleClinicId').html(data);
-                }
-            });
+                    districtName: dName
+                },
+                function(data) {
+                    if (data != "" || data != null || data != undefined) {
+                        $('#sampleClinicId').html(data);
+                    }
+                });
         }
     }
 

@@ -1,5 +1,7 @@
 <?php
+
 use Laminas\Session\Container;
+
 $loginContainer = new Container('credo');
 $languagecontainer = new Container('language');
 $sType = '';
@@ -46,11 +48,11 @@ foreach ($sampleType as $samples) {
             <div class="col-lg-6" id="districtHeight">
                 <select name="districtName[]" id="districtName" class="form-control" multiple title="<?php echo $this->translate('Please select one or more district. Leave blank for All'); ?>" onchange="selectClinicName();">
                     <!-- <?php
-                    foreach ($districtName as $district) {
-                    ?>
+                            foreach ($districtName as $district) {
+                            ?>
                         <option data-parent-location="<?php echo $district['geo_parent']; ?>" value="<?php echo $district['geo_id']; ?>"><?php echo $district['geo_name']; ?></option>
                     <?php
-                    }
+                            }
                     ?> -->
                 </select>
             </div>
@@ -61,11 +63,11 @@ foreach ($sampleType as $samples) {
             <div class="col-lg-6" id="clinicHeight">
                 <select class="form-control" id="clinicId" name="clinicId[]" multiple title="<?php echo $this->translate('Please select one or more clinics. Leave blank for All'); ?>">
                     <!-- <?php
-                    foreach ($clinicName as $clinic) {
-                    ?>
+                            foreach ($clinicName as $clinic) {
+                            ?>
                         <option value="<?php echo $clinic['facility_id']; ?>" data-district="<?php echo $clinic['facility_district']; ?>"><?php echo $clinic['facility_code'] . " - " . $clinic['facility_name']; ?></option>
                     <?php
-                    }
+                            }
                     ?> -->
                 </select>
             </div>
@@ -103,61 +105,67 @@ foreach ($sampleType as $samples) {
                     <option value=''>--<?php echo $this->translate('Select'); ?>--</option>
                     <option value="good"><?php echo $this->translate('Good'); ?> >= 95%</option>
                     <option value="fair"><?php echo $this->translate('Fair'); ?> 85-94%</option>
-                    <option value="poor"><?php echo $this->translate('Poor'); ?> < 85%</option> </select> </div> </div> </div> <div class="row">
-                            <div class="col-md-12">
-                                <div class="form-group col-lg-4" style="display:none;">
-                                    <label class="control-label"><?php echo $this->translate('Age Group'); ?>&nbsp;</label>
-                                    <select class="form-control" name="age[]" id="age" multiple title="<?php echo $this->translate('Please choose age group'); ?>">
-                                        <option value="<2">
-                                            < 2</option> <option value="2to5"> 2 - 5
-                                        </option>
-                                        <option value="6to14"> 6 - 14</option>
-                                        <option value="15to49"> 15 - 49</option>
-                                        <option value=">=50"> >= 50</option>
-                                        <option value="unknown"> <?php echo $this->translate('Unknown'); ?></option>
-                                    </select>
-                                </div>
-                                <div class="form-group col-lg-4">
-                                    <label class="control-label"><?php echo $this->translate('Gender'); ?></label>
-                                    <select class="form-control" name="gender" id="gender">
-                                        <option value=''>--<?php echo $this->translate('Select'); ?>--</option>
-                                        <option value="M"><?php echo $this->translate('Male'); ?></option>
-                                        <option value="F"><?php echo $this->translate('Female'); ?></option>
-                                        <option value="not_specified"><?php echo $this->translate('Other'); ?></option>
-                                    </select>
-                                </div>
-                                <div class="form-group col-lg-4 femaleSection" style="display:none;">
-                                    <label class="control-label"><?php echo $this->translate('Is Patient Pregnant'); ?></label>
-                                    <select class="form-control" name="isPregnant" id="isPregnant">
-                                        <option value=""><?php echo $this->translate('All'); ?></option>
-                                        <option value="yes"><?php echo $this->translate('Yes'); ?></option>
-                                        <option value="no"><?php echo $this->translate('No'); ?></option>
-                                        <option value="unreported"><?php echo $this->translate('Unreported'); ?></option>
-                                    </select>
-                                </div>
-                            </div>
+                    <option value="poor"><?php echo $this->translate('Poor'); ?> < 85%</option>
+                </select>
             </div>
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="form-group col-lg-4 femaleSection" style="display:none;">
-                        <label class="control-label"><?php echo $this->translate('Is Patient Breastfeeding'); ?></label>
-                        <select class="form-control" name="isBreastfeeding" id="isBreastfeeding">
-                            <option value=""><?php echo $this->translate('All'); ?></option>
-                            <option value="yes"><?php echo $this->translate('Yes'); ?></option>
-                            <option value="no"><?php echo $this->translate('No'); ?></option>
-                            <option value="unreported"><?php echo $this->translate('Unreported'); ?></option>
-                        </select>
-                    </div>
-                </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group col-lg-4" style="display:none;">
+                <label class="control-label"><?php echo $this->translate('Age Group'); ?>&nbsp;</label>
+                <select class="form-control" name="age[]" id="age" multiple title="<?php echo $this->translate('Please choose age group'); ?>">
+                    <option value="<2">
+                        < 2</option>
+                    <option value="2to5"> 2 - 5
+                    </option>
+                    <option value="6to14"> 6 - 14</option>
+                    <option value="15to49"> 15 - 49</option>
+                    <option value=">=50"> >= 50</option>
+                    <option value="unknown"> <?php echo $this->translate('Unknown'); ?></option>
+                </select>
             </div>
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="form-group col-lg-12" style="text-align:center;margin-top:10px;">
-                        <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="searchClinicData();"><?php echo $this->translate('Search'); ?></a>&nbsp;&nbsp;
-                        <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="resetEverything();"><?php echo $this->translate('Reset'); ?></a>
-                    </div>
-                </div>
+            <div class="form-group col-lg-4">
+                <label class="control-label"><?php echo $this->translate('Gender'); ?></label>
+                <select class="form-control" name="gender" id="gender">
+                    <option value=''>--<?php echo $this->translate('Select'); ?>--</option>
+                    <option value="M"><?php echo $this->translate('Male'); ?></option>
+                    <option value="F"><?php echo $this->translate('Female'); ?></option>
+                    <option value="not_specified"><?php echo $this->translate('Other'); ?></option>
+                </select>
             </div>
+            <div class="form-group col-lg-4 femaleSection" style="display:none;">
+                <label class="control-label"><?php echo $this->translate('Is Patient Pregnant'); ?></label>
+                <select class="form-control" name="isPregnant" id="isPregnant">
+                    <option value=""><?php echo $this->translate('All'); ?></option>
+                    <option value="yes"><?php echo $this->translate('Yes'); ?></option>
+                    <option value="no"><?php echo $this->translate('No'); ?></option>
+                    <option value="unreported"><?php echo $this->translate('Unreported'); ?></option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group col-lg-4 femaleSection" style="display:none;">
+                <label class="control-label"><?php echo $this->translate('Is Patient Breastfeeding'); ?></label>
+                <select class="form-control" name="isBreastfeeding" id="isBreastfeeding">
+                    <option value=""><?php echo $this->translate('All'); ?></option>
+                    <option value="yes"><?php echo $this->translate('Yes'); ?></option>
+                    <option value="no"><?php echo $this->translate('No'); ?></option>
+                    <option value="unreported"><?php echo $this->translate('Unreported'); ?></option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group col-lg-12" style="text-align:center;margin-top:10px;">
+                <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="searchClinicData();"><?php echo $this->translate('Search'); ?></a>&nbsp;&nbsp;
+                <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="resetEverything();"><?php echo $this->translate('Reset'); ?></a>
+            </div>
+        </div>
+    </div>
 </form>
 <hr style="background: #000 !important;border-color:#ccc;">
 <div class="row">
@@ -439,7 +447,7 @@ foreach ($sampleType as $samples) {
             placeholder: "<?php echo $this->translate('Select Districts First'); ?>",
             allowClear: true
         });
-        
+
         $('#age').select2({
             placeholder: "<?php echo $this->translate('All'); ?>",
             allowClear: true
@@ -467,10 +475,10 @@ foreach ($sampleType as $samples) {
             separator: ' to ',
             startDate: start,
             endDate: end,
-            <?php if(isset($loginContainer->useCurrentTables) && $loginContainer->useCurrentTables == true){?>
-            minDate:moment().subtract(12, 'months'),
-            maxDate: moment(),
-            <?php }?>
+            <?php if (isset($loginContainer->useCurrentTables) && $loginContainer->useCurrentTables == true) { ?>
+                minDate: moment().subtract(12, 'months'),
+                maxDate: moment(),
+            <?php } ?>
             ranges: {
                 'Today': [moment(), moment()],
                 'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
@@ -492,7 +500,7 @@ foreach ($sampleType as $samples) {
             let select = $(this)
             $(this).next('span.select2').find('ul').html(function() {
                 let count = select.select2('data').length
-                if(count > 1){
+                if (count > 1) {
                     return "<li>" + count + " items selected</li>"
                 }
             })
@@ -503,7 +511,7 @@ foreach ($sampleType as $samples) {
 
 
         if (!$('#sampleCollectionDate').val()) {
-            $('#sampleCollectionDate').val(moment().subtract('months', 1).format('YYYY-MM-DD') + ' to ' + moment().format('YYYY-MM-DD'));
+            $('#sampleCollectionDate').val(moment().subtract(1, 'month').format('YYYY-MM-DD') + ' to ' + moment().format('YYYY-MM-DD'));
         }
 
         $.when(getOverAllViralLoadStatus(),
@@ -740,13 +748,13 @@ foreach ($sampleType as $samples) {
         $(document).ajaxStart($.blockUI({
             message: '<h2><?php echo $this->translate('Processing...'); ?></h2>'
         })).ajaxStop($.unblockUI);
-        
+
 
         if (!$('#sampleCollectionDate').val()) {
-            $('#sampleCollectionDate').val(moment().subtract('months', 1).format('YYYY-MM-DD') + ' to ' + moment().format('YYYY-MM-DD'));
-        }        
+            $('#sampleCollectionDate').val(moment().subtract(1, 'month').format('YYYY-MM-DD') + ' to ' + moment().format('YYYY-MM-DD'));
+        }
 
-         getAllFunction('search');
+        getAllFunction('search');
     }
 
     function resetEverything() {
@@ -846,15 +854,15 @@ foreach ($sampleType as $samples) {
         $('#districtName,#clinicId').select2('val', '');
 
         var pName = $("#provinceName").val();
-        if(pName != null && pName.length > 0){
+        if (pName != null && pName.length > 0) {
             $.post("<?php echo $this->url('common', array('action' => 'get-district-list')); ?>", {
-                provinceName : pName
-            },
-            function(data) {
-                if (data != "" || data != null || data != undefined) {
-                    $('#districtName').html(data);
-                }
-            });
+                    provinceName: pName
+                },
+                function(data) {
+                    if (data != "" || data != null || data != undefined) {
+                        $('#districtName').html(data);
+                    }
+                });
         }
     }
 
@@ -862,16 +870,16 @@ foreach ($sampleType as $samples) {
         $('#clinicId').html('');
         $('#clinicId').select2('val', '');
         var dName = $("#districtName").val();
-        
-        if(dName != null && dName.length > 0){
+
+        if (dName != null && dName.length > 0) {
             $.post("<?php echo $this->url('common', array('action' => 'get-facility-list')); ?>", {
-                districtName : dName
-            },
-            function(data) {
-                if (data != "" || data != null || data != undefined) {
-                    $('#clinicId').html(data);
-                }
-            });
+                    districtName: dName
+                },
+                function(data) {
+                    if (data != "" || data != null || data != undefined) {
+                        $('#clinicId').html(data);
+                    }
+                });
         }
     }
 

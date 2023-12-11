@@ -2,23 +2,24 @@
 
 namespace Application\Service;
 
+use Exception;
+use Laminas\Db\Sql\Sql;
+use Laminas\Db\Sql\Expression;
 use Laminas\Session\Container;
 use Laminas\Db\Adapter\Adapter;
-use Laminas\Db\Sql\Sql;
-use Laminas\Db\TableGateway\AbstractTableGateway;
-use Laminas\Db\Sql\Expression;
-use Application\Service\CommonService;
+use Application\Model\SampleTable;
+use Laminas\Cache\Pattern\ObjectCache;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
-use \PhpOffice\PhpSpreadsheet\Spreadsheet;
 
 class SummaryService
 {
 
-    public $sampleTable;
+    public SampleTable|ObjectCache $sampleTable;
     protected $translator = null;
     protected $dbAdapter = null;
 
-    public function __construct($sampleTable, $translator, $dbAdapter)
+    public function __construct($sampleTable, $translator, Adapter $dbAdapter)
     {
         $this->sampleTable = $sampleTable;
         $this->translator = $translator;
@@ -224,7 +225,7 @@ class SummaryService
                         $currentRow++;
                     }
 
-                    $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($excel, 'Xlsx');
+                    $writer = IOFactory::createWriter($excel, 'Xlsx');
                     $filename = 'VL-SUMMARY-KEY-INDICATORS-' . date('d-M-Y-H-i-s') . '.xlsx';
                     $writer->save(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . $filename);
                     return $filename;
@@ -272,8 +273,8 @@ class SummaryService
                     )
                 )
                 ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'))
-                ->join(array('f_d_l_dp' => 'geographical_divisions'), 'f_d_l_dp.geo_id=f.facility_state', array('province' => 'geo_name'))
-                ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district', array('district' => 'geo_name'))
+                ->join(array('f_d_l_dp' => 'geographical_divisions'), 'f_d_l_dp.geo_id=f.facility_state_id', array('province' => 'geo_name'))
+                ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district_id', array('district' => 'geo_name'))
                 ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')")
                 ->group('vl.facility_id');
         }

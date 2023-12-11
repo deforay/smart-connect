@@ -318,7 +318,7 @@ if (isset($labFilter) && trim($labFilter) != '') {
       message: '<h2><?php echo $this->translate('Processing...'); ?></h2>'
     })).ajaxStop($.unblockUI);
     if (!$('#sampleCollectionDate').val()) {
-      $('#sampleCollectionDate').val(moment().subtract('days', 29).format('YYYY-MM-DD') + ' to ' + moment().format('YYYY-MM-DD'));
+      $('#sampleCollectionDate').val(moment().subtract(29, 'days').format('YYYY-MM-DD') + ' to ' + moment().format('YYYY-MM-DD'));
     }
   }
 

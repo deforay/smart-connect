@@ -845,8 +845,8 @@ class EidSampleService
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->from(array('vl' => $dashTable))
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name', 'facility_code', 'facility_logo'), 'left')
-            ->join(array('l_s' => 'geographical_divisions'), 'l_s.geo_id=f.facility_state', array('provinceName' => 'geo_name'), 'left')
-            ->join(array('l_d' => 'geographical_divisions'), 'l_d.geo_id=f.facility_district', array('districtName' => 'geo_name'), 'left')
+            ->join(array('l_s' => 'geographical_divisions'), 'l_s.geo_id=f.facility_state_id', array('provinceName' => 'geo_name'), 'left')
+            ->join(array('l_d' => 'geographical_divisions'), 'l_d.geo_id=f.facility_district_id', array('districtName' => 'geo_name'), 'left')
             ->join(array('rs' => 'r_eid_sample_type'), 'rs.sample_id=vl.specimen_type', array('sample_name'), 'left')
             ->join(array('l' => 'facility_details'), 'l.facility_id=vl.lab_id', array('labName' => 'facility_name'), 'left')
             ->join(array('u' => 'user_details'), 'u.user_id=vl.result_approved_by', array('approvedBy' => 'user_name'), 'left')
@@ -1141,8 +1141,8 @@ class EidSampleService
                         if (isset($aRow['sampleCollectionDate']) && $aRow['sampleCollectionDate'] != NULL && trim($aRow['sampleCollectionDate']) != "" && $aRow['sampleCollectionDate'] != '0000-00-00') {
                             $sampleCollectionDate = \Application\Service\CommonService::humanReadableDateFormat($aRow['sampleCollectionDate']);
                         }
-                        if (isset($aRow['sample_received_at_vl_lab_datetime']) && $aRow['sample_received_at_vl_lab_datetime'] != NULL && trim($aRow['sample_received_at_vl_lab_datetime']) != "" && $aRow['sample_received_at_vl_lab_datetime'] != '0000-00-00') {
-                            $requestDate = \Application\Service\CommonService::humanReadableDateFormat($aRow['sample_received_at_vl_lab_datetime']);
+                        if (isset($aRow['sample_received_at_lab_datetime']) && $aRow['sample_received_at_lab_datetime'] != NULL && trim($aRow['sample_received_at_lab_datetime']) != "" && $aRow['sample_received_at_lab_datetime'] != '0000-00-00') {
+                            $requestDate = \Application\Service\CommonService::humanReadableDateFormat($aRow['sample_received_at_lab_datetime']);
                         }
                         $row[] = $i;
                         $row[] = $aRow['sample_code'];

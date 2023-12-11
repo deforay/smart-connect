@@ -48,7 +48,7 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
 <style>
     /* .portlet-title{
     background: #fd5454 !important
-    
+
 }
 
 .portlet.box.blue{
@@ -309,7 +309,7 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
                         </select>
                     </div>
                     <div class="col-lg-2">
-                        <div class="form-group" style="">
+                        <div class="form-group">
                             <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="getSamplesReceivedBarChartInfo();"><?php echo $this->translate('Search'); ?></a>
                             <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="resetSampleEverything();"><?php echo $this->translate('Reset'); ?></a>
                         </div>
@@ -460,7 +460,7 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
                         </select>
                     </div>
                     <div class="col-lg-2">
-                        <div class="form-group" style="">
+                        <div class="form-group">
                             <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="getPositiveRateBarChartInfo();"><?php echo $this->translate('Search'); ?></a>
                             <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="resetPositiveEverything();"><?php echo $this->translate('Reset'); ?></a>
                         </div>
@@ -611,7 +611,7 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
                         </select>
                     </div>
                     <div class="col-lg-2">
-                        <div class="form-group" style="">
+                        <div class="form-group">
                             <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="getSamplesRejectedBarChartInfo();"><?php echo $this->translate('Search'); ?></a>
                             <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="resetRejectionEverything();"><?php echo $this->translate('Reset'); ?></a>
                         </div>
@@ -816,7 +816,7 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
                             </select>
                         </div>
                         <div class="col-lg-2">
-                            <div class="form-group" style="">
+                            <div class="form-group">
                                 <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="getSummaryIndicators();"><?php echo $this->translate('Search'); ?></a>
                                 <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="resetIndicators();"><?php echo $this->translate('Reset'); ?></a>
                             </div>
@@ -1888,9 +1888,9 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
     });
 
     function formatDate(date) {
-        // We are formatting Mon-Year date as 01/Mon/Year 
+        // We are formatting Mon-Year date as 01/Mon/Year
         // because firefox was not able to parse Mon-Year format
-        var d = new Date('01/'+date.replace("-" , "/")),
+        var d = new Date('01/' + date.replace("-", "/")),
             month = '' + (d.getMonth() + 1),
             year = d.getFullYear();
         if (month.length < 2) month = '0' + month;

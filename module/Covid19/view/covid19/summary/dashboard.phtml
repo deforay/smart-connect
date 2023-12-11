@@ -49,7 +49,7 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
 <style>
     /* .portlet-title{
     background: #fd5454 !important
-    
+
 }
 
 .portlet.box.blue{
@@ -280,11 +280,11 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
                     <div class="col-md-2">
                         <select style="width:100%" name="sampleDistrictName[]" id="sampleDistrictName" class="form-control" multiple title="<?php echo $this->translate('Please select one or more district. Leave blank for All'); ?>" onchange="selectLabName();">
                             <!-- <?php
-                            foreach ($districtName as $district) {
-                            ?>
+                                    foreach ($districtName as $district) {
+                                    ?>
                                 <option data-parent-location="<?php echo $district['geo_parent']; ?>" value="<?php echo $district['geo_id']; ?>"><?php echo $district['geo_name']; ?></option>
                             <?php
-                            }
+                                    }
                             ?>
                             <option value="0">Empty</option> -->
                         </select>
@@ -293,11 +293,11 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
                     <div class="col-lg-3">
                         <select style="width:100%" class="form-control" id="sampleClinicId" name="sampleClinicId[]" multiple title="<?php echo $this->translate('Please select one or more clinics. Leave blank for All'); ?>">
                             <!-- <?php
-                            foreach ($clinicName as $clinic) {
-                            ?>
+                                    foreach ($clinicName as $clinic) {
+                                    ?>
                                 <option value="<?php echo $clinic['facility_id']; ?>" data-district="<?php echo $clinic['facility_district']; ?>"><?php echo $clinic['facility_code'] . " - " . $clinic['facility_name']; ?></option>
                             <?php
-                            }
+                                    }
                             ?> -->
                         </select>
                     </div>
@@ -310,7 +310,7 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
                         </select>
                     </div> -->
                     <div class="col-lg-2">
-                        <div class="form-group" style="">
+                        <div class="form-group">
                             <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="getSamplesReceivedBarChartInfo();"><?php echo $this->translate('Search'); ?></a>
                             <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="resetSampleEverything();"><?php echo $this->translate('Reset'); ?></a>
                         </div>
@@ -455,7 +455,7 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
                         </select>
                     </div>
                     <div class="col-lg-2">
-                        <div class="form-group" style="">
+                        <div class="form-group">
                             <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="getPositiveRateBarChartInfo();"><?php echo $this->translate('Search'); ?></a>
                             <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="resetPositiveEverything();"><?php echo $this->translate('Reset'); ?></a>
                         </div>
@@ -605,7 +605,7 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
                         </select>
                     </div>
                     <div class="col-lg-2">
-                        <div class="form-group" style="">
+                        <div class="form-group">
                             <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="getSamplesRejectedBarChartInfo();"><?php echo $this->translate('Search'); ?></a>
                             <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="resetRejectionEverything();"><?php echo $this->translate('Reset'); ?></a>
                         </div>
@@ -810,7 +810,7 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
                             </select>
                         </div>
                         <div class="col-lg-2">
-                            <div class="form-group" style="">
+                            <div class="form-group">
                                 <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="getSummaryIndicators();"><?php echo $this->translate('Search'); ?></a>
                                 <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="resetIndicators();"><?php echo $this->translate('Reset'); ?></a>
                             </div>
@@ -1725,16 +1725,16 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
         var fromDate = formatDate($('#mrp-lowerDate').val());
         var toDate = formatDate($('#mrp-upperDate').val());
         $.post("<?php echo $this->url('covid19-summary', array('action' => 'get-tat')); ?>", {
-            districts: indDistrictIdList,
-            provinces: indProvinceIdList,
-            clinics: indClinicIdList,
-            fromDate: fromDate,
-            toDate: toDate
-        },
-        function(data) {
-            $("#nationalTAT").html(data);
-            $.unblockUI();
-        });
+                districts: indDistrictIdList,
+                provinces: indProvinceIdList,
+                clinics: indClinicIdList,
+                fromDate: fromDate,
+                toDate: toDate
+            },
+            function(data) {
+                $("#nationalTAT").html(data);
+                $.unblockUI();
+            });
     }
 
     function resetIndicators() {
@@ -1829,9 +1829,9 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
     });
 
     function formatDate(date) {
-        // We are formatting Mon-Year date as 01/Mon/Year 
+        // We are formatting Mon-Year date as 01/Mon/Year
         // because firefox was not able to parse Mon-Year format
-        var d = new Date('01/'+date.replace("-" , "/")),
+        var d = new Date('01/' + date.replace("-", "/")),
             month = '' + (d.getMonth() + 1),
             year = d.getFullYear();
         if (month.length < 2) month = '0' + month;
@@ -1843,15 +1843,15 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
         $('#sampleDistrictName,#sampleClinicId').select2('val', '');
 
         var pName = $("#sampleProvinceName").val();
-        if(pName != null && pName.length > 0){
+        if (pName != null && pName.length > 0) {
             $.post("<?php echo $this->url('common', array('action' => 'get-district-list')); ?>", {
-                provinceName : pName
-            },
-            function(data) {
-                if (data != "" || data != null || data != undefined) {
-                    $('#sampleDistrictName').html(data);
-                }
-            });
+                    provinceName: pName
+                },
+                function(data) {
+                    if (data != "" || data != null || data != undefined) {
+                        $('#sampleDistrictName').html(data);
+                    }
+                });
         }
     }
 
@@ -1860,15 +1860,15 @@ $tat = ceil($summaryTabInfo[0]["tat"]);
         $('#sampleClinicId').select2('val', '');
 
         var dName = $("#sampleDistrictName").val();
-        if(dName != null && dName.length > 0){
+        if (dName != null && dName.length > 0) {
             $.post("<?php echo $this->url('common', array('action' => 'get-facility-list')); ?>", {
-                districtName : dName
-            },
-            function(data) {
-                if (data != "" || data != null || data != undefined) {
-                    $('#sampleClinicId').html(data);
-                }
-            });
+                    districtName: dName
+                },
+                function(data) {
+                    if (data != "" || data != null || data != undefined) {
+                        $('#sampleClinicId').html(data);
+                    }
+                });
         }
     }
 </script>

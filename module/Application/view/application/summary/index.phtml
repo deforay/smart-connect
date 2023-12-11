@@ -5,23 +5,23 @@ use Laminas\Session\Container;
 $languagecontainer = new Container('language');
 $loginContainer = new Container('credo');
 
-$startArray = explode("-", $startDate);
-$endArray = explode("-", $endDate);
-// var_dump($loginContainer->sampleTable);die;
-if(isset($loginContainer->useCurrentTables) && $loginContainer->useCurrentTables == true){
-    $startYear = (int) date('Y',strtotime('-12 MONTH '.date('Y-m-d')));
-    $startMonth = (int) date('M',strtotime('-12 MONTH '.date('Y-m-d')));
-    $endYear = (int) date('y');
-    $endMonth = (int) date('M');
-}else{
-    $startYear = (int) $startArray[0];
-    $startMonth = (int) $startArray[1] - 1;
-    $endYear = (int) $endArray[0];
-    $endMonth = (int) $endArray[1] - 1;
-}
+// $startArray = explode("-", $startDate);
+// $endArray = explode("-", $endDate);
+// // var_dump($loginContainer->sampleTable);die;
+// if (isset($loginContainer->useCurrentTables) && $loginContainer->useCurrentTables == true) {
+//     $startYear = (int) date('Y', strtotime('-12 MONTH ' . date('Y-m-d')));
+//     $startMonth = (int) date('M', strtotime('-12 MONTH ' . date('Y-m-d')));
+//     $endYear = (int) date('y');
+//     $endMonth = (int) date('M');
+// } else {
+//     $startYear = (int) $startArray[0];
+//     $startMonth = (int) $startArray[1] - 1;
+//     $endYear = (int) $endArray[0];
+//     $endMonth = (int) $endArray[1] - 1;
+// }
 
 
-$MONTHS = array("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
+//$MONTHS = array("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
 
 
 
@@ -48,13 +48,13 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
 <style>
     /* .portlet-title{
     background: #fd5454 !important
-    
+
 }
 
 .portlet.box.blue{
     border-color: #fd5454 !important
 } */
-    .caption {}
+    /* .caption {} */
 
     .tabPercentageVal,
     .tabbable ul.nav li a {
@@ -71,7 +71,7 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
 
     }
 
-    .tabbable ul.nav li.active a>.tabPercentageVal {}
+    /* .tabbable ul.nav li.active a>.tabPercentageVal {} */
 
 
 
@@ -81,8 +81,9 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
     }
 
 
-    .datepicker table tr td span.disabled, .datepicker table tr td span.disabled:hover{
-        color : #ddd;
+    .datepicker table tr td span.disabled,
+    .datepicker table tr td span.disabled:hover {
+        color: #ddd;
     }
 
     .popover {
@@ -183,7 +184,7 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
                 <input type="hidden" value="<?php echo $endDate; ?>" id="mrp-upperDate" />
             </div> -->
             <div class="input-append date" id="dpMonthsStart" data-date-format="M/yyyy" data-date-viewmode="years" data-date-minviewmode="months">
-                <input type="text" class="form-control isRequired readonly" id="mrp-lowerDate" name="mrp-lowerDate" placeholder="Select month & year" title="Please select month and year" readonly="readonly" value="<?php echo date('M-Y',strtotime($startDate)); ?>" />
+                <input type="text" class="form-control isRequired readonly" id="mrp-lowerDate" name="mrp-lowerDate" placeholder="Select month & year" title="Please select month and year" readonly="readonly" value="<?php echo date('M-Y', strtotime($startDate)); ?>" />
                 <span class="add-on" style="display:none;"><i class="icon-calendar"></i></span>
             </div>
             <div class="input-group-prepend input-group-append">
@@ -192,7 +193,7 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
                 </span>
             </div>
             <div class="input-append date" id="dpMonthsEnd" data-date-format="M/yyyy" data-date-viewmode="years" data-date-minviewmode="months">
-                <input type="text" class="form-control isRequired readonly" id="mrp-upperDate" name="mrp-upperDate" placeholder="Select month & year" title="Please select month and year" readonly="readonly" value="<?php echo date('M-Y',strtotime($endDate)); ?>" />
+                <input type="text" class="form-control isRequired readonly" id="mrp-upperDate" name="mrp-upperDate" placeholder="Select month & year" title="Please select month and year" readonly="readonly" value="<?php echo date('M-Y', strtotime($endDate)); ?>" />
                 <span class="add-on" style="display:none;"><i class="icon-calendar"></i></span>
             </div>
         </div>
@@ -276,7 +277,7 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
                         </select>
                     </div>
                     <div class="col-lg-2">
-                        <div class="form-group" style="">
+                        <div class="form-group">
                             <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="getSamplesReceivedBarChartInfo();"><?php echo $this->translate('Search'); ?></a>
                             <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="resetSampleEverything();"><?php echo $this->translate('Reset'); ?></a>
                         </div>
@@ -430,7 +431,7 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
                         </select>
                     </div>
                     <div class="col-lg-2">
-                        <div class="form-group" style="">
+                        <div class="form-group">
                             <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="getSuppressionRateBarChartInfo();"><?php echo $this->translate('Search'); ?></a>
                             <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="resetSuppressionEverything();"><?php echo $this->translate('Reset'); ?></a>
                         </div>
@@ -581,7 +582,7 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
                         </select>
                     </div>
                     <div class="col-lg-2">
-                        <div class="form-group" style="">
+                        <div class="form-group">
                             <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="getSamplesRejectedBarChartInfo();"><?php echo $this->translate('Search'); ?></a>
                             <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="resetRejectionEverything();"><?php echo $this->translate('Reset'); ?></a>
                         </div>
@@ -729,7 +730,7 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
                         </select>
                     </div>
                     <div class="col-lg-2">
-                        <div class="form-group" style="">
+                        <div class="form-group">
                             <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="getRegimenGroupBarChartInfo();"><?php echo $this->translate('Search'); ?></a>
                             <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="resetEverything();"><?php echo $this->translate('Reset'); ?></a>
                         </div>
@@ -1282,7 +1283,7 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
                                     </select>
                                 </div>
                                 <div class="col-lg-2">
-                                    <div class="form-group" style="">
+                                    <div class="form-group">
                                         <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="getSummaryIndicators();"><?php echo $this->translate('Search'); ?></a>
                                         <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="resetIndicators();"><?php echo $this->translate('Reset'); ?></a>
                                     </div>
@@ -2266,44 +2267,47 @@ if ($summaryTabInfo[0]["all_current_regimen_samples"] > 0 && $summaryTabInfo[0][
         document.location.href = "/summary/dashboard?f=" + f + "&t=" + t
     }
 
+    <?php
+    $startDate = (isset($loginContainer->useCurrentTables) && $loginContainer->useCurrentTables == true) ? 'end' : null;
+    ?>
+
     jQuery(function() {
         var start = new Date();
-        var end = new Date(new Date().setYear(start.getFullYear()-1));
+        var end = new Date(new Date().setYear(start.getFullYear() - 1));
 
-        $('#dpMonthsStart').datepicker({
-            clearBtn: true,
-            autoclose: true,
-            todayHighlight: true,
-            format: 'M-yyyy',
-            viewMode: "months",
-            minViewMode: "months",
-            <?php if(isset($loginContainer->useCurrentTables) && $loginContainer->useCurrentTables == true){?>
-            startDate : end,
-            <?php }?>
-            endDate: "0m"
-        }).on('changeDate', function(e) {
+        function initializeDatepicker(id, startDate) {
+            var options = {
+                clearBtn: true,
+                autoclose: true,
+                todayHighlight: true,
+                format: 'M-yyyy',
+                viewMode: "months",
+                minViewMode: "months",
+                endDate: "0m"
+            };
+
+            if (startDate) {
+                options.startDate = startDate;
+            }
+
+            $(id).datepicker(options);
+        }
+
+        initializeDatepicker('#dpMonthsStart', <?php echo $startDate ? "'$startDate'" : 'null'; ?>);
+        initializeDatepicker('#dpMonthsEnd', <?php echo $startDate ? "'$startDate'" : 'null'; ?>);
+
+        $('#dpMonthsStart').on('changeDate', function(e) {
             $('#dpMonthsEnd').val('');
-			var _satrt = new Date(e.date.valueOf());
-			$('#dpMonthsEnd').datepicker('setStartDate', _satrt);
+            var _start = new Date(e.date.valueOf());
+            $('#dpMonthsEnd').datepicker('setStartDate', _start);
         });
-        $('#dpMonthsEnd').datepicker({
-            clearBtn: true,
-            autoclose: true,
-            todayHighlight: true,
-            format: 'M-yyyy',
-            viewMode: "months",
-            minViewMode: "months",
-            <?php if(isset($loginContainer->useCurrentTables) && $loginContainer->useCurrentTables == true){?>
-            startDate : end,
-            <?php }?>
-            endDate: "0m"
-        })
+
     });
 
     function formatDate(date) {
-        // We are formatting Mon-Year date as 01/Mon/Year 
+        // We are formatting Mon-Year date as 01/Mon/Year
         // because firefox was not able to parse Mon-Year format
-        var d = new Date('01/'+date.replace("-" , "/")),
+        var d = new Date('01/' + date.replace("-", "/")),
             month = '' + (d.getMonth() + 1),
             year = d.getFullYear();
         if (month.length < 2) month = '0' + month;

@@ -100,15 +100,15 @@ die; */
             <?php
             }
             if (isset($result['sampleReceivedPrinted'])) {
-                ?> {
-                        connectNulls: false,
-                        showInLegend: true,
-                        name: '<?= $this->translate('Received - Printed') ?>',
-                        data: [<?php echo implode(",", $result['sampleReceivedPrinted']); ?>],
-                        color: '#000',
-                    },
-                <?php
-                }
+            ?> {
+                    connectNulls: false,
+                    showInLegend: true,
+                    name: '<?= $this->translate('Received - Printed') ?>',
+                    data: [<?php echo implode(",", $result['sampleReceivedPrinted']); ?>],
+                    color: '#000',
+                },
+            <?php
+            }
             if (isset($result['sampleTestedDiff'])) {
             ?> {
                     connectNulls: false,

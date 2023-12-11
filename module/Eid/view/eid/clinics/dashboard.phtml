@@ -108,15 +108,16 @@ foreach ($sampleType as $samples) {
                     <option value="not_specified"><?php echo $this->translate('Other'); ?></option>
                 </select>
             </div>
-        </div> 
-    </div> 
+        </div>
+    </div>
     <div class="row">
         <div class="col-md-12">
             <div class="form-group col-lg-4">
                 <label class="control-label"><?php echo $this->translate('Age Group'); ?>&nbsp;</label>
                 <select class="form-control" name="age" id="age" title="<?php echo $this->translate('Please choose age group'); ?>">
                     <option value=""></option>
-                    <option value="<2">< 2</option>
+                    <option value="<2">
+                        < 2</option>
                     <option value="2to5" data-from="2" data-to="5"> 2 - 5</option>
                     <option value="6to14" data-from="6" data-to="14"> 6 - 14</option>
                     <option value="15to49" data-from="15" data-to="49"> 15 - 49</option>
@@ -373,18 +374,18 @@ foreach ($sampleType as $samples) {
 
 
         if (!$('#sampleCollectionDate').val()) {
-            $('#sampleCollectionDate').val(moment().subtract('months', 1).format('YYYY-MM-DD') + ' to ' + moment().format('YYYY-MM-DD'));
+            $('#sampleCollectionDate').val(moment().subtract(1, 'month').format('YYYY-MM-DD') + ' to ' + moment().format('YYYY-MM-DD'));
         }
 
         $.when(getOverAllEidResults(),
                 getOverAllEidBasedonGender())
-        .done(function() {
-            getTestedSampleResultBasedAgeGroup();
-            getAllTestReason();
-            getTestedSampleResult(typeOfCall);
-            loadTestResult();
-            fnShowHide();
-        });
+            .done(function() {
+                getTestedSampleResultBasedAgeGroup();
+                getAllTestReason();
+                getTestedSampleResult(typeOfCall);
+                loadTestResult();
+                fnShowHide();
+            });
     }
 
     function getOverAllEidResults() {
@@ -564,7 +565,7 @@ foreach ($sampleType as $samples) {
 
 
         if (!$('#sampleCollectionDate').val()) {
-            $('#sampleCollectionDate').val(moment().subtract('months', 1).format('YYYY-MM-DD') + ' to ' + moment().format('YYYY-MM-DD'));
+            $('#sampleCollectionDate').val(moment().subtract(1, 'month').format('YYYY-MM-DD') + ' to ' + moment().format('YYYY-MM-DD'));
         }
 
         getAllFunction('search');
@@ -700,29 +701,29 @@ foreach ($sampleType as $samples) {
         var sampleTypeId = $("#sampleTypeId").val();
         var gender = $("#gender").val();
         var ageField = $("#age").val();
-        if(ageField == '<2'){
+        if (ageField == '<2') {
             var age = {
                 'from': '> 0',
                 'to': '< 2',
                 'ageName': 'Age < 2'
             };
-        } else if(ageField == '>=50'){
+        } else if (ageField == '>=50') {
             var age = {
                 'from': '>= 50',
                 'to': '<= 250',
-                'ageName': 'Age >=50'   
+                'ageName': 'Age >=50'
             };
-        } else if(ageField == 'unknown'){
+        } else if (ageField == 'unknown') {
             var age = {
                 'from': 'unknown',
                 'to': 'unknown',
-                'ageName': 'Unknown'   
+                'ageName': 'Unknown'
             };
         } else {
             var age = {
                 'from': $('#age').attr('data-from'),
                 'to': $('#age').attr('data-to'),
-                'ageName': 'Age'+$("#age option:selected").text()   
+                'ageName': 'Age' + $("#age option:selected").text()
             };
         }
         $.post("<?php echo $this->url('eid-clinics', array('action' => 'get-sample-test-result-age-group')); ?>", {
