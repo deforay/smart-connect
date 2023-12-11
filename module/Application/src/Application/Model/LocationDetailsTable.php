@@ -2,9 +2,10 @@
 
 namespace Application\Model;
 
-use Laminas\Db\Adapter\Adapter;
 use Laminas\Db\Sql\Sql;
 use Laminas\Db\Sql\Expression;
+use Laminas\Db\Adapter\Adapter;
+use Application\Service\CommonService;
 use Laminas\Db\TableGateway\AbstractTableGateway;
 
 /*
@@ -43,8 +44,7 @@ class LocationDetailsTable extends AbstractTableGateway
             $sQuery = $sQuery->where('f.facility_id IN ("' . implode('", "', array_values(array_filter($mappedFacilities))) . '")');
         }
         $sQueryStr = $sql->buildSqlString($sQuery);
-        $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-        return $rResult;
+        return $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
     }
 
     public function fetchDistrictList($locationId)
@@ -53,8 +53,7 @@ class LocationDetailsTable extends AbstractTableGateway
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->from(array('l' => 'geographical_divisions'))->where(array('geo_parent' => $locationId));
         $sQueryStr = $sql->buildSqlString($sQuery);
-        $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-        return $rResult;
+        return $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
     }
 
     public function fetchDistrictListByIds($locationId)
@@ -63,8 +62,7 @@ class LocationDetailsTable extends AbstractTableGateway
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->from(array('l' => 'geographical_divisions'))->where(array('geo_parent IN(' . implode(",", $locationId) . ')'));
         $sQueryStr = $sql->buildSqlString($sQuery);
-        $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-        return $rResult;
+        return $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
     }
 
     public function fetchAllDistrictsList($mappedFacilities = null)
@@ -82,13 +80,10 @@ class LocationDetailsTable extends AbstractTableGateway
             $sQuery = $sQuery->where('f.facility_id IN ("' . implode('", "', array_values(array_filter($mappedFacilities))) . '")');
         }
         $sQueryStr = $sql->buildSqlString($sQuery);
-        $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-        return $rResult;
+        return $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
     }
     public function insertOrUpdate($arrayData)
     {
-        $query = 'INSERT INTO `' . $this->table . '` (' . implode(',', array_keys($arrayData)) . ') VALUES (' . implode(',', array_fill(1, count($arrayData), '?')) . ') ON DUPLICATE KEY UPDATE ' . implode(' = ?,', array_keys($arrayData)) . ' = ?';
-        $result =  $this->adapter->query($query, array_merge(array_values($arrayData), array_values($arrayData)));
-        return $result->getGeneratedValue();
+        return CommonService::insertOrUpdate($this->adapter, $this->table, $arrayData);
     }
 }

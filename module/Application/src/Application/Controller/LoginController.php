@@ -3,8 +3,9 @@
 namespace Application\Controller;
 
 use Laminas\Session\Container;
-use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\ViewModel;
+use Application\Service\CommonService;
+use Laminas\Mvc\Controller\AbstractActionController;
 
 class LoginController extends AbstractActionController
 {
@@ -23,13 +24,15 @@ class LoginController extends AbstractActionController
     {
         $loginContainer = new Container('credo');
 
+
         /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {
+
             $params = $request->getPost();
             if ($params["CSRF_TOKEN"] != $_SESSION["CSRF_TOKEN"]) {
                 // Reset token and create a new one
-                \Application\Service\CommonService::generateCSRF(true);
+                CommonService::generateCSRF(true);
                 $container = new Container('alert');
                 $container->alertMsg = 'Could not process your login request. Please try again.';
                 return '/login';
@@ -37,7 +40,7 @@ class LoginController extends AbstractActionController
             $url = $this->userService->login($params);
             return $this->redirect()->toRoute($url);
         }
-        if (isset($loginContainer->userId) && $loginContainer->userId != "") {
+        if (property_exists($loginContainer, 'userId') && $loginContainer->userId !== null && $loginContainer->userId != "") {
             return $this->redirect()->toRoute("summary");
         } else {
             $config = $this->configService->getAllGlobalConfig();

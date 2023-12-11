@@ -29,7 +29,6 @@ class HepatitisSampleRejectionReasonTable extends AbstractTableGateway {
 
     public function fetchAllSampleRejectionReason()
     {
-        $query = $this->select(array('rejection_reason_status' => 'active'));
-        return $query;
+        return $this->select(array('rejection_reason_status' => 'active'));
     }
 }

@@ -15,12 +15,11 @@ class GetActiveModules extends AbstractHelper
 
     public function __invoke()
     {
-        $dashModules =  array(
+        return array(
             'vl' => $this->config['defaults']['vlModule'],
             'eid' => $this->config['defaults']['eidModule'],
             'covid19' => $this->config['defaults']['covid19Module'],
             'poc' => $this->config['defaults']['pocDashboard']
         );
-        return $dashModules;
     }
 }

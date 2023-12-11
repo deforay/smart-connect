@@ -12,7 +12,7 @@ trait AjaxActionTrait
     public function ajaxAction(?ViewModel $view = null): bool
     {
         if ($this->request->isXmlHttpRequest()) {
-            if ($view !== null) {
+            if ($view instanceof \Laminas\View\Model\ViewModel) {
                 $view->setTerminal(true);
             }
             if (isset($this->view) && $this->view instanceof ModelInterface) {

@@ -29,7 +29,6 @@ class HepatitisRiskFactorTable extends AbstractTableGateway {
 
     public function fetchAllRiskFactors()
     {
-        $query = $this->select(array('riskfactor_status' => 'active'));
-        return $query;
+        return $this->select(array('riskfactor_status' => 'active'));
     }
 }

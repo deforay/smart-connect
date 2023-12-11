@@ -98,11 +98,11 @@ class UsersTable extends AbstractTableGateway
                 }
             } else {
                 //set 0 by default
-                $facilities_id = array(0);
-                $facilities_name = array(0);
-                $facilities_code = array(0);
-                $provinces = array(0);
-                $districts = array(0);
+                $facilities_id = [];
+                $facilities_name = [];
+                $facilities_code = [];
+                $provinces = [];
+                $districts = [];
             }
             $loginContainer->userId = $rResult[0]["user_id"];
             $loginContainer->name = $rResult[0]["user_name"];
@@ -130,21 +130,18 @@ class UsersTable extends AbstractTableGateway
 
 
             if ($otp == null && $loginContainer->role == 7) {
-
                 // Let us ensure this person cannot login till they enter OTP.
-                // so we will clear the login session                
+                // so we will clear the login session
                 $loginContainer->getManager()->getStorage()->clear('credo');
-
                 $dataInterfaceLogin = new Container('dataInterfaceLogin');
                 $dataInterfaceLogin->email = $rResult[0]["email"];
                 $dataInterfaceLogin->password = $rResult[0]["password"];
-
                 return 'login-otp';
-            } else if ($otp != null && $loginContainer->role == 7) {
+            } elseif ($otp != null && $loginContainer->role == 7) {
                 return 'data-management-export';
-            } else if ($loginContainer->role == 3) {
+            } elseif ($loginContainer->role == 3) {
                 return 'clinics';
-            } else if ($loginContainer->role == 2) {
+            } elseif ($loginContainer->role == 2) {
                 return 'laboratory';
             } else {
                 return 'summary';
@@ -168,8 +165,7 @@ class UsersTable extends AbstractTableGateway
         $sQuery = $sql->select()->from(array('u' => 'dash_users'))
             ->join(array('r' => 'dash_user_roles'), 'u.role=r.role_id');
         $sQueryStr = $sql->buildSqlString($sQuery);
-        $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-        return $rResult;
+        return $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
     }
 
     public function addUser($params)
@@ -188,13 +184,12 @@ class UsersTable extends AbstractTableGateway
             );
             $this->insert($newData);
             $userId = $this->lastInsertValue;
-            if ($userId > 0) {
-                if (isset($params['facility']) && count($params['facility']) > 0) {
-                    $dbAdapter = $this->adapter;
-                    $userFacilityMapDb = new UserFacilityMapTable($dbAdapter);
-                    for ($f = 0; $f < count($params['facility']); $f++) {
-                        $userFacilityMapDb->insert(array('user_id' => $userId, 'facility_id' => $params['facility'][$f]));
-                    }
+            if ($userId > 0 && (isset($params['facility']) && count($params['facility']) > 0)) {
+                $dbAdapter = $this->adapter;
+                $userFacilityMapDb = new UserFacilityMapTable($dbAdapter);
+                $counter = count($params['facility']);
+                for ($f = 0; $f < $counter; $f++) {
+                    $userFacilityMapDb->insert(array('user_id' => $userId, 'facility_id' => $params['facility'][$f]));
                 }
             }
         }
@@ -254,7 +249,8 @@ class UsersTable extends AbstractTableGateway
 
             //update user-facility map
             if (isset($params['facility']) && count($params['facility']) > 0) {
-                for ($f = 0; $f < count($params['facility']); $f++) {
+                $counter = count($params['facility']);
+                for ($f = 0; $f < $counter; $f++) {
                     $userFacilityMapDb->insert(array('user_id' => $userId, 'facility_id' => $params['facility'][$f]));
                 }
             }
@@ -286,9 +282,9 @@ class UsersTable extends AbstractTableGateway
 
         $sOrder = "";
         if (isset($parameters['iSortCol_0'])) {
-            for ($i = 0; $i < intval($parameters['iSortingCols']); $i++) {
-                if ($parameters['bSortable_' . intval($parameters['iSortCol_' . $i])] == "true") {
-                    $sOrder .= $aColumns[intval($parameters['iSortCol_' . $i])] . " " . ($parameters['sSortDir_' . $i]) . ",";
+            for ($i = 0; $i < (int) $parameters['iSortingCols']; $i++) {
+                if ($parameters['bSortable_' . (int) $parameters['iSortCol_' . $i]] == "true") {
+                    $sOrder .= $aColumns[(int) $parameters['iSortCol_' . $i]] . " " . ($parameters['sSortDir_' . $i]) . ",";
                 }
             }
             $sOrder = substr_replace($sOrder, "", -1);
@@ -324,9 +320,11 @@ class UsersTable extends AbstractTableGateway
             }
             $sWhere .= $sWhereSub;
         }
+        /* Individual column filtering */
+        $counter = count($aColumns);
 
         /* Individual column filtering */
-        for ($i = 0; $i < count($aColumns); $i++) {
+        for ($i = 0; $i < $counter; $i++) {
             if (isset($parameters['bSearchable_' . $i]) && $parameters['bSearchable_' . $i] == "true" && $parameters['sSearch_' . $i] != '') {
                 if ($sWhere == "") {
                     $sWhere .= $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
@@ -358,7 +356,7 @@ class UsersTable extends AbstractTableGateway
             $sQuery->offset($sOffset);
         }
 
-        $sQueryStr = $sql->buildSqlString($sQuery); // Get the string of the Sql, instead of the Select-instance 
+        $sQueryStr = $sql->buildSqlString($sQuery); // Get the string of the Sql, instead of the Select-instance
         //echo $sQueryStr;die;
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
 
@@ -372,7 +370,7 @@ class UsersTable extends AbstractTableGateway
         /* Total data set length */
         $iTotal = $this->select()->count();
         $output = array(
-            "sEcho" => intval($parameters['sEcho']),
+            "sEcho" => (int) $parameters['sEcho'],
             "iTotalRecords" => $iTotal,
             "iTotalDisplayRecords" => $iFilteredTotal,
             "aaData" => array()

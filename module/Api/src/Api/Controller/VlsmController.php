@@ -29,7 +29,7 @@ class VlsmController extends AbstractRestfulController
         }
         if ($params['api-version'] == 'v1') {
             $response = $this->sampleService->saveFileFromVlsmAPIV1();
-        } else if ($params['api-version'] == 'v2') {
+        } elseif ($params['api-version'] == 'v2') {
             $response = $this->sampleService->saveFileFromVlsmAPIV2();
         }
 

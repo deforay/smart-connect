@@ -52,9 +52,9 @@ class DashTrackApiRequestsTable extends AbstractTableGateway
 
         $sOrder = "";
         if (isset($parameters['iSortCol_0'])) {
-            for ($i = 0; $i < intval($parameters['iSortingCols']); $i++) {
-                if ($parameters['bSortable_' . intval($parameters['iSortCol_' . $i])] == "true") {
-                    $sOrder .= $orderColumns[intval($parameters['iSortCol_' . $i])] . " " . ($parameters['sSortDir_' . $i]) . ",";
+            for ($i = 0; $i < (int) $parameters['iSortingCols']; $i++) {
+                if ($parameters['bSortable_' . (int) $parameters['iSortCol_' . $i]] == "true") {
+                    $sOrder .= $orderColumns[(int) $parameters['iSortCol_' . $i]] . " " . ($parameters['sSortDir_' . $i]) . ",";
                 }
             }
             $sOrder = substr_replace($sOrder, "", -1);
@@ -90,9 +90,11 @@ class DashTrackApiRequestsTable extends AbstractTableGateway
             }
             $sWhere .= $sWhereSub;
         }
+        /* Individual column filtering */
+        $counter = count($aColumns);
 
         /* Individual column filtering */
-        for ($i = 0; $i < count($aColumns); $i++) {
+        for ($i = 0; $i < $counter; $i++) {
             if (isset($parameters['bSearchable_' . $i]) && $parameters['bSearchable_' . $i] == "true" && $parameters['sSearch_' . $i] != '') {
                 if ($sWhere == "") {
                     $sWhere .= $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
@@ -151,7 +153,7 @@ class DashTrackApiRequestsTable extends AbstractTableGateway
         /* Total data set length */
         $iTotal = $this->select()->count();
         $output = array(
-            "sEcho" => intval($parameters['sEcho']),
+            "sEcho" => (int) $parameters['sEcho'],
             "iTotalRecords" => $iTotal,
             "iTotalDisplayRecords" => $iFilteredTotal,
             "aaData" => array()
@@ -180,11 +182,11 @@ class DashTrackApiRequestsTable extends AbstractTableGateway
             $responseData = $common->toJSON($responseData);
 
             $folderPath = UPLOAD_PATH . DIRECTORY_SEPARATOR . 'track-api';
-            if (!empty($requestData) && $requestData != '[]') {
+            if ($requestData !== null && $requestData !== '' && $requestData != '[]') {
                 $common->makeDirectory($folderPath . DIRECTORY_SEPARATOR . 'requests');
                 $common->zipJson($requestData, "$folderPath/requests/$transactionId.json");
             }
-            if (!empty($responseData) && $responseData != '[]') {
+            if ($responseData !== null && $responseData !== '' && $responseData != '[]') {
                 $common->makeDirectory($folderPath . DIRECTORY_SEPARATOR . 'responses');
                 $common->zipJson($responseData, "$folderPath/responses/$transactionId.json");
             }
@@ -200,11 +202,11 @@ class DashTrackApiRequestsTable extends AbstractTableGateway
                 'facility_id' => $labId ?? null,
                 'data_format' => $format ?? null
             ];
-            if (!empty($requestData) && $requestData != '[]') {
+            if ($requestData !== null && $requestData !== '' && $requestData != '[]') {
                 // $data['api_params'] = '/uploads/requests/' . $transactionId . '.json';
                 $data['request_data'] = '/uploads/track-api/requests/' . $transactionId . '.json';
             }
-            if (!empty($responseData) && $responseData != '[]') {
+            if ($responseData !== null && $responseData !== '' && $responseData != '[]') {
                 $data['response_data'] = '/uploads/track-api/responses/' . $transactionId . '.json';
             }
             return $this->insert($data);

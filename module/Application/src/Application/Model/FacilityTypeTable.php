@@ -31,7 +31,6 @@ class FacilityTypeTable extends AbstractTableGateway {
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->from(array('f' => 'facility_type'));
         $sQueryStr = $sql->buildSqlString($sQuery);
-        $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-        return $rResult;
+        return $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
     }
 }

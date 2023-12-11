@@ -5,7 +5,6 @@ namespace Application\Model;
 use Laminas\Session\Container;
 use Laminas\Db\Adapter\Adapter;
 use Laminas\Db\Sql\Sql;
-use Laminas\Db\Sql\Expression;
 use Laminas\Db\TableGateway\AbstractTableGateway;
 use Application\Service\CommonService;
 
@@ -26,9 +25,9 @@ class FacilityTable extends AbstractTableGateway
     protected $table = 'facility_details';
     public $sm = null;
     public $adapter = null;
-    public \Application\Service\CommonService $commonService;
+    public CommonService $commonService;
 
-    public function __construct(Adapter $adapter, $sm = null, $commonService)
+    public function __construct(Adapter $adapter, CommonService $commonService, $sm = null)
     {
         $this->adapter = $adapter;
         $this->sm = $sm;
@@ -40,7 +39,7 @@ class FacilityTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $locationDb = new LocationDetailsTable($dbAdapter);
-        if (trim($params['facilityName'] != '')) {
+        if (trim($params['facilityName'] != '') !== '' && trim($params['facilityName'] != '') !== '0') {
             $facilityData = array(
                 'facility_name' => $params['facilityName'],
                 'facility_code' => $params['facilityCode'],
@@ -98,7 +97,7 @@ class FacilityTable extends AbstractTableGateway
                 $imageName = $fName .  "." . $extension;
                 if (move_uploaded_file($_FILES["logo"]["tmp_name"], UPLOAD_PATH . DIRECTORY_SEPARATOR . "facility" . DIRECTORY_SEPARATOR . $facilityId . DIRECTORY_SEPARATOR . $imageName)) {
                     $imageData = array('facility_logo' => $imageName);
-                    $this->update($imageData, array("facility_id" => $lastInsertedId));
+                    $this->update($imageData, array("facility_id" => $facilityId));
                 }
             }
         }
@@ -128,9 +127,9 @@ class FacilityTable extends AbstractTableGateway
 
         $sOrder = "";
         if (isset($parameters['iSortCol_0'])) {
-            for ($i = 0; $i < intval($parameters['iSortingCols']); $i++) {
-                if ($parameters['bSortable_' . intval($parameters['iSortCol_' . $i])] == "true") {
-                    $sOrder .= $aColumns[intval($parameters['iSortCol_' . $i])] . " " . ($parameters['sSortDir_' . $i]) . ",";
+            for ($i = 0; $i < (int) $parameters['iSortingCols']; $i++) {
+                if ($parameters['bSortable_' . (int) $parameters['iSortCol_' . $i]] == "true") {
+                    $sOrder .= $aColumns[(int) $parameters['iSortCol_' . $i]] . " " . ($parameters['sSortDir_' . $i]) . ",";
                 }
             }
             $sOrder = substr_replace($sOrder, "", -1);
@@ -166,9 +165,11 @@ class FacilityTable extends AbstractTableGateway
             }
             $sWhere .= $sWhereSub;
         }
+        /* Individual column filtering */
+        $counter = count($aColumns);
 
         /* Individual column filtering */
-        for ($i = 0; $i < count($aColumns); $i++) {
+        for ($i = 0; $i < $counter; $i++) {
             if (isset($parameters['bSearchable_' . $i]) && $parameters['bSearchable_' . $i] == "true" && $parameters['sSearch_' . $i] != '') {
                 if ($sWhere == "") {
                     $sWhere .= $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
@@ -200,7 +201,7 @@ class FacilityTable extends AbstractTableGateway
             $sQuery->offset($sOffset);
         }
 
-        $sQueryStr = $sql->buildSqlString($sQuery); // Get the string of the Sql, instead of the Select-instance 
+        $sQueryStr = $sql->buildSqlString($sQuery); // Get the string of the Sql, instead of the Select-instance
         //echo $sQueryStr;die;
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
 
@@ -214,7 +215,7 @@ class FacilityTable extends AbstractTableGateway
         /* Total data set length */
         $iTotal = $this->select()->count();
         $output = array(
-            "sEcho" => intval($parameters['sEcho']),
+            "sEcho" => (int) $parameters['sEcho'],
             "iTotalRecords" => $iTotal,
             "iTotalDisplayRecords" => $iFilteredTotal,
             "aaData" => array()
@@ -239,8 +240,7 @@ class FacilityTable extends AbstractTableGateway
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->from(array('f' => 'facility_details'))->where(array('facility_id' => $facilityId));
         $sQueryStr = $sql->buildSqlString($sQuery);
-        $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-        return $rResult;
+        return $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
     }
 
     public function updateFacility($params)
@@ -248,7 +248,7 @@ class FacilityTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $locationDb = new LocationDetailsTable($dbAdapter);
-        if (trim($params['facilityName'] != '')) {
+        if (trim($params['facilityName'] != '') !== '' && trim($params['facilityName'] != '') !== '0') {
             $facilityData = array(
                 'facility_name' => $params['facilityName'],
                 'facility_code' => $params['facilityCode'],
@@ -293,12 +293,10 @@ class FacilityTable extends AbstractTableGateway
             }
             $this->update($facilityData, array('facility_id' => base64_decode($params['facilityId'])));
             $facilityId = base64_decode($params['facilityId']);
-            if (isset($param['existLogo']) && trim($param['existLogo']) == '') {
-                if (file_exists(UPLOAD_PATH . DIRECTORY_SEPARATOR . "facility" . DIRECTORY_SEPARATOR . $facilityId . DIRECTORY_SEPARATOR . $params['removedLogo'])) {
-                    unlink(UPLOAD_PATH . DIRECTORY_SEPARATOR . "facility" . DIRECTORY_SEPARATOR . $facilityId . DIRECTORY_SEPARATOR . $params['removedLogo']);
-                    $imageData = array('facility_logo' => '');
-                    $result = $this->update($imageData, array("facility_id" => $facilityId));
-                }
+            if (isset($params['existLogo']) && trim($params['existLogo']) == '' && file_exists(UPLOAD_PATH . DIRECTORY_SEPARATOR . "facility" . DIRECTORY_SEPARATOR . $facilityId . DIRECTORY_SEPARATOR . $params['removedLogo'])) {
+                unlink(UPLOAD_PATH . DIRECTORY_SEPARATOR . "facility" . DIRECTORY_SEPARATOR . $facilityId . DIRECTORY_SEPARATOR . $params['removedLogo']);
+                $imageData = array('facility_logo' => '');
+                $result = $this->update($imageData, array("facility_id" => $facilityId));
             }
             if (isset($_FILES['logo']['name']) && $_FILES['logo']['name'] != '') {
                 if (!file_exists(UPLOAD_PATH . DIRECTORY_SEPARATOR . "facility") && !is_dir(UPLOAD_PATH . DIRECTORY_SEPARATOR . "facility")) {
@@ -336,7 +334,7 @@ class FacilityTable extends AbstractTableGateway
             ->where('f.facility_code=?', $params['facility_code'])
             ->where('f.vlsm_instance_id=?', $params['vlsm_instance_id']);
 
-        $sQueryStr = $sql->buildSqlString($sQuery);
+        $sQueryStr = $sql->buildSqlString($fQuery);
 
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         if (!empty($rResult)) {
@@ -392,8 +390,7 @@ class FacilityTable extends AbstractTableGateway
             $fQuery = $fQuery->where('f.facility_id IN ("' . implode('", "', array_values(array_filter($mappedFacilities))) . '")');
         }
         $fQueryStr = $sql->buildSqlString($fQuery);
-        $facilityResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-        return $facilityResult;
+        return $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
     }
 
     public function fetchAllHubName()
@@ -405,12 +402,11 @@ class FacilityTable extends AbstractTableGateway
             ->join(array('ft' => 'facility_type'), 'ft.facility_type_id=f.facility_type')
             ->where('ft.facility_type_name="hub"');
         if ($loginContainer->role != 1) {
-            $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : array();
+            $mappedFacilities = (!empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : array();
             $fQuery = $fQuery->where('f.facility_id IN ("' . implode('", "', array_values(array_filter($mappedFacilities))) . '")');
         }
         $fQueryStr = $sql->buildSqlString($fQuery);
-        $facilityResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-        return $facilityResult;
+        return $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
     }
 
     public function fetchRoleFacilities($params)
@@ -421,14 +417,13 @@ class FacilityTable extends AbstractTableGateway
             ->join(array('ft' => 'facility_type'), 'ft.facility_type_id=f.facility_type');
         if (isset($params['role']) && $params['role'] == 2) {
             $fQuery = $fQuery->where('f.facility_type=2');
-        } else if (isset($params['role']) && $params['role'] == 3) {
+        } elseif (isset($params['role']) && $params['role'] == 3) {
             $fQuery = $fQuery->where('f.facility_type IN (1,4)');
-        } else if (isset($params['role']) && $params['role'] == 4) {
+        } elseif (isset($params['role']) && $params['role'] == 4) {
             $fQuery = $fQuery->where('f.facility_type=3');
         }
         $fQueryStr = $sql->buildSqlString($fQuery);
-        $facilityResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-        return $facilityResult;
+        return $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
     }
 
     public function fetchSampleTestedFacilityInfo($params)
@@ -444,20 +439,22 @@ class FacilityTable extends AbstractTableGateway
                 ->order('facility_name asc');
             if (isset($params['labNames']) && !empty($params['labNames'])) {
                 $testedLabQuery = $testedLabQuery->where('f.facility_name IN ("' . implode('", "', $params['labNames']) . '")');
-            } //default redirect else case
+            }
+            //default redirect else case
             $testedLabQueryStr = $sql->buildSqlString($testedLabQuery);
             $testedLabResult = $dbAdapter->query($testedLabQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             foreach ($testedLabResult as $testedLab) {
                 $params['labs'][] = $testedLab['facility_id'];
             }
-        } else if (isset($params['fromSrc']) && $params['fromSrc'] == 'sample-volume') {
+        } elseif (isset($params['fromSrc']) && $params['fromSrc'] == 'sample-volume') {
             $params['labs'] = array();
             $volumeLabQuery = $sql->select()->from(array('f' => 'facility_details'))
                 ->columns(array('facility_id', 'facility_name'))
                 ->order('facility_name asc');
             if (isset($params['labCodes']) && !empty($params['labCodes'])) {
                 $volumeLabQuery = $volumeLabQuery->where('f.facility_code IN ("' . implode('", "', $params['labCodes']) . '")');
-            } //default redirect else case
+            }
+            //default redirect else case
             $volumeLabQueryStr = $sql->buildSqlString($volumeLabQuery);
             $volumeLabResult = $dbAdapter->query($volumeLabQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             foreach ($volumeLabResult as $volumeLab) {
@@ -497,12 +494,10 @@ class FacilityTable extends AbstractTableGateway
             ->columns(array('geo_id', 'geo_name'))
             ->where('geo_parent != 0')
             ->order('geo_name asc');
-        if (isset($labProvinces) && !empty($labProvinces)) {
+        if (isset($labProvinces) && $labProvinces !== []) {
             $provinceDistrictQuery = $provinceDistrictQuery->where('l_d.geo_parent IN ("' . implode('", "', $labProvinces) . '")');
-        } else {
-            if ($loginContainer->role != 1) {
-                $provinceDistrictQuery = $provinceDistrictQuery->where('l_d.geo_id IN ("' . implode('", "', $loginContainer->districts) . '")');
-            }
+        } elseif ($loginContainer->role != 1) {
+            $provinceDistrictQuery = $provinceDistrictQuery->where('l_d.geo_id IN ("' . implode('", "', $loginContainer->districts) . '")');
         }
         $provinceDistrictQueryStr = $sql->buildSqlString($provinceDistrictQuery);
         $facilityInfo['provinceDistricts'] = $dbAdapter->query($provinceDistrictQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -525,13 +520,11 @@ class FacilityTable extends AbstractTableGateway
             ->columns(array('facility_id', 'facility_name', 'facility_code'))
             ->where(array('f.facility_type' => 2))
             ->order('facility_name asc');
-        if (isset($labDistricts) && !empty($labDistricts)) {
+        if (isset($labDistricts) && $labDistricts !== []) {
             $labQuery = $labQuery->where('f.facility_district IN ("' . implode('", "', $labDistricts) . '")');
-        } else {
-            if ($loginContainer->role != 1) {
-                $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : array(0);
-                $labQuery = $labQuery->where('f.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
-            }
+        } elseif ($loginContainer->role != 1) {
+            $mappedFacilities = $loginContainer->mappedFacilities ?? [];
+            $labQuery = $labQuery->where('f.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
         }
         $labQueryStr = $sql->buildSqlString($labQuery);
         $facilityInfo['labs'] = $dbAdapter->query($labQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -540,13 +533,11 @@ class FacilityTable extends AbstractTableGateway
             ->columns(array('facility_id', 'facility_name'))
             ->where('f.facility_type IN ("1","4")')
             ->order('facility_name asc');
-        if (isset($labDistricts) && !empty($labDistricts)) {
+        if (isset($labDistricts) && $labDistricts !== []) {
             $clinicQuery = $clinicQuery->where('f.facility_district IN ("' . implode('", "', $labDistricts) . '")');
-        } else {
-            if ($loginContainer->role != 1) {
-                $mappedDistricts = (isset($loginContainer->districts) && !empty($loginContainer->districts)) ? $loginContainer->districts : array(0);
-                $clinicQuery = $clinicQuery->where('f.facility_district IN ("' . implode('", "', $mappedDistricts) . '")');
-            }
+        } elseif ($loginContainer->role != 1) {
+            $mappedDistricts = (property_exists($loginContainer, 'districts') && $loginContainer->districts !== null && !empty($loginContainer->districts)) ? $loginContainer->districts : [];
+            $clinicQuery = $clinicQuery->where('f.facility_district IN ("' . implode('", "', $mappedDistricts) . '")');
         }
         $clinicQueryStr = $sql->buildSqlString($clinicQuery);
         $facilityInfo['clinics'] = $dbAdapter->query($clinicQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -573,10 +564,8 @@ class FacilityTable extends AbstractTableGateway
                 } else {
                     $provinceDistrictQuery = $provinceDistrictQuery->where('l_d.geo_id IN ("' . implode('", "', $loginContainer->districts) . '")');
                 }
-            } else {
-                if (isset($params['provinces']) && !empty($params['provinces'])) {
-                    $provinceDistrictQuery = $provinceDistrictQuery->where('l_d.geo_parent IN ("' . implode('", "', $params['provinces']) . '")');
-                }
+            } elseif (isset($params['provinces']) && !empty($params['provinces'])) {
+                $provinceDistrictQuery = $provinceDistrictQuery->where('l_d.geo_parent IN ("' . implode('", "', $params['provinces']) . '")');
             }
             $provinceDistrictQueryStr = $sql->buildSqlString($provinceDistrictQuery);
             $locationInfo['provinceDistricts'] = $dbAdapter->query($provinceDistrictQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -593,13 +582,11 @@ class FacilityTable extends AbstractTableGateway
             ->order('facility_name asc');
         if (isset($provinceDistricts) && !empty($provinceDistricts)) {
             $labQuery = $labQuery->where('f.facility_district IN ("' . implode('", "', $provinceDistricts) . '")');
-        } else if (isset($params['provinces']) && !empty($params['provinces'])) {
+        } elseif (isset($params['provinces']) && !empty($params['provinces'])) {
             $labQuery = $labQuery->where('f.facility_state IN ("' . implode('", "', $params['provinces']) . '")');
-        } else {
-            if ($loginContainer->role != 1) {
-                $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : array(0);
-                $labQuery = $labQuery->where('f.facility_id IN ("' . implode('", "', array_values(array_filter($mappedFacilities))) . '")');
-            }
+        } elseif ($loginContainer->role != 1) {
+            $mappedFacilities = $loginContainer->mappedFacilities ?? [];
+            $labQuery = $labQuery->where('f.facility_id IN ("' . implode('", "', array_values(array_filter($mappedFacilities))) . '")');
         }
         $labQueryStr = $sql->buildSqlString($labQuery);
         $locationInfo['labs'] = $dbAdapter->query($labQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -610,13 +597,11 @@ class FacilityTable extends AbstractTableGateway
             ->order('facility_name asc');
         if (isset($provinceDistricts) && !empty($provinceDistricts)) {
             $clinicQuery = $clinicQuery->where('f.facility_district IN ("' . implode('", "', $provinceDistricts) . '")');
-        } else if (isset($params['provinces']) && !empty($params['provinces'])) {
+        } elseif (isset($params['provinces']) && !empty($params['provinces'])) {
             $clinicQuery = $clinicQuery->where('f.facility_state IN ("' . implode('", "', $params['provinces']) . '")');
-        } else {
-            if ($loginContainer->role != 1) {
-                $mappedDistricts = (isset($loginContainer->districts) && !empty($loginContainer->districts)) ? $loginContainer->districts : array(0);
-                $clinicQuery = $clinicQuery->where('f.facility_district IN ("' . implode('", "', array_values(array_filter($mappedDistricts))) . '")');
-            }
+        } elseif ($loginContainer->role != 1) {
+            $mappedDistricts = (property_exists($loginContainer, 'districts') && $loginContainer->districts !== null && !empty($loginContainer->districts)) ? $loginContainer->districts : [];
+            $clinicQuery = $clinicQuery->where('f.facility_district IN ("' . implode('", "', array_values(array_filter($mappedDistricts))) . '")');
         }
         $clinicQueryStr = $sql->buildSqlString($clinicQuery);
         //echo $clinicQueryStr;die;
@@ -655,7 +640,7 @@ class FacilityTable extends AbstractTableGateway
             $sQuery = $sQuery->where("f.facility_type = $facilityType");
         }
         if ($loginContainer->role != 1) {
-            $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : array(0);
+            $mappedFacilities = $loginContainer->mappedFacilities ?? [];
             $facilities = implode('", "', array_values(array_filter($mappedFacilities)));
             $sQuery = $sQuery->where('f.facility_id IN ("' . $facilities . '")');
         }
@@ -685,10 +670,6 @@ class FacilityTable extends AbstractTableGateway
     }
     public function insertOrUpdate($arrayData)
     {
-        $query = 'INSERT INTO `' . $this->table . '` (' . implode(',', array_keys($arrayData)) . ') VALUES (' . implode(',', array_fill(1, count($arrayData), '?')) . ') ON DUPLICATE KEY UPDATE ' . implode(' = ?,', array_keys($arrayData)) . ' = ?';
-
-        $result =  $this->adapter->query($query, array_merge(array_values($arrayData), array_values($arrayData)));
-
-        return $result->getGeneratedValue();
+        return CommonService::insertOrUpdate($this->adapter, $this->table, $arrayData);
     }
 }

@@ -59,11 +59,8 @@ class Covid19FormService
             }
 
             $pathname = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-covid19" . DIRECTORY_SEPARATOR . $fileName;
-            if (!file_exists($pathname)) {
-                if (move_uploaded_file($_FILES['covid19File']['tmp_name'], $pathname)) {
-                    $apiData = json_decode(file_get_contents($pathname), true);
-                    //$apiData = \JsonMachine\JsonMachine::fromFile($pathname);
-                }
+            if (!file_exists($pathname) && move_uploaded_file($_FILES['covid19File']['tmp_name'], $pathname)) {
+                [$apiData, $timestamp] = CommonService::processJsonFile($pathname, true);
             }
 
             $allColumns = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS where TABLE_SCHEMA = '" . $dbname . "' AND table_name='dash_form_covid19'";
@@ -79,14 +76,12 @@ class Covid19FormService
 
 
             $numRows = 0;
-            foreach ($apiData['data'] as $rowData) {
+            $counter = 0;
+            foreach ($apiData as $rowData) {
+                $counter++;
                 $data = array();
                 foreach ($columnList as $colName) {
-                    if (isset($rowData[$colName])) {
-                        $data[$colName] = $rowData[$colName];
-                    } else {
-                        $data[$colName] = null;
-                    }
+                    $data[$colName] = isset($rowData[$colName]) ? $rowData[$colName] : null;
                 }
                 $currentDateTime = CommonService::getDateTime();
                 $data['last_modified_datetime'] = $currentDateTime;
@@ -112,18 +107,18 @@ class Covid19FormService
             }
 
 
-            if (count($apiData['data'])  == $numRows) {
+            if ($counter === $numRows) {
                 $status = "success";
-            } else if ((count($apiData['data']) - $numRows) != 0) {
+            } elseif ($counter - $numRows != 0) {
                 $status = "partial";
-            } else if ($numRows == 0) {
+            } elseif ($numRows == 0) {
                 $status = 'failed';
             }
             $common = new CommonService();
             $apiTrackData = array(
-                'tracking_id'                   => $apiData['timestamp'],
+                'tracking_id'                   => $timestamp,
                 'received_on'                   => $common->getDateTime(),
-                'number_of_records_received'    => count($apiData['data']),
+                'number_of_records_received'    => $counter,
                 'number_of_records_processed'   => $numRows,
                 'source'                        => $source,
                 'test_type'                     => "covid-19",
@@ -174,10 +169,8 @@ class Covid19FormService
             }
 
             $pathname = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-covid19" . DIRECTORY_SEPARATOR . $fileName;
-            if (!file_exists($pathname)) {
-                if (move_uploaded_file($_FILES['covid19File']['tmp_name'], $pathname)) {
-                    $apiData = CommonService::processJsonFile($pathname);
-                }
+            if (!file_exists($pathname) && move_uploaded_file($_FILES['covid19File']['tmp_name'], $pathname)) {
+                [$apiData, $timestamp] = CommonService::processJsonFile($pathname, true);
             }
 
             if ($apiData !== FALSE) {
@@ -200,10 +193,8 @@ class Covid19FormService
                             foreach ($row as $index => $value) {
                                 if ($index == 'status_id') {
                                     break;
-                                } else {
-                                    if ($index != 'covid19_id') {
-                                        $data[$index] = $value;
-                                    }
+                                } elseif ($index != 'covid19_id') {
+                                    $data[$index] = $value;
                                 }
                             }
                             $data['sample_code']                = $sampleCode;
@@ -395,8 +386,7 @@ class Covid19FormService
             ->where(array('sample_code' => $sampleCode, 'vlsm_instance_id' => $instanceCode))
             ->where(array('unique_id' => $uniqueId), 'OR');
         $sQueryStr = $sql->buildSqlString($sQuery);
-        $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-        return $sResult;
+        return $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
     }
 
     public function checkFacilityStateDistrictDetails($location, $parent)
@@ -406,8 +396,7 @@ class Covid19FormService
         $sQuery = $sql->select()->from(array('l' => 'geographical_divisions'))
             ->where(array('l.geo_parent' => $parent, 'l.geo_name' => trim($location)));
         $sQuery = $sql->buildSqlString($sQuery);
-        $sQueryResult = $dbAdapter->query($sQuery, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-        return $sQueryResult;
+        return $dbAdapter->query($sQuery, $dbAdapter::QUERY_MODE_EXECUTE)->current();
     }
 
     public function checkFacilityDetails($clinicName)
@@ -416,8 +405,7 @@ class Covid19FormService
         $sql = new Sql($dbAdapter);
         $fQuery = $sql->select()->from('facility_details')->where(array('facility_name' => $clinicName));
         $fQueryStr = $sql->buildSqlString($fQuery);
-        $fResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-        return $fResult;
+        return $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
     }
     public function checkFacilityTypeDetails($facilityTypeName)
     {
@@ -425,8 +413,7 @@ class Covid19FormService
         $sql = new Sql($dbAdapter);
         $fQuery = $sql->select()->from('facility_type')->where(array('facility_type_name' => $facilityTypeName));
         $fQueryStr = $sql->buildSqlString($fQuery);
-        $fResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-        return $fResult;
+        return $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
     }
     public function checkTestingReson($testingReson)
     {
@@ -434,8 +421,7 @@ class Covid19FormService
         $sql = new Sql($dbAdapter);
         $tQuery = $sql->select()->from('r_covid19_test_reasons')->where(array('test_reason_name' => $testingReson));
         $tQueryStr = $sql->buildSqlString($tQuery);
-        $tResult = $dbAdapter->query($tQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-        return $tResult;
+        return $dbAdapter->query($tQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
     }
     public function checkSampleStatus($testingStatus)
     {
@@ -443,8 +429,7 @@ class Covid19FormService
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->from('r_sample_status')->where(array('status_name' => $testingStatus));
         $sQueryStr = $sql->buildSqlString($sQuery);
-        $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-        return $sResult;
+        return $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
     }
     public function checkSampleType($sampleType)
     {
@@ -452,8 +437,7 @@ class Covid19FormService
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->from('r_covid19_sample_type')->where(array('sample_name' => $sampleType));
         $sQueryStr = $sql->buildSqlString($sQuery);
-        $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-        return $sResult;
+        return $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
     }
     public function checkSampleRejectionReason($rejectReasonName)
     {
@@ -461,8 +445,7 @@ class Covid19FormService
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->from('r_covid19_sample_rejection_reasons')->where(array('rejection_reason_name' => $rejectReasonName));
         $sQueryStr = $sql->buildSqlString($sQuery);
-        $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-        return $sResult;
+        return $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
     }
 
     public function fetchSummaryTabDetails($params)
@@ -572,7 +555,7 @@ class Covid19FormService
         $queryContainer = new Container('query');
         $translator = $this->sm->get('translator');
 
-        if (isset($queryContainer->indicatorSummaryQuery)) {
+        if (property_exists($queryContainer, 'indicatorSummaryQuery') && $queryContainer->indicatorSummaryQuery !== null) {
             try {
                 $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
                 $sql = new Sql($dbAdapter);
@@ -687,12 +670,12 @@ class Covid19FormService
         $translator = $this->sm->get('translator');
         // To set te session table
         $loginContainer = new Container('credo');
-        if (isset($loginContainer->Covid19SampleTable) && $loginContainer->Covid19SampleTable != "") {
+        if (property_exists($loginContainer, 'Covid19SampleTable') && $loginContainer->Covid19SampleTable !== null && $loginContainer->Covid19SampleTable != "") {
             $dashTable = $loginContainer->Covid19SampleTable;
         }
 
 
-        if (!isset($queryContainer->fetchAllPositiveRateByFacility)) {
+        if (!property_exists($queryContainer, 'fetchAllPositiveRateByFacility') || $queryContainer->fetchAllPositiveRateByFacility === null) {
 
             $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
             $sql = new Sql($dbAdapter);
@@ -836,7 +819,7 @@ class Covid19FormService
         $loginContainer = new Container('credo');
         $mappedFacilities = null;
         if ($loginContainer->role != 1) {
-            $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : null;
+            $mappedFacilities = (!empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : null;
         }
         $facilityDb = $this->sm->get('FacilityTable');
         return $facilityDb->fetchAllLabName($mappedFacilities);
@@ -849,7 +832,7 @@ class Covid19FormService
         $loginContainer = new Container('credo');
         $mappedFacilities = null;
         if ($loginContainer->role != 1) {
-            $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : null;
+            $mappedFacilities = (!empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : null;
         }
 
         $facilityDb = $this->sm->get('FacilityTable');
@@ -862,7 +845,7 @@ class Covid19FormService
         $loginContainer = new Container('credo');
         $mappedFacilities = null;
         if ($loginContainer->role != 1) {
-            $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : null;
+            $mappedFacilities = (!empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : null;
         }
 
         $locationDb = $this->sm->get('LocationDetailsTable');
@@ -875,7 +858,7 @@ class Covid19FormService
         $loginContainer = new Container('credo');
         $mappedFacilities = null;
         if ($loginContainer->role != 1) {
-            $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : null;
+            $mappedFacilities = (!empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : null;
         }
         $locationDb = $this->sm->get('LocationDetailsTable');
         return $locationDb->fetchAllDistrictsList();
@@ -983,7 +966,7 @@ class Covid19FormService
         $result = array();
         $time = array();
         $sampleDb = $this->sm->get('Covid19FormTable');
-        $time = $sampleDb->getTATbyClinic($labs, $startDate, $endDate);
+        $resultSet = $sampleDb->getTATbyClinic($labs, $startDate, $endDate);
         foreach ($resultSet as $key) {
             $result[] = array(
                 "facility"           => $key['geo_name'],
@@ -1045,7 +1028,7 @@ class Covid19FormService
         $queryContainer = new Container('query');
         $translator = $this->sm->get('translator');
 
-        if (isset($queryContainer->resultsAwaitedQuery)) {
+        if (property_exists($queryContainer, 'resultsAwaitedQuery') && $queryContainer->resultsAwaitedQuery !== null) {
             try {
                 $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
                 $sql = new Sql($dbAdapter);
@@ -1217,7 +1200,7 @@ class Covid19FormService
         $queryContainer = new Container('query');
         $translator = $this->sm->get('translator');
 
-        if (isset($queryContainer->resultQuery)) {
+        if (property_exists($queryContainer, 'resultQuery') && $queryContainer->resultQuery !== null) {
             try {
                 $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
                 $sql = new Sql($dbAdapter);
@@ -1284,10 +1267,10 @@ class Covid19FormService
                         $sheet->setCellValue('D1', html_entity_decode($translator->translate('Rejection Reason'), ENT_QUOTES, 'UTF-8'));
                         $sheet->setCellValue('E1', html_entity_decode($translator->translate('Date Tested'), ENT_QUOTES, 'UTF-8'));
                         $sheet->setCellValue('F1', html_entity_decode($translator->translate('Viral Load(cp/ml)'), ENT_QUOTES, 'UTF-8'));
-                    } else if (trim($params['result']) == 'result') {
+                    } elseif (trim($params['result']) == 'result') {
                         $sheet->setCellValue('D1', html_entity_decode($translator->translate('Date Tested'), ENT_QUOTES, 'UTF-8'));
                         $sheet->setCellValue('E1', html_entity_decode($translator->translate('Viral Load(cp/ml)'), ENT_QUOTES, 'UTF-8'));
-                    } else if (trim($params['result']) == 'rejected') {
+                    } elseif (trim($params['result']) == 'rejected') {
                         $sheet->setCellValue('D1', html_entity_decode($translator->translate('Rejection Reason'), ENT_QUOTES, 'UTF-8'));
                     }
 
@@ -1298,19 +1281,19 @@ class Covid19FormService
                         $sheet->getStyle('D1')->applyFromArray($styleArray);
                         $sheet->getStyle('E1')->applyFromArray($styleArray);
                         $sheet->getStyle('F1')->applyFromArray($styleArray);
-                    } else if (trim($params['result']) == 'result') {
+                    } elseif (trim($params['result']) == 'result') {
                         $sheet->getStyle('D1')->applyFromArray($styleArray);
                         $sheet->getStyle('E1')->applyFromArray($styleArray);
-                    } else if (trim($params['result']) == 'rejected') {
+                    } elseif (trim($params['result']) == 'rejected') {
                         $sheet->getStyle('D1')->applyFromArray($styleArray);
                     }
                     $currentRow = 2;
                     $endColumn = 5;
                     if (trim($params['result']) == 'result') {
                         $endColumn = 4;
-                    } else if (trim($params['result']) == 'noresult') {
+                    } elseif (trim($params['result']) == 'noresult') {
                         $endColumn = 2;
-                    } else if (trim($params['result']) == 'rejected') {
+                    } elseif (trim($params['result']) == 'rejected') {
                         $endColumn = 3;
                     }
                     foreach ($output as $rowData) {
@@ -1358,7 +1341,7 @@ class Covid19FormService
         $queryContainer = new Container('query');
         $translator = $this->sm->get('translator');
 
-        if (isset($queryContainer->labTestedSampleQuery)) {
+        if (property_exists($queryContainer, 'labTestedSampleQuery') && $queryContainer->labTestedSampleQuery !== null) {
             try {
                 $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
                 $sql = new Sql($dbAdapter);

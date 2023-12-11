@@ -133,7 +133,7 @@ class EidSummaryService
     public function exportIndicatorResultExcel($params)
     {
         $queryContainer = new Container('query');
-        if (isset($queryContainer->indicatorSummaryQuery)) {
+        if (property_exists($queryContainer, 'indicatorSummaryQuery') && $queryContainer->indicatorSummaryQuery !== null) {
             try {
                 $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
                 $sql = new Sql($dbAdapter);
@@ -248,12 +248,12 @@ class EidSummaryService
         $translator = $this->sm->get('translator');
         // To set te session table
         $loginContainer = new Container('credo');
-        if (isset($loginContainer->EidSampleTable) && $loginContainer->EidSampleTable != "") {
+        if (property_exists($loginContainer, 'EidSampleTable') && $loginContainer->EidSampleTable !== null && $loginContainer->EidSampleTable != "") {
             $dashTable = $loginContainer->EidSampleTable;
         }
         $common = new CommonService();
 
-        if (!isset($queryContainer->fetchAllPositiveRateByFacility)) {
+        if (!property_exists($queryContainer, 'fetchAllPositiveRateByFacility') || $queryContainer->fetchAllPositiveRateByFacility === null) {
 
             $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
             $sql = new Sql($dbAdapter);

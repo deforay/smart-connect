@@ -3,14 +3,14 @@
 namespace Application\Service;
 
 use Exception;
+use JsonMachine\Items;
 use Laminas\Db\Sql\Sql;
-use JsonMachine\JsonMachine;
 use Laminas\Db\Sql\Expression;
 use Laminas\Session\Container;
 use Laminas\Db\Adapter\Adapter;
 use Application\Service\CommonService;
+use JsonMachine\JsonDecoder\ExtJsonDecoder;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
-use PhpOffice\PhpSpreadsheet\Collection\CellsFactory;
 
 class SampleService
 {
@@ -54,7 +54,7 @@ class SampleService
             $sQuery = $sQuery->where(array('unique_id' => $uniqueId), 'OR');
         }
         $sQueryStr = $sql->buildSqlString($sQuery);
-        return $this->dbAdapter->query($sQueryStr, $this->dbAdapter::QUERY_MODE_EXECUTE)->current();
+        return $this->dbAdapter->query($sQueryStr, Adapter::QUERY_MODE_EXECUTE)->current();
     }
 
     public function checkFacilityStateDistrictDetails($location, $parent)
@@ -64,7 +64,7 @@ class SampleService
         $sQuery = $sql->select()->from(array('l' => 'geographical_divisions'))
             ->where(array('l.geo_parent' => $parent, 'l.geo_name' => trim($location)));
         $sQuery = $sql->buildSqlString($sQuery);
-        return $this->dbAdapter->query($sQuery, $this->dbAdapter::QUERY_MODE_EXECUTE)->current();
+        return $this->dbAdapter->query($sQuery, Adapter::QUERY_MODE_EXECUTE)->current();
     }
 
     public function checkFacilityDetails($clinicName)
@@ -73,7 +73,7 @@ class SampleService
         $sql = new Sql($this->dbAdapter);
         $fQuery = $sql->select()->from('facility_details')->where(array('facility_name' => $clinicName));
         $fQueryStr = $sql->buildSqlString($fQuery);
-        return $this->dbAdapter->query($fQueryStr, $this->dbAdapter::QUERY_MODE_EXECUTE)->current();
+        return $this->dbAdapter->query($fQueryStr, Adapter::QUERY_MODE_EXECUTE)->current();
     }
     public function checkFacilityTypeDetails($facilityTypeName)
     {
@@ -81,7 +81,7 @@ class SampleService
         $sql = new Sql($this->dbAdapter);
         $fQuery = $sql->select()->from('facility_type')->where(array('facility_type_name' => $facilityTypeName));
         $fQueryStr = $sql->buildSqlString($fQuery);
-        return $this->dbAdapter->query($fQueryStr, $this->dbAdapter::QUERY_MODE_EXECUTE)->current();
+        return $this->dbAdapter->query($fQueryStr, Adapter::QUERY_MODE_EXECUTE)->current();
     }
     public function checkTestingReson($testingReson)
     {
@@ -89,21 +89,21 @@ class SampleService
         $sql = new Sql($this->dbAdapter);
         $tQuery = $sql->select()->from('r_vl_test_reasons')->where(array('test_reason_name' => $testingReson));
         $tQueryStr = $sql->buildSqlString($tQuery);
-        return $this->dbAdapter->query($tQueryStr, $this->dbAdapter::QUERY_MODE_EXECUTE)->current();
+        return $this->dbAdapter->query($tQueryStr, Adapter::QUERY_MODE_EXECUTE)->current();
     }
     public function checkSampleStatus($testingStatus)
     {
         $sql = new Sql($this->dbAdapter);
         $sQuery = $sql->select()->from('r_sample_status')->where(array('status_name' => $testingStatus));
         $sQueryStr = $sql->buildSqlString($sQuery);
-        return $this->dbAdapter->query($sQueryStr, $this->dbAdapter::QUERY_MODE_EXECUTE)->current();
+        return $this->dbAdapter->query($sQueryStr, Adapter::QUERY_MODE_EXECUTE)->current();
     }
     public function checkSampleType($sampleType)
     {
         $sql = new Sql($this->dbAdapter);
         $sQuery = $sql->select()->from('r_vl_sample_type')->where(array('sample_name' => $sampleType));
         $sQueryStr = $sql->buildSqlString($sQuery);
-        return $this->dbAdapter->query($sQueryStr, $this->dbAdapter::QUERY_MODE_EXECUTE)->current();
+        return $this->dbAdapter->query($sQueryStr, Adapter::QUERY_MODE_EXECUTE)->current();
     }
     public function checkSampleRejectionReason($rejectReasonName)
     {
@@ -111,13 +111,13 @@ class SampleService
         $sQuery = $sql->select()->from('r_vl_sample_rejection_reasons')
             ->where(array('rejection_reason_name' => $rejectReasonName));
         $sQueryStr = $sql->buildSqlString($sQuery);
-        return $this->dbAdapter->query($sQueryStr, $this->dbAdapter::QUERY_MODE_EXECUTE)->current();
+        return $this->dbAdapter->query($sQueryStr, Adapter::QUERY_MODE_EXECUTE)->current();
     }
 
     public function checkTestReason($reasonName)
     {
 
-        if (empty(trim($reasonName))) {
+        if (trim($reasonName) === '') {
             return null;
         }
 
@@ -269,7 +269,7 @@ class SampleService
         $loginContainer = new Container('credo');
         $mappedFacilities = null;
         if ($loginContainer->role != 1) {
-            $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : null;
+            $mappedFacilities = (!empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : null;
         }
         $facilityDb = $this->sm->get('FacilityTable');
         return $facilityDb->fetchAllLabName($mappedFacilities);
@@ -280,7 +280,7 @@ class SampleService
         $loginContainer = new Container('credo');
         $mappedFacilities = null;
         if ($loginContainer->role != 1) {
-            $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : null;
+            $mappedFacilities = (!empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : null;
         }
         $facilityDb = $this->sm->get('FacilityTable');
         return $facilityDb->fetchAllClinicName($mappedFacilities);
@@ -291,7 +291,7 @@ class SampleService
         $loginContainer = new Container('credo');
         $mappedFacilities = null;
         if ($loginContainer->role != 1) {
-            $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : null;
+            $mappedFacilities = (!empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : null;
         }
 
         $locationDb = $this->sm->get('LocationDetailsTable');
@@ -303,7 +303,7 @@ class SampleService
         $loginContainer = new Container('credo');
         $mappedFacilities = null;
         if ($loginContainer->role != 1) {
-            $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : null;
+            $mappedFacilities = (!empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : null;
         }
         $locationDb = $this->sm->get('LocationDetailsTable');
         return $locationDb->fetchAllDistrictsList();
@@ -397,7 +397,7 @@ class SampleService
             ->join(array('rej_f' => 'facility_details'), 'rej_f.facility_id=vl.sample_rejection_facility', array('rejectionFacilityName' => 'facility_name'), 'left')
             ->where(array('vl.vl_sample_id' => $params['id']));
         $sQueryStr = $sql->buildSqlString($sQuery);
-        return $this->dbAdapter->query($sQueryStr, $this->dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+        return $this->dbAdapter->query($sQueryStr, Adapter::QUERY_MODE_EXECUTE)->toArray();
     }
 
     public function generateResultExcel($params)
@@ -405,12 +405,12 @@ class SampleService
         $queryContainer = new Container('query');
         $translator = $this->sm->get('translator');
 
-        if (isset($queryContainer->resultQuery)) {
+        if (property_exists($queryContainer, 'resultQuery') && $queryContainer->resultQuery !== null) {
             try {
 
                 $sql = new Sql($this->dbAdapter);
                 $sQueryStr = $sql->buildSqlString($queryContainer->resultQuery);
-                $sResult = $this->dbAdapter->query($sQueryStr, $this->dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+                $sResult = $this->dbAdapter->query($sQueryStr, Adapter::QUERY_MODE_EXECUTE)->toArray();
                 if (isset($sResult) && !empty($sResult)) {
                     $excel = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
                     // $cacheMethod = \PhpOffice\PhpSpreadsheet\Collection\CellsFactory::cache_to_phpTemp;
@@ -472,10 +472,10 @@ class SampleService
                         $sheet->setCellValue('D1', html_entity_decode($translator->translate('Rejection Reason'), ENT_QUOTES, 'UTF-8'));
                         $sheet->setCellValue('E1', html_entity_decode($translator->translate('Date Tested'), ENT_QUOTES, 'UTF-8'));
                         $sheet->setCellValue('F1', html_entity_decode($translator->translate('Viral Load(cp/ml)'), ENT_QUOTES, 'UTF-8'));
-                    } else if (trim($params['result']) == 'result') {
+                    } elseif (trim($params['result']) == 'result') {
                         $sheet->setCellValue('D1', html_entity_decode($translator->translate('Date Tested'), ENT_QUOTES, 'UTF-8'));
                         $sheet->setCellValue('E1', html_entity_decode($translator->translate('Viral Load(cp/ml)'), ENT_QUOTES, 'UTF-8'));
-                    } else if (trim($params['result']) == 'rejected') {
+                    } elseif (trim($params['result']) == 'rejected') {
                         $sheet->setCellValue('D1', html_entity_decode($translator->translate('Rejection Reason'), ENT_QUOTES, 'UTF-8'));
                     }
 
@@ -486,19 +486,19 @@ class SampleService
                         $sheet->getStyle('D1')->applyFromArray($styleArray);
                         $sheet->getStyle('E1')->applyFromArray($styleArray);
                         $sheet->getStyle('F1')->applyFromArray($styleArray);
-                    } else if (trim($params['result']) == 'result') {
+                    } elseif (trim($params['result']) == 'result') {
                         $sheet->getStyle('D1')->applyFromArray($styleArray);
                         $sheet->getStyle('E1')->applyFromArray($styleArray);
-                    } else if (trim($params['result']) == 'rejected') {
+                    } elseif (trim($params['result']) == 'rejected') {
                         $sheet->getStyle('D1')->applyFromArray($styleArray);
                     }
                     $currentRow = 2;
                     $endColumn = 5;
                     if (trim($params['result']) == 'result') {
                         $endColumn = 4;
-                    } else if (trim($params['result']) == 'noresult') {
+                    } elseif (trim($params['result']) == 'noresult') {
                         $endColumn = 2;
-                    } else if (trim($params['result']) == 'rejected') {
+                    } elseif (trim($params['result']) == 'rejected') {
                         $endColumn = 3;
                     }
                     foreach ($output as $rowData) {
@@ -540,13 +540,13 @@ class SampleService
         $queryContainer = new Container('query');
         $translator = $this->sm->get('translator');
 
-        if (isset($queryContainer->resultQuery)) {
+        if (property_exists($queryContainer, 'resultQuery') && $queryContainer->resultQuery !== null) {
             try {
 
                 $sql = new Sql($this->dbAdapter);
                 $hQueryStr = $sql->buildSqlString($queryContainer->highVlSampleQuery);
                 //error_log($hQueryStr);die;
-                $sResult = $this->dbAdapter->query($hQueryStr, $this->dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+                $sResult = $this->dbAdapter->query($hQueryStr, Adapter::QUERY_MODE_EXECUTE)->toArray();
                 if (isset($sResult) && !empty($sResult)) {
                     $excel = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
                     // $cacheMethod = \PhpOffice\PhpSpreadsheet\Collection\CellsFactory::cache_to_phpTemp;
@@ -715,12 +715,12 @@ class SampleService
         $translator = $this->sm->get('translator');
 
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
-            if (isset($queryContainer->sampleResultQuery)) {
+            if (property_exists($queryContainer, 'sampleResultQuery') && $queryContainer->sampleResultQuery !== null) {
                 try {
 
                     $sql = new Sql($this->dbAdapter);
                     $sQueryStr = $sql->buildSqlString($queryContainer->sampleResultQuery);
-                    $sResult = $this->dbAdapter->query($sQueryStr, $this->dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+                    $sResult = $this->dbAdapter->query($sQueryStr, Adapter::QUERY_MODE_EXECUTE)->toArray();
                     if (isset($sResult) && !empty($sResult)) {
                         $excel = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
                         // $cacheMethod = \PhpOffice\PhpSpreadsheet\Collection\CellsFactory::cache_to_phpTemp;
@@ -824,12 +824,12 @@ class SampleService
         $queryContainer = new Container('query');
         $translator = $this->sm->get('translator');
 
-        if (isset($queryContainer->labTestedSampleQuery)) {
+        if (property_exists($queryContainer, 'labTestedSampleQuery') && $queryContainer->labTestedSampleQuery !== null) {
             try {
 
                 $sql = new Sql($this->dbAdapter);
                 $sQueryStr = $sql->buildSqlString($queryContainer->labTestedSampleQuery);
-                $sResult = $this->dbAdapter->query($sQueryStr, $this->dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+                $sResult = $this->dbAdapter->query($sQueryStr, Adapter::QUERY_MODE_EXECUTE)->toArray();
                 if (isset($sResult) && !empty($sResult)) {
                     $excel = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
                     // $cacheMethod = \PhpOffice\PhpSpreadsheet\Collection\CellsFactory::cache_to_phpTemp;
@@ -930,12 +930,12 @@ class SampleService
         $queryContainer = new Container('query');
         $translator = $this->sm->get('translator');
 
-        if (isset($queryContainer->sampleResultTestedTATQuery)) {
+        if (property_exists($queryContainer, 'sampleResultTestedTATQuery') && $queryContainer->sampleResultTestedTATQuery !== null) {
             try {
 
                 $sql = new Sql($this->dbAdapter);
                 $sQueryStr = $sql->buildSqlString($queryContainer->sampleResultTestedTATQuery);
-                $sResult = $this->dbAdapter->query($sQueryStr, $this->dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+                $sResult = $this->dbAdapter->query($sQueryStr, Adapter::QUERY_MODE_EXECUTE)->toArray();
                 if (isset($sResult) && !empty($sResult)) {
                     $excel = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
                     $sheet = $excel->getActiveSheet();
@@ -1064,12 +1064,12 @@ class SampleService
         $queryContainer = new Container('query');
         $translator = $this->sm->get('translator');
 
-        if (isset($queryContainer->resultsAwaitedQuery)) {
+        if (property_exists($queryContainer, 'resultsAwaitedQuery') && $queryContainer->resultsAwaitedQuery !== null) {
             try {
 
                 $sql = new Sql($this->dbAdapter);
                 $sQueryStr = $sql->buildSqlString($queryContainer->resultsAwaitedQuery);
-                $sResult = $this->dbAdapter->query($sQueryStr, $this->dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+                $sResult = $this->dbAdapter->query($sQueryStr, Adapter::QUERY_MODE_EXECUTE)->toArray();
                 if (isset($sResult) && !empty($sResult)) {
                     $excel = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
                     // $cacheMethod = \PhpOffice\PhpSpreadsheet\Collection\CellsFactory::cache_to_phpTemp;
@@ -1292,7 +1292,7 @@ class SampleService
     //             $sql = new Sql($this->dbAdapter);
     //             $sQueryStr = $sql->buildSqlString($queryContainer->sampleStatusResultQuery);
 
-    //             $sResult = $this->dbAdapter->query($sQueryStr, $this->dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+    //             $sResult = $this->dbAdapter->query($sQueryStr, Adapter::QUERY_MODE_EXECUTE)->toArray();
     //             if(isset($sResult) && !empty($sResult)){
     //                 $excel = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
     //                 $cacheMethod = \PhpOffice\PhpSpreadsheet\Collection\CellsFactory::cache_to_phpTemp;
@@ -1442,7 +1442,7 @@ class SampleService
                             FROM INFORMATION_SCHEMA.COLUMNS
                             WHERE TABLE_SCHEMA = '" . $dbname . "' AND table_name='dash_form_vl'";
 
-            $sResult = $this->dbAdapter->query($allColumns, $this->dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+            $sResult = $this->dbAdapter->query($allColumns, Adapter::QUERY_MODE_EXECUTE)->toArray();
             $columnList = array_map('current', $sResult);
 
             $removeKeys = array(
@@ -1453,10 +1453,8 @@ class SampleService
             $sampleDb = $this->sm->get('SampleTableWithoutCache');
 
             $pathname = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-vl" . DIRECTORY_SEPARATOR . $fileName;
-            if (!file_exists($pathname)) {
-                if (move_uploaded_file($_FILES['vlFile']['tmp_name'], $pathname)) {
-                    $apiData = CommonService::processJsonFile($pathname);
-                }
+            if (!file_exists($pathname) && move_uploaded_file($_FILES['vlFile']['tmp_name'], $pathname)) {
+                [$apiData, $timestamp] = CommonService::processJsonFile($pathname, true);
             }
 
 
@@ -1479,11 +1477,7 @@ class SampleService
 
                 $data = array();
                 foreach ($columnList as $colName) {
-                    if (isset($rowData[$colName])) {
-                        $data[$colName] = $rowData[$colName];
-                    } else {
-                        $data[$colName] = null;
-                    }
+                    $data[$colName] = isset($rowData[$colName]) ? $rowData[$colName] : null;
                 }
                 unset($data['vl_sample_id']);
 
@@ -1517,17 +1511,14 @@ class SampleService
             }
             // unlink($pathname);
 
-            if ($counter == $numRows) {
+            if ($counter === $numRows) {
                 $status = "success";
-            } elseif (($counter - $numRows) != 0) {
+            } elseif ($counter - $numRows != 0) {
                 $status = "partial";
             } elseif ($numRows == 0) {
                 $status = 'failed';
             }
 
-            $apiData = JsonMachine::fromFile($pathname, '/timestamp');
-            $timestamp = iterator_to_array($apiData)['timestamp'];
-            $timestamp = ($timestamp !== false && !empty($timestamp)) ? $timestamp : time();
             unset($pathname);
 
             $apiTrackData = array(
@@ -1583,16 +1574,13 @@ class SampleService
         }
 
         $pathname = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-vl" . DIRECTORY_SEPARATOR . $fileName;
-        if (!file_exists($pathname)) {
-            if (move_uploaded_file($_FILES['vlFile']['tmp_name'], $pathname)) {
-                $apiData = (array)json_decode(file_get_contents($pathname));
-                //$apiData = \JsonMachine\JsonMachine::fromFile($pathname);
-            }
+        if (!file_exists($pathname) && move_uploaded_file($_FILES['vlFile']['tmp_name'], $pathname)) {
+            $apiData = CommonService::processJsonFile($pathname, false);
         }
 
 
         if ($apiData !== FALSE) {
-            foreach ($apiData['data'] as $rowData) {
+            foreach ($apiData as $rowData) {
                 // ob_start();
                 // var_dump($rowData);
                 // error_log(ob_get_clean());
@@ -1613,21 +1601,21 @@ class SampleService
                             || $row['result'] == 'Target not Detected' || $row['result'] == 'Target Not Detected' || strtolower($row['result']) == 'target not detected' || strtolower($row['result']) == 'tnd'
                         ) {
                             $VLAnalysisResult = 20;
-                        } else if ($row['result_value_text'] == '< 20' || $row['result_value_text'] == '<20' || $row['result'] == '< 20' || $row['result'] == '<20') {
+                        } elseif ($row['result_value_text'] == '< 20' || $row['result_value_text'] == '<20' || $row['result'] == '< 20' || $row['result'] == '<20') {
                             $VLAnalysisResult = 20;
-                        } else if ($row['result_value_text'] == '< 40' || $row['result_value_text'] == '<40' || $row['result'] == '< 40' || $row['result'] == '<40') {
+                        } elseif ($row['result_value_text'] == '< 40' || $row['result_value_text'] == '<40' || $row['result'] == '< 40' || $row['result'] == '<40') {
                             $VLAnalysisResult = 40;
-                        } else if ($row['result_value_text'] == 'Nivel de detecÁao baixo' || $row['result_value_text'] == 'NÌvel de detecÁ„o baixo' || $row['result'] == 'Nivel de detecÁao baixo' || $row['result'] == 'NÌvel de detecÁ„o baixo') {
+                        } elseif ($row['result_value_text'] == 'Nivel de detecÁao baixo' || $row['result_value_text'] == 'NÌvel de detecÁ„o baixo' || $row['result'] == 'Nivel de detecÁao baixo' || $row['result'] == 'NÌvel de detecÁ„o baixo') {
                             $VLAnalysisResult = 20;
-                        } else if ($row['result_value_text'] == 'Suppressed' || $row['result'] == 'Suppressed') {
+                        } elseif ($row['result_value_text'] == 'Suppressed' || $row['result'] == 'Suppressed') {
                             $VLAnalysisResult = 500;
-                        } else if ($row['result_value_text'] == 'Not Suppressed' || $row['result'] == 'Not Suppressed') {
+                        } elseif ($row['result_value_text'] == 'Not Suppressed' || $row['result'] == 'Not Suppressed') {
                             $VLAnalysisResult = 1500;
-                        } else if ($row['result_value_text'] == 'Negative' || $row['result_value_text'] == 'NEGAT' || $row['result'] == 'Negative' || $row['result'] == 'NEGAT') {
+                        } elseif ($row['result_value_text'] == 'Negative' || $row['result_value_text'] == 'NEGAT' || $row['result'] == 'Negative' || $row['result'] == 'NEGAT') {
                             $VLAnalysisResult = 20;
-                        } else if ($row['result_value_text'] == 'Positive' || $row['result'] == 'Positive') {
+                        } elseif ($row['result_value_text'] == 'Positive' || $row['result'] == 'Positive') {
                             $VLAnalysisResult = 1500;
-                        } else if ($row['result_value_text'] == 'Indeterminado' || $row['result'] == 'Indeterminado') {
+                        } elseif ($row['result_value_text'] == 'Indeterminado' || $row['result'] == 'Indeterminado') {
                             $VLAnalysisResult = "";
                         }
 
@@ -1635,10 +1623,10 @@ class SampleService
                         if ($VLAnalysisResult == 'NULL' || $VLAnalysisResult == '' || $VLAnalysisResult == NULL) {
                             $result_value_absolute_decimal = null;
                             $vl_result_category = null;
-                        } else if ($VLAnalysisResult < 1000) {
+                        } elseif ($VLAnalysisResult < 1000) {
                             $vl_result_category = 'Suppressed';
                             $result_value_absolute_decimal = $VLAnalysisResult;
-                        } else if ($VLAnalysisResult >= 1000) {
+                        } elseif ($VLAnalysisResult >= 1000) {
                             $vl_result_category = 'Not Suppressed';
                             $result_value_absolute_decimal = $VLAnalysisResult;
                         }
@@ -1879,7 +1867,7 @@ class SampleService
     public function saveWeblimsVLAPI($params)
     {
         ini_set("memory_limit", -1);
-        if (empty(trim($params)) || trim($params) == '[]') {
+        if (trim($params) === '' || trim($params) == '[]') {
             http_response_code(400);
             $response = array(
                 'status'    => 'fail',
@@ -1899,14 +1887,18 @@ class SampleService
         $trackApiDb = $this->sm->get('DashTrackApiRequestsTable');
         $userDb = $this->sm->get('UsersTable');
         $failedImports = array();
-        //$params = json_decode($params, true);
-        $apiData = \JsonMachine\JsonMachine::fromString($params, "/data");
+
+        $apiData =  Items::fromString($params, [
+            'pointer' => '/data',
+            'decoder' => new ExtJsonDecoder(true)
+        ]);
+
         $counter = 0;
         // print_r($params);die;
         foreach ($apiData as $key => $row) {
             $counter++;
             // Debug::dump($row);die;
-            if (!empty(trim($row['SampleID'])) && trim($row['TestId']) == 'VIRAL_LOAD_2') {
+            if (trim($row['SampleID']) !== '' && trim($row['TestId']) == 'VIRAL_LOAD_2') {
                 $remoteSampleCode = $sampleCode = trim($row['SampleID']);
                 $instanceCode = 'nrl-weblims';
 
@@ -1915,7 +1907,7 @@ class SampleService
                 if (!$province) {
                     $provinceDb->insert(array(
                         'province_name'     => $row['ProvinceName'],
-                        'updated_datetime'  => \Application\Service\CommonService::getDateTime()
+                        'updated_datetime'  => CommonService::getDateTime()
                     ));
                     $province['province_id'] = $provinceDb->lastInsertValue;
                 }
@@ -1927,19 +1919,19 @@ class SampleService
                 if (strtolower($row['Result']['Raw Data']) == 'target not detected' || strtolower($row['Result']['Copies']) == 'target not detected' || strtolower($row['Result']['Copies']) == 'tnd' || strtolower($row['Result']['Raw Data']) == '< titre min' || strtolower($row['Result']['Copies']) == '< titre min') {
                     $row['result_value_absolute_decimal'] = $VLAnalysisResult = 20;
                     $row['Result']['Copies'] = "Target Not Detected";
-                } else if ($row['Result']['Copies'] == '< 20' || $row['Result']['Copies'] == '<20') {
+                } elseif ($row['Result']['Copies'] == '< 20' || $row['Result']['Copies'] == '<20') {
                     $row['result_value_absolute_decimal'] = $VLAnalysisResult = 20;
-                } else if ($row['Result']['Copies'] == '< 40' || $row['Result']['Copies'] == '<40') {
+                } elseif ($row['Result']['Copies'] == '< 40' || $row['Result']['Copies'] == '<40') {
                     $row['result_value_absolute_decimal'] = $VLAnalysisResult = 40;
-                } else if ($row['Result']['Copies'] == '< 839' || $row['Result']['Copies'] == '<839') {
+                } elseif ($row['Result']['Copies'] == '< 839' || $row['Result']['Copies'] == '<839') {
                     $row['result_value_absolute_decimal'] = $VLAnalysisResult = 20;
-                } else if (strtolower($row['Result']['Copies']) == 'suppressed') {
+                } elseif (strtolower($row['Result']['Copies']) == 'suppressed') {
                     $row['result_value_absolute_decimal'] = $VLAnalysisResult = 500;
-                } else if (strtolower($row['Result']['Copies']) == 'not suppressed') {
+                } elseif (strtolower($row['Result']['Copies']) == 'not suppressed') {
                     $row['result_value_absolute_decimal'] = $VLAnalysisResult = 1500;
-                } else if (strtolower($row['Result']['Copies']) == 'negative' || strtolower($row['Result']['Copies']) == 'negat') {
+                } elseif (strtolower($row['Result']['Copies']) == 'negative' || strtolower($row['Result']['Copies']) == 'negat') {
                     $row['result_value_absolute_decimal'] = $VLAnalysisResult = 20;
-                } else if (strtolower($row['Result']['Copies']) == 'positive') {
+                } elseif (strtolower($row['Result']['Copies']) == 'positive') {
                     $row['result_value_absolute_decimal'] = $VLAnalysisResult = 1500;
                 }
 
@@ -1947,10 +1939,10 @@ class SampleService
                 if ($VLAnalysisResult == 'NULL' || $VLAnalysisResult == '' || $VLAnalysisResult == NULL) {
                     $result_value_absolute_decimal = null;
                     $vl_result_category = null;
-                } else if ($VLAnalysisResult < 1000) {
+                } elseif ($VLAnalysisResult < 1000) {
                     $vl_result_category = 'Suppressed';
                     $result_value_absolute_decimal = $VLAnalysisResult;
-                } else if ($VLAnalysisResult >= 1000) {
+                } elseif ($VLAnalysisResult >= 1000) {
                     $vl_result_category = 'Not Suppressed';
                     $result_value_absolute_decimal = $VLAnalysisResult;
                 }
@@ -2010,7 +2002,7 @@ class SampleService
                         $facilityDb->insert(array(
                             'vlsm_instance_id'  => 'nrl-weblims',
                             'facility_name'     => $row['FacilityName'],
-                            'facility_code'     => !empty($row['FacilityName']) ? $row['FacilityName'] : null,
+                            'facility_code'     => empty($row['FacilityName']) ? null : $row['FacilityName'],
                             'facility_type'     => '1',
                             'status'            => 'active'
                         ));
@@ -2022,11 +2014,7 @@ class SampleService
 
                 //check lab details
                 $labDataResult = $this->checkFacilityDetails("NRL");
-                if ($labDataResult) {
-                    $data['lab_id'] = $labDataResult['facility_id'];
-                } else {
-                    $data['lab_id'] = null;
-                }
+                $data['lab_id'] = $labDataResult ? $labDataResult['facility_id'] : null;
 
                 //check testing reason
                 $data['result_status'] = null;
@@ -2075,7 +2063,7 @@ class SampleService
                 }
 
                 //check sample test reason
-                if (!empty(trim($row['ReasonForTesting']))) {
+                if (trim($row['ReasonForTesting']) !== '') {
                     $data['reason_for_vl_testing'] =  $this->checkTestReason(trim($row['ReasonForTesting']));
                 } else {
                     $data['reason_for_vl_testing'] = null;
@@ -2111,7 +2099,7 @@ class SampleService
 
         http_response_code(202);
         $status = 'success';
-        if (!empty($failedImports)) {
+        if ($failedImports !== []) {
             $status = 'partial';
             if (($counter - count($failedImports)) == 0) {
                 $status = 'failed';
@@ -2123,9 +2111,11 @@ class SampleService
         );
 
         // Track API Records
-        $timeStampData = JsonMachine::fromString($params, '/timestamp');
-        $timestamp = iterator_to_array($timeStampData)['timestamp'];
-        $timestamp = ($timestamp !== false && !empty($timestamp)) ? $timestamp : time();
+        $timestampData =  Items::fromString($params, [
+            'pointer' => '/timestamp',
+            'decoder' => new ExtJsonDecoder(true)
+        ]);
+        $timestamp = iterator_to_array($timestampData)['timestamp'] ?? time();
         $apiTrackData = array(
             'tracking_id'                   => $timestamp,
             'received_on'                   => CommonService::getDateTime(),

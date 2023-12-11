@@ -2,10 +2,11 @@
 
 namespace Application\Model;
 
-use Laminas\Session\Container;
-use Laminas\Db\Adapter\Adapter;
 use Laminas\Db\Sql\Sql;
 use Laminas\Db\Sql\Expression;
+use Laminas\Session\Container;
+use Laminas\Db\Adapter\Adapter;
+use Application\Service\CommonService;
 use Laminas\Db\TableGateway\AbstractTableGateway;
 
 /*
@@ -19,18 +20,17 @@ use Laminas\Db\TableGateway\AbstractTableGateway;
  *
  * @author amit
  */
-class SampleRejectionReasonTable extends AbstractTableGateway {
+class SampleRejectionReasonTable extends AbstractTableGateway
+{
 
     protected $table = 'r_vl_sample_rejection_reasons';
 
-    public function __construct(Adapter $adapter) {
+    public function __construct(Adapter $adapter)
+    {
         $this->adapter = $adapter;
     }
     public function insertOrUpdate($arrayData)
     {
-        $query = 'INSERT INTO `' . $this->table . '` (' . implode(',', array_keys($arrayData)) . ') VALUES (' . implode(',', array_fill(1, count($arrayData), '?')) . ') ON DUPLICATE KEY UPDATE ' . implode(' = ?,', array_keys($arrayData)) . ' = ?';
-        $result =  $this->adapter->query($query, array_merge(array_values($arrayData), array_values($arrayData)));
-        return $result->getGeneratedValue();
+        return CommonService::insertOrUpdate($this->adapter, $this->table, $arrayData);
     }
-    
 }

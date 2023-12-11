@@ -35,8 +35,7 @@ class UserOrganizationsMapTable extends AbstractTableGateway {
                       ->where(array('user_id' => $userId));
         
         $sQueryStr = $sql->buildSqlString($sQuery);
-        $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-        return $rResult;
+        return $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
     }
     
     
@@ -48,8 +47,7 @@ class UserOrganizationsMapTable extends AbstractTableGateway {
                       ->where(array('organization_id' => $orgId));
         
         $sQueryStr = $sql->buildSqlString($sQuery);
-        $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-        return $rResult;
+        return $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
     }
     
     

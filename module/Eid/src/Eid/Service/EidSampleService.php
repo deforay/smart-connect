@@ -2,11 +2,14 @@
 
 namespace Eid\Service;
 
-use Application\Service\CommonService;
-use Laminas\Session\Container;
+use Exception;
+use JsonMachine\Items;
 use Laminas\Db\Sql\Sql;
 use Laminas\Db\Sql\Expression;
-use Exception;
+use Laminas\Session\Container;
+use Laminas\Db\Adapter\Adapter;
+use Application\Service\CommonService;
+use JsonMachine\JsonDecoder\ExtJsonDecoder;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 
 class EidSampleService
@@ -14,7 +17,7 @@ class EidSampleService
 
     public $sm = null;
     public array $config;
-    /** @var \Application\Model\EidSampleTable $eidSampleTable */
+    /** @var \Eid\Model\EidSampleTable $eidSampleTable */
     public $eidSampleTable;
 
     public function __construct($sm, $eidSampleTable)
@@ -125,7 +128,7 @@ class EidSampleService
 
         $pathname = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-eid" . DIRECTORY_SEPARATOR . $fileName;
         if (!file_exists($pathname) && move_uploaded_file($_FILES['eidFile']['tmp_name'], $pathname)) {
-            $apiData = CommonService::processJsonFile($pathname);
+            [$apiData, $timestamp] = CommonService::processJsonFile($pathname, true);
         }
 
         $allColumns = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS
@@ -142,7 +145,7 @@ class EidSampleService
 
         $columnList = array_diff($columnList, $removeKeys);
 
-        /** @var \Application\Model\EidSampleTable $sampleDb */
+        /** @var \Eid\Model\EidSampleTable $sampleDb */
         $sampleDb = $this->sm->get('EidSampleTableWithoutCache');
 
 
@@ -152,11 +155,7 @@ class EidSampleService
             $counter++;
             $data = array();
             foreach ($columnList as $colName) {
-                if (isset($rowData[$colName])) {
-                    $data[$colName] = $rowData[$colName];
-                } else {
-                    $data[$colName] = null;
-                }
+                $data[$colName] = isset($rowData[$colName]) ? $rowData[$colName] : null;
             }
 
             $currentDateTime = CommonService::getDateTime();
@@ -175,16 +174,14 @@ class EidSampleService
             $numRows++;
         }
 
-        if ($counter  == $numRows) {
+        if ($counter === $numRows) {
             $status = "success";
-        } elseif (($counter - $numRows) != 0) {
+        } elseif ($counter - $numRows != 0) {
             $status = "partial";
         } elseif ($numRows == 0) {
             $status = 'failed';
         }
-        $timesTampData = \JsonMachine\JsonMachine::fromFile($pathname, '/timestamp');
-        $timestamp = iterator_to_array($timesTampData)['timestamp'];
-        $timestamp = ($timestamp !== false && !empty($timestamp)) ? $timestamp : time();
+
 
         unset($pathname);
         $common = new CommonService();
@@ -210,7 +207,7 @@ class EidSampleService
     public function saveFileFromVlsmAPIV1()
     {
         $apiData = [];
-        /** @var \Application\Model\EidSampleTable $sampleDb */
+        /** @var \Eid\Model\EidSampleTable $sampleDb */
         $sampleDb = $this->sm->get('EidSampleTableWithoutCache');
         $facilityDb = $this->sm->get('FacilityTable');
         $facilityTypeDb = $this->sm->get('FacilityTypeTable');
@@ -230,10 +227,8 @@ class EidSampleService
         }
 
         $pathname = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-eid" . DIRECTORY_SEPARATOR . $fileName;
-        if (!file_exists($pathname)) {
-            if (move_uploaded_file($_FILES['eidFile']['tmp_name'], $pathname)) {
-                $apiData = CommonService::processJsonFile($pathname);
-            }
+        if (!file_exists($pathname) && move_uploaded_file($_FILES['eidFile']['tmp_name'], $pathname)) {
+            $apiData = CommonService::processJsonFile($pathname);
         }
         if ($apiData !== false) {
             foreach ($apiData as $rowData) {
@@ -256,10 +251,8 @@ class EidSampleService
                         foreach ($row as $index => $value) {
                             if ($index == 'status_id') {
                                 break;
-                            } else {
-                                if ($index != 'eid_id') {
-                                    $data[$index] = $value;
-                                }
+                            } elseif ($index != 'eid_id') {
+                                $data[$index] = $value;
                             }
                         }
                         $data['sample_code']                = $sampleCode;
@@ -387,11 +380,7 @@ class EidSampleService
                             $data['lab_id'] = 0;
                         }
                         //check testing reason
-                        if (trim($row['status_name']) != '') {
-                            $data['result_status'] = $this->checkSampleStatus(trim($row['status_name']));
-                        } else {
-                            $data['result_status'] = 6;
-                        }
+                        $data['result_status'] = trim($row['status_name']) != '' ? $this->checkSampleStatus(trim($row['status_name'])) : 6;
 
                         //check sample rejection reason
                         if (trim($row['reason_for_sample_rejection']) != '') {
@@ -449,8 +438,7 @@ class EidSampleService
             $sQuery = $sQuery->where(array('remote_sample_code' => $remoteSampleCode));
         }
         $sQueryStr = $sql->buildSqlString($sQuery);
-        $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-        return $sResult;
+        return $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
     }
 
     public function checkFacilityStateDistrictDetails($location, $parent)
@@ -460,8 +448,7 @@ class EidSampleService
         $sQuery = $sql->select()->from(array('l' => 'geographical_divisions'))
             ->where(array('l.geo_parent' => $parent, 'l.geo_name' => trim($location)));
         $sQuery = $sql->buildSqlString($sQuery);
-        $sQueryResult = $dbAdapter->query($sQuery, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-        return $sQueryResult;
+        return $dbAdapter->query($sQuery, $dbAdapter::QUERY_MODE_EXECUTE)->current();
     }
 
     public function checkFacilityDetails($clinicName)
@@ -470,8 +457,7 @@ class EidSampleService
         $sql = new Sql($dbAdapter);
         $fQuery = $sql->select()->from('facility_details')->where(array('facility_name' => $clinicName));
         $fQueryStr = $sql->buildSqlString($fQuery);
-        $fResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-        return $fResult;
+        return $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
     }
     public function checkFacilityTypeDetails($facilityTypeName)
     {
@@ -479,8 +465,7 @@ class EidSampleService
         $sql = new Sql($dbAdapter);
         $fQuery = $sql->select()->from('facility_type')->where(array('facility_type_name' => $facilityTypeName));
         $fQueryStr = $sql->buildSqlString($fQuery);
-        $fResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-        return $fResult;
+        return $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
     }
     public function checkTestingReson($testingReson)
     {
@@ -488,8 +473,7 @@ class EidSampleService
         $sql = new Sql($dbAdapter);
         $tQuery = $sql->select()->from('r_eid_test_reasons')->where(array('test_reason_name' => $testingReson));
         $tQueryStr = $sql->buildSqlString($tQuery);
-        $tResult = $dbAdapter->query($tQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-        return $tResult;
+        return $dbAdapter->query($tQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
     }
     public function checkSampleStatus($testingStatus)
     {
@@ -513,14 +497,15 @@ class EidSampleService
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->from('r_eid_sample_type')->where(array('sample_name' => $sampleType));
         $sQueryStr = $sql->buildSqlString($sQuery);
-        $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-        return $sResult;
+        return $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
     }
 
     public function checkTestReason($reasonName)
     {
 
-        if (empty(trim($reasonName))) return null;
+        if (trim($reasonName) === '') {
+            return null;
+        }
 
         $testReasonDb = $this->sm->get('TestReasonTable');
         $sResult = $testReasonDb->select(array('test_reason_name' => $reasonName))->toArray();
@@ -539,8 +524,7 @@ class EidSampleService
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->from('r_eid_sample_rejection_reasons')->where(array('rejection_reason_name' => $rejectReasonName));
         $sQueryStr = $sql->buildSqlString($sQuery);
-        $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-        return $sResult;
+        return $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
     }
 
     public function getAllLabName()
@@ -548,7 +532,7 @@ class EidSampleService
         $loginContainer = new Container('credo');
         $mappedFacilities = null;
         if ($loginContainer->role != 1) {
-            $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : null;
+            $mappedFacilities = (!empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : null;
         }
         $facilityDb = $this->sm->get('FacilityTable');
         return $facilityDb->fetchAllLabName($mappedFacilities);
@@ -561,7 +545,7 @@ class EidSampleService
         $loginContainer = new Container('credo');
         $mappedFacilities = null;
         if ($loginContainer->role != 1) {
-            $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : null;
+            $mappedFacilities = (!empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : null;
         }
 
         $facilityDb = $this->sm->get('FacilityTable');
@@ -587,7 +571,7 @@ class EidSampleService
         $loginContainer = new Container('credo');
         $mappedFacilities = null;
         if ($loginContainer->role != 1) {
-            $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : null;
+            $mappedFacilities = (!empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : null;
         }
 
         $locationDb = $this->sm->get('LocationDetailsTable');
@@ -712,7 +696,7 @@ class EidSampleService
     {
         $queryContainer = new Container('query');
         $translator = $this->sm->get('translator');
-        if (isset($queryContainer->resultsAwaitedQuery)) {
+        if (property_exists($queryContainer, 'resultsAwaitedQuery') && $queryContainer->resultsAwaitedQuery !== null) {
             try {
                 $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
                 $sql = new Sql($dbAdapter);
@@ -878,7 +862,7 @@ class EidSampleService
     {
         $queryContainer = new Container('query');
         $translator = $this->sm->get('translator');
-        if (isset($queryContainer->resultQuery)) {
+        if (property_exists($queryContainer, 'resultQuery') && $queryContainer->resultQuery !== null) {
             try {
                 $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
                 $sql = new Sql($dbAdapter);
@@ -984,7 +968,7 @@ class EidSampleService
     {
         $queryContainer = new Container('query');
         $translator = $this->sm->get('translator');
-        if (isset($queryContainer->labTestedSampleQuery)) {
+        if (property_exists($queryContainer, 'labTestedSampleQuery') && $queryContainer->labTestedSampleQuery !== null) {
             try {
                 $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
                 $sql = new Sql($dbAdapter);
@@ -1140,7 +1124,7 @@ class EidSampleService
     {
         $queryContainer = new Container('query');
         $translator = $this->sm->get('translator');
-        if (isset($queryContainer->resultQuery)) {
+        if (property_exists($queryContainer, 'resultQuery') && $queryContainer->resultQuery !== null) {
             try {
                 $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
                 $sql = new Sql($dbAdapter);
@@ -1260,7 +1244,7 @@ class EidSampleService
         $queryContainer = new Container('query');
         $translator = $this->sm->get('translator');
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
-            if (isset($queryContainer->sampleResultQuery)) {
+            if (property_exists($queryContainer, 'sampleResultQuery') && $queryContainer->sampleResultQuery !== null) {
                 try {
                     $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
                     $sql = new Sql($dbAdapter);

@@ -4,20 +4,27 @@ namespace Application\Service;
 
 use Exception;
 use ZipArchive;
-use Spatie\Once;
 use DateTimeZone;
-
 use Laminas\Mail;
+use JsonException;
 use Ramsey\Uuid\Uuid;
 use DateTimeImmutable;
+use JsonMachine\Items;
 use Laminas\Db\Sql\Sql;
-use JsonMachine\JsonMachine;
+use Laminas\Db\Sql\Insert;
+use Laminas\Db\Sql\Expression;
 use Laminas\Session\Container;
+use Laminas\Db\Adapter\Adapter;
 use Laminas\Mime\Part as MimePart;
+
 use Laminas\Mail\Transport\SmtpOptions;
 use Laminas\Mime\Message as MimeMessage;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
 
+use JsonMachine\JsonDecoder\ExtJsonDecoder;
+use JsonMachine\Exception\JsonMachineException;
 use Application\Model\DashApiReceiverStatsTable;
+use JsonMachine\Exception\PathNotFoundException;
 use Laminas\Mail\Transport\Smtp as SmtpTransport;
 
 
@@ -88,8 +95,7 @@ class CommonService
           //error_log($sql);
           $statement = $sql->prepareStatementForSqlObject($select);
           $result = $statement->execute();
-          $data = count($result);
-          return $data;
+          return count($result);
      }
 
 
@@ -143,7 +149,7 @@ class CommonService
           $date = trim($date);
           $response = false;
 
-          if (empty($date) || 'undefined' === $date || 'null' === $date) {
+          if ($date === '' || 'undefined' === $date || 'null' === $date) {
                $response = false;
           } else {
                try {
@@ -175,7 +181,7 @@ class CommonService
           } else {
                $format = "Y-m-d";
                if ($includeTime === true) {
-                    $format = $format . " H:i:s";
+                    $format .= " H:i:s";
                }
                return (new DateTimeImmutable($date))->format($format);
           }
@@ -453,8 +459,7 @@ class CommonService
           if ($action == 'encrypt') {
                $output = openssl_encrypt($inputString, $encrypt_method, $key, 0, $iv);
                $output = base64_encode($output);
-          } else if ($action == 'decrypt') {
-
+          } elseif ($action == 'decrypt') {
                $output = openssl_decrypt(base64_decode($inputString), $encrypt_method, $key, 0, $iv);
           }
           return $output;
@@ -475,7 +480,7 @@ class CommonService
           $loginContainer = new Container('credo');
           $mappedFacilities = null;
           if ($loginContainer->role != 1) {
-               $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : null;
+               $mappedFacilities = (!empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : null;
           }
           $facilityDb = $this->sm->get('FacilityTable');
           return $facilityDb->fetchAllLabName($mappedFacilities);
@@ -487,7 +492,7 @@ class CommonService
           $loginContainer = new Container('credo');
           $mappedFacilities = null;
           if ($loginContainer->role != 1) {
-               $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : null;
+               $mappedFacilities = (!empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : null;
           }
 
           $facilityDb = $this->sm->get('FacilityTable');
@@ -500,7 +505,7 @@ class CommonService
           $loginContainer = new Container('credo');
           $mappedFacilities = null;
           if ($loginContainer->role != 1) {
-               $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : null;
+               $mappedFacilities = (!empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : null;
           }
 
           $locationDb = $this->sm->get('LocationDetailsTable');
@@ -520,7 +525,7 @@ class CommonService
           $loginContainer = new Container('credo');
           $mappedFacilities = null;
           if ($loginContainer->role != 1) {
-               $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : null;
+               $mappedFacilities = (!empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : null;
           }
           $locationDb = $this->sm->get('LocationDetailsTable');
           return $locationDb->fetchAllDistrictsList();
@@ -571,6 +576,7 @@ class CommonService
           $covid19SampleTypeDb = $this->sm->get('Covid19SampleTypeTable');
           $covid19ComorbiditiesDb = $this->sm->get('Covid19ComorbiditiesTable');
           $covid19SymptomsDb = $this->sm->get('Covid19SymptomsTable');
+          /** @var \Application\Model\FacilityTable $facilityDb */
           $facilityDb = $this->sm->get('FacilityTableWithoutCache');
           $locationDb = $this->sm->get('LocationDetailsTable');
           $importConfigDb = $this->sm->get('ImportConfigMachineTable');
@@ -597,11 +603,9 @@ class CommonService
           }
 
           $pathname = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-reference" . DIRECTORY_SEPARATOR . $fileName;
-          if (!file_exists($pathname)) {
-               if (move_uploaded_file($_FILES['referenceFile']['tmp_name'], $pathname)) {
-                    // $apiData = \JsonMachine\JsonMachine::fromFile($pathname);
-                    $apiData = Self::processJsonFile($pathname);
-               }
+          if (!file_exists($pathname) && move_uploaded_file($_FILES['referenceFile']['tmp_name'], $pathname)) {
+               /** @var $apiData */
+               $apiData = Self::processJsonFile($pathname);
           }
 
           /* echo "<pre>";
@@ -1109,8 +1113,7 @@ class CommonService
           $sQuery = $sql->select()->from(array('l' => 'geographical_divisions'))
                ->where($where);
           $sQuery = $sql->buildSqlString($sQuery);
-          $sQueryResult = $dbAdapter->query($sQuery, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-          return $sQueryResult;
+          return $dbAdapter->query($sQuery, $dbAdapter::QUERY_MODE_EXECUTE)->current();
      }
 
      public function getMonthsInRange($startDate, $endDate)
@@ -1150,14 +1153,14 @@ class CommonService
      {
           $queryContainer = new Container('query');
           $translator = $this->sm->get('translator');
-          if (isset($queryContainer->syncStatus)) {
+          if (property_exists($queryContainer, 'syncStatus') && $queryContainer->syncStatus !== null) {
                try {
                     $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
                     $sql = new Sql($dbAdapter);
                     $sQueryStr = $sql->buildSqlString($queryContainer->syncStatus);
                     $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
                     if (isset($sResult) && !empty($sResult)) {
-                         $excel = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+                         $excel = new Spreadsheet();
                          $sheet = $excel->getActiveSheet();
                          $output = array();
 
@@ -1172,13 +1175,13 @@ class CommonService
                               $_color = "f08080";
 
                               $aRow['latest'] = $aRow['latest'] ?: $aRow['requested_on'];
-                              $latest = new \DateTimeImmutable($aRow['latest']);
+                              $latest = new DateTimeImmutable($aRow['latest']);
 
-                              $latest = (!empty($aRow['latest'])) ? new \DateTimeImmutable($aRow['latest']) : null;
+                              $latest = (empty($aRow['latest'])) ? null : new DateTimeImmutable($aRow['latest']);
                               // $twoWeekExpiry = new DateTimeImmutable($twoWeekExpiry);
                               // $threeWeekExpiry = new DateTimeImmutable($threeWeekExpiry);
 
-                              if (empty($latest)) {
+                              if (!$latest instanceof DateTimeImmutable) {
                                    $_color = "f08080";
                               } elseif ($latest >= $twoWeekExpiry) {
                                    $_color = "90ee90";
@@ -1236,7 +1239,7 @@ class CommonService
                                    $cellName = $sheet->getCellByColumnAndRow($colNo, $rRowCount)->getColumn();
                                    $sheet->getStyle($cellName . $rRowCount)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB($color[$colorNo]['color']);
                                    $sheet->getStyle($cellName . $rRowCount)->applyFromArray($borderStyle);
-                                   $sheet->getDefaultRowDimension($colNo)->setRowHeight(18);
+                                   $sheet->getDefaultRowDimension()->setRowHeight(18);
                                    $sheet->getColumnDimensionByColumn($colNo)->setWidth(30);
                                    $colNo++;
                               }
@@ -1261,15 +1264,15 @@ class CommonService
 
      public static function convertDateRange(?string $dateRange): array
      {
-          if (empty($dateRange)) {
+          if ($dateRange === null || $dateRange === '') {
                return ['', ''];
           }
 
           $dates = explode("to", $dateRange ?? '');
           $dates = array_map('trim', $dates);
 
-          $startDate = !empty($dates[0]) ? self::isoDateFormat($dates[0]) : '';
-          $endDate = !empty($dates[1]) ? self::isoDateFormat($dates[1]) : '';
+          $startDate = empty($dates[0]) ? '' : self::isoDateFormat($dates[0]);
+          $endDate = empty($dates[1]) ? '' : self::isoDateFormat($dates[1]);
 
           return [$startDate, $endDate];
      }
@@ -1331,8 +1334,7 @@ class CommonService
      public function generateUUID($attachExtraString = true): string
      {
           $uuid = (Uuid::uuid4())->toString();
-          $uuid .= $attachExtraString ? '-' . $this->generateRandomString(6) : '';
-          return $uuid;
+          return $uuid . ($attachExtraString ? '-' . $this->generateRandomString(6) : '');
      }
 
      public function generateSelectOptions($optionList, $selectedOptions = [], $emptySelectText = false)
@@ -1379,56 +1381,96 @@ class CommonService
 
      public static function prettyJson($json): string
      {
-          if (is_array($json)) {
-               $json = json_encode($json, JSON_PRETTY_PRINT);
-          } else {
-               $json = json_encode(json_decode($json), JSON_PRETTY_PRINT);
-          }
+          $json = is_array($json) ? json_encode($json, JSON_PRETTY_PRINT) : json_encode(json_decode($json), JSON_PRETTY_PRINT);
           return htmlspecialchars($json, ENT_QUOTES, 'UTF-8');
      }
 
-     public static function processJsonFile($filePath)
+     public static function processJsonFile($filePath, $returnTimestamp = false)
      {
           if (!file_exists($filePath)) {
                return null; // File does not exist
           }
 
-          // Efficiently check if the file is gzipped
-          $file = fopen($filePath, 'rb');
-          $bytes = fread($file, 2);
-          fclose($file);
+          try {
+               // Efficiently check if the file is gzipped
+               $file = fopen($filePath, 'rb');
+               $bytes = fread($file, 2);
+               fclose($file);
 
-          $isGzipped = $bytes === "\x1f\x8b";
+               $isGzipped = $bytes === "\x1f\x8b";
+               $stream = $isGzipped ? gzopen($filePath, 'r') : fopen($filePath, 'r');
 
-          if ($isGzipped) {
-               $resource = gzopen($filePath, 'r');
-               if (!$resource) {
-                    return null; // Unable to open gzipped file
-               }
-
-               $decompressedContent = '';
-               while (!gzeof($resource)) {
-                    $decompressedContent .= gzread($resource, 4096);
-               }
-               gzclose($resource);
-
-               // Use the decompressed content
-               $stream = fopen('php://memory', 'r+');
-               fwrite($stream, $decompressedContent);
-               rewind($stream);
-          } else {
-               $stream = fopen($filePath, 'r');
                if (!$stream) {
-                    return null; // Unable to open file
+                    return null; // Unable to open file or gzipped file
                }
+
+               if ($isGzipped) {
+                    $decompressedContent = '';
+                    while (!gzeof($stream)) {
+                         $decompressedContent .= gzread($stream, 4096);
+                    }
+                    gzclose($stream);
+
+                    // Use the decompressed content
+                    $stream = fopen('php://memory', 'r+');
+                    fwrite($stream, $decompressedContent);
+                    rewind($stream);
+               }
+
+               // Process the JSON data
+               $apiData = Items::fromStream($stream, [
+                    'pointer' => '/data',
+                    'decoder' => new ExtJsonDecoder(true)
+               ]);
+
+               if ($returnTimestamp) {
+                    rewind($stream); // Rewind the stream to read it again
+                    $timestampData = Items::fromStream($stream, [
+                         'pointer' => '/timestamp',
+                         'decoder' => new ExtJsonDecoder(true)
+                    ]);
+                    $timestamp = iterator_to_array($timestampData)['timestamp'] ?? time();
+                    $result = [$apiData, $timestamp];
+               } else {
+                    $result = $apiData;
+               }
+
+               fclose($stream);
+               return $result;
+          } catch (JsonException | JsonMachineException $e) {
+               // Specific exceptions for JSON processing errors
+               error_log($e->getMessage());
+               if (isset($stream) && is_resource($stream)) {
+                    fclose($stream);
+               }
+               return null;
+          } catch (Exception $e) {
+               // General exception catch
+               error_log($e->getMessage());
+               if (isset($stream) && is_resource($stream)) {
+                    fclose($stream);
+               }
+               return null;
+          }
+     }
+
+     public static function insertOrUpdate(Adapter $adapter, $table, array $data)
+     {
+          $sql = new Sql($adapter);
+          $insert = new Insert($table);
+          $insert->values($data);
+
+          $update = [];
+          $platform = $adapter->getPlatform(); // Get platform from the adapter
+          foreach ($data as $key => $value) {
+               $update[] = $platform->quoteIdentifier($key) . ' = VALUES(' . $platform->quoteIdentifier($key) . ')';
           }
 
-          // Process the JSON data
-          $apiData = JsonMachine::fromStream($stream, "/data");
+          $query = $sql->buildSqlString($insert) . ' ON DUPLICATE KEY UPDATE ' . implode(', ', $update);
 
-          // Close the stream
-          fclose($stream);
+          /** @var \Laminas\Db\Adapter\Driver\ResultInterface $result */
+          $result = $adapter->query($query, Adapter::QUERY_MODE_EXECUTE);
 
-          return $apiData;
+          return $result->getGeneratedValue(); // Get the last generated value
      }
 }

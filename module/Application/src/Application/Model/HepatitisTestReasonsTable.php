@@ -29,7 +29,6 @@ class HepatitisTestReasonsTable extends AbstractTableGateway {
 
     public function fetchAllTestReasons()
     {
-        $query = $this->select(array('test_reason_status' => 'active'));
-        return $query;
+        return $this->select(array('test_reason_status' => 'active'));
     }
 }

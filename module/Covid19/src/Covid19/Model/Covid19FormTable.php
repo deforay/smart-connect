@@ -57,7 +57,7 @@ class Covid19FormTable extends AbstractTableGateway
             $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
             $queryStr = $queryStr->where("(sample_collection_date is not null AND sample_collection_date not like '')
-                                        AND DATE(sample_collection_date) >= '" . $startMonth . "' 
+                                        AND DATE(sample_collection_date) >= '" . $startMonth . "'
                                         AND DATE(sample_collection_date) <= '" . $endMonth . "'");
         }
 
@@ -101,7 +101,7 @@ class Covid19FormTable extends AbstractTableGateway
             $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
             $sQuery = $sQuery->where("(sample_collection_date is not null)
-                                        AND DATE(sample_collection_date) >= '" . $startMonth . "' 
+                                        AND DATE(sample_collection_date) >= '" . $startMonth . "'
                                         AND DATE(sample_collection_date) <= '" . $endMonth . "'");
         }
 
@@ -148,9 +148,9 @@ class Covid19FormTable extends AbstractTableGateway
 
         $sOrder = "";
         if (isset($parameters['iSortCol_0'])) {
-            for ($i = 0; $i < intval($parameters['iSortingCols']); $i++) {
-                if ($parameters['bSortable_' . intval($parameters['iSortCol_' . $i])] == "true") {
-                    $sOrder .= $orderColumns[intval($parameters['iSortCol_' . $i])] . " " . ($parameters['sSortDir_' . $i]) . ",";
+            for ($i = 0; $i < (int) $parameters['iSortingCols']; $i++) {
+                if ($parameters['bSortable_' . (int) $parameters['iSortCol_' . $i]] == "true") {
+                    $sOrder .= $orderColumns[(int) $parameters['iSortCol_' . $i]] . " " . ($parameters['sSortDir_' . $i]) . ",";
                 }
             }
             $sOrder = substr_replace($sOrder, "", -1);
@@ -187,9 +187,11 @@ class Covid19FormTable extends AbstractTableGateway
             }
             $sWhere .= $sWhereSub;
         }
+        /* Individual column filtering */
+        $counter = count($aColumns);
 
         /* Individual column filtering */
-        for ($i = 0; $i < count($aColumns); $i++) {
+        for ($i = 0; $i < $counter; $i++) {
             if (isset($parameters['bSearchable_' . $i]) && $parameters['bSearchable_' . $i] == "true" && $parameters['sSearch_' . $i] != '') {
 
                 if ($sWhere == "") {
@@ -236,7 +238,7 @@ class Covid19FormTable extends AbstractTableGateway
             $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $sQuery = $sQuery
                 ->where("(sample_collection_date is not null)
-                        AND DATE(sample_collection_date) >= '" . $startMonth . "' 
+                        AND DATE(sample_collection_date) >= '" . $startMonth . "'
                         AND DATE(sample_collection_date) <= '" . $endMonth . "'");
         }
 
@@ -249,7 +251,7 @@ class Covid19FormTable extends AbstractTableGateway
             $sQuery->offset($sOffset);
         }
 
-        $sQueryStr = $sql->buildSqlString($sQuery); // Get the string of the Sql, instead of the Select-instance 
+        $sQueryStr = $sql->buildSqlString($sQuery); // Get the string of the Sql, instead of the Select-instance
         // echo $sQueryStr;die;
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
 
@@ -275,7 +277,7 @@ class Covid19FormTable extends AbstractTableGateway
             $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $iQuery = $iQuery
                 ->where("(covid19.sample_collection_date is not null)
-                        AND DATE(covid19.sample_collection_date) >= '" . $startMonth . "' 
+                        AND DATE(covid19.sample_collection_date) >= '" . $startMonth . "'
                         AND DATE(covid19.sample_collection_date) <= '" . $endMonth . "'");
         }
 
@@ -287,7 +289,7 @@ class Covid19FormTable extends AbstractTableGateway
         $iTotal = count($iResult);
 
         $output = array(
-            "sEcho" => intval($parameters['sEcho']),
+            "sEcho" => (int) $parameters['sEcho'],
             "iTotalRecords" => $iTotal,
             "iTotalDisplayRecords" => $iFilteredTotal,
             "aaData" => array()
@@ -333,9 +335,9 @@ class Covid19FormTable extends AbstractTableGateway
 
         $sOrder = "";
         if (isset($parameters['iSortCol_0'])) {
-            for ($i = 0; $i < intval($parameters['iSortingCols']); $i++) {
-                if ($parameters['bSortable_' . intval($parameters['iSortCol_' . $i])] == "true") {
-                    $sOrder .= $orderColumns[intval($parameters['iSortCol_' . $i])] . " " . ($parameters['sSortDir_' . $i]) . ",";
+            for ($i = 0; $i < (int) $parameters['iSortingCols']; $i++) {
+                if ($parameters['bSortable_' . (int) $parameters['iSortCol_' . $i]] == "true") {
+                    $sOrder .= $orderColumns[(int) $parameters['iSortCol_' . $i]] . " " . ($parameters['sSortDir_' . $i]) . ",";
                 }
             }
             $sOrder = substr_replace($sOrder, "", -1);
@@ -372,9 +374,11 @@ class Covid19FormTable extends AbstractTableGateway
             }
             $sWhere .= $sWhereSub;
         }
+        /* Individual column filtering */
+        $counter = count($aColumns);
 
         /* Individual column filtering */
-        for ($i = 0; $i < count($aColumns); $i++) {
+        for ($i = 0; $i < $counter; $i++) {
             if (isset($parameters['bSearchable_' . $i]) && $parameters['bSearchable_' . $i] == "true" && $parameters['sSearch_' . $i] != '') {
 
                 if ($sWhere == "") {
@@ -419,7 +423,7 @@ class Covid19FormTable extends AbstractTableGateway
             $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $sQuery = $sQuery
                 ->where("(covid19.sample_collection_date is not null AND covid19.sample_collection_date not like '')
-                        AND DATE(covid19.sample_collection_date) >= '" . $startMonth . "' 
+                        AND DATE(covid19.sample_collection_date) >= '" . $startMonth . "'
                         AND DATE(covid19.sample_collection_date) <= '" . $endMonth . "'");
         }
 
@@ -432,7 +436,7 @@ class Covid19FormTable extends AbstractTableGateway
             $sQuery->offset($sOffset);
         }
 
-        $sQueryStr = $sql->buildSqlString($sQuery); // Get the string of the Sql, instead of the Select-instance 
+        $sQueryStr = $sql->buildSqlString($sQuery); // Get the string of the Sql, instead of the Select-instance
         // echo $sQueryStr;die;
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
 
@@ -460,7 +464,7 @@ class Covid19FormTable extends AbstractTableGateway
             $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $iQuery = $iQuery
                 ->where("(covid19.sample_collection_date is not null AND covid19.sample_collection_date not like '')
-                        AND DATE(covid19.sample_collection_date) >= '" . $startMonth . "' 
+                        AND DATE(covid19.sample_collection_date) >= '" . $startMonth . "'
                         AND DATE(covid19.sample_collection_date) <= '" . $endMonth . "'");
         }
         $iQueryStr = $sql->buildSqlString($iQuery);
@@ -468,7 +472,7 @@ class Covid19FormTable extends AbstractTableGateway
         $iTotal = count($iResult);
 
         $output = array(
-            "sEcho" => intval($parameters['sEcho']),
+            "sEcho" => (int) $parameters['sEcho'],
             "iTotalRecords" => $iTotal,
             "iTotalDisplayRecords" => $iFilteredTotal,
             "aaData" => array()
@@ -512,9 +516,9 @@ class Covid19FormTable extends AbstractTableGateway
 
         $sOrder = "";
         if (isset($parameters['iSortCol_0'])) {
-            for ($i = 0; $i < intval($parameters['iSortingCols']); $i++) {
-                if ($parameters['bSortable_' . intval($parameters['iSortCol_' . $i])] == "true") {
-                    $sOrder .= $orderColumns[intval($parameters['iSortCol_' . $i])] . " " . ($parameters['sSortDir_' . $i]) . ",";
+            for ($i = 0; $i < (int) $parameters['iSortingCols']; $i++) {
+                if ($parameters['bSortable_' . (int) $parameters['iSortCol_' . $i]] == "true") {
+                    $sOrder .= $orderColumns[(int) $parameters['iSortCol_' . $i]] . " " . ($parameters['sSortDir_' . $i]) . ",";
                 }
             }
             $sOrder = substr_replace($sOrder, "", -1);
@@ -551,9 +555,11 @@ class Covid19FormTable extends AbstractTableGateway
             }
             $sWhere .= $sWhereSub;
         }
+        /* Individual column filtering */
+        $counter = count($aColumns);
 
         /* Individual column filtering */
-        for ($i = 0; $i < count($aColumns); $i++) {
+        for ($i = 0; $i < $counter; $i++) {
             if (isset($parameters['bSearchable_' . $i]) && $parameters['bSearchable_' . $i] == "true" && $parameters['sSearch_' . $i] != '') {
 
                 if ($sWhere == "") {
@@ -599,7 +605,7 @@ class Covid19FormTable extends AbstractTableGateway
             $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $sQuery = $sQuery
                 ->where("(covid19.sample_collection_date is not null AND covid19.sample_collection_date not like '')
-                        AND DATE(covid19.sample_collection_date) >= '" . $startMonth . "' 
+                        AND DATE(covid19.sample_collection_date) >= '" . $startMonth . "'
                         AND DATE(covid19.sample_collection_date) <= '" . $endMonth . "'");
         }
 
@@ -612,7 +618,7 @@ class Covid19FormTable extends AbstractTableGateway
             $sQuery->offset($sOffset);
         }
 
-        $sQueryStr = $sql->buildSqlString($sQuery); // Get the string of the Sql, instead of the Select-instance 
+        $sQueryStr = $sql->buildSqlString($sQuery); // Get the string of the Sql, instead of the Select-instance
         //echo $sQueryStr;die;
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
 
@@ -642,7 +648,7 @@ class Covid19FormTable extends AbstractTableGateway
             $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $iQuery = $iQuery
                 ->where("(covid19.sample_collection_date is not null AND covid19.sample_collection_date not like '')
-                        AND DATE(covid19.sample_collection_date) >= '" . $startMonth . "' 
+                        AND DATE(covid19.sample_collection_date) >= '" . $startMonth . "'
                         AND DATE(covid19.sample_collection_date) <= '" . $endMonth . "'");
         }
         $iQueryStr = $sql->buildSqlString($iQuery);
@@ -650,7 +656,7 @@ class Covid19FormTable extends AbstractTableGateway
         $iTotal = count($iResult);
 
         $output = array(
-            "sEcho" => intval($parameters['sEcho']),
+            "sEcho" => (int) $parameters['sEcho'],
             "iTotalRecords" => $iTotal,
             "iTotalDisplayRecords" => $iFilteredTotal,
             "aaData" => array()
@@ -707,7 +713,7 @@ class Covid19FormTable extends AbstractTableGateway
             $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
             $sQuery = $sQuery->where("(sample_collection_date is not null)
-                                        AND DATE(sample_collection_date) >= '" . $startMonth . "' 
+                                        AND DATE(sample_collection_date) >= '" . $startMonth . "'
                                         AND DATE(sample_collection_date) <= '" . $endMonth . "'");
         }
         $sQuery = $sQuery->order(array(new Expression('DATE(sample_collection_date)')));
@@ -717,7 +723,7 @@ class Covid19FormTable extends AbstractTableGateway
         $sampleResult = $this->commonService->cacheQuery($queryStr, $dbAdapter);
         $j = 0;
         foreach ($sampleResult as $row) {
-            $result['valid_results'][$j]  = $valid = (!empty($row["total_samples_tested"])) ? $row["total_samples_tested"] - $row["total_samples_rejected"] : 0;
+            $result['valid_results'][$j]  = $valid = (empty($row["total_samples_tested"])) ? 0 : $row["total_samples_tested"] - $row["total_samples_rejected"];
             $result['positive_rate'][$j] = ($row["total_positive_samples"] > 0 && $valid > 0) ? round((($row["total_positive_samples"] / $valid) * 100), 2) : null;
             $result['date'][$j] = $row['monthyear'];
             $j++;
@@ -748,9 +754,9 @@ class Covid19FormTable extends AbstractTableGateway
 
         $sOrder = "";
         if (isset($parameters['iSortCol_0'])) {
-            for ($i = 0; $i < intval($parameters['iSortingCols']); $i++) {
-                if ($parameters['bSortable_' . intval($parameters['iSortCol_' . $i])] == "true") {
-                    $sOrder .= $orderColumns[intval($parameters['iSortCol_' . $i])] . " " . ($parameters['sSortDir_' . $i]) . ",";
+            for ($i = 0; $i < (int) $parameters['iSortingCols']; $i++) {
+                if ($parameters['bSortable_' . (int) $parameters['iSortCol_' . $i]] == "true") {
+                    $sOrder .= $orderColumns[(int) $parameters['iSortCol_' . $i]] . " " . ($parameters['sSortDir_' . $i]) . ",";
                 }
             }
             $sOrder = substr_replace($sOrder, "", -1);
@@ -787,9 +793,11 @@ class Covid19FormTable extends AbstractTableGateway
             }
             $sWhere .= $sWhereSub;
         }
+        /* Individual column filtering */
+        $counter = count($aColumns);
 
         /* Individual column filtering */
-        for ($i = 0; $i < count($aColumns); $i++) {
+        for ($i = 0; $i < $counter; $i++) {
             if (isset($parameters['bSearchable_' . $i]) && $parameters['bSearchable_' . $i] == "true" && $parameters['sSearch_' . $i] != '') {
 
                 if ($sWhere == "") {
@@ -838,7 +846,7 @@ class Covid19FormTable extends AbstractTableGateway
             $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $sQuery = $sQuery
                 ->where("(covid19.sample_collection_date is not null)
-                        AND DATE(covid19.sample_collection_date) >= '" . $startMonth . "' 
+                        AND DATE(covid19.sample_collection_date) >= '" . $startMonth . "'
                         AND DATE(covid19.sample_collection_date) <= '" . $endMonth . "'");
         }
 
@@ -851,7 +859,7 @@ class Covid19FormTable extends AbstractTableGateway
             $sQuery->offset($sOffset);
         }
 
-        $sQueryStr = $sql->buildSqlString($sQuery); // Get the string of the Sql, instead of the Select-instance 
+        $sQueryStr = $sql->buildSqlString($sQuery); // Get the string of the Sql, instead of the Select-instance
         //echo $sQueryStr;die;
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
 
@@ -878,7 +886,7 @@ class Covid19FormTable extends AbstractTableGateway
             $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $iQuery = $iQuery
                 ->where("(covid19.sample_collection_date is not null)
-                        AND DATE(covid19.sample_collection_date) >= '" . $startMonth . "' 
+                        AND DATE(covid19.sample_collection_date) >= '" . $startMonth . "'
                         AND DATE(covid19.sample_collection_date) <= '" . $endMonth . "'");
         }
         $iQueryStr = $sql->buildSqlString($iQuery);
@@ -886,7 +894,7 @@ class Covid19FormTable extends AbstractTableGateway
         $iTotal = count($iResult);
 
         $output = array(
-            "sEcho" => intval($parameters['sEcho']),
+            "sEcho" => (int) $parameters['sEcho'],
             "iTotalRecords" => $iTotal,
             "iTotalDisplayRecords" => $iFilteredTotal,
             "aaData" => array()
@@ -928,9 +936,9 @@ class Covid19FormTable extends AbstractTableGateway
 
         $sOrder = "";
         if (isset($parameters['iSortCol_0'])) {
-            for ($i = 0; $i < intval($parameters['iSortingCols']); $i++) {
-                if ($parameters['bSortable_' . intval($parameters['iSortCol_' . $i])] == "true") {
-                    $sOrder .= $orderColumns[intval($parameters['iSortCol_' . $i])] . " " . ($parameters['sSortDir_' . $i]) . ",";
+            for ($i = 0; $i < (int) $parameters['iSortingCols']; $i++) {
+                if ($parameters['bSortable_' . (int) $parameters['iSortCol_' . $i]] == "true") {
+                    $sOrder .= $orderColumns[(int) $parameters['iSortCol_' . $i]] . " " . ($parameters['sSortDir_' . $i]) . ",";
                 }
             }
             $sOrder = substr_replace($sOrder, "", -1);
@@ -967,9 +975,11 @@ class Covid19FormTable extends AbstractTableGateway
             }
             $sWhere .= $sWhereSub;
         }
+        /* Individual column filtering */
+        $counter = count($aColumns);
 
         /* Individual column filtering */
-        for ($i = 0; $i < count($aColumns); $i++) {
+        for ($i = 0; $i < $counter; $i++) {
             if (isset($parameters['bSearchable_' . $i]) && $parameters['bSearchable_' . $i] == "true" && $parameters['sSearch_' . $i] != '') {
 
                 if ($sWhere == "") {
@@ -1016,7 +1026,7 @@ class Covid19FormTable extends AbstractTableGateway
             $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $sQuery = $sQuery
                 ->where("(covid19.sample_collection_date is not null)
-                        AND DATE(covid19.sample_collection_date) >= '" . $startMonth . "' 
+                        AND DATE(covid19.sample_collection_date) >= '" . $startMonth . "'
                         AND DATE(covid19.sample_collection_date) <= '" . $endMonth . "'");
         }
 
@@ -1029,7 +1039,7 @@ class Covid19FormTable extends AbstractTableGateway
             $sQuery->offset($sOffset);
         }
 
-        $sQueryStr = $sql->buildSqlString($sQuery); // Get the string of the Sql, instead of the Select-instance 
+        $sQueryStr = $sql->buildSqlString($sQuery); // Get the string of the Sql, instead of the Select-instance
         //echo $sQueryStr;die;
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
 
@@ -1056,7 +1066,7 @@ class Covid19FormTable extends AbstractTableGateway
             $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $iQuery = $iQuery
                 ->where("(covid19.sample_collection_date is not null)
-                        AND DATE(covid19.sample_collection_date) >= '" . $startMonth . "' 
+                        AND DATE(covid19.sample_collection_date) >= '" . $startMonth . "'
                         AND DATE(covid19.sample_collection_date) <= '" . $endMonth . "'");
         }
         $iQueryStr = $sql->buildSqlString($iQuery);
@@ -1064,7 +1074,7 @@ class Covid19FormTable extends AbstractTableGateway
         $iTotal = count($iResult);
 
         $output = array(
-            "sEcho" => intval($parameters['sEcho']),
+            "sEcho" => (int) $parameters['sEcho'],
             "iTotalRecords" => $iTotal,
             "iTotalDisplayRecords" => $iFilteredTotal,
             "aaData" => array()
@@ -1109,9 +1119,9 @@ class Covid19FormTable extends AbstractTableGateway
 
         $sOrder = "";
         if (isset($parameters['iSortCol_0'])) {
-            for ($i = 0; $i < intval($parameters['iSortingCols']); $i++) {
-                if ($parameters['bSortable_' . intval($parameters['iSortCol_' . $i])] == "true") {
-                    $sOrder .= $orderColumns[intval($parameters['iSortCol_' . $i])] . " " . ($parameters['sSortDir_' . $i]) . ",";
+            for ($i = 0; $i < (int) $parameters['iSortingCols']; $i++) {
+                if ($parameters['bSortable_' . (int) $parameters['iSortCol_' . $i]] == "true") {
+                    $sOrder .= $orderColumns[(int) $parameters['iSortCol_' . $i]] . " " . ($parameters['sSortDir_' . $i]) . ",";
                 }
             }
             $sOrder = substr_replace($sOrder, "", -1);
@@ -1148,9 +1158,11 @@ class Covid19FormTable extends AbstractTableGateway
             }
             $sWhere .= $sWhereSub;
         }
+        /* Individual column filtering */
+        $counter = count($aColumns);
 
         /* Individual column filtering */
-        for ($i = 0; $i < count($aColumns); $i++) {
+        for ($i = 0; $i < $counter; $i++) {
             if (isset($parameters['bSearchable_' . $i]) && $parameters['bSearchable_' . $i] == "true" && $parameters['sSearch_' . $i] != '') {
 
                 if ($sWhere == "") {
@@ -1199,7 +1211,7 @@ class Covid19FormTable extends AbstractTableGateway
             $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $sQuery = $sQuery
                 ->where("(covid19.sample_collection_date is not null)
-                        AND DATE(covid19.sample_collection_date) >= '" . $startMonth . "' 
+                        AND DATE(covid19.sample_collection_date) >= '" . $startMonth . "'
                         AND DATE(covid19.sample_collection_date) <= '" . $endMonth . "'");
         }
 
@@ -1214,7 +1226,7 @@ class Covid19FormTable extends AbstractTableGateway
             $sQuery->offset($sOffset);
         }
 
-        $sQueryStr = $sql->buildSqlString($sQuery); // Get the string of the Sql, instead of the Select-instance 
+        $sQueryStr = $sql->buildSqlString($sQuery); // Get the string of the Sql, instead of the Select-instance
         //echo $sQueryStr;die;
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
 
@@ -1242,7 +1254,7 @@ class Covid19FormTable extends AbstractTableGateway
             $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $iQuery = $iQuery
                 ->where("(covid19.sample_collection_date is not null)
-                        AND DATE(covid19.sample_collection_date) >= '" . $startMonth . "' 
+                        AND DATE(covid19.sample_collection_date) >= '" . $startMonth . "'
                         AND DATE(covid19.sample_collection_date) <= '" . $endMonth . "'");
         }
         $iQueryStr = $sql->buildSqlString($iQuery);
@@ -1250,7 +1262,7 @@ class Covid19FormTable extends AbstractTableGateway
         $iTotal = count($iResult);
 
         $output = array(
-            "sEcho" => intval($parameters['sEcho']),
+            "sEcho" => (int) $parameters['sEcho'],
             "iTotalRecords" => $iTotal,
             "iTotalDisplayRecords" => $iFilteredTotal,
             "aaData" => array()
@@ -1299,7 +1311,7 @@ class Covid19FormTable extends AbstractTableGateway
             $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
             $mostRejectionQuery = $mostRejectionQuery->where("(sample_collection_date is not null)
-                                        AND DATE(sample_collection_date) >= '" . $startMonth . "' 
+                                        AND DATE(sample_collection_date) >= '" . $startMonth . "'
                                         AND DATE(sample_collection_date) <= '" . $endMonth . "'");
         }
         $mostRejectionQueryStr = $sql->buildSqlString($mostRejectionQuery);
@@ -1319,7 +1331,8 @@ class Covid19FormTable extends AbstractTableGateway
             $month = date('m', $start);
             $year = date('Y', $start);
             $monthYearFormat = date("M-Y", $start);
-            for ($m = 0; $m < count($mostRejectionReasons); $m++) {
+            $counter = count($mostRejectionReasons);
+            for ($m = 0; $m < $counter; $m++) {
                 $rejectionQuery = $sql->select()->from(array('covid19' => $this->table))
                     ->columns(array('rejections' => new Expression('COUNT(*)')))
                     ->join(array('r_r_r' => 'r_vl_sample_rejection_reasons'), 'r_r_r.rejection_reason_id=covid19.reason_for_sample_rejection', array('rejection_reason_name'))
@@ -1342,7 +1355,7 @@ class Covid19FormTable extends AbstractTableGateway
                     $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
                     $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
                     $rejectionQuery = $rejectionQuery->where("(sample_collection_date is not null)
-                                                AND DATE(sample_collection_date) >= '" . $startMonth . "' 
+                                                AND DATE(sample_collection_date) >= '" . $startMonth . "'
                                                 AND DATE(sample_collection_date) <= '" . $endMonth . "'");
                 }
                 if ($mostRejectionReasons[$m] == 0) {
@@ -1386,9 +1399,9 @@ class Covid19FormTable extends AbstractTableGateway
 
         $sOrder = "";
         if (isset($parameters['iSortCol_0'])) {
-            for ($i = 0; $i < intval($parameters['iSortingCols']); $i++) {
-                if ($parameters['bSortable_' . intval($parameters['iSortCol_' . $i])] == "true") {
-                    $sOrder .= $orderColumns[intval($parameters['iSortCol_' . $i])] . " " . ($parameters['sSortDir_' . $i]) . ",";
+            for ($i = 0; $i < (int) $parameters['iSortingCols']; $i++) {
+                if ($parameters['bSortable_' . (int) $parameters['iSortCol_' . $i]] == "true") {
+                    $sOrder .= $orderColumns[(int) $parameters['iSortCol_' . $i]] . " " . ($parameters['sSortDir_' . $i]) . ",";
                 }
             }
             $sOrder = substr_replace($sOrder, "", -1);
@@ -1425,9 +1438,11 @@ class Covid19FormTable extends AbstractTableGateway
             }
             $sWhere .= $sWhereSub;
         }
+        /* Individual column filtering */
+        $counter = count($aColumns);
 
         /* Individual column filtering */
-        for ($i = 0; $i < count($aColumns); $i++) {
+        for ($i = 0; $i < $counter; $i++) {
             if (isset($parameters['bSearchable_' . $i]) && $parameters['bSearchable_' . $i] == "true" && $parameters['sSearch_' . $i] != '') {
 
                 if ($sWhere == "") {
@@ -1467,7 +1482,7 @@ class Covid19FormTable extends AbstractTableGateway
             $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $sQuery = $sQuery
                 ->where("(covid19.sample_collection_date is not null)
-                        AND DATE(covid19.sample_collection_date) >= '" . $startMonth . "' 
+                        AND DATE(covid19.sample_collection_date) >= '" . $startMonth . "'
                         AND DATE(covid19.sample_collection_date) <= '" . $endMonth . "'");
         }
 
@@ -1480,7 +1495,7 @@ class Covid19FormTable extends AbstractTableGateway
             $sQuery->offset($sOffset);
         }
 
-        $sQueryStr = $sql->buildSqlString($sQuery); // Get the string of the Sql, instead of the Select-instance 
+        $sQueryStr = $sql->buildSqlString($sQuery); // Get the string of the Sql, instead of the Select-instance
         //echo $sQueryStr;die;
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
 
@@ -1507,7 +1522,7 @@ class Covid19FormTable extends AbstractTableGateway
             $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $iQuery = $iQuery
                 ->where("(covid19.sample_collection_date is not null)
-                        AND DATE(covid19.sample_collection_date) >= '" . $startMonth . "' 
+                        AND DATE(covid19.sample_collection_date) >= '" . $startMonth . "'
                         AND DATE(covid19.sample_collection_date) <= '" . $endMonth . "'");
         }
         $iQueryStr = $sql->buildSqlString($iQuery);
@@ -1515,7 +1530,7 @@ class Covid19FormTable extends AbstractTableGateway
         $iTotal = count($iResult);
 
         $output = array(
-            "sEcho" => intval($parameters['sEcho']),
+            "sEcho" => (int) $parameters['sEcho'],
             "iTotalRecords" => $iTotal,
             "iTotalDisplayRecords" => $iFilteredTotal,
             "aaData" => array()
@@ -1554,9 +1569,9 @@ class Covid19FormTable extends AbstractTableGateway
 
         $sOrder = "";
         if (isset($parameters['iSortCol_0'])) {
-            for ($i = 0; $i < intval($parameters['iSortingCols']); $i++) {
-                if ($parameters['bSortable_' . intval($parameters['iSortCol_' . $i])] == "true") {
-                    $sOrder .= $orderColumns[intval($parameters['iSortCol_' . $i])] . " " . ($parameters['sSortDir_' . $i]) . ",";
+            for ($i = 0; $i < (int) $parameters['iSortingCols']; $i++) {
+                if ($parameters['bSortable_' . (int) $parameters['iSortCol_' . $i]] == "true") {
+                    $sOrder .= $orderColumns[(int) $parameters['iSortCol_' . $i]] . " " . ($parameters['sSortDir_' . $i]) . ",";
                 }
             }
             $sOrder = substr_replace($sOrder, "", -1);
@@ -1593,9 +1608,11 @@ class Covid19FormTable extends AbstractTableGateway
             }
             $sWhere .= $sWhereSub;
         }
+        /* Individual column filtering */
+        $counter = count($aColumns);
 
         /* Individual column filtering */
-        for ($i = 0; $i < count($aColumns); $i++) {
+        for ($i = 0; $i < $counter; $i++) {
             if (isset($parameters['bSearchable_' . $i]) && $parameters['bSearchable_' . $i] == "true" && $parameters['sSearch_' . $i] != '') {
 
                 if ($sWhere == "") {
@@ -1635,7 +1652,7 @@ class Covid19FormTable extends AbstractTableGateway
             $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $sQuery = $sQuery
                 ->where("(covid19.sample_collection_date is not null AND covid19.sample_collection_date not like '')
-                        AND DATE(covid19.sample_collection_date) >= '" . $startMonth . "' 
+                        AND DATE(covid19.sample_collection_date) >= '" . $startMonth . "'
                         AND DATE(covid19.sample_collection_date) <= '" . $endMonth . "'");
         }
 
@@ -1648,7 +1665,7 @@ class Covid19FormTable extends AbstractTableGateway
             $sQuery->offset($sOffset);
         }
 
-        $sQueryStr = $sql->buildSqlString($sQuery); // Get the string of the Sql, instead of the Select-instance 
+        $sQueryStr = $sql->buildSqlString($sQuery); // Get the string of the Sql, instead of the Select-instance
         //echo $sQueryStr;die;
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
 
@@ -1675,7 +1692,7 @@ class Covid19FormTable extends AbstractTableGateway
             $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $iQuery = $iQuery
                 ->where("(covid19.sample_collection_date is not null AND covid19.sample_collection_date not like '')
-                        AND DATE(covid19.sample_collection_date) >= '" . $startMonth . "' 
+                        AND DATE(covid19.sample_collection_date) >= '" . $startMonth . "'
                         AND DATE(covid19.sample_collection_date) <= '" . $endMonth . "'");
         }
         $iQueryStr = $sql->buildSqlString($iQuery);
@@ -1683,7 +1700,7 @@ class Covid19FormTable extends AbstractTableGateway
         $iTotal = count($iResult);
 
         $output = array(
-            "sEcho" => intval($parameters['sEcho']),
+            "sEcho" => (int) $parameters['sEcho'],
             "iTotalRecords" => $iTotal,
             "iTotalDisplayRecords" => $iFilteredTotal,
             "aaData" => array()
@@ -1723,9 +1740,9 @@ class Covid19FormTable extends AbstractTableGateway
 
         $sOrder = "";
         if (isset($parameters['iSortCol_0'])) {
-            for ($i = 0; $i < intval($parameters['iSortingCols']); $i++) {
-                if ($parameters['bSortable_' . intval($parameters['iSortCol_' . $i])] == "true") {
-                    $sOrder .= $orderColumns[intval($parameters['iSortCol_' . $i])] . " " . ($parameters['sSortDir_' . $i]) . ",";
+            for ($i = 0; $i < (int) $parameters['iSortingCols']; $i++) {
+                if ($parameters['bSortable_' . (int) $parameters['iSortCol_' . $i]] == "true") {
+                    $sOrder .= $orderColumns[(int) $parameters['iSortCol_' . $i]] . " " . ($parameters['sSortDir_' . $i]) . ",";
                 }
             }
             $sOrder = substr_replace($sOrder, "", -1);
@@ -1762,9 +1779,11 @@ class Covid19FormTable extends AbstractTableGateway
             }
             $sWhere .= $sWhereSub;
         }
+        /* Individual column filtering */
+        $counter = count($aColumns);
 
         /* Individual column filtering */
-        for ($i = 0; $i < count($aColumns); $i++) {
+        for ($i = 0; $i < $counter; $i++) {
             if (isset($parameters['bSearchable_' . $i]) && $parameters['bSearchable_' . $i] == "true" && $parameters['sSearch_' . $i] != '') {
 
                 if ($sWhere == "") {
@@ -1805,7 +1824,7 @@ class Covid19FormTable extends AbstractTableGateway
             $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $sQuery = $sQuery
                 ->where("(covid19.sample_collection_date is not null AND covid19.sample_collection_date not like '')
-                        AND DATE(covid19.sample_collection_date) >= '" . $startMonth . "' 
+                        AND DATE(covid19.sample_collection_date) >= '" . $startMonth . "'
                         AND DATE(covid19.sample_collection_date) <= '" . $endMonth . "'");
         }
 
@@ -1818,7 +1837,7 @@ class Covid19FormTable extends AbstractTableGateway
             $sQuery->offset($sOffset);
         }
 
-        $sQueryStr = $sql->buildSqlString($sQuery); // Get the string of the Sql, instead of the Select-instance 
+        $sQueryStr = $sql->buildSqlString($sQuery); // Get the string of the Sql, instead of the Select-instance
         //echo $sQueryStr;die;
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
 
@@ -1846,7 +1865,7 @@ class Covid19FormTable extends AbstractTableGateway
             $endMonth = str_replace(' ', '-', $parameters['toDate']) . date('-t', strtotime($parameters['toDate']));
             $iQuery = $iQuery
                 ->where("(covid19.sample_collection_date is not null AND covid19.sample_collection_date not like '')
-                        AND DATE(covid19.sample_collection_date) >= '" . $startMonth . "' 
+                        AND DATE(covid19.sample_collection_date) >= '" . $startMonth . "'
                         AND DATE(covid19.sample_collection_date) <= '" . $endMonth . "'");
         }
         $iQueryStr = $sql->buildSqlString($iQuery);
@@ -1854,7 +1873,7 @@ class Covid19FormTable extends AbstractTableGateway
         $iTotal = count($iResult);
 
         $output = array(
-            "sEcho" => intval($parameters['sEcho']),
+            "sEcho" => (int) $parameters['sEcho'],
             "iTotalRecords" => $iTotal,
             "iTotalDisplayRecords" => $iFilteredTotal,
             "aaData" => array()
@@ -1911,7 +1930,7 @@ class Covid19FormTable extends AbstractTableGateway
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
             $samplesReceivedSummaryQuery = $samplesReceivedSummaryQuery
                 ->where("(sample_collection_date is not null)
-                                        AND DATE(sample_collection_date) >= '" . $startMonth . "' 
+                                        AND DATE(sample_collection_date) >= '" . $startMonth . "'
                                         AND DATE(sample_collection_date) <= '" . $endMonth . "'");
         }
 
@@ -1966,7 +1985,7 @@ class Covid19FormTable extends AbstractTableGateway
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
             $covid19OutcomesQuery = $covid19OutcomesQuery
                 ->where("(sample_collection_date is not null)
-                                        AND DATE(sample_collection_date) >= '" . $startMonth . "' 
+                                        AND DATE(sample_collection_date) >= '" . $startMonth . "'
                                         AND DATE(sample_collection_date) <= '" . $endMonth . "'");
         }
 
@@ -2018,7 +2037,7 @@ class Covid19FormTable extends AbstractTableGateway
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
             $covid19OutcomesQuery = $covid19OutcomesQuery
                 ->where("(sample_collection_date is not null)
-                                        AND DATE(sample_collection_date) >= '" . $startMonth . "' 
+                                        AND DATE(sample_collection_date) >= '" . $startMonth . "'
                                         AND DATE(sample_collection_date) <= '" . $endMonth . "'");
         }
 
@@ -2056,8 +2075,7 @@ class Covid19FormTable extends AbstractTableGateway
         }
 
         $covid19OutcomesQueryStr = $sql->buildSqlString($covid19OutcomesQuery);
-        $result = $this->commonService->cacheQuery($covid19OutcomesQueryStr, $dbAdapter);
-        return $result;
+        return $this->commonService->cacheQuery($covid19OutcomesQueryStr, $dbAdapter);
     }
 
     public function fetchTATDetails($params)
@@ -2090,7 +2108,7 @@ class Covid19FormTable extends AbstractTableGateway
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
             $covid19OutcomesQuery = $covid19OutcomesQuery
                 ->where("(sample_collection_date is not null)
-                                        AND DATE(sample_collection_date) >= '" . $startMonth . "' 
+                                        AND DATE(sample_collection_date) >= '" . $startMonth . "'
                                         AND DATE(sample_collection_date) <= '" . $endMonth . "'");
         }
         $covid19OutcomesQueryStr = $sql->buildSqlString($covid19OutcomesQuery);
@@ -2219,15 +2237,15 @@ class Covid19FormTable extends AbstractTableGateway
             ->columns(
                 array(
                     $this->translator->translate("Total Samples") => new Expression('COUNT(*)'),
-                    $this->translator->translate("Samples Tested") => new Expression("SUM(CASE 
+                    $this->translator->translate("Samples Tested") => new Expression("SUM(CASE
                                                                                 WHEN (((covid19.result is NOT NULL AND covid19.result !='') OR (covid19.reason_for_sample_rejection IS NOT NULL AND covid19.reason_for_sample_rejection != '' AND covid19.reason_for_sample_rejection != 0))) THEN 1
                                                                                 ELSE 0
                                                                                 END)"),
-                    $this->translator->translate("Gender Missing") => new Expression("SUM(CASE 
+                    $this->translator->translate("Gender Missing") => new Expression("SUM(CASE
                                                                                     WHEN ((patient_gender IS NULL OR patient_gender ='' OR patient_gender ='unreported' OR patient_gender ='Unreported')) THEN 1
                                                                                     ELSE 0
                                                                                     END)"),
-                    $this->translator->translate("Age Missing") => new Expression("SUM(CASE 
+                    $this->translator->translate("Age Missing") => new Expression("SUM(CASE
                                                                                 WHEN ((patient_age IS NULL OR patient_age ='' OR patient_age ='Unreported'  OR patient_age ='unreported')) THEN 1
                                                                                 ELSE 0
                                                                                 END)"),
@@ -2271,7 +2289,7 @@ class Covid19FormTable extends AbstractTableGateway
                 $fQueryStr = $sql->buildSqlString($fQuery);
                 $facilityResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
                 $facilityIdList = array_column($facilityResult, 'facility_id');
-            } else if (!empty($this->mappedFacilities)) {
+            } elseif (!empty($this->mappedFacilities)) {
                 $fQuery = $sql->select()->from(array('f' => 'facility_details'))->columns(array('facility_id'))
                     ->where('f.facility_id IN ("' . implode('", "', $this->mappedFacilities) . '")');
                 $fQueryStr = $sql->buildSqlString($fQuery);
@@ -2297,7 +2315,7 @@ class Covid19FormTable extends AbstractTableGateway
 
             $queryStr = $queryStr->where("
                         (sample_collection_date is not null AND sample_collection_date not like '')
-                        AND DATE(sample_collection_date) >= '" . $startMonth . "' 
+                        AND DATE(sample_collection_date) >= '" . $startMonth . "'
                         AND DATE(sample_collection_date) <= '" . $endMonth . "'");
 
             $queryStr = $queryStr->group(array(new Expression('MONTH(sample_collection_date)')));
@@ -2308,7 +2326,9 @@ class Covid19FormTable extends AbstractTableGateway
             $sampleResult = $this->commonService->cacheQuery($queryStr, $dbAdapter);
             $j = 0;
             foreach ($sampleResult as $sRow) {
-                if ($sRow["monthDate"] == null) continue;
+                if ($sRow["monthDate"] == null) {
+                    continue;
+                }
                 $result['covid19Result']['Positive'][$j] = (isset($sRow["positive"])) ? $sRow["positive"] : 0;
                 $result['covid19Result']['Negative'][$j] = (isset($sRow["negative"])) ? $sRow["negative"] : 0;
                 $result['date'][$j] = $sRow["monthDate"];
@@ -2336,7 +2356,7 @@ class Covid19FormTable extends AbstractTableGateway
                 $fQueryStr = $sql->buildSqlString($fQuery);
                 $facilityResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
                 $facilityIdList = array_column($facilityResult, 'facility_id');
-            } else if (!empty($this->mappedFacilities)) {
+            } elseif (!empty($this->mappedFacilities)) {
                 $fQuery = $sql->select()->from(array('f' => 'facility_details'))->columns(array('facility_id'))
                     //->where('f.facility_type = 2 AND f.status="active"')
                     ->where('f.facility_id IN ("' . implode('", "', $this->mappedFacilities) . '")');
@@ -2351,7 +2371,7 @@ class Covid19FormTable extends AbstractTableGateway
                 ->columns(
                     array(
                         "total" => new Expression("SUM(CASE WHEN (
-                                                        covid19.result in ('negative', 'Negative','positive', 'Positive')) 
+                                                        covid19.result in ('negative', 'Negative','positive', 'Positive'))
                                                         THEN 1 ELSE 0 END)"),
                         "negative" => new Expression("SUM(CASE WHEN ((covid19.result like 'negative' OR covid19.result like 'Negative')) THEN 1 ELSE 0 END)"),
                         "positive" => new Expression("SUM(CASE WHEN ((covid19.result like 'positive' OR covid19.result like 'Positive' )) THEN 1 ELSE 0 END)"),
@@ -2374,8 +2394,8 @@ class Covid19FormTable extends AbstractTableGateway
             $j = 0;
             foreach ($testResult as $data) {
 
-                $result['sampleName']['Positive'][$j] = !empty($data['positive']) ? $data['positive'] : 0;
-                $result['sampleName']['Negative'][$j] = !empty($data['negative']) ? $data['negative'] : 0;
+                $result['sampleName']['Positive'][$j] = empty($data['positive']) ? 0 : $data['positive'];
+                $result['sampleName']['Negative'][$j] = empty($data['negative']) ? 0 : $data['negative'];
                 $result['lab'][$j] = $data['facility_name'];
                 $j++;
             }
@@ -2402,7 +2422,7 @@ class Covid19FormTable extends AbstractTableGateway
             $fQueryStr = $sql->buildSqlString($fQuery);
             $facilityResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             $facilityIdList = array_column($facilityResult, 'facility_id');
-        } else if (!empty($this->mappedFacilities)) {
+        } elseif (!empty($this->mappedFacilities)) {
             $fQuery = $sql->select()->from(array('f' => 'facility_details'))->columns(array('facility_id'))
                 //->where('f.facility_type = 2 AND f.status="active"')
                 ->where('f.facility_id IN ("' . implode('", "', $this->mappedFacilities) . '")');
@@ -2420,7 +2440,7 @@ class Covid19FormTable extends AbstractTableGateway
 
             if (strtotime($startMonth) >= strtotime($monthyear)) {
                 $startMonth = $endMonth = date("Y-m-01", strtotime("-2 months"));
-            } else if (strtotime($endMonth) >= strtotime($monthyear)) {
+            } elseif (strtotime($endMonth) >= strtotime($monthyear)) {
                 $endMonth = date("Y-m-t", strtotime("-2 months"));
             }
 
@@ -2452,7 +2472,7 @@ class Covid19FormTable extends AbstractTableGateway
 
             $skipDays = (isset($skipDays) && $skipDays > 0) ? $skipDays : 120;
             $query = $query->where('
-                (DATEDIFF(result_approved_datetime,sample_collection_date) < ' . $skipDays . ' AND 
+                (DATEDIFF(result_approved_datetime,sample_collection_date) < ' . $skipDays . ' AND
                 DATEDIFF(result_approved_datetime,sample_collection_date) >= 0)');
 
             if ($facilityIdList != null) {
@@ -2508,7 +2528,7 @@ class Covid19FormTable extends AbstractTableGateway
                 $fQueryStr = $sql->buildSqlString($fQuery);
                 $facilityResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
                 $facilityIdList = array_column($facilityResult, 'facility_id');
-            } else if (!empty($this->mappedFacilities)) {
+            } elseif (!empty($this->mappedFacilities)) {
                 $fQuery = $sql->select()->from(array('f' => 'facility_details'))->columns(array('facility_id'))
                     //->where('f.facility_type = 2 AND f.status="active"')
                     ->where('f.facility_id IN ("' . implode('", "', $this->mappedFacilities) . '")');
@@ -2591,7 +2611,7 @@ class Covid19FormTable extends AbstractTableGateway
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
             $covid19OutcomesQuery = $covid19OutcomesQuery
                 ->where("(sample_collection_date is not null)
-                                        AND DATE(sample_collection_date) >= '" . $startMonth . "' 
+                                        AND DATE(sample_collection_date) >= '" . $startMonth . "'
                                         AND DATE(sample_collection_date) <= '" . $endMonth . "'");
         }
 
@@ -2603,7 +2623,7 @@ class Covid19FormTable extends AbstractTableGateway
             $fQueryStr = $sql->buildSqlString($fQuery);
             $facilityResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             $facilityIdList = array_column($facilityResult, 'facility_id');
-        } else if (!empty($this->mappedFacilities)) {
+        } elseif (!empty($this->mappedFacilities)) {
             $fQuery = $sql->select()->from(array('f' => 'facility_details'))->columns(array('facility_id'))
                 ->where('f.facility_id IN ("' . implode('", "', $this->mappedFacilities) . '")');
             $fQueryStr = $sql->buildSqlString($fQuery);
@@ -2624,7 +2644,7 @@ class Covid19FormTable extends AbstractTableGateway
     {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        
+
         $startMonth = "";
         $endMonth = "";
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
@@ -2638,7 +2658,7 @@ class Covid19FormTable extends AbstractTableGateway
             ))
                 ->join(array('f' => 'facility_details'), 'f.facility_id=covid19.lab_id', array('facility_name'))
                 ->where("(sample_collection_date is not null)
-                                    AND DATE(sample_collection_date) >= '" . $startMonth . "' 
+                                    AND DATE(sample_collection_date) >= '" . $startMonth . "'
                                     AND DATE(sample_collection_date) <= '" . $endMonth . "'")
                 ->group(array("lab_id", new Expression("DATE_FORMAT(sample_collection_date, '%m-%Y')")))
                 ->order(array("lab_id", new Expression("DATE_FORMAT(sample_collection_date, '%m-%Y')")));
@@ -2661,7 +2681,7 @@ class Covid19FormTable extends AbstractTableGateway
                 $mQueryStr = $sql->buildSqlString($mQuery);
                 $facilityResult = $dbAdapter->query($mQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
                 $facilityIdList = array_column($facilityResult, 'facility_id');
-            } else if (!empty($this->mappedFacilities)) {
+            } elseif (!empty($this->mappedFacilities)) {
                 $fQuery = $sql->select()->from(array('f' => 'facility_details'))->columns(array('facility_id'))
                     ->where('f.facility_id IN ("' . implode('", "', $this->mappedFacilities) . '")');
                 $fQueryStr = $sql->buildSqlString($fQuery);
@@ -2714,26 +2734,24 @@ class Covid19FormTable extends AbstractTableGateway
             );
         if ($skipDays > 0) {
             $squery = $squery->where('
-                DATEDIFF(sample_received_at_vl_lab_datetime,sample_collection_date) < ' . $skipDays . ' AND 
-                DATEDIFF(sample_received_at_vl_lab_datetime,sample_collection_date) >= 0 AND 
+                DATEDIFF(sample_received_at_vl_lab_datetime,sample_collection_date) < ' . $skipDays . ' AND
+                DATEDIFF(sample_received_at_vl_lab_datetime,sample_collection_date) >= 0 AND
 
-                DATEDIFF(sample_registered_at_lab,sample_received_at_vl_lab_datetime) < ' . $skipDays . ' AND 
-                DATEDIFF(sample_registered_at_lab,sample_received_at_vl_lab_datetime) >= 0 AND 
+                DATEDIFF(sample_registered_at_lab,sample_received_at_vl_lab_datetime) < ' . $skipDays . ' AND
+                DATEDIFF(sample_registered_at_lab,sample_received_at_vl_lab_datetime) >= 0 AND
 
-                DATEDIFF(sample_tested_datetime,sample_received_at_vl_lab_datetime) < ' . $skipDays . ' AND 
-                DATEDIFF(sample_tested_datetime,sample_registered_at_lab)>=0 AND 
+                DATEDIFF(sample_tested_datetime,sample_received_at_vl_lab_datetime) < ' . $skipDays . ' AND
+                DATEDIFF(sample_tested_datetime,sample_registered_at_lab)>=0 AND
 
-                DATEDIFF(result_approved_datetime,sample_tested_datetime) < ' . $skipDays . ' AND 
+                DATEDIFF(result_approved_datetime,sample_tested_datetime) < ' . $skipDays . ' AND
                 DATEDIFF(result_approved_datetime,sample_tested_datetime) >= 0');
         }
 
         if (isset($labs) && !empty($labs)) {
             $squery = $squery->where('covid19.lab_id IN (' . implode(',', $labs) . ')');
-        } else {
-            if ($loginContainer->role != 1) {
-                $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : array(0);
-                $squery = $squery->where('covid19.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
-            }
+        } elseif ($loginContainer->role != 1) {
+            $mappedFacilities = $loginContainer->mappedFacilities ?? [];
+            $squery = $squery->where('covid19.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
         }
         $squery = $squery->group(array('geo_id'));
         $sQueryStr = $sql->buildSqlString($squery);
@@ -2769,31 +2787,28 @@ class Covid19FormTable extends AbstractTableGateway
             );
         if ($skipDays > 0) {
             $squery = $squery->where('
-                DATEDIFF(sample_received_at_vl_lab_datetime,sample_collection_date)<120 AND 
-                DATEDIFF(sample_received_at_vl_lab_datetime,sample_collection_date)>=0 AND 
+                DATEDIFF(sample_received_at_vl_lab_datetime,sample_collection_date)<120 AND
+                DATEDIFF(sample_received_at_vl_lab_datetime,sample_collection_date)>=0 AND
 
-                DATEDIFF(sample_registered_at_lab,sample_received_at_vl_lab_datetime)<120 AND 
-                DATEDIFF(sample_registered_at_lab,sample_received_at_vl_lab_datetime)>=0 AND 
+                DATEDIFF(sample_registered_at_lab,sample_received_at_vl_lab_datetime)<120 AND
+                DATEDIFF(sample_registered_at_lab,sample_received_at_vl_lab_datetime)>=0 AND
 
-                DATEDIFF(sample_tested_datetime,sample_received_at_vl_lab_datetime)<120 AND 
-                DATEDIFF(sample_tested_datetime,sample_registered_at_lab)>=0 AND 
+                DATEDIFF(sample_tested_datetime,sample_received_at_vl_lab_datetime)<120 AND
+                DATEDIFF(sample_tested_datetime,sample_registered_at_lab)>=0 AND
 
-                DATEDIFF(result_approved_datetime,sample_tested_datetime)<120 AND 
+                DATEDIFF(result_approved_datetime,sample_tested_datetime)<120 AND
                 DATEDIFF(result_approved_datetime,sample_tested_datetime)>=0');
         }
 
         if (isset($labs) && !empty($labs)) {
             $squery = $squery->where('covid19.lab_id IN (' . implode(',', $labs) . ')');
-        } else {
-            if ($loginContainer->role != 1) {
-                $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : array(0);
-                $squery = $squery->where('covid19.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
-            }
+        } elseif ($loginContainer->role != 1) {
+            $mappedFacilities = $loginContainer->mappedFacilities ?? [];
+            $squery = $squery->where('covid19.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
         }
         $squery = $squery->group(array('geo_id'));
         $sQueryStr = $sql->buildSqlString($squery);
-        $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-        return $sResult;
+        return $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
     }
 
     public function getTATbyClinic($labs, $startDate, $endDate)
@@ -2823,32 +2838,29 @@ class Covid19FormTable extends AbstractTableGateway
             );
         if ($skipDays > 0) {
             $squery = $squery->where('
-                DATEDIFF(sample_received_at_vl_lab_datetime,sample_collection_date)<120 AND 
-                DATEDIFF(sample_received_at_vl_lab_datetime,sample_collection_date)>=0 AND 
+                DATEDIFF(sample_received_at_vl_lab_datetime,sample_collection_date)<120 AND
+                DATEDIFF(sample_received_at_vl_lab_datetime,sample_collection_date)>=0 AND
 
-                DATEDIFF(sample_registered_at_lab,sample_received_at_vl_lab_datetime)<120 AND 
-                DATEDIFF(sample_registered_at_lab,sample_received_at_vl_lab_datetime)>=0 AND 
+                DATEDIFF(sample_registered_at_lab,sample_received_at_vl_lab_datetime)<120 AND
+                DATEDIFF(sample_registered_at_lab,sample_received_at_vl_lab_datetime)>=0 AND
 
-                DATEDIFF(sample_tested_datetime,sample_received_at_vl_lab_datetime)<120 AND 
-                DATEDIFF(sample_tested_datetime,sample_registered_at_lab)>=0 AND 
+                DATEDIFF(sample_tested_datetime,sample_received_at_vl_lab_datetime)<120 AND
+                DATEDIFF(sample_tested_datetime,sample_registered_at_lab)>=0 AND
 
-                DATEDIFF(result_approved_datetime,sample_tested_datetime)<120 AND 
+                DATEDIFF(result_approved_datetime,sample_tested_datetime)<120 AND
                 DATEDIFF(result_approved_datetime,sample_tested_datetime)>=0');
         }
 
         if (isset($labs) && !empty($labs)) {
             $squery = $squery->where('covid19.lab_id IN (' . implode(',', $labs) . ')');
-        } else {
-            if ($loginContainer->role != 1) {
-                $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : array(0);
-                $squery = $squery->where('covid19.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
-            }
+        } elseif ($loginContainer->role != 1) {
+            $mappedFacilities = $loginContainer->mappedFacilities ?? [];
+            $squery = $squery->where('covid19.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
         }
         $squery = $squery->group(array('geo_id'));
         $sQueryStr = $sql->buildSqlString($squery);
         die($sQueryStr);
-        $sResult   = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
-        return $sResult;
+        return $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
     }
 
     /////////////////////////////////////////////
@@ -2861,7 +2873,7 @@ class Covid19FormTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = array();
-        
+
         $globalDb = $this->sm->get('GlobalTable');
         $samplesWaitingFromLastXMonths = $globalDb->getGlobalValue('sample_waiting_month_range');
         if (isset($params['daterange']) && trim($params['daterange']) != '') {
@@ -2872,7 +2884,7 @@ class Covid19FormTable extends AbstractTableGateway
 
         $countQuery = $sql->select()->from(array('covid19' => $this->table))
             ->columns(
-                array("total" => new Expression("SUM(CASE WHEN (((covid19.is_sample_rejected is NULL OR covid19.is_sample_rejected = '' OR covid19.is_sample_rejected = 'no') 
+                array("total" => new Expression("SUM(CASE WHEN (((covid19.is_sample_rejected is NULL OR covid19.is_sample_rejected = '' OR covid19.is_sample_rejected = 'no')
                                                     AND (reason_for_sample_rejection is NULL or reason_for_sample_rejection ='' or covid19.reason_for_sample_rejection = 0))) THEN 1
                                                             ELSE 0
                                                         END)"))
@@ -2882,11 +2894,9 @@ class Covid19FormTable extends AbstractTableGateway
             ->group('p.geo_id');
         if (isset($params['lab']) && trim($params['lab']) != '') {
             $countQuery = $countQuery->where('covid19.lab_id IN (' . $params['lab'] . ')');
-        } else {
-            if ($loginContainer->role != 1) {
-                $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : array(0);
-                $countQuery = $countQuery->where('covid19.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
-            }
+        } elseif ($loginContainer->role != 1) {
+            $mappedFacilities = $loginContainer->mappedFacilities ?? [];
+            $countQuery = $countQuery->where('covid19.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
         }
         if (isset($params['provinces']) && trim($params['provinces']) != '') {
             $countQuery = $countQuery->where('p.geo_id IN (' . $params['provinces'] . ')');
@@ -2899,33 +2909,32 @@ class Covid19FormTable extends AbstractTableGateway
         }
         if (isset($params['daterange']) && trim($params['daterange']) != '' && trim($splitDate[0]) != '' && trim($splitDate[1]) != '') {
             $countQuery = $countQuery->where(array("covid19.sample_collection_date >='" . trim($splitDate[0]) . " 00:00:00" . "'", "covid19.sample_collection_date <='" . trim($splitDate[1]) . " 23:59:59" . "'"));
-        } else {
-            if (isset($params['frmSource']) && trim($params['frmSource']) == '<') {
-                $countQuery = $countQuery->where("(covid19.sample_collection_date < DATE_SUB(NOW(), INTERVAL $samplesWaitingFromLastXMonths MONTH))");
-            } else if (isset($params['frmSource']) && trim($params['frmSource']) == '>') {
-                $countQuery = $countQuery->where("(covid19.sample_collection_date > DATE_SUB(NOW(), INTERVAL $samplesWaitingFromLastXMonths MONTH))");
-            }
+        } elseif (isset($params['frmSource']) && trim($params['frmSource']) == '<') {
+            $countQuery = $countQuery->where("(covid19.sample_collection_date < DATE_SUB(NOW(), INTERVAL $samplesWaitingFromLastXMonths MONTH))");
+        } elseif (isset($params['frmSource']) && trim($params['frmSource']) == '>') {
+            $countQuery = $countQuery->where("(covid19.sample_collection_date > DATE_SUB(NOW(), INTERVAL $samplesWaitingFromLastXMonths MONTH))");
         }
 
         //print_r($params['age']);die;
         if (isset($params['age']) && trim($params['age']) != '') {
             $age = explode(',', $params['age']);
             $where = '';
-            for ($a = 0; $a < count($age); $a++) {
+            $counter = count($age);
+            for ($a = 0; $a < $counter; $a++) {
                 if (trim($where) != '') {
                     $where .= ' OR ';
                 }
                 if ($age[$a] == '<2') {
                     $where .= "(covid19.patient_age > 0 AND covid19.patient_age < 2)";
-                } else if ($age[$a] == '2to5') {
+                } elseif ($age[$a] == '2to5') {
                     $where .= "(covid19.patient_age >= 2 AND covid19.patient_age <= 5)";
-                } else if ($age[$a] == '6to14') {
+                } elseif ($age[$a] == '6to14') {
                     $where .= "(covid19.patient_age >= 6 AND covid19.patient_age <= 14)";
-                } else if ($age[$a] == '15to49') {
+                } elseif ($age[$a] == '15to49') {
                     $where .= "(covid19.patient_age >= 15 AND covid19.patient_age <= 49)";
-                } else if ($age[$a] == '>=50') {
+                } elseif ($age[$a] == '>=50') {
                     $where .= "(covid19.patient_age >= 50)";
-                } else if ($age[$a] == 'unknown') {
+                } elseif ($age[$a] == 'unknown') {
                     $where .= "(covid19.patient_age IS NULL OR covid19.patient_age = '' OR covid19.patient_age = 'Unknown' OR covid19.patient_age = 'unknown' OR covid19.patient_age = 'unreported' OR covid19.patient_age = 'Unreported')";
                 }
             }
@@ -2938,9 +2947,9 @@ class Covid19FormTable extends AbstractTableGateway
 
         if (isset($params['gender']) && $params['gender'] == 'F') {
             $countQuery = $countQuery->where("covid19.patient_gender IN ('f','female','F','FEMALE')");
-        } else if (isset($params['gender']) && $params['gender'] == 'M') {
+        } elseif (isset($params['gender']) && $params['gender'] == 'M') {
             $countQuery = $countQuery->where("covid19.patient_gender IN ('m','male','M','MALE')");
-        } else if (isset($params['gender']) && $params['gender'] == 'not_specified') {
+        } elseif (isset($params['gender']) && $params['gender'] == 'not_specified') {
             $countQuery = $countQuery->where("(covid19.patient_gender IS NULL OR covid19.patient_gender = '' OR covid19.patient_gender ='Not Recorded' OR covid19.patient_gender = 'not recorded' OR covid19.patient_gender = 'Unreported' OR covid19.patient_gender = 'unreported')");
         }
 
@@ -2962,7 +2971,7 @@ class Covid19FormTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = array();
-        
+
         $globalDb = $this->sm->get('GlobalTable');
         $samplesWaitingFromLastXMonths = $globalDb->getGlobalValue('sample_waiting_month_range');
         if (isset($params['daterange']) && trim($params['daterange']) != '') {
@@ -2973,7 +2982,7 @@ class Covid19FormTable extends AbstractTableGateway
 
         $countQuery = $sql->select()->from(array('covid19' => $this->table))
             ->columns(
-                array("total" => new Expression("SUM(CASE WHEN (((covid19.is_sample_rejected is NULL OR covid19.is_sample_rejected = '' OR covid19.is_sample_rejected = 'no') 
+                array("total" => new Expression("SUM(CASE WHEN (((covid19.is_sample_rejected is NULL OR covid19.is_sample_rejected = '' OR covid19.is_sample_rejected = 'no')
                                                     AND (reason_for_sample_rejection is NULL or reason_for_sample_rejection ='' or covid19.reason_for_sample_rejection = 0))) THEN 1
                                                             ELSE 0
                                                         END)"))
@@ -2984,11 +2993,9 @@ class Covid19FormTable extends AbstractTableGateway
             ->group('d.geo_id');
         if (isset($params['lab']) && trim($params['lab']) != '') {
             $countQuery = $countQuery->where('covid19.lab_id IN (' . $params['lab'] . ')');
-        } else {
-            if ($loginContainer->role != 1) {
-                $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : array(0);
-                $countQuery = $countQuery->where('covid19.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
-            }
+        } elseif ($loginContainer->role != 1) {
+            $mappedFacilities = $loginContainer->mappedFacilities ?? [];
+            $countQuery = $countQuery->where('covid19.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
         }
         if (isset($params['provinces']) && trim($params['provinces']) != '') {
             $countQuery = $countQuery->where('p.geo_id IN (' . $params['provinces'] . ')');
@@ -3001,33 +3008,32 @@ class Covid19FormTable extends AbstractTableGateway
         }
         if (isset($params['daterange']) && trim($params['daterange']) != '' && trim($splitDate[0]) != '' && trim($splitDate[1]) != '') {
             $countQuery = $countQuery->where(array("covid19.sample_collection_date >='" . trim($splitDate[0]) . " 00:00:00" . "'", "covid19.sample_collection_date <='" . trim($splitDate[1]) . " 23:59:59" . "'"));
-        } else {
-            if (isset($params['frmSource']) && trim($params['frmSource']) == '<') {
-                $countQuery = $countQuery->where("(covid19.sample_collection_date < DATE_SUB(NOW(), INTERVAL $samplesWaitingFromLastXMonths MONTH))");
-            } else if (isset($params['frmSource']) && trim($params['frmSource']) == '>') {
-                $countQuery = $countQuery->where("(covid19.sample_collection_date > DATE_SUB(NOW(), INTERVAL $samplesWaitingFromLastXMonths MONTH))");
-            }
+        } elseif (isset($params['frmSource']) && trim($params['frmSource']) == '<') {
+            $countQuery = $countQuery->where("(covid19.sample_collection_date < DATE_SUB(NOW(), INTERVAL $samplesWaitingFromLastXMonths MONTH))");
+        } elseif (isset($params['frmSource']) && trim($params['frmSource']) == '>') {
+            $countQuery = $countQuery->where("(covid19.sample_collection_date > DATE_SUB(NOW(), INTERVAL $samplesWaitingFromLastXMonths MONTH))");
         }
 
         //print_r($params['age']);die;
         if (isset($params['age']) && trim($params['age']) != '') {
             $age = explode(',', $params['age']);
             $where = '';
-            for ($a = 0; $a < count($age); $a++) {
+            $counter = count($age);
+            for ($a = 0; $a < $counter; $a++) {
                 if (trim($where) != '') {
                     $where .= ' OR ';
                 }
                 if ($age[$a] == '<2') {
                     $where .= "(covid19.patient_age > 0 AND covid19.patient_age < 2)";
-                } else if ($age[$a] == '2to5') {
+                } elseif ($age[$a] == '2to5') {
                     $where .= "(covid19.patient_age >= 2 AND covid19.patient_age <= 5)";
-                } else if ($age[$a] == '6to14') {
+                } elseif ($age[$a] == '6to14') {
                     $where .= "(covid19.patient_age >= 6 AND covid19.patient_age <= 14)";
-                } else if ($age[$a] == '15to49') {
+                } elseif ($age[$a] == '15to49') {
                     $where .= "(covid19.patient_age >= 15 AND covid19.patient_age <= 49)";
-                } else if ($age[$a] == '>=50') {
+                } elseif ($age[$a] == '>=50') {
                     $where .= "(covid19.patient_age >= 50)";
-                } else if ($age[$a] == 'unknown') {
+                } elseif ($age[$a] == 'unknown') {
                     $where .= "(covid19.patient_age IS NULL OR covid19.patient_age = '' OR covid19.patient_age = 'Unknown' OR covid19.patient_age = 'unknown' OR covid19.patient_age = 'unreported' OR covid19.patient_age = 'Unreported')";
                 }
             }
@@ -3040,9 +3046,9 @@ class Covid19FormTable extends AbstractTableGateway
 
         if (isset($params['gender']) && $params['gender'] == 'F') {
             $countQuery = $countQuery->where("covid19.patient_gender IN ('f','female','F','FEMALE')");
-        } else if (isset($params['gender']) && $params['gender'] == 'M') {
+        } elseif (isset($params['gender']) && $params['gender'] == 'M') {
             $countQuery = $countQuery->where("covid19.patient_gender IN ('m','male','M','MALE')");
-        } else if (isset($params['gender']) && $params['gender'] == 'not_specified') {
+        } elseif (isset($params['gender']) && $params['gender'] == 'not_specified') {
             $countQuery = $countQuery->where("(covid19.patient_gender IS NULL OR covid19.patient_gender = '' OR covid19.patient_gender ='Not Recorded' OR covid19.patient_gender = 'not recorded' OR covid19.patient_gender = 'Unreported' OR covid19.patient_gender = 'unreported')");
         }
 
@@ -3065,7 +3071,7 @@ class Covid19FormTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = array();
-        
+
         $globalDb = $this->sm->get('GlobalTable');
         $samplesWaitingFromLastXMonths = $globalDb->getGlobalValue('sample_waiting_month_range');
         if (isset($params['daterange']) && trim($params['daterange']) != '') {
@@ -3086,11 +3092,9 @@ class Covid19FormTable extends AbstractTableGateway
 
         if (isset($params['lab']) && trim($params['lab']) != '') {
             $countQuery = $countQuery->where('f.facility_id IN (' . $params['lab'] . ')');
-        } else {
-            if ($loginContainer->role != 1) {
-                $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : array(0);
-                $countQuery = $countQuery->where('f.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
-            }
+        } elseif ($loginContainer->role != 1) {
+            $mappedFacilities = $loginContainer->mappedFacilities ?? [];
+            $countQuery = $countQuery->where('f.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
         }
         if (isset($params['provinces']) && trim($params['provinces']) != '') {
             $countQuery = $countQuery->where('f.facility_state IN (' . $params['provinces'] . ')');
@@ -3103,33 +3107,32 @@ class Covid19FormTable extends AbstractTableGateway
         }
         if (isset($params['daterange']) && trim($params['daterange']) != '' && trim($splitDate[0]) != '' && trim($splitDate[1]) != '') {
             $countQuery = $countQuery->where(array("covid19.sample_collection_date >='" . trim($splitDate[0]) . " 00:00:00" . "'", "covid19.sample_collection_date <='" . trim($splitDate[1]) . " 23:59:59" . "'"));
-        } else {
-            if (isset($params['frmSource']) && trim($params['frmSource']) == '<') {
-                $countQuery = $countQuery->where("(covid19.sample_collection_date < DATE_SUB(NOW(), INTERVAL $samplesWaitingFromLastXMonths MONTH))");
-            } else if (isset($params['frmSource']) && trim($params['frmSource']) == '>') {
-                $countQuery = $countQuery->where("(covid19.sample_collection_date > DATE_SUB(NOW(), INTERVAL $samplesWaitingFromLastXMonths MONTH))");
-            }
+        } elseif (isset($params['frmSource']) && trim($params['frmSource']) == '<') {
+            $countQuery = $countQuery->where("(covid19.sample_collection_date < DATE_SUB(NOW(), INTERVAL $samplesWaitingFromLastXMonths MONTH))");
+        } elseif (isset($params['frmSource']) && trim($params['frmSource']) == '>') {
+            $countQuery = $countQuery->where("(covid19.sample_collection_date > DATE_SUB(NOW(), INTERVAL $samplesWaitingFromLastXMonths MONTH))");
         }
 
         //print_r($params['age']);die;
         if (isset($params['age']) && trim($params['age']) != '') {
             $age = explode(',', $params['age']);
             $where = '';
-            for ($a = 0; $a < count($age); $a++) {
+            $counter = count($age);
+            for ($a = 0; $a < $counter; $a++) {
                 if (trim($where) != '') {
                     $where .= ' OR ';
                 }
                 if ($age[$a] == '<2') {
                     $where .= "(covid19.patient_age > 0 AND covid19.patient_age < 2)";
-                } else if ($age[$a] == '2to5') {
+                } elseif ($age[$a] == '2to5') {
                     $where .= "(covid19.patient_age >= 2 AND covid19.patient_age <= 5)";
-                } else if ($age[$a] == '6to14') {
+                } elseif ($age[$a] == '6to14') {
                     $where .= "(covid19.patient_age >= 6 AND covid19.patient_age <= 14)";
-                } else if ($age[$a] == '15to49') {
+                } elseif ($age[$a] == '15to49') {
                     $where .= "(covid19.patient_age >= 15 AND covid19.patient_age <= 49)";
-                } else if ($age[$a] == '>=50') {
+                } elseif ($age[$a] == '>=50') {
                     $where .= "(covid19.patient_age >= 50)";
-                } else if ($age[$a] == 'unknown') {
+                } elseif ($age[$a] == 'unknown') {
                     $where .= "(covid19.patient_age IS NULL OR covid19.patient_age = '' OR covid19.patient_age = 'Unknown' OR covid19.patient_age = 'unknown' OR covid19.patient_age = 'Unreported' OR covid19.patient_age = 'unreported')";
                 }
             }
@@ -3142,9 +3145,9 @@ class Covid19FormTable extends AbstractTableGateway
 
         if (isset($params['gender']) && $params['gender'] == 'F') {
             $countQuery = $countQuery->where("covid19.patient_gender IN ('f','female','F','FEMALE')");
-        } else if (isset($params['gender']) && $params['gender'] == 'M') {
+        } elseif (isset($params['gender']) && $params['gender'] == 'M') {
             $countQuery = $countQuery->where("covid19.patient_gender IN ('m','male','M','MALE')");
-        } else if (isset($params['gender']) && $params['gender'] == 'not_specified') {
+        } elseif (isset($params['gender']) && $params['gender'] == 'not_specified') {
             $countQuery = $countQuery->where("(covid19.patient_gender IS NULL OR covid19.patient_gender = '' OR covid19.patient_gender ='Not Recorded' OR covid19.patient_gender = 'not recorded' OR covid19.patient_gender = 'unreported' OR covid19.patient_gender = 'Unreported')");
         }
 
@@ -3168,7 +3171,7 @@ class Covid19FormTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = array();
-        
+
         $globalDb = $this->sm->get('GlobalTable');
         $samplesWaitingFromLastXMonths = $globalDb->getGlobalValue('sample_waiting_month_range');
         if (isset($params['daterange']) && trim($params['daterange']) != '') {
@@ -3189,11 +3192,9 @@ class Covid19FormTable extends AbstractTableGateway
 
         if (isset($params['lab']) && trim($params['lab']) != '') {
             $countQuery = $countQuery->where('f.facility_id IN (' . $params['lab'] . ')');
-        } else {
-            if ($loginContainer->role != 1) {
-                $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : array(0);
-                $countQuery = $countQuery->where('f.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
-            }
+        } elseif ($loginContainer->role != 1) {
+            $mappedFacilities = $loginContainer->mappedFacilities ?? [];
+            $countQuery = $countQuery->where('f.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
         }
         if (isset($params['provinces']) && trim($params['provinces']) != '') {
             $countQuery = $countQuery->where('f.facility_state IN (' . $params['provinces'] . ')');
@@ -3206,33 +3207,32 @@ class Covid19FormTable extends AbstractTableGateway
         }
         if (isset($params['daterange']) && trim($params['daterange']) != '' && trim($splitDate[0]) != '' && trim($splitDate[1]) != '') {
             $countQuery = $countQuery->where(array("covid19.sample_collection_date >='" . trim($splitDate[0]) . " 00:00:00" . "'", "covid19.sample_collection_date <='" . trim($splitDate[1]) . " 23:59:59" . "'"));
-        } else {
-            if (isset($params['frmSource']) && trim($params['frmSource']) == '<') {
-                $countQuery = $countQuery->where("(covid19.sample_collection_date < DATE_SUB(NOW(), INTERVAL $samplesWaitingFromLastXMonths MONTH))");
-            } else if (isset($params['frmSource']) && trim($params['frmSource']) == '>') {
-                $countQuery = $countQuery->where("(covid19.sample_collection_date > DATE_SUB(NOW(), INTERVAL $samplesWaitingFromLastXMonths MONTH))");
-            }
+        } elseif (isset($params['frmSource']) && trim($params['frmSource']) == '<') {
+            $countQuery = $countQuery->where("(covid19.sample_collection_date < DATE_SUB(NOW(), INTERVAL $samplesWaitingFromLastXMonths MONTH))");
+        } elseif (isset($params['frmSource']) && trim($params['frmSource']) == '>') {
+            $countQuery = $countQuery->where("(covid19.sample_collection_date > DATE_SUB(NOW(), INTERVAL $samplesWaitingFromLastXMonths MONTH))");
         }
 
         //print_r($params['age']);die;
         if (isset($params['age']) && trim($params['age']) != '') {
             $age = explode(',', $params['age']);
             $where = '';
-            for ($a = 0; $a < count($age); $a++) {
+            $counter = count($age);
+            for ($a = 0; $a < $counter; $a++) {
                 if (trim($where) != '') {
                     $where .= ' OR ';
                 }
                 if ($age[$a] == '<2') {
                     $where .= "(covid19.patient_age > 0 AND covid19.patient_age < 2)";
-                } else if ($age[$a] == '2to5') {
+                } elseif ($age[$a] == '2to5') {
                     $where .= "(covid19.patient_age >= 2 AND covid19.patient_age <= 5)";
-                } else if ($age[$a] == '6to14') {
+                } elseif ($age[$a] == '6to14') {
                     $where .= "(covid19.patient_age >= 6 AND covid19.patient_age <= 14)";
-                } else if ($age[$a] == '15to49') {
+                } elseif ($age[$a] == '15to49') {
                     $where .= "(covid19.patient_age >= 15 AND covid19.patient_age <= 49)";
-                } else if ($age[$a] == '>=50') {
+                } elseif ($age[$a] == '>=50') {
                     $where .= "(covid19.patient_age >= 50)";
-                } else if ($age[$a] == 'unknown') {
+                } elseif ($age[$a] == 'unknown') {
                     $where .= "(covid19.patient_age IS NULL OR covid19.patient_age = '' OR covid19.patient_age = 'Unknown' OR covid19.patient_age = 'unknown' OR covid19.patient_age = 'Unreported' OR covid19.patient_age = 'unreported')";
                 }
             }
@@ -3245,9 +3245,9 @@ class Covid19FormTable extends AbstractTableGateway
 
         if (isset($params['gender']) && $params['gender'] == 'F') {
             $countQuery = $countQuery->where("covid19.patient_gender IN ('f','female','F','FEMALE')");
-        } else if (isset($params['gender']) && $params['gender'] == 'M') {
+        } elseif (isset($params['gender']) && $params['gender'] == 'M') {
             $countQuery = $countQuery->where("covid19.patient_gender IN ('m','male','M','MALE')");
-        } else if (isset($params['gender']) && $params['gender'] == 'not_specified') {
+        } elseif (isset($params['gender']) && $params['gender'] == 'not_specified') {
             $countQuery = $countQuery->where("(covid19.patient_gender IS NULL OR covid19.patient_gender = '' OR covid19.patient_gender ='Not Recorded' OR covid19.patient_gender = 'not recorded' OR covid19.patient_gender = 'unreported' OR covid19.patient_gender = 'Unreported')");
         }
 
@@ -3270,8 +3270,8 @@ class Covid19FormTable extends AbstractTableGateway
     {
         $loginContainer = new Container('credo');
         $queryContainer = new Container('query');
-        
-        
+
+
         $globalDb = $this->sm->get('GlobalTable');
         $samplesWaitingFromLastXMonths = $globalDb->getGlobalValue('sample_waiting_month_range');
         /* Array of database columns which should be read and sent back to DataTables. Use a space where
@@ -3294,9 +3294,9 @@ class Covid19FormTable extends AbstractTableGateway
 
         $sOrder = "";
         if (isset($parameters['iSortCol_0'])) {
-            for ($i = 0; $i < intval($parameters['iSortingCols']); $i++) {
-                if ($parameters['bSortable_' . intval($parameters['iSortCol_' . $i])] == "true") {
-                    $sOrder .= $orderColumns[intval($parameters['iSortCol_' . $i])] . " " . ($parameters['sSortDir_' . $i]) . ",";
+            for ($i = 0; $i < (int) $parameters['iSortingCols']; $i++) {
+                if ($parameters['bSortable_' . (int) $parameters['iSortCol_' . $i]] == "true") {
+                    $sOrder .= $orderColumns[(int) $parameters['iSortCol_' . $i]] . " " . ($parameters['sSortDir_' . $i]) . ",";
                 }
             }
             $sOrder = substr_replace($sOrder, "", -1);
@@ -3332,9 +3332,11 @@ class Covid19FormTable extends AbstractTableGateway
             }
             $sWhere .= $sWhereSub;
         }
+        /* Individual column filtering */
+        $counter = count($aColumns);
 
         /* Individual column filtering */
-        for ($i = 0; $i < count($aColumns); $i++) {
+        for ($i = 0; $i < $counter; $i++) {
             if (isset($parameters['bSearchable_' . $i]) && $parameters['bSearchable_' . $i] == "true" && $parameters['sSearch_' . $i] != '') {
                 if ($sWhere == "") {
                     $sWhere .= $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
@@ -3360,12 +3362,10 @@ class Covid19FormTable extends AbstractTableGateway
             ->where("(covid19.is_sample_rejected is NULL OR covid19.is_sample_rejected = '' OR covid19.is_sample_rejected = 'no') AND (reason_for_sample_rejection is NULL or reason_for_sample_rejection ='' or covid19.reason_for_sample_rejection = 0)");
         if (isset($parameters['daterange']) && trim($parameters['daterange']) != '' && trim($splitDate[0]) != '' && trim($splitDate[1]) != '') {
             $sQuery = $sQuery->where(array("covid19.sample_collection_date >='" . $splitDate[0] . " 00:00:00" . "'", "covid19.sample_collection_date <='" . $splitDate[1] . " 23:59:59" . "'"));
-        } else {
-            if (isset($parameters['frmSource']) && trim($parameters['frmSource']) == '<') {
-                $sQuery = $sQuery->where("(covid19.sample_collection_date < DATE_SUB(NOW(), INTERVAL $samplesWaitingFromLastXMonths MONTH))");
-            } else if (isset($parameters['frmSource']) && trim($parameters['frmSource']) == '>') {
-                $sQuery = $sQuery->where("(covid19.sample_collection_date > DATE_SUB(NOW(), INTERVAL $samplesWaitingFromLastXMonths MONTH))");
-            }
+        } elseif (isset($parameters['frmSource']) && trim($parameters['frmSource']) == '<') {
+            $sQuery = $sQuery->where("(covid19.sample_collection_date < DATE_SUB(NOW(), INTERVAL $samplesWaitingFromLastXMonths MONTH))");
+        } elseif (isset($parameters['frmSource']) && trim($parameters['frmSource']) == '>') {
+            $sQuery = $sQuery->where("(covid19.sample_collection_date > DATE_SUB(NOW(), INTERVAL $samplesWaitingFromLastXMonths MONTH))");
         }
         if (isset($parameters['provinces']) && trim($parameters['provinces']) != '') {
             $sQuery = $sQuery->where('l.facility_state IN (' . $parameters['provinces'] . ')');
@@ -3375,11 +3375,9 @@ class Covid19FormTable extends AbstractTableGateway
         }
         if (isset($parameters['lab']) && trim($parameters['lab']) != '') {
             $sQuery = $sQuery->where('covid19.lab_id IN (' . $parameters['lab'] . ')');
-        } else {
-            if ($loginContainer->role != 1) {
-                $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : array(0);
-                $sQuery = $sQuery->where('covid19.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
-            }
+        } elseif ($loginContainer->role != 1) {
+            $mappedFacilities = $loginContainer->mappedFacilities ?? [];
+            $sQuery = $sQuery->where('covid19.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
         }
         if (isset($parameters['clinicId']) && trim($parameters['clinicId']) != '') {
             $sQuery = $sQuery->where('covid19.facility_id IN (' . $parameters['clinicId'] . ')');
@@ -3389,21 +3387,22 @@ class Covid19FormTable extends AbstractTableGateway
         if (isset($parameters['age']) && trim($parameters['age']) != '') {
             $where = '';
             $parameters['age'] = explode(',', $parameters['age']);
-            for ($a = 0; $a < count($parameters['age']); $a++) {
+            $counter = count($parameters['age']);
+            for ($a = 0; $a < $counter; $a++) {
                 if (trim($where) != '') {
                     $where .= ' OR ';
                 }
                 if ($parameters['age'][$a] == '<2') {
                     $where .= "(covid19.patient_age > 0 AND covid19.patient_age < 2)";
-                } else if ($parameters['age'][$a] == '2to5') {
+                } elseif ($parameters['age'][$a] == '2to5') {
                     $where .= "(covid19.patient_age >= 2 AND covid19.patient_age <= 5)";
-                } else if ($parameters['age'][$a] == '6to14') {
+                } elseif ($parameters['age'][$a] == '6to14') {
                     $where .= "(covid19.patient_age >= 6 AND covid19.patient_age <= 14)";
-                } else if ($parameters['age'][$a] == '15to49') {
+                } elseif ($parameters['age'][$a] == '15to49') {
                     $where .= "(covid19.patient_age >= 15 AND covid19.patient_age <= 49)";
-                } else if ($parameters['age'][$a] == '>=50') {
+                } elseif ($parameters['age'][$a] == '>=50') {
                     $where .= "(covid19.patient_age >= 50)";
-                } else if ($parameters['age'][$a] == 'unknown') {
+                } elseif ($parameters['age'][$a] == 'unknown') {
                     $where .= "(covid19.patient_age IS NULL OR covid19.patient_age = '' OR covid19.patient_age = 'Unknown' OR covid19.patient_age = 'unknown' OR covid19.patient_age = 'Unreported' OR covid19.patient_age = 'unreported')";
                 }
             }
@@ -3414,9 +3413,9 @@ class Covid19FormTable extends AbstractTableGateway
 
         if (isset($parameters['gender']) && $parameters['gender'] == 'F') {
             $sQuery = $sQuery->where("covid19.patient_gender IN ('f','female','F','FEMALE')");
-        } else if (isset($parameters['gender']) && $parameters['gender'] == 'M') {
+        } elseif (isset($parameters['gender']) && $parameters['gender'] == 'M') {
             $sQuery = $sQuery->where("covid19.patient_gender IN ('m','male','M','MALE')");
-        } else if (isset($parameters['gender']) && $parameters['gender'] == 'not_specified') {
+        } elseif (isset($parameters['gender']) && $parameters['gender'] == 'not_specified') {
             $sQuery = $sQuery->where("(covid19.patient_gender IS NULL OR covid19.patient_gender = '' OR covid19.patient_gender ='Not Recorded' OR covid19.patient_gender = 'not recorded' OR covid19.patient_gender = 'unreported' OR covid19.patient_gender = 'Unreported')");
         }
 
@@ -3453,7 +3452,7 @@ class Covid19FormTable extends AbstractTableGateway
             ->join(array('l' => 'facility_details'), 'l.facility_id=covid19.lab_id', array('labName' => 'facility_name'), 'left')
             ->where("(covid19.is_sample_rejected is NULL OR covid19.is_sample_rejected = '' OR covid19.is_sample_rejected = 'no') AND (reason_for_sample_rejection is NULL or reason_for_sample_rejection ='' or covid19.reason_for_sample_rejection = 0)");
         if ($loginContainer->role != 1) {
-            $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : array(0);
+            $mappedFacilities = $loginContainer->mappedFacilities ?? [];
             $iQuery = $iQuery->where('covid19.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
         }
         $iQueryStr = $sql->buildSqlString($iQuery);
@@ -3461,7 +3460,7 @@ class Covid19FormTable extends AbstractTableGateway
         $iResult = $dbAdapter->query($iQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $iTotal = count($iResult);
         $output = array(
-            "sEcho" => intval($parameters['sEcho']),
+            "sEcho" => (int) $parameters['sEcho'],
             "iTotalRecords" => $iTotal,
             "iTotalDisplayRecords" => $iFilteredTotal,
             "aaData" => array()
@@ -3501,7 +3500,7 @@ class Covid19FormTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = array();
-        
+
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
@@ -3509,11 +3508,9 @@ class Covid19FormTable extends AbstractTableGateway
                 ->where(array('f.facility_type' => 2));
             if (isset($params['lab']) && trim($params['lab']) != '') {
                 $facilityQuery = $facilityQuery->where('f.facility_id IN (' . $params['lab'] . ')');
-            } else {
-                if ($loginContainer->role != 1) {
-                    $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : array(0);
-                    $facilityQuery = $facilityQuery->where('f.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
-                }
+            } elseif ($loginContainer->role != 1) {
+                $mappedFacilities = $loginContainer->mappedFacilities ?? [];
+                $facilityQuery = $facilityQuery->where('f.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
             }
             $facilityQueryStr = $sql->buildSqlString($facilityQuery);
             $facilityResult = $dbAdapter->query($facilityQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -3547,21 +3544,22 @@ class Covid19FormTable extends AbstractTableGateway
                 if (isset($params['age']) && trim($params['age']) != '') {
                     $age = explode(',', $params['age']);
                     $where = '';
-                    for ($a = 0; $a < count($age); $a++) {
+                    $counter = count($age);
+                    for ($a = 0; $a < $counter; $a++) {
                         if (trim($where) != '') {
                             $where .= ' OR ';
                         }
                         if ($age[$a] == '<2') {
                             $where .= "(covid19.patient_age > 0 AND covid19.patient_age < 2)";
-                        } else if ($age[$a] == '2to5') {
+                        } elseif ($age[$a] == '2to5') {
                             $where .= "(covid19.patient_age >= 2 AND covid19.patient_age <= 5)";
-                        } else if ($age[$a] == '6to14') {
+                        } elseif ($age[$a] == '6to14') {
                             $where .= "(covid19.patient_age >= 6 AND covid19.patient_age <= 14)";
-                        } else if ($age[$a] == '15to49') {
+                        } elseif ($age[$a] == '15to49') {
                             $where .= "(covid19.patient_age >= 15 AND covid19.patient_age <= 49)";
-                        } else if ($age[$a] == '>=50') {
+                        } elseif ($age[$a] == '>=50') {
                             $where .= "(covid19.patient_age >= 50)";
-                        } else if ($age[$a] == 'unknown') {
+                        } elseif ($age[$a] == 'unknown') {
                             $where .= "(covid19.patient_age IS NULL OR covid19.patient_age = '' OR covid19.patient_age = 'Unknown' OR covid19.patient_age = 'unknown')";
                         }
                     }
@@ -3571,9 +3569,9 @@ class Covid19FormTable extends AbstractTableGateway
 
                 if (isset($params['gender']) && $params['gender'] == 'F') {
                     $countQuery = $countQuery->where("covid19.patient_gender IN ('f','female','F','FEMALE')");
-                } else if (isset($params['gender']) && $params['gender'] == 'M') {
+                } elseif (isset($params['gender']) && $params['gender'] == 'M') {
                     $countQuery = $countQuery->where("covid19.patient_gender IN ('m','male','M','MALE')");
-                } else if (isset($params['gender']) && $params['gender'] == 'not_specified') {
+                } elseif (isset($params['gender']) && $params['gender'] == 'not_specified') {
                     $countQuery = $countQuery->where("(covid19.patient_gender IS NULL OR covid19.patient_gender = '' OR covid19.patient_gender ='Not Recorded' OR covid19.patient_gender = 'not recorded')");
                 }
 
@@ -3600,7 +3598,7 @@ class Covid19FormTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = array();
-        
+
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
@@ -3608,11 +3606,9 @@ class Covid19FormTable extends AbstractTableGateway
                 ->where(array('f.facility_type' => 2));
             if (isset($params['lab']) && trim($params['lab']) != '') {
                 $fQuery = $fQuery->where('f.facility_id IN (' . $params['lab'] . ')');
-            } else {
-                if ($loginContainer->role != 1) {
-                    $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : array(0);
-                    $fQuery = $fQuery->where('f.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
-                }
+            } elseif ($loginContainer->role != 1) {
+                $mappedFacilities = $loginContainer->mappedFacilities ?? [];
+                $fQuery = $fQuery->where('f.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
             }
             $fQueryStr = $sql->buildSqlString($fQuery);
             $facilityResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -3651,21 +3647,22 @@ class Covid19FormTable extends AbstractTableGateway
                 if (isset($params['age']) && trim($params['age']) != '') {
                     $age = explode(',', $params['age']);
                     $where = '';
-                    for ($a = 0; $a < count($age); $a++) {
+                    $counter = count($age);
+                    for ($a = 0; $a < $counter; $a++) {
                         if (trim($where) != '') {
                             $where .= ' OR ';
                         }
                         if ($age[$a] == '<2') {
                             $where .= "(covid19.patient_age > 0 AND covid19.patient_age < 2)";
-                        } else if ($age[$a] == '2to5') {
+                        } elseif ($age[$a] == '2to5') {
                             $where .= "(covid19.patient_age >= 2 AND covid19.patient_age <= 5)";
-                        } else if ($age[$a] == '6to14') {
+                        } elseif ($age[$a] == '6to14') {
                             $where .= "(covid19.patient_age >= 6 AND covid19.patient_age <= 14)";
-                        } else if ($age[$a] == '15to49') {
+                        } elseif ($age[$a] == '15to49') {
                             $where .= "(covid19.patient_age >= 15 AND covid19.patient_age <= 49)";
-                        } else if ($age[$a] == '>=50') {
+                        } elseif ($age[$a] == '>=50') {
                             $where .= "(covid19.patient_age >= 50)";
-                        } else if ($age[$a] == 'unknown') {
+                        } elseif ($age[$a] == 'unknown') {
                             $where .= "(covid19.patient_age IS NULL OR covid19.patient_age = '' OR covid19.patient_age = 'Unknown' OR covid19.patient_age = 'unknown')";
                         }
                     }
@@ -3675,9 +3672,9 @@ class Covid19FormTable extends AbstractTableGateway
 
                 if (isset($params['gender']) && $params['gender'] == 'F') {
                     $countQuery = $countQuery->where("covid19.patient_gender IN ('f','female','F','FEMALE')");
-                } else if (isset($params['gender']) && $params['gender'] == 'M') {
+                } elseif (isset($params['gender']) && $params['gender'] == 'M') {
                     $countQuery = $countQuery->where("covid19.patient_gender IN ('m','male','M','MALE')");
-                } else if (isset($params['gender']) && $params['gender'] == 'not_specified') {
+                } elseif (isset($params['gender']) && $params['gender'] == 'not_specified') {
                     $countQuery = $countQuery->where("(covid19.patient_gender IS NULL OR covid19.patient_gender = '' OR covid19.patient_gender ='Not Recorded' OR covid19.patient_gender = 'not recorded')");
                 }
 
@@ -3704,7 +3701,7 @@ class Covid19FormTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = array();
-        
+
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
@@ -3725,17 +3722,15 @@ class Covid19FormTable extends AbstractTableGateway
             $sQuery = $sQuery->where(
                 "
                                         (sample_collection_date is not null AND sample_collection_date not like '')
-                                        AND DATE(sample_collection_date) >= '" . $startMonth . "' 
+                                        AND DATE(sample_collection_date) >= '" . $startMonth . "'
                                         AND DATE(sample_collection_date) <= '" . $endMonth . "'"
             );
 
             if (isset($params['lab']) && trim($params['lab']) != '') {
                 $sQuery = $sQuery->where('covid19.lab_id IN (' . $params['lab'] . ')');
-            } else {
-                if ($loginContainer->role != 1) {
-                    $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : array(0);
-                    $sQuery = $sQuery->where('covid19.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
-                }
+            } elseif ($loginContainer->role != 1) {
+                $mappedFacilities = $loginContainer->mappedFacilities ?? [];
+                $sQuery = $sQuery->where('covid19.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
             }
             if (isset($params['provinces']) && trim($params['provinces']) != '') {
                 $sQuery = $sQuery->where('f.facility_state IN (' . $params['provinces'] . ')');
@@ -3752,21 +3747,22 @@ class Covid19FormTable extends AbstractTableGateway
             if (isset($params['age']) && trim($params['age']) != '') {
                 $age = explode(',', $params['age']);
                 $where = '';
-                for ($a = 0; $a < count($age); $a++) {
+                $counter = count($age);
+                for ($a = 0; $a < $counter; $a++) {
                     if (trim($where) != '') {
                         $where .= ' OR ';
                     }
                     if ($age[$a] == '<2') {
                         $where .= "(covid19.patient_age > 0 AND covid19.patient_age < 2)";
-                    } else if ($age[$a] == '2to5') {
+                    } elseif ($age[$a] == '2to5') {
                         $where .= "(covid19.patient_age >= 2 AND covid19.patient_age <= 5)";
-                    } else if ($age[$a] == '6to14') {
+                    } elseif ($age[$a] == '6to14') {
                         $where .= "(covid19.patient_age >= 6 AND covid19.patient_age <= 14)";
-                    } else if ($age[$a] == '15to49') {
+                    } elseif ($age[$a] == '15to49') {
                         $where .= "(covid19.patient_age >= 15 AND covid19.patient_age <= 49)";
-                    } else if ($age[$a] == '>=50') {
+                    } elseif ($age[$a] == '>=50') {
                         $where .= "(covid19.patient_age >= 50)";
-                    } else if ($age[$a] == 'unknown') {
+                    } elseif ($age[$a] == 'unknown') {
                         $where .= "(covid19.patient_age IS NULL OR covid19.patient_age = '' OR covid19.patient_age = 'Unknown' OR covid19.patient_age = 'unknown')";
                     }
                 }
@@ -3775,7 +3771,7 @@ class Covid19FormTable extends AbstractTableGateway
             }
             if (isset($params['testResult']) && $params['testResult'] == '<1000') {
                 $sQuery = $sQuery->where("(covid19.result < 1000 or covid19.result = 'Target Not Detected' or covid19.result = 'TND' or covid19.result = 'tnd' or covid19.result= 'Below Detection Level' or covid19.result='BDL' or covid19.result='bdl' or covid19.result= 'Low Detection Level' or covid19.result='LDL' or covid19.result='ldl') AND covid19.result IS NOT NULL AND covid19.result!= '' AND covid19.result!='Failed' AND covid19.result!='failed' AND covid19.result!='Fail' AND covid19.result!='fail' AND covid19.result!='No Sample' AND covid19.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime not like '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00'");
-            } else if (isset($params['testResult']) && $params['testResult'] == '>=1000') {
+            } elseif (isset($params['testResult']) && $params['testResult'] == '>=1000') {
                 $sQuery = $sQuery->where("covid19.result IS NOT NULL AND covid19.result!= '' AND covid19.result >= 1000 AND covid19.result!='Failed' AND covid19.result!='failed' AND covid19.result!='Fail' AND covid19.result!='fail' AND covid19.result!='No Sample' AND covid19.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime not like '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00'");
             }
             if (isset($params['sampleType']) && trim($params['sampleType']) != '') {
@@ -3783,9 +3779,9 @@ class Covid19FormTable extends AbstractTableGateway
             }
             if (isset($params['gender']) && $params['gender'] == 'F') {
                 $sQuery = $sQuery->where("covid19.patient_gender IN ('f','female','F','FEMALE')");
-            } else if (isset($params['gender']) && $params['gender'] == 'M') {
+            } elseif (isset($params['gender']) && $params['gender'] == 'M') {
                 $sQuery = $sQuery->where("covid19.patient_gender IN ('m','male','M','MALE')");
-            } else if (isset($params['gender']) && $params['gender'] == 'not_specified') {
+            } elseif (isset($params['gender']) && $params['gender'] == 'not_specified') {
                 $sQuery = $sQuery->where("(covid19.patient_gender IS NULL OR covid19.patient_gender = '' OR covid19.patient_gender ='Not Recorded' OR covid19.patient_gender = 'not recorded')");
             }
 
@@ -3811,7 +3807,7 @@ class Covid19FormTable extends AbstractTableGateway
     {
         $loginContainer = new Container('credo');
         $queryContainer = new Container('query');
-        
+
         /* Array of database columns which should be read and sent back to DataTables. Use a space where
          * you want to insert a non-database field (for example a counter or static image)
         */
@@ -3833,9 +3829,9 @@ class Covid19FormTable extends AbstractTableGateway
 
         $sOrder = "";
         if (isset($parameters['iSortCol_0'])) {
-            for ($i = 0; $i < intval($parameters['iSortingCols']); $i++) {
-                if ($parameters['bSortable_' . intval($parameters['iSortCol_' . $i])] == "true") {
-                    $sOrder .= $orderColumns[intval($parameters['iSortCol_' . $i])] . " " . ($parameters['sSortDir_' . $i]) . ",";
+            for ($i = 0; $i < (int) $parameters['iSortingCols']; $i++) {
+                if ($parameters['bSortable_' . (int) $parameters['iSortCol_' . $i]] == "true") {
+                    $sOrder .= $orderColumns[(int) $parameters['iSortCol_' . $i]] . " " . ($parameters['sSortDir_' . $i]) . ",";
                 }
             }
             $sOrder = substr_replace($sOrder, "", -1);
@@ -3871,9 +3867,11 @@ class Covid19FormTable extends AbstractTableGateway
             }
             $sWhere .= $sWhereSub;
         }
+        /* Individual column filtering */
+        $counter = count($aColumns);
 
         /* Individual column filtering */
-        for ($i = 0; $i < count($aColumns); $i++) {
+        for ($i = 0; $i < $counter; $i++) {
             if (isset($parameters['bSearchable_' . $i]) && $parameters['bSearchable_' . $i] == "true" && $parameters['sSearch_' . $i] != '') {
                 if ($sWhere == "") {
                     $sWhere .= $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
@@ -3913,11 +3911,9 @@ class Covid19FormTable extends AbstractTableGateway
         }
         if (isset($parameters['lab']) && trim($parameters['lab']) != '') {
             $sQuery = $sQuery->where('covid19.lab_id IN (' . $parameters['lab'] . ')');
-        } else {
-            if ($loginContainer->role != 1) {
-                $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : array(0);
-                $sQuery = $sQuery->where('covid19.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
-            }
+        } elseif ($loginContainer->role != 1) {
+            $mappedFacilities = $loginContainer->mappedFacilities ?? [];
+            $sQuery = $sQuery->where('covid19.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
         }
         if (isset($parameters['provinces']) && trim($parameters['provinces']) != '') {
             $sQuery = $sQuery->where('l.facility_state IN (' . $parameters['provinces'] . ')');
@@ -3933,21 +3929,22 @@ class Covid19FormTable extends AbstractTableGateway
         if (isset($parameters['age']) && trim($parameters['age']) != '') {
             $age = explode(',', $parameters['age']);
             $where = '';
-            for ($a = 0; $a < count($age); $a++) {
+            $counter = count($age);
+            for ($a = 0; $a < $counter; $a++) {
                 if (trim($where) != '') {
                     $where .= ' OR ';
                 }
                 if ($age[$a] == '<2') {
                     $where .= "(covid19.patient_age > 0 AND covid19.patient_age < 2)";
-                } else if ($age[$a] == '2to5') {
+                } elseif ($age[$a] == '2to5') {
                     $where .= "(covid19.patient_age >= 2 AND covid19.patient_age <= 5)";
-                } else if ($age[$a] == '6to14') {
+                } elseif ($age[$a] == '6to14') {
                     $where .= "(covid19.patient_age >= 6 AND covid19.patient_age <= 14)";
-                } else if ($age[$a] == '15to49') {
+                } elseif ($age[$a] == '15to49') {
                     $where .= "(covid19.patient_age >= 15 AND covid19.patient_age <= 49)";
-                } else if ($age[$a] == '>=50') {
+                } elseif ($age[$a] == '>=50') {
                     $where .= "(covid19.patient_age >= 50)";
-                } else if ($age[$a] == 'unknown') {
+                } elseif ($age[$a] == 'unknown') {
                     $where .= "(covid19.patient_age IS NULL OR covid19.patient_age = '' OR covid19.patient_age = 'Unknown' OR covid19.patient_age = 'unknown')";
                 }
             }
@@ -3958,9 +3955,9 @@ class Covid19FormTable extends AbstractTableGateway
 
         if (isset($parameters['gender']) && $parameters['gender'] == 'F') {
             $sQuery = $sQuery->where("covid19.patient_gender IN ('f','female','F','FEMALE')");
-        } else if (isset($parameters['gender']) && $parameters['gender'] == 'M') {
+        } elseif (isset($parameters['gender']) && $parameters['gender'] == 'M') {
             $sQuery = $sQuery->where("covid19.patient_gender IN ('m','male','M','MALE')");
-        } else if (isset($parameters['gender']) && $parameters['gender'] == 'not_specified') {
+        } elseif (isset($parameters['gender']) && $parameters['gender'] == 'not_specified') {
             $sQuery = $sQuery->where("(covid19.patient_gender IS NULL OR covid19.patient_gender = '' OR covid19.patient_gender ='Not Recorded' OR covid19.patient_gender = 'not recorded')");
         }
 
@@ -4003,7 +4000,7 @@ class Covid19FormTable extends AbstractTableGateway
             ->group('covid19.specimen_type')
             ->group('covid19.facility_id');
         if ($loginContainer->role != 1) {
-            $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : array(0);
+            $mappedFacilities = $loginContainer->mappedFacilities ?? [];
             $iQuery = $iQuery->where('covid19.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
         }
         $iQueryStr = $sql->buildSqlString($iQuery);
@@ -4011,7 +4008,7 @@ class Covid19FormTable extends AbstractTableGateway
         $iTotal = count($iResult);
 
         $output = array(
-            "sEcho" => intval($parameters['sEcho']),
+            "sEcho" => (int) $parameters['sEcho'],
             "iTotalRecords" => $iTotal,
             "iTotalDisplayRecords" => $iFilteredTotal,
             "aaData" => array()
@@ -4039,7 +4036,7 @@ class Covid19FormTable extends AbstractTableGateway
     {
         $loginContainer = new Container('credo');
         $queryContainer = new Container('query');
-        
+
         /* Array of database columns which should be read and sent back to DataTables. Use a space where
          * you want to insert a non-database field (for example a counter or static image)
         */
@@ -4059,9 +4056,9 @@ class Covid19FormTable extends AbstractTableGateway
 
         $sOrder = "";
         if (isset($parameters['iSortCol_0'])) {
-            for ($i = 0; $i < intval($parameters['iSortingCols']); $i++) {
-                if ($parameters['bSortable_' . intval($parameters['iSortCol_' . $i])] == "true") {
-                    $sOrder .= $aColumns[intval($parameters['iSortCol_' . $i])] . " " . ($parameters['sSortDir_' . $i]) . ",";
+            for ($i = 0; $i < (int) $parameters['iSortingCols']; $i++) {
+                if ($parameters['bSortable_' . (int) $parameters['iSortCol_' . $i]] == "true") {
+                    $sOrder .= $aColumns[(int) $parameters['iSortCol_' . $i]] . " " . ($parameters['sSortDir_' . $i]) . ",";
                 }
             }
             $sOrder = substr_replace($sOrder, "", -1);
@@ -4097,9 +4094,11 @@ class Covid19FormTable extends AbstractTableGateway
             }
             $sWhere .= $sWhereSub;
         }
+        /* Individual column filtering */
+        $counter = count($aColumns);
 
         /* Individual column filtering */
-        for ($i = 0; $i < count($aColumns); $i++) {
+        for ($i = 0; $i < $counter; $i++) {
             if (isset($parameters['bSearchable_' . $i]) && $parameters['bSearchable_' . $i] == "true" && $parameters['sSearch_' . $i] != '') {
                 if ($sWhere == "") {
                     $sWhere .= $aColumns[$i] . " LIKE '%" . ($parameters['sSearch_' . $i]) . "%' ";
@@ -4136,11 +4135,9 @@ class Covid19FormTable extends AbstractTableGateway
         }
         if (isset($parameters['lab']) && trim($parameters['lab']) != '') {
             $sQuery = $sQuery->where('covid19.lab_id IN (' . $parameters['lab'] . ')');
-        } else {
-            if ($loginContainer->role != 1) {
-                $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : array(0);
-                $sQuery = $sQuery->where('covid19.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
-            }
+        } elseif ($loginContainer->role != 1) {
+            $mappedFacilities = $loginContainer->mappedFacilities ?? [];
+            $sQuery = $sQuery->where('covid19.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
         }
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
             $sQuery = $sQuery->where(array("covid19.sample_collection_date >='" . $startMonth . " 00:00:00" . "'", "covid19.sample_collection_date <='" . $endMonth . " 23:59:59" . "'"));
@@ -4153,21 +4150,22 @@ class Covid19FormTable extends AbstractTableGateway
         if (isset($parameters['age']) && trim($parameters['age']) != '') {
             $where = '';
             $parameters['age'] = explode(',', $parameters['age']);
-            for ($a = 0; $a < count($parameters['age']); $a++) {
+            $counter = count($parameters['age']);
+            for ($a = 0; $a < $counter; $a++) {
                 if (trim($where) != '') {
                     $where .= ' OR ';
                 }
                 if ($parameters['age'][$a] == '<2') {
                     $where .= "(covid19.patient_age > 0 AND covid19.patient_age < 2)";
-                } else if ($parameters['age'][$a] == '2to5') {
+                } elseif ($parameters['age'][$a] == '2to5') {
                     $where .= "(covid19.patient_age >= 2 AND covid19.patient_age <= 5)";
-                } else if ($parameters['age'][$a] == '6to14') {
+                } elseif ($parameters['age'][$a] == '6to14') {
                     $where .= "(covid19.patient_age >= 6 AND covid19.patient_age <= 14)";
-                } else if ($parameters['age'][$a] == '15to49') {
+                } elseif ($parameters['age'][$a] == '15to49') {
                     $where .= "(covid19.patient_age >= 15 AND covid19.patient_age <= 49)";
-                } else if ($parameters['age'][$a] == '>=50') {
+                } elseif ($parameters['age'][$a] == '>=50') {
                     $where .= "(covid19.patient_age >= 50)";
-                } else if ($parameters['age'][$a] == 'unknown') {
+                } elseif ($parameters['age'][$a] == 'unknown') {
                     $where .= "(covid19.patient_age IS NULL OR covid19.patient_age = '' OR covid19.patient_age = 'Unknown' OR covid19.patient_age = 'unknown')";
                 }
             }
@@ -4178,16 +4176,16 @@ class Covid19FormTable extends AbstractTableGateway
 
         if (isset($parameters['sampleStatus']) && $parameters['sampleStatus'] == 'sample_tested') {
             $sQuery = $sQuery->where("((covid19.result IS NOT NULL AND covid19.result != '' AND covid19.result != 'NULL' AND sample_tested_datetime is not null AND sample_tested_datetime not like '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') OR (covid19.reason_for_sample_rejection IS NOT NULL AND covid19.reason_for_sample_rejection != '' AND covid19.reason_for_sample_rejection != 0))");
-        } else if (isset($parameters['sampleStatus']) && $parameters['sampleStatus'] == 'samples_not_tested') {
+        } elseif (isset($parameters['sampleStatus']) && $parameters['sampleStatus'] == 'samples_not_tested') {
             $sQuery = $sQuery->where("(covid19.result IS NULL OR covid19.result = '' OR covid19.result = 'NULL' OR sample_tested_datetime is null OR sample_tested_datetime like '' OR DATE(sample_tested_datetime) ='1970-01-01' OR DATE(sample_tested_datetime) ='0000-00-00') AND (covid19.reason_for_sample_rejection IS NULL OR covid19.reason_for_sample_rejection = '' OR covid19.reason_for_sample_rejection = 0)");
-        } else if (isset($parameters['sampleStatus']) && $parameters['sampleStatus'] == 'sample_rejected') {
+        } elseif (isset($parameters['sampleStatus']) && $parameters['sampleStatus'] == 'sample_rejected') {
             $sQuery = $sQuery->where("covid19.reason_for_sample_rejection IS NOT NULL AND covid19.reason_for_sample_rejection != '' AND covid19.reason_for_sample_rejection != 0");
         }
         if (isset($parameters['gender']) && $parameters['gender'] == 'F') {
             $sQuery = $sQuery->where("covid19.patient_gender IN ('f','female','F','FEMALE')");
-        } else if (isset($parameters['gender']) && $parameters['gender'] == 'M') {
+        } elseif (isset($parameters['gender']) && $parameters['gender'] == 'M') {
             $sQuery = $sQuery->where("covid19.patient_gender IN ('m','male','M','MALE')");
-        } else if (isset($parameters['gender']) && $parameters['gender'] == 'not_specified') {
+        } elseif (isset($parameters['gender']) && $parameters['gender'] == 'not_specified') {
             $sQuery = $sQuery->where("(covid19.patient_gender IS NULL OR covid19.patient_gender = '' OR covid19.patient_gender ='Not Recorded' OR covid19.patient_gender = 'not recorded')");
         }
 
@@ -4223,7 +4221,7 @@ class Covid19FormTable extends AbstractTableGateway
             ->where("sample_collection_date is not null AND sample_collection_date not like '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00' AND covid19.lab_id !=0")
             ->group('covid19.lab_id');
         if ($loginContainer->role != 1) {
-            $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : array(0);
+            $mappedFacilities = $loginContainer->mappedFacilities ?? [];
             $iQuery = $iQuery->where('covid19.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
         }
         $iQueryStr = $sql->buildSqlString($iQuery);
@@ -4231,7 +4229,7 @@ class Covid19FormTable extends AbstractTableGateway
         $iTotal = count($iResult);
 
         $output = array(
-            "sEcho" => intval($parameters['sEcho']),
+            "sEcho" => (int) $parameters['sEcho'],
             "iTotalRecords" => $iTotal,
             "iTotalDisplayRecords" => $iFilteredTotal,
             "aaData" => array()
@@ -4256,7 +4254,7 @@ class Covid19FormTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $vlOutComeResult = array();
-        
+
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
@@ -4276,11 +4274,9 @@ class Covid19FormTable extends AbstractTableGateway
             }
             if (isset($params['lab']) && trim($params['lab']) != '') {
                 $sQuery = $sQuery->where('covid19.lab_id IN (' . $params['lab'] . ')');
-            } else {
-                if ($loginContainer->role != 1) {
-                    $mappedFacilities = (isset($loginContainer->mappedFacilities) && !empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : array(0);
-                    $sQuery = $sQuery->where('covid19.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
-                }
+            } elseif ($loginContainer->role != 1) {
+                $mappedFacilities = $loginContainer->mappedFacilities ?? [];
+                $sQuery = $sQuery->where('covid19.lab_id IN ("' . implode('", "', $mappedFacilities) . '")');
             }
             if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
                 $sQuery = $sQuery->where(array("covid19.sample_collection_date >='" . $startMonth . " 00:00:00" . "'", "covid19.sample_collection_date <='" . $endMonth . " 23:59:59" . "'"));
@@ -4296,21 +4292,22 @@ class Covid19FormTable extends AbstractTableGateway
             if (isset($params['age']) && trim($params['age']) != '') {
                 $where = '';
                 $params['age'] = explode(',', $params['age']);
-                for ($a = 0; $a < count($params['age']); $a++) {
+                $counter = count($params['age']);
+                for ($a = 0; $a < $counter; $a++) {
                     if (trim($where) != '') {
                         $where .= ' OR ';
                     }
                     if ($params['age'][$a] == '<2') {
                         $where .= "(covid19.patient_age > 0 AND covid19.patient_age < 2)";
-                    } else if ($params['age'][$a] == '2to5') {
+                    } elseif ($params['age'][$a] == '2to5') {
                         $where .= "(covid19.patient_age >= 2 AND covid19.patient_age <= 5)";
-                    } else if ($params['age'][$a] == '6to14') {
+                    } elseif ($params['age'][$a] == '6to14') {
                         $where .= "(covid19.patient_age >= 6 AND covid19.patient_age <= 14)";
-                    } else if ($params['age'][$a] == '15to49') {
+                    } elseif ($params['age'][$a] == '15to49') {
                         $where .= "(covid19.patient_age >= 15 AND covid19.patient_age <= 49)";
-                    } else if ($params['age'][$a] == '>=50') {
+                    } elseif ($params['age'][$a] == '>=50') {
                         $where .= "(covid19.patient_age >= 50)";
-                    } else if ($params['age'][$a] == 'unknown') {
+                    } elseif ($params['age'][$a] == 'unknown') {
                         $where .= "(covid19.patient_age IS NULL OR covid19.patient_age = '' OR covid19.patient_age = 'Unknown' OR covid19.patient_age = 'unknown')";
                     }
                 }
@@ -4320,9 +4317,9 @@ class Covid19FormTable extends AbstractTableGateway
 
             if (isset($params['gender']) && $params['gender'] == 'F') {
                 $sQuery = $sQuery->where("covid19.patient_gender IN ('f','female','F','FEMALE')");
-            } else if (isset($params['gender']) && $params['gender'] == 'M') {
+            } elseif (isset($params['gender']) && $params['gender'] == 'M') {
                 $sQuery = $sQuery->where("covid19.patient_gender IN ('m','male','M','MALE')");
-            } else if (isset($params['gender']) && $params['gender'] == 'not_specified') {
+            } elseif (isset($params['gender']) && $params['gender'] == 'not_specified') {
                 $sQuery = $sQuery->where("(covid19.patient_gender IS NULL OR covid19.patient_gender = '' OR covid19.patient_gender ='Not Recorded' OR covid19.patient_gender = 'not recorded')");
             }
 
@@ -4338,7 +4335,7 @@ class Covid19FormTable extends AbstractTableGateway
     {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        
+
         $eidOutcomesQuery = $sql->select()
             ->from(array('covid19' => 'dash_form_covid19'))
             ->columns(
@@ -4384,7 +4381,7 @@ class Covid19FormTable extends AbstractTableGateway
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
             $eidOutcomesQuery = $eidOutcomesQuery
                 ->where("(sample_collection_date is not null)
-                                        AND DATE(sample_collection_date) >= '" . $startMonth . "' 
+                                        AND DATE(sample_collection_date) >= '" . $startMonth . "'
                                         AND DATE(sample_collection_date) <= '" . $endMonth . "'");
         }
 
@@ -4396,7 +4393,7 @@ class Covid19FormTable extends AbstractTableGateway
             $fQueryStr = $sql->buildSqlString($fQuery);
             $facilityResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             $facilityIdList = array_column($facilityResult, 'facility_id');
-        } else if (!empty($this->mappedFacilities)) {
+        } elseif (!empty($this->mappedFacilities)) {
             $fQuery = $sql->select()->from(array('f' => 'facility_details'))->columns(array('facility_id'))
                 ->where('f.facility_id IN ("' . implode('", "', $this->mappedFacilities) . '")');
             $fQueryStr = $sql->buildSqlString($fQuery);
@@ -4417,7 +4414,7 @@ class Covid19FormTable extends AbstractTableGateway
     {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        
+
         $startMonth = "";
         $endMonth = "";
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
@@ -4434,7 +4431,7 @@ class Covid19FormTable extends AbstractTableGateway
             ))
                 ->join(array('f' => 'facility_details'), 'f.facility_id=covid19.lab_id', array('facility_name'))
                 ->where("(sample_collection_date is not null)
-                                    AND DATE(sample_collection_date) >= '" . $startMonth . "' 
+                                    AND DATE(sample_collection_date) >= '" . $startMonth . "'
                                     AND DATE(sample_collection_date) <= '" . $endMonth . "'")
                 ->group(array("lab_id", new Expression("DATE_FORMAT(sample_collection_date, '%m-%Y')")))
                 ->order(array("lab_id", new Expression("DATE_FORMAT(sample_collection_date, '%m-%Y')")));
@@ -4457,7 +4454,7 @@ class Covid19FormTable extends AbstractTableGateway
                 $mQueryStr = $sql->buildSqlString($mQuery);
                 $facilityResult = $dbAdapter->query($mQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
                 $facilityIdList = array_column($facilityResult, 'facility_id');
-            } else if (!empty($this->mappedFacilities)) {
+            } elseif (!empty($this->mappedFacilities)) {
                 $fQuery = $sql->select()->from(array('f' => 'facility_details'))->columns(array('facility_id'))
                     ->where('f.facility_id IN ("' . implode('", "', $this->mappedFacilities) . '")');
                 $fQueryStr = $sql->buildSqlString($fQuery);
@@ -4479,8 +4476,6 @@ class Covid19FormTable extends AbstractTableGateway
     }
     public function insertOrUpdate($arrayData)
     {
-        $query = 'INSERT INTO `' . $this->table . '` (' . implode(',', array_keys($arrayData)) . ') VALUES (' . implode(',', array_fill(1, count($arrayData), '?')) . ') ON DUPLICATE KEY UPDATE ' . implode(' = ?,', array_keys($arrayData)) . ' = ?';
-        $result =  $this->adapter->query($query, array_merge(array_values($arrayData), array_values($arrayData)));
-        return $result->getGeneratedValue();
+        return CommonService::insertOrUpdate($this->adapter, $this->table, $arrayData);
     }
 }

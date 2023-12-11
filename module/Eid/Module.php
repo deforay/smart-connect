@@ -60,9 +60,9 @@ class Module
                     public function __invoke($diContainer)
                     {
                         $session = new Container('credo');
-                        $mappedFacilities = (isset($session->mappedFacilities) && count($session->mappedFacilities) > 0) ? $session->mappedFacilities : array();
+                        $mappedFacilities = (property_exists($session, 'mappedFacilities') && $session->mappedFacilities !== null && count($session->mappedFacilities) > 0) ? $session->mappedFacilities : array();
                         $dbAdapter = $diContainer->get('Laminas\Db\Adapter\Adapter');
-                        $eidSampleTable = isset($session->eidSampleTable) ? $session->eidSampleTable :  null;
+                        $eidSampleTable = property_exists($session, 'eidSampleTable') && $session->eidSampleTable !== null ? $session->eidSampleTable :  null;
                         $commonService = $diContainer->get('CommonService');
                         $tableObj = new \Eid\Model\EidSampleTable($dbAdapter, $diContainer, $mappedFacilities, $eidSampleTable, $commonService);
 
@@ -82,8 +82,8 @@ class Module
                     public function __invoke($diContainer)
                     {
                         $session = new Container('credo');
-                        $mappedFacilities = (isset($session->mappedFacilities) && count($session->mappedFacilities) > 0) ? $session->mappedFacilities : array();
-                        $eidSampleTable = isset($session->eidSampleTable) ? $session->eidSampleTable :  null;
+                        $mappedFacilities = (property_exists($session, 'mappedFacilities') && $session->mappedFacilities !== null && count($session->mappedFacilities) > 0) ? $session->mappedFacilities : array();
+                        $eidSampleTable = property_exists($session, 'eidSampleTable') && $session->eidSampleTable !== null ? $session->eidSampleTable :  null;
                         $dbAdapter = $diContainer->get('Laminas\Db\Adapter\Adapter');
                         $commonService = $diContainer->get('CommonService');
                         return new \Eid\Model\EidSampleTable($dbAdapter, $diContainer, $mappedFacilities, $eidSampleTable, $commonService);

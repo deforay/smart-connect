@@ -10,6 +10,7 @@ use Zend\Debug\Debug;
 class CommonController extends AbstractActionController
 {
 
+    public $commonService;
     private $sampleService = null;
     private $configService = null;
 

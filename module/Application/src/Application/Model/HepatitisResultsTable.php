@@ -29,7 +29,6 @@ class HepatitisResultsTable extends AbstractTableGateway {
 
     public function fetchAllResults()
     {
-        $query = $this->select(array('status' => 'active'));
-        return $query;
+        return $this->select(array('status' => 'active'));
     }
 }

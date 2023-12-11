@@ -2,8 +2,9 @@
 
 namespace Application\Model;
 
-use Laminas\Db\Adapter\Adapter;
 use Laminas\Db\Sql\Sql;
+use Laminas\Db\Adapter\Adapter;
+use Application\Service\CommonService;
 use Laminas\Db\TableGateway\AbstractTableGateway;
 
 /*
@@ -29,13 +30,10 @@ class TestReasonTable extends AbstractTableGateway
 
     public function fetchAllTestReasonName()
     {
-        $query = $this->select(array('test_reason_status' => 'active'));
-        return $query;
+        return $this->select(array('test_reason_status' => 'active'));
     }
     public function insertOrUpdate($arrayData)
     {
-        $query = 'INSERT INTO `' . $this->table . '` (' . implode(',', array_keys($arrayData)) . ') VALUES (' . implode(',', array_fill(1, count($arrayData), '?')) . ') ON DUPLICATE KEY UPDATE ' . implode(' = ?,', array_keys($arrayData)) . ' = ?';
-        $result =  $this->adapter->query($query, array_merge(array_values($arrayData), array_values($arrayData)));
-        return $result->getGeneratedValue();
+        return CommonService::insertOrUpdate($this->adapter, $this->table, $arrayData);
     }
 }

@@ -29,7 +29,6 @@ class EidSampleTypeTable extends AbstractTableGateway {
 
     public function fetchAllSampleType()
     {
-        $query = $this->select(array('status' => 'active'));
-        return $query;
+        return $this->select(array('status' => 'active'));
     }
 }

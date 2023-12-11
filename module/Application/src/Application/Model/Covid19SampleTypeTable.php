@@ -29,7 +29,6 @@ class Covid19SampleTypeTable extends AbstractTableGateway {
 
     public function fetchAllSampleType()
     {
-        $query = $this->select(array('status' => 'active'));
-        return $query;
+        return $this->select(array('status' => 'active'));
     }
 }

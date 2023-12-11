@@ -133,7 +133,7 @@ class SummaryService
     public function exportIndicatorResultExcel($params)
     {
         $queryContainer = new Container('query');
-        if (isset($queryContainer->indicatorSummaryQuery)) {
+        if (property_exists($queryContainer, 'indicatorSummaryQuery') && $queryContainer->indicatorSummaryQuery !== null) {
             try {
 
                 $sql = new Sql($this->dbAdapter);
@@ -247,11 +247,11 @@ class SummaryService
         $queryContainer = new Container('query');
         // To set te session table
         $loginContainer = new Container('credo');
-        if (isset($loginContainer->SampleTableWithoutCache) && $loginContainer->SampleTableWithoutCache != "") {
+        if (property_exists($loginContainer, 'SampleTableWithoutCache') && $loginContainer->SampleTableWithoutCache !== null && $loginContainer->SampleTableWithoutCache != "") {
             $dashTable = $loginContainer->SampleTableWithoutCache;
         }
 
-        if (!isset($queryContainer->fetchAllSuppressionRateByFacility)) {
+        if (!property_exists($queryContainer, 'fetchAllSuppressionRateByFacility') || $queryContainer->fetchAllSuppressionRateByFacility === null) {
 
 
             $sql = new Sql($this->dbAdapter);

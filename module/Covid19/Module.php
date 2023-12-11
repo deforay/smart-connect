@@ -51,9 +51,9 @@ class Module
                     public function __invoke($diContainer)
                     {
                         $session = new Container('credo');
-                        $mappedFacilities = (isset($session->mappedFacilities) && !empty($session->mappedFacilities)) ? $session->mappedFacilities : array();
+                        $mappedFacilities = (property_exists($session, 'mappedFacilities') && $session->mappedFacilities !== null && !empty($session->mappedFacilities)) ? $session->mappedFacilities : array();
                         $dbAdapter = $diContainer->get('Laminas\Db\Adapter\Adapter');
-                        $covid19SampleTable = isset($session->covid19SampleTable) ? $session->covid19SampleTable :  'dash_form_covid19';
+                        $covid19SampleTable = property_exists($session, 'covid19SampleTable') && $session->covid19SampleTable !== null ? $session->covid19SampleTable :  'dash_form_covid19';
                         $dbAdapter = $diContainer->get('Laminas\Db\Adapter\Adapter');
                         $commonService = $diContainer->get('CommonService');
                         $tableObj = new \Covid19\Model\Covid19FormTable($dbAdapter, $diContainer, $mappedFacilities, $covid19SampleTable, $commonService);
@@ -75,9 +75,9 @@ class Module
                     public function __invoke($diContainer)
                     {
                         $session = new Container('credo');
-                        $mappedFacilities = (isset($session->mappedFacilities) && !empty($session->mappedFacilities)) ? $session->mappedFacilities : array();
+                        $mappedFacilities = (property_exists($session, 'mappedFacilities') && $session->mappedFacilities !== null && !empty($session->mappedFacilities)) ? $session->mappedFacilities : array();
                         $dbAdapter = $diContainer->get('Laminas\Db\Adapter\Adapter');
-                        $covid19SampleTable = isset($session->covid19SampleTable) ? $session->covid19SampleTable :  'dash_form_covid19';
+                        $covid19SampleTable = property_exists($session, 'covid19SampleTable') && $session->covid19SampleTable !== null ? $session->covid19SampleTable :  'dash_form_covid19';
                         $dbAdapter = $diContainer->get('Laminas\Db\Adapter\Adapter');
                         $commonService = $diContainer->get('CommonService');
                         return new \Covid19\Model\Covid19FormTable($dbAdapter, $diContainer, $mappedFacilities, $covid19SampleTable, $commonService);

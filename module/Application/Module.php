@@ -7,7 +7,6 @@ use Laminas\Mvc\MvcEvent;
 use Laminas\Session\Container;
 use Application\Model\RolesTable;
 use Application\Model\UsersTable;
-use Laminas\View\Model\ViewModel;
 use Application\Model\GlobalTable;
 use Application\Model\SampleTable;
 use Application\Model\ArtCodeTable;
@@ -41,18 +40,20 @@ use Application\Model\Covid19SampleTypeTable;
 
 use Application\Model\OrganizationTypesTable;
 use Application\Model\Covid19TestReasonsTable;
+use Application\Service\ApiSyncHistoryService;
 use Application\Model\HepatitisRiskFactorTable;
 use Application\Model\HepatitisSampleTypeTable;
 use Application\Model\ImportConfigMachineTable;
 use Application\Model\Covid19ComorbiditiesTable;
+
 use Application\Model\DashApiReceiverStatsTable;
+use Application\Model\DashTrackApiRequestsTable;
 
 use Application\Model\HepatitisTestReasonsTable;
 use Application\Model\UserOrganizationsMapTable;
 
 use Application\Model\SampleRejectionReasonTable;
 use Application\Model\EidSampleRejectionReasonTable;
-
 use Application\Model\Covid19SampleRejectionReasonsTable;
 use Application\Model\HepatitisSampleRejectionReasonTable;
 
@@ -60,16 +61,18 @@ class Module
 {
 	public function onBootstrap(MvcEvent $e)
 	{
-		define("APP_VERSION", "3.0");
+		define("APP_VERSION", "3.1");
 		$languagecontainer = new Container('language');
 		$eventManager        = $e->getApplication()->getEventManager();
 		$moduleRouteListener = new ModuleRouteListener();
 		$moduleRouteListener->attach($eventManager);
 		if (php_sapi_name() != 'cli') {
-			$eventManager->attach('dispatch', array($this, 'preSetter'), 100);
+			$eventManager->attach('dispatch', function (MvcEvent $e) {
+				return $this->preSetter($e);
+			}, 100);
 			//$eventManager->attach(MvcEvent::EVENT_DISPATCH_ERROR, array($this, 'dispatchError'), -999);
 		}
-		if (isset($languagecontainer->locale) && $languagecontainer->locale != '') {
+		if (property_exists($languagecontainer, 'locale') && $languagecontainer->locale !== null && $languagecontainer->locale != '') {
 			// Just a call to the translator, nothing special!
 			$this->initTranslator($e);
 		}
@@ -79,18 +82,36 @@ class Module
 	{
 		$session = new Container('credo');
 		$tempName = explode('Controller', $e->getRouteMatch()->getParam('controller'));
-		if (substr($tempName[0], 0, -1) != 'Api') {
-			if ($e->getRouteMatch()->getParam('controller') != 'Application\Controller\LoginController') {
-				//$session->userId = 'guest';
-				//$session->accessType = 4;
-				if (!isset($session->userId) || $session->userId == "") {
-					$url = $e->getRouter()->assemble(array(), array('name' => 'login'));
+
+		if (substr($tempName[0], 0, -1) != 'Api' && $e->getRouteMatch()->getParam('controller') != 'Application\Controller\LoginController') {
+
+			//$session->userId = 'guest';
+			//$session->accessType = 4;
+			if (empty($session->userId)) {
+				$url = $e->getRouter()->assemble(array(), array('name' => 'login'));
+				/** @var \Laminas\Http\Response $response */
+				$response = $e->getResponse();
+				$response->getHeaders()->addHeaderLine('Location', $url);
+				$response->setStatusCode(302);
+				//$response->sendHeaders();
+
+				// To avoid additional processing
+				// we can attach a listener for Event Route with a high priority
+				$stopCallBack = function ($event) use ($response) {
+					$event->stopPropagation();
+					return $response;
+				};
+				//Attach the "break" as a listener with a high priority
+				$e->getApplication()->getEventManager()->attach(MvcEvent::EVENT_ROUTE, $stopCallBack, -10000);
+				return $response;
+			} else {
+
+				if ((substr($tempName[1], 1) == 'Clinic' || substr($tempName[0], 1) == 'Hubs')  && $session->role == '2') {
 					/** @var \Laminas\Http\Response $response */
 					$response = $e->getResponse();
-					$response->getHeaders()->addHeaderLine('Location', $url);
+					$response->getHeaders()->addHeaderLine('Location', '/labs/dashboard');
 					$response->setStatusCode(302);
-					$response->sendHeaders();
-
+					//$response->sendHeaders();
 					// To avoid additional processing
 					// we can attach a listener for Event Route with a high priority
 					$stopCallBack = function ($event) use ($response) {
@@ -100,104 +121,86 @@ class Module
 					//Attach the "break" as a listener with a high priority
 					$e->getApplication()->getEventManager()->attach(MvcEvent::EVENT_ROUTE, $stopCallBack, -10000);
 					return $response;
-				} else {
-					if ((substr($tempName[1], 1) == 'Clinic' || substr($tempName[0], 1) == 'Hubs')  && $session->role == '2') {
-						/** @var \Laminas\Http\Response $response */
-						$response = $e->getResponse();
-						$response->getHeaders()->addHeaderLine('Location', '/labs/dashboard');
-						$response->setStatusCode(302);
-						$response->sendHeaders();
-
-						// To avoid additional processing
-						// we can attach a listener for Event Route with a high priority
-						$stopCallBack = function ($event) use ($response) {
-							$event->stopPropagation();
-							return $response;
-						};
-						//Attach the "break" as a listener with a high priority
-						$e->getApplication()->getEventManager()->attach(MvcEvent::EVENT_ROUTE, $stopCallBack, -10000);
+				} elseif ((substr($tempName[1], 1) == 'Laboratory' || substr($tempName[1], 1) == 'Hubs')  && $session->role == '3') {
+					/** @var \Laminas\Http\Response $response */
+					$response = $e->getResponse();
+					$response->getHeaders()->addHeaderLine('Location', '/clinics/dashboard');
+					$response->setStatusCode(302);
+					//$response->sendHeaders();
+					// To avoid additional processing
+					// we can attach a listener for Event Route with a high priority
+					$stopCallBack = function ($event) use ($response) {
+						$event->stopPropagation();
 						return $response;
-					} else if ((substr($tempName[1], 1) == 'Laboratory' || substr($tempName[1], 1) == 'Hubs')  && $session->role == '3') {
-						/** @var \Laminas\Http\Response $response */
-						$response = $e->getResponse();
-						$response->getHeaders()->addHeaderLine('Location', '/clinics/dashboard');
-						$response->setStatusCode(302);
-						$response->sendHeaders();
-
-						// To avoid additional processing
-						// we can attach a listener for Event Route with a high priority
-						$stopCallBack = function ($event) use ($response) {
-							$event->stopPropagation();
-							return $response;
-						};
-						//Attach the "break" as a listener with a high priority
-						$e->getApplication()->getEventManager()->attach(MvcEvent::EVENT_ROUTE, $stopCallBack, -10000);
+					};
+					//Attach the "break" as a listener with a high priority
+					$e->getApplication()->getEventManager()->attach(MvcEvent::EVENT_ROUTE, $stopCallBack, -10000);
+					return $response;
+				} elseif ((substr($tempName[1], 1) == 'Laboratory' || substr($tempName[1], 1) == 'Clinic')  && $session->role == '4') {
+					/** @var \Laminas\Http\Response $response */
+					$response = $e->getResponse();
+					$response->getHeaders()->addHeaderLine('Location', '/hubs/dashboard');
+					$response->setStatusCode(302);
+					//$response->sendHeaders();
+					// To avoid additional processing
+					// we can attach a listener for Event Route with a high priority
+					$stopCallBack = function ($event) use ($response) {
+						$event->stopPropagation();
 						return $response;
-					} else if ((substr($tempName[1], 1) == 'Laboratory' || substr($tempName[1], 1) == 'Clinic')  && $session->role == '4') {
-						/** @var \Laminas\Http\Response $response */
-						$response = $e->getResponse();
-						$response->getHeaders()->addHeaderLine('Location', '/hubs/dashboard');
-						$response->setStatusCode(302);
-						$response->sendHeaders();
+					};
+					//Attach the "break" as a listener with a high priority
+					$e->getApplication()->getEventManager()->attach(MvcEvent::EVENT_ROUTE, $stopCallBack, -10000);
+					return $response;
+				}
 
-						// To avoid additional processing
-						// we can attach a listener for Event Route with a high priority
-						$stopCallBack = function ($event) use ($response) {
-							$event->stopPropagation();
-							return $response;
-						};
-						//Attach the "break" as a listener with a high priority
-						$e->getApplication()->getEventManager()->attach(MvcEvent::EVENT_ROUTE, $stopCallBack, -10000);
-						return $response;
+				//clinic/lab dashboard re-direction, in-case of passing invalid url params
+				if ($session->role != 1) {
+					$mappedFacilities = (isset($session->mappedFacilities) && !empty($session->mappedFacilities)) ? $session->mappedFacilities : array();
+					$mappedFacilitiesName = (isset($session->mappedFacilitiesName) && !empty($session->mappedFacilitiesName)) ? $session->mappedFacilitiesName : array();
+					$mappedFacilitiesCode = (isset($session->mappedFacilitiesCode) && !empty($session->mappedFacilitiesCode)) ? $session->mappedFacilitiesCode : array();
+					$lab = array();
+					if (isset($_GET['lab']) && trim($_GET['lab']) != '') {
+						$lab = array_values(array_filter(explode(',', $_GET['lab'])));
 					}
-					//clinic/lab dashboard re-direction, in-case of passing invalid url params
-					if ($session->role != 1) {
-						$mappedFacilities = (isset($session->mappedFacilities) && !empty($session->mappedFacilities)) ? $session->mappedFacilities : array();
-						$mappedFacilitiesName = (isset($session->mappedFacilitiesName) && !empty($session->mappedFacilitiesName)) ? $session->mappedFacilitiesName : array();
-						$mappedFacilitiesCode = (isset($session->mappedFacilitiesCode) && !empty($session->mappedFacilitiesCode)) ? $session->mappedFacilitiesCode : array();
-						$lab = array();
-						if (isset($_GET['lab']) && trim($_GET['lab']) != '') {
-							$lab = array_values(array_filter(explode(',', $_GET['lab'])));
-						}
-						$redirect = false;
-						if (!empty($lab)) {
-							for ($l = 0; $l < count($lab); $l++) {
-								if (!in_array($lab[$l], $mappedFacilities) && !in_array($lab[$l], $mappedFacilitiesName) && !in_array($lab[$l], $mappedFacilitiesCode)) {
-									$redirect = true;
-									break;
-								}
+					$redirect = false;
+					if ($lab !== []) {
+						$counter = count($lab);
+						for ($l = 0; $l < $counter; $l++) {
+							if (!in_array($lab[$l], $mappedFacilities) && !in_array($lab[$l], $mappedFacilitiesName) && !in_array($lab[$l], $mappedFacilitiesCode)) {
+								$redirect = true;
+								break;
 							}
 						}
+					}
 
-						if (substr($tempName[1], 1) == 'Users' || substr($tempName[1], 1) == 'Config' || substr($tempName[1], 1) == 'Facility' || substr($tempName[1], 1) == 'Import') {
-							$redirect = true;
+					if (substr($tempName[1], 1) == 'Users' || substr($tempName[1], 1) == 'Config' || substr($tempName[1], 1) == 'Facility' || substr($tempName[1], 1) == 'Import') {
+						$redirect = true;
+					}
+					if ($redirect) {
+						//set redirect path
+						/** @var \Laminas\Http\Response $response */
+						$response = $e->getResponse();
+						if ($session->role == 2) {
+							$response->getHeaders()->addHeaderLine('Location', '/labs/dashboard');
+						} elseif ($session->role == 3) {
+							$response->getHeaders()->addHeaderLine('Location', '/clinics/dashboard');
+						} elseif ($session->role == 4) {
+							$response->getHeaders()->addHeaderLine('Location', '/hubs/dashboard');
+						} elseif ($session->role == 5) {
+							$response->getHeaders()->addHeaderLine('Location', '/labs/dashboard');
 						}
-						if ($redirect === true) {
-							//set redirect path
-							/** @var \Laminas\Http\Response $response */
-							$response = $e->getResponse();
-							if ($session->role == 2) {
-								$response->getHeaders()->addHeaderLine('Location', '/labs/dashboard');
-							} else if ($session->role == 3) {
-								$response->getHeaders()->addHeaderLine('Location', '/clinics/dashboard');
-							} else if ($session->role == 4) {
-								$response->getHeaders()->addHeaderLine('Location', '/hubs/dashboard');
-							} else if ($session->role == 5) {
-								$response->getHeaders()->addHeaderLine('Location', '/labs/dashboard');
-							}
-							$response->setStatusCode(302);
-							$response->sendHeaders();
+						$response->setStatusCode(302);
+						//$response->sendHeaders();
 
-							// To avoid additional processing
-							// we can attach a listener for Event Route with a high priority
-							$stopCallBack = function ($event) use ($response) {
-								$event->stopPropagation();
-								return $response;
-							};
-							//Attach the "break" as a listener with a high priority
-							$e->getApplication()->getEventManager()->attach(MvcEvent::EVENT_ROUTE, $stopCallBack, -10000);
+						// To avoid additional processing
+						// we can attach a listener for Event Route with a high priority
+						$stopCallBack = function ($event) use ($response) {
+							$event->stopPropagation();
 							return $response;
-						}
+						};
+						//Attach the "break" as a listener with a high priority
+						$e->getApplication()->getEventManager()->attach(MvcEvent::EVENT_ROUTE, $stopCallBack, -10000);
+						return $response;
 					}
 				}
 			}
@@ -276,8 +279,8 @@ class Module
 					public function __invoke($diContainer)
 					{
 						$session = new Container('credo');
-						$mappedFacilities = (isset($session->mappedFacilities) && !empty($session->mappedFacilities)) ? $session->mappedFacilities : array();
-						$sampleTable = isset($session->sampleTable) ? $session->sampleTable :  null;
+						$mappedFacilities = (property_exists($session, 'mappedFacilities') && $session->mappedFacilities !== null && !empty($session->mappedFacilities)) ? $session->mappedFacilities : array();
+						$sampleTable = property_exists($session, 'sampleTable') && $session->sampleTable !== null ? $session->sampleTable :  null;
 						$dbAdapter = $diContainer->get('Laminas\Db\Adapter\Adapter');
 						$commonService = $diContainer->get('CommonService');
 						$tableObj = new SampleTable($dbAdapter, $diContainer, $mappedFacilities, $sampleTable, $commonService);
@@ -297,8 +300,8 @@ class Module
 					public function __invoke($diContainer)
 					{
 						$session = new Container('credo');
-						$mappedFacilities = (isset($session->mappedFacilities) && !empty($session->mappedFacilities)) ? $session->mappedFacilities : array();
-						$sampleTable = isset($session->sampleTable) ? $session->sampleTable :  null;
+						$mappedFacilities = (property_exists($session, 'mappedFacilities') && $session->mappedFacilities !== null && !empty($session->mappedFacilities)) ? $session->mappedFacilities : array();
+						$sampleTable = property_exists($session, 'sampleTable') && $session->sampleTable !== null ? $session->sampleTable :  null;
 						$dbAdapter = $diContainer->get('Laminas\Db\Adapter\Adapter');
 						$commonService = $diContainer->get('CommonService');
 						return new SampleTable($dbAdapter, $diContainer, $mappedFacilities, $sampleTable, $commonService);
@@ -310,7 +313,7 @@ class Module
 					{
 						$dbAdapter = $diContainer->get('Laminas\Db\Adapter\Adapter');
 						$commonService = $diContainer->get('CommonService');
-						$tableObj = new FacilityTable($dbAdapter, $diContainer, $commonService);
+						$tableObj = new FacilityTable($dbAdapter, $commonService, $diContainer);
 
 						$storage = $diContainer->get('Cache\Persistent');
 						return new ObjectCache(
@@ -327,7 +330,7 @@ class Module
 					{
 						$dbAdapter = $diContainer->get('Laminas\Db\Adapter\Adapter');
 						$commonService = $diContainer->get('CommonService');
-						return new FacilityTable($dbAdapter, $diContainer, $commonService);
+						return new FacilityTable($dbAdapter, $commonService, $diContainer);
 					}
 				},
 				'FacilityTypeTable'  => new class
@@ -367,7 +370,7 @@ class Module
 					{
 						$dbAdapter = $diContainer->get('Laminas\Db\Adapter\Adapter');
 						$commonService = $diContainer->get('CommonService');
-						return new GlobalTable($dbAdapter, $diContainer, $commonService);
+						return new GlobalTable($dbAdapter, $commonService, $diContainer);
 					}
 				}, 'ArtCodeTable'  => new class
 				{
