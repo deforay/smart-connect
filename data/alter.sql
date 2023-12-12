@@ -735,3 +735,6 @@ CREATE TABLE `dash_track_api_requests` (
   PRIMARY KEY (`api_track_id`),
   KEY `requested_on` (`requested_on`)
 ) ENGINE=InnoDB AUTO_INCREMENT=94 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- Thana 12-Dec-2023
+ALTER TABLE `dash_form_vl` CHANGE `sample_received_at_vl_lab_datetime` `sample_received_at_lab_datetime` DATETIME NULL DEFAULT NULL;

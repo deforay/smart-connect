@@ -1893,7 +1893,6 @@ class SampleService
         ]);
 
         $counter = 0;
-        // print_r($params);die;
         foreach ($apiData as $key => $row) {
             $counter++;
             // Debug::dump($row);die;
@@ -1967,7 +1966,7 @@ class SampleService
                     'patient_age_in_years'                  => (trim($row['PatientAge']) != '' ? trim($row['PatientAge']) : NULL),
                     'patient_dob'                           => $dob,
                     'sample_collection_date'                => $sampleCollectionDate,
-                    'sample_received_at_lab_datetime'    => $sampleReceivedAtLab,
+                    'sample_received_at_lab_datetime'       => $sampleReceivedAtLab,
                     'result_printed_datetime'               => $resultPrinterDateTime,
                     'line_of_treatment'                     => (trim($row['CurrentTreatment']) != '' ? trim($row['CurrentTreatment']) : NULL),
                     'is_sample_rejected'                    => (trim($row['IsSampleRejected']) != '' ? strtolower($row['IsSampleRejected']) : NULL),
