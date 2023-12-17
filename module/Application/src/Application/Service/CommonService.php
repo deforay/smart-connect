@@ -12,7 +12,6 @@ use DateTimeImmutable;
 use JsonMachine\Items;
 use Laminas\Db\Sql\Sql;
 use Laminas\Db\Sql\Insert;
-use Laminas\Db\Sql\Expression;
 use Laminas\Session\Container;
 use Laminas\Db\Adapter\Adapter;
 use Laminas\Mime\Part as MimePart;
@@ -1303,6 +1302,27 @@ class CommonService
           return null;
      }
 
+     public static function generateCsv($headings, $data, $filename, $delimiter = ',', $enclosure = '"')
+     {
+          $handle = fopen($filename, 'w'); // Open file for writing
+
+          // The headings first
+          if (!empty($headings)) {
+               fputcsv($handle, $headings, $delimiter, $enclosure);
+          }
+          // Then the data
+          if (!empty($data)) {
+               foreach ($data as $line) {
+                    fputcsv($handle, $line, $delimiter, $enclosure);
+               }
+          }
+
+          //Clear Memory
+          unset($data);
+          fclose($handle);
+          return $filename;
+     }
+
      public static function makeDirectory($path, $mode = 0777, $recursive = true): bool
      {
           if (is_dir($path)) {
@@ -1385,72 +1405,79 @@ class CommonService
           return htmlspecialchars($json, ENT_QUOTES, 'UTF-8');
      }
 
-     public static function processJsonFile($filePath, $returnTimestamp = false)
+     public static function isGzipped($filePath)
      {
-          if (!file_exists($filePath)) {
-               return null; // File does not exist
+          $file = fopen($filePath, 'rb');
+          if ($file === false) {
+               return false;
           }
 
+          $bytes = fread($file, 2);
+          fclose($file);
+
+          return $bytes === "\x1f\x8b";
+     }
+
+     public static function ungzipFile($sourceFilePath, $destinationFilePath)
+     {
+          $bufferSize = 4096; // Adjust buffer size as needed
+
+          $source = gzopen($sourceFilePath, 'rb');
+          $destination = fopen($destinationFilePath, 'wb');
+
+          if (!$source || !$destination) {
+
+               error_log("Error opening gzip file");
+               return false; // Handle error opening file
+          }
+
+          while (!gzeof($source)) {
+               $chunk = gzread($source, $bufferSize);
+               fwrite($destination, $chunk);
+          }
+
+          gzclose($source);
+          fclose($destination);
+
+          return true;
+     }
+
+     public static function processJsonFile($filePath, $returnTimestamp = false)
+     {
           try {
-               // Efficiently check if the file is gzipped
-               $file = fopen($filePath, 'rb');
-               $bytes = fread($file, 2);
-               fclose($file);
-
-               $isGzipped = $bytes === "\x1f\x8b";
-               $stream = $isGzipped ? gzopen($filePath, 'r') : fopen($filePath, 'r');
-
-               if (!$stream) {
-                    return null; // Unable to open file or gzipped file
-               }
-
-               if ($isGzipped) {
-                    $decompressedContent = '';
-                    while (!gzeof($stream)) {
-                         $decompressedContent .= gzread($stream, 4096);
+               $apiData = [];
+               $timestamp = null;
+               if (file_exists($filePath)) {
+                    $isGzipped = self::isGzipped($filePath);
+                    if ($isGzipped) {
+                         $tempFilePath = dirname($filePath) . DIRECTORY_SEPARATOR . 'json_' . uniqid() . ".json";
+                         self::ungzipFile($filePath, $tempFilePath);
+                    } else {
+                         $tempFilePath = $filePath;
                     }
-                    gzclose($stream);
 
-                    // Use the decompressed content
-                    $stream = fopen('php://memory', 'r+');
-                    fwrite($stream, $decompressedContent);
-                    rewind($stream);
-               }
-
-               // Process the JSON data
-               $apiData = Items::fromStream($stream, [
-                    'pointer' => '/data',
-                    'decoder' => new ExtJsonDecoder(true)
-               ]);
-
-               if ($returnTimestamp) {
-                    rewind($stream); // Rewind the stream to read it again
-                    $timestampData = Items::fromStream($stream, [
-                         'pointer' => '/timestamp',
+                    // Process the JSON data from the temporary file
+                    $apiData = Items::fromFile($tempFilePath, [
+                         'pointer' => '/data',
                          'decoder' => new ExtJsonDecoder(true)
                     ]);
-                    $timestamp = iterator_to_array($timestampData)['timestamp'] ?? time();
-                    $result = [$apiData, $timestamp];
-               } else {
-                    $result = $apiData;
-               }
 
-               fclose($stream);
-               return $result;
-          } catch (JsonException | JsonMachineException $e) {
-               // Specific exceptions for JSON processing errors
-               error_log($e->getMessage());
-               if (isset($stream) && is_resource($stream)) {
-                    fclose($stream);
+                    $timestamp = time();
+                    if ($returnTimestamp) {
+                         $timestampData = Items::fromFile($tempFilePath, [
+                              'pointer' => '/timestamp',
+                              'decoder' => new ExtJsonDecoder(true)
+                         ]);
+                         $timestamp = iterator_to_array($timestampData)['timestamp'] ?? time();
+                    }
                }
-               return null;
+               return $returnTimestamp ? [$apiData, $timestamp] : $apiData;
+          } catch (JsonException | JsonMachineException | PathNotFoundException $e) {
+               error_log($e->getMessage());
+               return $returnTimestamp ? [[], null] : [];
           } catch (Exception $e) {
-               // General exception catch
                error_log($e->getMessage());
-               if (isset($stream) && is_resource($stream)) {
-                    fclose($stream);
-               }
-               return null;
+               return $returnTimestamp ? [[], null] : [];
           }
      }
 
@@ -1472,5 +1499,10 @@ class CommonService
           $result = $adapter->query($query, Adapter::QUERY_MODE_EXECUTE);
 
           return $result->getGeneratedValue(); // Get the last generated value
+     }
+     public static function sanitizeFilename($filename)
+     {
+          // Replace any non-alphanumeric, non-dot, non-dash and non-underscore characters
+          return preg_replace('/[^A-Za-z0-9._-]/', '_', $filename);
      }
 }

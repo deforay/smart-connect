@@ -1424,84 +1424,52 @@ class SampleService
             preg_match('~=(.*?);~', $input, $output);
             $dbname = $output[1];
 
-            $this->commonService->errorLog($_POST);
+            //$this->commonService->errorLog($_POST);
 
             $source = $_POST['source'] ?? 'LIS';
             $labId = $_POST['labId'] ?? null;
 
-            $fileName = $_FILES['vlFile']['name'];
-            $ranNumber = str_pad(rand(0, pow(10, 6) - 1), 6, '0', STR_PAD_LEFT);
-            $extension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-            $fileName = $ranNumber . "." . $extension;
-
-            if (!file_exists(TEMP_UPLOAD_PATH) && !is_dir(TEMP_UPLOAD_PATH)) {
-                mkdir(APPLICATION_PATH . DIRECTORY_SEPARATOR . "temporary", 0777);
-            }
-            if (!file_exists(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-vl") && !is_dir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-vl")) {
-                mkdir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-vl", 0777);
-            }
-
-
+            $removeKeys = array(
+                'vl_sample_id'
+            );
             $allColumns = "SELECT COLUMN_NAME
                             FROM INFORMATION_SCHEMA.COLUMNS
                             WHERE TABLE_SCHEMA = '" . $dbname . "' AND table_name='dash_form_vl'";
 
-            $sResult = $this->dbAdapter->query($allColumns, Adapter::QUERY_MODE_EXECUTE)->toArray();
-            $columnList = array_map('current', $sResult);
-
-            $removeKeys = array(
-                'vl_sample_id'
-            );
-
+            $allColResult = $this->dbAdapter->query($allColumns, Adapter::QUERY_MODE_EXECUTE)->toArray();
+            $columnList = array_map('current', $allColResult);
             $columnList = array_diff($columnList, $removeKeys);
+
+            /** @var SampleTable $sampleDb */
             $sampleDb = $this->sm->get('SampleTableWithoutCache');
 
-            $pathname = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-vl" . DIRECTORY_SEPARATOR . $fileName;
-            if (!file_exists($pathname) && move_uploaded_file($_FILES['vlFile']['tmp_name'], $pathname)) {
-                [$apiData, $timestamp] = CommonService::processJsonFile($pathname, true);
+
+            if (!file_exists(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-vl") && !is_dir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-vl")) {
+                mkdir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-vl", 0777);
             }
 
+            $fileName = $_FILES['vlFile']['name'];
+            $extension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+            $fileName = $this->commonService->generateRandomString(12) . time() . "." . $extension;
 
-            /*  echo "<pre>";
-            print_r($apiData);die; */
+            $fileName = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-vl" . DIRECTORY_SEPARATOR . $fileName;
 
-            // ob_start();
-            // var_dump($apiData);
-            // error_log(ob_get_clean());
+            if (move_uploaded_file($_FILES['vlFile']['tmp_name'], $fileName)) {
+                [$apiData, $timestamp] = CommonService::processJsonFile($fileName, true);
+            }
 
-            $numRows = 0;
-            $counter = 0;
-            foreach ($apiData as $key => $rowData) {
+            $numRows = $counter = 0;
+            $currentDateTime = CommonService::getDateTime();
+            foreach ($apiData as $rowData) {
                 $counter++;
-
-
-                // ob_start();
-                // var_dump($rowData);
-                // error_log(ob_get_clean());
-
                 $data = array();
                 foreach ($columnList as $colName) {
                     $data[$colName] = isset($rowData[$colName]) ? $rowData[$colName] : null;
                 }
-                unset($data['vl_sample_id']);
-
-                $currentDateTime = CommonService::getDateTime();
-                $data['last_modified_datetime'] = $currentDateTime;
-
-                // ob_start();
-                // var_dump($data);
-                // error_log(ob_get_clean());
-                // exit(0);
-
                 try {
 
                     $id = $sampleDb->insertOrUpdate($data);
-                    if (isset($id) && !empty($id) && is_numeric($id)) {
-                        $params = array(
-                            "table" => "dash_form_vl",
-                            "field" => "vl_sample_id",
-                            "id" => $id
-                        );
+                    if (false !== $id && !empty($id) && is_numeric($id)) {
                         //$this->apiTrackerTable->updateFormAttributes($params, $currentDateTime);
                         $this->apiTrackerTable->updateFacilityAttributes(
                             $data['facility_id'],
@@ -1513,7 +1481,6 @@ class SampleService
                     error_log($e->getMessage());
                 }
             }
-            // unlink($pathname);
 
             if ($counter === $numRows) {
                 $status = "success";
@@ -1522,8 +1489,6 @@ class SampleService
             } elseif ($numRows == 0) {
                 $status = 'failed';
             }
-
-            unset($pathname);
 
             $apiTrackData = array(
                 'tracking_id'                   => $timestamp,
@@ -1543,7 +1508,7 @@ class SampleService
                 'message'   => $numRows . ' uploaded successfully',
             );
         } catch (Exception $exc) {
-            error_log("HIGH-VL-SAMPLE-RESULT-REPORT--" . $exc->getMessage());
+            error_log($exc->getMessage());
             error_log($exc->getTraceAsString());
             return array(
                 'status'    => 'failed',
@@ -1565,23 +1530,21 @@ class SampleService
         $locationDb = $this->sm->get('LocationDetailsTable');
         $sampleRjtReasonDb = $this->sm->get('SampleRejectionReasonTable');
 
-        $fileName = $_FILES['vlFile']['name'];
-        $ranNumber = str_pad(rand(0, pow(10, 6) - 1), 6, '0', STR_PAD_LEFT);
-        $extension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-        $fileName = $ranNumber . "." . $extension;
 
-        if (!file_exists(TEMP_UPLOAD_PATH) && !is_dir(TEMP_UPLOAD_PATH)) {
-            mkdir(APPLICATION_PATH . DIRECTORY_SEPARATOR . "temporary", 0777);
-        }
+
         if (!file_exists(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-vl") && !is_dir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-vl")) {
             mkdir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-vl", 0777);
         }
 
-        $pathname = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-vl" . DIRECTORY_SEPARATOR . $fileName;
-        if (!file_exists($pathname) && move_uploaded_file($_FILES['vlFile']['tmp_name'], $pathname)) {
-            $apiData = CommonService::processJsonFile($pathname, false);
-        }
+        $fileName = $_FILES['vlFile']['name'];
+        $extension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+        $fileName = $this->commonService->generateRandomString(12) . "." . $extension;
 
+        $fileName = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-vl" . DIRECTORY_SEPARATOR . $fileName;
+        if (move_uploaded_file($_FILES['vlFile']['tmp_name'], $fileName)) {
+            error_log($fileName);
+            $apiData = CommonService::processJsonFile($fileName, false);
+        }
 
         if ($apiData !== FALSE) {
             foreach ($apiData as $rowData) {
@@ -1893,6 +1856,7 @@ class SampleService
         ]);
 
         $counter = 0;
+        // print_r($params);die;
         foreach ($apiData as $key => $row) {
             $counter++;
             // Debug::dump($row);die;
@@ -1966,7 +1930,7 @@ class SampleService
                     'patient_age_in_years'                  => (trim($row['PatientAge']) != '' ? trim($row['PatientAge']) : NULL),
                     'patient_dob'                           => $dob,
                     'sample_collection_date'                => $sampleCollectionDate,
-                    'sample_received_at_lab_datetime'       => $sampleReceivedAtLab,
+                    'sample_received_at_lab_datetime'    => $sampleReceivedAtLab,
                     'result_printed_datetime'               => $resultPrinterDateTime,
                     'line_of_treatment'                     => (trim($row['CurrentTreatment']) != '' ? trim($row['CurrentTreatment']) : NULL),
                     'is_sample_rejected'                    => (trim($row['IsSampleRejected']) != '' ? strtolower($row['IsSampleRejected']) : NULL),

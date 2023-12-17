@@ -149,17 +149,14 @@ class EidSampleService
         $sampleDb = $this->sm->get('EidSampleTableWithoutCache');
 
 
-        $numRows = 0;
-        $counter = 0;
-        foreach ($apiData as $key => $rowData) {
+        $numRows = $counter = 0;
+        $currentDateTime = CommonService::getDateTime();
+        foreach ($apiData as $rowData) {
             $counter++;
             $data = array();
             foreach ($columnList as $colName) {
                 $data[$colName] = isset($rowData[$colName]) ? $rowData[$colName] : null;
             }
-
-            $currentDateTime = CommonService::getDateTime();
-            $data['last_modified_datetime'] = $currentDateTime;
 
             $id = $sampleDb->insertOrUpdate($data);
             if (isset($id) && !empty($id) && is_numeric($id)) {

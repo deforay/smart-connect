@@ -7702,8 +7702,8 @@ class SampleTable extends AbstractTableGateway
 
             //var_dump($rResult);die;
 
-            $output = array();
-            $output[] = $headings = array("Sample Code", "Patient ID (ART No.)", "Gender", "Age In Years", "Clinic Name", "Clinic Code", "Clinic Phone Number", "Clinic Address", "Clinic HUB Name", "Clinic Contact Person", "Clinic Report Mail", "Clinic Country", "Clinic Longitude", "Clinic Latitude", "Sample Type", "Sample Collection Date", "LAB Name", "Lab Code", "Lab Phone Number", "Lab Address", "Lab HUB Name", "Lab Contact Person", "Lab Report Mail", "Lab Country", "Lab Longitude", "Lab Latitude", "Lab Type", "Lab Tested Date", "Log Value", "Absolute Value", "Text Value", "Absolute Decimal Value", "Result", "Testing Reason", "Sample Status", "Sample Received Datetime", "Line Of Treatment", "Sample Rejected", "Rejection Reason Name", "Rejection Reason Status", "Pregnant", "Breast Feeding", "Regimen Initiated Date", "ARV Adherance Percentage", "Is Adherance poor", "Approved Datetime", "Current Regimen", "Sample Registered Datetime");
+            $output = [];
+            $headings = array("Sample Code", "Patient ID (ART No.)", "Gender", "Age In Years", "Clinic Name", "Clinic Code", "Clinic Phone Number", "Clinic Address", "Clinic HUB Name", "Clinic Contact Person", "Clinic Report Mail", "Clinic Country", "Clinic Longitude", "Clinic Latitude", "Sample Type", "Sample Collection Date", "LAB Name", "Lab Code", "Lab Phone Number", "Lab Address", "Lab HUB Name", "Lab Contact Person", "Lab Report Mail", "Lab Country", "Lab Longitude", "Lab Latitude", "Lab Type", "Lab Tested Date", "Log Value", "Absolute Value", "Text Value", "Absolute Decimal Value", "Result", "Testing Reason", "Sample Status", "Sample Received Datetime", "Line Of Treatment", "Sample Rejected", "Rejection Reason Name", "Rejection Reason Status", "Pregnant", "Breast Feeding", "Regimen Initiated Date", "ARV Adherance Percentage", "Is Adherance poor", "Approved Datetime", "Current Regimen", "Sample Registered Datetime");
             foreach ($rResult as $aRow) {
                 $row = array();
                 $row[] = $aRow['sample_code'];
@@ -7764,13 +7764,7 @@ class SampleTable extends AbstractTableGateway
 
             $csvFile = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . 'backups' . DIRECTORY_SEPARATOR . 'export-data-' . $startDate . '-' . $endDate . '-' . mt_rand() . '.csv';
 
-            $fp = fopen($csvFile, 'w');
-
-            foreach ($output as $fields) {
-                fputcsv($fp, $fields);
-            }
-
-            fclose($fp);
+            CommonService::generateCsv($headings, $output, $csvFile);
 
             return array('fileName' => $csvFile, 'backupId' => $generateResult[0]['id']);
         }

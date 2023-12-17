@@ -75,16 +75,14 @@ class Covid19FormService
             $sampleDb = $this->sm->get('Covid19FormTableWithoutCache');
 
 
-            $numRows = 0;
-            $counter = 0;
+            $numRows = $counter = 0;
+            $currentDateTime = CommonService::getDateTime();
             foreach ($apiData as $rowData) {
                 $counter++;
                 $data = array();
                 foreach ($columnList as $colName) {
                     $data[$colName] = isset($rowData[$colName]) ? $rowData[$colName] : null;
                 }
-                $currentDateTime = CommonService::getDateTime();
-                $data['last_modified_datetime'] = $currentDateTime;
 
                 try {
 
