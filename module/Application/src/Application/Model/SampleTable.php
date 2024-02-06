@@ -214,7 +214,7 @@ class SampleTable extends AbstractTableGateway
         $rResult = $this->commonService->cacheQuery($cQueryStr, $dbAdapter);
         $rejTotal = 0;
         foreach ($rResult as $rRow) {
-            $displayDate = \Application\Service\CommonService::humanReadableDateFormat($rRow['rejectDate']);
+            $displayDate = CommonService::humanReadableDateFormat($rRow['rejectDate']);
             $rejectedResult[] = array(array('total' => $rRow['total']), 'date' => $displayDate, 'rejectDate' => $displayDate, 'rejectTotal' => $rejTotal += $rRow['total']);
         }
         return array('quickStats' => $quickStats, 'scResult' => $receivedResult, 'stResult' => $tResult, 'srResult' => $rejectedResult);
@@ -277,7 +277,7 @@ class SampleTable extends AbstractTableGateway
                 );
 
             if ($specimenTypes != null) {
-                $queryStr = $queryStr->where('vl.sample_type IN ("' . implode('", "', $specimenTypes) . '")');
+                $queryStr = $queryStr->where('vl.specimen_type IN ("' . implode('", "', $specimenTypes) . '")');
             }
             if ($facilityIdList != null) {
                 $queryStr = $queryStr->where('vl.lab_id IN ("' . implode('", "', $facilityIdList) . '")');
@@ -434,7 +434,7 @@ class SampleTable extends AbstractTableGateway
                 ->group('vl.lab_id');
 
             if ($specimenTypes != null) {
-                $query = $query->where('vl.sample_type IN ("' . implode('", "', $specimenTypes) . '")');
+                $query = $query->where('vl.specimen_type IN ("' . implode('", "', $specimenTypes) . '")');
             }
             if ($facilityIdList != null) {
                 $query = $query->where('vl.lab_id IN ("' . implode('", "', $facilityIdList) . '")');
@@ -587,7 +587,7 @@ class SampleTable extends AbstractTableGateway
                         // "monthDate" => new Expression("DATE_FORMAT(DATE(result_approved_datetime), '%b-%Y')"),
                         // "total_samples_pending" => new Expression("(SUM(CASE WHEN ((vl.vl_result_category IS NULL OR vl.vl_result_category = '' OR vl.vl_result_category = 'NULL') AND (vl.reason_for_sample_rejection IS NULL OR vl.reason_for_sample_rejection = '' OR vl.reason_for_sample_rejection = 0)) THEN 1 ELSE 0 END))"),
 
-                        "totalSamples" => new Expression('COUNT(*)'),
+                        "totalSamples" => new Expression('COUNT(vl_sample_id)'),
                         "monthDate" => new Expression("DATE_FORMAT(DATE(vl.sample_tested_datetime), '%b-%Y')"),
                         //"daydiff" => new Expression('AVG(ABS(TIMESTAMPDIFF(DAY,sample_tested_datetime,sample_collection_date)))'),
                         "AvgTestedDiff" => new Expression('CAST(ABS(AVG(TIMESTAMPDIFF(DAY,vl.sample_tested_datetime,vl.sample_collection_date))) AS DECIMAL (10,2))'),
@@ -600,16 +600,14 @@ class SampleTable extends AbstractTableGateway
             //     "(vl.sample_collection_date is not null AND vl.sample_collection_date not like '' AND DATE(vl.sample_collection_date) not like '1970-01-01' AND DATE(vl.sample_collection_date) not like '0000-00-00')
             //     AND (vl.sample_tested_datetime is not null AND vl.sample_tested_datetime not like '' AND DATE(vl.sample_tested_datetime) not like '1970-01-01' AND DATE(vl.sample_tested_datetime) not like '0000-00-00')"
             // );
-            $query = $query->where("
-                DATE(vl.sample_tested_datetime) BETWEEN '" . $startMonth . "'
-                AND '" . $endMonth . "' ");
+            $query = $query->where("DATE(vl.sample_tested_datetime) BETWEEN '$startMonth' AND '$endMonth'");
             $skipDays = (isset($skipDays) && $skipDays > 0) ? $skipDays : 120;
-            $query = $query->where('
-                (DATEDIFF(sample_tested_datetime,sample_collection_date) < ' . $skipDays . ' AND
-                DATEDIFF(sample_tested_datetime,sample_collection_date) >= 0)');
-            $query = $query->where('
-                    (DATEDIFF(result_printed_datetime,sample_collection_date) < ' . $skipDays . ' AND
-                    DATEDIFF(result_printed_datetime,sample_collection_date) >= 0)');
+            $query = $query->where("
+                                (DATEDIFF(sample_tested_datetime,sample_collection_date) < '$skipDays' AND
+                                DATEDIFF(sample_tested_datetime,sample_collection_date) >= 0)");
+            // $query = $query->where('
+            //         (DATEDIFF(result_printed_datetime,sample_collection_date) < ' . $skipDays . ' AND
+            //         DATEDIFF(result_printed_datetime,sample_collection_date) >= 0)');
 
             if ($facilityIdList != null) {
                 $query = $query->where('vl.lab_id IN ("' . implode('", "', $facilityIdList) . '")');
@@ -620,7 +618,7 @@ class SampleTable extends AbstractTableGateway
             // $query = $query->order(array(new Expression('DATE(vl.result_approved_datetime) ASC')));
             $query = $query->order('sample_tested_datetime ASC');
             $queryStr = $sql->buildSqlString($query);
-            error_log($queryStr);
+            //error_log($queryStr);
             //echo $queryStr;die;
             //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             $sampleResult = $this->commonService->cacheQuery($queryStr, $dbAdapter);
@@ -1181,7 +1179,7 @@ class SampleTable extends AbstractTableGateway
             $endMonth = str_replace(' ', '-', $params['toDate']) . date('-t', strtotime($params['toDate']));
         }
         $fQuery = $sql->select()->from(array('f' => 'facility_details'))
-            ->join(array('vl' => $this->table), 'vl.lab_id=f.facility_id', array('lab_id', 'sample_type', 'result'))
+            ->join(array('vl' => $this->table), 'vl.lab_id=f.facility_id', array('lab_id', 'specimen_type', 'result'))
             ->where('vl.lab_id !=0')
             ->group('f.facility_id');
         if (isset($params['lab']) && trim($params['lab']) != '') {
@@ -1329,7 +1327,7 @@ class SampleTable extends AbstractTableGateway
                 $sQuery = $sQuery->where("vl.vl_result_category like 'not suppressed%' OR vl.vl_result_category like 'Not Suppressed%' or vl.result_value_absolute_decimal >= 1000");
             }
             if (isset($params['sampleType']) && trim($params['sampleType']) != '') {
-                $sQuery = $sQuery->where('vl.sample_type="' . base64_decode(trim($params['sampleType'])) . '"');
+                $sQuery = $sQuery->where('vl.specimen_type="' . base64_decode(trim($params['sampleType'])) . '"');
             }
             if (isset($params['gender']) && $params['gender'] == 'F') {
                 $sQuery = $sQuery->where("vl.patient_gender IN ('f','female','F','FEMALE')");
@@ -1422,7 +1420,7 @@ class SampleTable extends AbstractTableGateway
             }
 
             if (isset($params['sampleTypeId']) && $params['sampleTypeId'] != '') {
-                $squery = $squery->where('vl.sample_type="' . base64_decode(trim($params['sampleTypeId'])) . '"');
+                $squery = $squery->where('vl.specimen_type="' . base64_decode(trim($params['sampleTypeId'])) . '"');
             }
             if (isset($params['adherence']) && trim($params['adherence']) != '') {
                 $squery = $squery->where(array("vl.arv_adherance_percentage ='" . $params['adherence'] . "'"));
@@ -1530,7 +1528,7 @@ class SampleTable extends AbstractTableGateway
                 $query = $query->where("(vl.vl_result_category like 'not suppressed%' OR vl.vl_result_category like 'Not Suppressed%' or vl.result_value_absolute_decimal >= 1000)");
             }
             if (isset($params['sampleTypeId']) && $params['sampleTypeId'] != '') {
-                $query = $query->where('vl.sample_type="' . base64_decode(trim($params['sampleTypeId'])) . '"');
+                $query = $query->where('vl.specimen_type="' . base64_decode(trim($params['sampleTypeId'])) . '"');
             }
             //print_r($params['age']);die;
             if (isset($params['age']) && trim($params['age']) != '') {
@@ -1651,7 +1649,7 @@ class SampleTable extends AbstractTableGateway
                 $query = $query->where("(vl.vl_result_category like 'not suppressed%' OR vl.vl_result_category like 'Not Suppressed%' or vl.result_value_absolute_decimal >= 1000)");
             }
             if (isset($params['sampleTypeId']) && $params['sampleTypeId'] != '') {
-                $query = $query->where('vl.sample_type="' . base64_decode(trim($params['sampleTypeId'])) . '"');
+                $query = $query->where('vl.specimen_type="' . base64_decode(trim($params['sampleTypeId'])) . '"');
             }
             //print_r($params['age']);die;
             if (isset($params['age']) && trim($params['age']) != '') {
@@ -1779,7 +1777,7 @@ class SampleTable extends AbstractTableGateway
                 $query = $query->where("(vl.vl_result_category like 'not suppressed%' OR vl.vl_result_category like 'Not Suppressed%' or vl.result_value_absolute_decimal >= 1000)");
             }
             if (isset($params['sampleTypeId']) && $params['sampleTypeId'] != '') {
-                $query = $query->where('vl.sample_type="' . base64_decode(trim($params['sampleTypeId'])) . '"');
+                $query = $query->where('vl.specimen_type="' . base64_decode(trim($params['sampleTypeId'])) . '"');
             }
 
             if (isset($params['adherence']) && trim($params['adherence']) != '') {
@@ -1888,7 +1886,7 @@ class SampleTable extends AbstractTableGateway
                 $query = $query->where("(vl.vl_result_category like 'not suppressed%' OR vl.vl_result_category like 'Not Suppressed%' or vl.result_value_absolute_decimal >= 1000)");
             }
             if (isset($params['sampleTypeId']) && $params['sampleTypeId'] != '') {
-                $query = $query->where('vl.sample_type="' . base64_decode(trim($params['sampleTypeId'])) . '"');
+                $query = $query->where('vl.specimen_type="' . base64_decode(trim($params['sampleTypeId'])) . '"');
             }
 
             if (isset($params['adherence']) && trim($params['adherence']) != '') {
@@ -1974,7 +1972,7 @@ class SampleTable extends AbstractTableGateway
                 $rQuery = $rQuery->where("(vl.vl_result_category like 'not suppressed%' OR vl.vl_result_category like 'Not Suppressed%' or vl.result_value_absolute_decimal >= 1000)");
             }
             if (isset($params['sampleTypeId']) && $params['sampleTypeId'] != '') {
-                $rQuery = $rQuery->where('vl.sample_type="' . base64_decode(trim($params['sampleTypeId'])) . '"');
+                $rQuery = $rQuery->where('vl.specimen_type="' . base64_decode(trim($params['sampleTypeId'])) . '"');
             }
             //print_r($params['age']);die;
             if (isset($params['age']) && trim($params['age']) != '') {
@@ -2164,7 +2162,7 @@ class SampleTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->from(array('vl' => $this->table))
-            ->columns(array('vl_sample_id', 'sample_code', 'vl_result_category', 'result_value_absolute_decimal', 'sampleCollectionDate' => new Expression('DATE(sample_collection_date)'), 'sample_type', 'sampleTestingDate' => new Expression('DATE(sample_tested_datetime)'), 'result_value_log', 'result_value_absolute', 'result_value_text', 'result'))
+            ->columns(array('vl_sample_id', 'sample_code', 'vl_result_category', 'result_value_absolute_decimal', 'sampleCollectionDate' => new Expression('DATE(sample_collection_date)'), 'specimen_type', 'sampleTestingDate' => new Expression('DATE(sample_tested_datetime)'), 'result_value_log', 'result_value_absolute', 'result_value_text', 'result'))
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'), 'left')
             ->join(array('r_r_r' => 'r_vl_sample_rejection_reasons'), 'r_r_r.rejection_reason_id=vl.reason_for_sample_rejection', array('rejection_reason_name'), 'left');
         //->where(array('f.facility_type'=>'1'));
@@ -2184,7 +2182,7 @@ class SampleTable extends AbstractTableGateway
             $sQuery = $sQuery->where("vl.vl_result_category like 'not suppressed%' OR vl.vl_result_category like 'Not Suppressed%' or vl.result_value_absolute_decimal >= 1000");
         }
         if (isset($parameters['sampleTypeId']) && trim($parameters['sampleTypeId']) != '') {
-            $sQuery = $sQuery->where('vl.sample_type="' . base64_decode(trim($parameters['sampleTypeId'])) . '"');
+            $sQuery = $sQuery->where('vl.specimen_type="' . base64_decode(trim($parameters['sampleTypeId'])) . '"');
         }
         //print_r($parameters['age']);die;
         if (isset($parameters['age']) && trim($parameters['age']) != '') {
@@ -2254,7 +2252,7 @@ class SampleTable extends AbstractTableGateway
             $hQuery = '';
             $hQuery = clone $sQuery;
             $hQuery->join(array('pat' => 'patients'), 'pat.patient_art_no=vl.patient_art_no', array('first_name', 'middle_name', 'last_name'), 'left')
-                ->join(array('st' => 'r_vl_sample_type'), 'st.sample_id=vl.sample_type', array('sample_name'), 'left')
+                ->join(array('st' => 'r_vl_sample_type'), 'st.sample_id=vl.specimen_type', array('sample_name'), 'left')
                 ->join(array('lds' => 'geographical_divisions'), 'lds.geo_id=f.facility_state_id', array('facilityState' => 'geo_name'), 'left')
                 ->join(array('ldd' => 'geographical_divisions'), 'ldd.geo_id=f.facility_district_id', array('facilityDistrict' => 'geo_name'), 'left')
                 ->where('vl_result_category="Not Suppressed"');
@@ -2352,11 +2350,11 @@ class SampleTable extends AbstractTableGateway
                         //"total" => new Expression('COUNT(*)'),
                         "day" => new Expression("DATE_FORMAT(DATE(sample_collection_date), '%d-%b-%Y')"),
 
-                        "DBSGreaterThan1000" => new Expression("SUM(CASE WHEN (vl.sample_type=$this->dbsId AND (vl.vl_result_category like 'not%' OR vl.vl_result_category like 'Not%' or vl.result_value_absolute_decimal >= 1000)) THEN 1 ELSE 0 END)"),
-                        "DBSLesserThan1000" => new Expression("SUM(CASE WHEN (vl.sample_type=$this->dbsId AND (vl.vl_result_category like 'suppressed%' OR vl.vl_result_category like 'Suppressed%' )) THEN 1 ELSE 0 END)"),
+                        "DBSGreaterThan1000" => new Expression("SUM(CASE WHEN (vl.specimen_type=$this->dbsId AND (vl.vl_result_category like 'not%' OR vl.vl_result_category like 'Not%' or vl.result_value_absolute_decimal >= 1000)) THEN 1 ELSE 0 END)"),
+                        "DBSLesserThan1000" => new Expression("SUM(CASE WHEN (vl.specimen_type=$this->dbsId AND (vl.vl_result_category like 'suppressed%' OR vl.vl_result_category like 'Suppressed%' )) THEN 1 ELSE 0 END)"),
 
-                        "OGreaterThan1000" => new Expression("SUM(CASE WHEN (vl.sample_type!=$this->dbsId AND (vl.vl_result_category like 'not%' OR vl.vl_result_category like 'Not%' or vl.result_value_absolute_decimal >= 1000)) THEN 1 ELSE 0 END)"),
-                        "OLesserThan1000" => new Expression("SUM(CASE WHEN (vl.sample_type!=$this->dbsId AND (vl.vl_result_category like 'suppressed%' OR vl.vl_result_category like 'Suppressed%' )) THEN 1 ELSE 0 END)"),
+                        "OGreaterThan1000" => new Expression("SUM(CASE WHEN (vl.specimen_type!=$this->dbsId AND (vl.vl_result_category like 'not%' OR vl.vl_result_category like 'Not%' or vl.result_value_absolute_decimal >= 1000)) THEN 1 ELSE 0 END)"),
+                        "OLesserThan1000" => new Expression("SUM(CASE WHEN (vl.specimen_type!=$this->dbsId AND (vl.vl_result_category like 'suppressed%' OR vl.vl_result_category like 'Suppressed%' )) THEN 1 ELSE 0 END)"),
                     )
                 )
                 ->where(array("DATE(vl.sample_collection_date) <='$endDate'", "DATE(vl.sample_collection_date) >='$startDate'"));
@@ -2373,12 +2371,12 @@ class SampleTable extends AbstractTableGateway
             }
             if (isset($params['frmSrc']) && $params['frmSrc'] == 'change') {
                 if (isset($params['sampleType']) && $params['sampleType'] == 'dbs') {
-                    $queryStr = $queryStr->where("vl.sample_type = $this->dbsId");
+                    $queryStr = $queryStr->where("vl.specimen_type = $this->dbsId");
                 } elseif (isset($params['sampleType']) && $params['sampleType'] == 'others') {
-                    $queryStr = $queryStr->where("vl.sample_type != $this->dbsId");
+                    $queryStr = $queryStr->where("vl.specimen_type != $this->dbsId");
                 }
             } elseif (isset($params['sampleTypeId']) && $params['sampleTypeId'] != '') {
-                $queryStr = $queryStr->where('vl.sample_type="' . base64_decode(trim($params['sampleTypeId'])) . '"');
+                $queryStr = $queryStr->where('vl.specimen_type="' . base64_decode(trim($params['sampleTypeId'])) . '"');
             }
             //print_r($params['age']);die;
             if (isset($params['age']) && trim($params['age']) != '') {
@@ -2535,7 +2533,7 @@ class SampleTable extends AbstractTableGateway
                     $countQuery = $countQuery->where("(vl.vl_result_category like 'not%' OR vl.vl_result_category like 'Not%' or vl.result_value_absolute_decimal >= 1000)");
                 }
                 if (isset($params['sampleType']) && trim($params['sampleType']) != '') {
-                    $countQuery = $countQuery->where('vl.sample_type="' . base64_decode(trim($params['sampleType'])) . '"');
+                    $countQuery = $countQuery->where('vl.specimen_type="' . base64_decode(trim($params['sampleType'])) . '"');
                 }
                 if (isset($params['sampleStatus']) && $params['sampleStatus'] == 'sample_tested') {
                     $countQuery = $countQuery->where("((vl.vl_result_category IS NOT NULL AND vl.vl_result_category != '' AND vl.vl_result_category != 'NULL') OR (vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0))");
@@ -2676,7 +2674,7 @@ class SampleTable extends AbstractTableGateway
                     $countQuery = $countQuery->where("(vl.vl_result_category like 'not%' OR vl.vl_result_category like 'Not%' or vl.result_value_absolute_decimal >= 1000)");
                 }
                 if (isset($params['sampleType']) && trim($params['sampleType']) != '') {
-                    $countQuery = $countQuery->where('vl.sample_type="' . base64_decode(trim($params['sampleType'])) . '"');
+                    $countQuery = $countQuery->where('vl.specimen_type="' . base64_decode(trim($params['sampleType'])) . '"');
                 }
                 if (isset($params['sampleStatus']) && $params['sampleStatus'] == 'sample_tested') {
                     $countQuery = $countQuery->where("((vl.vl_result_category IS NOT NULL AND vl.vl_result_category != '' AND vl.vl_result_category != 'NULL') OR (vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0))");
@@ -2747,8 +2745,8 @@ class SampleTable extends AbstractTableGateway
             $sQuery = $sql->select()->from(array('vl' => $this->table))
                 ->columns(
                     array(
-                        "DBS" => new Expression("SUM(CASE WHEN ((vl.sample_type=$this->dbsId AND (vl.vl_result_category IS NOT NULL AND vl.vl_result_category != '' AND vl.vl_result_category != 'NULL') OR (vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0))) THEN 1 ELSE 0 END)"),
-                        "Others" => new Expression("SUM(CASE WHEN ((vl.sample_type!=$this->dbsId AND (vl.vl_result_category IS NOT NULL AND vl.vl_result_category != '' AND vl.vl_result_category != 'NULL') OR (vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0))) THEN 1 ELSE 0 END)"),
+                        "DBS" => new Expression("SUM(CASE WHEN ((vl.specimen_type=$this->dbsId AND (vl.vl_result_category IS NOT NULL AND vl.vl_result_category != '' AND vl.vl_result_category != 'NULL') OR (vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0))) THEN 1 ELSE 0 END)"),
+                        "Others" => new Expression("SUM(CASE WHEN ((vl.specimen_type!=$this->dbsId AND (vl.vl_result_category IS NOT NULL AND vl.vl_result_category != '' AND vl.vl_result_category != 'NULL') OR (vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0))) THEN 1 ELSE 0 END)"),
                     )
                 )
                 ->join(array('f' => 'facility_details'), 'f.facility_id=vl.lab_id', array(), 'left')
@@ -2808,7 +2806,7 @@ class SampleTable extends AbstractTableGateway
                 $sQuery = $sQuery->where("vl.result IS NOT NULL AND vl.result!= '' AND vl.result >= 1000 AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime not like '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00'");
             }
             if (isset($params['sampleType']) && trim($params['sampleType']) != '') {
-                $sQuery = $sQuery->where('vl.sample_type="' . base64_decode(trim($params['sampleType'])) . '"');
+                $sQuery = $sQuery->where('vl.specimen_type="' . base64_decode(trim($params['sampleType'])) . '"');
             }
             if (isset($params['gender']) && $params['gender'] == 'F') {
                 $sQuery = $sQuery->where("vl.patient_gender IN ('f','female','F','FEMALE')");
@@ -2930,7 +2928,7 @@ class SampleTable extends AbstractTableGateway
                 $sQuery = $sQuery->where("vl.result IS NOT NULL AND vl.result!= '' AND vl.result >= 1000 AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime not like '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00'");
             }
             if (isset($params['sampleType']) && trim($params['sampleType']) != '') {
-                $sQuery = $sQuery->where('vl.sample_type="' . base64_decode(trim($params['sampleType'])) . '"');
+                $sQuery = $sQuery->where('vl.specimen_type="' . base64_decode(trim($params['sampleType'])) . '"');
             }
             if (isset($params['gender']) && $params['gender'] == 'F') {
                 $sQuery = $sQuery->where("vl.patient_gender IN ('f','female','F','FEMALE')");
@@ -3025,7 +3023,7 @@ class SampleTable extends AbstractTableGateway
             //         $sQuery = $sQuery->where("vl.result IS NOT NULL AND vl.result!= '' AND vl.result >= 1000 AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime not like '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00'");
             //     }
             //     if(isset($params['sampleType']) && trim($params['sampleType'])!=''){
-            //         $sQuery = $sQuery->where('vl.sample_type="'.base64_decode(trim($params['sampleType'])).'"');
+            //         $sQuery = $sQuery->where('vl.specimen_type="'.base64_decode(trim($params['sampleType'])).'"');
             //     }
             //     if(isset($params['gender']) && $params['gender']=='F'){
             //         $sQuery = $sQuery->where("vl.patient_gender IN ('f','female','F','FEMALE')");
@@ -3165,11 +3163,11 @@ class SampleTable extends AbstractTableGateway
                 "rejected_samples" => new Expression("SUM(CASE WHEN (vl.reason_for_sample_rejection !='' AND vl.reason_for_sample_rejection !='0' AND vl.reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END)")
             ))
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'))
-            ->join(array('rs' => 'r_vl_sample_type'), 'rs.sample_id=vl.sample_type', array('sample_name'))
+            ->join(array('rs' => 'r_vl_sample_type'), 'rs.sample_id=vl.specimen_type', array('sample_name'))
             ->join(array('l' => 'facility_details'), 'l.facility_id=vl.lab_id', array(), 'left')
             ->where("sample_collection_date is not null AND sample_collection_date not like '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00' AND f.facility_type = 1")
             ->group(new Expression('DATE(sample_collection_date)'))
-            ->group('vl.sample_type')
+            ->group('vl.specimen_type')
             ->group('vl.facility_id');
         //filter start
         if (trim($parameters['fromDate']) != '' && trim($parameters['toDate']) != '') {
@@ -3227,7 +3225,7 @@ class SampleTable extends AbstractTableGateway
             $sQuery = $sQuery->where("vl.result IS NOT NULL AND vl.result!= '' AND vl.result >= 1000 AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime not like '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00'");
         }
         if (isset($parameters['sampleType']) && trim($parameters['sampleType']) != '') {
-            $sQuery = $sQuery->where('vl.sample_type="' . base64_decode(trim($parameters['sampleType'])) . '"');
+            $sQuery = $sQuery->where('vl.specimen_type="' . base64_decode(trim($parameters['sampleType'])) . '"');
         }
         if (isset($parameters['gender']) && $parameters['gender'] == 'F') {
             $sQuery = $sQuery->where("vl.patient_gender IN ('f','female','F','FEMALE')");
@@ -3282,11 +3280,11 @@ class SampleTable extends AbstractTableGateway
                 "total_samples_received" => new Expression("(COUNT(*))")
             ))
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'))
-            ->join(array('rs' => 'r_vl_sample_type'), 'rs.sample_id=vl.sample_type', array('sample_name'))
+            ->join(array('rs' => 'r_vl_sample_type'), 'rs.sample_id=vl.specimen_type', array('sample_name'))
             ->join(array('l' => 'facility_details'), 'l.facility_id=vl.lab_id', array(), 'left')
             ->where("sample_collection_date is not null AND sample_collection_date not like '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00' AND f.facility_type = 1")
             ->group(new Expression('DATE(sample_collection_date)'))
-            ->group('vl.sample_type')
+            ->group('vl.specimen_type')
             ->group('vl.facility_id');
         if ($loginContainer->role != 1) {
             $mappedFacilities = $loginContainer->mappedFacilities ?? [];
@@ -3475,7 +3473,7 @@ class SampleTable extends AbstractTableGateway
             $sQuery = $sQuery->where("vl.result IS NOT NULL AND vl.result!= '' AND vl.result >= 1000 AND vl.result!='Failed' AND vl.result!='failed' AND vl.result!='Fail' AND vl.result!='fail' AND vl.result!='No Sample' AND vl.result!='no sample' AND sample_tested_datetime is not null AND sample_tested_datetime not like '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00'");
         }
         if (isset($parameters['sampleType']) && trim($parameters['sampleType']) != '') {
-            $sQuery = $sQuery->where('vl.sample_type="' . base64_decode(trim($parameters['sampleType'])) . '"');
+            $sQuery = $sQuery->where('vl.specimen_type="' . base64_decode(trim($parameters['sampleType'])) . '"');
         }
         if (isset($parameters['sampleStatus']) && $parameters['sampleStatus'] == 'sample_tested') {
             $sQuery = $sQuery->where("((vl.result IS NOT NULL AND vl.result != '' AND vl.result != 'NULL' AND sample_tested_datetime is not null AND sample_tested_datetime not like '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00') OR (vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0))");
@@ -3691,7 +3689,7 @@ class SampleTable extends AbstractTableGateway
             $sQuery = $sQuery->where('vl.facility_id IN (' . $parameters['clinicId'] . ')');
         }
         if (isset($parameters['sampleType']) && trim($parameters['sampleType']) != '') {
-            $sQuery = $sQuery->where('vl.sample_type="' . base64_decode(trim($parameters['sampleType'])) . '"');
+            $sQuery = $sQuery->where('vl.specimen_type="' . base64_decode(trim($parameters['sampleType'])) . '"');
         }
         if (isset($parameters['gender']) && $parameters['gender'] == 'F') {
             $sQuery = $sQuery->where("vl.patient_gender IN ('f','female','F','FEMALE')");
@@ -3866,7 +3864,7 @@ class SampleTable extends AbstractTableGateway
             $countQuery = $countQuery->where($where);
         }
         if (isset($params['sampleType']) && trim($params['sampleType']) != '') {
-            $countQuery = $countQuery->where('vl.sample_type="' . base64_decode(trim($params['sampleType'])) . '"');
+            $countQuery = $countQuery->where('vl.specimen_type="' . base64_decode(trim($params['sampleType'])) . '"');
         }
 
         if (isset($params['gender']) && $params['gender'] == 'F') {
@@ -3979,7 +3977,7 @@ class SampleTable extends AbstractTableGateway
             $countQuery = $countQuery->where($where);
         }
         if (isset($params['sampleType']) && trim($params['sampleType']) != '') {
-            $countQuery = $countQuery->where('vl.sample_type="' . base64_decode(trim($params['sampleType'])) . '"');
+            $countQuery = $countQuery->where('vl.specimen_type="' . base64_decode(trim($params['sampleType'])) . '"');
         }
 
         if (isset($params['gender']) && $params['gender'] == 'F') {
@@ -4092,7 +4090,7 @@ class SampleTable extends AbstractTableGateway
             $countQuery = $countQuery->where($where);
         }
         if (isset($params['sampleType']) && trim($params['sampleType']) != '') {
-            $countQuery = $countQuery->where('vl.sample_type="' . base64_decode(trim($params['sampleType'])) . '"');
+            $countQuery = $countQuery->where('vl.specimen_type="' . base64_decode(trim($params['sampleType'])) . '"');
         }
 
         if (isset($params['gender']) && $params['gender'] == 'F') {
@@ -4206,7 +4204,7 @@ class SampleTable extends AbstractTableGateway
             $countQuery = $countQuery->where($where);
         }
         if (isset($params['sampleType']) && trim($params['sampleType']) != '') {
-            $countQuery = $countQuery->where('vl.sample_type="' . base64_decode(trim($params['sampleType'])) . '"');
+            $countQuery = $countQuery->where('vl.specimen_type="' . base64_decode(trim($params['sampleType'])) . '"');
         }
 
         if (isset($params['gender']) && $params['gender'] == 'F') {
@@ -4337,7 +4335,7 @@ class SampleTable extends AbstractTableGateway
             ->columns(array('sample_code', 'collectionDate' => new Expression('DATE(sample_collection_date)'), 'receivedDate' => new Expression('DATE(sample_received_at_lab_datetime)')))
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facilityName' => 'facility_name', 'facilityCode' => 'facility_code'))
             ->join(array('l' => 'facility_details'), 'l.facility_id=vl.lab_id', array('labName' => 'facility_name'), 'left')
-            ->join(array('rs' => 'r_vl_sample_type'), 'rs.sample_id=vl.sample_type', array('sample_name'), 'left')
+            ->join(array('rs' => 'r_vl_sample_type'), 'rs.sample_id=vl.specimen_type', array('sample_name'), 'left')
             ->where("(vl.vl_result_category is NULL OR vl.vl_result_category ='') AND (reason_for_sample_rejection is NULL or reason_for_sample_rejection ='' or vl.reason_for_sample_rejection = 0)");
         if (isset($parameters['daterange']) && trim($parameters['daterange']) != '' && trim($splitDate[0]) != '' && trim($splitDate[1]) != '') {
             $sQuery = $sQuery->where(array("vl.sample_collection_date >='" . $splitDate[0] . " 00:00:00" . "'", "vl.sample_collection_date <='" . $splitDate[1] . " 23:59:59" . "'"));
@@ -4391,7 +4389,7 @@ class SampleTable extends AbstractTableGateway
             $sQuery = $sQuery->where($where);
         }
         if (isset($parameters['sampleType']) && trim($parameters['sampleType']) != '') {
-            $sQuery = $sQuery->where('vl.sample_type="' . base64_decode(trim($parameters['sampleType'])) . '"');
+            $sQuery = $sQuery->where('vl.specimen_type="' . base64_decode(trim($parameters['sampleType'])) . '"');
         }
 
         if (isset($parameters['gender']) && $parameters['gender'] == 'F') {
@@ -4445,7 +4443,7 @@ class SampleTable extends AbstractTableGateway
             ->columns(array('sample_code', 'collectionDate' => new Expression('DATE(sample_collection_date)'), 'receivedDate' => new Expression('DATE(sample_received_at_lab_datetime)')))
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facilityName' => 'facility_name', 'facilityCode' => 'facility_code'))
             ->join(array('l' => 'facility_details'), 'l.facility_id=vl.lab_id', array('labName' => 'facility_name'), 'left')
-            ->join(array('rs' => 'r_vl_sample_type'), 'rs.sample_id=vl.sample_type', array('sample_name'), 'left')
+            ->join(array('rs' => 'r_vl_sample_type'), 'rs.sample_id=vl.specimen_type', array('sample_name'), 'left')
             ->where("(vl.vl_result_category is NULL OR vl.vl_result_category ='') AND (reason_for_sample_rejection is NULL or reason_for_sample_rejection ='' or vl.reason_for_sample_rejection = 0)");
         if ($loginContainer->role != 1) {
             $mappedFacilities = $loginContainer->mappedFacilities ?? [];
@@ -4527,7 +4525,7 @@ class SampleTable extends AbstractTableGateway
             ->join(array('l' => 'facility_details'), 'l.facility_id=vl.lab_id', array('lab_name' => 'facility_name'), 'left')
             ->join(array('f_p_l_d' => 'geographical_divisions'), 'f_p_l_d.geo_id=f.facility_state_id', array('province' => 'geo_name'), 'left')
             ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district_id', array('district' => 'geo_name'), 'left')
-            //->join(array('rs'=>'r_vl_sample_type'),'rs.sample_id=vl.sample_type',array('sample_name'),'left')
+            //->join(array('rs'=>'r_vl_sample_type'),'rs.sample_id=vl.specimen_type',array('sample_name'),'left')
             ->where(array(
                 "MONTH(vl.sample_collection_date) in ($quarters)",
                 "YEAR(vl.sample_collection_date) = $year"
@@ -4676,7 +4674,7 @@ class SampleTable extends AbstractTableGateway
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'), 'left')
             ->join(array('f_p_l_d' => 'geographical_divisions'), 'f_p_l_d.geo_id=f.facility_state_id', array('province' => 'geo_name'), 'left')
             ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district_id', array('district' => 'geo_name'), 'left')
-            ->join(array('rs' => 'r_vl_sample_type'), 'rs.sample_id=vl.sample_type', array('sample_name'), 'left')
+            ->join(array('rs' => 'r_vl_sample_type'), 'rs.sample_id=vl.specimen_type', array('sample_name'), 'left')
             //->group('sample_code')
             //->group('facility_id')
             //->having('COUNT(*) > 1');
@@ -4713,7 +4711,7 @@ class SampleTable extends AbstractTableGateway
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'), 'left')
             ->join(array('f_p_l_d' => 'geographical_divisions'), 'f_p_l_d.geo_id=f.facility_state_id', array('province' => 'geo_name'), 'left')
             ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district_id', array('district' => 'geo_name'), 'left')
-            ->join(array('rs' => 'r_vl_sample_type'), 'rs.sample_id=vl.sample_type', array('sample_name'), 'left')
+            ->join(array('rs' => 'r_vl_sample_type'), 'rs.sample_id=vl.specimen_type', array('sample_name'), 'left')
             //->group('sample_code')
             //->group('facility_id')
             //->having('COUNT(*) > 1');
@@ -4824,12 +4822,12 @@ class SampleTable extends AbstractTableGateway
             ->columns(
                 array(
                     "monthDate" => new Expression("DATE_FORMAT(DATE(sample_collection_date), '%b-%Y')"),
-                    "total_dbs" => new Expression("SUM(CASE WHEN (sample_type=$this->dbsId) THEN 1 ELSE 0 END)"),
-                    "total_plasma" => new Expression("SUM(CASE WHEN (sample_type=$this->plasmaId) THEN 1 ELSE 0 END)"),
-                    "total_others" => new Expression("SUM(CASE WHEN ((sample_type!= $this->dbsId AND sample_type!= $this->plasmaId) AND sample_type IS NOT NULL AND sample_type!= '') THEN 1 ELSE 0 END)")
+                    "total_dbs" => new Expression("SUM(CASE WHEN (specimen_type=$this->dbsId) THEN 1 ELSE 0 END)"),
+                    "total_plasma" => new Expression("SUM(CASE WHEN (specimen_type=$this->plasmaId) THEN 1 ELSE 0 END)"),
+                    "total_others" => new Expression("SUM(CASE WHEN ((specimen_type!= $this->dbsId AND specimen_type!= $this->plasmaId) AND specimen_type IS NOT NULL AND specimen_type!= '') THEN 1 ELSE 0 END)")
                 )
             )
-            ->join(array('rs' => 'r_vl_sample_type'), 'rs.sample_id=vl.sample_type', array('sample_name'))
+            ->join(array('rs' => 'r_vl_sample_type'), 'rs.sample_id=vl.specimen_type', array('sample_name'))
             //->where("sample_collection_date <= NOW()")
             //->where("sample_collection_date >= DATE_ADD(Now(),interval - 12 month)")
             ->group(array(new Expression('YEAR(vl.sample_collection_date)'), new Expression('MONTH(vl.sample_collection_date)')));
@@ -4967,14 +4965,14 @@ class SampleTable extends AbstractTableGateway
                     "total_samples_tested" => new Expression("(SUM(CASE WHEN ((vl.vl_result_category IS NOT NULL AND vl.vl_result_category != '' AND vl.vl_result_category != 'NULL') OR (vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0)) THEN 1 ELSE 0 END))"),
                     "total_samples_pending" => new Expression("(SUM(CASE WHEN ((vl.vl_result_category IS NULL OR vl.vl_result_category = '' OR vl.vl_result_category = 'NULL') AND (vl.reason_for_sample_rejection IS NULL OR vl.reason_for_sample_rejection = '' OR vl.reason_for_sample_rejection = 0)) THEN 1 ELSE 0 END))"),
                     "total_samples_rejected" => new Expression("SUM(CASE WHEN (vl.reason_for_sample_rejection !='' AND vl.reason_for_sample_rejection !='0' AND vl.reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END)"),
-                    "total_dbs_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (sample_type = $this->dbsId) THEN 1 ELSE 0 END)/COUNT(*))*100),2)"),
-                    "total_plasma_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (sample_type = $this->plasmaId) THEN 1 ELSE 0 END)/COUNT(*))*100),2)"),
-                    "total_others_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (sample_type!= $this->dbsId AND sample_type!= $this->plasmaId) THEN 1 ELSE 0 END)/COUNT(*))*100),2)")
+                    "total_dbs_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (specimen_type = $this->dbsId) THEN 1 ELSE 0 END)/COUNT(*))*100),2)"),
+                    "total_plasma_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (specimen_type = $this->plasmaId) THEN 1 ELSE 0 END)/COUNT(*))*100),2)"),
+                    "total_others_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (specimen_type!= $this->dbsId AND specimen_type!= $this->plasmaId) THEN 1 ELSE 0 END)/COUNT(*))*100),2)")
                 )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'))
             ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_state_id', array('province' => 'geo_name'))
-            ->join(array('rs' => 'r_vl_sample_type'), 'rs.sample_id=vl.sample_type', array('sample_name'))
+            ->join(array('rs' => 'r_vl_sample_type'), 'rs.sample_id=vl.specimen_type', array('sample_name'))
             ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')")
             ->group('f.facility_state_id');
         if (isset($sWhere) && $sWhere != "") {
@@ -5020,7 +5018,7 @@ class SampleTable extends AbstractTableGateway
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'))
             ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_state_id', array('province' => 'geo_name'))
-            ->join(array('rs' => 'r_vl_sample_type'), 'rs.sample_id=vl.sample_type', array('sample_name'))
+            ->join(array('rs' => 'r_vl_sample_type'), 'rs.sample_id=vl.specimen_type', array('sample_name'))
             ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')")
             ->group('f.facility_state_id');
 
@@ -5155,14 +5153,14 @@ class SampleTable extends AbstractTableGateway
                     "total_samples_tested" => new Expression("(SUM(CASE WHEN ((vl.vl_result_category IS NOT NULL AND vl.vl_result_category != '' AND vl.vl_result_category != 'NULL') OR (vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0)) THEN 1 ELSE 0 END))"),
                     "total_samples_pending" => new Expression("(SUM(CASE WHEN ((vl.vl_result_category IS NULL OR vl.vl_result_category = '' OR vl.vl_result_category = 'NULL') AND (vl.reason_for_sample_rejection IS NULL OR vl.reason_for_sample_rejection = '' OR vl.reason_for_sample_rejection = 0)) THEN 1 ELSE 0 END))"),
                     "total_samples_rejected" => new Expression("SUM(CASE WHEN (vl.reason_for_sample_rejection !='' AND vl.reason_for_sample_rejection !='0' AND vl.reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END)"),
-                    "total_dbs_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (sample_type = $this->dbsId) THEN 1 ELSE 0 END)/COUNT(*))*100),2)"),
-                    "total_plasma_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (sample_type = $this->plasmaId) THEN 1 ELSE 0 END)/COUNT(*))*100),2)"),
-                    "total_others_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (sample_type!= $this->dbsId AND sample_type!= $this->plasmaId) THEN 1 ELSE 0 END)/COUNT(*))*100),2)")
+                    "total_dbs_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (specimen_type = $this->dbsId) THEN 1 ELSE 0 END)/COUNT(*))*100),2)"),
+                    "total_plasma_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (specimen_type = $this->plasmaId) THEN 1 ELSE 0 END)/COUNT(*))*100),2)"),
+                    "total_others_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (specimen_type!= $this->dbsId AND specimen_type!= $this->plasmaId) THEN 1 ELSE 0 END)/COUNT(*))*100),2)")
                 )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'))
             ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district_id', array('district' => 'geo_name'))
-            ->join(array('rs' => 'r_vl_sample_type'), 'rs.sample_id=vl.sample_type', array('sample_name'))
+            ->join(array('rs' => 'r_vl_sample_type'), 'rs.sample_id=vl.specimen_type', array('sample_name'))
             ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')")
             ->group('f.facility_district_id');
         if (isset($sWhere) && $sWhere != "") {
@@ -5208,7 +5206,7 @@ class SampleTable extends AbstractTableGateway
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'))
             ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district_id', array('district' => 'geo_name'))
-            ->join(array('rs' => 'r_vl_sample_type'), 'rs.sample_id=vl.sample_type', array('sample_name'))
+            ->join(array('rs' => 'r_vl_sample_type'), 'rs.sample_id=vl.specimen_type', array('sample_name'))
             ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '' AND DATE(vl.sample_collection_date) !='1970-01-01' AND DATE(vl.sample_collection_date) !='0000-00-00')")
             ->group('f.facility_district_id');
 
@@ -5344,15 +5342,15 @@ class SampleTable extends AbstractTableGateway
                     "total_samples_tested" => new Expression("(SUM(CASE WHEN ((vl.vl_result_category IS NOT NULL AND vl.vl_result_category != '' AND vl.vl_result_category != 'NULL') OR (vl.reason_for_sample_rejection IS NOT NULL AND vl.reason_for_sample_rejection != '' AND vl.reason_for_sample_rejection != 0)) THEN 1 ELSE 0 END))"),
                     "total_samples_pending" => new Expression("(SUM(CASE WHEN ((vl.vl_result_category IS NULL OR vl.vl_result_category = '' OR vl.vl_result_category = 'NULL') AND (vl.reason_for_sample_rejection IS NULL OR vl.reason_for_sample_rejection = '' OR vl.reason_for_sample_rejection = 0)) THEN 1 ELSE 0 END))"),
                     "total_samples_rejected" => new Expression("(SUM(CASE WHEN (reason_for_sample_rejection !='' AND reason_for_sample_rejection !='0' AND reason_for_sample_rejection IS NOT NULL) THEN 1 ELSE 0 END))"),
-                    "total_dbs_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (sample_type = $this->dbsId) THEN 1 ELSE 0 END)/COUNT(*))*100),2)"),
-                    "total_plasma_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (sample_type = $this->plasmaId) THEN 1 ELSE 0 END)/COUNT(*))*100),2)"),
-                    "total_others_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (sample_type!= $this->dbsId AND sample_type!= $this->plasmaId) THEN 1 ELSE 0 END)/COUNT(*))*100),2)")
+                    "total_dbs_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (specimen_type = $this->dbsId) THEN 1 ELSE 0 END)/COUNT(*))*100),2)"),
+                    "total_plasma_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (specimen_type = $this->plasmaId) THEN 1 ELSE 0 END)/COUNT(*))*100),2)"),
+                    "total_others_percentage" => new Expression("TRUNCATE(((SUM(CASE WHEN (specimen_type!= $this->dbsId AND specimen_type!= $this->plasmaId) THEN 1 ELSE 0 END)/COUNT(*))*100),2)")
                 )
             )
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'))
             ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district_id', array('district' => 'geo_name'))
             ->join(array('f_d_l_dp' => 'geographical_divisions'), 'f_d_l_dp.geo_id=f.facility_state_id', array('province' => 'geo_name'))
-            ->join(array('rs' => 'r_vl_sample_type'), 'rs.sample_id=vl.sample_type', array('sample_name'))
+            ->join(array('rs' => 'r_vl_sample_type'), 'rs.sample_id=vl.specimen_type', array('sample_name'))
             ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '' AND DATE(vl.sample_collection_date) not like '1970-01-01' AND DATE(vl.sample_collection_date) not like '0000-00-00')")
             ->group('vl.facility_id');
 
@@ -5396,7 +5394,7 @@ class SampleTable extends AbstractTableGateway
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array())
             ->join(array('f_d_l_d' => 'geographical_divisions'), 'f_d_l_d.geo_id=f.facility_district_id', array())
             ->join(array('f_d_l_dp' => 'geographical_divisions'), 'f_d_l_dp.geo_id=f.facility_state_id', array())
-            ->join(array('rs' => 'r_vl_sample_type'), 'rs.sample_id=vl.sample_type', array())
+            ->join(array('rs' => 'r_vl_sample_type'), 'rs.sample_id=vl.specimen_type', array())
             ->where("(vl.sample_collection_date is not null AND vl.sample_collection_date not like '' AND DATE(vl.sample_collection_date) not like '1970-01-01' AND DATE(vl.sample_collection_date) not like '0000-00-00')")
             ->group('vl.facility_id');
 
@@ -7108,7 +7106,7 @@ class SampleTable extends AbstractTableGateway
                 $rQuery = $rQuery->where('vl.reason_for_vl_testing IN (' . $params['testReason'] . ')');
             }
             if (isset($params['sampleTypeId']) && $params['sampleTypeId'] != '') {
-                $rQuery = $rQuery->where('vl.sample_type="' . base64_decode(trim($params['sampleTypeId'])) . '"');
+                $rQuery = $rQuery->where('vl.specimen_type="' . base64_decode(trim($params['sampleTypeId'])) . '"');
             }
             if (isset($params['adherence']) && trim($params['adherence']) != '') {
                 $rQuery = $rQuery->where(array("vl.arv_adherance_percentage ='" . $params['adherence'] . "'"));
@@ -7214,7 +7212,7 @@ class SampleTable extends AbstractTableGateway
                 $rQuery = $rQuery->where('vl.reason_for_vl_testing IN (' . $params['testReason'] . ')');
             }
             if (isset($params['sampleTypeId']) && $params['sampleTypeId'] != '') {
-                $rQuery = $rQuery->where('vl.sample_type="' . base64_decode(trim($params['sampleTypeId'])) . '"');
+                $rQuery = $rQuery->where('vl.specimen_type="' . base64_decode(trim($params['sampleTypeId'])) . '"');
             }
             if (isset($params['adherence']) && trim($params['adherence']) != '') {
                 $rQuery = $rQuery->where(array("vl.arv_adherance_percentage ='" . $params['adherence'] . "'"));
@@ -7322,7 +7320,7 @@ class SampleTable extends AbstractTableGateway
                         $rQuery = $rQuery->where('vl.reason_for_vl_testing IN (' . $params['testReason'] . ')');
                     }
                     if (isset($params['sampleTypeId']) && $params['sampleTypeId'] != '') {
-                        $rQuery = $rQuery->where('vl.sample_type="' . base64_decode(trim($params['sampleTypeId'])) . '"');
+                        $rQuery = $rQuery->where('vl.specimen_type="' . base64_decode(trim($params['sampleTypeId'])) . '"');
                     }
                     if (isset($params['adherence']) && trim($params['adherence']) != '') {
                         $rQuery = $rQuery->where(array("vl.arv_adherance_percentage ='" . $params['adherence'] . "'"));
@@ -7687,7 +7685,7 @@ class SampleTable extends AbstractTableGateway
             FROM  " . $this->table . "  as vl
             LEFT JOIN facility_details as f ON vl.facility_id=f.facility_id
             LEFT JOIN facility_details as l_f ON vl.lab_id=l_f.facility_id
-            LEFT JOIN r_vl_sample_type as s ON s.sample_id=vl.sample_type
+            LEFT JOIN r_vl_sample_type as s ON s.sample_id=vl.specimen_type
             LEFT JOIN r_sample_status as ts ON ts.status_id=vl.result_status
             LEFT JOIN r_vl_test_reasons as tr ON tr.test_reason_id=vl.reason_for_vl_testing
             LEFT JOIN facility_type as ft ON ft.facility_type_id=f.facility_type

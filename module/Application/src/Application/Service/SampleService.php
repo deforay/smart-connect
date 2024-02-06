@@ -394,7 +394,7 @@ class SampleService
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name', 'facility_code', 'facility_logo'), 'left')
             ->join(array('l_s' => 'geographical_divisions'), 'l_s.geo_id=f.facility_state_id', array('provinceName' => 'geo_name'), 'left')
             ->join(array('l_d' => 'geographical_divisions'), 'l_d.geo_id=f.facility_district_id', array('districtName' => 'geo_name'), 'left')
-            ->join(array('rs' => 'r_vl_sample_type'), 'rs.sample_id=vl.sample_type', array('sample_name'), 'left')
+            ->join(array('rs' => 'r_vl_sample_type'), 'rs.sample_id=vl.specimen_type', array('sample_name'), 'left')
             ->join(array('l' => 'facility_details'), 'l.facility_id=vl.lab_id', array('labName' => 'facility_name'), 'left')
             ->join(array('u' => 'user_details'), 'u.user_id=vl.result_approved_by', array('approvedBy' => 'user_name'), 'left')
             ->join(array('r_r_r' => 'r_vl_sample_rejection_reasons'), 'r_r_r.rejection_reason_id=vl.reason_for_sample_rejection', array('rejection_reason_name'), 'left')
@@ -1783,13 +1783,13 @@ class SampleService
                             $sampleType = $this->checkSampleType(trim($row['sample_name']));
                             if ($sampleType) {
                                 $sampleTypeDb->update(array('sample_name' => trim($row['sample_name']), 'status' => trim($row['sample_type_status'])), array('sample_id' => $sampleType['sample_id']));
-                                $data['sample_type'] = $sampleType['sample_id'];
+                                $data['specimen_type'] = $sampleType['sample_id'];
                             } else {
                                 $sampleTypeDb->insert(array('sample_name' => trim($row['sample_name']), 'status' => trim($row['sample_type_status'])));
-                                $data['sample_type'] = $sampleTypeDb->lastInsertValue;
+                                $data['specimen_type'] = $sampleTypeDb->lastInsertValue;
                             }
                         } else {
-                            $data['sample_type'] = null;
+                            $data['specimen_type'] = null;
                         }
                         //check sample rejection reason
                         if (trim($row['rejection_reason_name']) != '') {
@@ -2015,13 +2015,13 @@ class SampleService
                     $sampleType = $this->checkSampleType(trim($row['SampleType']));
                     if ($sampleType) {
                         $sampleTypeDb->update(array('sample_name' => trim($row['SampleType'])), array('sample_id' => $sampleType['sample_id']));
-                        $data['sample_type'] = $sampleType['sample_id'];
+                        $data['specimen_type'] = $sampleType['sample_id'];
                     } else {
                         $sampleTypeDb->insert(array('sample_name' => trim($row['SampleType']), 'status' => 'active'));
-                        $data['sample_type'] = $sampleTypeDb->lastInsertValue;
+                        $data['specimen_type'] = $sampleTypeDb->lastInsertValue;
                     }
                 } else {
-                    $data['sample_type'] = null;
+                    $data['specimen_type'] = null;
                 }
 
                 //check sample test reason

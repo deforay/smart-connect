@@ -2743,7 +2743,7 @@ class EidSampleTable extends AbstractTableGateway
             $query = $sql->select()->from(array('vl' => $this->table))
                 ->columns(
                     array(
-                        "totalSamples" => new Expression('COUNT(*)'),
+                        "totalSamples" => new Expression('COUNT(eid_id)'),
                         "monthDate" => new Expression("DATE_FORMAT(DATE(vl.sample_tested_datetime), '%b-%Y')"),
                         "daydiff" => new Expression('ABS(TIMESTAMPDIFF(DAY,sample_tested_datetime,sample_collection_date))'),
                         "AvgTestedDiff" => new Expression('CAST(ABS(AVG(TIMESTAMPDIFF(DAY,vl.sample_tested_datetime,vl.sample_collection_date))) AS DECIMAL (10,2))'),
@@ -2761,9 +2761,9 @@ class EidSampleTable extends AbstractTableGateway
                 AND DATE(vl.sample_tested_datetime) <= '" . $endMonth . "' ");
 
             $skipDays = (isset($skipDays) && $skipDays > 0) ? $skipDays : 120;
-            $query = $query->where('
-                (DATEDIFF(sample_tested_datetime,sample_collection_date) < ' . $skipDays . ' AND
-                DATEDIFF(sample_tested_datetime,sample_collection_date) >= 0)');
+            $query = $query->where("
+                                (DATEDIFF(sample_tested_datetime,sample_collection_date) < '$skipDays' AND
+                                DATEDIFF(sample_tested_datetime,sample_collection_date) >= 0)");
 
             if ($facilityIdList != null) {
                 $query = $query->where('vl.lab_id IN ("' . implode('", "', $facilityIdList) . '")');
