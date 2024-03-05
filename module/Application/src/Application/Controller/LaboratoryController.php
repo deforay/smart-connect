@@ -2,16 +2,17 @@
 
 namespace Application\Controller;
 
-use Laminas\View\Model\ViewModel;
 use Laminas\Json\Json;
 
+use Application\Service\CommonService;
+use Application\Service\SampleService;
 use Application\Controller\AbstractAppController;
 
 class LaboratoryController extends AbstractAppController
 {
 
-    public \Application\Service\SampleService $sampleService;
-    public \Application\Service\CommonService $commonService;
+    public SampleService $sampleService;
+    public CommonService $commonService;
 
     public function __construct($sampleService, $commonService)
     {
@@ -296,7 +297,7 @@ class LaboratoryController extends AbstractAppController
             $params = $request->getPost();
 
             $result = $this->sampleService->getSampleVolume($params);
-            
+
             $this->view->setVariables(array('result' => $result))
                 ->setTerminal(true);
             return $this->view;
@@ -311,7 +312,7 @@ class LaboratoryController extends AbstractAppController
             $params = $request->getPost();
 
             $result = $this->sampleService->getFemalePatientResult($params);
-            
+
             $this->view->setVariables(array('result' => $result))
                 ->setTerminal(true);
             return $this->view;
@@ -326,7 +327,7 @@ class LaboratoryController extends AbstractAppController
             $params = $request->getPost();
 
             $result = $this->sampleService->getLineOfTreatment($params);
-            
+
             $this->view->setVariables(array('result' => $result))
                 ->setTerminal(true);
             return $this->view;
@@ -342,7 +343,7 @@ class LaboratoryController extends AbstractAppController
 
             $sampleType = $this->sampleService->getSampleType();
             $result = $this->sampleService->getFacilites($params);
-            
+
             $this->view->setVariables(array('result' => $result, 'height' => $params['height']))
                 ->setTerminal(true);
             return $this->view;
@@ -357,7 +358,7 @@ class LaboratoryController extends AbstractAppController
             $params = $request->getPost();
 
             $result = $this->sampleService->getSampleDetails($params);
-            
+
             $this->view->setVariables(array('params' => $params, 'result' => $result))
                 ->setTerminal(true);
             return $this->view;
@@ -372,7 +373,7 @@ class LaboratoryController extends AbstractAppController
             $params = $request->getPost();
 
             $result = $this->sampleService->getVlOutComes($params);
-            
+
             $this->view->setVariables(array('result' => $result))
                 ->setTerminal(true);
             return $this->view;
@@ -387,7 +388,7 @@ class LaboratoryController extends AbstractAppController
             $params = $request->getPost();
 
             $result = $this->sampleService->getBarSampleDetails($params);
-            
+
             $this->view->setVariables(array('params' => $params, 'result' => $result))
                 ->setTerminal(true);
             return $this->view;
@@ -482,7 +483,7 @@ class LaboratoryController extends AbstractAppController
             $params = $request->getPost();
 
             $result = $this->sampleService->getLabSampleDetails($params);
-            
+
             $this->view->setVariables(array('result' => $result))
                 ->setTerminal(true);
             return $this->view;
@@ -497,7 +498,7 @@ class LaboratoryController extends AbstractAppController
             $params = $request->getPost();
 
             $result = $this->sampleService->getLabBarSampleDetails($params);
-            
+
             $this->view->setVariables(array('result' => $result))
                 ->setTerminal(true);
             return $this->view;
@@ -551,7 +552,7 @@ class LaboratoryController extends AbstractAppController
         if ($request->isPost()) {
             $params = $request->getPost();
             $file = $this->sampleService->generateSampleResultExcel($params);
-            
+
             $this->view->setVariables(array('file' => $file))
                 ->setTerminal(true);
             return $this->view;
@@ -566,7 +567,7 @@ class LaboratoryController extends AbstractAppController
             $params = $request->getPost();
 
             $file = $this->sampleService->generateLabTestedSampleExcel($params);
-            
+
             $this->view->setVariables(array('file' => $file))
                 ->setTerminal(true);
             return $this->view;
@@ -636,7 +637,7 @@ class LaboratoryController extends AbstractAppController
             $params = $request->getPost();
 
             $result = $this->sampleService->getBarSampleDetails($params);
-            
+
             $this->view->setVariables(array('params' => $params, 'result' => $result))
                 ->setTerminal(true);
             return $this->view;
@@ -651,7 +652,7 @@ class LaboratoryController extends AbstractAppController
             $params = $request->getPost();
 
             $result = $this->sampleService->getSampleDetails($params);
-            
+
             $this->view->setVariables(array('params' => $params, 'result' => $result))
                 ->setTerminal(true);
             return $this->view;
@@ -678,7 +679,7 @@ class LaboratoryController extends AbstractAppController
             $params = $request->getPost();
 
             $file = $this->sampleService->generateLabTestedSampleTatExcel($params);
-            
+
             $this->view->setVariables(array('file' => $file))
                 ->setTerminal(true);
             return $this->view;
@@ -717,7 +718,7 @@ class LaboratoryController extends AbstractAppController
             $params = $request->getPost();
 
             $result = $this->commonService->getSampleTestedLocationInfo($params);
-            
+
             $this->view->setVariables(array('result' => $result))
                 ->setTerminal(true);
             return $this->view;
@@ -761,7 +762,7 @@ class LaboratoryController extends AbstractAppController
             $params = $request->getPost();
 
             $result = $this->sampleService->getProvinceWiseResultAwaitedDrillDown($params);
-            
+
             $this->view->setVariables(array('result' => $result))
                 ->setTerminal(true);
             return $this->view;
@@ -776,7 +777,7 @@ class LaboratoryController extends AbstractAppController
             $params = $request->getPost();
 
             $result = $this->sampleService->getLabWiseResultAwaitedDrillDown($params);
-            
+
             $this->view->setVariables(array('result' => $result))
                 ->setTerminal(true);
             return $this->view;
@@ -791,7 +792,7 @@ class LaboratoryController extends AbstractAppController
             $params = $request->getPost();
 
             $result = $this->sampleService->getDistrictWiseResultAwaitedDrillDown($params);
-            
+
             $this->view->setVariables(array('result' => $result))
                 ->setTerminal(true);
             return $this->view;
@@ -806,7 +807,7 @@ class LaboratoryController extends AbstractAppController
             $params = $request->getPost();
 
             $result = $this->sampleService->getClinicWiseResultAwaitedDrillDown($params);
-            
+
             $this->view->setVariables(array('result' => $result))
                 ->setTerminal(true);
             return $this->view;
@@ -833,7 +834,7 @@ class LaboratoryController extends AbstractAppController
             $params = $request->getPost();
 
             $file = $this->sampleService->generateResultsAwaitedSampleExcel($params);
-            
+
             $this->view->setVariables(array('file' => $file))
                 ->setTerminal(true);
             return $this->view;
@@ -857,7 +858,7 @@ class LaboratoryController extends AbstractAppController
             $params = $request->getPost();
 
             $result = $this->sampleService->getSampleTestReasonBarChartDetails($params);
-            
+
             $this->view->setVariables(array(
                 'result' => $result
             ))->setTerminal(true);
@@ -872,7 +873,7 @@ class LaboratoryController extends AbstractAppController
             $params = $request->getPost();
 
             $result = $this->sampleService->getSampleTestedResultAgeGroupDetails($params);
-            
+
             $this->view->setVariables(array('result' => $result))
                 ->setTerminal(true);
             return $this->view;
@@ -886,7 +887,7 @@ class LaboratoryController extends AbstractAppController
             $params = $request->getPost();
 
             $result = $this->sampleService->getSampleTestedResultAgeGroupDetails($params);
-            
+
             $this->view->setVariables(array('result' => $result))
                 ->setTerminal(true);
             return $this->view;
@@ -900,7 +901,7 @@ class LaboratoryController extends AbstractAppController
             $params = $request->getPost();
 
             $result = $this->sampleService->getSampleTestedResultAgeGroupDetails($params);
-            
+
             $this->view->setVariables(array('result' => $result))
                 ->setTerminal(true);
             return $this->view;
@@ -914,7 +915,7 @@ class LaboratoryController extends AbstractAppController
             $params = $request->getPost();
 
             $result = $this->sampleService->getSampleTestedResultAgeGroupDetails($params);
-            
+
             $this->view->setVariables(array('result' => $result))
                 ->setTerminal(true);
             return $this->view;
@@ -928,7 +929,7 @@ class LaboratoryController extends AbstractAppController
             $params = $request->getPost();
 
             $result = $this->sampleService->getSampleTestedResultAgeGroupDetails($params);
-            
+
             $this->view->setVariables(array('result' => $result))
                 ->setTerminal(true);
             return $this->view;
@@ -943,7 +944,7 @@ class LaboratoryController extends AbstractAppController
             $parameters = $request->getPost();
 
             $result = $this->sampleService->getSampleStatusDataTable($parameters);
-            
+
             $this->view->setVariables(array('result' => $result))
                 ->setTerminal(true);
             return $this->view;

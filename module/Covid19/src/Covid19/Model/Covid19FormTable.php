@@ -2409,7 +2409,7 @@ class Covid19FormTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = array();
-        $skipDays = isset($this->config['defaults']['tat-skipdays']) ? $this->config['defaults']['tat-skipdays'] : 120;
+        $skipDays = isset($this->config['defaults']['tat-skipdays']) ? $this->config['defaults']['tat-skipdays'] : 365;
         $facilityIdList = null;
 
         // FILTER :: Checking if the facility filter is set
@@ -2470,7 +2470,7 @@ class Covid19FormTable extends AbstractTableGateway
                         AND DATE(covid19.result_approved_datetime) <= '" . $endMonth . "' ");
 
 
-            $skipDays = (isset($skipDays) && $skipDays > 0) ? $skipDays : 120;
+            $skipDays = (isset($skipDays) && $skipDays > 0) ? $skipDays : 365;
             $query = $query->where('
                 (DATEDIFF(result_approved_datetime,sample_collection_date) < ' . $skipDays . ' AND
                 DATEDIFF(result_approved_datetime,sample_collection_date) >= 0)');
@@ -2712,7 +2712,7 @@ class Covid19FormTable extends AbstractTableGateway
         $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $skipDays = isset($this->config['defaults']['tat-skipdays']) ? $this->config['defaults']['tat-skipdays'] : 120;
+        $skipDays = isset($this->config['defaults']['tat-skipdays']) ? $this->config['defaults']['tat-skipdays'] : 365;
         $squery = $sql->select()->from(array('covid19' => $this->table))
             ->columns(
                 array(
@@ -2765,7 +2765,7 @@ class Covid19FormTable extends AbstractTableGateway
         $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $skipDays = isset($this->config['defaults']['tat-skipdays']) ? $this->config['defaults']['tat-skipdays'] : 120;
+        $skipDays = isset($this->config['defaults']['tat-skipdays']) ? $this->config['defaults']['tat-skipdays'] : 365;
         $squery = $sql->select()->from(array('covid19' => $this->table))
             ->columns(
                 array(
@@ -2786,18 +2786,18 @@ class Covid19FormTable extends AbstractTableGateway
                 )
             );
         if ($skipDays > 0) {
-            $squery = $squery->where('
-                DATEDIFF(sample_received_at_lab_datetime,sample_collection_date)<120 AND
+            $squery = $squery->where("
+                DATEDIFF(sample_received_at_lab_datetime,sample_collection_date) < $skipDays AND
                 DATEDIFF(sample_received_at_lab_datetime,sample_collection_date)>=0 AND
 
-                DATEDIFF(sample_registered_at_lab,sample_received_at_lab_datetime)<120 AND
+                DATEDIFF(sample_registered_at_lab,sample_received_at_lab_datetime) < $skipDays AND
                 DATEDIFF(sample_registered_at_lab,sample_received_at_lab_datetime)>=0 AND
 
-                DATEDIFF(sample_tested_datetime,sample_received_at_lab_datetime)<120 AND
+                DATEDIFF(sample_tested_datetime,sample_received_at_lab_datetime) < $skipDays AND
                 DATEDIFF(sample_tested_datetime,sample_registered_at_lab)>=0 AND
 
-                DATEDIFF(result_approved_datetime,sample_tested_datetime)<120 AND
-                DATEDIFF(result_approved_datetime,sample_tested_datetime)>=0');
+                DATEDIFF(result_approved_datetime,sample_tested_datetime) < $skipDays AND
+                DATEDIFF(result_approved_datetime,sample_tested_datetime)>=0");
         }
 
         if (isset($labs) && !empty($labs)) {
@@ -2816,7 +2816,7 @@ class Covid19FormTable extends AbstractTableGateway
         $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $skipDays = isset($this->config['defaults']['tat-skipdays']) ? $this->config['defaults']['tat-skipdays'] : 120;
+        $skipDays = isset($this->config['defaults']['tat-skipdays']) ? $this->config['defaults']['tat-skipdays'] : 365;
         $squery = $sql->select()->from(array('covid19' => $this->table))
             ->columns(
                 array(
@@ -2837,18 +2837,18 @@ class Covid19FormTable extends AbstractTableGateway
                 )
             );
         if ($skipDays > 0) {
-            $squery = $squery->where('
-                DATEDIFF(sample_received_at_lab_datetime,sample_collection_date)<120 AND
+            $squery = $squery->where("
+                DATEDIFF(sample_received_at_lab_datetime,sample_collection_date) < $skipDays AND
                 DATEDIFF(sample_received_at_lab_datetime,sample_collection_date)>=0 AND
 
-                DATEDIFF(sample_registered_at_lab,sample_received_at_lab_datetime)<120 AND
+                DATEDIFF(sample_registered_at_lab,sample_received_at_lab_datetime) < $skipDays AND
                 DATEDIFF(sample_registered_at_lab,sample_received_at_lab_datetime)>=0 AND
 
-                DATEDIFF(sample_tested_datetime,sample_received_at_lab_datetime)<120 AND
+                DATEDIFF(sample_tested_datetime,sample_received_at_lab_datetime) < $skipDays AND
                 DATEDIFF(sample_tested_datetime,sample_registered_at_lab)>=0 AND
 
-                DATEDIFF(result_approved_datetime,sample_tested_datetime)<120 AND
-                DATEDIFF(result_approved_datetime,sample_tested_datetime)>=0');
+                DATEDIFF(result_approved_datetime,sample_tested_datetime) < $skipDays AND
+                DATEDIFF(result_approved_datetime,sample_tested_datetime)>=0");
         }
 
         if (isset($labs) && !empty($labs)) {

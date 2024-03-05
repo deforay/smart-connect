@@ -582,9 +582,10 @@ class Module
 					{
 						$sampleTable = $diContainer->get('SampleTable');
 						$apiTrackerTable = $diContainer->get('DashApiReceiverStatsTable');
+						$facilityTable = $diContainer->get('FacilityTable');
 						$commonService = $diContainer->get('CommonService');
 						$dbAdapter = $diContainer->get('Laminas\Db\Adapter\Adapter');
-						return new SampleService($diContainer, $sampleTable, $commonService, $apiTrackerTable, $dbAdapter);
+						return new SampleService($diContainer, $sampleTable, $commonService, $apiTrackerTable, $facilityTable, $dbAdapter);
 					}
 				},
 				'SummaryService'  => new class

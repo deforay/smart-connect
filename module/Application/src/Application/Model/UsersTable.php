@@ -27,7 +27,8 @@ class UsersTable extends AbstractTableGateway
     public $sm = null;
     public array $config;
     public $useCurrentSampleTable = null;
-    public \Application\Service\CommonService $commonService;
+    public CommonService $commonService;
+    protected $adapter;
     public function __construct(Adapter $adapter, $sm = null, $commonService = null)
     {
         $this->adapter = $adapter;

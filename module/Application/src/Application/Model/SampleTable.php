@@ -537,7 +537,7 @@ class SampleTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = array();
-        $skipDays = isset($this->config['defaults']['tat-skipdays']) ? $this->config['defaults']['tat-skipdays'] : 120;
+        $skipDays = isset($this->config['defaults']['tat-skipdays']) ? $this->config['defaults']['tat-skipdays'] : 365;
 
 
         $facilityIdList = null;
@@ -579,7 +579,7 @@ class SampleTable extends AbstractTableGateway
 
             $query = $sql->select()->from(array('vl' => $this->table))
                 ->columns(
-                    array(
+                    [
                         // "total_samples_collected" => new Expression('COUNT(*)'),
                         // "month" => new Expression("MONTH(result_approved_datetime)"),
                         // "year" => new Expression("YEAR(result_approved_datetime)"),
@@ -594,14 +594,14 @@ class SampleTable extends AbstractTableGateway
                         "AvgReceivedDiff" => new Expression('CAST(ABS(AVG(TIMESTAMPDIFF(DAY,vl.sample_received_at_lab_datetime,vl.sample_collection_date))) AS DECIMAL (10,2))'),
                         "AvgReceivedTested" => new Expression('CAST(ABS(AVG(TIMESTAMPDIFF(DAY,vl.sample_tested_datetime,vl.sample_received_at_lab_datetime))) AS DECIMAL (10,2))'),
                         "AvgReceivedPrinted" => new Expression('CAST(ABS(AVG(TIMESTAMPDIFF(DAY,vl.result_printed_datetime,vl.sample_collection_date))) AS DECIMAL (10,2))')
-                    )
+                    ]
                 );
             // $query = $query->where(
             //     "(vl.sample_collection_date is not null AND vl.sample_collection_date not like '' AND DATE(vl.sample_collection_date) not like '1970-01-01' AND DATE(vl.sample_collection_date) not like '0000-00-00')
             //     AND (vl.sample_tested_datetime is not null AND vl.sample_tested_datetime not like '' AND DATE(vl.sample_tested_datetime) not like '1970-01-01' AND DATE(vl.sample_tested_datetime) not like '0000-00-00')"
             // );
             $query = $query->where("DATE(vl.sample_tested_datetime) BETWEEN '$startMonth' AND '$endMonth'");
-            $skipDays = (isset($skipDays) && $skipDays > 0) ? $skipDays : 120;
+            $skipDays = (isset($skipDays) && $skipDays > 0) ? $skipDays : 365;
             $query = $query->where("
                                 (DATEDIFF(sample_tested_datetime,sample_collection_date) < '$skipDays' AND
                                 DATEDIFF(sample_tested_datetime,sample_collection_date) >= 0)");
@@ -4460,8 +4460,8 @@ class SampleTable extends AbstractTableGateway
             "aaData" => array()
         );
         foreach ($rResult as $aRow) {
-            $displayCollectionDate = \Application\Service\CommonService::humanReadableDateFormat($aRow['collectionDate']);
-            $displayReceivedDate = \Application\Service\CommonService::humanReadableDateFormat($aRow['receivedDate']);
+            $displayCollectionDate = CommonService::humanReadableDateFormat($aRow['collectionDate']);
+            $displayReceivedDate = CommonService::humanReadableDateFormat($aRow['receivedDate']);
             $row = array();
             $row[] = $aRow['sample_code'];
             $row[] = $displayCollectionDate;
@@ -7401,7 +7401,7 @@ class SampleTable extends AbstractTableGateway
         $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $skipDays = isset($this->config['defaults']['tat-skipdays']) ? $this->config['defaults']['tat-skipdays'] : 120;
+        $skipDays = isset($this->config['defaults']['tat-skipdays']) ? $this->config['defaults']['tat-skipdays'] : 365;
         $squery = $sql->select()->from(array('vl' => $this->table))
             ->columns(
                 array(
@@ -7461,7 +7461,7 @@ class SampleTable extends AbstractTableGateway
         $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $skipDays = isset($this->config['defaults']['tat-skipdays']) ? $this->config['defaults']['tat-skipdays'] : 120;
+        $skipDays = isset($this->config['defaults']['tat-skipdays']) ? $this->config['defaults']['tat-skipdays'] : 365;
         $squery = $sql->select()->from(array('vl' => $this->table))
             ->columns(
                 array(
@@ -7482,18 +7482,18 @@ class SampleTable extends AbstractTableGateway
                 )
             );
         if ($skipDays > 0) {
-            $squery = $squery->where('
-                DATEDIFF(sample_received_at_lab_datetime,sample_collection_date)<120 AND
+            $squery = $squery->where("
+                DATEDIFF(sample_received_at_lab_datetime,sample_collection_date) < $skipDays AND
                 DATEDIFF(sample_received_at_lab_datetime,sample_collection_date)>=0 AND
 
-                DATEDIFF(sample_registered_at_lab,sample_received_at_lab_datetime)<120 AND
+                DATEDIFF(sample_registered_at_lab,sample_received_at_lab_datetime) < $skipDays AND
                 DATEDIFF(sample_registered_at_lab,sample_received_at_lab_datetime)>=0 AND
 
-                DATEDIFF(sample_tested_datetime,sample_received_at_lab_datetime)<120 AND
+                DATEDIFF(sample_tested_datetime,sample_received_at_lab_datetime) < $skipDays AND
                 DATEDIFF(sample_tested_datetime,sample_registered_at_lab)>=0 AND
 
-                DATEDIFF(result_approved_datetime,sample_tested_datetime)<120 AND
-                DATEDIFF(result_approved_datetime,sample_tested_datetime)>=0');
+                DATEDIFF(result_approved_datetime,sample_tested_datetime) < $skipDays AND
+                DATEDIFF(result_approved_datetime,sample_tested_datetime)>=0");
         }
 
         if (isset($labs) && !empty($labs)) {
@@ -7512,7 +7512,7 @@ class SampleTable extends AbstractTableGateway
         $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $skipDays = isset($this->config['defaults']['tat-skipdays']) ? $this->config['defaults']['tat-skipdays'] : 120;
+        $skipDays = isset($this->config['defaults']['tat-skipdays']) ? $this->config['defaults']['tat-skipdays'] : 365;
         $squery = $sql->select()->from(array('vl' => $this->table))
             ->columns(
                 array(
@@ -7533,18 +7533,18 @@ class SampleTable extends AbstractTableGateway
                 )
             );
         if ($skipDays > 0) {
-            $squery = $squery->where('
-                DATEDIFF(sample_received_at_lab_datetime,sample_collection_date)<120 AND
-                DATEDIFF(sample_received_at_lab_datetime,sample_collection_date)>=0 AND
+            $squery = $squery->where("
+                DATEDIFF(sample_received_at_lab_datetime,sample_collection_date) < $skipDays AND
+                DATEDIFF(sample_received_at_lab_datetime,sample_collection_date) >= 0 AND
 
-                DATEDIFF(sample_registered_at_lab,sample_received_at_lab_datetime)<120 AND
+                DATEDIFF(sample_registered_at_lab,sample_received_at_lab_datetime) < $skipDays AND
                 DATEDIFF(sample_registered_at_lab,sample_received_at_lab_datetime)>=0 AND
 
-                DATEDIFF(sample_tested_datetime,sample_received_at_lab_datetime)<120 AND
+                DATEDIFF(sample_tested_datetime,sample_received_at_lab_datetime) < $skipDays AND
                 DATEDIFF(sample_tested_datetime,sample_registered_at_lab)>=0 AND
 
-                DATEDIFF(result_approved_datetime,sample_tested_datetime)<120 AND
-                DATEDIFF(result_approved_datetime,sample_tested_datetime)>=0');
+                DATEDIFF(result_approved_datetime,sample_tested_datetime) < $skipDays AND
+                DATEDIFF(result_approved_datetime,sample_tested_datetime)>= 0");
         }
 
         if (isset($labs) && !empty($labs)) {
@@ -7662,8 +7662,8 @@ class SampleTable extends AbstractTableGateway
             f.latitude,
             f.facility_type,
             f.status as facility_status,
-            ft.facility_type_name,
-            lft.facility_type_name as labFacilityTypeName,
+            ft.facility_type,
+            lft.facility_type as labFacilityTypeName,
             l_f.facility_name as labName,
             l_f.facility_code as labCode,
             l_f.facility_state as labState,

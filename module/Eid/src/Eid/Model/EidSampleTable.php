@@ -2641,15 +2641,16 @@ class EidSampleTable extends AbstractTableGateway
             $facilityIdList = null;
 
             if (isset($params['facilityId']) && trim($params['facilityId']) != '') {
-                $fQuery = $sql->select()->from(array('f' => 'facility_details'))->columns(array('facility_id'))
+                $fQuery = $sql->select()->from(array('f' => 'facility_details'))
+                    ->columns(array('facility_id'))
                     ->where('f.facility_type = 2 AND f.status="active"');
                 $fQuery = $fQuery->where('f.facility_id IN (' . $params['facilityId'] . ')');
                 $fQueryStr = $sql->buildSqlString($fQuery);
                 $facilityResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
                 $facilityIdList = array_column($facilityResult, 'facility_id');
             } elseif (!empty($this->mappedFacilities)) {
-                $fQuery = $sql->select()->from(array('f' => 'facility_details'))->columns(array('facility_id'))
-                    //->where('f.facility_type = 2 AND f.status="active"')
+                $fQuery = $sql->select()->from(array('f' => 'facility_details'))
+                    ->columns(array('facility_id'))
                     ->where('f.facility_id IN ("' . implode('", "', $this->mappedFacilities) . '")');
                 $fQueryStr = $sql->buildSqlString($fQuery);
                 $facilityResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -2703,7 +2704,7 @@ class EidSampleTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $result = array();
-        $skipDays = isset($this->config['defaults']['tat-skipdays']) ? $this->config['defaults']['tat-skipdays'] : 120;
+        $skipDays = isset($this->config['defaults']['tat-skipdays']) ? $this->config['defaults']['tat-skipdays'] : 365;
 
 
         $facilityIdList = null;
@@ -2760,7 +2761,7 @@ class EidSampleTable extends AbstractTableGateway
                 DATE(vl.sample_tested_datetime) >= '" . $startMonth . "'
                 AND DATE(vl.sample_tested_datetime) <= '" . $endMonth . "' ");
 
-            $skipDays = (isset($skipDays) && $skipDays > 0) ? $skipDays : 120;
+            $skipDays = (isset($skipDays) && $skipDays > 0) ? $skipDays : 365;
             $query = $query->where("
                                 (DATEDIFF(sample_tested_datetime,sample_collection_date) < '$skipDays' AND
                                 DATEDIFF(sample_tested_datetime,sample_collection_date) >= 0)");
@@ -2886,7 +2887,6 @@ class EidSampleTable extends AbstractTableGateway
                 $facilityIdList = array_column($facilityResult, 'facility_id');
             } elseif (!empty($this->mappedFacilities)) {
                 $fQuery = $sql->select()->from(array('f' => 'facility_details'))->columns(array('facility_id'))
-                    //->where('f.facility_type = 2 AND f.status="active"')
                     ->where('f.facility_id IN ("' . implode('", "', $this->mappedFacilities) . '")');
                 $fQueryStr = $sql->buildSqlString($fQuery);
                 $facilityResult = $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -2945,7 +2945,7 @@ class EidSampleTable extends AbstractTableGateway
         $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $skipDays = isset($this->config['defaults']['tat-skipdays']) ? $this->config['defaults']['tat-skipdays'] : 120;
+        $skipDays = isset($this->config['defaults']['tat-skipdays']) ? $this->config['defaults']['tat-skipdays'] : 365;
         $squery = $sql->select()->from(array('vl' => $this->table))
             ->columns(
                 array(
@@ -2999,7 +2999,7 @@ class EidSampleTable extends AbstractTableGateway
         $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $skipDays = isset($this->config['defaults']['tat-skipdays']) ? $this->config['defaults']['tat-skipdays'] : 120;
+        $skipDays = isset($this->config['defaults']['tat-skipdays']) ? $this->config['defaults']['tat-skipdays'] : 365;
         $squery = $sql->select()->from(array('vl' => $this->table))
             ->columns(
                 array(
@@ -3020,18 +3020,18 @@ class EidSampleTable extends AbstractTableGateway
                 )
             );
         if ($skipDays > 0) {
-            $squery = $squery->where('
-                DATEDIFF(sample_received_at_lab_datetime,sample_collection_date)<120 AND
+            $squery = $squery->where("
+                DATEDIFF(sample_received_at_lab_datetime,sample_collection_date) < $skipDays AND
                 DATEDIFF(sample_received_at_lab_datetime,sample_collection_date)>=0 AND
 
-                DATEDIFF(sample_registered_at_lab,sample_received_at_lab_datetime)<120 AND
+                DATEDIFF(sample_registered_at_lab,sample_received_at_lab_datetime) < $skipDays AND
                 DATEDIFF(sample_registered_at_lab,sample_received_at_lab_datetime)>=0 AND
 
-                DATEDIFF(sample_tested_datetime,sample_received_at_lab_datetime)<120 AND
+                DATEDIFF(sample_tested_datetime,sample_received_at_lab_datetime) < $skipDays AND
                 DATEDIFF(sample_tested_datetime,sample_registered_at_lab)>=0 AND
 
-                DATEDIFF(result_approved_datetime,sample_tested_datetime)<120 AND
-                DATEDIFF(result_approved_datetime,sample_tested_datetime)>=0');
+                DATEDIFF(result_approved_datetime,sample_tested_datetime) < $skipDays AND
+                DATEDIFF(result_approved_datetime,sample_tested_datetime)>=0");
         }
 
         if (isset($labs) && !empty($labs)) {
@@ -3053,7 +3053,7 @@ class EidSampleTable extends AbstractTableGateway
         $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $skipDays = isset($this->config['defaults']['tat-skipdays']) ? $this->config['defaults']['tat-skipdays'] : 120;
+        $skipDays = isset($this->config['defaults']['tat-skipdays']) ? $this->config['defaults']['tat-skipdays'] : 365;
         $squery = $sql->select()->from(array('vl' => $this->table))
             ->columns(
                 array(
@@ -3074,18 +3074,18 @@ class EidSampleTable extends AbstractTableGateway
                 )
             );
         if ($skipDays > 0) {
-            $squery = $squery->where('
-                DATEDIFF(sample_received_at_lab_datetime,sample_collection_date)<120 AND
+            $squery = $squery->where("
+                DATEDIFF(sample_received_at_lab_datetime,sample_collection_date) < $skipDays AND
                 DATEDIFF(sample_received_at_lab_datetime,sample_collection_date)>=0 AND
 
-                DATEDIFF(sample_registered_at_lab,sample_received_at_lab_datetime)<120 AND
+                DATEDIFF(sample_registered_at_lab,sample_received_at_lab_datetime) < $skipDays AND
                 DATEDIFF(sample_registered_at_lab,sample_received_at_lab_datetime)>=0 AND
 
-                DATEDIFF(sample_tested_datetime,sample_received_at_lab_datetime)<120 AND
+                DATEDIFF(sample_tested_datetime,sample_received_at_lab_datetime) < $skipDays AND
                 DATEDIFF(sample_tested_datetime,sample_registered_at_lab)>=0 AND
 
-                DATEDIFF(result_approved_datetime,sample_tested_datetime)<120 AND
-                DATEDIFF(result_approved_datetime,sample_tested_datetime)>=0');
+                DATEDIFF(result_approved_datetime,sample_tested_datetime) < $skipDays AND
+                DATEDIFF(result_approved_datetime,sample_tested_datetime)>=0");
         }
 
         if (isset($labs) && !empty($labs)) {
@@ -5391,9 +5391,7 @@ class EidSampleTable extends AbstractTableGateway
             ->columns(array('eid_id', 'sample_code', 'sampleCollectionDate' => new Expression('DATE(sample_collection_date)'), 'specimen_type', 'sampleTestingDate' => new Expression('DATE(sample_tested_datetime)'), 'result', 'sample_received_at_lab_datetime'))
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'), 'left')
             ->join(array('r_r_r' => 'r_eid_sample_rejection_reasons'), 'r_r_r.rejection_reason_id=vl.reason_for_sample_rejection', array('rejection_reason_name'), 'left');
-        //->where(array('f.facility_type'=>'1'));
         if (isset($parameters['sampleCollectionDate']) && trim($parameters['sampleCollectionDate']) != '') {
-            //$sQuery = $sQuery->where(array("vl.sample_collection_date <='" . $endDate . " 23:59:59" . "'", "vl.sample_collection_date >='" . $startDate . " 00:00:00" . "'"));
             $sQuery = $sQuery->where(array("DATE(vl.sample_collection_date) >='$startDate'", "DATE(vl.sample_collection_date) <='$endDate'"));
         }
         if (isset($parameters['clinicId']) && trim($parameters['clinicId']) != '') {
@@ -5486,7 +5484,6 @@ class EidSampleTable extends AbstractTableGateway
             ->columns(array('eid_id'))
             ->join(array('f' => 'facility_details'), 'f.facility_id=vl.facility_id', array('facility_name'))
             ->join(array('r_r_r' => 'r_eid_sample_rejection_reasons'), 'r_r_r.rejection_reason_id=vl.reason_for_sample_rejection', array('rejection_reason_name'), 'left');
-        //->where(array('f.facility_type'=>'1'));
         if ($loginContainer->role != 1) {
             $mappedFacilities = $loginContainer->mappedFacilities ?? [];
             $iQuery = $iQuery->where('vl.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');

@@ -37,7 +37,6 @@ class LocationDetailsTable extends AbstractTableGateway
         $sQuery = $sql->select()->quantifier(Select::QUANTIFIER_DISTINCT)
             ->from(array('l' => 'geographical_divisions'))
             ->join(array('f' => 'facility_details'), 'f.facility_state_id=l.geo_id', [])
-            //->join(array('ft' => 'facility_type'), 'ft.facility_type_id=f.facility_type')
             ->where('f.facility_type IN (1,3)')
             ->where(array('geo_parent' => 0));
         if ($mappedFacilities != null) {

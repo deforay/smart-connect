@@ -9,6 +9,7 @@ use Laminas\Db\Sql\Expression;
 use Laminas\Session\Container;
 use Laminas\Db\Adapter\Adapter;
 use Application\Model\SampleTable;
+use Application\Model\FacilityTable;
 use Application\Service\CommonService;
 use Laminas\Cache\Pattern\ObjectCache;
 use Application\Model\LocationDetailsTable;
@@ -26,13 +27,15 @@ class SampleService
     public CommonService $commonService;
     //public ObjectCache $sampleTableCached;
     public DashApiReceiverStatsTable $apiTrackerTable;
+    public FacilityTable|ObjectCache $facilityTable;
     public Adapter $dbAdapter;
 
-    public function __construct($sm, $sampleTable, $commonService, $apiTrackerTable, $dbAdapter)
+    public function __construct($sm, $sampleTable, $commonService, $apiTrackerTable, $facilityTable, $dbAdapter)
     {
         $this->sm = $sm;
         $this->commonService = $commonService;
         $this->sampleTable = $sampleTable;
+        $this->facilityTable = $facilityTable;
         $this->apiTrackerTable = $apiTrackerTable;
         $this->dbAdapter = $dbAdapter;
         $this->config = $this->sm->get('Config');
@@ -81,10 +84,11 @@ class SampleService
     public function checkFacilityTypeDetails($facilityTypeName)
     {
 
-        $sql = new Sql($this->dbAdapter);
-        $fQuery = $sql->select()->from('facility_type')->where(array('facility_type_name' => $facilityTypeName));
-        $fQueryStr = $sql->buildSqlString($fQuery);
-        return $this->dbAdapter->query($fQueryStr, Adapter::QUERY_MODE_EXECUTE)->current();
+        return $facilityTypeName;
+        // $sql = new Sql($this->dbAdapter);
+        // $fQuery = $sql->select()->from('facility_type')->where(array('facility_type' => $facilityTypeName));
+        // $fQueryStr = $sql->buildSqlString($fQuery);
+        // return $this->dbAdapter->query($fQueryStr, Adapter::QUERY_MODE_EXECUTE)->current();
     }
     public function checkTestingReson($testingReson)
     {
@@ -274,8 +278,7 @@ class SampleService
         if ($loginContainer->role != 1) {
             $mappedFacilities = (!empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : null;
         }
-        $facilityDb = $this->sm->get('FacilityTable');
-        return $facilityDb->fetchAllLabName($mappedFacilities);
+        return $this->facilityTable->fetchAllLabName($mappedFacilities);
     }
     //get all Lab Name
     public function getAllClinicName()
@@ -285,8 +288,7 @@ class SampleService
         if ($loginContainer->role != 1) {
             $mappedFacilities = (!empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : null;
         }
-        $facilityDb = $this->sm->get('FacilityTable');
-        return $facilityDb->fetchAllClinicName($mappedFacilities);
+        return $this->facilityTable->fetchAllClinicName($mappedFacilities);
     }
     //get all province name
     public function getAllProvinceList()
@@ -326,8 +328,7 @@ class SampleService
     //get all Hub Name
     public function getAllHubName()
     {
-        $facilityDb = $this->sm->get('FacilityTable');
-        return $facilityDb->fetchAllHubName();
+        return $this->facilityTable->fetchAllHubName();
     }
 
     //get all Current Regimen
@@ -1522,7 +1523,6 @@ class SampleService
         $apiData = array();
 
         $sampleDb = $this->sm->get('SampleTableWithoutCache');
-        $facilityDb = $this->sm->get('FacilityTable');
         $facilityTypeDb = $this->sm->get('FacilityTypeTable');
         $testStatusDb = $this->sm->get('SampleStatusTable');
         $testReasonDb = $this->sm->get('TestReasonTable');
@@ -1671,25 +1671,19 @@ class SampleService
                             }
                         }
                         //check facility type
-                        if (isset($row['facility_type_name']) && trim($row['facility_type_name']) != '') {
-                            $facilityTypeDataResult = $this->checkFacilityTypeDetails(trim($row['facility_type_name']));
-                            if ($facilityTypeDataResult) {
-                                $facilityData['facility_type'] = $facilityTypeDataResult['facility_type_id'];
-                            } else {
-                                $facilityTypeDb->insert(array('facility_type_name' => trim($row['facility_type_name'])));
-                                $facilityData['facility_type'] = $facilityTypeDb->lastInsertValue;
-                            }
+                        if (isset($row['facility_type']) && trim($row['facility_type']) != '') {
+                            $facilityData['facility_type'] = trim($row['facility_type']);
                         }
 
                         //check clinic details
                         if (isset($row['facility_name']) && trim($row['facility_name']) != '') {
                             $facilityDataResult = $this->checkFacilityDetails(trim($row['facility_name']));
                             if ($facilityDataResult) {
-                                $facilityDb->update($facilityData, array('facility_id' => $facilityDataResult['facility_id']));
+                                $this->facilityTable->update($facilityData, array('facility_id' => $facilityDataResult['facility_id']));
                                 $data['facility_id'] = $facilityDataResult['facility_id'];
                             } else {
-                                $facilityDb->insert($facilityData);
-                                $data['facility_id'] = $facilityDb->lastInsertValue;
+                                $this->facilityTable->insert($facilityData);
+                                $data['facility_id'] = $this->facilityTable->lastInsertValue;
                             }
                         } else {
                             $data['facility_id'] = null;
@@ -1730,25 +1724,19 @@ class SampleService
                             }
                         }
                         //check lab type
-                        if (trim($row['labFacilityTypeName']) != '') {
-                            $labTypeDataResult = $this->checkFacilityTypeDetails(trim($row['labFacilityTypeName']));
-                            if ($labTypeDataResult) {
-                                $labData['facility_type'] = $labTypeDataResult['facility_type_id'];
-                            } else {
-                                $facilityTypeDb->insert(array('facility_type_name' => trim($row['labFacilityTypeName'])));
-                                $labData['facility_type'] = $facilityTypeDb->lastInsertValue;
-                            }
+                        if (isset($row['labFacilityTypeName']) && trim($row['labFacilityTypeName']) != '') {
+                            $labData['facility_type'] = trim($row['labFacilityTypeName']);
                         }
 
                         //check lab details
                         if (trim($row['labName']) != '') {
                             $labDataResult = $this->checkFacilityDetails(trim($row['labName']));
                             if ($labDataResult) {
-                                $facilityDb->update($labData, array('facility_id' => $labDataResult['facility_id']));
+                                $this->facilityTable->update($labData, array('facility_id' => $labDataResult['facility_id']));
                                 $data['lab_id'] = $labDataResult['facility_id'];
                             } else {
-                                $facilityDb->insert($labData);
-                                $data['lab_id'] = $facilityDb->lastInsertValue;
+                                $this->facilityTable->insert($labData);
+                                $data['lab_id'] = $this->facilityTable->lastInsertValue;
                             }
                         } else {
                             $data['lab_id'] = 0;
@@ -1838,7 +1826,6 @@ class SampleService
         }
 
         $sampleDb = $this->sm->get('SampleTableWithoutCache');
-        $facilityDb = $this->sm->get('FacilityTable');
         // $facilityTypeDb = $this->sm->get('FacilityTypeTable');
         $testStatusDb = $this->sm->get('SampleStatusTable');
         // $testReasonDb = $this->sm->get('TestReasonTable');
@@ -1961,14 +1948,14 @@ class SampleService
                     if ($facilityDataResult) {
                         $data['facility_id'] = $facilityDataResult['facility_id'];
                     } else {
-                        $facilityDb->insert(array(
+                        $this->facilityTable->insert(array(
                             'vlsm_instance_id'  => 'nrl-weblims',
                             'facility_name'     => $row['FacilityName'],
                             'facility_code'     => empty($row['FacilityName']) ? null : $row['FacilityName'],
                             'facility_type'     => '1',
                             'status'            => 'active'
                         ));
-                        $data['facility_id'] = $facilityDb->lastInsertValue;
+                        $data['facility_id'] = $this->facilityTable->lastInsertValue;
                     }
                 } else {
                     $data['facility_id'] = null;

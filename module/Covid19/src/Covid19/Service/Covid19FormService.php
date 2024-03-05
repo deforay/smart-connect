@@ -236,14 +236,8 @@ class Covid19FormService
                                 }
                             }
                             //check facility type
-                            if (trim($row['facility_type']) != '') {
-                                $facilityTypeDataResult = $this->checkFacilityTypeDetails(trim($row['facility_type_name']));
-                                if ($facilityTypeDataResult) {
-                                    $facilityData['facility_type'] = $facilityTypeDataResult['facility_type_id'];
-                                } else {
-                                    $facilityTypeDb->insert(array('facility_type_name' => trim($row['facility_type_name'])));
-                                    $facilityData['facility_type'] = $facilityTypeDb->lastInsertValue;
-                                }
+                            if (isset($row['facility_type']) && trim($row['facility_type']) != '') {
+                                $facilityData['facility_type'] = trim($row['facility_type']);
                             }
 
                             //check clinic details
@@ -295,14 +289,8 @@ class Covid19FormService
                                 }
                             }
                             //check lab type
-                            if (trim($row['labFacilityTypeName']) != '') {
-                                $labTypeDataResult = $this->checkFacilityTypeDetails(trim($row['labFacilityTypeName']));
-                                if ($labTypeDataResult) {
-                                    $labData['facility_type'] = $labTypeDataResult['facility_type_id'];
-                                } else {
-                                    $facilityTypeDb->insert(array('facility_type_name' => trim($row['labFacilityTypeName'])));
-                                    $labData['facility_type'] = $facilityTypeDb->lastInsertValue;
-                                }
+                            if (isset($row['labFacilityTypeName']) && trim($row['labFacilityTypeName']) != '') {
+                                $labData['facility_type'] = trim($row['labFacilityTypeName']);
                             }
 
                             //check lab details
@@ -409,7 +397,7 @@ class Covid19FormService
     {
         $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
         $sql = new Sql($dbAdapter);
-        $fQuery = $sql->select()->from('facility_type')->where(array('facility_type_name' => $facilityTypeName));
+        $fQuery = $sql->select()->from('facility_type')->where(array('facility_type' => $facilityTypeName));
         $fQueryStr = $sql->buildSqlString($fQuery);
         return $dbAdapter->query($fQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
     }

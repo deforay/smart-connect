@@ -1,248 +1,248 @@
-<link rel="stylesheet" type="text/css" href="<?php echo $this->basePath('assets/global/css/jasny-bootstrap.min.css'); ?>"/>                   
-                    <!-- BEGIN PAGE HEADER-->
-                    <!-- BEGIN THEME PANEL -->
-                    <!-- END THEME PANEL -->
-                    <!-- BEGIN PAGE BAR -->
-                    <div class="page-bar">
-                        <ul class="page-breadcrumb">
-                            <li>
-                                <a href="/"><?php echo $this->translate('Dashboard'); ?></a>
-                                <i class="fa fa-circle"></i>
-                            </li>
-                            <li>
-                                <a href="/facility"><?php echo $this->translate('Facilities'); ?></a>
-                                <i class="fa fa-circle"></i>
-                            </li>
-                            <li>
-                                <?php echo $this->translate('Add'); ?>
-                            </li>
-                        </ul>
-                    </div>
-                    <!-- END PAGE BAR -->
-                    <!-- BEGIN PAGE TITLE-->
-                    <h3 class="page-title"> <?php echo $this->translate('Add Facility'); ?>
-                    </h3>
-                    <!-- END PAGE TITLE-->
-                    <!-- END PAGE HEADER-->
-                    <div class="row">
-                        <div class="col-md-12">
-                            <!-- BEGIN EXAMPLE TABLE PORTLET-->
-                            <div class="portlet light bordered">
-                                <div class="portlet-body">
-                                <div class="portlet-body form">
-                                    <form class="form-horizontal" name="addFacilityInformation" id="addFacilityInformation" enctype="multipart/form-data" method="post" action="/facility/add" role="form"  autocomplete="off">
-                                        <div class="form-body">
-                                            <div class="row">
-                                                <div class="col-md-6">
-                                                  <div class="form-group">
-                                                      <label for="facilityName" class="col-lg-4 control-label"><?php echo $this->translate('Facility Name'); ?> <span class="font-red-mint">*</span></label>
-                                                      <div class="col-lg-7">
-                                                      <input type="text" class="form-control isRequired" id="facilityName" name="facilityName" placeholder="<?php echo $this->translate('Facility Name'); ?>" title="<?php echo $this->translate('Please enter facility name'); ?>" onblur="checkNameValidation('facility_details','facility_name',this,null,'<?php echo $this->translate('The facility name that you entered already exists.Enter another name'); ?>',null)"/>
-                                                      </div>
-                                                  </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                 <div class="form-group">
-                                                     <label for="facilityCode" class="col-lg-4 control-label"><?php echo $this->translate('Facility Code'); ?></label>
-                                                     <div class="col-lg-7">
-                                                     <input type="text" class="form-control" id="facilityCode" name="facilityCode" placeholder="<?php echo $this->translate('Facility Code'); ?>" title="<?php echo $this->translate('Please enter facility code'); ?>" onblur="checkNameValidation('facility_details','facility_code',this,null,'<?php echo $this->translate('The code that you entered already exists.Try another code'); ?>',null)"/>
-                                                     </div>
-                                                 </div>
-                                               </div>
-                                            </div>
-                
-                                            <div class="row">
-                                              <div class="col-md-6">
-                                                <div class="form-group">
-                                                    <label for="otherId" class="col-lg-4 control-label"><?php echo $this->translate('Other ID'); ?> </label>
-                                                    <div class="col-lg-7">
-                                                    <input type="text" class="form-control" id="otherId" name="otherId" placeholder="<?php echo $this->translate('Other ID'); ?>" />
-                                                    </div>
-                                                </div>
-                                              </div>
-                                                <div class="col-md-6">
-                                                <div class="form-group">
-                                                    <label for="facilityType" class="col-lg-4 control-label"><?php echo $this->translate('Facility Type'); ?> <span class="font-red-mint">*</span> </label>
-                                                    <div class="col-lg-7">
-                                                    <select class="form-control isRequired" id="facilityType" name="facilityType" title="<?php echo $this->translate('Please select facility type'); ?>" onchange="hideLogoImage(this);">
-                                                      <option value=""> -- <?php echo $this->translate('Select'); ?> -- </option>
-                                                       <?php
-                                                       foreach($facilityType as $fType){
-                                                        ?>
-                                                            <option value="<?php echo $fType['facility_type_id'];?>"><?php echo ucwords($fType['facility_type_name']);?></option>
-                                                        <?php
-                                                       }
-                                                       ?>
-                                                      </select>
-                                                    </div>
-                                                </div>
-                                              </div>
-                                            </div>
-                
-                                            <div class="row">
-                                              <div class="col-md-6">
-                                                <div class="form-group">
-                                                    <label for="email" class="col-lg-4 control-label"><?php echo $this->translate('Email(s)'); ?> </label>
-                                                    <div class="col-lg-7">
-                                                    <input type="text" class="form-control" id="email" name="email" placeholder="eg-f1@gmail.com,f2@gmail.com" />
-                                                    </div>
-                                                </div>
-                                              </div>
-                                              <div class="col-md-6">
-                                                <div class="form-group">
-                                                    <label for="reportEmail" class="col-lg-4 control-label"><?php echo $this->translate('Report Email(s)'); ?> </label>
-                                                    <div class="col-lg-7">
-                                                    <textarea class="form-control" id="reportEmail" name="reportEmail" placeholder="eg-user1@gmail.com,user2@gmail.com" rows="3"></textarea>
-                                                    </div>
-                                                </div>
-                                              </div>
-                                            </div>
-                                            <div class="row">
-                                              <div class="col-md-6">
-                                                <div class="form-group">
-                                                    <label for="contactPerson" class="col-lg-4 control-label"><?php echo $this->translate('Contact Person'); ?></label>
-                                                    <div class="col-lg-7">
-                                                    <input type="text" class="form-control" id="contactPerson" name="contactPerson" placeholder="<?php echo $this->translate('Contact Person'); ?>" />
-                                                    </div>
-                                                </div>
-                                              </div>
-                                              <div class="col-md-6">
-                                                <div class="form-group">
-                                                    <label for="phoneNo" class="col-lg-4 control-label"><?php echo $this->translate('Phone Number'); ?></label>
-                                                    <div class="col-lg-7">
-                                                    <input type="text" class="form-control checkNum" id="phoneNo" name="phoneNo" placeholder="<?php echo $this->translate('Phone Number'); ?>"/>
-                                                    </div>
-                                                </div>
-                                              </div>
-                                            </div>
-                                            <div class="row">
-                                               <div class="col-md-6">
-                                                <div class="form-group">
-                                                    <label for="state" class="col-lg-4 control-label"><?php echo $this->translate('Province/State'); ?> <span class="font-red-mint">*</span></label>
-                                                    <div class="col-lg-7">
-                                                    <select name="state" id="state" class="form-control isRequired" title="<?php echo $this->translate('Please choose province/state'); ?>" >
-                                                      <option value=""> -- <?php echo $this->translate('Select'); ?> -- </option>
-                                                      <?php
-                                                       foreach($facilityLocation as $location){
-                                                        ?>
-                                                            <option value="<?php echo $location['geo_id'];?>"><?php echo ucwords($location['geo_name']);?></option>
-                                                        <?php
-                                                       }
-                                                       ?>
-                                                      <option value="other"><?php echo $this->translate('Other'); ?></option>
-                                                    </select>
-                                                    <input type="text" class="form-control" name="provinceNew" id="provinceNew" placeholder="<?php echo $this->translate('Enter Province/State'); ?>" title="<?php echo $this->translate('Please enter province/state'); ?>" style="margin-top:4px;display:none;"/>
-                                                    </div>
-                                                </div>
-                                              </div>
-                                               <div class="col-md-6">
-                                                <div class="form-group">
-                                                    <label for="district" class="col-lg-4 control-label"><?php echo $this->translate('District/County'); ?> <span class="font-red-mint">*</span></label>
-                                                    <div class="col-lg-7">
-                                                    <select name="district" id="districtName" class="form-control isRequired" title="<?php echo $this->translate('Please choose district/county'); ?>">
-                                                      <option value=""> -- <?php echo $this->translate('Select'); ?> -- </option>
-                                                      <option value="other"><?php echo $this->translate('Other'); ?></option>
-                                                    </select>
-                                                    <input type="text" class="form-control" name="districtNew" id="districtNew" placeholder="<?php echo $this->translate('Enter District/County'); ?>" title="<?php echo $this->translate('Please enter district/county'); ?>" style="margin-top:4px;display:none;"/>
-                                                    </div>
-                                                </div>
-                                              </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label for="hubName" class="col-lg-4 control-label"><?php echo $this->translate('Linked Hub Name (If Applicable)'); ?></label>
-                                                        <div class="col-lg-7">
-                                                        <input type="text" class="form-control" id="hubName" name="hubName" placeholder="<?php echo $this->translate('Hub Name'); ?>" title="<?php echo $this->translate('Please enter hub name'); ?>" />
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label for="address" class="col-lg-4 control-label"><?php echo $this->translate('Address'); ?></label>
-                                                        <div class="col-lg-7">
-                                                        <textarea class="form-control" name="address" id="address" placeholder="<?php echo $this->translate('Address'); ?>"></textarea>
-                                                        </div>
-                                                    </div>
-                                                  </div>
-                                             </div>
-                                            <div class="row">
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label for="country" class="col-lg-4 control-label"><?php echo $this->translate('Country'); ?></label>
-                                                        <div class="col-lg-7">
-                                                        <input type="text" class="form-control" id="country" name="country" placeholder="<?php echo $this->translate('Country'); ?>"/>
-                                                        </div>
-                                                    </div>
-                                                  </div>
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label for="latitude" class="col-lg-4 control-label"><?php echo $this->translate('Latitude'); ?></label>
-                                                        <div class="col-lg-7">
-                                                        <input type="text" class="form-control checkNum" id="latitude" name="latitude" placeholder="<?php echo $this->translate('Latitude'); ?>" title="<?php echo $this->translate('Please enter latitude'); ?>"/>
-                                                        </div>
-                                                    </div>
-                                                  </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label for="longitude" class="col-lg-4 control-label"><?php echo $this->translate('Longitude'); ?></label>
-                                                        <div class="col-lg-7">
-                                                        <input type="text" class="form-control checkNum" id="longitude" name="longitude" placeholder="<?php echo $this->translate('Longitude'); ?>" title="<?php echo $this->translate('Please enter longitude'); ?>"/>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6 logo" style="display:none;">
-                                                    <div class="form-group">
-                                                        <label class="col-lg-4 control-label"><?php echo $this->translate('Logo'); ?></label>
-                                                        <div class="col-lg-7">
-                                                            <div class="fileinput fileinput-new" data-provides="fileinput">
-                                                                <div class="fileinput-preview thumbnail" data-trigger="fileinput" style="width: 200px; height: 150px;">
-                                                                   <img src="http://www.placehold.it/200x150/EFEFEF/AAAAAA&text=No image"/>
-                                                                </div>
-                                                                <div>
-                                                                  <span class="btn btn-default btn-file"><span class="fileinput-new"><?php echo $this->translate('Select image'); ?></span><span class="fileinput-exists"><?php echo $this->translate('Change'); ?></span>
-                                                                  <input type="file" id="logo" name="logo" title="<?php echo $this->translate('Please choose logo'); ?>" onchange="fileValidation(this);">
-                                                                  </span>
-                                                                  <a href="#" class="btn btn-default fileinput-exists" data-dismiss="fileinput"><?php echo $this->translate('Remove'); ?></a>
-                                                                </div>
-                                                            </div>
-                                                            <div class="box-body">
-                                                              <?php echo $this->translate('Please make sure logo image size of'); ?> <code>170px X 175px</code>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
+<link rel="stylesheet" type="text/css" href="<?php echo $this->basePath('assets/global/css/jasny-bootstrap.min.css'); ?>" />
+<!-- BEGIN PAGE HEADER-->
+<!-- BEGIN THEME PANEL -->
+<!-- END THEME PANEL -->
+<!-- BEGIN PAGE BAR -->
+<div class="page-bar">
+    <ul class="page-breadcrumb">
+        <li>
+            <a href="/"><?php echo $this->translate('Dashboard'); ?></a>
+            <i class="fa fa-circle"></i>
+        </li>
+        <li>
+            <a href="/facility"><?php echo $this->translate('Facilities'); ?></a>
+            <i class="fa fa-circle"></i>
+        </li>
+        <li>
+            <?php echo $this->translate('Add'); ?>
+        </li>
+    </ul>
+</div>
+<!-- END PAGE BAR -->
+<!-- BEGIN PAGE TITLE-->
+<h3 class="page-title"> <?php echo $this->translate('Add Facility'); ?>
+</h3>
+<!-- END PAGE TITLE-->
+<!-- END PAGE HEADER-->
+<div class="row">
+    <div class="col-md-12">
+        <!-- BEGIN EXAMPLE TABLE PORTLET-->
+        <div class="portlet light bordered">
+            <div class="portlet-body">
+                <div class="portlet-body form">
+                    <form class="form-horizontal" name="addFacilityInformation" id="addFacilityInformation" enctype="multipart/form-data" method="post" action="/facility/add" role="form" autocomplete="off">
+                        <div class="form-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="facilityName" class="col-lg-4 control-label"><?php echo $this->translate('Facility Name'); ?> <span class="font-red-mint">*</span></label>
+                                        <div class="col-lg-7">
+                                            <input type="text" class="form-control isRequired" id="facilityName" name="facilityName" placeholder="<?php echo $this->translate('Facility Name'); ?>" title="<?php echo $this->translate('Please enter facility name'); ?>" onblur="checkNameValidation('facility_details','facility_name',this,null,'<?php echo $this->translate('The facility name that you entered already exists.Enter another name'); ?>',null)" />
                                         </div>
-                                        <div class="form-actions">
-                                            <div class="row">
-                                                <div class="col-md-offset-3 col-md-9">
-                                                    <input type="button" class="btn green" value="<?php echo $this->translate('Submit'); ?>" onclick="validateNow();return false;">
-                                                    <a href="<?php echo $this->url('facility', array('action' => 'index')); ?>" class="btn default"><?php echo $this->translate('Cancel'); ?></a>
-                                                    
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </form>
+                                    </div>
                                 </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="facilityCode" class="col-lg-4 control-label"><?php echo $this->translate('Facility Code'); ?></label>
+                                        <div class="col-lg-7">
+                                            <input type="text" class="form-control" id="facilityCode" name="facilityCode" placeholder="<?php echo $this->translate('Facility Code'); ?>" title="<?php echo $this->translate('Please enter facility code'); ?>" onblur="checkNameValidation('facility_details','facility_code',this,null,'<?php echo $this->translate('The code that you entered already exists.Try another code'); ?>',null)" />
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                            <!-- END EXAMPLE TABLE PORTLET-->
-                        </div>
-                    </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="otherId" class="col-lg-4 control-label"><?php echo $this->translate('Other ID'); ?> </label>
+                                        <div class="col-lg-7">
+                                            <input type="text" class="form-control" id="otherId" name="otherId" placeholder="<?php echo $this->translate('Other ID'); ?>" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="facilityType" class="col-lg-4 control-label"><?php echo $this->translate('Facility Type'); ?> <span class="font-red-mint">*</span> </label>
+                                        <div class="col-lg-7">
+                                            <select class="form-control isRequired" id="facilityType" name="facilityType" title="<?php echo $this->translate('Please select facility type'); ?>" onchange="hideLogoImage(this);">
+                                                <option value=""> -- <?php echo $this->translate('Select'); ?> -- </option>
+                                                <?php
+                                                foreach ($facilityType as $fType) {
+                                                ?>
+                                                    <option value="<?php echo $fType['facility_type_id']; ?>"><?php echo ucwords($fType['facility_type']); ?></option>
+                                                <?php
+                                                }
+                                                ?>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="email" class="col-lg-4 control-label"><?php echo $this->translate('Email(s)'); ?> </label>
+                                        <div class="col-lg-7">
+                                            <input type="text" class="form-control" id="email" name="email" placeholder="eg-f1@gmail.com,f2@gmail.com" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="reportEmail" class="col-lg-4 control-label"><?php echo $this->translate('Report Email(s)'); ?> </label>
+                                        <div class="col-lg-7">
+                                            <textarea class="form-control" id="reportEmail" name="reportEmail" placeholder="eg-user1@gmail.com,user2@gmail.com" rows="3"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="contactPerson" class="col-lg-4 control-label"><?php echo $this->translate('Contact Person'); ?></label>
+                                        <div class="col-lg-7">
+                                            <input type="text" class="form-control" id="contactPerson" name="contactPerson" placeholder="<?php echo $this->translate('Contact Person'); ?>" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="phoneNo" class="col-lg-4 control-label"><?php echo $this->translate('Phone Number'); ?></label>
+                                        <div class="col-lg-7">
+                                            <input type="text" class="form-control checkNum" id="phoneNo" name="phoneNo" placeholder="<?php echo $this->translate('Phone Number'); ?>" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="state" class="col-lg-4 control-label"><?php echo $this->translate('Province/State'); ?> <span class="font-red-mint">*</span></label>
+                                        <div class="col-lg-7">
+                                            <select name="state" id="state" class="form-control isRequired" title="<?php echo $this->translate('Please choose province/state'); ?>">
+                                                <option value=""> -- <?php echo $this->translate('Select'); ?> -- </option>
+                                                <?php
+                                                foreach ($facilityLocation as $location) {
+                                                ?>
+                                                    <option value="<?php echo $location['geo_id']; ?>"><?php echo ucwords($location['geo_name']); ?></option>
+                                                <?php
+                                                }
+                                                ?>
+                                                <option value="other"><?php echo $this->translate('Other'); ?></option>
+                                            </select>
+                                            <input type="text" class="form-control" name="provinceNew" id="provinceNew" placeholder="<?php echo $this->translate('Enter Province/State'); ?>" title="<?php echo $this->translate('Please enter province/state'); ?>" style="margin-top:4px;display:none;" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="district" class="col-lg-4 control-label"><?php echo $this->translate('District/County'); ?> <span class="font-red-mint">*</span></label>
+                                        <div class="col-lg-7">
+                                            <select name="district" id="districtName" class="form-control isRequired" title="<?php echo $this->translate('Please choose district/county'); ?>">
+                                                <option value=""> -- <?php echo $this->translate('Select'); ?> -- </option>
+                                                <option value="other"><?php echo $this->translate('Other'); ?></option>
+                                            </select>
+                                            <input type="text" class="form-control" name="districtNew" id="districtNew" placeholder="<?php echo $this->translate('Enter District/County'); ?>" title="<?php echo $this->translate('Please enter district/county'); ?>" style="margin-top:4px;display:none;" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="hubName" class="col-lg-4 control-label"><?php echo $this->translate('Linked Hub Name (If Applicable)'); ?></label>
+                                        <div class="col-lg-7">
+                                            <input type="text" class="form-control" id="hubName" name="hubName" placeholder="<?php echo $this->translate('Hub Name'); ?>" title="<?php echo $this->translate('Please enter hub name'); ?>" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="address" class="col-lg-4 control-label"><?php echo $this->translate('Address'); ?></label>
+                                        <div class="col-lg-7">
+                                            <textarea class="form-control" name="address" id="address" placeholder="<?php echo $this->translate('Address'); ?>"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="country" class="col-lg-4 control-label"><?php echo $this->translate('Country'); ?></label>
+                                        <div class="col-lg-7">
+                                            <input type="text" class="form-control" id="country" name="country" placeholder="<?php echo $this->translate('Country'); ?>" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="latitude" class="col-lg-4 control-label"><?php echo $this->translate('Latitude'); ?></label>
+                                        <div class="col-lg-7">
+                                            <input type="text" class="form-control checkNum" id="latitude" name="latitude" placeholder="<?php echo $this->translate('Latitude'); ?>" title="<?php echo $this->translate('Please enter latitude'); ?>" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="longitude" class="col-lg-4 control-label"><?php echo $this->translate('Longitude'); ?></label>
+                                        <div class="col-lg-7">
+                                            <input type="text" class="form-control checkNum" id="longitude" name="longitude" placeholder="<?php echo $this->translate('Longitude'); ?>" title="<?php echo $this->translate('Please enter longitude'); ?>" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 logo" style="display:none;">
+                                    <div class="form-group">
+                                        <label class="col-lg-4 control-label"><?php echo $this->translate('Logo'); ?></label>
+                                        <div class="col-lg-7">
+                                            <div class="fileinput fileinput-new" data-provides="fileinput">
+                                                <div class="fileinput-preview thumbnail" data-trigger="fileinput" style="width: 200px; height: 150px;">
+                                                    <img src="http://www.placehold.it/200x150/EFEFEF/AAAAAA&text=No image" />
+                                                </div>
+                                                <div>
+                                                    <span class="btn btn-default btn-file"><span class="fileinput-new"><?php echo $this->translate('Select image'); ?></span><span class="fileinput-exists"><?php echo $this->translate('Change'); ?></span>
+                                                        <input type="file" id="logo" name="logo" title="<?php echo $this->translate('Please choose logo'); ?>" onchange="fileValidation(this);">
+                                                    </span>
+                                                    <a href="#" class="btn btn-default fileinput-exists" data-dismiss="fileinput"><?php echo $this->translate('Remove'); ?></a>
+                                                </div>
+                                            </div>
+                                            <div class="box-body">
+                                                <?php echo $this->translate('Please make sure logo image size of'); ?> <code>170px X 175px</code>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-actions">
+                                <div class="row">
+                                    <div class="col-md-offset-3 col-md-9">
+                                        <input type="button" class="btn green" value="<?php echo $this->translate('Submit'); ?>" onclick="validateNow();return false;">
+                                        <a href="<?php echo $this->url('facility', array('action' => 'index')); ?>" class="btn default"><?php echo $this->translate('Cancel'); ?></a>
+
+                                    </div>
+                                </div>
+                            </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!-- END EXAMPLE TABLE PORTLET-->
+    </div>
+</div>
 <script type="text/javascript">
-    $(function () {
-    });
-    
+    $(function() {});
+
     duplicateName = true;
+
     function validateNow() {
         flag = deforayValidator.init({
             formId: 'addFacilityInformation'
         });
         if (flag) {
             if (duplicateName) {
-                if($('#districtName').val()=='' || $('#districtName').val()=='-- Select --'){
+                if ($('#districtName').val() == '' || $('#districtName').val() == '-- Select --') {
                     alert("Please choose district");
                     return false;
                 }
@@ -251,62 +251,70 @@
             }
         }
     }
-    
-    $('#state').on('change',function(){
-        if(this.value == 'other'){
+
+    $('#state').on('change', function() {
+        if (this.value == 'other') {
             $('#provinceNew').show().addClass('isRequired').focus();
             $('#districtName').html('<option value=""> -- Select -- </option><option value="other">Other</option>');
             $('#districtNew').hide().removeClass('isRequired').val('');
-        }else{
+        } else {
             $('#provinceNew').hide().removeClass('isRequired').val('');
-            $.blockUI.defaults.css.border = '1px solid grey'; 
-            $(document).ajaxStart($.blockUI({ message: '<h2><?php echo $this->translate('Processing...'); ?></h2>' })).ajaxStop($.unblockUI);
-            $.post("<?php echo $this->url('facility', array('action' => 'get-district-list')); ?>", {state : this.value},
-            function(data){
-                $('#districtName').html(data);
-                $('#districtName').addClass("isRequired");
-                $('#districtNew').hide().removeClass('isRequired').val('');
-            });
+            $.blockUI.defaults.css.border = '1px solid grey';
+            $(document).ajaxStart($.blockUI({
+                message: '<h2><?php echo $this->translate('Processing...'); ?></h2>'
+            })).ajaxStop($.unblockUI);
+            $.post("<?php echo $this->url('facility', array('action' => 'get-district-list')); ?>", {
+                    state: this.value
+                },
+                function(data) {
+                    $('#districtName').html(data);
+                    $('#districtName').addClass("isRequired");
+                    $('#districtNew').hide().removeClass('isRequired').val('');
+                });
         }
     });
-    
-    $('#districtName').on('change',function(){
-        if(this.value == 'other'){
-          $('#districtNew').show().addClass('isRequired').focus();
-        }else{
-          $('#districtNew').hide().removeClass('isRequired').val('');
+
+    $('#districtName').on('change', function() {
+        if (this.value == 'other') {
+            $('#districtNew').show().addClass('isRequired').focus();
+        } else {
+            $('#districtNew').hide().removeClass('isRequired').val('');
         }
     });
-    
+
     function fileValidation(obj) {
-	    var fileExtension = ['jpeg', 'jpg', 'png', 'gif', 'bmp'];
-            if ($.inArray($(obj).val().split('.').pop().toLowerCase(), fileExtension) == -1 && $(obj).val()!="")
-	    {
+        var fileExtension = ['jpeg', 'jpg', 'png', 'gif', 'bmp'];
+        if ($.inArray($(obj).val().split('.').pop().toLowerCase(), fileExtension) == -1 && $(obj).val() != "") {
             alert("Only '.jpeg','.jpg', '.png', '.gif', '.bmp' formats are allowed.");
-	    $(obj).val("");
-	    }
-	}
-    function checkNameValidation(tableName, fieldName, obj, fnct, msg){
-        checkValue = document.getElementById(obj.id).value;
-        if($.trim(checkValue)!= ''){
-            $.post("<?php echo $this->url('common', array('action' => 'index')); ?>", {tableName: tableName, fieldName: fieldName, value: checkValue, fnct: fnct},
-            function(data) {
-                if (data > 0)
-                {
-                    alert(msg);
-                    duplicateName = false;
-                    document.getElementById(obj.id).value = "";
-                }
-                else {
-                    duplicateName = true;
-                }
-            });
+            $(obj).val("");
         }
     }
-    function hideLogoImage(obj){
-        if($("#"+obj.id).val()=='2'){
+
+    function checkNameValidation(tableName, fieldName, obj, fnct, msg) {
+        checkValue = document.getElementById(obj.id).value;
+        if ($.trim(checkValue) != '') {
+            $.post("<?php echo $this->url('common', array('action' => 'index')); ?>", {
+                    tableName: tableName,
+                    fieldName: fieldName,
+                    value: checkValue,
+                    fnct: fnct
+                },
+                function(data) {
+                    if (data > 0) {
+                        alert(msg);
+                        duplicateName = false;
+                        document.getElementById(obj.id).value = "";
+                    } else {
+                        duplicateName = true;
+                    }
+                });
+        }
+    }
+
+    function hideLogoImage(obj) {
+        if ($("#" + obj.id).val() == '2') {
             $(".logo").show();
-        }else{
+        } else {
             $(".logo").hide();
         }
     }

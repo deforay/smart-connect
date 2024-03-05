@@ -110,7 +110,7 @@ class FacilityTable extends AbstractTableGateway
          * you want to insert a non-database field (for example a counter or static image)
          */
 
-        $aColumns = array('facility_code', 'facility_name', 'facility_type_name', 'status');
+        $aColumns = array('facility_code', 'facility_name', 'facility_type', 'status');
 
         /*
          * Paging
@@ -185,8 +185,8 @@ class FacilityTable extends AbstractTableGateway
          */
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $sQuery = $sql->select()->from(array('f' => 'facility_details'))
-            ->join(array('ft' => 'facility_type'), "ft.facility_type_id=f.facility_type");
+        $sQuery = $sql->select()->from(array('f' => 'facility_details'));
+        //->join(array('ft' => 'facility_type'), "ft.facility_type_id=f.facility_type");
 
         if (isset($sWhere) && $sWhere != "") {
             $sQuery->where($sWhere);
@@ -226,7 +226,7 @@ class FacilityTable extends AbstractTableGateway
             $row = array();
             $row[] = $aRow['facility_code'];
             $row[] = ucwords($aRow['facility_name']);
-            $row[] = ucwords($aRow['facility_type_name']);
+            $row[] = ucwords($aRow['facility_type']);
             $row[] = ucwords($aRow['status']);
             $row[] = '<a href="edit/' . base64_encode($aRow['facility_id']) . '" class="btn green" style="margin-right: 2px;" title="' . $buttText . '"><i class="fa fa-pencil"> ' . $buttText . '</i></a>';
             $output['aaData'][] = $row;
@@ -362,10 +362,10 @@ class FacilityTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $fQuery = $sql->select()->from(array('f' => 'facility_details'))
-            ->join(array('ft' => 'facility_type'), 'ft.facility_type_id=f.facility_type')
+            //->join(array('ft' => 'facility_type'), 'ft.facility_type_id=f.facility_type')
             ->join(array('lp' => 'geographical_divisions'), 'lp.geo_id=f.facility_state_id', array())
             ->join(array('ld' => 'geographical_divisions'), 'ld.geo_id=f.facility_district_id', array())
-            ->where('ft.facility_type_name="Viral Load Lab"');
+            ->where('f.facility_type=2');
         if ($mappedFacilities != null) {
             $fQuery = $fQuery->where('f.facility_id IN ("' . implode('", "', array_values(array_filter($mappedFacilities))) . '")');
         }
@@ -399,8 +399,8 @@ class FacilityTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $fQuery = $sql->select()->from(array('f' => 'facility_details'))
-            ->join(array('ft' => 'facility_type'), 'ft.facility_type_id=f.facility_type')
-            ->where('ft.facility_type_name="hub"');
+            //->join(array('ft' => 'facility_type'), 'ft.facility_type_id=f.facility_type')
+            ->where('f.facility_type=4');
         if ($loginContainer->role != 1) {
             $mappedFacilities = (!empty($loginContainer->mappedFacilities)) ? $loginContainer->mappedFacilities : array();
             $fQuery = $fQuery->where('f.facility_id IN ("' . implode('", "', array_values(array_filter($mappedFacilities))) . '")');
@@ -413,8 +413,7 @@ class FacilityTable extends AbstractTableGateway
     {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $fQuery = $sql->select()->from(array('f' => 'facility_details'))
-            ->join(array('ft' => 'facility_type'), 'ft.facility_type_id=f.facility_type');
+        $fQuery = $sql->select()->from(array('f' => 'facility_details'));
         if (isset($params['role']) && $params['role'] == 2) {
             $fQuery = $fQuery->where('f.facility_type=2');
         } elseif (isset($params['role']) && $params['role'] == 3) {
