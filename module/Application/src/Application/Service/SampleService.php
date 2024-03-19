@@ -2080,4 +2080,65 @@ class SampleService
 
         return $response;
     }
+
+    public function getSnapshotData($params){
+        $testTypeQuery = [];$where = [];
+        $common = new CommonService();
+        if(isset($params['collectionDate']) && !empty($params['collectionDate'])){
+            $date = explode(" to ", $params['collectionDate']);
+            $where[] = " DATE(sample_collection_date) >= '" . $common->isoDateFormat($date[0]) . "' AND DATE(sample_collection_date) <= '" . $common->isoDateFormat($date[1]) . "' ";
+        }
+        if(isset($params['testedDate']) && !empty($params['testedDate'])){
+            $date = explode(" to ", $params['testedDate']);
+            $where[] = " DATE(sample_tested_datetime) >= '" . $common->isoDateFormat($date[0]) . "' AND DATE(sample_tested_datetime) <= '" . $common->isoDateFormat($date[1]) . "' ";
+        }
+        if(isset($params['provinceName']) && !empty($params['provinceName'])){
+            $where[] = " facility_state_id IN(".implode(",", $params['provinceName']).") ";
+        }
+        if(isset($params['districtName']) && !empty($params['districtName'])){
+            $where[] = " facility_district_id IN(".implode(",", $params['districtName']).") ";
+        }
+        if(isset($params['clinicId']) && !empty($params['clinicId'])){
+            $where[] = " facility_id IN(".implode(",", $params['clinicId']).") ";
+        }
+        if(isset($where) && !empty($where)){
+            $whereQuery = " WHERE " . implode(" AND ", $where);
+        }
+        if(isset($params['testType']) && !empty($params['testType'])){
+            foreach($params['testType'] as $type){
+                $receivedField = 'sample_received_at_lab_datetime';
+                if($type == 'vl' || $type == 'eid' || $type == 'tb' || $type == 'covid19'){
+                    $receivedField = 'sample_received_at_lab_datetime';
+                }else if($type == 'hepatitis'){
+                    $receivedField = 'sample_received_at_vl_lab_datetime';
+                }
+                $testTypeQuery[] = " SELECT count(*) AS reg, 
+                SUM(CASE WHEN ($receivedField IS NOT NULL AND $receivedField NOT LIKE '' AND DATE($receivedField) NOT LIKE '0000:00:00') THEN 1 ELSE 0 END) AS 'totalReceived',
+                SUM(CASE WHEN (sample_tested_datetime IS NOT NULL AND sample_tested_datetime NOT LIKE '' AND DATE(sample_tested_datetime) NOT LIKE '0000:00:00') THEN 1 ELSE 0 END) AS 'totalTested',
+                SUM(CASE WHEN ((reason_for_sample_rejection IS NOT NULL AND reason_for_sample_rejection NOT LIKE '') OR is_sample_rejected like 'yes') THEN 1 ELSE 0 END) AS 'totalRejected',
+                facility_name FROM dash_form_".$type." AS ".$type." INNER JOIN facility_details as f ON ".$type.".lab_id = f.facility_id ".$whereQuery." GROUP BY f.facility_id ";
+            }
+        }else{
+            foreach(["vl", "eid", "tb", "covid19", "hepatitis"] as $type){
+                $receivedField = 'sample_received_at_lab_datetime';
+                if($type == 'vl' || $type == 'eid' || $type == 'tb' || $type == 'covid19'){
+                    $receivedField = 'sample_received_at_lab_datetime';
+                }else if($type == 'hepatitis'){
+                    $receivedField = 'sample_received_at_vl_lab_datetime';
+                }
+                $testTypeQuery[] = " SELECT count(*) AS reg, 
+                SUM(CASE WHEN ($receivedField IS NOT NULL AND $receivedField NOT LIKE '' AND DATE($receivedField) NOT LIKE '0000:00:00') THEN 1 ELSE 0 END) AS 'totalReceived',
+                SUM(CASE WHEN (sample_tested_datetime IS NOT NULL AND sample_tested_datetime NOT LIKE '' AND DATE(sample_tested_datetime) NOT LIKE '0000:00:00') THEN 1 ELSE 0 END) AS 'totalTested',
+                SUM(CASE WHEN ((reason_for_sample_rejection IS NOT NULL AND reason_for_sample_rejection NOT LIKE '') OR is_sample_rejected like 'yes') THEN 1 ELSE 0 END) AS 'totalRejected',
+                facility_name FROM dash_form_".$type." AS ".$type." INNER JOIN facility_details as f ON ".$type.".lab_id = f.facility_id ".$whereQuery." GROUP BY f.facility_id ";
+            }
+        }
+        $db = $this->dbAdapter;
+
+        $sql = "SELECT SUM(t.reg) AS total, t.facility_name AS clinicName, sum(t.totalTested) AS totalTested, sum(t.totalRejected) AS totalRejected 
+        FROM (
+                ".implode(" UNION ALL " , $testTypeQuery)."
+             ) t GROUP BY clinicName ORDER BY total, totalTested, totalRejected DESC";
+        return $this->dbAdapter->query($sql, Adapter::QUERY_MODE_EXECUTE)->toArray();
+    }
 }

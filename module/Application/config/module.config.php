@@ -195,6 +195,16 @@ return array(
                     ),
                 ),
             ),
+            'snapshot' => array(
+                'type'    => 'segment',
+                'options' => array(
+                    'route'    => '/snapshot[/][:action][/:id]',
+                    'defaults' => array(
+                        'controller' => Controller\SnapshotController::class,
+                        'action' => 'index',
+                    ),
+                ),
+            ),
         ),
     ),
     'service_manager' => [

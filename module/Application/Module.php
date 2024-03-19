@@ -757,6 +757,15 @@ class Module
 						return new \Application\Controller\OrganizationsController($organizationService, $commonService, $userService);
 					}
 				},
+				'Application\Controller\SnapshotController' => new class
+				{
+					public function __invoke($diContainer)
+					{
+						$sampleService = $diContainer->get('SampleService');
+						$commonService = $diContainer->get('CommonService');
+						return new \Application\Controller\SnapshotController($commonService, $sampleService);
+					}
+				},
 			),
 		);
 	}
