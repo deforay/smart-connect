@@ -2106,36 +2106,26 @@ class SampleService
         }
         if(isset($params['testType']) && !empty($params['testType'])){
             foreach($params['testType'] as $type){
-                $receivedField = 'sample_received_at_lab_datetime';
-                if($type == 'vl' || $type == 'eid' || $type == 'tb' || $type == 'covid19'){
-                    $receivedField = 'sample_received_at_lab_datetime';
-                }else if($type == 'hepatitis'){
-                    $receivedField = 'sample_received_at_vl_lab_datetime';
-                }
                 $testTypeQuery[] = " SELECT count(*) AS reg, 
-                SUM(CASE WHEN ($receivedField IS NOT NULL AND $receivedField NOT LIKE '' AND DATE($receivedField) NOT LIKE '0000:00:00') THEN 1 ELSE 0 END) AS 'totalReceived',
+                SUM(CASE WHEN (sample_collection_date IS NOT NULL AND sample_collection_date NOT LIKE '' AND DATE(sample_collection_date) NOT LIKE '0000:00:00') THEN 1 ELSE 0 END) AS 'totalReceived',
                 SUM(CASE WHEN (sample_tested_datetime IS NOT NULL AND sample_tested_datetime NOT LIKE '' AND DATE(sample_tested_datetime) NOT LIKE '0000:00:00') THEN 1 ELSE 0 END) AS 'totalTested',
                 SUM(CASE WHEN ((reason_for_sample_rejection IS NOT NULL AND reason_for_sample_rejection NOT LIKE '') OR is_sample_rejected like 'yes') THEN 1 ELSE 0 END) AS 'totalRejected',
+                SUM(CASE WHEN ((sample_collection_date IS NOT NULL AND sample_collection_date NOT LIKE '' AND DATE(sample_collection_date) NOT LIKE '0000:00:00') AND (is_sample_rejected like 'yes' OR result IS NULL OR result LIKE '' OR result_status IN(2,4,5,10))) THEN 1 ELSE 0 END) AS 'totalPending',
                 facility_name FROM dash_form_".$type." AS ".$type." INNER JOIN facility_details as f ON ".$type.".lab_id = f.facility_id ".$whereQuery." GROUP BY f.facility_id ";
             }
         }else{
             foreach(["vl", "eid", "tb", "covid19", "hepatitis"] as $type){
-                $receivedField = 'sample_received_at_lab_datetime';
-                if($type == 'vl' || $type == 'eid' || $type == 'tb' || $type == 'covid19'){
-                    $receivedField = 'sample_received_at_lab_datetime';
-                }else if($type == 'hepatitis'){
-                    $receivedField = 'sample_received_at_vl_lab_datetime';
-                }
                 $testTypeQuery[] = " SELECT count(*) AS reg, 
-                SUM(CASE WHEN ($receivedField IS NOT NULL AND $receivedField NOT LIKE '' AND DATE($receivedField) NOT LIKE '0000:00:00') THEN 1 ELSE 0 END) AS 'totalReceived',
+                SUM(CASE WHEN (sample_collection_date IS NOT NULL AND sample_collection_date NOT LIKE '' AND DATE(sample_collection_date) NOT LIKE '0000:00:00') THEN 1 ELSE 0 END) AS 'totalReceived',
                 SUM(CASE WHEN (sample_tested_datetime IS NOT NULL AND sample_tested_datetime NOT LIKE '' AND DATE(sample_tested_datetime) NOT LIKE '0000:00:00') THEN 1 ELSE 0 END) AS 'totalTested',
                 SUM(CASE WHEN ((reason_for_sample_rejection IS NOT NULL AND reason_for_sample_rejection NOT LIKE '') OR is_sample_rejected like 'yes') THEN 1 ELSE 0 END) AS 'totalRejected',
+                SUM(CASE WHEN ((sample_collection_date IS NOT NULL AND sample_collection_date NOT LIKE '' AND DATE(sample_collection_date) NOT LIKE '0000:00:00') AND (is_sample_rejected like 'yes' OR result IS NULL OR result LIKE '' OR result_status IN(2,4,5,10))) THEN 1 ELSE 0 END) AS 'totalPending',
                 facility_name FROM dash_form_".$type." AS ".$type." INNER JOIN facility_details as f ON ".$type.".lab_id = f.facility_id ".$whereQuery." GROUP BY f.facility_id ";
             }
         }
         $db = $this->dbAdapter;
 
-        $sql = "SELECT SUM(t.reg) AS total, t.facility_name AS clinicName, sum(t.totalTested) AS totalTested, sum(t.totalRejected) AS totalRejected 
+        $sql = "SELECT t.facility_name AS clinicName, SUM(t.reg) AS total, sum(t.totalTested) AS totalTested, sum(t.totalRejected) AS totalRejected, sum(t.totalPending) AS totalPending  
         FROM (
                 ".implode(" UNION ALL " , $testTypeQuery)."
              ) t GROUP BY clinicName ORDER BY total, totalTested, totalRejected DESC";

@@ -1,4 +1,18 @@
 <div class="row">
+    <div class="col-md-12 col-sm-6">
+        <div class="portlet box blue">
+            <div class="portlet-title">
+                <div class="caption">
+                    <span class="caption-subject"><?php echo $this->translate('Overall Snapshot status'); ?></span>
+                </div>
+            </div>
+            <div class="portlet-body">
+                <div id="overallSnapshotStatus" style="min-width: 310px; height: 420px; margin: 0 auto"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
     <div class="col-md-6 col-sm-6">
         <div class="portlet box blue">
             <div class="portlet-title">
@@ -38,7 +52,7 @@
         <?php
         $echo = '';
         if (isset($result) && !empty($result)) {
-            $total = 0;
+            $rtotal = $ttotal = $rjtotal = $pjtotal = 0;
             foreach ($result as $val) { ?>
                 <tr>
                     <td style="width:40%;text-align:left;"><?php echo $val['clinicName'];?></td>
@@ -49,6 +63,7 @@
             <?php $rtotal += $val['total'];
                 $ttotal += $val['totalTested'];
                 $rjtotal += $val['totalRejected'];
+                $pjtotal += $val['totalPending'];
             } ?>
         <?php } else { ?>
             <tr>
@@ -135,4 +150,70 @@
         }]
     });
     <?php } ?>
+
+    $('#overallSnapshotStatus').highcharts({
+        chart: {
+            type: 'column'
+        },
+
+        title: {
+            text: ''
+        },
+        exporting:{
+            chartOptions:{
+                subtitle: {
+                    text:'<?php echo $this->translate('Overall Snapshot Status'); ?>',
+                }
+            }
+        },
+        credits: {
+            enabled: false
+        },
+        xAxis: {
+            categories: ['<?php echo $this->translate('Samples Registered'); ?>',
+                         '<?php echo $this->translate('Sample Tested'); ?>',
+                         '<?php echo $this->translate('Sample Pending'); ?>',
+                         '<?php echo $this->translate('Sample Rejected'); ?>',
+                         ]
+        },
+
+        yAxis: {
+            allowDecimals: false,
+            min: 0,
+            title: {
+                text: '<?php echo $this->translate('No. of Samples'); ?>'
+            }
+        },
+
+        tooltip: {
+            formatter: function () {
+                return '<b>' + this.x + '</b><br/>' +
+                    this.series.name + ': ' + this.y + '<br/>' +
+                    '<?php echo $this->translate('Total'); ?>: ' + this.point.stackTotal;
+            }
+        },
+
+        plotOptions: {
+            column: {
+                stacking: 'normal',
+                dataLabels: {
+                    enabled: true
+                },
+                enableMouseTracking: false
+            }
+        },
+
+        series: [{
+            name: '<?php echo $this->translate('Sample'); ?>',
+            showInLegend: false, 
+            data: [
+                    { y : <?php echo (isset($rtotal))?$rtotal:0; ?> , color : 'gray' },
+                    { y : <?php echo (isset($ttotal))?$ttotal:0; ?> , color : 'blue' },
+                    { y : <?php echo (isset($pjtotal))?$pjtotal:0; ?> , color : 'yellow' },
+                    { y : <?php echo (isset($rjtotal))?$rjtotal:0; ?> , color : 'red' }
+                ],
+            stack: 'total',
+            color : 'red',
+        }]
+    }); 
 </script>
