@@ -329,7 +329,8 @@ if (isset($labFilter) && trim($labFilter) != '') {
     $.post("<?php echo $this->url('times', array('action' => 'get-tat-default')); ?>", {
         sampleCollectionDate: dateRange,
         lab: lab,
-        category: category
+        category: category,
+        flag: 'poc'
       },
       function(data) {
         $("#page-data-viewer").html(data);

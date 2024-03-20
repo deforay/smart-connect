@@ -573,8 +573,12 @@ class EidSampleService
     /////////*** Turnaround Time ***///////
     ///////////////////////////////////////
 
-    public function getTATbyProvince($labs, $startDate, $endDate)
+    public function getTATbyProvince($params)
     {
+        $labs = (isset($params['lab']) && !empty($params['lab'])) ? $params['lab'] : array();
+        $dates = explode(" to ", $params['sampleCollectionDate']);
+        $startDate = $dates[0];
+        $endDate = $dates[1];
         // set_time_limit(10000);
         $result = array();
         $resultSet = $this->eidSampleTable->getTATbyProvince($labs, $startDate, $endDate);

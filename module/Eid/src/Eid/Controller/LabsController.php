@@ -294,11 +294,10 @@ class LabsController extends AbstractActionController
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            $dates = explode(" to ", $params['sampleCollectionDate']);
+            $result = $this->sampleService->getTATbyProvince($params);
+            
             $category = $params['category'];
             $labs = (isset($params['lab']) && !empty($params['lab'])) ? $params['lab'] : array();
-
-            $result = $this->sampleService->getTATbyProvince($labs, $dates[0], $dates[1]);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('results' => $result, 'daterange' => $params['sampleCollectionDate'], 'labs' => implode(',', $labs), 'categoryChecked' => $category))
                 ->setTerminal(true);
