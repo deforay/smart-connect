@@ -1,9 +1,13 @@
+<?php 
+    $testType = (isset($params['testType']) && !empty($params['testType'])) ? $params['testType'] : ["vl", "eid", "covid19", "hepatitis", "tb"];
+    $testTypeValue = "for " . implode(",", $testType);
+?>
 <div class="row">
     <div class="col-md-12 col-sm-6">
         <div class="portlet box blue">
             <div class="portlet-title">
                 <div class="caption">
-                    <span class="caption-subject"><?php echo $this->translate('Overall Snapshot status'); ?></span>
+                    <span class="caption-subject"><?php echo $this->translate('Overall Snapshot status '). strtoupper($testTypeValue); ?></span>
                 </div>
             </div>
             <div class="portlet-body">
@@ -17,7 +21,7 @@
         <div class="portlet box blue">
             <div class="portlet-title">
                 <div class="caption">
-                    <span class="caption-subject"><?php echo $this->translate('Samples Recieved'); ?></span>
+                    <span class="caption-subject"><?php echo $this->translate('Samples Recieved '). strtoupper($testTypeValue); ?></span>
                 </div>
             </div>
             <div class="portlet-body" id="femalePatientPieChart">
@@ -29,7 +33,7 @@
         <div class="portlet box blue">
             <div class="portlet-title">
                 <div class="caption">
-                    <span class="caption-subject"><?php echo $this->translate('Samples Tested'); ?></span>
+                    <span class="caption-subject"><?php echo $this->translate('Samples Tested '). strtoupper($testTypeValue); ?></span>
                 </div>
             </div>
             <div class="portlet-body" id="lineOfTreatmentPieChart">
@@ -208,9 +212,9 @@
             showInLegend: false, 
             data: [
                     { y : <?php echo (isset($rtotal))?$rtotal:0; ?> , color : 'gray' },
-                    { y : <?php echo (isset($ttotal))?$ttotal:0; ?> , color : 'blue' },
-                    { y : <?php echo (isset($pjtotal))?$pjtotal:0; ?> , color : 'yellow' },
-                    { y : <?php echo (isset($rjtotal))?$rjtotal:0; ?> , color : 'red' }
+                    { y : <?php echo (isset($ttotal))?$ttotal:0; ?> , color : '#039BE6' },
+                    { y : <?php echo (isset($pjtotal))?$pjtotal:0; ?> , color : '#FFD55A' },
+                    { y : <?php echo (isset($rjtotal))?$rjtotal:0; ?> , color : '#ff1900' }
                 ],
             stack: 'total',
             color : 'red',

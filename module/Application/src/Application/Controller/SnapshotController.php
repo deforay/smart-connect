@@ -45,7 +45,7 @@ class SnapshotController extends AbstractActionController
             $params = $request->getPost();
             $result = $this->sampleService->getSnapshotData($params);
             $viewModel = new ViewModel();
-            $viewModel->setVariables(array('result' => $result))
+            $viewModel->setVariables(array('result' => $result, 'params' => $params))
                 ->setTerminal(true);
             return $viewModel;
         }
