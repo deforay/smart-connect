@@ -100,15 +100,15 @@ return array(
                     ),
                 ),
             ),
-            'vlsm-reference-tables' => array(
+            'vlsm-metadata' => array(
                 'type'    => 'segment',
                 'options' => array(
-                    'route'    => '/api/vlsm-reference-tables[/:id]',
+                    'route'    => '/api/vlsm-metadata[/:id]',
                     'constraints' => array(
                         'id'     => '[0-9]+',
                     ),
                     'defaults' => array(
-                        'controller' => 'Api\Controller\VlsmReferenceTables',
+                        'controller' => 'Api\Controller\VlsmMetadata',
                     ),
                 ),
             ),

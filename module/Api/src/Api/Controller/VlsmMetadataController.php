@@ -5,7 +5,7 @@ namespace Api\Controller;
 use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\View\Model\JsonModel;
 
-class VlsmReferenceTablesController extends AbstractRestfulController
+class VlsmMetadataController extends AbstractRestfulController
 {
 
     private \Application\Service\CommonService $commonService;
@@ -23,7 +23,7 @@ class VlsmReferenceTablesController extends AbstractRestfulController
     {
         // print_r($params);
         // die;
-        $response = $this->commonService->saveVlsmReferenceTablesFromAPI($params);
+        $response = $this->commonService->saveVlsmMetadataFromAPI($params);
         return new JsonModel($response);
     }
 }

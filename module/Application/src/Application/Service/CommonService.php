@@ -560,7 +560,7 @@ class CommonService
      }
 
 
-     public function saveVlsmReferenceTablesFromAPI($params)
+     public function saveVlsmMetadataFromAPI($params)
      {
           /* if(empty($params['api-version'])){
                return array('status' => 'fail', 'message' => 'Please specify API version');
@@ -607,9 +607,6 @@ class CommonService
                $apiData = Self::processJsonFile($pathname);
           }
 
-          /* echo "<pre>";
-          print_r($apiData->instrument_machines);
-          die; */
           if ($apiData !== FALSE) {
                /* For update the location details */
                if (isset($apiData->geographical_divisions) && !empty($apiData->geographical_divisions)) {
@@ -1442,7 +1439,7 @@ class CommonService
           return true;
      }
 
-     public static function processJsonFile($filePath, $returnTimestamp = false)
+     public static function processJsonFile($filePath, $returnTimestamp = false, $deleteSourceFile = true)
      {
           try {
                $apiData = [];
@@ -1470,6 +1467,10 @@ class CommonService
                          ]);
                          $timestamp = iterator_to_array($timestampData)['timestamp'] ?? time();
                     }
+               }
+               if ($deleteSourceFile) {
+                    unlink($filePath);
+                    unlink($tempFilePath);
                }
                return $returnTimestamp ? [$apiData, $timestamp] : $apiData;
           } catch (JsonException | JsonMachineException | PathNotFoundException $e) {
