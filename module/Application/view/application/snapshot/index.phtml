@@ -39,14 +39,6 @@ foreach ($requestType as $key => $value) {
 							<div class="box">
 								<table aria-describedby="table" class="table" aria-hidden="true" cellspacing="3" style="margin-left:1%;margin-top:20px;width:100%;">
 									<tr>
-										<td style="width:10%;"><strong><?php echo $this->translate('Sample Collection Date'); ?>&nbsp;:</strong></td>
-										<td style="width:20%;">
-											<input type="text" id="collectionDate" name="collectionDate" class="form-control daterangefield" placeholder="<?php echo $this->translate('Enter date range'); ?>" style="width:100%;background:#fff;" />
-										</td>
-                                        <td style="width:10%;"><strong><?php echo $this->translate('Sample Tested Date'); ?>&nbsp;:</strong></td>
-										<td style="width:20%;">
-											<input type="text" id="testedDate" name="testedDate" class="form-control daterangefield" placeholder="<?php echo $this->translate('Enter date range'); ?>" style="width:100%;background:#fff;" />
-										</td>
 										<td style="width:10%;"><strong><?php echo $this->translate("Test Type"); ?>&nbsp;:</strong></td>
 										<td style="width:20%;">
 											<select id="testType" name="testType[]" multiple class="form-control" title="<?php echo $this->translate('Please select the Test types'); ?>" style="width:100%;">
@@ -56,6 +48,14 @@ foreach ($requestType as $key => $value) {
 												<option value='hepatitis'><?php echo $this->translate("Hepatitis"); ?></option>
 												<option value='tb'><?php echo $this->translate("TB"); ?></option>
 											</select>
+										</td>
+										<td style="width:10%;"><strong><?php echo $this->translate('Sample Collection Date'); ?>&nbsp;:</strong></td>
+										<td style="width:20%;">
+											<input type="text" id="collectionDate" name="collectionDate" class="form-control daterangefield" placeholder="<?php echo $this->translate('Enter date range'); ?>" style="width:100%;background:#fff;" />
+										</td>
+                                        <td style="width:10%;"><strong><?php echo $this->translate('Sample Tested Date'); ?>&nbsp;:</strong></td>
+										<td style="width:20%;">
+											<input type="text" id="testedDate" name="testedDate" class="form-control daterangefield" placeholder="<?php echo $this->translate('Enter date range'); ?>" style="width:100%;background:#fff;" />
 										</td>
 									</tr>
                                     <tr>
