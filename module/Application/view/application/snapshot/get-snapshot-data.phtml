@@ -1,13 +1,13 @@
-<?php 
-    $testType = (isset($params['testType']) && !empty($params['testType'])) ? $params['testType'] : ["vl", "eid", "covid19", "hepatitis", "tb"];
-    $testTypeValue = "for " . implode(",", $testType);
+<?php
+$testType = (isset($params['testType']) && !empty($params['testType'])) ? $params['testType'] : ["vl", "eid", "covid19", "hepatitis", "tb"];
+$testTypeValue = "for " . implode(",", $testType);
 ?>
 <div class="row">
     <div class="col-md-12 col-sm-6">
         <div class="portlet box blue">
             <div class="portlet-title">
                 <div class="caption">
-                    <span class="caption-subject"><?php echo $this->translate('Overall Snapshot status '). strtoupper($testTypeValue); ?></span>
+                    <span class="caption-subject"><?php echo $this->translate('Overall Snapshot status ') . strtoupper($testTypeValue); ?></span>
                 </div>
             </div>
             <div class="portlet-body">
@@ -21,7 +21,7 @@
         <div class="portlet box blue">
             <div class="portlet-title">
                 <div class="caption">
-                    <span class="caption-subject"><?php echo $this->translate('Samples Recieved '). strtoupper($testTypeValue); ?></span>
+                    <span class="caption-subject"><?php echo $this->translate('Samples Recieved ') . strtoupper($testTypeValue); ?></span>
                 </div>
             </div>
             <div class="portlet-body" id="femalePatientPieChart">
@@ -33,7 +33,7 @@
         <div class="portlet box blue">
             <div class="portlet-title">
                 <div class="caption">
-                    <span class="caption-subject"><?php echo $this->translate('Samples Tested '). strtoupper($testTypeValue); ?></span>
+                    <span class="caption-subject"><?php echo $this->translate('Samples Tested ') . strtoupper($testTypeValue); ?></span>
                 </div>
             </div>
             <div class="portlet-body" id="lineOfTreatmentPieChart">
@@ -59,10 +59,10 @@
             $rtotal = $ttotal = $rjtotal = $pjtotal = 0;
             foreach ($result as $val) { ?>
                 <tr>
-                    <td style="width:40%;text-align:left;"><?php echo $val['clinicName'];?></td>
-                    <td style="width:20%;text-align:center;"><?php echo $val['total'];?></td>
-                    <td style="width:20%;text-align:center;"><?php echo $val['totalTested'];?></td>
-                    <td style="width:20%;text-align:center;"><?php echo $val['totalRejected'];?></td>
+                    <td style="width:40%;text-align:left;"><?php echo $val['clinicName']; ?></td>
+                    <td style="width:20%;text-align:center;"><?php echo $val['total']; ?></td>
+                    <td style="width:20%;text-align:center;"><?php echo $val['totalTested']; ?></td>
+                    <td style="width:20%;text-align:center;"><?php echo $val['totalRejected']; ?></td>
                 </tr>
             <?php $rtotal += $val['total'];
                 $ttotal += $val['totalTested'];
@@ -75,84 +75,83 @@
             </tr>
         <?php } ?>
     </tbody>
-    <?php if(isset($result) && !empty($result)){ ?>
+    <?php if (isset($result) && !empty($result)) { ?>
         <tfoot>
             <tr>
                 <td style="width:40%;font-weight:bold;text-align:right;">Total</td>
-                <td style="width:20%;font-weight:bold;text-align:center;"><?php echo $rtotal;?></td>
-                <td style="width:20%;font-weight:bold;text-align:center;"><?php echo $ttotal;?></td>
-                <td style="width:20%;font-weight:bold;text-align:center;"><?php echo $rjtotal;?></td>
+                <td style="width:20%;font-weight:bold;text-align:center;"><?php echo $rtotal; ?></td>
+                <td style="width:20%;font-weight:bold;text-align:center;"><?php echo $ttotal; ?></td>
+                <td style="width:20%;font-weight:bold;text-align:center;"><?php echo $rjtotal; ?></td>
             </tr>
         </tfoot>
     <?php } ?>
 </table>
 <script>
-    <?php foreach(['sampleRecived', 'sampleTested'] as $val){
-        $key = ($val == 'sampleRecived')? 'total' : 'totalTested';
-        $heading = ($val == 'sampleRecived')? "Sample Received" : "Sample Tested";
-        $subheading = ($val == 'sampleRecived')? "Received" : "Tested";?>
-        $('#<?php echo $val;?>').highcharts({
-        chart: {
-            plotBackgroundColor: null,
-            plotBorderWidth: null,
-            plotShadow: false,
-            type: 'pie'
-        },
-        title: {
-            text: ''
-        },
-        exporting:{
-            chartOptions:{
-                subtitle: {
-                    text:'<?php echo $this->translate($heading); ?>',
+    <?php foreach (['sampleRecived', 'sampleTested'] as $val) {
+        $key = ($val == 'sampleRecived') ? 'total' : 'totalTested';
+        $heading = ($val == 'sampleRecived') ? "Sample Received" : "Sample Tested";
+        $subheading = ($val == 'sampleRecived') ? "Received" : "Tested"; ?>
+        $('#<?php echo $val; ?>').highcharts({
+            chart: {
+                plotBackgroundColor: null,
+                plotBorderWidth: null,
+                plotShadow: false,
+                type: 'pie'
+            },
+            title: {
+                text: ''
+            },
+            exporting: {
+                chartOptions: {
+                    subtitle: {
+                        text: '<?php echo $this->translate($heading); ?>',
+                    }
                 }
-            }
-        },
-       credits: {
-              enabled: false
-       },
-        tooltip: {
-            pointFormat: '{series.name}: <b>{point.percentage:.1f}% ({point.number})</b>'
-        },
-        legend: {
-            //layout: 'vertical',
-            align: 'center',
-            //backgroundColor: '#f3f3f3',
-            useHTML: true,
-            itemMarginBottom: 5,
-            labelFormatter: function () {
-                return '<div style="width:230px"><span style="float:left;font-size:10px;">' + this.myData + ' ('+ this.name + ') - </span><span style="font-size:10px;padding:1px; ">'+ this.percentage.toFixed(1)+'% ('+Highcharts.numberFormat(this.y, 0)+')</span></div>';
-            }
-        },
-        plotOptions: {
-            pie: {
-                allowPointSelect: true,
-                cursor: 'pointer',
-                dataLabels: {
-                    //enabled : false,
-                distance: -30
-              },
-                showInLegend: true
-            }
-        },
-        series: [{
-            name: '<?php echo $this->translate($subheading); ?>',
-            colorByPoint: true,
-            data: [
-                <?php
-                    if(isset($result) && !empty($result)){
-                    foreach($result as $val){ ?>
-                        {
-                            name:'N: <?php echo $val[$key];?>',
-                            y:<?php echo $val[$key];?>,
-                            number:<?php echo $val[$key];?>,
-                            myData:'<?php echo $val['clinicName']; ?>'
-                        },
-                <?php }
-                }?>
-            ]
-        }]
-    });
+            },
+            credits: {
+                enabled: false
+            },
+            tooltip: {
+                pointFormat: '{series.name}: <b>{point.percentage:.1f}% ({point.number})</b>'
+            },
+            legend: {
+                //layout: 'vertical',
+                align: 'center',
+                //backgroundColor: '#f3f3f3',
+                useHTML: true,
+                itemMarginBottom: 5,
+                labelFormatter: function() {
+                    return '<div style="width:230px"><span style="float:left;font-size:10px;">' + this.myData + ' (' + this.name + ') - </span><span style="font-size:10px;padding:1px; ">' + this.percentage.toFixed(1) + '% (' + Highcharts.numberFormat(this.y, 0) + ')</span></div>';
+                }
+            },
+            plotOptions: {
+                pie: {
+                    allowPointSelect: true,
+                    cursor: 'pointer',
+                    dataLabels: {
+                        //enabled : false,
+                        distance: -30
+                    },
+                    showInLegend: true
+                }
+            },
+            series: [{
+                name: '<?php echo $this->translate($subheading); ?>',
+                colorByPoint: true,
+                data: [
+                    <?php
+                    if (isset($result) && !empty($result)) {
+                        foreach ($result as $val) { ?> {
+                                name: 'N: <?php echo $val[$key]; ?>',
+                                y: <?php echo $val[$key]; ?>,
+                                number: <?php echo $val[$key]; ?>,
+                                myData: '<?php echo htmlspecialchars($val['clinicName']); ?>'
+                            },
+                    <?php }
+                    } ?>
+                ]
+            }]
+        });
     <?php } ?>
 
     $('#overallSnapshotStatus').highcharts({
@@ -163,10 +162,10 @@
         title: {
             text: ''
         },
-        exporting:{
-            chartOptions:{
+        exporting: {
+            chartOptions: {
                 subtitle: {
-                    text:'<?php echo $this->translate('Overall Snapshot Status'); ?>',
+                    text: '<?php echo $this->translate('Overall Snapshot Status'); ?>',
                 }
             }
         },
@@ -175,10 +174,10 @@
         },
         xAxis: {
             categories: ['<?php echo $this->translate('Samples Registered'); ?>',
-                         '<?php echo $this->translate('Sample Tested'); ?>',
-                         '<?php echo $this->translate('Sample Pending'); ?>',
-                         '<?php echo $this->translate('Sample Rejected'); ?>',
-                         ]
+                '<?php echo $this->translate('Sample Tested'); ?>',
+                '<?php echo $this->translate('Sample Pending'); ?>',
+                '<?php echo $this->translate('Sample Rejected'); ?>',
+            ]
         },
 
         yAxis: {
@@ -190,7 +189,7 @@
         },
 
         tooltip: {
-            formatter: function () {
+            formatter: function() {
                 return '<b>' + this.x + '</b><br/>' +
                     this.series.name + ': ' + this.y + '<br/>' +
                     '<?php echo $this->translate('Total'); ?>: ' + this.point.stackTotal;
@@ -209,15 +208,26 @@
 
         series: [{
             name: '<?php echo $this->translate('Sample'); ?>',
-            showInLegend: false, 
-            data: [
-                    { y : <?php echo (isset($rtotal))?$rtotal:0; ?> , color : 'gray' },
-                    { y : <?php echo (isset($ttotal))?$ttotal:0; ?> , color : '#039BE6' },
-                    { y : <?php echo (isset($pjtotal))?$pjtotal:0; ?> , color : '#FFD55A' },
-                    { y : <?php echo (isset($rjtotal))?$rjtotal:0; ?> , color : '#ff1900' }
-                ],
+            showInLegend: false,
+            data: [{
+                    y: <?php echo (isset($rtotal)) ? $rtotal : 0; ?>,
+                    color: 'gray'
+                },
+                {
+                    y: <?php echo (isset($ttotal)) ? $ttotal : 0; ?>,
+                    color: '#039BE6'
+                },
+                {
+                    y: <?php echo (isset($pjtotal)) ? $pjtotal : 0; ?>,
+                    color: '#FFD55A'
+                },
+                {
+                    y: <?php echo (isset($rjtotal)) ? $rjtotal : 0; ?>,
+                    color: '#ff1900'
+                }
+            ],
             stack: 'total',
-            color : 'red',
+            color: 'red',
         }]
-    }); 
+    });
 </script>
