@@ -20,6 +20,7 @@ use Application\Model\TestReasonTable;
 use Application\Service\CommonService;
 use Application\Service\ConfigService;
 use Application\Service\SampleService;
+use Application\Service\SnapShotService;
 use Laminas\Cache\Pattern\ObjectCache;
 use Application\Service\SummaryService;
 use Application\Model\FacilityTypeTable;
@@ -588,6 +589,15 @@ class Module
 						return new SampleService($diContainer, $sampleTable, $commonService, $apiTrackerTable, $facilityTable, $dbAdapter);
 					}
 				},
+				'SnapShotService' => new class
+				{
+					public function __invoke($diContainer)
+					{
+						$commonService = $diContainer->get('CommonService');
+						$dbAdapter = $diContainer->get('Laminas\Db\Adapter\Adapter');
+						return new SnapShotService($diContainer, $commonService, $dbAdapter);
+					}
+				},
 				'SummaryService'  => new class
 				{
 					public function __invoke($diContainer)
@@ -761,9 +771,9 @@ class Module
 				{
 					public function __invoke($diContainer)
 					{
-						$sampleService = $diContainer->get('SampleService');
+						$snapshotService = $diContainer->get('SnapShotService');
 						$commonService = $diContainer->get('CommonService');
-						return new \Application\Controller\SnapshotController($commonService, $sampleService);
+						return new \Application\Controller\SnapshotController($commonService, $snapshotService);
 					}
 				},
 			),

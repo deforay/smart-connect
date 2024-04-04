@@ -10,12 +10,12 @@ class SnapshotController extends AbstractActionController
 {
 
     private \Application\Service\CommonService $commonService;
-    private \Application\Service\SampleService $sampleService;
+    private \Application\Service\SnapShotService $snapshotService;
 
-    public function __construct($commonService, $sampleService)
+    public function __construct($commonService, $snapshotService)
     {
         $this->commonService = $commonService;
-        $this->sampleService = $sampleService;
+        $this->snapshotService = $snapshotService;
     }
 
     public function indexAction()
@@ -43,11 +43,25 @@ class SnapshotController extends AbstractActionController
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            $result = $this->sampleService->getSnapshotData($params);
+            $result = $this->snapshotService->getSnapshotData($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('result' => $result, 'params' => $params))
                 ->setTerminal(true);
             return $viewModel;
+        }
+    }
+
+    public function getQuickStatsAction()
+    {
+        /** @var \Laminas\Http\Request $request */
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $params = $request->getPost();
+
+            $result = $this->snapshotService->getSampleResultDetails($params);
+            $this->view->setVariables(array('params' => $params, 'result' => $result))
+                ->setTerminal(true);
+            return $this->view;
         }
     }
 }

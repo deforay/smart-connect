@@ -7,6 +7,185 @@ foreach ($requestType as $key => $value) {
 	$requestTypeOption[$value['request_type']] = $value['request_type'];
 }
 ?>
+<link rel="stylesheet" href="<?php echo $this->basePath('assets/plugins/datepicker/datepicker3.css') ?>">
+<style>
+    .bluebox,
+    .dashboard-stat2 {
+        border: 1px solid #3598DC;
+    }
+
+    .mrp-monthdisplay {
+        display: inline-block !important;
+        border-radius: 0px 5px 5px 0px;
+        cursor: pointer;
+    }
+
+    .mrp-lowerMonth,
+    .mrp-upperMonth {
+        color: #40667A;
+        font-weight: bold;
+        font-size: 11px;
+        text-transform: uppercase;
+    }
+
+    .mrp-to {
+        color: #aaa;
+        margin-right: 0px;
+        margin-left: 0px;
+        font-size: 11px;
+        text-transform: uppercase;
+        /* background-color: #eee; */
+        padding: 5px 3px 5px 3px;
+    }
+
+    .mpr-calendar {
+        display: inline-block;
+        padding: 3px 5px;
+        border-right: solid #999 1px;
+    }
+
+    .mpr-calendar::last-child {
+        border-right: none;
+    }
+
+    .mpr-month {
+        padding: 20px;
+        text-transform: uppercase;
+        font-size: 12px;
+    }
+
+    .mpr-calendar h5 {
+        width: 100%;
+        text-align: center;
+        font-weight: bold;
+        font-size: 18px
+    }
+
+    /* .mpr-selected {} */
+
+    .mpr-month:hover {
+        border-radius: 5px;
+        box-shadow: 0 0 0 1px #ddd inset;
+        cursor: pointer;
+    }
+
+    .mpr-selected.mpr-month:hover {
+        border-radius: 0px;
+        box-shadow: none;
+    }
+
+    .mpr-calendarholder .col-xs-6 {
+        max-width: 250px;
+        min-width: 250px;
+    }
+
+    .mpr-calendarholder .col-xs-1 {
+        max-width: 150px;
+        min-width: 150px;
+    }
+
+    .mpr-calendarholder .btn-info {
+        background-color: #40667A;
+        border-color: #406670;
+        width: 100%;
+        margin-bottom: 10px;
+        text-transform: uppercase;
+        font-size: 10px;
+        padding: 10px 0px;
+    }
+
+    .mpr-quickset {
+        color: #666;
+        text-transform: uppercase;
+        text-align: center;
+    }
+
+    .mpr-yeardown,
+    .mpr-yearup {
+        margin-left: 5px;
+        cursor: pointer;
+        color: #666;
+    }
+
+    .mpr-yeardown {
+        float: left;
+    }
+
+    .mpr-yearup {
+        float: right;
+    }
+
+    .mpr-yeardown:hover,
+    .mpr-yearup:hover {
+        color: #40667A;
+    }
+
+    .mpr-calendar:first .mpr-selected:first {
+        background-color: #40667A;
+    }
+
+    .mpr-calendar:last .mpr-selected:last {
+        background-color: #40667A;
+    }
+
+    .popover {
+        max-width: 1920px !important;
+    }
+
+    .table>tbody>tr>td,
+    .table>tbody>tr>th,
+    .table>tfoot>tr>td,
+    .table>tfoot>tr>th,
+    .table>thead>tr>td,
+    .table>thead>tr>th {
+        padding: <?php echo (isset($languagecontainer->locale) && $languagecontainer->locale == 'en_US') ? '8' : '3'; ?>px;
+        font-size: <?php echo (isset($languagecontainer->locale) && $languagecontainer->locale == 'en_US') ? '14' : '13'; ?>px;
+    }
+
+    .select2-search__field,
+    .select2-selection__rendered {
+        color: #333;
+        text-align: center;
+    }
+
+    .select2-container--default {
+        width: 100% !important;
+    }
+
+    .select2-selection--multiple {
+        border-radius: 10px !important;
+    }
+
+    @media screen and (min-width:320px) and (max-width: 760px) {
+
+        #daterange-container,
+        #daterange-container-key-indicator {
+            width: 100% !important;
+        }
+
+        #showDateRange,
+        #closeDateRange {
+            margin-left: 0% !important;
+        }
+    }
+
+    @media screen and (min-width:761px) and (max-width: 970px) {
+
+        #daterange-container,
+        #daterange-container-key-indicator {
+            width: 100% !important;
+        }
+
+        #showDateRange,
+        #closeDateRange {
+            margin-left: 52% !important;
+        }
+    }
+
+    .select2-container--default .select2-selection--single {
+        height: 34px !important;
+    }
+</style>
 <div class="page-bar">
 	<ul class="page-breadcrumb">
 		<li>
@@ -20,18 +199,22 @@ foreach ($requestType as $key => $value) {
 </div>
 <!-- END PAGE BAR -->
 <!-- BEGIN PAGE TITLE-->
-<h3 class="page-title"></h3>
+<h3 class="page-title"><?php echo $this->translate('Snapshot'); ?></h3>
 <!-- END PAGE TITLE-->
 <!-- END PAGE HEADER-->
+<div class="row">
+    <div id="sampleResultDetails"></div>
+</div>
+
 <div class="row">
 	<div class="col-md-12">
 		<!-- BEGIN EXAMPLE TABLE PORTLET-->
 		<div class="portlet box blue">
-			<div class="portlet-title">
+			<!-- <div class="portlet-title">
 				<div class="caption">
-					<i class="fa fa-cogs"></i><?php echo $this->translate('Snapshot'); ?>
+					<i class="fa fa-cogs"></i>
 				</div>
-			</div>
+			</div> -->
 			<div class="portlet-body">
 				<div class="table-toolbar">
 					<div class="row">
@@ -96,6 +279,7 @@ foreach ($requestType as $key => $value) {
 	</div>
 </div>
 <script src="<?php echo $this->basePath('assets/pages/scripts/dashboard.js'); ?>" type="text/javascript"></script>
+<script src="<?php echo $this->basePath('assets/plugins/datepicker/bootstrap-datepicker.js') ?>"></script>
 <script type="text/javascript">
 	/* Table initialisation */
 	oTable = null;
@@ -169,8 +353,61 @@ foreach ($requestType as $key => $value) {
 
 		$('#collectionDate').val(moment().subtract(1, 'month').format('DD-MMM-YYYY') + ' to ' + moment().format('DD-MMM-YYYY'));
 		$('#testedDate').val('');
+		getSampleResult('daterange');
 		getData();
+		<?php
+        $minDate = (isset($loginContainer->useCurrentTables) && $loginContainer->useCurrentTables == true) ? "moment().subtract(12, 'months')" : "moment().subtract(12, 'years')";
+        ?>
+		$('#daterange-container, #daterange-container-key-indicator').daterangepicker({
+            'format': 'DD-MMM-YYYY',
+            'separator': ' to ',
+            'startDate': start,
+            'endDate': end,
+            'minDate': <?php echo $minDate; ?>,
+            'maxDate': moment(),
+            'ranges': {
+                'Today': [moment(), moment()],
+                'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+                'This Month': [moment().startOf('month'), moment().endOf('month')],
+                'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+            }
+        }, cb);
+        cb(start, end);
+        $('#dashboard-range').show();
+        $('#daterange-container span, #daterange-container-key-indicator span').html('<?php echo $this->translate('Choose Date Range'); ?>');
+        $('input[name="daterange"]').val('');
+
+        // The reason why getSampleResult is a separate call is because it does not follow
+        // the Date and Lab filters of the other functions.
+        getSampleResult('load');
+        getEverything();
+
+        $('#provinceName,#districtName,#labName').on('select2:close', function() {
+            let select = $(this)
+            $(this).next('span.select2').find('ul').html(function() {
+                let count = select.select2('data').length
+                if (count > 1) {
+                    return "<li>" + count + " items selected</li>"
+                }
+            })
+        })
 	});
+
+	function getSampleResult(frmSource) {
+        var daterange = $('#collectionDate').val();
+        if (frmSource == 'daterange' && $.trim(daterange) == '') {
+            alert('<?php echo $this->translate('Please choose date range'); ?>');
+            return false;
+        }
+        return $.post("<?php echo $this->url('snapshot', array('action' => 'get-quick-stats')); ?>", {
+                daterange: daterange
+            },
+            function(data) {
+                $("#sampleResultDetails").html(data);
+            });
+    }
 
     function selectDistrictName() {
         $('#districtName,#clinicId').html('');
@@ -228,5 +465,22 @@ foreach ($requestType as $key => $value) {
 				);
             }
         });
+    }
+
+	$("#showDateRange").click(function() {
+        $("#showDateRange").hide();
+        $("#closeDateRange,.daterange-container").show();
+    });
+
+    $("#closeDateRange").click(function() {
+        $("#closeDateRange,.daterange-container").hide();
+        $("#showDateRange").show();
+    });
+
+    function resetDateFilter() {
+        $('#dateFilter')[0].reset();
+        $('#daterange-container span, #daterange-container-key-indicator span').html('<?php echo $this->translate('Choose Date Range'); ?>');
+        $('input[name="daterange"]').val('');
+        getSampleResult('reset');
     }
 </script>
