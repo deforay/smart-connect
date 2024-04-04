@@ -2128,7 +2128,7 @@ class SampleService
         $sql = "SELECT t.facility_name AS clinicName, SUM(t.reg) AS total, sum(t.totalTested) AS totalTested, sum(t.totalRejected) AS totalRejected, sum(t.totalPending) AS totalPending  
         FROM (
                 ".implode(" UNION ALL " , $testTypeQuery)."
-             ) t GROUP BY clinicName ORDER BY total, totalTested, totalRejected DESC";
+             ) t GROUP BY clinicName ORDER BY total DESC";
         return $this->dbAdapter->query($sql, Adapter::QUERY_MODE_EXECUTE)->toArray();
     }
 }

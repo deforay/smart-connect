@@ -219,7 +219,13 @@ foreach ($requestType as $key => $value) {
         function(data) {
             if (data != "" || data != null || data != undefined) {
                 $('#loadData').html(data);
-				$('#regTable').dataTable();
+				$('#regTable').dataTable(
+					{
+						"aaSorting": [
+							[2, "desc"]
+						],
+					}
+				);
             }
         });
     }
