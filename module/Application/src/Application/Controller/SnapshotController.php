@@ -58,10 +58,11 @@ class SnapshotController extends AbstractActionController
         if ($request->isPost()) {
             $params = $request->getPost();
 
-            $result = $this->snapshotService->getSampleResultDetails($params);
-            $this->view->setVariables(array('params' => $params, 'result' => $result))
+            $result = $this->snapshotService->getSnapshotQuickStatsDetails($params);
+            $viewModel = new ViewModel();
+            $viewModel->setVariables(array('params' => $params, 'result' => $result))
                 ->setTerminal(true);
-            return $this->view;
+            return $viewModel;
         }
     }
 }

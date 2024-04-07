@@ -5,7 +5,7 @@ $rejectedDate = '';
 $receivedTotal = 0;
 $testedTotal = 0;
 $rejectedTotal = 0;
-$quickStats = (isset($result['quickStats']) & count($result['quickStats']) > 0) ? $result['quickStats'] : array();
+$quickStats = (isset($result['quickStats']) & !empty($result['quickStats'])) ? $result['quickStats'] : array();
 if (isset($result['scResult']) && !empty($result['scResult'])) {
     $received = end($result['scResult']);
     $receivedTotal = $received['receivedTotal'];
@@ -19,9 +19,10 @@ if (isset($result['stResult']) && !empty($result['stResult'])) {
 if (isset($result['srResult']) && !empty($result['srResult'])) {
     $reject = end($result['srResult']);
     $rejectedTotal = $reject['rejectTotal'];
-    $rejectedDate = $reject['rejectDate'];
+    $rejectedDate = $reject['rejectedDate'];
 }
 ?>
+<!-- <pre><?php print_r($result);?></pre> -->
 <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
     <div class="dashboard-stat2" style="cursor:pointer;">
         <div class="display">
@@ -78,7 +79,7 @@ if (isset($result['srResult']) && !empty($result['srResult'])) {
                 <?php
                 if (trim($params['daterange']) == '') {
                 ?>
-                    <small class="font-green-sharp"><?php echo $this->translate('Last 28 days'); ?></small>
+                    <!-- <small class="font-green-sharp"><?php echo $this->translate('Last 28 days'); ?></small> -->
                 <?php } ?>
             </div>
             <div class="icon">
@@ -101,7 +102,7 @@ if (isset($result['srResult']) && !empty($result['srResult'])) {
                 <?php
                 if (trim($params['daterange']) == '') {
                 ?>
-                    <small class="font-blue-sharp"><?php echo $this->translate('Last 28 days'); ?></small>
+                    <!-- <small class="font-blue-sharp"><?php echo $this->translate('Last 28 days'); ?></small> -->
                 <?php } ?>
             </div>
             <div class="icon">
@@ -123,7 +124,7 @@ if (isset($result['srResult']) && !empty($result['srResult'])) {
                 <?php
                 if (trim($params['daterange']) == '') {
                 ?>
-                    <small class="font-red-haze"><?php echo $this->translate('Last 28 days'); ?></small>
+                    <!-- <small class="font-red-haze"><?php echo $this->translate('Last 28 days'); ?></small> -->
                 <?php } ?>
             </div>
             <div class="icon">
