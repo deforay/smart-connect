@@ -18,11 +18,11 @@ if (isset($result['stResult']) && !empty($result['stResult'])) {
 }
 if (isset($result['srResult']) && !empty($result['srResult'])) {
     $reject = end($result['srResult']);
-    $rejectedTotal = $reject['rejectTotal'];
+    $rejectedTotal = $reject['rejectedTotal'];
     $rejectedDate = $reject['rejectedDate'];
 }
 ?>
-<!-- <pre><?php print_r($result);?></pre> -->
+<!-- <pre><?php print_r($result['srResult']);?></pre> -->
 <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
     <div class="dashboard-stat2" style="cursor:pointer;">
         <div class="display">
@@ -291,7 +291,7 @@ if (isset($result['srResult']) && !empty($result['srResult'])) {
                 xAxis: {
                     categories: [<?php
                                     foreach ($result['srResult'] as $total) {
-                                        echo "'" . ucwords($total['date']) . "',";
+                                        echo "'" . $total['date'] . "',";
                                     }
                                     ?>],
                     crosshair: true

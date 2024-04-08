@@ -61,37 +61,38 @@ class SnapShotService
         if(isset($types) && !empty($types)){
             foreach($types as $type){
                 $testTypeQuery[] = " SELECT count(*) AS reg, 
-                SUM(CASE WHEN (
-                    sample_collection_date is not null AND sample_collection_date not like '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00'
+                SUM(CASE WHEN 
+                    (
+                        sample_collection_date is not null AND sample_collection_date not like '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00'
                     ) THEN 1 ELSE 0 END
                 ) AS 'totalReceived',
                 
-                SUM(CASE WHEN (
-                    (reason_for_sample_rejection IS NOT NULL AND reason_for_sample_rejection != '' AND reason_for_sample_rejection != 0) 
-                    AND 
-                    (sample_tested_datetime is not null AND sample_tested_datetime not like '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')
+                SUM(CASE WHEN 
+                    (
+                        sample_tested_datetime is not null AND sample_tested_datetime not like '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00'
                     ) THEN 1 ELSE 0 END
                 ) AS 'totalTested',
 
                 SUM(CASE WHEN 
-                (
-                    (reason_for_sample_rejection IS NOT NULL AND reason_for_sample_rejection !='' AND reason_for_sample_rejection!= 0) OR (is_sample_rejected like 'yes') 
-                    AND 
-                    (sample_collection_date is not null AND sample_collection_date not like '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00')
+                    (
+                        (reason_for_sample_rejection IS NOT NULL AND reason_for_sample_rejection !='' AND reason_for_sample_rejection!= 0) OR (is_sample_rejected like 'yes') 
+                        AND 
+                        (sample_collection_date is not null AND sample_collection_date not like '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00')
                     ) THEN 1 ELSE 0 END
                 ) AS 'totalRejected',
                 
-                SUM(CASE WHEN (
-                    (sample_collection_date IS NOT NULL AND sample_collection_date NOT LIKE '' AND DATE(sample_collection_date) NOT LIKE '0000:00:00' AND DATE(sample_collection_date) !='1970-01-01') 
-                    AND 
-                    (is_sample_rejected like 'yes' OR result IS NULL OR result LIKE '' OR result_status IN(2,4,5,10))
+                SUM(CASE WHEN 
+                    (
+                        (sample_collection_date IS NOT NULL AND sample_collection_date NOT LIKE '' AND DATE(sample_collection_date) NOT LIKE '0000:00:00' AND DATE(sample_collection_date) !='1970-01-01') 
+                        AND 
+                        (is_sample_rejected like 'yes' OR result IS NULL OR result LIKE '' OR result_status IN(2,4,5,10))
                     ) THEN 1 ELSE 0 END
                 ) AS 'totalPending',
                 facility_name FROM dash_form_".$type." AS ".$type." INNER JOIN facility_details as f ON ".$type.".lab_id = f.facility_id ".$whereQuery." GROUP BY f.facility_id ";
             }
         }
 
-        $sql = "SELECT t.facility_name AS clinicName, SUM(t.reg) AS total, sum(t.totalTested) AS totalTested, sum(t.totalRejected) AS totalRejected, sum(t.totalPending) AS totalPending";
+        $sql = "SELECT t.facility_name AS clinicName, sum(t.reg) AS total, sum(t.totalReceived) AS totalReceived, sum(t.totalTested) AS totalTested, sum(t.totalRejected) AS totalRejected, sum(t.totalPending) AS totalPending";
         $sql .= " FROM (
                 ".implode(" UNION ALL " , $testTypeQuery)."
              ) t GROUP BY clinicName ORDER BY total DESC";
@@ -124,43 +125,67 @@ class SnapShotService
                     ->columns(
                         array(
                             $this->translator->translate("total") => new Expression('COUNT(*)'),
-                            $this->translator->translate("tested") => new Expression("SUM(CASE WHEN ((reason_for_sample_rejection IS NOT NULL AND reason_for_sample_rejection != '' AND reason_for_sample_rejection != 0)) THEN 1 ELSE 0 END)"),
+
+                            $this->translator->translate("recevied") => new Expression("SUM(CASE WHEN (sample_collection_date is not null AND sample_collection_date not like '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00') THEN 1 ELSE 0 END)"),
+
+                            $this->translator->translate("tested") => new Expression("SUM(CASE WHEN (
+                                (reason_for_sample_rejection IS NOT NULL AND reason_for_sample_rejection != '' AND reason_for_sample_rejection != 0) 
+                                And 
+                                (sample_tested_datetime is not null AND sample_tested_datetime not like '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')
+                            ) THEN 1 ELSE 0 END)"),
+
                             $this->translator->translate("gender") => new Expression("SUM(CASE WHEN ((".$gender." IS NULL OR ".$gender." ='' OR ".$gender." ='unreported' OR ".$gender." ='Unreported')) THEN 1 ELSE 0 END)"),
+
                             $this->translator->translate("age") => new Expression("SUM(CASE WHEN ((".$age[$type]." IS NULL OR ".$age[$type]." ='' OR ".$age[$type]." ='Unreported'  OR ".$age[$type]." ='unreported')) THEN 1 ELSE 0 END)"),
+
                             $this->translator->translate("less6") => new Expression("SUM(CASE WHEN ((sample_collection_date < DATE_SUB(NOW(), INTERVAL $samplesWaitingFromLastXMonths MONTH)) AND (reason_for_sample_rejection is NULL or reason_for_sample_rejection ='' or reason_for_sample_rejection = 0)) THEN 1 ELSE 0 END)"),
+
                             $this->translator->translate("greater6") => new Expression("SUM(CASE WHEN ((sample_collection_date > DATE_SUB(NOW(), INTERVAL $samplesWaitingFromLastXMonths MONTH)) AND (reason_for_sample_rejection is NULL or reason_for_sample_rejection ='' or reason_for_sample_rejection = 0)) THEN 1 ELSE 0 END)")
                         )
                 );
-
+                // recevied data
                 $receivedQuery = $sql->select()->from("dash_form_" .$type)
-                    ->columns(array('total' => new Expression('COUNT(*)'), 'receivedDate' => new Expression('DATE(sample_collection_date)')))
-                    ->where("sample_collection_date is not null AND sample_collection_date not like '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00'")
+                    ->columns(array('total' => new Expression("SUM(
+                        CASE WHEN(
+                            sample_collection_date is not null AND sample_collection_date not like '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00'
+                        ) THEN 1 ELSE 0 END
+                    )"), 'receivedDate' => new Expression('DATE(sample_collection_date)')))
+                    // ->where("sample_collection_date is not null AND sample_collection_date not like '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00'")
                     ->group(array("receivedDate"));
                 //tested data
                 $testedQuery = $sql->select()->from("dash_form_".$type)
-                    ->columns(array('total' => new Expression('COUNT(*)'), 'testedDate' => new Expression('DATE(sample_tested_datetime)')))
-                    ->where("(reason_for_sample_rejection IS NOT NULL AND reason_for_sample_rejection != '' AND reason_for_sample_rejection != 0)")
-                    ->where("sample_tested_datetime is not null AND sample_tested_datetime not like '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00'")
+                    ->columns(array('total' => new Expression("SUM(
+                        CASE WHEN(
+                            (sample_tested_datetime is not null AND sample_tested_datetime not like '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')
+                        ) THEN 1 ELSE 0 END
+                    )"), 'testedDate' => new Expression('DATE(sample_tested_datetime)')))
+                    // ->where("(is_sample_rejected IS NULL AND is_sample_rejected = '' AND is_sample_rejected like 'no') AND (sample_tested_datetime is not null AND sample_tested_datetime not like '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')")
                     ->group(array("testedDate"));
                 //get rejected data
                 $rejectedQuery = $sql->select()->from("dash_form_".$type)
-                ->columns(array('total' => new Expression('COUNT(*)'), 'rejectedDate' => new Expression('DATE(sample_collection_date)')))
-                ->where("reason_for_sample_rejection IS NOT NULL AND reason_for_sample_rejection !='' AND reason_for_sample_rejection!= 0")
-                ->where("sample_collection_date is not null AND sample_collection_date not like '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00'")
+                ->columns(array('total' => new Expression("SUM(
+                    CASE WHEN (
+                        (is_sample_rejected like 'yes' OR result IS NULL OR result LIKE '' OR result_status IN(2,4,5,10))
+                        AND
+                        (sample_collection_date is not null AND sample_collection_date not like '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00')
+                    ) THEN 1 ELSE 0 END
+                )"), 'rejectedDate' => new Expression('DATE(sample_collection_date)')))
+                // ->where("(is_sample_rejected like 'yes' OR result IS NULL OR result LIKE '' OR result_status IN(2,4,5,10)) AND (sample_collection_date is not null AND sample_collection_date not like '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00')")
                 ->group(array("rejectedDate"));
+                
                 if(isset($params['collectionDate']) && !empty($params['collectionDate'])){
                     $date = explode(" to ", $params['collectionDate']);
-                    $quickStatsquery = $quickStatsquery->where(array("DATE(sample_collection_date) <='".$common->isoDateFormat($date[0])."'", "DATE(sample_collection_date) >='".$common->isoDateFormat($date[0])."'"));
-                    $receivedQuery = $receivedQuery->where(array("DATE(sample_collection_date) <='".$common->isoDateFormat($date[0])."'", "DATE(sample_collection_date) >='".$common->isoDateFormat($date[0])."'"));
-                    $testedQuery = $testedQuery->where(array("DATE(sample_collection_date) <='".$common->isoDateFormat($date[0])."'", "DATE(sample_collection_date) >='".$common->isoDateFormat($date[0])."'"));
-                    $rejectedQuery = $rejectedQuery->where(array("DATE(sample_collection_date) <='".$common->isoDateFormat($date[0])."'", "DATE(sample_collection_date) >='".$common->isoDateFormat($date[0])."'"));
+                    $quickStatsquery = $quickStatsquery->where(array("DATE(sample_collection_date) >='".$common->isoDateFormat($date[0])."'", "DATE(sample_collection_date) <='".$common->isoDateFormat($date[1])."'"));
+                    $receivedQuery = $receivedQuery->where(array("DATE(sample_collection_date) >='".$common->isoDateFormat($date[0])."'", "DATE(sample_collection_date) <='".$common->isoDateFormat($date[1])."'"));
+                    $testedQuery = $testedQuery->where(array("DATE(sample_collection_date) >='".$common->isoDateFormat($date[0])."'", "DATE(sample_collection_date) <='".$common->isoDateFormat($date[1])."'"));
+                    $rejectedQuery = $rejectedQuery->where(array("DATE(sample_collection_date) >='".$common->isoDateFormat($date[0])."'", "DATE(sample_collection_date) <='".$common->isoDateFormat($date[1])."'"));
                 }
                 if(isset($params['testedDate']) && !empty($params['testedDate'])){
                     $date = explode(" to ", $params['testedDate']);
-                    $quickStatsquery = $quickStatsquery->where(array("DATE(sample_tested_datetime) <='".$common->isoDateFormat($date[0])."'", "DATE(sample_tested_datetime) >='".$common->isoDateFormat($date[0])."'"));
-                    $receivedQuery = $receivedQuery->where(array("DATE(sample_tested_datetime) <='".$common->isoDateFormat($date[0])."'", "DATE(sample_tested_datetime) >='".$common->isoDateFormat($date[0])."'"));
-                    $testedQuery = $testedQuery->where(array("DATE(sample_tested_datetime) <='".$common->isoDateFormat($date[0])."'", "DATE(sample_tested_datetime) >='".$common->isoDateFormat($date[0])."'"));
-                    $rejectedQuery = $rejectedQuery->where(array("DATE(sample_tested_datetime) <='".$common->isoDateFormat($date[0])."'", "DATE(sample_tested_datetime) >='".$common->isoDateFormat($date[0])."'"));
+                    $quickStatsquery = $quickStatsquery->where(array("DATE(sample_tested_datetime) >='".$common->isoDateFormat($date[0])."'", "DATE(sample_tested_datetime) <='".$common->isoDateFormat($date[1])."'"));
+                    $receivedQuery = $receivedQuery->where(array("DATE(sample_tested_datetime) >='".$common->isoDateFormat($date[0])."'", "DATE(sample_tested_datetime) <='".$common->isoDateFormat($date[1])."'"));
+                    $testedQuery = $testedQuery->where(array("DATE(sample_tested_datetime) >='".$common->isoDateFormat($date[0])."'", "DATE(sample_tested_datetime) <='".$common->isoDateFormat($date[1])."'"));
+                    $rejectedQuery = $rejectedQuery->where(array("DATE(sample_tested_datetime) >='".$common->isoDateFormat($date[0])."'", "DATE(sample_tested_datetime) <='".$common->isoDateFormat($date[1])."'"));
                 }
                 $query['quickStats'][] = $sql->buildSqlString($quickStatsquery);
                 $query['received'][] = $sql->buildSqlString($receivedQuery);
@@ -168,31 +193,33 @@ class SnapShotService
                 $query['rejected'][] = $sql->buildSqlString($rejectedQuery);
             }
         }
-        $sql = "SELECT SUM(t.total) AS 'Total Samples', 
-            t.tested AS 'Samples Tested',
-            t.gender AS 'Gender Missing',
-            t.age AS 'Age Missing',
-            t.less6 AS 'Results Not Available (< 6 months)',
-            t.greater6 AS 'Results Not Available (> 6 months)' ";
+        $sql = "SELECT SUM(t.recevied) AS 'Total Samples', 
+            SUM(t.tested) AS 'Samples Tested',
+            SUM(t.gender) AS 'Gender Missing',
+            SUM(t.age) AS 'Age Missing',
+            SUM(t.less6) AS 'Results Not Available (< 6 months)',
+            SUM(t.greater6) AS 'Results Not Available (> 6 months)' ";
         $sql .= " FROM (
                 ".implode(" UNION ALL " , $query['quickStats'])."
         ) t ";
+        // die($sql);
         $finalResult['quickStats'] = $this->adapter->query($sql, Adapter::QUERY_MODE_EXECUTE)->current();
         // echo "<pre>";print_r($query);die;
         foreach(array('received', 'tested', 'rejected') as $r){
-            $sql = "SELECT SUM(t.total) AS total, t.".$r."Date AS ".$r."Date ";
+            $sql = "SELECT SUM(t.total) AS total, t.".$r."Date ";
             $sql .= " FROM (
                     ".implode(" UNION ALL " , $query[$r])."
-            ) t GROUP BY ".$r."Date";
+            ) t GROUP BY ".$r."Date ORDER BY ".$r."Date DESC";
             // $q[$r] = $sql;
             $result = $this->adapter->query($sql, Adapter::QUERY_MODE_EXECUTE)->toArray();
             $totalSum = 0;
             foreach ($result as $rRow) {
-                $displayDate = $common->humanReadableDateFormat($rRow[$r.'Date']);
-                $finalResult[$r][] = array(array('total' => $rRow['total']), 'date' => $displayDate, 'testedDate' => $displayDate, $r.'Total' => $totalSum += $rRow['total']);
+                // $displayDate = $common->humanReadableDateFormat($rRow[$r.'Date']);
+                $displayDate = date("d-M-Y", strtotime($rRow[$r.'Date']));
+                $finalResult[$r][] = array(array('total' => $rRow['total']), 'date' => $displayDate, $r.'Date' => $displayDate, $r.'Total' => $totalSum += $rRow['total']);
             }
         }
-        // echo "<pre>";print_r($finalResult);die;
+        // die;
         return array('quickStats' => $finalResult['quickStats'], 'scResult' => $finalResult['received'], 'stResult' => $finalResult['tested'], 'srResult' => $finalResult['rejected']);
     }
 }
