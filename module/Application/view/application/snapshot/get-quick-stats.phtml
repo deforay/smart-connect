@@ -22,6 +22,11 @@ if (isset($result['srResult']) && !empty($result['srResult'])) {
     $rejectedDate = $reject['rejectedDate'];
 }
 ?>
+<style>
+    @media only screen and (max-width: 600px) {
+        .qucikstats{padding-top: 20px !important;}
+    }
+</style>
 <!-- <pre><?php print_r($result['srResult']);?></pre> -->
 <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
     <div class="dashboard-stat2" style="cursor:pointer;">
@@ -64,7 +69,7 @@ if (isset($result['srResult']) && !empty($result['srResult'])) {
                     </tr>
                 <?php } ?>
                 <tr><td colspan="2"></td></tr>
-                <tr><td colspan="2" style="padding-top: 20px !important;"></td></tr>
+                <tr><td colspan="2" class="qucikstats"></td></tr>
             </table>
         </div>
     </div>
