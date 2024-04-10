@@ -4,7 +4,7 @@ use Application\Service\CommonService;
 
 $common = new CommonService();
 foreach ($requestType as $key => $value) {
-	$requestTypeOption[$value['request_type']] = $value['request_type'];
+    $requestTypeOption[$value['request_type']] = $value['request_type'];
 }
 ?>
 <style>
@@ -15,15 +15,15 @@ foreach ($requestType as $key => $value) {
 </style>
 <link rel="stylesheet" href="<?php echo $this->basePath('assets/plugins/datepicker/datepicker3.css') ?>">
 <div class="page-bar">
-	<ul class="page-breadcrumb">
-		<li>
-			<a href="/"><?php echo $this->translate('Dashboard'); ?></a>
-			<i class="fa fa-circle"></i>
-		</li>
-		<li>
-			<?php echo $this->translate('Snapshot'); ?>
-		</li>
-	</ul>
+    <ul class="page-breadcrumb">
+        <li>
+            <a href="/"><?php echo $this->translate('Dashboard'); ?></a>
+            <i class="fa fa-circle"></i>
+        </li>
+        <li>
+            <?php echo $this->translate('Snapshot'); ?>
+        </li>
+    </ul>
 </div>
 <!-- END PAGE BAR -->
 <!-- BEGIN PAGE TITLE-->
@@ -32,70 +32,72 @@ foreach ($requestType as $key => $value) {
 <!-- END PAGE HEADER-->
 
 <div class="row">
-	<div class="col-md-12">
-		<!-- BEGIN EXAMPLE TABLE PORTLET-->
-		<div class="portlet box blue">
-			<div class="portlet-body">
-				<div class="table-toolbar">
-					<div class="row">
-						<div class="col-md-12">
-							<div class="box">
-								<table aria-describedby="table" class="table" aria-hidden="true" cellspacing="3" style="margin-left:1%;margin-top:20px;width:100%;">
-									<tr>
-										<td style="width:10%;"><strong><?php echo $this->translate("Test Type"); ?>&nbsp;:</strong></td>
-										<td style="width:20%;">
-											<select id="testType" name="testType[]" multiple class="form-control" title="<?php echo $this->translate('Please select the Test types'); ?>" style="width:100%;">
-												<option value="vl"><?php echo $this->translate("Viral Load"); ?></option>
-												<option value="eid"><?php echo $this->translate("Early Infant Diagnosis"); ?></option>
-												<option value="covid19"><?php echo $this->translate("Covid-19"); ?></option>
-												<option value='hepatitis'><?php echo $this->translate("Hepatitis"); ?></option>
-												<option value='tb'><?php echo $this->translate("TB"); ?></option>
-											</select>
-										</td>
-										<td style="width:10%;"><strong><?php echo $this->translate('Sample Collection Date'); ?>&nbsp;:</strong></td>
-										<td style="width:20%;">
-											<input type="text" id="collectionDate" name="collectionDate" class="form-control daterangefield" placeholder="<?php echo $this->translate('Enter date range'); ?>" style="width:100%;background:#fff;" />
-										</td>
+    <div class="col-md-12">
+        <!-- BEGIN EXAMPLE TABLE PORTLET-->
+        <div class="portlet box blue">
+            <div class="portlet-body">
+                <div class="table-toolbar">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="box">
+                                <table aria-describedby="table" class="table" aria-hidden="true" cellspacing="3" style="margin-left:1%;margin-top:20px;width:100%;">
+                                    <tr>
+                                        <td style="width:10%;"><strong><?php echo $this->translate("Test Type"); ?>&nbsp;:</strong></td>
+                                        <td style="width:20%;">
+                                            <select id="testType" name="testType[]" multiple class="form-control" title="<?php echo $this->translate('Please select the Test types'); ?>" style="width:100%;">
+                                                <option value="vl"><?php echo $this->translate("Viral Load"); ?></option>
+                                                <option value="eid"><?php echo $this->translate("Early Infant Diagnosis"); ?></option>
+                                                <option value="covid19"><?php echo $this->translate("Covid-19"); ?></option>
+                                                <option value='hepatitis'><?php echo $this->translate("Hepatitis"); ?></option>
+                                                <option value='tb'><?php echo $this->translate("TB"); ?></option>
+                                            </select>
+                                        </td>
+                                        <td style="width:10%;"><strong><?php echo $this->translate('Sample Collection Date'); ?>&nbsp;:</strong></td>
+                                        <td style="width:20%;">
+                                            <input type="text" id="collectionDate" name="collectionDate" class="form-control daterangefield" placeholder="<?php echo $this->translate('Enter date range'); ?>" style="width:100%;background:#fff;" />
+                                        </td>
                                         <td style="width:10%;"><strong><?php echo $this->translate('Sample Tested Date'); ?>&nbsp;:</strong></td>
-										<td style="width:20%;">
-											<input type="text" id="testedDate" name="testedDate" class="form-control daterangefield" placeholder="<?php echo $this->translate('Enter date range'); ?>" style="width:100%;background:#fff;" />
-										</td>
-									</tr>
+                                        <td style="width:20%;">
+                                            <input type="text" id="testedDate" name="testedDate" class="form-control daterangefield" placeholder="<?php echo $this->translate('Enter date range'); ?>" style="width:100%;background:#fff;" />
+                                        </td>
+                                    </tr>
                                     <tr>
                                         <td style="width:10%;"><strong><?php echo $this->translate("Province"); ?>&nbsp;:</strong></td>
-										<td style="width:20%;">
-                                            <select name="provinceName[]" id="provinceName" class="form-control" multiple title="<?php echo $this->translate('Please select one or more province. Leave blank for All'); ?>" onchange="selectDistrictName();"  style="width:100%;">
-                                                <?php foreach ($provinceName as $province) {?> 
+                                        <td style="width:20%;">
+                                            <select name="provinceName[]" id="provinceName" class="form-control" multiple title="<?php echo $this->translate('Please select one or more province. Leave blank for All'); ?>" onchange="selectDistrictName();" style="width:100%;">
+                                                <?php foreach ($provinceName as $province) { ?>
                                                     <option value="<?php echo $province['geo_id']; ?>"><?php echo $province['geo_name']; ?></option>
                                                 <?php } ?>
                                             </select>
-										</td>
+                                        </td>
                                         <td style="width:10%;"><strong><?php echo $this->translate("District"); ?>&nbsp;:</strong></td>
-										<td style="width:20%;">
-                                            <select name="districtName[]" id="districtName" class="form-control" multiple title="<?php echo $this->translate('Please select one or more district. Leave blank for All'); ?>" onchange="selectClinicName();"  style="width:100%;">
+                                        <td style="width:20%;">
+                                            <select name="districtName[]" id="districtName" class="form-control" multiple title="<?php echo $this->translate('Please select one or more district. Leave blank for All'); ?>" onchange="selectClinicName();" style="width:100%;">
                                             </select>
-										</td>
+                                        </td>
                                         <td style="width:10%;"><strong><?php echo $this->translate("Health Facility"); ?>&nbsp;:</strong></td>
-										<td style="width:20%;">
-                                            <select class="form-control" id="clinicId" name="clinicId[]" multiple title="<?php echo $this->translate('Please select one or more clinics. Leave blank for All'); ?>"  style="width:100%;">
+                                        <td style="width:20%;">
+                                            <select class="form-control" id="clinicId" name="clinicId[]" multiple title="<?php echo $this->translate('Please select one or more clinics. Leave blank for All'); ?>" style="width:100%;">
                                             </select>
-										</td>
-									</tr>
-                                    <tr><td colspan="2">
-                                        <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="getData();getSampleResult();"><?php echo $this->translate('Search'); ?></a>&nbsp;&nbsp;
-                                        <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="location.reload();" style="margin-right:5.8%;"><?php echo $this->translate('Reset'); ?></a>
-                                    </td></tr>
-								</table>
-							</div>
-							<!-- /.box -->
-						</div>
-					</div>
-					<br>
-				</div>
-			</div>
-		</div>
-		<!-- END EXAMPLE TABLE PORTLET-->
-	</div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2">
+                                            <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="getData();getSampleResult();"><?php echo $this->translate('Search'); ?></a>&nbsp;&nbsp;
+                                            <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="location.reload();" style="margin-right:5.8%;"><?php echo $this->translate('Reset'); ?></a>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <!-- /.box -->
+                        </div>
+                    </div>
+                    <br>
+                </div>
+            </div>
+        </div>
+        <!-- END EXAMPLE TABLE PORTLET-->
+    </div>
 </div>
 <div class="row">
     <div id="sampleResultDetails"></div>
@@ -105,10 +107,10 @@ foreach ($requestType as $key => $value) {
 <script src="<?php echo $this->basePath('assets/pages/scripts/dashboard.js'); ?>" type="text/javascript"></script>
 <script src="<?php echo $this->basePath('assets/plugins/datepicker/bootstrap-datepicker.js') ?>"></script>
 <script type="text/javascript">
-	/* Table initialisation */
-	oTable = null;
-    
-	$(document).ready(function() {
+    /* Table initialisation */
+    oTable = null;
+
+    $(document).ready(function() {
 
         $('#testType').select2({
             placeholder: "<?php echo $this->translate('Test Type'); ?>",
@@ -126,9 +128,9 @@ foreach ($requestType as $key => $value) {
             placeholder: "<?php echo $this->translate('Select Districts First'); ?>",
             allowClear: true
         });
-		$('.daterangefield').daterangepicker({
-			"ranges": {
-				'Today': [moment(), moment()],
+        $('.daterangefield').daterangepicker({
+            "ranges": {
+                'Today': [moment(), moment()],
                 'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
                 'Last 7 Days': [moment().subtract(6, 'days'), moment()],
                 'This Month': [moment().startOf('month'), moment().endOf('month')],
@@ -140,55 +142,55 @@ foreach ($requestType as $key => $value) {
                 'Last 12 Months': [moment().subtract(12, 'month').startOf('month'), moment().endOf('month')],
                 'Previous Year': [moment().subtract(1, 'year').startOf('year'), moment().subtract(1, 'year').endOf('year')],
                 'Current Year To Date': [moment().startOf('year'), moment()]
-			},
-			"locale": {
-				"format": "DD-MMM-YYYY",
-				"separator": " to ",
-				"applyLabel": "Apply",
-				"cancelLabel": "Cancel",
-				"fromLabel": "From",
-				"toLabel": "To",
-				"customRangeLabel": "Custom",
-				"daysOfWeek": [
-					"Su",
-					"Mo",
-					"Tu",
-					"We",
-					"Th",
-					"Fr",
-					"Sa"
-				],
-				"monthNames": [
-					"January",
-					"February",
-					"March",
-					"April",
-					"May",
-					"June",
-					"July",
-					"August",
-					"September",
-					"October",
-					"November",
-					"December"
-				],
-				"firstDay": 1
-			},
-			//"startDate": "11/08/2015",
-			//"endDate": "11/14/2015",
-			opens: "left",
-		}, function(start, end, label) {
-			$('.daterange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
-		});
+            },
+            "locale": {
+                "format": "DD-MMM-YYYY",
+                "separator": " to ",
+                "applyLabel": "Apply",
+                "cancelLabel": "Cancel",
+                "fromLabel": "From",
+                "toLabel": "To",
+                "customRangeLabel": "Custom",
+                "daysOfWeek": [
+                    "Su",
+                    "Mo",
+                    "Tu",
+                    "We",
+                    "Th",
+                    "Fr",
+                    "Sa"
+                ],
+                "monthNames": [
+                    "January",
+                    "February",
+                    "March",
+                    "April",
+                    "May",
+                    "June",
+                    "July",
+                    "August",
+                    "September",
+                    "October",
+                    "November",
+                    "December"
+                ],
+                "firstDay": 1
+            },
+            //"startDate": "11/08/2015",
+            //"endDate": "11/14/2015",
+            opens: "left",
+        }, function(start, end, label) {
+            $('.daterange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+        });
 
-		$('#collectionDate').val(moment().subtract(1, 'month').format('DD-MMM-YYYY') + ' to ' + moment().format('DD-MMM-YYYY'));
-		$('#testedDate').val('');
-		getSampleResult();
-		getData();
-		<?php
+        $('#collectionDate').val(moment().subtract(1, 'month').format('DD-MMM-YYYY') + ' to ' + moment().format('DD-MMM-YYYY'));
+        $('#testedDate').val('');
+        getSampleResult();
+        getData();
+        <?php
         $minDate = (isset($loginContainer->useCurrentTables) && $loginContainer->useCurrentTables == true) ? "moment().subtract(12, 'months')" : "moment().subtract(12, 'years')";
         ?>
-		$('#daterange-container, #daterange-container-key-indicator').daterangepicker({
+        $('#daterange-container, #daterange-container-key-indicator').daterangepicker({
             'format': 'DD-MMM-YYYY',
             'separator': ' to ',
             'startDate': start,
@@ -222,17 +224,17 @@ foreach ($requestType as $key => $value) {
                 }
             })
         })
-	});
+    });
 
-	function getSampleResult() {
-        
+    function getSampleResult() {
+
         return $.post("<?php echo $this->url('snapshot', array('action' => 'get-quick-stats')); ?>", {
-            collectionDate: $('#collectionDate').val(),
-            testedDate: $('#testedDate').val(),
-            testType: $('#testType').val(),
-            provinceName: $('#provinceName').val(),
-            districtName: $('#districtName').val(),
-            clinicId: $('#clinicId').val()
+                collectionDate: $('#collectionDate').val(),
+                testedDate: $('#testedDate').val(),
+                testType: $('#testType').val(),
+                provinceName: $('#provinceName').val(),
+                districtName: $('#districtName').val(),
+                clinicId: $('#clinicId').val()
             },
             function(data) {
                 $("#sampleResultDetails").html(data);
@@ -272,32 +274,30 @@ foreach ($requestType as $key => $value) {
                 });
         }
     }
-    
+
     function getData() {
         // $('#clinicId').select2('val', '');
         $.post("<?php echo $this->url('snapshot', array('action' => 'get-snapshot-data')); ?>", {
-            collectionDate: $('#collectionDate').val(),
-            testedDate: $('#testedDate').val(),
-            testType: $('#testType').val(),
-            provinceName: $('#provinceName').val(),
-            districtName: $('#districtName').val(),
-            clinicId: $('#clinicId').val()
-        },
-        function(data) {
-            if (data != "" || data != null || data != undefined) {
-                $('#loadData').html(data);
-				$('#regTable').dataTable(
-					{
-						"aaSorting": [
-							[2, "desc"]
-						],
-					}
-				);
-            }
-        });
+                collectionDate: $('#collectionDate').val(),
+                testedDate: $('#testedDate').val(),
+                testType: $('#testType').val(),
+                provinceName: $('#provinceName').val(),
+                districtName: $('#districtName').val(),
+                clinicId: $('#clinicId').val()
+            },
+            function(data) {
+                if (data != "" || data != null || data != undefined) {
+                    $('#loadData').html(data);
+                    $('#regTable').dataTable({
+                        "aaSorting": [
+                            [1, "desc"]
+                        ],
+                    });
+                }
+            });
     }
 
-	$("#showDateRange").click(function() {
+    $("#showDateRange").click(function() {
         $("#showDateRange").hide();
         $("#closeDateRange,.daterange-container").show();
     });
