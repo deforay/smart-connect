@@ -60,7 +60,7 @@ class Covid19FormService
 
             $pathname = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-covid19" . DIRECTORY_SEPARATOR . $fileName;
             if (!file_exists($pathname) && move_uploaded_file($_FILES['covid19File']['tmp_name'], $pathname)) {
-                [$apiData, $timestamp] = CommonService::processJsonFile($pathname, true);
+                [$apiData, $timestamp] = CommonService::processJsonFile($pathname, returnTimestamp: true, deleteSourceFile: true);
             }
 
             $allColumns = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS where TABLE_SCHEMA = '" . $dbname . "' AND table_name='dash_form_covid19'";

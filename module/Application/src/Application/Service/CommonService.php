@@ -1439,48 +1439,67 @@ class CommonService
           return true;
      }
 
-     public static function processJsonFile($filePath, $returnTimestamp = false, $deleteSourceFile = true)
+     public static function processJsonFile($filePath, $returnTimestamp = true, $deleteSourceFile = true)
      {
+          $jsonStream = null;
           try {
                $apiData = [];
                $timestamp = null;
-               if (file_exists($filePath)) {
+
+               if (!empty($filePath) && file_exists($filePath)) {
                     $isGzipped = self::isGzipped($filePath);
-                    if ($isGzipped) {
+                    $tempFilePath = $filePath;
+
+                    if ($isGzipped === true) {
                          $tempFilePath = dirname($filePath) . DIRECTORY_SEPARATOR . 'json_' . uniqid() . ".json";
                          self::ungzipFile($filePath, $tempFilePath);
-                    } else {
-                         $tempFilePath = $filePath;
                     }
 
-                    // Process the JSON data from the temporary file
-                    $apiData = Items::fromFile($tempFilePath, [
+                    // Open the file stream
+                    $jsonStream = fopen($tempFilePath, 'r');
+                    if (!$jsonStream) throw new Exception("Failed to open file: " . $tempFilePath);
+
+                    // Process the JSON data from the file
+                    $apiData = iterator_to_array(Items::fromStream($jsonStream, [
                          'pointer' => '/data',
                          'decoder' => new ExtJsonDecoder(true)
-                    ]);
+                    ]));
 
-                    $timestamp = time();
-                    if ($returnTimestamp) {
-                         $timestampData = Items::fromFile($tempFilePath, [
+                    if ($returnTimestamp === true) {
+                         rewind($jsonStream);
+                         $timestampData = Items::fromStream($jsonStream, [
                               'pointer' => '/timestamp',
                               'decoder' => new ExtJsonDecoder(true)
                          ]);
                          $timestamp = iterator_to_array($timestampData)['timestamp'] ?? time();
+                    } else {
+                         $timestamp = time();
+                    }
+
+                    fclose($jsonStream);  // Close the stream here
+                    $jsonStream = null;  // Prevent further attempts to close
+
+                    if ($deleteSourceFile === true) {
+                         if ($isGzipped && $tempFilePath !== $filePath) {
+                              unlink($tempFilePath);
+                         }
+                         unlink($filePath);
                     }
                }
-               if ($deleteSourceFile) {
-                    unlink($filePath);
-                    unlink($tempFilePath);
-               }
+
                return $returnTimestamp ? [$apiData, $timestamp] : $apiData;
           } catch (JsonException | JsonMachineException | PathNotFoundException $e) {
                error_log($e->getMessage());
+               if ($jsonStream) fclose($jsonStream);
                return $returnTimestamp ? [[], null] : [];
           } catch (Exception $e) {
                error_log($e->getMessage());
+               if ($jsonStream) fclose($jsonStream);
                return $returnTimestamp ? [[], null] : [];
           }
      }
+
+
 
      public static function insertOrUpdate(Adapter $adapter, $table, array $data)
      {

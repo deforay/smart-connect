@@ -1456,7 +1456,7 @@ class SampleService
             $fileName = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-vl" . DIRECTORY_SEPARATOR . $fileName;
 
             if (move_uploaded_file($_FILES['vlFile']['tmp_name'], $fileName)) {
-                [$apiData, $timestamp] = CommonService::processJsonFile($fileName, true);
+                [$apiData, $timestamp] = CommonService::processJsonFile($fileName, returnTimestamp: true, deleteSourceFile: true);
             }
 
             $numRows = $counter = 0;
