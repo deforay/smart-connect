@@ -550,9 +550,7 @@ class Covid19FormService
                 if (isset($sResult) && !empty($sResult)) {
                     $excel = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
 
-                    // $cacheMethod = \PhpOffice\PhpSpreadsheet\Collection\CellsFactory::cache_to_phpTemp;
-                    // $cacheSettings = array('memoryCacheSize' => '80MB');
-                    // \PhpOffice\PhpSpreadsheet\Settings::setCacheStorageMethod($cacheMethod, $cacheSettings);
+
                     $sheet = $excel->getActiveSheet();
                     $output = array();
                     $keySummaryIndicators = array();
@@ -695,11 +693,8 @@ class Covid19FormService
             $sQueryStr = $sql->buildSqlString($queryContainer->fetchAllSuppressionRateByFacility);
             $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
             if (isset($sResult) && !empty($sResult)) {
-                $excel = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
-                //$cacheMethod = \PhpOffice\PhpSpreadsheet\Collection\CellsFactory::cache_to_phpTemp;
-                //$cacheSettings = array('memoryCacheSize' => '80MB');
-                //\PhpOffice\PhpSpreadsheet\Settings::setCacheStorageMethod($cacheMethod, $cacheSettings);
-                //var_dump('AAYA');die;
+                $excel = new Spreadsheet();
+
                 $sheet = $excel->getActiveSheet();
                 $output = array();
                 foreach ($sResult as $aRow) {
@@ -1022,9 +1017,7 @@ class Covid19FormService
                 $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
                 if (isset($sResult) && !empty($sResult)) {
                     $excel = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
-                    // $cacheMethod = \PhpOffice\PhpSpreadsheet\Collection\CellsFactory::cache_to_phpTemp;
-                    // $cacheSettings = array('memoryCacheSize' => '80MB');
-                    // \PhpOffice\PhpSpreadsheet\Settings::setCacheStorageMethod($cacheMethod, $cacheSettings);
+
                     $sheet = $excel->getActiveSheet();
                     $output = array();
                     foreach ($sResult as $aRow) {
@@ -1194,9 +1187,7 @@ class Covid19FormService
                 $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
                 if (isset($sResult) && !empty($sResult)) {
                     $excel = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
-                    // $cacheMethod = \PhpOffice\PhpSpreadsheet\Collection\CellsFactory::cache_to_phpTemp;
-                    // $cacheSettings = array('memoryCacheSize' => '80MB');
-                    // \PhpOffice\PhpSpreadsheet\Settings::setCacheStorageMethod($cacheMethod, $cacheSettings);
+
                     $sheet = $excel->getActiveSheet();
                     $output = array();
                     foreach ($sResult as $aRow) {
@@ -1335,9 +1326,7 @@ class Covid19FormService
                 $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
                 if (isset($sResult) && !empty($sResult)) {
                     $excel = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
-                    // $cacheMethod = \PhpOffice\PhpSpreadsheet\Collection\CellsFactory::cache_to_phpTemp;
-                    // $cacheSettings = array('memoryCacheSize' => '80MB');
-                    // \PhpOffice\PhpSpreadsheet\Settings::setCacheStorageMethod($cacheMethod, $cacheSettings);
+
                     $sheet = $excel->getActiveSheet();
                     $output = array();
                     foreach ($sResult as $aRow) {
