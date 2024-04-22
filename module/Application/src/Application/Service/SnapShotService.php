@@ -165,7 +165,7 @@ class SnapShotService
                 $rejectedQuery = $sql->select()->from("dash_form_".$type)
                 ->columns(array('total' => new Expression("SUM(
                     CASE WHEN (
-                        (is_sample_rejected like 'yes' OR result IS NULL OR result LIKE '' OR result_status IN(2,4,5,10))
+                        (is_sample_rejected like 'yes' OR result_status IN(4))
                         AND
                         (sample_collection_date is not null AND sample_collection_date not like '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00')
                     ) THEN 1 ELSE 0 END
