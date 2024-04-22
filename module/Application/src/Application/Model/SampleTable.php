@@ -7396,7 +7396,7 @@ class SampleTable extends AbstractTableGateway
     /////////*** Turnaround Time Page ***///////
     ///////////////////////////////////////////
 
-    public function getTATbyProvince($labs, $startDate, $endDate)
+    public function getTATbyProvince($labs, $startDate, $endDate, $params = "")
     {
         $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
@@ -7429,8 +7429,7 @@ class SampleTable extends AbstractTableGateway
         //                 AND (vl.result_approved_datetime is not null AND vl.result_approved_datetime not like '' AND DATE(vl.result_approved_datetime) !='1970-01-01' AND DATE(vl.result_approved_datetime) !='0000-00-00')"
         //             );
         if ($skipDays > 0) {
-            $squery = $squery->where('
-                DATEDIFF(sample_received_at_lab_datetime,sample_collection_date) < ' . $skipDays . ' AND
+            $squery = $squery->where('DATEDIFF(sample_received_at_lab_datetime,sample_collection_date) < ' . $skipDays . ' AND
                 DATEDIFF(sample_received_at_lab_datetime,sample_collection_date) >= 0 AND
 
                 DATEDIFF(sample_registered_at_lab,sample_received_at_lab_datetime) < ' . $skipDays . ' AND

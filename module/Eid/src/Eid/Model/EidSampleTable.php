@@ -2517,7 +2517,9 @@ class EidSampleTable extends AbstractTableGateway
             ->join(array('icm' => 'instrument_machines'), 'icm.config_machine_id = eid.import_machine_name', array('config_machine_name'))
             ->where(array('eid.result' => 'failed'))
             ->group('eid.import_machine_name');
-
+        if (isset($params['flag']) && $params['flag'] == 'poc') {
+            $queryStr = $queryStr->join(array('icm' => 'instrument_machines'), 'icm.config_machine_id = eid.import_machine_name', array('poc_device'))->where(array('icm.poc_device' => 'yes'));
+        }
         $queryStr = $sql->buildSqlString($queryStr);
         // echo $queryStr;die;
         $sampleResult = $this->commonService->cacheQuery($queryStr, $dbAdapter);
@@ -2940,7 +2942,7 @@ class EidSampleTable extends AbstractTableGateway
     /////////*** Turnaround Time Page ***///////
     ///////////////////////////////////////////
 
-    public function getTATbyProvince($labs, $startDate, $endDate)
+    public function getTATbyProvince($labs, $startDate, $endDate, $params = "")
     {
         $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
@@ -2994,7 +2996,7 @@ class EidSampleTable extends AbstractTableGateway
         return $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
     }
 
-    public function getTATbyDistrict($labs, $startDate, $endDate)
+    public function getTATbyDistrict($labs, $startDate, $endDate, $params = "")
     {
         $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
@@ -3048,7 +3050,7 @@ class EidSampleTable extends AbstractTableGateway
         return $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
     }
 
-    public function getTATbyClinic($labs, $startDate, $endDate)
+    public function getTATbyClinic($labs, $startDate, $endDate, $params = "")
     {
         $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;

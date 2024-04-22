@@ -88,7 +88,7 @@ class TimeController extends AbstractActionController
 			$category = $params['category'];
 			$labs = (isset($params['lab']) && !empty($params['lab'])) ? $params['lab'] : array();
 
-			$result = $this->sampleService->getTATbyProvince($labs, $dates[0], $dates[1]);
+			$result = $this->sampleService->getTATbyProvince($labs, $dates[0], $dates[1], $params);
 			$viewModel = new ViewModel();
 			$viewModel->setVariables(array('results' => $result, 'daterange' => $params['sampleCollectionDate'], 'labs' => implode(',', $labs), 'categoryChecked' => $category))
 				->setTerminal(true);

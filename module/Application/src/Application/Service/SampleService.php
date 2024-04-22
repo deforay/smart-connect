@@ -1197,12 +1197,12 @@ class SampleService
     /////////*** Turnaround Time ***///////
     ///////////////////////////////////////
 
-    public function getTATbyProvince($labs, $startDate, $endDate)
+    public function getTATbyProvince($labs, $startDate, $endDate, $params = "")
     {
         // set_time_limit(10000);
         $result = array();
         $resultSet = array();
-        $resultSet = $this->sampleTable->getTATbyProvince($labs, $startDate, $endDate);
+        $resultSet = $this->sampleTable->getTATbyProvince($labs, $startDate, $endDate, $params);
         foreach ($resultSet as $key) {
             $result[] = array(
                 "facility"           => $key['facility_name'],

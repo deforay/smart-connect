@@ -581,7 +581,7 @@ class EidSampleService
         $endDate = $dates[1];
         // set_time_limit(10000);
         $result = array();
-        $resultSet = $this->eidSampleTable->getTATbyProvince($labs, $startDate, $endDate);
+        $resultSet = $this->eidSampleTable->getTATbyProvince($labs, $startDate, $endDate, $params);
         foreach ($resultSet as $key) {
             $result[] = array(
                 "facility"           => $key['geo_name'],
@@ -597,11 +597,11 @@ class EidSampleService
         return $result;
     }
 
-    public function getTATbyDistrict($labs, $startDate, $endDate)
+    public function getTATbyDistrict($labs, $startDate, $endDate, $params)
     {
         // set_time_limit(10000);
         $result = array();
-        $resultSet = $this->eidSampleTable->getTATbyDistrict($labs, $startDate, $endDate);
+        $resultSet = $this->eidSampleTable->getTATbyDistrict($labs, $startDate, $endDate, $params);
         foreach ($resultSet as $key) {
             $result[] = array(
                 "facility"           => $key['geo_name'],
@@ -617,12 +617,12 @@ class EidSampleService
         return $result;
     }
 
-    public function getTATbyClinic($labs, $startDate, $endDate)
+    public function getTATbyClinic($labs, $startDate, $endDate, $params)
     {
         // set_time_limit(10000);
         $result = array();
         $time = array();
-        $resultSet = $this->eidSampleTable->getTATbyClinic($labs, $startDate, $endDate);
+        $resultSet = $this->eidSampleTable->getTATbyClinic($labs, $startDate, $endDate, $params);
         foreach ($resultSet as $key) {
             $result[] = array(
                 "facility"           => $key['geo_name'],
