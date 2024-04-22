@@ -2942,7 +2942,7 @@ class EidSampleTable extends AbstractTableGateway
     /////////*** Turnaround Time Page ***///////
     ///////////////////////////////////////////
 
-    public function getTATbyProvince($labs, $startDate, $endDate, $params = "")
+    public function getTATbyProvince($labs, $startDate, $endDate, $params = [])
     {
         $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
@@ -2996,7 +2996,7 @@ class EidSampleTable extends AbstractTableGateway
         return $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
     }
 
-    public function getTATbyDistrict($labs, $startDate, $endDate, $params = "")
+    public function getTATbyDistrict($labs, $startDate, $endDate, $params = [])
     {
         $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
@@ -3004,22 +3004,22 @@ class EidSampleTable extends AbstractTableGateway
         $skipDays = isset($this->config['defaults']['tat-skipdays']) ? $this->config['defaults']['tat-skipdays'] : 365;
         $squery = $sql->select()->from(array('vl' => $this->table))
             ->columns(
-                array(
+                [
                     "Collection_Receive"  => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,sample_received_at_lab_datetime,sample_collection_date))) AS DECIMAL (10,2))"),
                     "Receive_Register"    => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,sample_registered_at_lab,sample_received_at_lab_datetime))) AS DECIMAL (10,2))"),
                     "Register_Analysis"   => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,sample_registered_at_lab,sample_tested_datetime))) AS DECIMAL (10,2))"),
                     "Analysis_Authorise"  => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,result_approved_datetime,sample_tested_datetime))) AS DECIMAL (10,2))"),
                     "total"               => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,result_approved_datetime,sample_collection_date))) AS DECIMAL (10,2))")
-                )
+                ]
             )
             ->join('facility_details', 'facility_details.facility_id = vl.facility_id')
             ->join('geographical_divisions', 'facility_details.facility_state = geographical_divisions.geo_id')
             ->where(
-                array(
+                [
                     "sample_tested_datetime >= '$startDate' AND sample_tested_datetime <= '$endDate'",
                     "(vl.sample_collection_date is not null AND vl.sample_collection_date not like '' AND DATE(vl.sample_collection_date) not like '1970-01-01' AND DATE(vl.sample_collection_date) not like '0000-00-00')",
                     // "facility_details.facility_district = '$districtID'"
-                )
+                ]
             );
         if ($skipDays > 0) {
             $squery = $squery->where("
@@ -3050,7 +3050,7 @@ class EidSampleTable extends AbstractTableGateway
         return $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
     }
 
-    public function getTATbyClinic($labs, $startDate, $endDate, $params = "")
+    public function getTATbyClinic($labs, $startDate, $endDate, $params = [])
     {
         $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
@@ -3058,13 +3058,13 @@ class EidSampleTable extends AbstractTableGateway
         $skipDays = isset($this->config['defaults']['tat-skipdays']) ? $this->config['defaults']['tat-skipdays'] : 365;
         $squery = $sql->select()->from(array('vl' => $this->table))
             ->columns(
-                array(
+                [
                     "Collection_Receive"  => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,sample_received_at_lab_datetime,sample_collection_date))) AS DECIMAL (10,2))"),
                     "Receive_Register"    => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,sample_registered_at_lab,sample_received_at_lab_datetime))) AS DECIMAL (10,2))"),
                     "Register_Analysis"   => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,sample_registered_at_lab,sample_tested_datetime))) AS DECIMAL (10,2))"),
                     "Analysis_Authorise"  => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,result_approved_datetime,sample_tested_datetime))) AS DECIMAL (10,2))"),
                     "total"               => new Expression("CAST(AVG(ABS(TIMESTAMPDIFF(DAY,result_approved_datetime,sample_collection_date))) AS DECIMAL (10,2))")
-                )
+                ]
             )
             ->join('facility_details', 'facility_details.facility_id = vl.facility_id')
             ->join('geographical_divisions', 'facility_details.facility_state = geographical_divisions.geo_id')

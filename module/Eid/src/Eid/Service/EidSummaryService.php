@@ -2,14 +2,15 @@
 
 namespace Eid\Service;
 
+use Laminas\Db\Sql\Sql;
+use Laminas\Db\Sql\Expression;
 use Laminas\Session\Container;
 use Laminas\Db\Adapter\Adapter;
-use Laminas\Db\Sql\Sql;
-use Laminas\Db\TableGateway\AbstractTableGateway;
-use Laminas\Db\Sql\Expression;
 use Application\Service\CommonService;
-use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 use \PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
+use Laminas\Db\TableGateway\AbstractTableGateway;
 
 class EidSummaryService
 {
@@ -140,7 +141,7 @@ class EidSummaryService
                 $sQueryStr = $sql->buildSqlString($queryContainer->indicatorSummaryQuery);
                 $sResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
                 if (isset($sResult) && !empty($sResult)) {
-                    $excel = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+                    $excel = new Spreadsheet();
 
 
                     $sheet = $excel->getActiveSheet();
@@ -160,38 +161,10 @@ class EidSummaryService
                         $j++;
                     }
 
-                    $styleArray = array(
-                        'font' => array(
-                            'bold' => true,
-                        ),
-                        'alignment' => array(
-                            'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
-                            'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
-                        ),
-                        'borders' => array(
-                            'outline' => array(
-                                'style' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
-                            ),
-                        )
-                    );
-                    $borderStyle = array(
-                        'alignment' => array(
-                            'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT,
-                        ),
-                        'borders' => array(
-                            'outline' => array(
-                                'style' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
-                            ),
-                        )
-                    );
-                    $eRow = 0;
                     $sheet->setCellValue('A1', html_entity_decode($this->translator->translate('Months'), ENT_QUOTES, 'UTF-8'));
                     foreach ($keySummaryIndicators['month'] as $key => $month) {
                         $colNo = $key + 1;
-                        $currentRow = 1;
-                        $sheet->getCellByColumnAndRow($colNo, $currentRow)->setValueExplicit(html_entity_decode($month, ENT_QUOTES, 'UTF-8'));
-                        $cellName = $sheet->getCellByColumnAndRow($colNo, $currentRow)->getColumn();
-                        $sheet->getStyle($cellName . $currentRow)->applyFromArray($styleArray);
+                        $sheet->setCellValue(Coordinate::stringFromColumnIndex($colNo) . '1', html_entity_decode($month));
                     }
 
 
@@ -209,14 +182,7 @@ class EidSummaryService
                     foreach ($output as $rowData) {
                         $colNo = 1;
                         foreach ($rowData as $field => $value) {
-                            if (!isset($value)) {
-                                $value = "";
-                            }
-
-                            $sheet->setCellValue(Coordinate::stringFromColumnIndex($colNo) . $currentRow, html_entity_decode($value, ENT_QUOTES, 'UTF-8'));
-                            // $cellName = $sheet->getCellByColumnAndRow($colNo, $currentRow)->getColumn();
-                            // $sheet->getStyle($cellName . $currentRow)->applyFromArray($borderStyle);
-                            // $sheet->getStyleByColumnAndRow($colNo, $currentRow)->getAlignment()->setWrapText(true);
+                            $sheet->setCellValue(Coordinate::stringFromColumnIndex($colNo) . $currentRow, html_entity_decode($value ?? "", ENT_QUOTES, 'UTF-8'));
                             $colNo++;
                         }
                         $currentRow++;
@@ -229,9 +195,8 @@ class EidSummaryService
                 } else {
                     return "";
                 }
-            } catch (Exception $exc) {
+            } catch (\Exception $exc) {
                 error_log("SUMMARY-INDICATORS-RESULT-REPORT--" . $exc->getMessage());
-                error_log($exc->getTraceAsString());
                 return "";
             }
         } else {
@@ -302,30 +267,7 @@ class EidSummaryService
                     $row[] = ($aRow['total_samples_valid'] > 0 && $aRow['total_positive_samples'] > 0) ? round((($aRow['total_positive_samples'] / $aRow['total_samples_valid']) * 100), 2) : '';
                     $output[] = $row;
                 }
-                $styleArray = array(
-                    'font' => array(
-                        'bold' => true,
-                    ),
-                    'alignment' => array(
-                        'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
-                        'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
-                    ),
-                    'borders' => array(
-                        'outline' => array(
-                            'style' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
-                        ),
-                    )
-                );
-                $borderStyle = array(
-                    'alignment' => array(
-                        'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT,
-                    ),
-                    'borders' => array(
-                        'outline' => array(
-                            'style' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
-                        ),
-                    )
-                );
+
 
                 $sheet->setCellValue('A1', html_entity_decode($this->translator->translate('Facility'), ENT_QUOTES, 'UTF-8'));
                 $sheet->setCellValue('B1', html_entity_decode($this->translator->translate('Province'), ENT_QUOTES, 'UTF-8'));
@@ -336,14 +278,7 @@ class EidSummaryService
                 $sheet->setCellValue('G1', html_entity_decode($this->translator->translate('Samples Rejected in %'), ENT_QUOTES, 'UTF-8'));
                 $sheet->setCellValue('H1', html_entity_decode($this->translator->translate('Positive Rate in %'), ENT_QUOTES, 'UTF-8'));
 
-                $sheet->getStyle('A1')->applyFromArray($styleArray);
-                $sheet->getStyle('B1')->applyFromArray($styleArray);
-                $sheet->getStyle('C1')->applyFromArray($styleArray);
-                $sheet->getStyle('D1')->applyFromArray($styleArray);
-                $sheet->getStyle('E1')->applyFromArray($styleArray);
-                $sheet->getStyle('F1')->applyFromArray($styleArray);
-                $sheet->getStyle('G1')->applyFromArray($styleArray);
-                $sheet->getStyle('H1')->applyFromArray($styleArray);
+
 
                 $currentRow = 2;
                 foreach ($output as $rowData) {
@@ -356,26 +291,20 @@ class EidSummaryService
                         //     break;
                         // }
                         $sheet->setCellValue(Coordinate::stringFromColumnIndex($colNo) . $currentRow, html_entity_decode($value, ENT_QUOTES, 'UTF-8'));
-                        // $cellName = $sheet->getCellByColumnAndRow($colNo, $currentRow)->getColumn();
-                        // $sheet->getStyle($cellName . $currentRow)->applyFromArray($borderStyle);
-                        // $sheet->getDefaultRowDimension()->setRowHeight(20);
-                        // $sheet->getColumnDimensionByColumn($colNo)->setWidth(20);
-                        // $sheet->getStyleByColumnAndRow($colNo, $currentRow)->getAlignment()->setWrapText(true);
                         $colNo++;
                     }
                     $currentRow++;
                 }
 
-                $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($excel, 'Xlsx');
+                $writer = IOFactory::createWriter($excel, 'Xlsx');
                 $filename = 'EID-Facility-Wise-Positive-Rate-' . date('d-M-Y-H-i-s') . '.xlsx';
                 $writer->save(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . $filename);
                 return $filename;
             } else {
                 return "";
             }
-        } catch (Exception $exc) {
+        } catch (\Exception $exc) {
             error_log("EID-Facility-Wise-Positive-Rate-" . $exc->getMessage());
-            error_log($exc->getTraceAsString());
             return "";
         }
     }
