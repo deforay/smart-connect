@@ -25,7 +25,7 @@ use JsonMachine\Exception\JsonMachineException;
 use Application\Model\DashApiReceiverStatsTable;
 use JsonMachine\Exception\PathNotFoundException;
 use Laminas\Mail\Transport\Smtp as SmtpTransport;
-
+use stdClass;
 
 class CommonService
 {
@@ -562,9 +562,7 @@ class CommonService
 
      public function saveVlsmMetadataFromAPI($params)
      {
-          /* if(empty($params['api-version'])){
-               return array('status' => 'fail', 'message' => 'Please specify API version');
-          } */
+
           $testReasonDb = $this->sm->get('TestReasonTable');
           $covid19TestReasonDb = $this->sm->get('Covid19TestReasonsTable');
           $artCodeDb = $this->sm->get('ArtCodeTable');
@@ -588,7 +586,7 @@ class CommonService
           $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
           $sql = new Sql($dbAdapter);
 
-          $apiData = array();
+
           $fileName = $_FILES['referenceFile']['name'];
           $ranNumber = str_pad(rand(0, pow(10, 6) - 1), 6, '0', STR_PAD_LEFT);
           $extension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
@@ -603,8 +601,8 @@ class CommonService
 
           $pathname = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-reference" . DIRECTORY_SEPARATOR . $fileName;
           if (!file_exists($pathname) && move_uploaded_file($_FILES['referenceFile']['tmp_name'], $pathname)) {
-               /** @var $apiData */
                $apiData = Self::processJsonFile($pathname);
+               $apiData = Self::arrayToObject($apiData);
           }
 
           if ($apiData !== FALSE) {
@@ -1524,5 +1522,18 @@ class CommonService
      {
           // Replace any non-alphanumeric, non-dot, non-dash and non-underscore characters
           return preg_replace('/[^A-Za-z0-9._-]/', '_', $filename);
+     }
+
+     public static function arrayToObject($array)
+     {
+          if (!is_array($array)) {
+               return $array;
+          }
+
+          $object = new stdClass();
+          foreach ($array as $key => $value) {
+               $object->$key = self::arrayToObject($value);
+          }
+          return $object;
      }
 }
