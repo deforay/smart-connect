@@ -51,6 +51,9 @@ class SnapShotService
         if(isset($params['clinicId']) && !empty($params['clinicId'])){
             $where[] = " facility_id IN(".implode(",", $params['clinicId']).") ";
         }
+        if (!empty($params['flag']) && $params['flag'] == 'poc') {
+            $where[] = " icm.poc_device = 'yes'";
+        }
         if(isset($where) && !empty($where)){
             $whereQuery = " WHERE " . implode(" AND ", $where);
         }
@@ -60,7 +63,7 @@ class SnapShotService
         }
         if(isset($types) && !empty($types)){
             foreach($types as $type){
-                $testTypeQuery[] = " SELECT count(*) AS reg, 
+                $q = " SELECT count(*) AS reg, 
                 SUM(CASE WHEN 
                     (
                         sample_collection_date is not null AND sample_collection_date not like '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00'
@@ -88,7 +91,13 @@ class SnapShotService
                         (is_sample_rejected like 'yes' OR result IS NULL OR result LIKE '' OR result_status IN(2,4,5,10))
                     ) THEN 1 ELSE 0 END
                 ) AS 'totalPending',
-                facility_name FROM dash_form_".$type." AS ".$type." INNER JOIN facility_details as f ON ".$type.".lab_id = f.facility_id ".$whereQuery." GROUP BY f.facility_id ";
+                facility_name FROM dash_form_".$type." AS ".$type." INNER JOIN facility_details as f ON ".$type.".lab_id = f.facility_id ";
+
+                if (!empty($params['flag']) && $params['flag'] == 'poc') {
+                    $q .= " INNER JOIN instrument_machines as icm ON ".$type.".import_machine_name = icm.config_machine_id ";
+                }
+                $q .= $whereQuery." GROUP BY f.facility_id ";
+                $testTypeQuery[] = $q;
             }
         }
 
@@ -121,7 +130,7 @@ class SnapShotService
         if(isset($types) && !empty($types)){
             foreach($types as $type){
                 $gender = ($type == 'eid') ? 'child_gender' : 'patient_gender';
-                $quickStatsquery = $sql->select()->from("dash_form_" . $type)
+                $quickStatsquery = $sql->select()->from(array("vl" => "dash_form_" . $type))
                     ->columns(
                         array(
                             $this->translator->translate("total") => new Expression('COUNT(*)'),
@@ -129,8 +138,6 @@ class SnapShotService
                             $this->translator->translate("recevied") => new Expression("SUM(CASE WHEN (sample_collection_date is not null AND sample_collection_date not like '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00') THEN 1 ELSE 0 END)"),
 
                             $this->translator->translate("tested") => new Expression("SUM(CASE WHEN (
-                                (reason_for_sample_rejection IS NOT NULL AND reason_for_sample_rejection != '' AND reason_for_sample_rejection != 0) 
-                                And 
                                 (sample_tested_datetime is not null AND sample_tested_datetime not like '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')
                             ) THEN 1 ELSE 0 END)"),
 
@@ -144,7 +151,7 @@ class SnapShotService
                         )
                 );
                 // recevied data
-                $receivedQuery = $sql->select()->from("dash_form_" .$type)
+                $receivedQuery = $sql->select()->from(array("vl" => "dash_form_" .$type))
                     ->columns(array('total' => new Expression("SUM(
                         CASE WHEN(
                             sample_collection_date is not null AND sample_collection_date not like '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00'
@@ -153,7 +160,7 @@ class SnapShotService
                     // ->where("sample_collection_date is not null AND sample_collection_date not like '' AND DATE(sample_collection_date) !='1970-01-01' AND DATE(sample_collection_date) !='0000-00-00'")
                     ->group(array("receivedDate"));
                 //tested data
-                $testedQuery = $sql->select()->from("dash_form_".$type)
+                $testedQuery = $sql->select()->from(array("vl" => "dash_form_".$type))
                     ->columns(array('total' => new Expression("SUM(
                         CASE WHEN(
                             (sample_tested_datetime is not null AND sample_tested_datetime not like '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')
@@ -162,7 +169,7 @@ class SnapShotService
                     // ->where("(is_sample_rejected IS NULL AND is_sample_rejected = '' AND is_sample_rejected like 'no') AND (sample_tested_datetime is not null AND sample_tested_datetime not like '' AND DATE(sample_tested_datetime) !='1970-01-01' AND DATE(sample_tested_datetime) !='0000-00-00')")
                     ->group(array("testedDate"));
                 //get rejected data
-                $rejectedQuery = $sql->select()->from("dash_form_".$type)
+                $rejectedQuery = $sql->select()->from(array("vl" => "dash_form_".$type))
                 ->columns(array('total' => new Expression("SUM(
                     CASE WHEN (
                         (is_sample_rejected like 'yes' OR result_status IN(4))
@@ -186,6 +193,12 @@ class SnapShotService
                     $receivedQuery = $receivedQuery->where(array("DATE(sample_tested_datetime) >='".$common->isoDateFormat($date[0])."'", "DATE(sample_tested_datetime) <='".$common->isoDateFormat($date[1])."'"));
                     $testedQuery = $testedQuery->where(array("DATE(sample_tested_datetime) >='".$common->isoDateFormat($date[0])."'", "DATE(sample_tested_datetime) <='".$common->isoDateFormat($date[1])."'"));
                     $rejectedQuery = $rejectedQuery->where(array("DATE(sample_tested_datetime) >='".$common->isoDateFormat($date[0])."'", "DATE(sample_tested_datetime) <='".$common->isoDateFormat($date[1])."'"));
+                }
+                if (!empty($params['flag']) && $params['flag'] == 'poc') {
+                    $quickStatsquery = $quickStatsquery->join(array('icm' => 'instrument_machines'), 'icm.config_machine_id = vl.import_machine_name', array('poc_device'))->where(array('icm.poc_device' => 'yes'));
+                    $receivedQuery = $receivedQuery->join(array('icm' => 'instrument_machines'), 'icm.config_machine_id = vl.import_machine_name', array('poc_device'))->where(array('icm.poc_device' => 'yes'));
+                    $testedQuery = $testedQuery->join(array('icm' => 'instrument_machines'), 'icm.config_machine_id = vl.import_machine_name', array('poc_device'))->where(array('icm.poc_device' => 'yes'));
+                    $rejectedQuery = $rejectedQuery->join(array('icm' => 'instrument_machines'), 'icm.config_machine_id = vl.import_machine_name', array('poc_device'))->where(array('icm.poc_device' => 'yes'));
                 }
                 $query['quickStats'][] = $sql->buildSqlString($quickStatsquery);
                 $query['received'][] = $sql->buildSqlString($receivedQuery);

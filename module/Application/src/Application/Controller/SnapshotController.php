@@ -32,6 +32,7 @@ class SnapshotController extends AbstractActionController
         $provinceName = $this->commonService->getAllProvinceList();
         $districtName = $this->commonService->getAllDistrictList();
         return new ViewModel(array(
+            'flag' => $this->params()->fromRoute('id') ?? '',
             'clinicName' => $clinicName,
             'provinceName' => $provinceName,
             'districtName' => $districtName
