@@ -83,7 +83,7 @@ foreach ($requestType as $key => $value) {
                                     </tr>
                                     <tr>
                                         <td colspan="2">
-                                            <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="getData();getSampleResult();"><?php echo $this->translate('Search'); ?></a>&nbsp;&nbsp;
+                                            <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="getData();"><?php echo $this->translate('Search'); ?></a>&nbsp;&nbsp;
                                             <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="location.reload();" style="margin-right:5.8%;"><?php echo $this->translate('Reset'); ?></a>
                                         </td>
                                     </tr>
@@ -185,11 +185,17 @@ foreach ($requestType as $key => $value) {
 
         $('#collectionDate').val(moment().subtract(1, 'month').format('DD-MMM-YYYY') + ' to ' + moment().format('DD-MMM-YYYY'));
         $('#testedDate').val('');
-        getSampleResult();
         getData();
-        <?php
-        $minDate = (isset($loginContainer->useCurrentTables) && $loginContainer->useCurrentTables == true) ? "moment().subtract(12, 'months')" : "moment().subtract(12, 'years')";
-        ?>
+        
+        var start = moment().subtract(12, 'months');
+        var end = moment();
+        function cb(start, end) {
+            $('#daterange-container span').html(start.format('MMM D, YYYY') + ' to ' + end.format('MMM D, YYYY'));
+            $('#daterange').val(start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
+            $('#daterange-container-key-indicator span').html(start.format('MMM D, YYYY') + ' to ' + end.format('MMM D, YYYY'));
+            $('#daterangeKeyIndicator').val(start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
+        }
+        <?php $minDate = (isset($loginContainer->useCurrentTables) && $loginContainer->useCurrentTables == true) ? "moment().subtract(12, 'months')" : "moment().subtract(12, 'years')"; ?>
         $('#daterange-container, #daterange-container-key-indicator').daterangepicker({
             'format': 'DD-MMM-YYYY',
             'separator': ' to ',
@@ -211,10 +217,7 @@ foreach ($requestType as $key => $value) {
         $('#daterange-container span, #daterange-container-key-indicator span').html('<?php echo $this->translate('Choose Date Range'); ?>');
         $('input[name="daterange"]').val('');
 
-        // The reason why getSampleResult is a separate call is because it does not follow
         // the Date and Lab filters of the other functions.
-        getSampleResult();
-
         $('#provinceName,#districtName,#labName').on('select2:close', function() {
             let select = $(this)
             $(this).next('span.select2').find('ul').html(function() {
@@ -234,9 +237,11 @@ foreach ($requestType as $key => $value) {
                 testType: $('#testType').val(),
                 provinceName: $('#provinceName').val(),
                 districtName: $('#districtName').val(),
-                clinicId: $('#clinicId').val()
+                clinicId: $('#clinicId').val(),
+                flag: '<?php echo $flag?>'
             },
             function(data) {
+                $.unblockUI();
                 $("#sampleResultDetails").html(data);
             });
     }
@@ -248,7 +253,8 @@ foreach ($requestType as $key => $value) {
         var pName = $("#provinceName").val();
         if (pName != null && pName.length > 0) {
             $.post("<?php echo $this->url('common', array('action' => 'get-district-list')); ?>", {
-                    provinceName: pName
+                    provinceName: pName,
+                    flag: '<?php echo $flag?>'
                 },
                 function(data) {
                     if (data != "" || data != null || data != undefined) {
@@ -265,7 +271,8 @@ foreach ($requestType as $key => $value) {
 
         if (dName != null && dName.length > 0) {
             $.post("<?php echo $this->url('common', array('action' => 'get-facility-list')); ?>", {
-                    districtName: dName
+                    districtName: dName,
+                    flag: '<?php echo $flag?>'
                 },
                 function(data) {
                     if (data != "" || data != null || data != undefined) {
@@ -276,14 +283,18 @@ foreach ($requestType as $key => $value) {
     }
 
     function getData() {
-        // $('#clinicId').select2('val', '');
+        $.blockUI.defaults.css.border = '1px solid grey';
+        $(document).ajaxStart($.blockUI({
+            message: '<h2><?php echo $this->translate('Processing...'); ?></h2>'
+        })).ajaxStop($.unblockUI);
         $.post("<?php echo $this->url('snapshot', array('action' => 'get-snapshot-data')); ?>", {
                 collectionDate: $('#collectionDate').val(),
                 testedDate: $('#testedDate').val(),
                 testType: $('#testType').val(),
                 provinceName: $('#provinceName').val(),
                 districtName: $('#districtName').val(),
-                clinicId: $('#clinicId').val()
+                clinicId: $('#clinicId').val(),
+                flag: '<?php echo $flag?>'
             },
             function(data) {
                 if (data != "" || data != null || data != undefined) {
@@ -295,6 +306,7 @@ foreach ($requestType as $key => $value) {
                     });
                 }
             });
+        getSampleResult();
     }
 
     $("#showDateRange").click(function() {
