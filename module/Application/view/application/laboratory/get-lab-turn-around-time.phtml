@@ -99,12 +99,12 @@ die; */
                 },
             <?php
             }
-            if (isset($result['sampleReceivedPrinted'])) {
+            if (isset($result['sampleCollectedPrinted'])) {
             ?> {
                     connectNulls: false,
                     showInLegend: true,
                     name: '<?= $this->translate('Received - Printed') ?>',
-                    data: [<?php echo implode(",", $result['sampleReceivedPrinted']); ?>],
+                    data: [<?php echo implode(",", $result['sampleCollectedPrinted']); ?>],
                     color: '#000',
                 },
             <?php
