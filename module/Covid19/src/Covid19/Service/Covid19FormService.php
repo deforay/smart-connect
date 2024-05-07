@@ -33,7 +33,7 @@ class Covid19FormService
     {
         ini_set('memory_limit', -1);
         try {
-            $apiData = array();
+            $apiData = [];
 
             $apiTrackDb = $this->sm->get('DashApiReceiverStatsTable');
             $trackApiDb = $this->sm->get('DashTrackApiRequestsTable');
@@ -55,12 +55,12 @@ class Covid19FormService
                 mkdir(APPLICATION_PATH . DIRECTORY_SEPARATOR . "temporary", 0777);
             }
             if (!file_exists(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-covid19") && !is_dir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-covid19")) {
-                mkdir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-covid19", 0777);
+                mkdir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-covid19", 0777, true);
             }
 
-            $pathname = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-covid19" . DIRECTORY_SEPARATOR . $fileName;
-            if (!file_exists($pathname) && move_uploaded_file($_FILES['covid19File']['tmp_name'], $pathname)) {
-                [$apiData, $timestamp] = CommonService::processJsonFile($pathname, returnTimestamp: true, deleteSourceFile: true);
+            $fileName = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-covid19" . DIRECTORY_SEPARATOR . $fileName;
+            if (!file_exists($fileName) && move_uploaded_file($_FILES['covid19File']['tmp_name'], $fileName)) {
+                [$apiData, $timestamp] = CommonService::processJsonFile($fileName);
             }
 
             $allColumns = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS where TABLE_SCHEMA = '" . $dbname . "' AND table_name='dash_form_covid19'";
@@ -79,7 +79,7 @@ class Covid19FormService
             $currentDateTime = CommonService::getDateTime();
             foreach ($apiData as $rowData) {
                 $counter++;
-                $data = array();
+                $data = [];
                 foreach ($columnList as $colName) {
                     $data[$colName] = isset($rowData[$colName]) ? $rowData[$colName] : null;
                 }
@@ -112,6 +112,9 @@ class Covid19FormService
             } elseif ($numRows == 0) {
                 $status = 'failed';
             }
+            if (is_readable($fileName)) {
+                unlink($fileName);
+            }
             $common = new CommonService();
             $apiTrackData = array(
                 'tracking_id'                   => $timestamp,
@@ -132,6 +135,9 @@ class Covid19FormService
 
             $trackApiDb->addApiTracking($common->generateUUID(), 1, $numRows, 'weblims-covid19', 'covid19', $_SERVER['REQUEST_URI'], $apiData, $response, 'json', $labId ?? $data['lab_id']);
         } catch (Exception $exc) {
+            if (is_readable($fileName)) {
+                unlink($fileName);
+            }
             error_log($exc->getMessage());
             error_log($exc->getTraceAsString());
             return array(
@@ -145,7 +151,7 @@ class Covid19FormService
     {
         try {
             // Debug::dump($_FILES['covid19File']);die;
-            $apiData = array();
+            $apiData = [];
 
             $sampleDb = $this->sm->get('Covid19FormTableWithoutCache');
             $facilityTypeDb = $this->sm->get('FacilityTypeTable');
@@ -163,202 +169,202 @@ class Covid19FormService
                 mkdir(APPLICATION_PATH . DIRECTORY_SEPARATOR . "temporary", 0777);
             }
             if (!file_exists(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-covid19") && !is_dir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-covid19")) {
-                mkdir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-covid19", 0777);
+                mkdir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-covid19", 0777, true);
             }
 
-            $pathname = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-covid19" . DIRECTORY_SEPARATOR . $fileName;
-            if (!file_exists($pathname) && move_uploaded_file($_FILES['covid19File']['tmp_name'], $pathname)) {
-                [$apiData, $timestamp] = CommonService::processJsonFile($pathname, true);
+            $fileName = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-covid19" . DIRECTORY_SEPARATOR . $fileName;
+            if (!file_exists($fileName) && move_uploaded_file($_FILES['covid19File']['tmp_name'], $fileName)) {
+                [$apiData, $timestamp] = CommonService::processJsonFile($fileName, true);
             }
 
-            if ($apiData !== FALSE) {
-                foreach ($apiData as $rowData) {
-                    // Debug::dump($rowData);die;
-                    foreach ($rowData as $key => $row) {
-                        // Debug::dump($row);die;
-                        // print_r($apiData);die;
-                        if (trim($row['sample_code']) != '' && trim($row['vlsm_instance_id']) != '') {
-                            $sampleCode = trim($row['sample_code']);
-                            $uniqueId = trim($row['unique_id']);
-                            $instanceCode = trim($row['vlsm_instance_id']);
 
-                            $sampleCollectionDate = (trim($row['sample_collection_date']) != '' ? trim(date('Y-m-d H:i', strtotime($row['sample_collection_date']))) : null);
-                            $sampleReceivedAtLab = (trim($row['sample_registered_at_lab']) != '' ? trim(date('Y-m-d H:i', strtotime($row['sample_registered_at_lab']))) : null);
-                            // $dateOfInitiationOfRegimen = (trim($row['date_of_initiation_of_current_regimen']) != '' ? trim(date('Y-m-d H:i', strtotime($row['date_of_initiation_of_current_regimen']))) : null);
-                            $resultApprovedDateTime = (trim($row['result_approved_datetime']) != '' ? trim(date('Y-m-d H:i', strtotime($row['result_approved_datetime']))) : null);
-                            $sampleTestedDateTime = (trim($row['sample_tested_datetime']) != '' ? trim(date('Y-m-d H:i', strtotime($row['sample_tested_datetime']))) : null);
+            foreach ($apiData as $rowData) {
+                // Debug::dump($rowData);die;
+                foreach ($rowData as $key => $row) {
+                    // Debug::dump($row);die;
+                    // print_r($apiData);die;
+                    if (trim($row['sample_code']) != '' && trim($row['vlsm_instance_id']) != '') {
+                        $sampleCode = trim($row['sample_code']);
+                        $uniqueId = trim($row['unique_id']);
+                        $instanceCode = trim($row['vlsm_instance_id']);
 
-                            foreach ($row as $index => $value) {
-                                if ($index == 'status_id') {
-                                    break;
-                                } elseif ($index != 'covid19_id') {
-                                    $data[$index] = $value;
-                                }
-                            }
-                            $data['sample_code']                = $sampleCode;
-                            $data['sample_collection_date']     = $sampleCollectionDate;
-                            $data['sample_registered_at_lab']   = $sampleReceivedAtLab;
-                            $data['result_approved_datetime']   = $resultApprovedDateTime;
-                            $data['sample_tested_datetime']     = $sampleTestedDateTime;
+                        $sampleCollectionDate = (trim($row['sample_collection_date']) != '' ? trim(date('Y-m-d H:i', strtotime($row['sample_collection_date']))) : null);
+                        $sampleReceivedAtLab = (trim($row['sample_registered_at_lab']) != '' ? trim(date('Y-m-d H:i', strtotime($row['sample_registered_at_lab']))) : null);
+                        // $dateOfInitiationOfRegimen = (trim($row['date_of_initiation_of_current_regimen']) != '' ? trim(date('Y-m-d H:i', strtotime($row['date_of_initiation_of_current_regimen']))) : null);
+                        $resultApprovedDateTime = (trim($row['result_approved_datetime']) != '' ? trim(date('Y-m-d H:i', strtotime($row['result_approved_datetime']))) : null);
+                        $sampleTestedDateTime = (trim($row['sample_tested_datetime']) != '' ? trim(date('Y-m-d H:i', strtotime($row['sample_tested_datetime']))) : null);
 
-                            $facilityData = array(
-                                'vlsm_instance_id'          => trim($row['vlsm_instance_id']),
-                                'facility_name'             => trim($row['facility_name']),
-                                'facility_code'             => trim($row['facility_code']),
-                                'facility_mobile_numbers'   => trim($row['facility_mobile_numbers']),
-                                'address'                   => trim($row['address']),
-                                'facility_hub_name'         => trim($row['facility_hub_name']),
-                                'contact_person'            => trim($row['contact_person']),
-                                'report_email'              => trim($row['report_email']),
-                                'country'                   => trim($row['country']),
-                                'facility_state'            => trim($row['facility_state']),
-                                'facility_district'         => trim($row['facility_district']),
-                                'longitude'                 => trim($row['longitude']),
-                                'latitude'                  => trim($row['latitude']),
-                                'status'                    => trim($row['facility_status'])
-                            );
-                            if (trim($row['facility_state']) != '') {
-                                $sQueryResult = $this->checkFacilityStateDistrictDetails(trim($row['facility_state']), 0);
-                                if ($sQueryResult) {
-                                    $facilityData['facility_state'] = $sQueryResult['geo_id'];
-                                } else {
-                                    $locationDb->insert(array('geo_parent' => 0, 'geo_name' => trim($row['facility_state'])));
-                                    $facilityData['facility_state'] = $locationDb->lastInsertValue;
-                                }
+                        foreach ($row as $index => $value) {
+                            if ($index == 'status_id') {
+                                break;
+                            } elseif ($index != 'covid19_id') {
+                                $data[$index] = $value;
                             }
-                            if (trim($row['facility_district']) != '') {
-                                $sQueryResult = $this->checkFacilityStateDistrictDetails(trim($row['facility_district']), $facilityData['facility_state']);
-                                if ($sQueryResult) {
-                                    $facilityData['facility_district'] = $sQueryResult['geo_id'];
-                                } else {
-                                    $locationDb->insert(array('geo_parent' => $facilityData['facility_state'], 'geo_name' => trim($row['facility_district'])));
-                                    $facilityData['facility_district'] = $locationDb->lastInsertValue;
-                                }
-                            }
-                            //check facility type
-                            if (isset($row['facility_type']) && trim($row['facility_type']) != '') {
-                                $facilityData['facility_type'] = trim($row['facility_type']);
-                            }
-
-                            //check clinic details
-                            if (trim($row['facility_name']) != '') {
-                                $facilityDataResult = $this->checkFacilityDetails(trim($row['facility_name']));
-                                if ($facilityDataResult) {
-                                    $facilityDb->update($facilityData, array('facility_id' => $facilityDataResult['facility_id']));
-                                    $data['facility_id'] = $facilityDataResult['facility_id'];
-                                } else {
-                                    $facilityDb->insert($facilityData);
-                                    $data['facility_id'] = $facilityDb->lastInsertValue;
-                                }
-                            } else {
-                                $data['facility_id'] = null;
-                            }
-
-                            $labData = array(
-                                'vlsm_instance_id'          => trim($row['vlsm_instance_id']),
-                                'facility_name'             => trim($row['labName']),
-                                'facility_code'             => trim($row['labCode']),
-                                'facility_mobile_numbers'   => trim($row['labPhone']),
-                                'address'                   => trim($row['labAddress']),
-                                'facility_hub_name'         => trim($row['labHub']),
-                                'contact_person'            => trim($row['labContactPerson']),
-                                'report_email'              => trim($row['labReportMail']),
-                                'country'                   => trim($row['labCountry']),
-                                'facility_state'            => trim($row['labState']),
-                                'facility_district'         => trim($row['labDistrict']),
-                                'longitude'                 => trim($row['labLongitude']),
-                                'latitude'                  => trim($row['labLatitude']),
-                                'status'                    => trim($row['labFacilityStatus'])
-                            );
-                            if (trim($row['labState']) != '') {
-                                $sQueryResult = $this->checkFacilityStateDistrictDetails(trim($row['labState']), 0);
-                                if ($sQueryResult) {
-                                    $labData['facility_state'] = $sQueryResult['geo_id'];
-                                } else {
-                                    $locationDb->insert(array('geo_parent' => 0, 'geo_name' => trim($row['labState'])));
-                                    $labData['facility_state'] = $locationDb->lastInsertValue;
-                                }
-                            }
-                            if (trim($row['labDistrict']) != '') {
-                                $sQueryResult = $this->checkFacilityStateDistrictDetails(trim($row['labDistrict']), $labData['facility_state']);
-                                if ($sQueryResult) {
-                                    $labData['facility_district'] = $sQueryResult['geo_id'];
-                                } else {
-                                    $locationDb->insert(array('geo_parent' => $labData['facility_state'], 'geo_name' => trim($row['labDistrict'])));
-                                    $labData['facility_district'] = $locationDb->lastInsertValue;
-                                }
-                            }
-                            //check lab type
-                            if (isset($row['labFacilityTypeName']) && trim($row['labFacilityTypeName']) != '') {
-                                $labData['facility_type'] = trim($row['labFacilityTypeName']);
-                            }
-
-                            //check lab details
-                            if (trim($row['labName']) != '') {
-                                $labDataResult = $this->checkFacilityDetails(trim($row['labName']));
-                                if ($labDataResult) {
-                                    $facilityDb->update($labData, array('facility_id' => $labDataResult['facility_id']));
-                                    $data['lab_id'] = $labDataResult['facility_id'];
-                                } else {
-                                    $facilityDb->insert($labData);
-                                    $data['lab_id'] = $facilityDb->lastInsertValue;
-                                }
-                            } else {
-                                $data['lab_id'] = 0;
-                            }
-                            //check testing reason
-                            if (trim($row['status_name']) != '') {
-                                $sampleStatusResult = $this->checkSampleStatus(trim($row['status_name']));
-                                if ($sampleStatusResult) {
-                                    $data['result_status'] = $sampleStatusResult['status_id'];
-                                } else {
-                                    $testStatusDb->insert(array('status_name' => trim($row['status_name'])));
-                                    $data['result_status'] = $testStatusDb->lastInsertValue;
-                                }
-                            } else {
-                                $data['result_status'] = 6;
-                            }
-
-                            //check sample rejection reason
-                            if (trim($row['reason_for_sample_rejection']) != '') {
-                                $sampleRejectionReason = $this->checkSampleRejectionReason(trim($row['reason_for_sample_rejection']));
-                                if ($sampleRejectionReason) {
-                                    $sampleRjtReasonDb->update(array('rejection_reason_name' => trim($row['reason_for_sample_rejection']), 'rejection_reason_status' => trim($row['rejection_reason_status'])), array('rejection_reason_id' => $sampleRejectionReason['rejection_reason_id']));
-                                    $data['reason_for_sample_rejection'] = $sampleRejectionReason['rejection_reason_id'];
-                                } else {
-                                    $sampleRjtReasonDb->insert(array('rejection_reason_name' => trim($row['reason_for_sample_rejection']), 'rejection_reason_status' => trim($row['rejection_reason_status'])));
-                                    $data['reason_for_sample_rejection'] = $sampleRjtReasonDb->lastInsertValue;
-                                }
-                            } else {
-                                $data['reason_for_sample_rejection'] = null;
-                            }
-                            // Debug::dump($data);die;
-                            //check existing sample code
-                            // $sampleCode = $this->checkSampleCode($uniqueId, $sampleCode, $instanceCode);
-                            // if ($sampleCode) {
-                            //     //sample data update
-                            //     $sampleDb->update($data, array('covid19_id' => $sampleCode['covid19_id']));
-                            // } else {
-                            //     //sample data insert
-                            //     $sampleDb->insert($data);
-                            // }
-
-                            $sampleDb->insertOrUpdate($data);
                         }
+                        $data['sample_code']                = $sampleCode;
+                        $data['sample_collection_date']     = $sampleCollectionDate;
+                        $data['sample_registered_at_lab']   = $sampleReceivedAtLab;
+                        $data['result_approved_datetime']   = $resultApprovedDateTime;
+                        $data['sample_tested_datetime']     = $sampleTestedDateTime;
+
+                        $facilityData = array(
+                            'vlsm_instance_id'          => trim($row['vlsm_instance_id']),
+                            'facility_name'             => trim($row['facility_name']),
+                            'facility_code'             => trim($row['facility_code']),
+                            'facility_mobile_numbers'   => trim($row['facility_mobile_numbers']),
+                            'address'                   => trim($row['address']),
+                            'facility_hub_name'         => trim($row['facility_hub_name']),
+                            'contact_person'            => trim($row['contact_person']),
+                            'report_email'              => trim($row['report_email']),
+                            'country'                   => trim($row['country']),
+                            'facility_state'            => trim($row['facility_state']),
+                            'facility_district'         => trim($row['facility_district']),
+                            'longitude'                 => trim($row['longitude']),
+                            'latitude'                  => trim($row['latitude']),
+                            'status'                    => trim($row['facility_status'])
+                        );
+                        if (trim($row['facility_state']) != '') {
+                            $sQueryResult = $this->checkFacilityStateDistrictDetails(trim($row['facility_state']), 0);
+                            if ($sQueryResult) {
+                                $facilityData['facility_state'] = $sQueryResult['geo_id'];
+                            } else {
+                                $locationDb->insert(array('geo_parent' => 0, 'geo_name' => trim($row['facility_state'])));
+                                $facilityData['facility_state'] = $locationDb->lastInsertValue;
+                            }
+                        }
+                        if (trim($row['facility_district']) != '') {
+                            $sQueryResult = $this->checkFacilityStateDistrictDetails(trim($row['facility_district']), $facilityData['facility_state']);
+                            if ($sQueryResult) {
+                                $facilityData['facility_district'] = $sQueryResult['geo_id'];
+                            } else {
+                                $locationDb->insert(array('geo_parent' => $facilityData['facility_state'], 'geo_name' => trim($row['facility_district'])));
+                                $facilityData['facility_district'] = $locationDb->lastInsertValue;
+                            }
+                        }
+                        //check facility type
+                        if (isset($row['facility_type']) && trim($row['facility_type']) != '') {
+                            $facilityData['facility_type'] = trim($row['facility_type']);
+                        }
+
+                        //check clinic details
+                        if (trim($row['facility_name']) != '') {
+                            $facilityDataResult = $this->checkFacilityDetails(trim($row['facility_name']));
+                            if ($facilityDataResult) {
+                                $facilityDb->update($facilityData, array('facility_id' => $facilityDataResult['facility_id']));
+                                $data['facility_id'] = $facilityDataResult['facility_id'];
+                            } else {
+                                $facilityDb->insert($facilityData);
+                                $data['facility_id'] = $facilityDb->lastInsertValue;
+                            }
+                        } else {
+                            $data['facility_id'] = null;
+                        }
+
+                        $labData = array(
+                            'vlsm_instance_id'          => trim($row['vlsm_instance_id']),
+                            'facility_name'             => trim($row['labName']),
+                            'facility_code'             => trim($row['labCode']),
+                            'facility_mobile_numbers'   => trim($row['labPhone']),
+                            'address'                   => trim($row['labAddress']),
+                            'facility_hub_name'         => trim($row['labHub']),
+                            'contact_person'            => trim($row['labContactPerson']),
+                            'report_email'              => trim($row['labReportMail']),
+                            'country'                   => trim($row['labCountry']),
+                            'facility_state'            => trim($row['labState']),
+                            'facility_district'         => trim($row['labDistrict']),
+                            'longitude'                 => trim($row['labLongitude']),
+                            'latitude'                  => trim($row['labLatitude']),
+                            'status'                    => trim($row['labFacilityStatus'])
+                        );
+                        if (trim($row['labState']) != '') {
+                            $sQueryResult = $this->checkFacilityStateDistrictDetails(trim($row['labState']), 0);
+                            if ($sQueryResult) {
+                                $labData['facility_state'] = $sQueryResult['geo_id'];
+                            } else {
+                                $locationDb->insert(array('geo_parent' => 0, 'geo_name' => trim($row['labState'])));
+                                $labData['facility_state'] = $locationDb->lastInsertValue;
+                            }
+                        }
+                        if (trim($row['labDistrict']) != '') {
+                            $sQueryResult = $this->checkFacilityStateDistrictDetails(trim($row['labDistrict']), $labData['facility_state']);
+                            if ($sQueryResult) {
+                                $labData['facility_district'] = $sQueryResult['geo_id'];
+                            } else {
+                                $locationDb->insert(array('geo_parent' => $labData['facility_state'], 'geo_name' => trim($row['labDistrict'])));
+                                $labData['facility_district'] = $locationDb->lastInsertValue;
+                            }
+                        }
+                        //check lab type
+                        if (isset($row['labFacilityTypeName']) && trim($row['labFacilityTypeName']) != '') {
+                            $labData['facility_type'] = trim($row['labFacilityTypeName']);
+                        }
+
+                        //check lab details
+                        if (trim($row['labName']) != '') {
+                            $labDataResult = $this->checkFacilityDetails(trim($row['labName']));
+                            if ($labDataResult) {
+                                $facilityDb->update($labData, array('facility_id' => $labDataResult['facility_id']));
+                                $data['lab_id'] = $labDataResult['facility_id'];
+                            } else {
+                                $facilityDb->insert($labData);
+                                $data['lab_id'] = $facilityDb->lastInsertValue;
+                            }
+                        } else {
+                            $data['lab_id'] = 0;
+                        }
+                        //check testing reason
+                        if (trim($row['status_name']) != '') {
+                            $sampleStatusResult = $this->checkSampleStatus(trim($row['status_name']));
+                            if ($sampleStatusResult) {
+                                $data['result_status'] = $sampleStatusResult['status_id'];
+                            } else {
+                                $testStatusDb->insert(array('status_name' => trim($row['status_name'])));
+                                $data['result_status'] = $testStatusDb->lastInsertValue;
+                            }
+                        } else {
+                            $data['result_status'] = 6;
+                        }
+
+                        //check sample rejection reason
+                        if (trim($row['reason_for_sample_rejection']) != '') {
+                            $sampleRejectionReason = $this->checkSampleRejectionReason(trim($row['reason_for_sample_rejection']));
+                            if ($sampleRejectionReason) {
+                                $sampleRjtReasonDb->update(array('rejection_reason_name' => trim($row['reason_for_sample_rejection']), 'rejection_reason_status' => trim($row['rejection_reason_status'])), array('rejection_reason_id' => $sampleRejectionReason['rejection_reason_id']));
+                                $data['reason_for_sample_rejection'] = $sampleRejectionReason['rejection_reason_id'];
+                            } else {
+                                $sampleRjtReasonDb->insert(array('rejection_reason_name' => trim($row['reason_for_sample_rejection']), 'rejection_reason_status' => trim($row['rejection_reason_status'])));
+                                $data['reason_for_sample_rejection'] = $sampleRjtReasonDb->lastInsertValue;
+                            }
+                        } else {
+                            $data['reason_for_sample_rejection'] = null;
+                        }
+                        // Debug::dump($data);die;
+                        //check existing sample code
+                        // $sampleCode = $this->checkSampleCode($uniqueId, $sampleCode, $instanceCode);
+                        // if ($sampleCode) {
+                        //     //sample data update
+                        //     $sampleDb->update($data, array('covid19_id' => $sampleCode['covid19_id']));
+                        // } else {
+                        //     //sample data insert
+                        //     $sampleDb->insert($data);
+                        // }
+
+                        $sampleDb->insertOrUpdate($data);
                     }
                 }
-                //remove directory
-                // $this->commonService->removeDirectory($pathname);
-                return array(
-                    'status'    => 'success',
-                    'message'   => 'Uploaded successfully',
-                );
             }
+            if (is_readable($fileName)) {
+                unlink($fileName);
+            }
+
             return array(
-                'status'    => 'fail',
-                'message'   => 'Uploaded failed',
+                'status'    => 'success',
+                'message'   => 'Uploaded successfully',
             );
         } catch (Exception $exc) {
+            if (is_readable($fileName)) {
+                unlink($fileName);
+            }
             error_log($exc->getMessage());
             error_log($exc->getTraceAsString());
         }
@@ -552,8 +558,8 @@ class Covid19FormService
 
 
                     $sheet = $excel->getActiveSheet();
-                    $output = array();
-                    $keySummaryIndicators = array();
+                    $output = [];
+                    $keySummaryIndicators = [];
                     $j = 1;
 
                     foreach ($sResult as $row) {
@@ -604,7 +610,7 @@ class Covid19FormService
 
 
                     foreach ($keySummaryIndicators['sample'] as $key => $indicators) {
-                        $row = array();
+                        $row = [];
                         $row[] = $key;
                         foreach ($indicators['month'] as $months) {
                             $row[] = $months;
@@ -696,10 +702,10 @@ class Covid19FormService
                 $excel = new Spreadsheet();
 
                 $sheet = $excel->getActiveSheet();
-                $output = array();
+                $output = [];
                 foreach ($sResult as $aRow) {
 
-                    $row = array();
+                    $row = [];
                     $row[] = ucwords($aRow['facility_name']);
                     $row[] = ucwords($aRow['province']);
                     $row[] = ucwords($aRow['district']);
@@ -902,7 +908,7 @@ class Covid19FormService
     public function getTATbyProvince($labs, $startDate, $endDate)
     {
         // set_time_limit(10000);
-        $result = array();
+        $result = [];
         $sampleDb = $this->sm->get('Covid19FormTable');
         $resultSet = $sampleDb->getTATbyProvince($labs, $startDate, $endDate);
         foreach ($resultSet as $key) {
@@ -923,7 +929,7 @@ class Covid19FormService
     public function getTATbyDistrict($labs, $startDate, $endDate)
     {
         // set_time_limit(10000);
-        $result = array();
+        $result = [];
         $sampleDb = $this->sm->get('Covid19FormTable');
         $resultSet = $sampleDb->getTATbyDistrict($labs, $startDate, $endDate);
         foreach ($resultSet as $key) {
@@ -944,8 +950,8 @@ class Covid19FormService
     public function getTATbyClinic($labs, $startDate, $endDate)
     {
         // set_time_limit(10000);
-        $result = array();
-        $time = array();
+        $result = [];
+        $time = [];
         $sampleDb = $this->sm->get('Covid19FormTable');
         $resultSet = $sampleDb->getTATbyClinic($labs, $startDate, $endDate);
         foreach ($resultSet as $key) {
@@ -1019,11 +1025,11 @@ class Covid19FormService
                     $excel = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
 
                     $sheet = $excel->getActiveSheet();
-                    $output = array();
+                    $output = [];
                     foreach ($sResult as $aRow) {
                         $displayCollectionDate = \Application\Service\CommonService::humanReadableDateFormat($aRow['collectionDate']);
                         $displayReceivedDate = \Application\Service\CommonService::humanReadableDateFormat($aRow['receivedDate']);
-                        $row = array();
+                        $row = [];
                         $row[] = $aRow['sample_code'];
                         $row[] = $displayCollectionDate;
                         $row[] = $aRow['facilityCode'] . ' - ' . ucwords($aRow['facilityName']);
@@ -1189,9 +1195,9 @@ class Covid19FormService
                     $excel = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
 
                     $sheet = $excel->getActiveSheet();
-                    $output = array();
+                    $output = [];
                     foreach ($sResult as $aRow) {
-                        $row = array();
+                        $row = [];
                         $sampleCollectionDate = '';
                         $sampleTestedDate = '';
                         if (isset($aRow['sampleCollectionDate']) && $aRow['sampleCollectionDate'] != NULL && trim($aRow['sampleCollectionDate']) != "" && $aRow['sampleCollectionDate'] != '0000-00-00') {
@@ -1328,9 +1334,9 @@ class Covid19FormService
                     $excel = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
 
                     $sheet = $excel->getActiveSheet();
-                    $output = array();
+                    $output = [];
                     foreach ($sResult as $aRow) {
-                        $row = array();
+                        $row = [];
                         $sampleCollectionDate = '';
                         if (isset($aRow['sampleCollectionDate']) && $aRow['sampleCollectionDate'] != null && trim($aRow['sampleCollectionDate']) != "" && $aRow['sampleCollectionDate'] != '0000-00-00') {
                             $sampleCollectionDate = \Application\Service\CommonService::humanReadableDateFormat($aRow['sampleCollectionDate']);

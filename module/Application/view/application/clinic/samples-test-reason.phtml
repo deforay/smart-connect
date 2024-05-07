@@ -16,12 +16,12 @@ if (isset($params['dateRange']) && trim($params['dateRange']) != '') {
     $endDate = $splitSearchRange[1];
 }
 //set selected clinics
-$selectedClinics = array();
+$selectedClinics = [];
 if (isset($params['clinic']) && trim($params['clinic']) != '') {
     $selectedClinics = explode(",", $params['clinic']);
 }
 //set selected age group
-$selectedAgeGroup = array();
+$selectedAgeGroup = [];
 if (isset($params['age']) && trim($params['age']) != '') {
     $selectedAgeGroup = explode(",", $params['age']);
 }

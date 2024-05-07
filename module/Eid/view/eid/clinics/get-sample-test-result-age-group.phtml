@@ -1,6 +1,6 @@
 <?php
 // \Zend\Debug\Debug::dump($result);die;
-$supAvg = array();
+$supAvg = [];
 if (isset($result[$params['age']['ageName']]) && !empty($result[$params['age']['ageName']])) {
     $arrayKey = array_keys($result[$params['age']['ageName']]);
     $sumArray = array_map(function () {
@@ -129,8 +129,8 @@ if (isset($result[$params['age']['ageName']]) && !empty($result[$params['age']['
                             <?php if (array_sum($condition) == 0) { ?> visible: false,
                             <?php } ?>
                             data: [<?php
-                                    foreach ($condition as $ckey=>$count) {
-                                        if($ckey != 'color'){
+                                    foreach ($condition as $ckey => $count) {
+                                        if ($ckey != 'color') {
                                             echo '{y:' . $count . ',age:"' . $age[$i] . '"},';
                                         }
                                     }

@@ -1,5 +1,6 @@
 <?php
-$startDisplayDate = "";$endDate = "";
+$startDisplayDate = "";
+$endDate = "";
 if (isset($searchMonth) && trim($searchMonth) != '') {
     $splitSearchMonth = explode("-", $searchMonth);
     $startDate = $endDate = $splitSearchMonth[1] . ' ' . date('m', strtotime($splitSearchMonth[0]));
@@ -28,19 +29,19 @@ if (isset($searchMonth) && trim($searchMonth) != '') {
     $endDisplayDate  = strtoupper(date('M')) . ' ' . date('Y');
 }
 //set selected labs
-$selectedLabs = array();
+$selectedLabs = [];
 if (isset($labFilter) && trim($labFilter) != '') {
     $selectedLabs = explode(",", $labFilter);
 }
 //set selected provinces
-$selectedProvinces = array();
+$selectedProvinces = [];
 if (isset($facilityInfo['selectedProvinces']) && !empty($facilityInfo['selectedProvinces'])) {
     foreach ($facilityInfo['selectedProvinces'] as $province) {
         $selectedProvinces[] = $province['geo_id'];
     }
 }
 //set selected districts
-$selectedDistricts = array();
+$selectedDistricts = [];
 if (isset($facilityInfo['labDistricts']) && !empty($facilityInfo['labDistricts'])) {
     foreach ($facilityInfo['labDistricts'] as $district) {
         $selectedDistricts[] = $district['facility_district'];
@@ -158,17 +159,21 @@ if (isset($facilityInfo['labDistricts']) && !empty($facilityInfo['labDistricts']
                         <option value="">--<?php echo $this->translate('Select'); ?>--</option>
                         <option value="good"><?php echo $this->translate('Good'); ?> >= 95%</option>
                         <option value="fair"><?php echo $this->translate('Fair'); ?> 85-94%</option>
-                        <option value="poor"><?php echo $this->translate('Poor'); ?> < 85%</option> </select> </div> <div class="form-group col-lg-4">
-                                <label class="control-label"><?php echo $this->translate('Age Group'); ?></label>
-                                <select class="form-control" name="age[]" id="age" multiple title="<?php echo $this->translate('Please choose age group'); ?>">
-                                    <option value="<2">
-                                        < 2</option> <option value="2to5"> 2 - 5
-                                    </option>
-                                    <option value="6to14"> 6 - 14</option>
-                                    <option value="15to49"> 15 - 49</option>
-                                    <option value=">=50"> >= 50</option>
-                                    <option value="unknown"> <?php echo $this->translate('Unknown'); ?></option>
-                                </select>
+                        <option value="poor"><?php echo $this->translate('Poor'); ?> < 85%</option>
+                    </select>
+                </div>
+                <div class="form-group col-lg-4">
+                    <label class="control-label"><?php echo $this->translate('Age Group'); ?></label>
+                    <select class="form-control" name="age[]" id="age" multiple title="<?php echo $this->translate('Please choose age group'); ?>">
+                        <option value="<2">
+                            < 2</option>
+                        <option value="2to5"> 2 - 5
+                        </option>
+                        <option value="6to14"> 6 - 14</option>
+                        <option value="15to49"> 15 - 49</option>
+                        <option value=">=50"> >= 50</option>
+                        <option value="unknown"> <?php echo $this->translate('Unknown'); ?></option>
+                    </select>
                 </div>
                 <div class="form-group col-lg-4">
                     <label class="control-label"><?php echo $this->translate('Test Result'); ?>&nbsp;</label>
@@ -340,7 +345,7 @@ if (isset($facilityInfo['labDistricts']) && !empty($facilityInfo['labDistricts']
             placeholder: "<?php echo $this->translate('All'); ?>",
             allowClear: true
         });
-        
+
         $('#barbutton').on('click', function() {
             $('#barcontainer').fadeIn(function() {
                 generateBarContainer();
@@ -398,7 +403,7 @@ if (isset($facilityInfo['labDistricts']) && !empty($facilityInfo['labDistricts']
                     "sClass": "center",
                     "bSortable": false
                 },
-                
+
                 {
                     "sClass": "center"
                 },

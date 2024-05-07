@@ -121,15 +121,15 @@ class SampleTable extends AbstractTableGateway
         $receivedTotal = 0;
         $testedTotal = 0;
         $rejectedTotal = 0;
-        $waitingResult = array();
-        $receivedResult = array();
-        $tResult = array();
-        $rejectedResult = array();
+        $waitingResult = [];
+        $receivedResult = [];
+        $tResult = [];
+        $rejectedResult = [];
         if (trim($params['daterange']) != '') {
             $splitDate = explode('to', $params['daterange']);
         } else {
             $timestamp = time();
-            $qDates = array();
+            $qDates = [];
             for ($i = 0; $i < 28; $i++) {
                 $qDates[] = "'" . date('Y-m-d', $timestamp) . "'";
                 $timestamp -= 24 * 3600;
@@ -224,7 +224,7 @@ class SampleTable extends AbstractTableGateway
     public function fetchSamplesTested($params)
     {
         $loginContainer = new Container('credo');
-        $result = array();
+        $result = [];
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
 
@@ -312,7 +312,7 @@ class SampleTable extends AbstractTableGateway
     public function fetchSampleTestReasonBarChartDetails($params)
     {
         $loginContainer = new Container('credo');
-        $result = array();
+        $result = [];
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
 
@@ -375,7 +375,7 @@ class SampleTable extends AbstractTableGateway
     public function getSamplesTestedPerLab($params)
     {
         $loginContainer = new Container('credo');
-        $result = array();
+        $result = [];
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
 
@@ -459,7 +459,7 @@ class SampleTable extends AbstractTableGateway
     public function fetchSampleTestedResultGenderDetails($params)
     {
         $loginContainer = new Container('credo');
-        $result = array();
+        $result = [];
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
 
@@ -536,7 +536,7 @@ class SampleTable extends AbstractTableGateway
         $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $result = array();
+        $result = [];
         $skipDays = isset($this->config['defaults']['tat-skipdays']) ? $this->config['defaults']['tat-skipdays'] : 365;
 
 
@@ -650,7 +650,7 @@ class SampleTable extends AbstractTableGateway
     public function fetchSampleTestedResultAgeGroupDetails($params)
     {
         $loginContainer = new Container('credo');
-        $result = array();
+        $result = [];
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
 
@@ -755,7 +755,7 @@ class SampleTable extends AbstractTableGateway
     public function fetchSampleTestedResultPregnantPatientDetails($params)
     {
         $loginContainer = new Container('credo');
-        $result = array();
+        $result = [];
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
 
@@ -807,7 +807,7 @@ class SampleTable extends AbstractTableGateway
     public function fetchSampleTestedResultBreastfeedingPatientDetails($params)
     {
         $loginContainer = new Container('credo');
-        $result = array();
+        $result = [];
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
 
@@ -861,7 +861,7 @@ class SampleTable extends AbstractTableGateway
         $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $result = array();
+        $result = [];
 
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
@@ -937,7 +937,7 @@ class SampleTable extends AbstractTableGateway
         $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $result = array();
+        $result = [];
 
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
@@ -983,7 +983,7 @@ class SampleTable extends AbstractTableGateway
         $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $femaleTestResult = array();
+        $femaleTestResult = [];
 
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
@@ -1023,7 +1023,7 @@ class SampleTable extends AbstractTableGateway
         $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $lineOfTreatmentResult = array();
+        $lineOfTreatmentResult = [];
 
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
@@ -1059,7 +1059,7 @@ class SampleTable extends AbstractTableGateway
         $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $lResult = array();
+        $lResult = [];
 
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
@@ -1101,7 +1101,7 @@ class SampleTable extends AbstractTableGateway
         $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $result = array();
+        $result = [];
 
         $i = 0;
         $j = 1;
@@ -1172,7 +1172,7 @@ class SampleTable extends AbstractTableGateway
         $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $result = array();
+        $result = [];
 
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
@@ -1256,7 +1256,7 @@ class SampleTable extends AbstractTableGateway
         $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $vlOutComeResult = array();
+        $vlOutComeResult = [];
 
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
@@ -1372,7 +1372,7 @@ class SampleTable extends AbstractTableGateway
         $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $sResult = array();
+        $sResult = [];
 
         if (isset($params['sampleCollectionDate']) && trim($params['sampleCollectionDate']) != '') {
             $s_c_date = explode("to", $params['sampleCollectionDate']);
@@ -1487,7 +1487,7 @@ class SampleTable extends AbstractTableGateway
         $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $result = array();
+        $result = [];
 
         if (isset($params['sampleCollectionDate']) && trim($params['sampleCollectionDate']) != '') {
             $s_c_date = explode("to", $params['sampleCollectionDate']);
@@ -1608,7 +1608,7 @@ class SampleTable extends AbstractTableGateway
         $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $result = array();
+        $result = [];
 
         if (isset($params['sampleCollectionDate']) && trim($params['sampleCollectionDate']) != '') {
             $s_c_date = explode("to", $params['sampleCollectionDate']);
@@ -1736,7 +1736,7 @@ class SampleTable extends AbstractTableGateway
         $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $result = array();
+        $result = [];
 
         if (isset($params['sampleCollectionDate']) && trim($params['sampleCollectionDate']) != '') {
             $s_c_date = explode("to", $params['sampleCollectionDate']);
@@ -1830,7 +1830,7 @@ class SampleTable extends AbstractTableGateway
         $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $result = array();
+        $result = [];
 
         if (isset($params['sampleCollectionDate']) && trim($params['sampleCollectionDate']) != '') {
             $s_c_date = explode("to", $params['sampleCollectionDate']);
@@ -1943,7 +1943,7 @@ class SampleTable extends AbstractTableGateway
         $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $rResult = array();
+        $rResult = [];
 
         if (isset($params['sampleCollectionDate']) && trim($params['sampleCollectionDate']) != '') {
             $s_c_date = explode("to", $params['sampleCollectionDate']);
@@ -2303,7 +2303,7 @@ class SampleTable extends AbstractTableGateway
         $viewText = $this->commonService->translate('View');
         $pdfText = $this->commonService->translate('PDF');
         foreach ($rResult as $aRow) {
-            $row = array();
+            $row = [];
             $sampleCollectionDate = '';
             if (isset($aRow['sampleCollectionDate']) && $aRow['sampleCollectionDate'] != NULL && trim($aRow['sampleCollectionDate']) != "" && $aRow['sampleCollectionDate'] != '0000-00-00') {
                 $sampleCollectionDate = \Application\Service\CommonService::humanReadableDateFormat($aRow['sampleCollectionDate']);
@@ -2332,7 +2332,7 @@ class SampleTable extends AbstractTableGateway
         $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $result = array();
+        $result = [];
 
 
 
@@ -2456,7 +2456,7 @@ class SampleTable extends AbstractTableGateway
         $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $result = array();
+        $result = [];
 
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
@@ -2592,7 +2592,7 @@ class SampleTable extends AbstractTableGateway
         $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $result = array();
+        $result = [];
 
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
@@ -2734,7 +2734,7 @@ class SampleTable extends AbstractTableGateway
         $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $result = array();
+        $result = [];
 
 
 
@@ -2849,7 +2849,7 @@ class SampleTable extends AbstractTableGateway
         $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $result = array();
+        $result = [];
 
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
@@ -3302,7 +3302,7 @@ class SampleTable extends AbstractTableGateway
         );
 
         foreach ($rResult as $aRow) {
-            $row = array();
+            $row = [];
             $sampleCollectionDate = '';
             if (isset($aRow['sampleCollectionDate']) && $aRow['sampleCollectionDate'] != null && trim($aRow['sampleCollectionDate']) != "" && $aRow['sampleCollectionDate'] != '0000-00-00') {
                 $sampleCollectionDate = \Application\Service\CommonService::humanReadableDateFormat($aRow['sampleCollectionDate']);
@@ -3559,7 +3559,7 @@ class SampleTable extends AbstractTableGateway
         );
         //print_r($parameters);die;
         foreach ($rResult as $aRow) {
-            $row = array();
+            $row = [];
             $row[] = ucwords($aRow['facility_name']);
             $row[] = $aRow['total_samples_received'];
             $row[] = $aRow['total_samples_tested'];
@@ -3773,7 +3773,7 @@ class SampleTable extends AbstractTableGateway
             "aaData" => array()
         );
         foreach ($rResult as $aRow) {
-            $row = array();
+            $row = [];
             $row[] = $aRow['monthDate'];
             $row[] = $aRow['total_samples_received'];
             $row[] = $aRow['total_samples_tested'];
@@ -3792,7 +3792,7 @@ class SampleTable extends AbstractTableGateway
         $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $result = array();
+        $result = [];
 
         $globalDb = $this->sm->get('GlobalTable');
         $samplesWaitingFromLastXMonths = $globalDb->getGlobalValue('sample_waiting_month_range');
@@ -3904,7 +3904,7 @@ class SampleTable extends AbstractTableGateway
         $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $result = array();
+        $result = [];
 
         $globalDb = $this->sm->get('GlobalTable');
         $samplesWaitingFromLastXMonths = $globalDb->getGlobalValue('sample_waiting_month_range');
@@ -4018,7 +4018,7 @@ class SampleTable extends AbstractTableGateway
         $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $result = array();
+        $result = [];
 
         $globalDb = $this->sm->get('GlobalTable');
         $samplesWaitingFromLastXMonths = $globalDb->getGlobalValue('sample_waiting_month_range');
@@ -4132,7 +4132,7 @@ class SampleTable extends AbstractTableGateway
         $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $result = array();
+        $result = [];
 
         $globalDb = $this->sm->get('GlobalTable');
         $samplesWaitingFromLastXMonths = $globalDb->getGlobalValue('sample_waiting_month_range');
@@ -4462,7 +4462,7 @@ class SampleTable extends AbstractTableGateway
         foreach ($rResult as $aRow) {
             $displayCollectionDate = CommonService::humanReadableDateFormat($aRow['collectionDate']);
             $displayReceivedDate = CommonService::humanReadableDateFormat($aRow['receivedDate']);
-            $row = array();
+            $row = [];
             $row[] = $aRow['sample_code'];
             $row[] = $displayCollectionDate;
             $row[] = $aRow['facilityCode'] . ' - ' . ucwords($aRow['facilityName']);
@@ -4551,9 +4551,9 @@ class SampleTable extends AbstractTableGateway
         //echo $sQueryStr;die;
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
 
-        $output = array();
+        $output = [];
 
-        $months = array();
+        $months = [];
 
         foreach ($quarterArray as $m) {
             $output['months'][] = $m . " " . $year;
@@ -4734,7 +4734,7 @@ class SampleTable extends AbstractTableGateway
             if (isset($aRow['sampleCollectionDate']) && $aRow['sampleCollectionDate'] != NULL && trim($aRow['sampleCollectionDate']) != "" && $aRow['sampleCollectionDate'] != '0000-00-00') {
                 $sampleCollectionDate = CommonService::humanReadableDateFormat($aRow['sampleCollectionDate']);
             }
-            $row = array();
+            $row = [];
             $row[] = '<input type="checkbox" name="duplicate-select[]" class="' . $aRow['sample_code'] . '" id="' . $aRow['vl_sample_id'] . '" value="' . $aRow['vl_sample_id'] . '" onchange="duplicateCheck(this);"/>';
             $row[] = $aRow['sample_code'];
             $row[] = $sampleCollectionDate;
@@ -4815,7 +4815,7 @@ class SampleTable extends AbstractTableGateway
     {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $result = array();
+        $result = [];
 
 
         $sQuery = $sql->select()->from(array('vl' => $this->table))
@@ -5042,7 +5042,7 @@ class SampleTable extends AbstractTableGateway
         );
 
         foreach ($rResult as $aRow) {
-            $row = array();
+            $row = [];
             $row[] = $aRow['province'];
             $row[] = $aRow['total_samples_received'];
             $row[] = $aRow['total_samples_tested'];
@@ -5231,7 +5231,7 @@ class SampleTable extends AbstractTableGateway
         );
 
         foreach ($rResult as $aRow) {
-            $row = array();
+            $row = [];
             $row[] = $aRow['district'];
             $row[] = $aRow['total_samples_received'];
             $row[] = $aRow['total_samples_tested'];
@@ -5423,7 +5423,7 @@ class SampleTable extends AbstractTableGateway
         );
 
         foreach ($rResult as $aRow) {
-            $row = array();
+            $row = [];
             $row[] = "<span style='white-space:nowrap !important;' >" . ucwords($aRow['facility_name']) . "</span>";
             $row[] = ucwords($aRow['province']);
             $row[] = ucwords($aRow['district']);
@@ -5444,7 +5444,7 @@ class SampleTable extends AbstractTableGateway
     {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $result = array();
+        $result = [];
 
 
         $sQuery = $sql->select()
@@ -5665,7 +5665,7 @@ class SampleTable extends AbstractTableGateway
             "aaData" => array()
         );
         foreach ($rResult as $aRow) {
-            $row = array();
+            $row = [];
             $row[] = ucwords($aRow['province']);
             $row[] = $aRow['total_samples_valid'];
             $row[] = $aRow['total_suppressed_samples'];
@@ -5844,7 +5844,7 @@ class SampleTable extends AbstractTableGateway
             "aaData" => array()
         );
         foreach ($rResult as $aRow) {
-            $row = array();
+            $row = [];
             $row[] = ucwords($aRow['district']);
             $row[] = $aRow['total_samples_valid'];
             $row[] = $aRow['total_suppressed_samples'];
@@ -6032,7 +6032,7 @@ class SampleTable extends AbstractTableGateway
             "aaData" => array()
         );
         foreach ($rResult as $aRow) {
-            $row = array();
+            $row = [];
             $row[] = "<span style='white-space:nowrap !important;' >" . ucwords($aRow['facility_name']) . "</span>";
             $row[] = ucwords($aRow['province']);
             $row[] = ucwords($aRow['district']);
@@ -6051,7 +6051,7 @@ class SampleTable extends AbstractTableGateway
     {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $mostRejectionReasons = array();
+        $mostRejectionReasons = [];
         $mostRejectionQuery = $sql->select()->from(array('vl' => $this->table))
             ->columns(array('rejections' => new Expression('COUNT(*)')))
             ->join(array('r_r_r' => 'r_vl_sample_rejection_reasons'), 'r_r_r.rejection_reason_id=vl.reason_for_sample_rejection', array('rejection_reason_id'))
@@ -6086,7 +6086,7 @@ class SampleTable extends AbstractTableGateway
             }
             $mostRejectionReasons[] = 0;
         }
-        $result = array();
+        $result = [];
 
         $start = strtotime($params['fromDate']);
         $end = strtotime($params['toDate']);
@@ -6301,7 +6301,7 @@ class SampleTable extends AbstractTableGateway
         );
 
         foreach ($rResult as $aRow) {
-            $row = array();
+            $row = [];
             $row[] = ucwords($aRow['district']);
             $row[] = $aRow['total_samples_received'];
             $row[] = $aRow['total_samples_rejected'];
@@ -6471,7 +6471,7 @@ class SampleTable extends AbstractTableGateway
         );
 
         foreach ($rResult as $aRow) {
-            $row = array();
+            $row = [];
             $row[] = ucwords($aRow['province']);
             $row[] = $aRow['total_samples_received'];
             $row[] = $aRow['total_samples_rejected'];
@@ -6644,7 +6644,7 @@ class SampleTable extends AbstractTableGateway
         );
 
         foreach ($rResult as $aRow) {
-            $row = array();
+            $row = [];
             $row[] = "<span style='white-space:nowrap !important;' >" . ucwords($aRow['facility_name']) . "</span>";
             $row[] = ucwords($aRow['province']);
             $row[] = ucwords($aRow['district']);
@@ -6723,7 +6723,7 @@ class SampleTable extends AbstractTableGateway
         $sampleResult = $this->commonService->cacheQuery($queryStr, $dbAdapter);
         //die;
         $j = 0;
-        $result = array();
+        $result = [];
         foreach ($sampleResult as $aRow) {
             $result['valid_results'][$j] = $aRow['total_samples_valid'];
             $result['suppression_rate'][$j] = ($aRow['total_samples_valid'] > 0) ? $aRow['suppression_rate'] : null;
@@ -6925,7 +6925,7 @@ class SampleTable extends AbstractTableGateway
         );
 
         foreach ($rResult as $aRow) {
-            $row = array();
+            $row = [];
             $row[] = $aRow['current_regimen'];
             $row[] = $aRow['total_samples_received'];
             $row[] = $aRow['total_samples_tested'];
@@ -7011,7 +7011,7 @@ class SampleTable extends AbstractTableGateway
         $queryContainer = new Container('query');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $summaryResult = array();
+        $summaryResult = [];
 
         $samplesReceivedSummaryQuery = $sql->select()
             ->from(array('vl' => $this->table))
@@ -7072,7 +7072,7 @@ class SampleTable extends AbstractTableGateway
         $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $rResult = array();
+        $rResult = [];
 
         if (isset($params['sampleCollectionDate']) && trim($params['sampleCollectionDate']) != '') {
             $s_c_date = explode("to", $params['sampleCollectionDate']);
@@ -7181,7 +7181,7 @@ class SampleTable extends AbstractTableGateway
         $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $rResult = array();
+        $rResult = [];
 
         if (isset($params['sampleCollectionDate']) && trim($params['sampleCollectionDate']) != '') {
             $s_c_date = explode("to", $params['sampleCollectionDate']);
@@ -7284,7 +7284,7 @@ class SampleTable extends AbstractTableGateway
         $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $result = array();
+        $result = [];
         if (isset($params['sampleCollectionDate']) && trim($params['sampleCollectionDate']) != '') {
             $s_c_date = explode("to", $params['sampleCollectionDate']);
             if (isset($s_c_date[0]) && trim($s_c_date[0]) != "") {
@@ -7566,7 +7566,7 @@ class SampleTable extends AbstractTableGateway
     //api for fetch samples refer SourceData Controller
     public function fetchSourceData($params)
     {
-        $result = array();
+        $result = [];
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         //check if the token is valid or not
@@ -7702,7 +7702,7 @@ class SampleTable extends AbstractTableGateway
             $output = [];
             $headings = array("Sample Code", "Patient ID (ART No.)", "Gender", "Age In Years", "Clinic Name", "Clinic Code", "Clinic Phone Number", "Clinic Address", "Clinic HUB Name", "Clinic Contact Person", "Clinic Report Mail", "Clinic Country", "Clinic Longitude", "Clinic Latitude", "Sample Type", "Sample Collection Date", "LAB Name", "Lab Code", "Lab Phone Number", "Lab Address", "Lab HUB Name", "Lab Contact Person", "Lab Report Mail", "Lab Country", "Lab Longitude", "Lab Latitude", "Lab Type", "Lab Tested Date", "Log Value", "Absolute Value", "Text Value", "Absolute Decimal Value", "Result", "Testing Reason", "Sample Status", "Sample Received Datetime", "Line Of Treatment", "Sample Rejected", "Rejection Reason Name", "Rejection Reason Status", "Pregnant", "Breast Feeding", "Regimen Initiated Date", "ARV Adherance Percentage", "Is Adherance poor", "Approved Datetime", "Current Regimen", "Sample Registered Datetime");
             foreach ($rResult as $aRow) {
-                $row = array();
+                $row = [];
                 $row[] = $aRow['sample_code'];
                 $row[] = $aRow['patient_art_no'];
                 $row[] = $aRow['patient_gender'];
@@ -7756,7 +7756,7 @@ class SampleTable extends AbstractTableGateway
             }
 
             if (!is_dir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . 'backups')) {
-                mkdir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . 'backups');
+                mkdir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . 'backups', true);
             }
 
             $csvFile = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . 'backups' . DIRECTORY_SEPARATOR . 'export-data-' . $startDate . '-' . $endDate . '-' . mt_rand() . '.csv';
@@ -7769,6 +7769,6 @@ class SampleTable extends AbstractTableGateway
 
     public function insertOrUpdate($arrayData)
     {
-        return CommonService::insertOrUpdate($this->adapter, $this->table, $arrayData);
+        return CommonService::upsert($this->adapter, $this->table, $arrayData);
     }
 }

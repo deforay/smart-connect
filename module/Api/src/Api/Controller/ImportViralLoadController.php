@@ -18,13 +18,13 @@ class ImportViralLoadController extends AbstractRestfulController
 	}
 	public function create($params)
 	{
-		$response = array();
+		$response = [];
 		if (isset($_FILES['vlFile']['name']) && trim($_FILES['vlFile']['name']) != "") {
-			$pathname = UPLOAD_PATH . DIRECTORY_SEPARATOR . "not-import-vl";
-			if (!file_exists($pathname) && !is_dir($pathname)) {
+			$fileName = UPLOAD_PATH . DIRECTORY_SEPARATOR . "not-import-vl";
+			if (!file_exists($fileName) && !is_dir($fileName)) {
 				mkdir(UPLOAD_PATH . DIRECTORY_SEPARATOR . "not-import-vl");
 			}
-			if (move_uploaded_file($_FILES["vlFile"]["tmp_name"], $pathname . DIRECTORY_SEPARATOR . $_FILES["vlFile"]["name"])) {
+			if (move_uploaded_file($_FILES["vlFile"]["tmp_name"], $fileName . DIRECTORY_SEPARATOR . $_FILES["vlFile"]["name"])) {
 				$response['status'] = 'success';
 			}
 		}

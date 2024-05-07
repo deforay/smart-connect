@@ -223,7 +223,7 @@ class FacilityTable extends AbstractTableGateway
 
         $buttText = $this->commonService->translate('Edit');
         foreach ($rResult as $aRow) {
-            $row = array();
+            $row = [];
             $row[] = $aRow['facility_code'];
             $row[] = ucwords($aRow['facility_name']);
             $row[] = ucwords($aRow['facility_type']);
@@ -432,7 +432,7 @@ class FacilityTable extends AbstractTableGateway
         $sql = new Sql($dbAdapter);
         //set filter labs
         if (isset($params['fromSrc']) && $params['fromSrc'] == 'tested-lab') {
-            $params['labs'] = array();
+            $params['labs'] = [];
             $testedLabQuery = $sql->select()->from(array('f' => 'facility_details'))
                 ->columns(array('facility_id', 'facility_name'))
                 ->order('facility_name asc');
@@ -446,7 +446,7 @@ class FacilityTable extends AbstractTableGateway
                 $params['labs'][] = $testedLab['facility_id'];
             }
         } elseif (isset($params['fromSrc']) && $params['fromSrc'] == 'sample-volume') {
-            $params['labs'] = array();
+            $params['labs'] = [];
             $volumeLabQuery = $sql->select()->from(array('f' => 'facility_details'))
                 ->columns(array('facility_id', 'facility_name'))
                 ->order('facility_name asc');
@@ -460,7 +460,7 @@ class FacilityTable extends AbstractTableGateway
                 $params['labs'][] = $volumeLab['facility_id'];
             }
         }
-        $facilityInfo = array();
+        $facilityInfo = [];
         //set accessible provinces
         $provinceQuery = $sql->select()->from(array('l_d' => 'geographical_divisions'))
             ->columns(array('geo_id', 'geo_name'))
@@ -472,8 +472,8 @@ class FacilityTable extends AbstractTableGateway
         $provinceQueryStr = $sql->buildSqlString($provinceQuery);
         $facilityInfo['provinces'] = $dbAdapter->query($provinceQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         //set selected provinces
-        $facilityInfo['selectedProvinces'] = array();
-        $labProvinces = array();
+        $facilityInfo['selectedProvinces'] = [];
+        $labProvinces = [];
         if (isset($params['labs']) && !empty($params['labs'])) {
             $labProvinceQuery = $sql->select()->from(array('l_d' => 'geographical_divisions'))
                 ->columns(array('geo_id', 'geo_name'))
@@ -501,8 +501,8 @@ class FacilityTable extends AbstractTableGateway
         $provinceDistrictQueryStr = $sql->buildSqlString($provinceDistrictQuery);
         $facilityInfo['provinceDistricts'] = $dbAdapter->query($provinceDistrictQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         //set lab districts
-        $facilityInfo['labDistricts'] = array();
-        $labDistricts = array();
+        $facilityInfo['labDistricts'] = [];
+        $labDistricts = [];
         if (isset($params['labs']) && !empty($params['labs'])) {
             $labDistrictQuery = $sql->select()->from(array('f' => 'facility_details'))
                 ->columns(array('facility_district'))
@@ -549,8 +549,8 @@ class FacilityTable extends AbstractTableGateway
         $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $locationInfo = array();
-        $provinceDistricts = array();
+        $locationInfo = [];
+        $provinceDistricts = [];
         if ($params['fromSrc'] == 'provinces') {
             //set province districts
             $provinceDistrictQuery = $sql->select()->from(array('l_d' => 'geographical_divisions'))
@@ -669,6 +669,6 @@ class FacilityTable extends AbstractTableGateway
     }
     public function insertOrUpdate($arrayData)
     {
-        return CommonService::insertOrUpdate($this->adapter, $this->table, $arrayData);
+        return CommonService::upsert($this->adapter, $this->table, $arrayData);
     }
 }

@@ -27,7 +27,7 @@ class UsersController extends AbstractActionController
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            
+
             $result = $this->userService->getAllUsers($params);
             return $this->getResponse()->setContent(Json::encode($result));
         }
@@ -36,7 +36,7 @@ class UsersController extends AbstractActionController
     public function addAction()
     {
         $this->layout()->setVariable('activeTab', 'users');
-        
+
 
         if ($this->getRequest()->isPost()) {
             $params = $this->getRequest()->getPost();
@@ -51,8 +51,8 @@ class UsersController extends AbstractActionController
     public function editAction()
     {
         $this->layout()->setVariable('activeTab', 'users');
-        
-        
+
+
         if ($this->getRequest()->isPost()) {
             $params = $this->getRequest()->getPost();
             $result = $this->userService->updateUser($params);
@@ -63,8 +63,8 @@ class UsersController extends AbstractActionController
             if ($user == false) {
                 return $this->redirect()->toRoute('users');
             } else {
-                $params = array();
-                $facilities = array();
+                $params = [];
+                $facilities = [];
                 $roles = $this->userService->fetchRoles();
                 if ($user->role != null && trim($user->role) != '' && $user->role > 1) {
                     $params['role'] = $user->role;
@@ -78,8 +78,8 @@ class UsersController extends AbstractActionController
     {
         $this->layout()->setVariable('activeTab', 'admin');
         $this->layout()->setVariable('activeMenu', 'users');
-        
-        
+
+
 
 
         if ($this->getRequest()->isPost()) {
@@ -105,7 +105,7 @@ class UsersController extends AbstractActionController
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            
+
             $result = $this->commonService->getRoleFacilities($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('params' => $params, 'result' => $result))

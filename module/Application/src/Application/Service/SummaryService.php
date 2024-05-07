@@ -145,8 +145,8 @@ class SummaryService
 
 
                     $sheet = $excel->getActiveSheet();
-                    $output = array();
-                    $keySummaryIndicators = array();
+                    $output = [];
+                    $keySummaryIndicators = [];
                     $j = 1;
 
                     foreach ($sResult as $row) {
@@ -197,7 +197,7 @@ class SummaryService
 
 
                     foreach ($keySummaryIndicators['sample'] as $key => $indicators) {
-                        $row = array();
+                        $row = [];
                         $row[] = $key;
                         foreach ($indicators['month'] as $months) {
                             $row[] = $months;
@@ -288,10 +288,10 @@ class SummaryService
                 $excel = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
 
                 $sheet = $excel->getActiveSheet();
-                $output = array();
+                $output = [];
                 foreach ($sResult as $aRow) {
 
-                    $row = array();
+                    $row = [];
                     $row[] = ucwords($aRow['facility_name']);
                     $row[] = ucwords($aRow['province']);
                     $row[] = ucwords($aRow['district']);

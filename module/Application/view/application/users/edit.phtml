@@ -1,5 +1,5 @@
                     <?php
-                    $mappedFacilities = array();
+                    $mappedFacilities = [];
                     if (isset($user['facilities']) && !empty($user['facilities'])) {
                         foreach ($user['facilities'] as $row) {
                             $mappedFacilities[] = $row['facility_id'];

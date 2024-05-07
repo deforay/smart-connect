@@ -1,137 +1,132 @@
-
 <?php
-$supAvg = array();
-if(isset($result['sampleName']) && !empty($result['sampleName'])){
-$arrayKey = array_keys($result['sampleName']);
-$sumArray = array_map(function () {
-    return array_sum(func_get_args());
-}, $result['sampleName'][$arrayKey[0]], $result['sampleName'][$arrayKey[1]]);
-foreach($result['sampleName'][$arrayKey[1]] as $key=>$suppression){
-    $supAvg[] = (($suppression==0) ? 0 : round(100 * ($suppression / $sumArray[$key]),2));
-}
+$supAvg = [];
+if (isset($result['sampleName']) && !empty($result['sampleName'])) {
+    $arrayKey = array_keys($result['sampleName']);
+    $sumArray = array_map(function () {
+        return array_sum(func_get_args());
+    }, $result['sampleName'][$arrayKey[0]], $result['sampleName'][$arrayKey[1]]);
+    foreach ($result['sampleName'][$arrayKey[1]] as $key => $suppression) {
+        $supAvg[] = (($suppression == 0) ? 0 : round(100 * ($suppression / $sumArray[$key]), 2));
+    }
 }
 ?>
 <div id="samplesTestedResultBreastfeedingPatient"></div>
 <script>
-       $(function () {
+    $(function() {
         $('#samplesTestedResultBreastfeedingPatient').highcharts({
-              chart: {
-                  type: 'column'
-              },
-              title: {
-                  text: ''
-              },
-              exporting:{
-                  chartOptions:{
-                      subtitle: {
-                          text:'<?php echo $this->translate('Samples Tested - Breastfeeding'); ?>',
-                      }
-                  }
-              },
-             credits: {
-                    enabled: false
-             },
-              xAxis: {
-                  categories: [<?php
-                  if (isset($result['date']) && !empty($result['date'])) {
-                    foreach($result['date'] as $date){
-                        echo "'".$date."',";
+            chart: {
+                type: 'column'
+            },
+            title: {
+                text: ''
+            },
+            exporting: {
+                chartOptions: {
+                    subtitle: {
+                        text: '<?php echo $this->translate('Samples Tested - Breastfeeding'); ?>',
                     }
-                  }
-                  ?>]
-              },
-              yAxis: [{
-                  allowDecimals: false,
-                  min: 0,
-                  title: {
-                      text: '<?php echo $this->translate('No. of Samples'); ?>'
-                  }
-              },{ // Secondary yAxis
-                         allowDecimals: true,
-                         min: 0,
-                         max: 100,
-                         title: {
-                            text: '<?php echo $this->translate('Suppression %'); ?>',
-                             style: {
-                             }
-                         },
-                         labels: {
-                             format: '{value}%',
-                             style: {
-                             }
-                         },
-                         opposite: true
-                     }],
-              tooltip: {
-                  formatter: function () {
-                      return '<b>' + this.x + '</b><br/>' +
-                          this.series.name + ': ' + this.y + '<br/>' +
-                          '<?php echo $this->translate('Total'); ?>: ' + this.point.stackTotal;
-                  }
-              },
-              plotOptions: {
-                  column: {
-                      stacking: 'normal',
-                      pointPadding: 0.2,
-                      borderWidth: 0,
-                      cursor: 'pointer',
-                      point: {
-                          events: {
-                              click: function (e) {
-                                  doSampleTestedBasedonBreastfeedingPatientRedirect(e.point.category);
-                              }
-                          }
-                      }
-                  },
-                  scatter: {
-                      stacking: 'normal',
-                      pointPadding: 0.2,
-                      borderWidth: 0,
-                      cursor: 'pointer',
-                      yAxis: 1,
-                      color : '#1B325F',
-                      marker: {
-                        symbol: 'diamond'
-                      },
-                      point: {
-                          events: {
-                              click: function (e) {
-                                  doSampleTestedBasedonBreastfeedingPatientRedirect(e.point.category);
-                              }
-                          }
-                      }
-                  }
-              },
-              series: [<?php
-              if(isset($result['sampleName']) && !empty($result['sampleName'])){
-                    foreach($result['sampleName'] as $key=>$condition){
-                    ?>
-                    {
-                    name:'<?php echo $this->translate($key); ?>',
-                    <?php if(strpos($key, '>') !== false){ ?>
-                    color : '#ff1900',
-                    <?php } else if(strpos($key, '<') !== false){ ?>
-                    color : '#60d18f',
-                    <?php } ?>                    
-                    data:[<?php
-                        foreach($condition as $count){
-                           echo '{y:'.$count.'},';
-                        }
-                    ?>],
-                    },
-                    <?php
-                    }
-              }
-              if(count($supAvg)>0){
-                ?>
-                {
-                name: '<?php echo $this->translate('Suppression %'); ?>',
-                type: 'scatter',
-                data: [<?php echo implode(",",$supAvg);?>],
                 }
-            <?php } ?>
-              ],
-              colors: ['#ff1900','#60d18f']
-          });
-      });
+            },
+            credits: {
+                enabled: false
+            },
+            xAxis: {
+                categories: [<?php
+                                if (isset($result['date']) && !empty($result['date'])) {
+                                    foreach ($result['date'] as $date) {
+                                        echo "'" . $date . "',";
+                                    }
+                                }
+                                ?>]
+            },
+            yAxis: [{
+                allowDecimals: false,
+                min: 0,
+                title: {
+                    text: '<?php echo $this->translate('No. of Samples'); ?>'
+                }
+            }, { // Secondary yAxis
+                allowDecimals: true,
+                min: 0,
+                max: 100,
+                title: {
+                    text: '<?php echo $this->translate('Suppression %'); ?>',
+                    style: {}
+                },
+                labels: {
+                    format: '{value}%',
+                    style: {}
+                },
+                opposite: true
+            }],
+            tooltip: {
+                formatter: function() {
+                    return '<b>' + this.x + '</b><br/>' +
+                        this.series.name + ': ' + this.y + '<br/>' +
+                        '<?php echo $this->translate('Total'); ?>: ' + this.point.stackTotal;
+                }
+            },
+            plotOptions: {
+                column: {
+                    stacking: 'normal',
+                    pointPadding: 0.2,
+                    borderWidth: 0,
+                    cursor: 'pointer',
+                    point: {
+                        events: {
+                            click: function(e) {
+                                doSampleTestedBasedonBreastfeedingPatientRedirect(e.point.category);
+                            }
+                        }
+                    }
+                },
+                scatter: {
+                    stacking: 'normal',
+                    pointPadding: 0.2,
+                    borderWidth: 0,
+                    cursor: 'pointer',
+                    yAxis: 1,
+                    color: '#1B325F',
+                    marker: {
+                        symbol: 'diamond'
+                    },
+                    point: {
+                        events: {
+                            click: function(e) {
+                                doSampleTestedBasedonBreastfeedingPatientRedirect(e.point.category);
+                            }
+                        }
+                    }
+                }
+            },
+            series: [<?php
+                        if (isset($result['sampleName']) && !empty($result['sampleName'])) {
+                            foreach ($result['sampleName'] as $key => $condition) {
+                        ?> {
+                            name: '<?php echo $this->translate($key); ?>',
+                            <?php if (strpos($key, '>') !== false) { ?>
+                                color: '#ff1900',
+                            <?php } else if (strpos($key, '<') !== false) { ?>
+                                color: '#60d18f',
+                            <?php } ?>
+                            data: [<?php
+                                    foreach ($condition as $count) {
+                                        echo '{y:' . $count . '},';
+                                    }
+                                    ?>],
+                        },
+                    <?php
+                            }
+                        }
+                        if (count($supAvg) > 0) {
+                    ?> {
+                        name: '<?php echo $this->translate('Suppression %'); ?>',
+                        type: 'scatter',
+                        data: [<?php echo implode(",", $supAvg); ?>],
+                    }
+                <?php } ?>
+            ],
+            colors: ['#ff1900', '#60d18f']
+        });
+    });
 </script>

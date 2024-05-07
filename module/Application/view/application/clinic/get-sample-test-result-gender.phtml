@@ -1,12 +1,12 @@
 <?php
 $gender = array('M', 'F', 'Not Specified');
-$supAvg = array();
+$supAvg = [];
 $less1000 = array('M' => '#65c6c4', 'F' => '#ffcece', 'Not Specified' => '#60d18f');
 $more1000 = array('M' => '#039BE6', 'F' => '#f185b3', 'Not Specified' => '#ff1900');
 //$supColor = array('M'=>'#252424', 'F' => '#826c6c', 'Not Specified' => '#cd6969');
 //var_dump($result);die;
 
-$maleSuppressionSpline = $femaleSuppressionSpline = $unspecifedSuppressionSpline = array();
+$maleSuppressionSpline = $femaleSuppressionSpline = $unspecifedSuppressionSpline = [];
 
 if (isset($result) && !empty($result)) {
     foreach ($gender as $gen) {
@@ -22,8 +22,8 @@ if (isset($result) && !empty($result)) {
 
 
 
-    $genderResult = array();
-    $genderSupName = array();
+    $genderResult = [];
+    $genderSupName = [];
     // for($i=0;$i<=count($supAvg['M']);$i++){
     //     foreach($gender as $gen){
     //         if($supAvg[$gen][$i]!=NULL){

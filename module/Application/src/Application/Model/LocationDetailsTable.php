@@ -43,7 +43,7 @@ class LocationDetailsTable extends AbstractTableGateway
             $sQuery = $sQuery->where('f.facility_id IN ("' . implode('", "', array_values(array_filter($mappedFacilities))) . '")');
         }
         $sQueryStr = $sql->buildSqlString($sQuery);
-        error_log($sQueryStr);
+        //error_log($sQueryStr);
         return $dbAdapter->query($sQueryStr, Adapter::QUERY_MODE_EXECUTE)->toArray();
     }
 
@@ -84,6 +84,6 @@ class LocationDetailsTable extends AbstractTableGateway
     }
     public function insertOrUpdate($arrayData)
     {
-        return CommonService::insertOrUpdate($this->adapter, $this->table, $arrayData);
+        return CommonService::upsert($this->adapter, $this->table, $arrayData);
     }
 }

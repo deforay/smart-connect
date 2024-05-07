@@ -1,7 +1,7 @@
 <?php
 $lt1000 = array($params['age']['ageName'] => '#60d18f');
 $gt1000 = array($params['age']['ageName'] => '#ff1900');
-$supAvg = array();
+$supAvg = [];
 if (isset($result[$params['age']['ageName']]) && !empty($result[$params['age']['ageName']])) {
     $arrayKey = array_keys($result[$params['age']['ageName']]);
     $sumArray = array_map(function () {

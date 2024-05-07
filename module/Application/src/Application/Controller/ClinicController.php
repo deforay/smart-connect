@@ -158,7 +158,7 @@ class ClinicController extends AbstractActionController
     public function testResultViewAction()
     {
         $this->layout()->setVariable('activeTab', 'clinics-dashboard');
-        $params = array();
+        $params = [];
         $params['id'] = base64_decode($this->params()->fromRoute('id'));
 
         $sampleResult = $this->sampleService->getSampleInfo($params);
@@ -170,7 +170,7 @@ class ClinicController extends AbstractActionController
     public function samplesTestReasonAction()
     {
         $this->layout()->setVariable('activeTab', 'clinics-dashboard');
-        $params = array();
+        $params = [];
         $params['clinic'] = $this->params()->fromQuery('clinic');
         $params['testReasonCode'] = $this->params()->fromQuery('r');
         $params['dateRange'] = $this->params()->fromQuery('dRange');

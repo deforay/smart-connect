@@ -1,5 +1,5 @@
 <?php
-$positivityAvg = array();
+$positivityAvg = [];
 
 if (isset($result['covid19Result']) && !empty($result['covid19Result'])) {
     $arrayKey = array_keys($result['covid19Result']);
@@ -113,20 +113,20 @@ if (isset($result['covid19Result']) && !empty($result['covid19Result'])) {
                                 } else {
                                     $range = 'nd';
                                 }
-                                ?> {
-                                    name: '<?php echo $this->translate($key); ?>',
-                                    <?php if ($key == 'Positive') { ?>
-                                        color: '#ff1900',
-                                    <?php } else if ($key == 'Negative') { ?>
-                                        color: '#60d18f',
-                                    <?php } ?>
-                                    data: [
-                                        <?php foreach ($condition as $count) {
-                                            echo '{y:' . $count . '},';
-                                        } ?>
-                                    ],
-                                },
-                                <?php
+                        ?> {
+                            name: '<?php echo $this->translate($key); ?>',
+                            <?php if ($key == 'Positive') { ?>
+                                color: '#ff1900',
+                            <?php } else if ($key == 'Negative') { ?>
+                                color: '#60d18f',
+                            <?php } ?>
+                            data: [
+                                <?php foreach ($condition as $count) {
+                                    echo '{y:' . $count . '},';
+                                } ?>
+                            ],
+                        },
+                    <?php
                             }
                         }
                         if (count($positivityAvg) > 0) {

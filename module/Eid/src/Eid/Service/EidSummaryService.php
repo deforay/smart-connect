@@ -145,8 +145,8 @@ class EidSummaryService
 
 
                     $sheet = $excel->getActiveSheet();
-                    $output = array();
-                    $keySummaryIndicators = array();
+                    $output = [];
+                    $keySummaryIndicators = [];
                     $j = 1;
 
                     foreach ($sResult as $row) {
@@ -169,7 +169,7 @@ class EidSummaryService
 
 
                     foreach ($keySummaryIndicators['sample'] as $key => $indicators) {
-                        $row = array();
+                        $row = [];
                         $row[] = $key;
                         foreach ($indicators['month'] as $months) {
                             $row[] = $months;
@@ -253,10 +253,10 @@ class EidSummaryService
                 $excel = new Spreadsheet();
 
                 $sheet = $excel->getActiveSheet();
-                $output = array();
+                $output = [];
                 foreach ($sResult as $aRow) {
 
-                    $row = array();
+                    $row = [];
                     $row[] = ucwords($aRow['facility_name']);
                     $row[] = ucwords($aRow['province']);
                     $row[] = ucwords($aRow['district']);

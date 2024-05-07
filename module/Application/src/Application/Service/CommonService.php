@@ -2,11 +2,14 @@
 
 namespace Application\Service;
 
+use stdClass;
 use Exception;
+use Generator;
+use Throwable;
 use ZipArchive;
+use Traversable;
 use DateTimeZone;
 use Laminas\Mail;
-use JsonException;
 use Ramsey\Uuid\Uuid;
 use DateTimeImmutable;
 use JsonMachine\Items;
@@ -15,17 +18,12 @@ use Laminas\Db\Sql\Insert;
 use Laminas\Session\Container;
 use Laminas\Db\Adapter\Adapter;
 use Laminas\Mime\Part as MimePart;
-
 use Laminas\Mail\Transport\SmtpOptions;
 use Laminas\Mime\Message as MimeMessage;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
-
 use JsonMachine\JsonDecoder\ExtJsonDecoder;
-use JsonMachine\Exception\JsonMachineException;
 use Application\Model\DashApiReceiverStatsTable;
-use JsonMachine\Exception\PathNotFoundException;
 use Laminas\Mail\Transport\Smtp as SmtpTransport;
-use stdClass;
 
 class CommonService
 {
@@ -296,7 +294,7 @@ class CommonService
      public function removeDirectory($dirname)
      {
           // Sanity check
-          if (!file_exists($dirname)) {
+          if (!is_readable($dirname)) {
                return false;
           }
 
@@ -596,503 +594,505 @@ class CommonService
                mkdir(APPLICATION_PATH . DIRECTORY_SEPARATOR . "temporary", 0777);
           }
           if (!file_exists(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-reference") && !is_dir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-reference")) {
-               mkdir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-reference", 0777);
+               mkdir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-reference", 0777, true);
           }
 
-          $pathname = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-reference" . DIRECTORY_SEPARATOR . $fileName;
-          if (!file_exists($pathname) && move_uploaded_file($_FILES['referenceFile']['tmp_name'], $pathname)) {
-               $apiData = Self::processJsonFile($pathname);
-               $apiData = Self::arrayToObject($apiData);
+          $fileName = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-reference" . DIRECTORY_SEPARATOR . $fileName;
+          if (is_readable($fileName) && move_uploaded_file($_FILES['referenceFile']['tmp_name'], $fileName)) {
+               $apiData = self::processJsonFile($fileName);
+               if ($apiData !== null && self::isTraversable($apiData)) {
+                    $apiData = is_array($apiData) ? $apiData : iterator_to_array($apiData);
+                    $apiData = self::arrayToObject($apiData);
+               } else {
+                    $apiData = [];
+               }
           }
 
-          if ($apiData !== FALSE) {
-               /* For update the location details */
-               if (isset($apiData->geographical_divisions) && !empty($apiData->geographical_divisions)) {
-                    /* if($apiData->forceSync){
+
+          /* For update the location details */
+          if (isset($apiData->geographical_divisions) && !empty($apiData->geographical_divisions)) {
+               /* if($apiData->forceSync){
                          $rQueryStr = $apiData->geographical_divisions->tableStructure;
                          $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
                     } */
-                    $condition = "";
-                    if (isset($apiData->geographical_divisions->lastModifiedTime) && !empty($apiData->geographical_divisions->lastModifiedTime)) {
-                         $condition = "updated_datetime > '" . $apiData->geographical_divisions->lastModifiedTime . "'";
-                    }
-                    $notUpdated = $this->getLastModifiedDateTime('geographical_divisions', 'updated_datetime', $condition);
-                    if (empty($notUpdated) || !isset($notUpdated)) {
-                         $rQueryStr = 'SET FOREIGN_KEY_CHECKS=0; ALTER TABLE `geographical_divisions` DISABLE KEYS';
-                         $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
-                         $dbAdapter->query('TRUNCATE TABLE `geographical_divisions`', $dbAdapter::QUERY_MODE_EXECUTE);
+               $condition = "";
+               if (isset($apiData->geographical_divisions->lastModifiedTime) && !empty($apiData->geographical_divisions->lastModifiedTime)) {
+                    $condition = "updated_datetime > '" . $apiData->geographical_divisions->lastModifiedTime . "'";
+               }
+               $notUpdated = $this->getLastModifiedDateTime('geographical_divisions', 'updated_datetime', $condition);
+               if (empty($notUpdated) || !isset($notUpdated)) {
+                    $rQueryStr = 'SET FOREIGN_KEY_CHECKS=0; ALTER TABLE `geographical_divisions` DISABLE KEYS';
+                    $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
+                    $dbAdapter->query('TRUNCATE TABLE `geographical_divisions`', $dbAdapter::QUERY_MODE_EXECUTE);
 
-                         foreach ((array)$apiData->geographical_divisions->tableData as $row) {
-                              $lData = (array)$row;
-                              $locationData = array(
-                                   'geo_id'       => $lData['geo_id'],
-                                   'geo_parent'   => $lData['geo_parent'],
-                                   'geo_name'     => $lData['geo_name'],
-                                   'geo_code'     => $lData['geo_code'],
-                                   'geo_status'     => $lData['geo_status'],
-                                   'updated_datetime'  => $lData['updated_datetime']
-                              );
-                              $locationDb->insert($locationData);
-                         }
+                    foreach ((array)$apiData->geographical_divisions->tableData as $row) {
+                         $lData = (array)$row;
+                         $locationData = array(
+                              'geo_id'       => $lData['geo_id'],
+                              'geo_parent'   => $lData['geo_parent'],
+                              'geo_name'     => $lData['geo_name'],
+                              'geo_code'     => $lData['geo_code'],
+                              'geo_status'     => $lData['geo_status'],
+                              'updated_datetime'  => $lData['updated_datetime']
+                         );
+                         $locationDb->insert($locationData);
                     }
                }
+          }
 
-               /* For update the Facility Details */
-               if (isset($apiData->facility_details) && !empty($apiData->facility_details)) {
-                    /* if($apiData->forceSync){
+          /* For update the Facility Details */
+          if (isset($apiData->facility_details) && !empty($apiData->facility_details)) {
+               /* if($apiData->forceSync){
                          $rQueryStr = $apiData->facility_details->tableStructure;
                          $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
                     } */
-                    $condition = "";
-                    if (isset($apiData->facility_details->lastModifiedTime) && !empty($apiData->facility_details->lastModifiedTime)) {
-                         $condition = "updated_datetime > '" . $apiData->facility_details->lastModifiedTime . "'";
-                    }
-                    $notUpdated = $this->getLastModifiedDateTime('facility_details', 'updated_datetime', $condition);
-                    if (empty($notUpdated) || !isset($notUpdated)) {
-                         foreach ((array)$apiData->facility_details->tableData as $row) {
-                              $facilityData = (array)$row;
-                              unset($facilityData['data_sync']);
-                              unset($facilityData['facility_state_id']);
-                              unset($facilityData['facility_district_id']);
-                              if (trim($facilityData['facility_state']) != '' || $facilityData['facility_state_id'] != '') {
-                                   if ($facilityData['facility_state_id'] != "") {
-                                        $facilityData['facility_state'] = $facilityData['facility_state_id'];
-                                   }
-                                   $sQueryResult = $this->checkFacilityStateDistrictDetails(trim($facilityData['facility_state']), 0);
-                                   if ($sQueryResult) {
-                                        $facilityData['facility_state'] = $sQueryResult['geo_id'];
-                                   } else {
-                                        $locationDb->insert(array('geo_parent' => 0, 'geo_name' => trim($facilityData['facility_state'])));
-                                        $facilityData['facility_state'] = $locationDb->lastInsertValue;
-                                   }
+               $condition = "";
+               if (isset($apiData->facility_details->lastModifiedTime) && !empty($apiData->facility_details->lastModifiedTime)) {
+                    $condition = "updated_datetime > '" . $apiData->facility_details->lastModifiedTime . "'";
+               }
+               $notUpdated = $this->getLastModifiedDateTime('facility_details', 'updated_datetime', $condition);
+               if (empty($notUpdated) || !isset($notUpdated)) {
+                    foreach ((array)$apiData->facility_details->tableData as $row) {
+                         $facilityData = (array)$row;
+                         unset($facilityData['data_sync']);
+                         unset($facilityData['facility_state_id']);
+                         unset($facilityData['facility_district_id']);
+                         if (trim($facilityData['facility_state']) != '' || $facilityData['facility_state_id'] != '') {
+                              if ($facilityData['facility_state_id'] != "") {
+                                   $facilityData['facility_state'] = $facilityData['facility_state_id'];
                               }
-                              if (trim($facilityData['facility_district']) != '' || $facilityData['facility_district_id'] != '') {
-                                   if ($facilityData['facility_district_id'] != "") {
-                                        $facilityData['facility_district'] = $facilityData['facility_district_id'];
-                                   }
-                                   $sQueryResult = $this->checkFacilityStateDistrictDetails(trim($facilityData['facility_district']), $facilityData['facility_state']);
-                                   if ($sQueryResult) {
-                                        $facilityData['facility_district'] = $sQueryResult['geo_id'];
-                                   } else {
-                                        $locationDb->insert(array('geo_parent' => $facilityData['facility_state'], 'geo_name' => trim($facilityData['facility_district'])));
-                                        $facilityData['facility_district'] = $locationDb->lastInsertValue;
-                                   }
+                              $sQueryResult = $this->checkFacilityStateDistrictDetails(trim($facilityData['facility_state']), 0);
+                              if ($sQueryResult) {
+                                   $facilityData['facility_state'] = $sQueryResult['geo_id'];
+                              } else {
+                                   $locationDb->insert(array('geo_parent' => 0, 'geo_name' => trim($facilityData['facility_state'])));
+                                   $facilityData['facility_state'] = $locationDb->lastInsertValue;
                               }
-
-                              $facilityDb->insertOrUpdate($facilityData);
                          }
+                         if (trim($facilityData['facility_district']) != '' || $facilityData['facility_district_id'] != '') {
+                              if ($facilityData['facility_district_id'] != "") {
+                                   $facilityData['facility_district'] = $facilityData['facility_district_id'];
+                              }
+                              $sQueryResult = $this->checkFacilityStateDistrictDetails(trim($facilityData['facility_district']), $facilityData['facility_state']);
+                              if ($sQueryResult) {
+                                   $facilityData['facility_district'] = $sQueryResult['geo_id'];
+                              } else {
+                                   $locationDb->insert(array('geo_parent' => $facilityData['facility_state'], 'geo_name' => trim($facilityData['facility_district'])));
+                                   $facilityData['facility_district'] = $locationDb->lastInsertValue;
+                              }
+                         }
+
+                         $facilityDb->insertOrUpdate($facilityData);
                     }
                }
+          }
 
-               /* For update the Test Reasons */
-               if (isset($apiData->r_vl_test_reasons) && !empty($apiData->r_vl_test_reasons)) {
-                    /* if($apiData->forceSync){
+          /* For update the Test Reasons */
+          if (isset($apiData->r_vl_test_reasons) && !empty($apiData->r_vl_test_reasons)) {
+               /* if($apiData->forceSync){
                          $rQueryStr = $apiData->r_vl_test_reasons->tableStructure;
                          $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
                     } */
-                    $condition = "";
-                    if (isset($apiData->r_vl_test_reasons->lastModifiedTime) && !empty($apiData->r_vl_test_reasons->lastModifiedTime)) {
-                         $condition = "updated_datetime > '" . $apiData->r_vl_test_reasons->lastModifiedTime . "'";
-                    }
-                    $notUpdated = $this->getLastModifiedDateTime('r_vl_test_reasons', 'updated_datetime', $condition);
-                    if (empty($notUpdated) || !isset($notUpdated)) {
-                         foreach ((array)$apiData->r_vl_test_reasons->tableData as $row) {
-                              $testReasonData = (array)$row;
-                              $testReasonDb->insertOrUpdate($testReasonData);
-                         }
+               $condition = "";
+               if (isset($apiData->r_vl_test_reasons->lastModifiedTime) && !empty($apiData->r_vl_test_reasons->lastModifiedTime)) {
+                    $condition = "updated_datetime > '" . $apiData->r_vl_test_reasons->lastModifiedTime . "'";
+               }
+               $notUpdated = $this->getLastModifiedDateTime('r_vl_test_reasons', 'updated_datetime', $condition);
+               if (empty($notUpdated) || !isset($notUpdated)) {
+                    foreach ((array)$apiData->r_vl_test_reasons->tableData as $row) {
+                         $testReasonData = (array)$row;
+                         $testReasonDb->insertOrUpdate($testReasonData);
                     }
                }
+          }
 
-               /* For update the Covid19 Test Reasons */
-               if (isset($apiData->r_covid19_test_reasons) && !empty($apiData->r_covid19_test_reasons)) {
-                    /* if($apiData->forceSync){
+          /* For update the Covid19 Test Reasons */
+          if (isset($apiData->r_covid19_test_reasons) && !empty($apiData->r_covid19_test_reasons)) {
+               /* if($apiData->forceSync){
                          $rQueryStr = $apiData->r_covid19_test_reasons->tableStructure;
                          $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
                     } */
-                    $condition = "";
-                    if (isset($apiData->r_covid19_test_reasons->lastModifiedTime) && !empty($apiData->r_covid19_test_reasons->lastModifiedTime)) {
-                         $condition = "updated_datetime > '" . $apiData->r_covid19_test_reasons->lastModifiedTime . "'";
-                    }
-                    $notUpdated = $this->getLastModifiedDateTime('r_covid19_test_reasons', 'updated_datetime', $condition);
-                    if (empty($notUpdated) || !isset($notUpdated)) {
-                         foreach ((array)$apiData->r_covid19_test_reasons->tableData as $row) {
-                              $covid19TestReasonData = (array)$row;
-                              $rQuery = $sql->select()->from('r_covid19_test_reasons')->where(array('test_reason_name LIKE "%' . $covid19TestReasonData['test_reason_name'] . '%" OR test_reason_id = ' . $covid19TestReasonData['test_reason_id']));
-                              $rQueryStr = $sql->buildSqlString($rQuery);
-                              $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-                              if ($rowData) {
-                                   $covid19TestReasonDb->update($covid19TestReasonData, array('test_reason_id' => $covid19TestReasonData['test_reason_id']));
-                              } else {
-                                   $covid19TestReasonDb->insert($covid19TestReasonData);
-                              }
+               $condition = "";
+               if (isset($apiData->r_covid19_test_reasons->lastModifiedTime) && !empty($apiData->r_covid19_test_reasons->lastModifiedTime)) {
+                    $condition = "updated_datetime > '" . $apiData->r_covid19_test_reasons->lastModifiedTime . "'";
+               }
+               $notUpdated = $this->getLastModifiedDateTime('r_covid19_test_reasons', 'updated_datetime', $condition);
+               if (empty($notUpdated) || !isset($notUpdated)) {
+                    foreach ((array)$apiData->r_covid19_test_reasons->tableData as $row) {
+                         $covid19TestReasonData = (array)$row;
+                         $rQuery = $sql->select()->from('r_covid19_test_reasons')->where(array('test_reason_name LIKE "%' . $covid19TestReasonData['test_reason_name'] . '%" OR test_reason_id = ' . $covid19TestReasonData['test_reason_id']));
+                         $rQueryStr = $sql->buildSqlString($rQuery);
+                         $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
+                         if ($rowData) {
+                              $covid19TestReasonDb->update($covid19TestReasonData, array('test_reason_id' => $covid19TestReasonData['test_reason_id']));
+                         } else {
+                              $covid19TestReasonDb->insert($covid19TestReasonData);
                          }
                     }
                }
+          }
 
-               /* For update the Art Code Details */
-               if (isset($apiData->r_vl_art_regimen) && !empty($apiData->r_vl_art_regimen)) {
-                    /* if($apiData->forceSync){
+          /* For update the Art Code Details */
+          if (isset($apiData->r_vl_art_regimen) && !empty($apiData->r_vl_art_regimen)) {
+               /* if($apiData->forceSync){
                          $rQueryStr = $apiData->r_vl_art_regimen->tableStructure;
                          $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
                     } */
-                    $condition = "";
-                    if (isset($apiData->r_vl_art_regimen->lastModifiedTime) && !empty($apiData->r_vl_art_regimen->lastModifiedTime)) {
-                         $condition = "updated_datetime > '" . $apiData->r_vl_art_regimen->lastModifiedTime . "'";
-                    }
-                    $notUpdated = $this->getLastModifiedDateTime('r_vl_art_regimen', 'updated_datetime', $condition);
-                    if (empty($notUpdated) || !isset($notUpdated)) {
-                         foreach ((array)$apiData->r_vl_art_regimen->tableData as $row) {
-                              $artCodeData = (array)$row;
-                              unset($artCodeData['data_sync']);
-                              $artCodeDb->insertOrUpdate($artCodeData);
-                         }
+               $condition = "";
+               if (isset($apiData->r_vl_art_regimen->lastModifiedTime) && !empty($apiData->r_vl_art_regimen->lastModifiedTime)) {
+                    $condition = "updated_datetime > '" . $apiData->r_vl_art_regimen->lastModifiedTime . "'";
+               }
+               $notUpdated = $this->getLastModifiedDateTime('r_vl_art_regimen', 'updated_datetime', $condition);
+               if (empty($notUpdated) || !isset($notUpdated)) {
+                    foreach ((array)$apiData->r_vl_art_regimen->tableData as $row) {
+                         $artCodeData = (array)$row;
+                         unset($artCodeData['data_sync']);
+                         $artCodeDb->insertOrUpdate($artCodeData);
                     }
                }
+          }
 
-               /* For update the Sample Rejection Reason Details */
-               if (isset($apiData->r_vl_sample_rejection_reasons) && !empty($apiData->r_vl_sample_rejection_reasons)) {
-                    /* if($apiData->forceSync){
+          /* For update the Sample Rejection Reason Details */
+          if (isset($apiData->r_vl_sample_rejection_reasons) && !empty($apiData->r_vl_sample_rejection_reasons)) {
+               /* if($apiData->forceSync){
                          $rQueryStr = $apiData->r_vl_sample_rejection_reasons->tableStructure;
                          $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
                     } */
-                    $condition = "";
-                    if (isset($apiData->r_vl_sample_rejection_reasons->lastModifiedTime) && !empty($apiData->r_vl_sample_rejection_reasons->lastModifiedTime)) {
-                         $condition = "updated_datetime > '" . $apiData->r_vl_sample_rejection_reasons->lastModifiedTime . "'";
-                    }
-                    $notUpdated = $this->getLastModifiedDateTime('r_vl_sample_rejection_reasons', 'updated_datetime', $condition);
-                    if (empty($notUpdated) || !isset($notUpdated)) {
-                         foreach ((array)$apiData->r_vl_sample_rejection_reasons->tableData as $row) {
-                              $sampleRejectionReasonData = (array)$row;
-                              unset($sampleRejectionReasonData['data_sync']);
-                              $sampleRejectionReasonDb->insertOrUpdate($sampleRejectionReasonData);
-                         }
+               $condition = "";
+               if (isset($apiData->r_vl_sample_rejection_reasons->lastModifiedTime) && !empty($apiData->r_vl_sample_rejection_reasons->lastModifiedTime)) {
+                    $condition = "updated_datetime > '" . $apiData->r_vl_sample_rejection_reasons->lastModifiedTime . "'";
+               }
+               $notUpdated = $this->getLastModifiedDateTime('r_vl_sample_rejection_reasons', 'updated_datetime', $condition);
+               if (empty($notUpdated) || !isset($notUpdated)) {
+                    foreach ((array)$apiData->r_vl_sample_rejection_reasons->tableData as $row) {
+                         $sampleRejectionReasonData = (array)$row;
+                         unset($sampleRejectionReasonData['data_sync']);
+                         $sampleRejectionReasonDb->insertOrUpdate($sampleRejectionReasonData);
                     }
                }
+          }
 
-               /* For update the EID Sample Rejection Reason Details */
-               if (isset($apiData->r_eid_sample_rejection_reasons) && !empty($apiData->r_eid_sample_rejection_reasons)) {
-                    /* if($apiData->forceSync){
+          /* For update the EID Sample Rejection Reason Details */
+          if (isset($apiData->r_eid_sample_rejection_reasons) && !empty($apiData->r_eid_sample_rejection_reasons)) {
+               /* if($apiData->forceSync){
                          $rQueryStr = $apiData->r_eid_sample_rejection_reasons->tableStructure;
                          $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
                     } */
-                    $condition = "";
-                    if (isset($apiData->r_eid_sample_rejection_reasons->lastModifiedTime) && !empty($apiData->r_eid_sample_rejection_reasons->lastModifiedTime)) {
-                         $condition = "updated_datetime > '" . $apiData->r_eid_sample_rejection_reasons->lastModifiedTime . "'";
-                    }
-                    $notUpdated = $this->getLastModifiedDateTime('r_eid_sample_rejection_reasons', 'updated_datetime', $condition);
-                    if (empty($notUpdated) || !isset($notUpdated)) {
-                         foreach ((array)$apiData->r_eid_sample_rejection_reasons->tableData as $row) {
-                              $eidSampleRejectionReasonData = (array)$row;
-                              $rQuery = $sql->select()->from('r_eid_sample_rejection_reasons')->where(array('rejection_reason_name LIKE "%' . $eidSampleRejectionReasonData['rejection_reason_name'] . '%" OR rejection_reason_id = ' . $eidSampleRejectionReasonData['rejection_reason_id']));
-                              $rQueryStr = $sql->buildSqlString($rQuery);
-                              $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-                              if ($rowData) {
-                                   $eidSampleRejectionReasonDb->update($eidSampleRejectionReasonData, array('rejection_reason_id' => $eidSampleRejectionReasonData['rejection_reason_id']));
-                              } else {
-                                   $eidSampleRejectionReasonDb->insert($eidSampleRejectionReasonData);
-                              }
+               $condition = "";
+               if (isset($apiData->r_eid_sample_rejection_reasons->lastModifiedTime) && !empty($apiData->r_eid_sample_rejection_reasons->lastModifiedTime)) {
+                    $condition = "updated_datetime > '" . $apiData->r_eid_sample_rejection_reasons->lastModifiedTime . "'";
+               }
+               $notUpdated = $this->getLastModifiedDateTime('r_eid_sample_rejection_reasons', 'updated_datetime', $condition);
+               if (empty($notUpdated) || !isset($notUpdated)) {
+                    foreach ((array)$apiData->r_eid_sample_rejection_reasons->tableData as $row) {
+                         $eidSampleRejectionReasonData = (array)$row;
+                         $rQuery = $sql->select()->from('r_eid_sample_rejection_reasons')->where(array('rejection_reason_name LIKE "%' . $eidSampleRejectionReasonData['rejection_reason_name'] . '%" OR rejection_reason_id = ' . $eidSampleRejectionReasonData['rejection_reason_id']));
+                         $rQueryStr = $sql->buildSqlString($rQuery);
+                         $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
+                         if ($rowData) {
+                              $eidSampleRejectionReasonDb->update($eidSampleRejectionReasonData, array('rejection_reason_id' => $eidSampleRejectionReasonData['rejection_reason_id']));
+                         } else {
+                              $eidSampleRejectionReasonDb->insert($eidSampleRejectionReasonData);
                          }
                     }
                }
+          }
 
-               /* For update the Covid19 Sample Rejection Reason Details */
-               if (isset($apiData->r_covid19_sample_rejection_reasons) && !empty($apiData->r_covid19_sample_rejection_reasons)) {
-                    /* if($apiData->forceSync){
+          /* For update the Covid19 Sample Rejection Reason Details */
+          if (isset($apiData->r_covid19_sample_rejection_reasons) && !empty($apiData->r_covid19_sample_rejection_reasons)) {
+               /* if($apiData->forceSync){
                          $rQueryStr = $apiData->r_covid19_sample_rejection_reasons->tableStructure;
                          $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
                     } */
-                    $condition = "";
-                    if (isset($apiData->r_covid19_sample_rejection_reasons->lastModifiedTime) && !empty($apiData->r_covid19_sample_rejection_reasons->lastModifiedTime)) {
-                         $condition = "updated_datetime > '" . $apiData->r_covid19_sample_rejection_reasons->lastModifiedTime . "'";
-                    }
-                    $notUpdated = $this->getLastModifiedDateTime('r_covid19_sample_rejection_reasons', 'updated_datetime', $condition);
-                    if (empty($notUpdated) || !isset($notUpdated)) {
-                         foreach ((array)$apiData->r_covid19_sample_rejection_reasons->tableData as $row) {
-                              $covid19SampleRejectionData = (array)$row;
-                              $rQuery = $sql->select()->from('r_covid19_sample_rejection_reasons')->where(array('rejection_reason_name LIKE "%' . $covid19SampleRejectionData['rejection_reason_name'] . '%" OR rejection_reason_id = ' . $covid19SampleRejectionData['rejection_reason_id']));
-                              $rQueryStr = $sql->buildSqlString($rQuery);
-                              $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-                              if ($rowData) {
-                                   $covid19SampleRejectionDb->update($covid19SampleRejectionData, array('rejection_reason_id' => $covid19SampleRejectionData['rejection_reason_id']));
-                              } else {
-                                   $covid19SampleRejectionDb->insert($covid19SampleRejectionData);
-                              }
+               $condition = "";
+               if (isset($apiData->r_covid19_sample_rejection_reasons->lastModifiedTime) && !empty($apiData->r_covid19_sample_rejection_reasons->lastModifiedTime)) {
+                    $condition = "updated_datetime > '" . $apiData->r_covid19_sample_rejection_reasons->lastModifiedTime . "'";
+               }
+               $notUpdated = $this->getLastModifiedDateTime('r_covid19_sample_rejection_reasons', 'updated_datetime', $condition);
+               if (empty($notUpdated) || !isset($notUpdated)) {
+                    foreach ((array)$apiData->r_covid19_sample_rejection_reasons->tableData as $row) {
+                         $covid19SampleRejectionData = (array)$row;
+                         $rQuery = $sql->select()->from('r_covid19_sample_rejection_reasons')->where(array('rejection_reason_name LIKE "%' . $covid19SampleRejectionData['rejection_reason_name'] . '%" OR rejection_reason_id = ' . $covid19SampleRejectionData['rejection_reason_id']));
+                         $rQueryStr = $sql->buildSqlString($rQuery);
+                         $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
+                         if ($rowData) {
+                              $covid19SampleRejectionDb->update($covid19SampleRejectionData, array('rejection_reason_id' => $covid19SampleRejectionData['rejection_reason_id']));
+                         } else {
+                              $covid19SampleRejectionDb->insert($covid19SampleRejectionData);
                          }
                     }
                }
+          }
 
-               /* For update the  Import Config Machine */
-               if (isset($apiData->instrument_machines) && !empty($apiData->instrument_machines)) {
-                    /* if($apiData->forceSync){
+          /* For update the  Import Config Machine */
+          if (isset($apiData->instrument_machines) && !empty($apiData->instrument_machines)) {
+               /* if($apiData->forceSync){
                          $rQueryStr = $apiData->r_covid19_symptoms->tableStructure;
                          $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
                     } */
-                    $condition = "";
-                    if (isset($apiData->instrument_machines->lastModifiedTime) && !empty($apiData->instrument_machines->lastModifiedTime)) {
-                         $condition = "updated_datetime > '" . $apiData->instrument_machines->lastModifiedTime . "'";
-                    }
-                    $notUpdated = $this->getLastModifiedDateTime('instrument_machines', 'updated_datetime', $condition);
+               $condition = "";
+               if (isset($apiData->instrument_machines->lastModifiedTime) && !empty($apiData->instrument_machines->lastModifiedTime)) {
+                    $condition = "updated_datetime > '" . $apiData->instrument_machines->lastModifiedTime . "'";
+               }
+               $notUpdated = $this->getLastModifiedDateTime('instrument_machines', 'updated_datetime', $condition);
 
-                    // print_r($notUpdated);die;
-                    if (empty($notUpdated) || !isset($notUpdated)) {
-                         foreach ((array)$apiData->instrument_machines->tableData as $row) {
-                              $importConfigMachData = (array)$row;
-                              // print_r($importConfigMachData);die;
-                              $rQuery = $sql->select()->from('instrument_machines')->where(array('config_machine_name LIKE "%' . $importConfigMachData['config_machine_name'] . '%" OR config_machine_id = ' . $importConfigMachData['config_machine_id']));
-                              $rQueryStr = $sql->buildSqlString($rQuery);
-                              $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-                              if ($rowData) {
-                                   $importConfigDb->update($importConfigMachData, array('config_machine_id' => $importConfigMachData['config_machine_id']));
-                              } else {
-                                   $importConfigDb->insert($importConfigMachData);
-                              }
+               // print_r($notUpdated);die;
+               if (empty($notUpdated) || !isset($notUpdated)) {
+                    foreach ((array)$apiData->instrument_machines->tableData as $row) {
+                         $importConfigMachData = (array)$row;
+                         // print_r($importConfigMachData);die;
+                         $rQuery = $sql->select()->from('instrument_machines')->where(array('config_machine_name LIKE "%' . $importConfigMachData['config_machine_name'] . '%" OR config_machine_id = ' . $importConfigMachData['config_machine_id']));
+                         $rQueryStr = $sql->buildSqlString($rQuery);
+                         $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
+                         if ($rowData) {
+                              $importConfigDb->update($importConfigMachData, array('config_machine_id' => $importConfigMachData['config_machine_id']));
+                         } else {
+                              $importConfigDb->insert($importConfigMachData);
                          }
                     }
                }
+          }
 
-               /* For update the EID Sample Type Details */
-               if (isset($apiData->r_eid_sample_type) && !empty($apiData->r_eid_sample_type)) {
-                    /* if($apiData->forceSync){
+          /* For update the EID Sample Type Details */
+          if (isset($apiData->r_eid_sample_type) && !empty($apiData->r_eid_sample_type)) {
+               /* if($apiData->forceSync){
                          $rQueryStr = $apiData->r_eid_sample_type->tableStructure;
                          $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
                     } */
-                    $condition = "";
-                    if (isset($apiData->r_eid_sample_type->lastModifiedTime) && !empty($apiData->r_eid_sample_type->lastModifiedTime)) {
-                         $condition = "updated_datetime > '" . $apiData->r_eid_sample_type->lastModifiedTime . "'";
-                    }
-                    $notUpdated = $this->getLastModifiedDateTime('r_eid_sample_type', 'updated_datetime', $condition);
-                    if (empty($notUpdated) || !isset($notUpdated)) {
-                         foreach ((array)$apiData->r_eid_sample_type->tableData as $row) {
-                              $eidSampleTypeData = (array)$row;
-                              $rQuery = $sql->select()->from('r_eid_sample_type')->where(array('sample_name LIKE "%' . $eidSampleTypeData['sample_name'] . '%" OR sample_id = ' . $eidSampleTypeData['sample_id']));
-                              $rQueryStr = $sql->buildSqlString($rQuery);
-                              $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-                              if ($rowData) {
-                                   $eidSampleTypeDb->update($eidSampleTypeData, array('sample_id' => $eidSampleTypeData['sample_id']));
-                              } else {
-                                   $eidSampleTypeDb->insert($eidSampleTypeData);
-                              }
+               $condition = "";
+               if (isset($apiData->r_eid_sample_type->lastModifiedTime) && !empty($apiData->r_eid_sample_type->lastModifiedTime)) {
+                    $condition = "updated_datetime > '" . $apiData->r_eid_sample_type->lastModifiedTime . "'";
+               }
+               $notUpdated = $this->getLastModifiedDateTime('r_eid_sample_type', 'updated_datetime', $condition);
+               if (empty($notUpdated) || !isset($notUpdated)) {
+                    foreach ((array)$apiData->r_eid_sample_type->tableData as $row) {
+                         $eidSampleTypeData = (array)$row;
+                         $rQuery = $sql->select()->from('r_eid_sample_type')->where(array('sample_name LIKE "%' . $eidSampleTypeData['sample_name'] . '%" OR sample_id = ' . $eidSampleTypeData['sample_id']));
+                         $rQueryStr = $sql->buildSqlString($rQuery);
+                         $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
+                         if ($rowData) {
+                              $eidSampleTypeDb->update($eidSampleTypeData, array('sample_id' => $eidSampleTypeData['sample_id']));
+                         } else {
+                              $eidSampleTypeDb->insert($eidSampleTypeData);
                          }
                     }
                }
+          }
 
-               /* For update the Covid19 Sample Type Details */
-               if (isset($apiData->r_covid19_sample_type) && !empty($apiData->r_covid19_sample_type)) {
-                    /* if($apiData->forceSync){
+          /* For update the Covid19 Sample Type Details */
+          if (isset($apiData->r_covid19_sample_type) && !empty($apiData->r_covid19_sample_type)) {
+               /* if($apiData->forceSync){
                          $rQueryStr = $apiData->r_covid19_sample_type->tableStructure;
                          $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
                     } */
-                    $condition = "";
-                    if (isset($apiData->r_covid19_sample_type->lastModifiedTime) && !empty($apiData->r_covid19_sample_type->lastModifiedTime)) {
-                         $condition = "updated_datetime > '" . $apiData->r_covid19_sample_type->lastModifiedTime . "'";
-                    }
-                    $notUpdated = $this->getLastModifiedDateTime('r_covid19_sample_type', 'updated_datetime', $condition);
-                    if (empty($notUpdated) || !isset($notUpdated)) {
-                         foreach ((array)$apiData->r_covid19_sample_type->tableData as $row) {
-                              $covid19SampleTypeData = (array)$row;
-                              $rQuery = $sql->select()->from('r_covid19_sample_type')->where(array('sample_name LIKE "%' . $covid19SampleTypeData['sample_name'] . '%" OR sample_id = ' . $covid19SampleTypeData['sample_id']));
-                              $rQueryStr = $sql->buildSqlString($rQuery);
-                              $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-                              if ($rowData) {
-                                   $covid19SampleTypeDb->update($covid19SampleTypeData, array('sample_id' => $covid19SampleTypeData['sample_id']));
-                              } else {
-                                   $covid19SampleTypeDb->insert($covid19SampleTypeData);
-                              }
+               $condition = "";
+               if (isset($apiData->r_covid19_sample_type->lastModifiedTime) && !empty($apiData->r_covid19_sample_type->lastModifiedTime)) {
+                    $condition = "updated_datetime > '" . $apiData->r_covid19_sample_type->lastModifiedTime . "'";
+               }
+               $notUpdated = $this->getLastModifiedDateTime('r_covid19_sample_type', 'updated_datetime', $condition);
+               if (empty($notUpdated) || !isset($notUpdated)) {
+                    foreach ((array)$apiData->r_covid19_sample_type->tableData as $row) {
+                         $covid19SampleTypeData = (array)$row;
+                         $rQuery = $sql->select()->from('r_covid19_sample_type')->where(array('sample_name LIKE "%' . $covid19SampleTypeData['sample_name'] . '%" OR sample_id = ' . $covid19SampleTypeData['sample_id']));
+                         $rQueryStr = $sql->buildSqlString($rQuery);
+                         $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
+                         if ($rowData) {
+                              $covid19SampleTypeDb->update($covid19SampleTypeData, array('sample_id' => $covid19SampleTypeData['sample_id']));
+                         } else {
+                              $covid19SampleTypeDb->insert($covid19SampleTypeData);
                          }
                     }
                }
+          }
 
-               /* For update the  Covid19 Comorbidities */
-               if (isset($apiData->r_covid19_comorbidities) && !empty($apiData->r_covid19_comorbidities)) {
-                    /* if($apiData->forceSync){
+          /* For update the  Covid19 Comorbidities */
+          if (isset($apiData->r_covid19_comorbidities) && !empty($apiData->r_covid19_comorbidities)) {
+               /* if($apiData->forceSync){
                          $rQueryStr = $apiData->r_covid19_comorbidities->tableStructure;
                          $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
                     } */
-                    $condition = "";
-                    if (isset($apiData->r_covid19_comorbidities->lastModifiedTime) && !empty($apiData->r_covid19_comorbidities->lastModifiedTime)) {
-                         $condition = "updated_datetime > '" . $apiData->r_covid19_comorbidities->lastModifiedTime . "'";
-                    }
-                    $notUpdated = $this->getLastModifiedDateTime('r_covid19_comorbidities', 'updated_datetime', $condition);
-                    if (empty($notUpdated) || !isset($notUpdated)) {
-                         foreach ((array)$apiData->r_covid19_comorbidities->tableData as $row) {
-                              $covid19ComorbiditiesData = (array)$row;
-                              $rQuery = $sql->select()->from('r_covid19_comorbidities')->where(array('comorbidity_name LIKE "%' . $covid19ComorbiditiesData['comorbidity_name'] . '%" OR comorbidity_id = ' . $covid19ComorbiditiesData['comorbidity_id']));
-                              $rQueryStr = $sql->buildSqlString($rQuery);
-                              $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-                              if ($rowData) {
-                                   $covid19ComorbiditiesDb->update($covid19ComorbiditiesData, array('comorbidity_id' => $covid19ComorbiditiesData['comorbidity_id']));
-                              } else {
-                                   $covid19ComorbiditiesDb->insert($covid19ComorbiditiesData);
-                              }
+               $condition = "";
+               if (isset($apiData->r_covid19_comorbidities->lastModifiedTime) && !empty($apiData->r_covid19_comorbidities->lastModifiedTime)) {
+                    $condition = "updated_datetime > '" . $apiData->r_covid19_comorbidities->lastModifiedTime . "'";
+               }
+               $notUpdated = $this->getLastModifiedDateTime('r_covid19_comorbidities', 'updated_datetime', $condition);
+               if (empty($notUpdated) || !isset($notUpdated)) {
+                    foreach ((array)$apiData->r_covid19_comorbidities->tableData as $row) {
+                         $covid19ComorbiditiesData = (array)$row;
+                         $rQuery = $sql->select()->from('r_covid19_comorbidities')->where(array('comorbidity_name LIKE "%' . $covid19ComorbiditiesData['comorbidity_name'] . '%" OR comorbidity_id = ' . $covid19ComorbiditiesData['comorbidity_id']));
+                         $rQueryStr = $sql->buildSqlString($rQuery);
+                         $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
+                         if ($rowData) {
+                              $covid19ComorbiditiesDb->update($covid19ComorbiditiesData, array('comorbidity_id' => $covid19ComorbiditiesData['comorbidity_id']));
+                         } else {
+                              $covid19ComorbiditiesDb->insert($covid19ComorbiditiesData);
                          }
                     }
                }
+          }
 
-               /* For update the  Covid19 Symptoms */
-               if (isset($apiData->r_covid19_symptoms) && !empty($apiData->r_covid19_symptoms)) {
-                    /* if($apiData->forceSync){
+          /* For update the  Covid19 Symptoms */
+          if (isset($apiData->r_covid19_symptoms) && !empty($apiData->r_covid19_symptoms)) {
+               /* if($apiData->forceSync){
                          $rQueryStr = $apiData->r_covid19_symptoms->tableStructure;
                          $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
                     } */
-                    $condition = "";
-                    if (isset($apiData->r_covid19_symptoms->lastModifiedTime) && !empty($apiData->r_covid19_symptoms->lastModifiedTime)) {
-                         $condition = "updated_datetime > '" . $apiData->r_covid19_symptoms->lastModifiedTime . "'";
-                    }
-                    $notUpdated = $this->getLastModifiedDateTime('r_covid19_symptoms', 'updated_datetime', $condition);
-                    if (empty($notUpdated) || !isset($notUpdated)) {
-                         foreach ((array)$apiData->r_covid19_symptoms->tableData as $row) {
-                              $covid19SymptomsData = (array)$row;
-                              $rQuery = $sql->select()->from('r_covid19_symptoms')->where(array('symptom_name LIKE "%' . $covid19SymptomsData['symptom_name'] . '%" OR symptom_id = ' . $covid19SymptomsData['symptom_id']));
-                              $rQueryStr = $sql->buildSqlString($rQuery);
-                              $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-                              if ($rowData) {
-                                   $covid19SymptomsDb->update($covid19SymptomsData, array('symptom_id' => $covid19SymptomsData['symptom_id']));
-                              } else {
-                                   $covid19SymptomsDb->insert($covid19SymptomsData);
-                              }
+               $condition = "";
+               if (isset($apiData->r_covid19_symptoms->lastModifiedTime) && !empty($apiData->r_covid19_symptoms->lastModifiedTime)) {
+                    $condition = "updated_datetime > '" . $apiData->r_covid19_symptoms->lastModifiedTime . "'";
+               }
+               $notUpdated = $this->getLastModifiedDateTime('r_covid19_symptoms', 'updated_datetime', $condition);
+               if (empty($notUpdated) || !isset($notUpdated)) {
+                    foreach ((array)$apiData->r_covid19_symptoms->tableData as $row) {
+                         $covid19SymptomsData = (array)$row;
+                         $rQuery = $sql->select()->from('r_covid19_symptoms')->where(array('symptom_name LIKE "%' . $covid19SymptomsData['symptom_name'] . '%" OR symptom_id = ' . $covid19SymptomsData['symptom_id']));
+                         $rQueryStr = $sql->buildSqlString($rQuery);
+                         $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
+                         if ($rowData) {
+                              $covid19SymptomsDb->update($covid19SymptomsData, array('symptom_id' => $covid19SymptomsData['symptom_id']));
+                         } else {
+                              $covid19SymptomsDb->insert($covid19SymptomsData);
                          }
                     }
                }
+          }
 
-               /* For update the Hepatitis Sample Rejection Reasons Details */
-               if (isset($apiData->r_hepatitis_sample_rejection_reasons) && !empty($apiData->r_hepatitis_sample_rejection_reasons)) {
-                    /* if($apiData->forceSync){
+          /* For update the Hepatitis Sample Rejection Reasons Details */
+          if (isset($apiData->r_hepatitis_sample_rejection_reasons) && !empty($apiData->r_hepatitis_sample_rejection_reasons)) {
+               /* if($apiData->forceSync){
                          $rQueryStr = $apiData->r_hepatitis_sample_rejection_reasons->tableStructure;
                          $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
                     } */
-                    $condition = "";
-                    if (isset($apiData->r_hepatitis_sample_rejection_reasons->lastModifiedTime) && !empty($apiData->r_hepatitis_sample_rejection_reasons->lastModifiedTime)) {
-                         $condition = "updated_datetime > '" . $apiData->r_hepatitis_sample_rejection_reasons->lastModifiedTime . "'";
-                    }
-                    $notUpdated = $this->getLastModifiedDateTime('r_hepatitis_sample_rejection_reasons', 'updated_datetime', $condition);
-                    if (empty($notUpdated) || !isset($notUpdated)) {
-                         foreach ((array)$apiData->r_hepatitis_sample_rejection_reasons->tableData as $row) {
-                              $hepatitisSampleRejectionData = (array)$row;
-                              $rQuery = $sql->select()->from('r_hepatitis_sample_rejection_reasons')->where(array('rejection_reason_name LIKE "%' . $hepatitisSampleRejectionData['rejection_reason_name'] . '%" OR rejection_reason_id = ' . $hepatitisSampleRejectionData['rejection_reason_id']));
-                              $rQueryStr = $sql->buildSqlString($rQuery);
-                              $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-                              if ($rowData) {
-                                   $hepatitisSampleRejectionDb->update($hepatitisSampleRejectionData, array('rejection_reason_id' => $hepatitisSampleRejectionData['rejection_reason_id']));
-                              } else {
-                                   $hepatitisSampleRejectionDb->insert($hepatitisSampleRejectionData);
-                              }
+               $condition = "";
+               if (isset($apiData->r_hepatitis_sample_rejection_reasons->lastModifiedTime) && !empty($apiData->r_hepatitis_sample_rejection_reasons->lastModifiedTime)) {
+                    $condition = "updated_datetime > '" . $apiData->r_hepatitis_sample_rejection_reasons->lastModifiedTime . "'";
+               }
+               $notUpdated = $this->getLastModifiedDateTime('r_hepatitis_sample_rejection_reasons', 'updated_datetime', $condition);
+               if (empty($notUpdated) || !isset($notUpdated)) {
+                    foreach ((array)$apiData->r_hepatitis_sample_rejection_reasons->tableData as $row) {
+                         $hepatitisSampleRejectionData = (array)$row;
+                         $rQuery = $sql->select()->from('r_hepatitis_sample_rejection_reasons')->where(array('rejection_reason_name LIKE "%' . $hepatitisSampleRejectionData['rejection_reason_name'] . '%" OR rejection_reason_id = ' . $hepatitisSampleRejectionData['rejection_reason_id']));
+                         $rQueryStr = $sql->buildSqlString($rQuery);
+                         $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
+                         if ($rowData) {
+                              $hepatitisSampleRejectionDb->update($hepatitisSampleRejectionData, array('rejection_reason_id' => $hepatitisSampleRejectionData['rejection_reason_id']));
+                         } else {
+                              $hepatitisSampleRejectionDb->insert($hepatitisSampleRejectionData);
                          }
                     }
                }
+          }
 
-               /* For update the Hepatitis Risk Factor Details */
-               if (isset($apiData->r_hepatitis_rick_factors) && !empty($apiData->r_hepatitis_rick_factors)) {
-                    /* if($apiData->forceSync){
+          /* For update the Hepatitis Risk Factor Details */
+          if (isset($apiData->r_hepatitis_rick_factors) && !empty($apiData->r_hepatitis_rick_factors)) {
+               /* if($apiData->forceSync){
                          $rQueryStr = $apiData->r_hepatitis_rick_factors->tableStructure;
                          $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
                     } */
-                    $condition = "";
-                    if (isset($apiData->r_hepatitis_rick_factors->lastModifiedTime) && !empty($apiData->r_hepatitis_rick_factors->lastModifiedTime)) {
-                         $condition = "updated_datetime > '" . $apiData->r_hepatitis_rick_factors->lastModifiedTime . "'";
-                    }
-                    $notUpdated = $this->getLastModifiedDateTime('r_hepatitis_rick_factors', 'updated_datetime', $condition);
-                    if (empty($notUpdated) || !isset($notUpdated)) {
-                         foreach ((array)$apiData->r_hepatitis_rick_factors->tableData as $row) {
-                              $hepatitisRiskData = (array)$row;
-                              $rQuery = $sql->select()->from('r_hepatitis_rick_factors')->where(array('riskfactor_name LIKE "%' . $hepatitisRiskData['riskfactor_name'] . '%" OR riskfactor_id = ' . $hepatitisRiskData['riskfactor_id']));
-                              $rQueryStr = $sql->buildSqlString($rQuery);
-                              $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-                              if ($rowData) {
-                                   $hepatitisRiskFactorDb->update($hepatitisRiskData, array('riskfactor_id' => $hepatitisRiskData['riskfactor_id']));
-                              } else {
-                                   $hepatitisRiskFactorDb->insert($hepatitisRiskData);
-                              }
+               $condition = "";
+               if (isset($apiData->r_hepatitis_rick_factors->lastModifiedTime) && !empty($apiData->r_hepatitis_rick_factors->lastModifiedTime)) {
+                    $condition = "updated_datetime > '" . $apiData->r_hepatitis_rick_factors->lastModifiedTime . "'";
+               }
+               $notUpdated = $this->getLastModifiedDateTime('r_hepatitis_rick_factors', 'updated_datetime', $condition);
+               if (empty($notUpdated) || !isset($notUpdated)) {
+                    foreach ((array)$apiData->r_hepatitis_rick_factors->tableData as $row) {
+                         $hepatitisRiskData = (array)$row;
+                         $rQuery = $sql->select()->from('r_hepatitis_rick_factors')->where(array('riskfactor_name LIKE "%' . $hepatitisRiskData['riskfactor_name'] . '%" OR riskfactor_id = ' . $hepatitisRiskData['riskfactor_id']));
+                         $rQueryStr = $sql->buildSqlString($rQuery);
+                         $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
+                         if ($rowData) {
+                              $hepatitisRiskFactorDb->update($hepatitisRiskData, array('riskfactor_id' => $hepatitisRiskData['riskfactor_id']));
+                         } else {
+                              $hepatitisRiskFactorDb->insert($hepatitisRiskData);
                          }
                     }
                }
+          }
 
-               /* For update the Hepatitis Results Details */
-               if (isset($apiData->r_hepatitis_test_reasons) && !empty($apiData->r_hepatitis_test_reasons)) {
-                    /* if($apiData->forceSync){
+          /* For update the Hepatitis Results Details */
+          if (isset($apiData->r_hepatitis_test_reasons) && !empty($apiData->r_hepatitis_test_reasons)) {
+               /* if($apiData->forceSync){
                          $rQueryStr = $apiData->r_hepatitis_test_reasons->tableStructure;
                          $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
                     } */
-                    $condition = "";
-                    if (isset($apiData->r_hepatitis_test_reasons->lastModifiedTime) && !empty($apiData->r_hepatitis_test_reasons->lastModifiedTime)) {
-                         $condition = "updated_datetime > '" . $apiData->r_hepatitis_test_reasons->lastModifiedTime . "'";
-                    }
-                    $notUpdated = $this->getLastModifiedDateTime('r_hepatitis_test_reasons', 'updated_datetime', $condition);
-                    if (empty($notUpdated) || !isset($notUpdated)) {
-                         foreach ((array)$apiData->r_hepatitis_test_reasons->tableData as $row) {
-                              $hepatitisTestReasonData = (array)$row;
-                              $rQuery = $sql->select()->from('r_hepatitis_test_reasons')->where(array('test_reason_name LIKE "%' . $hepatitisTestReasonData['test_reason_name'] . '%" OR test_reason_id = ' . $hepatitisTestReasonData['test_reason_id']));
-                              $rQueryStr = $sql->buildSqlString($rQuery);
-                              $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-                              if ($rowData) {
-                                   $hepatitisTestReasonsDb->update($hepatitisTestReasonData, array('test_reason_id' => $hepatitisTestReasonData['test_reason_id']));
-                              } else {
-                                   $hepatitisTestReasonsDb->insert($hepatitisTestReasonData);
-                              }
+               $condition = "";
+               if (isset($apiData->r_hepatitis_test_reasons->lastModifiedTime) && !empty($apiData->r_hepatitis_test_reasons->lastModifiedTime)) {
+                    $condition = "updated_datetime > '" . $apiData->r_hepatitis_test_reasons->lastModifiedTime . "'";
+               }
+               $notUpdated = $this->getLastModifiedDateTime('r_hepatitis_test_reasons', 'updated_datetime', $condition);
+               if (empty($notUpdated) || !isset($notUpdated)) {
+                    foreach ((array)$apiData->r_hepatitis_test_reasons->tableData as $row) {
+                         $hepatitisTestReasonData = (array)$row;
+                         $rQuery = $sql->select()->from('r_hepatitis_test_reasons')->where(array('test_reason_name LIKE "%' . $hepatitisTestReasonData['test_reason_name'] . '%" OR test_reason_id = ' . $hepatitisTestReasonData['test_reason_id']));
+                         $rQueryStr = $sql->buildSqlString($rQuery);
+                         $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
+                         if ($rowData) {
+                              $hepatitisTestReasonsDb->update($hepatitisTestReasonData, array('test_reason_id' => $hepatitisTestReasonData['test_reason_id']));
+                         } else {
+                              $hepatitisTestReasonsDb->insert($hepatitisTestReasonData);
                          }
                     }
                }
+          }
 
-               /* For update the Hepatitis Results Details */
-               if (isset($apiData->r_hepatitis_results) && !empty($apiData->r_hepatitis_results)) {
-                    /* if($apiData->forceSync){
+          /* For update the Hepatitis Results Details */
+          if (isset($apiData->r_hepatitis_results) && !empty($apiData->r_hepatitis_results)) {
+               /* if($apiData->forceSync){
                          $rQueryStr = $apiData->r_hepatitis_results->tableStructure;
                          $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
                     } */
-                    $condition = "";
-                    if (isset($apiData->r_hepatitis_results->lastModifiedTime) && !empty($apiData->r_hepatitis_results->lastModifiedTime)) {
-                         $condition = "updated_datetime > '" . $apiData->r_hepatitis_results->lastModifiedTime . "'";
-                    }
-                    $notUpdated = $this->getLastModifiedDateTime('r_hepatitis_results', 'updated_datetime', $condition);
-                    if (empty($notUpdated) || !isset($notUpdated)) {
-                         foreach ((array)$apiData->r_hepatitis_results->tableData as $row) {
-                              $hepatitisResultData = (array)$row;
-                              $rQuery = $sql->select()->from('r_hepatitis_results')->where(array('result LIKE "%' . $hepatitisResultData['result'] . '%" OR result_id = "' . $hepatitisResultData['result_id'] . '" '));
-                              $rQueryStr = $sql->buildSqlString($rQuery);
-                              $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-                              if ($rowData) {
-                                   $hepatitisResultsDb->update($hepatitisResultData, array('result_id' => $hepatitisResultData['result_id']));
-                              } else {
-                                   $hepatitisResultsDb->insert($hepatitisResultData);
-                              }
+               $condition = "";
+               if (isset($apiData->r_hepatitis_results->lastModifiedTime) && !empty($apiData->r_hepatitis_results->lastModifiedTime)) {
+                    $condition = "updated_datetime > '" . $apiData->r_hepatitis_results->lastModifiedTime . "'";
+               }
+               $notUpdated = $this->getLastModifiedDateTime('r_hepatitis_results', 'updated_datetime', $condition);
+               if (empty($notUpdated) || !isset($notUpdated)) {
+                    foreach ((array)$apiData->r_hepatitis_results->tableData as $row) {
+                         $hepatitisResultData = (array)$row;
+                         $rQuery = $sql->select()->from('r_hepatitis_results')->where(array('result LIKE "%' . $hepatitisResultData['result'] . '%" OR result_id = "' . $hepatitisResultData['result_id'] . '" '));
+                         $rQueryStr = $sql->buildSqlString($rQuery);
+                         $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
+                         if ($rowData) {
+                              $hepatitisResultsDb->update($hepatitisResultData, array('result_id' => $hepatitisResultData['result_id']));
+                         } else {
+                              $hepatitisResultsDb->insert($hepatitisResultData);
                          }
                     }
                }
+          }
 
-               /* For update the Hepatitis Sample Type Details */
-               if (isset($apiData->r_hepatitis_sample_type) && !empty($apiData->r_hepatitis_sample_type)) {
-                    /* if($apiData->forceSync){
+          /* For update the Hepatitis Sample Type Details */
+          if (isset($apiData->r_hepatitis_sample_type) && !empty($apiData->r_hepatitis_sample_type)) {
+               /* if($apiData->forceSync){
                          $rQueryStr = $apiData->r_hepatitis_sample_type->tableStructure;
                          $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
                     } */
-                    $condition = "";
-                    if (isset($apiData->r_hepatitis_sample_type->lastModifiedTime) && !empty($apiData->r_hepatitis_sample_type->lastModifiedTime)) {
-                         $condition = "updated_datetime > '" . $apiData->r_hepatitis_sample_type->lastModifiedTime . "'";
-                    }
-                    $notUpdated = $this->getLastModifiedDateTime('r_hepatitis_sample_type', 'updated_datetime', $condition);
-                    if (empty($notUpdated) || !isset($notUpdated)) {
-                         foreach ((array)$apiData->r_hepatitis_sample_type->tableData as $row) {
-                              $hepatitisSampleTypeData = (array)$row;
-                              $rQuery = $sql->select()->from('r_hepatitis_sample_type')->where(array('sample_name LIKE "%' . $hepatitisSampleTypeData['sample_name'] . '%" OR sample_id = "' . $hepatitisSampleTypeData['sample_id'] . '" '));
-                              $rQueryStr = $sql->buildSqlString($rQuery);
-                              $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
-                              if ($rowData) {
-                                   $hepatitisSampleTypeDb->update($hepatitisSampleTypeData, array('sample_id' => $hepatitisSampleTypeData['sample_id']));
-                              } else {
-                                   $hepatitisSampleTypeDb->insert($hepatitisSampleTypeData);
-                              }
+               $condition = "";
+               if (isset($apiData->r_hepatitis_sample_type->lastModifiedTime) && !empty($apiData->r_hepatitis_sample_type->lastModifiedTime)) {
+                    $condition = "updated_datetime > '" . $apiData->r_hepatitis_sample_type->lastModifiedTime . "'";
+               }
+               $notUpdated = $this->getLastModifiedDateTime('r_hepatitis_sample_type', 'updated_datetime', $condition);
+               if (empty($notUpdated) || !isset($notUpdated)) {
+                    foreach ((array)$apiData->r_hepatitis_sample_type->tableData as $row) {
+                         $hepatitisSampleTypeData = (array)$row;
+                         $rQuery = $sql->select()->from('r_hepatitis_sample_type')->where(array('sample_name LIKE "%' . $hepatitisSampleTypeData['sample_name'] . '%" OR sample_id = "' . $hepatitisSampleTypeData['sample_id'] . '" '));
+                         $rQueryStr = $sql->buildSqlString($rQuery);
+                         $rowData = $dbAdapter->query($rQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->current();
+                         if ($rowData) {
+                              $hepatitisSampleTypeDb->update($hepatitisSampleTypeData, array('sample_id' => $hepatitisSampleTypeData['sample_id']));
+                         } else {
+                              $hepatitisSampleTypeDb->insert($hepatitisSampleTypeData);
                          }
                     }
                }
-               return array(
-                    'status' => 'success',
-                    'message' => 'All reference tables synced'
-               );
-          } else {
-               return array(
-                    'status' => 'fail',
-                    'message' => "File doesn't have data to update"
-               );
           }
+          if ($fileName) {
+               unlink($fileName);
+          }
+          return array(
+               'status' => 'success',
+               'message' => 'All reference tables synced'
+          );
      }
 
      public function checkFacilityStateDistrictDetails($location, $parent)
@@ -1112,7 +1112,7 @@ class CommonService
 
      public function getMonthsInRange($startDate, $endDate)
      {
-          $months = array();
+          $months = [];
           while (strtotime($startDate) <= strtotime($endDate)) {
                $monthYear = date('M', strtotime($startDate)) . "-" . date('Y', strtotime($startDate));
                $monthYearDBForamt = date('Y', strtotime($startDate)) . "-" . date('m', strtotime($startDate));
@@ -1156,7 +1156,7 @@ class CommonService
                     if (isset($sResult) && !empty($sResult)) {
                          $excel = new Spreadsheet();
                          $sheet = $excel->getActiveSheet();
-                         $output = array();
+                         $output = [];
 
                          $today = new DateTimeImmutable();
                          $twoWeekExpiry = $today->sub(\DateInterval::createFromDateString('2 weeks'));
@@ -1164,7 +1164,7 @@ class CommonService
                          $threeWeekExpiry = $today->sub(\DateInterval::createFromDateString('4 weeks'));
 
                          foreach ($sResult as $aRow) {
-                              $row = array();
+                              $row = [];
 
                               $_color = "f08080";
 
@@ -1437,35 +1437,47 @@ class CommonService
           return true;
      }
 
+     public static function isTraversable($variable)
+     {
+          return $variable instanceof Traversable;
+     }
+
+     private static function cleanupGenerator($generator, $filePath, $deleteSourceFile = true)
+     {
+          foreach ($generator as $item) {
+               yield $item;
+          }
+          if ($deleteSourceFile) {
+               unlink($filePath);
+          }
+     }
+
      public static function processJsonFile($filePath, $returnTimestamp = true, $deleteSourceFile = true)
      {
-          $jsonStream = null;
+          $apiData = null;
+          $timestamp = null;
+          $tempFilePath = $filePath;
+
           try {
-               $apiData = [];
-               $timestamp = null;
-
-               if (!empty($filePath) && file_exists($filePath)) {
+               if (!empty($filePath) && is_readable($filePath)) {
                     $isGzipped = self::isGzipped($filePath);
-                    $tempFilePath = $filePath;
 
-                    if ($isGzipped === true) {
+                    if ($isGzipped) {
                          $tempFilePath = dirname($filePath) . DIRECTORY_SEPARATOR . 'json_' . uniqid() . ".json";
                          self::ungzipFile($filePath, $tempFilePath);
+                         if ($deleteSourceFile) {
+                              unlink($filePath);
+                         }
                     }
 
-                    // Open the file stream
-                    $jsonStream = fopen($tempFilePath, 'r');
-                    if (!$jsonStream) throw new Exception("Failed to open file: " . $tempFilePath);
-
                     // Process the JSON data from the file
-                    $apiData = iterator_to_array(Items::fromStream($jsonStream, [
+                    $apiData = Items::fromFile($tempFilePath, [
                          'pointer' => '/data',
                          'decoder' => new ExtJsonDecoder(true)
-                    ]));
+                    ]);
 
-                    if ($returnTimestamp === true) {
-                         rewind($jsonStream);
-                         $timestampData = Items::fromStream($jsonStream, [
+                    if ($returnTimestamp) {
+                         $timestampData = Items::fromFile($tempFilePath, [
                               'pointer' => '/timestamp',
                               'decoder' => new ExtJsonDecoder(true)
                          ]);
@@ -1473,33 +1485,20 @@ class CommonService
                     } else {
                          $timestamp = time();
                     }
-
-                    fclose($jsonStream);  // Close the stream here
-                    $jsonStream = null;  // Prevent further attempts to close
-
-                    if ($deleteSourceFile === true) {
-                         if ($isGzipped && $tempFilePath !== $filePath) {
-                              unlink($tempFilePath);
-                         }
-                         unlink($filePath);
-                    }
                }
 
-               return $returnTimestamp ? [$apiData, $timestamp] : $apiData;
-          } catch (JsonException | JsonMachineException | PathNotFoundException $e) {
+               return $returnTimestamp ? [self::cleanupGenerator($apiData, $tempFilePath, $deleteSourceFile), $timestamp] : self::cleanupGenerator($apiData, $tempFilePath, $deleteSourceFile);
+          } catch (Throwable $e) {
+               if ($deleteSourceFile && file_exists($tempFilePath) && $tempFilePath !== $filePath) {
+                    unlink($tempFilePath);
+               }
                error_log($e->getMessage());
-               if ($jsonStream) fclose($jsonStream);
-               return $returnTimestamp ? [[], null] : [];
-          } catch (Exception $e) {
-               error_log($e->getMessage());
-               if ($jsonStream) fclose($jsonStream);
-               return $returnTimestamp ? [[], null] : [];
+               return $returnTimestamp ? [null, null] : null;
           }
      }
 
 
-
-     public static function insertOrUpdate(Adapter $adapter, $table, array $data)
+     public static function upsert(Adapter $adapter, $table, array $data)
      {
           $sql = new Sql($adapter);
           $insert = new Insert($table);

@@ -135,7 +135,7 @@ class GlobalTable extends AbstractTableGateway
             $sQuery->offset($sOffset);
         }
 
-        $sQueryStr = $sql->buildSqlString($sQuery); // Get the string of the Sql, instead of the Select-instance 
+        $sQueryStr = $sql->buildSqlString($sQuery); // Get the string of the Sql, instead of the Select-instance
         //echo $sQueryStr;die;
         $rResult = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE);
 
@@ -160,7 +160,7 @@ class GlobalTable extends AbstractTableGateway
             if ($aRow['display_name'] == 'Language') {
                 $currentVal = $this->fetchLocaleDetailsById('display_name', $aRow['value']);
             }
-            $row = array();
+            $row = [];
             $row[] = ucwords($this->commonService->translate($aRow['display_name']));
             $row[] = ucwords($currentVal);
             $output['aaData'][] = $row;
@@ -176,7 +176,7 @@ class GlobalTable extends AbstractTableGateway
         $sQueryStr = $sql->buildSqlString($sQuery);
         $configValues = $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
         $size = count($configValues);
-        $arr = array();
+        $arr = [];
         // now we create an associative array so that we can easily create view variables
         for ($i = 0; $i < $size; $i++) {
             $arr[$configValues[$i]['name']] = $configValues[$i]['value'];

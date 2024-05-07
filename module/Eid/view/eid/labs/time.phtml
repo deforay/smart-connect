@@ -15,17 +15,17 @@ if (isset($searchMonth) && trim($searchMonth) != '') {
   $endDate = $splitSearchRange[1];
 }
 //set selected provinces
-$selectedProvinces = array();
+$selectedProvinces = [];
 if (isset($provinceFilter) && trim($provinceFilter) != '') {
   $selectedProvinces[] = $provinceFilter;
 }
 //set selected districts
-$selectedDistricts = array();
+$selectedDistricts = [];
 if (isset($districtFilter) && trim($districtFilter) != '') {
   $selectedDistricts[] = $districtFilter;
 }
 //set selected labs
-$selectedLabs = array();
+$selectedLabs = [];
 if (isset($labFilter) && trim($labFilter) != '') {
   $selectedLabs = explode(",", $labFilter);
 }

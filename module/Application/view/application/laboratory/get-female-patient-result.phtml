@@ -1,87 +1,87 @@
-<?php if(isset($result) && !empty($result)){ ?>
-<script>
-$('#labDashFemalePie').highcharts({
-        chart: {
-            plotBackgroundColor: null,
-            plotBorderWidth: null,
-            plotShadow: false,
-            type: 'pie'
-        },
-        title: {
-            text: ''
-        },
-        exporting:{
-            chartOptions:{
-                subtitle: {
-                    text:'<?php echo $this->translate('Female Patients'); ?>',
-                }
-            }
-        },
-       credits: {
-              enabled: false
-       },
-        tooltip: {
-            pointFormat: '{series.name}: <b>{point.percentage:.1f}% ({point.number})</b>'
-        },
-        legend: {
-            //layout: 'vertical',
-            align: 'center',
-            //backgroundColor: '#f3f3f3',
-            useHTML: true,
-            itemMarginBottom: 5,
-            labelFormatter: function () {
-                return '<div style="width:230px"><span style="float:left;font-size:10px;">' + this.myData + ' ('+ this.name + ') - </span><span style="font-size:10px;padding:1px; ">'+ this.percentage.toFixed(1)+'% ('+Highcharts.numberFormat(this.y, 0)+')</span></div>';
-            }
-        },
-        plotOptions: {
-            pie: {
-                allowPointSelect: true,
-                cursor: 'pointer',
-                dataLabels: {
-                    //enabled : false,
-                distance: -30
-              },
-                showInLegend: true
-            }
-        },
-        series: [{
-            name: '<?php echo $this->translate('Samples'); ?>',
-            point: {
-              events: {
-                  click: function(e) {
-                     doFemalePatientRedirect(this.name);
-                     e.preventDefault();
-                  }
-              }
+<?php if (isset($result) && !empty($result)) { ?>
+    <script>
+        $('#labDashFemalePie').highcharts({
+            chart: {
+                plotBackgroundColor: null,
+                plotBorderWidth: null,
+                plotShadow: false,
+                type: 'pie'
             },
-            colorByPoint: true,
-            data: [<?php
-            if(isset($result) && !empty($result)){
-              foreach($result[0] as $key=>$femaleResult){
-                if($result[0][$key]!='' && $result[0][$key]!=null){
-                     $getCode = explode("_",$key);
-                     $codeGenerate = array();
-                     if(count($getCode)>0){
-                            foreach($getCode as $code){
-                                   $codeGenerate[] = substr($code, 0, 1);
-                            }
-                     }else{
-                            $codeGenerate[] =  substr($key, 0, 1);
-                     }
-                     $code = implode("",$codeGenerate);
-                ?>
-                {
-                  name:'<?php echo $this->translate($code);?>',
-                  y:<?php echo $result[0][$key];?>,
-                  number:<?php echo $result[0][$key];?>,
-                  myData:'<?php echo $this->translate(str_replace("_"," ",$key)); ?>'
+            title: {
+                text: ''
+            },
+            exporting: {
+                chartOptions: {
+                    subtitle: {
+                        text: '<?php echo $this->translate('Female Patients'); ?>',
+                    }
+                }
+            },
+            credits: {
+                enabled: false
+            },
+            tooltip: {
+                pointFormat: '{series.name}: <b>{point.percentage:.1f}% ({point.number})</b>'
+            },
+            legend: {
+                //layout: 'vertical',
+                align: 'center',
+                //backgroundColor: '#f3f3f3',
+                useHTML: true,
+                itemMarginBottom: 5,
+                labelFormatter: function() {
+                    return '<div style="width:230px"><span style="float:left;font-size:10px;">' + this.myData + ' (' + this.name + ') - </span><span style="font-size:10px;padding:1px; ">' + this.percentage.toFixed(1) + '% (' + Highcharts.numberFormat(this.y, 0) + ')</span></div>';
+                }
+            },
+            plotOptions: {
+                pie: {
+                    allowPointSelect: true,
+                    cursor: 'pointer',
+                    dataLabels: {
+                        //enabled : false,
+                        distance: -30
+                    },
+                    showInLegend: true
+                }
+            },
+            series: [{
+                name: '<?php echo $this->translate('Samples'); ?>',
+                point: {
+                    events: {
+                        click: function(e) {
+                            doFemalePatientRedirect(this.name);
+                            e.preventDefault();
+                        }
+                    }
                 },
-                <?php
-              }
-              }
-            }
-            ?>]
-        }]
-});
-</script>
+                colorByPoint: true,
+                data: [<?php
+                        if (isset($result) && !empty($result)) {
+                            foreach ($result[0] as $key => $femaleResult) {
+                                if ($result[0][$key] != '' && $result[0][$key] != null) {
+                                    $getCode = explode("_", $key);
+                                    $codeGenerate = [];
+                                    if (count($getCode) > 0) {
+                                        foreach ($getCode as $code) {
+                                            $codeGenerate[] = substr($code, 0, 1);
+                                        }
+                                    } else {
+                                        $codeGenerate[] =  substr($key, 0, 1);
+                                    }
+                                    $code = implode("", $codeGenerate);
+                        ?> {
+                                    name: '<?php echo $this->translate($code); ?>',
+                                    y: <?php echo $result[0][$key]; ?>,
+                                    number: <?php echo $result[0][$key]; ?>,
+                                    myData: '<?php echo $this->translate(str_replace("_", " ", $key)); ?>'
+                                },
+                    <?php
+                                }
+                            }
+                        }
+                    ?>
+                ]
+            }]
+        });
+    </script>
 <?php } ?>

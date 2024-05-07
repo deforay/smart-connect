@@ -3,15 +3,15 @@
 use Zend\Debug\Debug;
 
 // Debug::dump($result);die;
-$countries = array();
-$postive = array();
-$negative = array();
-$posRate = array();
+$countries = [];
+$postive = [];
+$negative = [];
+$posRate = [];
 foreach ($result as $row) {
     $countries[] = '"' . $row['geo_name'] . '"';
     $postive[] = $row['total_positive_samples'];
     $negative[] = $row['total_negative_samples'];
-    $posRate[] = (float) number_format((($row['total_positive_samples'] / $row['total_samples']) * 100),2);
+    $posRate[] = (float) number_format((($row['total_positive_samples'] / $row['total_samples']) * 100), 2);
 }
 ?>
 <script type="text/javascript">
@@ -131,7 +131,7 @@ foreach ($result as $row) {
                         "valueSuffix": " %"
                     },
                     "data": [
-                        <?php echo implode(",",$posRate);?>    
+                        <?php echo implode(",", $posRate); ?>
                     ]
                 }
             ]

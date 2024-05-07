@@ -17,7 +17,7 @@ class LabsController extends AbstractActionController
     public EidSampleService $sampleService;
     public FacilityService $facilityService;
     public CommonService $commonService;
-    
+
     const PROVINCE = 0;
     const DISTRICT = 1;
     const CLINIC   = 2;
@@ -233,7 +233,7 @@ class LabsController extends AbstractActionController
         if ($request->isPost()) {
             $params = $request->getPost();
             $result = $this->sampleService->fetchLatLonMapPosNeg($params);
-            // $result = array();
+            // $result = [];
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('result' => $result))
                 ->setTerminal(true);
@@ -243,7 +243,7 @@ class LabsController extends AbstractActionController
 
     public function timeAction()
     {
-        $params = array();
+        $params = [];
         $month = "";
         $range = "";
         $provinceFilter = "";
@@ -295,7 +295,7 @@ class LabsController extends AbstractActionController
         if ($request->isPost()) {
             $params = $request->getPost();
             $result = $this->sampleService->getTATbyProvince($params);
-            
+
             $category = $params['category'];
             $labs = (isset($params['lab']) && !empty($params['lab'])) ? $params['lab'] : array();
             $viewModel = new ViewModel();
@@ -360,10 +360,10 @@ class LabsController extends AbstractActionController
             $districtNames    = $params['districtNames'];
             $clinicNames      = $params['clinicNames'];
             $dates            = explode(" to ", $params['sampleCollectionDate']);
-            $provinceArray    = array();
-            $districtArray    = array();
-            $clinicArray      = array();
-            $times            = array();
+            $provinceArray    = [];
+            $districtArray    = [];
+            $clinicArray      = [];
+            $times            = [];
 
             if (isset($provinces) && !empty($provinces)) {
                 $counter = count($provinces);
@@ -432,7 +432,7 @@ class LabsController extends AbstractActionController
     public function drillDownResultAwaitedAction()
     {
         $this->layout()->setVariable('activeTab', 'eid-labs');
-        $params = array();
+        $params = [];
         $frmSource = "";
         $labFilter = "";
         if ($this->params()->fromQuery('src')) {
@@ -531,7 +531,7 @@ class LabsController extends AbstractActionController
     public function drillDownAction()
     {
         $this->layout()->setVariable('activeTab', 'eid-labs');
-        $params = array();
+        $params = [];
 
         $labFilter = $this->params()->fromQuery('lab');
         $params['labs'] = explode(',', $labFilter);
@@ -626,7 +626,7 @@ class LabsController extends AbstractActionController
     public function samplesTestedLabAction()
     {
         $this->layout()->setVariable('activeTab', 'labs-dashboard');
-        $params = array();
+        $params = [];
         $gender = "";
         $month = "";
         $range = "";
@@ -658,8 +658,8 @@ class LabsController extends AbstractActionController
             $params['labNames'] = explode(',', $labFilter);
         }
 
-        
-        
+
+
         $hubName = $this->sampleService->getAllHubName();
         $sampleType = $this->sampleService->getSampleType();
         $currentRegimen = $this->sampleService->getAllCurrentRegimen();
@@ -710,7 +710,7 @@ class LabsController extends AbstractActionController
     public function sampleVolumeAction()
     {
         $this->layout()->setVariable('activeTab', 'labs-dashboard');
-        $params = array();
+        $params = [];
         $fromMonth = "";
         $toMonth = "";
         $labFilter = "";
@@ -729,8 +729,8 @@ class LabsController extends AbstractActionController
         if ($this->params()->fromQuery('result')) {
             $sampleStatus = $this->params()->fromQuery('result');
         }
-        
-        
+
+
         $hubName = $this->sampleService->getAllHubName();
         $sampleType = $this->sampleService->getSampleType();
         $currentRegimen = $this->sampleService->getAllCurrentRegimen();
@@ -753,7 +753,7 @@ class LabsController extends AbstractActionController
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            
+
             $file = $this->sampleService->generateSampleResultExcel($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('file' => $file))

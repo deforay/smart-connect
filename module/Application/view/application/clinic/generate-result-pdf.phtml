@@ -53,7 +53,7 @@ class MYPDF extends TCPDF
 }
 class Pdf_concat extends FPDI
 {
-     var $files = array();
+     var $files = [];
 
      function setFiles($files)
      {
@@ -81,7 +81,7 @@ if (sizeof($sampleResult) > 0) {
           $defaultLogo = APPLICATION_PATH . DIRECTORY_SEPARATOR . 'uploads' . DIRECTORY_SEPARATOR . 'logo' . DIRECTORY_SEPARATOR . $config['logo'];
      }
      $page = 1;
-     $pages = array();
+     $pages = [];
      foreach ($sampleResult as $result) {
           if (!isset($result['labName'])) {
                $result['labName'] = '';

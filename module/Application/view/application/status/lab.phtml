@@ -2,8 +2,8 @@
 /* echo "<pre>";
 print_r($result);
 die; */
-$received = array();
-$processed = array();
+$received = [];
+$processed = [];
 foreach ($result as $row) {
     $received[] = $row['number_of_records_received'];
     $processed[] = $row['number_of_records_processed'];

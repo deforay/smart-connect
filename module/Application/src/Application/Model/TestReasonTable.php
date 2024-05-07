@@ -34,6 +34,6 @@ class TestReasonTable extends AbstractTableGateway
     }
     public function insertOrUpdate($arrayData)
     {
-        return CommonService::insertOrUpdate($this->adapter, $this->table, $arrayData);
+        return CommonService::upsert($this->adapter, $this->table, $arrayData);
     }
 }

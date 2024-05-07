@@ -31,7 +31,7 @@ class TimeController extends AbstractActionController
 	public function dashboardAction()
 	{
 		$this->layout()->setVariable('activeTab', 'times-dashboard');
-		$params = array();
+		$params = [];
 		$month = "";
 		$range = "";
 		$provinceFilter = "";
@@ -80,7 +80,7 @@ class TimeController extends AbstractActionController
 	{
 		/** @var \Laminas\Http\Request $request */
 		/** @var \Laminas\Http\Request $request */
-        $request = $this->getRequest();
+		$request = $this->getRequest();
 		if ($request->isPost()) {
 			$params = $request->getPost();
 
@@ -100,7 +100,7 @@ class TimeController extends AbstractActionController
 	{
 		/** @var \Laminas\Http\Request $request */
 		/** @var \Laminas\Http\Request $request */
-        $request = $this->getRequest();
+		$request = $this->getRequest();
 		if ($request->isPost()) {
 			$params = $request->getPost();
 
@@ -111,14 +111,14 @@ class TimeController extends AbstractActionController
 			$facilities = null;
 
 			if ($params['category'] == self::PROVINCE) {
-       // If it is a Province: It brings the respective Districts TATs
-       // $facilities = $facilityService->getDistrictList($params['province']);
-       $result = $this->sampleService->getTATbyDistrict($labs, $dates[0], $dates[1]);
-   } elseif ($params['category'] == self::DISTRICT) {
-       // If it is a District: It brings the respective Clinics TATs
-       // $facilities   = $facilityService->getFacilityByDistrict($params['district']);
-       $result       = $this->sampleService->getTATbyClinic($labs, $dates[0], $dates[1]);
-   } else { // Brings the TAT ordered by Province
+				// If it is a Province: It brings the respective Districts TATs
+				// $facilities = $facilityService->getDistrictList($params['province']);
+				$result = $this->sampleService->getTATbyDistrict($labs, $dates[0], $dates[1]);
+			} elseif ($params['category'] == self::DISTRICT) {
+				// If it is a District: It brings the respective Clinics TATs
+				// $facilities   = $facilityService->getFacilityByDistrict($params['district']);
+				$result       = $this->sampleService->getTATbyClinic($labs, $dates[0], $dates[1]);
+			} else { // Brings the TAT ordered by Province
 				// $facilities = $facilityService->fetchLocationDetails();
 				$result = $this->sampleService->getTATbyProvince($labs, $dates[0], $dates[1]);
 			}
@@ -142,7 +142,7 @@ class TimeController extends AbstractActionController
 	{
 		/** @var \Laminas\Http\Request $request */
 		/** @var \Laminas\Http\Request $request */
-        $request = $this->getRequest();
+		$request = $this->getRequest();
 		if ($request->isPost()) {
 			$params           = $request->getPost();
 			$category         = $params['category'];
@@ -154,51 +154,51 @@ class TimeController extends AbstractActionController
 			$districtNames    = $params['districtNames'];
 			$clinicNames      = $params['clinicNames'];
 			$dates            = explode(" to ", $params['sampleCollectionDate']);
-			$provinceArray    = array();
-			$districtArray    = array();
-			$clinicArray      = array();
-			$times            = array();
+			$provinceArray    = [];
+			$districtArray    = [];
+			$clinicArray      = [];
+			$times            = [];
 
 			if (isset($provinces) && !empty($provinces)) {
-       $counter = count($provinces);
-       for ($i = 0; $i < $counter; $i++) {
-   					$provinceArray[]  = array(
-   						'geo_id'   => $provinces[$i],
-   						'geo_name' => $provinceNames[$i]
-   					);
-   				}
-   } else {
+				$counter = count($provinces);
+				for ($i = 0; $i < $counter; $i++) {
+					$provinceArray[]  = array(
+						'geo_id'   => $provinces[$i],
+						'geo_name' => $provinceNames[$i]
+					);
+				}
+			} else {
 				$provinceArray = $this->facilityService->fetchLocationDetails();
 			}
 
 			if (isset($districts) && !empty($districts)) {
-       $counter = count($districts);
-       for ($i = 0; $i < $counter; $i++) {
-   					$districtArray[] = array(
-   						'geo_id'   => $districts[$i],
-   						'geo_name' => $districtNames[$i]
-   					);
-   				}
-   } elseif (isset($provinces) && !empty($provinces)) {
-       $counter = count($provinces);
-       for ($i = 0; $i < $counter; $i++) {
-  						$districtArray = array_merge($districtArray, $this->facilityService->getDistrictList($provinces[$i]));
-  					}
-   }
+				$counter = count($districts);
+				for ($i = 0; $i < $counter; $i++) {
+					$districtArray[] = array(
+						'geo_id'   => $districts[$i],
+						'geo_name' => $districtNames[$i]
+					);
+				}
+			} elseif (isset($provinces) && !empty($provinces)) {
+				$counter = count($provinces);
+				for ($i = 0; $i < $counter; $i++) {
+					$districtArray = array_merge($districtArray, $this->facilityService->getDistrictList($provinces[$i]));
+				}
+			}
 			if (isset($clinics) && !empty($clinics)) {
-       $counter = count($clinics);
-       for ($i = 0; $i < $counter; $i++) {
-   					$clinicArray[] = array(
-   						'facility_id'   => $clinics[$i],
-   						'facility_name' => $clinicNames[$i]
-   					);
-   				}
-   } elseif (isset($districts) && !empty($districts)) {
-       $counter = count($districts);
-       for ($i = 0; $i < $counter; $i++) {
-  						$clinicArray = array_merge($clinicArray, $this->facilityService->getFacilityByDistrict($districts[$i]));
-  					}
-   }
+				$counter = count($clinics);
+				for ($i = 0; $i < $counter; $i++) {
+					$clinicArray[] = array(
+						'facility_id'   => $clinics[$i],
+						'facility_name' => $clinicNames[$i]
+					);
+				}
+			} elseif (isset($districts) && !empty($districts)) {
+				$counter = count($districts);
+				for ($i = 0; $i < $counter; $i++) {
+					$clinicArray = array_merge($clinicArray, $this->facilityService->getFacilityByDistrict($districts[$i]));
+				}
+			}
 
 			$viewModel = new ViewModel();
 			$viewModel->setVariables(

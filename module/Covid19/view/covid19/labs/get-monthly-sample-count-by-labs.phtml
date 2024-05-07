@@ -1,5 +1,5 @@
 <?php
-$supAvg = array();
+$supAvg = [];
 if (isset($result['sampleName']) && !empty($result['sampleName'])) {
     $arrayKey = array_keys($result['sampleName']);
     $sumArray = array_map(function () {
@@ -76,11 +76,11 @@ if (isset($result['sampleName']) && !empty($result['sampleName'])) {
                         events: {
                             click: function(e) {
                                 fromMonth = $(".mrp-lowerMonth").html();
-                                if(fromMonth != undefined){
+                                if (fromMonth != undefined) {
                                     fromMonth = fromMonth.replace(" ", "-");
                                 }
                                 toMonth = $(".mrp-upperMonth").html();
-                                if(fromMonth != undefined){
+                                if (fromMonth != undefined) {
                                     toMonth = toMonth.replace(" ", "-");
                                 }
                                 window.open(e.point.url + 'fromMonth=' + fromMonth + '&toMonth=' + toMonth + '&lab=' + e.point.category, '_blank');
@@ -103,11 +103,11 @@ if (isset($result['sampleName']) && !empty($result['sampleName'])) {
                             click: function(e) {
                                 url = "/covid19/labs/samples-tested-lab?";
                                 fromMonth = $(".mrp-lowerMonth").html();
-                                if(fromMonth != undefined){
+                                if (fromMonth != undefined) {
                                     fromMonth = fromMonth.replace(" ", "-");
                                 }
                                 toMonth = $(".mrp-upperMonth").html();
-                                if(fromMonth != undefined){
+                                if (fromMonth != undefined) {
                                     toMonth = toMonth.replace(" ", "-");
                                 }
                                 window.open(url + 'fromMonth=' + fromMonth + '&toMonth=' + toMonth + '&lab=' + e.point.category, '_blank');

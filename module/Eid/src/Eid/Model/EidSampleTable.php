@@ -86,7 +86,7 @@ class EidSampleTable extends AbstractTableGateway
     {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $result = array();
+        $result = [];
 
 
         $sQuery = $sql->select()->from(array('eid' => $this->table))
@@ -316,7 +316,7 @@ class EidSampleTable extends AbstractTableGateway
         );
 
         foreach ($rResult as $aRow) {
-            $row = array();
+            $row = [];
             $row[] = $aRow['province'];
             $row[] = $aRow['total_samples_received'];
             $row[] = $aRow['total_samples_tested'];
@@ -504,7 +504,7 @@ class EidSampleTable extends AbstractTableGateway
         );
 
         foreach ($rResult as $aRow) {
-            $row = array();
+            $row = [];
             $row[] = $aRow['district'];
             $row[] = $aRow['total_samples_received'];
             $row[] = $aRow['total_samples_tested'];
@@ -694,7 +694,7 @@ class EidSampleTable extends AbstractTableGateway
         );
 
         foreach ($rResult as $aRow) {
-            $row = array();
+            $row = [];
             $row[] = "<span style='white-space:nowrap !important;' >" . ucwords($aRow['facility_name']) . "</span>";
             $row[] = ucwords($aRow['province']);
             $row[] = ucwords($aRow['district']);
@@ -714,7 +714,7 @@ class EidSampleTable extends AbstractTableGateway
     {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $result = array();
+        $result = [];
 
 
         $sQuery = $sql->select()
@@ -934,7 +934,7 @@ class EidSampleTable extends AbstractTableGateway
             "aaData" => array()
         );
         foreach ($rResult as $aRow) {
-            $row = array();
+            $row = [];
             $row[] = ucwords($aRow['province']);
             $row[] = $aRow['total_samples_valid'];
             $row[] = $aRow['total_positive_samples'];
@@ -1114,7 +1114,7 @@ class EidSampleTable extends AbstractTableGateway
             "aaData" => array()
         );
         foreach ($rResult as $aRow) {
-            $row = array();
+            $row = [];
             $row[] = ucwords($aRow['district']);
             $row[] = $aRow['total_samples_valid'];
             $row[] = $aRow['total_positive_samples'];
@@ -1302,7 +1302,7 @@ class EidSampleTable extends AbstractTableGateway
             "aaData" => array()
         );
         foreach ($rResult as $aRow) {
-            $row = array();
+            $row = [];
             $row[] = "<span style='white-space:nowrap !important;' >" . ucwords($aRow['facility_name']) . "</span>";
             $row[] = ucwords($aRow['province']);
             $row[] = ucwords($aRow['district']);
@@ -1321,7 +1321,7 @@ class EidSampleTable extends AbstractTableGateway
     {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $mostRejectionReasons = array();
+        $mostRejectionReasons = [];
         $mostRejectionQuery = $sql->select()->from(array('eid' => $this->table))
             ->columns(array('rejections' => new Expression('COUNT(*)')))
             ->join(array('r_r_r' => 'r_eid_sample_rejection_reasons'), 'r_r_r.rejection_reason_id=eid.reason_for_sample_rejection', array('rejection_reason_id'))
@@ -1356,7 +1356,7 @@ class EidSampleTable extends AbstractTableGateway
             }
             $mostRejectionReasons[] = 0;
         }
-        $result = array();
+        $result = [];
 
         $start = strtotime($params['fromDate']);
         $end = strtotime($params['toDate']);
@@ -1571,7 +1571,7 @@ class EidSampleTable extends AbstractTableGateway
         );
 
         foreach ($rResult as $aRow) {
-            $row = array();
+            $row = [];
             $row[] = ucwords($aRow['district']);
             $row[] = $aRow['total_samples_received'];
             $row[] = $aRow['total_samples_rejected'];
@@ -1741,7 +1741,7 @@ class EidSampleTable extends AbstractTableGateway
         );
 
         foreach ($rResult as $aRow) {
-            $row = array();
+            $row = [];
             $row[] = ucwords($aRow['province']);
             $row[] = $aRow['total_samples_received'];
             $row[] = $aRow['total_samples_rejected'];
@@ -1914,7 +1914,7 @@ class EidSampleTable extends AbstractTableGateway
         );
 
         foreach ($rResult as $aRow) {
-            $row = array();
+            $row = [];
             $row[] = "<span style='white-space:nowrap !important;' >" . ucwords($aRow['facility_name']) . "</span>";
             $row[] = ucwords($aRow['province']);
             $row[] = ucwords($aRow['district']);
@@ -1930,7 +1930,7 @@ class EidSampleTable extends AbstractTableGateway
         $queryContainer = new Container('query');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $summaryResult = array();
+        $summaryResult = [];
 
 
         $samplesReceivedSummaryQuery = $sql->select()
@@ -2222,14 +2222,14 @@ class EidSampleTable extends AbstractTableGateway
         $sql = new Sql($dbAdapter);
 
         $testedTotal = 0;
-        $receivedResult = array();
-        $tResult = array();
-        $rejectedResult = array();
+        $receivedResult = [];
+        $tResult = [];
+        $rejectedResult = [];
         if (trim($params['daterange']) != '') {
             $splitDate = explode('to', $params['daterange']);
         } else {
             $timestamp = time();
-            $qDates = array();
+            $qDates = [];
             for ($i = 0; $i < 28; $i++) {
                 $qDates[] = "'" . date('Y-m-d', $timestamp) . "'";
                 $timestamp -= 24 * 3600;
@@ -2392,14 +2392,14 @@ class EidSampleTable extends AbstractTableGateway
         $sql = new Sql($dbAdapter);
 
         $testedTotal = 0;
-        $receivedResult = array();
-        $tResult = array();
-        $rejectedResult = array();
+        $receivedResult = [];
+        $tResult = [];
+        $rejectedResult = [];
         if (trim($params['daterange']) != '') {
             $splitDate = explode('to', $params['daterange']);
         } else {
             $timestamp = time();
-            $qDates = array();
+            $qDates = [];
             for ($i = 0; $i < 28; $i++) {
                 $qDates[] = "'" . date('Y-m-d', $timestamp) . "'";
                 $timestamp -= 24 * 3600;
@@ -2504,7 +2504,7 @@ class EidSampleTable extends AbstractTableGateway
     {
 
         $loginContainer = new Container('credo');
-        $result = array();
+        $result = [];
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
 
@@ -2530,7 +2530,7 @@ class EidSampleTable extends AbstractTableGateway
     {
 
         $loginContainer = new Container('credo');
-        $result = array();
+        $result = [];
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
 
@@ -2560,7 +2560,7 @@ class EidSampleTable extends AbstractTableGateway
     {
 
         $loginContainer = new Container('credo');
-        $result = array();
+        $result = [];
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
 
@@ -2632,7 +2632,7 @@ class EidSampleTable extends AbstractTableGateway
     public function getMonthlySampleCountByLabs($params)
     {
         $loginContainer = new Container('credo');
-        $result = array();
+        $result = [];
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
 
@@ -2705,7 +2705,7 @@ class EidSampleTable extends AbstractTableGateway
         $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $result = array();
+        $result = [];
         $skipDays = isset($this->config['defaults']['tat-skipdays']) ? $this->config['defaults']['tat-skipdays'] : 365;
 
 
@@ -2812,7 +2812,7 @@ class EidSampleTable extends AbstractTableGateway
         $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $result = array();
+        $result = [];
 
 
         $facilityIdList = null;
@@ -2871,7 +2871,7 @@ class EidSampleTable extends AbstractTableGateway
     public function fetchLabPerformance($params)
     {
         $loginContainer = new Container('credo');
-        $result = array();
+        $result = [];
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
 
@@ -3114,7 +3114,7 @@ class EidSampleTable extends AbstractTableGateway
         $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $result = array();
+        $result = [];
 
         $globalDb = $this->sm->get('GlobalTable');
         $samplesWaitingFromLastXMonths = $globalDb->getGlobalValue('sample_waiting_month_range');
@@ -3216,7 +3216,7 @@ class EidSampleTable extends AbstractTableGateway
         $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $result = array();
+        $result = [];
 
         $globalDb = $this->sm->get('GlobalTable');
         $samplesWaitingFromLastXMonths = $globalDb->getGlobalValue('sample_waiting_month_range');
@@ -3318,7 +3318,7 @@ class EidSampleTable extends AbstractTableGateway
         $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $result = array();
+        $result = [];
 
         $globalDb = $this->sm->get('GlobalTable');
         $samplesWaitingFromLastXMonths = $globalDb->getGlobalValue('sample_waiting_month_range');
@@ -3420,7 +3420,7 @@ class EidSampleTable extends AbstractTableGateway
         $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $result = array();
+        $result = [];
 
         $globalDb = $this->sm->get('GlobalTable');
         $samplesWaitingFromLastXMonths = $globalDb->getGlobalValue('sample_waiting_month_range');
@@ -3722,7 +3722,7 @@ class EidSampleTable extends AbstractTableGateway
         foreach ($rResult as $aRow) {
             $displayCollectionDate = CommonService::humanReadableDateFormat($aRow['collectionDate']);
             $displayReceivedDate = CommonService::humanReadableDateFormat($aRow['receivedDate']);
-            $row = array();
+            $row = [];
             $row[] = $aRow['sample_code'];
             $row[] = $displayCollectionDate;
             $row[] = $aRow['facilityCode'] . ' - ' . ucwords($aRow['facilityName']);
@@ -3753,7 +3753,7 @@ class EidSampleTable extends AbstractTableGateway
         $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $result = array();
+        $result = [];
 
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
@@ -3853,7 +3853,7 @@ class EidSampleTable extends AbstractTableGateway
         $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $result = array();
+        $result = [];
 
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
@@ -3958,7 +3958,7 @@ class EidSampleTable extends AbstractTableGateway
         $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $result = array();
+        $result = [];
 
 
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
@@ -4054,7 +4054,7 @@ class EidSampleTable extends AbstractTableGateway
         $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $result = array();
+        $result = [];
 
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
@@ -4374,7 +4374,7 @@ class EidSampleTable extends AbstractTableGateway
         );
 
         foreach ($rResult as $aRow) {
-            $row = array();
+            $row = [];
             $sampleCollectionDate = '';
             if (isset($aRow['sampleCollectionDate']) && $aRow['sampleCollectionDate'] != null && trim($aRow['sampleCollectionDate']) != "" && $aRow['sampleCollectionDate'] != '0000-00-00') {
                 $sampleCollectionDate = \Application\Service\CommonService::humanReadableDateFormat($aRow['sampleCollectionDate']);
@@ -4600,7 +4600,7 @@ class EidSampleTable extends AbstractTableGateway
         );
         //print_r($parameters);die;
         foreach ($rResult as $aRow) {
-            $row = array();
+            $row = [];
             $row[] = ucwords($aRow['facility_name']);
             $row[] = $aRow['total_samples_received'];
             $row[] = $aRow['total_samples_tested'];
@@ -4617,7 +4617,7 @@ class EidSampleTable extends AbstractTableGateway
         $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $vlOutComeResult = array();
+        $vlOutComeResult = [];
 
         if (trim($params['fromDate']) != '' && trim($params['toDate']) != '') {
             $startMonth = str_replace(' ', '-', $params['fromDate']) . "-01";
@@ -4750,7 +4750,7 @@ class EidSampleTable extends AbstractTableGateway
                                         AND DATE(sample_collection_date) <= '" . $endMonth . "'");
         }
 
-        $facilityIdList = array();
+        $facilityIdList = [];
         if (isset($params['facilityId']) && trim($params['facilityId']) != '') {
             $fQuery = $sql->select()->from(array('f' => 'facility_details'))->columns(array('facility_id'))
                 ->where('f.facility_type = 2 AND f.status="active"');
@@ -4814,7 +4814,7 @@ class EidSampleTable extends AbstractTableGateway
                 $sQuery = $sQuery->where('eid.facility_id IN (' . $params['clinics'] . ')');
             }
 
-            $facilityIdList = array();
+            $facilityIdList = [];
             if (isset($params['facilityId']) && trim($params['facilityId']) != '') {
                 $mQuery = $sql->select()->from(array('f' => 'facility_details'))->columns(array('facility_id'))
                     ->where('f.facility_type = 2 AND f.status="active"');
@@ -4851,7 +4851,7 @@ class EidSampleTable extends AbstractTableGateway
         $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $sResult = array();
+        $sResult = [];
         if (isset($params['sampleCollectionDate']) && trim($params['sampleCollectionDate']) != '') {
             $s_c_date = explode("to", $params['sampleCollectionDate']);
             if (isset($s_c_date[0]) && trim($s_c_date[0]) != "") {
@@ -4932,7 +4932,7 @@ class EidSampleTable extends AbstractTableGateway
         $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $result = array();
+        $result = [];
 
         if (isset($params['sampleCollectionDate']) && trim($params['sampleCollectionDate']) != '') {
             $s_c_date = explode("to", $params['sampleCollectionDate']);
@@ -5033,7 +5033,7 @@ class EidSampleTable extends AbstractTableGateway
         $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $result = array();
+        $result = [];
 
         if (isset($params['sampleCollectionDate']) && trim($params['sampleCollectionDate']) != '') {
             $s_c_date = explode("to", $params['sampleCollectionDate']);
@@ -5110,7 +5110,7 @@ class EidSampleTable extends AbstractTableGateway
         $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $rResult = array();
+        $rResult = [];
 
         if (isset($params['sampleCollectionDate']) && trim($params['sampleCollectionDate']) != '') {
             $s_c_date = explode("to", $params['sampleCollectionDate']);
@@ -5197,7 +5197,7 @@ class EidSampleTable extends AbstractTableGateway
         $loginContainer = new Container('credo');
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $result = array();
+        $result = [];
         if (isset($sampleType) && count($sampleType) > 0) {
             foreach ($sampleType as $type) {
                 $sampleList[] = $type['sample_id'];
@@ -5509,7 +5509,7 @@ class EidSampleTable extends AbstractTableGateway
         $viewText = $this->commonService->translate('View');
         $pdfText = $this->commonService->translate('PDF');
         foreach ($rResult as $aRow) {
-            $row = array();
+            $row = [];
             $sampleCollectionDate = '';
             if (isset($aRow['sampleCollectionDate']) && $aRow['sampleCollectionDate'] != NULL && trim($aRow['sampleCollectionDate']) != "" && $aRow['sampleCollectionDate'] != '0000-00-00') {
                 $sampleCollectionDate = \Application\Service\CommonService::humanReadableDateFormat($aRow['sampleCollectionDate']);
@@ -5536,7 +5536,7 @@ class EidSampleTable extends AbstractTableGateway
     {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $lResult = array();
+        $lResult = [];
 
         // $lQuery = $sql->select()->from(array('eid' => 'dash_form_eid'))->columns(array('child_name','mother_name','caretaker_phone_number','result'))
         //             ->join(array('f' => 'instrument_machines'), 'f.config_machine_id=eid.import_machine_name', array('lat'=>'latitude','lon'=>'longitude'))
@@ -5548,7 +5548,7 @@ class EidSampleTable extends AbstractTableGateway
             $splitDate = explode('to', $params['daterange']);
         } else {
             $timestamp = time();
-            $qDates = array();
+            $qDates = [];
             for ($i = 0; $i < 28; $i++) {
                 $qDates[] = "'" . date('Y-m-d', $timestamp) . "'";
                 $timestamp -= 24 * 3600;
@@ -5607,7 +5607,7 @@ class EidSampleTable extends AbstractTableGateway
     {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $lResult = array();
+        $lResult = [];
 
         // $lQuery = $sql->select()->from(array('eid' => 'dash_form_eid'))->columns(array('child_name','mother_name','caretaker_phone_number','result'))
         //             ->join(array('f' => 'instrument_machines'), 'f.config_machine_id=eid.import_machine_name', array('lat'=>'latitude','lon'=>'longitude'))
@@ -5619,7 +5619,7 @@ class EidSampleTable extends AbstractTableGateway
             $splitDate = explode('to', $params['daterange']);
         } else {
             $timestamp = time();
-            $qDates = array();
+            $qDates = [];
             for ($i = 0; $i < 28; $i++) {
                 $qDates[] = "'" . date('Y-m-d', $timestamp) . "'";
                 $timestamp -= 24 * 3600;
@@ -5672,7 +5672,7 @@ class EidSampleTable extends AbstractTableGateway
     {
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $lResult = array();
+        $lResult = [];
 
         $lQuery = $sql->select()->from(array('eid' => 'dash_form_eid'))->columns(array(
             'total' => new Expression("SUM(CASE WHEN ( eid.sample_collection_date is not NULL AND eid.sample_collection_date!='0000-00-00 00:00:00') THEN 1 ELSE 0 END)"),
@@ -5693,6 +5693,6 @@ class EidSampleTable extends AbstractTableGateway
     //end clinic details
     public function insertOrUpdate($arrayData)
     {
-        return CommonService::insertOrUpdate($this->adapter, $this->table, $arrayData);
+        return CommonService::upsert($this->adapter, $this->table, $arrayData);
     }
 }

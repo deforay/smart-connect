@@ -1,100 +1,102 @@
 <?php
-if(isset($searchMonth) && trim($searchMonth)!= ''){
-    $splitSearchMonth = explode("-",$searchMonth);
-    $startDate = $endDate = $splitSearchMonth[1].' '.date('m', strtotime($splitSearchMonth[0]));
+if (isset($searchMonth) && trim($searchMonth) != '') {
+    $splitSearchMonth = explode("-", $searchMonth);
+    $startDate = $endDate = $splitSearchMonth[1] . ' ' . date('m', strtotime($splitSearchMonth[0]));
     $startMonth = $endMonth = date('m', strtotime($splitSearchMonth[0]));
     $startYear = $endYear = $splitSearchMonth[1];
-    $startDisplayDate = $endDisplayDate = str_replace('-',' ',$searchMonth);
-}else{
-    $startDate = date("Y", strtotime("-1 year")).'-'.date('m', strtotime('+1 month', strtotime('-1 year')));
-    $endDate = date('Y').'-'.date('m');
+    $startDisplayDate = $endDisplayDate = str_replace('-', ' ', $searchMonth);
+} else {
+    $startDate = date("Y", strtotime("-1 year")) . '-' . date('m', strtotime('+1 month', strtotime('-1 year')));
+    $endDate = date('Y') . '-' . date('m');
     $startMonth = date('m', strtotime('+1 month', strtotime('-1 year')));
     $endMonth = date('m');
     $startYear = date("Y", strtotime("-1 year"));
     $endYear = date('Y');
-    $startDisplayDate  = strtoupper(date('M', strtotime('+1 month', strtotime('-1 year')))).' '.date("Y", strtotime("-1 year"));
-    $endDisplayDate  = strtoupper(date('M')).' '.date('Y');
+    $startDisplayDate  = strtoupper(date('M', strtotime('+1 month', strtotime('-1 year')))) . ' ' . date("Y", strtotime("-1 year"));
+    $endDisplayDate  = strtoupper(date('M')) . ' ' . date('Y');
 }
 //set selected labs
-$selectedLabs = array();
-if(isset($labFilter) && trim($labFilter)!= ''){
-    $selectedLabs = explode(",",$labFilter);
+$selectedLabs = [];
+if (isset($labFilter) && trim($labFilter) != '') {
+    $selectedLabs = explode(",", $labFilter);
 }
 //set selected provinces
-$selectedProvinces = array();
-if(isset($facilityInfo['selectedProvinces']) && count($facilityInfo['selectedProvinces']) >0){
-    foreach($facilityInfo['selectedProvinces'] as $province){
+$selectedProvinces = [];
+if (isset($facilityInfo['selectedProvinces']) && count($facilityInfo['selectedProvinces']) > 0) {
+    foreach ($facilityInfo['selectedProvinces'] as $province) {
         $selectedProvinces[] = $province['geo_id'];
     }
 }
 //set selected districts
-$selectedDistricts = array();
-if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) >0){
-    foreach($facilityInfo['labDistricts'] as $district){
+$selectedDistricts = [];
+if (isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) > 0) {
+    foreach ($facilityInfo['labDistricts'] as $district) {
         $selectedDistricts[] = $district['facility_district'];
     }
 }
 ?>
 <link href="<?php echo $this->basePath('assets/global/css/month-year-rang-picker.css'); ?>" rel="stylesheet" type="text/css" />
 <!-- BEGIN PAGE HEADER-->
-    <!-- BEGIN THEME PANEL -->
-    <!-- END THEME PANEL -->
-    <!-- BEGIN PAGE BAR -->
-     <div class="page-bar">
-        <h1 class="page-title"><?php echo $this->translate('Request Form Completeness'); ?>
+<!-- BEGIN THEME PANEL -->
+<!-- END THEME PANEL -->
+<!-- BEGIN PAGE BAR -->
+<div class="page-bar">
+    <h1 class="page-title"><?php echo $this->translate('Request Form Completeness'); ?>
         <ul class="page-breadcrumb pull-right">
             <li>
                 <i class="fa fa-arrow-left"></i>
                 <a href="/labs/dashboard"><?php echo $this->translate('Back to Labs Dashboard'); ?></a>
             </li>
         </ul>
-        </h1>
-    </div>                    
-   
-    <!-- END PAGE BAR -->
-    <!-- BEGIN PAGE TITLE-->
-    <h3 class="page-title"></h3>
-    <!-- END PAGE TITLE-->
-    <!-- END PAGE HEADER-->
-    <form id="pageFilter" action="#" method="">
-        <div class="row">
-            <div class="col-md-12" style="padding-left:30px;">
+    </h1>
+</div>
+
+<!-- END PAGE BAR -->
+<!-- BEGIN PAGE TITLE-->
+<h3 class="page-title"></h3>
+<!-- END PAGE TITLE-->
+<!-- END PAGE HEADER-->
+<form id="pageFilter" action="#" method="">
+    <div class="row">
+        <div class="col-md-12" style="padding-left:30px;">
             <div class="col-md-12">
                 <div class="form-group col-lg-4">
                     <label class="control-label"><?php echo $this->translate('Date Range'); ?>&nbsp;</label>
-                  <div id="sla-data-range" class="btn btn-sm form-control col-lg-6 mrp-container ">
-                    
-                    <span class="mrp-icon"><i class="fa fa-calendar"></i> &nbsp;</span>
-                    <div class="mrp-monthdisplay ">
-                      <span class="mrp-lowerMonth"><?php echo $startDisplayDate; ?></span>
-                      <span class="mrp-to"> to </span>
-                      <span class="mrp-upperMonth"><?php echo $endDisplayDate; ?></span>
+                    <div id="sla-data-range" class="btn btn-sm form-control col-lg-6 mrp-container ">
+
+                        <span class="mrp-icon"><i class="fa fa-calendar"></i> &nbsp;</span>
+                        <div class="mrp-monthdisplay ">
+                            <span class="mrp-lowerMonth"><?php echo $startDisplayDate; ?></span>
+                            <span class="mrp-to"> to </span>
+                            <span class="mrp-upperMonth"><?php echo $endDisplayDate; ?></span>
+                        </div>
+                        <input type="hidden" value="<?php echo $startDate; ?>" id="mrp-lowerDate" />
+                        <input type="hidden" value="<?php echo $endDate; ?>" id="mrp-upperDate" />
+
                     </div>
-                  <input type="hidden" value="<?php echo $startDate; ?>" id="mrp-lowerDate" />
-                  <input type="hidden" value="<?php echo $endDate; ?>" id="mrp-upperDate" />
-                
-                </div>
                 </div>
                 <div class="form-group col-lg-4">
                     <label class="control-label"><?php echo $this->translate('Provinces'); ?>&nbsp;</label>
                     <select name="provinces[]" id="provinces" class="form-control" multiple title="<?php echo $this->translate('Please choose provinces'); ?>" onchange="getLocationInfo('provinces');">
                         <?php
-                        if(isset($facilityInfo['provinces']) && !empty($facilityInfo['provinces'])){
-                            foreach($facilityInfo['provinces'] as $province){
+                        if (isset($facilityInfo['provinces']) && !empty($facilityInfo['provinces'])) {
+                            foreach ($facilityInfo['provinces'] as $province) {
                         ?>
-                            <option value="<?php echo $province['geo_id']; ?>" <?php echo(in_array($province['geo_id'],$selectedProvinces))?'selected="selected"':''; ?>><?php echo ucwords($province['geo_name']); ?></option>
-                        <?php } } ?>
+                                <option value="<?php echo $province['geo_id']; ?>" <?php echo (in_array($province['geo_id'], $selectedProvinces)) ? 'selected="selected"' : ''; ?>><?php echo ucwords($province['geo_name']); ?></option>
+                        <?php }
+                        } ?>
                     </select>
                 </div>
                 <div class="form-group col-lg-4">
                     <label class="control-label"><?php echo $this->translate('Districts'); ?>&nbsp;</label>
                     <select name="districts[]" id="districts" class="form-control" multiple title="<?php echo $this->translate('Please choose districts'); ?>" onchange="getLocationInfo('districts');">
                         <?php
-                        if(isset($facilityInfo['provinceDistricts']) && !empty($facilityInfo['provinceDistricts'])){
-                            foreach($facilityInfo['provinceDistricts'] as $provinceDistrict){
+                        if (isset($facilityInfo['provinceDistricts']) && !empty($facilityInfo['provinceDistricts'])) {
+                            foreach ($facilityInfo['provinceDistricts'] as $provinceDistrict) {
                         ?>
-                            <option value="<?php echo $provinceDistrict['geo_id']; ?>" <?php echo(in_array($provinceDistrict['geo_id'],$selectedDistricts))?'selected="selected"':''; ?>><?php echo ucwords($provinceDistrict['geo_name']); ?></option>
-                        <?php } } ?>
+                                <option value="<?php echo $provinceDistrict['geo_id']; ?>" <?php echo (in_array($provinceDistrict['geo_id'], $selectedDistricts)) ? 'selected="selected"' : ''; ?>><?php echo ucwords($provinceDistrict['geo_name']); ?></option>
+                        <?php }
+                        } ?>
                     </select>
                 </div>
             </div>
@@ -103,29 +105,30 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
                     <label class="control-label"><?php echo $this->translate('Labs'); ?>&nbsp;</label>
                     <select name="labName[]" id="labName" class="form-control" multiple title="<?php echo $this->translate('Please choose labs'); ?>">
                         <?php
-                        if(isset($facilityInfo['labs']) && count($facilityInfo['labs']) > 0){
-                            foreach($facilityInfo['labs'] as $labs){
+                        if (isset($facilityInfo['labs']) && count($facilityInfo['labs']) > 0) {
+                            foreach ($facilityInfo['labs'] as $labs) {
                         ?>
-                            <option value="<?php echo $labs['facility_id']; ?>" <?php echo(in_array($labs['facility_id'],$selectedLabs))?'selected="selected"':''; ?>><?php echo ucwords($labs['facility_name']); ?></option>
-                        <?php } } ?>
+                                <option value="<?php echo $labs['facility_id']; ?>" <?php echo (in_array($labs['facility_id'], $selectedLabs)) ? 'selected="selected"' : ''; ?>><?php echo ucwords($labs['facility_name']); ?></option>
+                        <?php }
+                        } ?>
                     </select>
                 </div>
                 <div class="form-group col-lg-4">
-                  <label class="control-label"><?php echo $this->translate('Gender'); ?></label>
-                  <select class="form-control" name="gender" id="gender">
-                    <option value=""><?php echo $this->translate('All'); ?></option>
-                    <option value="M"><?php echo $this->translate('Male'); ?></option>
-                    <option value="F"><?php echo $this->translate('Female'); ?></option>
-                    <option value="not_specified"><?php echo $this->translate('Not Specified'); ?></option>
-                  </select>
+                    <label class="control-label"><?php echo $this->translate('Gender'); ?></label>
+                    <select class="form-control" name="gender" id="gender">
+                        <option value=""><?php echo $this->translate('All'); ?></option>
+                        <option value="M"><?php echo $this->translate('Male'); ?></option>
+                        <option value="F"><?php echo $this->translate('Female'); ?></option>
+                        <option value="not_specified"><?php echo $this->translate('Not Specified'); ?></option>
+                    </select>
                 </div>
                 <div class="form-group col-lg-4 femaleSection" style="display:none;">
                     <label class="control-label"><?php echo $this->translate('Is Patient Pregnant'); ?></label>
                     <select class="form-control" name="isPregnant" id="isPregnant">
-                      <option value=""><?php echo $this->translate('All'); ?></option>  
-                      <option value="yes"><?php echo $this->translate('Yes'); ?></option>
-                      <option value="no"><?php echo $this->translate('No'); ?></option>
-                      <option value="unreported"><?php echo $this->translate('Unreported'); ?></option>
+                        <option value=""><?php echo $this->translate('All'); ?></option>
+                        <option value="yes"><?php echo $this->translate('Yes'); ?></option>
+                        <option value="no"><?php echo $this->translate('No'); ?></option>
+                        <option value="unreported"><?php echo $this->translate('Unreported'); ?></option>
                     </select>
                 </div>
             </div>
@@ -133,10 +136,10 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
                 <div class="form-group col-lg-4 femaleSection" style="display:none;">
                     <label class="control-label"><?php echo $this->translate('Is Patient Breastfeeding'); ?></label>
                     <select class="form-control" name="isBreastfeeding" id="isBreastfeeding">
-                      <option value=""><?php echo $this->translate('All'); ?></option>  
-                      <option value="yes"><?php echo $this->translate('Yes'); ?></option>
-                      <option value="no"><?php echo $this->translate('No'); ?></option>
-                      <option value="unreported"><?php echo $this->translate('Unreported'); ?></option>
+                        <option value=""><?php echo $this->translate('All'); ?></option>
+                        <option value="yes"><?php echo $this->translate('Yes'); ?></option>
+                        <option value="no"><?php echo $this->translate('No'); ?></option>
+                        <option value="unreported"><?php echo $this->translate('Unreported'); ?></option>
                     </select>
                 </div>
             </div>
@@ -146,54 +149,76 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
                     <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="resetEverything();"><?php echo $this->translate('Reset'); ?></a>
                 </div>
             </div>
-            </div>
-        </div>
-    </form>
-    <hr style="background: #000 !important;border-color:#ccc;">
-    <div class="row" style="margin-bottom:30px;">
-        <div class="col-lg-6">
-            <div id="piecontainer" style="min-width: 310px; height: 400px; max-width: 100%; margin: 0 auto;padding:1.5%;"></div>
-        </div>
-        <div class="col-lg-6">
-            <div id="barcontainer" style="min-width: 310px; height: 400px; max-width: 100%; margin: 0 auto;padding:1.5%;"></div>
         </div>
     </div>
+</form>
+<hr style="background: #000 !important;border-color:#ccc;">
+<div class="row" style="margin-bottom:30px;">
+    <div class="col-lg-6">
+        <div id="piecontainer" style="min-width: 310px; height: 400px; max-width: 100%; margin: 0 auto;padding:1.5%;"></div>
+    </div>
+    <div class="col-lg-6">
+        <div id="barcontainer" style="min-width: 310px; height: 400px; max-width: 100%; margin: 0 auto;padding:1.5%;"></div>
+    </div>
+</div>
 <script>
-    function generatePieContainer(){
+    function generatePieContainer() {
         $.blockUI.defaults.css.border = '1px solid grey';
-        $(document).ajaxStart($.blockUI({ message: '<h2><?php echo $this->translate('Processing...'); ?></h2>' })).ajaxStop($.unblockUI);
+        $(document).ajaxStart($.blockUI({
+            message: '<h2><?php echo $this->translate('Processing...'); ?></h2>'
+        })).ajaxStop($.unblockUI);
         var fromDate = $('#mrp-lowerDate').val();
         var toDate = $('#mrp-upperDate').val();
-        var provinces = ($("#provinces").val() == null)?'':$("#provinces").val().join(',');
-        var districts = ($("#districts").val() == null)?'':$("#districts").val().join(',');
-        var lab = ($("#labName").val() == null)?'':$("#labName").val().join(',');
+        var provinces = ($("#provinces").val() == null) ? '' : $("#provinces").val().join(',');
+        var districts = ($("#districts").val() == null) ? '' : $("#districts").val().join(',');
+        var lab = ($("#labName").val() == null) ? '' : $("#labName").val().join(',');
         var gender = $("#gender").val();
         var isPregnant = $("#isPregnant").val();
         var isBreastfeeding = $("#isBreastfeeding").val();
-        $.post("<?php echo $this->url('laboratory', array('action' => 'get-incomplete-sample-details')); ?>",{fromDate:fromDate,toDate:toDate,provinces:provinces,districts:districts,lab:lab,gender:gender,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding},
-        function(data) {
-            $("#piecontainer").html(data);
-        });
+        $.post("<?php echo $this->url('laboratory', array('action' => 'get-incomplete-sample-details')); ?>", {
+                fromDate: fromDate,
+                toDate: toDate,
+                provinces: provinces,
+                districts: districts,
+                lab: lab,
+                gender: gender,
+                isPregnant: isPregnant,
+                isBreastfeeding: isBreastfeeding
+            },
+            function(data) {
+                $("#piecontainer").html(data);
+            });
     }
-    
-    function generateChartContainer(){
+
+    function generateChartContainer() {
         $.blockUI.defaults.css.border = '1px solid grey';
-        $(document).ajaxStart($.blockUI({ message: '<h2><?php echo $this->translate('Processing...'); ?></h2>' })).ajaxStop($.unblockUI);
+        $(document).ajaxStart($.blockUI({
+            message: '<h2><?php echo $this->translate('Processing...'); ?></h2>'
+        })).ajaxStop($.unblockUI);
         var fromDate = $('#mrp-lowerDate').val();
         var toDate = $('#mrp-upperDate').val();
-        var provinces = ($("#provinces").val() == null)?'':$("#provinces").val().join(',');
-        var districts = ($("#districts").val() == null)?'':$("#districts").val().join(',');
-        var lab = ($("#labName").val() == null)?'':$("#labName").val().join(',');
+        var provinces = ($("#provinces").val() == null) ? '' : $("#provinces").val().join(',');
+        var districts = ($("#districts").val() == null) ? '' : $("#districts").val().join(',');
+        var lab = ($("#labName").val() == null) ? '' : $("#labName").val().join(',');
         var gender = $("#gender").val();
         var isPregnant = $("#isPregnant").val();
         var isBreastfeeding = $("#isBreastfeeding").val();
-        $.post("<?php echo $this->url('laboratory', array('action' => 'get-incomplete-bar-sample-details')); ?>",{fromDate:fromDate,toDate:toDate,provinces:provinces,districts:districts,lab:lab,gender:gender,isPregnant:isPregnant,isBreastfeeding:isBreastfeeding},
-        function(data) {
-            $("#barcontainer").html(data);
-        });
+        $.post("<?php echo $this->url('laboratory', array('action' => 'get-incomplete-bar-sample-details')); ?>", {
+                fromDate: fromDate,
+                toDate: toDate,
+                provinces: provinces,
+                districts: districts,
+                lab: lab,
+                gender: gender,
+                isPregnant: isPregnant,
+                isBreastfeeding: isBreastfeeding
+            },
+            function(data) {
+                $("#barcontainer").html(data);
+            });
     }
-    
-    $(document).ready(function(){
+
+    $(document).ready(function() {
         $('#provinces').select2({
             placeholder: "<?php echo $this->translate('All Provinces'); ?>",
             allowClear: true
@@ -206,59 +231,67 @@ if(isset($facilityInfo['labDistricts']) && count($facilityInfo['labDistricts']) 
             placeholder: "<?php echo $this->translate('All Labs'); ?>",
             allowClear: true
         });
-        $('#piebutton').on('click', function () {
-            $('#piecontainer').fadeIn(function () {
+        $('#piebutton').on('click', function() {
+            $('#piecontainer').fadeIn(function() {
                 generatePieContainer();
             });
         });
-        $('#barbutton').on('click', function () {
-            $('#barcontainer').fadeIn(function () {
+        $('#barbutton').on('click', function() {
+            $('#barcontainer').fadeIn(function() {
                 generateChartContainer();
             });
-        }); 
-       generatePieContainer();
-       generateChartContainer();
+        });
+        generatePieContainer();
+        generateChartContainer();
     });
 
-    function searchIncompleteSampleResult(){
+    function searchIncompleteSampleResult() {
         generatePieContainer();
         generateChartContainer();
     }
-    
-    function resetEverything(){
+
+    function resetEverything() {
         $('#pageFilter')[0].reset();
         $('#provinces').val('').change();
         $('#districts').val('').change();
         $('#labName').val('').change();
-        if($('#gender').val() == 'F'){
-          $('.femaleSection').show();  
-        }else{
-          $('.femaleSection').hide();  
+        if ($('#gender').val() == 'F') {
+            $('.femaleSection').show();
+        } else {
+            $('.femaleSection').hide();
         }
         searchIncompleteSampleResult();
     }
-    
-    $('#gender').on('change',function() {
-        if(this.value == 'F'){
+
+    $('#gender').on('change', function() {
+        if (this.value == 'F') {
             $('.femaleSection').show();
-        }else{
-           $('.femaleSection').hide();
-           $("#isPregnant").val('');
-           $("#isBreastfeeding").val('');
+        } else {
+            $('.femaleSection').hide();
+            $("#isPregnant").val('');
+            $("#isBreastfeeding").val('');
         }
     });
-    
-    function getLocationInfo(fromSrc){
-        var provinces = ($("#provinces").val() == null || $("#provinces").val() == '')?[]:$("#provinces").val();
-        var districts = ($("#districts").val() == null || $("#districts").val() == '')?[]:$("#districts").val();
-        $.post("<?php echo $this->url('laboratory', array('action' => 'get-location-info')); ?>", {provinces:provinces,districts:districts,fromSrc:fromSrc},
-        function(data){
-            if(fromSrc == 'provinces'){ $('#districts').val('').change(); }
-            $('#labName').val('').change();
-            var splitLocationInfo = data.split('##');
-            if(fromSrc == 'provinces'){ $('#districts').html(splitLocationInfo[0]); }
-            $('#labName').html(splitLocationInfo[1]);
-        });
+
+    function getLocationInfo(fromSrc) {
+        var provinces = ($("#provinces").val() == null || $("#provinces").val() == '') ? [] : $("#provinces").val();
+        var districts = ($("#districts").val() == null || $("#districts").val() == '') ? [] : $("#districts").val();
+        $.post("<?php echo $this->url('laboratory', array('action' => 'get-location-info')); ?>", {
+                provinces: provinces,
+                districts: districts,
+                fromSrc: fromSrc
+            },
+            function(data) {
+                if (fromSrc == 'provinces') {
+                    $('#districts').val('').change();
+                }
+                $('#labName').val('').change();
+                var splitLocationInfo = data.split('##');
+                if (fromSrc == 'provinces') {
+                    $('#districts').html(splitLocationInfo[0]);
+                }
+                $('#labName').html(splitLocationInfo[1]);
+            });
     }
 </script>
 <script src="<?php echo $this->basePath('assets/js/month-year-range-picker.php'); ?>" type="text/javascript"></script>

@@ -154,7 +154,7 @@ class DashApiReceiverStatsTable extends AbstractTableGateway
         );
         $xdays = 10;
         foreach ($rResult as $key => $aRow) {
-            $row = array();
+            $row = [];
             $max = date("y-m-d HH:mi:ss", strtotime($aRow['received_on'] . "+" . $xdays . " days"));
             if (date("y-m-d HH:mi:ss") >= $max) {
                 $row[] = "<status-indicator negative pulse></status-indicator>";

@@ -1,8 +1,7 @@
 <?php
 $less1000 = array('DBS' => '#60d18f', 'Others' => '#60d18f');
 $more1000 = array('DBS' => '#ff1900', 'Others' => '#F2786D');
-foreach($result as $sample=>$result){
-    
+foreach ($result as $sample => $result) {
 }
 ?>
 <div id="samplesTestedVsSuppressed"></div>
@@ -65,7 +64,7 @@ foreach($result as $sample=>$result){
             },
             series: [
                 <?php
-                $sampleType = array();
+                $sampleType = [];
                 $sampleType[0]['sample_name'] = 'DBS';
                 $sampleType[1]['sample_name'] = 'Others';
                 foreach ($sampleType as $sample) {

@@ -159,7 +159,7 @@ class Module
 					$mappedFacilities = (isset($session->mappedFacilities) && !empty($session->mappedFacilities)) ? $session->mappedFacilities : array();
 					$mappedFacilitiesName = (isset($session->mappedFacilitiesName) && !empty($session->mappedFacilitiesName)) ? $session->mappedFacilitiesName : array();
 					$mappedFacilitiesCode = (isset($session->mappedFacilitiesCode) && !empty($session->mappedFacilitiesCode)) ? $session->mappedFacilitiesCode : array();
-					$lab = array();
+					$lab = [];
 					if (isset($_GET['lab']) && trim($_GET['lab']) != '') {
 						$lab = array_values(array_filter(explode(',', $_GET['lab'])));
 					}

@@ -73,11 +73,11 @@ class UsersTable extends AbstractTableGateway
             }
 
 
-            $facilities_id = array();
-            $facilities_name = array();
-            $facilities_code = array();
-            $provinces = array();
-            $districts = array();
+            $facilities_id = [];
+            $facilities_name = [];
+            $facilities_code = [];
+            $provinces = [];
+            $districts = [];
             $mapQuery = $sql->select()->from(array('u_f_map' => 'dash_user_facility_map'))
                 ->join(array('f' => 'facility_details'), 'f.facility_id=u_f_map.facility_id', array('facility_name', 'facility_code', 'facility_state', 'facility_district'))
                 ->where(array('u_f_map.user_id' => $rResult[0]["user_id"]));
@@ -379,7 +379,7 @@ class UsersTable extends AbstractTableGateway
 
         $buttText = $this->commonService->translate('Edit');
         foreach ($rResult as $aRow) {
-            $row = array();
+            $row = [];
             $row[] = ucwords($aRow['user_name']);
             $row[] = ucfirst($aRow['role_name']);
             $row[] = $aRow['email'];

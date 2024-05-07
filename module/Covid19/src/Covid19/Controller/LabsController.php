@@ -110,7 +110,7 @@ class LabsController extends AbstractActionController
 
     public function timeAction()
     {
-        $params = array();
+        $params = [];
         $month = "";
         $range = "";
         $provinceFilter = "";
@@ -225,10 +225,10 @@ class LabsController extends AbstractActionController
             $districtNames    = $params['districtNames'];
             $clinicNames      = $params['clinicNames'];
             $dates            = explode(" to ", $params['sampleCollectionDate']);
-            $provinceArray    = array();
-            $districtArray    = array();
-            $clinicArray      = array();
-            $times            = array();
+            $provinceArray    = [];
+            $districtArray    = [];
+            $clinicArray      = [];
+            $times            = [];
 
             if (isset($provinces) && !empty($provinces)) {
                 $counter = count($provinces);
@@ -296,7 +296,7 @@ class LabsController extends AbstractActionController
     public function drillDownResultAwaitedAction()
     {
         $this->layout()->setVariable('activeTab', 'covid19-labs');
-        $params = array();
+        $params = [];
         $frmSource = "";
         $labFilter = "";
         if ($this->params()->fromQuery('src')) {
@@ -393,7 +393,7 @@ class LabsController extends AbstractActionController
     public function drillDownAction()
     {
         $this->layout()->setVariable('activeTab', 'covid19-labs');
-        $params = array();
+        $params = [];
 
         $labFilter = $this->params()->fromQuery('lab');
         $params['labs'] = explode(',', $labFilter);
@@ -486,7 +486,7 @@ class LabsController extends AbstractActionController
     public function samplesTestedLabAction()
     {
         $this->layout()->setVariable('activeTab', 'covid19-labs');
-        $params = array();
+        $params = [];
         $gender = "";
         $month = "";
         $range = "";
@@ -518,8 +518,8 @@ class LabsController extends AbstractActionController
             $params['labNames'] = explode(',', $labFilter);
         }
 
-        
-        
+
+
         $hubName = $this->sampleService->getAllHubName();
         $sampleType = $this->sampleService->getSampleType();
         $facilityInfo = $this->commonService->getSampleTestedFacilityInfo($params);
@@ -554,7 +554,7 @@ class LabsController extends AbstractActionController
     public function sampleVolumeAction()
     {
         $this->layout()->setVariable('activeTab', 'labs-dashboard');
-        $params = array();
+        $params = [];
         $fromMonth = "";
         $toMonth = "";
         $labFilter = "";
@@ -573,8 +573,8 @@ class LabsController extends AbstractActionController
         if ($this->params()->fromQuery('result')) {
             $sampleStatus = $this->params()->fromQuery('result');
         }
-        
-        
+
+
         $hubName = $this->sampleService->getAllHubName();
         $sampleType = $this->sampleService->getSampleType();
         $currentRegimen = $this->sampleService->getAllCurrentRegimen();
@@ -597,7 +597,7 @@ class LabsController extends AbstractActionController
         $request = $this->getRequest();
         if ($request->isPost()) {
             $params = $request->getPost();
-            
+
             $file = $this->sampleService->generateSampleResultExcel($params);
             $viewModel = new ViewModel();
             $viewModel->setVariables(array('file' => $file))

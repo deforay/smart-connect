@@ -27,19 +27,19 @@ if (isset($searchMonth) && trim($searchMonth) != '') {
     $endDisplayDate  = strtoupper(date('M')) . ' ' . date('Y');
 }
 //set selected labs
-$selectedLabs = array();
+$selectedLabs = [];
 if (isset($labFilter) && trim($labFilter) != '') {
     $selectedLabs = explode(",", $labFilter);
 }
 //set selected provinces
-$selectedProvinces = array();
+$selectedProvinces = [];
 if (isset($facilityInfo['selectedProvinces']) && !empty($facilityInfo['selectedProvinces'])) {
     foreach ($facilityInfo['selectedProvinces'] as $province) {
         $selectedProvinces[] = $province['geo_id'];
     }
 }
 //set selected districts
-$selectedDistricts = array();
+$selectedDistricts = [];
 if (isset($facilityInfo['labDistricts']) && !empty($facilityInfo['labDistricts'])) {
     foreach ($facilityInfo['labDistricts'] as $district) {
         $selectedDistricts[] = $district['facility_district'];

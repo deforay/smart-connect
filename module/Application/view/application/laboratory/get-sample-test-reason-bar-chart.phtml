@@ -1,151 +1,147 @@
 <?php
-$supAvg = array();
-if(isset($result['sampleTestedReason']) && count($result['sampleTestedReason']) >0){
-$arrayKey = array_keys($result['sampleTestedReason']);
-$sumArray = array_map(function () {
-    return array_sum(func_get_args());
-}, $result['sampleTestedReason'][$arrayKey[0]], $result['sampleTestedReason'][$arrayKey[1]]);
-foreach($result['sampleTestedReason'][$arrayKey[1]] as $key=>$suppression){
-    $supAvg[] = (($suppression==0) ? 0 : round(100 * ($suppression / $sumArray[$key]),2));
-}
+$supAvg = [];
+if (isset($result['sampleTestedReason']) && count($result['sampleTestedReason']) > 0) {
+    $arrayKey = array_keys($result['sampleTestedReason']);
+    $sumArray = array_map(function () {
+        return array_sum(func_get_args());
+    }, $result['sampleTestedReason'][$arrayKey[0]], $result['sampleTestedReason'][$arrayKey[1]]);
+    foreach ($result['sampleTestedReason'][$arrayKey[1]] as $key => $suppression) {
+        $supAvg[] = (($suppression == 0) ? 0 : round(100 * ($suppression / $sumArray[$key]), 2));
+    }
 }
 ?>
 <div id="samplesTestedReasonVsSuppressed"></div>
 <script>
-       $(function () {
+    $(function() {
         $('#samplesTestedReasonVsSuppressed').highcharts({
-        chart: {
-            type: 'column'
-        },
-        title: {
-            text: ''
-        },
-        exporting:{
-            chartOptions:{
-                subtitle: {
-                    text:'<?php echo $this->translate('Reason for VL Testing'); ?>',
-                }
-            }
-        },
-       credits: {
-              enabled: false
-       },
-        xAxis: {
-            categories: [<?php
-            if (isset($result['date']) && !empty($result['date'])) {
-              foreach($result['date'] as $date){
-                  echo "'".$date."',";
-              }
-            }
-            ?>]
-        },
-        yAxis: [{
-            allowDecimals: false,
-            min: 0,
+            chart: {
+                type: 'column'
+            },
             title: {
-                text: '<?php echo $this->translate('No. of Samples'); ?>'
+                text: ''
             },
-            
-        },
-        { // Secondary yAxis
-                         allowDecimals: true,
-                         min: 0,
-                         max: 100,
-                         title: {
-                            text: '<?php echo $this->translate('Suppression %'); ?>',
-                             style: {
-                             }
-                         },
-                         labels: {
-                             format: '{value}%',
-                             style: {
-                             }
-                         },
-                         opposite: true
-                     }
-        ],
-        tooltip: {
-            formatter: function () {
-                return '<b>' + this.x + '</b><br/>' +
-                    this.series.name + ': ' + this.y + '<br/>' +
-                    '<?php echo $this->translate('Total'); ?>: ' + this.point.stackTotal;
-            }
-        },
-        plotOptions: {
-            column: {
-                stacking: 'normal',
-                pointPadding: 0.2,
-                borderWidth: 0,
-                cursor: 'pointer',
-                point: {
-                    events: {
-                        click: function (e) {
-                            doSampleTestedRedirect(e.point.category);
-                        }
+            exporting: {
+                chartOptions: {
+                    subtitle: {
+                        text: '<?php echo $this->translate('Reason for VL Testing'); ?>',
                     }
                 }
             },
-            spline: {
-                stacking: 'normal',
-                pointPadding: 0.2,
-                borderWidth: 0,
-                lineWidth : 0,
-                cursor: 'pointer',
-                marker: {
-                symbol: 'diamond'
+            credits: {
+                enabled: false
+            },
+            xAxis: {
+                categories: [<?php
+                                if (isset($result['date']) && !empty($result['date'])) {
+                                    foreach ($result['date'] as $date) {
+                                        echo "'" . $date . "',";
+                                    }
+                                }
+                                ?>]
+            },
+            yAxis: [{
+                    allowDecimals: false,
+                    min: 0,
+                    title: {
+                        text: '<?php echo $this->translate('No. of Samples'); ?>'
+                    },
+
                 },
-                states: {
-                hover: {
-                    lineWidthPlus: 0
+                { // Secondary yAxis
+                    allowDecimals: true,
+                    min: 0,
+                    max: 100,
+                    title: {
+                        text: '<?php echo $this->translate('Suppression %'); ?>',
+                        style: {}
+                    },
+                    labels: {
+                        format: '{value}%',
+                        style: {}
+                    },
+                    opposite: true
                 }
-                },  
-                color : '#1B325F',
-                yAxis: 1,
-                point: {
-                    events: {
-                        click: function (e) {
-                            //doSampleTestedRedirect(e.point.category);
+            ],
+            tooltip: {
+                formatter: function() {
+                    return '<b>' + this.x + '</b><br/>' +
+                        this.series.name + ': ' + this.y + '<br/>' +
+                        '<?php echo $this->translate('Total'); ?>: ' + this.point.stackTotal;
+                }
+            },
+            plotOptions: {
+                column: {
+                    stacking: 'normal',
+                    pointPadding: 0.2,
+                    borderWidth: 0,
+                    cursor: 'pointer',
+                    point: {
+                        events: {
+                            click: function(e) {
+                                doSampleTestedRedirect(e.point.category);
+                            }
+                        }
+                    }
+                },
+                spline: {
+                    stacking: 'normal',
+                    pointPadding: 0.2,
+                    borderWidth: 0,
+                    lineWidth: 0,
+                    cursor: 'pointer',
+                    marker: {
+                        symbol: 'diamond'
+                    },
+                    states: {
+                        hover: {
+                            lineWidthPlus: 0
+                        }
+                    },
+                    color: '#1B325F',
+                    yAxis: 1,
+                    point: {
+                        events: {
+                            click: function(e) {
+                                //doSampleTestedRedirect(e.point.category);
+                            }
                         }
                     }
                 }
-            }
-        },
-        series: [<?php
-        if(isset($result['sampleTestedReason']) && count($result['sampleTestedReason']) >0){
-              foreach($result['sampleTestedReason'] as $key=>$condition){
-                     if($key!='VL Not Detected'){
-                       $range = substr($key,4,6);
-                       $range = preg_replace('/\s+/', '', $range);
-                     }else{
-                       $range = 'nd';
-                     }
-              ?>
-              {
-              name:'<?php echo $this->translate($key); ?>',
-              <?php if(strpos($key, '>') !== false){ ?>
-              color : '#ff1900',
-              <?php } else if(strpos($key, '<') !== false){ ?>
-              color : '#60d18f',
-              <?php } ?>              
-              data:[<?php
-                  foreach($condition as $count){
-                     echo '{y:'.$count.'},';
-                  }
-              ?>],
-              },
-              <?php
-              }
-        }
-        if(count($supAvg)>0){
-            ?>
-            {
-            name: '<?php echo $this->translate('Suppression %'); ?>',
-            type: 'spline',
-            data: [<?php echo implode(",",$supAvg);?>],
-        }
-        <?php } ?>
-        ],
-        colors: ['#ff1900','#60d18f',],
-    });
+            },
+            series: [<?php
+                        if (isset($result['sampleTestedReason']) && count($result['sampleTestedReason']) > 0) {
+                            foreach ($result['sampleTestedReason'] as $key => $condition) {
+                                if ($key != 'VL Not Detected') {
+                                    $range = substr($key, 4, 6);
+                                    $range = preg_replace('/\s+/', '', $range);
+                                } else {
+                                    $range = 'nd';
+                                }
+                        ?> {
+                            name: '<?php echo $this->translate($key); ?>',
+                            <?php if (strpos($key, '>') !== false) { ?>
+                                color: '#ff1900',
+                            <?php } else if (strpos($key, '<') !== false) { ?>
+                                color: '#60d18f',
+                            <?php } ?>
+                            data: [<?php
+                                    foreach ($condition as $count) {
+                                        echo '{y:' . $count . '},';
+                                    }
+                                    ?>],
+                        },
+                    <?php
+                            }
+                        }
+                        if (count($supAvg) > 0) {
+                    ?> {
+                        name: '<?php echo $this->translate('Suppression %'); ?>',
+                        type: 'spline',
+                        data: [<?php echo implode(",", $supAvg); ?>],
+                    }
+                <?php } ?>
+            ],
+            colors: ['#ff1900', '#60d18f', ],
+        });
     });
 </script>

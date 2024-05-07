@@ -420,9 +420,9 @@ class SampleService
                     $excel = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
 
                     $sheet = $excel->getActiveSheet();
-                    $output = array();
+                    $output = [];
                     foreach ($sResult as $aRow) {
-                        $row = array();
+                        $row = [];
                         $sampleCollectionDate = '';
                         $sampleTestedDate = '';
                         if (isset($aRow['sampleCollectionDate']) && $aRow['sampleCollectionDate'] != NULL && trim($aRow['sampleCollectionDate']) != "" && $aRow['sampleCollectionDate'] != '0000-00-00') {
@@ -554,10 +554,10 @@ class SampleService
                     $excel = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
 
                     $sheet = $excel->getActiveSheet();
-                    $output = array();
+                    $output = [];
                     $i = 1;
                     foreach ($sResult as $aRow) {
-                        $row = array();
+                        $row = [];
                         if (isset($aRow['sampleCollectionDate']) && $aRow['sampleCollectionDate'] != NULL && trim($aRow['sampleCollectionDate']) != "" && $aRow['sampleCollectionDate'] != '0000-00-00') {
                             $sampleCollectionDate = CommonService::humanReadableDateFormat($aRow['sampleCollectionDate']);
                         }
@@ -726,9 +726,9 @@ class SampleService
                         $excel = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
 
                         $sheet = $excel->getActiveSheet();
-                        $output = array();
+                        $output = [];
                         foreach ($sResult as $aRow) {
-                            $row = array();
+                            $row = [];
                             $row[] = ucwords($aRow['facility_name']);
                             $row[] = $aRow['total_samples_received'];
                             $row[] = $aRow['total_samples_tested'];
@@ -833,9 +833,9 @@ class SampleService
                     $excel = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
 
                     $sheet = $excel->getActiveSheet();
-                    $output = array();
+                    $output = [];
                     foreach ($sResult as $aRow) {
-                        $row = array();
+                        $row = [];
                         $sampleCollectionDate = '';
                         if (isset($aRow['sampleCollectionDate']) && $aRow['sampleCollectionDate'] != null && trim($aRow['sampleCollectionDate']) != "" && $aRow['sampleCollectionDate'] != '0000-00-00') {
                             $sampleCollectionDate = CommonService::humanReadableDateFormat($aRow['sampleCollectionDate']);
@@ -936,9 +936,9 @@ class SampleService
                 if (isset($sResult) && !empty($sResult)) {
                     $excel = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
                     $sheet = $excel->getActiveSheet();
-                    $output = array();
+                    $output = [];
                     foreach ($sResult as $aRow) {
-                        $row = array();
+                        $row = [];
                         $row[] = $aRow['monthDate'];
                         $row[] = $aRow['total_samples_received'];
                         $row[] = $aRow['total_samples_tested'];
@@ -1071,11 +1071,11 @@ class SampleService
                     $excel = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
 
                     $sheet = $excel->getActiveSheet();
-                    $output = array();
+                    $output = [];
                     foreach ($sResult as $aRow) {
                         $displayCollectionDate = CommonService::humanReadableDateFormat($aRow['collectionDate']);
                         $displayReceivedDate = CommonService::humanReadableDateFormat($aRow['receivedDate']);
-                        $row = array();
+                        $row = [];
                         $row[] = $aRow['sample_code'];
                         $row[] = $displayCollectionDate;
                         $row[] = $aRow['facilityCode'] . ' - ' . ucwords($aRow['facilityName']);
@@ -1200,8 +1200,8 @@ class SampleService
     public function getTATbyProvince($labs, $startDate, $endDate, $params = "")
     {
         // set_time_limit(10000);
-        $result = array();
-        $resultSet = array();
+        $result = [];
+        $resultSet = [];
         $resultSet = $this->sampleTable->getTATbyProvince($labs, $startDate, $endDate, $params);
         foreach ($resultSet as $key) {
             $result[] = array(
@@ -1222,7 +1222,7 @@ class SampleService
     public function getTATbyDistrict($labs, $startDate, $endDate)
     {
         // set_time_limit(10000);
-        $result = array();
+        $result = [];
 
         $resultSet = $this->sampleTable->getTATbyDistrict($labs, $startDate, $endDate);
         foreach ($resultSet as $key) {
@@ -1243,7 +1243,7 @@ class SampleService
     public function getTATbyClinic($labs, $startDate, $endDate)
     {
         // set_time_limit(10000);
-        $result = array();
+        $result = [];
 
         $resultSet = $this->sampleTable->getTATbyClinic($labs, $startDate, $endDate);
         foreach ($resultSet as $key) {
@@ -1292,7 +1292,7 @@ class SampleService
     {
         //ini_set("memory_limit", -1);
         try {
-            $apiData = array();
+            $apiData = [];
             $input = $this->config['db']['dsn'];
             preg_match('~=(.*?);~', $input, $output);
             $dbname = $output[1];
@@ -1318,7 +1318,7 @@ class SampleService
 
 
             if (!file_exists(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-vl") && !is_dir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-vl")) {
-                mkdir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-vl", 0777);
+                mkdir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-vl", 0777, true);
             }
 
             $fileName = $_FILES['vlFile']['name'];
@@ -1328,14 +1328,14 @@ class SampleService
             $fileName = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-vl" . DIRECTORY_SEPARATOR . $fileName;
 
             if (move_uploaded_file($_FILES['vlFile']['tmp_name'], $fileName)) {
-                [$apiData, $timestamp] = CommonService::processJsonFile($fileName, returnTimestamp: true, deleteSourceFile: true);
+                [$apiData, $timestamp] = CommonService::processJsonFile($fileName);
             }
 
             $numRows = $counter = 0;
             $currentDateTime = CommonService::getDateTime();
             foreach ($apiData as $rowData) {
                 $counter++;
-                $data = array();
+                $data = [];
                 foreach ($columnList as $colName) {
                     $data[$colName] = isset($rowData[$colName]) ? $rowData[$colName] : null;
                 }
@@ -1351,7 +1351,7 @@ class SampleService
                     }
                     $numRows++;
                 } catch (Exception $e) {
-                    error_log($e->getMessage());
+                    error_log($e->getFile() . ":" . $e->getLine() . " -" . $e->getMessage());
                 }
             }
 
@@ -1375,12 +1375,17 @@ class SampleService
             );
 
             $this->apiTrackerTable->insert($apiTrackData);
-
+            if (is_readable($fileName)) {
+                unlink($fileName);
+            }
             return array(
                 'status'    => 'success',
                 'message'   => $numRows . ' uploaded successfully',
             );
         } catch (Exception $exc) {
+            if (is_readable($fileName)) {
+                unlink($fileName);
+            }
             error_log($exc->getMessage());
             error_log($exc->getTraceAsString());
             return array(
@@ -1392,7 +1397,7 @@ class SampleService
     public function saveFileFromVlsmAPIV1()
     {
         ini_set("memory_limit", -1);
-        $apiData = array();
+        $apiData = [];
 
         $sampleDb = $this->sm->get('SampleTableWithoutCache');
         $facilityTypeDb = $this->sm->get('FacilityTypeTable');
@@ -1402,10 +1407,8 @@ class SampleService
         $locationDb = $this->sm->get('LocationDetailsTable');
         $sampleRjtReasonDb = $this->sm->get('SampleRejectionReasonTable');
 
-
-
         if (!file_exists(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-vl") && !is_dir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-vl")) {
-            mkdir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-vl", 0777);
+            mkdir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-vl", 0777, true);
         }
 
         $fileName = $_FILES['vlFile']['name'];
@@ -1413,277 +1416,269 @@ class SampleService
         $fileName = $this->commonService->generateRandomString(12) . "." . $extension;
 
         $fileName = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-vl" . DIRECTORY_SEPARATOR . $fileName;
-        if (move_uploaded_file($_FILES['vlFile']['tmp_name'], $fileName)) {
+        if (is_readable($fileName) && move_uploaded_file($_FILES['vlFile']['tmp_name'], $fileName)) {
             error_log($fileName);
             $apiData = CommonService::processJsonFile($fileName, false);
+        } else {
+            error_log("File $fileName not readable");
+            exit(0);
         }
 
-        if ($apiData !== FALSE) {
-            foreach ($apiData as $rowData) {
-                // ob_start();
-                // var_dump($rowData);
-                // error_log(ob_get_clean());
-                // exit(0);
-                foreach ($rowData as $row) {
-                    if (trim($row['sample_code']) != '' && trim($row['vlsm_instance_id']) != '') {
-                        $sampleCode = trim($row['sample_code']);
-                        $remoteSampleCode = trim($row['remote_sample_code']);
-                        $instanceCode = trim($row['vlsm_instance_id']);
-                        $uniqueId = trim($row['unique_id']);
 
-                        $VLAnalysisResult = (float) $row['result_value_absolute_decimal'];
+        foreach ($apiData as $rowData) {
+            foreach ($rowData as $row) {
+                if (trim($row['sample_code']) != '' && trim($row['vlsm_instance_id']) != '') {
+                    $sampleCode = trim($row['sample_code']);
+                    $remoteSampleCode = trim($row['remote_sample_code']);
+                    $instanceCode = trim($row['vlsm_instance_id']);
+                    $uniqueId = trim($row['unique_id']);
+
+                    $VLAnalysisResult = (float) $row['result_value_absolute_decimal'];
+                    $result_value_absolute_decimal = null;
+                    $vl_result_category = null;
+
+                    if (
+                        $row['result_value_text'] == 'Target not Detected' || $row['result_value_text'] == 'Target Not Detected' || strtolower($row['result_value_text']) == 'target not detected' || strtolower($row['result_value_text']) == 'tnd'
+                        || $row['result'] == 'Target not Detected' || $row['result'] == 'Target Not Detected' || strtolower($row['result']) == 'target not detected' || strtolower($row['result']) == 'tnd'
+                    ) {
+                        $VLAnalysisResult = 20;
+                    } elseif ($row['result_value_text'] == '< 20' || $row['result_value_text'] == '<20' || $row['result'] == '< 20' || $row['result'] == '<20') {
+                        $VLAnalysisResult = 20;
+                    } elseif ($row['result_value_text'] == '< 40' || $row['result_value_text'] == '<40' || $row['result'] == '< 40' || $row['result'] == '<40') {
+                        $VLAnalysisResult = 40;
+                    } elseif ($row['result_value_text'] == 'Nivel de detecÁao baixo' || $row['result_value_text'] == 'NÌvel de detecÁ„o baixo' || $row['result'] == 'Nivel de detecÁao baixo' || $row['result'] == 'NÌvel de detecÁ„o baixo') {
+                        $VLAnalysisResult = 20;
+                    } elseif ($row['result_value_text'] == 'Suppressed' || $row['result'] == 'Suppressed') {
+                        $VLAnalysisResult = 500;
+                    } elseif ($row['result_value_text'] == 'Not Suppressed' || $row['result'] == 'Not Suppressed') {
+                        $VLAnalysisResult = 1500;
+                    } elseif ($row['result_value_text'] == 'Negative' || $row['result_value_text'] == 'NEGAT' || $row['result'] == 'Negative' || $row['result'] == 'NEGAT') {
+                        $VLAnalysisResult = 20;
+                    } elseif ($row['result_value_text'] == 'Positive' || $row['result'] == 'Positive') {
+                        $VLAnalysisResult = 1500;
+                    } elseif ($row['result_value_text'] == 'Indeterminado' || $row['result'] == 'Indeterminado') {
+                        $VLAnalysisResult = "";
+                    }
+
+
+                    if ($VLAnalysisResult == 'NULL' || $VLAnalysisResult == '' || $VLAnalysisResult == NULL) {
                         $result_value_absolute_decimal = null;
                         $vl_result_category = null;
-
-                        if (
-                            $row['result_value_text'] == 'Target not Detected' || $row['result_value_text'] == 'Target Not Detected' || strtolower($row['result_value_text']) == 'target not detected' || strtolower($row['result_value_text']) == 'tnd'
-                            || $row['result'] == 'Target not Detected' || $row['result'] == 'Target Not Detected' || strtolower($row['result']) == 'target not detected' || strtolower($row['result']) == 'tnd'
-                        ) {
-                            $VLAnalysisResult = 20;
-                        } elseif ($row['result_value_text'] == '< 20' || $row['result_value_text'] == '<20' || $row['result'] == '< 20' || $row['result'] == '<20') {
-                            $VLAnalysisResult = 20;
-                        } elseif ($row['result_value_text'] == '< 40' || $row['result_value_text'] == '<40' || $row['result'] == '< 40' || $row['result'] == '<40') {
-                            $VLAnalysisResult = 40;
-                        } elseif ($row['result_value_text'] == 'Nivel de detecÁao baixo' || $row['result_value_text'] == 'NÌvel de detecÁ„o baixo' || $row['result'] == 'Nivel de detecÁao baixo' || $row['result'] == 'NÌvel de detecÁ„o baixo') {
-                            $VLAnalysisResult = 20;
-                        } elseif ($row['result_value_text'] == 'Suppressed' || $row['result'] == 'Suppressed') {
-                            $VLAnalysisResult = 500;
-                        } elseif ($row['result_value_text'] == 'Not Suppressed' || $row['result'] == 'Not Suppressed') {
-                            $VLAnalysisResult = 1500;
-                        } elseif ($row['result_value_text'] == 'Negative' || $row['result_value_text'] == 'NEGAT' || $row['result'] == 'Negative' || $row['result'] == 'NEGAT') {
-                            $VLAnalysisResult = 20;
-                        } elseif ($row['result_value_text'] == 'Positive' || $row['result'] == 'Positive') {
-                            $VLAnalysisResult = 1500;
-                        } elseif ($row['result_value_text'] == 'Indeterminado' || $row['result'] == 'Indeterminado') {
-                            $VLAnalysisResult = "";
-                        }
+                    } elseif ($VLAnalysisResult < 1000) {
+                        $vl_result_category = 'Suppressed';
+                        $result_value_absolute_decimal = $VLAnalysisResult;
+                    } elseif ($VLAnalysisResult >= 1000) {
+                        $vl_result_category = 'Not Suppressed';
+                        $result_value_absolute_decimal = $VLAnalysisResult;
+                    }
 
 
-                        if ($VLAnalysisResult == 'NULL' || $VLAnalysisResult == '' || $VLAnalysisResult == NULL) {
-                            $result_value_absolute_decimal = null;
-                            $vl_result_category = null;
-                        } elseif ($VLAnalysisResult < 1000) {
-                            $vl_result_category = 'Suppressed';
-                            $result_value_absolute_decimal = $VLAnalysisResult;
-                        } elseif ($VLAnalysisResult >= 1000) {
-                            $vl_result_category = 'Not Suppressed';
-                            $result_value_absolute_decimal = $VLAnalysisResult;
-                        }
+                    $sampleCollectionDate = (trim($row['sample_collection_date']) != '' ? trim(date('Y-m-d H:i', strtotime($row['sample_collection_date']))) : null);
+                    $sampleReceivedAtLab = (trim($row['sample_registered_at_lab']) != '' ? trim(date('Y-m-d H:i', strtotime($row['sample_registered_at_lab']))) : null);
+                    $dateOfInitiationOfRegimen = (trim($row['date_of_initiation_of_current_regimen']) != '' ? trim(date('Y-m-d H:i', strtotime($row['date_of_initiation_of_current_regimen']))) : null);
+                    $resultApprovedDateTime = (trim($row['result_approved_datetime']) != '' ? trim(date('Y-m-d H:i', strtotime($row['result_approved_datetime']))) : null);
+                    $sampleTestedDateTime = (trim($row['sample_tested_datetime']) != '' ? trim(date('Y-m-d H:i', strtotime($row['sample_tested_datetime']))) : null);
+                    $sampleRegisteredAtLabDateTime = (trim($row['sample_registered_at_lab']) != '' ? trim(date('Y-m-d H:i', strtotime($row['sample_registered_at_lab']))) : null);
+
+                    $data = array(
+                        'sample_code'                           => $sampleCode,
+                        'remote_sample_code'                    => $remoteSampleCode,
+                        'vlsm_instance_id'                      => trim($row['vlsm_instance_id']),
+                        'source'                                => '1',
+                        'patient_gender'                        => (trim($row['patient_gender']) != '' ? trim($row['patient_gender']) : NULL),
+                        'patient_age_in_years'                  => (trim($row['patient_age_in_years']) != '' ? trim($row['patient_age_in_years']) : NULL),
+                        'sample_collection_date'                => $sampleCollectionDate,
+                        //'sample_registered_at_lab'              => $sampleReceivedAtLab,
+                        'line_of_treatment'                     => (trim($row['line_of_treatment']) != '' ? trim($row['line_of_treatment']) : NULL),
+                        'is_sample_rejected'                    => (trim($row['is_sample_rejected']) != '' ? trim($row['is_sample_rejected']) : NULL),
+                        'is_patient_pregnant'                   => (trim($row['is_patient_pregnant']) != '' ? trim($row['is_patient_pregnant']) : NULL),
+                        'is_patient_breastfeeding'              => (trim($row['is_patient_breastfeeding']) != '' ? trim($row['is_patient_breastfeeding']) : NULL),
+                        'current_regimen'                       => (trim($row['current_regimen']) != '' ? trim($row['current_regimen']) : NULL),
+                        'date_of_initiation_of_current_regimen' => $dateOfInitiationOfRegimen,
+                        'arv_adherance_percentage'              => (trim($row['arv_adherance_percentage']) != '' ? trim($row['arv_adherance_percentage']) : NULL),
+                        'is_adherance_poor'                     => (trim($row['is_adherance_poor']) != '' ? trim($row['is_adherance_poor']) : NULL),
+                        'result_approved_datetime'              => $resultApprovedDateTime,
+                        'sample_tested_datetime'                => $sampleTestedDateTime,
+                        'result_value_log'                      => (trim($row['result_value_log']) != '' ? trim($row['result_value_log']) : NULL),
+                        'result_value_absolute'                 => (trim($row['result_value_absolute']) != '' ? trim($row['result_value_absolute']) : NULL),
+                        'result_value_text'                     => (trim($row['result_value_text']) != '' ? trim($row['result_value_text']) : NULL),
+                        //'result_value_absolute_decimal'         => (trim($row['result_value_absolute_decimal']) != '' ? trim($row['result_value_absolute_decimal']) : NULL),
+                        'result'                                => (trim($row['result']) != '' ? trim($row['result']) : NULL),
+                        'result_value_absolute_decimal'                            =>   $result_value_absolute_decimal,
+                        'vl_result_category'                 =>   $vl_result_category,
+                        'sample_registered_at_lab'              => $sampleRegisteredAtLabDateTime
+                    );
 
 
-                        $sampleCollectionDate = (trim($row['sample_collection_date']) != '' ? trim(date('Y-m-d H:i', strtotime($row['sample_collection_date']))) : null);
-                        $sampleReceivedAtLab = (trim($row['sample_registered_at_lab']) != '' ? trim(date('Y-m-d H:i', strtotime($row['sample_registered_at_lab']))) : null);
-                        $dateOfInitiationOfRegimen = (trim($row['date_of_initiation_of_current_regimen']) != '' ? trim(date('Y-m-d H:i', strtotime($row['date_of_initiation_of_current_regimen']))) : null);
-                        $resultApprovedDateTime = (trim($row['result_approved_datetime']) != '' ? trim(date('Y-m-d H:i', strtotime($row['result_approved_datetime']))) : null);
-                        $sampleTestedDateTime = (trim($row['sample_tested_datetime']) != '' ? trim(date('Y-m-d H:i', strtotime($row['sample_tested_datetime']))) : null);
-                        $sampleRegisteredAtLabDateTime = (trim($row['sample_registered_at_lab']) != '' ? trim(date('Y-m-d H:i', strtotime($row['sample_registered_at_lab']))) : null);
-
-                        $data = array(
-                            'sample_code'                           => $sampleCode,
-                            'remote_sample_code'                    => $remoteSampleCode,
-                            'vlsm_instance_id'                      => trim($row['vlsm_instance_id']),
-                            'source'                                => '1',
-                            'patient_gender'                        => (trim($row['patient_gender']) != '' ? trim($row['patient_gender']) : NULL),
-                            'patient_age_in_years'                  => (trim($row['patient_age_in_years']) != '' ? trim($row['patient_age_in_years']) : NULL),
-                            'sample_collection_date'                => $sampleCollectionDate,
-                            //'sample_registered_at_lab'              => $sampleReceivedAtLab,
-                            'line_of_treatment'                     => (trim($row['line_of_treatment']) != '' ? trim($row['line_of_treatment']) : NULL),
-                            'is_sample_rejected'                    => (trim($row['is_sample_rejected']) != '' ? trim($row['is_sample_rejected']) : NULL),
-                            'is_patient_pregnant'                   => (trim($row['is_patient_pregnant']) != '' ? trim($row['is_patient_pregnant']) : NULL),
-                            'is_patient_breastfeeding'              => (trim($row['is_patient_breastfeeding']) != '' ? trim($row['is_patient_breastfeeding']) : NULL),
-                            'current_regimen'                       => (trim($row['current_regimen']) != '' ? trim($row['current_regimen']) : NULL),
-                            'date_of_initiation_of_current_regimen' => $dateOfInitiationOfRegimen,
-                            'arv_adherance_percentage'              => (trim($row['arv_adherance_percentage']) != '' ? trim($row['arv_adherance_percentage']) : NULL),
-                            'is_adherance_poor'                     => (trim($row['is_adherance_poor']) != '' ? trim($row['is_adherance_poor']) : NULL),
-                            'result_approved_datetime'              => $resultApprovedDateTime,
-                            'sample_tested_datetime'                => $sampleTestedDateTime,
-                            'result_value_log'                      => (trim($row['result_value_log']) != '' ? trim($row['result_value_log']) : NULL),
-                            'result_value_absolute'                 => (trim($row['result_value_absolute']) != '' ? trim($row['result_value_absolute']) : NULL),
-                            'result_value_text'                     => (trim($row['result_value_text']) != '' ? trim($row['result_value_text']) : NULL),
-                            //'result_value_absolute_decimal'         => (trim($row['result_value_absolute_decimal']) != '' ? trim($row['result_value_absolute_decimal']) : NULL),
-                            'result'                                => (trim($row['result']) != '' ? trim($row['result']) : NULL),
-                            'result_value_absolute_decimal'                            =>   $result_value_absolute_decimal,
-                            'vl_result_category'                 =>   $vl_result_category,
-                            'sample_registered_at_lab'              => $sampleRegisteredAtLabDateTime
-                        );
-
-
-                        $facilityData = array(
-                            'vlsm_instance_id'          => trim($row['vlsm_instance_id']),
-                            'facility_name'             => trim($row['facility_name']),
-                            'facility_code'             => trim($row['facility_code']),
-                            'facility_mobile_numbers'   => trim($row['facility_mobile_numbers']),
-                            'address'                   => trim($row['address']),
-                            'facility_hub_name'         => trim($row['facility_hub_name']),
-                            'contact_person'            => trim($row['contact_person']),
-                            'report_email'              => trim($row['report_email']),
-                            'country'                   => trim($row['country']),
-                            'facility_state'            => trim($row['facility_state']),
-                            'facility_district'         => trim($row['facility_district']),
-                            'longitude'                 => trim($row['longitude']),
-                            'latitude'                  => trim($row['latitude']),
-                            'status'                    => trim($row['facility_status'])
-                        );
-                        if (trim($row['facility_state']) != '') {
-                            $sQueryResult = $this->checkFacilityStateDistrictDetails(trim($row['facility_state']), 0);
-                            if ($sQueryResult) {
-                                $facilityData['facility_state'] = $sQueryResult['geo_id'];
-                            } else {
-                                $locationDb->insert(array('geo_parent' => 0, 'geo_name' => trim($row['facility_state'])));
-                                $facilityData['facility_state'] = $locationDb->lastInsertValue;
-                            }
-                        }
-                        if (trim($row['facility_district']) != '') {
-                            $sQueryResult = $this->checkFacilityStateDistrictDetails(trim($row['facility_district']), $facilityData['facility_state']);
-                            if ($sQueryResult) {
-                                $facilityData['facility_district'] = $sQueryResult['geo_id'];
-                            } else {
-                                $locationDb->insert(array('geo_parent' => $facilityData['facility_state'], 'geo_name' => trim($row['facility_district'])));
-                                $facilityData['facility_district'] = $locationDb->lastInsertValue;
-                            }
-                        }
-                        //check facility type
-                        if (isset($row['facility_type']) && trim($row['facility_type']) != '') {
-                            $facilityData['facility_type'] = trim($row['facility_type']);
-                        }
-
-                        //check clinic details
-                        if (isset($row['facility_name']) && trim($row['facility_name']) != '') {
-                            $facilityDataResult = $this->checkFacilityDetails(trim($row['facility_name']));
-                            if ($facilityDataResult) {
-                                $this->facilityTable->update($facilityData, array('facility_id' => $facilityDataResult['facility_id']));
-                                $data['facility_id'] = $facilityDataResult['facility_id'];
-                            } else {
-                                $this->facilityTable->insert($facilityData);
-                                $data['facility_id'] = $this->facilityTable->lastInsertValue;
-                            }
+                    $facilityData = array(
+                        'vlsm_instance_id'          => trim($row['vlsm_instance_id']),
+                        'facility_name'             => trim($row['facility_name']),
+                        'facility_code'             => trim($row['facility_code']),
+                        'facility_mobile_numbers'   => trim($row['facility_mobile_numbers']),
+                        'address'                   => trim($row['address']),
+                        'facility_hub_name'         => trim($row['facility_hub_name']),
+                        'contact_person'            => trim($row['contact_person']),
+                        'report_email'              => trim($row['report_email']),
+                        'country'                   => trim($row['country']),
+                        'facility_state'            => trim($row['facility_state']),
+                        'facility_district'         => trim($row['facility_district']),
+                        'longitude'                 => trim($row['longitude']),
+                        'latitude'                  => trim($row['latitude']),
+                        'status'                    => trim($row['facility_status'])
+                    );
+                    if (trim($row['facility_state']) != '') {
+                        $sQueryResult = $this->checkFacilityStateDistrictDetails(trim($row['facility_state']), 0);
+                        if ($sQueryResult) {
+                            $facilityData['facility_state'] = $sQueryResult['geo_id'];
                         } else {
-                            $data['facility_id'] = null;
+                            $locationDb->insert(array('geo_parent' => 0, 'geo_name' => trim($row['facility_state'])));
+                            $facilityData['facility_state'] = $locationDb->lastInsertValue;
                         }
+                    }
+                    if (trim($row['facility_district']) != '') {
+                        $sQueryResult = $this->checkFacilityStateDistrictDetails(trim($row['facility_district']), $facilityData['facility_state']);
+                        if ($sQueryResult) {
+                            $facilityData['facility_district'] = $sQueryResult['geo_id'];
+                        } else {
+                            $locationDb->insert(array('geo_parent' => $facilityData['facility_state'], 'geo_name' => trim($row['facility_district'])));
+                            $facilityData['facility_district'] = $locationDb->lastInsertValue;
+                        }
+                    }
+                    //check facility type
+                    if (isset($row['facility_type']) && trim($row['facility_type']) != '') {
+                        $facilityData['facility_type'] = trim($row['facility_type']);
+                    }
 
-                        $labData = array(
-                            'vlsm_instance_id'          => trim($row['vlsm_instance_id']),
-                            'facility_name'             => trim($row['labName']),
-                            'facility_code'             => trim($row['labCode']),
-                            'facility_mobile_numbers'   => trim($row['labPhone']),
-                            'address'                   => trim($row['labAddress']),
-                            'facility_hub_name'         => trim($row['labHub']),
-                            'contact_person'            => trim($row['labContactPerson']),
-                            'report_email'              => trim($row['labReportMail']),
-                            'country'                   => trim($row['labCountry']),
-                            'facility_state'            => trim($row['labState']),
-                            'facility_district'         => trim($row['labDistrict']),
-                            'longitude'                 => trim($row['labLongitude']),
-                            'latitude'                  => trim($row['labLatitude']),
-                            'status'                    => trim($row['labFacilityStatus'])
-                        );
-                        if (trim($row['labState']) != '') {
-                            $sQueryResult = $this->checkFacilityStateDistrictDetails(trim($row['labState']), 0);
-                            if ($sQueryResult) {
-                                $labData['facility_state'] = $sQueryResult['geo_id'];
-                            } else {
-                                $locationDb->insert(array('geo_parent' => 0, 'geo_name' => trim($row['labState'])));
-                                $labData['facility_state'] = $locationDb->lastInsertValue;
-                            }
+                    //check clinic details
+                    if (isset($row['facility_name']) && trim($row['facility_name']) != '') {
+                        $facilityDataResult = $this->checkFacilityDetails(trim($row['facility_name']));
+                        if ($facilityDataResult) {
+                            $this->facilityTable->update($facilityData, array('facility_id' => $facilityDataResult['facility_id']));
+                            $data['facility_id'] = $facilityDataResult['facility_id'];
+                        } else {
+                            $this->facilityTable->insert($facilityData);
+                            $data['facility_id'] = $this->facilityTable->lastInsertValue;
                         }
-                        if (trim($row['labDistrict']) != '') {
-                            $sQueryResult = $this->checkFacilityStateDistrictDetails(trim($row['labDistrict']), $labData['facility_state']);
-                            if ($sQueryResult) {
-                                $labData['facility_district'] = $sQueryResult['geo_id'];
-                            } else {
-                                $locationDb->insert(array('geo_parent' => $labData['facility_state'], 'geo_name' => trim($row['labDistrict'])));
-                                $labData['facility_district'] = $locationDb->lastInsertValue;
-                            }
-                        }
-                        //check lab type
-                        if (isset($row['labFacilityTypeName']) && trim($row['labFacilityTypeName']) != '') {
-                            $labData['facility_type'] = trim($row['labFacilityTypeName']);
-                        }
+                    } else {
+                        $data['facility_id'] = null;
+                    }
 
-                        //check lab details
-                        if (trim($row['labName']) != '') {
-                            $labDataResult = $this->checkFacilityDetails(trim($row['labName']));
-                            if ($labDataResult) {
-                                $this->facilityTable->update($labData, array('facility_id' => $labDataResult['facility_id']));
-                                $data['lab_id'] = $labDataResult['facility_id'];
-                            } else {
-                                $this->facilityTable->insert($labData);
-                                $data['lab_id'] = $this->facilityTable->lastInsertValue;
-                            }
+                    $labData = array(
+                        'vlsm_instance_id'          => trim($row['vlsm_instance_id']),
+                        'facility_name'             => trim($row['labName']),
+                        'facility_code'             => trim($row['labCode']),
+                        'facility_mobile_numbers'   => trim($row['labPhone']),
+                        'address'                   => trim($row['labAddress']),
+                        'facility_hub_name'         => trim($row['labHub']),
+                        'contact_person'            => trim($row['labContactPerson']),
+                        'report_email'              => trim($row['labReportMail']),
+                        'country'                   => trim($row['labCountry']),
+                        'facility_state'            => trim($row['labState']),
+                        'facility_district'         => trim($row['labDistrict']),
+                        'longitude'                 => trim($row['labLongitude']),
+                        'latitude'                  => trim($row['labLatitude']),
+                        'status'                    => trim($row['labFacilityStatus'])
+                    );
+                    if (trim($row['labState']) != '') {
+                        $sQueryResult = $this->checkFacilityStateDistrictDetails(trim($row['labState']), 0);
+                        if ($sQueryResult) {
+                            $labData['facility_state'] = $sQueryResult['geo_id'];
                         } else {
-                            $data['lab_id'] = 0;
+                            $locationDb->insert(array('geo_parent' => 0, 'geo_name' => trim($row['labState'])));
+                            $labData['facility_state'] = $locationDb->lastInsertValue;
                         }
-                        //check testing reason
-                        if (trim($row['test_reason_name']) != '') {
-                            $testReasonResult = $this->checkTestingReson(trim($row['test_reason_name']));
-                            if ($testReasonResult) {
-                                $testReasonDb->update(array('test_reason_name' => trim($row['test_reason_name']), 'test_reason_status' => trim($row['test_reason_status'])), array('test_reason_id' => $testReasonResult['test_reason_id']));
-                                $data['reason_for_vl_testing'] = $testReasonResult['test_reason_id'];
-                            } else {
-                                $testReasonDb->insert(array('test_reason_name' => trim($row['test_reason_name']), 'test_reason_status' => trim($row['test_reason_status'])));
-                                $data['reason_for_vl_testing'] = $testReasonDb->lastInsertValue;
-                            }
+                    }
+                    if (trim($row['labDistrict']) != '') {
+                        $sQueryResult = $this->checkFacilityStateDistrictDetails(trim($row['labDistrict']), $labData['facility_state']);
+                        if ($sQueryResult) {
+                            $labData['facility_district'] = $sQueryResult['geo_id'];
                         } else {
-                            $data['reason_for_vl_testing'] = 0;
+                            $locationDb->insert(array('geo_parent' => $labData['facility_state'], 'geo_name' => trim($row['labDistrict'])));
+                            $labData['facility_district'] = $locationDb->lastInsertValue;
                         }
-                        //check testing reason
-                        if (trim($row['status_name']) != '') {
-                            $sampleStatusResult = $this->checkSampleStatus(trim($row['status_name']));
-                            if ($sampleStatusResult) {
-                                $data['result_status'] = $sampleStatusResult['status_id'];
-                            } else {
-                                $testStatusDb->insert(array('status_name' => trim($row['status_name'])));
-                                $data['result_status'] = $testStatusDb->lastInsertValue;
-                            }
-                        } else {
-                            $data['result_status'] = 6;
-                        }
-                        //check sample type
-                        if (trim($row['sample_name']) != '') {
-                            $sampleType = $this->checkSampleType(trim($row['sample_name']));
-                            if ($sampleType) {
-                                $sampleTypeDb->update(array('sample_name' => trim($row['sample_name']), 'status' => trim($row['sample_type_status'])), array('sample_id' => $sampleType['sample_id']));
-                                $data['specimen_type'] = $sampleType['sample_id'];
-                            } else {
-                                $sampleTypeDb->insert(array('sample_name' => trim($row['sample_name']), 'status' => trim($row['sample_type_status'])));
-                                $data['specimen_type'] = $sampleTypeDb->lastInsertValue;
-                            }
-                        } else {
-                            $data['specimen_type'] = null;
-                        }
-                        //check sample rejection reason
-                        if (trim($row['rejection_reason_name']) != '') {
-                            $sampleRejectionReason = $this->checkSampleRejectionReason(trim($row['rejection_reason_name']));
-                            if ($sampleRejectionReason) {
-                                $sampleRjtReasonDb->update(array('rejection_reason_name' => trim($row['rejection_reason_name']), 'rejection_reason_status' => trim($row['rejection_reason_status'])), array('rejection_reason_id' => $sampleRejectionReason['rejection_reason_id']));
-                                $data['reason_for_sample_rejection'] = $sampleRejectionReason['rejection_reason_id'];
-                            } else {
-                                $sampleRjtReasonDb->insert(array('rejection_reason_name' => trim($row['rejection_reason_name']), 'rejection_reason_status' => trim($row['rejection_reason_status'])));
-                                $data['reason_for_sample_rejection'] = $sampleRjtReasonDb->lastInsertValue;
-                            }
-                        } else {
-                            $data['reason_for_sample_rejection'] = null;
-                        }
+                    }
+                    //check lab type
+                    if (isset($row['labFacilityTypeName']) && trim($row['labFacilityTypeName']) != '') {
+                        $labData['facility_type'] = trim($row['labFacilityTypeName']);
+                    }
 
-                        //check existing sample code
-                        $sampleCode = $this->checkSampleCode($uniqueId, $sampleCode, $remoteSampleCode, $instanceCode);
-                        if ($sampleCode) {
-                            //sample data update
-                            $sampleDb->update($data, array('vl_sample_id' => $sampleCode['vl_sample_id']));
+                    //check lab details
+                    if (trim($row['labName']) != '') {
+                        $labDataResult = $this->checkFacilityDetails(trim($row['labName']));
+                        if ($labDataResult) {
+                            $this->facilityTable->update($labData, array('facility_id' => $labDataResult['facility_id']));
+                            $data['lab_id'] = $labDataResult['facility_id'];
                         } else {
-                            //sample data insert
-                            $sampleDb->insert($data);
+                            $this->facilityTable->insert($labData);
+                            $data['lab_id'] = $this->facilityTable->lastInsertValue;
                         }
+                    } else {
+                        $data['lab_id'] = 0;
+                    }
+                    //check testing reason
+                    if (trim($row['test_reason_name']) != '') {
+                        $testReasonResult = $this->checkTestingReson(trim($row['test_reason_name']));
+                        if ($testReasonResult) {
+                            $testReasonDb->update(array('test_reason_name' => trim($row['test_reason_name']), 'test_reason_status' => trim($row['test_reason_status'])), array('test_reason_id' => $testReasonResult['test_reason_id']));
+                            $data['reason_for_vl_testing'] = $testReasonResult['test_reason_id'];
+                        } else {
+                            $testReasonDb->insert(array('test_reason_name' => trim($row['test_reason_name']), 'test_reason_status' => trim($row['test_reason_status'])));
+                            $data['reason_for_vl_testing'] = $testReasonDb->lastInsertValue;
+                        }
+                    } else {
+                        $data['reason_for_vl_testing'] = 0;
+                    }
+                    //check testing reason
+                    if (trim($row['status_name']) != '') {
+                        $sampleStatusResult = $this->checkSampleStatus(trim($row['status_name']));
+                        if ($sampleStatusResult) {
+                            $data['result_status'] = $sampleStatusResult['status_id'];
+                        } else {
+                            $testStatusDb->insert(array('status_name' => trim($row['status_name'])));
+                            $data['result_status'] = $testStatusDb->lastInsertValue;
+                        }
+                    } else {
+                        $data['result_status'] = 6;
+                    }
+                    //check sample type
+                    if (trim($row['sample_name']) != '') {
+                        $sampleType = $this->checkSampleType(trim($row['sample_name']));
+                        if ($sampleType) {
+                            $sampleTypeDb->update(array('sample_name' => trim($row['sample_name']), 'status' => trim($row['sample_type_status'])), array('sample_id' => $sampleType['sample_id']));
+                            $data['specimen_type'] = $sampleType['sample_id'];
+                        } else {
+                            $sampleTypeDb->insert(array('sample_name' => trim($row['sample_name']), 'status' => trim($row['sample_type_status'])));
+                            $data['specimen_type'] = $sampleTypeDb->lastInsertValue;
+                        }
+                    } else {
+                        $data['specimen_type'] = null;
+                    }
+                    //check sample rejection reason
+                    if (trim($row['rejection_reason_name']) != '') {
+                        $sampleRejectionReason = $this->checkSampleRejectionReason(trim($row['rejection_reason_name']));
+                        if ($sampleRejectionReason) {
+                            $sampleRjtReasonDb->update(array('rejection_reason_name' => trim($row['rejection_reason_name']), 'rejection_reason_status' => trim($row['rejection_reason_status'])), array('rejection_reason_id' => $sampleRejectionReason['rejection_reason_id']));
+                            $data['reason_for_sample_rejection'] = $sampleRejectionReason['rejection_reason_id'];
+                        } else {
+                            $sampleRjtReasonDb->insert(array('rejection_reason_name' => trim($row['rejection_reason_name']), 'rejection_reason_status' => trim($row['rejection_reason_status'])));
+                            $data['reason_for_sample_rejection'] = $sampleRjtReasonDb->lastInsertValue;
+                        }
+                    } else {
+                        $data['reason_for_sample_rejection'] = null;
+                    }
+
+                    //check existing sample code
+                    $sampleCode = $this->checkSampleCode($uniqueId, $sampleCode, $remoteSampleCode, $instanceCode);
+                    if ($sampleCode) {
+                        //sample data update
+                        $sampleDb->update($data, array('vl_sample_id' => $sampleCode['vl_sample_id']));
+                    } else {
+                        //sample data insert
+                        $sampleDb->insert($data);
                     }
                 }
             }
-            //remove directory
-            // $this->commonService->removeDirectory($pathname);
         }
-        return array(
-            'status'    => 'success',
-            'message'   => 'Uploaded successfully',
-        );
     }
 
     public function saveWeblimsVLAPI($params)
@@ -1707,7 +1702,7 @@ class SampleService
         $apiTrackDb = $this->sm->get('DashApiReceiverStatsTable');
         $trackApiDb = $this->sm->get('DashTrackApiRequestsTable');
         $userDb = $this->sm->get('UsersTable');
-        $failedImports = array();
+        $failedImports = [];
 
         $apiData =  Items::fromString($params, [
             'pointer' => '/data',

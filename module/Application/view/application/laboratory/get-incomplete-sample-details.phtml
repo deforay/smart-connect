@@ -1,63 +1,63 @@
 <script>
-       $(function () {
+    $(function() {
         $('#piecontainer').highcharts({
-        chart: {
-            plotBackgroundColor: null,
-            plotBorderWidth: null,
-            plotShadow: false,
-            type: 'pie'
-        },
-        title: {
-            text: '<?php echo $this->translate('Incomplete Fields'); ?>'
-        },
-        credits: {
-              enabled: false
-       },
-        tooltip: {
-            pointFormat: '{series.name}: <b>{point.percentage:.1f}% ({point.number})</b>'
-        },
-        legend: {
-            itemMarginBottom: 5,
-            labelFormatter: function () {
-                return '<div ><span style="float:left;font-size:10px;">' + this.myData + ' ('+ this.name + ') -  </span><span style="font-size:10px; ">'+ this.percentage.toFixed(1)+'% ('+Highcharts.numberFormat(this.y, 0)+')</span></div>';
-            }
-        },
-        plotOptions: {
-            pie: {
-                dataLabels: {
-                distance: -30
-              },
-              showInLegend: true
-            }
-        },
-        series: [{
-            name: '<?php echo $this->translate('Field'); ?>',
-            colorByPoint: true,
-            data: [<?php
-            if(isset($result) && !empty($result)){
-              foreach($result as $lab){
-                $getCode = explode(" ",$lab['field']);
-                     $codeGenerate = array();
-                     if(count($getCode)>0){
-                            foreach($getCode as $code){
-                                 $codeGenerate[] = substr($code, 0, 1);
+            chart: {
+                plotBackgroundColor: null,
+                plotBorderWidth: null,
+                plotShadow: false,
+                type: 'pie'
+            },
+            title: {
+                text: '<?php echo $this->translate('Incomplete Fields'); ?>'
+            },
+            credits: {
+                enabled: false
+            },
+            tooltip: {
+                pointFormat: '{series.name}: <b>{point.percentage:.1f}% ({point.number})</b>'
+            },
+            legend: {
+                itemMarginBottom: 5,
+                labelFormatter: function() {
+                    return '<div ><span style="float:left;font-size:10px;">' + this.myData + ' (' + this.name + ') -  </span><span style="font-size:10px; ">' + this.percentage.toFixed(1) + '% (' + Highcharts.numberFormat(this.y, 0) + ')</span></div>';
+                }
+            },
+            plotOptions: {
+                pie: {
+                    dataLabels: {
+                        distance: -30
+                    },
+                    showInLegend: true
+                }
+            },
+            series: [{
+                name: '<?php echo $this->translate('Field'); ?>',
+                colorByPoint: true,
+                data: [<?php
+                        if (isset($result) && !empty($result)) {
+                            foreach ($result as $lab) {
+                                $getCode = explode(" ", $lab['field']);
+                                $codeGenerate = [];
+                                if (count($getCode) > 0) {
+                                    foreach ($getCode as $code) {
+                                        $codeGenerate[] = substr($code, 0, 1);
+                                    }
+                                } else {
+                                    $codeGenerate[] =  substr($lab['field'], 0, 1);
+                                }
+                                $code = implode("", $codeGenerate);
+                        ?> {
+                                name: '<?php echo $this->translate($code); ?>',
+                                y: <?php echo $lab['total']; ?>,
+                                number: <?php echo $lab['total']; ?>,
+                                myData: '<?php echo $this->translate($lab['field']); ?>'
+                            },
+                    <?php
                             }
-                     }else{
-                          $codeGenerate[] =  substr($lab['field'], 0, 1);
-                     }
-                     $code = implode("",$codeGenerate);
-                  ?>
-                  {
-                    name:'<?php echo $this->translate($code); ?>',
-                    y:<?php echo $lab['total'];?>,
-                    number:<?php echo $lab['total'];?>,
-                    myData:'<?php echo $this->translate($lab['field']); ?>'
-                  },
-                  <?php
-              }
-            }
-            ?>]
-        }]
-    });
+                        }
+                    ?>
+                ]
+            }]
+        });
     });
 </script>

@@ -72,7 +72,7 @@ class LaboratoryController extends AbstractAppController
     public function drillDownAction()
     {
         $this->layout()->setVariable('activeTab', 'labs-dashboard');
-        $params = array();
+        $params = [];
 
 
         $labFilter = $this->params()->fromQuery('lab');
@@ -104,7 +104,7 @@ class LaboratoryController extends AbstractAppController
     public function requisitionFormsIncompleteAction()
     {
         $this->layout()->setVariable('activeTab', 'labs-dashboard');
-        $params = array();
+        $params = [];
         $month = "";
         $labFilter = "";
         if ($this->params()->fromQuery('month')) {
@@ -422,7 +422,7 @@ class LaboratoryController extends AbstractAppController
     public function samplesTestedLabAction()
     {
         $this->layout()->setVariable('activeTab', 'labs-dashboard');
-        $params = array();
+        $params = [];
         $gender = "";
         $month = "";
         $range = "";
@@ -508,7 +508,7 @@ class LaboratoryController extends AbstractAppController
     public function sampleVolumeAction()
     {
         $this->layout()->setVariable('activeTab', 'labs-dashboard');
-        $params = array();
+        $params = [];
         $fromMonth = "";
         $toMonth = "";
         $labFilter = "";
@@ -577,7 +577,7 @@ class LaboratoryController extends AbstractAppController
     public function samplesTestedTurnAroundTimeAction()
     {
         $this->layout()->setVariable('activeTab', 'labs-dashboard');
-        $params = array();
+        $params = [];
         $gender = "";
         $month = "";
         $range = "";
@@ -728,7 +728,7 @@ class LaboratoryController extends AbstractAppController
     public function drillDownResultAwaitedAction()
     {
         $this->layout()->setVariable('activeTab', 'labs-dashboard');
-        $params = array();
+        $params = [];
         $frmSource = "";
         $labFilter = "";
         if ($this->params()->fromQuery('src')) {
