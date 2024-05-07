@@ -1439,7 +1439,7 @@ class CommonService
 
      public static function isTraversable($variable)
      {
-          return $variable instanceof Traversable;
+          return is_array($variable) || $variable instanceof Traversable;
      }
 
      private static function cleanupGenerator($generator, $filePath, $deleteSourceFile = true)
