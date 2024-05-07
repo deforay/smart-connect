@@ -54,8 +54,11 @@ $csrfToken = \Application\Service\CommonService::generateCSRF();
 <!-- END HEAD -->
 
 <body class="login" style="border:1px solid #5C97BD	;">
-    <img src="/assets/img/Mozambique-PEPFAR-logo.png" style="max-width:70px;margin:5px !important;float:right;clear:both !important;display:block !important;" /><br>
-    <?php
+    <?php if (isset($config['left_top_logo']) && trim($config['left_top_logo']) != "" && file_exists(UPLOAD_PATH . DIRECTORY_SEPARATOR . "logo" . DIRECTORY_SEPARATOR . $config['left_top_logo'])) { ?>
+        <img src="/uploads/logo/<?php echo trim($config['left_top_logo']); ?>" style="max-width:70px;margin:5px !important;float:right;clear:both !important;display:block !important;" /><br>
+    <?php }else{ ?>
+        <img src="/assets/img/Mozambique-PEPFAR-logo.png" style="max-width:70px;margin:5px !important;float:right;clear:both !important;display:block !important;" /><br>
+    <?php } 
     $margin = '142px';
     if (isset($config['logo']) && trim($config['logo']) != "" && file_exists(UPLOAD_PATH . DIRECTORY_SEPARATOR . "logo" . DIRECTORY_SEPARATOR . $config['logo'])) {
         $margin = '64px';

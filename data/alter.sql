@@ -738,3 +738,6 @@ CREATE TABLE `dash_track_api_requests` (
 
 -- Thana 12-Dec-2023
 ALTER TABLE `dash_form_vl` CHANGE `sample_received_at_vl_lab_datetime` `sample_received_at_lab_datetime` DATETIME NULL DEFAULT NULL;
+
+-- Thana 07-May-2024
+INSERT INTO `dash_global_config` (`name`, `display_name`, `value`, `status`) VALUES ('left_top_logo', 'Left Top Logo', 'logoz05b13.png', 'active');
