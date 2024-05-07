@@ -195,6 +195,10 @@ class GlobalTable extends AbstractTableGateway
             unlink(UPLOAD_PATH . DIRECTORY_SEPARATOR . "logo" . DIRECTORY_SEPARATOR . $params['removedLogoImage']);
             $this->update(array('value' => ''), array('name' => 'logo'));
         }
+        if (isset($params['removedLogoImageTop']) && trim($params['removedLogoImageTop']) != "" && file_exists(UPLOAD_PATH . DIRECTORY_SEPARATOR . "logo" . DIRECTORY_SEPARATOR . $params['removedLogoImageTop'])) {
+            unlink(UPLOAD_PATH . DIRECTORY_SEPARATOR . "logo" . DIRECTORY_SEPARATOR . $params['removedLogoImageTop']);
+            $this->update(array('value' => ''), array('name' => 'left_top_logo'));
+        }
         //for logo updation
         if (isset($_FILES['logo']['name']) && $_FILES['logo']['name'] != "") {
             if (!file_exists(UPLOAD_PATH . DIRECTORY_SEPARATOR . "logo") && !is_dir(UPLOAD_PATH . DIRECTORY_SEPARATOR . "logo")) {
@@ -205,6 +209,17 @@ class GlobalTable extends AbstractTableGateway
             $imageName = "logo" . $string . $extension;
             if (move_uploaded_file($_FILES["logo"]["tmp_name"], UPLOAD_PATH . DIRECTORY_SEPARATOR . "logo" . DIRECTORY_SEPARATOR . $imageName)) {
                 $this->update(array('value' => $imageName), array('name' => 'logo'));
+            }
+        }
+        if (isset($_FILES['leftTopLogo']['name']) && $_FILES['leftTopLogo']['name'] != "") {
+            if (!file_exists(UPLOAD_PATH . DIRECTORY_SEPARATOR . "logo") && !is_dir(UPLOAD_PATH . DIRECTORY_SEPARATOR . "logo")) {
+                mkdir(UPLOAD_PATH . DIRECTORY_SEPARATOR . "logo");
+            }
+            $extension = strtolower(pathinfo(UPLOAD_PATH . DIRECTORY_SEPARATOR . $_FILES['leftTopLogo']['name'], PATHINFO_EXTENSION));
+            $string = \Application\Service\CommonService::generateRandomString(6) . ".";
+            $imageName = "logo" . $string . $extension;
+            if (move_uploaded_file($_FILES["leftTopLogo"]["tmp_name"], UPLOAD_PATH . DIRECTORY_SEPARATOR . "logo" . DIRECTORY_SEPARATOR . $imageName)) {
+                $this->update(array('value' => $imageName), array('name' => 'left_top_logo'));
             }
         }
         //for non-logo field updation
