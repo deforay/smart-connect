@@ -23,7 +23,7 @@ class GlobalTable extends AbstractTableGateway
 
     protected $table = 'dash_global_config';
     public $sm = null;
-    public Adapter $adapter;
+    public $adapter;
     public CommonService $commonService;
 
     public function __construct(Adapter $adapter, $commonService, $sm = null)
