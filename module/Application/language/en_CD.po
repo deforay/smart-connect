@@ -1979,7 +1979,7 @@ msgstr ""
 #: ../view/application/login/index.phtml:16
 #: ../view/application/login/index.phtml:60 ../view/layout/layout.phtml:23
 #: ../view/layout/modal.phtml:10
-msgid "Dashboard for Enhancement of VL Treatment Cascade"
+msgid "National Dashboard for Priority Diseases"
 msgstr ""
 
 #: ../view/application/login/index.phtml:68

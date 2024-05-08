@@ -4,7 +4,6 @@ namespace Application\Service;
 
 use stdClass;
 use Exception;
-use Generator;
 use Throwable;
 use ZipArchive;
 use Traversable;
@@ -43,16 +42,18 @@ class CommonService
           return (substr($string, 0, $len) === $startString);
      }
 
-     public static function generateRandomString($length = 32)
+     public static function generateRandomString(int $length = 32): string
      {
-          // Possible seeds
-          $randomString = '';
-          for ($i = 0; $i < $length; $i++) {
-               $number = random_int(0, 36);
-               $character = base_convert($number, 10, 36);
-               $randomString .= $character;
+          $bytes = ceil($length * 3 / 4);
+          try {
+               $randomBytes = random_bytes($bytes);
+               $base64String = base64_encode($randomBytes);
+               // Replace base64 characters with some alphanumeric characters
+               $customBase64String = strtr($base64String, '+/=', 'ABC');
+               return substr($customBase64String, 0, $length);
+          } catch (Throwable $e) {
+               throw new Exception('Failed to generate random string: ' . $e->getMessage());
           }
-          return $randomString;
      }
 
      public static function generateCSRF($resetToken = false)
@@ -63,7 +64,7 @@ class CommonService
           }
           if ($resetToken || !isset($_SESSION["CSRF_TOKEN"])) {
                // Generate a new one
-               $token = $_SESSION["CSRF_TOKEN"] = bin2hex(random_bytes(64));
+               $token = $_SESSION["CSRF_TOKEN"] = self::generateUUID();
           } else {
                // Reuse the existing token
                $token = $_SESSION["CSRF_TOKEN"];
@@ -1346,10 +1347,10 @@ class CommonService
           return $result;
      }
 
-     public function generateUUID($attachExtraString = true): string
+     public static function generateUUID($attachExtraString = true): string
      {
           $uuid = (Uuid::uuid4())->toString();
-          return $uuid . ($attachExtraString ? '-' . $this->generateRandomString(6) : '');
+          return $uuid . ($attachExtraString ? '-' . self::generateRandomString(6) : '');
      }
 
      public function generateSelectOptions($optionList, $selectedOptions = [], $emptySelectText = false)

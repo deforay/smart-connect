@@ -5,12 +5,13 @@ if (session_status() == PHP_SESSION_NONE) {
 }
 
 use Laminas\Session\Container;
+use Application\Service\CommonService;
 
 $languagecontainer = new Container('language');
 $config = $this->GetConfigData();
 $languagecontainer->locale = $this->GetLocaleData('locale', $config['language']);
 
-$csrfToken = \Application\Service\CommonService::generateCSRF();
+$csrfToken = CommonService::generateCSRF();
 
 ?>
 <!DOCTYPE html>
@@ -23,7 +24,7 @@ $csrfToken = \Application\Service\CommonService::generateCSRF();
 
 <head>
     <meta charset="utf-8" />
-    <title>Smart Connect | <?php echo $this->translate('Dashboard for Enhancement of VL Treatment Cascade'); ?></title>
+    <title>Smart Connect | <?php echo $this->translate('National Dashboard for Priority Diseases'); ?></title>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta content="width=device-width, initial-scale=1" name="viewport" />
     <meta content="" name="description" />
@@ -50,15 +51,29 @@ $csrfToken = \Application\Service\CommonService::generateCSRF();
     <!-- BEGIN THEME LAYOUT STYLES -->
     <!-- END THEME LAYOUT STYLES -->
     <link rel="shortcut icon" href="<?php echo $this->basePath('assets/img/favicon.png'); ?>">
+    <style>
+        .login {
+            background: #5C97BD;
+        }
+
+        .login .content .form-control {
+            background: #fff;
+            color: #444;
+        }
+
+        .login .content .form-control::placeholder {
+            color: #aaa;
+        }
+    </style>
 </head>
 <!-- END HEAD -->
 
-<body class="login" style="border:1px solid #5C97BD	;">
+<body class="login" style="">
     <?php if (isset($config['left_top_logo']) && trim($config['left_top_logo']) != "" && file_exists(UPLOAD_PATH . DIRECTORY_SEPARATOR . "logo" . DIRECTORY_SEPARATOR . $config['left_top_logo'])) { ?>
-        <img src="/uploads/logo/<?php echo trim($config['left_top_logo']); ?>" style="max-width:70px;margin:5px !important;float:right;clear:both !important;display:block !important;" /><br>
-    <?php }else{ ?>
-        <img src="/assets/img/Mozambique-PEPFAR-logo.png" style="max-width:70px;margin:5px !important;float:right;clear:both !important;display:block !important;" /><br>
-    <?php } 
+        <img src="/uploads/logo/<?php echo trim($config['left_top_logo']); ?>" style="max-width:100px;margin:5px !important;float:right;clear:both !important;display:block !important;" /><br>
+    <?php } else { ?>
+        <img src="/assets/img/pepfar-logo.png" style="max-width:100px;margin:5px !important;float:right;clear:both !important;display:block !important;" /><br>
+    <?php }
     $margin = '142px';
     if (isset($config['logo']) && trim($config['logo']) != "" && file_exists(UPLOAD_PATH . DIRECTORY_SEPARATOR . "logo" . DIRECTORY_SEPARATOR . $config['logo'])) {
         $margin = '64px';
@@ -71,7 +86,7 @@ $csrfToken = \Application\Service\CommonService::generateCSRF();
             <img src="/uploads/logo/<?php echo trim($config['logo']); ?>" style="width:170px;height:175px;">
         <?php } ?>
         <h1 style="color:#fff;">Smart Connect</h1>
-        <h5 style="color:#fff;"><?php echo $this->translate('Dashboard for Enhancement of VL Treatment Cascade'); ?></h5>
+        <h5 style="color:#fff;"><?php echo $this->translate('National Dashboard for Priority Diseases'); ?></h5>
     </div>
     <!-- END LOGO -->
     <!-- BEGIN LOGIN -->
@@ -79,8 +94,7 @@ $csrfToken = \Application\Service\CommonService::generateCSRF();
         <!-- BEGIN LOGIN FORM -->
         <form class="login-form" action="" method="post">
             <input type="hidden" name="CSRF_TOKEN" value="<?= $csrfToken; ?>" />
-            <div class="form-title">
-                <span class="form-title"><?php echo $this->translate('Welcome'); ?>.</span>
+            <div class="form-title" style="text-align:center;">
                 <span class="form-subtitle"><?php echo $this->translate('Please login to continue'); ?>.</span>
             </div>
             <div class="alert alert-danger display-hide">
@@ -110,13 +124,10 @@ $csrfToken = \Application\Service\CommonService::generateCSRF();
                     </div>
                 </div>-->
         </form>
-        <p style="text-align:center;color:#ccc;"><?php echo $this->translate('Funded by'); ?>
-            <a href="https://www.taskforce.org/" style="color:#ccc !important;text-decoration:underline;"><?php echo $this->translate('The Task Force for Global Health'); ?></a> &
-            <a href="https://www.emory.edu/home/index.html" style="color:#ccc !important;text-decoration:underline;"><?php echo $this->translate('Emory University / PEPFAR'); ?></a> | ver. <?php echo APP_VERSION; ?>
-        </p>
+
         <!-- END REGISTRATION FORM -->
     </div>
-
+    <p style="text-align:center;color:#ddd;position:static;bottom:0;"><?php echo $this->translate("This project is supported by the U.S. President's Emergency Plan for AIDS Relief (PEPFAR) through the U.S.Centers for Disease Control and Prevention (CDC)."); ?> | ver. <?php echo APP_VERSION; ?></p>
     <!--<div class="copyright"> </div>-->
     <!--[if lt IE 9]>
 	<script src="<?php echo $this->basePath('assets/global/plugins/respond.min.js'); ?>"></script>

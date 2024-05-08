@@ -2164,7 +2164,7 @@ msgstr "3a Linha de Tratamento (LT 3)"
 #: ../view/application/login/otp.phtml:16
 #: ../view/application/login/otp.phtml:60 ../view/layout/layout.phtml:26
 #: ../view/layout/modal.phtml:10
-msgid "Dashboard for Enhancement of VL Treatment Cascade"
+msgid "National Dashboard for Priority Diseases"
 msgstr "Portal para o aprimoramento do Tratamento Cascata de Carga Viral"
 
 #: ../view/application/login/index.phtml:72

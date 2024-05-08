@@ -1323,7 +1323,7 @@ class SampleService
 
             $fileName = $_FILES['vlFile']['name'];
             $extension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-            $fileName = $this->commonService->generateRandomString(12) . time() . "." . $extension;
+            $fileName = CommonService::generateRandomString(12) . time() . "." . $extension;
 
             $fileName = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-vl" . DIRECTORY_SEPARATOR . $fileName;
 
@@ -1413,7 +1413,7 @@ class SampleService
 
         $fileName = $_FILES['vlFile']['name'];
         $extension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-        $fileName = $this->commonService->generateRandomString(12) . "." . $extension;
+        $fileName = CommonService::generateRandomString(12) . "." . $extension;
 
         $fileName = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-vl" . DIRECTORY_SEPARATOR . $fileName;
         if (is_readable($fileName) && move_uploaded_file($_FILES['vlFile']['tmp_name'], $fileName)) {

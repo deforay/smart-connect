@@ -1,86 +1,91 @@
 <?php
+
 use Laminas\Session\Container;
+
 $languagecontainer = new Container('language');
 $config = $this->GetConfigData();
-$languagecontainer->locale = $this->GetLocaleData('locale',$config['language']);
+$languagecontainer->locale = $this->GetLocaleData('locale', $config['language']);
 ?>
 <!DOCTYPE html>
 <!--[if IE 8]> <html lang="en" class="ie8 no-js"> <![endif]-->
 <!--[if IE 9]> <html lang="en" class="ie9 no-js"> <![endif]-->
 <!--[if !IE]><!-->
 <html lang="en">
-    <!--<![endif]-->
-    <!-- BEGIN HEAD -->
-    <head>
-        <meta charset="utf-8" />
-        <title>Smart Connect | <?php echo $this->translate('Dashboard for Enhancement of VL Treatment Cascade'); ?></title>
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta content="width=device-width, initial-scale=1" name="viewport" />
-        <meta content="" name="description" />
-        <meta content="" name="author" />
-        <!-- BEGIN GLOBAL MANDATORY STYLES -->
-        <link href="<?php echo $this->basePath('assets/global/css/google-fonts.css'); ?>" rel="stylesheet" type="text/css" />
-        <link href="<?php echo $this->basePath('assets/global/plugins/font-awesome/css/font-awesome.min.css'); ?>" rel="stylesheet" type="text/css" />
-        <link href="<?php echo $this->basePath('assets/global/plugins/simple-line-icons/simple-line-icons.min.css'); ?>" rel="stylesheet" type="text/css" />
-        <link href="<?php echo $this->basePath('assets/global/plugins/bootstrap/css/bootstrap.min.css'); ?>" rel="stylesheet" type="text/css" />
-        <link href="<?php echo $this->basePath('assets/global/plugins/uniform/css/uniform.default.css'); ?>" rel="stylesheet" type="text/css" />
-        <link href="<?php echo $this->basePath('assets/global/plugins/bootstrap-switch/css/bootstrap-switch.min.css'); ?>" rel="stylesheet" type="text/css" />
-        <!-- END GLOBAL MANDATORY STYLES -->
-        <!-- BEGIN PAGE LEVEL PLUGINS -->
-        <link href="<?php echo $this->basePath('assets/global/plugins/select2/css/select2.min.css'); ?>" rel="stylesheet" type="text/css" />
-        <link href="<?php echo $this->basePath('assets/global/plugins/select2/css/select2-bootstrap.min.css'); ?>" rel="stylesheet" type="text/css" />
-        <!-- END PAGE LEVEL PLUGINS -->
-        <!-- BEGIN THEME GLOBAL STYLES -->
-        <link href="<?php echo $this->basePath('assets/global/css/components-rounded.min.css'); ?>" rel="stylesheet" id="style_components" type="text/css" />
-        <link href="<?php echo $this->basePath('assets/global/css/plugins.min.css'); ?>" rel="stylesheet" type="text/css" />
-        <!-- END THEME GLOBAL STYLES -->
-        <!-- BEGIN PAGE LEVEL STYLES -->
-        <link href="<?php echo $this->basePath('assets/pages/css/login-2.min.css'); ?>" rel="stylesheet" type="text/css" />
-        <!-- END PAGE LEVEL STYLES -->
-        <!-- BEGIN THEME LAYOUT STYLES -->
-        <!-- END THEME LAYOUT STYLES -->
-	<link rel="shortcut icon" href="<?php echo $this->basePath('assets/img/favicon.png'); ?>">
-	</head>
-    <!-- END HEAD -->
-    <body class="login" style="border:1px solid #5C97BD	;">
-	<img src="/assets/img/Mozambique-PEPFAR-logo.png" style="max-width:70px;margin:5px !important;float:right;clear:both !important;display:block !important;"/><br>
-	<?php
-	 $margin = '142px';
-	 if(isset($config['logo']) && trim($config['logo']) != "" && file_exists(UPLOAD_PATH . DIRECTORY_SEPARATOR . "logo" . DIRECTORY_SEPARATOR . $config['logo'])){
-	  $margin = '64px';
-	 }
-	?>
-        <!-- BEGIN LOGO -->
-        <div class="logo" style="margin:<?php echo $margin; ?> auto 0;">
-	    <?php
-	    if(isset($config['logo']) && trim($config['logo']) != "" && file_exists(UPLOAD_PATH . DIRECTORY_SEPARATOR . "logo" . DIRECTORY_SEPARATOR . $config['logo'])){ ?>
-		<img src="/uploads/logo/<?php echo trim($config['logo']); ?>" style="width:170px;height:175px;">
-	    <?php } ?>
-	    <h1 style="color:#fff;">Smart Connect</h1>
-	    <h5 style="color:#fff;"><?php echo $this->translate('Dashboard for Enhancement of VL Treatment Cascade'); ?></h5>
-        </div>
-        <!-- END LOGO -->
-        <!-- BEGIN LOGIN -->
-        <div class="content" style="margin-top:0;">
-            <!-- BEGIN LOGIN FORM -->
-            <form class="login-form" action="" method="post">
-                <div class="form-title">
-                    <span class="form-title"><?php echo $this->translate('Please enter your One Time Password (OTP) to continue'); ?>.</span>
-                </div>
-                <div class="alert alert-danger display-hide">
-                    <button class="close" data-close="alert"></button>
-                    <span> <?php echo $this->translate('Enter any username and password'); ?>. </span>
-                </div>
-                <div class="form-group">
-                    <!--ie8, ie9 does not support html5 placeholder, so we just show field title for that-->
-                    <label class="control-label visible-ie8 visible-ie9"><?php echo $this->translate('One Time Password'); ?></label>
-                    <input class="form-control form-control-solid placeholder-no-fix" type="text" autocomplete="off" placeholder="XXXXXX" autofocus name="otp"/> </div>
+<!--<![endif]-->
+<!-- BEGIN HEAD -->
 
-		<div class="form-actions">
-                    <button type="submit" class="btn red btn-block uppercase"><?php echo $this->translate('Login'); ?></button>
-                </div>
-				
-		<!--<div class="form-actions">
+<head>
+    <meta charset="utf-8" />
+    <title>Smart Connect | <?php echo $this->translate('National Dashboard for Priority Diseases'); ?></title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta content="width=device-width, initial-scale=1" name="viewport" />
+    <meta content="" name="description" />
+    <meta content="" name="author" />
+    <!-- BEGIN GLOBAL MANDATORY STYLES -->
+    <link href="<?php echo $this->basePath('assets/global/css/google-fonts.css'); ?>" rel="stylesheet" type="text/css" />
+    <link href="<?php echo $this->basePath('assets/global/plugins/font-awesome/css/font-awesome.min.css'); ?>" rel="stylesheet" type="text/css" />
+    <link href="<?php echo $this->basePath('assets/global/plugins/simple-line-icons/simple-line-icons.min.css'); ?>" rel="stylesheet" type="text/css" />
+    <link href="<?php echo $this->basePath('assets/global/plugins/bootstrap/css/bootstrap.min.css'); ?>" rel="stylesheet" type="text/css" />
+    <link href="<?php echo $this->basePath('assets/global/plugins/uniform/css/uniform.default.css'); ?>" rel="stylesheet" type="text/css" />
+    <link href="<?php echo $this->basePath('assets/global/plugins/bootstrap-switch/css/bootstrap-switch.min.css'); ?>" rel="stylesheet" type="text/css" />
+    <!-- END GLOBAL MANDATORY STYLES -->
+    <!-- BEGIN PAGE LEVEL PLUGINS -->
+    <link href="<?php echo $this->basePath('assets/global/plugins/select2/css/select2.min.css'); ?>" rel="stylesheet" type="text/css" />
+    <link href="<?php echo $this->basePath('assets/global/plugins/select2/css/select2-bootstrap.min.css'); ?>" rel="stylesheet" type="text/css" />
+    <!-- END PAGE LEVEL PLUGINS -->
+    <!-- BEGIN THEME GLOBAL STYLES -->
+    <link href="<?php echo $this->basePath('assets/global/css/components-rounded.min.css'); ?>" rel="stylesheet" id="style_components" type="text/css" />
+    <link href="<?php echo $this->basePath('assets/global/css/plugins.min.css'); ?>" rel="stylesheet" type="text/css" />
+    <!-- END THEME GLOBAL STYLES -->
+    <!-- BEGIN PAGE LEVEL STYLES -->
+    <link href="<?php echo $this->basePath('assets/pages/css/login-2.min.css'); ?>" rel="stylesheet" type="text/css" />
+    <!-- END PAGE LEVEL STYLES -->
+    <!-- BEGIN THEME LAYOUT STYLES -->
+    <!-- END THEME LAYOUT STYLES -->
+    <link rel="shortcut icon" href="<?php echo $this->basePath('assets/img/favicon.png'); ?>">
+</head>
+<!-- END HEAD -->
+
+<body class="login" style="border:1px solid #5C97BD	;">
+    <img src="/assets/img/Mozambique-PEPFAR-logo.png" style="max-width:70px;margin:5px !important;float:right;clear:both !important;display:block !important;" /><br>
+    <?php
+    $margin = '142px';
+    if (isset($config['logo']) && trim($config['logo']) != "" && file_exists(UPLOAD_PATH . DIRECTORY_SEPARATOR . "logo" . DIRECTORY_SEPARATOR . $config['logo'])) {
+        $margin = '64px';
+    }
+    ?>
+    <!-- BEGIN LOGO -->
+    <div class="logo" style="margin:<?php echo $margin; ?> auto 0;">
+        <?php
+        if (isset($config['logo']) && trim($config['logo']) != "" && file_exists(UPLOAD_PATH . DIRECTORY_SEPARATOR . "logo" . DIRECTORY_SEPARATOR . $config['logo'])) { ?>
+            <img src="/uploads/logo/<?php echo trim($config['logo']); ?>" style="width:170px;height:175px;">
+        <?php } ?>
+        <h1 style="color:#fff;">Smart Connect</h1>
+        <h5 style="color:#fff;"><?php echo $this->translate('National Dashboard for Priority Diseases'); ?></h5>
+    </div>
+    <!-- END LOGO -->
+    <!-- BEGIN LOGIN -->
+    <div class="content" style="margin-top:0;">
+        <!-- BEGIN LOGIN FORM -->
+        <form class="login-form" action="" method="post">
+            <div class="form-title">
+                <span class="form-title"><?php echo $this->translate('Please enter your One Time Password (OTP) to continue'); ?>.</span>
+            </div>
+            <div class="alert alert-danger display-hide">
+                <button class="close" data-close="alert"></button>
+                <span> <?php echo $this->translate('Enter any username and password'); ?>. </span>
+            </div>
+            <div class="form-group">
+                <!--ie8, ie9 does not support html5 placeholder, so we just show field title for that-->
+                <label class="control-label visible-ie8 visible-ie9"><?php echo $this->translate('One Time Password'); ?></label>
+                <input class="form-control form-control-solid placeholder-no-fix" type="text" autocomplete="off" placeholder="XXXXXX" autofocus name="otp" />
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn red btn-block uppercase"><?php echo $this->translate('Login'); ?></button>
+            </div>
+
+            <!--<div class="form-actions">
                     <div class="pull-left">
                         <label class="rememberme check">
                             <input type="checkbox" name="remember" value="1" />Remember me </label>
@@ -89,48 +94,46 @@ $languagecontainer->locale = $this->GetLocaleData('locale',$config['language']);
                         <a href="javascript:;" id="forget-password" class="forget-password">Forgot Password?</a>
                     </div>
                 </div>-->
-            </form>
-	    <p style="text-align:center;color:#ccc;"><?php echo $this->translate('Funded by'); ?>
-		<a href="https://www.taskforce.org/" style="color:#ccc !important;text-decoration:underline;"><?php echo $this->translate('The Task Force for Global Health'); ?></a>  &
-                <a href="https://www.emory.edu/home/index.html" style="color:#ccc !important;text-decoration:underline;"><?php echo $this->translate('Emory University / PEPFAR'); ?></a>
-	    </p>
-            <!-- END REGISTRATION FORM -->
-        </div>
-		
-        <!--<div class="copyright"> </div>-->
-        <!--[if lt IE 9]>
+        </form>
+        <p style="text-align:center;color:#ccc;"><?php echo $this->translate("This project is supported by the U.S. President's Emergency Plan for AIDS Relief (PEPFAR) through the U.S.Centers for Disease Control and Prevention (CDC)."); ?>
+        </p>
+        <!-- END REGISTRATION FORM -->
+    </div>
+
+    <!--<div class="copyright"> </div>-->
+    <!--[if lt IE 9]>
 	<script src="<?php echo $this->basePath('assets/global/plugins/respond.min.js'); ?>"></script>
-	<script src="<?php echo $this->basePath('assets/global/plugins/excanvas.min.js'); ?>"></script> 
+	<script src="<?php echo $this->basePath('assets/global/plugins/excanvas.min.js'); ?>"></script>
 	<![endif]-->
-        <!-- BEGIN CORE PLUGINS -->
-        <script src="<?php echo $this->basePath('assets/global/plugins/jquery.min.js'); ?>" type="text/javascript"></script>
-        <script src="<?php echo $this->basePath('assets/global/plugins/bootstrap/js/bootstrap.min.js'); ?>" type="text/javascript"></script>
-        <script src="<?php echo $this->basePath('assets/global/plugins/js.cookie.min.js'); ?>" type="text/javascript"></script>
-        <script src="<?php echo $this->basePath('assets/global/plugins/bootstrap-hover-dropdown/bootstrap-hover-dropdown.min.js'); ?>" type="text/javascript"></script>
-        <script src="<?php echo $this->basePath('assets/global/plugins/jquery-slimscroll/jquery.slimscroll.min.js'); ?>" type="text/javascript"></script>
-        <script src="<?php echo $this->basePath('assets/global/plugins/jquery.blockui.min.js'); ?>" type="text/javascript"></script>
-        <script src="<?php echo $this->basePath('assets/global/plugins/uniform/jquery.uniform.min.js'); ?>" type="text/javascript"></script>
-        <script src="<?php echo $this->basePath('assets/global/plugins/bootstrap-switch/js/bootstrap-switch.min.js'); ?>" type="text/javascript"></script>
-        <!-- END CORE PLUGINS -->
-        <!-- BEGIN PAGE LEVEL PLUGINS -->
-        <script src="<?php echo $this->basePath('assets/global/plugins/jquery-validation/js/jquery.validate.min.js'); ?>" type="text/javascript"></script>
-        <script src="<?php echo $this->basePath('assets/global/plugins/jquery-validation/js/additional-methods.min.js'); ?>" type="text/javascript"></script>
-        <script src="<?php echo $this->basePath('assets/global/plugins/select2/js/select2.full.min.js'); ?>" type="text/javascript"></script>
-        <!-- END PAGE LEVEL PLUGINS -->
-        <!-- BEGIN THEME GLOBAL SCRIPTS -->
-        <script src="<?php echo $this->basePath('assets/global/scripts/app.min.js'); ?>" type="text/javascript"></script>
-        <!-- END THEME GLOBAL SCRIPTS -->
-        <!-- BEGIN PAGE LEVEL SCRIPTS -->
-        <script src="<?php echo $this->basePath('assets/pages/scripts/login.min.js'); ?>" type="text/javascript"></script>
-        <!-- END PAGE LEVEL SCRIPTS -->
-        <!-- BEGIN THEME LAYOUT SCRIPTS -->
-        <!-- END THEME LAYOUT SCRIPTS -->
-	<script src="<?php echo $this->basePath('assets/js/cookie.js'); ?>" type="text/javascript"></script>
-	<script>
-	    $(function () {
-		setCookie('msg_on','');
-	    });
-	</script>
-    </body>
+    <!-- BEGIN CORE PLUGINS -->
+    <script src="<?php echo $this->basePath('assets/global/plugins/jquery.min.js'); ?>" type="text/javascript"></script>
+    <script src="<?php echo $this->basePath('assets/global/plugins/bootstrap/js/bootstrap.min.js'); ?>" type="text/javascript"></script>
+    <script src="<?php echo $this->basePath('assets/global/plugins/js.cookie.min.js'); ?>" type="text/javascript"></script>
+    <script src="<?php echo $this->basePath('assets/global/plugins/bootstrap-hover-dropdown/bootstrap-hover-dropdown.min.js'); ?>" type="text/javascript"></script>
+    <script src="<?php echo $this->basePath('assets/global/plugins/jquery-slimscroll/jquery.slimscroll.min.js'); ?>" type="text/javascript"></script>
+    <script src="<?php echo $this->basePath('assets/global/plugins/jquery.blockui.min.js'); ?>" type="text/javascript"></script>
+    <script src="<?php echo $this->basePath('assets/global/plugins/uniform/jquery.uniform.min.js'); ?>" type="text/javascript"></script>
+    <script src="<?php echo $this->basePath('assets/global/plugins/bootstrap-switch/js/bootstrap-switch.min.js'); ?>" type="text/javascript"></script>
+    <!-- END CORE PLUGINS -->
+    <!-- BEGIN PAGE LEVEL PLUGINS -->
+    <script src="<?php echo $this->basePath('assets/global/plugins/jquery-validation/js/jquery.validate.min.js'); ?>" type="text/javascript"></script>
+    <script src="<?php echo $this->basePath('assets/global/plugins/jquery-validation/js/additional-methods.min.js'); ?>" type="text/javascript"></script>
+    <script src="<?php echo $this->basePath('assets/global/plugins/select2/js/select2.full.min.js'); ?>" type="text/javascript"></script>
+    <!-- END PAGE LEVEL PLUGINS -->
+    <!-- BEGIN THEME GLOBAL SCRIPTS -->
+    <script src="<?php echo $this->basePath('assets/global/scripts/app.min.js'); ?>" type="text/javascript"></script>
+    <!-- END THEME GLOBAL SCRIPTS -->
+    <!-- BEGIN PAGE LEVEL SCRIPTS -->
+    <script src="<?php echo $this->basePath('assets/pages/scripts/login.min.js'); ?>" type="text/javascript"></script>
+    <!-- END PAGE LEVEL SCRIPTS -->
+    <!-- BEGIN THEME LAYOUT SCRIPTS -->
+    <!-- END THEME LAYOUT SCRIPTS -->
+    <script src="<?php echo $this->basePath('assets/js/cookie.js'); ?>" type="text/javascript"></script>
+    <script>
+        $(function() {
+            setCookie('msg_on', '');
+        });
+    </script>
+</body>
 
 </html>
