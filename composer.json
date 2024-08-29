@@ -29,7 +29,7 @@
         "laminas/laminas-di": "^3.13",
         "laminas/laminas-validator": "^2.44",
         "laminas/laminas-router": "^3.12",
-        "phpoffice/phpspreadsheet": "^1.29",
+        "phpoffice/phpspreadsheet": "^2.2",
         "halaxa/json-machine": "^1.1",
         "ramsey/uuid": "^4.7",
         "spatie/once": "^3.1"
