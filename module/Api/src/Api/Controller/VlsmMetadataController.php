@@ -22,8 +22,9 @@ class VlsmMetadataController extends AbstractRestfulController
     }
     public function create($params)
     {
-        // print_r($params);
-        // die;
+        // Ensure to parse raw input data if $_POST and $_FILES are empty
+        CommonService::parseMultipartFormData();
+
         $response = $this->commonService->saveVlsmMetadataFromAPI($params);
         return new JsonModel($response);
     }

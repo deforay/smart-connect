@@ -208,13 +208,13 @@ if (!isset($activeTab)) {
                                 <span class="arrow"></span>
                             </a>
                             <ul class="sub-menu">
-                                <?php if ($loginContainer->role == 1 || $loginContainer->role == 5) { ?>
-                                    <li class="nav-item start <?php echo ($activeTab == 'summary') ? " active open" : ""; ?>">
-                                        <a href="<?php echo $this->url('summary', array('action' => 'dashboard')) ?>" class="nav-link ">
-                                            <i class="fa fa-angle-right"></i> <span class="title"><?php echo $this->translate('Summary'); ?></span>
-                                        </a>
-                                    </li>
-                                <?php }
+
+                                <li class="nav-item start <?php echo ($activeTab == 'summary') ? " active open" : ""; ?>">
+                                    <a href="<?php echo $this->url('summary', array('action' => 'dashboard')) ?>" class="nav-link ">
+                                        <i class="fa fa-angle-right"></i> <span class="title"><?php echo $this->translate('Summary'); ?></span>
+                                    </a>
+                                </li>
+                                <?php
                                 if ($loginContainer->role == 1 || $loginContainer->role == 2 || $loginContainer->role == 5) { ?>
                                     <li class="nav-item end <?php echo ($activeTab == 'laboratory') ? " active open" : ""; ?>">
                                         <a href="<?php echo $this->url('laboratory', array('action' => 'dashboard')) ?>" class="nav-link ">
@@ -222,7 +222,7 @@ if (!isset($activeTab)) {
                                         </a>
                                     </li>
                                 <?php }
-                                if ($loginContainer->role == 1 || $loginContainer->role == 3 || $loginContainer->role == 5) { ?>
+                                if ($loginContainer->role == 1 || $loginContainer->role == 2 || $loginContainer->role == 3 || $loginContainer->role == 5) { ?>
                                     <li class="nav-item end <?php echo ($activeTab == 'clinics') ? " active open" : ""; ?>">
                                         <a href="<?php echo $this->url('clinics', array('action' => 'dashboard')) ?>" class="nav-link ">
                                             <i class="fa fa-angle-right"></i> <span class="title"><?php echo $this->translate('Clinics Dashboard'); ?></span>
@@ -240,13 +240,13 @@ if (!isset($activeTab)) {
                                 <span class="arrow"></span>
                             </a>
                             <ul class="sub-menu">
-                                <?php if ($loginContainer->role == 1 || $loginContainer->role == 5) { ?>
-                                    <li class="nav-item start <?php echo ($activeTab == 'eid-summary') ? " active open" : ""; ?>">
-                                        <a href="<?php echo $this->url('eid-summary', array('action' => 'dashboard')) ?>" class="nav-link ">
-                                            <i class="fa fa-angle-right"></i> <span class="title"><?php echo $this->translate('Summary'); ?></span>
-                                        </a>
-                                    </li>
-                                <?php }
+
+                                <li class="nav-item start <?php echo ($activeTab == 'eid-summary') ? " active open" : ""; ?>">
+                                    <a href="<?php echo $this->url('eid-summary', array('action' => 'dashboard')) ?>" class="nav-link ">
+                                        <i class="fa fa-angle-right"></i> <span class="title"><?php echo $this->translate('Summary'); ?></span>
+                                    </a>
+                                </li>
+                                <?php
                                 if ($loginContainer->role == 1 || $loginContainer->role == 2 || $loginContainer->role == 5) { ?>
                                     <li class="nav-item end <?php echo ($activeTab == 'eid-labs') ? " active open" : ""; ?>">
                                         <a href="<?php echo $this->url('eid-labs', array('action' => 'dashboard')) ?>" class="nav-link ">
@@ -279,13 +279,12 @@ if (!isset($activeTab)) {
                                 <span class="arrow"></span>
                             </a>
                             <ul class="sub-menu">
-                                <?php if ($loginContainer->role == 1 || $loginContainer->role == 5) { ?>
-                                    <li class="nav-item start <?php echo ($activeTab == 'covid19-summary') ? " active open" : ""; ?>">
-                                        <a href="<?php echo $this->url('covid19-summary', array('action' => 'dashboard')) ?>" class="nav-link ">
-                                            <i class="fa fa-angle-right"></i> <span class="title"><?php echo $this->translate('Summary'); ?></span>
-                                        </a>
-                                    </li>
-                                <?php }
+                                <li class="nav-item start <?php echo ($activeTab == 'covid19-summary') ? " active open" : ""; ?>">
+                                    <a href="<?php echo $this->url('covid19-summary', array('action' => 'dashboard')) ?>" class="nav-link ">
+                                        <i class="fa fa-angle-right"></i> <span class="title"><?php echo $this->translate('Summary'); ?></span>
+                                    </a>
+                                </li>
+                                <?php
                                 if ($loginContainer->role == 1 || $loginContainer->role == 2 || $loginContainer->role == 5) { ?>
                                     <li class="nav-item end <?php echo ($activeTab == 'covid19-labs') ? " active open" : ""; ?>">
                                         <a href="<?php echo $this->url('covid19-labs', array('action' => 'dashboard')) ?>" class="nav-link ">

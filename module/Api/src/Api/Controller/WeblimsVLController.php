@@ -2,8 +2,9 @@
 
 namespace Api\Controller;
 
-use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\View\Model\JsonModel;
+use Application\Service\CommonService;
+use Laminas\Mvc\Controller\AbstractRestfulController;
 
 class WeblimsVLController extends AbstractRestfulController
 {
@@ -17,7 +18,7 @@ class WeblimsVLController extends AbstractRestfulController
 
     public function getList()
     {
-        
+
         return array(
             'status'    => 'fail',
             'message'   => 'Invalid Request',
@@ -25,6 +26,9 @@ class WeblimsVLController extends AbstractRestfulController
     }
     public function create($params)
     {
+        // Ensure to parse raw input data if $_POST and $_FILES are empty
+        CommonService::parseMultipartFormData();
+
         $params = file_get_contents('php://input');
         $response = $this->sampleService->saveWeblimsVLAPI($params);
         return new JsonModel($response);

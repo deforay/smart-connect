@@ -586,27 +586,34 @@ class CommonService
           $sql = new Sql($dbAdapter);
 
 
-          $fileName = $_FILES['referenceFile']['name'];
-          $ranNumber = str_pad(rand(0, pow(10, 6) - 1), 6, '0', STR_PAD_LEFT);
-          $extension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-          $fileName = $ranNumber . "." . $extension;
-          // $fileName = 'ref.json';   // Testing
-          if (!file_exists(TEMP_UPLOAD_PATH) && !is_dir(TEMP_UPLOAD_PATH)) {
-               mkdir(APPLICATION_PATH . DIRECTORY_SEPARATOR . "temporary", 0777);
-          }
           if (!file_exists(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-reference") && !is_dir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-reference")) {
                mkdir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-reference", 0777, true);
           }
 
-          $fileName = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-reference" . DIRECTORY_SEPARATOR . $fileName;
-          if (is_readable($fileName) && move_uploaded_file($_FILES['referenceFile']['tmp_name'], $fileName)) {
-               $apiData = self::processJsonFile($fileName);
-               if ($apiData !== null && self::isTraversable($apiData)) {
-                    $apiData = is_array($apiData) ? $apiData : iterator_to_array($apiData);
-                    $apiData = self::arrayToObject($apiData);
+          $extension = strtolower(pathinfo($_FILES['referenceFile']['name'], PATHINFO_EXTENSION));
+          $newFileName = CommonService::generateRandomString(12) . "." . $extension;
+          $fileName = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-vl" . DIRECTORY_SEPARATOR . $newFileName;
+
+          if (move_uploaded_file($_FILES['referenceFile']['tmp_name'], $fileName)) {
+               // Check if the file is readable after being moved
+               if (is_readable($fileName)) {
+                    // Process the file
+                    $apiData = self::processJsonFile($fileName);
+                    if ($apiData !== null && self::isTraversable($apiData)) {
+                         $apiData = is_array($apiData) ? $apiData : iterator_to_array($apiData);
+                         $apiData = self::arrayToObject($apiData);
+                    } else {
+                         $apiData = [];
+                    }
                } else {
-                    $apiData = [];
+                    // Log an error if the file is not readable
+                    error_log("File $fileName not readable after move");
+                    exit(0);
                }
+          } else {
+               // Log an error if the file move operation fails
+               error_log("Failed to move uploaded file to $fileName");
+               exit(0);
           }
 
 
@@ -1535,5 +1542,60 @@ class CommonService
                $object->$key = self::arrayToObject($value);
           }
           return $object;
+     }
+
+     public static function parseMultipartFormData()
+     {
+          if (!empty($_FILES) || !empty($_POST)) {
+               return; // No need to parse if $_FILES or $_POST is already populated
+          }
+
+          $rawPostData = file_get_contents('php://input');
+          if (empty($rawPostData)) {
+               return;
+          }
+
+          $boundary = substr($rawPostData, 0, strpos($rawPostData, "\r\n"));
+          $parts = array_slice(explode($boundary, $rawPostData), 1);
+
+          foreach ($parts as $part) {
+               if ($part == "--\r\n") {
+                    break;
+               }
+
+               $part = ltrim($part, "\r\n");
+               [$headers, $body] = explode("\r\n\r\n", $part, 2);
+               $headers = explode("\r\n", $headers);
+               $name = null;
+               $filename = null;
+
+               foreach ($headers as $header) {
+                    if (strpos($header, 'Content-Disposition:') !== false) {
+                         preg_match('/name="([^"]*)"/', $header, $nameMatch);
+                         if (isset($nameMatch[1])) {
+                              $name = $nameMatch[1];
+                         }
+                         preg_match('/filename="([^"]*)"/', $header, $filenameMatch);
+                         if (isset($filenameMatch[1])) {
+                              $filename = $filenameMatch[1];
+                         }
+                    }
+               }
+
+               $body = substr($body, 0, strlen($body) - 2);
+               if ($filename) {
+                    $tempFilePath = sys_get_temp_dir() . DIRECTORY_SEPARATOR . "vlsm-vl" . DIRECTORY_SEPARATOR . $filename;
+                    file_put_contents($tempFilePath, $body);
+                    $_FILES[$name] = [
+                         'name' => $filename,
+                         'type' => mime_content_type($tempFilePath),
+                         'tmp_name' => $tempFilePath,
+                         'error' => UPLOAD_ERR_OK,
+                         'size' => filesize($tempFilePath),
+                    ];
+               } else {
+                    $_POST[$name] = $body;
+               }
+          }
      }
 }

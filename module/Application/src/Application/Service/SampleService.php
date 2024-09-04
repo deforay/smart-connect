@@ -1302,9 +1302,9 @@ class SampleService
             $source = $_POST['source'] ?? 'LIS';
             $labId = $_POST['labId'] ?? null;
 
-            $removeKeys = array(
+            $removeKeys = [
                 'vl_sample_id'
-            );
+            ];
             $allColumns = "SELECT COLUMN_NAME
                             FROM INFORMATION_SCHEMA.COLUMNS
                             WHERE TABLE_SCHEMA = '" . $dbname . "' AND table_name='dash_form_vl'";
@@ -1316,19 +1316,19 @@ class SampleService
             /** @var SampleTable $sampleDb */
             $sampleDb = $this->sm->get('SampleTableWithoutCache');
 
-
             if (!file_exists(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-vl") && !is_dir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-vl")) {
                 mkdir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-vl", 0777, true);
             }
 
-            $fileName = $_FILES['vlFile']['name'];
-            $extension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+            $extension = strtolower(pathinfo($_FILES['vlFile']['name'], PATHINFO_EXTENSION));
             $fileName = CommonService::generateRandomString(12) . time() . "." . $extension;
 
             $fileName = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-vl" . DIRECTORY_SEPARATOR . $fileName;
 
             if (move_uploaded_file($_FILES['vlFile']['tmp_name'], $fileName)) {
-                [$apiData, $timestamp] = CommonService::processJsonFile($fileName);
+                if (is_readable($fileName)) {
+                    [$apiData, $timestamp] = CommonService::processJsonFile($fileName);
+                }
             }
 
             $numRows = $counter = 0;
@@ -1411,18 +1411,23 @@ class SampleService
             mkdir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-vl", 0777, true);
         }
 
-        $fileName = $_FILES['vlFile']['name'];
-        $extension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-        $fileName = CommonService::generateRandomString(12) . "." . $extension;
+        $extension = strtolower(pathinfo($_FILES['vlFile']['name'], PATHINFO_EXTENSION));
+        $newFileName = CommonService::generateRandomString(12) . "." . $extension;
 
-        $fileName = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-vl" . DIRECTORY_SEPARATOR . $fileName;
-        if (is_readable($fileName) && move_uploaded_file($_FILES['vlFile']['tmp_name'], $fileName)) {
-            error_log($fileName);
-            $apiData = CommonService::processJsonFile($fileName, false);
+        $fileName = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-vl" . DIRECTORY_SEPARATOR . $newFileName;
+
+        if (move_uploaded_file($_FILES['vlFile']['tmp_name'], $fileName)) {
+            if (is_readable($fileName)) {
+                $apiData = CommonService::processJsonFile($fileName, false);
+            } else {
+                error_log("File $fileName not readable after move");
+                exit(0);
+            }
         } else {
-            error_log("File $fileName not readable");
+            error_log("Failed to move uploaded file to $fileName");
             exit(0);
         }
+
 
 
         foreach ($apiData as $rowData) {

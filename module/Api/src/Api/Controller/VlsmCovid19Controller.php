@@ -2,8 +2,9 @@
 
 namespace Api\Controller;
 
-use Laminas\Mvc\Controller\AbstractRestfulController;
 use Laminas\View\Model\JsonModel;
+use Application\Service\CommonService;
+use Laminas\Mvc\Controller\AbstractRestfulController;
 
 class VlsmCovid19Controller extends AbstractRestfulController
 {
@@ -20,6 +21,8 @@ class VlsmCovid19Controller extends AbstractRestfulController
     }
     public function create($params)
     {
+        // Ensure to parse raw input data if $_POST and $_FILES are empty
+        CommonService::parseMultipartFormData();
         if (!isset($params['api-version'])) {
             $params['api-version'] = 'v1';
         }
@@ -30,7 +33,6 @@ class VlsmCovid19Controller extends AbstractRestfulController
         }
 
 
-        return new JsonModel($response); 
-        
+        return new JsonModel($response);
     }
 }

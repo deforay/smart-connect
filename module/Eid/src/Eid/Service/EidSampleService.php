@@ -213,10 +213,10 @@ class EidSampleService
         $locationDb = $this->sm->get('LocationDetailsTable');
         $sampleRjtReasonDb = $this->sm->get('SampleRejectionReasonTable');
 
-        $fileName = $_FILES['eidFile']['name'];
-        $ranNumber = str_pad(rand(0, pow(10, 6) - 1), 6, '0', STR_PAD_LEFT);
-        $extension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-        $fileName = $ranNumber . "." . $extension;
+
+        $extension = strtolower(pathinfo($_FILES['eidFile']['name'], PATHINFO_EXTENSION));
+        $newFileName = CommonService::generateRandomString(12) . "." . $extension;
+        $fileName = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-vl" . DIRECTORY_SEPARATOR . $newFileName;
 
         if (!file_exists(TEMP_UPLOAD_PATH) && !is_dir(TEMP_UPLOAD_PATH)) {
             mkdir(APPLICATION_PATH . DIRECTORY_SEPARATOR . "temporary", 0777);
@@ -225,9 +225,11 @@ class EidSampleService
             mkdir(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-eid", 0777, true);
         }
 
-        $fileName = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-eid" . DIRECTORY_SEPARATOR . $fileName;
-        if (!file_exists($fileName) && move_uploaded_file($_FILES['eidFile']['tmp_name'], $fileName)) {
-            $apiData = CommonService::processJsonFile($fileName);
+        $apiData = [];
+        if (move_uploaded_file($_FILES['eidFile']['tmp_name'], $fileName)) {
+            if (is_readable($fileName)) {
+                $apiData = CommonService::processJsonFile($fileName);
+            }
         }
 
         foreach ($apiData as $rowData) {

@@ -2,6 +2,7 @@
 
 namespace Api\Controller;
 
+use Application\Service\CommonService;
 use Laminas\View\Model\JsonModel;
 use Application\Service\SampleService;
 use Laminas\Mvc\Controller\AbstractRestfulController;
@@ -23,6 +24,9 @@ class VlsmController extends AbstractRestfulController
 
     public function create($params)
     {
+
+        // Ensure to parse raw input data if $_POST and $_FILES are empty
+        CommonService::parseMultipartFormData();
 
         if (!isset($params['api-version'])) {
             $params['api-version'] = 'v1';
