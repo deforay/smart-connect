@@ -3,8 +3,11 @@
 use Application\Service\CommonService;
 
 $common = new CommonService();
-foreach ($requestType as $key => $value) {
-    $requestTypeOption[$value['request_type']] = $value['request_type'];
+$requestTypeOption = [];
+if (isset($requestType) && !empty($requestType)) {
+    foreach ($requestType as $key => $value) {
+        $requestTypeOption[$value['request_type']] = $value['request_type'];
+    }
 }
 ?>
 <style>
@@ -82,6 +85,18 @@ foreach ($requestType as $key => $value) {
                                         </td>
                                     </tr>
                                     <tr>
+                                        <td style="width:10%;"><strong><?php echo $this->translate("Testing Lap"); ?>&nbsp;:</strong></td>
+                                        <td style="width:20%;">
+                                            <select class="form-control" id="labId" name="labId[]" multiple title="<?php echo $this->translate('Please select one or more testing lab. Leave blank for All'); ?>" style="width:100%;">
+                                                <?php if (isset($lapName) && !empty($lapName)) {
+                                                    foreach ($lapName as $lap) { ?>
+                                                        <option value="<?php echo $lap['facility_id']; ?>"><?php echo $lap['facility_name']; ?></option>
+                                                <?php }
+                                                } ?>
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
                                         <td colspan="2">
                                             <a href="javascript:void(0);" class="btn btn-primary btn-sm" onclick="getData();"><?php echo $this->translate('Search'); ?></a>&nbsp;&nbsp;
                                             <a href="javascript:void(0);" class="btn btn-danger btn-sm" onclick="location.reload();" style="margin-right:5.8%;"><?php echo $this->translate('Reset'); ?></a>
@@ -126,6 +141,10 @@ foreach ($requestType as $key => $value) {
         });
         $('#clinicId').select2({
             placeholder: "<?php echo $this->translate('Select Districts First'); ?>",
+            allowClear: true
+        });
+        $('#labId').select2({
+            placeholder: "<?php echo $this->translate('Select Testing Lap'); ?>",
             allowClear: true
         });
         $('.daterangefield').daterangepicker({
@@ -186,9 +205,10 @@ foreach ($requestType as $key => $value) {
         $('#collectionDate').val(moment().subtract(1, 'month').format('DD-MMM-YYYY') + ' to ' + moment().format('DD-MMM-YYYY'));
         $('#testedDate').val('');
         getData();
-        
+
         var start = moment().subtract(12, 'months');
         var end = moment();
+
         function cb(start, end) {
             $('#daterange-container span').html(start.format('MMM D, YYYY') + ' to ' + end.format('MMM D, YYYY'));
             $('#daterange').val(start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
@@ -238,7 +258,8 @@ foreach ($requestType as $key => $value) {
                 provinceName: $('#provinceName').val(),
                 districtName: $('#districtName').val(),
                 clinicId: $('#clinicId').val(),
-                flag: '<?php echo $flag?>'
+                labId: $('#labId').val(),
+                flag: '<?php echo $flag ?>'
             },
             function(data) {
                 $.unblockUI();
@@ -254,7 +275,7 @@ foreach ($requestType as $key => $value) {
         if (pName != null && pName.length > 0) {
             $.post("<?php echo $this->url('common', array('action' => 'get-district-list')); ?>", {
                     provinceName: pName,
-                    flag: '<?php echo $flag?>'
+                    flag: '<?php echo $flag ?>'
                 },
                 function(data) {
                     if (data != "" || data != null || data != undefined) {
@@ -272,7 +293,7 @@ foreach ($requestType as $key => $value) {
         if (dName != null && dName.length > 0) {
             $.post("<?php echo $this->url('common', array('action' => 'get-facility-list')); ?>", {
                     districtName: dName,
-                    flag: '<?php echo $flag?>'
+                    flag: '<?php echo $flag ?>'
                 },
                 function(data) {
                     if (data != "" || data != null || data != undefined) {
@@ -294,15 +315,31 @@ foreach ($requestType as $key => $value) {
                 provinceName: $('#provinceName').val(),
                 districtName: $('#districtName').val(),
                 clinicId: $('#clinicId').val(),
-                flag: '<?php echo $flag?>'
+                labId: $('#labId').val(),
+                flag: '<?php echo $flag ?>'
             },
             function(data) {
                 if (data != "" || data != null || data != undefined) {
                     $('#loadData').html(data);
                     $('#regTable').dataTable({
+                        "bAutoWidth": false,
+                        "bProcessing": true,
                         "aaSorting": [
                             [1, "desc"]
                         ],
+                        "aoColumns": [{
+                                "sClass": "center",
+                                "bSortable": false
+                            }, {
+                                "sClass": "center"
+                            },
+                            {
+                                "sClass": "center"
+                            },
+                            {
+                                "sClass": "center"
+                            }
+                        ]
                     });
                 }
             });
