@@ -20,7 +20,7 @@ class SnapshotController extends AbstractActionController
 
     public function indexAction()
     {
-        $this->layout()->setVariable('activeTab', 'status');
+        $this->layout()->setVariable('activeTab', 'snap-data');
         /** @var \Laminas\Http\Request $request */
         $request = $this->getRequest();
         if ($request->isPost()) {

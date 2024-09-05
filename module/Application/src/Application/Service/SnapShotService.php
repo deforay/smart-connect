@@ -33,6 +33,8 @@ class SnapShotService
     }
     public function getSnapshotData($params)
     {
+        $loginContainer = new Container('credo');
+        $mappedFacilities = $loginContainer->mappedFacilities ?? null;
         $testTypeQuery = [];
         $where = [];
         $common = new CommonService();
@@ -58,6 +60,9 @@ class SnapShotService
         }
         if (!empty($params['flag']) && $params['flag'] == 'poc') {
             $where[] = " icm.poc_device = 'yes'";
+        }
+        if (isset($mappedFacilities) && !empty($mappedFacilities)) {
+            $where[] = " lab_id IN (" . implode(', ', $mappedFacilities) . ")";
         }
         if (isset($where) && !empty($where)) {
             $whereQuery = " WHERE " . implode(" AND ", $where);
@@ -120,6 +125,9 @@ class SnapShotService
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $globalDb = $this->sm->get('GlobalTable');
+        $loginContainer = new Container('credo');
+        $mappedFacilities = $loginContainer->mappedFacilities ?? null;
+
         $samplesWaitingFromLastXMonths = $globalDb->getGlobalValue('sample_waiting_month_range');
         $age['vl'] = "patient_age_in_years";
         $age['eid'] = "child_age";
@@ -205,6 +213,12 @@ class SnapShotService
                     $testedQuery = $testedQuery->join(array('icm' => 'instrument_machines'), 'icm.config_machine_id = vl.import_machine_name', array('poc_device'))->where(array('icm.poc_device' => 'yes'));
                     $rejectedQuery = $rejectedQuery->join(array('icm' => 'instrument_machines'), 'icm.config_machine_id = vl.import_machine_name', array('poc_device'))->where(array('icm.poc_device' => 'yes'));
                 }
+                if (isset($mappedFacilities) && !empty($mappedFacilities)) {
+                    $quickStatsquery = $quickStatsquery->where(array("lab_id IN ('" . implode('", "', $mappedFacilities) . "')"));
+                    $receivedQuery = $receivedQuery->where(array("lab_id IN ('" . implode('", "', $mappedFacilities) . "')"));
+                    $testedQuery = $testedQuery->where(array("lab_id IN ('" . implode('", "', $mappedFacilities) . "')"));
+                    $rejectedQuery = $rejectedQuery->where(array("lab_id IN ('" . implode('", "', $mappedFacilities) . "')"));
+                }
                 $query['quickStats'][] = $sql->buildSqlString($quickStatsquery);
                 $query['received'][] = $sql->buildSqlString($receivedQuery);
                 $query['tested'][] = $sql->buildSqlString($testedQuery);
@@ -238,6 +252,6 @@ class SnapShotService
             }
         }
         // die;
-        return array('quickStats' => $finalResult['quickStats'], 'scResult' => $finalResult['received'], 'stResult' => $finalResult['tested'], 'srResult' => $finalResult['rejected']);
+        return array('quickStats' => $finalResult['quickStats'] ?? null, 'scResult' => $finalResult['received'] ?? null, 'stResult' => $finalResult['tested'] ?? null, 'srResult' => $finalResult['rejected'] ?? null);
     }
 }
