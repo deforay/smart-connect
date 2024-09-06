@@ -23,17 +23,25 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use JsonMachine\JsonDecoder\ExtJsonDecoder;
 use Application\Model\DashApiReceiverStatsTable;
 use Laminas\Mail\Transport\Smtp as SmtpTransport;
+use Application\Model\TempMailTable;
+
+use Symfony\Component\Mailer\Transport;
+use Symfony\Component\Mailer\Mailer;
+use Symfony\Component\Mime\Email;
 
 class CommonService
 {
 
      public $sm = null;
      public $cache = null;
+     /** @var TempMailTable TempMailTable */
+     public TempMailTable $tempMailTable;
 
-     public function __construct($sm = null, $cache = null)
+     public function __construct($sm = null, $cache = null, $tempMailTable)
      {
           $this->sm = $sm;
           $this->cache = $cache;
+          $this->tempMailTable = $tempMailTable;
      }
 
      public function startsWith($string, $startString)
@@ -205,31 +213,26 @@ class CommonService
 
      public function insertTempMail($to, $subject, $message, $fromMail, $fromName, $cc, $bcc)
      {
-          $tempmailDb = $this->sm->get('TempMailTable');
-          return $tempmailDb->insertTempMailDetails($to, $subject, $message, $fromMail, $fromName, $cc, $bcc);
+          return $this->tempMailTable->insertTempMailDetails($to, $subject, $message, $fromMail, $fromName, $cc, $bcc);
      }
 
      public function sendTempMail()
      {
           try {
-               $tempDb = $this->sm->get('TempMailTable');
                $configResult = $this->sm->get('Config');
                $dbAdapter = $this->sm->get('Laminas\Db\Adapter\Adapter');
                $sql = new Sql($dbAdapter);
+               // In my case this data is extracted from the DB
+               $user = $configResult["email"]["config"]["username"];
+               $pass = $configResult["email"]["config"]["password"];
+               $server = $configResult["email"]["host"];
+               $port = $configResult["email"]["config"]["port"];
 
+               // Generate connection configuration
+               $dsn = "smtp://" . $user . ":" . $pass . "@" . $server . ":" . $port;
                // Setup SMTP transport using LOGIN authentication
-               $transport = new SmtpTransport();
-               $options = new SmtpOptions([
-                    'host' => $configResult["email"]["host"],
-                    'port' => $configResult["email"]["config"]["port"],
-                    'connection_class' => $configResult["email"]["config"]["auth"],
-                    'connection_config' => array(
-                         'username' => $configResult["email"]["config"]["username"],
-                         'password' => $configResult["email"]["config"]["password"],
-                         'ssl' => $configResult["email"]["config"]["ssl"],
-                    ),
-               ]);
-               $transport->setOptions($options);
+               $symTransport = Transport::fromDsn($dsn);
+               $mailer = new Mailer($symTransport);
                $limit = '10';
                $mailQuery = $sql->select()->from(array('tm' => 'temp_mail'))
                     ->where("status='pending'")
@@ -239,34 +242,31 @@ class CommonService
                if (count($mailResult) > 0) {
                     foreach ($mailResult as $result) {
                          $alertMail = new Mail\Message();
-                         $id = $result['temp_id'];
-                         $tempDb->updateTempMailStatus($id);
 
-                         $fromEmail = $result['from_mail'];
-                         $fromFullName = $result['from_full_name'];
+                         $id = $result['id'];
+                         $this->tempMailTable->updateTempMailStatus($id);
+                         $fromEmail = $result['report_email'];
                          $subject = $result['subject'];
 
-                         $html = new MimePart($result['message']);
-                         $html->type = "text/html";
+                         $email = (new Email())
+                              ->from($fromEmail)
+                              ->replyTo($fromEmail)
+                              ->priority(Email::PRIORITY_HIGH)
+                              ->subject($subject)
+                              ->text('Sending emails is fun again!')
+                              ->html($result['text_message']);
 
-                         $body = new MimeMessage();
-                         $body->setParts(array($html));
-
-                         $alertMail->setBody($body);
-                         $alertMail->addFrom($fromEmail, $fromFullName);
-                         $alertMail->addReplyTo($fromEmail, $fromFullName);
-
-                         $toArray = explode(",", $result['to_email']);
+                         $toArray = explode(",", $result['to_mail']);
                          foreach ($toArray as $toId) {
                               if ($toId != '') {
-                                   $alertMail->addTo($toId);
+                                   $email->To($toId);
                               }
                          }
                          if (isset($result['cc']) && trim($result['cc']) != "") {
                               $ccArray = explode(",", $result['cc']);
                               foreach ($ccArray as $ccId) {
                                    if ($ccId != '') {
-                                        $alertMail->addCc($ccId);
+                                        $email->Cc($ccId);
                                    }
                               }
                          }
@@ -275,14 +275,13 @@ class CommonService
                               $bccArray = explode(",", $result['bcc']);
                               foreach ($bccArray as $bccId) {
                                    if ($bccId != '') {
-                                        $alertMail->addBcc($bccId);
+                                        $email->Bcc($bccId);
                                    }
                               }
                          }
 
-                         $alertMail->setSubject($subject);
-                         $transport->send($alertMail);
-                         $tempDb->deleteTempMail($id);
+                         $mailer->send($email);
+                         $this->tempMailTable->deleteTempMail($id);
                     }
                }
           } catch (Exception $e) {

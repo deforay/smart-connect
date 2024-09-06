@@ -2,6 +2,9 @@
 
 namespace Application;
 
+use Application\Command\SendTempMail;
+use Application\Command\SendTempMailFactory;
+use Laminas\DevelopmentMode\Command;
 
 return array(
     'router' => array(
@@ -50,7 +53,7 @@ return array(
                 'options' => array(
                     'route' => '/organizations[/][:action][/:id]',
                     'defaults' => array(
-                        'controller' => Controller\Organizations::class,
+                        'controller' => Controller\OrganizationsController::class,
                         'action' => 'index',
                     ),
                 ),
@@ -213,7 +216,8 @@ return array(
             'Laminas\Log\LoggerAbstractServiceFactory'
         ],
         'factories' => [
-            'translator' => 'Laminas\Mvc\I18n\TranslatorFactory'
+            'translator' => 'Laminas\Mvc\I18n\TranslatorFactory',
+            SendTempMail::class => SendTempMailFactory::class,
         ],
     ],
     'translator' => [
@@ -245,6 +249,11 @@ return array(
         ],
         'template_path_stack' => [
             __DIR__ . '/../view',
+        ],
+    ],
+    'laminas-cli' => [
+        'commands' => [
+            'send-mail' => SendTempMail::class,
         ],
     ],
 );
