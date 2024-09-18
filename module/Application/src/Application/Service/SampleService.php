@@ -143,7 +143,7 @@ class SampleService
                 'updated_datetime' => new Expression('NOW()')
             );
             $testReasonDb->insert($data);
-            return $testReasonDb->lastInsertValue;
+            return $testReasonDb->getLastInsertValue();
         }
     }
 
@@ -1404,6 +1404,8 @@ class SampleService
         $testStatusDb = $this->sm->get('SampleStatusTable');
         $testReasonDb = $this->sm->get('TestReasonTable');
         $sampleTypeDb = $this->sm->get('SampleTypeTable');
+
+        /** @var LocationDetailsTable $locationDb  */
         $locationDb = $this->sm->get('LocationDetailsTable');
         $sampleRjtReasonDb = $this->sm->get('SampleRejectionReasonTable');
 
@@ -1537,7 +1539,7 @@ class SampleService
                             $facilityData['facility_state'] = $sQueryResult['geo_id'];
                         } else {
                             $locationDb->insert(array('geo_parent' => 0, 'geo_name' => trim($row['facility_state'])));
-                            $facilityData['facility_state'] = $locationDb->lastInsertValue;
+                            $facilityData['facility_state'] = $locationDb->getLastInsertValue();
                         }
                     }
                     if (trim($row['facility_district']) != '') {
@@ -1546,7 +1548,7 @@ class SampleService
                             $facilityData['facility_district'] = $sQueryResult['geo_id'];
                         } else {
                             $locationDb->insert(array('geo_parent' => $facilityData['facility_state'], 'geo_name' => trim($row['facility_district'])));
-                            $facilityData['facility_district'] = $locationDb->lastInsertValue;
+                            $facilityData['facility_district'] = $locationDb->getLastInsertValue();
                         }
                     }
                     //check facility type
@@ -1562,7 +1564,7 @@ class SampleService
                             $data['facility_id'] = $facilityDataResult['facility_id'];
                         } else {
                             $this->facilityTable->insert($facilityData);
-                            $data['facility_id'] = $this->facilityTable->lastInsertValue;
+                            $data['facility_id'] = $this->facilityTable->getLastInsertValue();
                         }
                     } else {
                         $data['facility_id'] = null;
@@ -1590,7 +1592,7 @@ class SampleService
                             $labData['facility_state'] = $sQueryResult['geo_id'];
                         } else {
                             $locationDb->insert(array('geo_parent' => 0, 'geo_name' => trim($row['labState'])));
-                            $labData['facility_state'] = $locationDb->lastInsertValue;
+                            $labData['facility_state'] = $locationDb->getLastInsertValue();
                         }
                     }
                     if (trim($row['labDistrict']) != '') {
@@ -1599,7 +1601,7 @@ class SampleService
                             $labData['facility_district'] = $sQueryResult['geo_id'];
                         } else {
                             $locationDb->insert(array('geo_parent' => $labData['facility_state'], 'geo_name' => trim($row['labDistrict'])));
-                            $labData['facility_district'] = $locationDb->lastInsertValue;
+                            $labData['facility_district'] = $locationDb->getLastInsertValue();
                         }
                     }
                     //check lab type
@@ -1615,7 +1617,7 @@ class SampleService
                             $data['lab_id'] = $labDataResult['facility_id'];
                         } else {
                             $this->facilityTable->insert($labData);
-                            $data['lab_id'] = $this->facilityTable->lastInsertValue;
+                            $data['lab_id'] = $this->facilityTable->getLastInsertValue();
                         }
                     } else {
                         $data['lab_id'] = 0;
@@ -1827,7 +1829,7 @@ class SampleService
                             'facility_type'     => '1',
                             'status'            => 'active'
                         ));
-                        $data['facility_id'] = $this->facilityTable->lastInsertValue;
+                        $data['facility_id'] = $this->facilityTable->getLastInsertValue();
                     }
                 } else {
                     $data['facility_id'] = null;
@@ -1841,7 +1843,12 @@ class SampleService
                 $data['result_status'] = null;
                 if (trim($row['TestStatus']) != '') {
                     $resultStatusText = [
-                        "invalid", "fail", "failed", "inconclusive", "f", "i"
+                        "invalid",
+                        "fail",
+                        "failed",
+                        "inconclusive",
+                        "f",
+                        "i"
                     ];
                     $row['TestStatus'] = strtolower($row['TestStatus']);
                     if ($row['TestStatus'] == 'complete' || $row['TestStatus'] == 'authorized') {
@@ -1857,15 +1864,6 @@ class SampleService
                         $row['TestStatus'] = 'registered';
                         $data['result_status'] = 6;
                     }
-                    // if (!empty($data['result_status'])) {
-                    //     $sampleStatusResult = $this->checkSampleStatus(trim($row['TestStatus']));
-                    //     if ($sampleStatusResult) {
-                    //         $data['result_status'] = $sampleStatusResult['status_id'];
-                    //     } else {
-                    //         $testStatusDb->insert(array('status_name' => trim($row['TestStatus'])));
-                    //         $data['result_status'] = $testStatusDb->lastInsertValue;
-                    //     }
-                    // }
                 } else {
                     $data['result_status'] = 6;
                 }

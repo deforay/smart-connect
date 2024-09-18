@@ -2,14 +2,13 @@
 
 namespace Eid\Model;
 
+use Laminas\Db\Sql\Sql;
+use Laminas\Db\Sql\Expression;
 use Laminas\Session\Container;
 use Laminas\Db\Adapter\Adapter;
-use Laminas\Db\Sql\Sql;
-use Laminas\Db\TableGateway\AbstractTableGateway;
-use Laminas\Db\Sql\Expression;
-//use Laminas\Db\Sql\Where;
 use \Application\Service\CommonService;
-use Zend\Debug\Debug;
+use Laminas\Db\TableGateway\AbstractTableGateway;
+
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -5241,11 +5240,11 @@ class EidSampleTable extends AbstractTableGateway
             }
             if (isset($params['testResult']) && $params['testResult'] != '') {
                 $testResult = $params['testResult'];
-                $queryStr = $queryStr->where("(vl.result LIKE ? OR vl.result LIKE ?)", [$testResult . '%', ucwords($testResult) . '%']);                
+                $queryStr = $queryStr->where("(vl.result LIKE ? OR vl.result LIKE ?)", [$testResult . '%', ucwords($testResult) . '%']);
             }
             if (isset($params['sampleTypeId']) && $params['sampleTypeId'] != '') {
                 $sampleTypeId = base64_decode(trim($params['sampleTypeId']));
-                $queryStr = $queryStr->where('vl.specimen_type = ?', [$sampleTypeId]);                
+                $queryStr = $queryStr->where('vl.specimen_type = ?', [$sampleTypeId]);
             }
             //print_r($params['age']);die;
             if (isset($params['age']) && trim($params['age']) != '') {
