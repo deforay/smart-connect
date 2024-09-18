@@ -249,6 +249,8 @@ class LabsController extends AbstractActionController
         $provinceFilter = "";
         $districtFilter = "";
         $labFilter = "";
+        $place = "";
+		$category = "";
 
         if ($this->params()->fromQuery('month')) {
             $month = $this->params()->fromQuery('month');
@@ -266,6 +268,12 @@ class LabsController extends AbstractActionController
             $labFilter = $this->params()->fromQuery('lab');
             $params['labs'] = explode(',', $labFilter);
         }
+        if ($this->params()->fromQuery('place')) {
+			$place = $this->params()->fromQuery('place');
+		}
+		if ($this->params()->fromQuery('category')) {
+			$category = $this->params()->fromQuery('category');
+		}
 
         $provinces       = $this->facilityService->fetchLocationDetails();
         $districts       = $this->facilityService->getAllDistrictsList();
@@ -282,7 +290,9 @@ class LabsController extends AbstractActionController
                 'searchRange' => $range,
                 'labFilter' => $labFilter,
                 'provinceFilter' => $provinceFilter,
-                'districtFilter' => $districtFilter
+                'districtFilter' => $districtFilter,
+                'place'    => $place,
+				'category'    => $category
             )
         );
     }

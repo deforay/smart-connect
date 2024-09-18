@@ -300,7 +300,7 @@ if (isset($labFilter) && trim($labFilter) != '') {
     $('#dashboard-range').show();
     setProgress();
     <?php
-    if (isset($_GET['place'])) {
+    if (isset($place) && $place != '') {
     ?>
       getTATfromURL();
     <?php
@@ -342,11 +342,11 @@ if (isset($labFilter) && trim($labFilter) != '') {
         district: ($("#districts").val() == null || $("#districts").val() == '') ? '' : $("#districts").val().join(','),
         facility: ($("#clinics").val() == null || $("#clinics").val() == '') ? [] : $("#clinics").val(),
         lab: ($("#labs").val() == null || $("#labs").val() == '') ? [] : $("#labs").val(),
-        category: '<?php if (isset($_GET['category'])) {
-                      echo $_GET['category'];
+        category: '<?php if (isset($category)) {
+                      echo $category;
                     } ?>',
-        place: '<?php if (isset($_GET['place'])) {
-                  echo $_GET['place'];
+        place: '<?php if (isset($place)) {
+                  echo $place;
                 } ?>',
         sampleCollectionDate: $("#sampleCollectionDate").val()
       },
