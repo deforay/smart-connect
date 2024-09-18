@@ -5224,22 +5224,28 @@ class EidSampleTable extends AbstractTableGateway
                         //"total" => new Expression('COUNT(*)'),
                         "day" => new Expression("DATE_FORMAT(DATE(sample_collection_date), '%d-%b-%Y')"),
 
-                        "positive" => new Expression("SUM(CASE WHEN (vl.specimen_type IN($samples) AND (vl.result like 'not%' OR vl.result like 'Not%')) THEN 1 ELSE 0 END)"),
-                        "negative" => new Expression("SUM(CASE WHEN (vl.specimen_type IN($samples) AND (vl.result like 'suppressed%' OR vl.result like 'Suppressed%' )) THEN 1 ELSE 0 END)"),
+                        "positive" => new Expression("SUM(CASE WHEN (vl.specimen_type IN(?) AND (vl.result like 'not%' OR vl.result like 'Not%')) THEN 1 ELSE 0 END)", [$samples]),
+                        "negative" => new Expression("SUM(CASE WHEN (vl.specimen_type IN(?) AND (vl.result like 'suppressed%' OR vl.result like 'Suppressed%' )) THEN 1 ELSE 0 END)", [$samples]),
                     )
                 )->join(array('st' => 'r_eid_sample_type'), 'vl.specimen_type=st.sample_id', array('sample_name'))
-                ->where(array("DATE(vl.sample_collection_date) <='$endDate'", "DATE(vl.sample_collection_date) >='$startDate'"));
+                ->where(array("DATE(vl.sample_collection_date) <= ? AND DATE(vl.sample_collection_date) >= ?", [$endDate, $startDate]));
+
             if (isset($params['clinicId']) && trim($params['clinicId']) != '') {
-                $queryStr = $queryStr->where('vl.facility_id IN (' . $params['clinicId'] . ')');
+                $clinicIds = explode(',', $params['clinicId']);
+                $queryStr = $queryStr->where('vl.facility_id IN (' . implode(',', array_fill(0, count($clinicIds), '?')) . ')', $clinicIds);
             } elseif ($loginContainer->role != 1) {
                 $mappedFacilities = $loginContainer->mappedFacilities ?? [];
-                $queryStr = $queryStr->where('vl.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
+                if (!empty($mappedFacilities)) {
+                    $queryStr = $queryStr->where('vl.facility_id IN (' . implode(',', array_fill(0, count($mappedFacilities), '?')) . ')', $mappedFacilities);
+                }
             }
             if (isset($params['testResult']) && $params['testResult'] != '') {
-                $queryStr = $queryStr->where("(vl.result like '" . $params['testResult'] . "%' OR vl.result like '" . ucwords($params['testResult']) . "%' )");
+                $testResult = $params['testResult'];
+                $queryStr = $queryStr->where("(vl.result LIKE ? OR vl.result LIKE ?)", [$testResult . '%', ucwords($testResult) . '%']);                
             }
             if (isset($params['sampleTypeId']) && $params['sampleTypeId'] != '') {
-                $queryStr = $queryStr->where('vl.specimen_type="' . base64_decode(trim($params['sampleTypeId'])) . '"');
+                $sampleTypeId = base64_decode(trim($params['sampleTypeId']));
+                $queryStr = $queryStr->where('vl.specimen_type = ?', [$sampleTypeId]);                
             }
             //print_r($params['age']);die;
             if (isset($params['age']) && trim($params['age']) != '') {
@@ -5279,8 +5285,9 @@ class EidSampleTable extends AbstractTableGateway
             $queryStr = $queryStr->group(array(new Expression('WEEK(sample_collection_date)')));
             $queryStr = $queryStr->order(array(new Expression('WEEK(sample_collection_date)')));
             $queryStr = $sql->buildSqlString($queryStr);
-            // echo $queryStr;die;
-            $sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+            //echo $queryStr;die;
+            //$sampleResult = $dbAdapter->query($queryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
+            $sampleResult = $this->commonService->cacheQuery($queryStr, $dbAdapter);
             $j = 0;
             foreach ($sampleResult as $sRow) {
                 if ($sRow["day"] == null) {
