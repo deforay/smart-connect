@@ -9,6 +9,7 @@ use Application\Model\RolesTable;
 use Application\Model\UsersTable;
 use Application\Model\GlobalTable;
 use Application\Model\SampleTable;
+use Application\Model\TempMailTable;
 use Application\Model\ArtCodeTable;
 use Application\Model\FacilityTable;
 use Application\Model\ProvinceTable;
@@ -334,6 +335,14 @@ class Module
 						return new FacilityTable($dbAdapter, $commonService, $diContainer);
 					}
 				},
+				'TempMailTable'  => new class
+				{
+					public function __invoke($diContainer)
+					{
+						$dbAdapter = $diContainer->get('Laminas\Db\Adapter\Adapter');
+						return new TempMailTable($dbAdapter);
+					}
+				},
 				'FacilityTypeTable'  => new class
 				{
 					public function __invoke($diContainer)
@@ -365,7 +374,8 @@ class Module
 						$dbAdapter = $diContainer->get('Laminas\Db\Adapter\Adapter');
 						return new SampleTypeTable($dbAdapter);
 					}
-				}, 'GlobalTable' => new class
+				},
+				'GlobalTable' => new class
 				{
 					public function __invoke($diContainer)
 					{
@@ -373,14 +383,16 @@ class Module
 						$commonService = $diContainer->get('CommonService');
 						return new GlobalTable($dbAdapter, $commonService, $diContainer);
 					}
-				}, 'ArtCodeTable'  => new class
+				},
+				'ArtCodeTable'  => new class
 				{
 					public function __invoke($diContainer)
 					{
 						$dbAdapter = $diContainer->get('Laminas\Db\Adapter\Adapter');
 						return new ArtCodeTable($dbAdapter);
 					}
-				}, 'UserFacilityMapTable'  => new class
+				},
+				'UserFacilityMapTable'  => new class
 				{
 					public function __invoke($diContainer)
 					{
@@ -558,8 +570,9 @@ class Module
 				{
 					public function __invoke($diContainer)
 					{
+						$tempMailTable = $diContainer->get('TempMailTable');
 						$cache = $diContainer->get('Cache\Persistent');
-						return new CommonService($diContainer, $cache);
+						return new CommonService($diContainer, $cache, $tempMailTable);
 					}
 				},
 				'UserService'  => new class

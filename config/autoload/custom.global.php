@@ -16,8 +16,8 @@ return [
         'host' => 'smtp.gmail.com',
         'config' => [
             'port' => 587,
-            'username' => '',
-            'password' => '',
+            'username' => 'mail.codewemedia@gmail.com',
+            'password' => 'lvscdchhqhjhjzuo',
             'ssl' => 'tls',
             'auth' => 'login',
         ],
