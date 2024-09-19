@@ -1,8 +1,10 @@
 <?php
+$isDevelopment = getenv('APPLICATION_ENV') === 'development';
+
 return [
     'caches' => [
         'Cache\Persistent' => [
-            'adapter' => 'Laminas\Cache\Storage\Adapter\Filesystem',
+            'adapter' => $isDevelopment ? 'Laminas\Cache\Storage\Adapter\BlackHole' : 'Laminas\Cache\Storage\Adapter\Filesystem',
             'options' => [
                 'cache_dir' => getcwd() . "/data/cache/",
                 'dir_permission' => 0755,
