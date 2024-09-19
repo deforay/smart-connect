@@ -85,7 +85,7 @@ if (isset($requestType) && !empty($requestType)) {
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td style="width:10%;"><strong><?php echo $this->translate("Testing Lap"); ?>&nbsp;:</strong></td>
+                                        <td style="width:10%;"><strong><?php echo $this->translate("Testing Lab"); ?>&nbsp;:</strong></td>
                                         <td style="width:20%;">
                                             <select class="form-control" id="labId" name="labId[]" multiple title="<?php echo $this->translate('Please select one or more testing lab. Leave blank for All'); ?>" style="width:100%;">
                                                 <?php if (isset($lapName) && !empty($lapName)) {
@@ -144,7 +144,7 @@ if (isset($requestType) && !empty($requestType)) {
             allowClear: true
         });
         $('#labId').select2({
-            placeholder: "<?php echo $this->translate('Select Testing Lap'); ?>",
+            placeholder: "<?php echo $this->translate('Select Testing Lab'); ?>",
             allowClear: true
         });
         $('.daterangefield').daterangepicker({

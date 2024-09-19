@@ -106,7 +106,7 @@ class UsersTable extends AbstractTableGateway
                 $districts = [];
             }
             $loginContainer->userId = $rResult[0]["user_id"];
-            $loginContainer->name = $rResult[0]["user_name"];
+            $loginContainer->username = $rResult[0]["user_name"];
             $loginContainer->mobile = $rResult[0]["mobile"];
             $loginContainer->role = $rResult[0]["role"];
             $loginContainer->email = $rResult[0]["email"];
