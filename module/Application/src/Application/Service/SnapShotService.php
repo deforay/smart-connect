@@ -37,14 +37,14 @@ class SnapShotService
         $mappedFacilities = $loginContainer->mappedFacilities ?? null;
         $testTypeQuery = [];
         $where = [];
-        $common = new CommonService();
+
         if (isset($params['collectionDate']) && !empty($params['collectionDate'])) {
             $date = explode(" to ", $params['collectionDate']);
-            $where[] = " DATE(sample_collection_date) >= '" . $common->isoDateFormat($date[0]) . "' AND DATE(sample_collection_date) <= '" . $common->isoDateFormat($date[1]) . "' ";
+            $where[] = " DATE(sample_collection_date) >= '" . $this->commonService->isoDateFormat($date[0]) . "' AND DATE(sample_collection_date) <= '" . $this->commonService->isoDateFormat($date[1]) . "' ";
         }
         if (isset($params['testedDate']) && !empty($params['testedDate'])) {
             $date = explode(" to ", $params['testedDate']);
-            $where[] = " DATE(sample_tested_datetime) >= '" . $common->isoDateFormat($date[0]) . "' AND DATE(sample_tested_datetime) <= '" . $common->isoDateFormat($date[1]) . "' ";
+            $where[] = " DATE(sample_tested_datetime) >= '" . $this->commonService->isoDateFormat($date[0]) . "' AND DATE(sample_tested_datetime) <= '" . $this->commonService->isoDateFormat($date[1]) . "' ";
         }
         if (isset($params['provinceName']) && !empty($params['provinceName'])) {
             $where[] = " facility_state_id IN(" . implode(",", $params['provinceName']) . ") ";
@@ -121,7 +121,6 @@ class SnapShotService
 
     public function getSnapshotQuickStatsDetails($params)
     {
-        $common = new CommonService();
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $globalDb = $this->sm->get('GlobalTable');
@@ -195,17 +194,17 @@ class SnapShotService
 
                 if (isset($params['collectionDate']) && !empty($params['collectionDate'])) {
                     $date = explode(" to ", $params['collectionDate']);
-                    $quickStatsquery = $quickStatsquery->where(array("DATE(sample_collection_date) >='" . $common->isoDateFormat($date[0]) . "'", "DATE(sample_collection_date) <='" . $common->isoDateFormat($date[1]) . "'"));
-                    $receivedQuery = $receivedQuery->where(array("DATE(sample_collection_date) >='" . $common->isoDateFormat($date[0]) . "'", "DATE(sample_collection_date) <='" . $common->isoDateFormat($date[1]) . "'"));
-                    $testedQuery = $testedQuery->where(array("DATE(sample_collection_date) >='" . $common->isoDateFormat($date[0]) . "'", "DATE(sample_collection_date) <='" . $common->isoDateFormat($date[1]) . "'"));
-                    $rejectedQuery = $rejectedQuery->where(array("DATE(sample_collection_date) >='" . $common->isoDateFormat($date[0]) . "'", "DATE(sample_collection_date) <='" . $common->isoDateFormat($date[1]) . "'"));
+                    $quickStatsquery = $quickStatsquery->where(array("DATE(sample_collection_date) >='" . $this->commonService->isoDateFormat($date[0]) . "'", "DATE(sample_collection_date) <='" . $this->commonService->isoDateFormat($date[1]) . "'"));
+                    $receivedQuery = $receivedQuery->where(array("DATE(sample_collection_date) >='" . $this->commonService->isoDateFormat($date[0]) . "'", "DATE(sample_collection_date) <='" . $this->commonService->isoDateFormat($date[1]) . "'"));
+                    $testedQuery = $testedQuery->where(array("DATE(sample_collection_date) >='" . $this->commonService->isoDateFormat($date[0]) . "'", "DATE(sample_collection_date) <='" . $this->commonService->isoDateFormat($date[1]) . "'"));
+                    $rejectedQuery = $rejectedQuery->where(array("DATE(sample_collection_date) >='" . $this->commonService->isoDateFormat($date[0]) . "'", "DATE(sample_collection_date) <='" . $this->commonService->isoDateFormat($date[1]) . "'"));
                 }
                 if (isset($params['testedDate']) && !empty($params['testedDate'])) {
                     $date = explode(" to ", $params['testedDate']);
-                    $quickStatsquery = $quickStatsquery->where(array("DATE(sample_tested_datetime) >='" . $common->isoDateFormat($date[0]) . "'", "DATE(sample_tested_datetime) <='" . $common->isoDateFormat($date[1]) . "'"));
-                    $receivedQuery = $receivedQuery->where(array("DATE(sample_tested_datetime) >='" . $common->isoDateFormat($date[0]) . "'", "DATE(sample_tested_datetime) <='" . $common->isoDateFormat($date[1]) . "'"));
-                    $testedQuery = $testedQuery->where(array("DATE(sample_tested_datetime) >='" . $common->isoDateFormat($date[0]) . "'", "DATE(sample_tested_datetime) <='" . $common->isoDateFormat($date[1]) . "'"));
-                    $rejectedQuery = $rejectedQuery->where(array("DATE(sample_tested_datetime) >='" . $common->isoDateFormat($date[0]) . "'", "DATE(sample_tested_datetime) <='" . $common->isoDateFormat($date[1]) . "'"));
+                    $quickStatsquery = $quickStatsquery->where(array("DATE(sample_tested_datetime) >='" . $this->commonService->isoDateFormat($date[0]) . "'", "DATE(sample_tested_datetime) <='" . $this->commonService->isoDateFormat($date[1]) . "'"));
+                    $receivedQuery = $receivedQuery->where(array("DATE(sample_tested_datetime) >='" . $this->commonService->isoDateFormat($date[0]) . "'", "DATE(sample_tested_datetime) <='" . $this->commonService->isoDateFormat($date[1]) . "'"));
+                    $testedQuery = $testedQuery->where(array("DATE(sample_tested_datetime) >='" . $this->commonService->isoDateFormat($date[0]) . "'", "DATE(sample_tested_datetime) <='" . $this->commonService->isoDateFormat($date[1]) . "'"));
+                    $rejectedQuery = $rejectedQuery->where(array("DATE(sample_tested_datetime) >='" . $this->commonService->isoDateFormat($date[0]) . "'", "DATE(sample_tested_datetime) <='" . $this->commonService->isoDateFormat($date[1]) . "'"));
                 }
                 if (!empty($params['flag']) && $params['flag'] == 'poc') {
                     $quickStatsquery = $quickStatsquery->join(array('icm' => 'instrument_machines'), 'icm.config_machine_id = vl.import_machine_name', array('poc_device'))->where(array('icm.poc_device' => 'yes'));
