@@ -1577,7 +1577,7 @@ class SampleTable extends AbstractTableGateway
                 } elseif ($params['gender'] == 'M') {
                     $query->where("vl.patient_gender IN ('m','male','M','MALE')");
                 } elseif ($params['gender'] == 'not_specified') {
-                    $query->where("(vl.patient_gender IS NULL OR vl.patient_gender = '' OR vl.patient_gender ='Not Recorded' OR vl.patient_gender = 'not recorded')");$query->where("(vl.patient_gender IS NULL OR vl.patient_gender = '' OR vl.patient_gender ='Not Recorded' OR vl.patient_gender = 'not recorded')");
+                    $query->where("(vl.patient_gender IS NULL OR vl.patient_gender = '' OR vl.patient_gender ='Not Recorded' OR vl.patient_gender = 'not recorded')");
                 }
             }
 
@@ -1656,71 +1656,93 @@ class SampleTable extends AbstractTableGateway
 
                     )
                 )
-                ->where(array("DATE(vl.sample_collection_date) <='$endDate'", "DATE(vl.sample_collection_date) >='$startDate'"));
+                ->where("DATE(vl.sample_collection_date) BETWEEN '$startDate' AND '$endDate'");
+
             if (isset($params['clinicId']) && trim($params['clinicId']) != '') {
-                $query = $query->where('vl.facility_id IN (' . $params['clinicId'] . ')');
+                $clinicIds = explode(',', $params['clinicId']);
+                $query->where('vl.facility_id IN (' . implode(',', array_fill(0, count($clinicIds), '?')) . ')', $clinicIds);
             } elseif ($loginContainer->role != 1) {
                 $mappedFacilities = $loginContainer->mappedFacilities ?? [];
-                $query = $query->where('vl.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
+                if (!empty($mappedFacilities)) {
+                    $query->where('vl.facility_id IN (' . implode(',', array_fill(0, count($mappedFacilities), '?')) . ')', $mappedFacilities);
+                }
             }
+
             if (isset($params['testResult']) && $params['testResult'] == '<1000') {
-                $query = $query->where("(vl.vl_result_category like 'suppressed%' OR vl.vl_result_category like 'Suppressed%' )");
+                $query->where("(vl.vl_result_category like 'suppressed%' OR vl.vl_result_category like 'Suppressed%' )");
             } elseif (isset($params['testResult']) && $params['testResult'] == '>=1000') {
-                $query = $query->where("(vl.vl_result_category like 'not suppressed%' OR vl.vl_result_category like 'Not Suppressed%' or vl.result_value_absolute_decimal >= 1000)");
+                $query->where("(vl.vl_result_category like 'not suppressed%' OR vl.vl_result_category like 'Not Suppressed%' or vl.result_value_absolute_decimal >= 1000)");
             }
+
             if (isset($params['sampleTypeId']) && $params['sampleTypeId'] != '') {
-                $query = $query->where('vl.specimen_type="' . base64_decode(trim($params['sampleTypeId'])) . '"');
+                $sampleTypeId = base64_decode(trim($params['sampleTypeId']));
+                $query->where('vl.specimen_type = ?', [$sampleTypeId]);
             }
-            //print_r($params['age']);die;
+
             if (isset($params['age']) && trim($params['age']) != '') {
                 $age = explode(',', $params['age']);
-                $where = '';
-                $counter = count($age);
-                for ($a = 0; $a < $counter; $a++) {
-                    if (trim($where) != '') {
-                        $where .= ' OR ';
-                    }
-                    if ($age[$a] == '<2') {
-                        $where .= "(vl.patient_age_in_years > 0 AND vl.patient_age_in_years < 2)";
-                    } elseif ($age[$a] == '2to5') {
-                        $where .= "(vl.patient_age_in_years >= 2 AND vl.patient_age_in_years <= 5)";
-                    } elseif ($age[$a] == '6to14') {
-                        $where .= "(vl.patient_age_in_years >= 6 AND vl.patient_age_in_years <= 14)";
-                    } elseif ($age[$a] == '15to49') {
-                        $where .= "(vl.patient_age_in_years >= 15 AND vl.patient_age_in_years <= 49)";
-                    } elseif ($age[$a] == '>=50') {
-                        $where .= "(vl.patient_age_in_years >= 50)";
-                    } elseif ($age[$a] == 'unknown') {
-                        $where .= "(vl.patient_age_in_years IS NULL OR vl.patient_age_in_years = '' OR vl.patient_age_in_years = 'Unknown' OR vl.patient_age_in_years = 'unknown' OR vl.patient_age_in_years = 'Unreported' OR vl.patient_age_in_years = 'unreported')";
+                $ageConditions = [];
+                foreach ($age as $ageGroup) {
+                    switch ($ageGroup) {
+                        case '<2':
+                            $ageConditions[] = "(vl.patient_age_in_years > 0 AND vl.patient_age_in_years < 2)";
+                            break;
+                        case '2to5':
+                            $ageConditions[] = "(vl.patient_age_in_years >= 2 AND vl.patient_age_in_years <= 5)";
+                            break;
+                        case '6to14':
+                            $ageConditions[] = "(vl.patient_age_in_years >= 6 AND vl.patient_age_in_years <= 14)";
+                            break;
+                        case '15to49':
+                            $ageConditions[] = "(vl.patient_age_in_years >= 15 AND vl.patient_age_in_years <= 49)";
+                            break;
+                        case '>=50':
+                            $ageConditions[] = "(vl.patient_age_in_years >= 50)";
+                            break;
+                        case 'unknown':
+                            $ageConditions[] = "(vl.patient_age_in_years IS NULL OR vl.patient_age_in_years = '' OR vl.patient_age_in_years = 'Unknown' OR vl.patient_age_in_years = 'unknown' OR vl.patient_age_in_years = 'Unreported' OR vl.patient_age_in_years = 'unreported')";
+                            break;
                     }
                 }
-                $where = '(' . $where . ')';
-                $query = $query->where($where);
+                if (!empty($ageConditions)) {
+                    $query->where('(' . implode(' OR ', $ageConditions) . ')');
+                }
             }
+
             if (isset($params['adherence']) && trim($params['adherence']) != '') {
-                $query = $query->where(array("vl.arv_adherance_percentage = '" . $params['adherence'] . "'"));
+                $query->where("vl.arv_adherance_percentage = ?", $params['adherence']);
             }
-            if (isset($params['gender']) && $params['gender'] == 'F') {
-                $query = $query->where("vl.patient_gender IN ('f','female','F','FEMALE')");
-            } elseif (isset($params['gender']) && $params['gender'] == 'M') {
-                $query = $query->where("vl.patient_gender IN ('m','male','M','MALE')");
-            } elseif (isset($params['gender']) && $params['gender'] == 'not_specified') {
-                $query = $query->where("(vl.patient_gender IS NULL OR vl.patient_gender = '' OR vl.patient_gender ='Not Recorded' OR vl.patient_gender = 'not recorded OR vl.patient_age_in_years = 'Unreported' OR vl.patient_age_in_years = 'unreported')");
+
+            if (isset($params['gender'])) {
+                if ($params['gender'] == 'F') {
+                    $query->where("vl.patient_gender IN ('f','female','F','FEMALE')");
+                } elseif ($params['gender'] == 'M') {
+                    $query->where("vl.patient_gender IN ('m','male','M','MALE')");
+                } elseif ($params['gender'] == 'not_specified') {
+                    $query->where("(vl.patient_gender IS NULL OR vl.patient_gender = '' OR vl.patient_gender ='Not Recorded' OR vl.patient_gender = 'not recorded')");
+                }
             }
-            if (isset($params['isPregnant']) && $params['isPregnant'] == 'yes') {
-                $query = $query->where("vl.is_patient_pregnant = 'yes'");
-            } elseif (isset($params['isPregnant']) && $params['isPregnant'] == 'no') {
-                $query = $query->where("vl.is_patient_pregnant = 'no'");
-            } elseif (isset($params['isPregnant']) && $params['isPregnant'] == 'unreported') {
-                $query = $query->where("(vl.is_patient_pregnant IS NULL OR vl.is_patient_pregnant = '' OR vl.is_patient_pregnant = 'Unreported' OR vl.is_patient_pregnant = 'unreported')");
+
+            if (isset($params['isPregnant'])) {
+                if ($params['isPregnant'] == 'yes') {
+                    $query->where("vl.is_patient_pregnant = 'yes'");
+                } elseif ($params['isPregnant'] == 'no') {
+                    $query->where("vl.is_patient_pregnant = 'no'");
+                } elseif ($params['isPregnant'] == 'unreported') {
+                    $query->where("(vl.is_patient_pregnant IS NULL OR vl.is_patient_pregnant = '' OR vl.is_patient_pregnant = 'Unreported' OR vl.is_patient_pregnant = 'unreported')");
+                }
             }
-            if (isset($params['isBreastfeeding']) && $params['isBreastfeeding'] == 'yes') {
-                $query = $query->where("vl.is_patient_breastfeeding = 'yes'");
-            } elseif (isset($params['isBreastfeeding']) && $params['isBreastfeeding'] == 'no') {
-                $query = $query->where("vl.is_patient_breastfeeding = 'no'");
-            } elseif (isset($params['isBreastfeeding']) && $params['isBreastfeeding'] == 'unreported') {
-                $query = $query->where("(vl.is_patient_breastfeeding IS NULL OR vl.is_patient_breastfeeding = '' OR vl.is_patient_breastfeeding = 'Unreported' OR vl.is_patient_breastfeeding = 'unreported')");
+
+            if (isset($params['isBreastfeeding'])) {
+                if ($params['isBreastfeeding'] == 'yes') {
+                    $query->where("vl.is_patient_breastfeeding = 'yes'");
+                } elseif ($params['isBreastfeeding'] == 'no') {
+                    $query->where("vl.is_patient_breastfeeding = 'no'");
+                } elseif ($params['isBreastfeeding'] == 'unreported') {
+                    $query->where("(vl.is_patient_breastfeeding IS NULL OR vl.is_patient_breastfeeding = '' OR vl.is_patient_breastfeeding = 'Unreported' OR vl.is_patient_breastfeeding = 'unreported')");
+                }
             }
+
             $query = $query->group(array(new Expression('WEEK(sample_collection_date)')));
             $query = $query->order(array(new Expression('WEEK(sample_collection_date)')));
             $queryStr = $sql->buildSqlString($query);
@@ -1784,46 +1806,63 @@ class SampleTable extends AbstractTableGateway
                         "AgeLtVLLt1000" => $caseQuery2,
                     )
                 )
-                ->where(array("DATE(vl.sample_collection_date) <='$endDate'", "DATE(vl.sample_collection_date) >='$startDate'"));
+                ->where("DATE(vl.sample_collection_date) BETWEEN '$startDate' AND '$endDate'");
+
             if (isset($params['clinicId']) && trim($params['clinicId']) != '') {
-                $query = $query->where('vl.facility_id IN (' . $params['clinicId'] . ')');
+                $clinicIds = explode(',', $params['clinicId']);
+                $query->where('vl.facility_id IN (' . implode(',', array_fill(0, count($clinicIds), '?')) . ')', $clinicIds);
             } elseif ($loginContainer->role != 1) {
                 $mappedFacilities = $loginContainer->mappedFacilities ?? [];
-                $query = $query->where('vl.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
+                if (!empty($mappedFacilities)) {
+                    $query->where('vl.facility_id IN (' . implode(',', array_fill(0, count($mappedFacilities), '?')) . ')', $mappedFacilities);
+                }
             }
+
             if (isset($params['testResult']) && $params['testResult'] == '<1000') {
-                $query = $query->where("(vl.vl_result_category like 'suppressed%' OR vl.vl_result_category like 'Suppressed%' )");
+                $query->where("(vl.vl_result_category like 'suppressed%' OR vl.vl_result_category like 'Suppressed%' )");
             } elseif (isset($params['testResult']) && $params['testResult'] == '>=1000') {
-                $query = $query->where("(vl.vl_result_category like 'not suppressed%' OR vl.vl_result_category like 'Not Suppressed%' or vl.result_value_absolute_decimal >= 1000)");
+                $query->where("(vl.vl_result_category like 'not suppressed%' OR vl.vl_result_category like 'Not Suppressed%' or vl.result_value_absolute_decimal >= 1000)");
             }
+
             if (isset($params['sampleTypeId']) && $params['sampleTypeId'] != '') {
-                $query = $query->where('vl.specimen_type="' . base64_decode(trim($params['sampleTypeId'])) . '"');
+                $sampleTypeId = base64_decode(trim($params['sampleTypeId']));
+                $query->where('vl.specimen_type = ?', [$sampleTypeId]);
             }
 
             if (isset($params['adherence']) && trim($params['adherence']) != '') {
-                $query = $query->where(array("vl.arv_adherance_percentage = '" . $params['adherence'] . "'"));
+                $query->where("vl.arv_adherance_percentage = ?", $params['adherence']);
             }
-            if (isset($params['gender']) && $params['gender'] == 'F') {
-                $query = $query->where("vl.patient_gender IN ('f','female','F','FEMALE')");
-            } elseif (isset($params['gender']) && $params['gender'] == 'M') {
-                $query = $query->where("vl.patient_gender IN ('m','male','M','MALE')");
-            } elseif (isset($params['gender']) && $params['gender'] == 'not_specified') {
-                $query = $query->where("(vl.patient_gender IS NULL OR vl.patient_gender = '' OR vl.patient_gender ='Not Recorded' OR vl.patient_gender = 'not recorded OR vl.patient_age_in_years = 'Unreported' OR vl.patient_age_in_years = 'unreported')");
+
+            if (isset($params['gender'])) {
+                if ($params['gender'] == 'F') {
+                    $query->where("vl.patient_gender IN ('f','female','F','FEMALE')");
+                } elseif ($params['gender'] == 'M') {
+                    $query->where("vl.patient_gender IN ('m','male','M','MALE')");
+                } elseif ($params['gender'] == 'not_specified') {
+                    $query->where("(vl.patient_gender IS NULL OR vl.patient_gender = '' OR vl.patient_gender ='Not Recorded' OR vl.patient_gender = 'not recorded')");
+                }
             }
-            if (isset($params['isPregnant']) && $params['isPregnant'] == 'yes') {
-                $query = $query->where("vl.is_patient_pregnant = 'yes'");
-            } elseif (isset($params['isPregnant']) && $params['isPregnant'] == 'no') {
-                $query = $query->where("vl.is_patient_pregnant = 'no'");
-            } elseif (isset($params['isPregnant']) && $params['isPregnant'] == 'unreported') {
-                $query = $query->where("(vl.is_patient_pregnant IS NULL OR vl.is_patient_pregnant = '' OR vl.is_patient_pregnant = 'Unreported' OR vl.is_patient_pregnant = 'unreported')");
+
+            if (isset($params['isPregnant'])) {
+                if ($params['isPregnant'] == 'yes') {
+                    $query->where("vl.is_patient_pregnant = 'yes'");
+                } elseif ($params['isPregnant'] == 'no') {
+                    $query->where("vl.is_patient_pregnant = 'no'");
+                } elseif ($params['isPregnant'] == 'unreported') {
+                    $query->where("(vl.is_patient_pregnant IS NULL OR vl.is_patient_pregnant = '' OR vl.is_patient_pregnant = 'Unreported' OR vl.is_patient_pregnant = 'unreported')");
+                }
             }
-            if (isset($params['isBreastfeeding']) && $params['isBreastfeeding'] == 'yes') {
-                $query = $query->where("vl.is_patient_breastfeeding = 'yes'");
-            } elseif (isset($params['isBreastfeeding']) && $params['isBreastfeeding'] == 'no') {
-                $query = $query->where("vl.is_patient_breastfeeding = 'no'");
-            } elseif (isset($params['isBreastfeeding']) && $params['isBreastfeeding'] == 'unreported') {
-                $query = $query->where("(vl.is_patient_breastfeeding IS NULL OR vl.is_patient_breastfeeding = '' OR vl.is_patient_breastfeeding = 'Unreported' OR vl.is_patient_breastfeeding = 'unreported')");
+
+            if (isset($params['isBreastfeeding'])) {
+                if ($params['isBreastfeeding'] == 'yes') {
+                    $query->where("vl.is_patient_breastfeeding = 'yes'");
+                } elseif ($params['isBreastfeeding'] == 'no') {
+                    $query->where("vl.is_patient_breastfeeding = 'no'");
+                } elseif ($params['isBreastfeeding'] == 'unreported') {
+                    $query->where("(vl.is_patient_breastfeeding IS NULL OR vl.is_patient_breastfeeding = '' OR vl.is_patient_breastfeeding = 'Unreported' OR vl.is_patient_breastfeeding = 'unreported')");
+                }
             }
+            
             $query = $query->group(array(new Expression('WEEK(sample_collection_date)')));
             $query = $query->order(array(new Expression('WEEK(sample_collection_date)')));
             $queryStr = $sql->buildSqlString($query);
@@ -1893,46 +1932,63 @@ class SampleTable extends AbstractTableGateway
 
                     )
                 )
-                ->where(array("DATE(vl.sample_collection_date) <='$endDate'", "DATE(vl.sample_collection_date) >='$startDate'"));
+                ->where("DATE(vl.sample_collection_date) BETWEEN '$startDate' AND '$endDate'");
+
             if (isset($params['clinicId']) && trim($params['clinicId']) != '') {
-                $query = $query->where('vl.facility_id IN (' . $params['clinicId'] . ')');
+                $clinicIds = explode(',', $params['clinicId']);
+                $query->where('vl.facility_id IN (' . implode(',', array_fill(0, count($clinicIds), '?')) . ')', $clinicIds);
             } elseif ($loginContainer->role != 1) {
                 $mappedFacilities = $loginContainer->mappedFacilities ?? [];
-                $query = $query->where('vl.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
+                if (!empty($mappedFacilities)) {
+                    $query->where('vl.facility_id IN (' . implode(',', array_fill(0, count($mappedFacilities), '?')) . ')', $mappedFacilities);
+                }
             }
+
             if (isset($params['testResult']) && $params['testResult'] == '<1000') {
-                $query = $query->where("(vl.vl_result_category like 'suppressed%' OR vl.vl_result_category like 'Suppressed%' )");
+                $query->where("(vl.vl_result_category like 'suppressed%' OR vl.vl_result_category like 'Suppressed%' )");
             } elseif (isset($params['testResult']) && $params['testResult'] == '>=1000') {
-                $query = $query->where("(vl.vl_result_category like 'not suppressed%' OR vl.vl_result_category like 'Not Suppressed%' or vl.result_value_absolute_decimal >= 1000)");
+                $query->where("(vl.vl_result_category like 'not suppressed%' OR vl.vl_result_category like 'Not Suppressed%' or vl.result_value_absolute_decimal >= 1000)");
             }
+
             if (isset($params['sampleTypeId']) && $params['sampleTypeId'] != '') {
-                $query = $query->where('vl.specimen_type="' . base64_decode(trim($params['sampleTypeId'])) . '"');
+                $sampleTypeId = base64_decode(trim($params['sampleTypeId']));
+                $query->where('vl.specimen_type = ?', [$sampleTypeId]);
             }
 
             if (isset($params['adherence']) && trim($params['adherence']) != '') {
-                $query = $query->where(array("vl.arv_adherance_percentage = '" . $params['adherence'] . "'"));
+                $query->where("vl.arv_adherance_percentage = ?", $params['adherence']);
             }
-            if (isset($params['gender']) && $params['gender'] == 'F') {
-                $query = $query->where("vl.patient_gender IN ('f','female','F','FEMALE')");
-            } elseif (isset($params['gender']) && $params['gender'] == 'M') {
-                $query = $query->where("vl.patient_gender IN ('m','male','M','MALE')");
-            } elseif (isset($params['gender']) && $params['gender'] == 'not_specified') {
-                $query = $query->where("(vl.patient_gender IS NULL OR vl.patient_gender = '' OR vl.patient_gender ='Not Recorded' OR vl.patient_gender = 'not recorded OR vl.patient_age_in_years = 'Unreported' OR vl.patient_age_in_years = 'unreported')");
+
+            if (isset($params['gender'])) {
+                if ($params['gender'] == 'F') {
+                    $query->where("vl.patient_gender IN ('f','female','F','FEMALE')");
+                } elseif ($params['gender'] == 'M') {
+                    $query->where("vl.patient_gender IN ('m','male','M','MALE')");
+                } elseif ($params['gender'] == 'not_specified') {
+                    $query->where("(vl.patient_gender IS NULL OR vl.patient_gender = '' OR vl.patient_gender ='Not Recorded' OR vl.patient_gender = 'not recorded')");
+                }
             }
-            if (isset($params['isPregnant']) && $params['isPregnant'] == 'yes') {
-                $query = $query->where("vl.is_patient_pregnant = 'yes'");
-            } elseif (isset($params['isPregnant']) && $params['isPregnant'] == 'no') {
-                $query = $query->where("vl.is_patient_pregnant = 'no'");
-            } elseif (isset($params['isPregnant']) && $params['isPregnant'] == 'unreported') {
-                $query = $query->where("(vl.is_patient_pregnant IS NULL OR vl.is_patient_pregnant = '' OR vl.is_patient_pregnant = 'Unreported' OR vl.is_patient_pregnant = 'unreported')");
+
+            if (isset($params['isPregnant'])) {
+                if ($params['isPregnant'] == 'yes') {
+                    $query->where("vl.is_patient_pregnant = 'yes'");
+                } elseif ($params['isPregnant'] == 'no') {
+                    $query->where("vl.is_patient_pregnant = 'no'");
+                } elseif ($params['isPregnant'] == 'unreported') {
+                    $query->where("(vl.is_patient_pregnant IS NULL OR vl.is_patient_pregnant = '' OR vl.is_patient_pregnant = 'Unreported' OR vl.is_patient_pregnant = 'unreported')");
+                }
             }
-            if (isset($params['isBreastfeeding']) && $params['isBreastfeeding'] == 'yes') {
-                $query = $query->where("vl.is_patient_breastfeeding = 'yes'");
-            } elseif (isset($params['isBreastfeeding']) && $params['isBreastfeeding'] == 'no') {
-                $query = $query->where("vl.is_patient_breastfeeding = 'no'");
-            } elseif (isset($params['isBreastfeeding']) && $params['isBreastfeeding'] == 'unreported') {
-                $query = $query->where("(vl.is_patient_breastfeeding IS NULL OR vl.is_patient_breastfeeding = '' OR vl.is_patient_breastfeeding = 'Unreported' OR vl.is_patient_breastfeeding = 'unreported')");
+
+            if (isset($params['isBreastfeeding'])) {
+                if ($params['isBreastfeeding'] == 'yes') {
+                    $query->where("vl.is_patient_breastfeeding = 'yes'");
+                } elseif ($params['isBreastfeeding'] == 'no') {
+                    $query->where("vl.is_patient_breastfeeding = 'no'");
+                } elseif ($params['isBreastfeeding'] == 'unreported') {
+                    $query->where("(vl.is_patient_breastfeeding IS NULL OR vl.is_patient_breastfeeding = '' OR vl.is_patient_breastfeeding = 'Unreported' OR vl.is_patient_breastfeeding = 'unreported')");
+                }
             }
+
             $query = $query->group(array(new Expression('WEEK(sample_collection_date)')));
             $query = $query->order(array(new Expression('WEEK(sample_collection_date)')));
             $queryStr = $sql->buildSqlString($query);
