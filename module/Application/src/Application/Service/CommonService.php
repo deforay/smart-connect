@@ -7,6 +7,7 @@ use Exception;
 use Throwable;
 use ZipArchive;
 use Traversable;
+use DateInterval;
 use DateTimeZone;
 use Laminas\Mail;
 use Ramsey\Uuid\Uuid;
@@ -16,8 +17,12 @@ use Laminas\Db\Sql\Sql;
 use Laminas\Db\Sql\Insert;
 use Laminas\Session\Container;
 use Laminas\Db\Adapter\Adapter;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Style\Border;
 use JsonMachine\JsonDecoder\ExtJsonDecoder;
+use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use Application\Model\DashApiReceiverStatsTable;
 use Laminas\Mail\Transport\Smtp as SmtpTransport;
 use Application\Model\TempMailTable;
@@ -44,7 +49,7 @@ class CommonService
      public function startsWith($string, $startString)
      {
           $len = strlen($startString);
-          return (substr($string, 0, $len) === $startString);
+          return substr($string, 0, $len) === $startString;
      }
 
      public static function generateRandomString(int $length = 32): string
@@ -114,31 +119,19 @@ class CommonService
                if ($fnct == '' || $fnct == 'null') {
                     $select = $sql->select()
                          ->from($tableName)
-                         ->where(array($fieldName => $value));
+                         ->where([$fieldName => $value]);
                     $statement = $sql->prepareStatementForSqlObject($select);
                     $result = $statement->execute();
                     $data = count($result);
                } else {
                     $table = explode("##", $fnct);
-                    if ($fieldName == 'password') {
-                         //Password encrypted
-                         $configResult = $this->sm->get('Config');
-                         $password = sha1($value . $configResult["password"]["salt"]);
-                         //$password = $value;
-                         $select = $sql->select()
-                              ->from($tableName)
-                              ->where(array($fieldName => $password, $table[0] => $table[1]));
-                         $statement = $sql->prepareStatementForSqlObject($select);
-                         $result = $statement->execute();
-                         $data = count($result);
-                    } else {
-                         $select = $sql->select()
-                              ->from($tableName)
-                              ->where(array("$fieldName='$value'", $table[0] . "!=" . "'$table[1]'"));
-                         $statement = $sql->prepareStatementForSqlObject($select);
-                         $result = $statement->execute();
-                         $data = count($result);
-                    }
+
+                    $select = $sql->select()
+                         ->from($tableName)
+                         ->where(["$fieldName='$value'", $table[0] . "!=" . "'$table[1]'"]);
+                    $statement = $sql->prepareStatementForSqlObject($select);
+                    $result = $statement->execute();
+                    $data = count($result);
                }
                return $data;
           } catch (Exception $exc) {
@@ -587,7 +580,7 @@ class CommonService
           }
 
           $extension = strtolower(pathinfo($_FILES['referenceFile']['name'], PATHINFO_EXTENSION));
-          $newFileName = CommonService::generateRandomString(12) . "." . $extension;
+          $newFileName = self::generateRandomString(12) . "." . $extension;
           $fileName = TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . "vlsm-vl" . DIRECTORY_SEPARATOR . $newFileName;
 
           if (move_uploaded_file($_FILES['referenceFile']['tmp_name'], $fileName)) {
@@ -1163,9 +1156,9 @@ class CommonService
                          $output = [];
 
                          $today = new DateTimeImmutable();
-                         $twoWeekExpiry = $today->sub(\DateInterval::createFromDateString('2 weeks'));
+                         $twoWeekExpiry = $today->sub(DateInterval::createFromDateString('2 weeks'));
                          //$twoWeekExpiry = date("Y-m-d", strtotime(date("Y-m-d") . '-2 weeks'));
-                         $threeWeekExpiry = $today->sub(\DateInterval::createFromDateString('4 weeks'));
+                         $threeWeekExpiry = $today->sub(DateInterval::createFromDateString('4 weeks'));
 
                          foreach ($sResult as $aRow) {
                               $row = [];
@@ -1176,8 +1169,6 @@ class CommonService
                               $latest = new DateTimeImmutable($aRow['latest']);
 
                               $latest = (empty($aRow['latest'])) ? null : new DateTimeImmutable($aRow['latest']);
-                              // $twoWeekExpiry = new DateTimeImmutable($twoWeekExpiry);
-                              // $threeWeekExpiry = new DateTimeImmutable($threeWeekExpiry);
 
                               if (!$latest instanceof DateTimeImmutable) {
                                    $_color = "f08080";
@@ -1194,30 +1185,30 @@ class CommonService
                               $row[] = (isset($aRow['latest']) && !empty($aRow['latest'])) ? self::humanReadableDateFormat($aRow['latest']) : "";
                               $output[] = $row;
                          }
-                         $styleArray = array(
-                              'font' => array(
+                         $styleArray = [
+                              'font' => [
                                    'bold' => true,
-                              ),
-                              'alignment' => array(
-                                   'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
-                                   'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
-                              ),
-                              'borders' => array(
-                                   'outline' => array(
-                                        'style' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
-                                   ),
-                              )
-                         );
-                         $borderStyle = array(
-                              'alignment' => array(
-                                   'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT,
-                              ),
-                              'borders' => array(
-                                   'outline' => array(
-                                        'style' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
-                                   ),
-                              )
-                         );
+                              ],
+                              'alignment' => [
+                                   'horizontal' => Alignment::HORIZONTAL_CENTER,
+                                   'vertical' => Alignment::VERTICAL_CENTER,
+                              ],
+                              'borders' => [
+                                   'outline' => [
+                                        'style' => Border::BORDER_THIN,
+                                   ],
+                              ]
+                         ];
+                         $borderStyle = [
+                              'alignment' => [
+                                   'horizontal' => Alignment::HORIZONTAL_LEFT,
+                              ],
+                              'borders' => [
+                                   'outline' => [
+                                        'style' => Border::BORDER_THIN,
+                                   ],
+                              ]
+                         ];
 
                          $sheet->setCellValue('A1', html_entity_decode($translator->translate('Lab Name'), ENT_QUOTES, 'UTF-8'));
                          $sheet->setCellValue('B1', html_entity_decode($translator->translate('Last Synced on'), ENT_QUOTES, 'UTF-8'));
@@ -1231,19 +1222,17 @@ class CommonService
                               $colNo = 1;
                               foreach ($rowData as $field => $value) {
                                    $rRowCount = ($rowNo + 2);
-                                   $sheet->getCellByColumnAndRow($colNo, $rRowCount)->setValueExplicit(html_entity_decode($value));
-                                   // echo "Col : ".$colNo ." => Row : " . $rRowCount . " => Color : " .$color[$colorNo]['color'];
-                                   // echo "<br>";
-                                   $cellName = $sheet->getCellByColumnAndRow($colNo, $rRowCount)->getColumn();
-                                   $sheet->getStyle($cellName . $rRowCount)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB($color[$colorNo]['color']);
-                                   $sheet->getStyle($cellName . $rRowCount)->applyFromArray($borderStyle);
+
+                                   $sheet->setCellValue(Coordinate::stringFromColumnIndex($colNo) . $rRowCount, html_entity_decode($value, ENT_QUOTES, 'UTF-8'));
+                                   $sheet->getStyle(Coordinate::stringFromColumnIndex($colNo) . $rRowCount)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB($color[$colorNo]['color']);
+                                   $sheet->getStyle(Coordinate::stringFromColumnIndex($colNo) . $rRowCount)->applyFromArray($borderStyle);
                                    $sheet->getDefaultRowDimension()->setRowHeight(18);
                                    $sheet->getColumnDimensionByColumn($colNo)->setWidth(30);
                                    $colNo++;
                               }
                               $colorNo++;
                          }
-                         $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($excel, 'Xlsx');
+                         $writer = IOFactory::createWriter($excel, 'Xlsx');
                          $filename = 'SAMPLE-SYNC-STATUS-REPORT--' . date('d-M-Y-H-i-s') . '.xlsx';
                          $writer->save(TEMP_UPLOAD_PATH . DIRECTORY_SEPARATOR . $filename);
                          return $filename;
