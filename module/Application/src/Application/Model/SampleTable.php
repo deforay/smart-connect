@@ -8,6 +8,7 @@ use Laminas\Session\Container;
 use Laminas\Db\Adapter\Adapter;
 use Application\Service\CommonService;
 use Laminas\Db\TableGateway\AbstractTableGateway;
+use Laminas\Db\Sql\Predicate\Expression as WhereExpression;
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -1514,15 +1515,15 @@ class SampleTable extends AbstractTableGateway
                         "nsLesserThan1000" => new Expression("SUM(CASE WHEN ((vl.patient_gender IS NULL OR vl.patient_gender = '' OR vl.patient_gender ='Not Recorded' OR vl.patient_gender = 'not recorded' OR vl.patient_gender = 'Unreported' OR vl.patient_gender = 'unreported') and (vl.vl_result_category like 'suppressed%' OR vl.vl_result_category like 'Suppressed%' )) THEN 1 ELSE 0 END)"),
                     )
                 )
-                ->where("DATE(vl.sample_collection_date) BETWEEN '$startDate' AND '$endDate'");
+                ->where(new WhereExpression('DATE(vl.sample_collection_date) BETWEEN ? AND ?', [$startDate, $endDate]));
 
             if (isset($params['clinicId']) && trim($params['clinicId']) != '') {
                 $clinicIds = explode(',', $params['clinicId']);
-                $query->where('vl.facility_id IN (' . implode(',', array_fill(0, count($clinicIds), '?')) . ')', $clinicIds);
+                $query->where(new WhereExpression('vl.facility_id IN (' . implode(',', array_fill(0, count($clinicIds), '?')) . ')', $clinicIds));
             } elseif ($loginContainer->role != 1) {
                 $mappedFacilities = $loginContainer->mappedFacilities ?? [];
                 if (!empty($mappedFacilities)) {
-                    $query->where('vl.facility_id IN (' . implode(',', array_fill(0, count($mappedFacilities), '?')) . ')', $mappedFacilities);
+                    $query->where(new WhereExpression('vl.facility_id IN (' . implode(',', array_fill(0, count($mappedFacilities), '?')) . ')', $mappedFacilities));
                 }
             }
 
@@ -1534,7 +1535,7 @@ class SampleTable extends AbstractTableGateway
 
             if (isset($params['sampleTypeId']) && $params['sampleTypeId'] != '') {
                 $sampleTypeId = base64_decode(trim($params['sampleTypeId']));
-                $query->where('vl.specimen_type = ?', [$sampleTypeId]);
+                $query->where(new WhereExpression('vl.specimen_type = ?', [$sampleTypeId]));
             }
 
             if (isset($params['age']) && trim($params['age']) != '') {
@@ -1602,7 +1603,7 @@ class SampleTable extends AbstractTableGateway
             }
 
             $queryStr = $sql->buildSqlString($query);
-
+            //echo $queryStr;die;
             $sampleResult = $this->commonService->cacheQuery($queryStr, $dbAdapter);
             $j = 0;
             foreach ($sampleResult as $sample) {
@@ -1656,15 +1657,15 @@ class SampleTable extends AbstractTableGateway
 
                     )
                 )
-                ->where("DATE(vl.sample_collection_date) BETWEEN '$startDate' AND '$endDate'");
+                ->where(new WhereExpression('DATE(vl.sample_collection_date) BETWEEN ? AND ?', [$startDate, $endDate]));
 
             if (isset($params['clinicId']) && trim($params['clinicId']) != '') {
                 $clinicIds = explode(',', $params['clinicId']);
-                $query->where('vl.facility_id IN (' . implode(',', array_fill(0, count($clinicIds), '?')) . ')', $clinicIds);
+                $query->where(new WhereExpression('vl.facility_id IN (' . implode(',', array_fill(0, count($clinicIds), '?')) . ')', $clinicIds));
             } elseif ($loginContainer->role != 1) {
                 $mappedFacilities = $loginContainer->mappedFacilities ?? [];
                 if (!empty($mappedFacilities)) {
-                    $query->where('vl.facility_id IN (' . implode(',', array_fill(0, count($mappedFacilities), '?')) . ')', $mappedFacilities);
+                    $query->where(new WhereExpression('vl.facility_id IN (' . implode(',', array_fill(0, count($mappedFacilities), '?')) . ')', $mappedFacilities));
                 }
             }
 
@@ -1676,7 +1677,7 @@ class SampleTable extends AbstractTableGateway
 
             if (isset($params['sampleTypeId']) && $params['sampleTypeId'] != '') {
                 $sampleTypeId = base64_decode(trim($params['sampleTypeId']));
-                $query->where('vl.specimen_type = ?', [$sampleTypeId]);
+                $query->where(new WhereExpression('vl.specimen_type = ?', [$sampleTypeId]));
             }
 
             if (isset($params['age']) && trim($params['age']) != '') {
@@ -1710,7 +1711,7 @@ class SampleTable extends AbstractTableGateway
             }
 
             if (isset($params['adherence']) && trim($params['adherence']) != '') {
-                $query->where("vl.arv_adherance_percentage = ?", $params['adherence']);
+                $query->where(new WhereExpression("vl.arv_adherance_percentage = ?", $params['adherence']));
             }
 
             if (isset($params['gender'])) {
@@ -1806,15 +1807,15 @@ class SampleTable extends AbstractTableGateway
                         "AgeLtVLLt1000" => $caseQuery2,
                     )
                 )
-                ->where("DATE(vl.sample_collection_date) BETWEEN '$startDate' AND '$endDate'");
+                ->where(new WhereExpression('DATE(vl.sample_collection_date) BETWEEN ? AND ?', [$startDate, $endDate]));
 
             if (isset($params['clinicId']) && trim($params['clinicId']) != '') {
                 $clinicIds = explode(',', $params['clinicId']);
-                $query->where('vl.facility_id IN (' . implode(',', array_fill(0, count($clinicIds), '?')) . ')', $clinicIds);
+                $query->where(new WhereExpression('vl.facility_id IN (' . implode(',', array_fill(0, count($clinicIds), '?')) . ')', $clinicIds));
             } elseif ($loginContainer->role != 1) {
                 $mappedFacilities = $loginContainer->mappedFacilities ?? [];
                 if (!empty($mappedFacilities)) {
-                    $query->where('vl.facility_id IN (' . implode(',', array_fill(0, count($mappedFacilities), '?')) . ')', $mappedFacilities);
+                    $query->where(new WhereExpression('vl.facility_id IN (' . implode(',', array_fill(0, count($mappedFacilities), '?')) . ')', $mappedFacilities));
                 }
             }
 
@@ -1826,11 +1827,11 @@ class SampleTable extends AbstractTableGateway
 
             if (isset($params['sampleTypeId']) && $params['sampleTypeId'] != '') {
                 $sampleTypeId = base64_decode(trim($params['sampleTypeId']));
-                $query->where('vl.specimen_type = ?', [$sampleTypeId]);
+                $query->where(new WhereExpression('vl.specimen_type = ?', [$sampleTypeId]));
             }
 
             if (isset($params['adherence']) && trim($params['adherence']) != '') {
-                $query->where("vl.arv_adherance_percentage = ?", $params['adherence']);
+                $query->where(new WhereExpression("vl.arv_adherance_percentage = ?", $params['adherence']));
             }
 
             if (isset($params['gender'])) {
@@ -1932,15 +1933,15 @@ class SampleTable extends AbstractTableGateway
 
                     )
                 )
-                ->where("DATE(vl.sample_collection_date) BETWEEN '$startDate' AND '$endDate'");
+                ->where(new WhereExpression('DATE(vl.sample_collection_date) BETWEEN ? AND ?', [$startDate, $endDate]));
 
             if (isset($params['clinicId']) && trim($params['clinicId']) != '') {
                 $clinicIds = explode(',', $params['clinicId']);
-                $query->where('vl.facility_id IN (' . implode(',', array_fill(0, count($clinicIds), '?')) . ')', $clinicIds);
+                $query->where(new WhereExpression('vl.facility_id IN (' . implode(',', array_fill(0, count($clinicIds), '?')) . ')', $clinicIds));
             } elseif ($loginContainer->role != 1) {
                 $mappedFacilities = $loginContainer->mappedFacilities ?? [];
                 if (!empty($mappedFacilities)) {
-                    $query->where('vl.facility_id IN (' . implode(',', array_fill(0, count($mappedFacilities), '?')) . ')', $mappedFacilities);
+                    $query->where(new WhereExpression('vl.facility_id IN (' . implode(',', array_fill(0, count($mappedFacilities), '?')) . ')', $mappedFacilities));
                 }
             }
 
@@ -1952,11 +1953,11 @@ class SampleTable extends AbstractTableGateway
 
             if (isset($params['sampleTypeId']) && $params['sampleTypeId'] != '') {
                 $sampleTypeId = base64_decode(trim($params['sampleTypeId']));
-                $query->where('vl.specimen_type = ?', [$sampleTypeId]);
+                $query->where(new WhereExpression('vl.specimen_type = ?', [$sampleTypeId]));
             }
 
             if (isset($params['adherence']) && trim($params['adherence']) != '') {
-                $query->where("vl.arv_adherance_percentage = ?", $params['adherence']);
+                $query->where(new WhereExpression("vl.arv_adherance_percentage = ?", $params['adherence']));
             }
 
             if (isset($params['gender'])) {
@@ -2032,18 +2033,18 @@ class SampleTable extends AbstractTableGateway
             $rQuery = $sql->select()->from(array('vl' => $this->table))
                 ->columns(array('total' => new Expression('COUNT(*)'), 'monthDate' => new Expression("DATE_FORMAT(DATE(sample_collection_date), '%d-%M-%Y')")))
                 ->join(array('tr' => 'r_vl_test_reasons'), 'tr.test_reason_id=vl.reason_for_vl_testing', array('test_reason_name'))
-                ->where("DATE(vl.sample_collection_date) BETWEEN '$startDate' AND '$endDate'")
+                ->where(new WhereExpression('DATE(vl.sample_collection_date) BETWEEN ? AND ?', [$startDate, $endDate]))
                 //->where('vl.facility_id !=0')
                 //->where('vl.reason_for_vl_testing="'.$reason['test_reason_id'].'"');
                 ->group('tr.test_reason_id');
 
             if (isset($params['clinicId']) && trim($params['clinicId']) != '') {
                 $clinicIds = explode(',', $params['clinicId']);
-                $rQuery->where('vl.facility_id IN (' . implode(',', array_fill(0, count($clinicIds), '?')) . ')', $clinicIds);
+                $rQuery->where(new WhereExpression('vl.facility_id IN (' . implode(',', array_fill(0, count($clinicIds), '?')) . ')', $clinicIds));
             } elseif ($loginContainer->role != 1) {
                 $mappedFacilities = $loginContainer->mappedFacilities ?? [];
                 if (!empty($mappedFacilities)) {
-                    $rQuery->where('vl.facility_id IN (' . implode(',', array_fill(0, count($mappedFacilities), '?')) . ')', $mappedFacilities);
+                    $rQuery->where(new WhereExpression('vl.facility_id IN (' . implode(',', array_fill(0, count($mappedFacilities), '?')) . ')', $mappedFacilities));
                 }
             }
 
@@ -2055,7 +2056,7 @@ class SampleTable extends AbstractTableGateway
 
             if (isset($params['sampleTypeId']) && $params['sampleTypeId'] != '') {
                 $sampleTypeId = base64_decode(trim($params['sampleTypeId']));
-                $rQuery->where('vl.specimen_type = ?', [$sampleTypeId]);
+                $rQuery->where(new WhereExpression('vl.specimen_type = ?', [$sampleTypeId]));
             }
 
             if (isset($params['age']) && trim($params['age']) != '') {
@@ -2089,7 +2090,7 @@ class SampleTable extends AbstractTableGateway
             }
 
             if (isset($params['adherence']) && trim($params['adherence']) != '') {
-                $rQuery->where("vl.arv_adherance_percentage = ?", $params['adherence']);
+                $rQuery->where(new WhereExpression("vl.arv_adherance_percentage = ?", $params['adherence']));
 
             }
             if (isset($params['gender'])) {
@@ -2123,7 +2124,7 @@ class SampleTable extends AbstractTableGateway
             }
             
             if (isset($params['testReason']) && trim($params['testReason']) != '') {
-                $rQuery->where(array("vl.reason_for_vl_testing ='" . base64_decode($params['testReason']) . "'"));
+                $rQuery->where(new WhereExpression("vl.reason_for_vl_testing ='" . base64_decode($params['testReason']) . "'"));
             }
 
             $rQueryStr = $sql->buildSqlString($rQuery);
@@ -2456,14 +2457,14 @@ class SampleTable extends AbstractTableGateway
                         "OLesserThan1000" => new Expression("SUM(CASE WHEN (vl.specimen_type!=$this->dbsId AND (vl.vl_result_category like 'suppressed%' OR vl.vl_result_category like 'Suppressed%' )) THEN 1 ELSE 0 END)"),
                     )
                 )
-                ->where("DATE(vl.sample_collection_date) BETWEEN '$startDate' AND '$endDate'");
+                ->where(new WhereExpression('DATE(vl.sample_collection_date) BETWEEN ? AND ?', [$startDate, $endDate]));
 
             if (isset($params['clinicId']) && trim($params['clinicId']) != '') {
                 $clinicIds = explode(',', $params['clinicId']);
-                $query->where('vl.facility_id IN (' . implode(',', array_fill(0, count($clinicIds), '?')) . ')', $clinicIds);
+                $query->where(new WhereExpression('vl.facility_id IN (' . implode(',', array_fill(0, count($clinicIds), '?')) . ')', $clinicIds));
             } elseif ($loginContainer->role != 1) {
                 $mappedFacilities = $loginContainer->mappedFacilities ?? [];
-                $query->where('vl.facility_id IN ("' . implode('", "', $mappedFacilities) . '")');
+                $query->where(new WhereExpression('vl.facility_id IN ("' . implode('", "', $mappedFacilities) . '")'));
             }
 
             if (isset($params['testResult']) && $params['testResult'] == '<1000') {
@@ -2474,13 +2475,13 @@ class SampleTable extends AbstractTableGateway
 
             if (isset($params['frmSrc']) && $params['frmSrc'] == 'change') {
                 if (isset($params['sampleType']) && $params['sampleType'] == 'dbs') {
-                    $query->where("vl.specimen_type = $this->dbsId");
+                    $query->where(new WhereExpression("vl.specimen_type = $this->dbsId"));
                 } elseif (isset($params['sampleType']) && $params['sampleType'] == 'others') {
-                    $query->where("vl.specimen_type != $this->dbsId");
+                    $query->where(new WhereExpression("vl.specimen_type != $this->dbsId"));
                 }
             } elseif (isset($params['sampleTypeId']) && $params['sampleTypeId'] != '') {
                 $sampleTypeId = base64_decode(trim($params['sampleTypeId']));
-                $query->where('vl.specimen_type = ?', [$sampleTypeId]);
+                $query->where(new WhereExpression('vl.specimen_type = ?', [$sampleTypeId]));
             }
 
             if (isset($params['age']) && trim($params['age']) != '') {
@@ -2514,7 +2515,7 @@ class SampleTable extends AbstractTableGateway
             }
 
             if (isset($params['adherence']) && trim($params['adherence']) != '') {
-                $query->where("vl.arv_adherance_percentage = ?", $params['adherence']);
+                $query->where(new WhereExpression("vl.arv_adherance_percentage = ?", $params['adherence']));
             }
 
             if (isset($params['gender'])) {
@@ -7211,30 +7212,30 @@ class SampleTable extends AbstractTableGateway
                     )
                 )
                 ->join(array('tr' => 'r_vl_test_reasons'), 'tr.test_reason_id=vl.reason_for_vl_testing', array('test_reason_name'))
-                ->where("DATE(vl.sample_collection_date) BETWEEN '$startDate' AND '$endDate'");
+                ->where(new WhereExpression('DATE(vl.sample_collection_date) BETWEEN ? AND ?', [$startDate, $endDate]));
             
             if (isset($params['clinicId']) && trim($params['clinicId']) != '') {
                 $clinicIds = explode(',', $params['clinicId']);
-                $rQuery->where('vl.facility_id IN (' . implode(',', array_fill(0, count($clinicIds), '?')) . ')', $clinicIds);
+                $rQuery->where(new WhereExpression('vl.facility_id IN (' . implode(',', array_fill(0, count($clinicIds), '?')) . ')', $clinicIds));
             } elseif ($loginContainer->role != 1) {
                 $mappedFacilities = $loginContainer->mappedFacilities ?? [];
                 if (!empty($mappedFacilities)) {
-                    $rQuery->where('vl.facility_id IN (' . implode(',', array_fill(0, count($mappedFacilities), '?')) . ')', $mappedFacilities);
+                    $rQuery->where(new WhereExpression('vl.facility_id IN (' . implode(',', array_fill(0, count($mappedFacilities), '?')) . ')', $mappedFacilities));
                 }
             }
 
             if (isset($params['testReason']) && trim($params['testReason']) != '') {
                 $testReasonIds = explode(',', $params['testReason']);
-                $rQuery->where('vl.reason_for_vl_testing IN (' . implode(',', array_fill(0, count($testReasonIds), '?')) . ')', $testReasonIds);
+                $rQuery->where(new WhereExpression('vl.reason_for_vl_testing IN (' . implode(',', array_fill(0, count($testReasonIds), '?')) . ')', $testReasonIds));
             }
 
             if (isset($params['sampleTypeId']) && $params['sampleTypeId'] != '') {
                 $sampleTypeId = base64_decode(trim($params['sampleTypeId']));
-                $rQuery->where('vl.specimen_type = ?', [$sampleTypeId]);
+                $rQuery->where(new WhereExpression('vl.specimen_type = ?', [$sampleTypeId]));
             }
 
             if (isset($params['adherence']) && trim($params['adherence']) != '') {
-                $rQuery->where("vl.arv_adherance_percentage = ?", $params['adherence']);
+                $rQuery->where(new WhereExpression("vl.arv_adherance_percentage = ?", $params['adherence']));
             }
 
             if (isset($params['testResult']) && $params['testResult'] == '<1000') {
@@ -7340,28 +7341,28 @@ class SampleTable extends AbstractTableGateway
                     )
                 )
                 ->join(array('tr' => 'r_vl_test_reasons'), 'tr.test_reason_id=vl.reason_for_vl_testing', array('test_reason_name'))
-                ->where("DATE(vl.sample_collection_date) BETWEEN '$startDate' AND '$endDate'");
+                ->where(new WhereExpression('DATE(vl.sample_collection_date) BETWEEN ? AND ?', [$startDate, $endDate]));
 
             if (isset($params['clinicId']) && trim($params['clinicId']) != '') {
                 $clinicIds = explode(',', $params['clinicId']);
-                $rQuery->where('vl.facility_id IN (' . implode(',', array_fill(0, count($clinicIds), '?')) . ')', $clinicIds);
+                $rQuery->where(new WhereExpression('vl.facility_id IN (' . implode(',', array_fill(0, count($clinicIds), '?')) . ')', $clinicIds));
             } elseif ($loginContainer->role != 1) {
                 $mappedFacilities = $loginContainer->mappedFacilities ?? [];
                 if (!empty($mappedFacilities)) {
-                    $rQuery->where('vl.facility_id IN (' . implode(',', array_fill(0, count($mappedFacilities), '?')) . ')', $mappedFacilities);
+                    $rQuery->where(new WhereExpression('vl.facility_id IN (' . implode(',', array_fill(0, count($mappedFacilities), '?')) . ')', $mappedFacilities));
                 }
             }
             if (isset($params['testReason']) && trim($params['testReason']) != '') {
                 $testReasonIds = explode(',', $params['testReason']);
-                $rQuery->where('vl.reason_for_vl_testing IN (' . implode(',', array_fill(0, count($testReasonIds), '?')) . ')', $testReasonIds);
+                $rQuery->where(new WhereExpression('vl.reason_for_vl_testing IN (' . implode(',', array_fill(0, count($testReasonIds), '?')) . ')', $testReasonIds));
             }
 
             if (isset($params['sampleTypeId']) && $params['sampleTypeId'] != '') {
                 $sampleTypeId = base64_decode(trim($params['sampleTypeId']));
-                $rQuery->where('vl.specimen_type = ?', [$sampleTypeId]);
+                $rQuery->where(new WhereExpression('vl.specimen_type = ?', [$sampleTypeId]));
             }
             if (isset($params['adherence']) && trim($params['adherence']) != '') {
-                $rQuery->where("vl.arv_adherance_percentage = ?", $params['adherence']);
+                $rQuery->where(new WhereExpression("vl.arv_adherance_percentage = ?", $params['adherence']));
             }
 
             if (isset($params['testResult']) && $params['testResult'] == '<1000') {
