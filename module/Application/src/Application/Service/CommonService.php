@@ -174,10 +174,7 @@ class CommonService
           if (false === self::verifyIfDateValid($date)) {
                return null;
           } else {
-               $format = "Y-m-d";
-               if ($includeTime === true) {
-                    $format .= " H:i:s";
-               }
+               $format = ($includeTime !== true) ? "Y-m-d" : "Y-m-d H:i:s";
                return (new DateTimeImmutable($date))->format($format);
           }
      }
@@ -185,15 +182,18 @@ class CommonService
 
      // Returns the given date in d-M-Y format
      // (with or without time depending on the $includeTime parameter)
-     public static function humanReadableDateFormat($date, $includeTime = false, $dateFormat = "d-M-Y", $timeFormat = "H:i:s")
+     public static function humanReadableDateFormat($date, $includeTime = false, $format = "d-M-Y", $withSeconds = false)
      {
           $date = trim($date);
           if (false === self::verifyIfDateValid($date)) {
                return null;
           } else {
+               // Check if the format already includes time components
+               $hasTimeComponent = preg_match('/[HhGgis]/', $format);
 
-               if ($includeTime === true) {
-                    $format = $dateFormat . " " . $timeFormat;
+               // If the format doesn't have a time component and $includeTime is true, append the appropriate time format
+               if ($includeTime && !$hasTimeComponent) {
+                    $format .= $withSeconds ? ' H:i:s' : ' H:i';
                }
 
                return (new DateTimeImmutable($date))->format($format);

@@ -69,9 +69,7 @@ INSERT IGNORE INTO dash_form_hepatitis SELECT * FROM vlsm.form_hepatitis;
 INSERT IGNORE INTO dash_form_tb SELECT * FROM vlsm.form_tb;
 
 
-
-UPDATE facility_details
-SET facility_attributes = JSON_SET(COALESCE(facility_attributes, '{}'), '$.lastDashboardHeartBeat', (
+UPDATE facility_details SET facility_attributes = JSON_SET(COALESCE(facility_attributes, '{}'), '$.lastDashboardHeartBeat', (
         SELECT MAX(last_modified_datetime)
         FROM dash_form_vl
         WHERE facility_details.facility_id = dash_form_vl.lab_id

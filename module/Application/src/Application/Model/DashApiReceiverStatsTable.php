@@ -2,13 +2,12 @@
 
 namespace Application\Model;
 
+use Laminas\Json\Expr;
+use Laminas\Db\Sql\Sql;
 use Laminas\Session\Container;
 use Laminas\Db\Adapter\Adapter;
-use Laminas\Db\Sql\Sql;
-use Laminas\Db\Sql\Expression;
-use Laminas\Db\TableGateway\AbstractTableGateway;
 use \Application\Service\CommonService;
-use Laminas\Json\Expr;
+use Laminas\Db\TableGateway\AbstractTableGateway;
 
 class DashApiReceiverStatsTable extends AbstractTableGateway
 {
@@ -107,9 +106,10 @@ class DashApiReceiverStatsTable extends AbstractTableGateway
          */
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
-        $sQuery = $sql->select()->from(array('f' => "facility_details"))->columns(array("facility_id", "labName" => "facility_name"))
-            ->join(array('sync' => $this->table), "sync.lab_id=f.facility_id", array("*"), 'left')
-            ->where(array("facility_type" => 2));
+        $sQuery = $sql->select()->from(['f' => "facility_details"])
+            ->columns(["facility_id", "labName" => "facility_name"])
+            ->join(['sync' => $this->table], "sync.lab_id=f.facility_id", ["*"], 'left')
+            ->where(["facility_type" => 2]);
 
         if (isset($sWhere) && $sWhere != "") {
             $sQuery->where($sWhere);
@@ -183,14 +183,14 @@ class DashApiReceiverStatsTable extends AbstractTableGateway
         $dbAdapter = $this->adapter;
         $sql = new Sql($dbAdapter);
         $sQuery = $sql->select()->from(array('f' => "facility_details"))
-            ->columns(array("facility_id", "labName" => "facility_name"))
-            ->join(array('sync' => $this->table), "sync.lab_id=f.facility_id", array("*"), 'left')
-            ->where(array(
+            ->columns(["facility_id", "labName" => "facility_name"])
+            ->join(['sync' => $this->table], "sync.lab_id=f.facility_id", ["*"], 'left')
+            ->where([
                 "facility_type" => 2,
                 "facility_id" => $statusId,
                 "unix_timestamp(received_on) >= now()-interval 3 month"
-            ))
-            ->group(array(new Expr("DATE_FORMAT(received_on, '%m-%d')"), "lab_id"));
+            ])
+            ->group([new Expr("DATE_FORMAT(received_on, '%m-%d')"), "lab_id"]);
         $sQueryStr = $sql->buildSqlString($sQuery);
         die($sQueryStr);
         return $dbAdapter->query($sQueryStr, $dbAdapter::QUERY_MODE_EXECUTE)->toArray();
@@ -258,7 +258,7 @@ class DashApiReceiverStatsTable extends AbstractTableGateway
             "UPDATE " . $params['table'] .
                 " SET form_attributes = JSON_SET(COALESCE(form_attributes, '{}'), '$.lastDashboardHeartBeat', ?) " .
                 " WHERE " . $params['field'] . " IN (?)",
-            array($currentDateTime, $params['id'])
+            [$currentDateTime, $params['id']]
         );
     }
 
@@ -266,10 +266,9 @@ class DashApiReceiverStatsTable extends AbstractTableGateway
     {
         $currentDateTime = $currentDateTime ?? CommonService::getDateTime();
         return $this->adapter->query(
-            "UPDATE facility_details
-                SET facility_attributes = JSON_SET(COALESCE(facility_attributes, '{}'), '$.lastDashboardHeartBeat', ?, '$.lastUpdateSource', ?)
+            "UPDATE facility_details SET facility_attributes = JSON_SET(COALESCE(facility_attributes, '{}'), '$.lastDashboardHeartBeat', ?, '$.lastUpdateSource', ?)
                 WHERE facility_id IN (?)",
-            array($currentDateTime, $facilityId, $lastUpdateSource)
+            [$currentDateTime, $facilityId, $lastUpdateSource]
         );
     }
 }
